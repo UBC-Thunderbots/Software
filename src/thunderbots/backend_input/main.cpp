@@ -1,10 +1,11 @@
 #include <ros/ros.h>
 #include <iostream>
 #include "backend_input/filter/ball_filter.h"
-#include "backend_input/vision_client/robocup_ssl_client.h"
 #include "backend_input/message_util.h"
+#include "backend_input/vision_client/robocup_ssl_client.h"
 #include "geom/point.h"
 #include "thunderbots_msgs/Ball.h"
+#include "thunderbots_msgs/Field.h"
 
 int main(int argc, char **argv)
 {
@@ -15,6 +16,8 @@ int main(int argc, char **argv)
     // Create publishers
     ros::Publisher ball_publisher =
         n.advertise<thunderbots_msgs::Ball>("backend/ball", 1);
+    ros::Publisher field_publisher =
+        n.advertise<thunderbots_msgs::Field>("backend/field", 1);
 
     // Set up the SSL Client to receive data over the network
     RoboCupSSLClient vision_client = RoboCupSSLClient(10020, "224.5.23.2");
@@ -33,8 +36,8 @@ int main(int argc, char **argv)
             {
                 const SSL_GeometryData &geom       = packet.geometry();
                 const SSL_GeometryFieldSize &field = geom.field();
-                std::cout << "Field boundary width is: " << field.boundary_width()
-                          << std::endl;
+                thunderbots_msgs::Field field_msg  = VisionUtil::createFieldMsg(field);
+                field_publisher.publish(field_msg);
             }
 
             if (packet.has_detection())

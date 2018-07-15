@@ -2,11 +2,23 @@
 #define THUNDERBOTS_VISION_UTIL_H
 
 #include "geom/point.h"
+#include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "thunderbots_msgs/Ball.h"
+#include "thunderbots_msgs/Field.h"
 
 class VisionUtil
 {
    public:
+    /**
+     * Creates a Field msg given raw SSL Field Geometry data
+     *
+     * @param field_data the SSL Geometry packet containing field geometry data
+     *
+     * @return a Field message containing the field geometry information
+     */
+    static thunderbots_msgs::Field createFieldMsg(
+        const SSL_GeometryFieldSize &field_data);
+
     /**
      * Creates a Ball msg given the position and velocity of a ball
      *
