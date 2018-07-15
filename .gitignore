@@ -1,3 +1,7 @@
+# Compiled proto files
+*.pb.cc
+*.pb.h
+
 # ROS and catkin
 /src/CMakeLists.txt
 /build
