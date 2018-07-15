@@ -69,7 +69,7 @@ if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
     fi
 
     # Check if we need to change any files
-    output="$($CURR_DIR/clang_format/git-clang-format --binary $CURR_DIR/clang-format/clang-format-$CLANG_VERSION --commit $BASE_COMMIT --diff)"
+    output="$($CURR_DIR/clang_format/git-clang-format --binary $CURR_DIR/clang_format/clang-format-$CLANG_VERSION --commit $BASE_COMMIT --diff)"
     if [[ $output == *"no modified files to format"* ]] || [[ $output == *"clang-format did not modify any files"* ]] ; then
         echo "clang-format passed :D"
         exit 0
