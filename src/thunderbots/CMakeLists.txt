@@ -59,6 +59,8 @@ add_executable (backend_input
         backend_input/vision_client/netraw_util.h
         backend_input/vision_client/robocup_ssl_client.cpp
         backend_input/vision_client/robocup_ssl_client.h
+        geom/point.h
+        geom/angle.h
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
