@@ -67,3 +67,24 @@ add_executable (backend_input
 add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
 target_link_libraries(backend_input ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES})
+
+
+#############
+## Testing ##
+#############
+
+## Add gtest based cpp test target and link libraries
+if (CATKIN_ENABLE_TESTING)
+    #gtest
+    catkin_add_gtest(geom_angle_test
+            geom/test/angle.cpp
+            geom/angle.h
+            )
+    target_link_libraries(geom_angle_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(geom_point_test
+            geom/test/point.cpp
+            geom/point.h
+            )
+    target_link_libraries(geom_point_test ${catkin_LIBRARIES})
+endif()
