@@ -59,6 +59,10 @@ add_executable (backend_input
         backend_input/vision_client/netraw_util.h
         backend_input/vision_client/robocup_ssl_client.cpp
         backend_input/vision_client/robocup_ssl_client.h
+        backend_input/message_util.cpp
+        backend_input/message_util.h
+        backend_input/filter/ball_filter.cpp
+        backend_input/filter/ball_filter.h
         geom/point.h
         geom/angle.h
         )
