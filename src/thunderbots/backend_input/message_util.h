@@ -1,5 +1,5 @@
-#ifndef THUNDERBOTS_VISION_UTIL_H
-#define THUNDERBOTS_VISION_UTIL_H
+#ifndef BACKEND_INPUT_MESSAGE_UTIL_H_
+#define BACKEND_INPUT_MESSAGE_UTIL_H_
 
 #include <backend_input/filter/robot_team_filter.h>
 #include "geom/point.h"
@@ -53,4 +53,4 @@ class VisionUtil
         const std::vector<FilteredRobotData> &team_data);
 };
 
-#endif  // THUNDERBOTS_VISION_UTIL_H
+#endif  // BACKEND_INPUT_MESSAGE_UTIL_H_
