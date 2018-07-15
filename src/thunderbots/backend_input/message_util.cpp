@@ -93,3 +93,35 @@ thunderbots_msgs::Ball VisionUtil::createBallMsg(
 
     return ball_msg;
 }
+
+thunderbots_msgs::Robot VisionUtil::createRobotMsg(const FilteredRobotData &robot_data)
+{
+    thunderbots_msgs::Robot robot_msg;
+
+    robot_msg.id = robot_data.id;
+
+    robot_msg.position.x = robot_data.position.x();
+    robot_msg.position.y = robot_data.position.y();
+
+    robot_msg.velocity.x = robot_data.velocity.x();
+    robot_msg.velocity.y = robot_data.velocity.y();
+
+    robot_msg.orientation = robot_data.orientation.toRadians();
+
+    return robot_msg;
+}
+
+thunderbots_msgs::Team VisionUtil::createTeamMsg(
+    const std::vector<FilteredRobotData> &team_data)
+{
+    thunderbots_msgs::Team team_msg;
+    team_msg.robots.clear();
+
+    for (FilteredRobotData filtered_robot_data : team_data)
+    {
+        thunderbots_msgs::Robot robot_msg = createRobotMsg(filtered_robot_data);
+        team_msg.robots.emplace_back(robot_msg);
+    }
+
+    return team_msg;
+}

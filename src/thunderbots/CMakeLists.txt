@@ -63,6 +63,10 @@ add_executable (backend_input
         backend_input/message_util.h
         backend_input/filter/ball_filter.cpp
         backend_input/filter/ball_filter.h
+        backend_input/filter/robot_filter.cpp
+        backend_input/filter/robot_filter.h
+        backend_input/filter/robot_team_filter.cpp
+        backend_input/filter/robot_team_filter.h
         geom/point.h
         geom/angle.h
         )
