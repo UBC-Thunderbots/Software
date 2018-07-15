@@ -50,3 +50,18 @@ include_directories(
 )
 
 file(GLOB PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
+
+add_executable (backend_input
+        ${PROTO_SRCS}
+        backend_input/main.cpp
+        backend_input/vision_client/netraw.cpp
+        backend_input/vision_client/netraw.h
+        backend_input/vision_client/netraw_util.h
+        backend_input/vision_client/robocup_ssl_client.cpp
+        backend_input/vision_client/robocup_ssl_client.h
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
+target_link_libraries(backend_input ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES})
