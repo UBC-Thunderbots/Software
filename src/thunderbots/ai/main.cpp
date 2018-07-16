@@ -1,8 +1,9 @@
 #include <ros/ros.h>
+#include "ai/world/ball.h"
+#include "ai/world/field.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
-#include "ai/world/field.h"
 
 // Callbacks
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -16,6 +17,12 @@ void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
 void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
 {
     thunderbots_msgs::Ball ball_msg = *msg;
+
+    Point new_position = Point(ball_msg.position.x, ball_msg.position.y);
+    Point new_velocity = Point(ball_msg.velocity.x, ball_msg.velocity.y);
+
+    Ball new_ball = Ball();
+    new_ball.update(new_position, new_velocity);
 }
 
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
