@@ -2,11 +2,15 @@
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
+#include "ai/world/field.h"
 
 // Callbacks
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
 {
     thunderbots_msgs::Field field_msg = *msg;
+
+    Field new_field = Field();
+    new_field.updateDimensions(field_msg);
 }
 
 void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)

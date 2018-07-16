@@ -78,6 +78,8 @@ target_link_libraries(backend_input ${catkin_LIBRARIES}
 
 add_executable (ai_logic
         ai/main.cpp
+        ai/world/field.cpp
+        ai/world/field.h
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
