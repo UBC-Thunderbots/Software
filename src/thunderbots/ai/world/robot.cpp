@@ -9,6 +9,15 @@ Robot::Robot(const unsigned int id)
 {
 }
 
+Robot::Robot(const thunderbots_msgs::Robot &robot_msg) : id_(robot_msg.id)
+{
+    Point position    = Point(robot_msg.position.x, robot_msg.position.y);
+    Point velocity    = Point(robot_msg.velocity.x, robot_msg.velocity.y);
+    Angle orientation = Angle::ofRadians(robot_msg.orientation);
+
+    update(position, velocity, orientation);
+}
+
 void Robot::update(
     const Point &new_position, const Point &new_velocity, const Angle &new_orientation)
 {

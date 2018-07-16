@@ -1,6 +1,8 @@
 #include <ros/ros.h>
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
+#include "ai/world/robot.h"
+#include "ai/world/team.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
@@ -28,11 +30,31 @@ void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team friendly_team_msg = *msg;
+
+    std::vector<Robot> friendly_robots = std::vector<Robot>();
+    for (auto robot_msg : friendly_team_msg.robots)
+    {
+        Robot robot = Robot(robot_msg);
+        friendly_robots.emplace_back(robot);
+    }
+
+    Team new_friendly_team = Team();
+    new_friendly_team.update(friendly_robots);
 }
 
 void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team enemy_team_msg = *msg;
+
+    std::vector<Robot> enemy_robots = std::vector<Robot>();
+    for (auto robot_msg : enemy_team_msg.robots)
+    {
+        Robot robot = Robot(robot_msg);
+        enemy_robots.emplace_back(robot);
+    }
+
+    Team new_enemy_team = Team();
+    new_enemy_team.update(enemy_robots);
 }
 
 int main(int argc, char **argv)

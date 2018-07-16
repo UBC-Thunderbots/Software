@@ -3,6 +3,7 @@
 
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "thunderbots_msgs/Robot.h"
 
 /**
  * Defines an SSL robot
@@ -17,6 +18,11 @@ class Robot
      * Creates a new robot given a pattern id
      */
     explicit Robot(unsigned int id);
+
+    /**
+     * Creates a new robot given a pattern id
+     */
+    explicit Robot(const thunderbots_msgs::Robot& robot_msg);
 
     /**
      * Updates the state of the robot.
