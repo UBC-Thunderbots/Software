@@ -3,9 +3,13 @@
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
 #include "ai/world/team.h"
+#include "ai/world/world.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
+
+// Member variables we need to maintain state
+World world;
 
 // Callbacks
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -14,6 +18,8 @@ void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
 
     Field new_field = Field();
     new_field.updateDimensions(field_msg);
+
+    world.updateField(new_field);
 }
 
 void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
@@ -25,6 +31,8 @@ void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
 
     Ball new_ball = Ball();
     new_ball.update(new_position, new_velocity);
+
+    world.updateBall(new_ball);
 }
 
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
@@ -40,6 +48,8 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 
     Team new_friendly_team = Team();
     new_friendly_team.update(friendly_robots);
+
+    world.updateFriendlyTeam(new_friendly_team);
 }
 
 void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
@@ -55,6 +65,8 @@ void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 
     Team new_enemy_team = Team();
     new_enemy_team.update(enemy_robots);
+
+    world.updateEnemyTeam(new_enemy_team);
 }
 
 int main(int argc, char **argv)
@@ -70,6 +82,9 @@ int main(int argc, char **argv)
         n.subscribe("backend/friendly_team", 1, friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub =
         n.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
+
+    // Initialize variables
+    world = World();
 
     // Main loop
     while (ros::ok())

@@ -86,6 +86,8 @@ add_executable (ai_logic
         ai/world/robot.h
         ai/world/team.cpp
         ai/world/team.h
+        ai/world/world.cpp
+        ai/world/world.h
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
