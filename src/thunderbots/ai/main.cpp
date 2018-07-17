@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include "ai/hl/stp/stphl.h"
 #include "ai/intent.h"
+#include "ai/navigator/rrt/rrt.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
@@ -12,7 +13,10 @@
 
 // Member variables we need to maintain state
 World world;
+// TODO: Use proper abstract classes
 STPHL high_level;
+RRTNav navigator;
+
 
 // Callbacks
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -89,6 +93,7 @@ int main(int argc, char **argv)
     // Initialize variables
     world      = World();
     high_level = STPHL();
+    navigator  = RRTNav();
 
     // Main loop
     while (ros::ok())
@@ -96,6 +101,8 @@ int main(int argc, char **argv)
         std::vector<std::pair<unsigned int, Intent>> assignedIntents =
             high_level.getIntentAssignment(world);
 
+        std::map<unsigned int, Primitive> assignedPrimitives =
+            navigator.getAssignedPrimitives(assignedIntents, world);
 
         // Spin once to let all necessary callbacks run
         ros::spinOnce();

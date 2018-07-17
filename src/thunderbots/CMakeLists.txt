@@ -95,6 +95,9 @@ add_executable (ai_logic
         ai/primitive/primitive.h
         ai/primitive/move_prim.cpp
         ai/primitive/move_prim.h
+        ai/navigator/navigator.h
+        ai/navigator/rrt/rrt.cpp
+        ai/navigator/rrt/rrt.h
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
