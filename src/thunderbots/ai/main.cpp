@@ -2,6 +2,7 @@
 #include "ai/hl/stp/stphl.h"
 #include "ai/intent.h"
 #include "ai/navigator/rrt/rrt.h"
+#include "ai/primitive/move_prim.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
@@ -9,6 +10,7 @@
 #include "ai/world/world.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
+#include "thunderbots_msgs/MovePrimitive.h"
 #include "thunderbots_msgs/Team.h"
 
 // Member variables we need to maintain state
@@ -82,6 +84,10 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "ai_logic");
     ros::NodeHandle n;
 
+    // Create publishers
+    ros::Publisher move_prim_publisher =
+        n.advertise<thunderbots_msgs::MovePrimitive>("backend/move_prim", 1);
+
     // Create subscribers
     ros::Subscriber field_sub = n.subscribe("backend/field", 1, fieldUpdateCallback);
     ros::Subscriber ball_sub  = n.subscribe("backend/ball", 1, ballUpdateCallback);
@@ -103,6 +109,12 @@ int main(int argc, char **argv)
 
         std::map<unsigned int, Primitive> assignedPrimitives =
             navigator.getAssignedPrimitives(assignedIntents, world);
+
+        MovePrim test_move_prim = MovePrim(0, world.ball().position(), Angle::zero());
+        thunderbots_msgs::MovePrimitive move_prim_msg = test_move_prim.createMsg();
+        move_prim_publisher.publish(move_prim_msg);
+        std::cout << "Publishing MovePrim to location " << world.ball().position()
+                  << std::endl;
 
         // Spin once to let all necessary callbacks run
         ros::spinOnce();
