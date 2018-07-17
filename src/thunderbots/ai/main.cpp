@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include "ai/hl/stp/stphl.h"
+#include "ai/intent.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
@@ -10,6 +12,7 @@
 
 // Member variables we need to maintain state
 World world;
+STPHL high_level;
 
 // Callbacks
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -84,11 +87,16 @@ int main(int argc, char **argv)
         n.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
 
     // Initialize variables
-    world = World();
+    world      = World();
+    high_level = STPHL();
 
     // Main loop
     while (ros::ok())
     {
+        std::vector<std::pair<unsigned int, Intent>> assignedIntents =
+            high_level.getIntentAssignment(world);
+
+
         // Spin once to let all necessary callbacks run
         ros::spinOnce();
     }
