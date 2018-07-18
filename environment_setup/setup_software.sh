@@ -36,6 +36,7 @@ function show_help()
 if [ "$#" -ne 1 ]; then
     echo "Error: Illegal number of arguments provided. Expected 1 argument"
     show_help
+    exit 1
 fi
 
 while [ "$1" != "" ]; do
@@ -185,8 +186,14 @@ echo "================================================================"
 echo "Installing Misc. Utilities"
 echo "================================================================"
 
+sudo apt-get update
+sudo apt-get install -y software-properties-common # required for add-apt-repository
+# Required to install g++-7 on Ubuntu 16
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+sudo apt-get update
+
 host_software_packages=(
-    g++
+    g++-7 # We need g++ 7 or greater to support the C++17 standard
     cmake
     python-rosinstall
     clang-format
@@ -201,6 +208,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
+                         --slave /usr/bin/g++ g++ /usr/bin/g++-7 
+sudo update-alternatives --config gcc
 
 # Done
 echo "================================================================"

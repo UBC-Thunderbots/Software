@@ -76,6 +76,36 @@ add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
 target_link_libraries(backend_input ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES})
 
+add_executable (ai_logic
+        ai/main.cpp
+        ai/world/field.cpp
+        ai/world/field.h
+        ai/world/ball.cpp
+        ai/world/ball.h
+        ai/world/robot.cpp
+        ai/world/robot.h
+        ai/world/team.cpp
+        ai/world/team.h
+        ai/world/world.cpp
+        ai/world/world.h
+        ai/intent.cpp
+        ai/intent.h
+        ai/hl/hl.cpp
+        ai/hl/hl.h
+        ai/hl/stp/stphl.cpp
+        ai/hl/stp/stphl.h
+        ai/primitive/primitive.h
+        ai/primitive/move_prim.cpp
+        ai/primitive/move_prim.h
+        ai/navigator/navigator.cpp
+        ai/navigator/navigator.h
+        ai/navigator/rrt/rrt.cpp
+        ai/navigator/rrt/rrt.h
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ai_logic ${catkin_LIBRARIES})
 
 #############
 ## Testing ##
@@ -95,4 +125,10 @@ if (CATKIN_ENABLE_TESTING)
             geom/point.h
             )
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(field_test
+            ai/test/field.cpp
+            ai/world/field.cpp
+            )
+    target_link_libraries(field_test ${catkin_LIBRARIES})
 endif()

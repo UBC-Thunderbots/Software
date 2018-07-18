@@ -60,7 +60,7 @@ int main(int argc, char **argv)
                 for (const SSL_DetectionBall &ball : detection.balls())
                 {
                     SSLBallData ball_data;
-                    ball_data.position   = Point(ball.x(), ball.y());
+                    ball_data.position   = Point(ball.x() / 1000.0, ball.y() / 1000.0);
                     ball_data.confidence = ball.confidence();
                     ball_detections.push_back(ball_data);
                 }
