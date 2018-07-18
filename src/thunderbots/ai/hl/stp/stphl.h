@@ -1,6 +1,7 @@
 #ifndef AI_HL_STP_STPHL_H_
 #define AI_HL_STP_STPHL_H_
 
+#include "ai/hl/hl.h"
 #include "ai/intent.h"
 #include "ai/world/world.h"
 
@@ -8,7 +9,7 @@
  * The STPHL module is an implementation of the high-level logic Abstract class, that
  * uses the STP (Skills, Tactics, Plays) framework for its decision making.
  */
-class STPHL
+class STPHL : public HL
 {
    public:
     /**
@@ -25,7 +26,8 @@ class STPHL
     * @return A vector of pairs, where each pair contains a robot id and the Intent that
     * robot should run
     */
-    std::vector<std::pair<unsigned int, Intent>> getIntentAssignment(const World &world);
+    std::vector<std::pair<unsigned int, Intent>> getIntentAssignment(
+        const World &world) override;
 };
 
 #endif  // AI_HL_STP_STPHL_H_

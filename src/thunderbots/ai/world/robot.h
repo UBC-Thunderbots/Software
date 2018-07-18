@@ -27,10 +27,11 @@ class Robot
     /**
      * Updates the state of the robot.
      *
-     * @param new_position the new position of the robot
-     * @param new_velocity the new velocity of the robot
-     * @param new_orientation the new orientation of the robot
-     * @param new_angular_velocity the new angular velocity of the robot
+     * @param new_position the new position of the robot. Coordinates are in metres.
+     * @param new_velocity the new velocity of the robot, in metres / second.
+     * @param new_orientation the new orientation of the robot, in Radians.
+     * @param new_angular_velocity the new angular velocity of the robot, in Radians /
+     * second.
      */
     void update(
         const Point& new_position, const Point& new_velocity,
@@ -45,45 +46,45 @@ class Robot
 
     /**
      * Get the predicted position of the robot at a time relative to the current time.
-     * Using the default
-     * of 0 will give the current position of the robot.
+     * Using the default of 0 will give the current position of the robot.
      *
-     * @param time_delta the amount of time forwards to predict.
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the ball's position.
      *
-     * @return the predicted position of the robot.
+     * @return the predicted position of the robot. Coordinates are in metres.
      */
     Point position(double time_delta = 0.0) const;
 
     /**
      * Get the predicted velocity of the robot at a time relative to the current time.
-     * Using the default
-     * of 0 will give the current velocity of the robot.
+     * Using the default of 0 will give the current velocity of the robot.
      *
-     * @param time_delta The amount of time in seconds forwards to predict.
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the ball's position.
      *
-     * @return the predicted velocity of the robot.
+     * @return the predicted velocity of the robot, in metres / second.
      */
     Point velocity(double time_delta = 0.0) const;
 
     /**
      * Get the predicted orientation of the robot at a time relative to the current time.
-     * Using the default
-     * of 0 will give the current orientation of the robot.
+     * Using the default of 0 will give the current orientation of the robot.
      *
-     * @param time_delta the amount of time in seconds forwards to predict.
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the ball's position.
      *
-     * @return the predicted orientation of the robot.
+     * @return the predicted orientation of the robot, in Radians.
      */
     Angle orientation(double time_delta = 0.0) const;
 
     /**
      * Get the predicted angular velocity of the robot at a time relative to the current
-     * time.
-     * Using the default of 0 will give the current orientation of the robot.
+     * time. Using the default of 0 will give the current orientation of the robot.
      *
-     * @param time_delta the amount of time in seconds forwards the predict.
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the ball's position.
      *
-     * @return the predicted orientation of the robot.
+     * @return the predicted angular velocity of the robot, in Radians / second.
      */
     Angle angularVelocity(double time_delta = 0.0) const;
 

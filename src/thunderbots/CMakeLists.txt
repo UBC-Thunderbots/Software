@@ -90,11 +90,14 @@ add_executable (ai_logic
         ai/world/world.h
         ai/intent.cpp
         ai/intent.h
+        ai/hl/hl.cpp
+        ai/hl/hl.h
         ai/hl/stp/stphl.cpp
         ai/hl/stp/stphl.h
         ai/primitive/primitive.h
         ai/primitive/move_prim.cpp
         ai/primitive/move_prim.h
+        ai/navigator/navigator.cpp
         ai/navigator/navigator.h
         ai/navigator/rrt/rrt.cpp
         ai/navigator/rrt/rrt.h

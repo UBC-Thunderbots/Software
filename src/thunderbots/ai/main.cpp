@@ -14,10 +14,13 @@
 #include "thunderbots_msgs/Team.h"
 
 // Member variables we need to maintain state
+// In an anonymous namespace so they cannot be seen/accessed externally
+namespace
+{
 World world;
-// TODO: Use proper abstract classes
-STPHL high_level;
-RRTNav navigator;
+HL high_level;
+Navigator navigator;
+}
 
 
 // Callbacks
@@ -96,7 +99,7 @@ int main(int argc, char **argv)
     ros::Subscriber enemy_team_sub =
         n.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
 
-    // Initialize variables
+    // Initialize static variables used to maintain state
     world      = World();
     high_level = STPHL();
     navigator  = RRTNav();

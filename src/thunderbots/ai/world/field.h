@@ -24,7 +24,7 @@ class Field
     void updateDimensions(thunderbots_msgs::Field new_field_msg);
 
     /**
-     * Updates the dimensions of the field. All values should be in metres.
+     * Updates the dimensions of the field. All units should be in metres.
      *
      * @param field_length the length of the playing area (along the x-axis)
      * @param field_width the width of the playing area (along the y-axis)
@@ -47,28 +47,28 @@ class Field
     bool valid() const;
 
     /**
-     * Gets the length of the field from goal-line to goal-line.
+     * Gets the length of the field from goal-line to goal-line in metres.
      *
      * @return the length of the field in metres.
      */
     double length() const;
 
     /**
-     * Gets the length of the field including the boundary area.
+     * Gets the length of the field including the boundary area in metres.
      *
      * @return the total length of the field in metres, including the boundary area.
      */
     double totalLength() const;
 
     /**
-     * Gets the width of the field from sideline to sideline.
+     * Gets the width of the field from sideline to sideline in metres.
      *
      * @return the width of the field in metres.
      */
     double width() const;
 
     /**
-     * Gets the width of the field including the boundary area.
+     * Gets the width of the field including the boundary area in metres.
      *
      * @return the total width of the field in metres, including the boundary area.
      */
@@ -76,21 +76,22 @@ class Field
 
     /**
      * Gets the width of the goal, symmetric above and below the centreline,
-     * from goalpost to goalpost.
+     * from goalpost to goalpost in metres.
      *
      * @return the width of the goal in metres.
      */
     double goalWidth() const;
 
     /**
-     * Gets the radius of the centre circle.
+     * Gets the radius of the centre circle in metres.
      *
      * @return the radius of the centre circle in metres.
      */
     double centreCircleRadius() const;
 
     /**
-     * Gets the width of the defense area, which runs along the y-axis. This is the total
+     * Gets the width of the defense area in metres, which runs along the y-axis. This is
+     * the total
      * width of how far the defense area stretches from one side of the goal to the other.
      *
      * @return the width of the defense area
@@ -98,7 +99,7 @@ class Field
     double defenseAreaWidth() const;
 
     /**
-     * Gets the length of the defense area, which runs along the x-axis. This
+     * Gets the length of the defense area in metres, which runs along the x-axis. This
      * is how far the defense area extends in front of the goal
      *
      * @return the width of the straight parts in metres.
@@ -205,7 +206,7 @@ class Field
 
     /**
      * Gets the margin for being out of bounds on the top or bottom of the
-     * field.
+     * field in metres.
      *
      * @return the size of the margin/bounds around the field
      */
