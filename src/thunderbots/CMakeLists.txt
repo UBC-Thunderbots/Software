@@ -108,6 +108,24 @@ add_executable (ai_logic
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ai_logic ${catkin_LIBRARIES})
 
+add_executable (backend_output
+#            ${PROTO_SRCS}
+            backend_output/main.cpp
+            ai/primitive/primitive.h
+            ai/primitive/move_prim.h
+            ai/primitive/move_prim.cpp
+            backend_output/backend.cpp
+            backend_output/backend.h
+            backend_output/grsim/grsim_backend.cpp
+            backend_output/grsim/grsim_backend.h
+
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
+target_link_libraries(backend_output ${catkin_LIBRARIES})
+
+
 #############
 ## Testing ##
 #############
