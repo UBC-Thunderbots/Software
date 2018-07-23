@@ -36,7 +36,7 @@ catkin_package(
         LIBRARIES thunderbots
         CATKIN_DEPENDS roscpp std_msgs
         DEPENDS message_runtime
-)
+        )
 
 ###########
 ## Build ##
@@ -46,79 +46,45 @@ catkin_package(
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
-        # We don't use the "include" directory, so specify the current directory to capture all the files
-        ./
-)
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        )
 
+# Find all the generated protobuf source files
 file(GLOB PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 
+file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
+        )
 add_executable (backend_input
         ${PROTO_SRCS}
-        backend_input/main.cpp
-        backend_input/vision_client/netraw.cpp
-        backend_input/vision_client/netraw.h
-        backend_input/vision_client/netraw_util.h
-        backend_input/vision_client/robocup_ssl_client.cpp
-        backend_input/vision_client/robocup_ssl_client.h
-        backend_input/message_util.cpp
-        backend_input/message_util.h
-        backend_input/filter/ball_filter.cpp
-        backend_input/filter/ball_filter.h
-        backend_input/filter/robot_filter.cpp
-        backend_input/filter/robot_filter.h
-        backend_input/filter/robot_team_filter.cpp
-        backend_input/filter/robot_team_filter.h
-        geom/point.h
-        geom/angle.h
+        ${BACKEND_INPUT_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
-target_link_libraries(backend_input ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES})
+target_link_libraries(backend_input
+        ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
 
+file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
+        )
 add_executable (ai_logic
-        ai/main.cpp
-        ai/world/field.cpp
-        ai/world/field.h
-        ai/world/ball.cpp
-        ai/world/ball.h
-        ai/world/robot.cpp
-        ai/world/robot.h
-        ai/world/team.cpp
-        ai/world/team.h
-        ai/world/world.cpp
-        ai/world/world.h
-        ai/intent.cpp
-        ai/intent.h
-        ai/hl/hl.cpp
-        ai/hl/hl.h
-        ai/hl/stp/stphl.cpp
-        ai/hl/stp/stphl.h
-        ai/primitive/primitive.h
-        ai/primitive/move_prim.cpp
-        ai/primitive/move_prim.h
-        ai/navigator/navigator.cpp
-        ai/navigator/navigator.h
-        ai/navigator/rrt/rrt.cpp
-        ai/navigator/rrt/rrt.h
+        ${AI_LOGIC_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ai_logic ${catkin_LIBRARIES})
 
+file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        )
 add_executable (backend_output
-#            ${PROTO_SRCS}
-            backend_output/main.cpp
-            ai/primitive/primitive.h
-            ai/primitive/move_prim.h
-            ai/primitive/move_prim.cpp
-            backend_output/backend.cpp
-            backend_output/backend.h
-            backend_output/grsim/grsim_backend.cpp
-            backend_output/grsim/grsim_backend.h
-
+        ${BACKEND_OUTPUT_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
@@ -130,23 +96,29 @@ target_link_libraries(backend_output ${catkin_LIBRARIES})
 ## Testing ##
 #############
 
+###### IMPORTANT #####
+# DO NOT USE GLOBBING FOR TEST EXECUTABLES. SPECIFY EACH SOURCE FILE.
+# This is to make sure we know exactly what files/interfaces are being tested and that we are not accidentally
+# picking up other files that may affect test behaviour. Unit tests should not need too many files to be specified
+# and we want to make sure the minimum set of files required for the test are being used.
+
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
     #gtest
     catkin_add_gtest(geom_angle_test
-            geom/test/angle.cpp
+            test/geom/angle.cpp
             geom/angle.h
             )
     target_link_libraries(geom_angle_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(geom_point_test
-            geom/test/point.cpp
+            test/geom/point.cpp
             geom/point.h
             )
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(field_test
-            ai/test/field.cpp
+            test/field/field.cpp
             ai/world/field.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
