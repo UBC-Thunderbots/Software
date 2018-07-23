@@ -1,10 +1,10 @@
-#include <iostream>
-#include "geom/point.h"
 #include <ros/ros.h>
 #include <thunderbots_msgs/MovePrimitive.h>
+#include <iostream>
 #include "ai/primitive/move_prim.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"
+#include "geom/point.h"
 
 // Member variables we need to maintain state
 
@@ -14,10 +14,10 @@
 std::vector<Primitive> primitives;
 
 // Callbacks
-void movePrimUpdateCallback(const thunderbots_msgs::MovePrimitive::ConstPtr &msg)
+void movePrimUpdateCallback(const thunderbots_msgs::MovePrimitive::ConstPtr& msg)
 {
     thunderbots_msgs::MovePrimitive move_prim_msg = *msg;
-    MovePrim move_prim = MovePrim(move_prim_msg);
+    MovePrim move_prim                            = MovePrim(move_prim_msg);
     primitives.push_back(move_prim);
 }
 
@@ -28,10 +28,11 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
 
     // Create subscribers to topics we care about
-    ros::Subscriber move_prim_sub = n.subscribe("backend/move_prim", 1, movePrimUpdateCallback);
+    ros::Subscriber move_prim_sub =
+        n.subscribe("backend/move_prim", 1, movePrimUpdateCallback);
 
     // Initialize variables
-    primitives = std::vector<Primitive>();
+    primitives      = std::vector<Primitive>();
     Backend backend = GrSimBackend();
 
     // Main loop

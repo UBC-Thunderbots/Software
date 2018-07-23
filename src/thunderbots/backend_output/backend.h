@@ -3,11 +3,12 @@
 
 #include "ai/primitive/primitive.h"
 
-class Backend {
-public:
+class Backend
+{
+   public:
     virtual void sendPrimitives(const std::vector<Primitive> &primitives);
 };
 
 
 
-#endif //PROJECT_BACKEND_H
+#endif  // PROJECT_BACKEND_H
