@@ -54,7 +54,9 @@ file(GLOB PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 
 file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
         )
 add_executable (backend_input
         ${PROTO_SRCS}
@@ -70,6 +72,7 @@ target_link_libraries(backend_input
 
 file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.h
         )
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
@@ -81,7 +84,9 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES})
 
 file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
         )
 add_executable (backend_output
         ${BACKEND_OUTPUT_SRC}

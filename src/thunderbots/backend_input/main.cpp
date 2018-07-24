@@ -16,17 +16,17 @@ int main(int argc, char **argv)
 {
     // Init ROS node
     ros::init(argc, argv, "backend_input");
-    ros::NodeHandle n;
+    ros::NodeHandle node_handle;
 
     // Create publishers
     ros::Publisher ball_publisher =
-        n.advertise<thunderbots_msgs::Ball>("backend/ball", 1);
+        node_handle.advertise<thunderbots_msgs::Ball>("backend/ball", 1);
     ros::Publisher field_publisher =
-        n.advertise<thunderbots_msgs::Field>("backend/field", 1);
+        node_handle.advertise<thunderbots_msgs::Field>("backend/field", 1);
     ros::Publisher friendly_team_publisher =
-        n.advertise<thunderbots_msgs::Team>("backend/friendly_team", 1);
+        node_handle.advertise<thunderbots_msgs::Team>("backend/friendly_team", 1);
     ros::Publisher enemy_team_publisher =
-        n.advertise<thunderbots_msgs::Team>("backend/friendly_team", 1);
+        node_handle.advertise<thunderbots_msgs::Team>("backend/friendly_team", 1);
 
     // Set up the SSL Client to receive data over the network
     RoboCupSSLClient vision_client = RoboCupSSLClient(10020, "224.5.23.2");

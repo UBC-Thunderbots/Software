@@ -25,11 +25,11 @@ int main(int argc, char** argv)
 {
     // Init ROS node
     ros::init(argc, argv, "backend_output");
-    ros::NodeHandle n;
+    ros::NodeHandle node_handle;
 
     // Create subscribers to topics we care about
     ros::Subscriber move_prim_sub =
-        n.subscribe("backend/move_prim", 1, movePrimUpdateCallback);
+        node_handle.subscribe("backend/move_prim", 1, movePrimUpdateCallback);
 
     // Initialize variables
     primitives      = std::vector<Primitive>();
