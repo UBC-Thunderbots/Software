@@ -85,19 +85,21 @@ int main(int argc, char **argv)
 {
     // Init ROS node
     ros::init(argc, argv, "ai_logic");
-    ros::NodeHandle n;
+    ros::NodeHandle node_handle;
 
     // Create publishers
     ros::Publisher move_prim_publisher =
-        n.advertise<thunderbots_msgs::MovePrimitive>("backend/move_prim", 1);
+        node_handle.advertise<thunderbots_msgs::MovePrimitive>("backend/move_prim", 1);
 
     // Create subscribers
-    ros::Subscriber field_sub = n.subscribe("backend/field", 1, fieldUpdateCallback);
-    ros::Subscriber ball_sub  = n.subscribe("backend/ball", 1, ballUpdateCallback);
+    ros::Subscriber field_sub =
+        node_handle.subscribe("backend/field", 1, fieldUpdateCallback);
+    ros::Subscriber ball_sub =
+        node_handle.subscribe("backend/ball", 1, ballUpdateCallback);
     ros::Subscriber friendly_team_sub =
-        n.subscribe("backend/friendly_team", 1, friendlyTeamUpdateCallback);
+        node_handle.subscribe("backend/friendly_team", 1, friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub =
-        n.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
+        node_handle.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
 
     // Initialize static variables used to maintain state
     world      = World();

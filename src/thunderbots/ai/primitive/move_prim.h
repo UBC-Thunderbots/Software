@@ -6,7 +6,7 @@
 #include "geom/point.h"
 #include "thunderbots_msgs/MovePrimitive.h"
 
-class MovePrim : Primitive
+class MovePrim : public Primitive
 {
    public:
     explicit MovePrim();
