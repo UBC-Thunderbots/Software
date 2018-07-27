@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <ros/time.h>
 #include <thunderbots_msgs/MovePrimitive.h>
 #include <iostream>
 #include "ai/primitive/move_prim.h"
@@ -32,8 +33,11 @@ int main(int argc, char** argv)
         node_handle.subscribe("backend/move_prim", 1, movePrimUpdateCallback);
 
     // Initialize variables
-    primitives      = std::vector<Primitive>();
-    Backend backend = GrSimBackend();
+    primitives           = std::vector<Primitive>();
+    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+
+    // We loop at 30Hz so we don't overload the network with too many packets
+    ros::Rate tick_rate(30);
 
     // Main loop
     while (ros::ok())
@@ -46,6 +50,8 @@ int main(int argc, char** argv)
         ros::spinOnce();
 
         backend.sendPrimitives(primitives);
+
+        tick_rate.sleep();
     }
 
     return 0;
