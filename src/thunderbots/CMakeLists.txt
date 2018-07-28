@@ -6,7 +6,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
 endif()
 
-# For Visual Studio Code Intellisense
+# For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ####################
