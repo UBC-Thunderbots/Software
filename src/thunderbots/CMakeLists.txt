@@ -13,8 +13,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ## Compiler Flags ##
 ####################
 
-# Set cmake standard to c++ 1z
-add_definitions(-std=c++1z)
+# Set cmake standard to c++ 17
+add_definitions(-std=c++17)
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
 add_definitions(-fno-common) # Do not allow multiple definitions of the same global variable
 add_definitions(-Werror) # Treat warnings as errors, so they don't build up
