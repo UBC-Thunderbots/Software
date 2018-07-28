@@ -43,4 +43,5 @@ thunderbots_msgs::MovePrimitive MovePrim::createMsg() const
     msg.destination.x = destination_.x();
     msg.destination.y = destination_.y();
     msg.orientation   = orientation_.toRadians();
+    return msg;
 }

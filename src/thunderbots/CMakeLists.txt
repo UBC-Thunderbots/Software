@@ -6,12 +6,15 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
 endif()
 
+# For Visual Studio Code Intellisense
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 ####################
 ## Compiler Flags ##
 ####################
 
-# Set cmake standard to c++ 17
-add_definitions(-std=c++17)
+# Set cmake standard to c++ 1z
+add_definitions(-std=c++1z)
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
 add_definitions(-fno-common) # Do not allow multiple definitions of the same global variable
 add_definitions(-Werror) # Treat warnings as errors, so they don't build up
