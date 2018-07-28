@@ -3,7 +3,6 @@
 #include <optional>
 #include "ai/primitive/move_prim.h"
 #include "proto/grSim_Commands.pb.h"
-#include "proto/grSim_Packet.pb.h"
 
 using namespace boost::asio;
 
@@ -19,7 +18,7 @@ GrSimBackend::~GrSimBackend()
     socket.close();
 }
 
-void GrSimBackend::setRobotVelocities(
+grSim_Packet GrSimBackend::createGrSimPacket(
     unsigned int robot_id, bool team_colour_yellow, Point velocity,
     Angle angular_velocity)
 {
@@ -33,6 +32,7 @@ void GrSimBackend::setRobotVelocities(
 
     // We set a robot velocity, not individual wheel velocities
     command->set_wheelsspeed(false);
+
     command->set_veltangent(static_cast<float>(velocity.x()));
     command->set_velnormal(static_cast<float>(velocity.y()));
     command->set_velangular(static_cast<float>(angular_velocity.toRadians()));
@@ -41,7 +41,11 @@ void GrSimBackend::setRobotVelocities(
     command->set_kickspeedz(0.0);
     command->set_spinner(false);
 
-    // Send the packet via UDP
+    return packet;
+}
+
+void GrSimBackend::sendGrSimPacket(grSim_Packet packet)
+{
     boost::system::error_code err;
     socket.send_to(
         buffer(packet.SerializeAsString(), static_cast<size_t>(packet.ByteSize())),
@@ -50,5 +54,8 @@ void GrSimBackend::setRobotVelocities(
 
 void GrSimBackend::sendPrimitives(const std::vector<Primitive>& primitives)
 {
-    setRobotVelocities(0, false, Point(0.5, -0.1), Angle::ofRadians(-0.8));
+    // TODO: Implement this
+    grSim_Packet grsim_packet =
+        createGrSimPacket(0, false, Point(0.5, -0.1), Angle::ofRadians(-0.8));
+    sendGrSimPacket(grsim_packet);
 }

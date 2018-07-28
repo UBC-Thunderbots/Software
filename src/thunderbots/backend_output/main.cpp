@@ -7,6 +7,11 @@
 #include "backend_output/grsim/grsim_backend.h"
 #include "geom/point.h"
 
+// Constants
+const std::string NETWORK_ADDRESS       = "127.0.0.1";
+static constexpr short NETWORK_PORT     = 20011;
+static constexpr unsigned int TICK_RATE = 30;
+
 // Member variables we need to maintain state
 
 // A vector of primitives. It is cleared each tick, populated by the callbacks
@@ -34,10 +39,10 @@ int main(int argc, char** argv)
 
     // Initialize variables
     primitives           = std::vector<Primitive>();
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimBackend backend = GrSimBackend(NETWORK_ADDRESS, NETWORK_PORT);
 
     // We loop at 30Hz so we don't overload the network with too many packets
-    ros::Rate tick_rate(30);
+    ros::Rate tick_rate(TICK_RATE);
 
     // Main loop
     while (ros::ok())

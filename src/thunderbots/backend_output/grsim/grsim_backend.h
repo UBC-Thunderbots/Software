@@ -5,6 +5,7 @@
 #include "backend_output/backend.h"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "proto/grSim_Packet.pb.h"
 
 
 class GrSimBackend : public Backend
@@ -17,18 +18,14 @@ class GrSimBackend : public Backend
      * @param port The port to publish commands to
      */
     explicit GrSimBackend(std::string network_address, unsigned short port);
+
     ~GrSimBackend();
 
-    /**
-     * Sends the given primitives to grSim
-     * @param primitives the list of primitives to send
-     */
     void sendPrimitives(const std::vector<Primitive> &primitives) override;
 
-   private:
     /**
-     * Sets the velocities of a robot in grSim. The velocities are in the Robot's local
-     * coordinates.
+     * Creates a grSim Packet protobuf message given velocity information for a robot.
+     * Velocities are in the Robot's local coordinate system.
      *
      * @param robot_id The id of the robot to send the command to
      * @param team_colour_yellow Specifies if the robot to send the command to is on the
@@ -46,9 +43,17 @@ class GrSimBackend : public Backend
      * @param angular_velocity The angular velocity to set for the robot, in Radians per
      * second.
      */
-    void setRobotVelocities(
+    grSim_Packet createGrSimPacket(
         unsigned int robot_id, bool team_colour_yellow, Point velocity,
         Angle angular_velocity);
+
+   private:
+    /**
+     * Sends a grSim packet to grSim via UDP
+     *
+     * @param packet the grSim packet to send
+     */
+    void sendGrSimPacket(grSim_Packet packet);
 
 
     // Variables for networking

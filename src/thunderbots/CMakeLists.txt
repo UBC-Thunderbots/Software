@@ -132,4 +132,16 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/field.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(grsim_backend_test
+            ${PROTO_SRCS}
+            test/grsim_backend/grsim_backend.cpp
+            backend_output/grsim/grsim_backend.cpp
+            backend_output/grsim/grsim_backend.h
+            backend_output/backend.cpp
+            backend_output/backend.h
+            )
+    target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
+            ${PROTOBUF_LIBRARIES}
+            )
 endif()
