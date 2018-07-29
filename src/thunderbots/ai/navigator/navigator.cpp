@@ -5,4 +5,5 @@ std::map<unsigned int, Primitive> Navigator::getAssignedPrimitives(
     const World &world)
 {
     // Unimplemented. Intended to be overridden.
+    return std::map<unsigned int, Primitive>();
 }
