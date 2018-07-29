@@ -1,8 +1,9 @@
 #include <ros/ros.h>
 #include "ai/hl/stp/stphl.h"
-#include "ai/intent.h"
+#include "ai/intent/intent.h"
+#include "ai/navigator/navigator.h"
 #include "ai/navigator/rrt/rrt.h"
-#include "ai/primitive/move_prim.h"
+#include "ai/primitive/move_primitive.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
@@ -10,7 +11,8 @@
 #include "ai/world/world.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
-#include "thunderbots_msgs/MovePrimitive.h"
+#include "thunderbots_msgs/Primitive.h"
+#include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 
 // Member variables we need to maintain state
@@ -18,8 +20,8 @@
 namespace
 {
 World world;
-HL high_level;
-Navigator navigator;
+STPHL stp_high_level;
+RRTNav rrt_navigator;
 }
 
 
@@ -88,8 +90,8 @@ int main(int argc, char **argv)
     ros::NodeHandle node_handle;
 
     // Create publishers
-    ros::Publisher move_prim_publisher =
-        node_handle.advertise<thunderbots_msgs::MovePrimitive>("backend/move_prim", 1);
+    ros::Publisher primitive_publisher =
+        node_handle.advertise<thunderbots_msgs::PrimitiveArray>("backend/primitives", 1);
 
     // Create subscribers
     ros::Subscriber field_sub =
@@ -101,25 +103,33 @@ int main(int argc, char **argv)
     ros::Subscriber enemy_team_sub =
         node_handle.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
 
-    // Initialize static variables used to maintain state
-    world      = World();
-    high_level = STPHL();
-    navigator  = RRTNav();
+    // Initialize variables used to maintain state
+    rrt_navigator  = RRTNav();
+    stp_high_level = STPHL();
+    world          = World();
+
+    // Assign variables to their Abstract base class, so we can use them generically
+    // in terms of their public interfaces
+    Navigator &navigator = rrt_navigator;
+    HL &high_level       = stp_high_level;
 
     // Main loop
     while (ros::ok())
     {
-        std::vector<std::pair<unsigned int, Intent>> assignedIntents =
+        std::vector<std::unique_ptr<Intent>> assignedIntents =
             high_level.getIntentAssignment(world);
 
-        std::map<unsigned int, Primitive> assignedPrimitives =
-            navigator.getAssignedPrimitives(assignedIntents, world);
+        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+            navigator.getAssignedPrimitives(world, assignedIntents);
 
-        MovePrim test_move_prim = MovePrim(0, world.ball().position(), Angle::zero());
-        thunderbots_msgs::MovePrimitive move_prim_msg = test_move_prim.createMsg();
-        move_prim_publisher.publish(move_prim_msg);
-        std::cout << "Publishing MovePrim to location " << world.ball().position()
-                  << std::endl;
+        thunderbots_msgs::PrimitiveArray primitive_array_message;
+        for (auto const &prim : assignedPrimitives)
+        {
+            thunderbots_msgs::Primitive msg = prim->createMsg();
+            primitive_array_message.primitives.emplace_back(msg);
+            std::cout << msg << std::endl;
+        }
+        primitive_publisher.publish(primitive_array_message);
 
         // Spin once to let all necessary callbacks run
         ros::spinOnce();

@@ -1,20 +1,20 @@
-#include "stphl.h"
+#include "ai/hl/stp/stphl.h"
+#include "ai/intent/move_intent.h"
 
 STPHL::STPHL()
 {
 }
 
-std::vector<std::pair<unsigned int, Intent>> STPHL::getIntentAssignment(
-    const World &world)
+std::vector<std::unique_ptr<Intent>> STPHL::getIntentAssignment(const World &world)
 {
-    std::vector<std::pair<unsigned int, Intent>> result =
-        std::vector<std::pair<unsigned int, Intent>>();
+    // TODO: Implement this
+    std::vector<std::unique_ptr<Intent>> assigned_intents =
+        std::vector<std::unique_ptr<Intent>>();
 
-    std::vector<Robot> friendly_robots = world.friendlyTeam().getAllRobots();
-    for (Robot robot : friendly_robots)
-    {
-        result.emplace_back(std::make_pair(robot.id(), Intent()));
-    }
+    std::unique_ptr<Intent> move_intent =
+        std::unique_ptr<Intent>(new MoveIntent(0, Point(), Angle::zero(), 0.0));
 
-    return result;
+    assigned_intents.emplace_back(std::move(move_intent));
+
+    return assigned_intents;
 }

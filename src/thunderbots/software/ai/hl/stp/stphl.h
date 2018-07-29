@@ -1,8 +1,7 @@
 #pragma once
 
 #include "ai/hl/hl.h"
-#include "ai/intent.h"
-#include "ai/world/world.h"
+#include "ai/intent/intent.h"
 
 /**
  * The STPHL module is an implementation of the high-level logic Abstract class, that
@@ -17,14 +16,5 @@ class STPHL : public HL
      */
     explicit STPHL();
 
-    /**
-    * Given the state of the world, returns the intent that each available Robot should be
-    * running.
-    *
-    * @param world The current state of the world
-    * @return A vector of pairs, where each pair contains a robot id and the Intent that
-    * robot should run
-    */
-    std::vector<std::pair<unsigned int, Intent>> getIntentAssignment(
-        const World &world) override;
+    std::vector<std::unique_ptr<Intent>> getIntentAssignment(const World &world) override;
 };
