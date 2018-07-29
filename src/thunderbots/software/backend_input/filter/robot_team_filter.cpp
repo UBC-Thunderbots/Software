@@ -8,6 +8,7 @@ RobotTeamFilter::RobotTeamFilter()
     robot_filters = std::map<unsigned int, RobotFilter>();
 }
 
+// TODO: Combine this with filter return
 void RobotTeamFilter::update(std::vector<SSLRobotData> new_team_data)
 {
     // Go through each existing robot filter. If there is new robot data with a matching

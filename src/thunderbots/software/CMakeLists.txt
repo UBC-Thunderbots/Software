@@ -59,6 +59,7 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/team.h
         )
 add_executable (backend_input
         ${PROTO_SRCS}

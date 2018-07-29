@@ -19,12 +19,12 @@ GrSimBackend::~GrSimBackend()
 }
 
 grSim_Packet GrSimBackend::createGrSimPacket(
-    unsigned int robot_id, bool team_colour_yellow, Point velocity,
+    unsigned int robot_id, TEAM_COLOUR team_colour, Point velocity,
     Angle angular_velocity)
 {
     grSim_Packet packet;
 
-    packet.mutable_commands()->set_isteamyellow(team_colour_yellow);
+    packet.mutable_commands()->set_isteamyellow(team_colour == YELLOW);
     packet.mutable_commands()->set_timestamp(0.0);
     grSim_Robot_Command* command = packet.mutable_commands()->add_robot_commands();
 
@@ -56,6 +56,6 @@ void GrSimBackend::sendPrimitives(const std::vector<Primitive>& primitives)
 {
     // TODO: Implement this
     grSim_Packet grsim_packet =
-        createGrSimPacket(0, false, Point(0.5, -0.1), Angle::ofRadians(-0.8));
+        createGrSimPacket(0, YELLOW, Point(0.5, -0.1), Angle::ofRadians(-0.8));
     sendGrSimPacket(grsim_packet);
 }

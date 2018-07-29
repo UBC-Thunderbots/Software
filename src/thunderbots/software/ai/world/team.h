@@ -7,6 +7,11 @@
 #include "ai/world/robot.h"
 
 /**
+ * Defines the available colors for an SSL team
+ */
+typedef enum { BLUE = 0, YELLOW = 1 } TEAM_COLOUR;
+
+/**
  * A team of robots
  */
 class Team

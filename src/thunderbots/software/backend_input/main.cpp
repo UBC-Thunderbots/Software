@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <iostream>
+#include "ai/world/team.h"
 #include "backend_input/filter/ball_filter.h"
 #include "backend_input/filter/robot_filter.h"
 #include "backend_input/message_util.h"
@@ -9,8 +10,8 @@
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
 
-// TODO: Make a real constant
-#define FRIENDLY_COLOR_YELLOW true
+// TODO: Make this a tuneable parameter
+const TEAM_COLOUR FRIENDLY_TEAM_COLOUR = YELLOW;
 
 int main(int argc, char **argv)
 {
@@ -88,7 +89,7 @@ int main(int argc, char **argv)
                         Angle::ofRadians(yellow_robot.orientation());
                     new_robot_data.confidence = yellow_robot.confidence();
 
-                    if (FRIENDLY_COLOR_YELLOW)
+                    if (FRIENDLY_TEAM_COLOUR == YELLOW)
                     {
                         friendly_team_robot_data.emplace_back(new_robot_data);
                     }
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
                         Angle::ofRadians(blue_robot.orientation());
                     new_robot_data.confidence = blue_robot.confidence();
 
-                    if (FRIENDLY_COLOR_YELLOW)
+                    if (FRIENDLY_TEAM_COLOUR == YELLOW)
                     {
                         enemy_team_robot_data.emplace_back(new_robot_data);
                     }

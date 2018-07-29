@@ -10,7 +10,7 @@ TEST(GrSimBackendTest, create_grsim_packet_zero_vel)
 {
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
-    grSim_Packet result = backend.createGrSimPacket(0, true, Point(), Angle::zero());
+    grSim_Packet result = backend.createGrSimPacket(0, YELLOW, Point(), Angle::zero());
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -42,7 +42,7 @@ TEST(GrSimBackendTest, create_grsim_packet_positive_vel)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result =
-        backend.createGrSimPacket(6, false, Point(89.6, 0.1589), Angle::ofRadians(1.23));
+        backend.createGrSimPacket(6, BLUE, Point(89.6, 0.1589), Angle::ofRadians(1.23));
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -73,8 +73,8 @@ TEST(GrSimBackendTest, create_grsim_packet_negative_vel)
 {
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
-    grSim_Packet result =
-        backend.createGrSimPacket(1, true, Point(-0.001, 2.49), Angle::ofRadians(-0.04));
+    grSim_Packet result = backend.createGrSimPacket(
+        1, YELLOW, Point(-0.001, 2.49), Angle::ofRadians(-0.04));
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -106,7 +106,7 @@ TEST(GrSimBackendTest, create_grsim_packet_at_numeric_limits)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacket(
-        2, true,
+        2, YELLOW,
         Point(std::numeric_limits<float>::min(), std::numeric_limits<float>::min()),
         Angle::ofRadians(std::numeric_limits<float>::min()));
 
@@ -140,7 +140,7 @@ TEST(GrSimBackendTest, create_grsim_packet_beyond_numeric_limits)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacket(
-        2, true,
+        2, YELLOW,
         Point(std::numeric_limits<double>::min(), std::numeric_limits<double>::min()),
         Angle::ofRadians(std::numeric_limits<double>::min()));
 
