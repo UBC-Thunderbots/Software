@@ -190,6 +190,8 @@ sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 # Required to install g++-7 on Ubuntu 16
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+# Required to make sure we install protobuf version 3.0.0 or greater
+sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 sudo apt-get update
 
 host_software_packages=(
