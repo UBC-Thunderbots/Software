@@ -24,8 +24,7 @@
   \author  Stefan Zickler, 2009
 */
 //========================================================================
-#ifndef ROBOCUP_SSL_CLIENT_H
-#define ROBOCUP_SSL_CLIENT_H
+#pragma once
 #include <string>
 #include "netraw.h"
 #include "proto/messages_robocup_ssl_detection.pb.h"
@@ -53,5 +52,3 @@ class RoboCupSSLClient
     void close();
     bool receive(SSL_WrapperPacket& packet);
 };
-
-#endif

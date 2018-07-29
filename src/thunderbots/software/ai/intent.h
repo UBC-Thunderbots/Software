@@ -1,5 +1,4 @@
-#ifndef AI_HL_INTENT_H_
-#define AI_HL_INTENT_H_
+#pragma once
 
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
@@ -22,6 +21,3 @@ class Intent
      */
     explicit Intent();
 };
-
-
-#endif  // AI_HL_INTENT_H_

@@ -1,5 +1,4 @@
-#ifndef AI_WORLD_TEAM_H_
-#define AI_WORLD_TEAM_H_
+#pragma once
 
 #include <cstdlib>
 #include <map>
@@ -62,5 +61,3 @@ class Team
    private:
     std::map<unsigned int, Robot> team_;
 };
-
-#endif  // AI_WORLD_TEAM_H_

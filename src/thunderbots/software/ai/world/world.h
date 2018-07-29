@@ -1,5 +1,4 @@
-#ifndef AI_WORLD_WORLD_H_
-#define AI_WORLD_WORLD_H_
+#pragma once
 
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
@@ -94,6 +93,3 @@ class World
     Team friendly_team_;
     Team enemy_team_;
 };
-
-
-#endif  // AI_WORLD_WORLD_H_

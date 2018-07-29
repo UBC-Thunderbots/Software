@@ -1,5 +1,4 @@
-#ifndef AI_PRIMITIVE_H_
-#define AI_PRIMITIVE_H_
+#pragma once
 
 #include <vector>
 
@@ -18,6 +17,3 @@ class Primitive
 {
    public:
 };
-
-
-#endif  // AI_PRIMITIVE_H_

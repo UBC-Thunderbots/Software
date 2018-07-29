@@ -1,5 +1,4 @@
-#ifndef AI_NAVIGATOR_RRT_H_
-#define AI_NAVIGATOR_RRT_H_
+#pragma once
 
 #include "ai/navigator/navigator.h"
 
@@ -12,6 +11,3 @@ class RRTNav : public Navigator
         const std::vector<std::pair<unsigned int, Intent>> &assignedIntents,
         const World &world) override;
 };
-
-
-#endif  // AI_NAVIGATOR_RRT_H_

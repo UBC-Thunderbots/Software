@@ -1,5 +1,4 @@
-#ifndef PROJECT_GRSIM_BACKEND_H
-#define PROJECT_GRSIM_BACKEND_H
+#pragma once
 #include <boost/asio.hpp>
 #include <string>
 #include "backend_output/backend.h"
@@ -63,5 +62,3 @@ class GrSimBackend : public Backend
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint remote_endpoint;
 };
-
-#endif  // PROJECT_GRSIM_BACKEND_H

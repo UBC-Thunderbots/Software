@@ -1,5 +1,4 @@
-#ifndef BACKEND_INPUT_BALL_FILTER_H_
-#define BACKEND_INPUT_BALL_FILTER_H_
+#pragma once
 
 #include <vector>
 #include "geom/point.h"
@@ -51,5 +50,3 @@ class BallFilter
     Point current_ball_position;
     Point current_ball_velocity;
 };
-
-#endif  // BACKEND_INPUT_BALL_FILTER_H_

@@ -1,5 +1,4 @@
-#ifndef BACKEND_INPUT_ROBOT_TEAM_FILTER_H_
-#define BACKEND_INPUT_ROBOT_TEAM_FILTER_H_
+#pragma once
 
 #include <map>
 #include <vector>
@@ -40,5 +39,3 @@ class RobotTeamFilter
    private:
     std::map<unsigned int, RobotFilter> robot_filters;
 };
-
-#endif  // BACKEND_INPUT_ROBOT_TEAM_FILTER_H_

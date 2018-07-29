@@ -1,5 +1,4 @@
-#ifndef GEOM_POINT_H_
-#define GEOM_POINT_H_
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -542,5 +541,3 @@ struct hash<Point> final
     }
 };
 }
-
-#endif  // GEOM_POINT_H_

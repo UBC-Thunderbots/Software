@@ -1,5 +1,4 @@
-#ifndef AI_WORLD_BALL_H_
-#define AI_WORLD_BALL_H_
+#pragma once
 
 #include "geom/point.h"
 
@@ -46,5 +45,3 @@ class Ball
     Point position_;
     Point velocity_;
 };
-
-#endif  // AI_WORLD_BALL_H_

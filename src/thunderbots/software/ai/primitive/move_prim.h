@@ -1,5 +1,4 @@
-#ifndef AI_PRIMITIVES_MOVE_H_
-#define AI_PRIMITIVES_MOVE_H_
+#pragma once
 
 #include "ai/primitive/primitive.h"
 #include "geom/angle.h"
@@ -25,5 +24,3 @@ class MovePrim : public Primitive
     Point destination_;
     Angle orientation_;
 };
-
-#endif  // AI_PRIMITIVES_MOVE_H_

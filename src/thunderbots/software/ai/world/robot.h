@@ -1,5 +1,4 @@
-#ifndef AI_WORLD_ROBOT_H_
-#define AI_WORLD_ROBOT_H_
+#pragma once
 
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -95,5 +94,3 @@ class Robot
     Angle orientation_;
     Angle angularVelocity_;
 };
-
-#endif  // AI_WORLD_ROBOT_H_

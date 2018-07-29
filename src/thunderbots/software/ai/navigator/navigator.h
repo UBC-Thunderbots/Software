@@ -1,5 +1,4 @@
-#ifndef AI_NAGIVATOR_NAVIGATOR_H_
-#define AI_NAGIVATOR_NAVIGATOR_H_
+#pragma once
 
 #include "ai/intent.h"
 #include "ai/primitive/primitive.h"
@@ -27,6 +26,3 @@ class Navigator
     // plan paths function
     // collision avoidance function
 };
-
-
-#endif  // AI_NAGIVATOR_NAVIGATOR_H_

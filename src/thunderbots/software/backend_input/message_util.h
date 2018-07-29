@@ -1,5 +1,4 @@
-#ifndef BACKEND_INPUT_MESSAGE_UTIL_H_
-#define BACKEND_INPUT_MESSAGE_UTIL_H_
+#pragma once
 
 #include <backend_input/filter/robot_team_filter.h>
 #include "geom/point.h"
@@ -52,5 +51,3 @@ class VisionUtil
     static thunderbots_msgs::Team createTeamMsg(
         const std::vector<FilteredRobotData> &team_data);
 };
-
-#endif  // BACKEND_INPUT_MESSAGE_UTIL_H_

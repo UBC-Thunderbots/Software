@@ -1,5 +1,4 @@
-#ifndef AI_HL_STP_STPHL_H_
-#define AI_HL_STP_STPHL_H_
+#pragma once
 
 #include "ai/hl/hl.h"
 #include "ai/intent.h"
@@ -29,5 +28,3 @@ class STPHL : public HL
     std::vector<std::pair<unsigned int, Intent>> getIntentAssignment(
         const World &world) override;
 };
-
-#endif  // AI_HL_STP_STPHL_H_

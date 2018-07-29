@@ -1,5 +1,4 @@
-#ifndef AI_HL_H_
-#define AI_HL_H_
+#pragma once
 
 #include "ai/intent.h"
 #include "ai/world/world.h"
@@ -33,5 +32,3 @@ class HL
     virtual std::vector<std::pair<unsigned int, Intent>> getIntentAssignment(
         const World &world);
 };
-
-#endif  // AI_HL_H_

@@ -1,5 +1,4 @@
-#ifndef PROJECT_BACKEND_H
-#define PROJECT_BACKEND_H
+#pragma once
 
 #include "ai/primitive/primitive.h"
 
@@ -12,7 +11,3 @@ class Backend
      */
     virtual void sendPrimitives(const std::vector<Primitive> &primitives);
 };
-
-
-
-#endif  // PROJECT_BACKEND_H

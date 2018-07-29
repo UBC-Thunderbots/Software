@@ -1,5 +1,4 @@
-#ifndef BACKEND_INPUT_ROBOT_FILTER_H_
-#define BACKEND_INPUT_ROBOT_FILTER_H_
+#pragma once
 
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -69,6 +68,3 @@ class RobotFilter
     Point current_robot_velocity;
     Angle current_robot_orientation;
 };
-
-
-#endif  // BACKEND_INPUT_ROBOT_FILTER_H_
