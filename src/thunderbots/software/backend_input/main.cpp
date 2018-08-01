@@ -9,6 +9,7 @@
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
+#include "../shared_util/constants.h"
 
 // TODO: Make this a tuneable parameter
 const TEAM_COLOUR FRIENDLY_TEAM_COLOUR = YELLOW;
@@ -21,13 +22,13 @@ int main(int argc, char **argv)
 
     // Create publishers
     ros::Publisher ball_publisher =
-        node_handle.advertise<thunderbots_msgs::Ball>("backend/ball", 1);
+        node_handle.advertise<thunderbots_msgs::Ball>(BACKEND_INPUT_BALL_TOPIC, 1);
     ros::Publisher field_publisher =
-        node_handle.advertise<thunderbots_msgs::Field>("backend/field", 1);
+        node_handle.advertise<thunderbots_msgs::Field>(BACKEND_INPUT_FIELD_TOPIC, 1);
     ros::Publisher friendly_team_publisher =
-        node_handle.advertise<thunderbots_msgs::Team>("backend/friendly_team", 1);
+        node_handle.advertise<thunderbots_msgs::Team>(BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher =
-        node_handle.advertise<thunderbots_msgs::Team>("backend/friendly_team", 1);
+        node_handle.advertise<thunderbots_msgs::Team>(BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
     // Set up the SSL Client to receive data over the network
     RoboCupSSLClient vision_client = RoboCupSSLClient(10020, "224.5.23.2");

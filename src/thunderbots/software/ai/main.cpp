@@ -5,6 +5,7 @@
 #include "thunderbots_msgs/Primitive.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
+#include "../shared_util/constants.h"
 
 // Variables we need to maintain state
 // In an anonymous namespace so they cannot be seen/accessed externally
@@ -51,17 +52,17 @@ int main(int argc, char **argv)
 
     // Create publishers
     ros::Publisher primitive_publisher =
-        node_handle.advertise<thunderbots_msgs::PrimitiveArray>("backend/primitives", 1);
+        node_handle.advertise<thunderbots_msgs::PrimitiveArray>(AI_PRIMITIVES_TOPIC, 1);
 
     // Create subscribers
     ros::Subscriber field_sub =
-        node_handle.subscribe("backend/field", 1, fieldUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub =
-        node_handle.subscribe("backend/ball", 1, ballUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
     ros::Subscriber friendly_team_sub =
-        node_handle.subscribe("backend/friendly_team", 1, friendlyTeamUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1, friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub =
-        node_handle.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Initialize variables used to maintain state
     ai = AI();
