@@ -28,5 +28,5 @@ class HL
     * running
     */
     virtual std::vector<std::unique_ptr<Intent>> getIntentAssignment(
-        const World &world) = 0;
+        const World &world) const = 0;
 };

@@ -19,22 +19,24 @@ class Robot
     explicit Robot(unsigned int id);
 
     /**
-     * Creates a new robot given a pattern id
-     */
-    explicit Robot(const thunderbots_msgs::Robot& robot_msg);
-
-    /**
      * Updates the state of the robot.
      *
      * @param new_position the new position of the robot. Coordinates are in metres.
      * @param new_velocity the new velocity of the robot, in metres / second.
      * @param new_orientation the new orientation of the robot, in Radians.
-     * @param new_angular_velocity the new angular velocity of the robot, in Radians /
-     * second.
+     * @param new_angular_velocity the new angular velocity of the robot, in Radians
+     * per second
      */
     void update(
         const Point& new_position, const Point& new_velocity,
-        const Angle& new_orientation);
+        const Angle& new_orientation, const Angle& new_angular_velocity);
+
+    /**
+     * Updates the state of the robot.
+     *
+     * @param robot_msg the Robot message containing the new data to update with
+     */
+    void update(const thunderbots_msgs::Robot &robot_msg);
 
     /**
      * Returns the id of the robot

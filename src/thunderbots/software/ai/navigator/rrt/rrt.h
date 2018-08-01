@@ -13,5 +13,5 @@ class RRTNav : public Navigator
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
-        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+        const std::vector<std::unique_ptr<Intent>> &assignedIntents) const override;
 };

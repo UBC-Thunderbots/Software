@@ -9,22 +9,24 @@ Robot::Robot(const unsigned int id)
 {
 }
 
-Robot::Robot(const thunderbots_msgs::Robot &robot_msg) : id_(robot_msg.id)
-{
-    Point position    = Point(robot_msg.position.x, robot_msg.position.y);
-    Point velocity    = Point(robot_msg.velocity.x, robot_msg.velocity.y);
-    Angle orientation = Angle::ofRadians(robot_msg.orientation);
-
-    update(position, velocity, orientation);
-}
-
 void Robot::update(
-    const Point &new_position, const Point &new_velocity, const Angle &new_orientation)
+    const Point &new_position, const Point &new_velocity, const Angle &new_orientation, const Angle &new_angular_velocity)
 {
     position_        = new_position;
     velocity_        = new_velocity;
     orientation_     = new_orientation;
-    angularVelocity_ = Angle::zero();
+    angularVelocity_ = new_angular_velocity;
+}
+
+void Robot::update(const thunderbots_msgs::Robot &robot_msg) {
+    assert(robot_msg.id == id_);
+
+    Point position    = Point(robot_msg.position.x, robot_msg.position.y);
+    Point velocity    = Point(robot_msg.velocity.x, robot_msg.velocity.y);
+    Angle orientation = Angle::ofRadians(robot_msg.orientation);
+    Angle angular_velocity = Angle::ofRadians(robot_msg.angular_velocity);
+
+    update(position, velocity, orientation, angular_velocity);
 }
 
 unsigned int Robot::id() const

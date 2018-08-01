@@ -5,7 +5,7 @@ STPHL::STPHL()
 {
 }
 
-std::vector<std::unique_ptr<Intent>> STPHL::getIntentAssignment(const World &world)
+std::vector<std::unique_ptr<Intent>> STPHL::getIntentAssignment(const World &world) const
 {
     // TODO: Implement this
     std::vector<std::unique_ptr<Intent>> assigned_intents =
