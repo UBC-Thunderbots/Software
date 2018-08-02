@@ -7,7 +7,9 @@ class Backend
    public:
     /**
      * Sends the given primitives to the backend to control the robots
+     *
      * @param primitives the list of primitives to send
      */
-    virtual void sendPrimitives(const std::vector<Primitive> &primitives);
+    virtual void sendPrimitives(
+        const std::vector<std::unique_ptr<Primitive>> &primitives) const = 0;
 };

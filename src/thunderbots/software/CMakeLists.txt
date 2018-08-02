@@ -95,24 +95,25 @@ add_executable (ai_logic
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ai_logic ${catkin_LIBRARIES})
 
-#file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
-#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
-#        )
-#add_executable (backend_output
-#        ${PROTO_SRCS}
-#        ${BACKEND_OUTPUT_SRC}
-#        )
-## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-## This way the message headers are always generated before they are used in compilation here.
-#add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(backend_output ${catkin_LIBRARIES}
-#        ${PROTOBUF_LIBRARIES}
-#        )
+file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
+        )
+add_executable (backend_output
+        ${PROTO_SRCS}
+        ${BACKEND_OUTPUT_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
+target_link_libraries(backend_output ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
 
 
 #############
@@ -151,7 +152,6 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_backend/grsim_backend.cpp
             backend_output/grsim/grsim_backend.cpp
             backend_output/grsim/grsim_backend.h
-            backend_output/backend.cpp
             backend_output/backend.h
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}

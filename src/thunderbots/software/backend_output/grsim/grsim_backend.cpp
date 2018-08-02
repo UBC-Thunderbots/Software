@@ -1,8 +1,9 @@
 #include "backend_output/grsim/grsim_backend.h"
 #include <iostream>
 #include <optional>
-#include "ai/primitive/move_prim.h"
+#include "ai/primitive/move_primitive.h"
 #include "proto/grSim_Commands.pb.h"
+#include "../shared_util/constants.h"
 
 using namespace boost::asio;
 
@@ -20,7 +21,7 @@ GrSimBackend::~GrSimBackend()
 
 grSim_Packet GrSimBackend::createGrSimPacket(
     unsigned int robot_id, TEAM_COLOUR team_colour, Point velocity,
-    Angle angular_velocity)
+    Angle angular_velocity) const
 {
     grSim_Packet packet;
 
@@ -44,15 +45,16 @@ grSim_Packet GrSimBackend::createGrSimPacket(
     return packet;
 }
 
-void GrSimBackend::sendGrSimPacket(grSim_Packet packet)
+void GrSimBackend::sendGrSimPacket(grSim_Packet packet) const
 {
     boost::system::error_code err;
-    socket.send_to(
-        buffer(packet.SerializeAsString(), static_cast<size_t>(packet.ByteSize())),
-        remote_endpoint, 0, err);
+//    socket.send_to(
+//        buffer(packet.SerializeAsString(), static_cast<size_t>(packet.ByteSize())),
+//        remote_endpoint, 0, err);
 }
 
-void GrSimBackend::sendPrimitives(const std::vector<Primitive>& primitives)
+void GrSimBackend::sendPrimitives(
+    const std::vector<std::unique_ptr<Primitive>>& primitives) const
 {
     // TODO: Implement this
     grSim_Packet grsim_packet =
