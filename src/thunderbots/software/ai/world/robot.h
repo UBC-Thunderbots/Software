@@ -36,7 +36,7 @@ class Robot
      *
      * @param robot_msg the Robot message containing the new data to update with
      */
-    void update(const thunderbots_msgs::Robot &robot_msg);
+    void update(const thunderbots_msgs::Robot& robot_msg);
 
     /**
      * Returns the id of the robot

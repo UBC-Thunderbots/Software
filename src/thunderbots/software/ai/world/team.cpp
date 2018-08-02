@@ -6,11 +6,10 @@ Team::Team()
 
 void Team::update(std::vector<Robot> &team_robots)
 {
-
 }
 
-void Team::update(const thunderbots_msgs::Team &team_msg) {
-
+void Team::update(const thunderbots_msgs::Team &team_msg)
+{
 }
 
 std::size_t Team::size() const

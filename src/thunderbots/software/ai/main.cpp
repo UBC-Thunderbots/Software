@@ -1,11 +1,11 @@
 #include <ros/ros.h>
+#include "../shared_util/constants.h"
 #include "ai/ai.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Primitive.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
-#include "../shared_util/constants.h"
 
 // Variables we need to maintain state
 // In an anonymous namespace so they cannot be seen/accessed externally
@@ -59,8 +59,8 @@ int main(int argc, char **argv)
         node_handle.subscribe(BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub =
         node_handle.subscribe(BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
-    ros::Subscriber friendly_team_sub =
-        node_handle.subscribe(BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1, friendlyTeamUpdateCallback);
+    ros::Subscriber friendly_team_sub = node_handle.subscribe(
+        BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1, friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub =
         node_handle.subscribe(BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 

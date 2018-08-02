@@ -10,7 +10,8 @@ Robot::Robot(const unsigned int id)
 }
 
 void Robot::update(
-    const Point &new_position, const Point &new_velocity, const Angle &new_orientation, const Angle &new_angular_velocity)
+    const Point &new_position, const Point &new_velocity, const Angle &new_orientation,
+    const Angle &new_angular_velocity)
 {
     position_        = new_position;
     velocity_        = new_velocity;
@@ -18,12 +19,13 @@ void Robot::update(
     angularVelocity_ = new_angular_velocity;
 }
 
-void Robot::update(const thunderbots_msgs::Robot &robot_msg) {
+void Robot::update(const thunderbots_msgs::Robot &robot_msg)
+{
     assert(robot_msg.id == id_);
 
-    Point position    = Point(robot_msg.position.x, robot_msg.position.y);
-    Point velocity    = Point(robot_msg.velocity.x, robot_msg.velocity.y);
-    Angle orientation = Angle::ofRadians(robot_msg.orientation);
+    Point position         = Point(robot_msg.position.x, robot_msg.position.y);
+    Point velocity         = Point(robot_msg.velocity.x, robot_msg.velocity.y);
+    Angle orientation      = Angle::ofRadians(robot_msg.orientation);
     Angle angular_velocity = Angle::ofRadians(robot_msg.angular_velocity);
 
     update(position, velocity, orientation, angular_velocity);

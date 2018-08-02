@@ -16,5 +16,6 @@ class STPHL : public HL
      */
     explicit STPHL();
 
-    std::vector<std::unique_ptr<Intent>> getIntentAssignment(const World &world) const override;
+    std::vector<std::unique_ptr<Intent>> getIntentAssignment(
+        const World &world) const override;
 };

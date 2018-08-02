@@ -1,7 +1,6 @@
 #include "world.h"
 
-World::World()
-    : field(Field()), ball(Ball()), friendly_team(Team()), enemy_team(Team())
+World::World() : field(Field()), ball(Ball()), friendly_team(Team()), enemy_team(Team())
 {
 }
 

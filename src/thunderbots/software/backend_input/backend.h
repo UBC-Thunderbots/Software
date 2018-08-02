@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include "backend_input/filter/ball_filter.h"
 #include "backend_input/filter/robot_filter.h"
 #include "backend_input/filter/robot_team_filter.h"
@@ -8,10 +9,10 @@
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
-#include <optional>
 
-class Backend {
-public:
+class Backend
+{
+   public:
     /**
      * Creates a new Backend for data input and filtering
      */
@@ -26,7 +27,8 @@ public:
      * @return a Ball message containing the most up to date filtered Ball data. If the
      * packet does not contain any new Ball information, returns std::nullopt
      */
-    std::optional<thunderbots_msgs::Ball> getFilteredBallMsg(const SSL_WrapperPacket &packet);
+    std::optional<thunderbots_msgs::Ball> getFilteredBallMsg(
+        const SSL_WrapperPacket &packet);
 
     /**
      * Given a new protobuf packet, returns a Field message containing the most up to date
@@ -48,7 +50,8 @@ public:
      * @return a Team message containing the most up to date filtered friendly team data.
      * If the packet does not contain any new Team or Robot data, returns std::nullopt
      */
-    std::optional<thunderbots_msgs::Team> getFilteredFriendlyTeamMsg(const SSL_WrapperPacket &packet);
+    std::optional<thunderbots_msgs::Team> getFilteredFriendlyTeamMsg(
+        const SSL_WrapperPacket &packet);
 
     /**
      * Given a new protobuf packet, updates the enemy team filter and returns a Team
@@ -59,9 +62,10 @@ public:
      * @return a Team message containing the most up to date filtered enemy team data.
      * If the packet does not contain any new Team or Robot data, returns std::nullopt
      */
-    std::optional<thunderbots_msgs::Team> getFilteredEnemyTeamMsg(const SSL_WrapperPacket &packet);
+    std::optional<thunderbots_msgs::Team> getFilteredEnemyTeamMsg(
+        const SSL_WrapperPacket &packet);
 
-private:
+   private:
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include "ai/intent/intent.h"
 #include "ai/world/world.h"
 
@@ -24,6 +25,7 @@ class HL
     * running.
     *
     * @param world The current state of the world
+    *
     * @return A vector of unique pointers to the Intents our friendly robots should be
     * running
     */
