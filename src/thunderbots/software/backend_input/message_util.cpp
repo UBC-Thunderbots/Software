@@ -3,7 +3,7 @@
 // TODO: Create unit conversion functions
 #define MILLIMETERS_TO_METERS_FLOAT 1000.0
 
-thunderbots_msgs::Field VisionUtil::createFieldMsg(
+thunderbots_msgs::Field MessageUtil::createFieldMsg(
     const SSL_GeometryFieldSize &field_data)
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
@@ -80,44 +80,45 @@ thunderbots_msgs::Field VisionUtil::createFieldMsg(
     return field_msg;
 }
 
-thunderbots_msgs::Ball VisionUtil::createBallMsg(
-    const Point &position, const Point &velocity)
+thunderbots_msgs::Ball MessageUtil::createBallMsg(
+    const FilteredBallData &filtered_ball_data)
 {
     thunderbots_msgs::Ball ball_msg;
 
-    ball_msg.position.x = position.x();
-    ball_msg.position.y = position.y();
+    ball_msg.position.x = filtered_ball_data.position.x();
+    ball_msg.position.y = filtered_ball_data.position.y();
 
-    ball_msg.velocity.x = velocity.x();
-    ball_msg.velocity.y = velocity.y();
+    ball_msg.velocity.x = filtered_ball_data.velocity.x();
+    ball_msg.velocity.y = filtered_ball_data.velocity.y();
 
     return ball_msg;
 }
 
-thunderbots_msgs::Robot VisionUtil::createRobotMsg(const FilteredRobotData &robot_data)
+thunderbots_msgs::Robot MessageUtil::createRobotMsg(
+    const FilteredRobotData &filtered_robot_data)
 {
     thunderbots_msgs::Robot robot_msg;
 
-    robot_msg.id = robot_data.id;
+    robot_msg.id = filtered_robot_data.id;
 
-    robot_msg.position.x = robot_data.position.x();
-    robot_msg.position.y = robot_data.position.y();
+    robot_msg.position.x = filtered_robot_data.position.x();
+    robot_msg.position.y = filtered_robot_data.position.y();
 
-    robot_msg.velocity.x = robot_data.velocity.x();
-    robot_msg.velocity.y = robot_data.velocity.y();
+    robot_msg.velocity.x = filtered_robot_data.velocity.x();
+    robot_msg.velocity.y = filtered_robot_data.velocity.y();
 
-    robot_msg.orientation = robot_data.orientation.toRadians();
+    robot_msg.orientation = filtered_robot_data.orientation.toRadians();
 
     return robot_msg;
 }
 
-thunderbots_msgs::Team VisionUtil::createTeamMsg(
-    const std::vector<FilteredRobotData> &team_data)
+thunderbots_msgs::Team MessageUtil::createTeamMsg(
+    const std::vector<FilteredRobotData> &filtered_team_data)
 {
     thunderbots_msgs::Team team_msg;
     team_msg.robots.clear();
 
-    for (FilteredRobotData filtered_robot_data : team_data)
+    for (const FilteredRobotData &filtered_robot_data : filtered_team_data)
     {
         thunderbots_msgs::Robot robot_msg = createRobotMsg(filtered_robot_data);
         team_msg.robots.emplace_back(robot_msg);

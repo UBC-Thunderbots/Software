@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "geom/angle.h"
 #include "geom/point.h"
 
@@ -17,6 +18,18 @@ typedef struct
     double confidence;
 } SSLRobotData;
 
+/**
+ * A lightweight datatype used to pass filtered robot data
+ */
+typedef struct
+{
+    unsigned int id;
+    Point position;
+    Point velocity;
+    Angle orientation;
+    Angle angular_velocity;
+} FilteredRobotData;
+
 class RobotFilter
 {
    public:
@@ -28,43 +41,24 @@ class RobotFilter
     explicit RobotFilter(unsigned int id);
 
     /**
-     * Updates the filter given a new set of data
+     * Updates the filter given a new set of data, and returns the most up to date
+     * filtered data for the Robot.
+     *
+     * @param new_robot_data A list of SSLRobot detections containing new robot data.
+     * The data does not all have to be for a particular Robot, the filter will only use
+     * the new Robot data that matches the robot id the filter was constructed with.
+     *
+     * @return The filtered data for the robot
      */
-    // TODO: Could this accept a vector? Are we likely to get multiple robot detections at
-    // once?
-    void update(const SSLRobotData &new_robot_data);
+    FilteredRobotData getFilteredData(const std::vector<SSLRobotData> &new_robot_data);
 
     /**
-     * Returns the filtered position of the robot
+     * Returns the id of the Robot that this filter is filtering for
      *
-     * @return the filtered position of the robot
+     * @return the id of the Robot that this filter is filtering for
      */
-    Point getRobotPosition();
-
-    /**
-     * Returns the filtered velocity of the robot
-     *
-     * @return the filtered velocity of the robot
-     */
-    Point getRobotVelocity();
-
-    /**
-     * Gets the filtered orientation of the robot
-     *
-     * @return the filtered orientation of the robot
-     */
-    Angle getRobotOrientation();
-
-    /**
-     * Gets the id of the robot
-     *
-     * @return the id of the robot
-     */
-    unsigned int getRobotId();
+    unsigned int getRobotId() const;
 
    private:
     unsigned int robot_id;
-    Point current_robot_position;
-    Point current_robot_velocity;
-    Angle current_robot_orientation;
 };

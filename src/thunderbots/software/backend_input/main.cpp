@@ -1,15 +1,16 @@
 #include <ros/ros.h>
 #include <iostream>
+#include "../shared_util/constants.h"
 #include "ai/world/team.h"
 #include "backend_input/filter/ball_filter.h"
 #include "backend_input/filter/robot_filter.h"
+#include "backend_input/filter/robot_team_filter.h"
 #include "backend_input/message_util.h"
 #include "backend_input/vision_client/robocup_ssl_client.h"
 #include "geom/point.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
-#include "../shared_util/constants.h"
 
 // TODO: Make this a tuneable parameter
 const TEAM_COLOUR FRIENDLY_TEAM_COLOUR = YELLOW;
@@ -26,7 +27,8 @@ int main(int argc, char **argv)
     ros::Publisher field_publisher =
         node_handle.advertise<thunderbots_msgs::Field>(BACKEND_INPUT_FIELD_TOPIC, 1);
     ros::Publisher friendly_team_publisher =
-        node_handle.advertise<thunderbots_msgs::Team>(BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
+        node_handle.advertise<thunderbots_msgs::Team>(
+            BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher =
         node_handle.advertise<thunderbots_msgs::Team>(BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
             {
                 const SSL_GeometryData &geom       = packet.geometry();
                 const SSL_GeometryFieldSize &field = geom.field();
-                thunderbots_msgs::Field field_msg  = VisionUtil::createFieldMsg(field);
+                thunderbots_msgs::Field field_msg  = MessageUtil::createFieldMsg(field);
                 field_publisher.publish(field_msg);
             }
 
@@ -67,11 +69,10 @@ int main(int argc, char **argv)
                     ball_detections.push_back(ball_data);
                 }
 
-                ball_filter.update(ball_detections);
-                Point new_ball_position = ball_filter.getBallPosition();
-                Point new_ball_velocity = ball_filter.getBallVelocity();
+                FilteredBallData filtered_ball_data =
+                    ball_filter.getFilteredData(ball_detections);
                 thunderbots_msgs::Ball ball_msg =
-                    VisionUtil::createBallMsg(new_ball_position, new_ball_velocity);
+                    MessageUtil::createBallMsg(filtered_ball_data);
                 ball_publisher.publish(ball_msg);
 
 
@@ -119,13 +120,15 @@ int main(int argc, char **argv)
                     }
                 }
 
-                friendly_team_filter.update(friendly_team_robot_data);
-                enemy_team_filter.update(enemy_team_robot_data);
+                std::vector<FilteredRobotData> filtered_friendly_team_data =
+                    friendly_team_filter.getFilteredData(friendly_team_robot_data);
+                std::vector<FilteredRobotData> filtered_enemy_team_data =
+                    enemy_team_filter.getFilteredData(enemy_team_robot_data);
 
                 thunderbots_msgs::Team friendly_team_msg =
-                    VisionUtil::createTeamMsg(friendly_team_filter.getFilteredTeamData());
+                    MessageUtil::createTeamMsg(filtered_friendly_team_data);
                 thunderbots_msgs::Team enemy_team_msg =
-                    VisionUtil::createTeamMsg(enemy_team_filter.getFilteredTeamData());
+                    MessageUtil::createTeamMsg(filtered_enemy_team_data);
 
                 friendly_team_publisher.publish(friendly_team_msg);
                 enemy_team_publisher.publish(enemy_team_msg);

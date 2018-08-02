@@ -16,6 +16,17 @@ typedef struct
 } SSLBallData;
 
 /**
+ * A lightweight datatype used to pass filtered ball data. We use this rather than
+ * something like std::pair so it's very explicit what data is being accessed, since
+ * it's accessed by name rather than by index (first/second)
+ */
+typedef struct
+{
+    Point position;
+    Point velocity;
+} FilteredBallData;
+
+/**
  * Given ball data from SSL Vision, filters for and returns the position/velocity of the
  * "real" ball
  */
@@ -28,25 +39,11 @@ class BallFilter
     explicit BallFilter();
 
     /**
-     * Updates the filter given a new set of data
-     */
-    void update(std::vector<SSLBallData> new_ball_data);
-
-    /**
-     * Returns the filtered position of the ball
+     * Updates the filter given a new set of data, and returns the most up to date
+     * filtered data for the ball.
      *
-     * @return the filtered position of the ball
+     * @param new_ball_data A list of new datapoints for the ball
+     * @return The filtered data for the ball
      */
-    Point getBallPosition();
-
-    /**
-     * Returns the filtered velocity of the ball
-     *
-     * @return the filtered velocity of the ball
-     */
-    Point getBallVelocity();
-
-   private:
-    Point current_ball_position;
-    Point current_ball_velocity;
+    FilteredBallData getFilteredData(std::vector<SSLBallData> new_ball_data);
 };

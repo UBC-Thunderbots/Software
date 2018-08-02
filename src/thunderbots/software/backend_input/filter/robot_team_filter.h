@@ -6,14 +6,6 @@
 #include "geom/point.h"
 #include "robot_filter.h"
 
-typedef struct
-{
-    unsigned int id;
-    Point position;
-    Point velocity;
-    Angle orientation;
-} FilteredRobotData;
-
 class RobotTeamFilter
 {
    public:
@@ -23,19 +15,13 @@ class RobotTeamFilter
     explicit RobotTeamFilter();
 
     /**
-     * Given a list of new robot data, updates the filter for this team of robots
+     * Updates the filter given a new set of data, and returns the most up to date
+     * filtered data for the team of robots
      *
-     * @param new_team_data a vector of new robot data for the team
-     */
-    void update(std::vector<SSLRobotData> new_team_data);
-
-    /**
-     * Gets the latest filtered team data.
+     * @param new_team_data A list of new SSL Robot detections
      *
-     * @return the latest filtered data for every robot on the team
+     * @return The filtered data for the team of robots
      */
-    std::vector<FilteredRobotData> getFilteredTeamData();
-
-   private:
-    std::map<unsigned int, RobotFilter> robot_filters;
+    std::vector<FilteredRobotData> getFilteredData(
+        const std::vector<SSLRobotData> &new_team_data);
 };
