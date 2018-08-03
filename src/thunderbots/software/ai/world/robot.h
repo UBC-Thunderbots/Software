@@ -50,7 +50,7 @@ class Robot
      * Using the default of 0 will give the current position of the robot.
      *
      * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the ball's position.
+     * to predict the robot's position.
      *
      * @return the predicted position of the robot. Coordinates are in metres.
      */
@@ -61,7 +61,7 @@ class Robot
      * Using the default of 0 will give the current velocity of the robot.
      *
      * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the ball's position.
+     * to predict the robot's position.
      *
      * @return the predicted velocity of the robot, in metres / second.
      */
@@ -72,7 +72,7 @@ class Robot
      * Using the default of 0 will give the current orientation of the robot.
      *
      * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the ball's position.
+     * to predict the robot's position.
      *
      * @return the predicted orientation of the robot, in Radians.
      */
@@ -83,7 +83,7 @@ class Robot
      * time. Using the default of 0 will give the current orientation of the robot.
      *
      * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the ball's position.
+     * to predict the robot's position.
      *
      * @return the predicted angular velocity of the robot, in Radians / second.
      */
