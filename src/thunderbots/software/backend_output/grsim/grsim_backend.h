@@ -23,7 +23,7 @@ class GrSimBackend : public Backend
     ~GrSimBackend();
 
     void sendPrimitives(
-        const std::vector<std::unique_ptr<Primitive>> &primitives) override;
+        const std::vector<std::unique_ptr<Primitive>>& primitives) override;
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.

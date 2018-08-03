@@ -59,4 +59,15 @@ class Primitive
      * @return A vector of Booleans that are the extra bits used by the Primitive.
      */
     virtual std::vector<bool> getExtraBitArray() const = 0;
+
+    /**
+     * Given a ROS Primitive message, constructs a concrete Primitive object and returns
+     * a unique_ptr using the Abstract Primitive interface. This acts like a Primitive
+     * factory.
+     *
+     * @param primitive_msg the Primitive message from which to construct the Primitive
+     * @return a unique_ptr to a Primitive object
+     */
+    static std::unique_ptr<Primitive> createPrimitive(
+        const thunderbots_msgs::Primitive& primitive_msg);
 };
