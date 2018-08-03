@@ -8,6 +8,7 @@
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
+#include "util/timestamp.h"
 
 class MessageUtil
 {

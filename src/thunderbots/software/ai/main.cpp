@@ -6,6 +6,7 @@
 #include "thunderbots_msgs/Primitive.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
+#include "util/timestamp.h"
 
 // Variables we need to maintain state
 // In an anonymous namespace so they cannot be seen/accessed externally
@@ -75,7 +76,14 @@ int main(int argc, char **argv)
         ros::spinOnce();
 
         // Get the Primitives the Robots should run from the AI
-        std::vector<std::unique_ptr<Primitive>> assignedPrimitives = ai.getPrimitives();
+        // We pass a timestamp with the current time (the time we initiate the call)
+        // to let the AI update its predictors so that decisions are always made with the
+        // most up to date predicted data (eg. future Robot or Ball position), even if
+        // some
+        // time has passed since the AI's state was last updated.
+        AITimestamp timestamp = Timestamp::getTimestampNow();
+        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+            ai.getPrimitives(timestamp);
 
         // Put these Primitives into a message and publish it
         thunderbots_msgs::PrimitiveArray primitive_array_message;

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "geom/point.h"
+#include "util/timestamp.h"
 
 /**
  * A lightweight datatype used to input new data into the filter.
@@ -13,6 +14,7 @@ typedef struct
 {
     Point position;
     double confidence;
+    AITimestamp timestamp;
 } SSLBallData;
 
 /**
@@ -24,6 +26,7 @@ typedef struct
 {
     Point position;
     Point velocity;
+    AITimestamp timestamp;
 } FilteredBallData;
 
 /**

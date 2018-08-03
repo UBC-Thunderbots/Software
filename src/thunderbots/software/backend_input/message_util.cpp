@@ -91,6 +91,9 @@ thunderbots_msgs::Ball MessageUtil::createBallMsg(
     ball_msg.velocity.x = filtered_ball_data.velocity.x();
     ball_msg.velocity.y = filtered_ball_data.velocity.y();
 
+    ball_msg.timestamp_microseconds =
+        Timestamp::getMicroseconds(filtered_ball_data.timestamp);
+
     return ball_msg;
 }
 
@@ -108,6 +111,9 @@ thunderbots_msgs::Robot MessageUtil::createRobotMsg(
     robot_msg.velocity.y = filtered_robot_data.velocity.y();
 
     robot_msg.orientation = filtered_robot_data.orientation.toRadians();
+
+    robot_msg.timestamp_microseconds =
+        Timestamp::getMicroseconds(filtered_robot_data.timestamp);
 
     return robot_msg;
 }

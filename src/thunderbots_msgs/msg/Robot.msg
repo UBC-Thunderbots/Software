@@ -1,5 +1,8 @@
 # Describes the current state of a robot
 
+# The timestamp of this data, in microseconds
+int64 timestamp_microseconds
+
 # The id of the robot
 uint32 id
 

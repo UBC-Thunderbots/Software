@@ -23,7 +23,7 @@ std::optional<thunderbots_msgs::Field> Backend::getFieldMsg(
 }
 
 std::optional<thunderbots_msgs::Ball> Backend::getFilteredBallMsg(
-    const SSL_WrapperPacket &packet)
+    const SSL_WrapperPacket &packet, const AITimestamp &timestamp)
 {
     if (packet.has_detection())
     {
@@ -35,6 +35,7 @@ std::optional<thunderbots_msgs::Ball> Backend::getFilteredBallMsg(
             SSLBallData ball_data;
             ball_data.position   = Point(ball.x() / 1000.0, ball.y() / 1000.0);
             ball_data.confidence = ball.confidence();
+            ball_data.timestamp  = timestamp;
             ball_detections.push_back(ball_data);
         }
 
@@ -48,7 +49,7 @@ std::optional<thunderbots_msgs::Ball> Backend::getFilteredBallMsg(
 }
 
 std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
-    const SSL_WrapperPacket &packet)
+    const SSL_WrapperPacket &packet, const AITimestamp &timestamp)
 {
     if (packet.has_detection())
     {
@@ -70,6 +71,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
             new_robot_data.position    = Point(friendly_robot.x(), friendly_robot.y());
             new_robot_data.orientation = Angle::ofRadians(friendly_robot.orientation());
             new_robot_data.confidence  = friendly_robot.confidence();
+            new_robot_data.timestamp   = timestamp;
 
             friendly_team_robot_data.emplace_back(new_robot_data);
         }
@@ -88,7 +90,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
 
 
 std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
-    const SSL_WrapperPacket &packet)
+    const SSL_WrapperPacket &packet, const AITimestamp &timestamp)
 {
     if (packet.has_detection())
     {

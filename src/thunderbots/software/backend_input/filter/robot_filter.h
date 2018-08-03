@@ -3,6 +3,7 @@
 #include <vector>
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "util/timestamp.h"
 
 /**
  * A lightweight datatype used to input new data into the filter.
@@ -16,6 +17,7 @@ typedef struct
     Point position;
     Angle orientation;
     double confidence;
+    AITimestamp timestamp;
 } SSLRobotData;
 
 /**
@@ -28,6 +30,7 @@ typedef struct
     Point velocity;
     Angle orientation;
     Angle angular_velocity;
+    AITimestamp timestamp;
 } FilteredRobotData;
 
 class RobotFilter
