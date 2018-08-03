@@ -45,16 +45,16 @@ grSim_Packet GrSimBackend::createGrSimPacket(
     return packet;
 }
 
-void GrSimBackend::sendGrSimPacket(grSim_Packet packet) const
+void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
 {
     boost::system::error_code err;
-    //    socket.send_to(
-    //        buffer(packet.SerializeAsString(), static_cast<size_t>(packet.ByteSize())),
-    //        remote_endpoint, 0, err);
+    socket.send_to(
+        buffer(packet.SerializeAsString(), static_cast<size_t>(packet.ByteSize())),
+        remote_endpoint, 0, err);
 }
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives) const
+    const std::vector<std::unique_ptr<Primitive>>& primitives)
 {
     // TODO: Implement this
     grSim_Packet grsim_packet =
