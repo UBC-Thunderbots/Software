@@ -1,7 +1,8 @@
-#ifndef PROJECT_GRSIM_BACKEND_H
-#define PROJECT_GRSIM_BACKEND_H
+#pragma once
+
 #include <boost/asio.hpp>
 #include <string>
+#include "ai/world/team.h"
 #include "backend_output/backend.h"
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -21,11 +22,13 @@ class GrSimBackend : public Backend
 
     ~GrSimBackend();
 
-    void sendPrimitives(const std::vector<Primitive> &primitives) override;
+    void sendPrimitives(
+        const std::vector<std::unique_ptr<Primitive>>& primitives) override;
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.
-     * Velocities are in the Robot's local coordinate system.
+     * Velocities are in the Robot's local coordinate system. This function is left public
+     * so that it's easily testable
      *
      * @param robot_id The id of the robot to send the command to
      * @param team_colour_yellow Specifies if the robot to send the command to is on the
@@ -44,8 +47,8 @@ class GrSimBackend : public Backend
      * second.
      */
     grSim_Packet createGrSimPacket(
-        unsigned int robot_id, bool team_colour_yellow, Point velocity,
-        Angle angular_velocity);
+        unsigned int robot_id, TeamColour team_colour, Point velocity,
+        Angle angular_velocity) const;
 
    private:
     /**
@@ -53,7 +56,7 @@ class GrSimBackend : public Backend
      *
      * @param packet the grSim packet to send
      */
-    void sendGrSimPacket(grSim_Packet packet);
+    void sendGrSimPacket(const grSim_Packet& packet);
 
 
     // Variables for networking
@@ -63,5 +66,3 @@ class GrSimBackend : public Backend
     boost::asio::ip::udp::socket socket;
     boost::asio::ip::udp::endpoint remote_endpoint;
 };
-
-#endif  // PROJECT_GRSIM_BACKEND_H

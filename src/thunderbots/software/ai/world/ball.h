@@ -1,9 +1,9 @@
-#ifndef AI_WORLD_BALL_H_
-#define AI_WORLD_BALL_H_
+#pragma once
 
+#include <thunderbots_msgs/Ball.h>
 #include "geom/point.h"
 
-class Ball
+class Ball final
 {
    public:
     // The approximate radius of the ball according to the SSL rulebook
@@ -15,12 +15,21 @@ class Ball
     explicit Ball();
 
     /**
-     * Updates the ball with new data.
+     * Updates the ball with new data, updating the current data as well as the predictive
+     * model
      *
-     * @param new_position the new position of the ball.
-     * @param new_velocity the new velocity of the ball.
+     * @param new_position the new position of the ball, defined in metres
+     * @param new_velocity the new velocity of the ball, defined in metres per second
      */
     void update(Point &new_position, Point &new_velocity);
+
+    /**
+     * Updates the ball with new data from a Ball message. This updates the current data
+     * as well as the predictive models
+     *
+     * @param ball_msg The message containing the new data to update the Ball with
+     */
+    void update(const thunderbots_msgs::Ball &ball_msg);
 
     /**
      * Get the predicted position of the ball at a time relative to the current time.
@@ -28,7 +37,7 @@ class Ball
      *
      * @param time_delta the amount of time in seconds forward to predict
      *
-     * @return the predicted position of the ball.
+     * @return the predicted position of the ball, defined in metres
      */
     Point position(double time_delta = 0.0) const;
 
@@ -38,7 +47,7 @@ class Ball
      *
      * @param time_delta the amount of time in seconds forwards to predict
      *
-     * @return the predicted velocity of the ball;
+     * @return the predicted velocity of the ball, defined in metres per second
      */
     Point velocity(double time_delta = 0.0) const;
 
@@ -46,5 +55,3 @@ class Ball
     Point position_;
     Point velocity_;
 };
-
-#endif  // AI_WORLD_BALL_H_

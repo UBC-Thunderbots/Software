@@ -1,11 +1,16 @@
-#ifndef AI_WORLD_TEAM_H_
-#define AI_WORLD_TEAM_H_
+#pragma once
 
 #include <cstdlib>
 #include <map>
 #include <optional>
 #include <vector>
 #include "ai/world/robot.h"
+#include "thunderbots_msgs/Team.h"
+
+/**
+ * Defines the available colors for an SSL team
+ */
+typedef enum { BLUE = 0, YELLOW = 1 } TeamColour;
 
 /**
  * A team of robots
@@ -24,6 +29,13 @@ class Team
      * @param team_robots the new robots for this team
      */
     void update(std::vector<Robot> &team_robots);
+
+    /**
+     * Updates this team with new data from the team message
+     *
+     * @param team_msg the message with the new team data
+     */
+    void update(const thunderbots_msgs::Team &team_msg);
 
     /**
      * Gets the number of robots on this team
@@ -58,9 +70,4 @@ class Team
      * @return a vector of all the robots on this team.
      */
     std::vector<Robot> getAllRobots() const;
-
-   private:
-    std::map<unsigned int, Robot> team_;
 };
-
-#endif  // AI_WORLD_TEAM_H_

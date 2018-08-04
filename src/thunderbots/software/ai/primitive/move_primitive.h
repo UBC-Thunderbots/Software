@@ -1,29 +1,44 @@
-#ifndef AI_PRIMITIVES_MOVE_H_
-#define AI_PRIMITIVES_MOVE_H_
+#pragma once
 
 #include "ai/primitive/primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "thunderbots_msgs/MovePrimitive.h"
 
-class MovePrim : public Primitive
+class MovePrimitive : public Primitive
 {
    public:
-    explicit MovePrim();
-    explicit MovePrim(unsigned int robot_id, Point destination, Angle orientation);
-    explicit MovePrim(const thunderbots_msgs::MovePrimitive &move_prim_msg);
+    /**
+     * Creates a new Move Primitive
+     *
+     * @param robot_id The id of the Robot to run this Primitive
+     * @param dest The final destination of the movement
+     * @param final_angle The final orientation the robot should have at the end
+     * of the movement
+     * @param final_speed The final speed the Robot should have when it reaches
+     * its destination at the end of the movement
+     */
+    explicit MovePrimitive(
+        unsigned int robot_id, const Point &dest, const Angle &final_angle,
+        double final_speed);
 
-    unsigned int robotId() const;
-    Point destination() const;
-    Angle orientation() const;
+    /**
+     * Creates a new Move Primitive from a Primitive message
+     *
+     * @param primtiive_msg The message from which to create the Move Primitive
+     */
+    explicit MovePrimitive(const thunderbots_msgs::Primitive &primtiive_msg);
 
-    thunderbots_msgs::MovePrimitive createMsg() const;
+    std::string getPrimitiveName() const override;
+
+    unsigned int getRobotId() const override;
+
+    std::vector<double> getParameterArray() const override;
+
+    std::vector<bool> getExtraBitArray() const override;
 
    private:
-    PrimtiveID id_;
-    unsigned int robot_id_;
-    Point destination_;
-    Angle orientation_;
+    unsigned int robot_id;
+    Point dest;
+    Angle final_angle;
+    double final_speed;
 };
-
-#endif  // AI_PRIMITIVES_MOVE_H_

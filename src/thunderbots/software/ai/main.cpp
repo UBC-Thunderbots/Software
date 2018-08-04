@@ -1,84 +1,48 @@
 #include <ros/ros.h>
-#include "ai/hl/stp/stphl.h"
-#include "ai/intent.h"
-#include "ai/navigator/rrt/rrt.h"
-#include "ai/primitive/move_prim.h"
-#include "ai/world/ball.h"
-#include "ai/world/field.h"
-#include "ai/world/robot.h"
-#include "ai/world/team.h"
-#include "ai/world/world.h"
+#include "../shared_util/constants.h"
+#include "ai/ai.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
-#include "thunderbots_msgs/MovePrimitive.h"
+#include "thunderbots_msgs/Primitive.h"
+#include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
+#include "util/timestamp.h"
 
-// Member variables we need to maintain state
+// Variables we need to maintain state
 // In an anonymous namespace so they cannot be seen/accessed externally
 namespace
 {
-World world;
-HL high_level;
-Navigator navigator;
+AI ai;
 }
 
 
-// Callbacks
+// Callbacks to update the state of the world
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
 {
     thunderbots_msgs::Field field_msg = *msg;
 
-    Field new_field = Field();
-    new_field.updateDimensions(field_msg);
-
-    world.updateField(new_field);
+    ai.world.field.updateDimensions(field_msg);
 }
 
 void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
 {
     thunderbots_msgs::Ball ball_msg = *msg;
 
-    Point new_position = Point(ball_msg.position.x, ball_msg.position.y);
-    Point new_velocity = Point(ball_msg.velocity.x, ball_msg.velocity.y);
-
-    Ball new_ball = Ball();
-    new_ball.update(new_position, new_velocity);
-
-    world.updateBall(new_ball);
+    ai.world.ball.update(ball_msg);
 }
 
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team friendly_team_msg = *msg;
 
-    std::vector<Robot> friendly_robots = std::vector<Robot>();
-    for (auto robot_msg : friendly_team_msg.robots)
-    {
-        Robot robot = Robot(robot_msg);
-        friendly_robots.emplace_back(robot);
-    }
-
-    Team new_friendly_team = Team();
-    new_friendly_team.update(friendly_robots);
-
-    world.updateFriendlyTeam(new_friendly_team);
+    ai.world.friendly_team.update(friendly_team_msg);
 }
 
 void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team enemy_team_msg = *msg;
 
-    std::vector<Robot> enemy_robots = std::vector<Robot>();
-    for (auto robot_msg : enemy_team_msg.robots)
-    {
-        Robot robot = Robot(robot_msg);
-        enemy_robots.emplace_back(robot);
-    }
-
-    Team new_enemy_team = Team();
-    new_enemy_team.update(enemy_robots);
-
-    world.updateEnemyTeam(new_enemy_team);
+    ai.world.enemy_team.update(enemy_team_msg);
 }
 
 int main(int argc, char **argv)
@@ -88,41 +52,48 @@ int main(int argc, char **argv)
     ros::NodeHandle node_handle;
 
     // Create publishers
-    ros::Publisher move_prim_publisher =
-        node_handle.advertise<thunderbots_msgs::MovePrimitive>("backend/move_prim", 1);
+    ros::Publisher primitive_publisher =
+        node_handle.advertise<thunderbots_msgs::PrimitiveArray>(AI_PRIMITIVES_TOPIC, 1);
 
     // Create subscribers
     ros::Subscriber field_sub =
-        node_handle.subscribe("backend/field", 1, fieldUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub =
-        node_handle.subscribe("backend/ball", 1, ballUpdateCallback);
-    ros::Subscriber friendly_team_sub =
-        node_handle.subscribe("backend/friendly_team", 1, friendlyTeamUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
+    ros::Subscriber friendly_team_sub = node_handle.subscribe(
+        BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1, friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub =
-        node_handle.subscribe("backend/enemy_team", 1, enemyTeamUpdateCallback);
+        node_handle.subscribe(BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
-    // Initialize static variables used to maintain state
-    world      = World();
-    high_level = STPHL();
-    navigator  = RRTNav();
+    // Initialize variables used to maintain state
+    ai = AI();
 
     // Main loop
     while (ros::ok())
     {
-        std::vector<std::pair<unsigned int, Intent>> assignedIntents =
-            high_level.getIntentAssignment(world);
-
-        std::map<unsigned int, Primitive> assignedPrimitives =
-            navigator.getAssignedPrimitives(assignedIntents, world);
-
-        MovePrim test_move_prim = MovePrim(0, world.ball().position(), Angle::zero());
-        thunderbots_msgs::MovePrimitive move_prim_msg = test_move_prim.createMsg();
-        move_prim_publisher.publish(move_prim_msg);
-        std::cout << "Publishing MovePrim to location " << world.ball().position()
-                  << std::endl;
-
         // Spin once to let all necessary callbacks run
+        // These callbacks will update the AI's world state
         ros::spinOnce();
+
+        // Get the Primitives the Robots should run from the AI
+        // We pass a timestamp with the current time (the time we initiate the call)
+        // to let the AI update its predictors so that decisions are always made with the
+        // most up to date predicted data (eg. future Robot or Ball position), even if
+        // some
+        // time has passed since the AI's state was last updated.
+        AITimestamp timestamp = Timestamp::getTimestampNow();
+        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+            ai.getPrimitives(timestamp);
+
+        // Put these Primitives into a message and publish it
+        thunderbots_msgs::PrimitiveArray primitive_array_message;
+        for (auto const &prim : assignedPrimitives)
+        {
+            thunderbots_msgs::Primitive msg = prim->createMsg();
+            primitive_array_message.primitives.emplace_back(msg);
+            std::cout << msg << std::endl;
+        }
+        primitive_publisher.publish(primitive_array_message);
     }
 
     return 0;

@@ -1,5 +1,4 @@
-#ifndef AI_WORLD_WORLD_H_
-#define AI_WORLD_WORLD_H_
+#pragma once
 
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
@@ -12,7 +11,7 @@
  * way to pass all this information
  * around to modules that may need it.
  */
-class World
+class World final
 {
    public:
     /**
@@ -32,68 +31,11 @@ class World
         const Field &field, const Ball &ball, const Team &friendly_team,
         const Team &enemy_team);
 
-    /**
-     * Updates the field in this world.
-     *
-     * @param new_field the new field
-     */
-    void updateField(const Field &new_field);
 
-    /**
-     * Updates the ball in this world.
-     *
-     * @param new_ball the new ball
-     */
-    void updateBall(const Ball &new_ball);
-
-    /**
-     * Updates the friendly team in this world.
-     *
-     * @param new_friendly_team the friendly team
-     */
-    void updateFriendlyTeam(const Team &new_friendly_team);
-
-    /**
-     * Updates the enemy team in this world.
-     *
-     * @param new_enemy_team the enemy team
-     */
-    void updateEnemyTeam(const Team &new_enemy_team);
-
-    /**
-     * Returns the ball in this world.
-     *
-     * @return the ball in this world.
-     */
-    Ball ball() const;
-
-    /**
-     * Returns the ball in this world.
-     *
-     * @return the ball in this world.
-     */
-    Field field() const;
-
-    /**
-     * Returns the friendly team in this world.
-     *
-     * @return the friendly team in this world.
-     */
-    Team friendlyTeam() const;
-
-    /**
-     * Returns the enemy team in this world.
-     *
-     * @return the enemy team in this world.
-     */
-    Team enemyTeam() const;
-
-   private:
-    Field field_;
-    Ball ball_;
-    Team friendly_team_;
-    Team enemy_team_;
+    // We leave these members public to make theme easy to access and update, rather
+    // than providing redundant getters and setters.
+    Field field;
+    Ball ball;
+    Team friendly_team;
+    Team enemy_team;
 };
-
-
-#endif  // AI_WORLD_WORLD_H_
