@@ -22,8 +22,8 @@ add_message_files(
     Robot.msg
     Team.msg
     Field.msg
-    MovePrimitive.msg
-    PrimitiveWrapper.msg
+    Primitive.msg
+    PrimitiveArray.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
