@@ -1,6 +1,6 @@
 # Describes the current state of the ball
 
-# The timestamp of this data, in microseconds
+# The timestamp when this data was received, in microseconds
 int64 timestamp_microseconds
 
 # The position of the ball. Coordinates are in metres

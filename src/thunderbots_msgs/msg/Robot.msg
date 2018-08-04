@@ -1,6 +1,6 @@
 # Describes the current state of a robot
 
-# The timestamp of this data, in microseconds
+# The timestamp when this data was received, in microseconds
 int64 timestamp_microseconds
 
 # The id of the robot
