@@ -5,8 +5,7 @@
 // This file is from the SSL-Vision repository:
 // https://github.com/RoboCup-SSL/ssl-vision/tree/master/src/shared/net
 
-#ifndef _INCLUDED_NETRAW_H_
-#define _INCLUDED_NETRAW_H_
+#pragma once
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -123,5 +122,3 @@ class UDP
 };
 
 };  // namespace Net
-
-#endif

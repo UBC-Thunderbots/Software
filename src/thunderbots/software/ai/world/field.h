@@ -1,5 +1,4 @@
-#ifndef AI_FIELD_H_
-#define AI_FIELD_H_
+#pragma once
 
 #include "geom/point.h"
 #include "thunderbots_msgs/Field.h"
@@ -240,5 +239,3 @@ class Field
     double boundary_width_;
     double center_circle_radius_;
 };
-
-#endif  // AI_FIELD_H_

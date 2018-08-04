@@ -1,15 +1,16 @@
-#ifndef BACKEND_INPUT_MESSAGE_UTIL_H_
-#define BACKEND_INPUT_MESSAGE_UTIL_H_
+#pragma once
 
-#include <backend_input/filter/robot_team_filter.h>
+#include "backend_input/filter/ball_filter.h"
+#include "backend_input/filter/robot_filter.h"
 #include "geom/point.h"
 #include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
+#include "util/timestamp.h"
 
-class VisionUtil
+class MessageUtil
 {
    public:
     /**
@@ -23,34 +24,32 @@ class VisionUtil
         const SSL_GeometryFieldSize &field_data);
 
     /**
-     * Creates a Ball msg given the position and velocity of a ball
+     * Creates a Ball msg given the filtered data for a ball
      *
-     * @param position the position of the ball
-     * @param velocity the velocity of the ball
+     * @param filtered_ball_data the filtered data for the ball
      *
      * @return a Ball message containing the ball information
      */
     static thunderbots_msgs::Ball createBallMsg(
-        const Point &position, const Point &velocity);
+        const FilteredBallData &filtered_ball_data);
 
     /**
      * Creates a Robot msg given the Filtered Data for a robot
      *
-     * @param robot_data the Filtered Data for a robot
+     * @param filtered_robot_data the Filtered Data for a robot
      *
      * @return a Robot message containing the robot's information
      */
-    static thunderbots_msgs::Robot createRobotMsg(const FilteredRobotData &robot_data);
+    static thunderbots_msgs::Robot createRobotMsg(
+        const FilteredRobotData &filtered_robot_data);
 
     /**
      * Creates a Team msg given team data
      *
-     * @param team_data A vector of robot data representing a team
+     * @param filtered_team_data A vector of robot data representing a team
      *
      * @return a Team message containing the information for the team
      */
     static thunderbots_msgs::Team createTeamMsg(
-        const std::vector<FilteredRobotData> &team_data);
+        const std::vector<FilteredRobotData> &filtered_team_data);
 };
-
-#endif  // BACKEND_INPUT_MESSAGE_UTIL_H_

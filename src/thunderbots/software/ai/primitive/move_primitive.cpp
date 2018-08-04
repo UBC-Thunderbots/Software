@@ -1,47 +1,50 @@
-#include "move_prim.h"
+#include "ai/primitive/move_primitive.h"
 
-MovePrim::MovePrim() : id_(PRIM_MOVE_ID)
+MovePrimitive::MovePrimitive(
+    unsigned int robot_id, const Point &dest, const Angle &final_angle,
+    double final_speed)
+    : robot_id(robot_id), dest(dest), final_angle(final_angle), final_speed(final_speed)
 {
 }
 
-MovePrim::MovePrim(unsigned int robot_id, Point destination, Angle orientation)
+MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
-    id_          = PRIM_MOVE_ID;
-    robot_id_    = robot_id;
-    destination_ = destination;
-    orientation_ = orientation;
+    if (primitive_msg.primitive_name != getPrimitiveName())
+    {
+        // TODO: Throw a proper exception here
+        std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
+                  << std::endl;
+        exit(1);
+    }
+
+    robot_id      = primitive_msg.robot_id;
+    double dest_x = primitive_msg.parameters.at(0);
+    double dest_y = primitive_msg.parameters.at(1);
+    dest          = Point(dest_x, dest_y);
+    final_angle   = Angle::ofRadians(primitive_msg.parameters.at(2));
+    final_speed   = primitive_msg.parameters.at(3);
 }
 
-MovePrim::MovePrim(const thunderbots_msgs::MovePrimitive &move_prim_msg)
+
+std::string MovePrimitive::getPrimitiveName() const
 {
-    id_          = PRIM_MOVE_ID;
-    robot_id_    = move_prim_msg.robot_id;
-    destination_ = Point(move_prim_msg.destination.x, move_prim_msg.destination.y);
-    orientation_ = Angle::ofRadians(move_prim_msg.orientation);
+    return MOVE_PRIMITIVE_NAME;
 }
 
-unsigned int MovePrim::robotId() const
+unsigned int MovePrimitive::getRobotId() const
 {
-    return robot_id_;
+    return robot_id;
 }
 
-Point MovePrim::destination() const
+std::vector<double> MovePrimitive::getParameterArray() const
 {
-    return destination_;
+    std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),
+                                      final_speed};
+
+    return parameters;
 }
 
-Angle MovePrim::orientation() const
+std::vector<bool> MovePrimitive::getExtraBitArray() const
 {
-    return orientation_;
-}
-
-thunderbots_msgs::MovePrimitive MovePrim::createMsg() const
-{
-    thunderbots_msgs::MovePrimitive msg;
-    msg.robot_id      = robot_id_;
-    msg.prim_id       = id_;
-    msg.destination.x = destination_.x();
-    msg.destination.y = destination_.y();
-    msg.orientation   = orientation_.toRadians();
-    return msg;
+    return std::vector<bool>();
 }

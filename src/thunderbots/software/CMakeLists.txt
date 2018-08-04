@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.1)
 project(thunderbots_software)
 
 # Build in "Release" (with lots of compiler optimizations) by default
@@ -25,6 +24,14 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 
 # Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
+
+# Create a list of files from the shared_util folder
+file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util/*.h
+        )
+
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -60,10 +67,14 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/team.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
 add_executable (backend_input
         ${PROTO_SRCS}
         ${BACKEND_INPUT_SRC}
+        ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
@@ -76,9 +87,12 @@ target_link_libraries(backend_input
 file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
+        ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
@@ -92,10 +106,13 @@ file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
 add_executable (backend_output
         ${PROTO_SRCS}
         ${BACKEND_OUTPUT_SRC}
+        ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
@@ -141,7 +158,6 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_backend/grsim_backend.cpp
             backend_output/grsim/grsim_backend.cpp
             backend_output/grsim/grsim_backend.h
-            backend_output/backend.cpp
             backend_output/backend.h
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}

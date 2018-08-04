@@ -22,8 +22,7 @@
 */
 //========================================================================
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#pragma once
 
 #include <math.h>
 #include <algorithm>
@@ -599,6 +598,4 @@ inline void mzero(data *d, int n)
 #else
 #define likely(x) (x)
 #define unlikely(x) (x)
-#endif
-
 #endif

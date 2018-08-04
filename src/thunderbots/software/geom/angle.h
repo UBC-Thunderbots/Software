@@ -1,5 +1,4 @@
-#ifndef GEOM_ANGLE_H
-#define GEOM_ANGLE_H
+#pragma once
 
 #include <cmath>
 #include <ostream>
@@ -577,5 +576,3 @@ inline std::ostream &operator<<(std::ostream &os, const Angle &a)
     os << a.toRadians() << "R";
     return os;
 }
-
-#endif
