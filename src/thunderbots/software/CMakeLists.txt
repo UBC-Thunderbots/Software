@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(thunderbots)
+project(thunderbots_software)
 
 # Build in "Release" (with lots of compiler optimizations) by default
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
