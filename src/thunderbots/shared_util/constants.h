@@ -11,4 +11,4 @@ static const std::string BACKEND_INPUT_ENEMY_TEAM_TOPIC    = "backend/enemy_team
 static const std::string AI_PRIMITIVES_TOPIC               = "backend/enemy_team";
 
 // TODO: Make this a tuneable parameter
-const TEAM_COLOUR FRIENDLY_TEAM_COLOUR = YELLOW;
+const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;

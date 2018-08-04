@@ -7,9 +7,9 @@ MovePrimitive::MovePrimitive(
 {
 }
 
-MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primtiive_msg)
+MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
-    if (primtiive_msg.primitive_name != getPrimitiveName())
+    if (primitive_msg.primitive_name != getPrimitiveName())
     {
         // TODO: Throw a proper exception here
         std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
@@ -17,12 +17,12 @@ MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primtiive_msg)
         exit(1);
     }
 
-    robot_id      = primtiive_msg.robot_id;
-    double dest_x = primtiive_msg.parameters.at(0);
-    double dest_y = primtiive_msg.parameters.at(1);
+    robot_id      = primitive_msg.robot_id;
+    double dest_x = primitive_msg.parameters.at(0);
+    double dest_y = primitive_msg.parameters.at(1);
     dest          = Point(dest_x, dest_y);
-    final_angle   = Angle::ofRadians(primtiive_msg.parameters.at(2));
-    final_speed   = primtiive_msg.parameters.at(3);
+    final_angle   = Angle::ofRadians(primitive_msg.parameters.at(2));
+    final_speed   = primitive_msg.parameters.at(3);
 }
 
 

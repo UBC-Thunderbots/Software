@@ -20,7 +20,7 @@ GrSimBackend::~GrSimBackend()
 }
 
 grSim_Packet GrSimBackend::createGrSimPacket(
-    unsigned int robot_id, TEAM_COLOUR team_colour, Point velocity,
+    unsigned int robot_id, TeamColour team_colour, Point velocity,
     Angle angular_velocity) const
 {
     grSim_Packet packet;
