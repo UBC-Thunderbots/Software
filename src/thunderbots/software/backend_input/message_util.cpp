@@ -1,5 +1,5 @@
 #include "message_util.h"
-#include <shared_constants.h>
+#include "shared/constants.h"
 
 thunderbots_msgs::Field MessageUtil::createFieldMsg(
     const SSL_GeometryFieldSize &field_data)

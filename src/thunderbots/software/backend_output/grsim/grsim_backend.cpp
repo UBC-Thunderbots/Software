@@ -3,7 +3,7 @@
 #include <optional>
 #include "ai/primitive/move_primitive.h"
 #include "proto/grSim_Commands.pb.h"
-#include "shared_constants.h"
+#include "shared/constants.h"
 
 using namespace boost::asio;
 

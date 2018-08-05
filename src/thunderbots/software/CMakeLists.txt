@@ -25,11 +25,11 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 # Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
-# Create a list of files from the shared_util folder
+# Create a list of files from the shared folder
 file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util/*.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
         )
 
 
@@ -57,7 +57,7 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared_util
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
         )
 
 # Find all the generated protobuf source files
