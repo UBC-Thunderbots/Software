@@ -21,7 +21,7 @@ class Ball final
      * @param new_position the new position of the ball, defined in metres
      * @param new_velocity the new velocity of the ball, defined in metres per second
      */
-    void update(Point &new_position, Point &new_velocity);
+    void update(Point &new_position, Vector2 &new_velocity);
 
     /**
      * Updates the ball with new data from a Ball message. This updates the current data
@@ -49,9 +49,9 @@ class Ball final
      *
      * @return the predicted velocity of the ball, defined in metres per second
      */
-    Point velocity(double time_delta = 0.0) const;
+    Vector2 velocity(double time_delta = 0.0) const;
 
    private:
     Point position_;
-    Point velocity_;
+    Vector2 velocity_;
 };

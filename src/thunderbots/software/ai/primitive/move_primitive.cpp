@@ -1,5 +1,7 @@
 #include "ai/primitive/move_primitive.h"
 
+const std::string MovePrimitive::PRIMITIVE_NAME = "Move Primitive";
+
 MovePrimitive::MovePrimitive(
     unsigned int robot_id, const Point &dest, const Angle &final_angle,
     double final_speed)
@@ -9,13 +11,7 @@ MovePrimitive::MovePrimitive(
 
 MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
-    if (primitive_msg.primitive_name != getPrimitiveName())
-    {
-        // TODO: Throw a proper exception here
-        std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
-                  << std::endl;
-        exit(1);
-    }
+    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
     robot_id      = primitive_msg.robot_id;
     double dest_x = primitive_msg.parameters.at(0);
@@ -28,7 +24,7 @@ MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 
 std::string MovePrimitive::getPrimitiveName() const
 {
-    return MOVE_PRIMITIVE_NAME;
+    return PRIMITIVE_NAME;
 }
 
 unsigned int MovePrimitive::getRobotId() const

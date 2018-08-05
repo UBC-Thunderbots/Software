@@ -7,6 +7,7 @@
 class MovePrimitive : public Primitive
 {
    public:
+    static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Move Primitive
      *

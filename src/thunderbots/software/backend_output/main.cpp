@@ -3,11 +3,11 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <iostream>
-#include "../shared_util/constants.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"
 #include "geom/point.h"
+#include "util/constants.h"
 
 // Constants
 const std::string NETWORK_ADDRESS       = "127.0.0.1";
@@ -38,8 +38,8 @@ int main(int argc, char** argv)
     ros::NodeHandle node_handle;
 
     // Create subscribers to topics we care about
-    ros::Subscriber prim_array_sub =
-        node_handle.subscribe(AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+    ros::Subscriber prim_array_sub = node_handle.subscribe(
+        UTIL::CONSTANTS::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();

@@ -1,9 +1,9 @@
 #include "backend_output/grsim/grsim_backend.h"
 #include <iostream>
 #include <optional>
-#include "../shared_util/constants.h"
 #include "ai/primitive/move_primitive.h"
 #include "proto/grSim_Commands.pb.h"
+#include "shared_constants.h"
 
 using namespace boost::asio;
 
@@ -20,8 +20,8 @@ GrSimBackend::~GrSimBackend()
 }
 
 grSim_Packet GrSimBackend::createGrSimPacket(
-    unsigned int robot_id, TeamColour team_colour, Point velocity,
-    Angle angular_velocity) const
+    unsigned int robot_id, TeamColour team_colour, Vector2 velocity,
+    AngularVelocity angular_velocity) const
 {
     grSim_Packet packet;
 
@@ -57,6 +57,7 @@ void GrSimBackend::sendPrimitives(
     const std::vector<std::unique_ptr<Primitive>>& primitives)
 {
     // TODO: Implement this
+    // https://github.com/UBC-Thunderbots/Software/issues/21
     grSim_Packet grsim_packet =
         createGrSimPacket(0, YELLOW, Point(0.5, -0.1), Angle::ofRadians(-0.8));
     sendGrSimPacket(grsim_packet);

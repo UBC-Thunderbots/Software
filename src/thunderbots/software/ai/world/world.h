@@ -32,7 +32,7 @@ class World final
         const Team &enemy_team);
 
 
-    // We leave these members public to make theme easy to access and update, rather
+    // We leave these members public to make them easy to access and update, rather
     // than providing redundant getters and setters.
     Field field;
     Ball ball;

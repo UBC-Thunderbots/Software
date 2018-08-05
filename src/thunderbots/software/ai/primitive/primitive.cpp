@@ -19,21 +19,35 @@ thunderbots_msgs::Primitive Primitive::createMsg() const
 }
 
 std::unique_ptr<Primitive> Primitive::createPrimitive(
-    const thunderbots_msgs::Primitive &primitive_msg)
+    const thunderbots_msgs::Primitive& primitive_msg)
 {
     std::unique_ptr<Primitive> prim_ptr;
 
-    if (primitive_msg.primitive_name == MOVE_PRIMITIVE_NAME)
+    if (primitive_msg.primitive_name == MovePrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
     else
     {
         // TODO: Throw unknown primitive exception here
+        // https://github.com/UBC-Thunderbots/Software/issues/16
         std::cerr << "Error: Unexpected Primitive message of type "
                   << primitive_msg.primitive_name << std::endl;
         std::exit(1);
     }
 
     return prim_ptr;
+}
+
+void Primitive::validatePrimitiveMessage(
+    const thunderbots_msgs::Primitive& prim_msg, std::string prim_name) const
+{
+    if (prim_msg.primitive_name != prim_name)
+    {
+        // TODO: Throw a proper exception here
+        // https://github.com/UBC-Thunderbots/Software/issues/16
+        std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
+                  << std::endl;
+        exit(1);
+    }
 }

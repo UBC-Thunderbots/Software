@@ -8,7 +8,7 @@
  * An abstraction for all navigation operations performed by our AI. The navigator is
  * responsible for all navigation, path-planning, and collision-avoidance for our robots.
  *
- * This is an Abstract, pure-virtual class. It is meant to define the intercace that all
+ * This is an Abstract, pure-virtual class. It is meant to define the interface that all
  * Navigator modules must follow. Other classes should inherit from this class and
  * implement the methods to create a useable Navigator class. This allows us to
  * potentially have multiple different navigators that we can swap out or combine at

@@ -47,8 +47,12 @@ class GrSimBackend : public Backend
      * second.
      */
     grSim_Packet createGrSimPacket(
-        unsigned int robot_id, TeamColour team_colour, Point velocity,
-        Angle angular_velocity) const;
+        unsigned int robot_id, TeamColour team_colour, Vector2 velocity,
+        AngularVelocity angular_velocity) const;
+
+
+    // TODO: Implement grSim bang bang controller
+    // https://github.com/UBC-Thunderbots/Software/issues/16
 
    private:
     /**

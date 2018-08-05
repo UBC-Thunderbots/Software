@@ -28,7 +28,7 @@ class MoveIntent : public Intent
     /**
      * Returns the destination of this movement
      *
-     * @return the destionation of this movement
+     * @return the destination of this movement
      */
     Point getDestination() const;
 

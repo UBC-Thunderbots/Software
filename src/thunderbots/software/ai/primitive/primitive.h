@@ -5,13 +5,10 @@
 #include <vector>
 #include "thunderbots_msgs/Primitive.h"
 
-// Constants for the names of the Primitives
-static const std::string MOVE_PRIMITIVE_NAME = "Move Primitive";
-
-
 /**
  * Defines a Robot Primitive, which is the most basic action / unit of work a robot can
- * do.
+ * do. For example, moving straight to a point, pivoting around a point,
+ * or shooting the ball at a target.
  *
  * This is an Abstract, pure-virtual class. It is meant to define the interface that all
  * Primitives must follow.
@@ -59,6 +56,17 @@ class Primitive
      * @return A vector of Booleans that are the extra bits used by the Primitive.
      */
     virtual std::vector<bool> getExtraBitArray() const = 0;
+
+    /**
+     * Validates that a primitive message is compatible with the primitive
+     * specified by name, and throws an exception if the validation check fails.
+     *
+     * @param prim_msg The primitive message
+     * @param prim_name The name of the primitive
+     * @throws //TODO: Add exception
+     */
+    void validatePrimitiveMessage(
+        const thunderbots_msgs::Primitive& prim_msg, std::string prim_name) const;
 
     /**
      * Given a ROS Primitive message, constructs a concrete Primitive object and returns

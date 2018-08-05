@@ -1,8 +1,9 @@
 #include "backend.h"
-#include "../shared_util/constants.h"
+#include <shared_constants.h>
 #include "backend_input/message_util.h"
 #include "proto/messages_robocup_ssl_detection.pb.h"
 #include "proto/messages_robocup_ssl_geometry.pb.h"
+#include "util/constants.h"
 
 Backend::Backend() : ball_filter(), friendly_team_filter(), enemy_team_filter()
 {
@@ -33,7 +34,8 @@ std::optional<thunderbots_msgs::Ball> Backend::getFilteredBallMsg(
         for (const SSL_DetectionBall &ball : detection.balls())
         {
             SSLBallData ball_data;
-            ball_data.position   = Point(ball.x() / 1000.0, ball.y() / 1000.0);
+            ball_data.position =
+                Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
             ball_data.confidence = ball.confidence();
             ball_data.timestamp  = timestamp;
             ball_detections.push_back(ball_data);
@@ -58,7 +60,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
         std::vector<SSLRobotData> friendly_team_robot_data = std::vector<SSLRobotData>();
 
         auto ssl_robots = detection.robots_yellow();
-        if (FRIENDLY_TEAM_COLOUR == BLUE)
+        if (UTIL::CONSTANTS::FRIENDLY_TEAM_COLOUR == BLUE)
         {
             ssl_robots = detection.robots_blue();
         }
@@ -99,7 +101,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
         std::vector<SSLRobotData> enemy_team_robot_data = std::vector<SSLRobotData>();
 
         auto ssl_robots = detection.robots_yellow();
-        if (FRIENDLY_TEAM_COLOUR == YELLOW)
+        if (UTIL::CONSTANTS::FRIENDLY_TEAM_COLOUR == YELLOW)
         {
             ssl_robots = detection.robots_blue();
         }

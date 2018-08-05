@@ -18,17 +18,16 @@
 class HL
 {
    public:
-    // TODO: Will need timestamps
-
     /**
-    * Given the state of the world, returns the Intent that each available Robot should be
-    * running.
-    *
-    * @param world The current state of the world
-    *
-    * @return A vector of unique pointers to the Intents our friendly robots should be
-    * running
-    */
+     * Given the state of the world, returns the Intent that each available Robot should
+     * be
+     * running.
+     *
+     * @param world The current state of the world
+     *
+     * @return A vector of unique pointers to the Intents our friendly robots should be
+     * running
+     */
     virtual std::vector<std::unique_ptr<Intent>> getIntentAssignment(
         const World &world) const = 0;
 };

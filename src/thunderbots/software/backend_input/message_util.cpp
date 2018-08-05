@@ -1,7 +1,5 @@
 #include "message_util.h"
-
-// TODO: Create unit conversion functions
-#define MILLIMETERS_TO_METERS_FLOAT 1000.0
+#include <shared_constants.h>
 
 thunderbots_msgs::Field MessageUtil::createFieldMsg(
     const SSL_GeometryFieldSize &field_data)
@@ -54,8 +52,8 @@ thunderbots_msgs::Field MessageUtil::createFieldMsg(
     thunderbots_msgs::Field field_msg;
 
     // Make sure we convert ALL fields into meters before returning
-    field_msg.field_length  = field_data.field_length() / MILLIMETERS_TO_METERS_FLOAT;
-    field_msg.field_width   = field_data.field_width() / MILLIMETERS_TO_METERS_FLOAT;
+    field_msg.field_length  = field_data.field_length() * METERS_PER_MILLIMETER;
+    field_msg.field_width   = field_data.field_width() * METERS_PER_MILLIMETER;
     Point defense_length_p1 = Point(
         ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().x(),
         ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().y());
@@ -63,7 +61,7 @@ thunderbots_msgs::Field MessageUtil::createFieldMsg(
         ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().x(),
         ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().y());
     field_msg.defense_length =
-        (defense_length_p2 - defense_length_p1).len() / MILLIMETERS_TO_METERS_FLOAT;
+        (defense_length_p2 - defense_length_p1).len() * METERS_PER_MILLIMETER;
     Point defense_width_p1 = Point(
         ssl_field_lines["LeftPenaltyStretch"].p1().x(),
         ssl_field_lines["LeftPenaltyStretch"].p1().y());
@@ -71,11 +69,11 @@ thunderbots_msgs::Field MessageUtil::createFieldMsg(
         ssl_field_lines["LeftPenaltyStretch"].p2().x(),
         ssl_field_lines["LeftPenaltyStretch"].p2().y());
     field_msg.defense_width =
-        (defense_width_p1 - defense_width_p2).len() / MILLIMETERS_TO_METERS_FLOAT;
-    field_msg.goal_width     = field_data.goalwidth() / MILLIMETERS_TO_METERS_FLOAT;
-    field_msg.boundary_width = field_data.boundary_width() / MILLIMETERS_TO_METERS_FLOAT;
+        (defense_width_p1 - defense_width_p2).len() * METERS_PER_MILLIMETER;
+    field_msg.goal_width     = field_data.goalwidth() * METERS_PER_MILLIMETER;
+    field_msg.boundary_width = field_data.boundary_width() * METERS_PER_MILLIMETER;
     field_msg.center_circle_radius =
-        ssl_circular_arcs["CenterCircle"].radius() / MILLIMETERS_TO_METERS_FLOAT;
+        ssl_circular_arcs["CenterCircle"].radius() * METERS_PER_MILLIMETER;
 
     return field_msg;
 }
@@ -122,7 +120,6 @@ thunderbots_msgs::Team MessageUtil::createTeamMsg(
     const std::vector<FilteredRobotData> &filtered_team_data)
 {
     thunderbots_msgs::Team team_msg;
-    team_msg.robots.clear();
 
     for (const FilteredRobotData &filtered_robot_data : filtered_team_data)
     {

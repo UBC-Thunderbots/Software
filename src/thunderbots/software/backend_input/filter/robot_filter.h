@@ -27,9 +27,9 @@ typedef struct
 {
     unsigned int id;
     Point position;
-    Point velocity;
+    Vector2 velocity;
     Angle orientation;
-    Angle angular_velocity;
+    AngularVelocity angular_velocity;
     AITimestamp timestamp;
 } FilteredRobotData;
 

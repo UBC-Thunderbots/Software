@@ -1,12 +1,12 @@
 #include <ros/ros.h>
 #include <iostream>
-#include "../shared_util/constants.h"
 #include "backend_input/backend.h"
 #include "backend_input/vision_client/robocup_ssl_client.h"
 #include "geom/point.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
+#include "util/constants.h"
 #include "util/timestamp.h"
 
 int main(int argc, char **argv)
@@ -16,15 +16,15 @@ int main(int argc, char **argv)
     ros::NodeHandle node_handle;
 
     // Create publishers
-    ros::Publisher ball_publisher =
-        node_handle.advertise<thunderbots_msgs::Ball>(BACKEND_INPUT_BALL_TOPIC, 1);
-    ros::Publisher field_publisher =
-        node_handle.advertise<thunderbots_msgs::Field>(BACKEND_INPUT_FIELD_TOPIC, 1);
+    ros::Publisher ball_publisher = node_handle.advertise<thunderbots_msgs::Ball>(
+        UTIL::CONSTANTS::BACKEND_INPUT_BALL_TOPIC, 1);
+    ros::Publisher field_publisher = node_handle.advertise<thunderbots_msgs::Field>(
+        UTIL::CONSTANTS::BACKEND_INPUT_FIELD_TOPIC, 1);
     ros::Publisher friendly_team_publisher =
         node_handle.advertise<thunderbots_msgs::Team>(
-            BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
-    ros::Publisher enemy_team_publisher =
-        node_handle.advertise<thunderbots_msgs::Team>(BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
+            UTIL::CONSTANTS::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
+    ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
+        UTIL::CONSTANTS::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
     // Set up our backend
     Backend backend = Backend();

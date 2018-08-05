@@ -10,9 +10,6 @@
 class Robot
 {
    public:
-    // The max radius of a robot in metres
-    static constexpr double MAX_RADIUS = 0.09;
-
     /**
      * Creates a new robot given a pattern id
      */
@@ -28,8 +25,8 @@ class Robot
      * per second
      */
     void update(
-        const Point& new_position, const Point& new_velocity,
-        const Angle& new_orientation, const Angle& new_angular_velocity);
+        const Point& new_position, const Vector2& new_velocity,
+        const Angle& new_orientation, const AngularVelocity& new_angular_velocity);
 
     /**
      * Updates the state of the robot.
@@ -65,7 +62,7 @@ class Robot
      *
      * @return the predicted velocity of the robot, in metres / second.
      */
-    Point velocity(double time_delta = 0.0) const;
+    Vector2 velocity(double time_delta = 0.0) const;
 
     /**
      * Get the predicted orientation of the robot at a time relative to the current time.
@@ -87,12 +84,12 @@ class Robot
      *
      * @return the predicted angular velocity of the robot, in Radians / second.
      */
-    Angle angularVelocity(double time_delta = 0.0) const;
+    AngularVelocity angularVelocity(double time_delta = 0.0) const;
 
    private:
     const unsigned int id_;
     Point position_;
-    Point velocity_;
+    Vector2 velocity_;
     Angle orientation_;
-    Angle angularVelocity_;
+    AngularVelocity angularVelocity_;
 };
