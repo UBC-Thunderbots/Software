@@ -24,20 +24,20 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
 
 void AI::updateWorldBallState(const thunderbots_msgs::Ball &new_ball_msg)
 {
-    world.ball.update(new_ball_msg);
+    world.updateBallState(new_ball_msg);
 }
 
 void AI::updateWorldFieldState(const thunderbots_msgs::Field &new_field_msg)
 {
-    world.field.updateDimensions(new_field_msg);
+    world.updateFieldGeometry(new_field_msg);
 }
 
 void AI::updateWorldFriendlyTeamState(const thunderbots_msgs::Team &new_friendly_team_msg)
 {
-    world.friendly_team.update(new_friendly_team_msg);
+    world.updateFriendlyTeam(new_friendly_team_msg);
 }
 
 void AI::updateWorldEnemyTeamState(const thunderbots_msgs::Team &new_enemy_team_msg)
 {
-    world.enemy_team.update(new_enemy_team_msg);
+    world.updateEnemyTeam(new_enemy_team_msg);
 }
