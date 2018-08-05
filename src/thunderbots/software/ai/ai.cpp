@@ -1,6 +1,6 @@
 #include "ai.h"
 
-AI::AI() : rrt_navigator(), stp_high_level()
+AI::AI() : navigator(std::make_unique<RRTNav>()), high_level(std::make_unique<STP_HL>())
 {
 }
 
@@ -13,18 +13,11 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
     // for any predictors (ie. modules that predict Robot, Ball position etc.). When those
     // are implemented we can update them in some way from here, if necessary.
 
-    // Use generic variables with the types of the Abstract base classes
-    // so we can only operate in terms of the public interfaces of these modules.
-    // These can't be declared in the header because the default copy
-    // constructor for the class will be automatically deleted
-    const HL &high_level       = stp_high_level;
-    const Navigator &navigator = rrt_navigator;
-
     std::vector<std::unique_ptr<Intent>> assignedIntents =
-        high_level.getIntentAssignment(world);
+        high_level->getIntentAssignment(world);
 
     std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-        navigator.getAssignedPrimitives(world, assignedIntents);
+        navigator->getAssignedPrimitives(world, assignedIntents);
 
     return assignedPrimitives;
 }

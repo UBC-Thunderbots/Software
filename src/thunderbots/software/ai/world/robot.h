@@ -25,7 +25,7 @@ class Robot
      * per second
      */
     void update(
-        const Point& new_position, const Vector2& new_velocity,
+        const Point& new_position, const Vector& new_velocity,
         const Angle& new_orientation, const AngularVelocity& new_angular_velocity);
 
     /**
@@ -62,7 +62,7 @@ class Robot
      *
      * @return the predicted velocity of the robot, in metres / second.
      */
-    Vector2 velocity(double time_delta = 0.0) const;
+    Vector velocity(double time_delta = 0.0) const;
 
     /**
      * Get the predicted orientation of the robot at a time relative to the current time.
@@ -89,7 +89,7 @@ class Robot
    private:
     const unsigned int id_;
     Point position_;
-    Vector2 velocity_;
+    Vector velocity_;
     Angle orientation_;
     AngularVelocity angularVelocity_;
 };

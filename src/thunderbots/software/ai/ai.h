@@ -69,6 +69,6 @@ class AI final
 
    private:
     World world;
-    STP_HL stp_high_level;
-    RRTNav rrt_navigator;
+    std::unique_ptr<HL> high_level;
+    std::unique_ptr<Navigator> navigator;
 };

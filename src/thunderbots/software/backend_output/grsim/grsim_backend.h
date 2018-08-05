@@ -47,7 +47,7 @@ class GrSimBackend : public Backend
      * second.
      */
     grSim_Packet createGrSimPacket(
-        unsigned int robot_id, TeamColour team_colour, Vector2 velocity,
+        unsigned int robot_id, TeamColour team_colour, Vector velocity,
         AngularVelocity angular_velocity) const;
 
 

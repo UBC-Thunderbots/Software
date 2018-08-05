@@ -27,7 +27,7 @@ typedef struct
 {
     unsigned int id;
     Point position;
-    Vector2 velocity;
+    Vector velocity;
     Angle orientation;
     AngularVelocity angular_velocity;
     AITimestamp timestamp;

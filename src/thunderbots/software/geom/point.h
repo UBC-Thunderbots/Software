@@ -218,7 +218,7 @@ class Point final
 
 // Vectors can be represented by points, and vice-versa, se we let points also be called
 // vectors
-typedef Point Vector2;
+typedef Point Vector;
 
 /**
  * Adds two points
@@ -544,4 +544,4 @@ struct hash<Point> final
 
 // Since we also use Points to represent 2D vectors, we also allow
 // Points to be referred to as Vectors. This help make interfaces easier to read.
-typedef Point Vector2;
+typedef Point Vector;
