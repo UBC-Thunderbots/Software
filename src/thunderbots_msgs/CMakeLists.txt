@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8.2)
 project(thunderbots_msgs)
 
 ## Find catkin macros and libraries
@@ -22,8 +22,8 @@ add_message_files(
     Robot.msg
     Team.msg
     Field.msg
-    MovePrimitive.msg
-    PrimitiveWrapper.msg
+    Primitive.msg
+    PrimitiveArray.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
