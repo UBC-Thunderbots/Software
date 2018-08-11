@@ -179,13 +179,6 @@ std::vector<std::pair<Point, Angle>> angle_sweep_circles_all(
     const std::vector<Point> &obstacles, const double &radius);
 
 /**
- * returns a list of points that lie exactle "buffer" distance awaw from the
- * line seg
- */
-std::vector<Point> seg_buffer_boundaries(
-    const Point &a, const Point &b, double buffer, int num_points);
-
-/**
  * returns a list of points that lie on the border of the circle
  */
 std::vector<Point> circle_boundaries(
@@ -472,7 +465,7 @@ bool point_in_front_vector(Point offset, Point dir, Point p);
 /**
  * Returns true if v2 is clockwise relative to v1
  */
-#warning this should work but hasn't been properly tested
+// TODO: this should work but hasn't been properly tested
 bool is_clockwise(Point v1, Point v2);
 
 /**

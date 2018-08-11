@@ -138,7 +138,7 @@ class Circle final
     {
     }
 
-#warning these shapes could use more operators and functions (eg area), and hashes
+// TODO: these shapes could use more operators and functions (eg area), and hashes
 
     inline constexpr bool operator==(const Circle& p)
     {

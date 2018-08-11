@@ -441,90 +441,6 @@ std::pair<Vector2, Angle> angle_sweep_circles(
     return std::make_pair(bestshot, best);
 }
 
-std::vector<Vector2> seg_buffer_boundaries(
-    const Vector2 &a, const Vector2 &b, double buffer, int num_points)
-{
-    if ((a - b).lensq() < EPS)
-    {
-        return circle_boundaries(a, buffer, num_points);
-    }
-    std::vector<Vector2> ans;
-
-    double line_seg        = (a - b).len();
-    double semi_circle     = M_PI * buffer;
-    double total_dist      = 2 * line_seg + 2 * semi_circle;
-    double total_travelled = 0.0;
-    double step_len        = total_dist / num_points;
-    Vector2 add1(0.0, 0.0);
-    Vector2 add2          = buffer * ((a - b)).rotate(Angle::quarter()).norm();
-    Vector2 seg_direction = (b - a).norm();
-    bool swapped          = false;
-
-    for (int i = 0; i < num_points; i++)
-    {
-        Vector2 p = a + add1 + add2;
-        ans.push_back(p);
-        double travel_left = step_len;
-
-        if (total_travelled < line_seg)
-        {
-            double l_travel = std::min(travel_left, line_seg - total_travelled);
-            add1 += l_travel * seg_direction;
-            travel_left -= l_travel;
-            total_travelled += l_travel;
-        }
-
-        if (travel_left < EPS)
-        {
-            continue;
-        }
-
-        if (total_travelled + EPS >= line_seg &&
-            total_travelled < line_seg + semi_circle)
-        {
-            double l_travel =
-                std::min(travel_left, line_seg + semi_circle - total_travelled);
-            Angle rads = Angle::of_radians(l_travel / buffer);
-            add2       = add2.rotate(rads);
-            travel_left -= l_travel;
-            total_travelled += l_travel;
-        }
-
-        if (travel_left < EPS)
-        {
-            continue;
-        }
-
-        if (total_travelled + EPS >= line_seg + semi_circle &&
-            total_travelled < 2 * line_seg + semi_circle)
-        {
-            if (!swapped)
-            {
-                seg_direction = -seg_direction;
-                swapped       = true;
-            }
-            double l_travel = std::min(
-                travel_left, 2 * line_seg + semi_circle - total_travelled);
-            add1 += l_travel * seg_direction;
-            travel_left -= l_travel;
-            total_travelled += l_travel;
-        }
-
-        if (travel_left < EPS)
-        {
-            continue;
-        }
-
-        if (total_travelled + EPS >= 2 * line_seg)
-        {
-            Angle rads = Angle::of_radians(travel_left / buffer);
-            add2       = add2.rotate(rads);
-            total_travelled += travel_left;
-        }
-    }
-    return ans;
-}
-
 std::vector<Vector2> circle_boundaries(
     const Vector2 &centre, double radius, int num_points)
 {
@@ -603,7 +519,7 @@ Vector2 clip_point(const Vector2 &p, const Rect &r)
     return ret;
 }
 
-#warning does this work? unit test
+// TODO: does this work? unit test
 std::vector<Vector2> line_circle_intersect(
     const Vector2 &centre, double radius, const Vector2 &segA,
     const Vector2 &segB)
@@ -824,7 +740,7 @@ Vector2 line_intersect(
     //	return ret;
 }
 
-#warning a line intersect that takes segments would be nice
+// TODO: a line intersect that takes segments would be nice
 
 Vector2 reflect(const Vector2 &v, const Vector2 &n)
 {
