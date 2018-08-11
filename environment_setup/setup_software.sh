@@ -190,11 +190,12 @@ sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 # Required to install g++-7 on Ubuntu 16
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+# Required to make sure we install protobuf version 3.0.0 or greater
+sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 sudo apt-get update
 
 host_software_packages=(
     g++-7 # We need g++ 7 or greater to support the C++17 standard
-    cmake
     python-rosinstall
     clang-format
     protobuf-compiler
@@ -211,6 +212,39 @@ fi
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
                          --slave /usr/bin/g++ g++ /usr/bin/g++-7 
 sudo update-alternatives --config gcc
+
+
+if [ "$ros_distro" == "kinetic" ]; then
+    # Since Ubuntu 16 and earlier do not ship with a new enough version
+    # of cmake (>= 3.8.2), we need to install a newer version manually.
+    # The following script installs cmake 3.10.2 (the same as Ubuntu 18).
+    # The script is from the cmake website (https://cmake.org/files/v3.10/)
+    # https://askubuntu.com/questions/355565/how-do-i-install-the-latest-version-of-cmake-from-the-command-line
+    sudo mkdir /opt/cmake
+    wget -P /tmp https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
+    if [ $? -ne 0 ]; then
+        echo "##############################################################"
+        echo "Error: Failed to download cmake installation file"
+        echo "##############################################################"
+        exit 1
+    fi
+    chmod +x /tmp/cmake-3.10.2-Linux-x86_64.sh
+    sudo /tmp/cmake-3.10.2-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+    if [ $? -ne 0 ]; then
+        echo "##############################################################"
+        echo "Error: Failed to run cmake installation script"
+        echo "##############################################################"
+        exit 1
+    fi
+    sudo ln -sf /opt/cmake/bin/cmake /usr/local/bin/cmake
+
+elif [ "$ros_distro" == "melodic" ]; then
+    # Ubuntu 18.04 and later ship with cmake versions >= 3.8.2,
+    # so we can just install from the default PPA
+    sudo apt-get install cmake
+fi
+
+
 
 # Done
 echo "================================================================"

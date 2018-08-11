@@ -1,5 +1,8 @@
 # Describes the current state of a robot
 
+# The timestamp when this data was received, in microseconds
+int64 timestamp_microseconds
+
 # The id of the robot
 uint32 id
 
@@ -14,7 +17,3 @@ float64 orientation
 
 # The angular velocity of the robot, in Radians/second
 float64 angular_velocity
-
-# Indicates the team colour of the robot. If this value is true, the robot
-# is on the yellow team. Otherwise, the robot is on the blue team
-bool team_colour_yellow
