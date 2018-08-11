@@ -47,8 +47,7 @@ class Seg final
     /**
      * \brief Creates a Seg that starts and ends at the given points
      */
-    inline explicit Seg(const Vector2& start, const Vector2& end)
-        : start(start), end(end)
+    inline explicit Seg(const Vector2& start, const Vector2& end) : start(start), end(end)
     {
     }
 
@@ -99,8 +98,7 @@ class Ray final
      * \brief Creates a Seg that starts and contains a point along the given
      * line
      */
-    inline explicit Ray(const Vector2& start, const Vector2& dir)
-        : start(start), dir(dir)
+    inline explicit Ray(const Vector2& start, const Vector2& dir) : start(start), dir(dir)
     {
     }
 
@@ -138,7 +136,7 @@ class Circle final
     {
     }
 
-// TODO: these shapes could use more operators and functions (eg area), and hashes
+    // TODO: these shapes could use more operators and functions (eg area), and hashes
 
     inline constexpr bool operator==(const Circle& p)
     {
@@ -150,4 +148,3 @@ class Circle final
         return !(*this == p);
     }
 };
-

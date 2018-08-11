@@ -28,8 +28,7 @@ class Rect final
      *
      * \param[in] height the height of the rectangle.
      */
-    explicit constexpr Rect(
-        const Point &sw_corner, double width, double height);
+    explicit constexpr Rect(const Point &sw_corner, double width, double height);
 
     /**
      * Returns the width of the rectangle.
@@ -199,10 +198,9 @@ inline constexpr Point Rect::se_corner() const
 
 inline constexpr Point Rect::operator[](unsigned int pos) const
 {
-    return (pos % 4) == 0
-               ? sw_corner()
-               : (pos % 4) == 1 ? nw_corner()
-                                : (pos % 4) == 2 ? ne_corner() : se_corner();
+    return (pos % 4) == 0 ? sw_corner()
+                          : (pos % 4) == 1 ? nw_corner()
+                                           : (pos % 4) == 2 ? ne_corner() : se_corner();
 }
 
 inline void Rect::translate(const Point &offset)

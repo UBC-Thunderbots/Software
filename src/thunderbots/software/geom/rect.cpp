@@ -1,8 +1,8 @@
 #include "geom/rect.h"
-#include "geom/shapes.h"
-#include "geom/util.h"
 #include <algorithm>
 #include <cmath>
+#include "geom/shapes.h"
+#include "geom/util.h"
 
 bool Rect::expand(double amount)
 {

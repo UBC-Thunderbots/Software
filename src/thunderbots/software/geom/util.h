@@ -181,8 +181,7 @@ std::vector<std::pair<Point, Angle>> angle_sweep_circles_all(
 /**
  * returns a list of points that lie on the border of the circle
  */
-std::vector<Point> circle_boundaries(
-    const Point &centre, double radius, int num_points);
+std::vector<Point> circle_boundaries(const Point &centre, double radius, int num_points);
 
 /**
  * Finds the Point on line segment closest to point.
@@ -195,8 +194,7 @@ std::vector<Point> circle_boundaries(
  *
  * \return the Point on line segment closest to centre point.
  */
-Point closest_lineseg_point(
-    const Point &p, const Point &segA, const Point &segB);
+Point closest_lineseg_point(const Point &p, const Point &segA, const Point &segB);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -242,8 +240,7 @@ std::vector<Point> line_rect_intersect(
  *
  * \return the points of intersection.
  */
-Point vector_rect_intersect(
-    const Rect &r, const Point &segA, const Point &segB);
+Point vector_rect_intersect(const Rect &r, const Point &segA, const Point &segB);
 
 /**
  * Clips a point to a rectangle boundary.
@@ -300,8 +297,7 @@ bool unique_line_intersect(
  *
  * \return the point of intersection.
  */
-Point line_intersect(
-    const Point &a, const Point &b, const Point &c, const Point &d);
+Point line_intersect(const Point &a, const Point &b, const Point &c, const Point &d);
 
 std::vector<Point> line_intersect(const Seg &a, const Seg &b);
 
@@ -412,8 +408,7 @@ bool goalie_block_goal_post(
  * \param[in] r radius of defending robot
  */
 Point calc_block_cone_defender(
-    const Point &a, const Point &b, const Point &c, const Point &g,
-    const double &r);
+    const Point &a, const Point &b, const Point &c, const Point &g, const double &r);
 
 /*
  * Ported code from CM geom util
