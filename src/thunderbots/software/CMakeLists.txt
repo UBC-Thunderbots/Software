@@ -164,4 +164,15 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
             )
+
+    catkin_add_gtest(geom_util_test
+            test/geom/util.cpp
+            geom/util.cpp
+            geom/util.h
+            geom/point.h
+            geom/angle.h
+            geom/shapes.h)
+
+    target_link_libraries(geom_util_test ${catkin_LIBRARIES})
+
 endif()

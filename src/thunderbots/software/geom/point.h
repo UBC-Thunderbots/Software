@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GEOM_POINT_H_
+#define GEOM_POINT_H_
 
 #include <cmath>
 #include <iostream>
@@ -192,6 +193,15 @@ class Point final
     constexpr bool isClose(const Point &other, double dist) const;
 
     /**
+     * \brief Creates a unit-magnitude Point for an angle
+     *
+     * \param[in] angle the angle
+     *
+     * \return the Point
+     */
+    static Point of_angle(Angle angle);
+
+    /**
     * Assigns one Point to another
     *
     * @param other the Point whose value should be copied into this Point
@@ -218,7 +228,7 @@ class Point final
 
 // Vectors can be represented by points, and vice-versa, se we let points also be called
 // vectors
-typedef Point Vector;
+typedef Point Vector2;
 
 /**
  * Adds two points
@@ -455,6 +465,11 @@ inline constexpr bool Point::isClose(const Point &other, double dist) const
     return std::pow(_x - other.x(), 2) + std::pow(_y - other.y(), 2) < dist * dist;
 }
 
+inline Point Point::of_angle(Angle angle)
+{
+    return Point(angle.cos(), angle.sin());
+}
+
 inline constexpr Point operator+(const Point &p, const Point &q)
 {
     return Point(p.x() + q.x(), p.y() + q.y());
@@ -542,6 +557,4 @@ struct hash<Point> final
 };
 }
 
-// Since we also use Points to represent 2D vectors, we also allow
-// Points to be referred to as Vectors. This help make interfaces easier to read.
-typedef Point Vector;
+#endif  // GEOM_POINT_H_
