@@ -81,9 +81,8 @@ void Address::print(FILE *out) const
         unsigned a       = ntohl(sockname->sin_addr.s_addr);
         unsigned short p = ntohs(sockname->sin_port);
 
-        fprintf(
-            out, "%d.%d.%d.%d:%d", (a >> 24) & 0xFF, (a >> 16) & 0xFF, (a >> 8) & 0xFF,
-            a & 0xFF, p);
+        fprintf(out, "%d.%d.%d.%d:%d", (a >> 24) & 0xFF, (a >> 16) & 0xFF,
+                (a >> 8) & 0xFF, a & 0xFF, p);
     }
     else
     {
@@ -96,9 +95,8 @@ void Address::print(FILE *out) const
 //  (C) James Bruce
 //====================================================================//
 
-bool UDP::open(
-    int port, bool share_port_for_multicasting, bool multicast_include_localhost,
-    bool blocking)
+bool UDP::open(int port, bool share_port_for_multicasting,
+               bool multicast_include_localhost, bool blocking)
 {
     const int TTL = 32;
 
@@ -116,8 +114,8 @@ bool UDP::open(
     if (share_port_for_multicasting)
     {
         int reuse = 1;
-        if (setsockopt(
-                fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuse, sizeof(reuse)) != 0)
+        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuse,
+                       sizeof(reuse)) != 0)
         {
             fprintf(stderr, "ERROR WHEN SETTING SO_REUSEADDR ON UDP SOCKET\n");
             fflush(stderr);
@@ -132,8 +130,8 @@ bool UDP::open(
     {
         int yes = 1;
         // allow packets to be received on this host
-        if (setsockopt(
-                fd, IPPROTO_IP, IP_MULTICAST_LOOP, (const char *)&yes, sizeof(yes)) != 0)
+        if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, (const char *)&yes,
+                       sizeof(yes)) != 0)
         {
             fprintf(stderr, "ERROR WHEN SETTING IP_MULTICAST_LOOP ON UDP SOCKET\n");
             fflush(stderr);
@@ -179,9 +177,8 @@ bool UDP::addMulticast(const Address &multiaddr, const Address &interface)
         return false;
 
     // set multicast output interface
-    ret = setsockopt(
-        fd, IPPROTO_IP, IP_MULTICAST_IF, &imreq.imr_interface.s_addr,
-        sizeof(imreq.imr_interface.s_addr));
+    ret = setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &imreq.imr_interface.s_addr,
+                     sizeof(imreq.imr_interface.s_addr));
     if (debug)
         printf("ret=%d\n", ret);
 

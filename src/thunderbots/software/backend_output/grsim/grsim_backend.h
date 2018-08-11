@@ -46,9 +46,9 @@ class GrSimBackend : public Backend
      * @param angular_velocity The angular velocity to set for the robot, in Radians per
      * second.
      */
-    grSim_Packet createGrSimPacket(
-        unsigned int robot_id, TeamColour team_colour, Vector velocity,
-        AngularVelocity angular_velocity) const;
+    grSim_Packet createGrSimPacket(unsigned int robot_id, TeamColour team_colour,
+                                   Vector velocity,
+                                   AngularVelocity angular_velocity) const;
 
 
     // TODO: Implement grSim bang bang controller

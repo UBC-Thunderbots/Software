@@ -9,9 +9,9 @@ Robot::Robot(const unsigned int id)
 {
 }
 
-void Robot::update(
-    const Point &new_position, const Vector &new_velocity, const Angle &new_orientation,
-    const AngularVelocity &new_angular_velocity)
+void Robot::update(const Point &new_position, const Vector &new_velocity,
+                   const Angle &new_orientation,
+                   const AngularVelocity &new_angular_velocity)
 {
     position_        = new_position;
     velocity_        = new_velocity;

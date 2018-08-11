@@ -39,8 +39,8 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     return prim_ptr;
 }
 
-void Primitive::validatePrimitiveMessage(
-    const thunderbots_msgs::Primitive& prim_msg, std::string prim_name) const
+void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim_msg,
+                                         std::string prim_name) const
 {
     if (prim_msg.primitive_name != prim_name)
     {

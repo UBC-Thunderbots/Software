@@ -24,9 +24,9 @@ class Robot
      * @param new_angular_velocity the new angular velocity of the robot, in Radians
      * per second
      */
-    void update(
-        const Point& new_position, const Vector& new_velocity,
-        const Angle& new_orientation, const AngularVelocity& new_angular_velocity);
+    void update(const Point& new_position, const Vector& new_velocity,
+                const Angle& new_orientation,
+                const AngularVelocity& new_angular_velocity);
 
     /**
      * Updates the state of the robot.

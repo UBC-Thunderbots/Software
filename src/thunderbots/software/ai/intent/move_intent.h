@@ -17,9 +17,8 @@ class MoveIntent : public Intent
      * destination
      */
     // TODO: Add parameter override field/object/struct
-    explicit MoveIntent(
-        unsigned int robot_id, const Point &dest, const Angle &final_angle,
-        double final_speed);
+    explicit MoveIntent(unsigned int robot_id, const Point &dest,
+                        const Angle &final_angle, double final_speed);
 
     std::string getIntentName() const override;
 
