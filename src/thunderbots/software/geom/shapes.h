@@ -7,8 +7,8 @@
 class Line final
 {
    public:
-    Vector2 first;
-    Vector2 second;
+    Point first;
+    Point second;
 
     /**
      * \brief Creates a degenerate Line at (0, 0)
@@ -20,7 +20,7 @@ class Line final
     /**
      * \brief Creates a Line that starts and ends at the given points
      */
-    inline explicit Line(const Vector2& first, const Vector2& second)
+    inline explicit Line(const Point& first, const Point& second)
         : first(first), second(second)
     {
     }
@@ -34,8 +34,8 @@ class Line final
 class Seg final
 {
    public:
-    Vector2 start;
-    Vector2 end;
+    Point start;
+    Point end;
 
     /**
      * \brief Creates a degenerate Seg at (0, 0)
@@ -47,7 +47,7 @@ class Seg final
     /**
      * \brief Creates a Seg that starts and ends at the given points
      */
-    inline explicit Seg(const Vector2& start, const Vector2& end) : start(start), end(end)
+    inline explicit Seg(const Point& start, const Point& end) : start(start), end(end)
     {
     }
 
@@ -60,9 +60,9 @@ class Seg final
     }
 
     /**
-     * \brief Makes a Vector2 out of this Seg.
+     * \brief Makes a Point out of this Seg.
      */
-    inline Vector2 to_vector2() const
+    inline Point to_vector() const
     {
         return end - start;
     }
@@ -84,8 +84,8 @@ class Seg final
 class Ray final
 {
    public:
-    Vector2 start;
-    Vector2 dir;
+    Point start;
+    Vector dir;
 
     /**
      * \brief Creates a degenerate Seg at (0, 0)
@@ -98,7 +98,7 @@ class Ray final
      * \brief Creates a Seg that starts and contains a point along the given
      * line
      */
-    inline explicit Ray(const Vector2& start, const Vector2& dir) : start(start), dir(dir)
+    inline explicit Ray(const Point& start, const Vector& dir) : start(start), dir(dir)
     {
     }
 
@@ -107,7 +107,7 @@ class Ray final
         return Seg(start, dir);
     }
 
-    inline Vector2 to_vector2() const
+    inline Point to_vector() const
     {
         return dir - start;
     }
@@ -121,7 +121,7 @@ class Ray final
 class Circle final
 {
    public:
-    Vector2 origin;
+    Point origin;
     double radius;
 
     /**
@@ -131,7 +131,7 @@ class Circle final
     {
     }
 
-    inline explicit constexpr Circle(const Vector2& origin, double r)
+    inline explicit constexpr Circle(const Point& origin, double r)
         : origin(origin), radius(r)
     {
     }

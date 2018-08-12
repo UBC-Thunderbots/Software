@@ -6,7 +6,7 @@
 #include "geom/shapes.h"
 
 template <size_t N>
-using Poly     = std::array<Vector2, N>;
+using Poly     = std::array<Vector, N>;
 using Triangle = Poly<3>;
 using Quad     = Poly<4>;
 
@@ -31,12 +31,12 @@ inline Quad quad(const Point &a, const Point &b, const Point &c, const Point &d)
 /**
  * Signed magnitude of the projection of `second` on `first`
  */
-double proj_len(const Vector2 &first, const Vector2 &second);
+double proj_len(const Vector &first, const Vector &second);
 
 /**
  * Signed magnitude of the projection of `first.start -> second` on `first`
  */
-double proj_len(const Seg &first, const Vector2 &second);
+double proj_len(const Seg &first, const Vector &second);
 
 /*
  * The family of `contains` functions determins whether
@@ -44,12 +44,12 @@ double proj_len(const Seg &first, const Vector2 &second);
  * inside the first parameter.
  */
 
-bool contains(const Triangle &out, const Vector2 &in);
-bool contains(const Circle &out, const Vector2 &in);
+bool contains(const Triangle &out, const Vector &in);
+bool contains(const Circle &out, const Vector &in);
 bool contains(const Circle &out, const Seg &in);
-bool contains(const Ray &out, const Vector2 &in);
-bool contains(const Seg &out, const Vector2 &in);
-bool contains(const Rect &out, const Vector2 &in);
+bool contains(const Ray &out, const Vector &in);
+bool contains(const Seg &out, const Vector &in);
+bool contains(const Rect &out, const Vector &in);
 
 /*
  * The family of `intersects` functions determines whether there
@@ -69,18 +69,18 @@ bool intersects(const Seg &first, const Ray &second);
  * The family of `dist` functions calculates the unsigned distance
  * between one object and another.
  */
-double dist(const Vector2 &first, const Vector2 &second);
+double dist(const Vector &first, const Vector &second);
 double dist(const Seg &first, const Seg &second);
 
-double dist(const Vector2 &first, const Seg &second);
-double dist(const Seg &first, const Vector2 &second);
+double dist(const Vector &first, const Seg &second);
+double dist(const Seg &first, const Vector &second);
 
-double dist(const Line &first, const Vector2 &second);
-double dist(const Vector2 &first, const Line &second);
+double dist(const Line &first, const Vector &second);
+double dist(const Vector &first, const Line &second);
 
-double distsq(const Vector2 &first, const Seg &second);
-double distsq(const Seg &first, const Vector2 &second);
-double distsq(const Vector2 &first, const Vector2 &second);
+double distsq(const Vector &first, const Seg &second);
+double distsq(const Seg &first, const Vector &second);
+double distsq(const Vector &first, const Vector &second);
 
 bool is_degenerate(const Seg &seg);
 bool is_degenerate(const Ray &seg);
@@ -93,9 +93,9 @@ double lensq(const Seg &seg);
 double lensq(const Line &line);
 
 template <size_t N>
-Vector2 get_vertex(const Poly<N> &poly, unsigned int i);
+Vector get_vertex(const Poly<N> &poly, unsigned int i);
 template <size_t N>
-void set_vertex(Poly<N> &poly, unsigned int i, Vector2 &v);
+void set_vertex(Poly<N> &poly, unsigned int i, Vector &v);
 
 /**
  * Gets the side that is connected to the vertex with index provided

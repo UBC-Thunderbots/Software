@@ -7,17 +7,17 @@
 #include "geom/angle.h"
 
 
-double proj_len(const Seg &first, const Vector2 &second)
+double proj_len(const Seg &first, const Vector &second)
 {
-    return proj_len(first.to_vector2(), second - first.start);
+    return proj_len(first.to_vector(), second - first.start);
 }
 
-double proj_len(const Vector2 &first, const Vector2 &second)
+double proj_len(const Vector &first, const Vector &second)
 {
     return first.dot(second) / first.len();
 }
 
-double dist(const Vector2 &first, const Vector2 &second)
+double dist(const Vector &first, const Vector &second)
 {
     return (first - second).len();
 }
@@ -32,7 +32,7 @@ double dist(const Seg &first, const Seg &second)
         std::min(distsq(second, first.start), distsq(second, first.end))));
 }
 
-double dist(const Line &first, const Vector2 &second)
+double dist(const Line &first, const Vector &second)
 {
     if (is_degenerate(first))
     {
@@ -43,30 +43,30 @@ double dist(const Line &first, const Vector2 &second)
         (first.second - first.first).len());
 }
 
-double dist(const Vector2 &first, const Line &second)
+double dist(const Vector &first, const Line &second)
 {
     return dist(second, first);
 }
 
-double dist(const Vector2 &first, const Seg &second)
+double dist(const Vector &first, const Seg &second)
 {
     return std::sqrt(distsq(first, second));
 }
 
-double dist(const Seg &first, const Vector2 &second)
+double dist(const Seg &first, const Vector &second)
 {
     return dist(second, first);
 }
 
-double distsq(const Vector2 &first, const Seg &second)
+double distsq(const Vector &first, const Seg &second)
 {
     double seglensq     = lensq(second);
-    Vector2 relsecond_s = first - second.start;
-    Vector2 relsecond_e = first - second.end;
+    Vector relsecond_s = first - second.start;
+    Vector relsecond_e = first - second.end;
 
-    Vector2 s_vec2 = second.to_vector2();
+    Vector s_vec2 = second.to_vector();
 
-    if (s_vec2.dot(relsecond_s) > 0 && second.reverse().to_vector2().dot(relsecond_e) > 0)
+    if (s_vec2.dot(relsecond_s) > 0 && second.reverse().to_vector().dot(relsecond_e) > 0)
     {
         if (is_degenerate(second))
         {
@@ -81,12 +81,12 @@ double distsq(const Vector2 &first, const Seg &second)
     return std::min(lensq_s, lensq_e);
 }
 
-double distsq(const Seg &first, const Vector2 &second)
+double distsq(const Seg &first, const Vector &second)
 {
     return distsq(second, first);
 }
 
-double distsq(const Vector2 &first, const Vector2 &second)
+double distsq(const Vector &first, const Vector &second)
 {
     return (first - second).lensq();
 }
@@ -128,7 +128,7 @@ double lensq(const Line &line)
     return std::numeric_limits<double>::infinity();
 }
 
-bool contains(const Triangle &out, const Vector2 &in)
+bool contains(const Triangle &out, const Vector &in)
 {
     double angle = 0;
     for (int i = 0, j = 2; i < 3; j = i++)
@@ -144,7 +144,7 @@ bool contains(const Triangle &out, const Vector2 &in)
     return std::fabs(angle) > 6;
 }
 
-bool contains(const Circle &out, const Vector2 &in)
+bool contains(const Circle &out, const Vector &in)
 {
     return distsq(out.origin, in) <= out.radius * out.radius;
 }
@@ -154,7 +154,7 @@ bool contains(const Circle &out, const Seg &in)
     return dist(in, out.origin) < out.radius;
 }
 
-bool contains(const Seg &out, const Vector2 &in)
+bool contains(const Seg &out, const Vector &in)
 {
     if (collinear(in, out.start, out.end))
     {
@@ -167,7 +167,7 @@ bool contains(const Seg &out, const Vector2 &in)
     return false;
 }
 
-bool contains(const Ray &out, const Vector2 &in)
+bool contains(const Ray &out, const Vector &in)
 {
     if (collinear(in, out.start, out.dir))
     {
@@ -178,7 +178,7 @@ bool contains(const Ray &out, const Vector2 &in)
     return false;
 }
 
-bool contains(const Rect &out, const Vector2 &in)
+bool contains(const Rect &out, const Vector &in)
 {
     return out.point_inside(in);
 }
@@ -202,9 +202,9 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Ray &first, const Seg &second)
 {
-    if (std::abs(first.to_vector2().cross(second.to_vector2())) > EPS)
+    if (std::abs(first.to_vector().cross(second.to_vector())) > EPS)
     {
-        Vector2 isect = line_intersect(first.start, first.dir, second.start, second.end);
+        Vector isect = line_intersect(first.start, first.dir, second.start, second.end);
         return contains(first, isect) && contains(second, isect);
     }
     return collinear(first.start, first.dir, second.start);
@@ -254,13 +254,13 @@ bool intersects(const Seg &first, const Seg &second)
 }
 
 template <size_t N>
-Vector2 get_vertex(const Poly<N> &poly, unsigned int i)
+Vector get_vertex(const Poly<N> &poly, unsigned int i)
 {
     return poly[i % N];
 }
 
 template <size_t N>
-void set_vertex(Poly<N> &poly, unsigned int i, const Vector2 &v)
+void set_vertex(Poly<N> &poly, unsigned int i, const Vector &v)
 {
     poly[i % N] = v;
 }
@@ -271,11 +271,11 @@ Seg get_side(const Poly<N> &poly, unsigned int i)
     return Seg(get_vertex(poly, i), get_vertex(poly, i + 1));
 }
 
-std::vector<std::pair<Vector2, Angle>> angle_sweep_circles_all(
-    const Vector2 &src, const Vector2 &p1, const Vector2 &p2,
-    const std::vector<Vector2> &obstacles, const double &radius)
+std::vector<std::pair<Vector, Angle>> angle_sweep_circles_all(
+    const Vector &src, const Vector &p1, const Vector &p2,
+    const std::vector<Vector> &obstacles, const double &radius)
 {
-    std::vector<std::pair<Vector2, Angle>> ret;
+    std::vector<std::pair<Vector, Angle>> ret;
 
     const Angle offangle = (p1 - src).orientation();
     if (collinear(src, p1, p2))
@@ -292,9 +292,9 @@ std::vector<std::pair<Vector2, Angle>> angle_sweep_circles_all(
     events.push_back(std::make_pair(Angle::zero(), 1));  // p1 becomes angle 0
     events.push_back(
         std::make_pair(((p2 - src).orientation() - offangle).angle_mod(), -1));
-    for (Vector2 i : obstacles)
+    for (Vector i : obstacles)
     {
-        Vector2 diff = i - src;
+        Vector diff = i - src;
         if (diff.len() < radius)
         {
             return ret;
@@ -328,8 +328,8 @@ std::vector<std::pair<Vector2, Angle>> angle_sweep_circles_all(
         else
         {
             const Angle mid     = start + sum / 2 + offangle;
-            const Vector2 ray   = Vector2::of_angle(mid) * 10.0;
-            const Vector2 inter = line_intersect(src, src + ray, p1, p2);
+            const Vector ray   = Vector::of_angle(mid) * 10.0;
+            const Vector inter = line_intersect(src, src + ray, p1, p2);
 
             ret.push_back(std::make_pair(inter, sum));
 
@@ -340,12 +340,12 @@ std::vector<std::pair<Vector2, Angle>> angle_sweep_circles_all(
     return ret;
 }
 
-std::pair<Vector2, Angle> angle_sweep_circles(
-    const Vector2 &src, const Vector2 &p1, const Vector2 &p2,
-    const std::vector<Vector2> &obstacles, const double &radius)
+std::pair<Vector, Angle> angle_sweep_circles(
+    const Vector &src, const Vector &p1, const Vector &p2,
+    const std::vector<Vector> &obstacles, const double &radius)
 {
     // default value to return if nothing is valid
-    Vector2 bestshot     = (p1 + p2) * 0.5;
+    Vector bestshot     = (p1 + p2) * 0.5;
     const Angle offangle = (p1 - src).orientation();
     if (collinear(src, p1, p2))
     {
@@ -360,9 +360,9 @@ std::pair<Vector2, Angle> angle_sweep_circles(
     events.push_back(std::make_pair(Angle::zero(), 1));  // p1 becomes angle 0
     events.push_back(
         std::make_pair(((p2 - src).orientation() - offangle).angle_mod(), -1));
-    for (Vector2 i : obstacles)
+    for (Vector i : obstacles)
     {
-        Vector2 diff = i - src;
+        Vector diff = i - src;
         if (diff.len() < radius)
         {
             return std::make_pair(bestshot, Angle::zero());
@@ -419,8 +419,8 @@ std::pair<Vector2, Angle> angle_sweep_circles(
                 // shoot ray from point p
                 // intersect with line p1-p2
                 const Angle mid     = start + sum / 2 + offangle;
-                const Vector2 ray   = Vector2::of_angle(mid) * 10.0;
-                const Vector2 inter = line_intersect(src, src + ray, p1, p2);
+                const Vector ray   = Vector::of_angle(mid) * 10.0;
+                const Vector inter = line_intersect(src, src + ray, p1, p2);
                 bestshot            = inter;
             }
         }
@@ -433,22 +433,22 @@ std::pair<Vector2, Angle> angle_sweep_circles(
     return std::make_pair(bestshot, best);
 }
 
-std::vector<Vector2> circle_boundaries(
-    const Vector2 &centre, double radius, int num_points)
+std::vector<Vector> circle_boundaries(
+    const Vector &centre, double radius, int num_points)
 {
     Angle rotate_amount = Angle::full() / num_points;
-    std::vector<Vector2> ans;
-    Vector2 bound(radius, 0.0);
+    std::vector<Vector> ans;
+    Vector bound(radius, 0.0);
     for (int i = 0; i < num_points; i++)
     {
-        Vector2 temp = centre + bound;
+        Vector temp = centre + bound;
         ans.push_back(temp);
         bound = bound.rotate(rotate_amount);
     }
     return ans;
 }
 
-bool collinear(const Vector2 &a, const Vector2 &b, const Vector2 &c)
+bool collinear(const Vector &a, const Vector &b, const Vector &c)
 {
     if ((a - b).lensq() < EPS2 || (b - c).lensq() < EPS2 || (a - c).lensq() < EPS2)
     {
@@ -457,13 +457,13 @@ bool collinear(const Vector2 &a, const Vector2 &b, const Vector2 &c)
     return std::fabs((b - a).cross(c - a)) < EPS;
 }
 
-Vector2 clip_point(const Vector2 &p, const Vector2 &bound1, const Vector2 &bound2)
+Vector clip_point(const Vector &p, const Vector &bound1, const Vector &bound2)
 {
     const double minx = std::min(bound1.x(), bound2.x());
     const double miny = std::min(bound1.y(), bound2.y());
     const double maxx = std::max(bound1.x(), bound2.x());
     const double maxy = std::max(bound1.y(), bound2.y());
-    Vector2 ret       = p;
+    Vector ret       = p;
     if (p.x() < minx)
     {
         ret.set(minx, ret.y());
@@ -483,13 +483,13 @@ Vector2 clip_point(const Vector2 &p, const Vector2 &bound1, const Vector2 &bound
     return ret;
 }
 
-Vector2 clip_point(const Vector2 &p, const Rect &r)
+Vector clip_point(const Vector &p, const Rect &r)
 {
     const double minx = r.sw_corner().x();
     const double miny = r.sw_corner().y();
     const double maxx = r.ne_corner().x();
     const double maxy = r.ne_corner().y();
-    Vector2 ret       = p;
+    Vector ret       = p;
     if (p.x() < minx)
     {
         ret.set(minx, ret.y());
@@ -510,10 +510,10 @@ Vector2 clip_point(const Vector2 &p, const Rect &r)
 }
 
 // TODO: does this work? unit test
-std::vector<Vector2> line_circle_intersect(
-    const Vector2 &centre, double radius, const Vector2 &segA, const Vector2 &segB)
+std::vector<Vector> line_circle_intersect(
+    const Vector &centre, double radius, const Vector &segA, const Vector &segB)
 {
-    std::vector<Vector2> ans;
+    std::vector<Vector> ans;
 
     // take care of 0 length segments too much error here
     if ((segB - segA).lensq() < EPS)
@@ -522,7 +522,7 @@ std::vector<Vector2> line_circle_intersect(
     }
 
     double lenseg = (segB - segA).dot(centre - segA) / (segB - segA).len();
-    Vector2 C     = segA + lenseg * (segB - segA).norm();
+    Vector C     = segA + lenseg * (segB - segA).norm();
 
     // if C outside circle no intersections
     if ((C - centre).lensq() > radius * radius + EPS)
@@ -546,14 +546,14 @@ std::vector<Vector2> line_circle_intersect(
     return ans;
 }
 
-std::vector<Vector2> line_rect_intersect(
-    const Rect &r, const Vector2 &segA, const Vector2 &segB)
+std::vector<Vector> line_rect_intersect(
+    const Rect &r, const Vector &segA, const Vector &segB)
 {
-    std::vector<Vector2> ans;
+    std::vector<Vector> ans;
     for (unsigned int i = 0; i < 4; i++)
     {
-        const Vector2 &a = r[i];
-        const Vector2 &b = r[i + 1];
+        const Vector &a = r[i];
+        const Vector &b = r[i + 1];
         if (intersects(Seg(a, b), Seg(segA, segB)) &&
             unique_line_intersect(a, b, segA, segB))
         {
@@ -563,15 +563,15 @@ std::vector<Vector2> line_rect_intersect(
     return ans;
 }
 
-Vector2 vector_rect_intersect(const Rect &r, const Vector2 &vecA, const Vector2 &vecB)
+Vector vector_rect_intersect(const Rect &r, const Vector &vecA, const Vector &vecB)
 {
     /*std::cout << vecA << vecB << r.ne_corner() << r.sw_corner();
        for (unsigned int i = 0; i < 4; i++) {
         unsigned int j = (i + 1)%4;
-        const Vector2 &a = r[i];
-        const Vector2 &b = r[j];
+        const Vector &a = r[i];
+        const Vector &b = r[j];
         if ( intersects(Ray(vecA, vecB), Seg( a, b ) )) {
-            Vector2 intersect = line_intersect(a, b, vecA, vecB);
+            Vector intersect = line_intersect(a, b, vecA, vecB);
             std::cout << std::endl;
             return intersect;
         }
@@ -579,20 +579,20 @@ Vector2 vector_rect_intersect(const Rect &r, const Vector2 &vecA, const Vector2 
        std::cout << "fail \n";
        return r.centre();  // return the center of the rectangle, if no valid
        answer is found*/
-    std::vector<Vector2> points =
+    std::vector<Vector> points =
         line_rect_intersect(r, vecA, (vecB - vecA) * 100 + vecA);
-    for (Vector2 i : points)
+    for (Vector i : points)
     {
         if (contains(Ray(vecA, vecB), i))
         {
             return i;
         }
     }
-    return Vector2(1.0 / 0.0, 1.0 / 0.0);  // no solution found, propagate infinity
+    return Vector(1.0 / 0.0, 1.0 / 0.0);  // no solution found, propagate infinity
 }
 
-Vector2 closest_lineseg_point(
-    const Vector2 &centre, const Vector2 &segA, const Vector2 &segB)
+Vector closest_lineseg_point(
+    const Vector &centre, const Vector &segA, const Vector &segB)
 {
     // if one of the end-points is extremely close to the centre point
     // then return 0.0
@@ -615,7 +615,7 @@ Vector2 closest_lineseg_point(
     // find point C
     // which is the projection onto the line
     double lenseg = (segB - segA).dot(centre - segA) / (segB - segA).len();
-    Vector2 C     = segA + lenseg * (segB - segA).norm();
+    Vector C     = segA + lenseg * (segB - segA).norm();
 
     // check if C is in the line seg range
     double AC     = (segA - C).lensq();
@@ -642,13 +642,13 @@ Vector2 closest_lineseg_point(
 namespace
 {
 // this function is never used
-std::vector<Vector2> lineseg_circle_intersect(
-    const Vector2 &centre, double radius, const Vector2 &segA, const Vector2 &segB)
+std::vector<Vector> lineseg_circle_intersect(
+    const Vector &centre, double radius, const Vector &segA, const Vector &segB)
 {
-    std::vector<Vector2> ans;
-    std::vector<Vector2> poss = line_circle_intersect(centre, radius, segA, segB);
+    std::vector<Vector> ans;
+    std::vector<Vector> poss = line_circle_intersect(centre, radius, segA, segB);
 
-    for (Vector2 i : poss)
+    for (Vector i : poss)
     {
         bool x_ok = i.x() <= std::max(segA.x(), segB.x()) + EPS &&
                     i.x() >= std::min(segA.x(), segB.x()) - EPS;
@@ -664,7 +664,7 @@ std::vector<Vector2> lineseg_circle_intersect(
 }
 
 bool unique_line_intersect(
-    const Vector2 &a, const Vector2 &b, const Vector2 &c, const Vector2 &d)
+    const Vector &a, const Vector &b, const Vector &c, const Vector &d)
 {
     return std::abs((d - c).cross(b - a)) > EPS;
 }
@@ -684,8 +684,8 @@ std::vector<Point> line_intersect(const Seg &a, const Seg &b)
 }
 
 // ported code
-Vector2 line_intersect(
-    const Vector2 &a, const Vector2 &b, const Vector2 &c, const Vector2 &d)
+Vector line_intersect(
+    const Vector &a, const Vector &b, const Vector &c, const Vector &d)
 {
     // TODO figure out why this is asserting
     // assert(std::abs((d - c).cross(b - a)) > EPS);
@@ -727,42 +727,42 @@ Vector2 line_intersect(
 
 // TODO: a line intersect that takes segments would be nice
 
-Vector2 reflect(const Vector2 &v, const Vector2 &n)
+Vector reflect(const Vector &v, const Vector &n)
 {
     if (n.len() < EPS)
     {
         return v;
     }
-    Vector2 normal = n.norm();
+    Vector normal = n.norm();
     return v - 2 * v.dot(normal) * normal;
 }
 
-Vector2 reflect(const Vector2 &a, const Vector2 &b, const Vector2 &p)
+Vector reflect(const Vector &a, const Vector &b, const Vector &p)
 {
     // Make a as origin.
     // Rotate by 90 degrees, does not matter which direction?
-    Vector2 n = (b - a).rotate(Angle::quarter());
+    Vector n = (b - a).rotate(Angle::quarter());
     return a + reflect(p - a, n);
 }
 
 // ported code
-Vector2 calc_block_cone(const Vector2 &a, const Vector2 &b, const double &radius)
+Vector calc_block_cone(const Vector &a, const Vector &b, const double &radius)
 {
     if (a.len() < EPS || b.len() < EPS)
     {
     }
     // unit vector and bisector
-    Vector2 au = a / a.len();
-    Vector2 c  = au + b / b.len();
+    Vector au = a / a.len();
+    Vector c  = au + b / b.len();
     // use similar triangle
     return c * (radius / std::fabs(au.cross(c)));
 }
 
-Vector2 calc_block_cone(
-    const Vector2 &a, const Vector2 &b, const Vector2 &p, const double &radius)
+Vector calc_block_cone(
+    const Vector &a, const Vector &b, const Vector &p, const double &radius)
 {
     /*
-       Vector2 R = p + calc_block_cone(a - p, b - p, radius);
+       Vector R = p + calc_block_cone(a - p, b - p, radius);
        const double MIN_X = std::min(-2.5, (p.x() + 3.025) / 2.0 - 3.025);
        if (R.x() < MIN_X){
        R = (R - p) * ((MIN_X - p.x()) / (R.x() - p.x())) + p;
@@ -773,7 +773,7 @@ Vector2 calc_block_cone(
 }
 
 // ported code
-Vector2 calc_block_other_ray(const Vector2 &a, const Vector2 &c, const Vector2 &g)
+Vector calc_block_other_ray(const Vector &a, const Vector &c, const Vector &g)
 {
     return reflect(c - a, g - c);  // this, and the next two instances, were
                                    // changed from a - c since reflect() was
@@ -782,27 +782,27 @@ Vector2 calc_block_other_ray(const Vector2 &a, const Vector2 &c, const Vector2 &
 
 // ported code
 bool goalie_block_goal_post(
-    const Vector2 &a, const Vector2 &b, const Vector2 &c, const Vector2 &g)
+    const Vector &a, const Vector &b, const Vector &c, const Vector &g)
 {
-    Vector2 R = reflect(c - a, g - c);
+    Vector R = reflect(c - a, g - c);
     return fabs(R.cross(b - c)) < EPS;
 }
 
 // ported code
-Vector2 calc_block_cone_defender(
-    const Vector2 &a, const Vector2 &b, const Vector2 &c, const Vector2 &g,
+Vector calc_block_cone_defender(
+    const Vector &a, const Vector &b, const Vector &c, const Vector &g,
     const double &r)
 {
-    Vector2 R = reflect(c - a, g - c);
+    Vector R = reflect(c - a, g - c);
     // std::cout << (R + c) << std::endl;
     return calc_block_cone(R + c, b, c, r);
 }
 
 // ported cm code below
 
-double offset_to_line(Vector2 x0, Vector2 x1, Vector2 p)
+double offset_to_line(Vector x0, Vector x1, Vector p)
 {
-    Vector2 n;
+    Vector n;
 
     // get normal to line
     n = (x1 - x0).perp().norm();
@@ -810,9 +810,9 @@ double offset_to_line(Vector2 x0, Vector2 x1, Vector2 p)
     return n.dot(p - x0);
 }
 
-double offset_along_line(Vector2 x0, Vector2 x1, Vector2 p)
+double offset_along_line(Vector x0, Vector x1, Vector p)
 {
-    Vector2 n, v;
+    Vector n, v;
 
     // get normal to line
     n = x1 - x0;
@@ -823,9 +823,9 @@ double offset_along_line(Vector2 x0, Vector2 x1, Vector2 p)
     return n.dot(v);
 }
 
-Vector2 segment_near_line(Vector2 a0, Vector2 a1, Vector2 b0, Vector2 b1)
+Vector segment_near_line(Vector a0, Vector a1, Vector b0, Vector b1)
 {
-    Vector2 v, n, p;
+    Vector v, n, p;
     double dn, t;
 
     v = a1 - a0;
@@ -853,26 +853,26 @@ Vector2 segment_near_line(Vector2 a0, Vector2 a1, Vector2 b0, Vector2 b1)
     return p;
 }
 
-Vector2 intersection(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2)
+Vector intersection(Vector a1, Vector a2, Vector b1, Vector b2)
 {
-    Vector2 a = a2 - a1;
+    Vector a = a2 - a1;
 
-    Vector2 b1r = (b1 - a1).rotate(-a.orientation());
-    Vector2 b2r = (b2 - a1).rotate(-a.orientation());
-    Vector2 br  = (b1r - b2r);
+    Vector b1r = (b1 - a1).rotate(-a.orientation());
+    Vector b2r = (b2 - a1).rotate(-a.orientation());
+    Vector br  = (b1r - b2r);
 
-    return Vector2(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation()) +
+    return Vector(b2r.x() - b2r.y() * (br.x() / br.y()), 0.0).rotate(a.orientation()) +
            a1;
 }
 
-Angle vertex_angle(Vector2 a, Vector2 b, Vector2 c)
+Angle vertex_angle(Vector a, Vector b, Vector c)
 {
     return ((a - b).orientation() - (c - b).orientation()).angle_mod();
 }
 
-double closest_point_time(Vector2 x1, Vector2 v1, Vector2 x2, Vector2 v2)
+double closest_point_time(Vector x1, Vector v1, Vector x2, Vector v2)
 {
-    Vector2 v = v1 - v2;
+    Vector v = v1 - v2;
     double sl = v.lensq();
     double t;
 
@@ -889,7 +889,7 @@ double closest_point_time(Vector2 x1, Vector2 v1, Vector2 x2, Vector2 v2)
     return t;
 }
 
-bool point_in_front_vector(Vector2 offset, Vector2 dir, Vector2 p)
+bool point_in_front_vector(Vector offset, Vector dir, Vector p)
 {
     // compare angle different
     Angle a1   = dir.orientation();
@@ -898,7 +898,7 @@ bool point_in_front_vector(Vector2 offset, Vector2 dir, Vector2 p)
     return diff < Angle::quarter() && diff > -Angle::quarter();
 }
 
-bool is_clockwise(Vector2 v1, Vector2 v2)
+bool is_clockwise(Vector v1, Vector v2)
 {
     if (v1.y() * v2.x() > v1.x() * v2.y())
     {
