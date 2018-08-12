@@ -1,5 +1,4 @@
-#ifndef GEOM_ANGLE_H
-#define GEOM_ANGLE_H
+#pragma once
 
 #include <cmath>
 #include <ostream>
@@ -621,4 +620,7 @@ inline std::ostream &operator<<(std::ostream &os, const Angle &a)
     return os;
 }
 
-#endif
+// We also use variables of type 'Angle' to represent angular velocities, since they
+// are essentially represented the same. This typedef allows us to refer to Angles as
+// AngularVelocities, which makes the interfaces more intuitive.
+typedef Angle AngularVelocity;
