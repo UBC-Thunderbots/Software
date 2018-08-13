@@ -88,24 +88,6 @@ class Angle final
     explicit constexpr Angle();
 
     /**
-     * \brief Constructs an angle from a value in radians.
-     *
-     * \param[in] t the angle.
-     *
-     * \return the angle.
-     */
-    static constexpr Angle of_radians(double t);
-
-    /**
-     * \brief Constructs an angle from a value in degrees.
-     *
-     * \param[in] t the angle.
-     *
-     * \return the angle.
-     */
-    static constexpr Angle of_degrees(double t);
-
-    /**
      * Converts this angle to a value in radians.
      *
      * @return the number of radians in this angle in the range [0, 2PI)
@@ -202,7 +184,7 @@ class Angle final
      *
      * \return the clamped angle.
      */
-    constexpr Angle angle_mod() const;
+    constexpr Angle angleMod() const;
 
    private:
     double rads;
@@ -446,16 +428,6 @@ inline constexpr Angle::Angle() : rads(0.0)
 {
 }
 
-inline constexpr Angle Angle::of_radians(double t)
-{
-    return Angle(t);
-}
-
-inline constexpr Angle Angle::of_degrees(double t)
-{
-    return Angle(t / 180.0 * M_PI);
-}
-
 inline constexpr double Angle::toRadians() const
 {
     return rads;
@@ -520,7 +492,7 @@ inline constexpr Angle Angle::diff(Angle other) const
     return (*this - other).clamp().abs();
 }
 
-inline constexpr Angle Angle::angle_mod() const
+inline constexpr Angle Angle::angleMod() const
 {
     return remainder(Angle::full());
 }

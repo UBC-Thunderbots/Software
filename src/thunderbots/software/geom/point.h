@@ -192,15 +192,6 @@ class Point final
     constexpr bool isClose(const Point &other, double dist) const;
 
     /**
-     * \brief Creates a unit-magnitude Point for an angle
-     *
-     * \param[in] angle the angle
-     *
-     * \return the Point
-     */
-    static Point of_angle(Angle angle);
-
-    /**
     * Assigns one Point to another
     *
     * @param other the Point whose value should be copied into this Point
@@ -458,11 +449,6 @@ inline constexpr bool Point::isClose(const Point &other) const
 inline constexpr bool Point::isClose(const Point &other, double dist) const
 {
     return std::pow(_x - other.x(), 2) + std::pow(_y - other.y(), 2) < dist * dist;
-}
-
-inline Point Point::of_angle(Angle angle)
-{
-    return Point(angle.cos(), angle.sin());
 }
 
 inline constexpr Point operator+(const Point &p, const Point &q)

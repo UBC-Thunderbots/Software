@@ -63,28 +63,28 @@ class Rect final
      *
      * \return the north-east corner of the rectangle.
      */
-    constexpr Point ne_corner() const;
+    constexpr Point neCorner() const;
 
     /**
      * Returns the north-west corner of the rectangle.
      *
      * \return the north-west corner of the rectangle.
      */
-    constexpr Point nw_corner() const;
+    constexpr Point nwCorner() const;
 
     /**
      * Returns the south-west corner of the rectangle.
      *
      * \return the south-west corner of the rectangle.
      */
-    constexpr Point sw_corner() const;
+    constexpr Point swCorner() const;
 
     /**
      * Returns the south-east corner of the rectangle.
      *
      * \return the south-east corner of the rectangle.
      */
-    constexpr Point se_corner() const;
+    constexpr Point seCorner() const;
 
     /**
      * Returns 0-sw 1-nw 2-ne 3-se corner for pos%4
@@ -109,7 +109,7 @@ class Rect final
      *
      * \return bool whether the point is inside the boundry of the rectangle
      */
-    constexpr bool point_inside(Point p) const;
+    constexpr bool containsPoint(Point p) const;
 
     /**
      * Tries to move all of the edges of the rectangle outwards/inwards towards
@@ -134,7 +134,7 @@ class Rect final
      *
      * \return double
      */
-    double dist_to_boundary(Point p);
+    double distToBoundary(Point p);
 
    private:
     Point min_corner;
@@ -176,31 +176,31 @@ inline constexpr Point Rect::centre() const
     return min_corner + diag / 2;
 }
 
-inline constexpr Point Rect::ne_corner() const
+inline constexpr Point Rect::neCorner() const
 {
     return min_corner + diag;
 }
 
-inline constexpr Point Rect::nw_corner() const
+inline constexpr Point Rect::nwCorner() const
 {
     return min_corner + Point(0, diag.y());
 }
 
-inline constexpr Point Rect::sw_corner() const
+inline constexpr Point Rect::swCorner() const
 {
     return min_corner;
 }
 
-inline constexpr Point Rect::se_corner() const
+inline constexpr Point Rect::seCorner() const
 {
     return min_corner + Point(diag.x(), 0);
 }
 
 inline constexpr Point Rect::operator[](unsigned int pos) const
 {
-    return (pos % 4) == 0 ? sw_corner()
-                          : (pos % 4) == 1 ? nw_corner()
-                                           : (pos % 4) == 2 ? ne_corner() : se_corner();
+    return (pos % 4) == 0
+               ? swCorner()
+               : (pos % 4) == 1 ? nwCorner() : (pos % 4) == 2 ? neCorner() : seCorner();
 }
 
 inline void Rect::translate(const Point &offset)
@@ -208,7 +208,7 @@ inline void Rect::translate(const Point &offset)
     min_corner += offset;
 }
 
-inline constexpr bool Rect::point_inside(Point p) const
+inline constexpr bool Rect::containsPoint(Point p) const
 {
     return p.x() >= min_corner.x() && p.y() >= min_corner.y() &&
            p.x() <= min_corner.x() + diag.x() && p.y() <= min_corner.y() + diag.y();

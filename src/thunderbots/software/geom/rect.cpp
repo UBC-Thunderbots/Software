@@ -16,7 +16,7 @@ bool Rect::expand(double amount)
     return true;
 }
 
-double Rect::dist_to_boundary(Point p)
+double Rect::distToBoundary(Point p)
 {
     double inf = 10e9;  // approx of infinity
     for (unsigned int i = 0; i < 4; i++)

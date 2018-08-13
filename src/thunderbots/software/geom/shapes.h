@@ -62,7 +62,7 @@ class Seg final
     /**
      * \brief Makes a Point out of this Seg.
      */
-    inline Point to_vector() const
+    inline Vector toVector() const
     {
         return end - start;
     }
@@ -70,7 +70,7 @@ class Seg final
     /**
      * \brief Makes a line out of this Seg.
      */
-    inline Line to_line()
+    inline Line toLine()
     {
         return Line(start, end);
     }
@@ -102,17 +102,17 @@ class Ray final
     {
     }
 
-    inline Seg to_seg() const
+    inline Seg toSeg() const
     {
         return Seg(start, dir);
     }
 
-    inline Point to_vector() const
+    inline Vector toVector() const
     {
         return dir - start;
     }
 
-    inline Line to_line() const
+    inline Line toLine() const
     {
         return Line(start, dir);
     }

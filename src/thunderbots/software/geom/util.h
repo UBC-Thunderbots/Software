@@ -69,22 +69,22 @@ bool intersects(const Seg &first, const Ray &second);
  * The family of `dist` functions calculates the unsigned distance
  * between one object and another.
  */
-double dist(const Vector &first, const Vector &second);
+double dist(const Point &first, const Point &second);
 double dist(const Seg &first, const Seg &second);
 
-double dist(const Vector &first, const Seg &second);
-double dist(const Seg &first, const Vector &second);
+double dist(const Point &first, const Seg &second);
+double dist(const Seg &first, const Point &second);
 
-double dist(const Line &first, const Vector &second);
-double dist(const Vector &first, const Line &second);
+double dist(const Line &first, const Point &second);
+double dist(const Point &first, const Line &second);
 
-double distsq(const Vector &first, const Seg &second);
-double distsq(const Seg &first, const Vector &second);
-double distsq(const Vector &first, const Vector &second);
+double distsq(const Point &first, const Seg &second);
+double distsq(const Seg &first, const Point &second);
+double distsq(const Point &first, const Point &second);
 
-bool is_degenerate(const Seg &seg);
-bool is_degenerate(const Ray &seg);
-bool is_degenerate(const Line &line);
+bool isDegenerate(const Seg &seg);
+bool isDegenerate(const Ray &seg);
+bool isDegenerate(const Line &line);
 
 double len(const Seg &seg);
 double len(const Line &line);
@@ -93,16 +93,16 @@ double lensq(const Seg &seg);
 double lensq(const Line &line);
 
 template <size_t N>
-Vector get_vertex(const Poly<N> &poly, unsigned int i);
+Vector getVertex(const Poly<N> &poly, unsigned int i);
 template <size_t N>
-void set_vertex(Poly<N> &poly, unsigned int i, Vector &v);
+void setVertex(Poly<N> &poly, unsigned int i, Vector &v);
 
 /**
  * Gets the side that is connected to the vertex with index provided
  * and also connected to the vertex with the next index.
  */
 template <size_t N>
-Seg get_side(const Poly<N> &poly, unsigned int i);
+Seg getSide(const Poly<N> &poly, unsigned int i);
 
 /**
  * Checks if 3 points are collinear.
@@ -151,7 +151,7 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  * or <code>(<var>p</var>, 0)</code> for some unspecified <var>p</var> if there
  * is no free path.
  */
-std::pair<Point, Angle> angle_sweep_circles(
+std::pair<Point, Angle> angleSweepCircles(
     const Point &src, const Point &p1, const Point &p2,
     const std::vector<Point> &obstacles, const double &radius);
 
@@ -174,14 +174,14 @@ std::pair<Point, Angle> angle_sweep_circles(
  * \returns a vector of all possible pairs of directions and angles to a target
  * area. An empty vector is returned if the preconditions aren't satisfied.
  */
-std::vector<std::pair<Point, Angle>> angle_sweep_circles_all(
+std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
     const Point &src, const Point &p1, const Point &p2,
     const std::vector<Point> &obstacles, const double &radius);
 
 /**
  * returns a list of points that lie on the border of the circle
  */
-std::vector<Point> circle_boundaries(const Point &centre, double radius, int num_points);
+std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_points);
 
 /**
  * Finds the Point on line segment closest to point.
@@ -194,7 +194,7 @@ std::vector<Point> circle_boundaries(const Point &centre, double radius, int num
  *
  * \return the Point on line segment closest to centre point.
  */
-Point closest_lineseg_point(const Point &p, const Point &segA, const Point &segB);
+Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -210,7 +210,7 @@ Point closest_lineseg_point(const Point &p, const Point &segA, const Point &segB
  *
  * \return the points of intersection.
  */
-std::vector<Point> line_circle_intersect(
+std::vector<Point> lineCircleIntersect(
     const Point &centre, double radius, const Point &segA, const Point &segB);
 
 /**
@@ -225,8 +225,7 @@ std::vector<Point> line_circle_intersect(
  *
  * \return the points of intersection.
  */
-std::vector<Point> line_rect_intersect(
-    const Rect &r, const Point &segA, const Point &segB);
+std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Point &segB);
 
 /**
  * Find where a vector intersect a rectangle
@@ -240,7 +239,7 @@ std::vector<Point> line_rect_intersect(
  *
  * \return the points of intersection.
  */
-Point vector_rect_intersect(const Rect &r, const Point &segA, const Point &segB);
+Point vectorRectIntersect(const Rect &r, const Point &segA, const Point &segB);
 
 /**
  * Clips a point to a rectangle boundary.
@@ -253,7 +252,7 @@ Point vector_rect_intersect(const Rect &r, const Point &segA, const Point &segB)
  *
  * \return the closest point to \p p that lies within the rectangle.
  */
-Point clip_point(const Point &p, const Point &bound1, const Point &bound2);
+Point clipPoint(const Point &p, const Point &bound1, const Point &bound2);
 
 /**
  * Clips a point to a rectangle boundary.
@@ -264,7 +263,7 @@ Point clip_point(const Point &p, const Point &bound1, const Point &bound2);
  *
  * \return the closest point to \p p that lies within the rectangle.
  */
-Point clip_point(const Point &p, const Rect &r);
+Point clipPoint(const Point &p, const Rect &r);
 
 /**
  * Computes whether there is a unique intersection of two lines.
@@ -279,8 +278,7 @@ Point clip_point(const Point &p, const Rect &r);
  *
  * \return whether there is one and only one answer
  */
-bool unique_line_intersect(
-    const Point &a, const Point &b, const Point &c, const Point &d);
+bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d);
 
 /**
  * Computes the intersection of two lines.
@@ -297,9 +295,9 @@ bool unique_line_intersect(
  *
  * \return the point of intersection.
  */
-Point line_intersect(const Point &a, const Point &b, const Point &c, const Point &d);
+Point lineIntersection(const Point &a, const Point &b, const Point &c, const Point &d);
 
-std::vector<Point> line_intersect(const Seg &a, const Seg &b);
+std::vector<Point> lineIntersection(const Seg &a, const Seg &b);
 
 /**
  * Reflects a ray incident on origin given the normal of the reflecting plane.
@@ -343,7 +341,7 @@ Point reflect(const Point &a, const Point &b, const Point &p);
  *
  * \return the blocking position.
  */
-Point calc_block_cone(const Point &a, const Point &b, const double &radius);
+Point calcBlockCone(const Point &a, const Point &b, const double &radius);
 
 /**
  * Given a cone shooting from a point P, determines the furthest location from
@@ -363,8 +361,7 @@ Point calc_block_cone(const Point &a, const Point &b, const double &radius);
  *
  * \return the blocking position.
  */
-Point calc_block_cone(
-    const Point &a, const Point &b, const Point &p, const double &radius);
+Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius);
 
 /**
  * Used for defender_blocks_goal
@@ -375,7 +372,7 @@ Point calc_block_cone(
  * I.e. if p is return value,
  * then points to the other side of line p-c is not covered by goalie.
  */
-Point calc_block_other_ray(const Point &a, const Point &c, const Point &g);
+Point calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
 
 /**
  * Ported code
@@ -389,8 +386,7 @@ Point calc_block_other_ray(const Point &a, const Point &c, const Point &g);
  *
  * \param[in] g goalie position
  */
-bool goalie_block_goal_post(
-    const Point &a, const Point &b, const Point &c, const Point &g);
+bool goalieBlockGoalPost(const Point &a, const Point &b, const Point &c, const Point &g);
 
 /**
  * Calculates a defender position to block the ball.
@@ -407,7 +403,7 @@ bool goalie_block_goal_post(
  *
  * \param[in] r radius of defending robot
  */
-Point calc_block_cone_defender(
+Point calcBlockConeDefender(
     const Point &a, const Point &b, const Point &c, const Point &g, const double &r);
 
 /*
@@ -417,17 +413,17 @@ Point calc_block_cone_defender(
 /**
  * returns perpendicular offset from line x0-x1 to point p
  */
-double offset_to_line(Point x0, Point x1, Point p);
+double offsetToLine(Point x0, Point x1, Point p);
 
 /**
  * returns perpendicular offset from line x0-x1 to point p
  */
-double offset_along_line(Point x0, Point x1, Point p);
+double offsetAlongLine(Point x0, Point x1, Point p);
 
 /**
  * returns nearest point on segment a0-a1 to line b0-b1
  */
-Point segment_near_line(Point a0, Point a1, Point b0, Point b1);
+Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 
 /**
  * intersection of two segments?
@@ -437,13 +433,13 @@ Point intersection(Point a1, Point a2, Point b1, Point b2);
 /**
  * gives counterclockwise angle from <a-b> to <c-b>
  */
-Angle vertex_angle(Point a, Point b, Point c);
+Angle vertexAngle(Point a, Point b, Point c);
 
 /**
  * returns time of closest point of approach of two points
  * moving along constant velocity vectors.
  */
-double closest_point_time(Point x1, Point v1, Point x2, Point v2);
+double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
 
 /**
  * found out if a point is in the vector's direction or against it
@@ -455,23 +451,23 @@ double closest_point_time(Point x1, Point v1, Point x2, Point v2);
  *
  * param[in] p is the point is question
  */
-bool point_in_front_vector(Point offset, Point dir, Point p);
+bool pointInFrontVector(Point offset, Point dir, Point p);
 
 /**
  * Returns true if v2 is clockwise relative to v1
  */
 // TODO: this should work but hasn't been properly tested
-bool is_clockwise(Point v1, Point v2);
+bool isClockwise(Vector v1, Vector v2);
 
 /**
  * Returns the circle's tangent points.
  *
  * Returns the points on the circle that form tangent lines with the start point
  */
-std::pair<Point, Point> get_circle_tangent_points(
+std::pair<Point, Point> getCircleTangentPoints(
     const Point &start, const Circle &circle, double buffer = 0.0);
 
-bool point_is_to_right_of_line(const Seg &line, const Point &point);
+bool pointIsRightOfLine(const Seg &line, const Point &point);
 
 /**
  * Returns the mean of a list of points
