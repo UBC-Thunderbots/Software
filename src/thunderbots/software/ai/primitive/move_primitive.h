@@ -18,9 +18,8 @@ class MovePrimitive : public Primitive
      * @param final_speed The final speed the Robot should have when it reaches
      * its destination at the end of the movement
      */
-    explicit MovePrimitive(
-        unsigned int robot_id, const Point &dest, const Angle &final_angle,
-        double final_speed);
+    explicit MovePrimitive(unsigned int robot_id, const Point &dest,
+                           const Angle &final_angle, double final_speed);
 
     /**
      * Creates a new Move Primitive from a Primitive message

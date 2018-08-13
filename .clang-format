@@ -1,6 +1,6 @@
 ﻿---
 BasedOnStyle: Google
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'true'
 AlignEscapedNewlinesLeft: 'false'
 AllowShortBlocksOnASingleLine: 'false'
@@ -8,6 +8,8 @@ AllowShortCaseLabelsOnASingleLine: 'false'
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: 'false'
 AllowShortLoopsOnASingleLine: 'false'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
 BreakBeforeBraces: Allman
 BreakStringLiterals: 'false'
 ColumnLimit: '90'

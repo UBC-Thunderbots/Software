@@ -52,22 +52,20 @@ thunderbots_msgs::Field MessageUtil::createFieldMsg(
     thunderbots_msgs::Field field_msg;
 
     // Make sure we convert ALL fields into meters before returning
-    field_msg.field_length  = field_data.field_length() * METERS_PER_MILLIMETER;
-    field_msg.field_width   = field_data.field_width() * METERS_PER_MILLIMETER;
-    Point defense_length_p1 = Point(
-        ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().x(),
-        ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().y());
-    Point defense_length_p2 = Point(
-        ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().x(),
-        ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().y());
+    field_msg.field_length = field_data.field_length() * METERS_PER_MILLIMETER;
+    field_msg.field_width  = field_data.field_width() * METERS_PER_MILLIMETER;
+    Point defense_length_p1 =
+        Point(ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().x(),
+              ssl_field_lines["LeftFieldLeftPenaltyStretch"].p1().y());
+    Point defense_length_p2 =
+        Point(ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().x(),
+              ssl_field_lines["LeftFieldLeftPenaltyStretch"].p2().y());
     field_msg.defense_length =
         (defense_length_p2 - defense_length_p1).len() * METERS_PER_MILLIMETER;
-    Point defense_width_p1 = Point(
-        ssl_field_lines["LeftPenaltyStretch"].p1().x(),
-        ssl_field_lines["LeftPenaltyStretch"].p1().y());
-    Point defense_width_p2 = Point(
-        ssl_field_lines["LeftPenaltyStretch"].p2().x(),
-        ssl_field_lines["LeftPenaltyStretch"].p2().y());
+    Point defense_width_p1 = Point(ssl_field_lines["LeftPenaltyStretch"].p1().x(),
+                                   ssl_field_lines["LeftPenaltyStretch"].p1().y());
+    Point defense_width_p2 = Point(ssl_field_lines["LeftPenaltyStretch"].p2().x(),
+                                   ssl_field_lines["LeftPenaltyStretch"].p2().y());
     field_msg.defense_width =
         (defense_width_p1 - defense_width_p2).len() * METERS_PER_MILLIMETER;
     field_msg.goal_width     = field_data.goalwidth() * METERS_PER_MILLIMETER;

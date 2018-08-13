@@ -65,8 +65,8 @@ class Primitive
      * @param prim_name The name of the primitive
      * @throws //TODO: Add exception
      */
-    void validatePrimitiveMessage(
-        const thunderbots_msgs::Primitive& prim_msg, std::string prim_name) const;
+    void validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim_msg,
+                                  std::string prim_name) const;
 
     /**
      * Given a ROS Primitive message, constructs a concrete Primitive object and returns

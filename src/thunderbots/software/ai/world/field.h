@@ -34,9 +34,9 @@ class Field
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      */
-    void updateDimensions(
-        double field_length, double field_width, double goal_width, double defense_length,
-        double defense_width, double boundary_width, double center_circle_radius);
+    void updateDimensions(double field_length, double field_width, double goal_width,
+                          double defense_length, double defense_width,
+                          double boundary_width, double center_circle_radius);
 
     /**
      * Checks if the field data is valid yet.
