@@ -13,101 +13,101 @@ class Rect final
     /**
      * Creates a new Rect from two corners.
      *
-     * \param[in] point1 one of the rectangle's corners.
+     * @param point1 one of the rectangle's corners.
      *
-     * \param[in] point2 the corner diagonally-opposite to \p point1.
+     * @param point2 the corner diagonally-opposite to \p point1.
      */
     explicit constexpr Rect(const Point &point1, const Point &point2);
 
     /**
      * Creates a new Rect from a corner and a size.
      *
-     * \param[in] sw_corner the south-west corner of the rectangle.
+     * @param sw_corner the south-west corner of the rectangle.
      *
-     * \param[in] width the width of the rectangle.
+     * @param width the width of the rectangle.
      *
-     * \param[in] height the height of the rectangle.
+     * @param height the height of the rectangle.
      */
     explicit constexpr Rect(const Point &sw_corner, double width, double height);
 
     /**
      * Returns the width of the rectangle.
      *
-     * \return the width of the rectangle.
+     * @return the width of the rectangle.
      */
     constexpr double width() const;
 
     /**
      * Returns the height of the rectangle.
      *
-     * \return the height of the rectangle.
+     * @return the height of the rectangle.
      */
     constexpr double height() const;
 
     /**
      * Returns the area of the rectangle.
      *
-     * \return the area of the rectangle.
+     * @return the area of the rectangle.
      */
     constexpr double area() const;
 
     /**
      * Returns the centre of the rectangle.
      *
-     * \return the centre of the rectangle.
+     * @return the centre of the rectangle.
      */
     constexpr Point centre() const;
 
     /**
      * Returns the north-east corner of the rectangle.
      *
-     * \return the north-east corner of the rectangle.
+     * @return the north-east corner of the rectangle.
      */
     constexpr Point neCorner() const;
 
     /**
      * Returns the north-west corner of the rectangle.
      *
-     * \return the north-west corner of the rectangle.
+     * @return the north-west corner of the rectangle.
      */
     constexpr Point nwCorner() const;
 
     /**
      * Returns the south-west corner of the rectangle.
      *
-     * \return the south-west corner of the rectangle.
+     * @return the south-west corner of the rectangle.
      */
     constexpr Point swCorner() const;
 
     /**
      * Returns the south-east corner of the rectangle.
      *
-     * \return the south-east corner of the rectangle.
+     * @return the south-east corner of the rectangle.
      */
     constexpr Point seCorner() const;
 
     /**
      * Returns 0-sw 1-nw 2-ne 3-se corner for pos%4
      *
-     * \param[in] pos of corner wanted
+     * @param pos of corner wanted
      *
-     * \return Point corresponding to position
+     * @return Point corresponding to position
      */
     constexpr Point operator[](unsigned int pos) const;
 
     /**
      * Translates the rectangle.
      *
-     * \param[in] offset the distance to move the rectangle.
+     * @param offset the distance to move the rectangle.
      */
     void translate(const Point &offset);
 
     /**
      * Checks whether a point is within the boundries of the rectangle
      *
-     * \param[in] p the point to test
+     * @param p the point to test
      *
-     * \return bool whether the point is inside the boundry of the rectangle
+     * @return bool whether the point is inside the boundry of the rectangle
      */
     constexpr bool containsPoint(Point p) const;
 
@@ -118,10 +118,10 @@ class Rect final
      * rectangle
      * will not shrink to something smaller than a point
      *
-     * \param[in] amount the amount to shrink the recatngle by on all sides
+     * @param amount the amount to shrink the recatngle by on all sides
      * (positive or negative numbers ok)
      *
-     * \return bool whether it was possible to expand/shrink the rectangle by
+     * @return bool whether it was possible to expand/shrink the rectangle by
      * amount requested
      */
     bool expand(double amount);
@@ -130,9 +130,9 @@ class Rect final
      * Gives the distance between a point and the nearest point on the rectangle
      * boundry
      *
-     * \param[in] p the point to test
+     * @param p the point to test
      *
-     * \return double
+     * @return double
      */
     double distToBoundary(Point p);
 

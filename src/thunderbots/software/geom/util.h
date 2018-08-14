@@ -107,11 +107,11 @@ Seg getSide(const Poly<N> &poly, unsigned int i);
 /**
  * Checks if 3 points are collinear.
  *
- * \param[in] a a point
+ * @param a a point
  *
- * \param[in] b a point
+ * @param b a point
  *
- * \param[in] c a point
+ * @param c a point
  *
  * \returns true if any two points are within EPS distance to each other. (If
  * any two of three points are within EPS distance of each other, they are
@@ -136,17 +136,17 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  *
  * \pre \p src must not be between \p p1 and \p p2.
  *
- * \param[in] src the location where you are standing.
+ * @param src the location where you are standing.
  *
- * \param[in] p1 the location of the right-hand edge of the target area.
+ * @param p1 the location of the right-hand edge of the target area.
  *
- * \param[in] p2 the location of the left-hand edge of the target area.
+ * @param p2 the location of the left-hand edge of the target area.
  *
- * \param[in] obstacles the coordinates of the centres of the obstacles.
+ * @param obstacles the coordinates of the centres of the obstacles.
  *
- * \param[in] radius the radii of the obstacles.
+ * @param radius the radii of the obstacles.
  *
- * \return the best direction to shoot and the size of the angle centered around
+ * @return the best direction to shoot and the size of the angle centered around
  * that direction that is completely free of obstacles,
  * or <code>(<var>p</var>, 0)</code> for some unspecified <var>p</var> if there
  * is no free path.
@@ -161,15 +161,15 @@ std::pair<Point, Angle> angleSweepCircles(
  * \pre The points \p p1,\p p2, and \p src has to not be collinear and \p src
  * can't be within the radius of the obstacle
  *
- * \param[in] src the location where you are standing.
+ * @param src the location where you are standing.
  *
- * \param[in] p1 the location of the right-hand edge of the target area.
+ * @param p1 the location of the right-hand edge of the target area.
  *
- * \param[in] p2 the location of the left-hand edge of the target area.
+ * @param p2 the location of the left-hand edge of the target area.
  *
- * \param[in] obstacles the coordinates of the centres of the obstacles.
+ * @param obstacles the coordinates of the centres of the obstacles.
  *
- * \param[in] radius the radii of the obstacles.
+ * @param radius the radii of the obstacles.
  *
  * \returns a vector of all possible pairs of directions and angles to a target
  * area. An empty vector is returned if the preconditions aren't satisfied.
@@ -186,13 +186,13 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
 /**
  * Finds the Point on line segment closest to point.
  *
- * \param[in] centre the point.
+ * @param centre the point.
  *
- * \param[in] segA one end of the line segment.
+ * @param segA one end of the line segment.
  *
- * \param[in] segB the other end of the line segment.
+ * @param segB the other end of the line segment.
  *
- * \return the Point on line segment closest to centre point.
+ * @return the Point on line segment closest to centre point.
  */
 Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
 
@@ -200,15 +200,15 @@ Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
  * Finds the points of intersection between a circle and a line.
  * There may be zero, one, or two such points.
  *
- * \param[in] centre the centre of the circle.
+ * @param centre the centre of the circle.
  *
- * \param[in] radius the radius of the circle.
+ * @param radius the radius of the circle.
  *
- * \param[in] segA one point on the line.
+ * @param segA one point on the line.
  *
- * \param[in] segB another point on the line.
+ * @param segB another point on the line.
  *
- * \return the points of intersection.
+ * @return the points of intersection.
  */
 std::vector<Point> lineCircleIntersect(
     const Point &centre, double radius, const Point &segA, const Point &segB);
@@ -217,13 +217,13 @@ std::vector<Point> lineCircleIntersect(
  * Finds the points of intersection between a circle and a line.
  * There may be zero, one, or two such points.
  *
- * \param[in] r the rectangle.
+ * @param r the rectangle.
  *
- * \param[in] segA one point on the line.
+ * @param segA one point on the line.
  *
- * \param[in] segB another point on the line.
+ * @param segB another point on the line.
  *
- * \return the points of intersection.
+ * @return the points of intersection.
  */
 std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Point &segB);
 
@@ -231,52 +231,52 @@ std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Poi
  * Find where a vector intersect a rectangle
  * return the center of the rectangle if there is no intersection
  *
- * \param[in] r the rectangle.
+ * @param r the rectangle.
  *
- * \param[in] segA one point on the line.
+ * @param segA one point on the line.
  *
- * \param[in] segB another point on the line.
+ * @param segB another point on the line.
  *
- * \return the points of intersection.
+ * @return the points of intersection.
  */
 Point vectorRectIntersect(const Rect &r, const Point &segA, const Point &segB);
 
 /**
  * Clips a point to a rectangle boundary.
  *
- * \param[in] p the point to clip.
+ * @param p the point to clip.
  *
- * \param[in] bound1 one corner of the rectangle.
+ * @param bound1 one corner of the rectangle.
  *
- * \param[in] bound2 the diagonally-opposite corner of the rectangle.
+ * @param bound2 the diagonally-opposite corner of the rectangle.
  *
- * \return the closest point to \p p that lies within the rectangle.
+ * @return the closest point to \p p that lies within the rectangle.
  */
 Point clipPoint(const Point &p, const Point &bound1, const Point &bound2);
 
 /**
  * Clips a point to a rectangle boundary.
  *
- * \param[in] p the point to clip.
+ * @param p the point to clip.
  *
- * \param[in] r the rectangle.
+ * @param r the rectangle.
  *
- * \return the closest point to \p p that lies within the rectangle.
+ * @return the closest point to \p p that lies within the rectangle.
  */
 Point clipPoint(const Point &p, const Rect &r);
 
 /**
  * Computes whether there is a unique intersection of two lines.
  *
- * \param[in] a a point on the first line.
+ * @param a a point on the first line.
  *
- * \param[in] b another point on the first line.
+ * @param b another point on the first line.
  *
- * \param[in] c a point on the second line.
+ * @param c a point on the second line.
  *
- * \param[in] d another point on the second line.
+ * @param d another point on the second line.
  *
- * \return whether there is one and only one answer
+ * @return whether there is one and only one answer
  */
 bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const Point &d);
 
@@ -285,15 +285,15 @@ bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const 
  *
  * \pre The lines must be non-parallel.
  *
- * \param[in] a a point on the first line.
+ * @param a a point on the first line.
  *
- * \param[in] b another point on the first line.
+ * @param b another point on the first line.
  *
- * \param[in] c a point on the second line.
+ * @param c a point on the second line.
  *
- * \param[in] d another point on the second line.
+ * @param d another point on the second line.
  *
- * \return the point of intersection.
+ * @return the point of intersection.
  */
 Point lineIntersection(const Point &a, const Point &b, const Point &c, const Point &d);
 
@@ -304,24 +304,24 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b);
  *
  * \pre the normal vector cannot have length smaller than EPS.
  *
- * \param[in] v the incident ray to reflect.
+ * @param v the incident ray to reflect.
  *
- * \param[in] n the vector normal to the reflecting plane.
+ * @param n the vector normal to the reflecting plane.
  *
- * \return the reflected ray.
+ * @return the reflected ray.
  */
 Point reflect(const Point &v, const Point &n);
 
 /**
  * Reflects a point across a line.
  *
- * \param[in] a a point on the line.
+ * @param a a point on the line.
  *
- * \param[in] b another point on the line.
+ * @param b another point on the line.
  *
- * \param[in] p the point to reflect.
+ * @param p the point to reflect.
  *
- * \return the reflection of \p p across the line.
+ * @return the reflection of \p p across the line.
  */
 Point reflect(const Point &a, const Point &b, const Point &p);
 
@@ -333,13 +333,13 @@ Point reflect(const Point &a, const Point &b, const Point &p);
  *
  * \pre \p b must be counterclockwise of \p a.
  *
- * \param[in] a the starting angle of the cone.
+ * @param a the starting angle of the cone.
  *
- * \param[in] b the ending angle of the cone.
+ * @param b the ending angle of the cone.
  *
- * \param[in] radius the radius of the circle with which to block the cone.
+ * @param radius the radius of the circle with which to block the cone.
  *
- * \return the blocking position.
+ * @return the blocking position.
  */
 Point calcBlockCone(const Point &a, const Point &b, const double &radius);
 
@@ -351,15 +351,15 @@ Point calcBlockCone(const Point &a, const Point &b, const double &radius);
  *
  * \pre \p b must be counterclockwise of \p a.
  *
- * \param[in] a the starting angle of the cone.
+ * @param a the starting angle of the cone.
  *
- * \param[in] b the ending angle of the cone.
+ * @param b the ending angle of the cone.
  *
- * \param[in] radius the radius of the circle with which to block the cone.
+ * @param radius the radius of the circle with which to block the cone.
  *
- * \param[in] p the source of the cone.
+ * @param p the source of the cone.
  *
- * \return the blocking position.
+ * @return the blocking position.
  */
 Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double &radius);
 
@@ -378,13 +378,13 @@ Point calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
  * Ported code
  * Checks whether the goalie is in the middle of both goal posts.
  *
- * \param[in] a goal post position
+ * @param a goal post position
  *
- * \param[in] b other goal post position
+ * @param b other goal post position
  *
- * \param[in] c ball position
+ * @param c ball position
  *
- * \param[in] g goalie position
+ * @param g goalie position
  */
 bool goalieBlockGoalPost(const Point &a, const Point &b, const Point &c, const Point &g);
 
@@ -393,15 +393,15 @@ bool goalieBlockGoalPost(const Point &a, const Point &b, const Point &c, const P
  *
  * \pre the goalie is between the two goal posts, as seen from the ball.
  *
- * \param[in] a right goal post position, from goalie's perspective
+ * @param a right goal post position, from goalie's perspective
  *
- * \param[in] b other goal post position
+ * @param b other goal post position
  *
- * \param[in] c ball position
+ * @param c ball position
  *
- * \param[in] g goalie position
+ * @param g goalie position
  *
- * \param[in] r radius of defending robot
+ * @param r radius of defending robot
  */
 Point calcBlockConeDefender(
     const Point &a, const Point &b, const Point &c, const Point &g, const double &r);

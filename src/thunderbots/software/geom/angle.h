@@ -177,12 +177,12 @@ class Angle final
     constexpr Angle diff(Angle other) const;
 
     /**
-     * \brief Limits this angle to [−π, π].
+     * Limits this angle to [−π, π].
      *
      * The angle is rotated by a multiple of 2π until it lies within the target
      * interval.
      *
-     * \return the clamped angle.
+     * @return the clamped angle.
      */
     constexpr Angle angleMod() const;
 

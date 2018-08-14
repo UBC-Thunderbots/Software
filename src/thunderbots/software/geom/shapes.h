@@ -11,14 +11,14 @@ class Line final
     Point second;
 
     /**
-     * \brief Creates a degenerate Line at (0, 0)
+     * Creates a degenerate Line at (0, 0)
      */
     inline explicit constexpr Line()
     {
     }
 
     /**
-     * \brief Creates a Line that starts and ends at the given points
+     * Creates a Line that starts and ends at the given points
      */
     inline explicit Line(const Point& first, const Point& second)
         : first(first), second(second)
@@ -38,21 +38,21 @@ class Seg final
     Point end;
 
     /**
-     * \brief Creates a degenerate Seg at (0, 0)
+     * Creates a degenerate Seg at (0, 0)
      */
     inline explicit constexpr Seg()
     {
     }
 
     /**
-     * \brief Creates a Seg that starts and ends at the given points
+     * Creates a Seg that starts and ends at the given points
      */
     inline explicit Seg(const Point& start, const Point& end) : start(start), end(end)
     {
     }
 
     /**
-     * \brief Creates a Seg that is this reversed.
+     * Creates a Seg that is this reversed.
      */
     inline Seg reverse() const
     {
@@ -60,7 +60,7 @@ class Seg final
     }
 
     /**
-     * \brief Makes a Point out of this Seg.
+     * Makes a Point out of this Seg.
      */
     inline Vector toVector() const
     {
@@ -68,7 +68,7 @@ class Seg final
     }
 
     /**
-     * \brief Makes a line out of this Seg.
+     * Makes a line out of this Seg.
      */
     inline Line toLine()
     {
@@ -88,14 +88,14 @@ class Ray final
     Vector dir;
 
     /**
-     * \brief Creates a degenerate Seg at (0, 0)
+     * Creates a degenerate Seg at (0, 0)
      */
     inline explicit constexpr Ray()
     {
     }
 
     /**
-     * \brief Creates a Seg that starts and contains a point along the given
+     * Creates a Seg that starts and contains a point along the given
      * line
      */
     inline explicit Ray(const Point& start, const Vector& dir) : start(start), dir(dir)
@@ -125,7 +125,7 @@ class Circle final
     double radius;
 
     /**
-     * \brief Creates a circle with origin (0, 0) and radius 0.
+     * Creates a circle with origin (0, 0) and radius 0.
      */
     inline explicit constexpr Circle() : radius(0)
     {
