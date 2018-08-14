@@ -171,7 +171,7 @@ std::pair<Point, Angle> angleSweepCircles(
  *
  * @param radius the radii of the obstacles.
  *
- * \returns a vector of all possible pairs of directions and angles to a target
+ * @return a vector of all possible pairs of directions and angles to a target
  * area. An empty vector is returned if the preconditions aren't satisfied.
  */
 std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(

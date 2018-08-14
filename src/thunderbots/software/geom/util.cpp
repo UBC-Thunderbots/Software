@@ -372,27 +372,6 @@ std::pair<Vector, Angle> angleSweepCircles(
         const Angle range1 = cent - span;
         const Angle range2 = cent + span;
 
-        /*
-           if (range1 < -M_PI) {
-           // [-PI, range2]
-           events.push_back(std::make_pair(-M_PI, -1));
-           events.push_back(std::make_pair(range2, 1));
-           // [range1, PI]
-           events.push_back(std::make_pair(range1 + 2 * M_PI, -1));
-           events.push_back(std::make_pair(M_PI, 1));
-           } else if (range2 > M_PI) {
-           // [range1, PI]
-           events.push_back(std::make_pair(range1, -1));
-           events.push_back(std::make_pair(M_PI, 1));
-           // [-PI, range2]
-           events.push_back(std::make_pair(-M_PI, -1));
-           events.push_back(std::make_pair(range2 - 2 * M_PI, 1));
-           } else {
-           events.push_back(std::make_pair(range1, -1));
-           events.push_back(std::make_pair(range2, 1));
-           }
-         */
-
         if (range1 < -Angle::half() || range2 > Angle::half())
         {
             continue;
@@ -692,34 +671,6 @@ Vector lineIntersection(
     }
 
     return a + (a - c).cross(d - c) / (d - c).cross(b - a) * (b - a);
-
-    //	// testing new code from
-    // http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
-    //	// Store the values for fast access and easy
-    //	// equations-to-code conversion
-    //	float x1 = a.x(), x2 = b.x(), x3 = c.x(), x4 = d.x();
-    //	float y1 = a.y(), y2 = b.y(), y3 = c.y(), y4 = d.y();
-    //
-    //	float dd = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    //	// If d is zero, there is no intersection
-    //	if (d == 0) return std::vector<Point>();
-    //
-    //	// Get the x and y
-    //	float pre = (x1*y2 - y1*x2), post = (x3*y4 - y3*x4);
-    //	float x = ( pre * (x3 - x4) - (x1 - x2) * post ) / dd;
-    //	float y = ( pre * (y3 - y4) - (y1 - y2) * post ) / dd;
-    //
-    //	// Check if the x and y coordinates are within both lines
-    //	if ( x < std::min(x1, x2) || x > std::max(x1, x2) ||
-    //	x < std::min(x3, x4) || x > std::max(x3, x4) ) return NULL;
-    //	if ( y < std::min(y1, y2) || y > std::max(y1, y2) ||
-    //	y < std::min(y3, y4) || y > std::max(y3, y4) ) return NULL;
-    //
-    //	// Return the point of intersection
-    //	Point* ret = new Point();
-    //	ret->x = x;
-    //	ret->y = y;
-    //	return ret;
 }
 
 // TODO: a line intersect that takes segments would be nice
@@ -758,14 +709,6 @@ Vector calcBlockCone(const Vector &a, const Vector &b, const double &radius)
 Vector calcBlockCone(
     const Vector &a, const Vector &b, const Vector &p, const double &radius)
 {
-    /*
-       Vector R = p + calcBlockCone(a - p, b - p, radius);
-       const double MIN_X = std::min(-2.5, (p.x() + 3.025) / 2.0 - 3.025);
-       if (R.x() < MIN_X){
-       R = (R - p) * ((MIN_X - p.x()) / (R.x() - p.x())) + p;
-       }
-       return R;
-     */
     return p + calcBlockCone(a - p, b - p, radius);
 }
 
