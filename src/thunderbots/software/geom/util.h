@@ -113,11 +113,11 @@ Seg getSide(const Poly<N> &poly, unsigned int i);
  *
  * @param c a point
  *
- * \returns true if any two points are within EPS distance to each other. (If
+ * @return true if any two points are within EPS distance to each other. (If
  * any two of three points are within EPS distance of each other, they are
  * essentially the same point and the two points will form the same line.)
  *
- * \returns true if the cross product of the two lines formed by the three
+ * @return true if the cross product of the two lines formed by the three
  * points are smaller than EPS
  */
 bool collinear(const Point &a, const Point &b, const Point &c);
