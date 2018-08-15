@@ -273,17 +273,24 @@ Seg getSide(const Poly<N> &poly, unsigned int i)
 
 std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
     const Vector &src, const Vector &p1, const Vector &p2,
-    const std::vector<Vector> &obstacles, const double &radius)
+    const std::vector<Point> &obstacles, const double &radius)
 {
     std::vector<std::pair<Vector, Angle>> ret;
 
     const Angle offangle = (p1 - src).orientation();
     if (collinear(src, p1, p2))
     {
-        // std::cerr << "geom: collinear " << src << " " << p1 << " " << p2 <<
-        // std::endl;
-        // std::cerr << (p1 - src) << " " << (p2 - src) << std::endl;
-        // std::cerr << (p1 - src).cross(p2 - src) << std::endl;
+        // return a result that contains the direction of the line and zero angle if not blocked by obstacles
+        Seg collinear_seg = Seg(src, p1);
+        for (Point p : obstacles)
+        {
+            if(intersects(collinear_seg, Circle(p, radius)))
+            {
+                // intersection with obstacle found, we're done here and we return nothing
+                return ret;
+            }
+        }
+        ret.push_back(std::make_pair(collinear_seg.toVector(), Angle::zero()));
         return ret;
     }
 
@@ -487,7 +494,6 @@ Vector clipPoint(const Vector &p, const Rect &r)
     return ret;
 }
 
-// TODO: does this work? unit test
 std::vector<Vector> lineCircleIntersect(
     const Vector &centre, double radius, const Vector &segA, const Vector &segB)
 {
