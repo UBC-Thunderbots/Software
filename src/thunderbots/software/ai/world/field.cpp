@@ -24,9 +24,10 @@ void Field::updateDimensions(thunderbots_msgs::Field new_field_msg)
     center_circle_radius_ = new_field_msg.center_circle_radius;
 }
 
-void Field::updateDimensions(
-    double field_length, double field_width, double defense_length, double defense_width,
-    double goal_width, double boundary_width, double center_circle_radius)
+void Field::updateDimensions(double field_length, double field_width,
+                             double defense_length, double defense_width,
+                             double goal_width, double boundary_width,
+                             double center_circle_radius)
 {
     valid_                = true;
     field_length_         = field_length;

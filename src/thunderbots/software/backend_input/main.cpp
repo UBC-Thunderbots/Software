@@ -52,7 +52,7 @@ int main(int argc, char **argv)
                 backend.getFilteredBallMsg(packet, timestamp);
             if (ball_msg)
             {
-                field_publisher.publish(*ball_msg);
+                ball_publisher.publish(*ball_msg);
             }
 
             std::optional<thunderbots_msgs::Team> friendly_team_msg =

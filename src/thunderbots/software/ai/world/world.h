@@ -27,9 +27,8 @@ class World final
      * @param friendly_team the friendly team for the world
      * @param enemy_team the enemy_team for the world
      */
-    explicit World(
-        const Field& field, const Ball& ball, const Team& friendly_team,
-        const Team& enemy_team);
+    explicit World(const Field& field, const Ball& ball, const Team& friendly_team,
+                   const Team& enemy_team);
 
     /**
      * Given a message containing new field geometry, update the geometry of the
