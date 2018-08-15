@@ -128,13 +128,13 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  * You are at point \p src, and you want to shoot a ray between \p p1 and \p p2.
  * This function calculates the largest open angle interval that you can shoot.
  *
- * \pre \p p1 must be to the right of \p p2.
+ * @pre \p p1 must be to the right of \p p2.
  * In other words, if there is a counterclockwise ordering, \p p1 is before \p
  * p2 from \p src's point of view.
  *
- * \pre The angle \p p1, \p src, \p p2 must not be greater than 180 degrees.
+ * @pre The angle \p p1, \p src, \p p2 must not be greater than 180 degrees.
  *
- * \pre \p src must not be between \p p1 and \p p2.
+ * @pre \p src must not be between \p p1 and \p p2.
  *
  * @param src the location where you are standing.
  *
@@ -158,7 +158,7 @@ std::pair<Point, Angle> angleSweepCircles(
 /**
  * Gets all angle.
  *
- * \pre The points \p p1,\p p2, and \p src has to not be collinear and \p src
+ * @pre The points \p p1,\p p2, and \p src has to not be collinear and \p src
  * can't be within the radius of the obstacle
  *
  * @param src the location where you are standing.
@@ -283,7 +283,7 @@ bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const 
 /**
  * Computes the intersection of two lines.
  *
- * \pre The lines must be non-parallel.
+ * @pre The lines must be non-parallel.
  *
  * @param a a point on the first line.
  *
@@ -302,7 +302,7 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b);
 /**
  * Reflects a ray incident on origin given the normal of the reflecting plane.
  *
- * \pre the normal vector cannot have length smaller than EPS.
+ * @pre the normal vector cannot have length smaller than EPS.
  *
  * @param v the incident ray to reflect.
  *
@@ -329,9 +329,9 @@ Point reflect(const Point &a, const Point &b, const Point &p);
  * Given a cone shooting from the origin, determines the furthest location from
  * the origin, at which to place a circle to block the cone.
  *
- * \pre The cone must have nonzero area.
+ * @pre The cone must have nonzero area.
  *
- * \pre \p b must be counterclockwise of \p a.
+ * @pre \p b must be counterclockwise of \p a.
  *
  * @param a the starting angle of the cone.
  *
@@ -347,9 +347,9 @@ Point calcBlockCone(const Point &a, const Point &b, const double &radius);
  * Given a cone shooting from a point P, determines the furthest location from
  * P, at which to place a circle to block the cone.
  *
- * \pre The cone must have nonzero area.
+ * @pre The cone must have nonzero area.
  *
- * \pre \p b must be counterclockwise of \p a.
+ * @pre \p b must be counterclockwise of \p a.
  *
  * @param a the starting angle of the cone.
  *
@@ -391,7 +391,7 @@ bool goalieBlockGoalPost(const Point &a, const Point &b, const Point &c, const P
 /**
  * Calculates a defender position to block the ball.
  *
- * \pre the goalie is between the two goal posts, as seen from the ball.
+ * @pre the goalie is between the two goal posts, as seen from the ball.
  *
  * @param a right goal post position, from goalie's perspective
  *
