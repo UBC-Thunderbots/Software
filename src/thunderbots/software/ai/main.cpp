@@ -61,9 +61,9 @@ int main(int argc, char **argv)
         UTIL::CONSTANTS::BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub = node_handle.subscribe(
         UTIL::CONSTANTS::BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
-    ros::Subscriber friendly_team_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
-        friendlyTeamUpdateCallback);
+    ros::Subscriber friendly_team_sub =
+        node_handle.subscribe(UTIL::CONSTANTS::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
+                              friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
         UTIL::CONSTANTS::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 

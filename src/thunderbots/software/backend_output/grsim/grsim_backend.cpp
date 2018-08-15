@@ -19,9 +19,9 @@ GrSimBackend::~GrSimBackend()
     socket.close();
 }
 
-grSim_Packet GrSimBackend::createGrSimPacket(
-    unsigned int robot_id, TeamColour team_colour, Vector velocity,
-    AngularVelocity angular_velocity) const
+grSim_Packet GrSimBackend::createGrSimPacket(unsigned int robot_id,
+                                             TeamColour team_colour, Vector velocity,
+                                             AngularVelocity angular_velocity) const
 {
     grSim_Packet packet;
 

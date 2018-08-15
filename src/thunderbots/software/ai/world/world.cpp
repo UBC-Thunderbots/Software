@@ -4,9 +4,8 @@ World::World() : field_(), ball_(), friendly_team_(), enemy_team_()
 {
 }
 
-World::World(
-    const Field &field, const Ball &ball, const Team &friendly_team,
-    const Team &enemy_team)
+World::World(const Field &field, const Ball &ball, const Team &friendly_team,
+             const Team &enemy_team)
     : field_(field), ball_(ball), friendly_team_(friendly_team), enemy_team_(enemy_team)
 {
 }

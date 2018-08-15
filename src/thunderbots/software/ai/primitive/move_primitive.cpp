@@ -2,9 +2,8 @@
 
 const std::string MovePrimitive::PRIMITIVE_NAME = "Move Primitive";
 
-MovePrimitive::MovePrimitive(
-    unsigned int robot_id, const Point &dest, const Angle &final_angle,
-    double final_speed)
+MovePrimitive::MovePrimitive(unsigned int robot_id, const Point &dest,
+                             const Angle &final_angle, double final_speed)
     : robot_id(robot_id), dest(dest), final_angle(final_angle), final_speed(final_speed)
 {
 }

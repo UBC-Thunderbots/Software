@@ -448,13 +448,12 @@ inline constexpr Angle Angle::mod(Angle divisor) const
 
 inline constexpr Angle Angle::remainder(Angle divisor) const
 {
-    return Angle::ofRadians(
-        toRadians() -
-        static_cast<double>(static_cast<long>(
-            (toRadians() / divisor.toRadians()) >= 0
-                ? (toRadians() / divisor.toRadians() + 0.5)
-                : (toRadians() / divisor.toRadians() - 0.5))) *
-            divisor.toRadians());
+    return Angle::ofRadians(toRadians() -
+                            static_cast<double>(static_cast<long>(
+                                (toRadians() / divisor.toRadians()) >= 0
+                                    ? (toRadians() / divisor.toRadians() + 0.5)
+                                    : (toRadians() / divisor.toRadians() - 0.5))) *
+                                divisor.toRadians());
 }
 
 inline constexpr Angle Angle::abs() const

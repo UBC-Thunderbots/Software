@@ -73,8 +73,8 @@ TEST(GrSimBackendTest, create_grsim_packet_negative_vel)
 {
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
-    grSim_Packet result = backend.createGrSimPacket(
-        1, YELLOW, Point(-0.001, 2.49), Angle::ofRadians(-0.04));
+    grSim_Packet result = backend.createGrSimPacket(1, YELLOW, Point(-0.001, 2.49),
+                                                    Angle::ofRadians(-0.04));
 
     // Create the packet we expect.
     grSim_Packet expected;
