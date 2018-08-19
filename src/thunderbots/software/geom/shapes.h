@@ -157,7 +157,7 @@ class Circle final
 template <>
 struct std::hash<Circle>
 {
-    size_t operator()(const Circle &circle) const
+    size_t operator()(const Circle& circle) const
     {
         return std::hash<Point>()(circle.origin) ^ std::hash<double>()(circle.radius);
     }

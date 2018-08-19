@@ -142,12 +142,10 @@ class Rect final
 };
 
 inline constexpr Rect::Rect(const Point &point1, const Point &point2)
-    : min_corner(
-          point1.x() < point2.x() ? point1.x() : point2.x(),
-          point1.y() < point2.y() ? point1.y() : point2.y()),
-      diag(
-          point1.x() < point2.x() ? point2.x() - point1.x() : point1.x() - point2.x(),
-          point1.y() < point2.y() ? point2.y() - point1.y() : point1.y() - point2.y())
+    : min_corner(point1.x() < point2.x() ? point1.x() : point2.x(),
+                 point1.y() < point2.y() ? point1.y() : point2.y()),
+      diag(point1.x() < point2.x() ? point2.x() - point1.x() : point1.x() - point2.x(),
+           point1.y() < point2.y() ? point2.y() - point1.y() : point1.y() - point2.y())
 {
 }
 
@@ -198,7 +196,8 @@ inline constexpr Point Rect::seCorner() const
 
 inline constexpr Point Rect::operator[](unsigned int pos) const
 {
-    switch (pos) {
+    switch (pos)
+    {
         case 0:
             return swCorner();
         case 1:

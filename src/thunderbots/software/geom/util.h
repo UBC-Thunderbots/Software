@@ -150,9 +150,10 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  * or <code>(<var>p</var>, 0)</code> for some unspecified <var>p</var> if there
  * is no free path.
  */
-std::pair<Point, Angle> angleSweepCircles(
-    const Point &src, const Point &p1, const Point &p2,
-    const std::vector<Point> &obstacles, const double &radius);
+std::pair<Point, Angle> angleSweepCircles(const Point &src, const Point &p1,
+                                          const Point &p2,
+                                          const std::vector<Point> &obstacles,
+                                          const double &radius);
 
 /**
  * Gets all angles.
@@ -209,8 +210,8 @@ Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
  *
  * @return the points of intersection.
  */
-std::vector<Point> lineCircleIntersect(
-    const Point &centre, double radius, const Point &segA, const Point &segB);
+std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
+                                       const Point &segA, const Point &segB);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -425,8 +426,8 @@ bool pointInFrontVector(Point offset, Point dir, Point p);
  *
  * Returns the points on the circle that form tangent lines with the start point
  */
-std::pair<Point, Point> getCircleTangentPoints(
-    const Point &start, const Circle &circle, double buffer = 0.0);
+std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle &circle,
+                                               double buffer = 0.0);
 
 bool pointIsRightOfLine(const Seg &line, const Point &point);
 

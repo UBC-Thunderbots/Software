@@ -152,11 +152,10 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     Point test1p3(2, 5);
     Point test1c(0, -1);
     double test1radius = 1;
-    EXPECT_TRUE(!intersects(
-        triangle(test1p1, test1p2, test1p3),
-        Circle(
-            test1c,
-            test1radius)));  // circle is tangent to triangle, no intersect
+    EXPECT_TRUE(
+        !intersects(triangle(test1p1, test1p2, test1p3),
+                    Circle(test1c,
+                           test1radius)));  // circle is tangent to triangle, no intersect
 
     Point test2p1(-10, 0);
     Point test2p2(10, 0);
@@ -165,20 +164,18 @@ TEST(GeomUtilTest, test_intersects_triangle_circle)
     double test2radius = 1;
     EXPECT_TRUE(intersects(
         triangle(test2p1, test2p2, test2p3),
-        Circle(
-            test2c,
-            test2radius)));  // circle is completely inside triangle, intersect
+        Circle(test2c,
+               test2radius)));  // circle is completely inside triangle, intersect
 
     Point test3p1(-5, -5);
     Point test3p2(5, -5);
     Point test3p3(0, 0);
     Point test3c(0, 1);
     double test3radius = 1;
-    EXPECT_TRUE(!intersects(
-        triangle(test3p1, test3p2, test3p3),
-        Circle(
-            test3c,
-            test3radius)));  // circle is tangent to vertice, no intersect
+    EXPECT_TRUE(
+        !intersects(triangle(test3p1, test3p2, test3p3),
+                    Circle(test3c,
+                           test3radius)));  // circle is tangent to vertice, no intersect
 
     Point test4p1(-8, -5);
     Point test4p2(0, 0);
@@ -290,16 +287,16 @@ TEST(GeomUtilTest, test_closest_lineseg_point)
     Point l2(1, 1);
 
     EXPECT_TRUE((closestPointOnSeg(Point(0, 2), l1, l2) - Point(0, 1)).len() < 0.00001);
-    EXPECT_TRUE(
-        (closestPointOnSeg(Point(-2, 1.5), l1, l2) - Point(-1, 1)).len() < 0.00001);
+    EXPECT_TRUE((closestPointOnSeg(Point(-2, 1.5), l1, l2) - Point(-1, 1)).len() <
+                0.00001);
 
     l1 = Point(-2, 1);
     l2 = Point(1, 2);
 
-    EXPECT_TRUE(
-        (closestPointOnSeg(Point(1, 0), l1, l2) - Point(0.4, 1.8)).len() < 0.00001);
-    EXPECT_TRUE(
-        (closestPointOnSeg(Point(-1.4, 1.2), l1, l2) - Point(-1.4, 1.2)).len() < 0.00001);
+    EXPECT_TRUE((closestPointOnSeg(Point(1, 0), l1, l2) - Point(0.4, 1.8)).len() <
+                0.00001);
+    EXPECT_TRUE((closestPointOnSeg(Point(-1.4, 1.2), l1, l2) - Point(-1.4, 1.2)).len() <
+                0.00001);
 }
 
 TEST(GeomUtilTest, test_line_circle_intersect)
@@ -329,23 +326,19 @@ TEST(GeomUtilTest, test_line_rect_intersect)
         lineRectIntersect(Rect(Point(-1, -1), Point(1, 1)), Point(-1, -2), Point(1, 2));
 
     EXPECT_TRUE(intersections.size() == 2);
-    EXPECT_TRUE(
-        (intersections[0] - Point(0.5, 1)).len() < 0.00001 ||
-        (intersections[0] - Point(-0.5, -1)).len() < 0.00001);
-    EXPECT_TRUE(
-        (intersections[1] - Point(0.5, 1)).len() < 0.00001 ||
-        (intersections[1] - Point(-0.5, -1)).len() < 0.00001);
+    EXPECT_TRUE((intersections[0] - Point(0.5, 1)).len() < 0.00001 ||
+                (intersections[0] - Point(-0.5, -1)).len() < 0.00001);
+    EXPECT_TRUE((intersections[1] - Point(0.5, 1)).len() < 0.00001 ||
+                (intersections[1] - Point(-0.5, -1)).len() < 0.00001);
 
     intersections =
         lineRectIntersect(Rect(Point(0, 0), Point(1, 2)), Point(-1, 0), Point(4, 2));
 
     EXPECT_TRUE(intersections.size() == 2);
-    EXPECT_TRUE(
-        (intersections[0] - Point(0, 0.4)).len() < 0.00001 ||
-        (intersections[0] - Point(1, 0.8)).len() < 0.00001);
-    EXPECT_TRUE(
-        (intersections[1] - Point(0, 0.4)).len() < 0.00001 ||
-        (intersections[1] - Point(1, 0.8)).len() < 0.00001);
+    EXPECT_TRUE((intersections[0] - Point(0, 0.4)).len() < 0.00001 ||
+                (intersections[0] - Point(1, 0.8)).len() < 0.00001);
+    EXPECT_TRUE((intersections[1] - Point(0, 0.4)).len() < 0.00001 ||
+                (intersections[1] - Point(1, 0.8)).len() < 0.00001);
 
     intersections =
         lineRectIntersect(Rect(Point(-1, -1), Point(1, 1)), Point(0, 0), Point(1, 2));
@@ -353,8 +346,8 @@ TEST(GeomUtilTest, test_line_rect_intersect)
     EXPECT_TRUE(intersections.size() == 1);
     EXPECT_TRUE((intersections[0] - Point(0.5, 1)).len() < 0.00001);
 
-    intersections = lineRectIntersect(
-        Rect(Point(-1, -1), Point(1, 1)), Point(-0.5, -0.5), Point(0.5, 0.5));
+    intersections = lineRectIntersect(Rect(Point(-1, -1), Point(1, 1)), Point(-0.5, -0.5),
+                                      Point(0.5, 0.5));
 
     EXPECT_TRUE(intersections.size() == 0);
 }

@@ -27,9 +27,9 @@ double dist(const Seg &first, const Seg &second)
     {
         return 0.0;
     }
-    return std::sqrt(std::min(
-        std::min(distsq(first, second.start), distsq(first, second.end)),
-        std::min(distsq(second, first.start), distsq(second, first.end))));
+    return std::sqrt(
+        std::min(std::min(distsq(first, second.start), distsq(first, second.end)),
+                 std::min(distsq(second, first.start), distsq(second, first.end))));
 }
 
 double dist(const Line &first, const Vector &second)
@@ -38,9 +38,8 @@ double dist(const Line &first, const Vector &second)
     {
         return dist(first.first, second);
     }
-    return fabs(
-        (second - first.first).cross(first.second - first.first) /
-        (first.second - first.first).len());
+    return fabs((second - first.first).cross(first.second - first.first) /
+                (first.second - first.first).len());
 }
 
 double dist(const Vector &first, const Line &second)
@@ -227,12 +226,10 @@ bool intersects(const Seg &first, const Seg &second)
     {
         // find distance of two endpoints on segments furthest away from each
         // other
-        double mx_len = std::sqrt(std::max(
-            std::max(
-                (second.start - first.end).lensq(), (second.end - first.end).lensq()),
-            std::max(
-                (second.start - first.start).lensq(),
-                (second.end - first.start).lensq())));
+        double mx_len = std::sqrt(std::max(std::max((second.start - first.end).lensq(),
+                                                    (second.end - first.end).lensq()),
+                                           std::max((second.start - first.start).lensq(),
+                                                    (second.end - first.start).lensq())));
         // if the segments cross then this distance should be less than
         // the sum of the distances of the line segments
         return mx_len <
@@ -274,11 +271,12 @@ std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
     const Angle offangle = (p1 - src).orientation();
     if (collinear(src, p1, p2))
     {
-        // return a result that contains the direction of the line and zero angle if not blocked by obstacles
+        // return a result that contains the direction of the line and zero angle if not
+        // blocked by obstacles
         Seg collinear_seg = Seg(src, p1);
         for (Point p : obstacles)
         {
-            if(intersects(collinear_seg, Circle(p, radius)))
+            if (intersects(collinear_seg, Circle(p, radius)))
             {
                 // intersection with obstacle found, we're done here and we return nothing
                 return ret;
@@ -341,9 +339,10 @@ std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
     return ret;
 }
 
-std::pair<Vector, Angle> angleSweepCircles(
-    const Vector &src, const Vector &p1, const Vector &p2,
-    const std::vector<Vector> &obstacles, const double &radius)
+std::pair<Vector, Angle> angleSweepCircles(const Vector &src, const Vector &p1,
+                                           const Vector &p2,
+                                           const std::vector<Vector> &obstacles,
+                                           const double &radius)
 {
     // default value to return if nothing is valid
     Vector bestshot      = (p1 + p2) * 0.5;
@@ -488,8 +487,8 @@ Vector clipPoint(const Vector &p, const Rect &r)
     return ret;
 }
 
-std::vector<Vector> lineCircleIntersect(
-    const Vector &centre, double radius, const Vector &segA, const Vector &segB)
+std::vector<Vector> lineCircleIntersect(const Vector &centre, double radius,
+                                        const Vector &segA, const Vector &segB)
 {
     std::vector<Vector> ans;
 
@@ -524,8 +523,8 @@ std::vector<Vector> lineCircleIntersect(
     return ans;
 }
 
-std::vector<Vector> lineRectIntersect(
-    const Rect &r, const Vector &segA, const Vector &segB)
+std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
+                                      const Vector &segB)
 {
     std::vector<Vector> ans;
     for (unsigned int i = 0; i < 4; i++)
@@ -619,8 +618,8 @@ Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector 
 namespace
 {
 // this function is never used
-std::vector<Vector> lineseg_circle_intersect(
-    const Vector &centre, double radius, const Vector &segA, const Vector &segB)
+std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
+                                             const Vector &segA, const Vector &segB)
 {
     std::vector<Vector> ans;
     std::vector<Vector> poss = lineCircleIntersect(centre, radius, segA, segB);
@@ -640,8 +639,8 @@ std::vector<Vector> lineseg_circle_intersect(
 }
 }
 
-bool uniqueLineIntersects(
-    const Vector &a, const Vector &b, const Vector &c, const Vector &d)
+bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
+                          const Vector &d)
 {
     return std::abs((d - c).cross(b - a)) > EPS;
 }
@@ -661,10 +660,10 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
 }
 
 // shamelessly copy-pasted from RoboJackets
-Vector lineIntersection(
-    const Vector &a, const Vector &b, const Vector &c, const Vector &d)
+Vector lineIntersection(const Vector &a, const Vector &b, const Vector &c,
+                        const Vector &d)
 {
-    Seg line1 (a, b), line2 (c, d);
+    Seg line1(a, b), line2(c, d);
     double x1 = line1.start.x();
     double y1 = line1.start.y();
     double x2 = line1.end.x();
@@ -686,7 +685,7 @@ Vector lineIntersection(
     Point intersection;
 
     intersection.set((deta * (x3 - x4) - (x1 - x2) * detb) / denom,
-                   (deta * (y3 - y4) - (y1 - y2) * detb) / denom);
+                     (deta * (y3 - y4) - (y1 - y2) * detb) / denom);
 
     return intersection;
 }
@@ -724,8 +723,8 @@ Vector calcBlockCone(const Vector &a, const Vector &b, const double &radius)
     return c * (radius / std::fabs(au.cross(c)));
 }
 
-Vector calcBlockCone(
-    const Vector &a, const Vector &b, const Vector &p, const double &radius)
+Vector calcBlockCone(const Vector &a, const Vector &b, const Vector &p,
+                     const double &radius)
 {
     return p + calcBlockCone(a - p, b - p, radius);
 }
@@ -739,8 +738,8 @@ Vector calcBlockOtherRay(const Vector &a, const Vector &c, const Vector &g)
 }
 
 // ported code
-Vector calcBlockConeDefender(
-    const Vector &a, const Vector &b, const Vector &c, const Vector &g, const double &r)
+Vector calcBlockConeDefender(const Vector &a, const Vector &b, const Vector &c,
+                             const Vector &g, const double &r)
 {
     Vector R = reflect(c - a, g - c);
     // std::cout << (R + c) << std::endl;
@@ -847,8 +846,8 @@ bool pointInFrontVector(Vector offset, Vector dir, Vector p)
     return diff < Angle::quarter() && diff > -Angle::quarter();
 }
 
-std::pair<Point, Point> getCircleTangentPoints(
-    const Point &start, const Circle &circle, double buffer)
+std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle &circle,
+                                               double buffer)
 {
     // If the point is already inside the circe arccos won't work so just return
     // the perp points
