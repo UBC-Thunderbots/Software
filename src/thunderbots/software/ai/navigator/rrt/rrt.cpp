@@ -23,6 +23,17 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
             // Cast down to the MoveIntent class so we can access its members
             MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent);
 
+            /**
+             * process obstacles: 
+             * 1) Robots treated as circles with radius depending 
+             * on flags
+             * 
+             * 1b) Robots also have a Vector, in the direction of travel, with magnitude proportional to velocity
+             * 
+             * 2) Field boundaries marked as Rects
+             * 
+             * }
+             */
             std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), move_intent.getDestination(),
                 move_intent.getFinalAngle(), move_intent.getFinalSpeed());
