@@ -413,11 +413,11 @@ double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
  * found out if a point is in the vector's direction or against it
  * if the point normal to the vector, return false
  *
- * param[in] offset is the position of the origin of the vector
+ * @param offset is the position of the origin of the vector
  *
- * param[in] dir is the direction of the vector
+ * @param dir is the direction of the vector
  *
- * param[in] p is the point is question
+ * @param p is the point is question
  */
 bool pointInFrontVector(Point offset, Point dir, Point p);
 
