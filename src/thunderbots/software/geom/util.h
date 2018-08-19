@@ -87,7 +87,6 @@ bool isDegenerate(const Ray &seg);
 bool isDegenerate(const Line &line);
 
 double len(const Seg &seg);
-double len(const Line &line);
 
 double lensq(const Seg &seg);
 double lensq(const Line &line);
@@ -156,7 +155,7 @@ std::pair<Point, Angle> angleSweepCircles(
     const std::vector<Point> &obstacles, const double &radius);
 
 /**
- * Gets all angle.
+ * Gets all angles.
  *
  * @pre The points \p p1,\p p2, and \p src has to not be collinear and \p src
  * can't be within the radius of the obstacle
@@ -374,38 +373,6 @@ Point calcBlockCone(const Point &a, const Point &b, const Point &p, const double
  */
 Point calcBlockOtherRay(const Point &a, const Point &c, const Point &g);
 
-/**
- * Ported code
- * Checks whether the goalie is in the middle of both goal posts.
- *
- * @param a goal post position
- *
- * @param b other goal post position
- *
- * @param c ball position
- *
- * @param g goalie position
- */
-bool goalieBlockGoalPost(const Point &a, const Point &b, const Point &c, const Point &g);
-
-/**
- * Calculates a defender position to block the ball.
- *
- * @pre the goalie is between the two goal posts, as seen from the ball.
- *
- * @param a right goal post position, from goalie's perspective
- *
- * @param b other goal post position
- *
- * @param c ball position
- *
- * @param g goalie position
- *
- * @param r radius of defending robot
- */
-Point calcBlockConeDefender(
-    const Point &a, const Point &b, const Point &c, const Point &g, const double &r);
-
 /*
  * Ported code from CM geom util
  */
@@ -452,12 +419,6 @@ double closestPointTime(Point x1, Vector v1, Point x2, Vector v2);
  * param[in] p is the point is question
  */
 bool pointInFrontVector(Point offset, Point dir, Point p);
-
-/**
- * Returns true if v2 is clockwise relative to v1
- */
-// TODO: this should work but hasn't been properly tested
-bool isClockwise(Vector v1, Vector v2);
 
 /**
  * Returns the circle's tangent points.

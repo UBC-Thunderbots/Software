@@ -145,6 +145,20 @@ class Circle final
 
     inline constexpr bool operator!=(const Circle& p)
     {
-        return !(*this == p);
+        return this->origin != p.origin || this->radius != p.radius;
+    }
+
+    inline constexpr double area()
+    {
+        return M_PI * radius * radius;
+    }
+};
+
+template <>
+struct std::hash<Circle>
+{
+    size_t operator()(const Circle &circle) const
+    {
+        return std::hash<Point>()(circle.origin) ^ std::hash<double>()(circle.radius);
     }
 };

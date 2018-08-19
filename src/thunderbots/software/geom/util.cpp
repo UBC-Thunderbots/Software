@@ -111,12 +111,6 @@ double len(const Seg &seg)
     return dist(seg.start, seg.end);
 }
 
-double len(const Line &line)
-{
-    (void)line;  // unused
-    return std::numeric_limits<double>::infinity();
-}
-
 double lensq(const Seg &seg)
 {
     return distsq(seg.start, seg.end);
@@ -537,7 +531,8 @@ std::vector<Vector> lineRectIntersect(
     for (unsigned int i = 0; i < 4; i++)
     {
         const Vector &a = r[i];
-        const Vector &b = r[i + 1];
+        // to draw a line segment from point 3 to point 0
+        const Vector &b = r[(i + 1) % 4];
         if (intersects(Seg(a, b), Seg(segA, segB)) &&
             uniqueLineIntersects(a, b, segA, segB))
         {
@@ -665,18 +660,35 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
                                   (a.end - a.start)};
 }
 
-// ported code
+// shamelessly copy-pasted from RoboJackets
 Vector lineIntersection(
     const Vector &a, const Vector &b, const Vector &c, const Vector &d)
 {
-    // TODO figure out why this is asserting
-    // assert(std::abs((d - c).cross(b - a)) > EPS);
-    if (std::fabs((d - c).cross(b - a)) < EPS)
+    Seg line1 (a, b), line2 (c, d);
+    double x1 = line1.start.x();
+    double y1 = line1.start.y();
+    double x2 = line1.end.x();
+    double y2 = line1.end.y();
+    double x3 = line2.start.x();
+    double y3 = line2.start.y();
+    double x4 = line2.end.x();
+    double y4 = line2.end.y();
+
+    double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    if (denom == 0)
     {
-        // LOG_WARN(u8"Cross product problem again");
+        throw std::out_of_range("fuck");
     }
 
-    return a + (a - c).cross(d - c) / (d - c).cross(b - a) * (b - a);
+    double deta = x1 * y2 - y1 * x2;
+    double detb = x3 * y4 - y3 * x4;
+
+    Point intersection;
+
+    intersection.set((deta * (x3 - x4) - (x1 - x2) * detb) / denom,
+                   (deta * (y3 - y4) - (y1 - y2) * detb) / denom);
+
+    return intersection;
 }
 
 // TODO: a line intersect that takes segments would be nice
@@ -724,14 +736,6 @@ Vector calcBlockOtherRay(const Vector &a, const Vector &c, const Vector &g)
     return reflect(c - a, g - c);  // this, and the next two instances, were
                                    // changed from a - c since reflect() was
                                    // fixed
-}
-
-// ported code
-bool goalieBlockGoalPost(
-    const Vector &a, const Vector &b, const Vector &c, const Vector &g)
-{
-    Vector R = reflect(c - a, g - c);
-    return fabs(R.cross(b - c)) < EPS;
 }
 
 // ported code
@@ -841,15 +845,6 @@ bool pointInFrontVector(Vector offset, Vector dir, Vector p)
     Angle a2   = (p - offset).orientation();
     Angle diff = (a1 - a2).angleMod();
     return diff < Angle::quarter() && diff > -Angle::quarter();
-}
-
-bool isClockwise(Vector v1, Vector v2)
-{
-    if (v1.y() * v2.x() > v1.x() * v2.y())
-    {
-        return true;
-    }
-    return false;
 }
 
 std::pair<Point, Point> getCircleTangentPoints(

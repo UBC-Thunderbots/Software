@@ -109,7 +109,7 @@ class Rect final
      *
      * @return bool whether the point is inside the boundry of the rectangle
      */
-    constexpr bool containsPoint(Point p) const;
+    constexpr bool containsPoint(const Point &p) const;
 
     /**
      * Tries to move all of the edges of the rectangle outwards/inwards towards
@@ -198,9 +198,18 @@ inline constexpr Point Rect::seCorner() const
 
 inline constexpr Point Rect::operator[](unsigned int pos) const
 {
-    return (pos % 4) == 0
-               ? swCorner()
-               : (pos % 4) == 1 ? nwCorner() : (pos % 4) == 2 ? neCorner() : seCorner();
+    switch (pos) {
+        case 0:
+            return swCorner();
+        case 1:
+            return nwCorner();
+        case 2:
+            return neCorner();
+        case 3:
+            return seCorner();
+        default:
+            throw std::out_of_range("Rectangle only has 4 points!!!!!!");
+    }
 }
 
 inline void Rect::translate(const Point &offset)
@@ -208,7 +217,7 @@ inline void Rect::translate(const Point &offset)
     min_corner += offset;
 }
 
-inline constexpr bool Rect::containsPoint(Point p) const
+inline constexpr bool Rect::containsPoint(const Point &p) const
 {
     return p.x() >= min_corner.x() && p.y() >= min_corner.y() &&
            p.x() <= min_corner.x() + diag.x() && p.y() <= min_corner.y() + diag.y();

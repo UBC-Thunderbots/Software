@@ -649,24 +649,6 @@ TEST(GeomUtilTest, test_calc_block_other_ray)
     EXPECT_TRUE((a - p).len() < 0.00001);
 }
 
-TEST(GeomUtilTest, test_calc_goalie_block_goal_post)
-{
-    Point a(-1, 0);
-    Point b(1.5, -0.5);
-    Point c(0, 1);
-    Point g(0, 0.5);
-
-    EXPECT_TRUE(goalieBlockGoalPost(a, b, c, g));
-}
-
-TEST(GeomUtilTest, test_calc_block_cone_defender)
-{
-    Point p(-0.353553, -0.0606602);
-    Point a = calcBlockConeDefender(
-        Point(1, 0), Point(-1, 0), Point(0, 1), Point(0.25, 0.5), 0.5);
-    EXPECT_TRUE((a - p).len() < 0.00001);
-}
-
 TEST(GeomUtilTest, test_offset_to_line)
 {
     Point x0(1, -1);
