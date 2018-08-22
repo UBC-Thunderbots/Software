@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ai/hl/hl.h"
+#include "ai/hl/stp/play/play.h"
 #include "ai/intent/intent.h"
 
 /**
@@ -16,6 +17,12 @@ class STP_HL : public HL
      */
     explicit STP_HL();
 
-    std::vector<std::unique_ptr<Intent>> getIntentAssignment(
-        const World &world) const override;
+    std::vector<std::unique_ptr<Intent>> getIntentAssignment(const World& world) override;
+
+   private:
+    std::vector<std::pair<Robot, std::unique_ptr<Tactic>>> assignTacticsToRobots(
+        const World& world, const std::vector<std::unique_ptr<Tactic>>& tactics) const;
+    std::shared_ptr<Play> calculateNewPlay(const World& world) const;
+
+    std::shared_ptr<Play> current_play;
 };

@@ -20,8 +20,7 @@ class HL
    public:
     /**
      * Given the state of the world, returns the Intent that each available Robot should
-     * be
-     * running.
+     * be running.
      *
      * @param world The current state of the world
      *
@@ -29,5 +28,5 @@ class HL
      * running
      */
     virtual std::vector<std::unique_ptr<Intent>> getIntentAssignment(
-        const World &world) const = 0;
+        const World &world) = 0;
 };
