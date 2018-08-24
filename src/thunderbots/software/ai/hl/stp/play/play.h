@@ -21,6 +21,7 @@ class PlayFactory
 {
    public:
     virtual std::shared_ptr<Play> getInstance() = 0;
+    virtual ~PlayFactory() = default;
 };
 
 /**
@@ -55,6 +56,8 @@ class Play
     // Factory stuff
     static const std::vector<std::shared_ptr<PlayFactory>>& getRegistry();
     static void registerPlay(std::shared_ptr<PlayFactory> play_factory);
+
+    virtual ~Play() = default;
 
    private:
     static std::vector<std::shared_ptr<PlayFactory>>& getMutableRegistry();

@@ -29,4 +29,6 @@ class HL
      */
     virtual std::vector<std::unique_ptr<Intent>> getIntentAssignment(
         const World &world) = 0;
+
+    virtual ~HL() = default;
 };

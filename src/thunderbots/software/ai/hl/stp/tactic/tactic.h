@@ -13,5 +13,5 @@ class Tactic
 
     virtual std::pair<Robot, Team> selectRobot(const Team& available_robots) = 0;
 
-   private:
+    virtual ~Tactic() = default;
 };
