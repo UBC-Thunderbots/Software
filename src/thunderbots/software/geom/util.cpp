@@ -198,7 +198,6 @@ bool intersects(const Ray &first, const Seg &second)
     auto isect = lineIntersection(first.start, first.dir, second.start, second.end);
     if (isect.has_value())
     {
-
         return contains(first, isect.value()) && contains(second, isect.value());
     }
     return collinear(first.start, first.dir, second.start);
@@ -652,44 +651,55 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
     {
         // parallel line segments, find if they're collinear and return the 2 points
         // on the line they both lay on if they are collinear and intersecting
-        // shamelessly copypasted from 
+        // shamelessly copypasted from
         // https://stackoverflow.com/questions/22456517/algorithm-for-finding-the-segment-overlapping-two-collinear-segments
         if (collinear(a.start, b.start, b.end) && collinear(a.end, b.start, b.end))
         {
-            double slope = (a.end.y() - a.start.y())/(a.end.x() - a.start.x());
+            double slope      = (a.end.y() - a.start.y()) / (a.end.x() - a.start.x());
             bool isHorizontal = slope < EPS;
             bool isDescending = slope < 0 && !isHorizontal;
-            double invertY = isDescending || isHorizontal ? -1 : 1;
+            double invertY    = isDescending || isHorizontal ? -1 : 1;
 
-            Point min1 =  Point (std::min(a.start.x(), a.end.x()), std::min(a.start.y()*invertY, a.end.y()*invertY));
-            Point max1 =  Point (std::max(a.start.x(), a.end.x()), std::max(a.start.y()*invertY, a.end.y()*invertY));
+            Point min1 = Point(std::min(a.start.x(), a.end.x()),
+                               std::min(a.start.y() * invertY, a.end.y() * invertY));
+            Point max1 = Point(std::max(a.start.x(), a.end.x()),
+                               std::max(a.start.y() * invertY, a.end.y() * invertY));
 
-            Point min2 =  Point (std::min(b.start.x(), b.end.x()), std::min(b.start.y()*invertY, b.end.y()*invertY));
-            Point max2 =  Point (std::max(b.start.x(), b.end.x()), std::max(b.start.y()*invertY, b.end.y()*invertY));
+            Point min2 = Point(std::min(b.start.x(), b.end.x()),
+                               std::min(b.start.y() * invertY, b.end.y() * invertY));
+            Point max2 = Point(std::max(b.start.x(), b.end.x()),
+                               std::max(b.start.y() * invertY, b.end.y() * invertY));
 
             Point minIntersection;
             if (isDescending)
-                minIntersection =  Point (std::max(min1.x(), min2.x()), std::min(min1.y()*invertY, min2.y()*invertY));
+                minIntersection = Point(std::max(min1.x(), min2.x()),
+                                        std::min(min1.y() * invertY, min2.y() * invertY));
             else
-                minIntersection =  Point (std::max(min1.x(), min2.x()), std::max(min1.y()*invertY, min2.y()*invertY));
+                minIntersection = Point(std::max(min1.x(), min2.x()),
+                                        std::max(min1.y() * invertY, min2.y() * invertY));
 
             Point maxIntersection;
             if (isDescending)
-                maxIntersection =  Point (std::min(max1.x(), max2.x()), std::max(max1.y()*invertY, max2.y()*invertY));
+                maxIntersection = Point(std::min(max1.x(), max2.x()),
+                                        std::max(max1.y() * invertY, max2.y() * invertY));
             else
-                maxIntersection =  Point (std::min(max1.x(), max2.x()), std::min(max1.y()*invertY, max2.y()*invertY));
+                maxIntersection = Point(std::min(max1.x(), max2.x()),
+                                        std::min(max1.y() * invertY, max2.y() * invertY));
 
-            bool intersect = minIntersection.x() <= maxIntersection.x() &&
-                             ((!isDescending && minIntersection.y() <= maxIntersection.y()) ||
-                                     (isDescending && minIntersection.y() >= maxIntersection.y()));
+            bool intersect =
+                minIntersection.x() <= maxIntersection.x() &&
+                ((!isDescending && minIntersection.y() <= maxIntersection.y()) ||
+                 (isDescending && minIntersection.y() >= maxIntersection.y()));
 
-            if(intersect)
+            if (intersect)
             {
                 return std::vector<Point>{minIntersection, maxIntersection};
             }
-            else return std::vector<Point>();
+            else
+                return std::vector<Point>();
         }
-        else return std::vector<Point>();
+        else
+            return std::vector<Point>();
     }
 
     return std::vector<Point>{a.start +
@@ -700,7 +710,7 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
 
 // shamelessly copy-pasted from RoboJackets
 std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Vector &c,
-                        const Vector &d)
+                                      const Vector &d)
 {
     Seg line1(a, b), line2(c, d);
     double x1 = line1.start.x();

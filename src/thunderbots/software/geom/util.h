@@ -295,7 +295,8 @@ bool uniqueLineIntersects(const Point &a, const Point &b, const Point &c, const 
  *
  * @return the point of intersection.
  */
-std::optional<Point> lineIntersection(const Point &a, const Point &b, const Point &c, const Point &d);
+std::optional<Point> lineIntersection(const Point &a, const Point &b, const Point &c,
+                                      const Point &d);
 
 /**
  * Computes the intersection of two lines.
@@ -307,7 +308,8 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
  * @param b another line segment
 
  * @return a vector containing the point of intersection if there is a single point
- *         a vector containing the 2 points of the line segment of the overlap if both line segments are collinear
+ *         a vector containing the 2 points of the line segment of the overlap if both
+ line segments are collinear
  *         and overlapping
  *         otherwise, an empty vector
  */

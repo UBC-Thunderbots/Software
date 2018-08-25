@@ -709,22 +709,22 @@ TEST(GeomUtilTest, test_intersection)
 
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
 {
-    Seg seg1(Point(0, 0), Point(2,2));
-    Seg seg2(Point(1, 1), Point(3,3));
+    Seg seg1(Point(0, 0), Point(2, 2));
+    Seg seg2(Point(1, 1), Point(3, 3));
 
     auto retval = lineIntersection(seg1, seg2);
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1,1)) != retval.end());
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2,2)) != retval.end());
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1, 1)) != retval.end());
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) != retval.end());
 }
 
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
 {
-    Seg seg1(Point(0, 0), Point(1,1));
-    Seg seg2(Point(2, 2), Point(3,3));
+    Seg seg1(Point(0, 0), Point(1, 1));
+    Seg seg2(Point(2, 2), Point(3, 3));
 
     auto retval = lineIntersection(seg1, seg2);
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1,1)) == retval.end());
-    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2,2)) == retval.end());
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1, 1)) == retval.end());
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) == retval.end());
 }
 
 TEST(GeomUtilTest, test_vertex_angle)
