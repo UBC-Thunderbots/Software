@@ -195,10 +195,11 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Ray &first, const Seg &second)
 {
-    if (std::abs(first.toVector().cross(second.toVector())) > EPS)
+    auto isect = lineIntersection(first.start, first.dir, second.start, second.end);
+    if (isect.has_value())
     {
-        Vector isect = lineIntersection(first.start, first.dir, second.start, second.end);
-        return contains(first, isect) && contains(second, isect);
+
+        return contains(first, isect.value()) && contains(second, isect.value());
     }
     return collinear(first.start, first.dir, second.start);
 }
@@ -328,7 +329,7 @@ std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
         {
             const Angle mid    = start + sum / 2 + offangle;
             const Vector ray   = Vector::createFromAngle(mid) * 10.0;
-            const Vector inter = lineIntersection(src, src + ray, p1, p2);
+            const Vector inter = lineIntersection(src, src + ray, p1, p2).value();
 
             ret.push_back(std::make_pair(inter, sum));
 
@@ -399,7 +400,7 @@ std::pair<Vector, Angle> angleSweepCircles(const Vector &src, const Vector &p1,
                 // intersect with line p1-p2
                 const Angle mid    = start + sum / 2 + offangle;
                 const Vector ray   = Vector::createFromAngle(mid) * 10.0;
-                const Vector inter = lineIntersection(src, src + ray, p1, p2);
+                const Vector inter = lineIntersection(src, src + ray, p1, p2).value();
                 bestshot           = inter;
             }
         }
@@ -535,7 +536,7 @@ std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
         if (intersects(Seg(a, b), Seg(segA, segB)) &&
             uniqueLineIntersects(a, b, segA, segB))
         {
-            ans.push_back(lineIntersection(a, b, segA, segB));
+            ans.push_back(lineIntersection(a, b, segA, segB).value());
         }
     }
     return ans;
@@ -649,8 +650,46 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
 {
     if (std::fabs((b.end - b.start).cross(a.end - a.start)) < EPS)
     {
-        // LOG_WARN(u8"Cross product problem again in new function");
-        return std::vector<Point>();
+        // parallel line segments, find if they're collinear and return the 2 points
+        // on the line they both lay on if they are collinear and intersecting
+        // shamelessly copypasted from 
+        // https://stackoverflow.com/questions/22456517/algorithm-for-finding-the-segment-overlapping-two-collinear-segments
+        if (collinear(a.start, b.start, b.end) && collinear(a.end, b.start, b.end))
+        {
+            double slope = (a.end.y() - a.start.y())/(a.end.x() - a.start.x());
+            bool isHorizontal = slope < EPS;
+            bool isDescending = slope < 0 && !isHorizontal;
+            double invertY = isDescending || isHorizontal ? -1 : 1;
+
+            Point min1 =  Point (std::min(a.start.x(), a.end.x()), std::min(a.start.y()*invertY, a.end.y()*invertY));
+            Point max1 =  Point (std::max(a.start.x(), a.end.x()), std::max(a.start.y()*invertY, a.end.y()*invertY));
+
+            Point min2 =  Point (std::min(b.start.x(), b.end.x()), std::min(b.start.y()*invertY, b.end.y()*invertY));
+            Point max2 =  Point (std::max(b.start.x(), b.end.x()), std::max(b.start.y()*invertY, b.end.y()*invertY));
+
+            Point minIntersection;
+            if (isDescending)
+                minIntersection =  Point (std::max(min1.x(), min2.x()), std::min(min1.y()*invertY, min2.y()*invertY));
+            else
+                minIntersection =  Point (std::max(min1.x(), min2.x()), std::max(min1.y()*invertY, min2.y()*invertY));
+
+            Point maxIntersection;
+            if (isDescending)
+                maxIntersection =  Point (std::min(max1.x(), max2.x()), std::max(max1.y()*invertY, max2.y()*invertY));
+            else
+                maxIntersection =  Point (std::min(max1.x(), max2.x()), std::min(max1.y()*invertY, max2.y()*invertY));
+
+            bool intersect = minIntersection.x() <= maxIntersection.x() &&
+                             ((!isDescending && minIntersection.y() <= maxIntersection.y()) ||
+                                     (isDescending && minIntersection.y() >= maxIntersection.y()));
+
+            if(intersect)
+            {
+                return std::vector<Point>{minIntersection, maxIntersection};
+            }
+            else return std::vector<Point>();
+        }
+        else return std::vector<Point>();
     }
 
     return std::vector<Point>{a.start +
@@ -660,7 +699,7 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
 }
 
 // shamelessly copy-pasted from RoboJackets
-Vector lineIntersection(const Vector &a, const Vector &b, const Vector &c,
+std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Vector &c,
                         const Vector &d)
 {
     Seg line1(a, b), line2(c, d);
@@ -676,7 +715,8 @@ Vector lineIntersection(const Vector &a, const Vector &b, const Vector &c,
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (denom == 0)
     {
-        throw std::out_of_range("fuck");
+        // log the parallel lines when we actually implement logging?
+        return std::nullopt;
     }
 
     double deta = x1 * y2 - y1 * x2;
@@ -687,10 +727,9 @@ Vector lineIntersection(const Vector &a, const Vector &b, const Vector &c,
     intersection.set((deta * (x3 - x4) - (x1 - x2) * detb) / denom,
                      (deta * (y3 - y4) - (y1 - y2) * detb) / denom);
 
-    return intersection;
+    return std::make_optional(intersection);
 }
 
-// TODO: a line intersect that takes segments would be nice
 
 Vector reflect(const Vector &v, const Vector &n)
 {

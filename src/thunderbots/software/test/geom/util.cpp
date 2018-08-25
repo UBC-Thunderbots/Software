@@ -436,7 +436,7 @@ TEST(GeomUtilTest, test_line_intersect)
         Point a2 = a1 + (expected - a1) * (1 + std::rand() % 200 / 100.0);
         Point b2 = b1 + (expected - b1) * (1 + std::rand() % 200 / 100.0);
 
-        Point found = lineIntersection(a1, a2, b1, b2);
+        Point found = lineIntersection(a1, a2, b1, b2).value();
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -705,6 +705,26 @@ TEST(GeomUtilTest, test_intersection)
     a2 = Point(4, 2);
 
     EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).len() < 0.0001);
+}
+
+TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
+{
+    Seg seg1(Point(0, 0), Point(2,2));
+    Seg seg2(Point(1, 1), Point(3,3));
+
+    auto retval = lineIntersection(seg1, seg2);
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1,1)) != retval.end());
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2,2)) != retval.end());
+}
+
+TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
+{
+    Seg seg1(Point(0, 0), Point(1,1));
+    Seg seg2(Point(2, 2), Point(3,3));
+
+    auto retval = lineIntersection(seg1, seg2);
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1,1)) == retval.end());
+    EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2,2)) == retval.end());
 }
 
 TEST(GeomUtilTest, test_vertex_angle)
