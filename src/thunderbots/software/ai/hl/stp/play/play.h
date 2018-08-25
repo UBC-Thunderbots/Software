@@ -104,17 +104,17 @@ class Play
     static std::vector<std::shared_ptr<PlayFactory>>& getMutableRegistry();
 };
 
-#define REGISTER_PLAY(klass)                                                             \
-    class klass##Factory : public PlayFactory                                            \
+#define REGISTER_PLAY(play_class_name)                                                   \
+    class play_class_name##Factory : public PlayFactory                                  \
     {                                                                                    \
        public:                                                                           \
-        klass##Factory()                                                                 \
+        play_class_name##Factory()                                                       \
         {                                                                                \
-            Play::registerPlay(std::shared_ptr<klass##Factory>(this));                   \
+            Play::registerPlay(std::shared_ptr<play_class_name##Factory>(this));         \
         }                                                                                \
         std::shared_ptr<Play> getInstance() override                                     \
         {                                                                                \
-            return std::make_shared<klass>();                                            \
+            return std::make_shared<play_class_name>();                                  \
         }                                                                                \
     };                                                                                   \
-    static klass##Factory global_##klass##Factory;
+    static play_class_name##Factory global_##play_class_name##Factory;
