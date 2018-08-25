@@ -4,9 +4,11 @@ MoveTactic::MoveTactic(const Point &destination) : destination(destination)
 {
 }
 
-std::pair<Robot, Team> MoveTactic::selectRobot(const Team &available_robots)
+Robot MoveTactic::selectRobot(const World &world,
+                              const std::vector<Robot> &available_robots)
 {
-    return std::make_pair(available_robots.getAllRobots().at(0), available_robots);
+    // Placeholder for now
+    return Robot(0);
 }
 
 std::unique_ptr<Intent> MoveTactic::getNextIntent(const World &world, const Robot &robot)

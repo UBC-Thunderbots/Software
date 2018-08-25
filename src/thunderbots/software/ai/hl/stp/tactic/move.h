@@ -11,7 +11,8 @@ class MoveTactic : public Tactic
 
     std::unique_ptr<Intent> getNextIntent(const World& world,
                                           const Robot& robot) override;
-    std::pair<Robot, Team> selectRobot(const Team& available_robots) override;
+    Robot selectRobot(const World& world,
+                      const std::vector<Robot>& available_robots) override;
 
    private:
     Point destination;
