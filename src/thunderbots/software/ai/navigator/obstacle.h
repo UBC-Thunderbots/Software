@@ -9,7 +9,7 @@
 
 constexpr double DEFAULT_AVOID_DIST = 0.15; // meters
 
-typedef struct RobotObstacle
+typedef struct _RobotObstacle
 {
     /**
      * Represents the physical footprint of the robot, with
@@ -25,17 +25,24 @@ typedef struct RobotObstacle
 
 } RobotObstacle;
 
-/**
- * Since all field 'obstacles' (ex. external boundary and defense areas) are rectangles,
- * we can model these as rectangles.
- */
-typedef Geom::Rect FieldBoundary;
+
+typedef struct _FieldBoundary
+{
+    /**
+     * Since all field 'obstacles' (ex. external boundary and defense areas) are rectangles,
+     * we can model these as Rects.
+     */
+    Geom::Rect boundary;
+
+} FieldBoundary;
 
 /**
  * Creates RobotObstacles based on the friendly team robots.
  * 
  * @param friendly_team The team of friendly robots.
  * @param avoid_dist Avoidance distance around robots in meters.
+ * 
+ * @return Vector of all friendly robots as RobotObstacles.
  */
 std::vector<RobotObstacle> process_friendly(Team& friendly_team, double avoid_dist);
 
@@ -44,11 +51,17 @@ std::vector<RobotObstacle> process_friendly(Team& friendly_team, double avoid_di
  * 
  * @param enemy_team The team of enemy robots.
  * @param avoid_dist Avoidance distance around robots in meters.
+ * 
+ * @return Vector of all enemy robots as RobotObstacles.
  */
 std::vector<RobotObstacle> process_enemy(Team& enemy_team, double avoid_dist);
 
 /**
  * Creates FieldBoundaries for the field 'obstacles' (ex. defense areas, outer boundaries).
  * 
+ * @param field The field to get boundaries from.
+ * 
+ * @return Vector of relevant field boundaries as FieldBoundaries.
+ */
+std::vector<FieldBoundary> process_field(Field& field);
 
-bool path_valid(std::vector<Point>);
