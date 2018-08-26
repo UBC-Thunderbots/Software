@@ -13,5 +13,6 @@ Robot MoveTactic::selectRobot(const World &world,
 
 std::unique_ptr<Intent> MoveTactic::getNextIntent(const World &world, const Robot &robot)
 {
+    // Placeholder for now
     return std::make_unique<MoveIntent>(robot.id(), destination, Angle::zero(), 0.0);
 }

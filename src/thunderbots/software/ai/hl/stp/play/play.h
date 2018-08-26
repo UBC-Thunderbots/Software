@@ -20,8 +20,14 @@ class Play;
 class PlayFactory
 {
    public:
+    /**
+     * Returns a pointer to the Play constructed by this Factory
+     *
+     * @return a shared pointer to the Play constructed by this Factory
+     */
     virtual std::shared_ptr<Play> getInstance() = 0;
-    virtual ~PlayFactory()                      = default;
+
+    virtual ~PlayFactory() = default;
 };
 
 /**
@@ -88,22 +94,63 @@ class Play
      */
     virtual std::string name() = 0;
 
+    virtual ~Play() = default;
+
+    /** Factory Stuff **/
+    /**
+     * Returns a reference to the Play registry. The registry is a list of pointers
+     * to all the factories for the existing Play, which allows the code to be aware
+     * of all the Plays that are available.
+     *
+     * @return a const reference to the Play registry
+     */
+    static const std::vector<std::shared_ptr<PlayFactory>>& getRegistry();
+
+    /**
+     * Adds a Play to the Play Registry by adding the corresponding Play Factory
+     * @param play_factory A Pointer to the Play Factory to be added
+     */
+    static void registerPlay(std::shared_ptr<PlayFactory> play_factory);
+
     /**
      * Returns a list of names of all the existing Plays
      * @return a list of names of all the existing Plays
      */
     static std::vector<std::string> getPlayNames();
 
-    // Factory stuff
-    static const std::vector<std::shared_ptr<PlayFactory>>& getRegistry();
-    static void registerPlay(std::shared_ptr<PlayFactory> play_factory);
-
-    virtual ~Play() = default;
-
    private:
+    /**
+     * Returns a reference to the Play registry. The registry is a list of pointers
+     * to all the factories for the existing Play, which allows the code to be aware
+     * of all the Plays that are available.
+     *
+     * This is the same as the above public getRegistry function. We need a mutable
+     * version in order to add entries to the registry. The function is private so that
+     * only this class can make the modifications. Outside sources should not have direct
+     * access to modify the registry.
+     *
+     * @return a mutable reference to the Play registry
+     */
     static std::vector<std::shared_ptr<PlayFactory>>& getMutableRegistry();
 };
 
+/**
+ * This macro is used by Plays that are derived from the Abstract Play class above. Its
+ * purpose is to create a Factory for the implemented Play, and declare a static variable
+ * for the factory so that the Play is automatically registered in the Play
+ * registry.
+ *
+ * Declaring the static variable will also cause it to be initialized at the start of the
+ * program (because it's static). This will immediately call the constructor, which adds
+ * a pointer to the Factory to the Play registry. From then on, the rest of the program
+ * can use the registry to find all the Plays that are available (and register with this
+ * macro).
+ *
+ * @param play_class_name The classname of the Play to be added to the registry. For
+ * example, to add new class called MovePlay that inherits from Play, the following line
+ * should be added to the end of the .cpp file (without the quotations):
+ * "REGISTER_PLAY(MovePlay)"
+ */
 #define REGISTER_PLAY(play_class_name)                                                   \
     class play_class_name##Factory : public PlayFactory                                  \
     {                                                                                    \

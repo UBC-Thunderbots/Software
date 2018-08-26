@@ -20,12 +20,6 @@ std::shared_ptr<Play> STP_HL::calculateNewPlay(const World &world) const
 
 std::vector<std::unique_ptr<Intent>> STP_HL::getIntentAssignment(const World &world)
 {
-    std::cout << "getting stp intent assignment" << std::endl;
-    for (auto name : Play::getPlayNames())
-    {
-        std::cout << name << std::endl;
-    }
-
     if (!current_play || !current_play->invariantHolds(world) ||
         current_play->hasFailed(world))
     {
