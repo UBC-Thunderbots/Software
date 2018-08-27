@@ -172,8 +172,9 @@ std::pair<Point, Angle> angleSweepCircles(const Point &src, const Point &p1,
  *
  * @return a vector of all possible pairs of directions and angles to a target area.
  * If lines \p src -> \p p1 and \p src -> \p p2 are collinear, the result will contain a
- * single pair
- * of the direction of \p src -> \p p1 and zero angle.
+ * single pair of the direction of \p src -> \p p1 and zero angle if the line is not
+ * blocked by an obstacle.
+ * Otherwise, an empty vector will be returned.
  * An empty vector is returned if the preconditions aren't satisfied.
  */
 std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
