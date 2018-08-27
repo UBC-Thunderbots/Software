@@ -349,10 +349,6 @@ std::pair<Vector, Angle> angleSweepCircles(const Vector &src, const Vector &p1,
     const Angle offangle = (p1 - src).orientation();
     if (collinear(src, p1, p2))
     {
-        // std::cerr << "geom: collinear " << src << " " << p1 << " " << p2 <<
-        // std::endl;
-        // std::cerr << (p1 - src) << " " << (p2 - src) << std::endl;
-        // std::cerr << (p1 - src).cross(p2 - src) << std::endl;
         return std::make_pair(bestshot, Angle::zero());
     }
     std::vector<std::pair<Angle, int>> events;
@@ -543,20 +539,6 @@ std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
 
 Vector vectorRectIntersect(const Rect &r, const Vector &vecA, const Vector &vecB)
 {
-    /*std::cout << vecA << vecB << r.neCorner() << r.swCorner();
-       for (unsigned int i = 0; i < 4; i++) {
-        unsigned int j = (i + 1)%4;
-        const Vector &a = r[i];
-        const Vector &b = r[j];
-        if ( intersects(Ray(vecA, vecB), Seg( a, b ) )) {
-            Vector intersect = lineIntersection(a, b, vecA, vecB);
-            std::cout << std::endl;
-            return intersect;
-        }
-       }
-       std::cout << "fail \n";
-       return r.centre();  // return the center of the rectangle, if no valid
-       answer is found*/
     std::vector<Vector> points = lineRectIntersect(r, vecA, (vecB - vecA) * 100 + vecA);
     for (Vector i : points)
     {

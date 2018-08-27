@@ -99,25 +99,7 @@ TEST(GeomUtilTest, test_contains_triangle_point)
     Point p((std::rand() % 100) / 100, (std::rand() % 100) / 100);
     bool expected_val = true;
 
-    /* i don't know what is going on here, this part seems to not work very well
-    if (p.y() <= p3.y() && p.x() >= p.y() / p3.y() * p3.x() && p.x() <= (p.y() / p3.y() *
-    (p3.x() -
-    p2.x()) + p2.x())) {
-            expected_val = true;            // so the point is inside the
-    triangle,
-    }
-    Angle rot = Angle::of_degrees(std::rand());
-    Point trans(1.2, 1.2);
-    p1 = p1.rotate(rot);
-    p2 = p2.rotate(rot);
-    p3 = p3.rotate(rot);
-    p = p.rotate(rot);
-    p1 += trans;
-    p2 += trans;
-    p3 += trans;
-    p += trans;
-    */
-
+    // i don't know what is going on here, this part seems to not work very well
     // so we'll just abuse cross products to see on which side of each side of
     // the triangle it's on
     if (((p2 - p1).cross(p - p1) > 0) != ((p2 - p1).cross(p3 - p1) > 0))
