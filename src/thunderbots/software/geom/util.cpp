@@ -247,19 +247,25 @@ bool intersects(const Seg &first, const Seg &second)
 template <size_t N>
 Vector getVertex(const Poly<N> &poly, unsigned int i)
 {
-    return poly[i % N];
+    if (i > N)
+        throw std::out_of_range("poly does not have that many sides!!!");
+    else
+        return poly[i];
 }
 
 template <size_t N>
 void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
 {
-    poly[i % N] = v;
+    if (i > N)
+        throw std::out_of_range("poly does not have that many sides!!!");
+    else
+        poly[i] = v;
 }
 
 template <size_t N>
 Seg getSide(const Poly<N> &poly, unsigned int i)
 {
-    return Seg(getVertex(poly, i), getVertex(poly, i + 1));
+    return Seg(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
 std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
@@ -599,7 +605,6 @@ Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector 
 
 namespace
 {
-// this function is never used
 std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
                                              const Vector &segA, const Vector &segB)
 {
@@ -741,7 +746,6 @@ Vector reflect(const Vector &a, const Vector &b, const Vector &p)
     return a + reflect(p - a, n);
 }
 
-// ported code
 Vector calcBlockCone(const Vector &a, const Vector &b, const double &radius)
 {
     if (a.len() < EPS || b.len() < EPS)
@@ -760,7 +764,6 @@ Vector calcBlockCone(const Vector &a, const Vector &b, const Vector &p,
     return p + calcBlockCone(a - p, b - p, radius);
 }
 
-// ported code
 Vector calcBlockOtherRay(const Vector &a, const Vector &c, const Vector &g)
 {
     return reflect(c - a, g - c);  // this, and the next two instances, were
@@ -768,16 +771,12 @@ Vector calcBlockOtherRay(const Vector &a, const Vector &c, const Vector &g)
                                    // fixed
 }
 
-// ported code
 Vector calcBlockConeDefender(const Vector &a, const Vector &b, const Vector &c,
                              const Vector &g, const double &r)
 {
     Vector R = reflect(c - a, g - c);
-    // std::cout << (R + c) << std::endl;
     return calcBlockCone(R + c, b, c, r);
 }
-
-// ported cm code below
 
 double offsetToLine(Vector x0, Vector x1, Vector p)
 {

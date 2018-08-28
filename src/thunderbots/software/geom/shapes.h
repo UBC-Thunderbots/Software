@@ -136,8 +136,6 @@ class Circle final
     {
     }
 
-    // TODO: these shapes could use more operators and functions (eg area), and hashes
-
     inline constexpr bool operator==(const Circle& p)
     {
         return this->origin == p.origin && this->radius == p.radius;
