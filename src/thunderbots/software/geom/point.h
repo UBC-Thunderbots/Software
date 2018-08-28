@@ -216,10 +216,6 @@ class Point final
     double _y;
 };
 
-// Vectors can be represented by points, and vice-versa, se we let points also be called
-// vectors
-typedef Point Vector;
-
 /**
  * Adds two points
  *

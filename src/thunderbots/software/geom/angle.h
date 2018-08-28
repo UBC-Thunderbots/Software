@@ -176,6 +176,16 @@ class Angle final
      */
     constexpr Angle diff(Angle other) const;
 
+    /**
+     * Limits this angle to [−π, π].
+     *
+     * The angle is rotated by a multiple of 2π until it lies within the target
+     * interval.
+     *
+     * @return the clamped angle.
+     */
+    constexpr Angle angleMod() const;
+
    private:
     double rads;
 
@@ -479,6 +489,11 @@ inline constexpr Angle Angle::clamp() const
 inline constexpr Angle Angle::diff(Angle other) const
 {
     return (*this - other).clamp().abs();
+}
+
+inline constexpr Angle Angle::angleMod() const
+{
+    return remainder(Angle::full());
 }
 
 inline constexpr Angle::Angle(double rads) : rads(rads)
