@@ -13,11 +13,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ## Compiler Flags ##
 ####################
 
-# Set cmake standard to c++ 17
+### Set cmake standard to c++ 17 ###
 set(CMAKE_CXX_STANDARD 17)
+
+### Set compiler flags for all code ###
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
 add_definitions(-fno-common) # Do not allow multiple definitions of the same global variable
 add_definitions(-Werror) # Treat warnings as errors, so they don't build up
+
+### Set compiler flags only for cpp code. These flags do not work for C files ###
+# Warn if parent classes do not define a virtual destructor
+# See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
+set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
+
 
 #############################################
 ## Find and include pacakges and libraries ##
