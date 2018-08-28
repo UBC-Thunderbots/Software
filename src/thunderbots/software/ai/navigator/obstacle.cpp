@@ -1,5 +1,7 @@
 #include "obstacle.h"
-#include "constants.h"
+#include "shared/constants.h"
+
+#define DEFAULT_VELOCITY_SCALE 2.0
 
 std::vector<RobotObstacle> process_friendly(Team& friendly_team, double avoid_dist)
 {
@@ -8,10 +10,10 @@ std::vector<RobotObstacle> process_friendly(Team& friendly_team, double avoid_di
     {
         obst.push_back(
             {
-                .robot = Geom::Circle(r.position(), avoid_dist + ROBOT_MAX_RADIUS),
-                .velocity = Geom::Seg() // TODO: FIX
+                .robot = Circle(r.position(), avoid_dist + ROBOT_MAX_RADIUS),
+                .velocity = Seg(r.position(), r.position() + r.velocity() * DEFAULT_VELOCITY_SCALE )
             }
-        )
+        );
     }
     
     return obst;
@@ -25,5 +27,5 @@ std::vector<RobotObstacle> process_enemy(Team& friendly_team, double avoid_dist)
 
 std::vector<FieldBoundary> process_field(Field& field)
 {
-    
+    return std::vector<FieldBoundary>();
 }

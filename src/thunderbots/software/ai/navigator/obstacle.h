@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ai/world/team.h"
-#include "ai/geom/point.h"
+#include "ai/world/world.h"
+#include "geom/point.h"
+#include "geom/util.h"
 
 /**
  * This defines the interface for obstacle processing.
@@ -15,13 +16,13 @@ typedef struct _RobotObstacle
      * Represents the physical footprint of the robot, with
      * an additional avoid distance.
      */
-    Geom::Circle robot;
+    Circle robot;
 
     /**
      * Segment extending from robot in direction of robot travel with length
      * proportional to current velocity. Used for collision avoidance.
      */
-    Geom::Seg velocity;
+    Seg velocity;
 
 } RobotObstacle;
 
@@ -32,7 +33,7 @@ typedef struct _FieldBoundary
      * Since all field 'obstacles' (ex. external boundary and defense areas) are rectangles,
      * we can model these as Rects.
      */
-    Geom::Rect boundary;
+    Rect boundary;
 
 } FieldBoundary;
 
