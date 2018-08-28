@@ -34,4 +34,6 @@ class Intent
      * @return the id of the robot this Intent corresponds to
      */
     virtual unsigned int getRobotId() const = 0;
+
+    virtual ~Intent() = default;
 };
