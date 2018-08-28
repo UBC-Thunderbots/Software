@@ -69,6 +69,8 @@ class Backend
     std::optional<thunderbots_msgs::Team> getFilteredEnemyTeamMsg(
         const SSL_WrapperPacket &packet, const AITimestamp &timestamp);
 
+    virtual ~Backend() = default;
+
    private:
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;

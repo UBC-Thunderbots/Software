@@ -78,4 +78,6 @@ class Primitive
      */
     static std::unique_ptr<Primitive> createPrimitive(
         const thunderbots_msgs::Primitive& primitive_msg);
+
+    virtual ~Primitive() = default;
 };
