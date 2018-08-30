@@ -1,10 +1,12 @@
 #pragma once
 
-#include "util/parameter/boolean/boolean_parameter.h"
-#include "util/parameter/double/double_parameter.h"
-#include "util/parameter/integer/integer_parameter.h"
-#include "util/parameter/string/string_parameter.h"
+#include "util/parameter/parameter.h"
 
+/**
+ * This namespace contains all of our dynamically adjustable Parameters, providing
+ * a centralized way to access them. See the comment in the parameter.h file for
+ * a list of valid Parameter types.
+ */
 namespace Configuration
 {
 /**
@@ -12,9 +14,21 @@ namespace Configuration
  */
 void updateParametersFromParameterServer();
 
-// Parameters
-extern BooleanParameter param1;
-extern IntegerParameter param2;
-extern DoubleParameter param3;
-extern StringParameter param4;
+// These are currently placeholders to provide an example of how parameters are
+// created an initialized. Parameters can be organized in (nested) namespaces.
+const Parameter<int> param1("/thunderbots/parameters/param1", 7);
+
+namespace Navigator
+{
+const Parameter<double> param2("/thunderbots/parameters/param2", 55.0);
+}
+
+namespace HL
+{
+namespace STP
+{
+const Parameter<std::vector<std::string>> param3("/thunderbots/parameters/param3",
+                                                 {"MovePlay", "IdlePlay"});
+}
+}
 }

@@ -1,36 +1,47 @@
-#include "configuration.h"
+#include "util/parameter/configuration.h"
 
 namespace Configuration
 {
-// Update functions
 void updateParametersFromParameterServer()
 {
-    for (const auto& parameter : BooleanParameter::getRegistry())
+    for (const auto& p : Parameter<bool>::getRegistry())
     {
-        parameter->updateValueFromParameterServer();
+        p->updateValueFromParameterServer();
     }
 
-    for (const auto& parameter : IntegerParameter::getRegistry())
+    for (const auto& p : Parameter<int32_t>::getRegistry())
     {
-        parameter->updateValueFromParameterServer();
+        p->updateValueFromParameterServer();
     }
 
-    for (const auto& parameter : DoubleParameter::getRegistry())
+    for (const auto& p : Parameter<double>::getRegistry())
     {
-        parameter->updateValueFromParameterServer();
+        p->updateValueFromParameterServer();
     }
 
-    for (const auto& parameter : StringParameter::getRegistry())
+    for (const auto& p : Parameter<std::string>::getRegistry())
     {
-        parameter->updateValueFromParameterServer();
+        p->updateValueFromParameterServer();
+    }
+
+    for (const auto& p : Parameter<std::vector<bool>>::getRegistry())
+    {
+        p->updateValueFromParameterServer();
+    }
+
+    for (const auto& p : Parameter<std::vector<int32_t>>::getRegistry())
+    {
+        p->updateValueFromParameterServer();
+    }
+
+    for (const auto& p : Parameter<std::vector<double>>::getRegistry())
+    {
+        p->updateValueFromParameterServer();
+    }
+
+    for (const auto& p : Parameter<std::vector<std::string>>::getRegistry())
+    {
+        p->updateValueFromParameterServer();
     }
 }
-
-// Parameters
-// These are currently placeholders to provide an example of how parameters are
-// created an initialized
-BooleanParameter param1("/thunderbots/paramters/param1", true);
-IntegerParameter param2("/thunderbots/paramters/param2", 5);
-DoubleParameter param3("/thunderbots/paramters/param3", -6.1818);
-StringParameter param4("/thunderbots/paramters/param4", "Hello, World!");
 }
