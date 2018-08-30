@@ -44,4 +44,20 @@ void updateParametersFromParameterServer()
         p->updateValueFromParameterServer();
     }
 }
+
+const extern Parameter<int> param1("/thunderbots/parameters/param1", 7);
+
+namespace Navigator
+{
+const Parameter<double> param2("/thunderbots/parameters/param2", 55.0);
+}
+
+namespace HL
+{
+namespace STP
+{
+const Parameter<std::vector<std::string>> param3("/thunderbots/parameters/param3",
+                                                 {"MovePlay", "IdlePlay"});
+}
+}
 }

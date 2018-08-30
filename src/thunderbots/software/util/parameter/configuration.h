@@ -16,19 +16,18 @@ void updateParametersFromParameterServer();
 
 // These are currently placeholders to provide an example of how parameters are
 // created an initialized. Parameters can be organized in (nested) namespaces.
-const Parameter<int> param1("/thunderbots/parameters/param1", 7);
+const extern Parameter<int> param1;
 
 namespace Navigator
 {
-const Parameter<double> param2("/thunderbots/parameters/param2", 55.0);
+const extern Parameter<double> param2;
 }
 
 namespace HL
 {
 namespace STP
 {
-const Parameter<std::vector<std::string>> param3("/thunderbots/parameters/param3",
-                                                 {"MovePlay", "IdlePlay"});
+const extern Parameter<std::vector<std::string>> param3;
 }
 }
 }
