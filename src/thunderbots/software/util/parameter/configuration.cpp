@@ -1,48 +1,17 @@
 #include "util/parameter/configuration.h"
 
-namespace Configuration
+namespace DynamicParameters
 {
-void updateParametersFromParameterServer()
+void updateAllParametersFromROSParameterServer()
 {
-    for (const auto& p : Parameter<bool>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<int32_t>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<double>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<std::string>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<std::vector<bool>>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<std::vector<int32_t>>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<std::vector<double>>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
-
-    for (const auto& p : Parameter<std::vector<std::string>>::getRegistry())
-    {
-        p->updateValueFromParameterServer();
-    }
+    Parameter<bool>::updateAllParametersFromROSParameterServer();
+    Parameter<int32_t>::updateAllParametersFromROSParameterServer();
+    Parameter<double>::updateAllParametersFromROSParameterServer();
+    Parameter<std::string>::updateAllParametersFromROSParameterServer();
+    Parameter<std::vector<bool>>::updateAllParametersFromROSParameterServer();
+    Parameter<std::vector<int32_t>>::updateAllParametersFromROSParameterServer();
+    Parameter<std::vector<double>>::updateAllParametersFromROSParameterServer();
+    Parameter<std::vector<std::string>>::updateAllParametersFromROSParameterServer();
 }
 
 const extern Parameter<int> param1("/thunderbots/parameters/param1", 7);

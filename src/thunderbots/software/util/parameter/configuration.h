@@ -7,12 +7,12 @@
  * a centralized way to access them. See the comment in the parameter.h file for
  * a list of valid Parameter types.
  */
-namespace Configuration
+namespace DynamicParameters
 {
 /**
  * Updates all known parameters with the latest values from the ROS Parameter Server
  */
-void updateParametersFromParameterServer();
+void updateAllParametersFromROSParameterServer();
 
 // These are currently placeholders to provide an example of how parameters are
 // created an initialized. Parameters can be organized in (nested) namespaces.

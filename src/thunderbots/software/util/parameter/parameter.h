@@ -31,7 +31,7 @@ class Parameter
         this->ros_parameter_path = ros_parameter_path;
         value_                   = default_value;
 
-        Parameter<T>::registerParameter(std::shared_ptr<Parameter<T>>(this));
+        Parameter<T>::registerParameter(std::unique_ptr<Parameter<T>>(this));
     }
 
     /**
@@ -55,10 +55,10 @@ class Parameter
     }
 
     /**
-     * Updates the value of this BooleanParameter with the value from the ROS
+     * Updates the value of this Parameter with the value from the ROS
      * Parameter Server
      */
-    void updateValueFromParameterServer()
+    void updateValueFromROSParameterServer()
     {
         ros::param::get(getROSParameterPath(), value_);
     }
@@ -72,25 +72,41 @@ class Parameter
     {
         ros::param::set(getROSParameterPath(), new_value);
     }
+
     /**
      * Returns a reference to the Parameter registry. The registry is a list of
      * pointers to all the existing Parameters.
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::vector<std::shared_ptr<Parameter<T>>>& getRegistry()
+    static const std::vector<std::unique_ptr<Parameter<T>>>& getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
     }
 
     /**
-     * Registers (adds) a Parameter to the registry
+     * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
+     * into the registry, the pointer may not be accessed by the caller after this
+     * function has been called.
      *
-     * @param parameter A shared pointer to the Parameter to add
+     * @param parameter A unique pointer to the Parameter to add. This pointer may not
+     * be accessed by the caller after this function has been called.
      */
-    static void registerParameter(std::shared_ptr<Parameter<T>> parameter)
+    static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
     {
-        Parameter<T>::getMutableRegistry().emplace_back(parameter);
+        Parameter<T>::getMutableRegistry().emplace_back(std::move(parameter));
+    }
+
+    /**
+     * Updates all the Parameters of type T with the latest values from the ROS
+     * Parameter Server
+     */
+    static void updateAllParametersFromROSParameterServer()
+    {
+        for (const auto& p : Parameter<T>::getRegistry())
+        {
+            p->updateValueFromROSParameterServer();
+        }
     }
 
    private:
@@ -102,9 +118,9 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::vector<std::shared_ptr<Parameter>>& getMutableRegistry()
+    static std::vector<std::unique_ptr<Parameter>>& getMutableRegistry()
     {
-        static std::vector<std::shared_ptr<Parameter<T>>> instance;
+        static std::vector<std::unique_ptr<Parameter<T>>> instance;
         return instance;
     }
 
