@@ -1,4 +1,4 @@
-#include "util/parameter/configuration.h"
+#include "util/parameter/dynamic_parameters.h"
 
 namespace DynamicParameters
 {
