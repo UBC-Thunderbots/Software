@@ -12,7 +12,7 @@
 // In an anonymous namespace so they cannot be seen/accessed externally
 namespace
 {
-AI ai;
+    AI ai;
 }
 
 

@@ -20,219 +20,220 @@
 
 namespace Net
 {
-//====================================================================//
-//  Net::Address: Network address class
-//  (C) James Bruce
-//====================================================================//
+    //====================================================================//
+    //  Net::Address: Network address class
+    //  (C) James Bruce
+    //====================================================================//
 
-bool Address::setHost(const char *hostname, int port)
-{
-    // printf("%s %d\n",hostname,port);
-    addrinfo *res = NULL;
-    getaddrinfo(hostname, NULL, NULL, &res);
-    if (!res)
-        return (false);
-
-    mzero(addr);
-    addr_len = res->ai_addrlen;
-    memcpy(&addr, res->ai_addr, addr_len);
-
-    // set port for internet sockets
-    sockaddr_in *sockname = (sockaddr_in *)(&addr);
-    if (sockname->sin_family == AF_INET)
+    bool Address::setHost(const char *hostname, int port)
     {
-        sockname->sin_port = htons(port);
-    }
-    else
-    {
-        // TODO: any way to set port in general?
-    }
+        // printf("%s %d\n",hostname,port);
+        addrinfo *res = NULL;
+        getaddrinfo(hostname, NULL, NULL, &res);
+        if (!res)
+            return (false);
 
-    freeaddrinfo(res);
-    return (true);
-}
+        mzero(addr);
+        addr_len = res->ai_addrlen;
+        memcpy(&addr, res->ai_addr, addr_len);
 
-void Address::setAny(int port)
-{
-    mzero(addr);
-    sockaddr_in *s     = (sockaddr_in *)(&addr);
-    s->sin_addr.s_addr = htonl(INADDR_ANY);
-    s->sin_port        = htons(port);
-    addr_len           = sizeof(sockaddr_in);
-}
-
-in_addr_t Address::getInAddr() const
-{
-    const sockaddr_in *s = (sockaddr_in *)(&addr);
-    return (s->sin_addr.s_addr);
-}
-
-void Address::print(FILE *out) const
-{
-    if (!addr_len)
-    {
-        printf("null");
-        return;
-    }
-
-    sockaddr_in *sockname = (sockaddr_in *)(&addr);
-    if (sockname->sin_family == AF_INET)
-    {
-        unsigned a       = ntohl(sockname->sin_addr.s_addr);
-        unsigned short p = ntohs(sockname->sin_port);
-
-        fprintf(out, "%d.%d.%d.%d:%d", (a >> 24) & 0xFF, (a >> 16) & 0xFF,
-                (a >> 8) & 0xFF, a & 0xFF, p);
-    }
-    else
-    {
-        fprintf(out, "?");
-    }
-}
-
-//====================================================================//
-//  Net::UDP: Simple raw UDP messaging
-//  (C) James Bruce
-//====================================================================//
-
-bool UDP::open(int port, bool share_port_for_multicasting,
-               bool multicast_include_localhost, bool blocking)
-{
-    const int TTL = 32;
-
-    // open the socket
-    if (fd >= 0)
-        ::close(fd);
-    fd = socket(PF_INET, SOCK_DGRAM, 0);
-
-    // set socket as non-blocking
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags < 0)
-        flags = 0;
-    fcntl(fd, F_SETFL, flags | (blocking ? 0 : O_NONBLOCK));
-
-    if (share_port_for_multicasting)
-    {
-        int reuse = 1;
-        if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuse,
-                       sizeof(reuse)) != 0)
+        // set port for internet sockets
+        sockaddr_in *sockname = (sockaddr_in *)(&addr);
+        if (sockname->sin_family == AF_INET)
         {
-            fprintf(stderr, "ERROR WHEN SETTING SO_REUSEADDR ON UDP SOCKET\n");
-            fflush(stderr);
+            sockname->sin_port = htons(port);
         }
-        /*if(setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)!=0) {
-          fprintf(stderr,"ERROR WHEN SETTING SO_REUSEPORT ON UDP SOCKET\n");
-          fflush(stderr);
-        }*/
+        else
+        {
+            // TODO: any way to set port in general?
+        }
+
+        freeaddrinfo(res);
+        return (true);
     }
 
-    if (multicast_include_localhost)
+    void Address::setAny(int port)
     {
-        int yes = 1;
-        // allow packets to be received on this host
-        if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, (const char *)&yes,
-                       sizeof(yes)) != 0)
+        mzero(addr);
+        sockaddr_in *s     = (sockaddr_in *)(&addr);
+        s->sin_addr.s_addr = htonl(INADDR_ANY);
+        s->sin_port        = htons(port);
+        addr_len           = sizeof(sockaddr_in);
+    }
+
+    in_addr_t Address::getInAddr() const
+    {
+        const sockaddr_in *s = (sockaddr_in *)(&addr);
+        return (s->sin_addr.s_addr);
+    }
+
+    void Address::print(FILE *out) const
+    {
+        if (!addr_len)
         {
-            fprintf(stderr, "ERROR WHEN SETTING IP_MULTICAST_LOOP ON UDP SOCKET\n");
-            fflush(stderr);
+            printf("null");
+            return;
+        }
+
+        sockaddr_in *sockname = (sockaddr_in *)(&addr);
+        if (sockname->sin_family == AF_INET)
+        {
+            unsigned a       = ntohl(sockname->sin_addr.s_addr);
+            unsigned short p = ntohs(sockname->sin_port);
+
+            fprintf(out, "%d.%d.%d.%d:%d", (a >> 24) & 0xFF, (a >> 16) & 0xFF,
+                    (a >> 8) & 0xFF, a & 0xFF, p);
+        }
+        else
+        {
+            fprintf(out, "?");
         }
     }
-    // sets the TTL value so routing of the packet is possible, if needed.
-    int ret = setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, &TTL, sizeof(TTL));
-    if (ret != 0)
+
+    //====================================================================//
+    //  Net::UDP: Simple raw UDP messaging
+    //  (C) James Bruce
+    //====================================================================//
+
+    bool UDP::open(int port, bool share_port_for_multicasting,
+                   bool multicast_include_localhost, bool blocking)
     {
-        printf("ERROR %d WHEN SETTING IP_MULTICAST_TTL\n", ret);
-        return false;
+        const int TTL = 32;
+
+        // open the socket
+        if (fd >= 0)
+            ::close(fd);
+        fd = socket(PF_INET, SOCK_DGRAM, 0);
+
+        // set socket as non-blocking
+        int flags = fcntl(fd, F_GETFL, 0);
+        if (flags < 0)
+            flags = 0;
+        fcntl(fd, F_SETFL, flags | (blocking ? 0 : O_NONBLOCK));
+
+        if (share_port_for_multicasting)
+        {
+            int reuse = 1;
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuse,
+                           sizeof(reuse)) != 0)
+            {
+                fprintf(stderr, "ERROR WHEN SETTING SO_REUSEADDR ON UDP SOCKET\n");
+                fflush(stderr);
+            }
+            /*if(setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, 1)!=0) {
+              fprintf(stderr,"ERROR WHEN SETTING SO_REUSEPORT ON UDP SOCKET\n");
+              fflush(stderr);
+            }*/
+        }
+
+        if (multicast_include_localhost)
+        {
+            int yes = 1;
+            // allow packets to be received on this host
+            if (setsockopt(fd, IPPROTO_IP, IP_MULTICAST_LOOP, (const char *)&yes,
+                           sizeof(yes)) != 0)
+            {
+                fprintf(stderr, "ERROR WHEN SETTING IP_MULTICAST_LOOP ON UDP SOCKET\n");
+                fflush(stderr);
+            }
+        }
+        // sets the TTL value so routing of the packet is possible, if needed.
+        int ret = setsockopt(fd, IPPROTO_IP, IP_MULTICAST_TTL, &TTL, sizeof(TTL));
+        if (ret != 0)
+        {
+            printf("ERROR %d WHEN SETTING IP_MULTICAST_TTL\n", ret);
+            return false;
+        }
+
+        // bind socket to port if nonzero
+        if (port != 0)
+        {
+            sockaddr_in sockname;
+            sockname.sin_family      = AF_INET;
+            sockname.sin_addr.s_addr = htonl(INADDR_ANY);
+            sockname.sin_port        = htons(port);
+            bind(fd, (struct sockaddr *)(&sockname), sizeof(sockname));
+        }
+
+        return (true);
     }
 
-    // bind socket to port if nonzero
-    if (port != 0)
+    bool UDP::addMulticast(const Address &multiaddr, const Address &interface)
     {
-        sockaddr_in sockname;
-        sockname.sin_family      = AF_INET;
-        sockname.sin_addr.s_addr = htonl(INADDR_ANY);
-        sockname.sin_port        = htons(port);
-        bind(fd, (struct sockaddr *)(&sockname), sizeof(sockname));
+        static const bool debug = false;
+        struct ip_mreq imreq;
+        imreq.imr_multiaddr.s_addr = multiaddr.getInAddr();
+        imreq.imr_interface.s_addr = interface.getInAddr();
+
+        if (debug)
+        {
+            printf("0x%08X 0x%08X\n", (unsigned)interface.getInAddr(),
+                   (unsigned)INADDR_ANY);
+        }
+
+        int ret = setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imreq, sizeof(imreq));
+        if (debug)
+            printf("ret=%d\n", ret);
+        if (ret != 0)
+            return false;
+
+        // set multicast output interface
+        ret = setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &imreq.imr_interface.s_addr,
+                         sizeof(imreq.imr_interface.s_addr));
+        if (debug)
+            printf("ret=%d\n", ret);
+
+        return (ret == 0);
     }
 
-    return (true);
-}
-
-bool UDP::addMulticast(const Address &multiaddr, const Address &interface)
-{
-    static const bool debug = false;
-    struct ip_mreq imreq;
-    imreq.imr_multiaddr.s_addr = multiaddr.getInAddr();
-    imreq.imr_interface.s_addr = interface.getInAddr();
-
-    if (debug)
+    void UDP::close()
     {
-        printf("0x%08X 0x%08X\n", (unsigned)interface.getInAddr(), (unsigned)INADDR_ANY);
+        if (fd >= 0)
+            ::close(fd);
+        fd = -1;
+
+        sent_packets = 0;
+        sent_bytes   = 0;
+        recv_packets = 0;
+        recv_bytes   = 0;
     }
 
-    int ret = setsockopt(fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imreq, sizeof(imreq));
-    if (debug)
-        printf("ret=%d\n", ret);
-    if (ret != 0)
-        return false;
-
-    // set multicast output interface
-    ret = setsockopt(fd, IPPROTO_IP, IP_MULTICAST_IF, &imreq.imr_interface.s_addr,
-                     sizeof(imreq.imr_interface.s_addr));
-    if (debug)
-        printf("ret=%d\n", ret);
-
-    return (ret == 0);
-}
-
-void UDP::close()
-{
-    if (fd >= 0)
-        ::close(fd);
-    fd = -1;
-
-    sent_packets = 0;
-    sent_bytes   = 0;
-    recv_packets = 0;
-    recv_bytes   = 0;
-}
-
-bool UDP::send(const void *data, int length, const Address &dest)
-{
-    int len = sendto(fd, data, length, 0, &dest.addr, dest.addr_len);
-
-    if (len > 0)
+    bool UDP::send(const void *data, int length, const Address &dest)
     {
-        sent_packets++;
-        sent_bytes += len;
+        int len = sendto(fd, data, length, 0, &dest.addr, dest.addr_len);
+
+        if (len > 0)
+        {
+            sent_packets++;
+            sent_bytes += len;
+        }
+
+        return (len == length);
     }
 
-    return (len == length);
-}
-
-int UDP::recv(void *data, int length, Address &src)
-{
-    src.addr_len = sizeof(src.addr);
-    int len      = recvfrom(fd, data, length, 0, &src.addr, &src.addr_len);
-
-    if (len > 0)
+    int UDP::recv(void *data, int length, Address &src)
     {
-        recv_packets++;
-        recv_bytes += len;
+        src.addr_len = sizeof(src.addr);
+        int len      = recvfrom(fd, data, length, 0, &src.addr, &src.addr_len);
+
+        if (len > 0)
+        {
+            recv_packets++;
+            recv_bytes += len;
+        }
+
+        return (len);
     }
 
-    return (len);
-}
+    bool UDP::wait(int timeout_ms) const
+    {
+        pollfd pfd;
+        pfd.fd      = fd;
+        pfd.events  = POLLIN;
+        pfd.revents = 0;
 
-bool UDP::wait(int timeout_ms) const
-{
-    pollfd pfd;
-    pfd.fd      = fd;
-    pfd.events  = POLLIN;
-    pfd.revents = 0;
-
-    return (poll(&pfd, 1, timeout_ms) == 1);
-}
+        return (poll(&pfd, 1, timeout_ms) == 1);
+    }
 
 };  // namespace Net
 
