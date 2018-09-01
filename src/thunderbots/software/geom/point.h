@@ -527,15 +527,15 @@ inline constexpr bool operator!=(const Point &p, const Point &q)
 // https://prateekvjoshi.com/2014/06/05/using-hash-function-in-c-for-user-defined-classes/
 namespace std
 {
-template <>
-struct hash<Point> final
-{
-    size_t operator()(const Point &p) const
+    template <>
+    struct hash<Point> final
     {
-        hash<double> h;
-        return h(p.x()) * 17 + h(p.y());
-    }
-};
+        size_t operator()(const Point &p) const
+        {
+            hash<double> h;
+            return h(p.x()) * 17 + h(p.y());
+        }
+    };
 }
 
 // Since we also use Points to represent 2D vectors, we also allow

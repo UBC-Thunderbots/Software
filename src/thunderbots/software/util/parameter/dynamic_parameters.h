@@ -9,25 +9,25 @@
  */
 namespace DynamicParameters
 {
-/**
- * Updates all known parameters with the latest values from the ROS Parameter Server
- */
-void updateAllParametersFromROSParameterServer();
+    /**
+     * Updates all known parameters with the latest values from the ROS Parameter Server
+     */
+    void updateAllParametersFromROSParameterServer();
 
-// These are currently placeholders to provide an example of how parameters are
-// created an initialized. Parameters can be organized in (nested) namespaces.
-const extern Parameter<int> param1;
+    // These are currently placeholders to provide an example of how parameters are
+    // created an initialized. Parameters can be organized in (nested) namespaces.
+    const extern Parameter<int> param1;
 
-namespace Navigator
-{
-const extern Parameter<double> param2;
-}
+    namespace Navigator
+    {
+        const extern Parameter<double> param2;
+    }
 
-namespace HL
-{
-namespace STP
-{
-const extern Parameter<std::vector<std::string>> param3;
-}
-}
+    namespace HL
+    {
+        namespace STP
+        {
+            const extern Parameter<std::vector<std::string>> param3;
+        }
+    }
 }

@@ -18,7 +18,7 @@ IndentCaseLabels: 'true'
 IndentWidth: '4'
 Language: Cpp
 MaxEmptyLinesToKeep: '3'
-NamespaceIndentation: None
+NamespaceIndentation: All
 ReflowComments: 'true'
 SortIncludes: 'true'
 Standard: Cpp11
