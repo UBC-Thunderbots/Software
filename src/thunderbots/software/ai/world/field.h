@@ -1,6 +1,7 @@
 #pragma once
 
 #include "geom/point.h"
+#include "geom/rect.h"
 #include "thunderbots_msgs/Field.h"
 
 /**
@@ -90,8 +91,8 @@ class Field
 
     /**
      * Gets the width of the defense area in metres, which runs along the y-axis. This is
-     * the total
-     * width of how far the defense area stretches from one side of the goal to the other.
+     * the total width of how far the defense area stretches from one side of the goal to
+     * the other.
      *
      * @return the width of the defense area
      */
@@ -99,11 +100,26 @@ class Field
 
     /**
      * Gets the length of the defense area in metres, which runs along the x-axis. This
-     * is how far the defense area extends in front of the goal
+     * is how far the defense area extends in front of the goal.
      *
      * @return the width of the straight parts in metres.
      */
     double defenseAreaLength() const;
+
+    /**
+     * Gets the friendly defense area as a Rect.
+     * 
+     * @return defense area of the friendly team
+     */
+    Rect friendlyDefenseArea() const;
+
+    /**
+     * Gets the enemy defense area as a Rect.
+     * 
+     * @return defense area of the enemy team
+     */
+    Rect enemyDefenseArea() const;
+
 
     /**
      * Gets the position of the centre of the friendly goal.

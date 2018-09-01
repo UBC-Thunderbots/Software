@@ -136,6 +136,11 @@ class Rect final
      */
     double distToBoundary(Point p);
 
+    constexpr bool operator==(const Rect& p) const
+    {
+        return this->min_corner == p.min_corner && this->diag == p.diag;
+    }
+
    private:
     Point min_corner;
     Point diag;

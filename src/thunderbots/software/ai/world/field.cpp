@@ -79,6 +79,18 @@ double Field::defenseAreaLength() const
     return defense_length_;
 }
 
+Rect Field::friendlyDefenseArea() const
+{
+    return Rect(Point(-field_length_ * 0.5, defense_width_ / 2.0),
+                Point(-field_length_ * 0.5 + defense_length_, -defense_width_ / 2.0));
+}
+
+Rect Field::enemyDefenseArea() const
+{
+    return Rect(Point(field_length_ * 0.5, defense_width_ / 2.0),
+                Point(field_length_ * 0.5 - defense_length_, -defense_width_ / 2.0));
+}
+
 double Field::centreCircleRadius() const
 {
     return center_circle_radius_;
