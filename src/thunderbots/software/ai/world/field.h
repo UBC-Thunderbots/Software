@@ -108,14 +108,14 @@ class Field
 
     /**
      * Gets the friendly defense area as a Rect.
-     * 
+     *
      * @return defense area of the friendly team
      */
     Rect friendlyDefenseArea() const;
 
     /**
      * Gets the enemy defense area as a Rect.
-     * 
+     *
      * @return defense area of the enemy team
      */
     Rect enemyDefenseArea() const;

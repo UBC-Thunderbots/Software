@@ -35,17 +35,17 @@ const Field &World::field()
     return field_;
 }
 
-const Ball &World::ball()
+const Ball &World::ball() const
 {
     return ball_;
 }
 
-const Team &World::friendly_team()
+const Team &World::friendly_team() const
 {
     return friendly_team_;
 }
 
-const Team &World::enemy_team()
+const Team &World::enemy_team() const
 {
     return enemy_team_;
 }

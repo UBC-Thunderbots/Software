@@ -1,5 +1,6 @@
 #include "rrt.h"
 #include "ai/intent/move_intent.h"
+#include "ai/navigator/obstacle.h"
 #include "ai/primitive/move_primitive.h"
 
 RRTNav::RRTNav()
@@ -18,22 +19,17 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
         if (intent->getIntentName() == MOVE_INTENT_NAME)
         {
             // TODO: Implement this
-            // https://github.com/UBC-Thunderbots/Software/issues/22
             // https://github.com/UBC-Thunderbots/Software/issues/23
             // Cast down to the MoveIntent class so we can access its members
             MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent);
 
-            /**
-             * process obstacles: 
-             * 1) Robots treated as circles with radius depending 
-             * on flags
-             * 
-             * 1b) Robots also have a Vector, in the direction of travel, with magnitude proportional to velocity
-             * 
-             * 2) Field boundaries marked as Rects
-             * 
-             * }
-             */
+            // Get vectors of robot obstacles
+            // TODO: do something with these for path planning
+            std::vector<RobotObstacle> friendly_obsts =
+                process_friendly_obstacles(world.friendly_team(), DEFAULT_AVOID_DIST);
+            std::vector<RobotObstacle> enemy_obsts =
+                process_enemy_obstacles(world.enemy_team(), DEFAULT_AVOID_DIST);
+
             std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), move_intent.getDestination(),
                 move_intent.getFinalAngle(), move_intent.getFinalSpeed());
