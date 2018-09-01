@@ -606,25 +606,25 @@ Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector 
 
 namespace
 {
-std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
-                                             const Vector &segA, const Vector &segB)
-{
-    std::vector<Vector> ans;
-    std::vector<Vector> poss = lineCircleIntersect(centre, radius, segA, segB);
-
-    for (Vector i : poss)
+    std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
+                                                 const Vector &segA, const Vector &segB)
     {
-        bool x_ok = i.x() <= std::max(segA.x(), segB.x()) + EPS &&
-                    i.x() >= std::min(segA.x(), segB.x()) - EPS;
-        bool y_ok = i.y() <= std::max(segA.y(), segB.y()) + EPS &&
-                    i.y() >= std::min(segA.y(), segB.y()) - EPS;
-        if (x_ok && y_ok)
+        std::vector<Vector> ans;
+        std::vector<Vector> poss = lineCircleIntersect(centre, radius, segA, segB);
+
+        for (Vector i : poss)
         {
-            ans.push_back(i);
+            bool x_ok = i.x() <= std::max(segA.x(), segB.x()) + EPS &&
+                        i.x() >= std::min(segA.x(), segB.x()) - EPS;
+            bool y_ok = i.y() <= std::max(segA.y(), segB.y()) + EPS &&
+                        i.y() >= std::min(segA.y(), segB.y()) - EPS;
+            if (x_ok && y_ok)
+            {
+                ans.push_back(i);
+            }
         }
+        return ans;
     }
-    return ans;
-}
 }
 
 bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
