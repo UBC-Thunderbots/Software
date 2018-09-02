@@ -1,6 +1,6 @@
 #include "rrt.h"
 #include "ai/intent/move_intent.h"
-#include "ai/navigator/obstacle.h"
+#include "ai/navigator/RobotObstacle.h"
 #include "ai/primitive/move_primitive.h"
 
 RRTNav::RRTNav()
@@ -26,9 +26,9 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
             // Get vectors of robot obstacles
             // TODO: do something with these for path planning
             std::vector<RobotObstacle> friendly_obsts =
-                process_friendly_obstacles(world.friendly_team(), DEFAULT_AVOID_DIST);
+                generate_friendly_obstacles(world.friendly_team(), DynamicParameters::Navigator::default_avoid_dist.value());
             std::vector<RobotObstacle> enemy_obsts =
-                process_enemy_obstacles(world.enemy_team(), DEFAULT_AVOID_DIST);
+                generate_enemy_obstacles(world.enemy_team(), DynamicParameters::Navigator::default_avoid_dist.value());
 
             std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), move_intent.getDestination(),

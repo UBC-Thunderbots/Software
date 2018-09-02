@@ -18,7 +18,12 @@ namespace DynamicParameters
 
     namespace Navigator
     {
-        const Parameter<double> param2("/thunderbots/parameters/param2", 55.0);
+        // Default avoid distance around robots.
+        const Parameter<double> default_avoid_dist("/thunderbots/parameters/default_avoid_dist", 0.15);
+
+        // Scaling factor for collision avoidance.
+        // TODO this is arbitrary for now
+        const Parameter<double> collision_avoid_velocity_scale("/thunderbots/parameters/collision_avoid_velocity_scale", 2.0);
     }
 
     namespace HL

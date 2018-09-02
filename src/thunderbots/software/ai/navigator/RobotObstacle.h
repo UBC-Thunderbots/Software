@@ -2,8 +2,7 @@
 
 #include "geom/util.h"
 #include "ai/world/world.h"
-
-constexpr double DEFAULT_AVOID_DIST = 0.15;  // meters
+#include "util/parameter/dynamic_parameters.h"
 
 class RobotObstacle
 {
@@ -11,41 +10,42 @@ class RobotObstacle
     /**
      * Constructor.
      *
-     * @param r Robot to create obstacle from.
+     * @param robot Robot to create obstacle from.
+     * @param avoid_dist Distance to avoid obstacle by.
      */
-    RobotObstacle(Robot& r, double avoid_dist);
+    RobotObstacle(Robot& robot, double avoid_dist);
 
     /**
      * Returns the violation distance of the given point inside the obstacle
      * boundary; 0.0 if no violation.
      *
-     * @param p point to check if violating
+     * @param point point to check if violating
      *
      * @return Violation distance, defined as distance from the nearest boundary
      *         to the given point; 0.0 if no violation occured.
      */
-    double getViolation(Point& p);
+    double getViolation(const Point& point);
 
     /**
      * Returns the closest Point on the obstacle boundary to the given Point that
      * is not inside the boundary. If the given Point does not violate the boundary,
      * the given Point will be returned.
      *
-     * @param p Point to check for
+     * @param point Point to check for
      * @return A point on the boundary nearest to p if p violates the boundary, otherwise
      *         returns p
      */
-    Point getNearestValidPoint(Point& p);
+    Point getNearestValidPoint(const Point& point);
 
     /**
      * TODO: This function may have to be rewritten depending on our needs later.
      * Checks if the given Robot will collide with the obstacle based on the current
      * velocities.
      *
-     * @param r Robot to check against.
+     * @param robot Robot to check against.
      * @return true if collision possible, false otherwise.
      */
-    bool willCollide(Robot& r);
+    bool willCollide(Robot& robot);
 
    private:
     /**
@@ -59,10 +59,6 @@ class RobotObstacle
      * proportional to current velocity. Used for collision avoidance.
      */
     Seg velocity;
-
-    // Scaling factor for collision avoidance.
-    // TODO this is arbitrary for now
-    static constexpr double DEFAULT_VELOCITY_SCALE = 2.0;
 };
 
 /**
@@ -73,7 +69,7 @@ class RobotObstacle
  *
  * @return Vector of all friendly robots as RobotObstacles.
  */
-std::vector<RobotObstacle> process_friendly_obstacles(const Team& friendly_team,
+std::vector<RobotObstacle> generate_friendly_obstacles(const Team& friendly_team,
                                                       double avoid_dist);
 
 /**
@@ -84,5 +80,5 @@ std::vector<RobotObstacle> process_friendly_obstacles(const Team& friendly_team,
  *
  * @return Vector of all enemy robots as RobotObstacles.
  */
-std::vector<RobotObstacle> process_enemy_obstacles(const Team& enemy_team,
+std::vector<RobotObstacle> generate_enemy_obstacles(const Team& enemy_team,
                                                    double avoid_dist);
