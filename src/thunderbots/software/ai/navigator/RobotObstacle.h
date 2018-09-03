@@ -1,7 +1,7 @@
 #pragma once
 
-#include "geom/util.h"
 #include "ai/world/world.h"
+#include "geom/util.h"
 #include "util/parameter/dynamic_parameters.h"
 
 class RobotObstacle
@@ -24,7 +24,7 @@ class RobotObstacle
      * @return Violation distance, defined as distance from the nearest boundary
      *         to the given point; 0.0 if no violation occured.
      */
-    double getViolation(const Point& point);
+    double getViolationDistance(const Point& point);
 
     /**
      * Returns the closest Point on the obstacle boundary to the given Point that
@@ -38,7 +38,9 @@ class RobotObstacle
     Point getNearestValidPoint(const Point& point);
 
     /**
-     * TODO: This function may have to be rewritten depending on our needs later.
+     * TODO: This function may have to be rewritten depending on our needs later,
+     * as part of #23:  https://github.com/UBC-Thunderbots/Software/issues/23
+     * 
      * Checks if the given Robot will collide with the obstacle based on the current
      * velocities.
      *
@@ -70,7 +72,7 @@ class RobotObstacle
  * @return Vector of all friendly robots as RobotObstacles.
  */
 std::vector<RobotObstacle> generate_friendly_obstacles(const Team& friendly_team,
-                                                      double avoid_dist);
+                                                       double avoid_dist);
 
 /**
  * Creates RobotObstacles around the enemy team robots.
@@ -81,4 +83,4 @@ std::vector<RobotObstacle> generate_friendly_obstacles(const Team& friendly_team
  * @return Vector of all enemy robots as RobotObstacles.
  */
 std::vector<RobotObstacle> generate_enemy_obstacles(const Team& enemy_team,
-                                                   double avoid_dist);
+                                                    double avoid_dist);

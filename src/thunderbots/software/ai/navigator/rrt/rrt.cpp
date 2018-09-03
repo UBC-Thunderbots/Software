@@ -25,10 +25,12 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
 
             // Get vectors of robot obstacles
             // TODO: do something with these for path planning
-            std::vector<RobotObstacle> friendly_obsts =
-                generate_friendly_obstacles(world.friendly_team(), DynamicParameters::Navigator::default_avoid_dist.value());
-            std::vector<RobotObstacle> enemy_obsts =
-                generate_enemy_obstacles(world.enemy_team(), DynamicParameters::Navigator::default_avoid_dist.value());
+            std::vector<RobotObstacle> friendly_obsts = generate_friendly_obstacles(
+                world.friendly_team(),
+                DynamicParameters::Navigator::default_avoid_dist.value());
+            std::vector<RobotObstacle> enemy_obsts = generate_enemy_obstacles(
+                world.enemy_team(),
+                DynamicParameters::Navigator::default_avoid_dist.value());
 
             std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), move_intent.getDestination(),
