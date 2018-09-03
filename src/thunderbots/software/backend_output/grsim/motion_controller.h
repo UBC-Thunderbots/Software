@@ -2,7 +2,9 @@
 // Created by evan on 18/08/18.
 //
 
-#ifndef SOFTWARE_MOTION_CONTROLLER_H
-#define SOFTWARE_MOTION_CONTROLLER_H
+#pragma once
 
-#endif //SOFTWARE_MOTION_CONTROLLER_H
+Point grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed);
+
+
+

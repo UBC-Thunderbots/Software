@@ -4,6 +4,7 @@
 #include "ai/primitive/move_primitive.h"
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"
+#include "motion_controller.h"
 
 using namespace boost::asio;
 
@@ -58,7 +59,9 @@ void GrSimBackend::sendPrimitives(
 {
     // TODO: Implement this
     // https://github.com/UBC-Thunderbots/Software/issues/21
+
     grSim_Packet grsim_packet =
         createGrSimPacket(0, YELLOW, Point(0.5, -0.1), Angle::ofRadians(-0.8));
+
     sendGrSimPacket(grsim_packet);
 }
