@@ -40,7 +40,7 @@ class RobotObstacle
     /**
      * TODO: This function may have to be rewritten depending on our needs later,
      * as part of #23:  https://github.com/UBC-Thunderbots/Software/issues/23
-     * 
+     *
      * Checks if the given Robot will collide with the obstacle based on the current
      * velocities.
      *

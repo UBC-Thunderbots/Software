@@ -1,6 +1,5 @@
 #include "RobotObstacle.h"
 #include "shared/constants.h"
-#include "geom/angle.h"
 
 using namespace DynamicParameters::Navigator;
 
