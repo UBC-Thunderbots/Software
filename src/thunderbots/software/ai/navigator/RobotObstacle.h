@@ -13,7 +13,7 @@ class RobotObstacle
      * @param robot Robot to create obstacle from.
      * @param avoid_dist Distance to avoid obstacle by.
      */
-    RobotObstacle(Robot& robot, double avoid_dist);
+    RobotObstacle(const Robot& robot, double avoid_dist);
 
     /**
      * Returns the violation distance of the given point inside the obstacle
@@ -47,7 +47,7 @@ class RobotObstacle
      * @param robot Robot to check against.
      * @return true if collision possible, false otherwise.
      */
-    bool willCollide(Robot& robot);
+    bool willCollide(const Robot& robot);
 
    private:
     /**

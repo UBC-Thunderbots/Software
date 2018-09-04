@@ -3,7 +3,7 @@
 
 using namespace DynamicParameters::Navigator;
 
-RobotObstacle::RobotObstacle(Robot& robot, double avoid_dist)
+RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
 {
     boundary = Circle(robot.position(), avoid_dist + ROBOT_MAX_RADIUS);
     velocity =
@@ -28,7 +28,7 @@ Point RobotObstacle::getNearestValidPoint(const Point& point)
     return point;
 }
 
-bool RobotObstacle::willCollide(Robot& robot)
+bool RobotObstacle::willCollide(const Robot& robot)
 {
     RobotObstacle other = RobotObstacle(robot, default_avoid_dist.value());
     return dist(velocity, other.velocity) < default_avoid_dist.value();
