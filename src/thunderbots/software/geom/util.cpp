@@ -21,6 +21,7 @@ double dist(const Vector &first, const Vector &second)
 {
     return (first - second).len();
 }
+
 double dist(const Seg &first, const Seg &second)
 {
     if (intersects(first, second))

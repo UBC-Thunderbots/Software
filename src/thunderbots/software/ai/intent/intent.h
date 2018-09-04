@@ -2,6 +2,7 @@
 
 #include <string>
 
+// TODO: should this be an enum instead?
 const static std::string MOVE_INTENT_NAME = "Move Intent";
 
 /**
