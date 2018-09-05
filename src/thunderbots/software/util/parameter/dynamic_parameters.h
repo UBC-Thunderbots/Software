@@ -20,7 +20,8 @@ namespace DynamicParameters
 
     namespace Navigator
     {
-        const extern Parameter<double> param2;
+        const extern Parameter<double> default_avoid_dist;
+        const extern Parameter<double> collision_avoid_velocity_scale;
     }
 
     namespace HL

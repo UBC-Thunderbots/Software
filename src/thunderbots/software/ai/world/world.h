@@ -74,21 +74,21 @@ class World final
      *
      * @return a const reference to the Ball in the world
      */
-    const Ball& ball();
+    const Ball& ball() const;
 
     /**
      * Returns a const reference to the Friendly Team in the world
      *
      * @return a const reference to the Friendly Team in the world
      */
-    const Team& friendly_team();
+    const Team& friendly_team() const;
 
     /**
      * Returns a const reference to the Enemy Team in the world
      *
      * @return a const reference to the Enemy Team in the world
      */
-    const Team& enemy_team();
+    const Team& enemy_team() const;
 
    private:
     Field field_;
