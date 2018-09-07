@@ -4,7 +4,10 @@
 
 #pragma once
 
-Point grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed);
+#include "util/constants.h"
+
+
+Point grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun);
 
 
 

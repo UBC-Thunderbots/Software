@@ -28,10 +28,16 @@ class MovePrimitive : public Primitive
      */
     explicit MovePrimitive(const thunderbots_msgs::Primitive &primtiive_msg);
 
-    std::string getPrimitiveName() const override;
+    std::string getPrimitiveName() const;
 
-    unsigned int getRobotId() const override;
+    unsigned int getRobotId() const;
+    
+    Point getDestination() const;
 
+    Angle getFinalAngle() const;
+
+    double getFinalSpeed() const;
+    
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;

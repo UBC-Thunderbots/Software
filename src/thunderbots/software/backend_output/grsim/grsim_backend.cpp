@@ -54,11 +54,23 @@ void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
         remote_endpoint, 0, err);
 }
 
-void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives)
+//void GrSimBackend::sendPrimitives(
+//    const std::vector<std::unique_ptr<Primitive>>& primitives)
+
+void GrSimBackend::sendPrimitives( const std::vector< std::pair< std::unique_ptr<Primitive >, Robot >& primsAndRobots) // needs a final robot speed, robot orientation, and destination
 {
     // TODO: Implement this
     // https://github.com/UBC-Thunderbots/Software/issues/21
+    std::vector<grSim_Packet> grsim_packets;
+
+    std::pair< Vector, double> robotVelocities;
+
+    for (auto robotPrimPair : primsAndRobots) {
+
+        //robotVelocities = grSim_bang_bang(primsAndRobots.second, primsAndRobots.first->getDestination(), primsAndRobots.second->getFinalSpeed());
+
+        //createGrSimPacket(robotPrimPair.second.id(), YELLOW, robotVelocities.first, robotVelocities.second );
+    }
 
     grSim_Packet grsim_packet =
         createGrSimPacket(0, YELLOW, Point(0.5, -0.1), Angle::ofRadians(-0.8));

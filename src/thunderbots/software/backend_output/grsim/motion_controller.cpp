@@ -10,20 +10,18 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include "shared/constants.h"
 
-
-// need to determine these values from experimentation with real robots
-const double ROBOT_MAX_ACCELERATION  = 3; // [m/s^2]
-const double ROBOT_MAX_ANG_ACCELERATION = 3; // [rad/s^2]
-
-std::pair<Vector2, Double> grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun) {
+std::pair<Vector, double> grSim_bang_bang(Robot& robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun) {
 
     // pair to hold the X/Y velocities and angular velocity of the robot to send to GrSim
-    std::pair <Vector2, double> robotSpeeds;
+    std::pair <Vector, double> robotSpeeds;
 
     double acceleration;
     double timeToDest;
 
+    bool bCanStopInTime;
+    bool bCanStopRotateInTime;
 
     // calculate the current time (will be used to calculate the time step since the last time the motion controller was run)
     const double currentTime = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
@@ -35,12 +33,12 @@ std::pair<Vector2, Double> grSim_bang_bang(Robot robot, Point dest, double desir
     // calculates robot angle based on unit vector that points from the robot location to the destination (used to calculate the X/Y velocity magnitudes
     Angle directionAngle = (dest - robot.position()).norm().orientation();
 
-    double angleToDest = (robot.orientation().toRadians() - desiredFinalOrientation);
+    double angleToDest = (robot.orientation().toRadians() - desiredFinalOrientation.toRadians());
 
     // calculate the expected speed at the destination based on current speed and acceleration
     // Vf = sqrt( Vi^2 - 2*a*d)
-    double expectedFinalSpeed = sqrt(  pow(robot.velocity(), 2) - 2*ROBOT_MAX_ACCELERATION*distanceToDest );
-    double expectedFinalAngSpeed = sqrt( pow(robot.angularVelocity(), 2) - 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest );
+    double expectedFinalSpeed = sqrt(  pow(robot.velocity().len(), 2) - 2*ROBOT_MAX_ACCELERATION*distanceToDest );
+    double expectedFinalAngSpeed = sqrt( pow(robot.angularVelocity().toRadians() , 2) - 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest );
 
 
     // variables used to hold the change in velocities based on the maximum acceleration and the change in time since the last motion controller run
@@ -90,11 +88,11 @@ std::pair<Vector2, Double> grSim_bang_bang(Robot robot, Point dest, double desir
 
     // if the robot can't stop rotating in time then angular decelerate
     else {
-        deltaAngylarSpeed = -(ROBOT_MAX_ANG_ACCELERATION*deltaTime);
+        deltaAngularSpeed = -(ROBOT_MAX_ANG_ACCELERATION*deltaTime);
     }
 
-    const Vector2 robotXYVelocities = (robot.velocity().x + deltaSpeedX, robot.velocity().y + deltaSpeedY); // calculate new X/Y/ang velocities based on the current robot speeds and delta speeds
-    const double robotAngularVelocity = Angle::of_radians(robot.avelocity()) + deltaAngularSpeed;
+    const Vector robotXYVelocities = Point(robot.velocity().x() + deltaSpeedX, robot.velocity().y() + deltaSpeedY); // calculate new X/Y/ang velocities based on the current robot speeds and delta speeds
+    const double robotAngularVelocity = (robot.angularVelocity().toRadians() ) + deltaAngularSpeed;
 
 
 
