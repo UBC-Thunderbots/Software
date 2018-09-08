@@ -13,6 +13,20 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
     std::vector<std::unique_ptr<Primitive>> assigned_primitives =
         std::vector<std::unique_ptr<Primitive>>();
 
+    // Get vectors of robot obstacles
+    // TODO: do something with these for path planning
+    std::vector<RobotObstacle> friendly_obsts = generate_friendly_obstacles(
+        world.friendly_team(),
+        DynamicParameters::Navigator::default_avoid_dist.value());
+    std::vector<RobotObstacle> enemy_obsts = generate_enemy_obstacles(
+        world.enemy_team(),
+        DynamicParameters::Navigator::default_avoid_dist.value());
+
+    std::vector<RobotObstacle> all_obsts;
+	all_obsts.reserve(friendly_obsts.size() + enemy_obsts.size());
+	all_obsts.insert( all_obsts.end(), friendly_obsts.begin(), friendly_obsts.end() );
+	all_obsts.insert( all_obsts.end(), enemy_obsts.begin(), enemy_obsts.end() );
+
     // Hand the different types of Intents here
     for (const auto &intent : assignedIntents)
     {
@@ -23,18 +37,58 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
             // Cast down to the MoveIntent class so we can access its members
             MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent);
 
-            // Get vectors of robot obstacles
-            // TODO: do something with these for path planning
-            std::vector<RobotObstacle> friendly_obsts = generate_friendly_obstacles(
-                world.friendly_team(),
-                DynamicParameters::Navigator::default_avoid_dist.value());
-            std::vector<RobotObstacle> enemy_obsts = generate_enemy_obstacles(
-                world.enemy_team(),
-                DynamicParameters::Navigator::default_avoid_dist.value());
+			std::optional<Robot> r = world.friendly_team().getRobotById(move_intent.getRobotId());
+			assert(r!=std::nullopt);
+			Point currPos = r->position();
+			Point destPos = move_intent.getDestination();
+			double angleToDest = atan2(currPos.y(), currPos.x());
+			if ((destPos-currPos).len()<stepSize){
+				continue;
+			}
+
+			//Use simple bug pathfinding algorithm and no collision detection
+			//counter clockwise bias
+			Point stepPoint(stepSize * cos(angleToDest), stepSize * sin(angleToDest));
+
+			//TODO: refactor into function
+			bool goodPoint = true;
+			bool cc = true;
+			double angleShift = 0;
+			Point nextStepPoint = stepPoint;
+			do{
+				goodPoint = true;
+				stepPoint = nextStepPoint;
+				//TODO: define all_obsts from friendly and enemy obsts
+				for (const auto ro: all_obsts){
+    				if(ro.getViolationDistance(stepPoint)!=0.0){
+						goodPoint = false;
+						break;
+					}
+				}
+				angleShift += angleStep;
+				if (angleShift>180){
+					break;
+				}
+				if (cc){
+					nextStepPoint.set(stepSize * cos(angleToDest + angleShift), stepSize * sin(angleToDest + angleShift));
+					cc = false;
+				}else{
+					nextStepPoint.set(stepSize * cos(angleToDest - angleShift), stepSize * sin(angleToDest - angleShift));
+					cc = true;
+				}
+			} while (!goodPoint);
+
 
             std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), move_intent.getDestination(),
+                move_intent.getRobotId(), stepPoint,
                 move_intent.getFinalAngle(), move_intent.getFinalSpeed());
+
+			if (angleShift>180){
+				//no path forward
+            	std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
+            	    move_intent.getRobotId(), currPos,
+            	    move_intent.getFinalAngle(), 0);
+			}
 
             assigned_primitives.emplace_back(std::move(move_prim));
         }

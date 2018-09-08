@@ -14,4 +14,8 @@ class RRTNav : public Navigator
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) const override;
+
+   private:
+	double stepSize = 0.01; //1 cm
+	double angleStep = 0.26; //15deg in rad
 };
