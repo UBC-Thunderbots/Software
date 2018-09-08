@@ -35,7 +35,7 @@ set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
 # Create a list of files from the shared folder
-file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
@@ -187,5 +187,12 @@ if (CATKIN_ENABLE_TESTING)
             geom/shapes.h)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(shared_util_test
+            ../shared/test/util.cpp
+            ../shared/util.c
+            ../shared/util.h)
+
+    target_link_libraries(shared_util_test ${catkin_LIBRARIES})
 
 endif()
