@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
 #include <limits>
-extern "C"
-{
-#include "../util.h"
+extern "C" {
 #include "../constants.h"
+#include "../util.h"
 }
 
 constexpr double EPS = 1e-6;

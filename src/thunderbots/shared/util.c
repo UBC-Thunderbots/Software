@@ -18,9 +18,8 @@ Vector2D toLocalCoords(Vector2D point, float orientationAngle)
 
     // rotation matrix copy-pasted from physbot.c in firmware
     Vector2D rotationMatrix[2] = {
-            {.x = cosf(orientationAngle), .y = sinf(orientationAngle)},
-            {.x = cosf(orientationAngle + P_PI / 2), .y = sinf(orientationAngle + P_PI / 2)}
-    };
+        {.x = cosf(orientationAngle), .y = sinf(orientationAngle)},
+        {.x = cosf(orientationAngle + P_PI / 2), .y = sinf(orientationAngle + P_PI / 2)}};
 
     // multiply global point by rotation matrix
     result.x = dot2D(rotationMatrix[0], point);
