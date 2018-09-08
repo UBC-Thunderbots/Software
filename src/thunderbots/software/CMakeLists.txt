@@ -34,14 +34,6 @@ set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
 # Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
-# Create a list of files from the shared folder
-file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
-        )
-
-
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
         roscpp

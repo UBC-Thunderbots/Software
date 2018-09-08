@@ -9,4 +9,13 @@
 cmake_minimum_required(VERSION 3.8.2)
 project(thunderbots_all)
 
+# Create a list of files from the shared folder
+# This is put at top level since shared files may be used across software and firmware. Removes need for relative paths
+# (i.e. paths with .. in them)
+file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/shared/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/shared/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/shared/*.h
+        )
+
 add_subdirectory(software)
