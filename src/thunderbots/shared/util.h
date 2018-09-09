@@ -22,15 +22,15 @@ float dot2D(Vector2D first, Vector2D second);
  * robot's position, the x-axis is along the orientation of the robot, and
  * the y-axis is perpendicular to the x-axis
  *
- * @param robotPosition the position of the robot
+ * @param robot_position the position of the robot
+ *
+ * @param robot_orientation the orientation of the robot in radians, where 0 is direction
+ * of global positive x-axis
  *
  * @param point the point, in global coordinates, to be converted to robot-local
  * coordinates
  *
- * @param orientationAngle the orientation of the robot in radians, where 0 is direction
- * of global positive x-axis
- *
  * @return the input point, in coordinates relative to robotPosition and orientationAngle
  */
-Vector2D toRobotLocalCoords(Vector2D robotPosition, Vector2D point,
-                            float orientationAngle);
+Vector2D toRobotLocalCoords(Vector2D robot_position, float robot_orientation,
+                            Vector2D point);
