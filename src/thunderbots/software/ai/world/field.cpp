@@ -1,4 +1,4 @@
-#include "field.h"
+#include "ai/world/field.h"
 
 Field::Field()
     : valid_(false),
@@ -24,10 +24,21 @@ void Field::updateDimensions(thunderbots_msgs::Field new_field_msg)
     center_circle_radius_ = new_field_msg.center_circle_radius;
 }
 
-void Field::updateDimensions(double field_length, double field_width,
+void Field::updateDimensions(const Field &new_field_data)
+{
+    valid_                = true;
+    field_length_         = new_field_data.length();
+    field_width_          = new_field_data.width();
+    goal_width_           = new_field_data.goalWidth();
+    defense_width_        = new_field_data.defenseAreaWidth();
+    defense_length_       = new_field_data.defenseAreaLength();
+    boundary_width_       = new_field_data.boundaryWidth();
+    center_circle_radius_ = new_field_data.centreCircleRadius();
+}
+
+void Field::updateDimensions(double field_length, double field_width, double goal_width,
                              double defense_length, double defense_width,
-                             double goal_width, double boundary_width,
-                             double center_circle_radius)
+                             double boundary_width, double center_circle_radius)
 {
     valid_                = true;
     field_length_         = field_length;
@@ -138,22 +149,22 @@ Point Field::enemyCornerNeg() const
 
 Point Field::friendlyGoalpostPos() const
 {
-    return Point(friendlyGoal().x(), defenseAreaWidth() / 2.0);
+    return Point(friendlyGoal().x(), goalWidth() / 2.0);
 }
 
 Point Field::friendlyGoalpostNeg() const
 {
-    return Point(friendlyGoal().x(), -defenseAreaWidth() / 2.0);
+    return Point(friendlyGoal().x(), -goalWidth() / 2.0);
 }
 
 Point Field::enemyGoalpostPos() const
 {
-    return Point(enemyGoal().x(), defenseAreaWidth() / 2.0);
+    return Point(enemyGoal().x(), goalWidth() / 2.0);
 }
 
 Point Field::enemyGoalpostNeg() const
 {
-    return Point(enemyGoal().x(), -defenseAreaWidth() / 2.0);
+    return Point(enemyGoal().x(), -goalWidth() / 2.0);
 }
 
 std::pair<Point, Point> Field::friendlyGoalposts() const

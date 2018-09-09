@@ -24,6 +24,14 @@ class Field
     void updateDimensions(thunderbots_msgs::Field new_field_msg);
 
     /**
+     * Updates the dimensions of the field given a new field object. All dimensions should
+     * be in metres.
+     *
+     * @param new_field_data A field containing the new field information
+     */
+    void updateDimensions(const Field &new_field_data);
+
+    /**
      * Updates the dimensions of the field. All units should be in metres.
      *
      * @param field_length the length of the playing area (along the x-axis)

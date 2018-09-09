@@ -25,22 +25,22 @@ TEST(FieldTest, update_and_accessors)
     double boundary_width       = 0.3;
     double center_circle_radius = 0.5;
 
-    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
+    field.updateDimensions(length, width, goal_width, defense_length, defense_width,
                            boundary_width, center_circle_radius);
 
     EXPECT_TRUE(field.valid());
 
     EXPECT_DOUBLE_EQ(9.6, field.totalLength());
     EXPECT_DOUBLE_EQ(6.6, field.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, boundary_width);
+    EXPECT_DOUBLE_EQ(0.3, field.boundaryWidth());
 
     EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoal());
     EXPECT_EQ(Point(4.5, 0.0), field.enemyGoal());
 
-    EXPECT_EQ(Point(-4.5, 1.0), field.friendlyGoalpostPos());
-    EXPECT_EQ(Point(-4.5, -1.0), field.friendlyGoalpostNeg());
-    EXPECT_EQ(Point(4.5, 1.0), field.enemyGoalpostPos());
-    EXPECT_EQ(Point(4.5, -1.0), field.enemyGoalpostNeg());
+    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
+    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
+    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
+    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
 
     EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)), field.friendlyDefenseArea());
     EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
@@ -74,6 +74,8 @@ TEST(FieldTest, equality_operators)
     field_other.updateDimensions(length, width, goal_width, defense_length, defense_width,
                                  boundary_width, center_circle_radius);
 
+    // field and field_other have been updated with the same dimensions, so
+    // should be equal
     EXPECT_EQ(invalid_field, invalid_field);
     EXPECT_NE(invalid_field, field);
     EXPECT_NE(invalid_field, field_other);

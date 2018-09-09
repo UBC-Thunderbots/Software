@@ -162,7 +162,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(field_test
-            test/field/field.cpp
+            test/world/field.cpp
             ai/world/field.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
@@ -187,5 +187,68 @@ if (CATKIN_ENABLE_TESTING)
             geom/shapes.h)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(robot_test
+            test/world/robot.cpp
+            ai/world/robot.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(robot_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(team_test
+            test/world/team.cpp
+            ai/world/team.cpp
+            ai/world/robot.cpp
+            util/timestamp.h
+            util/parameter/dynamic_parameters.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(team_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(ball_test
+            test/world/ball.cpp
+            ai/world/ball.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ball_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(world_test
+            test/world/world.cpp
+            test/test_util/util.cpp
+            ai/world/world.h
+            ai/world/world.cpp
+            ai/world/ball.h
+            ai/world/ball.cpp
+            ai/world/field.h
+            ai/world/field.cpp
+            ai/world/robot.h
+            ai/world/robot.cpp
+            ai/world/team.h
+            ai/world/team.cpp
+            util/parameter/dynamic_parameters.cpp)
+
+    target_link_libraries(world_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(unit_test_util_test
+            test/test_util/test_util.cpp
+            test/test_util/util.cpp
+            test/test_util/util.h
+            ai/world/world.h
+            ai/world/world.cpp
+            ai/world/ball.h
+            ai/world/ball.cpp
+            ai/world/field.h
+            ai/world/field.cpp
+            ai/world/robot.h
+            ai/world/robot.cpp
+            ai/world/team.h
+            ai/world/team.cpp
+            util/parameter/dynamic_parameters.cpp)
+
+    target_link_libraries(unit_test_util_test ${catkin_LIBRARIES})
+
 
 endif()

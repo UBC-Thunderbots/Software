@@ -10,7 +10,12 @@ void Ball::update(const thunderbots_msgs::Ball &ball_msg)
     velocity_ = Vector(ball_msg.velocity.x, ball_msg.velocity.y);
 }
 
-void Ball::update(Point &new_position, Vector &new_velocity)
+void Ball::update(const Ball &new_ball_data)
+{
+    update(new_ball_data.position(), new_ball_data.velocity());
+}
+
+void Ball::update(const Point &new_position, const Vector &new_velocity)
 {
     position_ = new_position;
     velocity_ = new_velocity;
@@ -24,4 +29,14 @@ Point Ball::position(double time_delta) const
 Vector Ball::velocity(double time_delta) const
 {
     return velocity_;
+}
+
+bool Ball::operator==(const Ball &other) const
+{
+    return this->position_ == other.position_ && this->velocity_ == other.velocity_;
+}
+
+bool Ball::operator!=(const Ball &other) const
+{
+    return !(*this == other);
 }
