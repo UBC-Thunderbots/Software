@@ -39,12 +39,26 @@ class World final
     void updateFieldGeometry(const thunderbots_msgs::Field& new_field_msg);
 
     /**
+     * Update the geometry of the Field in the world
+     *
+     * @param new_field_data A Field containing the new field geometry
+     */
+    void updateFieldGeometry(const Field& new_field_data);
+
+    /**
      * Given a message containing new ball state, updates the state of the ball
      * in the world
      *
      * @param new_ball_msg The message containing new ball information
      */
     void updateBallState(const thunderbots_msgs::Ball& new_ball_msg);
+
+    /**
+     * Epdates the state of the ball in the world
+     *
+     * @param new_ball_data A Ball containing new ball information
+     */
+    void updateBallState(const Ball& new_ball_data);
 
     /**
      * Given a message containing new information about the friendly team, updates
@@ -55,6 +69,13 @@ class World final
     void updateFriendlyTeam(const thunderbots_msgs::Team& new_friendly_team_msg);
 
     /**
+     * Updates the state of the friendly team in the world
+     *
+     * @param new_friendly_team_data A Team containing new friendly team information
+     */
+    void updateFriendlyTeam(const Team& new_friendly_team_data);
+
+    /**
      * Given a message containing new information about the enemy team, updates
      * the state of the enemy team in the world
      *
@@ -63,11 +84,28 @@ class World final
     void updateEnemyTeam(const thunderbots_msgs::Team& new_enemy_team_msg);
 
     /**
+     * Updates the state of the enemy team in the world
+     *
+     * @param new_enemy_team_data A Team containing new enemy team information
+     */
+    void updateEnemyTeam(const Team& new_enemy_team_data);
+
+    /**
+     * Removes all Robots from the friendly team.
+     */
+    void clearFriendlyTeamRobots();
+
+    /**
+     * Removes all Robots from the enemy team
+     */
+    void clearEnemyTeamRobots();
+
+    /**
      * Returns a const reference to the Field in the world
      *
      * @return a const reference to the Field in the world
      */
-    const Field& field();
+    const Field& field() const;
 
     /**
      * Returns a const reference to the Ball in the world
