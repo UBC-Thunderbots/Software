@@ -4,9 +4,6 @@
 // and firmware code. Since this needs to be compiled by both C and C++, everything
 // should be defined in a way that's compatible with C.
 
-// define our own PI value here that is a float because M_PI in math.h is a double
-#define P_PI 3.14159265f
-
 /* Game Rules */
 // The max allowed speed of the ball, in metres per second
 const double BALL_MAX_SPEED = 6.5;

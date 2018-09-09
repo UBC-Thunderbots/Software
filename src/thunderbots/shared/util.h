@@ -3,7 +3,7 @@
 
 typedef struct
 {
-    float x, y;
+    double x, y;
 } Vector2D;
 
 /**
@@ -15,7 +15,7 @@ typedef struct
  *
  * @return the dot product of first and second
  */
-float dot2D(Vector2D first, Vector2D second);
+double dot2D(Vector2D first, Vector2D second);
 
 /**
  * Find a point in a robot's local coordinates, where the origin is the
@@ -32,5 +32,5 @@ float dot2D(Vector2D first, Vector2D second);
  *
  * @return the input point, in coordinates relative to robotPosition and orientationAngle
  */
-Vector2D toRobotLocalCoords(Vector2D robot_position, float robot_orientation,
+Vector2D toRobotLocalCoords(Vector2D robot_position, double robot_orientation,
                             Vector2D point);
