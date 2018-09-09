@@ -6,8 +6,12 @@ float dot2D(Vector2D first, Vector2D second)
     return first.x * second.x + first.y * second.y;
 }
 
-Vector2D toLocalCoords(Vector2D point, float orientationAngle)
+Vector2D toRobotLocalCoords(Vector2D robotPosition, Vector2D point,
+                            float orientationAngle)
 {
+    Vector2D relativePoint = {.x = point.x - robotPosition.x,
+                              .y = point.y - robotPosition.y};
+
     Vector2D result = {.x = 0.0f, .y = 0.0f};
 
     // clamp angle to [0, 2 * pi]
@@ -22,8 +26,8 @@ Vector2D toLocalCoords(Vector2D point, float orientationAngle)
         {.x = cosf(orientationAngle + P_PI / 2), .y = sinf(orientationAngle + P_PI / 2)}};
 
     // multiply global point by rotation matrix
-    result.x = dot2D(rotationMatrix[0], point);
-    result.y = dot2D(rotationMatrix[1], point);
+    result.x = dot2D(rotationMatrix[0], relativePoint);
+    result.y = dot2D(rotationMatrix[1], relativePoint);
 
     return result;
 }
