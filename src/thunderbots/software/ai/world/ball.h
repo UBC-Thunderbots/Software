@@ -6,9 +6,6 @@
 class Ball final
 {
    public:
-    // The approximate radius of the ball according to the SSL rulebook
-    static constexpr double MAX_RADIUS = 0.0215;
-
     /**
      * Creates a new ball
      */
