@@ -204,4 +204,13 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(ball_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(ros_message_util_test
+            test/util/ros_messages.cpp
+            util/ros_messages.cpp
+            ai/world/ball.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
+
 endif()
