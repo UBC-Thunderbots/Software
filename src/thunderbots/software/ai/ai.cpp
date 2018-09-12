@@ -22,9 +22,9 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
     return assignedPrimitives;
 }
 
-void AI::updateWorldBallState(const thunderbots_msgs::Ball &new_ball_msg)
+void AI::updateWorldBallState(const Ball &new_ball_data)
 {
-    world.updateBallState(new_ball_msg);
+    world.updateBallState(new_ball_data);
 }
 
 void AI::updateWorldFieldState(const thunderbots_msgs::Field &new_field_msg)
