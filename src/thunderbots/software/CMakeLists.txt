@@ -196,4 +196,12 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(shared_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(ball_test
+            test/world/ball.cpp
+            ai/world/ball.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ball_test ${catkin_LIBRARIES})
+
 endif()
