@@ -14,21 +14,9 @@ namespace DynamicParameters
      */
     void updateAllParametersFromROSParameterServer();
 
-    // These are currently placeholders to provide an example of how parameters are
-    // created an initialized. Parameters can be organized in (nested) namespaces.
-    const extern Parameter<int> param1;
-
     namespace Navigator
     {
-        const extern Parameter<double> default_avoid_dist;
-        const extern Parameter<double> collision_avoid_velocity_scale;
-    }
-
-    namespace HL
-    {
-        namespace STP
-        {
-            const extern Parameter<std::vector<std::string>> param3;
-        }
+        extern Parameter<double> default_avoid_dist;
+        extern Parameter<double> collision_avoid_velocity_scale;
     }
 }
