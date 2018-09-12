@@ -163,7 +163,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(field_test
-            test/field/field.cpp
+            test/world/field.cpp
             ai/world/field.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
