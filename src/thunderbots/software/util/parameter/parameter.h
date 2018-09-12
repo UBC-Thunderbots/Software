@@ -68,21 +68,9 @@ class Parameter
      *
      * @param new_value The new value to be set
      */
-    void setValueInParameterServer(T new_value)
+    void setValueInROSParameterServer(T new_value)
     {
         ros::param::set(getROSParameterPath(), new_value);
-    }
-
-    /**
-     * Sets the local value of the parameter to the new value. This is primarily useful
-     * for unit testing, so that parameters can be adjusted without needing the ROS
-     * Parameter server
-     *
-     * @param new_value The new value to be set
-     */
-    void setValueLocally(T new_value)
-    {
-        value_ = new_value;
     }
 
     /**
