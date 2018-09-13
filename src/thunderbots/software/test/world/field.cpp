@@ -25,7 +25,7 @@ TEST(FieldTest, update_and_accessors)
     double boundary_width       = 0.3;
     double center_circle_radius = 0.5;
 
-    field.updateDimensions(length, width, goal_width, defense_length, defense_width,
+    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
                            boundary_width, center_circle_radius);
 
     EXPECT_TRUE(field.valid());
@@ -67,11 +67,11 @@ TEST(FieldTest, equality_operators)
     Field invalid_field = Field();
 
     Field field = Field();
-    field.updateDimensions(length, width, goal_width, defense_length, defense_width,
+    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
                            boundary_width, center_circle_radius);
 
     Field field_other = Field();
-    field_other.updateDimensions(length, width, goal_width, defense_length, defense_width,
+    field_other.updateDimensions(length, width, defense_length, defense_width, goal_width,
                                  boundary_width, center_circle_radius);
 
     // field and field_other have been updated with the same dimensions, so
@@ -83,7 +83,7 @@ TEST(FieldTest, equality_operators)
     EXPECT_EQ(field, field);
 
     // Update with the same dimensions as above, except for a slightly larger length
-    field_other.updateDimensions(length + 0.02, width, goal_width, defense_length,
+    field_other.updateDimensions(length + 0.02, width, defense_length, goal_width,
                                  defense_width, boundary_width, center_circle_radius);
 
     EXPECT_NE(field, field_other);
