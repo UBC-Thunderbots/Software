@@ -327,7 +327,8 @@ Point &operator/=(Point &p, double s);
 inline std::ostream &operator<<(std::ostream &os, const Point &p);
 
 /**
- * Compares two vectors for equality
+ * Compares two Points for equality. Points are considered equal if they
+ * are within a distance of 1e-15 from each other.
  *
  * @param p the first Point
  * @param q the second Point
@@ -513,7 +514,15 @@ inline std::ostream &operator<<(std::ostream &os, const Point &p)
 
 inline constexpr bool operator==(const Point &p, const Point &q)
 {
-    return p.x() == q.x() && p.y() == q.y();
+    // Due to internal representation of doubles being slightly less accurate/consistent
+    // with some numbers and operations, we consider points that are very close together
+    // to be equal (since they likely are, just possibly slightly misrepresented by the
+    // system/compiler). 1e-15 was chosen as a value because doubles have about 16 digits
+    // of precision. Comparing numbers with 15 digits of precision gives us a small buffer
+    // while remaining as accurate as possible.
+    // http://www.cplusplus.com/forum/beginner/95128/
+    double EPS = 1e-15;
+    return p.isClose(q, EPS);
 }
 
 inline constexpr bool operator!=(const Point &p, const Point &q)
