@@ -4,7 +4,6 @@
 #include "ai/navigator/rrt/rrt.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
-#include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/timestamp.h"
@@ -34,12 +33,11 @@ class AI final
         const AITimestamp& timestamp) const;
 
     /**
-     * Given a message containing new ball state, updates the state of the ball
-     * in the world
+     * Updates the state of the ball in the AI's world with the new ball data
      *
-     * @param new_ball_msg The message containing new ball information
+     * @param new_ball_data A Ball containing new ball information
      */
-    void updateWorldBallState(const thunderbots_msgs::Ball& new_ball_msg);
+    void updateWorldBallState(const Ball& new_ball_data);
 
     /**
      * Given a message containing new field geometry, update the geometry of the

@@ -138,22 +138,22 @@ Point Field::enemyCornerNeg() const
 
 Point Field::friendlyGoalpostPos() const
 {
-    return Point(friendlyGoal().x(), defenseAreaWidth() / 2.0);
+    return Point(friendlyGoal().x(), goalWidth() / 2.0);
 }
 
 Point Field::friendlyGoalpostNeg() const
 {
-    return Point(friendlyGoal().x(), -defenseAreaWidth() / 2.0);
+    return Point(friendlyGoal().x(), -goalWidth() / 2.0);
 }
 
 Point Field::enemyGoalpostPos() const
 {
-    return Point(enemyGoal().x(), defenseAreaWidth() / 2.0);
+    return Point(enemyGoal().x(), goalWidth() / 2.0);
 }
 
 Point Field::enemyGoalpostNeg() const
 {
-    return Point(enemyGoal().x(), -defenseAreaWidth() / 2.0);
+    return Point(enemyGoal().x(), -goalWidth() / 2.0);
 }
 
 std::pair<Point, Point> Field::friendlyGoalposts() const

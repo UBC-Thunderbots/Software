@@ -6,6 +6,7 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/ros_messages.h"
 #include "util/timestamp.h"
 
 // Variables we need to maintain state
@@ -28,7 +29,9 @@ void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
 {
     thunderbots_msgs::Ball ball_msg = *msg;
 
-    ai.updateWorldBallState(ball_msg);
+    Ball ball = Util::ROSMessages::createBallFromROSMessage(ball_msg);
+
+    ai.updateWorldBallState(ball);
 }
 
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
