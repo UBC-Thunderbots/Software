@@ -14,7 +14,8 @@ TEST(RobotTest, construct_with_id_only)
 
 TEST(RobotTest, construct_with_all_params)
 {
-    Robot robot = Robot(3, Point(1, 1), Vector(-0.3, 0), Angle::ofRadians(2.2), AngularVelocity::ofRadians(-0.6));
+    Robot robot = Robot(3, Point(1, 1), Vector(-0.3, 0), Angle::ofRadians(2.2),
+                        AngularVelocity::ofRadians(-0.6));
 
     EXPECT_EQ(3, robot.id());
     EXPECT_EQ(Point(1, 1), robot.position());
@@ -98,7 +99,7 @@ TEST(RobotTest, get_position_at_future_time)
     EXPECT_EQ(Point(-2.7, 10.8), robot.position(3));
 
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
-                  AngularVelocity::ofRadians(2));
+                              AngularVelocity::ofRadians(2));
 
     EXPECT_EQ(Point(2.4, -1.6), robot_other.position(0.4));
     EXPECT_EQ(Point(4.5, -1), robot_other.position(1));
@@ -152,7 +153,8 @@ TEST(RobotTest, get_orientation_at_future_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2));
 
-    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(0.8), robot_other.orientation(0.4));
+    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(0.8),
+              robot_other.orientation(0.4));
     EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(2), robot_other.orientation(1));
     EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(6), robot_other.orientation(3));
 }
@@ -220,7 +222,7 @@ TEST(RobotTest, equality_operators)
 
     // Update robot_0_1 to be the same as robot_0
     robot_0_1.update(Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
-                   AngularVelocity::ofDegrees(30));
+                     AngularVelocity::ofDegrees(30));
 
     EXPECT_EQ(robot_0_0, robot_0_1);
 }

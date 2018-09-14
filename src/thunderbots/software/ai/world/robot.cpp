@@ -11,11 +11,11 @@ Robot::Robot(const unsigned int id)
 
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity)
-        : id_(id),
-          position_(position),
-          velocity_(velocity),
-          orientation_(orientation),
-          angularVelocity_(angular_velocity)
+    : id_(id),
+      position_(position),
+      velocity_(velocity),
+      orientation_(orientation),
+      angularVelocity_(angular_velocity)
 {
 }
 
@@ -29,16 +29,20 @@ void Robot::update(const Point &new_position, const Vector &new_velocity,
     angularVelocity_ = new_angular_velocity;
 }
 
-void Robot::update(const Robot &new_robot_data) {
-    if(new_robot_data.id() != id()) {
+void Robot::update(const Robot &new_robot_data)
+{
+    if (new_robot_data.id() != id())
+    {
         // TODO: Throw a proper exception here. We should not update a robot using a robot
         // with a different id (a different robot)
         // https://github.com/UBC-Thunderbots/Software/issues/16
-        std::cerr << "Error: Robot updated using a robot with a mismatched id" << std::endl;
+        std::cerr << "Error: Robot updated using a robot with a mismatched id"
+                  << std::endl;
         exit(1);
     }
 
-    update(new_robot_data.position(), new_robot_data.velocity(), new_robot_data.orientation(), new_robot_data.angularVelocity());
+    update(new_robot_data.position(), new_robot_data.velocity(),
+           new_robot_data.orientation(), new_robot_data.angularVelocity());
 }
 
 unsigned int Robot::id() const
