@@ -40,12 +40,11 @@ class AI final
     void updateWorldBallState(const Ball& new_ball_data);
 
     /**
-     * Given a message containing new field geometry, update the geometry of the
-     * Field in the world
+     * Updates the state of the field in the AI's world with the new field data
      *
-     * @param new_field_msg The message containing new field geometry
+     * @param new_field_data A Field containing new field information
      */
-    void updateWorldFieldState(const thunderbots_msgs::Field& new_field_msg);
+    void updateWorldFieldState(const Field& new_field_data);
 
     /**
      * Given a message containing new information about the friendly team, updates
