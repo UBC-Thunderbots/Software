@@ -5,9 +5,9 @@
 #pragma once
 
 #include "util/constants.h"
+#include <utility>
 
-
-Point grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun);
+std::pair<Vector, AngularVelocity>  grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun);
 
 
 

@@ -5,6 +5,10 @@
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"
 #include "motion_controller.h"
+#include "ai/world/team.h"
+#include <ctime>
+#include <chrono>
+#include <utility>
 
 using namespace boost::asio;
 
@@ -54,22 +58,29 @@ void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
         remote_endpoint, 0, err);
 }
 
-//void GrSimBackend::sendPrimitives(
-//    const std::vector<std::unique_ptr<Primitive>>& primitives)
 
-void GrSimBackend::sendPrimitives( const std::vector< std::pair< std::unique_ptr<Primitive >, Robot >& primsAndRobots) // needs a final robot speed, robot orientation, and destination
+void GrSimBackend::sendPrimitives(
+    const std::vector<std::unique_ptr<Primitive>>& primitives)
 {
-    // TODO: Implement this
-    // https://github.com/UBC-Thunderbots/Software/issues/21
     std::vector<grSim_Packet> grsim_packets;
 
-    std::pair< Vector, double> robotVelocities;
+    std::pair<Vector, AngularVelocity> robotVelocities;
 
-    for (auto robotPrimPair : primsAndRobots) {
 
-        //robotVelocities = grSim_bang_bang(primsAndRobots.second, primsAndRobots.first->getDestination(), primsAndRobots.second->getFinalSpeed());
+    double bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
 
-        //createGrSimPacket(robotPrimPair.second.id(), YELLOW, robotVelocities.first, robotVelocities.second );
+    Team team;
+
+
+    for (auto& prim : primitives) {
+
+        MovePrimitive movePrim = dynamic_cast<MovePrimitive &>(*prim);
+
+        robotVelocities = grSim_bang_bang(*team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(), movePrim.getFinalSpeed(), movePrim.getFinalAngle(), bangBangTimestamp);
+
+        bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
+
+        createGrSimPacket(movePrim.getRobotId(), YELLOW, robotVelocities.first, robotVelocities.second);
     }
 
     grSim_Packet grsim_packet =

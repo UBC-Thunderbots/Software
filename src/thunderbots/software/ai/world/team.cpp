@@ -19,6 +19,18 @@ std::size_t Team::size() const
 
 std::optional<Robot> Team::getRobotById(unsigned int id) const
 {
+
+    std::vector<Robot> robots = getAllRobots();
+    int roboId;
+
+    for (Robot robo : robots) {
+
+        roboId = robo.id();
+
+        if (roboId == id) { return robo; }
+
+    }
+
     return std::nullopt;
 }
 

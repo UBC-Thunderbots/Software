@@ -85,7 +85,7 @@ class Robot
      * @return the predicted angular velocity of the robot, in Radians / second.
      */
     AngularVelocity angularVelocity(double time_delta = 0.0) const;
-
+	
    private:
     const unsigned int id_;
     Point position_;

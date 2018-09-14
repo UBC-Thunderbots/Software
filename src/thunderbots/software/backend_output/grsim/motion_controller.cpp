@@ -12,20 +12,21 @@
 #include <ctime>
 #include "shared/constants.h"
 
-std::pair<Vector, double> grSim_bang_bang(Robot& robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun) {
+std::pair<Vector, AngularVelocity> grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun) {
 
-    // pair to hold the X/Y velocities and angular velocity of the robot to send to GrSim
-    std::pair <Vector, double> robotSpeeds;
+    // vector to hold the XY velocities of the robot
+    Vector robotXYVelocities;
 
-    double acceleration;
-    double timeToDest;
-
+    // boolean value if the robot can reach it's destination at target speed based on MAX acceleration
     bool bCanStopInTime;
     bool bCanStopRotateInTime;
 
     // calculate the current time (will be used to calculate the time step since the last time the motion controller was run)
     const double currentTime = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
+
+    // calculate the delta in time to calculate changes in speed based on acceleration
     const double deltaTime = currentTime - timeOfLastRun;
+    double robotAngularVelocity;
 
 
     double distanceToDest = (robot.position() - dest).len();
@@ -91,10 +92,9 @@ std::pair<Vector, double> grSim_bang_bang(Robot& robot, Point dest, double desir
         deltaAngularSpeed = -(ROBOT_MAX_ANG_ACCELERATION*deltaTime);
     }
 
-    const Vector robotXYVelocities = Point(robot.velocity().x() + deltaSpeedX, robot.velocity().y() + deltaSpeedY); // calculate new X/Y/ang velocities based on the current robot speeds and delta speeds
-    const double robotAngularVelocity = (robot.angularVelocity().toRadians() ) + deltaAngularSpeed;
+    robotXYVelocities = Vector(robot.velocity().x() + deltaSpeedX, robot.velocity().y() + deltaSpeedY); // calculate new X/Y/ang velocities based on the current robot speeds and delta speeds
+    robotAngularVelocity = (robot.angularVelocity().toRadians() ) + deltaAngularSpeed;                  // calculate new angular velocity based on the current robot ang. velocity and delta ang. velocity
 
 
-
-    return std::make_pair(robotXYVelocities, robotAngularVelocity);
+    return std::make_pair(robotXYVelocities, Angle::ofRadians(robotAngularVelocity));
 }

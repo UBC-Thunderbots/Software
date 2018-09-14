@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include "thunderbots_msgs/Primitive.h"
+#include "geom/point.h"
+#include "geom/angle.h"
 
 /**
  * Defines a Robot Primitive, which is the most basic action / unit of work a robot can
