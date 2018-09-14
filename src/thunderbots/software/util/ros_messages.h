@@ -1,11 +1,11 @@
 #pragma once
 
 #include "ai/world/ball.h"
-#include "thunderbots_msgs/Ball.h"
-#include "ai/world/robot.h"
-#include "thunderbots_msgs/Robot.h"
 #include "ai/world/field.h"
+#include "ai/world/robot.h"
+#include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
+#include "thunderbots_msgs/Robot.h"
 
 namespace Util
 {

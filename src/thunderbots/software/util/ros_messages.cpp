@@ -14,13 +14,14 @@ namespace Util
             return ball;
         }
 
-        Robot createRobotFromROSMessage(const thunderbots_msgs::Robot& robot_msg) {
-            unsigned int robot_id = robot_msg.id;
-            Point robot_position = Point(robot_msg.position.x, robot_msg.position.y);
-            Vector robot_velocity = Vector(robot_msg.velocity.x, robot_msg.velocity.y);
+        Robot createRobotFromROSMessage(const thunderbots_msgs::Robot& robot_msg)
+        {
+            unsigned int robot_id   = robot_msg.id;
+            Point robot_position    = Point(robot_msg.position.x, robot_msg.position.y);
+            Vector robot_velocity   = Vector(robot_msg.velocity.x, robot_msg.velocity.y);
             Angle robot_orientation = Angle::ofRadians(robot_msg.orientation);
             AngularVelocity robot_angular_velocity =
-                    Angle::ofRadians(robot_msg.angular_velocity);
+                Angle::ofRadians(robot_msg.angular_velocity);
 
             Robot robot = Robot(robot_id, robot_position, robot_velocity,
                                 robot_orientation, robot_angular_velocity);
