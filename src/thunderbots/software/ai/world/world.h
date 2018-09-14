@@ -39,12 +39,11 @@ class World final
     void updateFieldGeometry(const thunderbots_msgs::Field& new_field_msg);
 
     /**
-     * Given a message containing new ball state, updates the state of the ball
-     * in the world
+     * Updates the state of the ball in the world with the new ball data
      *
-     * @param new_ball_msg The message containing new ball information
+     * @param new_ball_data A Ball containing new ball information
      */
-    void updateBallState(const thunderbots_msgs::Ball& new_ball_msg);
+    void updateBallState(const Ball& new_ball_data);
 
     /**
      * Given a message containing new information about the friendly team, updates

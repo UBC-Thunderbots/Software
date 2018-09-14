@@ -28,16 +28,16 @@ class Field
      *
      * @param field_length the length of the playing area (along the x-axis)
      * @param field_width the width of the playing area (along the y-axis)
-     * @param goal_width the width of the goal (along the y-axis)
      * @param defense_length the length of the defense area (along the x-axis)
      * @param defense_width the width of the defense area (along the y-axis)
+     * @param goal_width the width of the goal (along the y-axis)
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      */
-    void updateDimensions(double field_length, double field_width, double goal_width,
-                          double defense_length, double defense_width,
-                          double boundary_width, double center_circle_radius);
+    void updateDimensions(double field_length, double field_width, double defense_length,
+                          double defense_width, double goal_width, double boundary_width,
+                          double center_circle_radius);
 
     /**
      * Checks if the field data is valid yet.

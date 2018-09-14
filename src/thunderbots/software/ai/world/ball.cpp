@@ -1,16 +1,15 @@
 #include "ball.h"
 
-Ball::Ball() : position_(Point()), velocity_(Vector())
+Ball::Ball(Point position, Vector velocity) : position_(position), velocity_(velocity)
 {
 }
 
-void Ball::update(const thunderbots_msgs::Ball &ball_msg)
+void Ball::update(const Ball &new_ball_data)
 {
-    position_ = Point(ball_msg.position.x, ball_msg.position.y);
-    velocity_ = Vector(ball_msg.velocity.x, ball_msg.velocity.y);
+    update(new_ball_data.position(), new_ball_data.velocity());
 }
 
-void Ball::update(Point &new_position, Vector &new_velocity)
+void Ball::update(const Point &new_position, const Vector &new_velocity)
 {
     position_ = new_position;
     velocity_ = new_velocity;
@@ -18,10 +17,26 @@ void Ball::update(Point &new_position, Vector &new_velocity)
 
 Point Ball::position(double time_delta) const
 {
-    return position_;
+    // TODO: This is a simple linear implementation that does not necessarily reflect
+    // real-world behavior. Position prediction should be improved as outlined in
+    // https://github.com/UBC-Thunderbots/Software/issues/47
+    return position_ + (velocity_.norm(time_delta * velocity_.len()));
 }
 
 Vector Ball::velocity(double time_delta) const
 {
-    return velocity_;
+    // TODO: This is a implementation with an empirically determined time constant that
+    // does not necessarily reflect real-world behavior. Velocity prediction should be
+    // improved as outlined in https://github.com/UBC-Thunderbots/Software/issues/47
+    return velocity_ * exp(-0.1 * time_delta);
+}
+
+bool Ball::operator==(const Ball &other) const
+{
+    return this->position_ == other.position_ && this->velocity_ == other.velocity_;
+}
+
+bool Ball::operator!=(const Ball &other) const
+{
+    return !(*this == other);
 }

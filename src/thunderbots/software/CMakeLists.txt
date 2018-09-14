@@ -78,6 +78,7 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/team.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/ball.*
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
@@ -162,7 +163,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(field_test
-            test/field/field.cpp
+            test/world/field.cpp
             ai/world/field.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
@@ -194,5 +195,22 @@ if (CATKIN_ENABLE_TESTING)
             ../shared/util.h)
 
     target_link_libraries(shared_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(ball_test
+            test/world/ball.cpp
+            ai/world/ball.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ball_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(ros_message_util_test
+            test/util/ros_messages.cpp
+            util/ros_messages.cpp
+            ai/world/ball.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
 endif()
