@@ -50,7 +50,12 @@ unsigned int Robot::id() const
     return id_;
 }
 
-Point Robot::position(const double time_delta) const
+Point Robot::position() const
+{
+    return position_;
+}
+
+Point Robot::estimatePositionAtFutureTime(double time_delta) const
 {
     // TODO: This is a simple linear implementation that does not necessarily reflect
     // real-world behavior. Position prediction should be improved as outlined in
@@ -58,7 +63,12 @@ Point Robot::position(const double time_delta) const
     return position_ + velocity_.norm(velocity_.len() * time_delta);
 }
 
-Vector Robot::velocity(const double time_delta) const
+Vector Robot::velocity() const
+{
+    return velocity_;
+}
+
+Vector Robot::estimateVelocityAtFutureTime(double time_delta) const
 {
     // TODO: This simple implementation that assumes the robot maintains the same velocity
     // and does not necessarily reflect real-world behavior. Velocity prediction should be
@@ -66,7 +76,12 @@ Vector Robot::velocity(const double time_delta) const
     return velocity_;
 }
 
-Angle Robot::orientation(const double time_delta) const
+Angle Robot::orientation() const
+{
+    return orientation_;
+}
+
+Angle Robot::estimateOrientationAtFutureTime(double time_delta) const
 {
     // TODO: This is a simple linear implementation that does not necessarily reflect
     // real-world behavior. Orientation prediction should be improved as outlined in
@@ -74,7 +89,12 @@ Angle Robot::orientation(const double time_delta) const
     return orientation_ + angularVelocity_ * time_delta;
 }
 
-AngularVelocity Robot::angularVelocity(const double time_delta) const
+AngularVelocity Robot::angularVelocity() const
+{
+    return angularVelocity_;
+}
+
+AngularVelocity Robot::estimateAngularVelocityAtFutureTime(double time_delta) const
 {
     // TODO: This simple implementation that assumes the robot maintains the same
     // angular velocity and does not necessarily reflect real-world behavior. Angular

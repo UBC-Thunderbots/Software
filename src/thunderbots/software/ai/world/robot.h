@@ -58,48 +58,84 @@ class Robot
     unsigned int id() const;
 
     /**
-     * Get the predicted position of the robot at a time relative to the current time.
-     * Using the default of 0 will give the current position of the robot.
+     * Returns the current position of the robot
      *
-     * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the robot's position.
-     *
-     * @return the predicted position of the robot. Coordinates are in metres.
+     * @return the current position of the robot
      */
-    Point position(double time_delta = 0.0) const;
+    Point position() const;
 
     /**
-     * Get the predicted velocity of the robot at a time relative to the current time.
-     * Using the default of 0 will give the current velocity of the robot.
+     * Returns the estimated position of the robot at a future time, relative to the
+     * current time
      *
      * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the robot's position.
+     * to predict the robot's position. For example, a value of 1.5 would return the
+     * estimated position of the robot 1.5s in the future.
      *
-     * @return the predicted velocity of the robot, in metres / second.
+     * @return the estimated position of the robot at a future time.
+     * Coordinates are in metres.
      */
-    Vector velocity(double time_delta = 0.0) const;
+    Point estimatePositionAtFutureTime(double time_delta = 0.0) const;
 
     /**
-     * Get the predicted orientation of the robot at a time relative to the current time.
-     * Using the default of 0 will give the current orientation of the robot.
+     * Returns the current velocity of the robot
      *
-     * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the robot's position.
-     *
-     * @return the predicted orientation of the robot, in Radians.
+     * @return the current velocity of the robot
      */
-    Angle orientation(double time_delta = 0.0) const;
+    Vector velocity() const;
 
     /**
-     * Get the predicted angular velocity of the robot at a time relative to the current
-     * time. Using the default of 0 will give the current orientation of the robot.
+     * Returns the estimated velocity of the robot at a future time, relative to the
+     * current time
      *
      * @param time_delta The relative amount of time in the future (in seconds) at which
-     * to predict the robot's position.
+     * to predict the robot's velocity. For example, a value of 1.5 would return the
+     * estimated velocity of the robot 1.5s in the future.
      *
-     * @return the predicted angular velocity of the robot, in Radians / second.
+     * @return the estimated velocity of the robot at a future time.
+     * Coordinates are in metres.
      */
-    AngularVelocity angularVelocity(double time_delta = 0.0) const;
+    Vector estimateVelocityAtFutureTime(double time_delta = 0.0) const;
+
+    /**
+     * Returns the current orientation of the robot
+     *
+     * @return the current orientation of the robot
+     */
+    Angle orientation() const;
+
+    /**
+     * Returns the estimated orientation of the robot at a future time, relative to the
+     * current time
+     *
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the robot's orientation. For example, a value of 1.5 would return the
+     * estimated orientation of the robot 1.5s in the future.
+     *
+     * @return the estimated orientation of the robot at a future time.
+     * Coordinates are in metres.
+     */
+    Angle estimateOrientationAtFutureTime(double time_delta = 0.0) const;
+
+    /**
+     * Returns the current angular velocity of the robot
+     *
+     * @return the current angular velocity of the robot
+     */
+    AngularVelocity angularVelocity() const;
+
+    /**
+     * Returns the estimated angular velocity of the robot at a future time, relative to
+     * the current time
+     *
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the robot's angular velocity. For example, a value of 1.5 would return
+     * the estimated angular velocity of the robot 1.5s in the future.
+     *
+     * @return the estimated angular velocity of the robot at a future time.
+     * Coordinates are in metres.
+     */
+    AngularVelocity estimateAngularVelocityAtFutureTime(double time_delta = 0.0) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and

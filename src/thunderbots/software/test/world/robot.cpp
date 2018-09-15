@@ -86,7 +86,6 @@ TEST(RobotTest, get_position_at_current_time)
                         AngularVelocity::ofRadians(0.7));
 
     EXPECT_EQ(Point(-1.2, 3), robot.position());
-    EXPECT_EQ(Point(-1.2, 3), robot.position(0.0));
 }
 
 TEST(RobotTest, get_position_at_future_time)
@@ -94,16 +93,16 @@ TEST(RobotTest, get_position_at_future_time)
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7));
 
-    EXPECT_EQ(Point(-1.4, 4.04), robot.position(0.4));
-    EXPECT_EQ(Point(-1.7, 5.6), robot.position(1));
-    EXPECT_EQ(Point(-2.7, 10.8), robot.position(3));
+    EXPECT_EQ(Point(-1.4, 4.04), robot.estimatePositionAtFutureTime(0.4));
+    EXPECT_EQ(Point(-1.7, 5.6), robot.estimatePositionAtFutureTime(1));
+    EXPECT_EQ(Point(-2.7, 10.8), robot.estimatePositionAtFutureTime(3));
 
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2));
 
-    EXPECT_EQ(Point(2.4, -1.6), robot_other.position(0.4));
-    EXPECT_EQ(Point(4.5, -1), robot_other.position(1));
-    EXPECT_EQ(Point(11.5, 1), robot_other.position(3));
+    EXPECT_EQ(Point(2.4, -1.6), robot_other.estimatePositionAtFutureTime(0.4));
+    EXPECT_EQ(Point(4.5, -1), robot_other.estimatePositionAtFutureTime(1));
+    EXPECT_EQ(Point(11.5, 1), robot_other.estimatePositionAtFutureTime(3));
 }
 
 TEST(RobotTest, get_velocity_at_current_time)
@@ -112,7 +111,6 @@ TEST(RobotTest, get_velocity_at_current_time)
                         AngularVelocity::ofRadians(0.7));
 
     EXPECT_EQ(Vector(-0.5, 2.6), robot.velocity());
-    EXPECT_EQ(Vector(-0.5, 2.6), robot.velocity(0.0));
 }
 
 TEST(RobotTest, get_velocity_at_future_time)
@@ -120,16 +118,16 @@ TEST(RobotTest, get_velocity_at_future_time)
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7));
 
-    EXPECT_EQ(Point(-0.5, 2.6), robot.velocity(0.4));
-    EXPECT_EQ(Point(-0.5, 2.6), robot.velocity(1));
-    EXPECT_EQ(Point(-0.5, 2.6), robot.velocity(3));
+    EXPECT_EQ(Point(-0.5, 2.6), robot.estimateVelocityAtFutureTime(0.4));
+    EXPECT_EQ(Point(-0.5, 2.6), robot.estimateVelocityAtFutureTime(1));
+    EXPECT_EQ(Point(-0.5, 2.6), robot.estimateVelocityAtFutureTime(3));
 
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2));
 
-    EXPECT_EQ(Point(3.5, 1), robot_other.velocity(0.4));
-    EXPECT_EQ(Point(3.5, 1), robot_other.velocity(1));
-    EXPECT_EQ(Point(3.5, 1), robot_other.velocity(3));
+    EXPECT_EQ(Point(3.5, 1), robot_other.estimateVelocityAtFutureTime(0.4));
+    EXPECT_EQ(Point(3.5, 1), robot_other.estimateVelocityAtFutureTime(1));
+    EXPECT_EQ(Point(3.5, 1), robot_other.estimateVelocityAtFutureTime(3));
 }
 
 TEST(RobotTest, get_orientation_at_current_time)
@@ -138,7 +136,6 @@ TEST(RobotTest, get_orientation_at_current_time)
                         AngularVelocity::ofRadians(0.7));
 
     EXPECT_EQ(Angle::quarter(), robot.orientation());
-    EXPECT_EQ(Angle::quarter(), robot.orientation(0.0));
 }
 
 TEST(RobotTest, get_orientation_at_future_time)
@@ -146,17 +143,22 @@ TEST(RobotTest, get_orientation_at_future_time)
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7));
 
-    EXPECT_EQ(Angle::quarter() + Angle::ofRadians(0.28), robot.orientation(0.4));
-    EXPECT_EQ(Angle::quarter() + Angle::ofRadians(0.7), robot.orientation(1));
-    EXPECT_EQ(Angle::quarter() + Angle::ofRadians(2.1), robot.orientation(3));
+    EXPECT_EQ(Angle::quarter() + Angle::ofRadians(0.28),
+              robot.estimateOrientationAtFutureTime(0.4));
+    EXPECT_EQ(Angle::quarter() + Angle::ofRadians(0.7),
+              robot.estimateOrientationAtFutureTime(1));
+    EXPECT_EQ(Angle::quarter() + Angle::ofRadians(2.1),
+              robot.estimateOrientationAtFutureTime(3));
 
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2));
 
     EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(0.8),
-              robot_other.orientation(0.4));
-    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(2), robot_other.orientation(1));
-    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(6), robot_other.orientation(3));
+              robot_other.estimateOrientationAtFutureTime(0.4));
+    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(2),
+              robot_other.estimateOrientationAtFutureTime(1));
+    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(6),
+              robot_other.estimateOrientationAtFutureTime(3));
 }
 
 TEST(RobotTest, get_angular_velocity_at_current_time)
@@ -165,7 +167,6 @@ TEST(RobotTest, get_angular_velocity_at_current_time)
                         AngularVelocity::ofRadians(0.7));
 
     EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.angularVelocity());
-    EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.angularVelocity(0.0));
 }
 
 TEST(RobotTest, get_angularVelocity_at_future_time)
@@ -173,16 +174,22 @@ TEST(RobotTest, get_angularVelocity_at_future_time)
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7));
 
-    EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.angularVelocity(0.4));
-    EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.angularVelocity(1));
-    EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.angularVelocity(3));
+    EXPECT_EQ(AngularVelocity::ofRadians(0.7),
+              robot.estimateAngularVelocityAtFutureTime(0.4));
+    EXPECT_EQ(AngularVelocity::ofRadians(0.7),
+              robot.estimateAngularVelocityAtFutureTime(1));
+    EXPECT_EQ(AngularVelocity::ofRadians(0.7),
+              robot.estimateAngularVelocityAtFutureTime(3));
 
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2));
 
-    EXPECT_EQ(AngularVelocity::ofRadians(2), robot_other.angularVelocity(0.4));
-    EXPECT_EQ(AngularVelocity::ofRadians(2), robot_other.angularVelocity(1));
-    EXPECT_EQ(AngularVelocity::ofRadians(2), robot_other.angularVelocity(3));
+    EXPECT_EQ(AngularVelocity::ofRadians(2),
+              robot_other.estimateAngularVelocityAtFutureTime(0.4));
+    EXPECT_EQ(AngularVelocity::ofRadians(2),
+              robot_other.estimateAngularVelocityAtFutureTime(1));
+    EXPECT_EQ(AngularVelocity::ofRadians(2),
+              robot_other.estimateAngularVelocityAtFutureTime(3));
 }
 
 TEST(RobotTest, equality_operators)
