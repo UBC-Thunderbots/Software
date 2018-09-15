@@ -12,6 +12,16 @@
 class Angle final
 {
    public:
+    // Due to internal representation of doubles being slightly less accurate/consistent
+    // with some numbers and operations, we consider angles that are very close together
+    // to be equal (since they likely are, just possibly slightly misrepresented by the
+    // system/compiler). We use this EPSILON as a threshold for comparison. 1e-15 was
+    // chosen as a value because doubles have about 16 consistent significant figures.
+    // Comparing numbers with 15 significant figures gives us a
+    // small buffer while remaining as accurate as possible.
+    // http://www.cplusplus.com/forum/beginner/95128/
+    static constexpr double EPSILON = 1e-15;
+
     /**
      * The zero angle.
      */
@@ -345,8 +355,7 @@ constexpr bool operator<=(Angle x, Angle y);
 constexpr bool operator>=(Angle x, Angle y);
 
 /**
- * Compares two angles for equality. Angles are considered equal if their difference is no
- * greater than 1e-15 radians
+ * Compares two angles for equality
  *
  * @param x the first angle.
  * @param y the second angle.
@@ -578,15 +587,7 @@ inline constexpr bool operator>=(Angle x, Angle y)
 
 inline bool operator==(Angle x, Angle y)
 {
-    // Due to internal representation of doubles being slightly less accurate/consistent
-    // with some numbers and operations, we consider angles that are very close together
-    // to be equal (since they likely are, just possibly slightly misrepresented by the
-    // system/compiler). 1e-15 was chosen as a value because doubles have about 16 digits
-    // of precision. Comparing numbers with 15 digits of precision gives us a small buffer
-    // while remaining as accurate as possible.
-    // http://www.cplusplus.com/forum/beginner/95128/
-    double EPS = 1e-15;
-    return (std::fabs(x.toRadians() - y.toRadians()) <= EPS);
+    return (std::fabs(x.toRadians() - y.toRadians()) <= Angle::EPSILON);
 }
 
 inline constexpr bool operator!=(Angle x, Angle y)
