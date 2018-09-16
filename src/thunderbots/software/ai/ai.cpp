@@ -27,9 +27,9 @@ void AI::updateWorldBallState(const Ball &new_ball_data)
     world.updateBallState(new_ball_data);
 }
 
-void AI::updateWorldFieldState(const thunderbots_msgs::Field &new_field_msg)
+void AI::updateWorldFieldState(const Field &new_field_data)
 {
-    world.updateFieldGeometry(new_field_msg);
+    world.updateFieldGeometry(new_field_data);
 }
 
 void AI::updateWorldFriendlyTeamState(const thunderbots_msgs::Team &new_friendly_team_msg)

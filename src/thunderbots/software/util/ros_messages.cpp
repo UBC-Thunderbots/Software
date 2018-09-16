@@ -28,5 +28,17 @@ namespace Util
 
             return robot;
         }
+
+        Field createFieldFromROSMessage(const thunderbots_msgs::Field& field_msg)
+        {
+            Field field = Field();
+
+            field.updateDimensions(field_msg.field_length, field_msg.field_width,
+                                   field_msg.defense_length, field_msg.defense_width,
+                                   field_msg.goal_width, field_msg.boundary_width,
+                                   field_msg.center_circle_radius);
+
+            return field;
+        }
     }
 }

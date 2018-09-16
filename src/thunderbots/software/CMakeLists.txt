@@ -217,6 +217,7 @@ if (CATKIN_ENABLE_TESTING)
             util/ros_messages.cpp
             ai/world/ball.cpp
             ai/world/robot.cpp
+            ai/world/field.cpp
             geom/point.h
             geom/angle.h)
 

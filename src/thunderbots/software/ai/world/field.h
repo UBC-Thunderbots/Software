@@ -2,7 +2,6 @@
 
 #include "geom/point.h"
 #include "geom/rect.h"
-#include "thunderbots_msgs/Field.h"
 
 /**
  * Exposes the dimensions of various parts of the field.
@@ -14,14 +13,6 @@ class Field
      * Constructs a new field
      */
     explicit Field();
-
-    /**
-     * Updates the dimensions of the field given a field message. All dimensions should be
-     * in metres.
-     *
-     * @param new_field_msg the field message containing the new field information
-     */
-    void updateDimensions(thunderbots_msgs::Field new_field_msg);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -38,6 +29,13 @@ class Field
     void updateDimensions(double field_length, double field_width, double defense_length,
                           double defense_width, double goal_width, double boundary_width,
                           double center_circle_radius);
+
+    /**
+     * Updates the field with new data
+     *
+     * @param new_ball_data A field containing new field data
+     */
+    void updateDimensions(const Field &new_field_data);
 
     /**
      * Checks if the field data is valid yet.
@@ -206,20 +204,6 @@ class Field
     Point enemyGoalpostNeg() const;
 
     /**
-     * Gets the positions of the friendly goalposts.
-     *
-     * @return the goalpost positions, top and bottom.
-     */
-    std::pair<Point, Point> friendlyGoalposts() const;
-
-    /**
-     * Gets the positions of the enemy goalposts.
-     *
-     * @return the goalpost positions, top and bottom.
-     */
-    std::pair<Point, Point> enemyGoalposts() const;
-
-    /**
      * Gets the margin for being out of bounds on the top or bottom of the
      * field in metres.
      *
@@ -246,12 +230,22 @@ class Field
    private:
     // Private variables have underscores at the end of their names
     // to avoid conflicts with function names
+
+    // Whether or not this field object contains valid data
     bool valid_;
+    // The length of the playable field (between the goal lines) in metres
     double field_length_;
+    // The width of the playable field (between the sidelines) in metres
     double field_width_;
+    // The width of the goal (between the goalposts) in metres
     double goal_width_;
+    // The width of the defense area in metres
     double defense_width_;
+    // The length of the defense area in metres
     double defense_length_;
+    // The width of the boundary (between the edge of the marked field lines and the
+    // physical border around the field) in metres
     double boundary_width_;
+    // The radius of the center circle in metres
     double center_circle_radius_;
 };

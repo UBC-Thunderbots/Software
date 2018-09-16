@@ -38,6 +38,35 @@ TEST(ROSMessageUtilTest, create_robot_from_ros_message)
     EXPECT_EQ(Robot(id, position, velocity, orientation, angular_velocity), robot);
 }
 
+TEST(ROSMessageUtilTest, create_field_from_ros_message)
+{
+    double length               = 9.0;
+    double width                = 6.0;
+    double goal_width           = 1.0;
+    double defense_width        = 2.0;
+    double defense_length       = 1.0;
+    double boundary_width       = 0.3;
+    double center_circle_radius = 0.5;
+
+    thunderbots_msgs::Field field_msg;
+
+    field_msg.field_length         = length;
+    field_msg.field_width          = width;
+    field_msg.defense_length       = defense_length;
+    field_msg.defense_width        = defense_width;
+    field_msg.goal_width           = goal_width;
+    field_msg.boundary_width       = boundary_width;
+    field_msg.center_circle_radius = center_circle_radius;
+
+    Field field = Util::ROSMessages::createFieldFromROSMessage(field_msg);
+
+    Field field_other = Field();
+    field_other.updateDimensions(length, width, defense_length, defense_width, goal_width,
+                                 boundary_width, center_circle_radius);
+
+    EXPECT_EQ(field_other, field);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

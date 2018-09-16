@@ -22,7 +22,9 @@ void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
 {
     thunderbots_msgs::Field field_msg = *msg;
 
-    ai.updateWorldFieldState(field_msg);
+    Field field = Util::ROSMessages::createFieldFromROSMessage(field_msg);
+
+    ai.updateWorldFieldState(field);
 }
 
 void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
