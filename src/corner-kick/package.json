@@ -1,0 +1,75 @@
+{
+  "name": "corner-kick",
+  "description": "A visualization tool for UBC Thunderbots",
+  "main": "public/electron.js",
+  "author": {
+    "name": "UBC Thunderbots",
+    "email": "ubcrobocup@gmail.com"
+  },
+  "homepage": "./",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "electron-is-dev": "^0.3.0",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-scripts-ts": "2.17.0",
+    "roslib": "^0.20.0",
+    "styled-components": "^3.4.6",
+    "unstated": "^2.1.1"
+  },
+  "scripts": {
+    "start": "concurrently \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "react-start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "package": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "@types/jest": "^23.3.2",
+    "@types/node": "^10.9.4",
+    "@types/react": "^16.4.14",
+    "@types/react-dom": "^16.0.7",
+    "babel-core": "^6.26.3",
+    "babel-runtime": "^6.26.0",
+    "concurrently": "^4.0.1",
+    "electron": "^2.0.9",
+    "electron-builder": "^20.28.4",
+    "prop-types": "^15.6.2",
+    "typescript": "^2.9.1",
+    "wait-on": "^3.0.1"
+  },
+  "build": {
+    "productName": "CornerKick",
+    "artifactName": "${productName}.${ext}",
+    "directories": {
+      "buildResources": "dist-resources"
+    },
+    "files": [
+      "!**/*.d.ts"
+    ],
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Development"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": "false",
+      "artifactName": "${productName}-Setup.${ext}",
+      "perMachine": true,
+      "deleteAppDataOnUninstall": true
+    },
+    "deb": {
+      "packageCategory": "Development"
+    }
+  }
+}

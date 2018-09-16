@@ -141,7 +141,8 @@ if [ "$ros_distro" == "kinetic" ]; then
         echo "##############################################################"
         exit 1
     fi
-    sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+    sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
+    sudo apt-get install ros-kinetic-rosbridge-server -y
 elif [ "$ros_distro" == "melodic" ]; then
     # See http://wiki.ros.org/melodic/Installation/Ubuntu for instructions
     sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -155,6 +156,7 @@ elif [ "$ros_distro" == "melodic" ]; then
         exit 1
     fi
     sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+    sudo apt-get install install ros-melodic-rosbridge-server -y
 fi
 
 
