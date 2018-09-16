@@ -77,8 +77,8 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/team.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/ball.*
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
@@ -204,10 +204,19 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(ball_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(robot_test
+            test/world/robot.cpp
+            ai/world/robot.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(robot_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(ros_message_util_test
             test/util/ros_messages.cpp
             util/ros_messages.cpp
             ai/world/ball.cpp
+            ai/world/robot.cpp
             geom/point.h
             geom/angle.h)
 

@@ -14,6 +14,16 @@
 class Point final
 {
    public:
+    // Due to internal representation of doubles being slightly less accurate/consistent
+    // with some numbers and operations, we consider points that are very close together
+    // to be equal (since they likely are, just possibly slightly misrepresented by the
+    // system/compiler). We use this EPSILON as a threshold for comparison. 1e-15 was
+    // chosen as a value because doubles have about 16 consistent significant figures.
+    // Comparing numbers with 15 significant figures gives us a
+    // small buffer while remaining as accurate as possible.
+    // http://www.cplusplus.com/forum/beginner/95128/
+    static constexpr double EPSILON = 1e-15;
+
     /**
      * Creates a Point at the origin (0, 0).
      */
@@ -327,7 +337,7 @@ Point &operator/=(Point &p, double s);
 inline std::ostream &operator<<(std::ostream &os, const Point &p);
 
 /**
- * Compares two vectors for equality
+ * Compares two Points for equality
  *
  * @param p the first Point
  * @param q the second Point
@@ -513,7 +523,7 @@ inline std::ostream &operator<<(std::ostream &os, const Point &p)
 
 inline constexpr bool operator==(const Point &p, const Point &q)
 {
-    return p.x() == q.x() && p.y() == q.y();
+    return p.isClose(q, Point::EPSILON);
 }
 
 inline constexpr bool operator!=(const Point &p, const Point &q)
