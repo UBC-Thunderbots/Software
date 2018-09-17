@@ -31,12 +31,11 @@ class World final
                    const Team& enemy_team);
 
     /**
-     * Given a message containing new field geometry, update the geometry of the
-     * Field in the world
+     * Updates the state of the field in the world with the new field data
      *
-     * @param new_field_msg The message containing new field geometry
+     * @param new_field_data A Field containing new field information
      */
-    void updateFieldGeometry(const thunderbots_msgs::Field& new_field_msg);
+    void updateFieldGeometry(const Field& new_field_data);
 
     /**
      * Updates the state of the ball in the world with the new ball data

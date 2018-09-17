@@ -10,9 +10,9 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 {
 }
 
-void World::updateFieldGeometry(const thunderbots_msgs::Field &new_field_msg)
+void World::updateFieldGeometry(const Field &new_field_data)
 {
-    field_.updateDimensions(new_field_msg);
+    field_.updateDimensions(new_field_data);
 }
 
 void World::updateBallState(const Ball &new_ball_data)

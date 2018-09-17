@@ -32,24 +32,44 @@ class Ball final
     void update(const Ball& new_ball_data);
 
     /**
-     * Get the predicted position of the ball at a time relative to the current time.
-     * Using the default of 0 will give the current position of the ball.
+     * Returns the current position of the ball
      *
-     * @param time_delta the amount of time in seconds forward to predict
-     *
-     * @return the predicted position of the ball, defined in metres
+     * @return the current position of the ball
      */
-    Point position(double time_delta = 0.0) const;
+    Point position() const;
 
     /**
-     * Get the predicted velocity of the ball at a time relative to the current time.
-     * Using the default of 0 will give the current velocity of the ball.
+     * Returns the estimated position of the ball at a future time, relative to the
+     * current time
      *
-     * @param time_delta the amount of time in seconds forwards to predict
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the ball's position. For example, a value of 1.5 would return the
+     * estimated position of the ball 1.5s in the future.
      *
-     * @return the predicted velocity of the ball, defined in metres per second
+     * @return the estimated position of the ball at a future time.
+     * Coordinates are in metres.
      */
-    Vector velocity(double time_delta = 0.0) const;
+    Point estimatePositionAtFutureTime(double time_delta = 0.0) const;
+
+    /**
+     * Returns the current velocity of the ball
+     *
+     * @return the current velocity of the ball
+     */
+    Vector velocity() const;
+
+    /**
+     * Returns the estimated velocity of the ball at a future time, relative to the
+     * current time
+     *
+     * @param time_delta The relative amount of time in the future (in seconds) at which
+     * to predict the ball's velocity. For example, a value of 1.5 would return the
+     * estimated velocity of the ball 1.5s in the future.
+     *
+     * @return the estimated velocity of the ball at a future time.
+     * Coordinates are in metres.
+     */
+    Vector estimateVelocityAtFutureTime(double time_delta = 0.0) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
