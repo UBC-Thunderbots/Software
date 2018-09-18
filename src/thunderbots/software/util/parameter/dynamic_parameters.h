@@ -14,6 +14,10 @@ namespace DynamicParameters
      */
     void updateAllParametersFromROSParameterServer();
 
+    // How long in milliseconds a Robot must not appear in vision before it is treated
+    // as "non-existent" by the AI
+    extern Parameter<unsigned int> robot_vision_debounce_milliseconds;
+
     namespace Navigator
     {
         extern Parameter<double> default_avoid_dist;

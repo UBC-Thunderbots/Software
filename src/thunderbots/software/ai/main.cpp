@@ -6,6 +6,7 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
 
@@ -40,14 +41,20 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team friendly_team_msg = *msg;
 
-    ai.updateWorldFriendlyTeamState(friendly_team_msg);
+    Team friendly_team = Util::ROSMessages::createTeamFromROSMessage(
+        friendly_team_msg, std::chrono::steady_clock::now());
+
+    ai.updateWorldFriendlyTeamState(friendly_team, std::chrono::steady_clock::now());
 }
 
 void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team enemy_team_msg = *msg;
 
-    ai.updateWorldEnemyTeamState(enemy_team_msg);
+    Team enemy_team = Util::ROSMessages::createTeamFromROSMessage(
+        enemy_team_msg, std::chrono::steady_clock::now());
+
+    ai.updateWorldEnemyTeamState(enemy_team, std::chrono::steady_clock::now());
 }
 
 int main(int argc, char **argv)

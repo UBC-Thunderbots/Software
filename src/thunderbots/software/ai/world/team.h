@@ -1,11 +1,12 @@
 #pragma once
 
+#include <chrono>
 #include <cstdlib>
 #include <map>
 #include <optional>
 #include <vector>
 #include "ai/world/robot.h"
-#include "thunderbots_msgs/Team.h"
+
 
 /**
  * Defines the available colors for an SSL team
@@ -20,22 +21,62 @@ class Team
    public:
     /**
      * Create a new team
+     *
+     * @param robot_expiry_buffer_milliseconds The number of milliseconds a robot must not
+     * have been updated for before it is removed from the team
      */
-    explicit Team();
+    explicit Team(const std::chrono::milliseconds robot_expiry_buffer_milliseconds);
 
     /**
      * Updates this team with new robots.
      *
      * @param team_robots the new robots for this team
+     * @param timestamp The timestamp at which this update is taking place. The timestamp
+     * must be >= the last update timestamp of the robots on the team
      */
-    void update(std::vector<Robot> &team_robots);
+    void updateRobots(const std::vector<Robot>& team_robots,
+                      const std::chrono::steady_clock::time_point timestamp);
 
     /**
-     * Updates this team with new data from the team message
+     * Updates this team with new data from the given team object
      *
-     * @param team_msg the message with the new team data
+     * @param new_team_data A team with the new team data
+     * @param timestamp The timestamp at which this update is taking place. The timestamp
+     * must be >= the last update timestamp of the robots on the team
      */
-    void update(const thunderbots_msgs::Team &team_msg);
+    void updateState(const Team& new_team_data,
+                     const std::chrono::steady_clock::time_point timestamp);
+
+    /**
+     * Updates the Team's state to be its predicted state at the given timestamp.
+     * The timestamp must be >= the last update timestamp of the robots on the team
+     *
+     * @param timestamp The timestamp at which to update the team's state to. Must
+     * be >= the last update timestamp of the robots on the team
+     */
+    void updateStateToPredictedState(
+        const std::chrono::steady_clock::time_point timestamp);
+
+    /**
+     * Removes expired robots from the team. Robots are expired if it has been more than
+     * the expiry_buffer time has passed since they were last updated.
+     *
+     * @param timestamp The timestamp for when this removal is taking place
+     */
+    void removeExpiredRobots(const std::chrono::steady_clock::time_point timestamp);
+
+    /**
+     * Assigns the goalie for this team, making it the robot with the newly given id
+     *
+     * @param new_goalie_id The id of the new goalie for this team
+     */
+    void assignGoalie(unsigned int new_goalie_id);
+
+    /**
+     * Clears the goalie for this team. There will be no goalie assigned after
+     * this operation
+     */
+    void clearGoalie();
 
     /**
      * Gets the number of robots on this team
@@ -43,6 +84,15 @@ class Team
      * @return the number of robots on this team
      */
     std::size_t size() const;
+
+    /**
+     * Returns the number of milliseconds a Robot must not have been updated for before
+     * being removed from this team.
+     *
+     * @return the number of milliseconds a Robot must not have been updated for before
+     * being removed from this team.
+     */
+    std::chrono::milliseconds getRobotExpiryBufferMilliseconds();
 
     /**
      * Returns the robot with the given id. If this team does not have that robot,
@@ -70,4 +120,38 @@ class Team
      * @return a vector of all the robots on this team.
      */
     std::vector<Robot> getAllRobots() const;
+
+    /**
+     * Removes all Robots from this team. Does not affect the goalie id.
+     */
+    void clearAllRobots();
+
+    /**
+     * Defines the equality operator for a Team. Teams are equal if their robots and
+     * goalies are equal
+     *
+     * @param other The team to compare against for equality
+     * @return True if the other team is equal to this team, and false otherwise
+     */
+    bool operator==(const Team& other) const;
+
+    /**
+     * Defines the inequality operator for a Team.
+     *
+     * @param other The team to compare against for inequality
+     * @return True if the other team is not equal to this team, and false otherwise
+     */
+    bool operator!=(const Team& other) const;
+
+   private:
+    // The map that contains the Robots for this team. The map makes it easier to
+    // guarantee we only have robots with unique IDs.
+    std::map<unsigned int, Robot> team_robots;
+
+    // The robot id of the goalie for this team
+    std::optional<unsigned int> goalie_id;
+
+    // The number of milliseconds a Robot must not have been updated for before
+    // being removed from this team.
+    std::chrono::milliseconds robot_expiry_buffer_milliseconds;
 };

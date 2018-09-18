@@ -14,6 +14,9 @@ namespace DynamicParameters
         Parameter<std::vector<std::string>>::updateAllParametersFromROSParameterServer();
     }
 
+    Parameter<unsigned int> robot_vision_debounce_milliseconds(
+        "thunderbots/parameters/robot_vision_debounce_milliseconds", 2000);
+
     namespace Navigator
     {
         // Default avoid distance around robots.

@@ -45,20 +45,24 @@ class World final
     void updateBallState(const Ball& new_ball_data);
 
     /**
-     * Given a message containing new information about the friendly team, updates
-     * the state of the friendly team in the world
+     * Updates the state of the friendly team in the world with the new team data
      *
      * @param new_friendly_team_msg The message containing new friendly team information
+     * @param timestamp The timestamp at which this update is taking place. The timestamp
+     * must be >= the last update timestamp of the robots on the team
      */
-    void updateFriendlyTeam(const thunderbots_msgs::Team& new_friendly_team_msg);
+    void updateFriendlyTeam(const Team& new_friendly_team_data,
+                            const std::chrono::steady_clock::time_point timestamp);
 
     /**
-     * Given a message containing new information about the enemy team, updates
-     * the state of the enemy team in the world
+     * Updates the state of the enemy team in the world with the new team data
      *
      * @param new_enemy_team_msg The message containing new enemy team information
+     * @param timestamp The timestamp at which this update is taking place. The timestamp
+     * must be >= the last update timestamp of the robots on the team
      */
-    void updateEnemyTeam(const thunderbots_msgs::Team& new_enemy_team_msg);
+    void updateEnemyTeam(const Team& new_enemy_team_data,
+                         const std::chrono::steady_clock::time_point timestamp);
 
     /**
      * Returns a const reference to the Field in the world
