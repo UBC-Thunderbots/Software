@@ -55,7 +55,6 @@ env:
     # NOTE: this is a single test
     - RUN_BUILD="true"
       RUN_TESTS="true"
-      RUN_TESTS="true"
       RUN_COVERAGE="true"
     # Test Formatting
     - RUN_FORMATTING_CHECKS="true"
