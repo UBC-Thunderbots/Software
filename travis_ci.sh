@@ -38,6 +38,7 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     # Build the codebase
     if [ "$RUN_COVERAGE" == "true" ]; then
         # Build with coverage - slower but gives more detailed coverage info
+        # that we will use later to produce a report
         travis_run catkin_make \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_FLAGS="-g -O0 -Wall -fprofile-arcs -ftest-coverage" \
