@@ -24,6 +24,7 @@ install:
     # Tests default to false if not set
     - RUN_BUILD=${RUN_BUILD:-"false"}
     - RUN_TESTS=${RUN_TESTS:-"false"}
+    - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
@@ -54,6 +55,8 @@ env:
     # NOTE: this is a single test
     - RUN_BUILD="true"
       RUN_TESTS="true"
+      RUN_TESTS="true"
+      RUN_COVERAGE="true"
     # Test Formatting
     - RUN_FORMATTING_CHECKS="true"
 
