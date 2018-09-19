@@ -42,7 +42,8 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
         travis_run catkin_make \
             -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_CXX_FLAGS=\"-g -O0 -fprofile-arcs -ftest-coverage\" \
-            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1
+            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1 \
+            VERBOSE=1
     else
         # Build Normally
         travis_run catkin_make
