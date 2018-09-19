@@ -62,8 +62,9 @@ if [ "$RUN_COVERAGE" == "true" ]; then
     travis_run pip install --user cpp-coveralls
 
     # Run The Coverage Checker
-    # TODO: Make me actually work
-    travis_run coveralls --exclude lib --exclude tests --gcov-options '\-lp'
+    travis_run coveralls \
+        --root build \
+        --gcov-options '\-lp'
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
