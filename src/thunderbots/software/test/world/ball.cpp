@@ -80,7 +80,7 @@ TEST(BallTest, update_values_with_past_timestamp)
 
 TEST(BallTest, update_state_with_future_timestamp)
 {
-    auto current_time = steady_clock::now();
+    auto current_time      = steady_clock::now();
     auto one_second_future = current_time + seconds(1);
 
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
@@ -98,7 +98,7 @@ TEST(BallTest, update_state_with_future_timestamp)
 TEST(BallTest, update_state_with_future_timestamp_2)
 {
     auto current_time = steady_clock::now();
-    auto future_time = current_time + milliseconds(150);
+    auto future_time  = current_time + milliseconds(150);
 
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
@@ -164,11 +164,14 @@ TEST(BallTest, get_velocity_at_future_time)
     double EPSILON = 1e-4;
 
     EXPECT_TRUE(
-        Vector(0.9851, 1.9702).isClose(ball.estimateVelocityAtFutureTime(milliseconds(150)), EPSILON));
+        Vector(0.9851, 1.9702)
+            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(150)), EPSILON));
     EXPECT_TRUE(
-        Vector(0.9048, 1.8097).isClose(ball.estimateVelocityAtFutureTime(milliseconds(1000)), EPSILON));
+        Vector(0.9048, 1.8097)
+            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(1000)), EPSILON));
     EXPECT_TRUE(
-        Vector(0.8187, 1.6375).isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
+        Vector(0.8187, 1.6375)
+            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
 }
 
 TEST(BallTest, get_velocity_at_future_time_2)
@@ -178,12 +181,15 @@ TEST(BallTest, get_velocity_at_future_time_2)
 
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12));
 
-    EXPECT_TRUE(Vector(-4.4330, -0.1182)
-                        .isClose(ball.estimateVelocityAtFutureTime(milliseconds(150)), EPSILON));
     EXPECT_TRUE(
-            Vector(-4.0717, -0.1086).isClose(ball.estimateVelocityAtFutureTime(milliseconds(1000)), EPSILON));
+        Vector(-4.4330, -0.1182)
+            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(150)), EPSILON));
     EXPECT_TRUE(
-            Vector(-3.6843, -0.0982).isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
+        Vector(-4.0717, -0.1086)
+            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(1000)), EPSILON));
+    EXPECT_TRUE(
+        Vector(-3.6843, -0.0982)
+            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
 }
 
 TEST(BallTest, get_velocity_at_past_time)
@@ -194,7 +200,7 @@ TEST(BallTest, get_velocity_at_past_time)
 
 TEST(BallTest, get_last_update_timestamp)
 {
-    auto current_time = steady_clock::now();
+    auto current_time       = steady_clock::now();
     auto half_second_future = current_time + milliseconds(500);
 
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
@@ -208,7 +214,7 @@ TEST(BallTest, get_last_update_timestamp)
 
 TEST(BallTest, get_last_update_timestamp_2)
 {
-    auto current_time = steady_clock::now();
+    auto current_time        = steady_clock::now();
     auto nine_seconds_future = current_time + seconds(9);
 
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
@@ -223,7 +229,7 @@ TEST(BallTest, get_last_update_timestamp_2)
 TEST(BallTest, equality_operators)
 {
     auto current_time = steady_clock::now();
-    auto future_time = current_time + milliseconds(123);
+    auto future_time  = current_time + milliseconds(123);
 
     Ball ball_0 = Ball();
 

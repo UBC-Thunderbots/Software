@@ -1,7 +1,7 @@
 #pragma once
 
-#include "geom/point.h"
 #include <chrono>
+#include "geom/point.h"
 
 class Ball final
 {
@@ -15,7 +15,9 @@ class Ball final
      * @paragraph last_update_timestamp A timestamp of when this ball's information was
      * last updated. Default is the current time.
      */
-    explicit Ball(Point position = Point(), Vector velocity = Vector(), std::chrono::time_point<std::chrono::steady_clock> last_update_timestamp = std::chrono::steady_clock::now());
+    explicit Ball(Point position = Point(), Vector velocity = Vector(),
+                  std::chrono::time_point<std::chrono::steady_clock>
+                      last_update_timestamp = std::chrono::steady_clock::now());
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -26,7 +28,8 @@ class Ball final
      * @param timestamp The timestamp for the time at which this update is taking place.
      * The timestamp must be >= the ball's latest update timestamp
      */
-    void update(const Point& new_position, const Vector& new_velocity, std::chrono::time_point<std::chrono::steady_clock> timestamp);
+    void update(const Point& new_position, const Vector& new_velocity,
+                std::chrono::time_point<std::chrono::steady_clock> timestamp);
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -70,7 +73,8 @@ class Ball final
      * @return the estimated position of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
-    Point estimatePositionAtFutureTime(const std::chrono::milliseconds& milliseconds_in_future) const;
+    Point estimatePositionAtFutureTime(
+        const std::chrono::milliseconds& milliseconds_in_future) const;
 
     /**
      * Returns the current velocity of the ball
@@ -91,7 +95,8 @@ class Ball final
      * @return the estimated velocity of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
-    Vector estimateVelocityAtFutureTime(const std::chrono::milliseconds& milliseconds_in_future) const;
+    Vector estimateVelocityAtFutureTime(
+        const std::chrono::milliseconds& milliseconds_in_future) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
