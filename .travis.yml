@@ -11,7 +11,6 @@ sudo: false
 dist: trusty
 services:
   - docker
-compiler: gcc
 language: generic
 notifications:
   email:
