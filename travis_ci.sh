@@ -36,7 +36,16 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     travis_run ./environment_setup/setup_software.sh kinetic
 
     # Build the codebase
-    travis_run catkin_make
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Build with coverage - slower but gives more detailed coverage info
+        travis_run catkin_make \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="-g -O0 -Wall -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1
+    else
+        # Build Normally
+        travis_run catkin_make
+    fi
 fi
 
 if [ "$RUN_TESTS" == "true" ]; then
@@ -46,6 +55,15 @@ if [ "$RUN_TESTS" == "true" ]; then
     # Report the results of the tests
     # (which tests failed and why)
     travis_run catkin_test_results --verbose
+fi
+
+if [ "$RUN_COVERAGE" == "true" ]; then
+    # Install the C++ Wrapper for Coveralls (Our Coverage Checker)
+    travis_run pip install --user cpp-coveralls
+
+    # Run The Coverage Checker
+    # TODO: Make me actually work
+    travis_run coveralls --exclude lib --exclude tests --gcov-options '\-lp'
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
