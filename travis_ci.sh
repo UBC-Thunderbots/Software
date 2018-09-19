@@ -41,7 +41,7 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
         # that we will use later to produce a report
         travis_run catkin_make \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_FLAGS="-g -O0 -Wall -fprofile-arcs -ftest-coverage" \
+            -DCMAKE_CXX_FLAGS="-g -O0 -fprofile-arcs -ftest-coverage" \
             -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1
     else
         # Build Normally
@@ -63,9 +63,7 @@ if [ "$RUN_COVERAGE" == "true" ]; then
     travis_run pip install --user cpp-coveralls
 
     # Run The Coverage Checker
-    travis_run coveralls \
-        --root build \
-        --gcov-options '\-lp'
+    travis_run coveralls
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
