@@ -20,7 +20,7 @@ function travis_run() {
 
   echo -e "\e[0Ktravis_fold:start:command$TRAVIS_FOLD_COUNTER \e[34m$ $command\e[0m"
   # actually run command
-  $command || exit 1 # kill build if error
+  eval ${command} || exit 1 # kill build if error
   echo -e -n "\e[0Ktravis_fold:end:command$TRAVIS_FOLD_COUNTER\e[0m"
 
   let "TRAVIS_FOLD_COUNTER += 1"
