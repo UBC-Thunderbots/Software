@@ -47,7 +47,7 @@ TEST_F(BallTest, construct_with_params)
     EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, update_all_values)
+TEST_F(BallTest, update_state_with_all_values)
 {
     Ball ball = Ball(Point(), Vector(), current_time);
 
@@ -56,7 +56,7 @@ TEST_F(BallTest, update_all_values)
     EXPECT_EQ(Ball(Point(-4.23, 1.07), Vector(1, 2), one_second_future), ball);
 }
 
-TEST_F(BallTest, update_position_only)
+TEST_F(BallTest, update_state_with_position_only)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -65,7 +65,7 @@ TEST_F(BallTest, update_position_only)
     EXPECT_EQ(Ball(Point(0.01, -99.8), Vector(1, 2), current_time), ball);
 }
 
-TEST_F(BallTest, update_velocity_only)
+TEST_F(BallTest, update_state_with_velocity_only)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -74,7 +74,7 @@ TEST_F(BallTest, update_velocity_only)
     EXPECT_EQ(Ball(Point(-4.23, 1.07), Vector(-0.0, -9.433), current_time), ball);
 }
 
-TEST_F(BallTest, update_with_new_ball)
+TEST_F(BallTest, update_state_with_new_ball)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -85,13 +85,13 @@ TEST_F(BallTest, update_with_new_ball)
     EXPECT_EQ(ball_update, ball);
 }
 
-TEST_F(BallTest, update_values_with_past_timestamp)
+TEST_F(BallTest, update_state_with_past_timestamp)
 {
     // TODO: Add unit tests to check for thrown exceptions when past timestamps are used
     // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
 }
 
-TEST_F(BallTest, update_state_with_future_timestamp)
+TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp)
 {
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
@@ -105,7 +105,7 @@ TEST_F(BallTest, update_state_with_future_timestamp)
     EXPECT_EQ(one_second_future, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, update_state_with_future_timestamp_2)
+TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp_2)
 {
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
@@ -119,7 +119,7 @@ TEST_F(BallTest, update_state_with_future_timestamp_2)
     EXPECT_EQ(one_hundred_fifty_milliseconds_future, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, update_state_with_past_timestamp)
+TEST_F(BallTest, update_state_to_predicted_state_with_past_timestamp)
 {
     // TODO: Add unit tests to check for thrown exceptions when past timestamps are used
     // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
