@@ -61,6 +61,7 @@ fi
 
 if [ "$RUN_COVERAGE" == "true" ]; then
     # Install the C++ Wrapper for Coveralls (Our Coverage Checker)
+    sudo apt-get install python-pip -y
     travis_run pip install --user cpp-coveralls
 
     # Run The Coverage Checker
