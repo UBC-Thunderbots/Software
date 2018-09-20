@@ -8,7 +8,8 @@
 # called. This setup is dictated in the `.travis.yml` file                  # 
 #############################################################################
 
-#TODO: We use the coverage arguments for CMake multiple times here, so we should put them in a variables!!!
+#TODO: We use the coverage arguments for CMake multiple times here, so we should put them in a variables!!!n
+# TODO: conditionals should reflect the fact that we must build and run tests to get coverage
 
 # The current directory
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -74,10 +75,10 @@ fi
 if [ "$RUN_COVERAGE" == "true" ]; then
     # Install the C++ Wrapper for Coveralls (Our Coverage Checker)
     sudo apt-get install python-pip -y
-    travis_run pip install --user cpp-coveralls
+    travis_run pip install --user cpp-coveralls pyOpenSSL
 
     # Make sure we can find the coveralls executable
-    PATH="$PATH:$HOME/.local"
+    PATH="$PATH:$HOME/.local/bin"
 
     # Run The Coverage Checker
     travis_run coveralls
