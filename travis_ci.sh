@@ -64,6 +64,9 @@ if [ "$RUN_COVERAGE" == "true" ]; then
     sudo apt-get install python-pip -y
     travis_run pip install --user cpp-coveralls
 
+    # Make sure we can find the coveralls executable
+    PATH="$PATH:$HOME/.local/bin"
+
     # Run The Coverage Checker
     travis_run coveralls
 fi
