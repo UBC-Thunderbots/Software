@@ -5,14 +5,14 @@ using namespace std::chrono;
 
 class ROSMessageUtilTest : public ::testing::Test
 {
-protected:
+   protected:
     void SetUp() override
     {
         auto epoch = time_point<std::chrono::steady_clock>();
         // An arbitrary fixed point in time. 10000 seconds after the epoch
         auto since_epoch = std::chrono::seconds(10000);
 
-        current_time       = epoch + since_epoch;
+        current_time = epoch + since_epoch;
     }
 
     steady_clock::time_point current_time;
@@ -52,7 +52,8 @@ TEST_F(ROSMessageUtilTest, create_robot_from_ros_message)
 
     Robot robot = Util::ROSMessages::createRobotFromROSMessage(robot_msg);
 
-    EXPECT_EQ(Robot(id, position, velocity, orientation, angular_velocity, current_time), robot);
+    EXPECT_EQ(Robot(id, position, velocity, orientation, angular_velocity, current_time),
+              robot);
 }
 
 TEST_F(ROSMessageUtilTest, create_field_from_ros_message)

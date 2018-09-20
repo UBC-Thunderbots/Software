@@ -23,8 +23,9 @@ namespace Util
             AngularVelocity robot_angular_velocity =
                 Angle::ofRadians(robot_msg.angular_velocity);
 
-            Robot robot = Robot(robot_id, robot_position, robot_velocity,
-                                robot_orientation, robot_angular_velocity, std::chrono::steady_clock::now());
+            Robot robot =
+                Robot(robot_id, robot_position, robot_velocity, robot_orientation,
+                      robot_angular_velocity, std::chrono::steady_clock::now());
 
             return robot;
         }
