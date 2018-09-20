@@ -16,7 +16,7 @@ class Ball final
      * given position and velocity. Default is the current time.
      */
     explicit Ball(Point position = Point(), Vector velocity = Vector(),
-                  std::chrono::time_point<std::chrono::steady_clock> timestamp =
+                  std::chrono::steady_clock::time_point timestamp =
                       std::chrono::steady_clock::now());
 
     /**
@@ -29,7 +29,7 @@ class Ball final
      * position and velocity. The timestamp must be >= the ball's latest update timestamp
      */
     void updateState(const Point& new_position, const Vector& new_velocity,
-                     std::chrono::time_point<std::chrono::steady_clock> timestamp);
+                     std::chrono::steady_clock::time_point timestamp);
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -46,15 +46,14 @@ class Ball final
      * @param timestamp The timestamp at which to update the ball's state to. Must
      * be >= the ball's last update timestamp
      */
-    void updateStateToPredictedState(
-        std::chrono::time_point<std::chrono::steady_clock> timestamp);
+    void updateStateToPredictedState(std::chrono::steady_clock::time_point timestamp);
 
     /**
      * Returns the timestamp for when this ball's data was last updated
      *
      * @return the timestamp for when this ball's data was last updated
      */
-    std::chrono::time_point<std::chrono::steady_clock> lastUpdateTimestamp() const;
+    std::chrono::steady_clock::time_point lastUpdateTimestamp() const;
 
     /**
      * Returns the current position of the ball
@@ -123,5 +122,5 @@ class Ball final
     // The current velocity of the ball, in metres per second
     Vector velocity_;
     // The timestamp for when this ball was last updated
-    std::chrono::time_point<std::chrono::steady_clock> last_update_timestamp;
+    std::chrono::steady_clock::time_point last_update_timestamp;
 };

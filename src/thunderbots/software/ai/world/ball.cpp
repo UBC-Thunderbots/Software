@@ -1,7 +1,7 @@
 #include "ball.h"
 
 Ball::Ball(Point position, Vector velocity,
-           std::chrono::time_point<std::chrono::steady_clock> timestamp)
+           std::chrono::steady_clock::time_point timestamp)
     : position_(position), velocity_(velocity), last_update_timestamp(timestamp)
 {
 }
@@ -13,7 +13,7 @@ void Ball::updateState(const Ball &new_ball_data)
 }
 
 void Ball::updateState(const Point &new_position, const Vector &new_velocity,
-                       std::chrono::time_point<std::chrono::steady_clock> timestamp)
+                       std::chrono::steady_clock::time_point timestamp)
 {
     if (timestamp < last_update_timestamp)
     {
@@ -28,8 +28,7 @@ void Ball::updateState(const Point &new_position, const Vector &new_velocity,
     last_update_timestamp = timestamp;
 }
 
-void Ball::updateStateToPredictedState(
-    std::chrono::time_point<std::chrono::steady_clock> timestamp)
+void Ball::updateStateToPredictedState(std::chrono::steady_clock::time_point timestamp)
 {
     if (timestamp < last_update_timestamp)
     {
@@ -47,7 +46,7 @@ void Ball::updateStateToPredictedState(
     updateState(new_position, new_velocity, timestamp);
 }
 
-std::chrono::time_point<std::chrono::steady_clock> Ball::lastUpdateTimestamp() const
+std::chrono::steady_clock::time_point Ball::lastUpdateTimestamp() const
 {
     return last_update_timestamp;
 }
