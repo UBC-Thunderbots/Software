@@ -8,6 +8,8 @@
 # called. This setup is dictated in the `.travis.yml` file                  # 
 #############################################################################
 
+#TODO: We use the coverage arguments for CMake multiple times here, so we should put them in a variables!!!
+
 # The current directory
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -51,8 +53,18 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
 fi
 
 if [ "$RUN_TESTS" == "true" ]; then
-    # Run all the tests
-    travis_run catkin_make run_tests
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Build with coverage - slower but gives more detailed coverage info
+        # that we will use later to produce a report
+        travis_run catkin_make run_tests \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS=\'-O0 -fprofile-arcs -ftest-coverage\' \
+            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1 \
+            VERBOSE=1
+    else
+        # Run tests normally
+        travis_run catkin_make run_tests
+    fi
 
     # Report the results of the tests
     # (which tests failed and why)
@@ -65,7 +77,7 @@ if [ "$RUN_COVERAGE" == "true" ]; then
     travis_run pip install --user cpp-coveralls
 
     # Make sure we can find the coveralls executable
-    PATH="$PATH:$HOME/.local/bin"
+    PATH="$PATH:$HOME/.local"
 
     # Run The Coverage Checker
     travis_run coveralls
