@@ -1,21 +1,19 @@
 #include "ball.h"
 
 Ball::Ball(Point position, Vector velocity,
-           std::chrono::time_point<std::chrono::steady_clock> last_update_timestamp)
-    : position_(position),
-      velocity_(velocity),
-      last_update_timestamp(last_update_timestamp)
+           std::chrono::time_point<std::chrono::steady_clock> timestamp)
+    : position_(position), velocity_(velocity), last_update_timestamp(timestamp)
 {
 }
 
-void Ball::update(const Ball &new_ball_data)
+void Ball::updateState(const Ball &new_ball_data)
 {
-    update(new_ball_data.position(), new_ball_data.velocity(),
-           new_ball_data.lastUpdateTimestamp());
+    updateState(new_ball_data.position(), new_ball_data.velocity(),
+                new_ball_data.lastUpdateTimestamp());
 }
 
-void Ball::update(const Point &new_position, const Vector &new_velocity,
-                  std::chrono::time_point<std::chrono::steady_clock> timestamp)
+void Ball::updateState(const Point &new_position, const Vector &new_velocity,
+                       std::chrono::time_point<std::chrono::steady_clock> timestamp)
 {
     if (timestamp < last_update_timestamp)
     {
@@ -30,7 +28,8 @@ void Ball::update(const Point &new_position, const Vector &new_velocity,
     last_update_timestamp = timestamp;
 }
 
-void Ball::updateState(std::chrono::time_point<std::chrono::steady_clock> timestamp)
+void Ball::updateStateToPredictedState(
+    std::chrono::time_point<std::chrono::steady_clock> timestamp)
 {
     if (timestamp < last_update_timestamp)
     {
@@ -45,7 +44,7 @@ void Ball::updateState(std::chrono::time_point<std::chrono::steady_clock> timest
     Point new_position = estimatePositionAtFutureTime(milliseconds_in_future);
     Point new_velocity = estimateVelocityAtFutureTime(milliseconds_in_future);
 
-    update(new_position, new_velocity, timestamp);
+    updateState(new_position, new_velocity, timestamp);
 }
 
 std::chrono::time_point<std::chrono::steady_clock> Ball::lastUpdateTimestamp() const

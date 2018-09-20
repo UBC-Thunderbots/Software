@@ -12,12 +12,12 @@ class Ball final
      * @param position The position of the ball, with coordinates in metres.
      * Default is (0, 0)
      * @param velocity The velocity of the ball, in metres per second. Default is (0, 0)
-     * @paragraph last_update_timestamp A timestamp of when this ball's information was
-     * last updated. Default is the current time.
+     * @param timestamp The timestamp at which the ball was observed to be at the
+     * given position and velocity. Default is the current time.
      */
     explicit Ball(Point position = Point(), Vector velocity = Vector(),
-                  std::chrono::time_point<std::chrono::steady_clock>
-                      last_update_timestamp = std::chrono::steady_clock::now());
+                  std::chrono::time_point<std::chrono::steady_clock> timestamp =
+                      std::chrono::steady_clock::now());
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -25,11 +25,11 @@ class Ball final
      *
      * @param new_position the new position of the ball, defined in metres
      * @param new_velocity the new velocity of the ball, defined in metres per second
-     * @param timestamp The timestamp for the time at which this update is taking place.
-     * The timestamp must be >= the ball's latest update timestamp
+     * @param timestamp The timestamp at which the ball was observed to be at the given
+     * position and velocity. The timestamp must be >= the ball's latest update timestamp
      */
-    void update(const Point& new_position, const Vector& new_velocity,
-                std::chrono::time_point<std::chrono::steady_clock> timestamp);
+    void updateState(const Point& new_position, const Vector& new_velocity,
+                     std::chrono::time_point<std::chrono::steady_clock> timestamp);
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -37,15 +37,17 @@ class Ball final
      *
      * @param new_ball_data A ball containing new ball data
      */
-    void update(const Ball& new_ball_data);
+    void updateState(const Ball& new_ball_data);
 
     /**
-     * Updates the ball's state to match what it would be at the given timestamp. The
-     * timestamp must be >= the ball's last update timestamp.
+     * Updates the ball's state to be its predicted state at the given timestamp.
+     * The timestamp must be >= the ball's last update timestamp
      *
-     * @param timestamp The timestamp at which to update the ball's state to
+     * @param timestamp The timestamp at which to update the ball's state to. Must
+     * be >= the ball's last update timestamp
      */
-    void updateState(std::chrono::time_point<std::chrono::steady_clock> timestamp);
+    void updateStateToPredictedState(
+        std::chrono::time_point<std::chrono::steady_clock> timestamp);
 
     /**
      * Returns the timestamp for when this ball's data was last updated
