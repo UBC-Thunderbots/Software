@@ -17,7 +17,7 @@ void World::updateFieldGeometry(const Field &new_field_data)
 
 void World::updateBallState(const Ball &new_ball_data)
 {
-    ball_.update(new_ball_data);
+    ball_.updateState(new_ball_data);
 }
 
 void World::updateFriendlyTeam(const thunderbots_msgs::Team &new_friendly_team_msg)
