@@ -81,7 +81,7 @@ if [ "$RUN_COVERAGE" == "true" ]; then
     PATH="$PATH:$HOME/.local/bin"
 
     # Run The Coverage Checker
-    travis_run coveralls
+    travis_run coveralls -t $COVERALLS_REPO_TOKEN
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
