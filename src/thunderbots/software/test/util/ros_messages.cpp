@@ -1,7 +1,24 @@
 #include "util/ros_messages.h"
 #include <gtest/gtest.h>
 
-TEST(ROSMessageUtilTest, create_ball_from_ros_message)
+using namespace std::chrono;
+
+class ROSMessageUtilTest : public ::testing::Test
+{
+   protected:
+    void SetUp() override
+    {
+        auto epoch = time_point<std::chrono::steady_clock>();
+        // An arbitrary fixed point in time. 10000 seconds after the epoch
+        auto since_epoch = std::chrono::seconds(10000);
+
+        current_time = epoch + since_epoch;
+    }
+
+    steady_clock::time_point current_time;
+};
+
+TEST_F(ROSMessageUtilTest, create_ball_from_ros_message)
 {
     thunderbots_msgs::Ball ball_msg;
 
@@ -15,7 +32,7 @@ TEST(ROSMessageUtilTest, create_ball_from_ros_message)
     EXPECT_EQ(Ball(Point(1.2, -8.07), Vector(0, 3)), ball);
 }
 
-TEST(ROSMessageUtilTest, create_robot_from_ros_message)
+TEST_F(ROSMessageUtilTest, create_robot_from_ros_message)
 {
     unsigned int id                  = 2;
     Point position                   = Point(1.2, -8.07);
@@ -35,10 +52,11 @@ TEST(ROSMessageUtilTest, create_robot_from_ros_message)
 
     Robot robot = Util::ROSMessages::createRobotFromROSMessage(robot_msg);
 
-    EXPECT_EQ(Robot(id, position, velocity, orientation, angular_velocity), robot);
+    EXPECT_EQ(Robot(id, position, velocity, orientation, angular_velocity, current_time),
+              robot);
 }
 
-TEST(ROSMessageUtilTest, create_field_from_ros_message)
+TEST_F(ROSMessageUtilTest, create_field_from_ros_message)
 {
     double length               = 9.0;
     double width                = 6.0;
