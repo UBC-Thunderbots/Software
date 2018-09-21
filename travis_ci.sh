@@ -8,6 +8,9 @@
 # called. This setup is dictated in the `.travis.yml` file                  # 
 #############################################################################
 
+# TODO: We use the coverage arguments for CMake multiple times here, so we should put them in a variables!!!n
+# TODO: conditionals should reflect the fact that we must build and run tests to get coverage
+
 # The current directory
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -20,7 +23,7 @@ function travis_run() {
 
   echo -e "\e[0Ktravis_fold:start:command$TRAVIS_FOLD_COUNTER \e[34m$ $command\e[0m"
   # actually run command
-  $command || exit 1 # kill build if error
+  eval ${command} || exit 1 # kill build if error
   echo -e -n "\e[0Ktravis_fold:end:command$TRAVIS_FOLD_COUNTER\e[0m"
 
   let "TRAVIS_FOLD_COUNTER += 1"
@@ -36,16 +39,49 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     travis_run ./environment_setup/setup_software.sh kinetic
 
     # Build the codebase
-    travis_run catkin_make
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Build with coverage - slower but gives more detailed coverage info
+        # that we will use later to produce a report
+        travis_run catkin_make \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS=\'-O0 -fprofile-arcs -ftest-coverage\' \
+            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1 \
+            VERBOSE=1
+    else
+        # Build Normally
+        travis_run catkin_make
+    fi
 fi
 
 if [ "$RUN_TESTS" == "true" ]; then
-    # Run all the tests
-    travis_run catkin_make run_tests
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Build with coverage - slower but gives more detailed coverage info
+        # that we will use later to produce a report
+        travis_run catkin_make run_tests \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS=\'-O0 -fprofile-arcs -ftest-coverage\' \
+            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1 \
+            VERBOSE=1
+    else
+        # Run tests normally
+        travis_run catkin_make run_tests
+    fi
 
     # Report the results of the tests
     # (which tests failed and why)
     travis_run catkin_test_results --verbose
+fi
+
+if [ "$RUN_COVERAGE" == "true" ]; then
+    # Install the C++ Wrapper for Coveralls (Our Coverage Checker)
+    sudo apt-get install python-pip -y
+    travis_run pip install --user cpp-coveralls pyOpenSSL
+
+    # Make sure we can find the coveralls executable
+    PATH="$PATH:$HOME/.local/bin"
+
+    # Run The Coverage Checker
+    travis_run coveralls -t $COVERALLS_REPO_TOKEN
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
