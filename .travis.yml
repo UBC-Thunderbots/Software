@@ -43,11 +43,13 @@ install:
     # Coveralls Travis-CI integration requires it to be run directly within
     # Travis (will NOT work from within the docker container)
     # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
-    - >
-      if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
-        pip install --user cpp-coveralls pyOpenSSL;
-        coveralls;
-      fi;
+    - pip install --user cpp-coveralls pyOpenSSL
+    - coveralls
+    #- >
+    #  if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
+    #    pip install --user cpp-coveralls pyOpenSSL;
+    #    coveralls;
+    #  fi;
 
 
 env:
