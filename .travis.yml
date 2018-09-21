@@ -24,13 +24,17 @@ install:
     # Tests default to false if not set
     - RUN_BUILD=${RUN_BUILD:-"false"}
     - RUN_TESTS=${RUN_TESTS:-"false"}
+    - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
     - docker run 
       --env RUN_BUILD
       --env RUN_TESTS
+      --env RUN_COVERAGE
       --env RUN_FORMATTING_CHECKS
+      # COVERALLS_REPO_TOKEN is a secret token for uploading to Coveralls.
+      # It should be defined in the settings for this project on Travis CI.
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
@@ -54,6 +58,7 @@ env:
     # NOTE: this is a single test
     - RUN_BUILD="true"
       RUN_TESTS="true"
+      RUN_COVERAGE="true"
     # Test Formatting
     - RUN_FORMATTING_CHECKS="true"
 
