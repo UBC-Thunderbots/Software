@@ -8,10 +8,11 @@ class RobotTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        auto epoch = time_point<std::chrono::steady_clock>();
-        // An arbitrary fixed point in time. 10000 seconds after the epoch
+        auto epoch       = time_point<std::chrono::steady_clock>();
         auto since_epoch = std::chrono::seconds(10000);
 
+        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // We use this fixed point in time to make the tests deterministic.
         current_time       = epoch + since_epoch;
         half_second_future = current_time + milliseconds(500);
         one_second_future  = current_time + seconds(1);
@@ -62,39 +63,6 @@ TEST_F(RobotTest, update_state_with_all_params)
     EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
 }
 
-TEST_F(RobotTest, update_state_with_specific_params)
-{
-    Robot robot = Robot(0, current_time);
-
-    // Only update certain parameters and leave the rest as their previous values
-    robot.updateState(robot.position(), Vector(2.2, -0.05), robot.orientation(),
-                      AngularVelocity::ofRadians(1.1), current_time);
-
-    EXPECT_EQ(0, robot.id());
-    EXPECT_EQ(Point(), robot.position());
-    EXPECT_EQ(Vector(2.2, -0.05), robot.velocity());
-    EXPECT_EQ(Angle::zero(), robot.orientation());
-    EXPECT_EQ(AngularVelocity::ofRadians(1.1), robot.angularVelocity());
-    EXPECT_EQ(current_time, robot.lastUpdateTimestamp());
-}
-
-TEST_F(RobotTest, update_state_with_specific_params_2)
-{
-    Robot robot = Robot(0, Point(), Vector(2.2, -0.05), Angle::zero(),
-                        AngularVelocity::ofRadians(1.1), current_time);
-
-    // Repeat with a different combination of parameters
-    robot.updateState(Point(-1.2, 3), robot.velocity(), Angle::quarter(),
-                      robot.angularVelocity(), one_second_future);
-
-    EXPECT_EQ(0, robot.id());
-    EXPECT_EQ(Point(-1.2, 3), robot.position());
-    EXPECT_EQ(Vector(2.2, -0.05), robot.velocity());
-    EXPECT_EQ(Angle::quarter(), robot.orientation());
-    EXPECT_EQ(AngularVelocity::ofRadians(1.1), robot.angularVelocity());
-    EXPECT_EQ(one_second_future, robot.lastUpdateTimestamp());
-}
-
 TEST_F(RobotTest, update_state_with_new_robot_with_same_id)
 {
     Robot robot = Robot(0, current_time);
@@ -107,10 +75,10 @@ TEST_F(RobotTest, update_state_with_new_robot_with_same_id)
     EXPECT_EQ(robot, update_robot);
 }
 
-TEST_F(RobotTest, update_with_new_robot_with_different_id)
+TEST_F(RobotTest, update_state_with_new_robot_with_different_id)
 {
     // TODO: Add unit test to check for a thrown exception when a robot with a different
-    // id is used once https://github.com/UBC-Thunderbots/Software/issues/16i is done
+    // id is used once https://github.com/UBC-Thunderbots/Software/issues/16 is done
 }
 
 TEST_F(RobotTest, update_state_to_predicted_state_with_future_timestamp)
@@ -141,17 +109,17 @@ TEST_F(RobotTest, get_position_at_current_time)
     EXPECT_EQ(Point(-1.2, 3), robot.position());
 }
 
-TEST_F(RobotTest, get_position_at_future_time)
+TEST_F(RobotTest, get_position_at_future_time_with_negative_robot_velocity)
 {
-    Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
+    Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, -2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7), current_time);
 
-    EXPECT_EQ(Point(-1.4, 4.04), robot.estimatePositionAtFutureTime(milliseconds(400)));
-    EXPECT_EQ(Point(-1.7, 5.6), robot.estimatePositionAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Point(-2.7, 10.8), robot.estimatePositionAtFutureTime(milliseconds(3000)));
+    EXPECT_EQ(Point(-1.4, 1.96), robot.estimatePositionAtFutureTime(milliseconds(400)));
+    EXPECT_EQ(Point(-1.7, 0.4), robot.estimatePositionAtFutureTime(milliseconds(1000)));
+    EXPECT_EQ(Point(-2.7, -4.8), robot.estimatePositionAtFutureTime(milliseconds(3000)));
 }
 
-TEST_F(RobotTest, get_position_at_future_time_2)
+TEST_F(RobotTest, get_position_at_future_time_with_positive_robot_velocity)
 {
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
@@ -178,17 +146,17 @@ TEST_F(RobotTest, get_velocity_at_current_time)
     EXPECT_EQ(Vector(-0.5, 2.6), robot.velocity());
 }
 
-TEST_F(RobotTest, get_velocity_at_future_time)
+TEST_F(RobotTest, get_velocity_at_future_time_with_negative_robot_velocity)
 {
-    Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
+    Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, -2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7), current_time);
 
-    EXPECT_EQ(Point(-0.5, 2.6), robot.estimateVelocityAtFutureTime(milliseconds(400)));
-    EXPECT_EQ(Point(-0.5, 2.6), robot.estimateVelocityAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Point(-0.5, 2.6), robot.estimateVelocityAtFutureTime(milliseconds(3000)));
+    EXPECT_EQ(Point(-0.5, -2.6), robot.estimateVelocityAtFutureTime(milliseconds(400)));
+    EXPECT_EQ(Point(-0.5, -2.6), robot.estimateVelocityAtFutureTime(milliseconds(1000)));
+    EXPECT_EQ(Point(-0.5, -2.6), robot.estimateVelocityAtFutureTime(milliseconds(3000)));
 }
 
-TEST_F(RobotTest, get_velocity_at_future_time_2)
+TEST_F(RobotTest, get_velocity_at_future_time_with_positive_robot_velocity)
 {
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
@@ -214,7 +182,7 @@ TEST_F(RobotTest, get_orientation_at_current_time)
     EXPECT_EQ(Angle::quarter(), robot.orientation());
 }
 
-TEST_F(RobotTest, get_orientation_at_future_time)
+TEST_F(RobotTest, get_orientation_at_future_time_with_positive_robot_angular_velocity)
 {
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7), current_time);
@@ -227,7 +195,7 @@ TEST_F(RobotTest, get_orientation_at_future_time)
               robot.estimateOrientationAtFutureTime(milliseconds(3000)));
 }
 
-TEST_F(RobotTest, get_orientation_at_future_time_2)
+TEST_F(RobotTest, get_orientation_at_future_time_with_negative_robot_angular_velocity)
 {
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
@@ -254,7 +222,8 @@ TEST_F(RobotTest, get_angular_velocity_at_current_time)
     EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.angularVelocity());
 }
 
-TEST_F(RobotTest, get_angular_velocity_at_future_time)
+TEST_F(RobotTest,
+       get_angular_velocity_at_future_time_with_positive_robot_angular_velocity)
 {
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, 2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7), current_time);
@@ -267,7 +236,8 @@ TEST_F(RobotTest, get_angular_velocity_at_future_time)
               robot.estimateAngularVelocityAtFutureTime(milliseconds(3000)));
 }
 
-TEST_F(RobotTest, get_angular_velocity_at_future_time_2)
+TEST_F(RobotTest,
+       get_angular_velocity_at_future_time_with_negative_robot_angular_velocity)
 {
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
@@ -296,18 +266,6 @@ TEST_F(RobotTest, get_last_update_timestamp)
     robot.updateStateToPredictedState(half_second_future);
 
     EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
-}
-
-TEST_F(RobotTest, get_last_update_timestamp_2)
-{
-    Robot robot = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
-                        AngularVelocity::ofRadians(2), half_second_future);
-
-    EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
-
-    robot.updateStateToPredictedState(one_second_future);
-
-    EXPECT_EQ(one_second_future, robot.lastUpdateTimestamp());
 }
 
 TEST_F(RobotTest, equality_operators)
