@@ -45,6 +45,7 @@ install:
       pip install --user cpp-coveralls pyOpenSSL
       coveralls
       fi
+    - echo "Travis has finished successfully"
 
 
 env:
