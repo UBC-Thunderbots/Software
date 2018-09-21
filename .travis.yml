@@ -42,7 +42,7 @@ install:
     # If Code Coverage ran, then upload the report. We do this from here because
     # of Coveralls Travis-CI integration
     - if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
-      pip install --user cpp-coveralls
+      pip install --user cpp-coveralls pyOpenSSL
       coveralls
       fi
 
