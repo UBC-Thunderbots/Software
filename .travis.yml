@@ -20,7 +20,7 @@ install:
     # Pull in MoveIt's ROS Docker CI image (piping to `/dev/null` to hide output)
     - DOCKER_IMAGE=moveit/moveit:$ROS_DISTRO-ci
     - echo "Pulling in Docker Image \"$DOCKER_IMAGE\""
-    #- docker pull $DOCKER_IMAGE > /dev/null
+    - docker pull $DOCKER_IMAGE > /dev/null
     # Tests default to false if not set
     - RUN_BUILD=${RUN_BUILD:-"false"}
     - RUN_TESTS=${RUN_TESTS:-"false"}
@@ -28,19 +28,21 @@ install:
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
-    #- docker run 
-    #  --env RUN_BUILD
-    #  --env RUN_TESTS
-    #  --env RUN_COVERAGE
-    #  --env RUN_FORMATTING_CHECKS
-    #  --env REPOSITORY_NAME
-    #  --env TRAVIS_PULL_REQUEST
-    #  --env TRAVIS_BRANCH
-    #  --volume $(pwd):/root/$REPOSITORY_NAME
-    #  $DOCKER_IMAGE
-    #  /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
+    - docker run 
+      --env RUN_BUILD
+      --env RUN_TESTS
+      --env RUN_COVERAGE
+      --env RUN_FORMATTING_CHECKS
+      --env REPOSITORY_NAME
+      --env TRAVIS_PULL_REQUEST
+      --env TRAVIS_BRANCH
+      --volume $(pwd):/root/$REPOSITORY_NAME
+      $DOCKER_IMAGE
+      /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
     # If Code Coverage ran, then upload the report. We do this from here because
-    # of Coveralls Travis-CI integration
+    # Coveralls Travis-CI integration requires it to be run directly within
+    # Travis (will NOT work from within the docker container)
+    # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
     - >
       if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
         pip install --user cpp-coveralls pyOpenSSL;
