@@ -44,7 +44,7 @@ install:
     # Travis (will NOT work from within the docker container)
     # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
     - pip install --user cpp-coveralls pyOpenSSL
-    - coveralls
+    - coveralls --gcov-options '\-lp'
     #- >
     #  if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
     #    pip install --user cpp-coveralls pyOpenSSL;
