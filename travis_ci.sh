@@ -8,7 +8,7 @@
 # called. This setup is dictated in the `.travis.yml` file                  # 
 #############################################################################
 
-# TODO: We use the coverage arguments for CMake multiple times here, so we should put them in a variables!!!n
+#TODO: We use the coverage arguments for CMake multiple times here, so we should put them in a variables!!!n
 # TODO: conditionals should reflect the fact that we must build and run tests to get coverage
 
 # The current directory
