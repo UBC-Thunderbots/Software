@@ -41,7 +41,11 @@ install:
     #  /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
     # If Code Coverage ran, then upload the report. We do this from here because
     # of Coveralls Travis-CI integration
-    - if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then pip install --user cpp-coveralls pyOpenSSL && coveralls fi
+    - >
+      if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
+        pip install --user cpp-coveralls pyOpenSSL;
+        coveralls;
+      fi;
 
 
 env:
