@@ -33,13 +33,19 @@ install:
       --env RUN_TESTS
       --env RUN_COVERAGE
       --env RUN_FORMATTING_CHECKS
-      --env COVERALLS_REPO_TOKEN
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
       --volume $(pwd):/root/$REPOSITORY_NAME
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
+    # If Code Coverage ran, then upload the report. We do this from here because
+    # of Coveralls Travis-CI integration
+    - if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
+        pip install --user cpp-coveralls
+        coveralls
+      fi
+
 
 env:
   # Global Variables that are set at the start of every CI run

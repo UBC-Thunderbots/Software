@@ -72,17 +72,17 @@ if [ "$RUN_TESTS" == "true" ]; then
     travis_run catkin_test_results --verbose
 fi
 
-if [ "$RUN_COVERAGE" == "true" ]; then
-    # Install the C++ Wrapper for Coveralls (Our Coverage Checker)
-    sudo apt-get install python-pip -y
-    travis_run pip install --user cpp-coveralls pyOpenSSL
-
-    # Make sure we can find the coveralls executable
-    PATH="$PATH:$HOME/.local/bin"
-
-    # Run The Coverage Checker
-    travis_run coveralls -t $COVERALLS_REPO_TOKEN
-fi
+#if [ "$RUN_COVERAGE" == "true" ]; then
+#    # Install the C++ Wrapper for Coveralls (Our Coverage Checker)
+#    sudo apt-get install python-pip -y
+#    travis_run pip install --user cpp-coveralls pyOpenSSL
+#
+#    # Make sure we can find the coveralls executable
+#    PATH="$PATH:$HOME/.local/bin"
+#
+#    # Run The Coverage Checker
+#    travis_run coveralls -t $COVERALLS_REPO_TOKEN
+#fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
     CLANG_VERSION="4.0"
