@@ -33,6 +33,7 @@ install:
       --env RUN_TESTS
       --env RUN_COVERAGE
       --env RUN_FORMATTING_CHECKS
+      --env COVERALLS_REPO_TOKEN 
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
