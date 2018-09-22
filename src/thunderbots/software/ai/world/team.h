@@ -36,21 +36,22 @@ class Team
      * Updates this team with new robots.
      *
      * @param team_robots the new robots for this team
-     * @param timestamp The timestamp at which this update is taking place. The timestamp
-     * must be >= the last update timestamp of the robots on the team
      */
-    void updateRobots(const std::vector<Robot>& team_robots,
-                      const std::chrono::steady_clock::time_point timestamp);
+    void updateRobots(const std::vector<Robot>& team_robots);
 
     /**
-     * Updates this team with new data from the given team object
+     * Updates this team with new data from the given team object. This is different from
+     * a copy constructor because the team object is only used to store data, we don't
+     * take the entire state of the new_team_data. For example, the robots on this team
+     * may have complex internal state for predicting movement. In most cases the
+     * new_team_data we get will be constructed from a ROS message, and not contain this
+     * complex state. The "simple" robot data such as position, velocity... from the
+     * new_team_data is used to update the state of the robots on this team, rather than
+     * the robots simply being copied over (because if we copied we would lose our state).
      *
      * @param new_team_data A team with the new team data
-     * @param timestamp The timestamp at which this update is taking place. The timestamp
-     * must be >= the last update timestamp of the robots on the team
      */
-    void updateState(const Team& new_team_data,
-                     const std::chrono::steady_clock::time_point timestamp);
+    void updateState(const Team& new_team_data);
 
     /**
      * Updates the Team's state to be its predicted state at the given timestamp.
@@ -113,7 +114,7 @@ class Team
      * @return the Robot on the team with the given id if it exists, otherwise
      * std::nullopt
      */
-    std::optional<Robot> getRobotById(unsigned int id) const;
+    std::optional<Robot> getRobotById(const unsigned int id) const;
 
     /**
      * Returns the goalie robot for this team, if one is specified. Otherwise

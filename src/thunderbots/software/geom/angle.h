@@ -582,7 +582,8 @@ inline constexpr bool operator>=(Angle x, Angle y)
 
 inline bool operator==(Angle x, Angle y)
 {
-    return (std::fabs(x.toRadians() - y.toRadians()) <= Angle::EPSILON);
+    Angle diff = x.angleMod().diff(y.angleMod());
+    return diff.toRadians() <= Angle::EPSILON;
 }
 
 inline constexpr bool operator!=(Angle x, Angle y)

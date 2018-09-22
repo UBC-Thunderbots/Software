@@ -91,7 +91,7 @@ TEST_F(ROSMessageUtilTest, create_field_from_ros_message)
 TEST_F(ROSMessageUtilTest, create_team_from_ros_message)
 {
     auto robot_expiry_buffer_milliseconds = milliseconds(1000);
-    int goalie_id                         = 5;
+    unsigned int goalie_id                = 5;
 
     unsigned int robot_id            = 9;
     Point position                   = Point(1.2, -8.07);
@@ -120,15 +120,16 @@ TEST_F(ROSMessageUtilTest, create_team_from_ros_message)
     team_msg.robot_expiry_buffer_milliseconds =
         static_cast<unsigned int>(robot_expiry_buffer_milliseconds.count());
 
-    Team team = Util::ROSMessages::createTeamFromROSMessage(team_msg, current_time);
+    Team team = Util::ROSMessages::createTeamFromROSMessage(team_msg);
 
     Team team_other = Team(robot_expiry_buffer_milliseconds);
     Robot robot =
         Robot(robot_id, position, velocity, orientation, angular_velocity, current_time);
 
-    team_other.updateRobots({robot}, current_time);
+    team_other.updateRobots({robot});
+    team_other.assignGoalie(goalie_id);
 
-    EXPECT_EQ(team_other.goalie(), team.goalie());
+    EXPECT_EQ(team_other, team);
 }
 
 int main(int argc, char **argv)

@@ -48,21 +48,15 @@ class World final
      * Updates the state of the friendly team in the world with the new team data
      *
      * @param new_friendly_team_msg The message containing new friendly team information
-     * @param timestamp The timestamp at which this update is taking place. The timestamp
-     * must be >= the last update timestamp of the robots on the team
      */
-    void updateFriendlyTeam(const Team& new_friendly_team_data,
-                            const std::chrono::steady_clock::time_point timestamp);
+    void updateFriendlyTeamState(const Team& new_friendly_team_data);
 
     /**
      * Updates the state of the enemy team in the world with the new team data
      *
      * @param new_enemy_team_msg The message containing new enemy team information
-     * @param timestamp The timestamp at which this update is taking place. The timestamp
-     * must be >= the last update timestamp of the robots on the team
      */
-    void updateEnemyTeam(const Team& new_enemy_team_data,
-                         const std::chrono::steady_clock::time_point timestamp);
+    void updateEnemyTeamState(const Team& new_enemy_team_data);
 
     /**
      * Returns a const reference to the Field in the world

@@ -42,20 +42,18 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team friendly_team_msg = *msg;
 
-    Team friendly_team = Util::ROSMessages::createTeamFromROSMessage(
-        friendly_team_msg, std::chrono::steady_clock::now());
+    Team friendly_team = Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
 
-    ai.updateWorldFriendlyTeamState(friendly_team, std::chrono::steady_clock::now());
+    ai.updateWorldFriendlyTeamState(friendly_team);
 }
 
 void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team enemy_team_msg = *msg;
 
-    Team enemy_team = Util::ROSMessages::createTeamFromROSMessage(
-        enemy_team_msg, std::chrono::steady_clock::now());
+    Team enemy_team = Util::ROSMessages::createTeamFromROSMessage(enemy_team_msg);
 
-    ai.updateWorldEnemyTeamState(enemy_team, std::chrono::steady_clock::now());
+    ai.updateWorldEnemyTeamState(enemy_team);
 }
 
 int main(int argc, char **argv)

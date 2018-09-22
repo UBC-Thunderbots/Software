@@ -45,13 +45,8 @@ namespace Util
          * Given a Team message, constructs and returns a Team object
          *
          * @param team_msg The message containing the team message data
-         * @param timestamp The timestamp at which this update is taking place. The
-         * timestamp
-         * must be >= the last update timestamp of the robots on the team
          * @return A Team object created with the given team message data
          */
-        Team createTeamFromROSMessage(
-            const thunderbots_msgs::Team& team_msg,
-            const std::chrono::steady_clock::time_point timestamp);
+        Team createTeamFromROSMessage(const thunderbots_msgs::Team& team_msg);
     }  // namespace ROSMessages
 }  // namespace Util

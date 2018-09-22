@@ -45,9 +45,7 @@ namespace Util
             return field;
         }
 
-        Team createTeamFromROSMessage(
-            const thunderbots_msgs::Team& team_msg,
-            const std::chrono::steady_clock::time_point timestamp)
+        Team createTeamFromROSMessage(const thunderbots_msgs::Team& team_msg)
         {
             std::vector<Robot> robots;
             for (const auto& robot_msg : team_msg.robots)
@@ -61,7 +59,7 @@ namespace Util
 
             Team team = Team(expiry_buffer);
 
-            team.updateRobots(robots, timestamp);
+            team.updateRobots(robots);
 
             if (team_msg.goalie_id >= 0)
             {

@@ -11,8 +11,7 @@ Team::Team(const std::chrono::milliseconds robot_expiry_buffer_milliseconds)
 {
 }
 
-void Team::updateRobots(const std::vector<Robot>& new_robots,
-                        const std::chrono::steady_clock::time_point timestamp)
+void Team::updateRobots(const std::vector<Robot>& new_robots)
 {
     // Update the robots, checking that there are no duplicate IDs in the given data
     std::set<unsigned int> robot_ids;
@@ -37,14 +36,11 @@ void Team::updateRobots(const std::vector<Robot>& new_robots,
             team_robots.insert(std::make_pair(robot.id(), robot));
         }
     }
-
-    removeExpiredRobots(timestamp);
 }
 
-void Team::updateState(const Team& new_team_data,
-                       const std::chrono::steady_clock::time_point timestamp)
+void Team::updateState(const Team& new_team_data)
 {
-    updateRobots(new_team_data.getAllRobots(), timestamp);
+    updateRobots(new_team_data.getAllRobots());
     this->goalie_id = new_team_data.goalie_id;
 }
 
@@ -67,7 +63,7 @@ void Team::removeExpiredRobots(const std::chrono::steady_clock::time_point times
         if (std::chrono::duration(timestamp - it->second.lastUpdateTimestamp()) >
             robot_expiry_buffer_milliseconds)
         {
-            team_robots.erase(it++);
+            it = team_robots.erase(it);
         }
         else
         {
@@ -103,7 +99,7 @@ std::chrono::milliseconds Team::getRobotExpiryBufferMilliseconds()
     return robot_expiry_buffer_milliseconds;
 }
 
-std::optional<Robot> Team::getRobotById(unsigned int id) const
+std::optional<Robot> Team::getRobotById(const unsigned int id) const
 {
     auto it = team_robots.find(id);
     if (it != team_robots.end())

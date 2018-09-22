@@ -51,23 +51,16 @@ class AI final
      * the state of the friendly team in the world
      *
      * @param new_friendly_team_msg The message containing new friendly team information
-     * @param timestamp The timestamp at which this update is taking place. The timestamp
-     * must be >= the last update timestamp of the robots on the team
      */
-    void updateWorldFriendlyTeamState(
-        const Team& new_friendly_team_data,
-        const std::chrono::steady_clock::time_point timestamp);
+    void updateWorldFriendlyTeamState(const Team& new_friendly_team_data);
 
     /**
      * Given a message containing new information about the enemy team, updates
      * the state of the enemy team in the world
      *
      * @param new_enemy_team_msg The message containing new enemy team information
-     * @param timestamp The timestamp at which this update is taking place. The timestamp
-     * must be >= the last update timestamp of the robots on the team
      */
-    void updateWorldEnemyTeamState(const Team& new_enemy_team_data,
-                                   const std::chrono::steady_clock::time_point timestamp);
+    void updateWorldEnemyTeamState(const Team& new_enemy_team_data);
 
 
    private:
