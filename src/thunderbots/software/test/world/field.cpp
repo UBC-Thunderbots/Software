@@ -1,4 +1,5 @@
 #include "ai/world/field.h"
+
 #include <gtest/gtest.h>
 
 TEST(FieldTest, construction)

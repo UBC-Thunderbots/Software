@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+
 #include "geom/angle.h"
 
 /**
@@ -202,12 +203,12 @@ class Point final
     constexpr bool isClose(const Point &other, double dist) const;
 
     /**
-    * Assigns one Point to another
-    *
-    * @param other the Point whose value should be copied into this Point
-    *
-    * @return this Point
-    */
+     * Assigns one Point to another
+     *
+     * @param other the Point whose value should be copied into this Point
+     *
+     * @return this Point
+     */
     Point &operator=(const Point &other);
 
    private:
@@ -361,17 +362,11 @@ inline Point Point::createFromAngle(Angle angle)
     return Point(angle.cos(), angle.sin());
 }
 
-inline constexpr Point::Point() : _x(0.0), _y(0.0)
-{
-}
+inline constexpr Point::Point() : _x(0.0), _y(0.0) {}
 
-inline constexpr Point::Point(double x, double y) : _x(x), _y(y)
-{
-}
+inline constexpr Point::Point(double x, double y) : _x(x), _y(y) {}
 
-inline constexpr Point::Point(const Point &p) : _x(p.x()), _y(p.y())
-{
-}
+inline constexpr Point::Point(const Point &p) : _x(p.x()), _y(p.y()) {}
 
 inline constexpr double Point::x() const
 {
@@ -546,7 +541,7 @@ namespace std
             return h(p.x()) * 17 + h(p.y());
         }
     };
-}
+}  // namespace std
 
 // Since we also use Points to represent 2D vectors, we also allow
 // Points to be referred to as Vectors. This help make interfaces easier to read.

@@ -1,4 +1,5 @@
 #include "ai/hl/stp/tactic/move.h"
+
 #include "ai/hl/stp/play/play.h"
 
 class MovePlay : public Play

@@ -1,4 +1,5 @@
 #include "geom/point.h"
+
 #include <gtest/gtest.h>
 
 TEST(AngleTest, accesors)

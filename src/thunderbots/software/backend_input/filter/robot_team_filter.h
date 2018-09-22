@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "robot_filter.h"

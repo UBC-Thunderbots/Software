@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+
 #include "geom/angle.h"
 #include "geom/point.h"
 
@@ -18,9 +19,8 @@ class Robot
      * state. The timestamp must be >= the robot's latest update timestamp. Default
      * is the current time
      */
-    explicit Robot(unsigned int id,
-                   std::chrono::steady_clock::time_point timestamp =
-                       std::chrono::steady_clock::now());
+    explicit Robot(unsigned int id, std::chrono::steady_clock::time_point timestamp =
+                                        std::chrono::steady_clock::now());
 
     /**
      * Creates a new robot given robot data

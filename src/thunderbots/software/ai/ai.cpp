@@ -32,12 +32,12 @@ void AI::updateWorldFieldState(const Field &new_field_data)
     world.updateFieldGeometry(new_field_data);
 }
 
-void AI::updateWorldFriendlyTeamState(const thunderbots_msgs::Team &new_friendly_team_msg)
+void AI::updateWorldFriendlyTeamState(const Team &new_friendly_team_data)
 {
-    world.updateFriendlyTeam(new_friendly_team_msg);
+    world.updateFriendlyTeamState(new_friendly_team_data);
 }
 
-void AI::updateWorldEnemyTeamState(const thunderbots_msgs::Team &new_enemy_team_msg)
+void AI::updateWorldEnemyTeamState(const Team &new_enemy_team_data)
 {
-    world.updateEnemyTeam(new_enemy_team_msg);
+    world.updateEnemyTeamState(new_enemy_team_data);
 }

@@ -49,7 +49,7 @@ if [ "$RUN_TESTS" == "true" ]; then
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
-    CLANG_VERSION="4.0"
+    CLANG_VERSION="7.0"
 
     # Determine what we should compare this branch against to figure out what
     # files were changed

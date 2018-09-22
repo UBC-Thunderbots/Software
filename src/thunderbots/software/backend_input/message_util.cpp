@@ -1,4 +1,5 @@
 #include "message_util.h"
+
 #include "shared/constants.h"
 
 thunderbots_msgs::Field MessageUtil::createFieldMsg(
@@ -108,8 +109,11 @@ thunderbots_msgs::Robot MessageUtil::createRobotMsg(
 
     robot_msg.orientation = filtered_robot_data.orientation.toRadians();
 
-    robot_msg.timestamp_microseconds =
-        Timestamp::getMicroseconds(filtered_robot_data.timestamp);
+    robot_msg.timestamp_nanoseconds_since_epoch = static_cast<unsigned long>(
+        std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::microseconds(
+                Timestamp::getMicroseconds(filtered_robot_data.timestamp)))
+            .count());
 
     return robot_msg;
 }
