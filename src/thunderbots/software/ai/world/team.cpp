@@ -76,7 +76,13 @@ void Team::removeExpiredRobots(const std::chrono::steady_clock::time_point times
 
 void Team::assignGoalie(unsigned int new_goalie_id)
 {
-    goalie_id = new_goalie_id;
+    if (getRobotById(new_goalie_id)) {
+        goalie_id = new_goalie_id;
+    }
+
+    // TODO: We should not be assigning the goalie to a robot that is not a member
+    // of the team. Throw a proper exception here once
+    // https://github.com/UBC-Thunderbots/Software/issues/16 is completed
 }
 
 void Team::clearGoalie()
@@ -84,7 +90,7 @@ void Team::clearGoalie()
     goalie_id.reset();
 }
 
-std::size_t Team::size() const
+std::size_t Team::numRobots() const
 {
     return team_robots.size();
 }

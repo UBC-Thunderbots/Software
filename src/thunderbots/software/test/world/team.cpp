@@ -35,7 +35,7 @@ TEST_F(TeamTest, construction)
 {
     Team team = Team(milliseconds(1000));
 
-    EXPECT_EQ(0, team.size());
+    EXPECT_EQ(0, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(2));
     EXPECT_EQ(std::nullopt, team.goalie());
@@ -60,7 +60,7 @@ TEST_F(TeamTest, update_with_robots)
 
     team.updateRobots(robot_list, current_time);
 
-    EXPECT_EQ(3, team.size());
+    EXPECT_EQ(3, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
     EXPECT_EQ(robot_2, team.getRobotById(2));
@@ -90,7 +90,7 @@ TEST_F(TeamTest, update_with_new_team)
 
     team.updateState(team_update, current_time);
 
-    EXPECT_EQ(3, team.size());
+    EXPECT_EQ(3, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
     EXPECT_EQ(robot_2, team.getRobotById(2));
@@ -124,7 +124,7 @@ TEST_F(TeamTest, update_state_to_predicted_state_with_future_timestamp)
     Robot future_robot_1 = robot_1;
     future_robot_1.updateStateToPredictedState(one_second_future);
 
-    EXPECT_EQ(2, team.size());
+    EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(future_robot_0, team.getRobotById(0));
     EXPECT_EQ(future_robot_1, team.getRobotById(1));
     EXPECT_EQ(future_robot_0, team.goalie());
@@ -144,25 +144,25 @@ TEST_F(TeamTest, remove_expired_robots)
 
     team.removeExpiredRobots(current_time);
 
-    EXPECT_EQ(2, team.size());
+    EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
 
     team.removeExpiredRobots(two_seconds_100ms_future);
 
-    EXPECT_EQ(2, team.size());
+    EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
 
     team.removeExpiredRobots(three_seconds_future);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
 
     team.removeExpiredRobots(four_seconds_future);
 
-    EXPECT_EQ(0, team.size());
+    EXPECT_EQ(0, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
 }
@@ -177,21 +177,21 @@ TEST_F(TeamTest, update_robots_no_robots_expire)
     // Add a single robot to the team
     team.updateRobots({robot_0}, current_time);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
 
     // Pretend it has been 1 second since the last update, with no new updates
     team.updateRobots({}, one_second_future);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
 
     // Pretend it has been 4 seconds since the last update, with no new updates
     team.updateRobots({}, four_seconds_future);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
 }
@@ -206,7 +206,7 @@ TEST_F(TeamTest, update_robots_all_robots_expire)
     // Add a single robot to the team
     team.updateRobots({robot_0}, current_time);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
 
@@ -215,7 +215,7 @@ TEST_F(TeamTest, update_robots_all_robots_expire)
     // robot to have expired and been removed from the team
     team.updateRobots({}, two_seconds_100ms_future);
 
-    EXPECT_EQ(0, team.size());
+    EXPECT_EQ(0, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
 }
@@ -229,7 +229,7 @@ TEST_F(TeamTest, update_robots_staggered_robot_expiry)
 
     team.updateRobots({robot_0}, current_time);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
     EXPECT_EQ(std::nullopt, team.getRobotById(2));
@@ -241,7 +241,7 @@ TEST_F(TeamTest, update_robots_staggered_robot_expiry)
 
     team.updateRobots({robot_1}, one_second_future);
 
-    EXPECT_EQ(2, team.size());
+    EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
     EXPECT_EQ(std::nullopt, team.getRobotById(2));
@@ -254,7 +254,7 @@ TEST_F(TeamTest, update_robots_staggered_robot_expiry)
 
     team.updateRobots({robot_2}, two_seconds_future);
 
-    EXPECT_EQ(3, team.size());
+    EXPECT_EQ(3, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
     EXPECT_EQ(robot_2, team.getRobotById(2));
@@ -265,7 +265,7 @@ TEST_F(TeamTest, update_robots_staggered_robot_expiry)
     // been removed from the team
     team.updateRobots({}, three_seconds_future);
 
-    EXPECT_EQ(2, team.size());
+    EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
     EXPECT_EQ(robot_2, team.getRobotById(2));
@@ -274,7 +274,7 @@ TEST_F(TeamTest, update_robots_staggered_robot_expiry)
     // Update again. The second robot should have expired now
     team.updateRobots({}, four_seconds_future);
 
-    EXPECT_EQ(1, team.size());
+    EXPECT_EQ(1, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
     EXPECT_EQ(robot_2, team.getRobotById(2));
@@ -283,7 +283,7 @@ TEST_F(TeamTest, update_robots_staggered_robot_expiry)
     // Update again. The third robot should have expired now
     team.updateRobots({}, five_seconds_future);
 
-    EXPECT_EQ(0, team.size());
+    EXPECT_EQ(0, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
     EXPECT_EQ(std::nullopt, team.getRobotById(2));
@@ -304,7 +304,7 @@ TEST_F(TeamTest, clear_all_robots)
 
     team.updateRobots(robot_list, current_time);
 
-    EXPECT_EQ(2, team.size());
+    EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
     EXPECT_EQ(std::nullopt, team.getRobotById(2));
@@ -313,7 +313,7 @@ TEST_F(TeamTest, clear_all_robots)
 
     team.clearAllRobots();
 
-    EXPECT_EQ(0, team.size());
+    EXPECT_EQ(0, team.numRobots());
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(std::nullopt, team.getRobotById(1));
     EXPECT_EQ(std::nullopt, team.getRobotById(2));

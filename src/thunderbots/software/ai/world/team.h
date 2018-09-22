@@ -59,14 +59,19 @@ class Team
 
     /**
      * Removes expired robots from the team. Robots are expired if it has been more than
-     * the expiry_buffer time has passed since they were last updated.
+     * the expiry_buffer time has passed since they were last updated. This would happen
+     * if a robot is removed from the field, so that it is no longer seen by the cameras.
+     * After a short amount of time, we should treat robots that we can no longer see
+     * (and therefore have not been updating) as removed from the field, so we should
+     * remove them from the team.
      *
      * @param timestamp The timestamp for when this removal is taking place
      */
     void removeExpiredRobots(const std::chrono::steady_clock::time_point timestamp);
 
     /**
-     * Assigns the goalie for this team, making it the robot with the newly given id
+     * Assigns the goalie for this team, making it the robot with the newly given id.
+     * A robot with the given id must already exist on the team.
      *
      * @param new_goalie_id The id of the new goalie for this team
      */
@@ -83,7 +88,7 @@ class Team
      *
      * @return the number of robots on this team
      */
-    std::size_t size() const;
+    std::size_t numRobots() const;
 
     /**
      * Returns the number of milliseconds a Robot must not have been updated for before
@@ -127,8 +132,8 @@ class Team
     void clearAllRobots();
 
     /**
-     * Defines the equality operator for a Team. Teams are equal if their robots and
-     * goalies are equal
+     * Defines the equality operator for a Team. Teams are equal if their robots are equal
+     * and have the same robot assigned as the goalie
      *
      * @param other The team to compare against for equality
      * @return True if the other team is equal to this team, and false otherwise
