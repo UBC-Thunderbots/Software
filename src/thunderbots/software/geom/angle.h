@@ -434,9 +434,7 @@ inline Angle Angle::atan(double x)
     return Angle::ofRadians(std::atan(x));
 }
 
-inline constexpr Angle::Angle() : rads(0.0)
-{
-}
+inline constexpr Angle::Angle() : rads(0.0) {}
 
 inline constexpr double Angle::toRadians() const
 {
@@ -450,10 +448,9 @@ inline constexpr double Angle::toDegrees() const
 
 inline constexpr Angle Angle::mod(Angle divisor) const
 {
-    return Angle::ofRadians(
-        toRadians() -
-        static_cast<double>(static_cast<long>(toRadians() / divisor.toRadians())) *
-            divisor.toRadians());
+    return Angle::ofRadians(toRadians() - static_cast<double>(static_cast<long>(
+                                              toRadians() / divisor.toRadians())) *
+                                              divisor.toRadians());
 }
 
 inline constexpr Angle Angle::remainder(Angle divisor) const
@@ -506,9 +503,7 @@ inline constexpr Angle Angle::angleMod() const
     return remainder(Angle::full());
 }
 
-inline constexpr Angle::Angle(double rads) : rads(rads)
-{
-}
+inline constexpr Angle::Angle(double rads) : rads(rads) {}
 
 inline constexpr Angle operator-(Angle angle)
 {

@@ -1,4 +1,5 @@
 #include "message_util.h"
+
 #include "shared/constants.h"
 
 thunderbots_msgs::Field MessageUtil::createFieldMsg(

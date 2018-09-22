@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+
 #include "geom/point.h"
 #include "util/timestamp.h"
 

@@ -1,5 +1,7 @@
 #include "team.h"
+
 #include <set>
+
 #include "shared/constants.h"
 
 Team::Team(const std::chrono::milliseconds robot_expiry_buffer_milliseconds)
@@ -76,7 +78,8 @@ void Team::removeExpiredRobots(const std::chrono::steady_clock::time_point times
 
 void Team::assignGoalie(unsigned int new_goalie_id)
 {
-    if (getRobotById(new_goalie_id)) {
+    if (getRobotById(new_goalie_id))
+    {
         goalie_id = new_goalie_id;
     }
 

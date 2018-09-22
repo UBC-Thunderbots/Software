@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "ai/hl/stp/tactic/tactic.h"
 #include "ai/world/world.h"
 

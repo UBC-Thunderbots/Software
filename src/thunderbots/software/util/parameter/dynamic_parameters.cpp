@@ -28,5 +28,5 @@ namespace DynamicParameters
         // #23: https://github.com/UBC-Thunderbots/Software/issues/23
         Parameter<double> collision_avoid_velocity_scale(
             "/thunderbots/parameters/collision_avoid_velocity_scale", 2.0);
-    }
-}
+    }  // namespace Navigator
+}  // namespace DynamicParameters

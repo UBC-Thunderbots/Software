@@ -1,4 +1,5 @@
 #include "ai/world/robot.h"
+
 #include <gtest/gtest.h>
 
 using namespace std::chrono;

@@ -74,5 +74,5 @@ namespace Util
 
             return team;
         }
-    }
-}
+    }  // namespace ROSMessages
+}  // namespace Util

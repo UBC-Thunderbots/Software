@@ -1,6 +1,8 @@
 #include "geom/rect.h"
+
 #include <algorithm>
 #include <cmath>
+
 #include "geom/shapes.h"
 #include "geom/util.h"
 

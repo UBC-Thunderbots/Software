@@ -53,5 +53,5 @@ namespace Util
         Team createTeamFromROSMessage(
             const thunderbots_msgs::Team& team_msg,
             const std::chrono::steady_clock::time_point timestamp);
-    }
-}
+    }  // namespace ROSMessages
+}  // namespace Util

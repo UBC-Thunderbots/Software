@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <vector>
+
 #include "ai/intent/intent.h"
 #include "ai/world/world.h"
 

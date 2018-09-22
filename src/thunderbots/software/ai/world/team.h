@@ -5,13 +5,18 @@
 #include <map>
 #include <optional>
 #include <vector>
+
 #include "ai/world/robot.h"
 
 
 /**
  * Defines the available colors for an SSL team
  */
-typedef enum { BLUE = 0, YELLOW = 1 } TeamColour;
+typedef enum
+{
+    BLUE   = 0,
+    YELLOW = 1
+} TeamColour;
 
 /**
  * A team of robots
