@@ -10,13 +10,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "electron-is-dev": "^0.3.0",
-    "react": "^16.5.1",
-    "react-dom": "^16.5.1",
+    "@blueprintjs/core": "3.6.1",
+    "@types/pixi.js": "4.8.1",
+    "electron-is-dev": "0.3.0",
+    "pixi-viewport": "3.0.0",
+    "pixi.js": "4.8.1",
+    "react": "16.4.1",
+    "react-dom": "16.4.1",
+    "react-pixi-fiber": "0.4.9",
     "react-scripts-ts": "2.17.0",
-    "roslib": "^0.20.0",
-    "styled-components": "^3.4.6",
-    "unstated": "^2.1.1"
+    "roslib": "0.20.0",
+    "styled-components": "3.4.6",
+    "unstated": "2.1.1"
   },
   "scripts": {
     "start": "concurrently \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
@@ -28,18 +33,18 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.2",
-    "@types/node": "^10.9.4",
-    "@types/react": "^16.4.14",
-    "@types/react-dom": "^16.0.7",
-    "babel-core": "^6.26.3",
-    "babel-runtime": "^6.26.0",
-    "concurrently": "^4.0.1",
-    "electron": "^2.0.9",
-    "electron-builder": "^20.28.4",
-    "prop-types": "^15.6.2",
-    "typescript": "^2.9.1",
-    "wait-on": "^3.0.1"
+    "@types/jest": "23.3.2",
+    "@types/node": "10.9.4",
+    "@types/react": "16.4.14",
+    "@types/react-dom": "16.0.7",
+    "babel-core": "6.26.3",
+    "babel-runtime": "6.26.0",
+    "concurrently": "4.0.1",
+    "electron": "2.0.9",
+    "electron-builder": "20.28.4",
+    "prop-types": "15.6.2",
+    "typescript": "2.9.1",
+    "wait-on": "3.0.1"
   },
   "build": {
     "productName": "CornerKick",

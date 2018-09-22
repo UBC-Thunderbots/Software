@@ -1,17 +1,13 @@
+import * as React from 'react';
 import styled, {keyframes} from 'styled-components';
 
+import { ROSState } from '../services/ros';
+
 export const StyledWrapper = styled.div`
-    width: 32px;
-    height: 64px;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: all .2s;
-    cursor: pointer;
-
-    &:hover {
-        background: #EEE;
-    }
 `;
 
 
@@ -53,3 +49,25 @@ export const StyledDot = styled.div`
     }
 `;
 
+export const ConnectedIndicator = (props: {state: ROSState}) => {
+    let state = '';
+    switch(props.state) {
+        case ROSState.Connected:
+        state = 'connected';
+        break;
+        case ROSState.Disconnected:
+        state = 'disconnected';
+        break;
+        case ROSState.Connecting:
+        state = 'connecting';
+        break;
+        case ROSState.Error:
+        state = 'error';
+        break;
+    }
+    return (
+        <StyledWrapper>
+            <StyledDot className={state}/>
+        </StyledWrapper>
+    )
+}
