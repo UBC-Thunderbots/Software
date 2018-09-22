@@ -269,42 +269,78 @@ TEST_F(RobotTest, get_last_update_timestamp)
     EXPECT_EQ(half_second_future, robot.lastUpdateTimestamp());
 }
 
-TEST_F(RobotTest, equality_operators)
+TEST_F(RobotTest, equality_operator_compare_same_robot)
 {
-    Robot robot_0_0 = Robot(0, Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
-                            AngularVelocity::ofDegrees(30), current_time);
+    Robot robot = Robot(0, Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
+                        AngularVelocity::ofDegrees(30), current_time);
 
-    Robot robot_0_1 = Robot(0, Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
-                            AngularVelocity::ofDegrees(-30), current_time);
+    EXPECT_EQ(robot, robot);
+}
 
-    Robot robot_1 = Robot(1, Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
-                          AngularVelocity::ofDegrees(30), half_second_future);
+TEST_F(RobotTest, equality_operator_robots_with_different_id)
+{
+    Robot robot_0 = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                          AngularVelocity::ofDegrees(25), current_time);
 
-    Robot robot_2 = Robot(2, Point(3, 1.2), Vector(3, 1), Angle::ofDegrees(0),
-                          AngularVelocity::ofDegrees(25), one_second_future);
+    Robot robot_1 = Robot(1, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                          AngularVelocity::ofDegrees(25), current_time);
 
-    EXPECT_EQ(robot_0_0, robot_0_0);
-    EXPECT_NE(robot_0_0, robot_0_1);
-    EXPECT_NE(robot_0_0, robot_1);
-    EXPECT_NE(robot_0_0, robot_2);
+    EXPECT_NE(robot_0, robot_1);
+}
 
-    EXPECT_EQ(robot_1, robot_1);
-    EXPECT_NE(robot_1, robot_2);
+TEST_F(RobotTest, equality_operator_robots_with_different_position)
+{
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time);
 
-    EXPECT_NE(robot_0_1, robot_1);
-    EXPECT_NE(robot_0_1, robot_2);
+    Robot robot_other = Robot(0, Point(-3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                              AngularVelocity::ofDegrees(25), current_time);
 
-    // Update robot_2 to be the same as robot_1 (except for the robot id)
-    robot_2.updateState(Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
-                        AngularVelocity::ofDegrees(30), one_second_future);
+    EXPECT_NE(robot, robot_other);
+}
 
-    EXPECT_NE(robot_1, robot_2);
+TEST_F(RobotTest, equality_operator_robots_with_different_velocity)
+{
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time);
 
-    // Update robot_0_1 to be the same as robot_0
-    robot_0_1.updateState(Point(1, -1.5), Vector(-0.7, -0.55), Angle::ofDegrees(100),
-                          AngularVelocity::ofDegrees(30), one_second_future);
+    Robot robot_other = Robot(0, Point(3, 1.2), Vector(), Angle::ofDegrees(0),
+                              AngularVelocity::ofDegrees(25), current_time);
 
-    EXPECT_EQ(robot_0_0, robot_0_1);
+    EXPECT_NE(robot, robot_other);
+}
+
+TEST_F(RobotTest, equality_operator_robots_with_different_orientation)
+{
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time);
+
+    Robot robot_other = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(45),
+                              AngularVelocity::ofDegrees(25), current_time);
+
+    EXPECT_NE(robot, robot_other);
+}
+
+TEST_F(RobotTest, equality_operator_robots_with_different_angular_velocity)
+{
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time);
+
+    Robot robot_other = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                              AngularVelocity::ofDegrees(-70), current_time);
+
+    EXPECT_NE(robot, robot_other);
+}
+
+TEST_F(RobotTest, equality_operator_robots_with_different_timestamp)
+{
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time);
+
+    Robot robot_other = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                              AngularVelocity::ofDegrees(25), one_second_future);
+
+    EXPECT_EQ(robot, robot_other);
 }
 
 int main(int argc, char **argv)

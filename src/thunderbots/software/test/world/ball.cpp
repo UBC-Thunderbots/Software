@@ -18,13 +18,11 @@ class BallTest : public ::testing::Test
         one_hundred_fifty_milliseconds_future = current_time + milliseconds(150);
         half_second_future                    = current_time + milliseconds(500);
         one_second_future                     = current_time + seconds(1);
-        nine_seconds_future                   = current_time + seconds(9);
     }
 
     steady_clock::time_point current_time;
     steady_clock::time_point half_second_future;
     steady_clock::time_point one_second_future;
-    steady_clock::time_point nine_seconds_future;
     steady_clock::time_point one_hundred_fifty_milliseconds_future;
 };
 
@@ -58,7 +56,7 @@ TEST_F(BallTest, update_state_with_all_params)
     EXPECT_EQ(Ball(Point(-4.23, 1.07), Vector(1, 2), one_second_future), ball);
 }
 
-TEST_F(BallTest, update_state_with_position_only)
+TEST_F(BallTest, update_state_with_new_position_old_velocity)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -67,7 +65,7 @@ TEST_F(BallTest, update_state_with_position_only)
     EXPECT_EQ(Ball(Point(0.01, -99.8), Vector(1, 2), current_time), ball);
 }
 
-TEST_F(BallTest, update_state_with_velocity_only)
+TEST_F(BallTest, update_state_with_new_velocity_old_position)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -205,24 +203,41 @@ TEST_F(BallTest, get_last_update_timestamp)
     EXPECT_EQ(half_second_future, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, equality_operators)
+TEST_F(BallTest, equality_operator_compare_ball_with_itself)
 {
     Ball ball_0 = Ball();
 
-    Ball ball_1 = Ball(Point(0.01, -0.0), Vector(), current_time);
-
-    Ball ball_2 = Ball(Point(2, -3), Vector(0, 1), one_hundred_fifty_milliseconds_future);
-
-    Ball ball_3 =
-        Ball(Point(0.01, -0.0), Vector(), one_hundred_fifty_milliseconds_future);
+    Ball ball_1 = Ball(Point(2, -3), Vector(0, 1), one_hundred_fifty_milliseconds_future);
 
     EXPECT_EQ(ball_0, ball_0);
-    EXPECT_NE(ball_0, ball_1);
-    EXPECT_NE(ball_0, ball_2);
     EXPECT_EQ(ball_1, ball_1);
-    EXPECT_NE(ball_1, ball_2);
-    EXPECT_EQ(ball_1, ball_3);
-    EXPECT_NE(ball_2, ball_3);
+}
+
+TEST_F(BallTest, equality_operator_balls_with_different_positions)
+{
+    Ball ball_0 = Ball(Point(0.01, -0.0), Vector(), current_time);
+
+    Ball ball_1 = Ball(Point(2, -3), Vector(), current_time);
+
+    EXPECT_NE(ball_0, ball_1);
+}
+
+TEST_F(BallTest, equality_operator_balls_with_different_velocities)
+{
+    Ball ball_0 = Ball(Point(2, -3), Vector(1, 2), current_time);
+
+    Ball ball_1 = Ball(Point(2, -3), Vector(-1, 4.5), current_time);
+
+    EXPECT_NE(ball_0, ball_1);
+}
+
+TEST_F(BallTest, equality_operator_balls_with_different_timestamps)
+{
+    Ball ball_0 = Ball(Point(2, -3), Vector(1, 2), current_time);
+
+    Ball ball_1 = Ball(Point(2, -3), Vector(1, 2), one_second_future);
+
+    EXPECT_EQ(ball_0, ball_1);
 }
 
 int main(int argc, char **argv)
