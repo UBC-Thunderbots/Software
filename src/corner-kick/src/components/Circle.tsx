@@ -15,6 +15,8 @@ const behavior = {
     customApplyProps: (instance: PIXI.Graphics, oldProps: IRectangleProps, newProps: IRectangleProps) => {
         const { fill, stroke, strokeWidth, radius } = newProps;
 
+        console.log(newProps);
+
         instance.x = newProps.x || 0;
         instance.y = newProps.y || 0;
 

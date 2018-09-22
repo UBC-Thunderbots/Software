@@ -16,6 +16,7 @@ export class ROSService extends React.Component {
 }
 
 interface IRosState {
+    topic: {[name: string]: any};
     state: ROSState;
     error: string;
 }
@@ -31,6 +32,7 @@ export class ROSContainer extends Container<IRosState> {
     public state = {
         error: '',
         state: ROSState.Disconnected,
+        topic: {},
     };
 
     private ros: any;
@@ -41,6 +43,7 @@ export class ROSContainer extends Container<IRosState> {
         }
 
         this.connectToROS('ws:localhost:9090');
+        this.subscribeToTopics();
     }
 
     private connectToROS = async (url: string) => {
@@ -61,5 +64,28 @@ export class ROSContainer extends Container<IRosState> {
         this.ros.on('close', () => {
             this.setState({state: ROSState.Disconnected});
         });
+    }
+
+    private subscribeToTopics = () => {
+        this.ros.getTopics((response: {topics: string[], types: string[]}) => {
+            response.topics.forEach((element, index) => {
+                const topic = new ROSLib.Topic({
+                    messageType: response.types[index],
+                    name: element,
+                    ros: this.ros,
+                });
+
+                topic.subscribe(this.onMessageReceived(element));
+            });
+        });
+    }
+
+    private onMessageReceived = (name: string) => (message: any) => {
+        this.setState({
+            topic: {
+                ...this.state.topic,
+                [name]: message,
+            }
+        })
     }
 }
