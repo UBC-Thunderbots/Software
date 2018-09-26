@@ -1,8 +1,9 @@
 #include "rrt.h"
+#include "ai/intent/move_intent.h"
+#include "ai/navigator/RobotObstacle.h"
+#include "ai/primitive/move_primitive.h"
 
-RRTNav::RRTNav()
-{
-}
+RRTNav::RRTNav() {}
 
 std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents) const

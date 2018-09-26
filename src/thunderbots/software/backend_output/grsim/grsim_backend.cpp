@@ -1,6 +1,8 @@
 #include "backend_output/grsim/grsim_backend.h"
+
 #include <iostream>
 #include <optional>
+
 #include "ai/primitive/move_primitive.h"
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"

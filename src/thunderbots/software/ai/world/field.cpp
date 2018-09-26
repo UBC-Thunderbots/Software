@@ -4,24 +4,24 @@ Field::Field()
     : valid_(false),
       field_length_(0),
       field_width_(0),
-      goal_width_(0),
       defense_length_(0),
       defense_width_(0),
+      goal_width_(0),
       boundary_width_(0),
       center_circle_radius_(0)
 {
 }
 
-void Field::updateDimensions(thunderbots_msgs::Field new_field_msg)
+void Field::updateDimensions(const Field &new_field_data)
 {
-    valid_                = true;
-    field_length_         = new_field_msg.field_length;
-    field_width_          = new_field_msg.field_width;
-    goal_width_           = new_field_msg.goal_width;
-    defense_width_        = new_field_msg.defense_width;
-    defense_length_       = new_field_msg.defense_length;
-    boundary_width_       = new_field_msg.boundary_width;
-    center_circle_radius_ = new_field_msg.center_circle_radius;
+    valid_                = new_field_data.valid();
+    field_length_         = new_field_data.length();
+    field_width_          = new_field_data.width();
+    defense_width_        = new_field_data.defenseAreaWidth();
+    defense_length_       = new_field_data.defenseAreaLength();
+    goal_width_           = new_field_data.goalWidth();
+    boundary_width_       = new_field_data.boundaryWidth();
+    center_circle_radius_ = new_field_data.centreCircleRadius();
 }
 
 void Field::updateDimensions(double field_length, double field_width,
@@ -32,9 +32,9 @@ void Field::updateDimensions(double field_length, double field_width,
     valid_                = true;
     field_length_         = field_length;
     field_width_          = field_width;
-    goal_width_           = goal_width;
     defense_width_        = defense_width;
     defense_length_       = defense_length;
+    goal_width_           = goal_width;
     boundary_width_       = boundary_width;
     center_circle_radius_ = center_circle_radius;
 }
@@ -138,32 +138,22 @@ Point Field::enemyCornerNeg() const
 
 Point Field::friendlyGoalpostPos() const
 {
-    return Point(friendlyGoal().x(), defenseAreaWidth() / 2.0);
+    return Point(friendlyGoal().x(), goalWidth() / 2.0);
 }
 
 Point Field::friendlyGoalpostNeg() const
 {
-    return Point(friendlyGoal().x(), -defenseAreaWidth() / 2.0);
+    return Point(friendlyGoal().x(), -goalWidth() / 2.0);
 }
 
 Point Field::enemyGoalpostPos() const
 {
-    return Point(enemyGoal().x(), defenseAreaWidth() / 2.0);
+    return Point(enemyGoal().x(), goalWidth() / 2.0);
 }
 
 Point Field::enemyGoalpostNeg() const
 {
-    return Point(enemyGoal().x(), -defenseAreaWidth() / 2.0);
-}
-
-std::pair<Point, Point> Field::friendlyGoalposts() const
-{
-    return std::make_pair(friendlyGoalpostNeg(), friendlyGoalpostPos());
-}
-
-std::pair<Point, Point> Field::enemyGoalposts() const
-{
-    return std::make_pair(enemyGoalpostNeg(), enemyGoalpostPos());
+    return Point(enemyGoal().x(), -goalWidth() / 2.0);
 }
 
 double Field::boundaryWidth() const
@@ -173,18 +163,13 @@ double Field::boundaryWidth() const
 
 bool Field::operator==(const Field &other) const
 {
-    if (this->valid_ != other.valid_ || this->field_width_ != other.field_width_ ||
-        this->field_length_ != other.field_length_ ||
-        this->goal_width_ != other.goal_width_ ||
-        this->defense_width_ != other.defense_width_ ||
-        this->defense_length_ != other.defense_length_ ||
-        this->boundary_width_ != other.boundary_width_ ||
-        this->center_circle_radius_ != other.center_circle_radius_)
-    {
-        return false;
-    }
-
-    return true;
+    return this->valid_ == other.valid_ && this->field_width_ == other.field_width_ &&
+           this->field_length_ == other.field_length_ &&
+           this->goal_width_ == other.goal_width_ &&
+           this->defense_width_ == other.defense_width_ &&
+           this->defense_length_ == other.defense_length_ &&
+           this->boundary_width_ == other.boundary_width_ &&
+           this->center_circle_radius_ == other.center_circle_radius_;
 }
 
 bool Field::operator!=(const Field &other) const

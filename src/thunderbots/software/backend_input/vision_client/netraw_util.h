@@ -25,6 +25,7 @@
 #pragma once
 
 #include <math.h>
+
 #include <algorithm>
 #include <cstring>
 
@@ -48,8 +49,8 @@ using std::sort;
 
 #if 1
 
-using std::min;
 using std::max;
+using std::min;
 using std::swap;
 
 #else
@@ -500,7 +501,7 @@ data *resize_array(data *arr, num &size, num new_size, num cur_used)
     if (narr)
     {
         // copy existing data
-        for (num i  = 0; i < cur_used; i++)
+        for (num i = 0; i < cur_used; i++)
             narr[i] = arr[i];
         delete[](arr);
         size = new_size;
@@ -563,7 +564,7 @@ inline int mcopy(data *dest, data *src, int num)
 {
     int i;
 
-    for (i      = 0; i < num; i++)
+    for (i = 0; i < num; i++)
         dest[i] = src[i];
 
     return (num);
@@ -574,7 +575,7 @@ inline data mset(data *dest, data val, int num)
 {
     int i;
 
-    for (i      = 0; i < num; i++)
+    for (i = 0; i < num; i++)
         dest[i] = val;
 
     return (val);

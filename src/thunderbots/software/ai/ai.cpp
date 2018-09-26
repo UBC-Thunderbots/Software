@@ -22,22 +22,22 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
     return assignedPrimitives;
 }
 
-void AI::updateWorldBallState(const thunderbots_msgs::Ball &new_ball_msg)
+void AI::updateWorldBallState(const Ball &new_ball_data)
 {
-    world.updateBallState(new_ball_msg);
+    world.updateBallState(new_ball_data);
 }
 
-void AI::updateWorldFieldState(const thunderbots_msgs::Field &new_field_msg)
+void AI::updateWorldFieldState(const Field &new_field_data)
 {
-    world.updateFieldGeometry(new_field_msg);
+    world.updateFieldGeometry(new_field_data);
 }
 
-void AI::updateWorldFriendlyTeamState(const thunderbots_msgs::Team &new_friendly_team_msg)
+void AI::updateWorldFriendlyTeamState(const Team &new_friendly_team_data)
 {
-    world.updateFriendlyTeam(new_friendly_team_msg);
+    world.updateFriendlyTeamState(new_friendly_team_data);
 }
 
-void AI::updateWorldEnemyTeamState(const thunderbots_msgs::Team &new_enemy_team_msg)
+void AI::updateWorldEnemyTeamState(const Team &new_enemy_team_data)
 {
-    world.updateEnemyTeam(new_enemy_team_msg);
+    world.updateEnemyTeamState(new_enemy_team_data);
 }

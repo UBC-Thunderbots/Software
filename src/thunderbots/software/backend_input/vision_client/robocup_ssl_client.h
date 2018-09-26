@@ -26,6 +26,7 @@
 //========================================================================
 #pragma once
 #include <string>
+
 #include "netraw.h"
 #include "proto/messages_robocup_ssl_detection.pb.h"
 #include "proto/messages_robocup_ssl_geometry.pb.h"

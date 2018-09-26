@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+
 #include "../ai/world/team.h"
 
 namespace UTIL
@@ -17,5 +18,5 @@ namespace UTIL
 
         // TODO: Make this a tuneable parameter
         const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
-    }
-}
+    }  // namespace CONSTANTS
+}  // namespace UTIL

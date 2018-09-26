@@ -4,7 +4,6 @@
 #include "ai/navigator/rrt/rrt.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
-#include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/timestamp.h"
@@ -34,20 +33,18 @@ class AI final
         const AITimestamp& timestamp) const;
 
     /**
-     * Given a message containing new ball state, updates the state of the ball
-     * in the world
+     * Updates the state of the ball in the AI's world with the new ball data
      *
-     * @param new_ball_msg The message containing new ball information
+     * @param new_ball_data A Ball containing new ball information
      */
-    void updateWorldBallState(const thunderbots_msgs::Ball& new_ball_msg);
+    void updateWorldBallState(const Ball& new_ball_data);
 
     /**
-     * Given a message containing new field geometry, update the geometry of the
-     * Field in the world
+     * Updates the state of the field in the AI's world with the new field data
      *
-     * @param new_field_msg The message containing new field geometry
+     * @param new_field_data A Field containing new field information
      */
-    void updateWorldFieldState(const thunderbots_msgs::Field& new_field_msg);
+    void updateWorldFieldState(const Field& new_field_data);
 
     /**
      * Given a message containing new information about the friendly team, updates
@@ -55,8 +52,7 @@ class AI final
      *
      * @param new_friendly_team_msg The message containing new friendly team information
      */
-    void updateWorldFriendlyTeamState(
-        const thunderbots_msgs::Team& new_friendly_team_msg);
+    void updateWorldFriendlyTeamState(const Team& new_friendly_team_data);
 
     /**
      * Given a message containing new information about the enemy team, updates
@@ -64,7 +60,7 @@ class AI final
      *
      * @param new_enemy_team_msg The message containing new enemy team information
      */
-    void updateWorldEnemyTeamState(const thunderbots_msgs::Team& new_enemy_team_msg);
+    void updateWorldEnemyTeamState(const Team& new_enemy_team_data);
 
 
    private:

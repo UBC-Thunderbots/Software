@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <vector>
+
 #include "geom/point.h"
 #include "geom/shapes.h"
 

@@ -1,4 +1,5 @@
 #include "RobotObstacle.h"
+
 #include "shared/constants.h"
 
 using namespace DynamicParameters::Navigator;

@@ -1,4 +1,5 @@
 #include "ai/primitive/primitive.h"
+
 #include "ai/primitive/move_primitive.h"
 
 thunderbots_msgs::Primitive Primitive::createMsg() const

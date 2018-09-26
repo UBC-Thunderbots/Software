@@ -2,7 +2,9 @@
 #include <ros/time.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
+
 #include <iostream>
+
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"

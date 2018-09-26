@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+
 #include "ai/ai.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
@@ -6,6 +7,8 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/parameter/dynamic_parameters.h"
+#include "util/ros_messages.h"
 #include "util/timestamp.h"
 
 // Variables we need to maintain state
@@ -21,28 +24,36 @@ void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
 {
     thunderbots_msgs::Field field_msg = *msg;
 
-    ai.updateWorldFieldState(field_msg);
+    Field field = Util::ROSMessages::createFieldFromROSMessage(field_msg);
+
+    ai.updateWorldFieldState(field);
 }
 
 void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
 {
     thunderbots_msgs::Ball ball_msg = *msg;
 
-    ai.updateWorldBallState(ball_msg);
+    Ball ball = Util::ROSMessages::createBallFromROSMessage(ball_msg);
+
+    ai.updateWorldBallState(ball);
 }
 
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team friendly_team_msg = *msg;
 
-    ai.updateWorldFriendlyTeamState(friendly_team_msg);
+    Team friendly_team = Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
+
+    ai.updateWorldFriendlyTeamState(friendly_team);
 }
 
 void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
 {
     thunderbots_msgs::Team enemy_team_msg = *msg;
 
-    ai.updateWorldEnemyTeamState(enemy_team_msg);
+    Team enemy_team = Util::ROSMessages::createTeamFromROSMessage(enemy_team_msg);
+
+    ai.updateWorldEnemyTeamState(enemy_team);
 }
 
 int main(int argc, char **argv)

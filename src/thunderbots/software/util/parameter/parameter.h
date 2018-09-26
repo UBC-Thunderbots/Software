@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ros/ros.h>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -31,7 +32,7 @@ class Parameter
         this->ros_parameter_path = ros_parameter_path;
         value_                   = default_value;
 
-        Parameter<T>::registerParameter(std::unique_ptr<Parameter<T>>(this));
+        Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
     }
 
     /**
@@ -64,11 +65,11 @@ class Parameter
     }
 
     /**
-     * Sets the parameter value in the ROS Parameter Server to the new value
+     * Sets the parameter value in the ROS Parameter Server to the new value.
      *
      * @param new_value The new value to be set
      */
-    void setValueInParameterServer(T new_value)
+    void setValueInROSParameterServer(T new_value)
     {
         ros::param::set(getROSParameterPath(), new_value);
     }

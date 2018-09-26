@@ -1,6 +1,10 @@
 #include "world.h"
 
-World::World() : field_(), ball_(), friendly_team_(), enemy_team_()
+World::World()
+    : field_(),
+      ball_(),
+      friendly_team_(std::chrono::milliseconds(0)),
+      enemy_team_(std::chrono::milliseconds(0))
 {
 }
 
@@ -10,24 +14,24 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 {
 }
 
-void World::updateFieldGeometry(const thunderbots_msgs::Field &new_field_msg)
+void World::updateFieldGeometry(const Field &new_field_data)
 {
-    field_.updateDimensions(new_field_msg);
+    field_.updateDimensions(new_field_data);
 }
 
-void World::updateBallState(const thunderbots_msgs::Ball &new_ball_msg)
+void World::updateBallState(const Ball &new_ball_data)
 {
-    ball_.update(new_ball_msg);
+    ball_.updateState(new_ball_data);
 }
 
-void World::updateFriendlyTeam(const thunderbots_msgs::Team &new_friendly_team_msg)
+void World::updateFriendlyTeamState(const Team &new_friendly_team_data)
 {
-    friendly_team_.update(new_friendly_team_msg);
+    friendly_team_.updateState(new_friendly_team_data);
 }
 
-void World::updateEnemyTeam(const thunderbots_msgs::Team &new_enemy_team_msg)
+void World::updateEnemyTeamState(const Team &new_enemy_team_data)
 {
-    enemy_team_.update(new_enemy_team_msg);
+    enemy_team_.updateState(new_enemy_team_data);
 }
 
 const Field &World::field()

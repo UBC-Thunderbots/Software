@@ -35,7 +35,7 @@ set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
 # Create a list of files from the shared folder
-file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
@@ -77,7 +77,8 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/team.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
@@ -162,7 +163,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(field_test
-            test/field/field.cpp
+            test/world/field.cpp
             ai/world/field.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
@@ -187,5 +188,49 @@ if (CATKIN_ENABLE_TESTING)
             geom/shapes.h)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(shared_util_test
+            ../shared/test/util.cpp
+            ../shared/util.c
+            ../shared/util.h)
+
+    target_link_libraries(shared_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(ball_test
+            test/world/ball.cpp
+            ai/world/ball.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ball_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(robot_test
+            test/world/robot.cpp
+            ai/world/robot.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(robot_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(team_test
+            test/world/team.cpp
+            ai/world/team.cpp
+            ai/world/robot.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(team_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(ros_message_util_test
+            test/util/ros_messages.cpp
+            util/ros_messages.cpp
+            ai/world/ball.cpp
+            ai/world/robot.cpp
+            ai/world/field.cpp
+            ai/world/team.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
 endif()
