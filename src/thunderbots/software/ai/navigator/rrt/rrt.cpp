@@ -12,8 +12,6 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
     std::vector<std::unique_ptr<Primitive>> assigned_primitives =
         std::vector<std::unique_ptr<Primitive>>();
 
-    // Get vectors of robot obstacles
-    // TODO: do something with these for path planning
     std::vector<RobotObstacle> friendly_obsts = generate_friendly_obstacles(
         world.friendly_team(), DynamicParameters::Navigator::default_avoid_dist.value());
     std::vector<RobotObstacle> enemy_obsts = generate_enemy_obstacles(
@@ -37,19 +35,10 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
             std::optional<Robot> r =
                 world.friendly_team().getRobotById(move_intent.getRobotId());
             assert(r != std::nullopt && "The world is messed up!");
-            Point currPos      = r->position();
-            Point destPos      = move_intent.getDestination();
-            double angleToDest = atan2(currPos.y(), currPos.x());
-            if ((destPos - currPos).len() < stepSize)
-            {
-                continue;
-            }
-
-            Point stepPoint(stepSize * cos(angleToDest), stepSize * sin(angleToDest));
 
             std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), stepPoint, move_intent.getFinalAngle(),
-                move_intent.getFinalSpeed());
+                move_intent.getRobotId(), move_intent.getDestination(),
+                move_intent.getFinalAngle(), move_intent.getFinalSpeed());
 
             assigned_primitives.emplace_back(std::move(move_prim));
         }
