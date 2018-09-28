@@ -1,5 +1,4 @@
 #include "rrt.h"
-
 #include "ai/intent/move_intent.h"
 #include "ai/navigator/RobotObstacle.h"
 #include "ai/primitive/move_primitive.h"
@@ -12,6 +11,20 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
     std::vector<std::unique_ptr<Primitive>> assigned_primitives =
         std::vector<std::unique_ptr<Primitive>>();
 
+    // Get vectors of robot obstacles
+    // TODO: do something with these for path planning
+    std::vector<RobotObstacle> friendly_obsts = generate_friendly_obstacles(
+        world.friendly_team(),
+        DynamicParameters::Navigator::default_avoid_dist.value());
+    std::vector<RobotObstacle> enemy_obsts = generate_enemy_obstacles(
+        world.enemy_team(),
+        DynamicParameters::Navigator::default_avoid_dist.value());
+
+    std::vector<RobotObstacle> all_obsts;
+	all_obsts.reserve(friendly_obsts.size() + enemy_obsts.size());
+	all_obsts.insert( all_obsts.end(), friendly_obsts.begin(), friendly_obsts.end() );
+	all_obsts.insert( all_obsts.end(), enemy_obsts.begin(), enemy_obsts.end() );
+
     // Hand the different types of Intents here
     for (const auto &intent : assignedIntents)
     {
@@ -22,20 +35,22 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
             // Cast down to the MoveIntent class so we can access its members
             MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent);
 
-            // Get vectors of robot obstacles
-            // TODO: do something with these for path planning
-            std::vector<RobotObstacle> friendly_obsts = generate_friendly_obstacles(
-                world.friendly_team(),
-                DynamicParameters::Navigator::default_avoid_dist.value());
-            std::vector<RobotObstacle> enemy_obsts = generate_enemy_obstacles(
-                world.enemy_team(),
-                DynamicParameters::Navigator::default_avoid_dist.value());
+			std::optional<Robot> r = world.friendly_team().getRobotById(move_intent.getRobotId());
+			assert(r!=std::nullopt && "The world is messed up!");
+			Point currPos = r->position();
+			Point destPos = move_intent.getDestination();
+			double angleToDest = atan2(currPos.y(), currPos.x());
+			if ((destPos-currPos).len()<stepSize){
+				continue;
+			}
 
-            std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), move_intent.getDestination(),
-                move_intent.getFinalAngle(), move_intent.getFinalSpeed());
+			Point stepPoint(stepSize * cos(angleToDest), stepSize * sin(angleToDest));
 
-            assigned_primitives.emplace_back(std::move(move_prim));
+			std::unique_ptr<Primitive> move_prim = std::make_unique<MovePrimitive>(
+				    move_intent.getRobotId(), stepPoint,
+				    move_intent.getFinalAngle(), move_intent.getFinalSpeed());
+
+			assigned_primitives.emplace_back(std::move(move_prim));
         }
         else
         {
@@ -48,3 +63,4 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
 
     return assigned_primitives;
 }
+
