@@ -233,6 +233,17 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(world_test
+            test/world/world.cpp
+            test/test_util/util.cpp
+            ai/world/world.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp)
+
+    target_link_libraries(world_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(unit_test_util_test
             test/test_util/test_util.cpp
             test/test_util/util.cpp
