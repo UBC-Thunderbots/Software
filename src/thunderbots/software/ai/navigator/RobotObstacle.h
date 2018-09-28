@@ -24,7 +24,7 @@ class RobotObstacle
      * @return Violation distance, defined as distance from the nearest boundary
      *         to the given point; 0.0 if no violation occured.
      */
-    double getViolationDistance(const Point& point);
+    double getViolationDistance(const Point& point) const;
 
     /**
      * Returns the closest Point on the obstacle boundary to the given Point that

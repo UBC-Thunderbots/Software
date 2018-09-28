@@ -12,7 +12,7 @@ RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
             robot.position() + robot.velocity() * collision_avoid_velocity_scale.value());
 }
 
-double RobotObstacle::getViolationDistance(const Point& point)
+double RobotObstacle::getViolationDistance(const Point& point) const
 {
     // Check if distance between p and center of boundary is less than the radius;
     // if so then we have a violation.
