@@ -17,6 +17,17 @@ namespace DynamicParameters
     namespace Navigator
     {
         extern Parameter<double> default_avoid_dist;
-        extern Parameter<double> collision_avoid_velocity_scale;
+        extern Parameter<double> collision_avoid_velocity_scale; 
     }
+
+    namespace Example
+    {
+        extern Parameter<bool> bl;
+        extern Parameter<std::string> strng;
+        extern Parameter<int> it;
+        extern Parameter<double> dbl;
+
+        extern Parameter<double> collision_avoid_velocity_scale;    
+    }
+
 }

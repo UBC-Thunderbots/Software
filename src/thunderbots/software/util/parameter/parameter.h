@@ -5,6 +5,18 @@
 #include <string>
 #include <vector>
 
+//messages for dynamic_reconfigure
+#include <dynamic_reconfigure/BoolParameter.h>
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/IntParameter.h>
+#include <dynamic_reconfigure/StrParameter.h>
+
+//message that contains arrays of the xmlrpc types for reconf
+#include <dynamic_reconfigure/Config.h>
+
+//message for the reconfigure srv, takes a config msg
+#include <dynamic_reconfigure/Reconfigure.h>
+
 /**
  * This class defines a dynamic parameter, meaning the parameter
  * value can be changed during runtime. Although the class is templated, it is only meant
@@ -18,115 +30,171 @@
 template <class T>
 class Parameter
 {
-   public:
-    /**
-     * Constructs a new Parameter
-     *
-     * @param ros_parameter_path The global path in the ROS parameter server where this
-     * parameter is stored
-     * @param default_value The default value for this parameter
-     */
-    explicit Parameter<T>(const std::string& ros_parameter_path, T default_value)
-    {
-        this->ros_parameter_path = ros_parameter_path;
-        value_                   = default_value;
-
-        Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
-    }
-
-    /**
-     * Returns the global path in the ROS parameter server where this parameter is stored
-     *
-     * @return the global path in the ROS parameter sever where this parameter is stored
-     */
-    const std::string getROSParameterPath() const
-    {
-        return ros_parameter_path;
-    }
-
-    /**
-     * Returns the value of this parameter
-     *
-     * @return the value of this parameter
-     */
-    const T value() const
-    {
-        return value_;
-    }
-
-    /**
-     * Updates the value of this Parameter with the value from the ROS
-     * Parameter Server
-     */
-    void updateValueFromROSParameterServer()
-    {
-        ros::param::get(getROSParameterPath(), value_);
-    }
-
-    /**
-     * Sets the parameter value in the ROS Parameter Server to the new value.
-     *
-     * @param new_value The new value to be set
-     */
-    void setValueInROSParameterServer(T new_value)
-    {
-        ros::param::set(getROSParameterPath(), new_value);
-    }
-
-    /**
-     * Returns a reference to the Parameter registry. The registry is a list of
-     * pointers to all the existing Parameters.
-     *
-     * @return An immutable reference to the Parameter registry
-     */
-    static const std::vector<std::unique_ptr<Parameter<T>>>& getRegistry()
-    {
-        return Parameter<T>::getMutableRegistry();
-    }
-
-    /**
-     * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
-     * into the registry, the pointer may not be accessed by the caller after this
-     * function has been called.
-     *
-     * @param parameter A unique pointer to the Parameter to add. This pointer may not
-     * be accessed by the caller after this function has been called.
-     */
-    static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
-    {
-        Parameter<T>::getMutableRegistry().emplace_back(std::move(parameter));
-    }
-
-    /**
-     * Updates all the Parameters of type T with the latest values from the ROS
-     * Parameter Server
-     */
-    static void updateAllParametersFromROSParameterServer()
-    {
-        for (const auto& p : Parameter<T>::getRegistry())
+    public:
+        /**
+         * Constructs a new Parameter
+         *
+         * @param ros_parameter_path The global path in the ROS parameter server where this
+         * parameter is stored
+         * @param default_value The default value for this parameter
+         */
+        explicit Parameter<T>(const std::string& ros_parameter_path, T default_value)
         {
-            p->updateValueFromROSParameterServer();
+            this->ros_parameter_path = ros_parameter_path;
+            this->value_             = default_value;
+
+            Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
         }
-    }
 
-   private:
-    /**
-     * Returns a mutable reference to the Parameter registry. This is the same as the
-     * above getRegistry() function, except that it returns a mutable reference. We need a
-     * mutable version so that member functions can modify the registry. The function is
-     * private so that external sources cannot modify the registry in unexpected ways.
-     *
-     * @return A mutable reference to the Parameter registry
-     */
-    static std::vector<std::unique_ptr<Parameter>>& getMutableRegistry()
-    {
-        static std::vector<std::unique_ptr<Parameter<T>>> instance;
-        return instance;
-    }
+        /**
+         * Returns the global path in the ROS parameter server where this parameter is stored
+         *
+         * @return the global path in the ROS parameter sever where this parameter is stored
+         */
+        const std::string getROSParameterPath() const
+        {
+            return ros_parameter_path;
+        }
 
-    // Store the value so it can be retrieved without fetching from the server again
-    T value_;
+        /**
+         * Returns the value of this parameter
+         *
+         * @return the value of this parameter
+         */
+        const T value() const
+        {
+            return value_;
+        }
 
-    // The global path to the variable in the ROS Parameter Server
-    std::string ros_parameter_path;
+        /**
+         * Updates the value of this Parameter with the value from the ROS
+         * Parameter Server
+         */
+        void updateValueFromROSParameterServer()
+        {
+            ros::param::get(getROSParameterPath(), value_);
+        }
+
+        /**
+         * Sets the parameter value in the ROS Parameter Server to the new value.
+         *
+         * @param new_value The new value to be set
+         */
+        void setValueInROSParameterServer(T new_value)
+        {
+            ros::param::set(getROSParameterPath(), new_value);
+        }
+        /**
+         * Callback for dynamic reconfigure
+         *
+         * @param new_value The new value to be set
+         */
+        void setValueInROSSParameterServer(T new_value)
+        {
+        }
+
+        /**
+         * Returns a reference to the Parameter registry. The registry is a list of
+         * pointers to all the existing Parameters.
+         *
+         * @return An immutable reference to the Parameter registry
+         */
+        static const std::vector<std::unique_ptr<Parameter<T>>>& getRegistry()
+        {
+            return Parameter<T>::getMutableRegistry();
+        }
+
+        /**
+         * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
+         * into the registry, the pointer may not be accessed by the caller after this
+         * function has been called.
+         *
+         * @param parameter A unique pointer to the Parameter to add. This pointer may not
+         * be accessed by the caller after this function has been called.
+         */
+        static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
+        {   
+            if (std::is_same<T, bool>::value){   
+                dynamic_reconfigure::BoolParameter bool_msg;
+
+                bool_msg.name = parameter->getROSParameterPath();
+                bool_msg.value = static_cast<bool>(parameter->value());
+
+                Parameter<T>::getMutableConfigStruct().bools.push_back(bool_msg);
+            }
+
+            if (std::is_same<T, int>::value){   
+                dynamic_reconfigure::IntParameter int_msg;
+
+                int_msg.name = parameter->getROSParameterPath();
+                int_msg.value = static_cast<int>(parameter->value());
+
+                Parameter<T>::getMutableConfigStruct().ints.push_back(int_msg);
+            }
+
+            if (std::is_same<T, double>::value){   
+                dynamic_reconfigure::DoubleParameter double_msg;
+
+                double_msg.name = parameter->getROSParameterPath();
+                double_msg.value = static_cast<double>(parameter->value());
+
+                Parameter<T>::getMutableConfigStruct().doubles.push_back(double_msg);
+            }
+
+            if (std::is_same<T, std::string>::value){   
+                dynamic_reconfigure::StrParameter str_msg;
+
+                str_msg.name = parameter->getROSParameterPath();
+                str_msg.value = static_cast<std::string>(parameter->value());
+
+                Parameter<T>::getMutableConfigStruct().strs.push_back(str_msg);
+            }
+
+            Parameter<T>::getMutableRegistry().emplace_back(std::move(parameter));
+        }
+
+        /**
+         * Updates all the Parameters of type T with the latest values from the ROS
+         * Parameter Server
+         */
+        static void updateAllParametersFromROSParameterServer()
+        {
+            for (const auto& p : Parameter<T>::getRegistry())
+            {
+                p->updateValueFromROSParameterServer();
+            }
+        }
+
+    private:
+        /**
+         * Returns a mutable reference to the Parameter registry. This is the same as the
+         * above getRegistry() function, except that it returns a mutable reference. We need a
+         * mutable version so that member functions can modify the registry. The function is
+         * private so that external sources cannot modify the registry in unexpected ways.
+         *
+         * @return A mutable reference to the Parameter registry
+         */
+        static std::vector<std::unique_ptr<Parameter>>& getMutableRegistry()
+        {
+            static std::vector<std::unique_ptr<Parameter<T>>> instance;
+            return instance;
+        }
+
+        // Store the value so it can be retrieved without fetching from the server again
+        T value_;
+
+        /**
+         * Returns a mutable configuration struct that will hold all the 
+         * information related to the parameters created
+         * Struct contains bool,strs,ints,doubles vectors which are inherently mutable
+         *
+         * @return A mutable reference to the configuration struct
+         */
+        static dynamic_reconfigure::Config& getMutableConfigStruct()
+        {
+            static dynamic_reconfigure::Config config;
+            return config;
+        }
+
+        std::string ros_parameter_path;
 };
