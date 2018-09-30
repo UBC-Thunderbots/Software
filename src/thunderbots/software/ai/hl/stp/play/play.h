@@ -152,13 +152,13 @@ class Play
  * "static TPlayFactory<MovePlay> factory;"
  */
 
-template<class T>
+template <class T>
 class TPlayFactory : public PlayFactory
 {
     // compile time type checking that T is derived class of Play
     static_assert(std::is_base_of<Play, T>::value, "T must be derived class of Play!");
 
-public:
+   public:
     TPlayFactory()
     {
         Play::registerPlay(std::shared_ptr<PlayFactory>(this));
