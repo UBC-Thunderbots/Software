@@ -10,7 +10,7 @@ using namespace std::chrono;
 
 TEST(TestUtilsTest, create_testing_field)
 {
-    Field field = UnitTest::Util::createSSLDivBField();
+    Field field = ::Test::TestUtil::createSSLDivBField();
 
     // Check that the field is valid and has the correct dimensions for a
     // SSL Division B field according to the rules
@@ -42,9 +42,9 @@ TEST(TestUtilsTest, create_testing_field)
 
 TEST(TestUtilsTest, create_testing_world)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    EXPECT_EQ(UnitTest::Util::createSSLDivBField(), world.field());
+    EXPECT_EQ(::Test::TestUtil::createSSLDivBField(), world.field());
     EXPECT_EQ(Team(milliseconds(1000)), world.friendlyTeam());
     EXPECT_EQ(Team(milliseconds(1000)), world.enemyTeam());
     EXPECT_EQ(Ball(Point(), Vector()), world.ball());
@@ -52,9 +52,9 @@ TEST(TestUtilsTest, create_testing_world)
 
 TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_positive_number_of_robots)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = UnitTest::Util::setFriendlyRobotPositions(
+    world = ::Test::TestUtil::setFriendlyRobotPositions(
         world, {Point(), Point(-4, 1.2), Point(2.2, -0.1)});
 
     EXPECT_EQ(3, world.friendlyTeam().numRobots());
@@ -67,9 +67,9 @@ TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_positive_number_o
 
 TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_positive_number_of_robots)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = UnitTest::Util::setEnemyRobotPositions(
+    world = ::Test::TestUtil::setEnemyRobotPositions(
         world, {world.field().enemyGoal(), world.field().friendlyCornerPos()});
 
     EXPECT_EQ(2, world.enemyTeam().numRobots());
@@ -82,36 +82,36 @@ TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_positive_number_of_r
 
 TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_zero_robots)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = UnitTest::Util::setFriendlyRobotPositions(world, {});
+    world = ::Test::TestUtil::setFriendlyRobotPositions(world, {});
 
     EXPECT_EQ(0, world.friendlyTeam().numRobots());
 }
 
 TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_zero_robots)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = UnitTest::Util::setEnemyRobotPositions(world, {});
+    world = ::Test::TestUtil::setEnemyRobotPositions(world, {});
 
     EXPECT_EQ(0, world.enemyTeam().numRobots());
 }
 
 TEST(TestUtilsTest, set_ball_position_in_world)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = UnitTest::Util::setBallPosition(world, Point(-0.2, 3.11));
+    world = ::Test::TestUtil::setBallPosition(world, Point(-0.2, 3.11));
     EXPECT_EQ(Point(-0.2, 3.11), world.ball().position());
     EXPECT_EQ(Vector(), world.ball().velocity());
 }
 
 TEST(TestUtilsTest, set_ball_velocity_in_world)
 {
-    World world = UnitTest::Util::createBlankTestingWorld();
+    World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = UnitTest::Util::setBallVelocity(world, Vector(0, -2));
+    world = ::Test::TestUtil::setBallVelocity(world, Vector(0, -2));
     EXPECT_EQ(Point(), world.ball().position());
     EXPECT_EQ(Vector(0, -2), world.ball().velocity());
 }

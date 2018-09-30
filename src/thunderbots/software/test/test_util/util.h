@@ -1,17 +1,17 @@
-#pragma
+#pragma once
 
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
 #include "ai/world/world.h"
 
-namespace UnitTest
+namespace Test
 {
     /**
      * This util class is to provide utility functions to our unit test suite,
      * primarily for assisting with test setup (such as creating World or Field objects)
      */
-    class Util
+    class TestUtil
     {
        public:
         /**
@@ -89,4 +89,4 @@ namespace UnitTest
         static Team setRobotPositionsHelper(Team team,
                                             const std::vector<Point> &robot_positions);
     };
-}  // namespace UnitTest
+}  // namespace Test

@@ -244,7 +244,7 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(world_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(unit_test_util_test
+    catkin_add_gtest(test_util_test
             test/test_util/test_util.cpp
             test/test_util/util.cpp
             ai/world/world.cpp
@@ -254,6 +254,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             )
 
-    target_link_libraries(unit_test_util_test ${catkin_LIBRARIES})
+    target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
 endif()

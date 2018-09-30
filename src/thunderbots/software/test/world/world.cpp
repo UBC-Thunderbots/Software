@@ -24,7 +24,7 @@ class WorldTest : public ::testing::Test
 
 TEST_F(WorldTest, construction_with_parameters)
 {
-    Field field = UnitTest::Util::createSSLDivBField();
+    Field field = ::Test::TestUtil::createSSLDivBField();
 
     Ball ball = Ball(Point(1, 2), Vector(-0.3, 0), current_time);
 

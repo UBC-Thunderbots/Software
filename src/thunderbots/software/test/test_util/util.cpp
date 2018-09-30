@@ -1,8 +1,8 @@
 #include "util.h"
 
-namespace UnitTest
+namespace Test
 {
-    Field Util::createSSLDivBField()
+    Field TestUtil::createSSLDivBField()
     {
         Field field = Field();
         // Using the dimensions of a standard Division B SSL field
@@ -11,7 +11,7 @@ namespace UnitTest
         return field;
     }
 
-    World Util::createBlankTestingWorld()
+    World TestUtil::createBlankTestingWorld()
     {
         Field field        = createSSLDivBField();
         Team friendly_team = Team(std::chrono::milliseconds(1000));
@@ -23,8 +23,8 @@ namespace UnitTest
         return world;
     }
 
-    Team Util::setRobotPositionsHelper(Team team,
-                                       const std::vector<Point> &robot_positions)
+    Team TestUtil::setRobotPositionsHelper(Team team,
+                                           const std::vector<Point> &robot_positions)
     {
         std::vector<Robot> robots;
         unsigned int robot_id_index = 0;
@@ -44,7 +44,8 @@ namespace UnitTest
         return team;
     }
 
-    World Util::setFriendlyRobotPositions(World world, std::vector<Point> robot_positions)
+    World TestUtil::setFriendlyRobotPositions(World world,
+                                              std::vector<Point> robot_positions)
     {
         Team new_friendly_team =
             setRobotPositionsHelper(world.friendlyTeam(), robot_positions);
@@ -54,7 +55,8 @@ namespace UnitTest
         return world;
     }
 
-    World Util::setEnemyRobotPositions(World world, std::vector<Point> robot_positions)
+    World TestUtil::setEnemyRobotPositions(World world,
+                                           std::vector<Point> robot_positions)
     {
         Team new_enemy_team = setRobotPositionsHelper(world.enemyTeam(), robot_positions);
         world.mutableEnemyTeam().clearAllRobots();
@@ -63,7 +65,7 @@ namespace UnitTest
         return world;
     }
 
-    World Util::setBallPosition(World world, Point ball_position)
+    World TestUtil::setBallPosition(World world, Point ball_position)
     {
         Ball ball = Ball(ball_position, world.ball().velocity(),
                          std::chrono::steady_clock::now());
@@ -72,7 +74,7 @@ namespace UnitTest
         return world;
     }
 
-    World Util::setBallVelocity(World world, Vector ball_velocity)
+    World TestUtil::setBallVelocity(World world, Vector ball_velocity)
     {
         Ball ball = Ball(world.ball().position(), ball_velocity,
                          std::chrono::steady_clock::now());
@@ -80,4 +82,4 @@ namespace UnitTest
 
         return world;
     }
-}  // namespace UnitTest
+}  // namespace Test
