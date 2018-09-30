@@ -146,7 +146,7 @@ class Play
  * can use the registry to find all the Plays that are available (and register with this
  * templated class).
  *
- * @param <T> The class of the Play to be addred to the registry. For example, to add a
+ * @tparam <T> The class of the Play to be added to the registry. For example, to add a
  * new class called MovePlay that inherits from Play, the following line should be added
  * to the end of the .cpp file (without the quotations):
  * "static TPlayFactory<MovePlay> factory;"
