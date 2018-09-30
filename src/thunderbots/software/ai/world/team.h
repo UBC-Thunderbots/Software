@@ -106,6 +106,16 @@ class Team
     std::chrono::milliseconds getRobotExpiryBufferMilliseconds();
 
     /**
+     * Sets the number of milliseconds a Robot must not have been updated for before being
+     * removed from this team.
+     *
+     * @param new_robot_expiry_buffer_milliseconds the number of milliseconds a Robot must
+     * not have been updated for before being removed from this team.
+     */
+    void setRobotExpiryBuffer(
+        std::chrono::milliseconds new_robot_expiry_buffer_milliseconds);
+
+    /**
      * Returns the robot with the given id. If this team does not have that robot,
      * returns an std::nullopt
      *
