@@ -1,6 +1,17 @@
 #include "ai.h"
 
-AI::AI() : navigator(std::make_unique<RRTNav>()), high_level(std::make_unique<STP_HL>())
+AI::AI()
+    : world(World(Field(), Ball(), Team(std::chrono::milliseconds(0)),
+                  Team(std::chrono::milliseconds(0)))),
+      navigator(std::make_unique<RRTNav>()),
+      high_level(std::make_unique<STP_HL>())
+{
+}
+
+AI::AI(const World &world)
+    : world(world),
+      navigator(std::make_unique<RRTNav>()),
+      high_level(std::make_unique<STP_HL>())
 {
 }
 

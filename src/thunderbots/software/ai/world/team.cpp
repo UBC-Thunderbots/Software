@@ -99,6 +99,12 @@ std::chrono::milliseconds Team::getRobotExpiryBufferMilliseconds()
     return robot_expiry_buffer_milliseconds;
 }
 
+void Team::setRobotExpiryBuffer(
+    std::chrono::milliseconds new_robot_expiry_buffer_milliseconds)
+{
+    robot_expiry_buffer_milliseconds = new_robot_expiry_buffer_milliseconds;
+}
+
 std::optional<Robot> Team::getRobotById(const unsigned int id) const
 {
     auto it = team_robots.find(id);

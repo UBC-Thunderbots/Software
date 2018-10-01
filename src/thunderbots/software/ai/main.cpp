@@ -11,13 +11,13 @@
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
 
-// Variables we need to maintain state
-// In an anonymous namespace so they cannot be seen/accessed externally
+// Variables we need to maintain state. They are declared "globally" in the file so they
+// can be seen/used by the callback functions as well as the main function.
+// In an anonymous namespace so they cannot be seen/accessed outside this file.
 namespace
 {
     AI ai;
 }
-
 
 // Callbacks to update the state of the world
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -79,7 +79,11 @@ int main(int argc, char **argv)
         UTIL::CONSTANTS::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Initialize variables used to maintain state
-    ai = AI();
+    ai = AI(World(Field(), Ball(),
+                  Team(std::chrono::milliseconds(
+                      DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                  Team(std::chrono::milliseconds(
+                      DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
 
     // Main loop
     while (ros::ok())

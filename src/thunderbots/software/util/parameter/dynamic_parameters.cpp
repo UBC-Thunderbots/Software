@@ -14,8 +14,8 @@ namespace DynamicParameters
         Parameter<std::vector<std::string>>::updateAllParametersFromROSParameterServer();
     }
 
-    Parameter<unsigned int> robot_vision_debounce_milliseconds(
-        "thunderbots/parameters/robot_vision_debounce_milliseconds", 2000);
+    Parameter<unsigned int> robot_expiry_buffer_milliseconds(
+        "thunderbots/parameters/robot_expiry_buffer_milliseconds", 1000);
 
     namespace Navigator
     {
