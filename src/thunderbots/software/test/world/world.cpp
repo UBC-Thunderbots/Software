@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "test/test_util/util.h"
+#include "test/test_util/test_util.h"
 
 using namespace std::chrono;
 
