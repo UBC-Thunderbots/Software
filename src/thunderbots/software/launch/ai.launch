@@ -12,4 +12,6 @@
     <node name="backend_output" pkg="thunderbots" type="backend_output" output="screen">
     </node>
 
+    <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
+
 </launch>

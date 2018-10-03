@@ -140,24 +140,22 @@ add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
 target_link_libraries(backend_output ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
-
-
     file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
         )
-add_executable (param_server
+add_executable (parameters
         ${PROTO_SRCS}
         ${PARAM_SERVER_SRC}
         ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(param_server thunderbots_gencfg ${catkin_EXPORTED_TARGETS})
+add_dependencies(parameters thukderbots_gencfg ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(param_server  ${catkin_LIBRARIES}
+target_link_libraries(parameters  ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
 
