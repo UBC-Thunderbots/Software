@@ -1,5 +1,4 @@
 #pragma once
-
 #include "util/parameter/parameter.h"
 
 /**
@@ -26,7 +25,6 @@ namespace DynamicParameters
         extern Parameter<std::string> strng;
         extern Parameter<int> it;
         extern Parameter<double> dbl;
-
         extern Parameter<double> collision_avoid_velocity_scale;    
     }
 

@@ -24,7 +24,7 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 ### Set compiler flags only for cpp code. These flags do not work for C files ###
 # Warn if parent classes do not define a virtual destructor
 # See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
-set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
+#set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
 
 
 #############################################
@@ -48,12 +48,17 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         message_generation
         thunderbots_msgs
+        dynamic_reconfigure
         )
+
+generate_dynamic_reconfigure_options(
+    ${CMAKE_CURRENT_SOURCE_DIR}/param_server/cfg/Params.cfg
+)
 
 catkin_package(
         INCLUDE_DIRS
         LIBRARIES thunderbots
-        CATKIN_DEPENDS roscpp std_msgs
+        CATKIN_DEPENDS roscpp std_msgs dynamic_reconfigure
         DEPENDS message_runtime
         )
 
@@ -136,6 +141,25 @@ target_link_libraries(backend_output ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
 
+
+    file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
+        )
+add_executable (param_server
+        ${PROTO_SRCS}
+        ${PARAM_SERVER_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(param_server thunderbots_gencfg ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(param_server  ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
 
 #############
 ## Testing ##

@@ -61,6 +61,8 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
 
+  <depend>dynamic_reconfigure</depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

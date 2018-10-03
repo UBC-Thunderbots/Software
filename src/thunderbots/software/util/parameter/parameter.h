@@ -11,6 +11,12 @@
 #include <dynamic_reconfigure/IntParameter.h>
 #include <dynamic_reconfigure/StrParameter.h>
 
+//std messages for creating dynamic_reconfigure messages
+#include <std_msgs/Bool.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/Float64.h>
+#include <std_msgs/String.h>
+
 //message that contains arrays of the xmlrpc types for reconf
 #include <dynamic_reconfigure/Config.h>
 
@@ -91,7 +97,9 @@ class Parameter
          */
         void setValueInROSSParameterServer(T new_value)
         {
+
         }
+
 
         /**
          * Returns a reference to the Parameter registry. The registry is a list of
@@ -105,16 +113,31 @@ class Parameter
         }
 
         /**
+         * Returns a reference to the config struct. The config struct contains
+         * all the current configurations
+         *
+         * @return An immutable reference to the Config struct
+         */
+        static const dynamic_reconfigure::Config& getConfigStruct()
+        {
+            return Parameter<T>::getMutableConfigStruct();
+        }
+
+        /**
          * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
          * into the registry, the pointer may not be accessed by the caller after this
          * function has been called.
+	 *
+	 * Also registers params to the static configuration struct used to 
+	 * set parameters
          *
          * @param parameter A unique pointer to the Parameter to add. This pointer may not
          * be accessed by the caller after this function has been called.
          */
         static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
         {   
-            if (std::is_same<T, bool>::value){   
+
+            if constexpr(std::is_same<T, bool>::value){   
                 dynamic_reconfigure::BoolParameter bool_msg;
 
                 bool_msg.name = parameter->getROSParameterPath();
@@ -123,16 +146,16 @@ class Parameter
                 Parameter<T>::getMutableConfigStruct().bools.push_back(bool_msg);
             }
 
-            if (std::is_same<T, int>::value){   
+	    else if  constexpr(std::is_same<T, int32_t>::value){   
                 dynamic_reconfigure::IntParameter int_msg;
 
                 int_msg.name = parameter->getROSParameterPath();
-                int_msg.value = static_cast<int>(parameter->value());
+                int_msg.value = static_cast<int32_t>(parameter->value());
 
                 Parameter<T>::getMutableConfigStruct().ints.push_back(int_msg);
             }
 
-            if (std::is_same<T, double>::value){   
+	    else if constexpr(std::is_same<T, double>::value){   
                 dynamic_reconfigure::DoubleParameter double_msg;
 
                 double_msg.name = parameter->getROSParameterPath();
@@ -141,7 +164,7 @@ class Parameter
                 Parameter<T>::getMutableConfigStruct().doubles.push_back(double_msg);
             }
 
-            if (std::is_same<T, std::string>::value){   
+	    else if constexpr(std::is_same<T, std::string>::value){   
                 dynamic_reconfigure::StrParameter str_msg;
 
                 str_msg.name = parameter->getROSParameterPath();
@@ -149,6 +172,10 @@ class Parameter
 
                 Parameter<T>::getMutableConfigStruct().strs.push_back(str_msg);
             }
+
+	    else {
+		ROS_WARN("attempting to configure with unkown type");
+	    }
 
             Parameter<T>::getMutableRegistry().emplace_back(std::move(parameter));
         }
