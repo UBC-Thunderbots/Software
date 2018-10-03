@@ -3,6 +3,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <dynamic_reconfigure/Config.h>
 #include <dynamic_reconfigure/Reconfigure.h>
+#include <util/parameter/dynamic_parameters.h>
 #include <util/parameter/parameter.h>
 #include <thunderbots/ParamsConfig.h>
 
@@ -10,6 +11,7 @@
 void callback(param_server::ParamsConfig &config, uint32_t level) {
 	//save the parameters here
 }
+
 
 int main(int argc, char **argv) {
     //init node
@@ -34,6 +36,12 @@ int main(int argc, char **argv) {
     srv.request.config.strs = Parameter<std::string>::getConfigStruct().strs;
     srv.request.config.doubles = Parameter<double>::getConfigStruct().doubles;
     srv.request.config.bools = Parameter<bool>::getConfigStruct().bools;
+
+    	//testing that the params can be accessed
+	std::cerr<<DynamicParameters::Example::strng.value()<<std::endl;
+	std::cerr<<DynamicParameters::Example::bl.value()<<std::endl;
+	std::cerr<<DynamicParameters::Example::it.value()<<std::endl;
+	std::cerr<<DynamicParameters::Example::dbl.value()<<std::endl;
 
     //using the AsyncSpinner to allow for the service call to happen
     //after the node has spun as ros::spin() blocks
