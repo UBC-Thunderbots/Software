@@ -11,17 +11,12 @@
 #include <dynamic_reconfigure/IntParameter.h>
 #include <dynamic_reconfigure/StrParameter.h>
 
-//std messages for creating dynamic_reconfigure messages
-#include <std_msgs/Bool.h>
-#include <std_msgs/Int32.h>
-#include <std_msgs/Float64.h>
-#include <std_msgs/String.h>
-
 //message that contains arrays of the xmlrpc types for reconf
 #include <dynamic_reconfigure/Config.h>
 
 //message for the reconfigure srv, takes a config msg
 #include <dynamic_reconfigure/Reconfigure.h>
+
 
 /**
  * This class defines a dynamic parameter, meaning the parameter
@@ -33,6 +28,11 @@
  * In our codebase, we support bool, int32_t, double, string, and lists (aka vectors)
  * of the previous 4 types
  */
+
+namespace{
+	std::string kParameterNs = "/parameter";
+}
+
 template <class T>
 class Parameter
 {
@@ -40,14 +40,13 @@ class Parameter
         /**
          * Constructs a new Parameter
          *
-         * @param ros_parameter_path The global path in the ROS parameter server where this
-         * parameter is stored
+         * @param parameter_name The name of the parameter used by dynamic_reconfigure
          * @param default_value The default value for this parameter
          */
-        explicit Parameter<T>(const std::string& ros_parameter_path, T default_value)
+        explicit Parameter<T>(const std::string& parameter_name, T default_value)
         {
-            this->ros_parameter_path = ros_parameter_path;
-            this->value_             = default_value;
+            this->name_ = parameter_name;
+            this->value_ = default_value;
 
             Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
         }
@@ -59,7 +58,7 @@ class Parameter
          */
         const std::string getROSParameterPath() const
         {
-            return ros_parameter_path;
+            return kParameterNs + "/" + name_;
         }
 
         /**
@@ -70,6 +69,15 @@ class Parameter
         const T value() const
         {
             return value_;
+        }
+        /**
+         * Returns the name of this parameter
+         *
+         * @return the name of this parameter
+         */
+        const std::string name() const
+        {
+            return name_;
         }
 
         /**
@@ -88,18 +96,9 @@ class Parameter
          */
         void setValueInROSParameterServer(T new_value)
         {
-            ros::param::set(getROSParameterPath(), new_value);
+	    //dynamic reconfigure takes control of setting params
+            //ros::param::set(getROSParameterPath(), new_value);
         }
-        /**
-         * Callback for dynamic reconfigure
-         *
-         * @param new_value The new value to be set
-         */
-        void setValueInROSSParameterServer(T new_value)
-        {
-
-        }
-
 
         /**
          * Returns a reference to the Parameter registry. The registry is a list of
@@ -140,7 +139,7 @@ class Parameter
             if constexpr(std::is_same<T, bool>::value){   
                 dynamic_reconfigure::BoolParameter bool_msg;
 
-                bool_msg.name = parameter->getROSParameterPath();
+                bool_msg.name = parameter->name();
                 bool_msg.value = static_cast<bool>(parameter->value());
 
                 Parameter<T>::getMutableConfigStruct().bools.push_back(bool_msg);
@@ -149,7 +148,7 @@ class Parameter
 	    else if  constexpr(std::is_same<T, int32_t>::value){   
                 dynamic_reconfigure::IntParameter int_msg;
 
-                int_msg.name = parameter->getROSParameterPath();
+                int_msg.name = parameter->name();
                 int_msg.value = static_cast<int32_t>(parameter->value());
 
                 Parameter<T>::getMutableConfigStruct().ints.push_back(int_msg);
@@ -158,7 +157,7 @@ class Parameter
 	    else if constexpr(std::is_same<T, double>::value){   
                 dynamic_reconfigure::DoubleParameter double_msg;
 
-                double_msg.name = parameter->getROSParameterPath();
+                double_msg.name = parameter->name();
                 double_msg.value = static_cast<double>(parameter->value());
 
                 Parameter<T>::getMutableConfigStruct().doubles.push_back(double_msg);
@@ -167,7 +166,7 @@ class Parameter
 	    else if constexpr(std::is_same<T, std::string>::value){   
                 dynamic_reconfigure::StrParameter str_msg;
 
-                str_msg.name = parameter->getROSParameterPath();
+                str_msg.name = parameter->name();
                 str_msg.value = static_cast<std::string>(parameter->value());
 
                 Parameter<T>::getMutableConfigStruct().strs.push_back(str_msg);
@@ -209,6 +208,7 @@ class Parameter
 
         // Store the value so it can be retrieved without fetching from the server again
         T value_;
+        std::string name_;
 
         /**
          * Returns a mutable configuration struct that will hold all the 
@@ -223,5 +223,4 @@ class Parameter
             return config;
         }
 
-        std::string ros_parameter_path;
 };
