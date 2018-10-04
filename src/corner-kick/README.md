@@ -37,3 +37,21 @@ yarn start
 ```
 
 A window should open with the application in development mode.
+
+## Project Structure
+
+The project is defined as follow:
+
+- public - contains the HTML base file and the Electron start code
+- src
+    - components
+        - containers - contains React stateful components
+        - modules - contains high-level UI components (logger, visualizer, etc.)
+        - ui - contains repeatable UI components
+        - visualizer - contains visualizer specific components
+    - pages - contains the various application pages
+    - service - contains various communication layers (including the service communicating with ROS)
+    - types - contains standard ROS topics schema
+    - App.tsx - Top-level React component
+    - index.css - Base styling
+    - index.tsx - Contains the code that initializes React

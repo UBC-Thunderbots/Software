@@ -11,31 +11,33 @@
   "private": true,
   "dependencies": {
     "@blueprintjs/core": "3.6.1",
-    "@types/pixi.js": "4.8.1",
     "electron-is-dev": "0.3.0",
+    "lodash": "^4.17.11",
     "pixi-viewport": "3.0.0",
     "pixi.js": "4.8.1",
     "react": "16.4.1",
     "react-dom": "16.4.1",
+    "react-panelgroup": "^1.0.7",
     "react-pixi-fiber": "0.4.9",
-    "react-router": "^4.3.1",
-    "react-router-dom": "^4.3.1",
     "react-scripts-ts": "2.17.0",
-    "react-split-pane": "^0.1.84",
     "roslib": "0.20.0",
     "styled-components": "3.4.6",
     "unstated": "2.1.1"
   },
   "scripts": {
-    "start": "concurrently \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "concurrently \"roslaunch rosbridge_server rosbridge_websocket.launch\" \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\" \"wait-on http://localhost:3000 && rosrun turtlesim turtlesim_node\"",
     "react-start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "package": "electron-builder --dir",
     "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.116",
+    "@types/pixi.js": "^4.8.1",
     "@types/inline-style-prefixer": "^3.0.1",
     "@types/jest": "23.3.2",
     "@types/node": "10.9.4",
@@ -49,6 +51,11 @@
     "prop-types": "15.6.2",
     "typescript": "2.9.1",
     "wait-on": "3.0.1"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^~/(.*)$": "<rootDir>/src/$1"
+    }
   },
   "build": {
     "productName": "CornerKick",

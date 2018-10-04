@@ -9,6 +9,8 @@
   },
   "rules": {
     "no-console": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "semicolon": true,
+    "jsx-no-lambda": false
   }
 }
