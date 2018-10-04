@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="corner-kick" type="corner-kick" name="corner-kick" output="screen">
+  </node>
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
+     <arg name="port" value="9090"/>
+  </include>
+</launch>

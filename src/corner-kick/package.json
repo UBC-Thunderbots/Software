@@ -25,15 +25,13 @@
     "unstated": "2.1.1"
   },
   "scripts": {
-    "start": "concurrently \"roslaunch rosbridge_server rosbridge_websocket.launch\" \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\" \"wait-on http://localhost:3000 && rosrun turtlesim turtlesim_node\"",
+    "start": "concurrently \"roslaunch rosbridge_server rosbridge_websocket.launch\" \"BROWSER=none yarn react-start\" \"wait-on http://localhost:3000 && electron .\"",
     "react-start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "package": "electron-builder --dir",
     "dist": "electron-builder",
-    "postinstall": "electron-builder install-app-deps",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.116",
