@@ -1,7 +1,7 @@
 # Describes the current state of a robot
 
-# The timestamp when this data was received, in microseconds
-int64 timestamp_microseconds
+# The timestamp for this data, represented by the number of nanoseconds since the epoch
+uint64 timestamp_nanoseconds_since_epoch
 
 # The id of the robot
 uint32 id

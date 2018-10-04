@@ -1,8 +1,6 @@
 #include "ai/hl/stp/tactic/move.h"
 
-MoveTactic::MoveTactic(const Point &destination) : destination(destination)
-{
-}
+MoveTactic::MoveTactic(const Point &destination) : destination(destination) {}
 
 Robot MoveTactic::selectRobot(const World &world,
                               const std::vector<Robot> &available_robots)

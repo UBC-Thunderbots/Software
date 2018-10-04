@@ -1,9 +1,11 @@
 #include "geom/util.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <limits>
+
 #include "geom/angle.h"
 
 
@@ -625,7 +627,7 @@ namespace
         }
         return ans;
     }
-}
+}  // namespace
 
 bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
                           const Vector &d)
@@ -690,10 +692,9 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
             return std::vector<Point>();
     }
 
-    return std::vector<Point>{a.start +
-                              (a.start - b.start).cross(b.end - b.start) /
-                                  (b.end - b.start).cross(a.end - a.start) *
-                                  (a.end - a.start)};
+    return std::vector<Point>{a.start + (a.start - b.start).cross(b.end - b.start) /
+                                            (b.end - b.start).cross(a.end - a.start) *
+                                            (a.end - a.start)};
 }
 
 // shamelessly copy-pasted from RoboJackets
@@ -893,14 +894,12 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     else
     {
         double radiusAngle = std::acos(circle.radius / (start - circle.origin).len());
-        Point p1           = circle.origin +
-                   (start - circle.origin)
-                       .rotate(Angle::ofRadians(radiusAngle))
-                       .norm(circle.radius + buffer);
-        Point p2 = circle.origin +
-                   (start - circle.origin)
-                       .rotate(-Angle::ofRadians(radiusAngle))
-                       .norm(circle.radius + buffer);
+        Point p1           = circle.origin + (start - circle.origin)
+                                       .rotate(Angle::ofRadians(radiusAngle))
+                                       .norm(circle.radius + buffer);
+        Point p2 = circle.origin + (start - circle.origin)
+                                       .rotate(-Angle::ofRadians(radiusAngle))
+                                       .norm(circle.radius + buffer);
         return std::make_pair(p1, p2);
     }
 }

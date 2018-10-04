@@ -14,6 +14,7 @@ BreakBeforeBraces: Allman
 BreakStringLiterals: 'false'
 ColumnLimit: '90'
 Cpp11BracedListStyle: 'true'
+IncludeBlocks: Regroup
 IndentCaseLabels: 'true'
 IndentWidth: '4'
 Language: Cpp

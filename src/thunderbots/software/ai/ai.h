@@ -16,9 +16,18 @@ class AI final
 {
    public:
     /**
-     * Creates a new AI
+     * Creates a new AI with a default world. The ball will be at the center of the field
+     * with 0 velocity, and the friendly and enemy teams will both be empty and have
+     * initial robot_expiry_buffers of 0 milliseconds.
      */
     explicit AI();
+
+    /**
+     * Creates a new AI
+     *
+     * @param world The initial state of the world for the AI
+     */
+    explicit AI(const World& world);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
@@ -52,8 +61,7 @@ class AI final
      *
      * @param new_friendly_team_msg The message containing new friendly team information
      */
-    void updateWorldFriendlyTeamState(
-        const thunderbots_msgs::Team& new_friendly_team_msg);
+    void updateWorldFriendlyTeamState(const Team& new_friendly_team_data);
 
     /**
      * Given a message containing new information about the enemy team, updates
@@ -61,7 +69,7 @@ class AI final
      *
      * @param new_enemy_team_msg The message containing new enemy team information
      */
-    void updateWorldEnemyTeamState(const thunderbots_msgs::Team& new_enemy_team_msg);
+    void updateWorldEnemyTeamState(const Team& new_enemy_team_data);
 
 
    private:

@@ -27,4 +27,4 @@ namespace Timestamp
     {
         return std::chrono::duration_cast<std::chrono::microseconds>(timestamp).count();
     }
-}
+}  // namespace Timestamp

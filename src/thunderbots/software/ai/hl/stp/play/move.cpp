@@ -1,4 +1,5 @@
 #include "ai/hl/stp/tactic/move.h"
+
 #include "ai/hl/stp/play/play.h"
 
 class MovePlay : public Play
@@ -33,4 +34,4 @@ class MovePlay : public Play
     }
 };
 
-REGISTER_PLAY(MovePlay)
+static TPlayFactory<MovePlay> factory;

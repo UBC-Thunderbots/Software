@@ -1,5 +1,7 @@
 #include "geom/angle.h"
+
 #include <gtest/gtest.h>
+
 #include <limits>
 
 TEST(AngleTest, Statics)
