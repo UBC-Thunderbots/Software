@@ -29,7 +29,7 @@ catkin_package(
 add_custom_target(
   clean_src_npm
   COMMENT Removing ${PROJECT_NAME}'s modules and builds
-  COMMAND rm -rf build dist
+  COMMAND rm -rf node_modules build dist
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
 ## Copy files over to devel for build and installation
@@ -42,7 +42,7 @@ add_custom_target(
 
 ## Install NPM dependencies
 add_custom_target(
-  install_npm_modules
+  corner-kick-dependencies
   DEPENDS copy_src_to_devel
   COMMENT Installing ${PROJECT_NAME}'s dependencies
   COMMAND
@@ -53,9 +53,9 @@ add_custom_target(
 
 ## Package application
 add_custom_target(
-  package_npm_executable
+  corner-kick-package
   ALL
-  DEPENDS install_npm_modules
+  DEPENDS corner-kick-dependencies
   COMMENT Packaging up ${PROJECT_NAME}
   COMMAND npm run build
   COMMAND npm run dist
