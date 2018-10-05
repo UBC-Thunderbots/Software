@@ -31,6 +31,7 @@ install:
       --env RUN_BUILD
       --env RUN_TESTS
       --env RUN_FORMATTING_CHECKS
+      --env ROS_DISTRO 
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
@@ -49,19 +50,17 @@ env:
 # The variables here are uniquely set at the start of each different test
 matrix:
   include:
-  - name: "ROS Melodic - Build and Test"
+  - name: "ROS Melodic / Ubuntu 18.04 - Build and Test"
     env: RUN_BUILD="true"
          RUN_TESTS="true"
          ROS_DISTRO=melodic
-  - name: "ROS Melodic - Check Formatting"
-    env: RUN_BUILD="true"
-         RUN_TESTS="true"
+  - name: "ROS Melodic / Ubuntu 18.04 - Check Formatting"
+    env: RUN_FORMATTING_CHECKS="true"
          ROS_DISTRO=melodic
-  - name: "ROS Kinetic - Build and Test"
+  - name: "ROS Kinetic / Ubuntu 16.04 - Build and Test"
     env: RUN_BUILD="true"
          RUN_TESTS="true"
          ROS_DISTRO=kinetic
-  - name: "ROS Kinetic - Check Formatting"
-    env: RUN_BUILD="true"
-         RUN_TESTS="true"
+  - name: "ROS Kinetic / Ubuntu 16.04 - Check Formatting"
+    env: RUN_FORMATTING_CHECKS="true"
          ROS_DISTRO=kinetic
