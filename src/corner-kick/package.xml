@@ -36,11 +36,7 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>nodejs</build_depend>
-  <build_depend>npm</build_depend>
   <exec_depend>rosbridge_server</exec_depend>
-  <exec_depend>nodejs</exec_depend>
-  <exec_depend>npm</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

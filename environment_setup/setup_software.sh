@@ -142,7 +142,6 @@ if [ "$ros_distro" == "kinetic" ]; then
         exit 1
     fi
     sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-    sudo apt-get install ros-kinetic-rosbridge-server -y
 elif [ "$ros_distro" == "melodic" ]; then
     # See http://wiki.ros.org/melodic/Installation/Ubuntu for instructions
     sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
@@ -156,7 +155,6 @@ elif [ "$ros_distro" == "melodic" ]; then
         exit 1
     fi
     sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
-    sudo apt-get install install ros-melodic-rosbridge-server -y
 fi
 
 
@@ -194,6 +192,10 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 # Required to make sure we install protobuf version 3.0.0 or greater
 sudo add-apt-repository ppa:maarten-fonville/protobuf -y
+# Required to make sure we install node v8
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt-get update
 
 host_software_packages=(
@@ -202,8 +204,11 @@ host_software_packages=(
     clang-format
     protobuf-compiler
     libprotobuf-dev
+    nodejs
+    yarn
 )
 sudo apt-get install ${host_software_packages[@]} -y
+sudo npm install -g yarn
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing utilities failed"

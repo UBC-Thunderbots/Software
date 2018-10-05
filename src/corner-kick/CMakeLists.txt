@@ -46,8 +46,8 @@ add_custom_target(
   DEPENDS copy_src_to_devel
   COMMENT Installing ${PROJECT_NAME}'s dependencies
   COMMAND
-  npm install --no-optional
-    --prefix ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME}
+  yarn install
+    --cwd ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME}
   BYPRODUCTS node_modules
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
 
@@ -57,8 +57,8 @@ add_custom_target(
   ALL
   DEPENDS corner-kick-dependencies
   COMMENT Packaging up ${PROJECT_NAME}
-  COMMAND npm run build
-  COMMAND npm run dist
+  COMMAND yarn build
+  COMMAND yarn dist
   BYPRODUCTS dist
   BYPRODUCTS build
   WORKING_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}/${PROJECT_NAME})
