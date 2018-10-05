@@ -12,7 +12,10 @@
 #include <ctime>
 #include "shared/constants.h"
 
-std::pair<Vector, AngularVelocity> grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun) {
+
+//TODO: add negative time condition
+
+std::pair<Vector, AngularVelocity> MotionController::grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double deltaTime) {
 
     // vector to hold the XY velocities of the robot
     Vector robotXYVelocities;
@@ -25,7 +28,7 @@ std::pair<Vector, AngularVelocity> grSim_bang_bang(Robot robot, Point dest, doub
     const double currentTime = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
 
     // calculate the delta in time to calculate changes in speed based on acceleration
-    const double deltaTime = currentTime - timeOfLastRun;
+
     double robotAngularVelocity;
 
 
@@ -49,6 +52,9 @@ std::pair<Vector, AngularVelocity> grSim_bang_bang(Robot robot, Point dest, doub
     bCanStopInTime = expectedFinalSpeed < desiredFinalSpeed;
     bCanStopRotateInTime = expectedFinalAngSpeed < 0.0;
 
+    if (deltaTime < 0) { // there should be no negative changes in time except from the first run when variables are initialized
+        deltaTime = fabs(deltaTime);
+    }
 
     if( bCanStopInTime ) {
 

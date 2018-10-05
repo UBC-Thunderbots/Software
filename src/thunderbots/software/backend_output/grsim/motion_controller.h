@@ -7,7 +7,9 @@
 #include "util/constants.h"
 #include <utility>
 
-std::pair<Vector, AngularVelocity>  grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double timeOfLastRun);
+namespace MotionController {
 
+    std::pair<Vector, AngularVelocity>  grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double delaTime);
+}
 
 

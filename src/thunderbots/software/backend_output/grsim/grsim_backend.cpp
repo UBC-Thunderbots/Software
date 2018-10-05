@@ -68,6 +68,7 @@ void GrSimBackend::sendPrimitives(
 
 
     double bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
+    double currentTime;
 
     Team team;
 
@@ -76,9 +77,10 @@ void GrSimBackend::sendPrimitives(
 
         MovePrimitive movePrim = dynamic_cast<MovePrimitive &>(*prim);
 
-        robotVelocities = grSim_bang_bang(*team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(), movePrim.getFinalSpeed(), movePrim.getFinalAngle(), bangBangTimestamp);
+        currentTime = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
 
-        bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
+        robotVelocities = MotionController::grSim_bang_bang(*team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(), movePrim.getFinalSpeed(), movePrim.getFinalAngle(), currentTime - bangBangTimestamp);
+        bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
 
         createGrSimPacket(movePrim.getRobotId(), YELLOW, robotVelocities.first, robotVelocities.second);
     }

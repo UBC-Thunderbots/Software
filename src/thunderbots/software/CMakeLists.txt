@@ -223,4 +223,10 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(motion_controller_test
+	    test/grsim_backend/moton_controller.cpp
+	    ai/backend_output/grsim/motion_controller.cpp)
+    
+    target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
+
 endif()
