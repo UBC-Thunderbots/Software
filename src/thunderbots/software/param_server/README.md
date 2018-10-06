@@ -1,9 +1,9 @@
 # Dynamic Reconfigure
 
-The param server node uses the initializes the dynamic_reconfigure server and calls the set_parameter service with the proper configuration message created when all the `parameters` are constructed
+The param server node initializes the dynamic_reconfigure server and calls the set_parameter service with the proper configuration message created when all the `parameters` are constructed
 
 ### Registering a parameter to be configured through rqt_reconfigure
-If the parameter is defined in a new namespace, creating a new group will categorize it in that group 
+If the parameter is defined in a new namespace, creating a new group will put it in that group 
 ~~~python
 navigator = gen.add_group("Navigator")
 ~~~
