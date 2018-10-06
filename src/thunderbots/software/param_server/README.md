@@ -1,4 +1,4 @@
-mic Reconfigure
+#Dynamic Reconfigure
 
 The param server node uses the initializes the dynamic_reconfigure server and calls the set_parameter service with the proper configuration message created when all the `parameters` are constructed
 
