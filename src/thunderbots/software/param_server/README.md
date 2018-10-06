@@ -1,4 +1,4 @@
-# Dynamic Reconfigure
+mic Reconfigure
 
 The param server node uses the initializes the dynamic_reconfigure server and calls the set_parameter service with the proper configuration message created when all the `parameters` are constructed
 
@@ -20,6 +20,5 @@ After launching ai, opening the rqt_reconfigure node will open the gui
 ~~~
 rosrun rqt_reconfigure rqt_reconfigure
 ~~~
-
-
-
+![rqt_reconfigure](rsc/gui.png?raw=true "rqt_reconfigure")
+The parameters are updated automatically when any value changes on the GUI. The save and load buttons can be used to version parameter configurations. 
