@@ -26,12 +26,12 @@
  *
  * See http://wiki.ros.org/Parameter%20Server for the list of types
  *
- * In our codebase, we support bool, int32_t, double, string, and lists (aka vectors)
- * of the previous 4 types
- */
+ * In our codebase, we support bool, int32_t, double, and strings
+ * */
 
 namespace{
-	std::string kParameterNs = "/parameters";
+        // what namespace the parameters will be in (ROS param server)
+	std::string kNamespaceForParameters = "/parameters";
 }
 
 template <class T>

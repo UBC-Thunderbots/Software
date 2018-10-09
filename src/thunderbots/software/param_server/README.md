@@ -3,10 +3,13 @@
 The param server node initializes the dynamic_reconfigure server and calls the set_parameter service with the proper configuration message created when all `parameters` are constructed
 
 ### Registering a parameter to be configured through rqt_reconfigure
+Add the following code in the Params.cfg file found at param_server/cfg/Params.cfg
 ~~~python
 navigator = gen.add_group("Navigator")
 ~~~
 The namespace in dynamic_parameter.cpp should correspond to the group defined in `Params.cfg`.
+Note that calling 'add_group("child")' on a group object, will nest that group
+
 Calling `add` on the group object will put the paramter in that group. 
 
 ~~~python

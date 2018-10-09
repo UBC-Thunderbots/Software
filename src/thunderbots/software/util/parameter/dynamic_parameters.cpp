@@ -8,12 +8,6 @@ namespace DynamicParameters
         Parameter<int32_t>::updateAllParametersFromROSParameterServer();
 	Parameter<double>::updateAllParametersFromROSParameterServer();
         Parameter<std::string>::updateAllParametersFromROSParameterServer();
-
-	//currently not supported (possible to implement through custom dynamic reconf)
-        //Parameter<std::vector<bool>>::updateAllParametersFromROSParameterServer();
-        //Parameter<std::vector<int32_t>>::updateAllParametersFromROSParameterServer();
-        //Parameter<std::vector<double>>::updateAllParametersFromROSParameterServer();
-        //Parameter<std::vector<std::string>>::updateAllParametersFromROSParameterServer();
     }
 
     Parameter<int32_t> robot_expiry_buffer_milliseconds(
@@ -30,12 +24,4 @@ namespace DynamicParameters
         Parameter<double> collision_avoid_velocity_scale(
             "collision_avoid_velocity_scale", 2.0);
     }  // namespace Navigator
-
-    namespace Example
-    {
-        Parameter<bool> bl("bool_example", false); //bool
-        Parameter<std::string> strng("string_example", "example"); //string
-        Parameter<int32_t> it("int_example", -1); //int
-        Parameter<double> dbl("double_example",12.0); //double
-    } // namespace Example
 }  // namespace DynamicParameters

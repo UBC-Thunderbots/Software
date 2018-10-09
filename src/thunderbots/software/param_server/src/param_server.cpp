@@ -10,10 +10,12 @@
 #include <thunderbots/ParamsConfig.h>
 
 // define the refresh rate for the paramters in hz
-#define REFRESH_RATE 10
+#define REFRESH_RATE_HZ 1
 
 // callback for the param timer
-void updateAllParameters(const ros::TimerEvent& event);
+void updateAllParameters(const ros::TimerEvent& event) {
+    DynamicParameters::updateAllParametersFromROSParameterServer();
+}
 
 /**
  * This node starts up the dynamic_reconfigure server and properly configures
@@ -21,7 +23,7 @@ void updateAllParameters(const ros::TimerEvent& event);
  * defined, updateROSParameters...() is called, fetching the values from the server
  *
  * For documentation on how to create new parameters and configure them to work
- * with the rqt_reconfigure node see this nodes README.md
+ * with the rqt_reconfigure node see this node's README.md
  *
  */
 int main(int argc, char **argv) {
@@ -32,7 +34,6 @@ int main(int argc, char **argv) {
 
     // setup dynamic reconfigure server
     dynamic_reconfigure::Server<param_server::ParamsConfig> server;
-    dynamic_reconfigure::Server<param_server::ParamsConfig>::CallbackType f;
 
     ros::service::waitForService("/parameters/set_parameters", 1);
     ros::ServiceClient client = node_handle.serviceClient<dynamic_reconfigure::Reconfigure>("/parameters/set_parameters");
@@ -47,7 +48,7 @@ int main(int argc, char **argv) {
     srv.request.config.bools = Parameter<bool>::getConfigStruct().bools;
 
     // start the timer to update Parameters
-    ros::Timer timer = node_handle.createTimer(ros::Duration(1/REFRESH_RATE), updateAllParameters);
+    ros::Timer timer = node_handle.createTimer(ros::Duration(1/REFRESH_RATE_HZ), updateAllParameters);
 
     // spin asynchronously to allow for service call in the same node
     ros::AsyncSpinner spinner(1);
@@ -65,6 +66,3 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void updateAllParameters(const ros::TimerEvent& event) {
-    DynamicParameters::updateAllParametersFromROSParameterServer();
-}
