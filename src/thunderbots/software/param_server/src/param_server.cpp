@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     dynamic_reconfigure::Reconfigure srv;
 
     // get all configuration structs
-    srv.request.config.ints = Parameter<int>::getConfigStruct().ints;
+    srv.request.config.ints = Parameter<int32_t>::getConfigStruct().ints;
     srv.request.config.strs = Parameter<std::string>::getConfigStruct().strs;
     srv.request.config.doubles = Parameter<double>::getConfigStruct().doubles;
     srv.request.config.bools = Parameter<bool>::getConfigStruct().bools;
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     if(client.call(srv)) {
         ROS_INFO("All parameters have been configured");
     } else {
-        ROS_FATAL("Parameters have not been configured, showing cached values");
+        ROS_FATAL("Parameters have not been configured, showing default values");
         return 1;
     }
 

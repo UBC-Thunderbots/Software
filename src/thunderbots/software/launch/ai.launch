@@ -1,5 +1,4 @@
 <launch>
-
     <!-- Launch the backend_input node -->
     <node name="backend_input" pkg="thunderbots" type="backend_input" output="screen">
     </node>

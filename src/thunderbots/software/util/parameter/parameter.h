@@ -87,7 +87,6 @@ class Parameter
         void updateValueFromROSParameterServer()
         {
             ros::param::get(getROSParameterPath(), value_);
-	    std::cerr<<value_<<std::endl;
         }
 
         /**
@@ -97,8 +96,7 @@ class Parameter
          */
         void setValueInROSParameterServer(T new_value)
         {
-	    //dynamic reconfigure takes control of setting params
-            //ros::param::set(getROSParameterPath(), new_value);
+	    //dynamic reconfigure takes control of setting params //ros::param::set(getROSParameterPath(), new_value);
         }
 
         /**
