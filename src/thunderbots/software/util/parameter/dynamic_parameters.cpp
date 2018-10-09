@@ -2,8 +2,6 @@
 
 namespace DynamicParameters
 {
-    std::string kParamNs = "/thunderbots/parameters/"; 
-
     void updateAllParametersFromROSParameterServer()
     {
         Parameter<bool>::updateAllParametersFromROSParameterServer();
@@ -33,7 +31,7 @@ namespace DynamicParameters
     {
         Parameter<bool> bl("bool_example", false); //bool
         Parameter<std::string> strng("string_example", "example"); //string
-        Parameter<int> it("int_example", -1); //int
+        Parameter<int32_t> it("int_example", -1); //int
         Parameter<double> dbl("double_example",12.0); //double
     }
 }

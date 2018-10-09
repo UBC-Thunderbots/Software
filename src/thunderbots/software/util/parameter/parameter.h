@@ -30,7 +30,7 @@
  */
 
 namespace{
-	std::string kParameterNs = "/parameter";
+	std::string kParameterNs = "/parameters";
 }
 
 template <class T>
@@ -58,7 +58,7 @@ class Parameter
          */
         const std::string getROSParameterPath() const
         {
-            return kParameterNs + "/" + name_;
+            return kParameterNs + "/" + name();
         }
 
         /**
@@ -87,6 +87,7 @@ class Parameter
         void updateValueFromROSParameterServer()
         {
             ros::param::get(getROSParameterPath(), value_);
+	    std::cerr<<value_<<std::endl;
         }
 
         /**

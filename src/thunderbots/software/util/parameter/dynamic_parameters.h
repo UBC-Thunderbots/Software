@@ -23,7 +23,7 @@ namespace DynamicParameters
     {
         extern Parameter<bool> bl;
         extern Parameter<std::string> strng;
-        extern Parameter<int> it;
+        extern Parameter<int32_t> it;
         extern Parameter<double> dbl;
         extern Parameter<double> collision_avoid_velocity_scale;    
     }
