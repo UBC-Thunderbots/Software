@@ -13,11 +13,15 @@ namespace DynamicParameters
      */
     void updateAllParametersFromROSParameterServer();
 
+    // How long in milliseconds a Robot must not appear in vision before it is removed
+    // from the AI
+    extern Parameter<int32_t> robot_expiry_buffer_milliseconds;
+
     namespace Navigator
     {
         extern Parameter<double> default_avoid_dist;
         extern Parameter<double> collision_avoid_velocity_scale; 
-    }
+    }  // namespace Navigator
 
     namespace Example
     {
@@ -25,7 +29,7 @@ namespace DynamicParameters
         extern Parameter<std::string> strng;
         extern Parameter<int32_t> it;
         extern Parameter<double> dbl;
-        extern Parameter<double> collision_avoid_velocity_scale;    
-    }
+    } // namespace Example
 
-}
+   	extern Parameter<double> collision_avoid_velocity_scale;
+}  // namespace DynamicParameters

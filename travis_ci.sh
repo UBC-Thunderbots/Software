@@ -33,7 +33,7 @@ cd $CURR_DIR
 # Note that we must build the codebase in order to run tests
 if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     # Install all required dependecies
-    travis_run ./environment_setup/setup_software.sh kinetic
+    travis_run ./environment_setup/setup_software.sh $ROS_DISTRO 
 
     # Build the codebase
     travis_run catkin_make
@@ -49,7 +49,7 @@ if [ "$RUN_TESTS" == "true" ]; then
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
-    CLANG_VERSION="4.0"
+    CLANG_VERSION="7.0"
 
     # Determine what we should compare this branch against to figure out what
     # files were changed

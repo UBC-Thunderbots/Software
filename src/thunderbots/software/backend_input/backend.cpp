@@ -1,13 +1,12 @@
 #include "backend.h"
+
 #include "backend_input/message_util.h"
 #include "proto/messages_robocup_ssl_detection.pb.h"
 #include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "shared/constants.h"
 #include "util/constants.h"
 
-Backend::Backend() : ball_filter(), friendly_team_filter(), enemy_team_filter()
-{
-}
+Backend::Backend() : ball_filter(), friendly_team_filter(), enemy_team_filter() {}
 
 std::optional<thunderbots_msgs::Field> Backend::getFieldMsg(
     const SSL_WrapperPacket &packet)

@@ -5,29 +5,26 @@
 // This file is from the SSL-Vision repository:
 // https://github.com/RoboCup-SSL/ssl-vision/tree/master/src/shared/net
 
-#include <sys/poll.h>
-#include <sys/socket.h>
-#include <sys/types.h>
+#include "netraw.h"
 
 #include <fcntl.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <sys/poll.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "netraw_util.h"
 
-#include "netraw.h"
-
 namespace Net
-{
-    //====================================================================//
+{  //====================================================================//
     //  Net::Address: Network address class
     //  (C) James Bruce
     //====================================================================//
 
     bool Address::setHost(const char *hostname, int port)
-    {
-        // printf("%s %d\n",hostname,port);
+    {  // printf("%s %d\n",hostname,port);
         addrinfo *res = NULL;
         getaddrinfo(hostname, NULL, NULL, &res);
         if (!res)
@@ -234,13 +231,12 @@ namespace Net
 
         return (poll(&pfd, 1, timeout_ms) == 1);
     }
-
 };  // namespace Net
 
-//====================================================================//
-//  Testing Code
-//====================================================================//
-// compile with: g++ -g -Wall -O2 -DNETRAW_TEST netraw.cc -o nettest
+    //====================================================================//
+    //  Testing Code
+    //====================================================================//
+    // compile with: g++ -g -Wall -O2 -DNETRAW_TEST netraw.cc -o nettest
 
 #ifdef NETRAW_TEST
 

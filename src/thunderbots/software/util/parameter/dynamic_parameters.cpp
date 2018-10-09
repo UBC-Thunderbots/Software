@@ -16,6 +16,9 @@ namespace DynamicParameters
         //Parameter<std::vector<std::string>>::updateAllParametersFromROSParameterServer();
     }
 
+    Parameter<int32_t> robot_expiry_buffer_milliseconds(
+        "robot_expiry_buffer_milliseconds", 1000);
+
     namespace Navigator
     {
         // Default avoid distance around robots.
@@ -24,8 +27,9 @@ namespace DynamicParameters
         // Scaling factor for collision avoidance.
         // TODO this is arbitrary for now; could be determined as part of
         // #23: https://github.com/UBC-Thunderbots/Software/issues/23
-        Parameter<double> collision_avoid_velocity_scale("collision_avoid_velocity_scale", 2.0);
-    }
+        Parameter<double> collision_avoid_velocity_scale(
+            "collision_avoid_velocity_scale", 2.0);
+    }  // namespace Navigator
 
     namespace Example
     {
@@ -33,7 +37,5 @@ namespace DynamicParameters
         Parameter<std::string> strng("string_example", "example"); //string
         Parameter<int32_t> it("int_example", -1); //int
         Parameter<double> dbl("double_example",12.0); //double
-    }
-}
-
-
+    } // namespace Example
+}  // namespace DynamicParameters

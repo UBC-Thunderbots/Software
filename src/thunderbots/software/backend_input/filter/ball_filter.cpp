@@ -1,8 +1,6 @@
 #include "ball_filter.h"
 
-BallFilter::BallFilter()
-{
-}
+BallFilter::BallFilter() {}
 
 FilteredBallData BallFilter::getFilteredData(std::vector<SSLBallData> new_ball_data)
 {

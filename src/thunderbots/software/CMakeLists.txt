@@ -235,15 +235,48 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(robot_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(team_test
+            test/world/team.cpp
+            ai/world/team.cpp
+            ai/world/robot.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(team_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(ros_message_util_test
             test/util/ros_messages.cpp
             util/ros_messages.cpp
             ai/world/ball.cpp
             ai/world/robot.cpp
             ai/world/field.cpp
+            ai/world/team.cpp
             geom/point.h
             geom/angle.h)
 
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(world_test
+            test/world/world.cpp
+            test/test_util/test_util.cpp
+            ai/world/world.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp)
+
+    target_link_libraries(world_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(test_util_test
+            test/test_util/test_util_test.cpp
+            test/test_util/test_util.cpp
+            ai/world/world.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            )
+
+    target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
 endif()
