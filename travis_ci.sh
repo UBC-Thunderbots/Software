@@ -33,7 +33,7 @@ cd $CURR_DIR
 # Note that we must build the codebase in order to run tests
 if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     # Install all required dependecies
-    travis_run ./environment_setup/setup_software.sh kinetic
+    travis_run ./environment_setup/setup_software.sh $ROS_DISTRO 
 
     # Build the codebase
     travis_run catkin_make
