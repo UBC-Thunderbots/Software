@@ -40,6 +40,19 @@ void SSLVisionClient::handleDataReception(const boost::system::error_code &error
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
+    else
+    {
+        // Start listening again to receive the next data
+        socket_.async_receive_from(
+            boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,
+            boost::bind(&SSLVisionClient::handleDataReception, this,
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred));
+
+        // TODO: Log a proper warning here so we can be notified that there was an error
+        // while handling received data. Can be done once
+        // https://github.com/UBC-Thunderbots/Software/issues/33 is done
+    }
 }
 
 const std::unique_ptr<SSL_WrapperPacket> SSLVisionClient::getVisionPacket()

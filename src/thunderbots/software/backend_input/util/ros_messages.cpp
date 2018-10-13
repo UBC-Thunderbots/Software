@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 
 thunderbots_msgs::Field MessageUtil::createFieldMsgFromFieldGeometry(
-        const SSL_GeometryFieldSize &field_data)
+    const SSL_GeometryFieldSize &field_data)
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
@@ -77,8 +77,8 @@ thunderbots_msgs::Field MessageUtil::createFieldMsgFromFieldGeometry(
     return field_msg;
 }
 
-thunderbots_msgs::Ball MessageUtil::createBallMsgFromFileredBallData(
-        const FilteredBallData &filtered_ball_data)
+thunderbots_msgs::Ball MessageUtil::createBallMsgFromFilteredBallData(
+    const FilteredBallData &filtered_ball_data)
 {
     thunderbots_msgs::Ball ball_msg;
 
@@ -95,7 +95,7 @@ thunderbots_msgs::Ball MessageUtil::createBallMsgFromFileredBallData(
 }
 
 thunderbots_msgs::Robot MessageUtil::createRobotMsgFromFilteredRobotData(
-        const FilteredRobotData &filtered_robot_data)
+    const FilteredRobotData &filtered_robot_data)
 {
     thunderbots_msgs::Robot robot_msg;
 
@@ -119,14 +119,14 @@ thunderbots_msgs::Robot MessageUtil::createRobotMsgFromFilteredRobotData(
 }
 
 thunderbots_msgs::Team MessageUtil::createTeamMsgFromFilteredRobotData(
-        const std::vector<FilteredRobotData> &filtered_team_data)
+    const std::vector<FilteredRobotData> &filtered_team_data)
 {
     thunderbots_msgs::Team team_msg;
 
     for (const FilteredRobotData &filtered_robot_data : filtered_team_data)
     {
-        thunderbots_msgs::Robot robot_msg = createRobotMsgFromFilteredRobotData(
-                filtered_robot_data);
+        thunderbots_msgs::Robot robot_msg =
+            createRobotMsgFromFilteredRobotData(filtered_robot_data);
         team_msg.robots.emplace_back(robot_msg);
     }
 
