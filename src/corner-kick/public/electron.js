@@ -7,15 +7,39 @@ const path = require('path');
 const url = require('url');
 const isDev = require('electron-is-dev');
 
+const storage = require('electron-json-storage');
+
 let mainWindow;
-let rosBridge;
 
 app.commandLine.appendSwitch('--ignore-gpu-blacklist');
 
 function start() {
-  mainWindow = new BrowserWindow({width: 900, height: 680});
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
-  mainWindow.on('closed', () => mainWindow = null);
+  storage.get('windowBounds', (error, data) => {
+    if (error) {
+      throw error;
+    }
+
+    mainWindow = new BrowserWindow({
+      height: data.height || 680,
+      width: data.width || 900, 
+      x: data.x || undefined, 
+      y: data.y || undefined, 
+    });
+
+    mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+    mainWindow.on('closed', () => mainWindow = null);
+  
+    mainWindow.on('resize', () => {
+      let { x, y, width, height } = mainWindow.getBounds();
+      storage.set('windowBounds', { x, y, width, height });
+    });
+    
+    mainWindow.on('move', () => {
+      let { x, y } = mainWindow.getBounds();
+      storage.set('windowBounds', { x, y });
+    });
+
+  });
 }
 
 app.on('ready', start);
