@@ -59,7 +59,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
         std::vector<SSLRobotData> friendly_team_robot_data = std::vector<SSLRobotData>();
 
         auto ssl_robots = detection.robots_yellow();
-        if (UTIL::CONSTANTS::FRIENDLY_TEAM_COLOUR == BLUE)
+        if (Util::Constants::FRIENDLY_TEAM_COLOUR == BLUE)
         {
             ssl_robots = detection.robots_blue();
         }
@@ -100,7 +100,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
         std::vector<SSLRobotData> enemy_team_robot_data = std::vector<SSLRobotData>();
 
         auto ssl_robots = detection.robots_yellow();
-        if (UTIL::CONSTANTS::FRIENDLY_TEAM_COLOUR == YELLOW)
+        if (Util::Constants::FRIENDLY_TEAM_COLOUR == YELLOW)
         {
             ssl_robots = detection.robots_blue();
         }

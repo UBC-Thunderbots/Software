@@ -18,20 +18,20 @@ int main(int argc, char **argv)
 
     // Create publishers
     ros::Publisher ball_publisher = node_handle.advertise<thunderbots_msgs::Ball>(
-        UTIL::CONSTANTS::BACKEND_INPUT_BALL_TOPIC, 1);
+        Util::Constants::BACKEND_INPUT_BALL_TOPIC, 1);
     ros::Publisher field_publisher = node_handle.advertise<thunderbots_msgs::Field>(
-        UTIL::CONSTANTS::BACKEND_INPUT_FIELD_TOPIC, 1);
+        Util::Constants::BACKEND_INPUT_FIELD_TOPIC, 1);
     ros::Publisher friendly_team_publisher =
         node_handle.advertise<thunderbots_msgs::Team>(
-            UTIL::CONSTANTS::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
+            Util::Constants::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
-        UTIL::CONSTANTS::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
+        Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
     // Set up our backend
     Backend backend = Backend();
     SSLVisionClient ssl_vision_client =
-        SSLVisionClient(UTIL::CONSTANTS::SSL_VISION_MULTICAST_ADDRESS,
-                        UTIL::CONSTANTS::SSL_VISION_MULTICAST_PORT);
+        SSLVisionClient(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+                        Util::Constants::SSL_VISION_MULTICAST_PORT);
 
     // Main loop
     while (ros::ok())
