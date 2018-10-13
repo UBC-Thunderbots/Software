@@ -17,6 +17,10 @@ namespace UTIL
         static const std::string AI_PRIMITIVES_TOPIC            = "backend/primitives";
 
         // TODO: Make this a tuneable parameter
-        const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
+        static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
+
+        // Networking and vision
+        static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
+        static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
     }  // namespace CONSTANTS
 }  // namespace UTIL
