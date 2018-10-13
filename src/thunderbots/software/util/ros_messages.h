@@ -3,9 +3,11 @@
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
+#include "ai/world/team.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
+#include "thunderbots_msgs/Team.h"
 
 namespace Util
 {
@@ -38,5 +40,13 @@ namespace Util
          * @return A Field object created with the given field message data
          */
         Field createFieldFromROSMessage(const thunderbots_msgs::Field& field_msg);
-    }
-}
+
+        /**
+         * Given a Team message, constructs and returns a Team object
+         *
+         * @param team_msg The message containing the team message data
+         * @return A Team object created with the given team message data
+         */
+        Team createTeamFromROSMessage(const thunderbots_msgs::Team& team_msg);
+    }  // namespace ROSMessages
+}  // namespace Util

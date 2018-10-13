@@ -1,10 +1,13 @@
 #include "geom/util.h"
+
 #include <gtest/gtest.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <sstream>
+
 #include "geom/angle.h"
 #include "geom/point.h"
 
@@ -452,18 +455,15 @@ TEST(GeomUtilTest, test_seg_crosses_seg)
         bool a_over = std::rand() % 2;
         bool b_over = std::rand() % 2;
 
-        Point a2 =
-            a1 +
-            (i0 - a1) *
-                (1 + std::rand() % 100 / 100.0 * (a_over ? 1 : -1));  // the last part
+        Point a2 = a1 + (i0 - a1) * (1 + std::rand() % 100 / 100.0 *
+                                             (a_over ? 1 : -1));  // the last part
         // generate a number
         // either bigger or
         // smaller than 1
         Point b2 =
             b1 +
-            (i0 - b1) * (1 +
-                         std::rand() % 100 / 100.0 *
-                             (b_over ? 1 : -1));  // as a scaling factor for a2 and b2
+            (i0 - b1) * (1 + std::rand() % 100 / 100.0 *
+                                 (b_over ? 1 : -1));  // as a scaling factor for a2 and b2
 
         bool expected = a_over && b_over;
         bool found    = intersects(Seg(a1, a2), Seg(b1, b2));
@@ -503,10 +503,9 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         bool expected = std::rand() % 2;
 
         Point a2 = a1 + (i0 - a1).norm();
-        Point b2 = b1 +
-                   (i0 - b1) * (1 +
-                                std::rand() % 100 / 100.0 *
-                                    (expected ? 1 : -1));  // as a scaling factor for b2
+        Point b2 =
+            b1 + (i0 - b1) * (1 + std::rand() % 100 / 100.0 *
+                                      (expected ? 1 : -1));  // as a scaling factor for b2
 
         bool found = intersects(Ray(a1, a2), Seg(b1, b2));
 

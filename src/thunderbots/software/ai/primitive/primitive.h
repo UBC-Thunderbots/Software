@@ -1,8 +1,10 @@
 #pragma once
 
 #include <ros/ros.h>
+
 #include <string>
 #include <vector>
+
 #include "thunderbots_msgs/Primitive.h"
 #include "geom/point.h"
 #include "geom/angle.h"

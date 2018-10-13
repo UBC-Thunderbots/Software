@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+
 #include "ai/intent/intent.h"
 #include "ai/world/world.h"
 
