@@ -38,13 +38,13 @@ TEST(MotionControllerTest, calc_correct_velocity_twos)
     double deltaTime = 0.2;
     Point destination = Point(1,1);
     Angle destinationAngle = Angle::ofDegrees(22);
-    double destinationSpeed = 2;
+    double destinationSpeed = 2;(0,0);
+    Angle expectedAngularVelocity = Angle::ofRadians(0);
+
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSim_bang_bang(robo, destination, destinationSpeed, desintationAngle, deltaTime);
 
-    Vector expectedVector = Point(0,0);
-    Angle expectedAngularVelocity = Angle::ofRadians(0);
-
+    Vector expectedVector = Point;
     if (expectedVector == roboSpeeds.first && expectedAngularVelocity == roboSpeeds.second) {
     speedsEqual = true;
     }

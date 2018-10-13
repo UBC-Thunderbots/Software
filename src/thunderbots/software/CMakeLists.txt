@@ -224,9 +224,17 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(motion_controller_test
-	    test/grsim_backend/moton_controller.cpp
-	    ai/backend_output/grsim/motion_controller.cpp)
-    
-    target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
+            ${PROTO_SRCS}
+            test/grsim_backend/grsim_backend.cpp
+            backend_output/grsim/grsim_backend.cpp
+            backend_output/grsim/grsim_backend.h
+            backend_output/backend.h
+            test/grsim_backend/motion_controller.cpp
+            src/thunderbots/software/backend_output/grsim/motion_controller.cpp
+            )
+
+    target_link_libraries(motion_controller_test ${catkin_LIBRARIES}
+            ${PROTOBUF_LIBRARIES}
+            )
 
 endif()
