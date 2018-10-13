@@ -1,7 +1,7 @@
 #include "ai.h"
 
 AI::AI()
-    : world(World(Field(), Ball(), Team(std::chrono::milliseconds(0)),
+    : world(World(Field(), Ball(Point(), Vector()), Team(std::chrono::milliseconds(0)),
                   Team(std::chrono::milliseconds(0)))),
       navigator(std::make_unique<RRTNav>()),
       high_level(std::make_unique<STP_HL>())

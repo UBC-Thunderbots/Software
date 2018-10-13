@@ -16,7 +16,7 @@ namespace Test
         Field field        = createSSLDivBField();
         Team friendly_team = Team(std::chrono::milliseconds(1000));
         Team enemy_team    = Team(std::chrono::milliseconds(1000));
-        Ball ball          = Ball();
+        Ball ball          = Ball(Point(), Vector());
 
         World world = World(field, ball, friendly_team, enemy_team);
 
