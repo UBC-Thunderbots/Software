@@ -44,10 +44,11 @@ class SSLVisionClient
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
     // The actual length (in bytes) of the ssl_wrapper packets is around 263 bytes
-    // (determined empirically by printing the size of the received packet). A maximum
-    // buffer size of 512 bytes gives us a buffer (haha) in case the size of the packets
-    // ever increase.
-    static constexpr unsigned int max_buffer_length = 512;
+    // (determined empirically by printing the size of the received packet). We set the
+    // max buffer length to be the largest possible size of a UDP datagram. This way
+    // we don't need to worry about buffer overflow, or about our data getting truncated
+    // to fit into the buffer
+    static constexpr unsigned int max_buffer_length = 65535;
     char raw_received_data_[max_buffer_length];
 
     // Stores the most up to date packet data received by the client
