@@ -65,25 +65,26 @@ int main(int argc, char **argv)
     // Create publishers
     ros::Publisher primitive_publisher =
         node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
-            UTIL::CONSTANTS::AI_PRIMITIVES_TOPIC, 1);
+            Util::Constants::AI_PRIMITIVES_TOPIC, 1);
 
     // Create subscribers
     ros::Subscriber field_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
+        Util::Constants::BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
+        Util::Constants::BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
     ros::Subscriber friendly_team_sub =
-        node_handle.subscribe(UTIL::CONSTANTS::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
+        node_handle.subscribe(Util::Constants::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
                               friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
+        Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Initialize variables used to maintain state
-    ai = AI(World(Field(), Ball(),
-                  Team(std::chrono::milliseconds(
-                      DynamicParameters::robot_expiry_buffer_milliseconds.value())),
-                  Team(std::chrono::milliseconds(
-                      DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
+    ai = AI(
+        World(Field(), Ball(),
+              Team(std::chrono::milliseconds(
+                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+              Team(std::chrono::milliseconds(
+                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
 
     // Main loop
     while (ros::ok())

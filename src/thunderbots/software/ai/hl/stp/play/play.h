@@ -151,7 +151,6 @@ class Play
  * to the end of the .cpp file (without the quotations):
  * "static TPlayFactory<MovePlay> factory;"
  */
-
 template <class T>
 class TPlayFactory : public PlayFactory
 {
@@ -161,7 +160,7 @@ class TPlayFactory : public PlayFactory
    public:
     TPlayFactory()
     {
-        Play::registerPlay(std::shared_ptr<PlayFactory>(this));
+        Play::registerPlay(std::make_shared<TPlayFactory>(*this));
     }
 
     std::shared_ptr<Play> getInstance() override
