@@ -20,8 +20,8 @@ class MessageUtil
      *
      * @return a Field message containing the field geometry information
      */
-    static thunderbots_msgs::Field createFieldMsg(
-        const SSL_GeometryFieldSize &field_data);
+    static thunderbots_msgs::Field createFieldMsgFromFieldGeometry(
+            const SSL_GeometryFieldSize &field_data);
 
     /**
      * Creates a Ball msg given the filtered data for a ball
@@ -30,8 +30,8 @@ class MessageUtil
      *
      * @return a Ball message containing the ball information
      */
-    static thunderbots_msgs::Ball createBallMsg(
-        const FilteredBallData &filtered_ball_data);
+    static thunderbots_msgs::Ball createBallMsgFromFileredBallData(
+            const FilteredBallData &filtered_ball_data);
 
     /**
      * Creates a Robot msg given the Filtered Data for a robot
@@ -40,8 +40,8 @@ class MessageUtil
      *
      * @return a Robot message containing the robot's information
      */
-    static thunderbots_msgs::Robot createRobotMsg(
-        const FilteredRobotData &filtered_robot_data);
+    static thunderbots_msgs::Robot createRobotMsgFromFilteredRobotData(
+            const FilteredRobotData &filtered_robot_data);
 
     /**
      * Creates a Team msg given team data
@@ -50,6 +50,6 @@ class MessageUtil
      *
      * @return a Team message containing the information for the team
      */
-    static thunderbots_msgs::Team createTeamMsg(
-        const std::vector<FilteredRobotData> &filtered_team_data);
+    static thunderbots_msgs::Team createTeamMsgFromFilteredRobotData(
+            const std::vector<FilteredRobotData> &filtered_team_data);
 };

@@ -15,7 +15,8 @@ std::optional<thunderbots_msgs::Field> Backend::getFieldMsg(
     {
         const SSL_GeometryData &geom       = packet.geometry();
         const SSL_GeometryFieldSize &field = geom.field();
-        thunderbots_msgs::Field field_msg  = MessageUtil::createFieldMsg(field);
+        thunderbots_msgs::Field field_msg  = MessageUtil::createFieldMsgFromFieldGeometry(
+                field);
         return std::optional<thunderbots_msgs::Field>(field_msg);
     }
 
@@ -42,7 +43,8 @@ std::optional<thunderbots_msgs::Ball> Backend::getFilteredBallMsg(
 
         FilteredBallData filtered_ball_data =
             ball_filter.getFilteredData(ball_detections);
-        thunderbots_msgs::Ball ball_msg = MessageUtil::createBallMsg(filtered_ball_data);
+        thunderbots_msgs::Ball ball_msg = MessageUtil::createBallMsgFromFileredBallData(
+                filtered_ball_data);
         return ball_msg;
     }
 
@@ -81,7 +83,8 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
             friendly_team_filter.getFilteredData(friendly_team_robot_data);
 
         thunderbots_msgs::Team friendly_team_msg =
-            MessageUtil::createTeamMsg(filtered_friendly_team_data);
+                MessageUtil::createTeamMsgFromFilteredRobotData(
+                        filtered_friendly_team_data);
 
         return friendly_team_msg;
     }
@@ -121,7 +124,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
             enemy_team_filter.getFilteredData(enemy_team_robot_data);
 
         thunderbots_msgs::Team enemy_team_msg =
-            MessageUtil::createTeamMsg(filtered_enemy_team_data);
+                MessageUtil::createTeamMsgFromFilteredRobotData(filtered_enemy_team_data);
 
         return enemy_team_msg;
     }
