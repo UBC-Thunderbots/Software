@@ -71,7 +71,7 @@ void GrSimBackend::sendPrimitives(
     double bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
     double currentTime;
 
-
+    
 
     for (auto& prim : primitives) {
 
