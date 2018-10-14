@@ -9,7 +9,7 @@
 
 namespace MotionController {
 
-    std::pair<Vector, AngularVelocity>  grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double delaTime);
+    std::pair<Vector, Angle>  grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double delaTime);
 }
 
 

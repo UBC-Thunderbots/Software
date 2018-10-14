@@ -240,7 +240,7 @@ if (CATKIN_ENABLE_TESTING)
             backend_output/grsim/grsim_backend.h
             backend_output/backend.h
             test/grsim_backend/motion_controller.cpp
-            src/thunderbots/software/backend_output/grsim/motion_controller.cpp
+            backend_output/grsim/motion_controller.cpp
             )
 
     target_link_libraries(motion_controller_test ${catkin_LIBRARIES}

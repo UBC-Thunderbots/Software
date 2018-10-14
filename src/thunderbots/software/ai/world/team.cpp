@@ -86,16 +86,6 @@ void Team::assignGoalie(unsigned int new_goalie_id)
 
 void Team::clearGoalie()
 {
-
-    std::vector<Robot> robots = getAllRobots();
-    int roboId;
-
-    for (Robot robo : robots) {
-
-        roboId = robo.id();
-
-        if (roboId == id) { return robo; }
-
     goalie_id.reset();
 }
 

@@ -15,7 +15,7 @@
 
 //TODO: add negative time condition
 
-std::pair<Vector, AngularVelocity> MotionController::grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double deltaTime) {
+std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double deltaTime) {
 
     // vector to hold the XY velocities of the robot
     Vector robotXYVelocities;

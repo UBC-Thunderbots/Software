@@ -50,6 +50,8 @@ int main(int argc, char** argv)
     // We loop at 30Hz so we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
+    Team team = Team(std::chrono::milliseconds(1000));
+
     // Main loop
     while (ros::ok())
     {
@@ -60,7 +62,7 @@ int main(int argc, char** argv)
         // The callbacks will populate the primitives vector
         ros::spinOnce();
 
-        backend.sendPrimitives(primitives);
+        backend.sendPrimitives(primitives, team);
 
         tick_rate.sleep();
     }
