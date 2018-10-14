@@ -45,6 +45,7 @@ Point MovePrimitive::getDestination() const
 {
 	return dest;
 }
+
 std::vector<double> MovePrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),

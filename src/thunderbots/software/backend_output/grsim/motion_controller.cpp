@@ -41,16 +41,31 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
 
     // calculate the expected speed at the destination based on current speed and acceleration
     // Vf = sqrt( Vi^2 - 2*a*d)
-    double expectedFinalSpeed = sqrt(  pow(robot.velocity().len(), 2) - 2*ROBOT_MAX_ACCELERATION*distanceToDest );
-    double expectedFinalAngSpeed = sqrt( pow(robot.angularVelocity().toRadians() , 2) - 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest );
+    double expectedFinalSpeed;
+    double expectedFinalAngSpeed;
 
 
     // variables used to hold the change in velocities based on the maximum acceleration and the change in time since the last motion controller run
     double deltaSpeedX, deltaSpeedY, deltaAngularSpeed;
 
+    if ( pow(robot.velocity().len(), 2) <= 2*ROBOT_MAX_ACCELERATION*distanceToDest) {
+        bCanStopInTime = true;
+    }
+    else {
+        expectedFinalSpeed = sqrt(  pow(robot.velocity().len(), 2) - 2*ROBOT_MAX_ACCELERATION*distanceToDest );
+        bCanStopInTime = expectedFinalSpeed <= desiredFinalSpeed;
+    }
+
+    if ( pow(robot.angularVelocity().toRadians(), 2) <= 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest ) {
+        bCanStopInTime = true;
+    }
+    else {
+        expectedFinalAngSpeed = sqrt( pow(robot.angularVelocity().toRadians() , 2) - 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest );
+        bCanStopRotateInTime = expectedFinalAngSpeed <= 0.0;
+    }
+
     // the robot can stop in time if it's desired final speed is higher than the speed if the robot maximum decelerates from the current state
-    bCanStopInTime = expectedFinalSpeed < desiredFinalSpeed;
-    bCanStopRotateInTime = expectedFinalAngSpeed < 0.0;
+
 
     if (deltaTime < 0) { // there should be no negative changes in time except from the first run when variables are initialized
         deltaTime = fabs(deltaTime);

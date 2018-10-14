@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 #include "geom/angle.h"
 #include "software/ai/world/robot.h"
+#include "software/ai/primitive/move_primitive.h"
 
 using namespace std::chrono;
 
@@ -28,21 +29,52 @@ protected:
     steady_clock::time_point one_second_future;
 };
 
-TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
+//TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
+//{
+//
+//    Robot robot = Robot(1, Point(0, 0), Vector(0, 0), Angle::ofRadians(0.0),
+//                        AngularVelocity::ofRadians(0.0), current_time);
+//    double deltaTime = 0.1;
+//    Point destination = Point(0,0);
+//    Angle destinationAngle = Angle::ofDegrees(0);
+//    double destinationSpeed = 0;
+//    bool speedsEqual;
+//
+//    std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSim_bang_bang(robot, destination, destinationSpeed, destinationAngle, deltaTime);
+//
+//    Vector expectedVector = Point(0,0);
+//    Angle expectedAngularVelocity = Angle::ofRadians(0);
+//
+//    printf("\n%f\n", roboSpeeds.second.toDegrees());
+//
+//    if (expectedVector == roboSpeeds.first && expectedAngularVelocity == roboSpeeds.second) {
+//        speedsEqual = true;
+//    }
+//    else {
+//        speedsEqual = false;
+//    }
+//
+//
+//    EXPECT_TRUE(speedsEqual);
+//}
+
+TEST_F(MotionControllerTest, calc_correct_velocity_ones)
 {
 
-    Robot robot = Robot(3, Point(1, 1), Vector(-0.3, 0), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
-    double deltaTime = 0.1;
+    Robot robot = Robot(2, Point(1, 0), Vector(1, 0), Angle::ofRadians(0),
+                        AngularVelocity::ofRadians(0), current_time);
+    double deltaTime = 1;
     Point destination = Point(0,0);
     Angle destinationAngle = Angle::ofDegrees(0);
-    double destinationSpeed = 1;
+    double destinationSpeed = 0;
     bool speedsEqual;
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSim_bang_bang(robot, destination, destinationSpeed, destinationAngle, deltaTime);
 
     Vector expectedVector = Point(0,0);
     Angle expectedAngularVelocity = Angle::ofRadians(0);
+
+    printf("\n%f\n", roboSpeeds.second.toDegrees());
 
     if (expectedVector == roboSpeeds.first && expectedAngularVelocity == roboSpeeds.second) {
         speedsEqual = true;
@@ -55,35 +87,9 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
     EXPECT_TRUE(speedsEqual);
 }
 
-//TEST_F(MotionControllerTest, calc_correct_velocity_twos)
-//{
-//    Robot robo = Robot(1U, &Point(2,2), &Point(2,2),
-//                       Angle::ofDegrees(2), Angle::ofRadians(2));
-//    double deltaTime = 0.2;
-//    Point destination = Point(1,1);
-//    Angle destinationAngle = Angle::ofDegrees(22);
-//    double destinationSpeed = 2;(0,0);
-//    Angle expectedAngularVelocity = Angle::ofRadians(0);
-//
-//
-//    std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSim_bang_bang(robo, destination, destinationSpeed, desintationAngle, deltaTime);
-//
-//    Vector expectedVector = Point;
-//    if (expectedVector == roboSpeeds.first && expectedAngularVelocity == roboSpeeds.second) {
-//    speedsEqual = true;
-//    }
-//    else {
-//    speedsEqual = false;
-//    }
-//
-//
-//    EXPECT_TRUE(speedsEqual);
-//
-//}
-
-//int main(int argc, char **argv)
-//{
-//    std::cout << argv[0] << std::endl;
-//    testing::InitGoogleTest(&argc, argv);
-//    return RUN_ALL_TESTS();
-//}
+int main(int argc, char **argv)
+{
+    std::cout << argv[0] << std::endl;
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

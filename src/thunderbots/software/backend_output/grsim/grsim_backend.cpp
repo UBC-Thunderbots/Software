@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/primitive.h"
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"
 #include "motion_controller.h"
@@ -70,14 +71,15 @@ void GrSimBackend::sendPrimitives(
 
     double bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
     double currentTime;
+    int test;
 
-    
 
     for (auto& prim : primitives) {
 
         MovePrimitive movePrim = dynamic_cast<MovePrimitive &>(*prim);
 
         currentTime = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
+        test = movePrim.getRobotId();
 
         robotVelocities = MotionController::grSim_bang_bang( *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(), movePrim.getFinalSpeed(), movePrim.getFinalAngle(), currentTime - bangBangTimestamp);
         bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
