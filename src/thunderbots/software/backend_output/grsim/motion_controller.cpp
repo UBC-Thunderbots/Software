@@ -49,6 +49,7 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
     double deltaSpeedX, deltaSpeedY, deltaAngularSpeed;
 
     if ( pow(robot.velocity().len(), 2) <= 2*ROBOT_MAX_ACCELERATION*distanceToDest) {
+        expectedFinalSpeed = -1*sqrt(  2*ROBOT_MAX_ACCELERATION*distanceToDest - pow(robot.velocity().len(), 2) );
         bCanStopInTime = true;
     }
     else {
@@ -56,8 +57,9 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
         bCanStopInTime = expectedFinalSpeed <= desiredFinalSpeed;
     }
 
-    if ( pow(robot.angularVelocity().toRadians(), 2) <= 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest ) {
-        bCanStopInTime = true;
+    if ( pow(robot.angularVelocity().toRadians(), 2) <= fabs(2*ROBOT_MAX_ANG_ACCELERATION*angleToDest) ) {
+        expectedFinalAngSpeed = -1*sqrt( fabs(2*ROBOT_MAX_ANG_ACCELERATION*angleToDest) - pow(robot.angularVelocity().toRadians() , 2) );
+        bCanStopRotateInTime = true;
     }
     else {
         expectedFinalAngSpeed = sqrt( pow(robot.angularVelocity().toRadians() , 2) - 2*ROBOT_MAX_ANG_ACCELERATION*angleToDest );
@@ -116,6 +118,18 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
     robotXYVelocities = Vector(robot.velocity().x() + deltaSpeedX, robot.velocity().y() + deltaSpeedY); // calculate new X/Y/ang velocities based on the current robot speeds and delta speeds
     robotAngularVelocity = (robot.angularVelocity().toRadians() ) + deltaAngularSpeed;                  // calculate new angular velocity based on the current robot ang. velocity and delta ang. velocity
 
+    if(robotXYVelocities.len() > ROBOT_MAX_SPEED) {
+        robotXYVelocities = robotXYVelocities.norm(ROBOT_MAX_SPEED);
+    }
+
+    if( fabs(robotAngularVelocity) > ROBOT_MAX_ANG_SPEED) {
+        if( robotAngularVelocity < 0) {
+            robotAngularVelocity = -1*ROBOT_MAX_ANG_SPEED;
+        }
+        else {
+            robotAngularVelocity = ROBOT_MAX_ANG_SPEED;
+        }
+    }
 
     return std::make_pair(robotXYVelocities, Angle::ofRadians(robotAngularVelocity));
 }
