@@ -1,17 +1,17 @@
 #include "backend_output/grsim/grsim_backend.h"
 
+#include <chrono>
+#include <ctime>
 #include <iostream>
 #include <optional>
+#include <utility>
 
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
+#include "ai/world/team.h"
+#include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"
-#include "motion_controller.h"
-#include "ai/world/team.h"
-#include <ctime>
-#include <chrono>
-#include <utility>
 
 using namespace boost::asio;
 
@@ -70,22 +70,29 @@ void GrSimBackend::sendPrimitives(
     std::pair<Vector, Angle> robotVelocities;
     grSim_Packet grsim_packet;
 
-    double bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
+    double bangBangTimestamp =
+        std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     double currentTime;
     int test;
 
 
-    for (auto& prim : primitives) {
+    for (auto& prim : primitives)
+    {
+        MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
 
-        MovePrimitive movePrim = dynamic_cast<MovePrimitive &>(*prim);
-
-        currentTime = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now());
+        currentTime =
+            std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         test = movePrim.getRobotId();
 
-        robotVelocities = MotionController::grSim_bang_bang( *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(), movePrim.getFinalSpeed(), movePrim.getFinalAngle(), currentTime - bangBangTimestamp);
-        bangBangTimestamp = std::chrono::system_clock::to_time_t( std::chrono::system_clock::now() );
+        robotVelocities = MotionController::grSim_bang_bang(
+            *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
+            movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
+            currentTime - bangBangTimestamp);
+        bangBangTimestamp =
+            std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-        grsim_packet = createGrSimPacket(movePrim.getRobotId(), YELLOW, robotVelocities.first, robotVelocities.second);
+        grsim_packet = createGrSimPacket(movePrim.getRobotId(), YELLOW,
+                                         robotVelocities.first, robotVelocities.second);
     }
 
     sendGrSimPacket(grsim_packet);

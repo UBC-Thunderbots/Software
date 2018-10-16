@@ -23,8 +23,8 @@ class GrSimBackend : public Backend
 
     ~GrSimBackend();
 
-    void sendPrimitives(
-        const std::vector<std::unique_ptr<Primitive>>& primitives, Team& team) override;
+    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives,
+                        Team& team) override;
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.
@@ -50,7 +50,7 @@ class GrSimBackend : public Backend
     grSim_Packet createGrSimPacket(unsigned int robot_id, TeamColour team_colour,
                                    Vector velocity,
                                    AngularVelocity angular_velocity) const;
-    
+
     // TODO: Implement grSim bang bang controller
     // https://github.com/UBC-Thunderbots/Software/issues/16
 

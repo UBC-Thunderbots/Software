@@ -37,7 +37,7 @@ class MovePrimitive : public Primitive
     Angle getFinalAngle() const;
 
     double getFinalSpeed() const;
-    
+
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;

@@ -33,17 +33,17 @@ unsigned int MovePrimitive::getRobotId() const
 
 Angle MovePrimitive::getFinalAngle() const
 {
-	return final_angle;
+    return final_angle;
 }
 
-double MovePrimitive::getFinalSpeed() const 
+double MovePrimitive::getFinalSpeed() const
 {
-		return final_speed;
+    return final_speed;
 }
 
 Point MovePrimitive::getDestination() const
 {
-	return dest;
+    return dest;
 }
 
 std::vector<double> MovePrimitive::getParameterArray() const

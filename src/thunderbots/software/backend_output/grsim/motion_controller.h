@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include "util/constants.h"
 #include <utility>
 
-namespace MotionController {
+#include "util/constants.h"
 
-    std::pair<Vector, Angle>  grSim_bang_bang(Robot robot, Point dest, double desiredFinalSpeed, Angle desiredFinalOrientation, double delaTime);
+namespace MotionController
+{
+    std::pair<Vector, Angle> grSim_bang_bang(Robot robot, Point dest,
+                                             double desiredFinalSpeed,
+                                             Angle desiredFinalOrientation,
+                                             double delaTime);
 }
-
-
