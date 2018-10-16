@@ -67,32 +67,31 @@ void GrSimBackend::sendPrimitives(
 {
     std::vector<grSim_Packet> grsim_packets;
 
-    std::pair<Vector, Angle> robotVelocities;
+    std::pair<Vector, Angle> robot_velocities;
     grSim_Packet grsim_packet;
 
-    double bangBangTimestamp =
+    double bangbang_timestamp =
         std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    double currentTime;
-    int test;
+    double current_time;
 
-
+    //TODO:Implement a better way of tracking changes in time for bang-bang
     for (auto& prim : primitives)
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
 
-        currentTime =
+        current_time =
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        test = movePrim.getRobotId();
 
-        robotVelocities = MotionController::grSim_bang_bang(
-            *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
-            movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
-            currentTime - bangBangTimestamp);
-        bangBangTimestamp =
+        robot_velocities = MotionController::grSimBangBang(
+                *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
+                movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
+                current_time - bangbang_timestamp);
+
+        bangbang_timestamp =
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
         grsim_packet = createGrSimPacket(movePrim.getRobotId(), YELLOW,
-                                         robotVelocities.first, robotVelocities.second);
+                                         robot_velocities.first, robot_velocities.second);
     }
 
     sendGrSimPacket(grsim_packet);

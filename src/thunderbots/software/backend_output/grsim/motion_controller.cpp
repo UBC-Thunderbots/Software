@@ -14,13 +14,10 @@
 #include "geom/point.h"
 #include "shared/constants.h"
 
-
-// TODO: add negative time condition
-
-std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point dest,
-                                                           double desiredFinalSpeed,
-                                                           Angle desiredFinalOrientation,
-                                                           double deltaTime)
+std::pair<Vector, Angle> MotionController::grSimBangBang(Robot robot, Point dest,
+                                                         const double desired_final_speed,
+                                                         const Angle desired_final_orientation,
+                                                         double delta_time)
 {
     Vector robot_linear_velocities;  // vector to hold the XY velocities of the robot
     bool b_can_stop_in_time;  // boolean value if the robot can reach it's destination at
@@ -29,18 +26,13 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
                                      // destination at target speed based on angular MAX
                                      // acceleration
 
-    const double CURRENT_TIME = std::chrono::system_clock::to_time_t(
-        std::chrono::system_clock::now());  // calculate the current time (will be used to
-                                            // calculate the time step since the last time
-                                            // the motion controller was run)
-
     double robot_angular_velocity;
     const double distance_to_dest =
         (robot.position() - dest).len();  // destination distance used for constant linear
                                           // acceleration speed calculations
     const double angle_to_dest =
         (robot.orientation().toRadians() -
-         desiredFinalOrientation.toRadians());  // rotation used for constant angular
+         desired_final_orientation.toRadians());  // rotation used for constant angular
                                                 // acceleration calculations
 
     // calculates robot angle based on unit vector that points from the robot location to
@@ -56,19 +48,26 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
     // and the change in time since the last motion controller run
     double delta_speed_x, delta_speed_y, delta_angular_speed;
 
+    // check for negative sqrt case
     if (pow(robot.velocity().len(), 2) <= 2 * ROBOT_MAX_ACCELERATION * distance_to_dest)
     {
+        // if the sqrt is negative, the final speed will be negative (opposite direction of current speed)
         expected_final_speed = -1 * sqrt(2 * ROBOT_MAX_ACCELERATION * distance_to_dest -
                                          pow(robot.velocity().len(), 2));
         b_can_stop_in_time   = true;
     }
     else
     {
+        // calculate the expected final speed assuming max decceleration
         expected_final_speed = sqrt(pow(robot.velocity().len(), 2) -
                                     2 * ROBOT_MAX_ACCELERATION * distance_to_dest);
-        b_can_stop_in_time   = expected_final_speed <= desiredFinalSpeed;
+
+        // the robot can stop in time if it's desired final speed is higher than the speed if
+        // the robot maximum decelerates from the current state
+        b_can_stop_in_time   = expected_final_speed <= desired_final_speed;
     }
 
+    // check negative sqrt case for angular speed
     if (pow(robot.angularVelocity().toRadians(), 2) <=
         fabs(2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest))
     {
@@ -84,24 +83,21 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
         b_can_stop_rotate_in_time = expected_final_ang_speed <= 0.0;
     }
 
-    // the robot can stop in time if it's desired final speed is higher than the speed if
-    // the robot maximum decelerates from the current state
 
-
-    if (deltaTime < 0)
+    if (delta_time < 0)
     {  // there should be no negative changes in time except from the first run when
-       // variables are initialized
-        deltaTime = fabs(deltaTime);
+       // variables are initialized. TODO: Add some sort of error checking here
+        delta_time = fabs(delta_time);
     }
 
     if (b_can_stop_in_time)
     {
         // if the robot can stop in time and is going slower than the desired final speed
         // then accelerate
-        if (expected_final_speed < desiredFinalSpeed)
+        if (expected_final_speed < desired_final_speed)
         {
-            delta_speed_x = (ROBOT_MAX_ACCELERATION * deltaTime) * direction_angle.cos();
-            delta_speed_y = (ROBOT_MAX_ACCELERATION * deltaTime) * direction_angle.sin();
+            delta_speed_x = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.cos();
+            delta_speed_y = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.sin();
         }
 
         // if not then maintain speed
@@ -116,8 +112,8 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
     // if the robot can't stop in time then decelerate
     else
     {
-        delta_speed_x = -(ROBOT_MAX_ACCELERATION * deltaTime) * direction_angle.cos();
-        delta_speed_y = -(ROBOT_MAX_ACCELERATION * deltaTime) * direction_angle.sin();
+        delta_speed_x = -(ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.cos();
+        delta_speed_y = -(ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.sin();
     }
 
     // if the robot can stop rotating in time
@@ -128,7 +124,7 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
         if (expected_final_ang_speed < 0)
         {
             // angularly accelerate
-            delta_angular_speed = ROBOT_MAX_ANG_ACCELERATION * deltaTime;
+            delta_angular_speed = ROBOT_MAX_ANG_ACCELERATION * delta_time;
         }
 
         // if not then maintain angular velocity
@@ -141,7 +137,7 @@ std::pair<Vector, Angle> MotionController::grSim_bang_bang(Robot robot, Point de
     // if the robot can't stop rotating in time then angular decelerate
     else
     {
-        delta_angular_speed = -(ROBOT_MAX_ANG_ACCELERATION * deltaTime);
+        delta_angular_speed = -(ROBOT_MAX_ANG_ACCELERATION * delta_time);
     }
 
     robot_linear_velocities =
