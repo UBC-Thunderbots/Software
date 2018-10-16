@@ -11,6 +11,8 @@
 
 using namespace std::chrono;
 
+
+// set up test class to keep deterministic time
 class MotionControllerTest : public ::testing::Test
 {
 protected:
@@ -36,6 +38,7 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
 
     Robot robot = Robot(1, Point(0, 0), Vector(0, 0), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), current_time);
+
     double deltaTime = 0.1;
     Point destination = Point(0,0);
     Angle destinationAngle = Angle::ofDegrees(0);
