@@ -1,6 +1,6 @@
-//
-// Created by evan on 18/08/18.
-//
+/**
+ * This file contains the content for the grSim motion controller
+ */
 
 #pragma once
 

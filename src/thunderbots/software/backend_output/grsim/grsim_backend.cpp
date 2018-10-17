@@ -76,7 +76,8 @@ void GrSimBackend::sendPrimitives(
         std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     double current_time;
 
-    // TODO:Implement a better way of tracking changes in time for bang-bang
+    // TODO: Implement this
+    // https://github.com/UBC-Thunderbots/Software/issues/99
     for (auto& prim : primitives)
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);

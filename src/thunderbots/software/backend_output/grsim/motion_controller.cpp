@@ -14,6 +14,16 @@
 #include "geom/point.h"
 #include "shared/constants.h"
 
+
+// .cpp file for the grSim motion controller.
+//
+// In the current state it is a bang-bang controller.
+//
+// It assumed the robot max acceleration is constant.
+//
+// Uses constant acceleration kinematics equations to
+// calculate changes in speed.
+
 std::pair<Vector, Angle> MotionController::grSimBangBang(
     Robot robot, Point dest, const double desired_final_speed,
     const Angle desired_final_orientation, double delta_time)
@@ -86,7 +96,7 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
 
     if (delta_time < 0)
     {  // there should be no negative changes in time except from the first run when
-       // variables are initialized. TODO: Add some sort of error checking here
+       // variables are initialized.
         delta_time = fabs(delta_time);
     }
 

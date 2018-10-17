@@ -12,6 +12,9 @@
 
 using namespace std::chrono;
 
+// GrSim motion controller test file.
+// Functional unit tests for the controller are located here.
+
 
 // set up test class to keep deterministic time
 class MotionControllerTest : public ::testing::Test
@@ -46,8 +49,6 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
 
     Vector expectedVector         = Point(0, 0);
     Angle expectedAngularVelocity = Angle::ofRadians(0);
-
-    printf("\n%f\n", roboSpeeds.second.toDegrees());
 
     if (expectedVector == roboSpeeds.first &&
         expectedAngularVelocity == roboSpeeds.second)
@@ -185,8 +186,6 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
 
     EXPECT_TRUE(speedsEqual);
 }
-
-// TODO: make angular velocity max speed tests
 
 int main(int argc, char **argv)
 {
