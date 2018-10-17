@@ -6,7 +6,6 @@
 
 RRTNav::RRTNav() {}
 
-
 std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents) const
 {
