@@ -70,6 +70,8 @@ void GrSimBackend::sendPrimitives(
     std::pair<Vector, Angle> robot_velocities;
     grSim_Packet grsim_packet;
 
+
+    // get timestamp before running bang-bang controller for all robots
     double bangbang_timestamp =
         std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     double current_time;
@@ -79,17 +81,17 @@ void GrSimBackend::sendPrimitives(
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
 
-        current_time =
-            std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        current_time = std::chrono::system_clock::to_time_t(
+            std::chrono::system_clock::now());  // get the current time right before
+                                                // running bang-bang to get a time-delta
+                                                // for acceleration
 
         robot_velocities = MotionController::grSimBangBang(
             *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
             movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
             current_time - bangbang_timestamp);
 
-        bangbang_timestamp =
-            std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-
+        // send the velocity data via grsim_packet
         grsim_packet = createGrSimPacket(movePrim.getRobotId(), YELLOW,
                                          robot_velocities.first, robot_velocities.second);
     }
