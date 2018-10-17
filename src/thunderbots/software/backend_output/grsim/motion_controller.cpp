@@ -14,10 +14,9 @@
 #include "geom/point.h"
 #include "shared/constants.h"
 
-std::pair<Vector, Angle> MotionController::grSimBangBang(Robot robot, Point dest,
-                                                         const double desired_final_speed,
-                                                         const Angle desired_final_orientation,
-                                                         double delta_time)
+std::pair<Vector, Angle> MotionController::grSimBangBang(
+    Robot robot, Point dest, const double desired_final_speed,
+    const Angle desired_final_orientation, double delta_time)
 {
     Vector robot_linear_velocities;  // vector to hold the XY velocities of the robot
     bool b_can_stop_in_time;  // boolean value if the robot can reach it's destination at
@@ -33,7 +32,7 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(Robot robot, Point dest
     const double angle_to_dest =
         (robot.orientation().toRadians() -
          desired_final_orientation.toRadians());  // rotation used for constant angular
-                                                // acceleration calculations
+                                                  // acceleration calculations
 
     // calculates robot angle based on unit vector that points from the robot location to
     // the destination (used to calculate the X/Y velocity magnitudes
@@ -51,7 +50,8 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(Robot robot, Point dest
     // check for negative sqrt case
     if (pow(robot.velocity().len(), 2) <= 2 * ROBOT_MAX_ACCELERATION * distance_to_dest)
     {
-        // if the sqrt is negative, the final speed will be negative (opposite direction of current speed)
+        // if the sqrt is negative, the final speed will be negative (opposite direction
+        // of current speed)
         expected_final_speed = -1 * sqrt(2 * ROBOT_MAX_ACCELERATION * distance_to_dest -
                                          pow(robot.velocity().len(), 2));
         b_can_stop_in_time   = true;
@@ -62,9 +62,9 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(Robot robot, Point dest
         expected_final_speed = sqrt(pow(robot.velocity().len(), 2) -
                                     2 * ROBOT_MAX_ACCELERATION * distance_to_dest);
 
-        // the robot can stop in time if it's desired final speed is higher than the speed if
-        // the robot maximum decelerates from the current state
-        b_can_stop_in_time   = expected_final_speed <= desired_final_speed;
+        // the robot can stop in time if it's desired final speed is higher than the speed
+        // if the robot maximum decelerates from the current state
+        b_can_stop_in_time = expected_final_speed <= desired_final_speed;
     }
 
     // check negative sqrt case for angular speed

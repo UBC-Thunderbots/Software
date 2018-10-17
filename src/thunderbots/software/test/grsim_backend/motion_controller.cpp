@@ -24,7 +24,7 @@ class MotionControllerTest : public ::testing::Test
 
         // An arbitrary fixed point in time. 10000 seconds after the epoch.
         // We use this fixed point in time to make the tests deterministic.
-        current_time       = epoch + since_epoch;
+        current_time = epoch + since_epoch;
     }
 
     steady_clock::time_point current_time;
@@ -42,7 +42,7 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
     bool speedsEqual;
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSimBangBang(
-            robot, destination, destinationSpeed, destinationAngle, deltaTime);
+        robot, destination, destinationSpeed, destinationAngle, deltaTime);
 
     Vector expectedVector         = Point(0, 0);
     Angle expectedAngularVelocity = Angle::ofRadians(0);
@@ -74,7 +74,7 @@ TEST_F(MotionControllerTest, calc_correct_velocity_ones)
     bool speedsEqual;
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSimBangBang(
-            robot, destination, destinationSpeed, destinationAngle, deltaTime);
+        robot, destination, destinationSpeed, destinationAngle, deltaTime);
 
     Vector expectedVector         = Point(1 - ROBOT_MAX_ACCELERATION, 0);
     Angle expectedAngularVelocity = Angle::ofRadians(0);
@@ -104,7 +104,7 @@ TEST_F(MotionControllerTest, over_speed_test)
     bool speedsEqual;
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSimBangBang(
-            robot, destination, destinationSpeed, destinationAngle, deltaTime);
+        robot, destination, destinationSpeed, destinationAngle, deltaTime);
 
     double expectedSpeed = ROBOT_MAX_SPEED;
 
@@ -135,7 +135,7 @@ TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
     bool speedsEqual;
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSimBangBang(
-            robot, destination, destinationSpeed, destinationAngle, deltaTime);
+        robot, destination, destinationSpeed, destinationAngle, deltaTime);
 
     double expectedSpeed = ROBOT_MAX_SPEED;
 
@@ -166,7 +166,7 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
     bool speedsEqual;
 
     std::pair<Vector, AngularVelocity> roboSpeeds = MotionController::grSimBangBang(
-            robot, destination, destinationSpeed, destinationAngle, deltaTime);
+        robot, destination, destinationSpeed, destinationAngle, deltaTime);
 
     double expectedSpeed = 0;
 

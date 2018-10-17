@@ -74,7 +74,7 @@ void GrSimBackend::sendPrimitives(
         std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     double current_time;
 
-    //TODO:Implement a better way of tracking changes in time for bang-bang
+    // TODO:Implement a better way of tracking changes in time for bang-bang
     for (auto& prim : primitives)
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
@@ -83,9 +83,9 @@ void GrSimBackend::sendPrimitives(
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
         robot_velocities = MotionController::grSimBangBang(
-                *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
-                movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
-                current_time - bangbang_timestamp);
+            *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
+            movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
+            current_time - bangbang_timestamp);
 
         bangbang_timestamp =
             std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
