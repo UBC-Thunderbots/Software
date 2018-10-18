@@ -12,10 +12,8 @@ TEST(TestUtilsTest, create_testing_field)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    // Check that the field is valid and has the correct dimensions for a
+    // Check that the field has the correct dimensions for a
     // SSL Division B field according to the rules
-    EXPECT_TRUE(field.valid());
-
     EXPECT_DOUBLE_EQ(9.6, field.totalLength());
     EXPECT_DOUBLE_EQ(6.6, field.totalWidth());
     EXPECT_DOUBLE_EQ(0.3, field.boundaryWidth());

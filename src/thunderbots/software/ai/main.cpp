@@ -79,7 +79,7 @@ int main(int argc, char **argv)
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Initialize variables used to maintain state
-    ai = AI(World(Field(), Ball(Point(), Vector()),
+    ai = AI(World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
                   Team(std::chrono::milliseconds(
                       Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
                   Team(std::chrono::milliseconds(
