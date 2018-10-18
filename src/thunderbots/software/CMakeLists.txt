@@ -174,7 +174,6 @@ if (CATKIN_ENABLE_TESTING)
             backend_output/grsim/grsim_backend.cpp
             backend_output/grsim/grsim_backend.h
             backend_output/backend.h
-            backend_output/grsim/motion_controller.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/world.cpp
