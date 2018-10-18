@@ -16,8 +16,13 @@
 // In an anonymous namespace so they cannot be seen/accessed outside this file.
 namespace
 {
-    AI ai;
-}
+    // Initialize our AI, which is the main object that maintains state
+    AI ai = AI(World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
+                     Team(std::chrono::milliseconds(
+                         Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                     Team(std::chrono::milliseconds(
+                         Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
+}  // namespace
 
 // Callbacks to update the state of the world
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -77,13 +82,6 @@ int main(int argc, char **argv)
                               friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
-
-    // Initialize variables used to maintain state
-    ai = AI(World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
-                  Team(std::chrono::milliseconds(
-                      Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
-                  Team(std::chrono::milliseconds(
-                      Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
 
     // Main loop
     while (ros::ok())
