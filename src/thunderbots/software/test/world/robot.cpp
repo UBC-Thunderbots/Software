@@ -39,7 +39,8 @@ TEST_F(RobotTest, construct_with_all_params)
 
 TEST_F(RobotTest, update_state_with_all_params)
 {
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
+    Robot robot =
+        Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
 
     robot.updateState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
                       AngularVelocity::ofRadians(1.1), half_second_future);
@@ -54,7 +55,8 @@ TEST_F(RobotTest, update_state_with_all_params)
 
 TEST_F(RobotTest, update_state_with_new_robot_with_same_id)
 {
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
+    Robot robot =
+        Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
 
     Robot update_robot = Robot(0, Point(-1.2, 3), robot.velocity(), Angle::quarter(),
                                robot.angularVelocity(), current_time);
