@@ -48,8 +48,8 @@ class GrSimBackend : public Backend
      * second.
      */
     grSim_Packet createGrSimPacket(unsigned int robot_id, TeamColour team_colour,
-                                   Vector velocity,
-                                   AngularVelocity angular_velocity) const;
+                                   Vector velocity, AngularVelocity angular_velocity,
+                                   bool dribbler_on) const;
 
 
     // TODO: Implement grSim bang bang controller
