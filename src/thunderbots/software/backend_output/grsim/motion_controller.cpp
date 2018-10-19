@@ -1,11 +1,6 @@
-//
-// Created by evan on 18/08/18.
-//
-
-#include "motion_controller.h"
+#include "backend_output/grsim/motion_controller.h"
 
 #include <chrono>
-#include <ctime>
 #include <iostream>
 #include <utility>
 
@@ -23,39 +18,48 @@
 //
 // Uses constant acceleration kinematics equations to
 // calculate changes in speed.
+//
+// See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
 
-std::pair<Vector, Angle> MotionController::grSimBangBang(
+std::pair<Vector, AngularVelocity> MotionController::grSimBangBang(
     Robot robot, Point dest, const double desired_final_speed,
     const Angle desired_final_orientation, double delta_time)
 {
-    Vector robot_linear_velocities;  // vector to hold the XY velocities of the robot
-    bool b_can_stop_in_time;  // boolean value if the robot can reach it's destination at
-                              // target speed based on linear MAX acceleration
-    bool b_can_stop_rotate_in_time;  // boolean value if the robot can reach it's
-                                     // destination at target speed based on angular MAX
-                                     // acceleration
+    // vector to hold the XY velocities of the robot
+    Vector robot_linear_velocities;
+
+    // boolean value if the robot can reach it's destination at target speed based on linear MAX acceleration
+    bool can_stop_in_time;
+
+    // boolean value if the robot can reach it's destination at target speed based on angular MAX acceleration
+    bool can_stop_rotate_in_time;
 
     double robot_angular_velocity;
+
+    // destination distance used for constant linear acceleration speed calculations
     const double distance_to_dest =
-        (robot.position() - dest).len();  // destination distance used for constant linear
-                                          // acceleration speed calculations
+        (robot.position() - dest).len();
+
+    // rotation used for constant angular acceleration calculations
     const double angle_to_dest =
         (robot.orientation().toRadians() -
-         desired_final_orientation.toRadians());  // rotation used for constant angular
-                                                  // acceleration calculations
+         desired_final_orientation.toRadians());
+
 
     // calculates robot angle based on unit vector that points from the robot location to
     // the destination (used to calculate the X/Y velocity magnitudes
     const Angle direction_angle = (dest - robot.position()).norm().orientation();
 
-    // calculate the expected speed at the destination based on current speed and
-    // acceleration Vf = sqrt( Vi^2 - 2*a*d)
     double expected_final_speed;
     double expected_final_ang_speed;
 
     // variables used to hold the change in velocities based on the maximum acceleration
     // and the change in time since the last motion controller run
     double delta_speed_x, delta_speed_y, delta_angular_speed;
+
+
+    // calculate the expected speed at the destination based on current speed and
+    // acceleration Vf = sqrt( Vi^2 - 2*a*d)
 
     // check for negative sqrt case
     if (pow(robot.velocity().len(), 2) <= 2 * ROBOT_MAX_ACCELERATION * distance_to_dest)
@@ -64,7 +68,7 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
         // of current speed)
         expected_final_speed = -1 * sqrt(2 * ROBOT_MAX_ACCELERATION * distance_to_dest -
                                          pow(robot.velocity().len(), 2));
-        b_can_stop_in_time   = true;
+        can_stop_in_time   = true;
     }
     else
     {
@@ -74,7 +78,7 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
 
         // the robot can stop in time if it's desired final speed is higher than the speed
         // if the robot maximum decelerates from the current state
-        b_can_stop_in_time = expected_final_speed <= desired_final_speed;
+        can_stop_in_time = expected_final_speed <= desired_final_speed;
     }
 
     // check negative sqrt case for angular speed
@@ -84,13 +88,13 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
         expected_final_ang_speed =
             -1 * sqrt(fabs(2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest) -
                       pow(robot.angularVelocity().toRadians(), 2));
-        b_can_stop_rotate_in_time = true;
+        can_stop_rotate_in_time = true;
     }
     else
     {
         expected_final_ang_speed  = sqrt(pow(robot.angularVelocity().toRadians(), 2) -
                                         2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest);
-        b_can_stop_rotate_in_time = expected_final_ang_speed <= 0.0;
+        can_stop_rotate_in_time = expected_final_ang_speed <= 0.0;
     }
 
 
@@ -100,7 +104,7 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
         delta_time = fabs(delta_time);
     }
 
-    if (b_can_stop_in_time)
+    if (can_stop_in_time)
     {
         // if the robot can stop in time and is going slower than the desired final speed
         // then accelerate
@@ -127,7 +131,7 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
     }
 
     // if the robot can stop rotating in time
-    if (b_can_stop_rotate_in_time)
+    if (can_stop_rotate_in_time)
     {
         // if the final expected angle is less than the desired angle then angularly
         // accelerate
@@ -178,5 +182,5 @@ std::pair<Vector, Angle> MotionController::grSimBangBang(
     }
 
     return std::make_pair(robot_linear_velocities,
-                          Angle::ofRadians(robot_angular_velocity));
+                          AngularVelocity::ofRadians(robot_angular_velocity));
 }

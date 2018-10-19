@@ -190,7 +190,6 @@ class Robot
      * @param other The robot to compare against for inequality
      * @return True if the other robot is not equal to this robots, and false otherwise
      */
-
     bool operator!=(const Robot& other) const;
 
    private:

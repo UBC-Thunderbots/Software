@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <utility>
-
 #include "util/constants.h"
 
 namespace MotionController
@@ -19,8 +17,9 @@ namespace MotionController
      * @param desired_final_orientation The target final orientation of the robot
      * @param delta_time The time that will be used to calculate the change in speed of
      * the robot (based on constant acceleration)
+     * @return The linear velocity of the robot as a Vector(X,Y) and the angular velocity of the robot as a AngularVelocity packaged in a vector
      */
-    std::pair<Vector, Angle> grSimBangBang(const Robot robot, const Point dest,
+    std::pair<Vector, AngularVelocity> grSimBangBang(const Robot robot, const Point dest,
                                            const double desired_final_speed,
                                            const Angle desired_final_orientation,
                                            double delta_time);

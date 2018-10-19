@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include "geom/angle.h"
-#include "geom/point.h"
 #include "thunderbots_msgs/Primitive.h"
 
 /**

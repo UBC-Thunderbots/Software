@@ -1,6 +1,3 @@
-//
-// Created by evan on 14/09/18.
-//
 #include "software/backend_output/grsim/motion_controller.h"
 
 #include "geom/angle.h"

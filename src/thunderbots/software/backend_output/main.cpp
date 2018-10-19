@@ -47,7 +47,7 @@ int main(int argc, char** argv)
     primitives           = std::vector<std::unique_ptr<Primitive>>();
     GrSimBackend backend = GrSimBackend(NETWORK_ADDRESS, NETWORK_PORT);
 
-    // We loop at 30Hz so we don't overload the network with too many packets
+    // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
     Team team = Team(std::chrono::milliseconds(1000));

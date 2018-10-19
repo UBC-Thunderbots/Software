@@ -1,6 +1,5 @@
 #include "backend_output/grsim/grsim_backend.h"
 
-#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <optional>
@@ -63,11 +62,11 @@ void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
 
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives, Team& team)
+    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& team)
 {
     std::vector<grSim_Packet> grsim_packets;
 
-    std::pair<Vector, Angle> robot_velocities;
+    std::pair<Vector, AngularVelocity> robot_velocities;
     grSim_Packet grsim_packet;
 
 
