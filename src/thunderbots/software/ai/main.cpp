@@ -17,11 +17,12 @@
 namespace
 {
     // Initialize our AI, which is the main object that maintains state
-    AI ai = AI(World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
-                     Team(std::chrono::milliseconds(
-                         Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
-                     Team(std::chrono::milliseconds(
-                         Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
+    AI ai = AI(
+        World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
+              Team(std::chrono::milliseconds(
+                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+              Team(std::chrono::milliseconds(
+                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
 }  // namespace
 
 // Callbacks to update the state of the world
