@@ -4,10 +4,8 @@ namespace Test
 {
     Field TestUtil::createSSLDivBField()
     {
-        Field field = Field();
         // Using the dimensions of a standard Division B SSL field
-        field.updateDimensions(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
-
+        Field field = Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
         return field;
     }
 
@@ -16,7 +14,7 @@ namespace Test
         Field field        = createSSLDivBField();
         Team friendly_team = Team(std::chrono::milliseconds(1000));
         Team enemy_team    = Team(std::chrono::milliseconds(1000));
-        Ball ball          = Ball();
+        Ball ball          = Ball(Point(), Vector());
 
         World world = World(field, ball, friendly_team, enemy_team);
 
