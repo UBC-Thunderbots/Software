@@ -46,10 +46,17 @@ class GrSimBackend : public Backend
      *
      * @param angular_velocity The angular velocity to set for the robot, in Radians per
      * second.
+     * @param kick_power How hard to kick the ball, in meters/second. If chip is false,
+     * the ball is kicked along the ground. If chip is true, the ball is chipped in
+     * the air
+     * @param chip Whether or not to chip the ball. If chip is true, the ball is chipped
+     * in the air, otherwise it is kicked along the ground
+     * @param dribbler_on Whether or not to turn on the dribbler. If dribbler_on is true,
+     * the dribbler will be turned on, otherwise the dribbler remains off
      */
     grSim_Packet createGrSimPacket(unsigned int robot_id, TeamColour team_colour,
                                    Vector velocity, AngularVelocity angular_velocity,
-                                   bool dribbler_on) const;
+                                   double kick_power, bool chip, bool dribbler_on) const;
 
 
     // TODO: Implement grSim bang bang controller

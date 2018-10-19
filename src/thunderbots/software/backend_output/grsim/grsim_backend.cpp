@@ -24,6 +24,7 @@ GrSimBackend::~GrSimBackend()
 grSim_Packet GrSimBackend::createGrSimPacket(unsigned int robot_id,
                                              TeamColour team_colour, Vector velocity,
                                              AngularVelocity angular_velocity,
+                                             double kick_power, bool chip,
                                              bool dribbler_on) const
 {
     grSim_Packet packet;
@@ -41,8 +42,8 @@ grSim_Packet GrSimBackend::createGrSimPacket(unsigned int robot_id,
     command->set_velnormal(static_cast<float>(velocity.y()));
     command->set_velangular(static_cast<float>(angular_velocity.toRadians()));
 
-    command->set_kickspeedx(0.0);
-    command->set_kickspeedz(0.0);
+    command->set_kickspeedx(static_cast<float>(kick_power));
+    command->set_kickspeedz(static_cast<float>(chip ? kick_power : 0.0));
     command->set_spinner(dribbler_on);
 
     return packet;
@@ -61,7 +62,7 @@ void GrSimBackend::sendPrimitives(
 {
     // TODO: Implement this
     // https://github.com/UBC-Thunderbots/Software/issues/21
-    grSim_Packet grsim_packet =
-        createGrSimPacket(0, YELLOW, Point(0.2, -0.04), Angle::ofRadians(-0.8), true);
+    grSim_Packet grsim_packet = createGrSimPacket(
+        0, YELLOW, Point(0.5, -0.1), Angle::ofRadians(-0.8), 4.0, true, false);
     sendGrSimPacket(grsim_packet);
 }
