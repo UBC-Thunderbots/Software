@@ -22,5 +22,5 @@ namespace MotionController
     std::pair<Vector, AngularVelocity> grSimBangBang(const Robot robot, const Point dest,
                                            const double desired_final_speed,
                                            const Angle desired_final_orientation,
-                                           double delta_time);
+                                           const double delta_time);
 }  // namespace MotionController

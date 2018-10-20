@@ -21,9 +21,9 @@
 //
 // See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
 
-std::pair<Vector, AngularVelocity> MotionController::grSimBangBang(
-    Robot robot, Point dest, const double desired_final_speed,
-    const Angle desired_final_orientation, double delta_time)
+std::pair<Vector, Angle> MotionController::grSimBangBang(
+    const Robot robot, const Point dest, const double desired_final_speed,
+    const Angle desired_final_orientation, const double delta_time)
 {
     // vector to hold the XY velocities of the robot
     Vector robot_linear_velocities;
@@ -101,7 +101,8 @@ std::pair<Vector, AngularVelocity> MotionController::grSimBangBang(
     if (delta_time < 0)
     {  // there should be no negative changes in time except from the first run when
        // variables are initialized.
-        delta_time = fabs(delta_time);
+//        delta_time = fabs(delta_time);
+    //TODO: add exception case here
     }
 
     if (can_stop_in_time)

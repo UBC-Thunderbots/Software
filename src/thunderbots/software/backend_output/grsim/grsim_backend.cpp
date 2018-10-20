@@ -86,7 +86,7 @@ void GrSimBackend::sendPrimitives(
                                                 // running bang-bang to get a time-delta
                                                 // for acceleration
 
-        robot_velocities = MotionController::grSimBangBang(
+        MotionController::grSimBangBang(
             *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
             movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
             current_time - bangbang_timestamp);

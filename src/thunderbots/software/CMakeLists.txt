@@ -174,16 +174,11 @@ if (CATKIN_ENABLE_TESTING)
             backend_output/grsim/grsim_backend.cpp
             backend_output/grsim/grsim_backend.h
             backend_output/backend.h
+            backend_output/grsim/motion_controller.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
-            ai/world/world.cpp
-            ai/world/ball.cpp
-            ai/world/field.cpp
             ai/world/robot.cpp
-            ai/world/team.cpp
-            geom/point.h
-            geom/angle.h
-            )
+            ai/world/team.cpp)
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
             )
@@ -243,28 +238,13 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(motion_controller_test
-            ${PROTO_SRCS}
-            backend_output/grsim/grsim_backend.cpp
-            backend_output/grsim/grsim_backend.h
-            backend_output/backend.h
             test/grsim_backend/motion_controller.cpp
             backend_output/grsim/motion_controller.cpp
-            ai/primitive/move_primitive.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/move_primitive.h
-            ai/primitive/primitive.h
-            ai/world/world.cpp
-            ai/world/ball.cpp
-            ai/world/field.cpp
             ai/world/robot.cpp
-            ai/world/team.cpp
             geom/point.h
-            geom/angle.h
-            )
+            geom/angle.h)
 
-    target_link_libraries(motion_controller_test ${catkin_LIBRARIES}
-            ${PROTOBUF_LIBRARIES}
-            )
+    target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(world_test
             test/world/world.cpp
