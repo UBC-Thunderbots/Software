@@ -24,6 +24,7 @@
     }
   },
   "exclude": [
+    "config",
     "node_modules",
     "build",
     "scripts",

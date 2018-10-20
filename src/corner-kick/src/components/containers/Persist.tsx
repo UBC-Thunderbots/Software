@@ -26,6 +26,8 @@ const generatePersist = (key: string) => (
         public constructor() {
             super();
 
+            this.state = {};
+
             storage.get(key, (error, data) => {
                 if(error) {
                     throw error;

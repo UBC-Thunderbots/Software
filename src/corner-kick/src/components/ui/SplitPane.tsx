@@ -19,7 +19,7 @@ export const SplitPane = (props: ISplitpaneProps) => (
     </Subscribe>
 );
 
-const mapSplitPanes = (props: ISplitpaneProps, storage: Container<any>) => {
+const mapSplitPanes = (props: ISplitpaneProps, storage: any) => {
 
     const verticalWidths = storage.state.vertical 
         ||  [
@@ -36,10 +36,12 @@ const mapSplitPanes = (props: ISplitpaneProps, storage: Container<any>) => {
         
     return (
         <PanelGroup borderColor="grey" panelWidths={verticalWidths} onUpdate={(data: any) => {
-            console.log(data);
+            storage.set({vertical: data});
         }}>
                 {props.left}
-                <PanelGroup direction="column" borderColor="grey" panelWidths={horizontalWidths}>
+                <PanelGroup direction="column" borderColor="grey" panelWidths={horizontalWidths} onUpdate={(data: any) => {
+                    storage.set({horizontal: data});
+                }}>
                     {props.top}
                     {props.bottom}
                 </PanelGroup>
