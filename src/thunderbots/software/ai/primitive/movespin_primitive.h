@@ -22,7 +22,7 @@ class MoveSpinPrimitive : public Primitive
     /**
      * Creates a new MoveSpin Primitive from a Primitive message
      *
-     * @param primtiive_msg The message from which to create the Move Primitive
+     * @param primitive_msg The message from which to create the Move Primitive
      */
     explicit MoveSpinPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
