@@ -24,8 +24,8 @@ GrSimBackend::~GrSimBackend()
 grSim_Packet GrSimBackend::createGrSimPacket(unsigned int robot_id,
                                              TeamColour team_colour, Vector velocity,
                                              AngularVelocity angular_velocity,
-                                             double kick_power, bool chip,
-                                             bool dribbler_on) const
+                                             double kick_speed_meters_per_second,
+                                             bool chip, bool dribbler_on) const
 {
     grSim_Packet packet;
 
@@ -42,8 +42,9 @@ grSim_Packet GrSimBackend::createGrSimPacket(unsigned int robot_id,
     command->set_velnormal(static_cast<float>(velocity.y()));
     command->set_velangular(static_cast<float>(angular_velocity.toRadians()));
 
-    command->set_kickspeedx(static_cast<float>(kick_power));
-    command->set_kickspeedz(static_cast<float>(chip ? kick_power : 0.0));
+    command->set_kickspeedx(static_cast<float>(kick_speed_meters_per_second));
+    command->set_kickspeedz(
+        static_cast<float>(chip ? kick_speed_meters_per_second : 0.0));
     command->set_spinner(dribbler_on);
 
     return packet;
