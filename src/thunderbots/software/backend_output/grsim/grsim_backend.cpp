@@ -1,6 +1,6 @@
 #include "backend_output/grsim/grsim_backend.h"
 
-#include <ctime>
+#include <chrono>
 #include <iostream>
 #include <optional>
 #include <utility>
@@ -86,10 +86,10 @@ void GrSimBackend::sendPrimitives(
                                                 // running bang-bang to get a time-delta
                                                 // for acceleration
 
-        MotionController::grSimBangBang(
-            *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
-            movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
-            current_time - bangbang_timestamp);
+        MotionController::bangBangVelocityController(
+                *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
+                movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
+                current_time - bangbang_timestamp);
 
         // send the velocity data via grsim_packet
         grsim_packet = createGrSimPacket(movePrim.getRobotId(), YELLOW,
