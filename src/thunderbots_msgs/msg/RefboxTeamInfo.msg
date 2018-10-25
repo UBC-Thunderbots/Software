@@ -1,3 +1,4 @@
+# Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeTeamInfo.msg
 
 string name
 

@@ -1,3 +1,4 @@
+# Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeStage.msg
 
 # The stage of the game.
 # This can take on any of the values defined below.

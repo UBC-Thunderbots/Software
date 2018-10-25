@@ -1,3 +1,4 @@
+# Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeCommand.msg
 
 # A referee command.
 # This can take on any of the values defined below.
