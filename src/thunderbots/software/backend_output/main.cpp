@@ -1,7 +1,10 @@
 #include <ros/ros.h>
 #include <ros/time.h>
+#include "ai/ai.h"
+#include "util/ros_messages.h"
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
+#include "thunderbots_msgs/Team.h"
 
 #include <iostream>
 
@@ -23,6 +26,11 @@ static constexpr unsigned int TICK_RATE = 30;
 // the primitives to the system we have chosen (such as grSim, our radio, etc.)
 std::vector<std::unique_ptr<Primitive>> primitives;
 
+namespace{
+
+    Team friendly_team = Team(std::chrono::milliseconds(1000));
+}
+
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
@@ -31,6 +39,16 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     {
         primitives.emplace_back(Primitive::createPrimitive(prim_msg));
     }
+}
+
+// Update the friendly team
+void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
+{
+    thunderbots_msgs::Team friendly_team_msg = *msg;
+
+    Team updated_friendly_team = Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
+
+    friendly_team = updated_friendly_team;
 }
 
 int main(int argc, char** argv)
@@ -50,8 +68,6 @@ int main(int argc, char** argv)
     // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
-    Team team = Team(std::chrono::milliseconds(1000));
-
     // Main loop
     while (ros::ok())
     {
@@ -62,7 +78,7 @@ int main(int argc, char** argv)
         // The callbacks will populate the primitives vector
         ros::spinOnce();
 
-        backend.sendPrimitives(primitives, team);
+        backend.sendPrimitives(primitives, friendly_team);
 
         tick_rate.sleep();
     }

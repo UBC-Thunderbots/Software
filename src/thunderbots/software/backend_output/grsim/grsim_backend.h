@@ -60,9 +60,6 @@ class GrSimBackend : public Backend
                                    double kick_speed_meters_per_second, bool chip,
                                    bool dribbler_on) const;
 
-    // TODO: Implement grSim bang bang controller
-    // https://github.com/UBC-Thunderbots/Software/issues/16
-
    private:
     /**
      * Sends a grSim packet to grSim via UDP
@@ -70,7 +67,6 @@ class GrSimBackend : public Backend
      * @param packet the grSim packet to send
      */
     void sendGrSimPacket(const grSim_Packet& packet);
-
 
     // Variables for networking
     std::string network_address;

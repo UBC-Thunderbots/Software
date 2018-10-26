@@ -69,14 +69,15 @@ void GrSimBackend::sendPrimitives(
 {
     std::vector<grSim_Packet> grsim_packets;
 
-    std::pair<Vector, AngularVelocity> robot_velocities;
+    MotionController::Velocity robot_velocities;
     grSim_Packet grsim_packet;
 
 
     // get timestamp before running bang-bang controller for all robots
-    double bangbang_timestamp =
-        std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    double current_time;
+    auto bangbang_timestamp =
+        std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> delta_time;
 
     // TODO: Implement this
     // https://github.com/UBC-Thunderbots/Software/issues/99
@@ -84,20 +85,22 @@ void GrSimBackend::sendPrimitives(
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
 
-        current_time = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());  // get the current time right before
+        auto current_time = std::chrono::steady_clock::now();  // get the current time right before
                                                 // running bang-bang to get a time-delta
                                                 // for acceleration
+
+        delta_time = current_time - bangbang_timestamp;
 
         MotionController::bangBangVelocityController(
                 *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
                 movePrim.getFinalSpeed(), movePrim.getFinalAngle(),
-                current_time - bangbang_timestamp);
+                delta_time.count());
 
         // send the velocity data via grsim_packet
         grsim_packet = createGrSimPacket(movePrim.getRobotId(), YELLOW,
-                                         robot_velocities.first, robot_velocities.second);
+                                         robot_velocities.linear_velocity, robot_velocities.angular_velocity, 0, false, false);
     }
 
     sendGrSimPacket(grsim_packet);
 }
+

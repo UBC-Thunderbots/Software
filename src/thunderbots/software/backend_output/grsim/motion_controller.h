@@ -20,8 +20,7 @@ namespace MotionController
      * @param dest The destination of the robot
      * @param desired_final_speed The target final speed of the robot
      * @param desired_final_orientation The target final orientation of the robot
-     * @param delta_time The time that will be used to calculate the change in speed of
-     * the robot (based on constant acceleration)
+     * @param delta_time The change in time that will be used to calculate changes in robot velocity (based on formula: Vf = Vi + acceleration*delta_time and Wf = Wi + angular_acceleration*delta_time
      * @return The linear velocity of the robot as a Vector(X,Y) and the angular velocity of the robot as a AngularVelocity packaged in a vector
      */
     Velocity bangBangVelocityController(const Robot robot, const Point dest,
