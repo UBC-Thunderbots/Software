@@ -20,31 +20,32 @@
  *calculate changes in speed.
  *
  *See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
-*/
+ */
 MotionController::Velocity MotionController::bangBangVelocityController(
-        const Robot robot, const Point dest, const double desired_final_speed,
-        const Angle desired_final_orientation, const double delta_time)
+    const Robot robot, const Point dest, const double desired_final_speed,
+    const Angle desired_final_orientation, const double delta_time)
 {
-
     MotionController::Velocity robot_velocities;
 
-    robot_velocities.linear_velocity = MotionController::determineLinearVelocity(robot, dest, desired_final_speed, delta_time);
-    robot_velocities.angular_velocity = MotionController::determineAngularVelocity(robot, desired_final_orientation, delta_time);
+    robot_velocities.linear_velocity = MotionController::determineLinearVelocity(
+        robot, dest, desired_final_speed, delta_time);
+    robot_velocities.angular_velocity = MotionController::determineAngularVelocity(
+        robot, desired_final_orientation, delta_time);
 
     return robot_velocities;
 }
 
-AngularVelocity MotionController::determineAngularVelocity(const Robot robot, const Angle desired_final_orientation,
-                                                           const double delta_time) {
-    // boolean value if the robot can reach it's destination at target speed based on angular MAX acceleration
+AngularVelocity MotionController::determineAngularVelocity(
+    const Robot robot, const Angle desired_final_orientation, const double delta_time)
+{
+    // boolean value if the robot can reach it's destination at target speed based on
+    // angular MAX acceleration
     bool can_stop_rotate_in_time;
 
     AngularVelocity robot_angular_velocity;
 
     // rotation used for constant angular acceleration calculations
-    const Angle angle_to_dest =
-            (robot.orientation() -
-             desired_final_orientation);
+    const Angle angle_to_dest = (robot.orientation() - desired_final_orientation);
     AngularVelocity delta_angular_speed;
     AngularVelocity expected_final_ang_speed;
 
@@ -53,15 +54,17 @@ AngularVelocity MotionController::determineAngularVelocity(const Robot robot, co
         fabs(2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest.toRadians()))
     {
         expected_final_ang_speed = AngularVelocity::ofRadians(
-                -1 * sqrt(fabs(2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest.toRadians()) -
-                          pow(robot.angularVelocity().toRadians(), 2)));
+            -1 * sqrt(fabs(2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest.toRadians()) -
+                      pow(robot.angularVelocity().toRadians(), 2)));
         can_stop_rotate_in_time = true;
     }
     else
     {
-        expected_final_ang_speed  = AngularVelocity::ofRadians(sqrt(pow(robot.angularVelocity().toRadians(), 2) -
-                                         2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest.toRadians()));
-        can_stop_rotate_in_time = expected_final_ang_speed <= AngularVelocity::ofRadians(0.0);
+        expected_final_ang_speed = AngularVelocity::ofRadians(
+            sqrt(pow(robot.angularVelocity().toRadians(), 2) -
+                 2 * ROBOT_MAX_ANG_ACCELERATION * angle_to_dest.toRadians()));
+        can_stop_rotate_in_time =
+            expected_final_ang_speed <= AngularVelocity::ofRadians(0.0);
     }
 
     // if the robot can stop rotating in time
@@ -72,28 +75,30 @@ AngularVelocity MotionController::determineAngularVelocity(const Robot robot, co
         if (expected_final_ang_speed < AngularVelocity::ofRadians(0.0))
         {
             // angularly accelerate
-            delta_angular_speed = AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
+            delta_angular_speed =
+                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
         }
 
-            // if not then maintain angular velocity
+        // if not then maintain angular velocity
         else
         {
             delta_angular_speed = AngularVelocity::ofRadians(0.0);
         }
     }
 
-        // if the robot can't stop rotating in time then angular decelerate
+    // if the robot can't stop rotating in time then angular decelerate
     else
     {
-        delta_angular_speed = AngularVelocity::ofRadians(-(ROBOT_MAX_ANG_ACCELERATION * delta_time));
+        delta_angular_speed =
+            AngularVelocity::ofRadians(-(ROBOT_MAX_ANG_ACCELERATION * delta_time));
     }
 
     robot_angular_velocity =
-            robot.angularVelocity() +
-            delta_angular_speed;  // calculate new angular velocity based on the current robot
+        robot.angularVelocity() +
+        delta_angular_speed;  // calculate new angular velocity based on the current robot
     // ang. velocity and delta ang. velocity
 
-    if ( (robot_angular_velocity.abs() > AngularVelocity::ofRadians(ROBOT_MAX_ANG_SPEED)) )
+    if ((robot_angular_velocity.abs() > AngularVelocity::ofRadians(ROBOT_MAX_ANG_SPEED)))
     {
         if (robot_angular_velocity < AngularVelocity::ofRadians(0))
         {
@@ -108,17 +113,19 @@ AngularVelocity MotionController::determineAngularVelocity(const Robot robot, co
     return robot_angular_velocity;
 }
 
-Vector MotionController::determineLinearVelocity(const Robot robot, const Point dest, const double desired_final_speed,
-                                                 const double delta_time) {
+Vector MotionController::determineLinearVelocity(const Robot robot, const Point dest,
+                                                 const double desired_final_speed,
+                                                 const double delta_time)
+{
     // vector to hold the XY velocities of the robot
     Vector robot_linear_velocities;
 
-    // boolean value if the robot can reach it's destination at target speed based on linear MAX acceleration
+    // boolean value if the robot can reach it's destination at target speed based on
+    // linear MAX acceleration
     bool can_stop_in_time;
 
     // destination distance used for constant linear acceleration speed calculations
-    const double distance_to_dest =
-            (robot.position() - dest).len();
+    const double distance_to_dest = (robot.position() - dest).len();
 
     // calculates robot angle based on unit vector that points from the robot location to
     // the destination (used to calculate the X/Y velocity magnitudes
@@ -137,7 +144,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         // of current speed)
         expected_final_speed = -1 * sqrt(2 * ROBOT_MAX_ACCELERATION * distance_to_dest -
                                          pow(robot.velocity().len(), 2));
-        can_stop_in_time   = true;
+        can_stop_in_time     = true;
     }
     else
     {
@@ -160,7 +167,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
             delta_speed_y = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.sin();
         }
 
-            // if not then maintain speed
+        // if not then maintain speed
         else
         {
             // maintain speed
@@ -169,7 +176,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         }
     }
 
-        // if the robot can't stop in time then decelerate
+    // if the robot can't stop in time then decelerate
     else
     {
         delta_speed_x = -(ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.cos();
@@ -177,8 +184,8 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     }
 
     robot_linear_velocities =
-            Vector(robot.velocity().x() + delta_speed_x,
-                   robot.velocity().y() +
+        Vector(robot.velocity().x() + delta_speed_x,
+               robot.velocity().y() +
                    delta_speed_y);  // calculate new X/Y/ang velocities based on the
     // current robot speeds and delta speeds
 

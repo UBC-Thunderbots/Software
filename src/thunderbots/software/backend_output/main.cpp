@@ -1,18 +1,18 @@
 #include <ros/ros.h>
 #include <ros/time.h>
-#include "ai/ai.h"
-#include "util/ros_messages.h"
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
-#include "thunderbots_msgs/Team.h"
 
 #include <iostream>
 
+#include "ai/ai.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"
 #include "geom/point.h"
+#include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/ros_messages.h"
 
 // Constants
 const std::string NETWORK_ADDRESS       = "127.0.0.1";
@@ -26,8 +26,8 @@ static constexpr unsigned int TICK_RATE = 30;
 // the primitives to the system we have chosen (such as grSim, our radio, etc.)
 std::vector<std::unique_ptr<Primitive>> primitives;
 
-namespace{
-
+namespace
+{
     Team friendly_team = Team(std::chrono::milliseconds(1000));
 }
 
@@ -42,11 +42,12 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
 }
 
 // Update the friendly team
-void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
+void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
 {
     thunderbots_msgs::Team friendly_team_msg = *msg;
 
-    Team updated_friendly_team = Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
+    Team updated_friendly_team =
+        Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
 
     friendly_team = updated_friendly_team;
 }
