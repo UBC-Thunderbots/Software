@@ -6,19 +6,12 @@
 
 /**
  * The world object describes the entire state of the world, which for us is all the
- * information we have about
- * the field, robots, ball, and referee commands. The world object acts as a convenient
- * way to pass all this information
- * around to modules that may need it.
+ * information we have about the field, robots, and ball. The world object acts as a
+ * convenient way to pass all this information around to modules that may need it.
  */
 class World final
 {
    public:
-    /**
-     * Creates a new default world.
-     */
-    explicit World();
-
     /**
      * Creates a new world.
      *
@@ -63,7 +56,14 @@ class World final
      *
      * @return a const reference to the Field in the world
      */
-    const Field& field();
+    const Field& field() const;
+
+    /**
+     * Returns a mutable reference to the Field in the world
+     *
+     * @return a mutable reference to the Field in the world
+     */
+    Field& mutableField();
 
     /**
      * Returns a const reference to the Ball in the world
@@ -73,18 +73,39 @@ class World final
     const Ball& ball() const;
 
     /**
+     * Returns a mutable reference to the Ball in the world
+     *
+     * @return a mutable reference to the Ball in the world
+     */
+    Ball& mutableBall();
+
+    /**
      * Returns a const reference to the Friendly Team in the world
      *
      * @return a const reference to the Friendly Team in the world
      */
-    const Team& friendly_team() const;
+    const Team& friendlyTeam() const;
+
+    /**
+     * Returns a mutable reference to the Friendly Team in the world
+     *
+     * @return a mutable reference to the Friendly Team in the world
+     */
+    Team& mutableFriendlyTeam();
 
     /**
      * Returns a const reference to the Enemy Team in the world
      *
      * @return a const reference to the Enemy Team in the world
      */
-    const Team& enemy_team() const;
+    const Team& enemyTeam() const;
+
+    /**
+     * Returns a mutable reference to the Enemy Team in the world
+     *
+     * @return a mutable reference to the Enemy Team in the world
+     */
+    Team& mutableEnemyTeam();
 
    private:
     Field field_;

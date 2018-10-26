@@ -200,7 +200,6 @@ sudo apt-get update
 host_software_packages=(
     g++-7 # We need g++ 7 or greater to support the C++17 standard
     python-rosinstall
-    clang-format
     protobuf-compiler
     libprotobuf-dev
 )

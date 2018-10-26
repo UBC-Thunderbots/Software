@@ -136,33 +136,35 @@ class Play
 };
 
 /**
- * This macro is used by Plays that are derived from the Abstract Play class above. Its
- * purpose is to create a Factory for the implemented Play, and declare a static variable
- * for the factory so that the Play is automatically registered in the Play
- * registry.
+ * This templated play factory class is used by Plays that are derived from the Abstract
+ * Play class above. Its purpose is to create a Factory for the implemented Play and
+ * automatically register the play in the play registry.
  *
  * Declaring the static variable will also cause it to be initialized at the start of the
  * program (because it's static). This will immediately call the constructor, which adds
  * a pointer to the Factory to the Play registry. From then on, the rest of the program
  * can use the registry to find all the Plays that are available (and register with this
- * macro).
+ * templated class).
  *
- * @param play_class_name The classname of the Play to be added to the registry. For
- * example, to add new class called MovePlay that inherits from Play, the following line
- * should be added to the end of the .cpp file (without the quotations):
- * "REGISTER_PLAY(MovePlay)"
+ * @tparam T The class of the Play to be added to the registry. For example, to add a
+ * new class called MovePlay that inherits from Play, the following line should be added
+ * to the end of the .cpp file (without the quotations):
+ * "static TPlayFactory<MovePlay> factory;"
  */
-#define REGISTER_PLAY(play_class_name)                                                   \
-    class play_class_name##Factory : public PlayFactory                                  \
-    {                                                                                    \
-       public:                                                                           \
-        play_class_name##Factory()                                                       \
-        {                                                                                \
-            Play::registerPlay(std::shared_ptr<play_class_name##Factory>(this));         \
-        }                                                                                \
-        std::shared_ptr<Play> getInstance() override                                     \
-        {                                                                                \
-            return std::make_shared<play_class_name>();                                  \
-        }                                                                                \
-    };                                                                                   \
-    static play_class_name##Factory global_##play_class_name##Factory;
+template <class T>
+class TPlayFactory : public PlayFactory
+{
+    // compile time type checking that T is derived class of Play
+    static_assert(std::is_base_of<Play, T>::value, "T must be derived class of Play!");
+
+   public:
+    TPlayFactory()
+    {
+        Play::registerPlay(std::make_shared<TPlayFactory>(*this));
+    }
+
+    std::shared_ptr<Play> getInstance() override
+    {
+        return std::make_shared<T>();
+    }
+};

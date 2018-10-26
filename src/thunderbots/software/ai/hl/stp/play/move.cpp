@@ -34,4 +34,4 @@ class MovePlay : public Play
     }
 };
 
-REGISTER_PLAY(MovePlay)
+static TPlayFactory<MovePlay> factory;

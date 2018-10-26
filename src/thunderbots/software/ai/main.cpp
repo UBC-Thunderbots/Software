@@ -11,13 +11,19 @@
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
 
-// Variables we need to maintain state
-// In an anonymous namespace so they cannot be seen/accessed externally
+// Variables we need to maintain state. They are declared "globally" in the file so they
+// can be seen/used by the callback functions as well as the main function.
+// In an anonymous namespace so they cannot be seen/accessed outside this file.
 namespace
 {
-    AI ai;
-}
-
+    // Initialize our AI, which is the main object that maintains state
+    AI ai = AI(
+        World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
+              Team(std::chrono::milliseconds(
+                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+              Team(std::chrono::milliseconds(
+                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
+}  // namespace
 
 // Callbacks to update the state of the world
 void fieldUpdateCallback(const thunderbots_msgs::Field::ConstPtr &msg)
@@ -65,21 +71,18 @@ int main(int argc, char **argv)
     // Create publishers
     ros::Publisher primitive_publisher =
         node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
-            UTIL::CONSTANTS::AI_PRIMITIVES_TOPIC, 1);
+            Util::Constants::AI_PRIMITIVES_TOPIC, 1);
 
     // Create subscribers
     ros::Subscriber field_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
+        Util::Constants::BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
+        Util::Constants::BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
     ros::Subscriber friendly_team_sub =
-        node_handle.subscribe(UTIL::CONSTANTS::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
+        node_handle.subscribe(Util::Constants::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
                               friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
-
-    // Initialize variables used to maintain state
-    ai = AI();
+        Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Main loop
     while (ros::ok())
