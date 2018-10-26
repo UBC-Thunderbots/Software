@@ -27,11 +27,19 @@ MotionController::Velocity MotionController::bangBangVelocityController(
 {
     MotionController::Velocity robot_velocities;
 
-    robot_velocities.linear_velocity = MotionController::determineLinearVelocity(
-        robot, dest, desired_final_speed, delta_time);
-    robot_velocities.angular_velocity = MotionController::determineAngularVelocity(
-        robot, desired_final_orientation, delta_time);
+    // if the change is time is somehow negative or zero, just return the current robot velocity
+    if(delta_time <= 0) {
+        robot_velocities.linear_velocity = robot.velocity();
+        robot_velocities.angular_velocity = robot.angularVelocity();
+    }
+    else {
 
+        robot_velocities.linear_velocity = MotionController::determineLinearVelocity(
+                robot, dest, desired_final_speed, delta_time);
+        robot_velocities.angular_velocity = MotionController::determineAngularVelocity(
+                robot, desired_final_orientation, delta_time);
+    }
+    
     return robot_velocities;
 }
 
