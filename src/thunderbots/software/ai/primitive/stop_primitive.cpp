@@ -13,10 +13,10 @@ StopPrimitive::StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     robot_id = primitive_msg.robot_id;
 }
 
-std:string StopPrimitive::getPrimitiveName() const
+std::string StopPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
-};
+}
 
 unsigned int StopPrimitive::getRobotId() const
 {

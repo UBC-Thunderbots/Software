@@ -2,7 +2,7 @@
 
 #include "ai/primitive/primitive.h"
 
-class StopPrimitive : public Primative
+class StopPrimitive : public Primitive
 {
     public:
      static const std::string PRIMITIVE_NAME;
@@ -27,6 +27,8 @@ class StopPrimitive : public Primative
      unsigned int getRobotId() const override;
 
      std::vector<double> getParameterArray() const override;
+
+     std::vector<bool> getExtraBitArray() const override;
 
     private:
      unsigned int robot_id;
