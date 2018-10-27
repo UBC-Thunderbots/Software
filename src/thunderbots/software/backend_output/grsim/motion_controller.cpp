@@ -11,16 +11,16 @@
 
 
 /**
- *.cpp file for the grSim motion controller.
+ * .cpp file for the grSim motion controller.
  *
- *In the current state it is a bang-bang controller.
+ * In the current state it is a bang-bang controller.
  *
- *It assumed the robot max acceleration is constant.
+ * It assumed the robot max acceleration is constant.
  *
- *Uses constant acceleration kinematics equations to
- *calculate changes in speed.
+ * Uses constant acceleration kinematics equations to
+ * calculate changes in speed.
  *
- *See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
+ * See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
  */
 MotionController::Velocity MotionController::bangBangVelocityController(
     const Robot robot, const Point dest, const double desired_final_speed,
@@ -68,7 +68,8 @@ AngularVelocity MotionController::determineAngularVelocity(
 
     // check if the robot is nearly in it's final orientation with close to no angular
     // velocity
-    if ((robot.orientation() - desired_final_orientation).abs().toRadians() <= POSITION_STOP_TOLERANCE &&
+    if ((robot.orientation() - desired_final_orientation).abs().toRadians() <=
+            POSITION_STOP_TOLERANCE &&
         robot.angularVelocity().toRadians() <= VELOCITY_STOP_TOLERANCE)
     {
         return AngularVelocity::ofRadians(0);
@@ -174,7 +175,8 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
 
     double delta_speed_x, delta_speed_y;
 
-    if ((robot.position() - dest).len() <= POSITION_STOP_TOLERANCE && robot.velocity().len() <= VELOCITY_STOP_TOLERANCE)
+    if ((robot.position() - dest).len() <= POSITION_STOP_TOLERANCE &&
+        robot.velocity().len() <= VELOCITY_STOP_TOLERANCE)
     {
         return Vector(0, 0);
     }
@@ -204,12 +206,13 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // calculate if the robot can stop in time to achieve the target speed at the target
     // destination based on acceleration Vf = sqrt( Vi^2 - 2*a*d) if the robot can stop in
     // time ( Vi^2 < 2*a*d
-    if ((pow(robot.velocity().len(), 2) - 2 * ROBOT_MAX_ACCELERATION * distance_to_dest) <=
-        desired_final_speed)
+    if ((pow(robot.velocity().len(), 2) -
+         2 * ROBOT_MAX_ACCELERATION * distance_to_dest) <= desired_final_speed)
     {
         can_stop_in_time = true;
     }
-    else {
+    else
+    {
         can_stop_in_time = false;
     }
     // check for directions
@@ -266,11 +269,10 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         delta_speed_y = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.sin();
     }
 
-    robot_linear_velocities =
-        Vector(robot.velocity().x() + delta_speed_x,
-               robot.velocity().y() +
-                   delta_speed_y);  // calculate new X/Y/ang velocities based on the
-    // current robot speeds and delta speeds
+    // calculate new X/Y velocities based on the
+    // current robot speeds and calculated delta speeds
+    robot_linear_velocities = Vector(robot.velocity().x() + delta_speed_x,
+                                     robot.velocity().y() + delta_speed_y);
 
     if (robot_linear_velocities.len() >= ROBOT_MAX_SPEED)
     {
