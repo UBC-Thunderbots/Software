@@ -1,21 +1,20 @@
 import * as React from 'react';
-import {Provider} from 'unstated';
+import { Provider } from 'unstated';
 
-import { Main } from './pages/Main';
+import { Logger } from '~/modules/Logger';
+import { Visualizer } from '~/modules/Visualizer';
+import { SplitPane } from '~/components/ui/SplitPane';
 
 /**
- * Primary React component. This is where our top-level application is defined.
+ * The main page of our application. 
  */
-class App extends React.Component {
+export default class App extends React.Component {
 
-  // TODO: add support for navigating between pages. For now, we only have Main to visit.
   public render() {
     return (
       <Provider>
-          <Main />
+        <SplitPane top={<Visualizer />} bottom={<Logger />} />
       </Provider>
     );
   }
 }
-
-export default App;

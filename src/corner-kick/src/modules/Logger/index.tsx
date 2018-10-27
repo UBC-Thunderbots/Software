@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Subscribe } from 'unstated';
 
 import { TopicListener, TopicListenerType } from '~/components/containers/TopicListener';
-import { LogMessage } from '~/components/ui/LogMessage';
+import { LogMessage } from './LogMessage';
 import { IROSOut } from '~/types/standardTopics';
 
 /**

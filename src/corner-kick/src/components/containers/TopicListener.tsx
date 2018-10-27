@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Container } from "unstated";
 
-import { ROSConnector } from "~/service/RosConnector";
+import { ROSConnector } from "~/ros/RosConnector";
 
 /**
  * Interface that defines the format of our topic container

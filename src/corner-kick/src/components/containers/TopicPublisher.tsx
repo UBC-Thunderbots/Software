@@ -1,6 +1,6 @@
 import { Container } from "unstated";
 
-import { ROSConnector } from "~/service/RosConnector";
+import { ROSConnector } from "~/ros/RosConnector";
 
 /**
  * A TopicPublisher allows us to send message at a given topic
