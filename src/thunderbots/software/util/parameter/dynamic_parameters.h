@@ -1,26 +1,29 @@
 #pragma once
 
 #include "util/parameter/parameter.h"
-
-/**
- * This namespace contains all of our dynamically adjustable Parameters, providing
- * a centralized way to access them. See the comment in the parameter.h file for
- * a list of valid Parameter types.
- */
-namespace DynamicParameters
+namespace Util
 {
     /**
-     * Updates all known parameters with the latest values from the ROS Parameter Server
+     * This namespace contains all of our dynamically adjustable Parameters, providing
+     * a centralized way to access them. See the comment in the parameter.h file for
+     * a list of valid Parameter types.
      */
-    void updateAllParametersFromROSParameterServer();
-
-    // How long in milliseconds a Robot must not appear in vision before it is treated
-    // as "non-existent" by the AI
-    extern Parameter<unsigned int> robot_vision_debounce_milliseconds;
-
-    namespace Navigator
+    namespace DynamicParameters
     {
-        extern Parameter<double> default_avoid_dist;
-        extern Parameter<double> collision_avoid_velocity_scale;
-    }  // namespace Navigator
-}  // namespace DynamicParameters
+        /**
+         * Updates all known parameters with the latest values from the ROS Parameter
+         * Server
+         */
+        void updateAllParametersFromROSParameterServer();
+
+        // How long in milliseconds a Robot must not appear in vision before it is removed
+        // from the AI
+        extern Parameter<unsigned int> robot_expiry_buffer_milliseconds;
+
+        namespace Navigator
+        {
+            extern Parameter<double> default_avoid_dist;
+            extern Parameter<double> collision_avoid_velocity_scale;
+        }  // namespace Navigator
+    }      // namespace DynamicParameters
+}  // namespace Util

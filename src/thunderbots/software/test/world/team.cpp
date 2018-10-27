@@ -329,6 +329,22 @@ TEST_F(TeamTest, clear_goalie)
     EXPECT_EQ(std::nullopt, team.goalie());
 }
 
+TEST_F(TeamTest, get_robot_expiry_buffer)
+{
+    Team team = Team(milliseconds(500));
+
+    EXPECT_EQ(milliseconds(500), team.getRobotExpiryBufferMilliseconds());
+}
+
+TEST_F(TeamTest, set_robot_expiry_buffer)
+{
+    Team team = Team(milliseconds(0));
+
+    team.setRobotExpiryBuffer(milliseconds(831));
+
+    EXPECT_EQ(milliseconds(831), team.getRobotExpiryBufferMilliseconds());
+}
+
 TEST_F(TeamTest, equality_operator_compare_team_with_itself)
 {
     Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
