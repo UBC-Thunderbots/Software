@@ -1,4 +1,5 @@
 ﻿---
+Language: Cpp
 BasedOnStyle: Google
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'true'
@@ -17,7 +18,6 @@ Cpp11BracedListStyle: 'true'
 IncludeBlocks: Regroup
 IndentCaseLabels: 'true'
 IndentWidth: '4'
-Language: Cpp
 MaxEmptyLinesToKeep: '3'
 NamespaceIndentation: All
 ReflowComments: 'true'
@@ -25,6 +25,12 @@ SortIncludes: 'true'
 Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
+---
+Language: JavaScript
+BasedOnStyle: Google
+ColumnLimit: '90'
+JavaScriptWrapImports: 'true'
+SpacesInContainerLiterals: 'false'
 ---
 Language: Proto
 # Don't format proto files.

@@ -10,13 +10,12 @@ class Ball final
     /**
      * Creates a new ball with the given position and velocity
      *
-     * @param position The position of the ball, with coordinates in metres.
-     * Default is (0, 0)
-     * @param velocity The velocity of the ball, in metres per second. Default is (0, 0)
+     * @param position The position of the ball, with coordinates in metres
+     * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity. Default is the current time.
      */
-    explicit Ball(Point position = Point(), Vector velocity = Vector(),
+    explicit Ball(Point position, Vector velocity,
                   std::chrono::steady_clock::time_point timestamp =
                       std::chrono::steady_clock::now());
 
