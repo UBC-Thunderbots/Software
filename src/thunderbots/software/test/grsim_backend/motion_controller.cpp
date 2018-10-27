@@ -521,7 +521,7 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
     double new_x_position;
     double new_y_position;
 
-    for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
+    for (iteration_count = 0; iteration_count < TOTAL_STEPS-8000; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);

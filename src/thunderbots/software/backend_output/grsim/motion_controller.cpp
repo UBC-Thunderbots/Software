@@ -9,6 +9,7 @@
 #include "geom/point.h"
 #include "shared/constants.h"
 
+
 /**
  *.cpp file for the grSim motion controller.
  *
@@ -67,8 +68,8 @@ AngularVelocity MotionController::determineAngularVelocity(
 
     // check if the robot is nearly in it's final orientation with close to no angular
     // velocity
-    if ((robot.orientation() - desired_final_orientation).abs().toRadians() <= 0.01 &&
-        robot.angularVelocity().toRadians() <= 0.015)
+    if ((robot.orientation() - desired_final_orientation).abs().toRadians() <= POSITION_STOP_TOLERANCE &&
+        robot.angularVelocity().toRadians() <= VELOCITY_STOP_TOLERANCE)
     {
         return AngularVelocity::ofRadians(0);
     }
@@ -173,7 +174,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
 
     double delta_speed_x, delta_speed_y;
 
-    if ((robot.position() - dest).len() <= 0.01 && robot.velocity().len() <= 0.015)
+    if ((robot.position() - dest).len() <= POSITION_STOP_TOLERANCE && robot.velocity().len() <= VELOCITY_STOP_TOLERANCE)
     {
         return Vector(0, 0);
     }
@@ -203,10 +204,13 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // calculate if the robot can stop in time to achieve the target speed at the target
     // destination based on acceleration Vf = sqrt( Vi^2 - 2*a*d) if the robot can stop in
     // time ( Vi^2 < 2*a*d
-    if ((pow(robot.velocity().len(), 2) - 2 * ROBOT_MAX_ACCELERATION * distance_to_dest) <
+    if ((pow(robot.velocity().len(), 2) - 2 * ROBOT_MAX_ACCELERATION * distance_to_dest) <=
         desired_final_speed)
     {
         can_stop_in_time = true;
+    }
+    else {
+        can_stop_in_time = false;
     }
     // check for directions
     if (moving_towards_dest_x && moving_towards_dest_y)

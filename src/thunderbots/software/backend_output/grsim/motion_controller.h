@@ -14,6 +14,10 @@ namespace MotionController
         AngularVelocity angular_velocity;
     };
 
+    // tolerance distance measurement in meters
+    const double VELOCITY_STOP_TOLERANCE = 0.015;
+    const double POSITION_STOP_TOLERANCE = 0.01;
+
     /**
      * Calculate robot velocities using Bang-bang motion controller
      *
