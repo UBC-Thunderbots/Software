@@ -7,12 +7,12 @@
     "email": "ubcrobocup@gmail.com"
   },
   "homepage": "./",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "concurrently \"yarn webpack-dev-server --config ./config/webpack.config.dev.js\" \"wait-on http://localhost:8080 && electron .\"",
     "build": "webpack --config ./config/webpack.config.prod.js",
-    "dist": "electron-builder"
+    "dist": "electron-builder --dir"
   },
   "dependencies": {
     "@blueprintjs/core": "3.7.0",
@@ -55,7 +55,7 @@
     "webpack-dev-server": "^3.1.10"
   },
   "build": {
-    "productName": "CornerKick",
+    "productName": "corner_kick",
     "artifactName": "${productName}.${ext}",
     "directories": {
       "buildResources": "dist-resources"
@@ -77,7 +77,7 @@
     },
     "nsis": {
       "oneClick": "false",
-      "artifactName": "${productName}-Setup.${ext}",
+      "artifactName": "${productName}-setup.${ext}",
       "perMachine": true,
       "deleteAppDataOnUninstall": true
     },

@@ -195,10 +195,13 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 # Required to make sure we install protobuf version 3.0.0 or greater
 sudo add-apt-repository ppa:maarten-fonville/protobuf -y
-# Required to make sure we install node v8
+
+# Running a PPA setup script to give us access to the correct node and yarn version
+# on non-Ubuntu 18.04 systems. 
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
 sudo apt-get update
 
 host_software_packages=(
@@ -206,8 +209,8 @@ host_software_packages=(
     python-rosinstall
     protobuf-compiler
     libprotobuf-dev
-    nodejs
-    yarn
+    nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
+    yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
 )
 sudo apt-get install ${host_software_packages[@]} -y
 sudo npm install -g yarn

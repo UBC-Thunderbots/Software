@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(corner-kick)
+project(corner_kick)
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS)
@@ -29,7 +29,7 @@ add_custom_target(
 
 ## Install NPM dependencies
 add_custom_target(
-  corner-kick-dependencies
+  corner_kick-dependencies
   DEPENDS copy_src_to_devel
   COMMENT Installing ${PROJECT_NAME}'s dependencies
   COMMAND
@@ -41,9 +41,9 @@ add_custom_target(
 
 ## Package application
 add_custom_target(
-  corner-kick-package
+  corner_kick-package
   ALL
-  DEPENDS corner-kick-dependencies
+  DEPENDS corner_kick-dependencies
   COMMENT Packaging up ${PROJECT_NAME}
   COMMAND yarn build
   COMMAND yarn dist
