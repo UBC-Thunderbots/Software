@@ -23,8 +23,7 @@ class GrSimBackend : public Backend
 
     ~GrSimBackend();
 
-    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives,
-                        const Team& team) override;
+    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives) override;
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.
@@ -60,7 +59,19 @@ class GrSimBackend : public Backend
                                    double kick_speed_meters_per_second, bool chip,
                                    bool dribbler_on) const;
 
+    /**
+     * Helper function that updates the backend friendly team object
+     * @param new_friendly_team The updated instance of the friendly team
+     */
+    void updateBackendTeam(const Team& new_friendly_team){
+        team = new_friendly_team;
+    }
+
    private:
+
+    // construct default team
+    Team team = Team(std::chrono::milliseconds(1000));
+
     /**
      * Sends a grSim packet to grSim via UDP
      *

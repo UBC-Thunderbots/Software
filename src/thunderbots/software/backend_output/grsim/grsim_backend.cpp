@@ -65,7 +65,7 @@ void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
 
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& team)
+    const std::vector<std::unique_ptr<Primitive>>& primitives)
 {
     std::vector<grSim_Packet> grsim_packets;
 

@@ -79,7 +79,9 @@ int main(int argc, char** argv)
         // The callbacks will populate the primitives vector
         ros::spinOnce();
 
-        backend.sendPrimitives(primitives, friendly_team);
+        backend.updateBackendTeam(friendly_team);
+
+        backend.sendPrimitives(primitives);
 
         tick_rate.sleep();
     }
