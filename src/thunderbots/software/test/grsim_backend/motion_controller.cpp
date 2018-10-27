@@ -332,7 +332,7 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
     bool speeds_equal;
     AngularVelocity initial_ang_speed = AngularVelocity::ofRadians(3);
 
-    Robot robot              = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
+    Robot robot = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
                         initial_ang_speed, current_time);
 
 
@@ -342,7 +342,7 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
 
     // expect -4 because of angular speed cap
     AngularVelocity expected_velocity =
-        AngularVelocity::ofRadians(initial_ang_speed.toRadians()-ROBOT_MAX_ANG_SPEED);
+        AngularVelocity::ofRadians(initial_ang_speed.toRadians() - ROBOT_MAX_ANG_SPEED);
 
     if (expected_velocity == robot_velocities.angular_velocity)
     {
@@ -366,7 +366,7 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
     bool speeds_equal;
     AngularVelocity initial_ang_speed = AngularVelocity::ofRadians(-3);
 
-    Robot robot              = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
+    Robot robot = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
                         initial_ang_speed, current_time);
 
     MotionController::Velocity robot_velocities =
@@ -392,14 +392,13 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
 
 TEST_F(MotionControllerTest, negative_y_positive_x_velocity_test)
 {
-
     double delta_time        = 1;
     Point destination        = Point(2, -2);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 6;
     bool speeds_equal;
 
-    Robot robot              = Robot(4, Point(1, -1), Vector(0, 0), Angle::ofRadians(0),
+    Robot robot = Robot(4, Point(1, -1), Vector(0, 0), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(0), current_time);
 
     MotionController::Velocity robot_velocities =
@@ -510,10 +509,10 @@ TEST_F(MotionControllerTest, negative_y_negative_x_velocity_test)
 
 TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_test)
 {
-    Robot robot       = Robot(4, Point(3.0, 3.0), Vector(0.0, 0.0), Angle::ofRadians(0),
+    Robot robot = Robot(4, Point(3.0, 3.0), Vector(0.0, 0.0), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(0), current_time);
-    const double delta_time = TIME_STEP;
-    Point destination = Point(3.05, 3.05);
+    const double delta_time  = TIME_STEP;
+    Point destination        = Point(3.05, 3.05);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 0;
     bool speeds_equal;
@@ -750,7 +749,7 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
 {
     Robot robot             = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(0), current_time);
-    const double delta_time       = TIME_STEP;
+    const double delta_time = TIME_STEP;
     Point destination       = Point(0., 0);
     Angle destination_angle = Angle::ofDegrees(90);
     double destination_speed = 0;
@@ -784,7 +783,7 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
 {
     Robot robot             = Robot(4, Point(0, 0), Vector(0.0, 0.0), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(0), current_time);
-    const double delta_time       = TIME_STEP;
+    const double delta_time = TIME_STEP;
     Point destination       = Point(0., 0);
     Angle destination_angle = Angle::ofRadians(-1);
     double destination_speed = 0;
