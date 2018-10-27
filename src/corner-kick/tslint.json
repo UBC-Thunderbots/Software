@@ -1,5 +1,5 @@
 {
-  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "extends": ["tslint:recommended", "tslint-react"],
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
@@ -9,8 +9,12 @@
   },
   "rules": {
     "no-console": false,
-    "max-classes-per-file": false,
-    "semicolon": true,
-    "jsx-no-lambda": false
+    "jsx-no-lambda": false,
+    "semicolon": [true, "always", "ignore-bound-class-methods"],
+    "object-literal-sort-keys": [true, "shorthand-first"],
+    "variable-name": false,
+    "match-default-export-name": false,
+    "import-name": false,
+    "quotemark": [true, "single", "jsx-double"]
   }
 }

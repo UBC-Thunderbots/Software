@@ -1,7 +1,7 @@
 {
   "name": "corner-kick",
   "description": "A visualization tool for UBC Thunderbots",
-  "main": "public/electron.js",
+  "main": "public/main.js",
   "author": {
     "name": "UBC Thunderbots",
     "email": "ubcrobocup@gmail.com"
@@ -10,8 +10,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "concurrently \"yarn webpack-dev-server --config ./config/webpack.config.js\" \"wait-on http://localhost:8080 && electron .\"",
-    "build": "webpack --config ./config/webpack.config.js",
+    "start": "concurrently \"yarn webpack-dev-server --config ./config/webpack.config.dev.js\" \"wait-on http://localhost:8080 && electron .\"",
+    "build": "webpack --config ./config/webpack.config.prod.js",
     "dist": "electron-builder"
   },
   "dependencies": {
@@ -42,9 +42,12 @@
     "electron-builder": "^20.28.4",
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
+    "prettier": "1.14.3",
     "style-loader": "^0.23.1",
-    "ts-lint": "4.5.1",
     "ts-loader": "5.2.2",
+    "tslint": "^5.11.0",
+    "tslint-config-airbnb": "^5.11.0",
+    "tslint-react": "^3.6.0",
     "typescript": "3.1.3",
     "wait-on": "^3.1.0",
     "webpack": "4.23.1",

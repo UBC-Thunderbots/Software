@@ -5,18 +5,12 @@ import styled from 'styled-components';
  * Styling for the LogMessage
  */
 const StyledWrapper = styled.div`
-    padding: 8px;
+  padding: 8px;
 `;
 
 /**
  * Displays a single log message in our UI
  */
-export const LogMessage = (props: {
-    message: string;
-}) => {
-    return (
-        <StyledWrapper>
-            {props.message}
-        </StyledWrapper>
-    );
+export const LogMessage = (props: { message: string }) => {
+  return <StyledWrapper>{props.message}</StyledWrapper>;
 };

@@ -1,1 +1,1 @@
-export {Canvas as Visualizer} from './Canvas';
+export { Canvas as Visualizer } from './Canvas';

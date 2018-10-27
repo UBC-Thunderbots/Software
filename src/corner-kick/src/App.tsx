@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { Provider } from 'unstated';
 
+import { SplitPane } from '~/components/ui/SplitPane';
 import { Logger } from '~/modules/Logger';
 import { Visualizer } from '~/modules/Visualizer';
-import { SplitPane } from '~/components/ui/SplitPane';
 
 /**
- * The main page of our application. 
+ * The main page of our application.
  */
 export default class App extends React.Component {
-
   public render() {
     return (
       <Provider>
