@@ -17,7 +17,7 @@ public:
      * @param angular_vel The angular velocity of the robot. Positive is clock wise and vice versa.
      * @param dribbler_rpm The dribbler speed in RPM.
      */
-    explicit MovePrimitive(unsigned int robot_id, double x_vel, double y_vel,
+    explicit DirectVelocityPrimitive(unsigned int robot_id, double x_vel, double y_vel,
             AngularVelocity angular_vel, double dribbler_rpm);
 
     /**
@@ -25,7 +25,7 @@ public:
      *
      * @param primitive_msg The message from which to create the Move Primitive
      */
-    explicit DirectVelocityPrimitivePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    explicit DirectVelocityPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
     std::string getPrimitiveName() const override;
 
