@@ -31,7 +31,7 @@
 
 namespace{
         // what namespace the parameters will be in (ROS param server)
-	std::string kNamespaceForParameters = "/parameters";
+	std::string NamespaceForParameters = "/parameters";
 }
 
 template <class T>
@@ -48,8 +48,9 @@ class Parameter
         {
             this->name_ = parameter_name;
             this->value_ = default_value;
+	    this->internal_param_ = std::make_shared<Parameter<T>>(*this);
 
-            Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
+            Parameter<T>::registerParameter(this->internal_param_);
         }
 
         /**
@@ -59,7 +60,7 @@ class Parameter
          */
         const std::string getROSParameterPath() const
         {
-            return kParameterNs + "/" + name();
+            return NamespaceForParameters + "/" + name();
         }
 
         /**
@@ -69,7 +70,11 @@ class Parameter
          */
         const T value() const
         {
-            return value_;
+	    if (internal_param_.get() != nullptr){
+            	return this->internal_param_->value();
+	    } else {
+		return this->value_;
+	    }
         }
         /**
          * Returns the name of this parameter
@@ -97,7 +102,8 @@ class Parameter
          */
         void setValueInROSParameterServer(T new_value)
         {
-	    //dynamic reconfigure takes control of setting params //ros::param::set(getROSParameterPath(), new_value);
+	    //dynamic reconfigure takes control of setting params 
+	    //ros::param::set(getROSParameterPath(), new_value);
         }
 
         /**
@@ -106,7 +112,7 @@ class Parameter
          *
          * @return An immutable reference to the Parameter registry
          */
-        static const std::vector<std::unique_ptr<Parameter<T>>>& getRegistry()
+        static const std::vector<std::shared_ptr<Parameter<T>>>& getRegistry()
         {
             return Parameter<T>::getMutableRegistry();
         }
@@ -123,17 +129,17 @@ class Parameter
         }
 
         /**
-         * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
+         * Registers (adds) a Parameter to the registry. Since the shared pointer is moved
          * into the registry, the pointer may not be accessed by the caller after this
          * function has been called.
 	 *
 	 * Also registers params to the static configuration struct used to 
 	 * set parameters
          *
-         * @param parameter A unique pointer to the Parameter to add. This pointer may not
+         * @param parameter A shared pointer to the Parameter to add. This pointer may not
          * be accessed by the caller after this function has been called.
          */
-        static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
+        static void registerParameter(std::shared_ptr<Parameter<T>> parameter)
         {   
 
             if constexpr(std::is_same<T, bool>::value){   
@@ -176,7 +182,7 @@ class Parameter
 		ROS_WARN("attempting to configure with unkown type");
 	    }
 
-            Parameter<T>::getMutableRegistry().emplace_back(std::move(parameter));
+            Parameter<T>::getMutableRegistry().emplace_back(parameter);
         }
 
         /**
@@ -200,15 +206,16 @@ class Parameter
          *
          * @return A mutable reference to the Parameter registry
          */
-        static std::vector<std::unique_ptr<Parameter>>& getMutableRegistry()
+        static std::vector<std::shared_ptr<Parameter>>& getMutableRegistry()
         {
-            static std::vector<std::unique_ptr<Parameter<T>>> instance;
+            static std::vector<std::shared_ptr<Parameter<T>>> instance;
             return instance;
         }
 
         // Store the value so it can be retrieved without fetching from the server again
         T value_;
         std::string name_;
+	std::shared_ptr<Parameter<T>> internal_param_;
 
         /**
          * Returns a mutable configuration struct that will hold all the 
