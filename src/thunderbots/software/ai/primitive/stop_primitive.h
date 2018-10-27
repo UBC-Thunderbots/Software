@@ -1,15 +1,6 @@
-//
-// Created by jpaul on 10/13/18.
-//
-
-#ifndef PROJECT_STOP_PRIMITIVE_H
-#define PROJECT_STOP_PRIMITIVE_H
-
-#endif //PROJECT_STOP_PRIMITIVE_H
+#pragma once
 
 #include "ai/primitive/primitive.h"
-#include "geom/angle.h"
-#include "geom/point.h"
 
 class StopPrimitive : public Primative
 {
