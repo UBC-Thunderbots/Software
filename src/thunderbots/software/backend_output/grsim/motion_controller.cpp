@@ -59,6 +59,8 @@ AngularVelocity MotionController::determineAngularVelocity(
 
     // rotation used for constant angular acceleration calculations
     const Angle angle_to_dest = (desired_final_orientation - robot.orientation());
+    // integer that will be -1 or 1 giving the rotation direction to reach the destination
+    const int direction_to_dest = angle_to_dest.toRadians()/angle_to_dest.abs().toRadians();
 
     AngularVelocity delta_angular_speed;
 
@@ -97,61 +99,64 @@ AngularVelocity MotionController::determineAngularVelocity(
     // check robot rotation state for correct delta_angular_speed sign
     if (rotating_towards_dest && can_stop_rotate_in_time)
     {
-        if (angular_velocity_is_positive)
-        {
-            delta_angular_speed =
-                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
-        }
-        else
-        {
-            delta_angular_speed =
-                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
-        }
+//        if (angular_velocity_is_positive)
+//        {
+//            delta_angular_speed =
+//                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
+//        }
+//        else
+//        {
+//            delta_angular_speed =
+//                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
+//        }
+        delta_angular_speed = AngularVelocity::ofRadians(direction_to_dest*ROBOT_MAX_ANG_SPEED*delta_time);
     }
     // if the robot is rotating in the correct direction but can't stop in time, slow down
     else if (rotating_towards_dest && !can_stop_rotate_in_time)
     {
-        if (angular_velocity_is_positive)
-        {
-            delta_angular_speed =
-                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
-        }
-        else
-        {
-            delta_angular_speed =
-                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
-        }
+//        if (angular_velocity_is_positive)
+//        {
+//            delta_angular_speed =
+//                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
+//        }
+//        else
+//        {
+//            delta_angular_speed =
+//                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
+//        }
+        delta_angular_speed = AngularVelocity::ofRadians(-direction_to_dest*ROBOT_MAX_ANG_SPEED*delta_time);
     }
-    // special case that the robot has no angular velocity to determine the rotation
-    // direction
+        // special case that the robot has no angular velocity to determine the rotation
+        // direction
 
     else if (robot.angularVelocity().toRadians() == 0)
     {
         if ((desired_final_orientation - robot.orientation()).toRadians() > 0)
         {
             delta_angular_speed =
-                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
+                    AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
         }
         else
         {
             delta_angular_speed =
-                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
+                    AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
         }
     }
     // the last case is that the robot is not roating towards it's final angle, which
     // means it should accelerate the other direction
     else
     {
-        if (angular_velocity_is_positive)
-        {
-            delta_angular_speed =
-                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
-        }
-        else
-        {
-            delta_angular_speed =
-                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
-        }
+//        if (angular_velocity_is_positive)
+//        {
+//            delta_angular_speed =
+//                AngularVelocity::ofRadians(-ROBOT_MAX_ANG_ACCELERATION * delta_time);
+//        }
+//        else
+//        {
+//            delta_angular_speed =
+//                AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION * delta_time);
+//        }
+        delta_angular_speed = AngularVelocity::ofRadians(direction_to_dest*ROBOT_MAX_ANG_SPEED*delta_time);
     }
 
     // calculate the new angular velocity
