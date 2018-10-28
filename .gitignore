@@ -57,6 +57,9 @@ Makefile
 *yarn-debug.log*
 *yarn-error.log*
 
+# Checksum
+*.checksum
+
 
 ### Default C++ gitignore ###
 

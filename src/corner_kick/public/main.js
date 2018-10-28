@@ -53,11 +53,11 @@ function createWindow(windowBounds) {
   // Production mode will be using the prebundled file.
   // Development mode will be connecting to a localhost web server. This allows us
   // to have hot-reloading as we modify the source code.
-  mainWindow.loadURL(
-    isDev
-      ? 'http://localhost:8080'
-      : `file://${path.join(__dirname, '../build/index.html')}`,
-  );
+  if (process.env.ELECTRON_ENV == 'production') {
+    mainWindow.loadURL(`file://${path.join(__dirname, '../build/index.html')}`);
+  } else {
+    mainWindow.loadURL('http://localhost:8080');
+  }
 
   mainWindow.on('closed', () => (mainWindow = null));
 

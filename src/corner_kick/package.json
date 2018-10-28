@@ -12,7 +12,7 @@
   "scripts": {
     "start": "concurrently \"yarn webpack-dev-server --config ./config/webpack.config.dev.js\" \"wait-on http://localhost:8080 && electron .\"",
     "build": "webpack --config ./config/webpack.config.prod.js",
-    "dist": "electron-builder --dir"
+    "prod": "ELECTRON_ENV=production electron ."
   },
   "dependencies": {
     "@blueprintjs/core": "3.7.0",
@@ -52,36 +52,5 @@
     "webpack": "4.23.1",
     "webpack-cli": "3.1.2",
     "webpack-dev-server": "3.1.10"
-  },
-  "build": {
-    "productName": "corner_kick",
-    "artifactName": "${productName}.${ext}",
-    "directories": {
-      "buildResources": "dist-resources"
-    },
-    "files": [
-      "!**/*.d.ts"
-    ],
-    "linux": {
-      "target": [
-        "deb"
-      ],
-      "category": "Development"
-    },
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ]
-    },
-    "nsis": {
-      "oneClick": "false",
-      "artifactName": "${productName}-setup.${ext}",
-      "perMachine": true,
-      "deleteAppDataOnUninstall": true
-    },
-    "deb": {
-      "packageCategory": "Development"
-    }
   }
 }

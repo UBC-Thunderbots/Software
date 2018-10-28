@@ -16,10 +16,6 @@ module.exports = {
   // This target allows us to access DOM and Node libraries simultaneously
   target: 'electron-renderer',
 
-  // We use source-maps to debug from our typescript files, rather than
-  // from the bundle directly
-  devtool: 'inline-source-map',
-
   // We support js, typescript, html and css files.
   // To add additional file support, add the required loader here.
   module: {
@@ -49,7 +45,7 @@ module.exports = {
 
   resolve: {
     // Make sure if you add a new file support to add its extension here.
-    extensions: ['.js', '.ts', '.tsx', '.jsx', '.json'],
+    extensions: ['.js', '.ts', '.tsx', '.json'],
 
     // We set an alias to our src directory to reduce the need for relative paths.
     alias: {
