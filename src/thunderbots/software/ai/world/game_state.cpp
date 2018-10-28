@@ -1,4 +1,6 @@
 #include "ai/world/game_state.h"
+#include "game_state.h"
+
 
 bool GameState::halt() const
 {
@@ -154,4 +156,96 @@ void GameState::setBallPlacementPoint(double x, double y)
 Point GameState::getBallPlacementPoint() const
 {
     return ballPlacementPoint;
+}
+
+// apologies for this monster swt
+void GameState::updateRefboxGameState(RefboxGameState gameState) {
+    switch(gameState) {
+        case RefboxGameState::HALT:
+            state = HALT;
+            restart = NONE;
+            break;
+        case RefboxGameState::STOP:
+            state = STOP;
+            restart = NONE;
+            ourRestart = false;
+            break;
+        case RefboxGameState::NORMAL_START:
+            state = PLAYING;
+            break;
+        case RefboxGameState::FORCE_START:
+            state = PLAYING;
+            restart = NONE;
+            break;
+        case RefboxGameState::PREPARE_KICKOFF_US:
+            state = SETUP;
+            restart = KICKOFF;
+            ourRestart = true;
+            break;
+        case RefboxGameState::PREPARE_KICKOFF_THEM:
+            state = READY;
+            restart = KICKOFF;
+            ourRestart = false;
+            break;
+        case RefboxGameState::PREPARE_PENALTY_US:
+            state = SETUP;
+            restart = PENALTY;
+            ourRestart = true;
+            break;
+        case RefboxGameState::PREPARE_PENALTY_THEM:
+            state = READY;
+            restart = PENALTY;
+            ourRestart = false;
+            break;
+        case RefboxGameState::DIRECT_FREE_US:
+            state = SETUP;
+            restart = DIRECT;
+            ourRestart = true;
+            break;
+        case RefboxGameState::DIRECT_FREE_THEM:
+            state = READY;
+            restart = DIRECT;
+            ourRestart = false;
+            break;
+        case RefboxGameState::INDIRECT_FREE_US:
+            state = SETUP;
+            restart = INDIRECT;
+            ourRestart = true;
+            break;
+        case RefboxGameState::INDIRECT_FREE_THEM:
+            state = READY;
+            restart = INDIRECT;
+            ourRestart = false;
+            break;
+        case RefboxGameState::TIMEOUT_US:
+            state = HALT;
+            restart = NONE;
+            break;
+        case RefboxGameState::TIMEOUT_THEM:
+            state = HALT;
+            restart = NONE;
+            break;
+        case RefboxGameState::GOAL_US:
+            state = STOP;
+            restart = NONE;
+            break;
+        case RefboxGameState::GOAL_THEM:
+            state = STOP;
+            restart = NONE;
+            break;
+        case RefboxGameState::BALL_PLACEMENT_US:
+            state = READY;
+            restart = BALL_PLACEMENT;
+            ourRestart = true;
+            break;
+        case RefboxGameState::BALL_PLACEMENT_THEM:
+            state = SETUP;
+            restart = BALL_PLACEMENT;
+            ourRestart = false;
+            break;
+    }
+}
+
+void GameState::updateRefboxGameStage(RefboxGameStage gameStage) {
+
 }
