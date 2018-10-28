@@ -34,7 +34,6 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
       
         throw std::invalid_argument("Error: Unknown Primitive (" + primitive_msg.primitive_name + ") ");
-        // std::cerr <<"Error: Unexpected Primitive message of type "
        
 
     }
@@ -49,8 +48,7 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
     {
         
         throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);
-        // std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
        
-    
+       
     }
 }
