@@ -1,3 +1,5 @@
+# CMake build script for Corner Kick
+
 cmake_minimum_required(VERSION 2.8.3)
 project(corner_kick)
 
@@ -10,15 +12,11 @@ catkin_package()
 ## Build ##
 ###########
 
-## Package application
+# Build Corner Kick executable
 add_custom_target(
   corner_kick-package
   ALL
   COMMENT Packaging up ${PROJECT_NAME}
-
-  # Make scripts executable
-  COMMAND chmod +x ./scripts/compare_src.sh
-  COMMAND chmod +x ./scripts/start_corner_kick.sh
 
   # Get dependencies
   COMMAND yarn

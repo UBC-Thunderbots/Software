@@ -1,7 +1,5 @@
 #!/bin/bash
 #
-# @author Quentin Golsteyn
-#
 # This script checks if the src folder has been modified by comparing the current
 # MD5 checksum of the directory with the one stored from the last run of this script.
 #

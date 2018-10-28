@@ -213,7 +213,7 @@ host_software_packages=(
     yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
 )
 sudo apt-get install ${host_software_packages[@]} -y
-sudo npm install -g yarn
+
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing utilities failed"
