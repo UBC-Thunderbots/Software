@@ -1,0 +1,45 @@
+#include "ai/primitive/direct_velocity_primitive.h"
+
+const std::string DirectVelocityPrimitive::PRIMITIVE_NAME = "Direct Velocity Primitive";
+
+DirectVelocityPrimitive::DirectVelocityPrimitive(unsigned int robot_id, double x_velocity, double y_velocity,
+        double angular_velocity, double dribbler_rpm)
+        : robot_id(robot_id), x_velocity(x_velocity), y_velocity(y_velocity),
+        angular_velocity(angular_velocity),dribbler_rpm(dribbler_rpm)
+{
+}
+
+DirectVelocityPrimitive::DirectVelocityPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
+{
+    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
+
+    robot_id      = primitive_msg.robot_id;
+    x_velocity = primitive_msg.parameters.at(0);
+    y_velocity = primitive_msg.parameters.at(1);
+    angular_velocity =primitive_msg.parameters.at(2);
+    dribbler_rpm   = primitive_msg.parameters.at(3);
+}
+
+
+std::string DirectVelocityPrimitive::getPrimitiveName() const
+{
+    return PRIMITIVE_NAME;
+}
+
+unsigned int DirectVelocityPrimitive::getRobotId() const
+{
+    return robot_id;
+}
+
+std::vector<double> DirectVelocityPrimitive::getParameterArray() const
+{
+    std::vector<double> parameters = {x_velocity,y_velocity,angular_velocity,dribbler_rpm};
+
+    return parameters;
+}
+
+std::vector<bool> DirectVelocityPrimitive::getExtraBitArray() const
+{
+    return std::vector<bool>();
+}
+
