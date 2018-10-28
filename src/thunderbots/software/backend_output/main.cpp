@@ -33,6 +33,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     }
 }
 
+    
 int main(int argc, char** argv)
 {
     // Init ROS node
@@ -59,7 +60,7 @@ int main(int argc, char** argv)
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
-
+        
         backend.sendPrimitives(primitives);
 
         tick_rate.sleep();

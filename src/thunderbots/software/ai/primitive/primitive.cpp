@@ -1,6 +1,7 @@
 #include "ai/primitive/primitive.h"
 
 #include "ai/primitive/move_primitive.h"
+#include <exception>
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
 {
@@ -26,15 +27,16 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
 
     if (primitive_msg.primitive_name == MovePrimitive::PRIMITIVE_NAME)
     {
+        
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
     else
     {
-        // TODO: Throw unknown primitive exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        std::cerr << "Error: Unexpected Primitive message of type "
-                  << primitive_msg.primitive_name << std::endl;
-        std::exit(1);
+      
+        throw std::invalid_argument("Error: Unknown Primitive (" + primitive_msg.primitive_name + ") ");
+        // std::cerr <<"Error: Unexpected Primitive message of type "
+       
+
     }
 
     return prim_ptr;
@@ -45,10 +47,10 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
 {
     if (prim_msg.primitive_name != prim_name)
     {
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
-                  << std::endl;
-        exit(1);
+        
+        throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);
+        // std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
+       
+    
     }
 }
