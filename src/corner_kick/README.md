@@ -12,14 +12,6 @@ roslaunch corner_kick corner_kick.launch
 
 ## Contribute
 
-### Installing the project
-
-Clone the project and install the dependencies.
-
-```
-rosdep install corner-kick
-```
-
 ### Running the dev server
 
 You can test your code by running:
