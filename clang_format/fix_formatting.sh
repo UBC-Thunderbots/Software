@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# This script allows us to automatically format the entire codebase using
+# clang-format, or some set of changes based on a diff via `git-clang-format`
+
+# Will set the `FILES_CHANGED` environment variable to 1 if we changed any
+# files, and 0 otherwise (assuming no error occured)
+
+# Will return:
+# `0` if no files formatted and no errors
+# `1` if an unexpected error occured
+# `3` if the script ran properly and we changed some files
+
+
 # The version of the clang executable to use
 export CLANG_VERSION=7.0
 
@@ -12,6 +24,7 @@ SCRIPT_NAME="$0"
 # Check that we have at least some arguments
 if (( $# == 0 )); then
     echo "Missing arguments (\"$SCRIPT_NAME --help\" for help)"
+    exit 1
 fi
 
 # This loop iterates through and handles the provided command-line arguments.
@@ -29,7 +42,7 @@ while test $# -gt 0; do
             echo "options:"
             echo "-h, --help       show help"
             echo "-a, --all        format all files in our codebase"
-            echo "-b, --branch     specify a git branch to diff against, and only format the files you have changed"
+            echo "-b, --branch     specify a git branch to diff against, and only format the files you have changed (NOTE: This argument will also accept a git commit hash)"
             echo " "
             echo "Examples:"
             echo "$SCRIPT_NAME -a"
@@ -61,10 +74,10 @@ while test $# -gt 0; do
             # Shift the arguents to check for the argument to this flag
             shift
             # Make sure we only have 1 arguement for the branch name
-            if test $# -le 1; then
+            if test $# -lt 1; then
                 echo "Error: No branch specified"
                 exit 1
-            elif test $# -ge 1; then
+            elif test $# -gt 1; then
                 echo "Error: More then one branch specified"
                 exit 1
             fi
@@ -77,24 +90,25 @@ while test $# -gt 0; do
 
             # Check the results of clang-format
             if [[ $OUTPUT == *"no modified files to format"* ]] || [[ $OUTPUT == *"clang-format did not modify any files"* ]] ; then
-                # Great, we passed!
+                # No files were changed
                 echo "clang-format passed, no files changed :D"
                 exit 0
             else
+                # We changed some files
                 # Output the results.
                 # We're using printf here so we can replace spaces with newlines to make the output readable
                 printf '%s\n' $OUTPUT
                 echo " "
                 echo "========================================================================"
                 echo "clang-format has modified the above files. Formatting complete."
+                exit 3
             fi
 
             shift
             ;;
         *)
             echo "Invalid arguments (\"$SCRIPT_NAME --help\" for help)"
-
-            break
+            exit 1
             ;;
     esac
 done
