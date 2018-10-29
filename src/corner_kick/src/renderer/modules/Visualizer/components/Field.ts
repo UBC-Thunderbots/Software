@@ -41,7 +41,7 @@ export const Field = () => {
 
         // Draw left goal
         field.drawRect(
-            (topic.boundary_width / 3) * 2 * MULTIPLY_FACTOR,
+            (topic.boundary_width / 3) * MULTIPLY_FACTOR,
             (topic.boundary_width + (topic.field_width - topic.goal_width) / 2) *
                 MULTIPLY_FACTOR,
             (topic.boundary_width / 3) * 2 * MULTIPLY_FACTOR,
