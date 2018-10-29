@@ -37,17 +37,8 @@ while test $# -gt 0; do
             
             # Find all the files that we want to format, and pass them to
             # clang-format as arguments
-            find $CURR_DIR/../src/ \
-                -path "*node_modules*" -prune \
-                -o -iname *.h \
-                -o -iname *.cpp \
-                -o -iname *.c \
-                -o -iname *.hpp \
-                -o -iname *.tpp \
-                -o -iname *.tpp \
-                -o -iname *.ts \
-                -o -iname *.js \
-                -o -iname *.tsx \
+            find $CURR_DIR/../src/ -iname *.h -o -iname *.cpp -o -iname *.c \
+                -o -iname *.hpp -o -iname *.tpp \
                 | xargs $CURR_DIR/clang-format-$CLANG_VERSION -i -style=file
 
             shift
