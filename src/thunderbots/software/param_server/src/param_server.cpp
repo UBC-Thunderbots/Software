@@ -12,6 +12,8 @@
 // define the refresh rate for the paramters in hz
 #define REFRESH_RATE_HZ 1
 
+#define NUMBER_OF_THREADS 1
+
 // callback for the param timer
 void updateAllParameters(const ros::TimerEvent& event) {
     DynamicParameters::updateAllParametersFromROSParameterServer();
@@ -49,9 +51,10 @@ int main(int argc, char **argv) {
 
     // start the timer to update Parameters
     ros::Timer timer = node_handle.createTimer(ros::Duration(1/REFRESH_RATE_HZ), updateAllParameters);
+    timer.start();
 
     // spin asynchronously to allow for service call in the same node
-    ros::AsyncSpinner spinner(1);
+    ros::AsyncSpinner spinner(NUMBER_OF_THREADS);
     spinner.start();
 
     // call the service to set params

@@ -29,9 +29,9 @@
  * In our codebase, we support bool, int32_t, double, and strings
  * */
 
-namespace{
-        // what namespace the parameters will be in (ROS param server)
-	std::string NamespaceForParameters = "/parameters";
+namespace {
+	// the namespaces related to the param_server
+	const std::string NamespaceForParameters = "/parameters";
 }
 
 template <class T>
@@ -92,7 +92,7 @@ class Parameter
          */
         void updateValueFromROSParameterServer()
         {
-            ros::param::get(getROSParameterPath(), value_);
+            ros::param::get(getROSParameterPath(), this->value_);
         }
 
         /**
@@ -132,17 +132,16 @@ class Parameter
          * Registers (adds) a Parameter to the registry. Since the shared pointer is moved
          * into the registry, the pointer may not be accessed by the caller after this
          * function has been called.
-	 *
-	 * Also registers params to the static configuration struct used to 
-	 * set parameters
+         *
+         * Also registers params to the static configuration struct used to
+         * set parameters
          *
          * @param parameter A shared pointer to the Parameter to add. This pointer may not
          * be accessed by the caller after this function has been called.
          */
         static void registerParameter(std::shared_ptr<Parameter<T>> parameter)
         {   
-
-            if constexpr(std::is_same<T, bool>::value){   
+            if constexpr(std::is_same<T, bool>::value) {
                 dynamic_reconfigure::BoolParameter bool_msg;
 
                 bool_msg.name = parameter->name();
@@ -151,7 +150,7 @@ class Parameter
                 Parameter<T>::getMutableConfigStruct().bools.push_back(bool_msg);
             }
 
-	    else if  constexpr(std::is_same<T, int32_t>::value){   
+            else if  constexpr(std::is_same<T, int32_t>::value) {
                 dynamic_reconfigure::IntParameter int_msg;
 
                 int_msg.name = parameter->name();
@@ -160,7 +159,7 @@ class Parameter
                 Parameter<T>::getMutableConfigStruct().ints.push_back(int_msg);
             }
 
-	    else if constexpr(std::is_same<T, double>::value){   
+            else if constexpr(std::is_same<T, double>::value) {
                 dynamic_reconfigure::DoubleParameter double_msg;
 
                 double_msg.name = parameter->name();
@@ -169,7 +168,7 @@ class Parameter
                 Parameter<T>::getMutableConfigStruct().doubles.push_back(double_msg);
             }
 
-	    else if constexpr(std::is_same<T, std::string>::value){   
+            else if constexpr(std::is_same<T, std::string>::value) {
                 dynamic_reconfigure::StrParameter str_msg;
 
                 str_msg.name = parameter->name();
@@ -178,9 +177,9 @@ class Parameter
                 Parameter<T>::getMutableConfigStruct().strs.push_back(str_msg);
             }
 
-	    else {
-		ROS_WARN("attempting to configure with unkown type");
-	    }
+            else {
+                ROS_WARN("Attempting to configure with unkown type");
+            }
 
             Parameter<T>::getMutableRegistry().emplace_back(parameter);
         }
@@ -214,11 +213,15 @@ class Parameter
 
         // Store the value so it can be retrieved without fetching from the server again
         T value_;
+
+        // Store the name of the parameter
         std::string name_;
+
+	// Store a pointer to the parameter in the registry
 	std::shared_ptr<Parameter<T>> internal_param_;
 
         /**
-         * Returns a mutable configuration struct that will hold all the 
+         * Returns a mutable configuration struct that will hold all the
          * information related to the parameters created
          * Struct contains bool,strs,ints,doubles vectors which are inherently mutable
          *

@@ -23,5 +23,4 @@ namespace DynamicParameters
         extern Parameter<double> collision_avoid_velocity_scale;
     }  // namespace Navigator
 
-   	extern Parameter<double> collision_avoid_velocity_scale;
 }  // namespace DynamicParameters

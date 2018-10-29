@@ -10,7 +10,7 @@ navigator = gen.add_group("Navigator")
 The namespace in dynamic_parameter.cpp should correspond to the group defined in `Params.cfg`.
 Note that calling 'add_group("child")' on a group object, will nest that group
 
-Calling `add` on the group object will put the paramter in that group. 
+Calling `add` on the group object will put the parameter in that group. 
 
 ~~~python
 navigator.add("int_example", int_t, 0, "An example int parameter", 50,  0, 100)

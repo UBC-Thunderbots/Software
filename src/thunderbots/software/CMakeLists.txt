@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
         )
 
+## Specify the configuration file for dynamic_reconfigure pkg
 generate_dynamic_reconfigure_options(
     ${CMAKE_CURRENT_SOURCE_DIR}/param_server/cfg/Params.cfg
 )
@@ -67,8 +68,11 @@ catkin_package(
 ###########
 
 # Specify additional locations of header files
+include_directories(SYSTEM
+	${catkin_INCLUDE_DIRS}
+	)
+
 include_directories(
-	SYSTEM "${LIB_DIR}/Include"
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -138,10 +142,11 @@ add_executable (backend_output
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
+
 target_link_libraries(backend_output ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
-    file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
