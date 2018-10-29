@@ -9,6 +9,11 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # The name of this script, used for help info
 SCRIPT_NAME="$0"
 
+# Check that we have at least some arguments
+if (( $# == 0 )); then
+    echo "Missing arguments (\"$SCRIPT_NAME --help\" for help)"
+fi
+
 # This loop iterates through and handles the provided command-line arguments.
 # See: https://stackoverflow.com/questions/7069682/how-to-get-arguments-with-flags-in-bash-script/7069755?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 #
@@ -90,8 +95,3 @@ while test $# -gt 0; do
             ;;
     esac
 done
-
-if (( $# == 0 )); then
-    echo "Missing arguments (\"$SCRIPT_NAME --help\" for help)"
-fi
-
