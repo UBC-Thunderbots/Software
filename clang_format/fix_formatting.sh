@@ -61,8 +61,11 @@ while test $# -gt 0; do
             # Shift the arguents to check for the argument to this flag
             shift
             # Make sure we only have 1 arguement for the branch name
-            if test $# -ne 1; then
+            if test $# -le 1; then
                 echo "Error: No branch specified"
+                exit 1
+            elif test $# -ge 1; then
+                echo "Error: More then one branch specified"
                 exit 1
             fi
 
