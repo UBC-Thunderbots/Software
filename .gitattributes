@@ -1,0 +1,4 @@
+# Set the default behavior for handling line endings, in case people don't have core.autocrlf set.
+# This fixes github complaining about line endings by letting git set the line-endings as it sees
+# fit on each commit
+* text=auto
