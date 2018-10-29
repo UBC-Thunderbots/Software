@@ -16,7 +16,7 @@
 
 // callback for the param timer
 void updateAllParameters(const ros::TimerEvent& event) {
-    DynamicParameters::updateAllParametersFromROSParameterServer();
+	Util::DynamicParameters::updateAllParametersFromROSParameterServer();
 }
 
 /**

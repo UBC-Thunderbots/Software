@@ -1,15 +1,5 @@
 #include "robot.h"
 
-Robot::Robot(const unsigned int id, std::chrono::steady_clock::time_point timestamp)
-    : id_(id),
-      position_(Point()),
-      velocity_(Vector()),
-      orientation_(Angle::zero()),
-      angularVelocity_(AngularVelocity::zero()),
-      last_update_timestamp(timestamp)
-{
-}
-
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              std::chrono::steady_clock::time_point timestamp)

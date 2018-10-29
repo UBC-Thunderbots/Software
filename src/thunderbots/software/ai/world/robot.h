@@ -12,17 +12,6 @@ class Robot
 {
    public:
     /**
-     * Creates a new robot given a pattern id
-     *
-     * @param id The id of the robot to create
-     * @param timestamp The timestamp at which the robot was observed to be in the given
-     * state. The timestamp must be >= the robot's latest update timestamp. Default
-     * is the current time
-     */
-    explicit Robot(unsigned int id, std::chrono::steady_clock::time_point timestamp =
-                                        std::chrono::steady_clock::now());
-
-    /**
      * Creates a new robot given robot data
      *
      * @param id The id of the robot to create
