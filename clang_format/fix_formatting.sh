@@ -84,10 +84,14 @@ while test $# -gt 0; do
             shift
             ;;
         *)
-            echo "Missing or invalid arguments (\"$SCRIPT_NAME --help\" for help)"
+            echo "Invalid arguments (\"$SCRIPT_NAME --help\" for help)"
 
             break
             ;;
     esac
 done
+
+if (( $# == 0 )); then
+    echo "Missing arguments (\"$SCRIPT_NAME --help\" for help)"
+fi
 
