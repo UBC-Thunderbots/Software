@@ -26,6 +26,10 @@ Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
 ---
+Language: JavaScript
+# Don't format javascript files
+DisableFormat: true
+---
 Language: Proto
 # Don't format proto files.
 DisableFormat: true
