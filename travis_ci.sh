@@ -14,7 +14,8 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # This variable is used to let us show nice folds in travis
 export TRAVIS_FOLD_COUNTER=1
 
-# Display command in Travis console and fold output in dropdown section function travis_run() {
+# Display command in Travis console and fold output in dropdown section
+function travis_run() {
   local command=$@
 
   echo -e "\e[0Ktravis_fold:start:command$TRAVIS_FOLD_COUNTER \e[34m$ $command\e[0m"
