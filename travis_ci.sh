@@ -14,8 +14,7 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # This variable is used to let us show nice folds in travis
 export TRAVIS_FOLD_COUNTER=1
 
-# Display command in Travis console and fold output in dropdown section
-function travis_run() {
+# Display command in Travis console and fold output in dropdown section function travis_run() {
   local command=$@
 
   echo -e "\e[0Ktravis_fold:start:command$TRAVIS_FOLD_COUNTER \e[34m$ $command\e[0m"
@@ -69,7 +68,7 @@ if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
     fi
 
     # Run formatting
-    OUTPUT="$(.$CURR_DIR/clang_format/fix_formatting.sh -b $BASE_COMMIT)"
+    OUTPUT="$($CURR_DIR/clang_format/fix_formatting.sh -b $BASE_COMMIT)"
     FORMATTING_RETURN_VAL=$?
 
     # Check if we changed any files (based on the return code of the last command)
