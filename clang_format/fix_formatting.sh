@@ -78,7 +78,7 @@ while test $# -gt 0; do
                 echo "Error: No branch specified"
                 exit 1
             elif test $# -gt 1; then
-                echo "Error: More then one branch specified"
+                echo "Error: More than one branch specified"
                 exit 1
             fi
 
