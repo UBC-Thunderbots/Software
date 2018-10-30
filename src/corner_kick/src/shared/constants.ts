@@ -55,7 +55,7 @@ export const FIELD_LINE_WIDTH = 1;
  */
 export const DEFAULT_PANE_HEIGHT = 300;
 
-// VISUALIZER CONSTANT
+// VISUALIZER CONSTANT //
 
 /**
  * @description Visual multiply factor for all elements of the visualizer.
