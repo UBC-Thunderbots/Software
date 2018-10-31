@@ -1,6 +1,7 @@
 #pragma once
 
-enum class RefboxGameState {
+enum class RefboxGameState
+{
     HALT = 0,
     STOP,
     NORMAL_START,
@@ -19,21 +20,4 @@ enum class RefboxGameState {
     GOAL_THEM,
     BALL_PLACEMENT_US,
     BALL_PLACEMENT_THEM
-};
-
-enum class RefboxGameStage {
-    NORMAL_FIRST_HALF_PRE = 0,
-    NORMAL_FIRST_HALF,
-    NORMAL_HALF_TIME,
-    NORMAL_SECOND_HALF_PRE,
-    NORMAL_SECOND_HALF,
-    EXTRA_TIME_BREAK,
-    EXTRA_FIRST_HALF_PRE,
-    EXTRA_FIRST_HALF,
-    EXTRA_HALF_TIME,
-    EXTRA_SECOND_HALF_PRE,
-    EXTRA_SECOND_HALF,
-    PENALTY_SHOOTOUT_BREAK,
-    PENALTY_SHOOTOUT,
-    POST_GAME
 };

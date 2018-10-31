@@ -17,16 +17,6 @@
 class GameState
 {
    public:
-    enum Period
-    {
-        FIRST_HALF,
-        HALF_TIME,
-        SECOND_HALF,
-        OVERTIME_1,
-        OVERTIME_2,
-        PENALTY_SHOOTOUT
-    };
-
     enum State
     {
         HALT,    // Robots must not move
@@ -47,7 +37,6 @@ class GameState
         BALL_PLACEMENT
     };
 
-    Period period;
     State state;
     Restart restart;
 
@@ -65,7 +54,6 @@ class GameState
 
     GameState()
     {
-        period           = FIRST_HALF;
         state            = HALT;
         restart          = NONE;
         ourRestart       = false;
@@ -75,8 +63,6 @@ class GameState
     }
 
     void updateRefboxGameState(RefboxGameState gameState);
-    void updateRefboxGameStage(RefboxGameStage gameStage);
-
 
     // Rule queries
 
