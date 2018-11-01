@@ -10,17 +10,17 @@ class ShootPrimitive : public Primitive
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Shoot Primitive
-     * 
+     *
      * @param robot_id The id of the Robot to run this Primitive
      * @param shot_origin The location where the shot will be taken
      * @param shot_direction The orientation the Robot will shoot at
-     * @param power The power of the kick (how fast the Robot will kick the ball) 
+     * @param power The power of the kick (how fast the Robot will kick the ball)
      * or chip (distance between start location of chipping and first bounce)
      * @param chip Whether to chip the ball or not (If true, the Robot will chip,
      * if false, the Robot will kick)
      */
     explicit ShootPrimitive(unsigned int robot_id, const Point &shot_origin,
-                           const Angle &shot_direction, double power, bool chip);
+                            const Angle &shot_direction, double power, bool chip);
 
     /**
      * Creates a new Shoot Primitive from a Primitive message

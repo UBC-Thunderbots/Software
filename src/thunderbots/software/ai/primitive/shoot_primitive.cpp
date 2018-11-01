@@ -3,9 +3,12 @@
 const std::string ShootPrimitive::PRIMITIVE_NAME = "Shoot Primitive";
 
 ShootPrimitive::ShootPrimitive(unsigned int robot_id, const Point &shot_origin,
-                           const Angle &shot_direction, double power, bool chip)
-    : robot_id(robot_id), shot_origin(shot_origin), shot_direction(shot_direction), 
-    power(power), chip(chip)
+                               const Angle &shot_direction, double power, bool chip)
+    : robot_id(robot_id),
+      shot_origin(shot_origin),
+      shot_direction(shot_direction),
+      power(power),
+      chip(chip)
 {
 }
 
@@ -35,7 +38,7 @@ unsigned int ShootPrimitive::getRobotId() const
 
 std::vector<double> ShootPrimitive::getParameterArray() const
 {
-    std::vector<double> parameters = {shot_origin.x(), shot_origin.y(), 
+    std::vector<double> parameters = {shot_origin.x(), shot_origin.y(),
                                       shot_direction.toRadians(), power};
 
     return parameters;
