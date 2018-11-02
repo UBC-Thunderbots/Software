@@ -30,6 +30,8 @@ MotionController::Velocity MotionController::bangBangVelocityController(
 
     // if the change is time is somehow negative or zero, just return the current robot
     // velocity
+    // TODO: Implement exception handling for negative time case
+    // See issue #123
     if (delta_time <= 0)
     {
         robot_velocities.linear_velocity  = robot.velocity();
@@ -76,8 +78,10 @@ AngularVelocity MotionController::determineAngularVelocity(
     }
 
     // check if the robot is rotating in the same direction as it's target angle
-    if ((desired_final_orientation - robot.orientation()).abs().toRadians() > 0 &&
-        robot.angularVelocity().abs().toRadians() > 0)
+    if (((desired_final_orientation - robot.orientation()).toRadians() > 0 &&
+         robot.angularVelocity().toRadians() > 0) ||
+        ((desired_final_orientation - robot.orientation()).toRadians() < 0 &&
+         robot.angularVelocity().toRadians() < 0))
     {
         rotating_towards_dest = true;
     }
