@@ -51,7 +51,6 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
     Point destination        = Point(0, 0);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 0;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -60,18 +59,8 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
     Vector expected_vector          = Point(0, 0);
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    if (expected_vector == robot_velocities.linear_velocity &&
-        expected_angular_velocity == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_vector, robot_velocities.linear_velocity);
+    EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, calc_correct_velocity_ones)
@@ -82,7 +71,6 @@ TEST_F(MotionControllerTest, calc_correct_velocity_ones)
     Point destination        = Point(0, 0);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 0;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -91,18 +79,9 @@ TEST_F(MotionControllerTest, calc_correct_velocity_ones)
     Vector expected_vector          = Point(1 - ROBOT_MAX_ACCELERATION, 0);
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    if (expected_vector == robot_velocities.linear_velocity &&
-        expected_angular_velocity == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
 
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_vector, robot_velocities.linear_velocity);
+    EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, over_speed_test)
@@ -113,7 +92,6 @@ TEST_F(MotionControllerTest, over_speed_test)
     Point destination = Point(5, 1);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 1.75;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -123,18 +101,8 @@ TEST_F(MotionControllerTest, over_speed_test)
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    if (expected_speed == robot_velocities.linear_velocity.len() &&
-        expected_angular_velocity == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_speed, robot_velocities.linear_velocity.len());
+    EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
@@ -145,28 +113,17 @@ TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
     Point destination = Point(5, 1);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 1.75;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    double expectedSpeed = ROBOT_MAX_SPEED;
+    double expected_speed = ROBOT_MAX_SPEED;
 
-    Angle expectedAngularVelocity = Angle::ofRadians(0);
+    Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    if (expectedSpeed == robot_velocities.linear_velocity.len() &&
-        expectedAngularVelocity == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_speed, robot_velocities.linear_velocity.len());
+    EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
@@ -177,7 +134,6 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
     Point destination        = Point(-1, -1);
     Angle destination_angle  = Angle::ofDegrees(210);
     double destination_speed = 0;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -187,18 +143,8 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
 
     Angle expected_angular_speed = Angle::ofRadians(4);
 
-    if (expected_speed == robot_velocities.linear_velocity.len() &&
-        expected_angular_speed == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_speed, robot_velocities.linear_velocity.len());
+    EXPECT_EQ(expected_angular_speed, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_time_test)
@@ -209,7 +155,6 @@ TEST_F(MotionControllerTest, negative_time_test)
     Point destination        = Point(-1, -1);
     Angle destination_angle  = Angle::ofDegrees(210);
     double destination_speed = 0;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -219,18 +164,8 @@ TEST_F(MotionControllerTest, negative_time_test)
 
     AngularVelocity expected_angular_speed = Angle::ofRadians(3.9);
 
-    if (expected_velocity == robot_velocities.linear_velocity &&
-        expected_angular_speed == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
+    EXPECT_EQ(expected_angular_speed, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, zero_time_test)
@@ -241,7 +176,6 @@ TEST_F(MotionControllerTest, zero_time_test)
     Point destination = Point(-1, -1);
     Angle destination_angle  = Angle::ofDegrees(210);
     double destination_speed = 0;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -251,18 +185,8 @@ TEST_F(MotionControllerTest, zero_time_test)
 
     AngularVelocity expected_angular_speed = Angle::ofRadians(3.2);
 
-    if (expected_velocity == robot_velocities.linear_velocity &&
-        expected_angular_speed == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
+    EXPECT_EQ(expected_angular_speed, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_x_velocity_test)
@@ -273,25 +197,14 @@ TEST_F(MotionControllerTest, negative_x_velocity_test)
     Point destination        = Point(-8, 0);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 3;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(-2, 0);
+    Vector expected_velocity = Vector(-ROBOT_MAX_SPEED, 0);
 
-    if (expected_velocity == robot_velocities.linear_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_y_velocity_test)
@@ -308,19 +221,10 @@ TEST_F(MotionControllerTest, negative_y_velocity_test)
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(0, -2);
-
-    if (expected_velocity == robot_velocities.linear_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
+    Vector expected_velocity = Vector(0, -ROBOT_MAX_SPEED);
 
 
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_desired_orientation_test)
@@ -344,17 +248,7 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
     AngularVelocity expected_velocity =
         AngularVelocity::ofRadians(initial_ang_speed.toRadians() - ROBOT_MAX_ANG_SPEED);
 
-    if (expected_velocity == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, positive_desired_orientation_test)
@@ -363,7 +257,7 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
     Point destination        = Point(0, 0);
     Angle destination_angle  = Angle::ofDegrees(179);
     double destination_speed = 0;
-    bool speeds_equal;
+
     AngularVelocity initial_ang_speed = AngularVelocity::ofRadians(-3);
 
     Robot robot = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
@@ -377,17 +271,7 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
     AngularVelocity expected_velocity =
         AngularVelocity::ofRadians(initial_ang_speed.toRadians() + ROBOT_MAX_ANG_SPEED);
 
-    if (expected_velocity == robot_velocities.angular_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.angular_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_y_positive_x_velocity_test)
@@ -396,7 +280,6 @@ TEST_F(MotionControllerTest, negative_y_positive_x_velocity_test)
     Point destination        = Point(2, -2);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 6;
-    bool speeds_equal;
 
     Robot robot = Robot(4, Point(1, -1), Vector(0, 0), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(0), current_time);
@@ -405,19 +288,9 @@ TEST_F(MotionControllerTest, negative_y_positive_x_velocity_test)
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(sqrt(2), -sqrt(2));
+    Vector expected_velocity = Vector(sqrt(ROBOT_MAX_SPEED), -sqrt(ROBOT_MAX_SPEED));
 
-    if (expected_velocity == robot_velocities.linear_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, positive_y_negative_x_velocity_test)
@@ -434,19 +307,9 @@ TEST_F(MotionControllerTest, positive_y_negative_x_velocity_test)
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(-sqrt(2), sqrt(2));
+    Vector expected_velocity = Vector(-sqrt(ROBOT_MAX_SPEED), sqrt(ROBOT_MAX_SPEED));
 
-    if (expected_velocity == robot_velocities.linear_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, positive_y_positive_x_velocity_test)
@@ -457,25 +320,14 @@ TEST_F(MotionControllerTest, positive_y_positive_x_velocity_test)
     Point destination        = Point(2, 2);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 6;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(sqrt(2), sqrt(2));
+    Vector expected_velocity = Vector(sqrt(ROBOT_MAX_SPEED), sqrt(ROBOT_MAX_SPEED));
 
-    if (expected_velocity == robot_velocities.linear_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_y_negative_x_velocity_test)
@@ -492,19 +344,9 @@ TEST_F(MotionControllerTest, negative_y_negative_x_velocity_test)
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(-sqrt(2), -sqrt(2));
+    Vector expected_velocity = Vector(-sqrt(ROBOT_MAX_SPEED), -sqrt(ROBOT_MAX_SPEED));
 
-    if (expected_velocity == robot_velocities.linear_velocity)
-    {
-        speeds_equal = true;
-    }
-    else
-    {
-        speeds_equal = false;
-    }
-
-
-    EXPECT_TRUE(speeds_equal);
+    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_test)
@@ -515,13 +357,13 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
     Point destination        = Point(3.05, 3.05);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 0;
-    bool speeds_equal;
+
     int iteration_count;
     MotionController::Velocity robot_velocities;
     double new_x_position;
     double new_y_position;
 
-    for (iteration_count = 0; iteration_count < TOTAL_STEPS - 8000; iteration_count++)
+    for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
