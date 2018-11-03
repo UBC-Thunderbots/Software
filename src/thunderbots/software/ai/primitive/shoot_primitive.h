@@ -27,7 +27,7 @@ class ShootPrimitive : public Primitive
      *
      * @param primitive_msg The message from which to create the Shoot Primitive
      */
-    explicit ShootPrimitive(const thunderbots_msgs::Primitive &primtiive_msg);
+    explicit ShootPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
     std::string getPrimitiveName() const override;
 
