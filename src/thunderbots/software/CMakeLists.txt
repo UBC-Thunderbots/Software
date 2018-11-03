@@ -106,7 +106,7 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-        )
+        ai/primitive/catch_primative.h ai/primitive/catch_primitive.cpp)
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
