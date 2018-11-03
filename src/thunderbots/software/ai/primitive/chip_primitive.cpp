@@ -7,7 +7,7 @@ ChipPrimitive::ChipPrimitive(unsigned int robot_id, const Point &chip_origin,
     : robot_id(robot_id),
       chip_origin(chip_origin),
       chip_direction(chip_direction),
-      chip_distance_meters(chip_distance_meters),
+      chip_distance_meters(chip_distance_meters)
 {
 }
 

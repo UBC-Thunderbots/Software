@@ -8,7 +8,7 @@ KickPrimitive::KickPrimitive(unsigned int robot_id, const Point &kick_origin,
     : robot_id(robot_id),
       kick_origin(kick_origin),
       kick_direction(kick_direction),
-      kick_speed_meters_per_second(kick_speed_meters_per_second),
+      kick_speed_meters_per_second(kick_speed_meters_per_second)
 {
 }
 

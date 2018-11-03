@@ -10,7 +10,8 @@ class ShootPrimitive : public Primitive
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Shoot Primitive
-     *
+     * Kicks/chips the ball in the desired direction with the specified power.
+
      * @param robot_id The id of the Robot to run this Primitive
      * @param shot_origin The location where the shot will be taken
      * @param shot_direction The orientation the Robot will shoot at
