@@ -10,8 +10,9 @@ class MovePrimitive : public Primitive
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Move Primitive
-     * Moves the robot in a straight line between its current position and the given destination. 
-     * 
+     * Moves the robot in a straight line between its current position and the given
+     * destination.
+     *
      * @param robot_id The id of the Robot to run this Primitive
      * @param dest The final destination of the movement
      * @param final_angle The final orientation the robot should have at the end

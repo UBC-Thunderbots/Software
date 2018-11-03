@@ -11,7 +11,7 @@ class KickPrimitive : public Primitive
     /**
      * Creates a new Kick Primitive
      * Kicks the ball in the desired direction with a specified speed.
-     * 
+     *
      * @param robot_id The id of the Robot to run this Primitive
      * @param kick_origin The location where the kick will be taken
      * @param kick_direction The orientation the Robot will kick at
