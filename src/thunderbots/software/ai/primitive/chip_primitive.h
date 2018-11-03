@@ -12,7 +12,7 @@ class ChipPrimitive : public Primitive
      * Creates a new Chip Primitive
      * Chips the ball in the desired direction at a specified distance between
      * the starting location and the location of the first bounce.
-     * 
+     *
      * @param robot_id The id of the Robot to run this Primitive
      * @param chip_origin The location where the chip will be taken
      * @param chip_direction The orientation the Robot will chip at
