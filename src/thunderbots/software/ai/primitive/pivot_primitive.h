@@ -8,9 +8,9 @@ class PivotPrimitive : public Primitive
 {
 public:
     static const std::string PRIMITIVE_NAME;
-    /*
+    /**
      * Creates a new Pivot Primitive
-     * TODO check angles are in radians or degrees
+     * TODO check input angles are in radians or degrees
      * TODO check Point vs center_x and center_y
      *
      * @param robot_id          The id of the Robot to run this Primitive
@@ -22,11 +22,11 @@ public:
     explicit PivotPrimitive(unsigned int robot_id,
                             double center_x,
                             double center_y,
-                            Angle &final_angle,
-                            Angle &robot_orientation);
+                            const Angle &final_angle,
+                            const Angle &robot_orientation);
 
 
-    /*
+    /**
      * Create a new Pivot Primitive from a Primitive message
      *
      * @param primitive_msg The message from which to create the primitive
@@ -50,6 +50,6 @@ public:
         unsigned int robot_id;
         double center_x;
         double center_y;
-        Angle &final_angle;
-        Angle &robot_orientation;
+        Angle final_angle;
+        Angle robot_orientation;
 };

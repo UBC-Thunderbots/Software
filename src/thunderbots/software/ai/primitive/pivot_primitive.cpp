@@ -5,8 +5,8 @@ const std::string PivotPrimitive::PRIMITIVE_NAME = "Pivot Primitive";
 PivotPrimitive::PivotPrimitive(unsigned int robot_id,
                                double center_x,
                                double center_y,
-                               Angle &final_angle,
-                               Angle &robot_orientation)
+                               const Angle &final_angle,
+                               const Angle &robot_orientation)
     : robot_id(robot_id),
       center_x(center_x),
       center_y(center_y),
@@ -20,7 +20,7 @@ PivotPrimitive::PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
-    robot_id          = primitive_msg.robot.id;
+    robot_id          = primitive_msg.robot_id;
     center_x          = primitive_msg.parameters.at(0);
     center_y          = primitive_msg.parameters.at(1);
     final_angle       = Angle::ofRadians(primitive_msg.parameters.at(2));
@@ -28,18 +28,18 @@ PivotPrimitive::PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 }
 
 
-std::string PivotPrimitive::getPrimitiveName()
+std::string PivotPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
 }
 
 
-unsigned int PivotPrimitive::getRobotId()
+unsigned int PivotPrimitive::getRobotId() const
 {
     return robot_id;
 }
 
-std::vector<double> getParameterArray()
+std::vector<double> PivotPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {center_x,
                                       center_y,
@@ -49,7 +49,7 @@ std::vector<double> getParameterArray()
 }
 
 
-std::vector<bool> getExtraBitArray()
+std::vector<bool> PivotPrimitive::getExtraBitArray() const
 {
     return std::vector<bool>();
 }
