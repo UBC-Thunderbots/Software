@@ -3,13 +3,11 @@
 const std::string PivotPrimitive::PRIMITIVE_NAME = "Pivot Primitive";
 
 PivotPrimitive::PivotPrimitive(unsigned int robot_id,
-                               double center_x,
-                               double center_y,
+                               const Point &pivot_point,
                                const Angle &final_angle,
                                const Angle &robot_orientation)
     : robot_id(robot_id),
-      center_x(center_x),
-      center_y(center_y),
+      pivot_point(pivot_point),
       final_angle(final_angle),
       robot_orientation(robot_orientation)
 {
@@ -21,8 +19,9 @@ PivotPrimitive::PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
     robot_id          = primitive_msg.robot_id;
-    center_x          = primitive_msg.parameters.at(0);
-    center_y          = primitive_msg.parameters.at(1);
+    double center_x   = primitive_msg.parameters.at(0);
+    double center_y   = primitive_msg.parameters.at(1);
+    pivot_point       = Point(center_x,center_y);
     final_angle       = Angle::ofRadians(primitive_msg.parameters.at(2));
     robot_orientation = Angle::ofRadians(primitive_msg.parameters.at(3));
 }
@@ -41,8 +40,8 @@ unsigned int PivotPrimitive::getRobotId() const
 
 std::vector<double> PivotPrimitive::getParameterArray() const
 {
-    std::vector<double> parameters = {center_x,
-                                      center_y,
+    std::vector<double> parameters = {pivot_point.x(),
+                                      pivot_point.y(),
                                       final_angle.toRadians(),
                                       robot_orientation.toRadians()};
     return parameters;

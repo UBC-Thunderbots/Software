@@ -16,18 +16,15 @@ class PivotPrimitive : public Primitive
      * 	   The robot will pivot in the direction of the shortest path
      * 	   The robot will always face the point around which it pivots
      *
-     * TODO check Point vs center_x and center_y
      *
-     * @param robot_id          The id of the Robot to run this Primitive
-     * @param center_x          The x coordinate about which to pivot (in metres)
-     * @param center_y          The y coordinate about which to pivot (in metres)
+     * @param robot_id          The id of the robot to run this primitive
+     * @param pivot_point       The point around which the robot will pivot
      * @param final_angle       Global angle from rotation point to robot (in radians)
      * @param robot_orientation The orientation of robot (facing direction)
      *                          during pivot (radians; Not used)
      */
     explicit PivotPrimitive(unsigned int robot_id,
-                            double center_x,
-                            double center_y,
+                            const Point &pivot_point,
                             const Angle &final_angle,
                             const Angle &robot_orientation);
 
@@ -54,8 +51,7 @@ class PivotPrimitive : public Primitive
 
    private:
     unsigned int robot_id;
-    double center_x;
-    double center_y;
+    Point pivot_point;
     Angle final_angle;
     Angle robot_orientation;
 };
