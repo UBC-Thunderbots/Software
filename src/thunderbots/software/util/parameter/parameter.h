@@ -96,17 +96,6 @@ class Parameter
         }
 
         /**
-         * Sets the parameter value in the ROS Parameter Server to the new value.
-         *
-         * @param new_value The new value to be set
-         */
-        void setValueInROSParameterServer(T new_value)
-        {
-	    //dynamic reconfigure takes control of setting params 
-	    //ros::param::set(getROSParameterPath(), new_value);
-        }
-
-        /**
          * Returns a reference to the Parameter registry. The registry is a list of
          * pointers to all the existing Parameters.
          *
@@ -178,9 +167,9 @@ class Parameter
             }
 
             else {
+	    	// TODO (Issue #16): Replace with proper exception once exception handling is implemented	     
                 ROS_WARN("Attempting to configure with unkown type");
             }
-
             Parameter<T>::getMutableRegistry().emplace_back(parameter);
         }
 

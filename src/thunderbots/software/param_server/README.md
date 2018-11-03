@@ -2,6 +2,7 @@
 
 The param server node initializes the dynamic_reconfigure server and calls the set_parameter service with the proper configuration message created when all `parameters` are constructed
 
+We currently support `int32_t`, `double`, `bool` and `string`
 ### Registering a parameter to be configured through rqt_reconfigure
 Add the following code in the Params.cfg file found at param_server/cfg/Params.cfg
 ~~~python
