@@ -1,8 +1,10 @@
 #pragma once
 
+#include <util/refbox_constants.h>
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
+#include "game_state.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -50,6 +52,13 @@ class World final
      * @param new_enemy_team_msg The message containing new enemy team information
      */
     void updateEnemyTeamState(const Team& new_enemy_team_data);
+
+    /**
+     * Updates the refbox game state
+     *
+     * @param game_state the game state sent by refbox
+     */
+     void updateRefboxGameState(const RefboxGameState& game_state);
 
     /**
      * Returns a const reference to the Field in the world
@@ -107,9 +116,17 @@ class World final
      */
     Team& mutableEnemyTeam();
 
+    /**
+     * Returns a const reference to the Game State
+     *
+     * @return a const reference to the Game State
+     */
+     const GameState& gameState() const;
+
    private:
     Field field_;
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
+    GameState game_state_;
 };

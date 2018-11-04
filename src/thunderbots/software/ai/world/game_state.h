@@ -43,13 +43,6 @@ class GameState
     // True if our team can kick the ball during a restart
     bool ourRestart;
 
-    // Scores
-    int ourScore;
-    int theirScore;
-
-    // Time in seconds remaining in the current period
-    int secondsRemaining;
-
     Point ballPlacementPoint;
 
     GameState()
@@ -57,9 +50,6 @@ class GameState
         state            = HALT;
         restart          = NONE;
         ourRestart       = false;
-        ourScore         = 0;
-        theirScore       = 0;
-        secondsRemaining = 0;
     }
 
     void updateRefboxGameState(RefboxGameState gameState);
