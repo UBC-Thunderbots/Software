@@ -46,7 +46,7 @@ after_success:
     # CodeCov's Travis-CI integration requires it to be run directly within
     # Travis (will NOT work from within the docker container)
     # TODO: if statement here
-    - bash <(curl -s https://codecov.io/bash)
+    - bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
     # - pip install --user cpp-coveralls pyOpenSSL
     # - coveralls --verbose --gcov-options '\-lp'
     # # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
