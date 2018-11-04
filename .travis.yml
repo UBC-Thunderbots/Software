@@ -45,7 +45,8 @@ after_success:
     # If Code Coverage ran, then upload the report. We do this from here because
     # CodeCov's Travis-CI integration requires it to be run directly within
     # Travis (will NOT work from within the docker container)
-    # TODO: if statement here
+    # TODO: This above comment was true for coveralls, but we might be able to move this to travis_ci.sh for codecov
+    # TODO: Can we put all the `.gcov` files this generates into a directory instead of root?
     - bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
     # - pip install --user cpp-coveralls pyOpenSSL
     # - coveralls --verbose --gcov-options '\-lp'
@@ -71,6 +72,7 @@ matrix:
   - name: "ROS Melodic / Ubuntu 18.04 - Build and Test"
     env: RUN_BUILD="true"
          RUN_TESTS="true"
+         RUN_COVERAGE="true"
          ROS_DISTRO=melodic
   - name: "ROS Melodic / Ubuntu 18.04 - Check Formatting"
     env: RUN_FORMATTING_CHECKS="true"
@@ -78,6 +80,7 @@ matrix:
   - name: "ROS Kinetic / Ubuntu 16.04 - Build and Test"
     env: RUN_BUILD="true"
          RUN_TESTS="true"
+         RUN_COVERAGE="true"
          ROS_DISTRO=kinetic
   - name: "ROS Kinetic / Ubuntu 16.04 - Check Formatting"
     env: RUN_FORMATTING_CHECKS="true"
