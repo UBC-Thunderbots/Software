@@ -151,7 +151,8 @@ bool GameState::stayBehindPenaltyLine() const
 
 void GameState::setBallPlacementPoint(double x, double y)
 {
-    // TODO: coordinate transform?
+    // TODO: potentially do coordinate transform so that our side is always negative x
+    ballPlacementPoint = Point(x, y);
 }
 
 Point GameState::getBallPlacementPoint() const
