@@ -40,12 +40,14 @@ install:
       --volume $(pwd):/root/$REPOSITORY_NAME
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
+    # TODO: Delete me
+    - echo $(pwd)
     # If Code Coverage ran, then upload the report. We do this from here because
     # Coveralls Travis-CI integration requires it to be run directly within
     # Travis (will NOT work from within the docker container)
-    # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
     - pip install --user cpp-coveralls pyOpenSSL
     - coveralls --gcov-options '\-lp'
+    # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
     #- >
     #  if [ "$RUN_FORMATTING_CHECKS" = "true" ]; then 
     #    pip install --user cpp-coveralls pyOpenSSL;

@@ -40,6 +40,7 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
 
     # Build the codebase
     if [ "$RUN_COVERAGE" == "true" ]; then
+        # TODO: Do we need to build with coverage here? Probably not......
         # Build with coverage - slower but gives more detailed coverage info
         # that we will use later to produce a report
         travis_run catkin_make \
@@ -70,6 +71,9 @@ if [ "$RUN_TESTS" == "true" ]; then
     # Report the results of the tests
     # (which tests failed and why)
     travis_run catkin_test_results --verbose
+
+    # TODO: Delete me
+    echo $(pwd)
 fi
 
 #if [ "$RUN_COVERAGE" == "true" ]; then
