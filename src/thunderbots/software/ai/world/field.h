@@ -10,9 +10,20 @@ class Field
 {
    public:
     /**
-     * Constructs a new field
+     * Constructs a new field with the given dimensions
+     *
+     * @param field_length the length of the playing area (along the x-axis)
+     * @param field_width the width of the playing area (along the y-axis)
+     * @param defense_length the length of the defense area (along the x-axis)
+     * @param defense_width the width of the defense area (along the y-axis)
+     * @param goal_width the width of the goal (along the y-axis)
+     * @param boundary_width the width/size of the boundary area between the edge of the
+     * playing area and the physical border/perimeter of the field
+     * @param center_circle_radius the radius of the center circle
      */
-    explicit Field();
+    explicit Field(double field_length, double field_width, double defense_length,
+                   double defense_width, double goal_width, double boundary_width,
+                   double center_circle_radius);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -36,13 +47,6 @@ class Field
      * @param new_ball_data A field containing new field data
      */
     void updateDimensions(const Field &new_field_data);
-
-    /**
-     * Checks if the field data is valid yet.
-     *
-     * @return true if the data in the Field is valid, or false if not.
-     */
-    bool valid() const;
 
     /**
      * Gets the length of the field from goal-line to goal-line in metres.
@@ -231,8 +235,6 @@ class Field
     // Private variables have underscores at the end of their names
     // to avoid conflicts with function names
 
-    // Whether or not this field object contains valid data
-    bool valid_;
     // The length of the playable field (between the goal lines) in metres
     double field_length_;
     // The width of the playable field (between the sidelines) in metres

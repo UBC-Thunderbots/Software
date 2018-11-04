@@ -1,7 +1,8 @@
 #include "RobotObstacle.h"
+
 #include "shared/constants.h"
 
-using namespace DynamicParameters::Navigator;
+using namespace Util::DynamicParameters::Navigator;
 
 RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
 {

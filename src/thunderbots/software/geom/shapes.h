@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+
 #include "geom/point.h"
 #include "geom/rect.h"
 
@@ -13,9 +14,7 @@ class Line final
     /**
      * Creates a degenerate Line at (0, 0)
      */
-    inline explicit constexpr Line()
-    {
-    }
+    inline explicit constexpr Line() {}
 
     /**
      * Creates a Line that starts and ends at the given points
@@ -40,16 +39,12 @@ class Seg final
     /**
      * Creates a degenerate Seg at (0, 0)
      */
-    inline explicit constexpr Seg()
-    {
-    }
+    inline explicit constexpr Seg() {}
 
     /**
      * Creates a Seg that starts and ends at the given points
      */
-    inline explicit Seg(const Point& start, const Point& end) : start(start), end(end)
-    {
-    }
+    inline explicit Seg(const Point& start, const Point& end) : start(start), end(end) {}
 
     /**
      * Creates a Seg that is this reversed.
@@ -90,17 +85,13 @@ class Ray final
     /**
      * Creates a degenerate Seg at (0, 0)
      */
-    inline explicit constexpr Ray()
-    {
-    }
+    inline explicit constexpr Ray() {}
 
     /**
      * Creates a Seg that starts and contains a point along the given
      * line
      */
-    inline explicit Ray(const Point& start, const Vector& dir) : start(start), dir(dir)
-    {
-    }
+    inline explicit Ray(const Point& start, const Vector& dir) : start(start), dir(dir) {}
 
     inline Seg toSeg() const
     {
@@ -127,9 +118,7 @@ class Circle final
     /**
      * Creates a circle with origin (0, 0) and radius 0.
      */
-    inline explicit constexpr Circle() : radius(0)
-    {
-    }
+    inline explicit constexpr Circle() : radius(0) {}
 
     inline explicit constexpr Circle(const Point& origin, double r)
         : origin(origin), radius(r)

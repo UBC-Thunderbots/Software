@@ -1,229 +1,185 @@
 #include "ai/world/field.h"
+
 #include <gtest/gtest.h>
 
-TEST(FieldTest, construction)
+class FieldTest : public ::testing::Test
 {
-    Field field = Field();
+   protected:
+    void SetUp() override
+    {
+        length               = 9.0;
+        width                = 6.0;
+        defense_length       = 1.0;
+        defense_width        = 2.0;
+        goal_width           = 1.0;
+        boundary_width       = 0.3;
+        center_circle_radius = 0.5;
 
-    EXPECT_FALSE(field.valid());
-    EXPECT_DOUBLE_EQ(0, field.length());
-    EXPECT_DOUBLE_EQ(0, field.width());
-    EXPECT_DOUBLE_EQ(0, field.goalWidth());
-    EXPECT_DOUBLE_EQ(0, field.centreCircleRadius());
-    EXPECT_DOUBLE_EQ(0, field.defenseAreaWidth());
-    EXPECT_DOUBLE_EQ(0, field.defenseAreaLength());
+        field = Field(length, width, defense_length, defense_width, goal_width,
+                      boundary_width, center_circle_radius);
+    }
+
+    Field field = Field(0, 0, 0, 0, 0, 0, 0);
+    double length;
+    double width;
+    double defense_length;
+    double defense_width;
+    double goal_width;
+    double boundary_width;
+    double center_circle_radius;
+};
+
+TEST_F(FieldTest, construct_with_parameters)
+{
+    // The field was already constructed in the test setup, so we only need to check
+    // values here
+    EXPECT_DOUBLE_EQ(length, field.length());
+    EXPECT_DOUBLE_EQ(width, field.width());
+    EXPECT_DOUBLE_EQ(goal_width, field.goalWidth());
+    EXPECT_DOUBLE_EQ(center_circle_radius, field.centreCircleRadius());
+    EXPECT_DOUBLE_EQ(defense_width, field.defenseAreaWidth());
+    EXPECT_DOUBLE_EQ(defense_length, field.defenseAreaLength());
 }
 
-TEST(FieldTest, update_with_all_parameters)
+TEST_F(FieldTest, update_with_all_parameters)
 {
-    Field field                 = Field();
-    double length               = 9.0;
-    double width                = 6.0;
-    double defense_width        = 2.0;
-    double defense_length       = 1.0;
-    double goal_width           = 1.0;
-    double boundary_width       = 0.3;
-    double center_circle_radius = 0.5;
+    Field field_to_update = Field(0, 0, 0, 0, 0, 0, 0);
 
-    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                           boundary_width, center_circle_radius);
+    field_to_update.updateDimensions(length, width, defense_length, defense_width,
+                                     goal_width, boundary_width, center_circle_radius);
 
-    EXPECT_TRUE(field.valid());
+    EXPECT_DOUBLE_EQ(9.6, field_to_update.totalLength());
+    EXPECT_DOUBLE_EQ(6.6, field_to_update.totalWidth());
+    EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryWidth());
 
-    EXPECT_DOUBLE_EQ(9.6, field.totalLength());
-    EXPECT_DOUBLE_EQ(6.6, field.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, field.boundaryWidth());
+    EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoal());
+    EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoal());
 
-    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoal());
-    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoal());
+    EXPECT_EQ(Point(-4.5, 0.5), field_to_update.friendlyGoalpostPos());
+    EXPECT_EQ(Point(-4.5, -0.5), field_to_update.friendlyGoalpostNeg());
+    EXPECT_EQ(Point(4.5, 0.5), field_to_update.enemyGoalpostPos());
+    EXPECT_EQ(Point(4.5, -0.5), field_to_update.enemyGoalpostNeg());
 
-    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
-    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
-    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
-    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
+    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+              field_to_update.friendlyDefenseArea());
+    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)),
+              field_to_update.enemyDefenseArea());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
+    EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
+    EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
 
-    EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
-    EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
-
-    EXPECT_EQ(Point(-4.5, 3.0), field.friendlyCornerPos());
-    EXPECT_EQ(Point(-4.5, -3.0), field.friendlyCornerNeg());
-    EXPECT_EQ(Point(4.5, 3.0), field.enemyCornerPos());
-    EXPECT_EQ(Point(4.5, -3.0), field.enemyCornerNeg());
+    EXPECT_EQ(Point(-4.5, 3.0), field_to_update.friendlyCornerPos());
+    EXPECT_EQ(Point(-4.5, -3.0), field_to_update.friendlyCornerNeg());
+    EXPECT_EQ(Point(4.5, 3.0), field_to_update.enemyCornerPos());
+    EXPECT_EQ(Point(4.5, -3.0), field_to_update.enemyCornerNeg());
 }
 
-TEST(FieldTest, update_specific_params)
+TEST_F(FieldTest, update_with_new_field)
 {
-    Field field                 = Field();
-    double length               = 9.0;
-    double width                = 6.0;
-    double defense_width        = 2.0;
-    double defense_length       = 1.0;
-    double goal_width           = 1.0;
-    double boundary_width       = 0.3;
-    double center_circle_radius = 0.5;
+    Field field_to_update = Field(0, 0, 0, 0, 0, 0, 0);
 
-    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                           boundary_width, center_circle_radius);
+    field_to_update.updateDimensions(field);
 
-    field.updateDimensions(field.length(), width / 2, field.defenseAreaLength(),
-                           defense_width * 1.5, field.goalWidth(), boundary_width * 0,
-                           field.centreCircleRadius());
+    EXPECT_DOUBLE_EQ(9.6, field_to_update.totalLength());
+    EXPECT_DOUBLE_EQ(6.6, field_to_update.totalWidth());
+    EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryWidth());
 
-    EXPECT_TRUE(field.valid());
+    EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoal());
+    EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoal());
 
-    EXPECT_DOUBLE_EQ(9.0, field.totalLength());
-    EXPECT_DOUBLE_EQ(3.0, field.totalWidth());
-    EXPECT_DOUBLE_EQ(0.0, field.boundaryWidth());
+    EXPECT_EQ(Point(-4.5, 0.5), field_to_update.friendlyGoalpostPos());
+    EXPECT_EQ(Point(-4.5, -0.5), field_to_update.friendlyGoalpostNeg());
+    EXPECT_EQ(Point(4.5, 0.5), field_to_update.enemyGoalpostPos());
+    EXPECT_EQ(Point(4.5, -0.5), field_to_update.enemyGoalpostNeg());
 
-    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoal());
-    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoal());
+    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+              field_to_update.friendlyDefenseArea());
+    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)),
+              field_to_update.enemyDefenseArea());
 
-    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
-    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
-    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
-    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
+    EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
+    EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.5), Point(-3.5, -1.5)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.5), Point(3.5, -1.5)), field.enemyDefenseArea());
-
-    EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
-    EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
-
-    EXPECT_EQ(Point(-4.5, 1.5), field.friendlyCornerPos());
-    EXPECT_EQ(Point(-4.5, -1.5), field.friendlyCornerNeg());
-    EXPECT_EQ(Point(4.5, 1.5), field.enemyCornerPos());
-    EXPECT_EQ(Point(4.5, -1.5), field.enemyCornerNeg());
+    EXPECT_EQ(Point(-4.5, 3.0), field_to_update.friendlyCornerPos());
+    EXPECT_EQ(Point(-4.5, -3.0), field_to_update.friendlyCornerNeg());
+    EXPECT_EQ(Point(4.5, 3.0), field_to_update.enemyCornerPos());
+    EXPECT_EQ(Point(4.5, -3.0), field_to_update.enemyCornerNeg());
 }
 
-TEST(FieldTest, update_specific_params_2)
+TEST_F(FieldTest, equality_operator_fields_with_different_lengths)
 {
-    Field field                 = Field();
-    double length               = 9.0;
-    double width                = 6.0;
-    double defense_width        = 2.0;
-    double defense_length       = 1.0;
-    double goal_width           = 1.0;
-    double boundary_width       = 0.3;
-    double center_circle_radius = 0.5;
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                           boundary_width, center_circle_radius);
+    Field field_2 = Field(length / 2, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    field.updateDimensions(field.length() / 3, field.width(),
-                           field.defenseAreaLength() * 0.5, field.defenseAreaWidth(),
-                           field.goalWidth() * 2, field.boundaryWidth(),
-                           field.centreCircleRadius() * 1.25);
+    EXPECT_NE(field_1, field_2);
+}
+TEST_F(FieldTest, equality_operator_fields_with_different_widths)
+{
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    EXPECT_TRUE(field.valid());
+    Field field_2 = Field(length, width * 2, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    EXPECT_DOUBLE_EQ(3.6, field.totalLength());
-    EXPECT_DOUBLE_EQ(6.6, field.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, field.boundaryWidth());
-
-    EXPECT_EQ(Point(-1.5, 0.0), field.friendlyGoal());
-    EXPECT_EQ(Point(1.5, 0.0), field.enemyGoal());
-
-    EXPECT_EQ(Point(-1.5, 1.0), field.friendlyGoalpostPos());
-    EXPECT_EQ(Point(-1.5, -1.0), field.friendlyGoalpostNeg());
-    EXPECT_EQ(Point(1.5, 1.0), field.enemyGoalpostPos());
-    EXPECT_EQ(Point(1.5, -1.0), field.enemyGoalpostNeg());
-
-    EXPECT_EQ(Rect(Point(-1.5, 1.0), Point(-1.0, -1.0)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(1.5, 1.0), Point(1.0, -1.0)), field.enemyDefenseArea());
-
-    EXPECT_EQ(Point(-1.0, 0.0), field.penaltyFriendly());
-    EXPECT_EQ(Point(1.0, 0.0), field.penaltyEnemy());
-
-    EXPECT_EQ(Point(-1.5, 3.0), field.friendlyCornerPos());
-    EXPECT_EQ(Point(-1.5, -3.0), field.friendlyCornerNeg());
-    EXPECT_EQ(Point(1.5, 3.0), field.enemyCornerPos());
-    EXPECT_EQ(Point(1.5, -3.0), field.enemyCornerNeg());
+    EXPECT_NE(field_1, field_2);
 }
 
-TEST(FieldTest, update_with_new_field)
+TEST_F(FieldTest, equality_operator_fields_with_different_defense_length)
 {
-    Field field_update          = Field();
-    double length               = 9.0;
-    double width                = 6.0;
-    double defense_width        = 2.0;
-    double defense_length       = 1.0;
-    double goal_width           = 1.0;
-    double boundary_width       = 0.3;
-    double center_circle_radius = 0.5;
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    field_update.updateDimensions(length, width, defense_length, defense_width,
-                                  goal_width, boundary_width, center_circle_radius);
+    Field field_2 = Field(length, width, defense_length * 2, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    Field field = Field();
-
-    field.updateDimensions(field_update);
-
-    EXPECT_TRUE(field.valid());
-
-    EXPECT_DOUBLE_EQ(9.6, field.totalLength());
-    EXPECT_DOUBLE_EQ(6.6, field.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, field.boundaryWidth());
-
-    EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoal());
-    EXPECT_EQ(Point(4.5, 0.0), field.enemyGoal());
-
-    EXPECT_EQ(Point(-4.5, 0.5), field.friendlyGoalpostPos());
-    EXPECT_EQ(Point(-4.5, -0.5), field.friendlyGoalpostNeg());
-    EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
-    EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
-
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
-
-    EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
-    EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
-
-    EXPECT_EQ(Point(-4.5, 3.0), field.friendlyCornerPos());
-    EXPECT_EQ(Point(-4.5, -3.0), field.friendlyCornerNeg());
-    EXPECT_EQ(Point(4.5, 3.0), field.enemyCornerPos());
-    EXPECT_EQ(Point(4.5, -3.0), field.enemyCornerNeg());
+    EXPECT_NE(field_1, field_2);
 }
 
-TEST(FieldTest, equality_operators)
+TEST_F(FieldTest, equality_operator_fields_with_different_defense_width)
 {
-    double length               = 9.0;
-    double width                = 6.0;
-    double defense_width        = 2.0;
-    double defense_length       = 1.0;
-    double goal_width           = 1.0;
-    double boundary_width       = 0.3;
-    double center_circle_radius = 0.5;
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    Field invalid_field = Field();
+    Field field_2 = Field(length, width, defense_length, defense_width / 2, goal_width,
+                          boundary_width, center_circle_radius);
 
-    Field field = Field();
-    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                           boundary_width, center_circle_radius);
+    EXPECT_NE(field_1, field_2);
+}
 
-    Field field_other = Field();
-    field_other.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                                 boundary_width, center_circle_radius);
+TEST_F(FieldTest, equality_operator_fields_with_different_goal_width)
+{
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
 
-    // field and field_other have been updated with the same dimensions, so
-    // should be equal
-    EXPECT_EQ(invalid_field, invalid_field);
-    EXPECT_NE(invalid_field, field);
-    EXPECT_NE(invalid_field, field_other);
-    EXPECT_EQ(field, field_other);
-    EXPECT_EQ(field, field);
+    Field field_2 = Field(length, width, defense_length, defense_width, 0, boundary_width,
+                          center_circle_radius);
 
-    // Update with the same dimensions as above, except for a slightly larger length
-    field_other.updateDimensions(length + 0.02, width, defense_length, goal_width,
-                                 defense_width, boundary_width, center_circle_radius);
+    EXPECT_NE(field_1, field_2);
+}
 
-    EXPECT_NE(field, field_other);
-    EXPECT_NE(field_other, field);
-    EXPECT_NE(invalid_field, field_other);
-    EXPECT_NE(field_other, invalid_field);
-    EXPECT_EQ(field_other, field_other);
+TEST_F(FieldTest, equality_operator_fields_with_different_boundary_width)
+{
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
+
+    Field field_2 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width * 1.1, center_circle_radius);
+
+    EXPECT_NE(field_1, field_2);
+}
+
+TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
+{
+    Field field_1 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius);
+
+    Field field_2 = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius * 10);
+
+    EXPECT_NE(field_1, field_2);
 }
 
 int main(int argc, char **argv)

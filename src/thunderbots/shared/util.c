@@ -1,4 +1,5 @@
 #include "util.h"
+
 #include "constants.h"
 
 double dot2D(Vector2D first, Vector2D second)

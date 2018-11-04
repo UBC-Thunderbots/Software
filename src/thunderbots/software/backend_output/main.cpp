@@ -2,7 +2,9 @@
 #include <ros/time.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
+
 #include <iostream>
+
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"
@@ -39,7 +41,7 @@ int main(int argc, char** argv)
 
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+        Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();

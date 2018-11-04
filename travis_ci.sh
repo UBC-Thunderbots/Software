@@ -36,7 +36,7 @@ cd $CURR_DIR
 # Note that we must build the codebase in order to run tests
 if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     # Install all required dependecies
-    travis_run ./environment_setup/setup_software.sh kinetic
+    travis_run ./environment_setup/setup_software.sh $ROS_DISTRO 
 
     # Build the codebase
     if [ "$RUN_COVERAGE" == "true" ]; then
@@ -85,7 +85,7 @@ fi
 #fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
-    CLANG_VERSION="4.0"
+    CLANG_VERSION="7.0"
 
     # Determine what we should compare this branch against to figure out what
     # files were changed
@@ -104,16 +104,19 @@ if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
       echo "=================================================="
     fi
 
-    # Check if we need to change any files
-    output="$($CURR_DIR/clang_format/git-clang-format --binary $CURR_DIR/clang_format/clang-format-$CLANG_VERSION --commit $BASE_COMMIT --diff)"
-    if [[ $output == *"no modified files to format"* ]] || [[ $output == *"clang-format did not modify any files"* ]] ; then
-        echo "clang-format passed :D"
-        exit 0
-    else
-        echo "$output"
-        echo "=================================================="
+    # Run formatting
+    OUTPUT="$($CURR_DIR/clang_format/fix_formatting.sh -b $BASE_COMMIT)"
+    FORMATTING_RETURN_VAL=$?
+
+    # Check if we changed any files (based on the return code of the last command)
+    if [ $FORMATTING_RETURN_VAL -eq 3 ] || [ $FORMATTING_RETURN_VAL -eq 1 ]; then
+        echo "$OUTPUT"
+        echo "========================================================================"
         echo "clang-format failed :( - please reformat your code via the \`fix_formatting.sh\` script and resubmit"
         exit 1
+    else
+        echo "clang-format passed, no files changed :D"
+        exit 0
     fi
 fi
 

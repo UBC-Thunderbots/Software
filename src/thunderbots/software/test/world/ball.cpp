@@ -1,4 +1,5 @@
 #include "ai/world/ball.h"
+
 #include <gtest/gtest.h>
 
 using namespace std::chrono;
@@ -8,27 +9,26 @@ class BallTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        auto epoch = time_point<std::chrono::steady_clock>();
-        // An arbitrary fixed point in time. 10000 seconds after the epoch
+        auto epoch       = time_point<std::chrono::steady_clock>();
         auto since_epoch = std::chrono::seconds(10000);
 
+        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // We use this fixed point in time to make the tests deterministic.
         current_time                          = epoch + since_epoch;
         one_hundred_fifty_milliseconds_future = current_time + milliseconds(150);
         half_second_future                    = current_time + milliseconds(500);
         one_second_future                     = current_time + seconds(1);
-        nine_seconds_future                   = current_time + seconds(9);
     }
 
     steady_clock::time_point current_time;
     steady_clock::time_point half_second_future;
     steady_clock::time_point one_second_future;
-    steady_clock::time_point nine_seconds_future;
     steady_clock::time_point one_hundred_fifty_milliseconds_future;
 };
 
 TEST_F(BallTest, construct_with_no_params)
 {
-    Ball ball = Ball();
+    Ball ball = Ball(Point(), Vector());
 
     EXPECT_EQ(Point(), ball.position());
     EXPECT_EQ(Vector(), ball.velocity());
@@ -47,7 +47,7 @@ TEST_F(BallTest, construct_with_params)
     EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, update_state_with_all_values)
+TEST_F(BallTest, update_state_with_all_params)
 {
     Ball ball = Ball(Point(), Vector(), current_time);
 
@@ -56,7 +56,7 @@ TEST_F(BallTest, update_state_with_all_values)
     EXPECT_EQ(Ball(Point(-4.23, 1.07), Vector(1, 2), one_second_future), ball);
 }
 
-TEST_F(BallTest, update_state_with_position_only)
+TEST_F(BallTest, update_state_with_new_position_old_velocity)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -65,7 +65,7 @@ TEST_F(BallTest, update_state_with_position_only)
     EXPECT_EQ(Ball(Point(0.01, -99.8), Vector(1, 2), current_time), ball);
 }
 
-TEST_F(BallTest, update_state_with_velocity_only)
+TEST_F(BallTest, update_state_with_new_velocity_old_position)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
@@ -105,19 +105,6 @@ TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp)
     EXPECT_EQ(one_second_future, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp_2)
-{
-    Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
-
-    ball.updateStateToPredictedState(one_hundred_fifty_milliseconds_future);
-
-    // A small distance to check that values are approximately equal
-    double EPSILON = 1e-4;
-
-    EXPECT_EQ(Point(2.325, 6.982), ball.position());
-    EXPECT_TRUE(Vector(-4.4330, -0.1182).isClose(ball.velocity(), EPSILON));
-    EXPECT_EQ(one_hundred_fifty_milliseconds_future, ball.lastUpdateTimestamp());
-}
 
 TEST_F(BallTest, update_state_to_predicted_state_with_past_timestamp)
 {
@@ -132,7 +119,7 @@ TEST_F(BallTest, get_position_at_current_time)
     EXPECT_EQ(Point(3, 7), ball.position());
 }
 
-TEST_F(BallTest, get_position_at_future_time)
+TEST_F(BallTest, get_position_at_future_time_with_positive_ball_velocity)
 {
     Ball ball = Ball(Point(), Vector(1, 2), current_time);
 
@@ -141,7 +128,7 @@ TEST_F(BallTest, get_position_at_future_time)
     EXPECT_EQ(Point(2, 4), ball.estimatePositionAtFutureTime(milliseconds(2000)));
 }
 
-TEST_F(BallTest, get_position_at_future_time_2)
+TEST_F(BallTest, get_position_at_future_time_with_negative_ball_velocity)
 {
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
@@ -163,7 +150,7 @@ TEST_F(BallTest, get_velocity_at_current_time)
     EXPECT_EQ(Vector(-4.5, -0.12), ball.velocity());
 }
 
-TEST_F(BallTest, get_velocity_at_future_time)
+TEST_F(BallTest, get_velocity_at_future_time_with_positive_ball_velocity)
 {
     Ball ball = Ball(Point(), Vector(1, 2), current_time);
 
@@ -181,7 +168,7 @@ TEST_F(BallTest, get_velocity_at_future_time)
             .isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
 }
 
-TEST_F(BallTest, get_velocity_at_future_time_2)
+TEST_F(BallTest, get_velocity_at_future_time_with_negative_ball_velocity)
 {
     // A small distance to check that values are approximately equal
     double EPSILON = 1e-4;
@@ -216,35 +203,41 @@ TEST_F(BallTest, get_last_update_timestamp)
     EXPECT_EQ(half_second_future, ball.lastUpdateTimestamp());
 }
 
-TEST_F(BallTest, get_last_update_timestamp_2)
+TEST_F(BallTest, equality_operator_compare_ball_with_itself)
 {
-    Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
+    Ball ball_0 = Ball(Point(), Vector());
 
-    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
-
-    ball.updateStateToPredictedState(nine_seconds_future);
-
-    EXPECT_EQ(nine_seconds_future, ball.lastUpdateTimestamp());
-}
-
-TEST_F(BallTest, equality_operators)
-{
-    Ball ball_0 = Ball();
-
-    Ball ball_1 = Ball(Point(0.01, -0.0), Vector(), current_time);
-
-    Ball ball_2 = Ball(Point(2, -3), Vector(0, 1), one_hundred_fifty_milliseconds_future);
-
-    Ball ball_3 =
-        Ball(Point(0.01, -0.0), Vector(), one_hundred_fifty_milliseconds_future);
+    Ball ball_1 = Ball(Point(2, -3), Vector(0, 1), one_hundred_fifty_milliseconds_future);
 
     EXPECT_EQ(ball_0, ball_0);
-    EXPECT_NE(ball_0, ball_1);
-    EXPECT_NE(ball_0, ball_2);
     EXPECT_EQ(ball_1, ball_1);
-    EXPECT_NE(ball_1, ball_2);
-    EXPECT_EQ(ball_1, ball_3);
-    EXPECT_NE(ball_2, ball_3);
+}
+
+TEST_F(BallTest, equality_operator_balls_with_different_positions)
+{
+    Ball ball_0 = Ball(Point(0.01, -0.0), Vector(), current_time);
+
+    Ball ball_1 = Ball(Point(2, -3), Vector(), current_time);
+
+    EXPECT_NE(ball_0, ball_1);
+}
+
+TEST_F(BallTest, equality_operator_balls_with_different_velocities)
+{
+    Ball ball_0 = Ball(Point(2, -3), Vector(1, 2), current_time);
+
+    Ball ball_1 = Ball(Point(2, -3), Vector(-1, 4.5), current_time);
+
+    EXPECT_NE(ball_0, ball_1);
+}
+
+TEST_F(BallTest, equality_operator_balls_with_different_timestamps)
+{
+    Ball ball_0 = Ball(Point(2, -3), Vector(1, 2), current_time);
+
+    Ball ball_1 = Ball(Point(2, -3), Vector(1, 2), one_second_future);
+
+    EXPECT_EQ(ball_0, ball_1);
 }
 
 int main(int argc, char **argv)
