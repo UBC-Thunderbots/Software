@@ -1,0 +1,2 @@
+# File to have clang-format ignore specific directories.
+src/corner_kick/.*
