@@ -47,7 +47,6 @@ after_success:
     # Travis (will not work from within the docker container)
     - ./codecov.sh
 
-
 env:
   # Global Variables that are set at the start of every CI run
   global:
