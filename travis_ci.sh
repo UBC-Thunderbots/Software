@@ -17,10 +17,15 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # This variable is used to let us show nice folds in travis
 export TRAVIS_FOLD_COUNTER=1
 
-# The flags that we should use to build the code with coverage reporting enabled
-CMAKE_COVERAGE_FLAGS="-DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_FLAGS='-O0 -fprofile-arcs -ftest-coverage' \
-            -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1"
+# Figure out what flags we should be passing to `cmake`
+CMAKE_FLAGS=""
+if [ "$RUN_COVERAGE" == "true" ]; then
+    # These flags slow the build a bit, slower but gives more detailed coverage 
+    # info that we will use later to produce a report
+    CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_CXX_FLAGS='-O0 -fprofile-arcs -ftest-coverage' \
+                -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1"
+fi
 
 # Display command in Travis console and fold output in dropdown section
 function travis_run() {
@@ -44,25 +49,11 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
     travis_run ./environment_setup/setup_software.sh $ROS_DISTRO 
 
     # Build the codebase
-    if [ "$RUN_COVERAGE" == "true" ]; then
-        # Build with coverage - slower but gives more detailed coverage info
-        # that we will use later to produce a report
-        travis_run catkin_make ${CMAKE_COVERAGE_FLAGS}
-    else
-        # Build Normally
-        travis_run catkin_make
-    fi
+    travis_run catkin_make ${CMAKE_FLAGS}
 fi
 
 if [ "$RUN_TESTS" == "true" ]; then
-    if [ "$RUN_COVERAGE" == "true" ]; then
-        # Build with coverage - slower but gives more detailed coverage info
-        # that we will use later to produce a report
-        travis_run catkin_make run_tests ${CMAKE_COVERAGE_FLAGS}
-    else
-        # Run tests normally
-        travis_run catkin_make run_tests
-    fi
+    travis_run catkin_make ${CMAKE_FLAGS}
 
     # Report the results of the tests
     # (which tests failed and why)
