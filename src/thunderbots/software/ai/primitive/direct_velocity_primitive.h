@@ -2,20 +2,24 @@
 
 #include "ai/primitive/primitive.h"
 
+/**
+ * This Primitive is extended from Primitive class for the control of linear velocity,
+ * angular velocity and dribbler speed
+ */
+
 class DirectVelocityPrimitive : public Primitive
 {
    public:
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Direct Velocity Primitive
+     * AI could output this primitive to control the linear velocity,
+     * angular velocity, and dribbler speed of a specific robot
      *
      * @param robot_id The id of the Robot to run this Primitive
-     * @param x_velocity The robot velocity along x-axis in m/s, positive forward,
-     * negative backward
-     * @param y_velocity The robot velocity along y-axis in m/s, positive forward,
-     * negative backward
-     * @param angular_velocity The angular velocity robot has in rad/s, positve clockwise,
-     * negative counterclockwise
+     * @param x_velocity positive forward
+     * @param y_velocity positive forward
+     * @param angular_velocity positive clockwise
      * @param dribbler_rpm The dribbler speed in rpm
      */
     explicit DirectVelocityPrimitive(unsigned int robot_id, double x_velocity,
