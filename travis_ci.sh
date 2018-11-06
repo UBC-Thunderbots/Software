@@ -53,7 +53,7 @@ if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
 fi
 
 if [ "$RUN_TESTS" == "true" ]; then
-    travis_run catkin_make ${CMAKE_FLAGS}
+    travis_run catkin_make run_tests ${CMAKE_FLAGS}
 
     # Report the results of the tests
     # (which tests failed and why)
