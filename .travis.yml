@@ -47,7 +47,7 @@ after_success:
     # Travis (will NOT work from within the docker container)
     # TODO: This above comment was true for coveralls, but we might be able to move this to travis_ci.sh for codecov
     # TODO: Can we put all the `.gcov` files this generates into a directory instead of root?
-    - bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
+    - bash <(curl -s https://codecov.io/bash)
     # - pip install --user cpp-coveralls pyOpenSSL
     # - coveralls --verbose --gcov-options '\-lp'
     # # TODO: This currently doesn't echo out info, can we run it as sepreate lines?
