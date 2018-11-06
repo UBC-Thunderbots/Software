@@ -19,7 +19,7 @@ export TRAVIS_FOLD_COUNTER=1
 
 # The flags that we should use to build the code with coverage reporting enabled
 CMAKE_COVERAGE_FLAGS="-DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_CXX_FLAGS=\'-O0 -fprofile-arcs -ftest-coverage\' \
+            -DCMAKE_CXX_FLAGS='-O0 -fprofile-arcs -ftest-coverage' \
             -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1"
 
 # Display command in Travis console and fold output in dropdown section
