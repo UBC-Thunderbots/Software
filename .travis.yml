@@ -7,7 +7,7 @@
 #########################################################################
 
 # Note: Setting `sudo` to `required` will add 20-50s to CI image boot time
-sudo: required
+sudo: false
 dist: trusty
 services:
   - docker
