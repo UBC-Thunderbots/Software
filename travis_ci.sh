@@ -43,8 +43,10 @@ function travis_run() {
 # Change to the directory this script is in
 cd $CURR_DIR
 
-# Note that we must build the codebase in order to run tests
-if [ "$RUN_BUILD" == "true" ] || [ "$RUN_TESTS" == "true" ]; then
+# Note that we must build the codebase in order to run tests and/or get coverage
+if [ "$RUN_BUILD" == "true" ] || \
+    [ "$RUN_TESTS" == "true" ] || \
+    [ "$RUN_COVERAGE" == "true" ]; then
     # Install all required dependecies
     travis_run ./environment_setup/setup_software.sh $ROS_DISTRO 
 
@@ -60,7 +62,9 @@ if [ "$RUN_TESTS" == "true" ]; then
     travis_run catkin_test_results --verbose
 fi
 
-if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then
+# We need to run tests in order to get coverage
+if [ "$RUN_FORMATTING_CHECKS" == "true" ] || \
+    [ "$RUN_COVERAGE" == "true" ]; then    
     CLANG_VERSION="7.0"
 
     # Determine what we should compare this branch against to figure out what
