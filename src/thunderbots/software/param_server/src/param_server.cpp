@@ -9,14 +9,17 @@
 
 #include <thunderbots/ParamsConfig.h>
 
-// define the refresh rate for the paramters in hz
-#define REFRESH_RATE_HZ 1
-
-#define NUMBER_OF_THREADS 1
+// constants used by this node
+namespace {
+    // specifies the rate at which the parameter values are refreshed
+    constexpr int REFRESH_RATE_HZ = 1;
+    // specifies the number of threads this node spins with
+    constexpr int NUMBER_OF_THREADS = 1;
+}
 
 // callback for the param timer
 void updateAllParameters(const ros::TimerEvent& event) {
-	Util::DynamicParameters::updateAllParametersFromROSParameterServer();
+    Util::DynamicParameters::updateAllParametersFromROSParameterServer();
 }
 
 /**
@@ -50,7 +53,7 @@ int main(int argc, char **argv) {
     srv.request.config.bools = Parameter<bool>::getConfigStruct().bools;
 
     // start the timer to update Parameters
-    ros::Timer timer = node_handle.createTimer(ros::Duration(1/REFRESH_RATE_HZ), updateAllParameters);
+    ros::Timer timer = node_handle.createTimer(ros::Duration(static_cast<double>(1/REFRESH_RATE_HZ)), updateAllParameters);
     timer.start();
 
     // spin asynchronously to allow for service call in the same node
