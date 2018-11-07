@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string>
-
-#include "../ai/world/team.h"
+#include "ai/world/team.h"
 
 namespace Util
 {
@@ -17,10 +16,14 @@ namespace Util
         static const std::string AI_PRIMITIVES_TOPIC            = "backend/primitives";
 
         // TODO: Make this a tuneable parameter
-        static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
+        static const TeamColour FRIENDLY_TEAM_COLOUR = TeamColour::YELLOW;
 
         // Networking and vision
         static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
         static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
+
+        // Refbox address
+        static const std::string SSL_GAMECONTROLLER_MULTICAST_ADDRESS = "224.5.23.1";
+        static const unsigned short SSL_GAMECONTROLLER_MULTICAST_PORT = 10003;
     }  // namespace Constants
 }  // namespace Util

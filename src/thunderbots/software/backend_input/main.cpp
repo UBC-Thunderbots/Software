@@ -2,6 +2,7 @@
 
 #include "backend_input/backend.h"
 #include "backend_input/networking/ssl_vision_client.h"
+#include "backend_input/networking/ssl_gamecontroller_client.h"
 #include "geom/point.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
@@ -33,6 +34,9 @@ int main(int argc, char **argv)
         SSLVisionClient(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
                         Util::Constants::SSL_VISION_MULTICAST_PORT);
 
+    SSLGameControllerClient game_controller_client =
+            SSLGameControllerClient(Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+                                    Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT);
     // Main loop
     while (ros::ok())
     {
@@ -70,6 +74,11 @@ int main(int argc, char **argv)
             {
                 enemy_team_publisher.publish(*enemy_team_msg);
             }
+        }
+
+        auto gamecontroller_packet_ptr = game_controller_client.getGameControllerPacket();
+        if(gamecontroller_packet_ptr) {
+            std::cout << Referee_Command_Name(gamecontroller_packet_ptr->command()) << std::endl;
         }
 
         // We spin once here so any callbacks in this node can run (if we ever add them)
