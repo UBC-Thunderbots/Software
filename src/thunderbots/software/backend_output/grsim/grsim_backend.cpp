@@ -94,7 +94,7 @@ void GrSimBackend::sendPrimitives(
         // Motion controller determines the speeds to send to the robots based on their
         // state, maximum linear and angular accelerations, and the robots target
         // destination location/orientation and speed
-        MotionController::bangBangVelocityController(
+        robot_velocities = MotionController::bangBangVelocityController(
             *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
             movePrim.getFinalSpeed(), movePrim.getFinalAngle(), delta_time.count());
 

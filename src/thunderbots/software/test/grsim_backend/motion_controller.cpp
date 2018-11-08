@@ -338,7 +338,6 @@ TEST_F(MotionControllerTest, negative_y_negative_x_velocity_test)
     Point destination = Point(-3, -3);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 6;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
