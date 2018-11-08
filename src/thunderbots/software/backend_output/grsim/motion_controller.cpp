@@ -179,8 +179,10 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
 
     double delta_speed_x, delta_speed_y;
 
+    // if the robot is required to stop at a destination check to see if it is "close
+    // enough" and return zero speed to avoid jittering
     if ((robot.position() - dest).len() <= POSITION_STOP_TOLERANCE &&
-        robot.velocity().len() <= VELOCITY_STOP_TOLERANCE)
+        robot.velocity().len() <= VELOCITY_STOP_TOLERANCE && desired_final_speed == 0)
     {
         return Vector(0, 0);
     }
