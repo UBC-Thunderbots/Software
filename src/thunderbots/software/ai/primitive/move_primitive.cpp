@@ -31,6 +31,7 @@ unsigned int MovePrimitive::getRobotId() const
     return robot_id;
 }
 
+//TODO: figure out why you need dest.x() and dest.y() here
 std::vector<double> MovePrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),
