@@ -61,7 +61,8 @@ AngularVelocity MotionController::determineAngularVelocity(
     const int rotation_direction_modifier =
         delta_angle.toRadians() / delta_angle.abs().toRadians();
 
-    AngularVelocity delta_angular_speed;
+    // calculate the change in angular speed as: max_acceleration * delta_time
+    AngularVelocity delta_angular_speed = AngularVelocity::ofRadians(rotation_direction_modifier*ROBOT_MAX_ANG_ACCELERATION*delta_time);
 
     // check if the robot is nearly in it's final orientation with close to no angular
     // velocity
@@ -78,18 +79,10 @@ AngularVelocity MotionController::determineAngularVelocity(
     bool can_stop_rotate_in_time = (pow(robot.angularVelocity().toRadians(), 2) <=
                                fabs(2 * ROBOT_MAX_ANG_ACCELERATION * delta_angle.toRadians()));
 
-    // calculate the change in angular speed as: max_acceleration * delta_time
-    delta_angular_speed = AngularVelocity::ofRadians(ROBOT_MAX_ANG_ACCELERATION*delta_time);
-
     // check robot rotation state for correct delta_angular_speed sign
-    if (can_stop_rotate_in_time)
+    if (!can_stop_rotate_in_time)
     {
-        delta_angular_speed *= rotation_direction_modifier;
-    }
-    // if the robot is rotating in the correct direction but can't stop in time, slow down
-    else if (!can_stop_rotate_in_time)
-    {
-        delta_angular_speed *= -rotation_direction_modifier;
+        delta_angular_speed *= 1;
     }
 
     // calculate the new angular velocity
@@ -159,7 +152,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
 
     // calculate if the robot can stop in time to achieve the target speed at the target
     // destination based on acceleration Vf = sqrt( Vi^2 - 2*a*d) if the robot can stop in
-    // time ( Vi^2 < 2*a*d
+    // time ( Vi^2 < 2*a*d)
     if ((pow(robot.velocity().len(), 2) -
          2 * ROBOT_MAX_ACCELERATION * distance_to_dest) <= desired_final_speed)
     {

@@ -19,7 +19,7 @@ namespace MotionController
     const double POSITION_STOP_TOLERANCE = 0.01;
 
     /**
-     * Calculate robot velocities using Bang-bang motion controller
+     * Calculate new robot velocities based on current robot state and destination criteria using Bang-bang motion controller
      *
      * @param robot The robot whose motion is to be controlled
      * @param dest The destination of the robot
@@ -35,7 +35,7 @@ namespace MotionController
                                         const double delta_time);
 
     /**
-     * Calculate robot angular velocities
+     * Calculate robot angular velocities based on current robot polar state and destination polar criteria
      *
      * @param robot The robot whose motion is to be controlled
      * @param desired_final_orientation The target final orientation of the robot
@@ -47,7 +47,7 @@ namespace MotionController
                                              const double delta_time);
 
     /**
-     * Calculate robot linear velocities
+     * Calculate robot linear velocities based on current robot cartesian state and destination cartesian state
      *
      * @param robot The robot whose motion is to be controlled
      * @param desired_final_speed The target final speed of the robot
