@@ -31,6 +31,26 @@ class MovePrimitive : public Primitive
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
+        /**
+     * gets the robots destination
+     *
+     * @return The robots destination as a Point(X,Y)
+     */
+    Point getDestination() const;
+
+    /**
+     * Gets the robots destination orientation
+     *
+     * @return The robots final orientation as an Angle
+     */
+    Angle getFinalAngle() const;
+
+    /**
+     * Gets the robots final speed in m/s
+     *
+     * @return The robots speed in m/s
+     */
+    double getFinalSpeed() const;
 
     std::vector<double> getParameterArray() const override;
 
