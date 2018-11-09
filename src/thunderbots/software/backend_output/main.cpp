@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-#include "ai/ai.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"

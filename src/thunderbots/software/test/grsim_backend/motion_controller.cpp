@@ -233,7 +233,6 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
     Point destination        = Point(0, 0);
     Angle destination_angle  = Angle::ofDegrees(-179);
     double destination_speed = 0;
-    bool speeds_equal;
     AngularVelocity initial_ang_speed = AngularVelocity::ofRadians(3);
 
     Robot robot = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
@@ -246,7 +245,7 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
 
     // expect -4 because of angular speed cap
     AngularVelocity expected_velocity =
-        AngularVelocity::ofRadians(initial_ang_speed.toRadians() - ROBOT_MAX_ANG_SPEED);
+        AngularVelocity::ofRadians(initial_ang_speed.toRadians() - ROBOT_MAX_ANG_ACCELERATION);
 
     EXPECT_EQ(expected_velocity, robot_velocities.angular_velocity);
 }
@@ -269,7 +268,7 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
 
     // expect -4 because of angular speed cap
     AngularVelocity expected_velocity =
-        AngularVelocity::ofRadians(initial_ang_speed.toRadians() + ROBOT_MAX_ANG_SPEED);
+        AngularVelocity::ofRadians(initial_ang_speed.toRadians() + ROBOT_MAX_ANG_ACCELERATION);
 
     EXPECT_EQ(expected_velocity, robot_velocities.angular_velocity);
 }
