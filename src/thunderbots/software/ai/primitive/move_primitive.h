@@ -31,7 +31,7 @@ class MovePrimitive : public Primitive
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
-        /**
+    /**
      * gets the robots destination
      *
      * @return The robots destination as a Point(X,Y)

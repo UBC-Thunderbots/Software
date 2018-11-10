@@ -1,4 +1,5 @@
 #include "ai/primitive/move_primitive.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
 
@@ -23,19 +24,47 @@ TEST(MovePrimTest, get_robot_id_test)
 
 TEST(MovePrimTest, parameter_array_test)
 {
-    const Point destination = Point(-1,2);
-    const Angle final_angle = Angle::ofRadians(3.15);
+    const Point destination  = Point(-1, 2);
+    const Angle final_angle  = Angle::ofRadians(3.15);
     const double final_speed = 2.11;
-    const int robot_id = 2U;
+    const int robot_id       = 2U;
 
-    MovePrimitive move_prim = MovePrimitive(robot_id, destination, final_angle, final_speed);
+    MovePrimitive move_prim =
+        MovePrimitive(robot_id, destination, final_angle, final_speed);
 
     std::vector<double> param_array = move_prim.getParameterArray();
 
-    EXPECT_DOUBLE_EQ(destination.x(), param_array[0] );
-    EXPECT_DOUBLE_EQ(destination.y(), param_array[1] );
+    EXPECT_DOUBLE_EQ(destination.x(), param_array[0]);
+    EXPECT_DOUBLE_EQ(destination.y(), param_array[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), param_array[2]);
     EXPECT_DOUBLE_EQ(final_speed, param_array[3]);
+}
+
+TEST(MovePrimTest, get_final_speed_test)
+{
+    const double final_speed = 2.11;
+
+    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), final_speed);
+
+    EXPECT_DOUBLE_EQ(move_prim.getFinalSpeed(), final_speed);
+}
+
+TEST(MovePrimTest, get_final_orientation_test)
+{
+    const Angle final_angle = Angle::ofRadians(3.15);
+
+    MovePrimitive move_prim = MovePrimitive(int(), Point(), final_angle, double());
+
+    EXPECT_EQ(move_prim.getFinalAngle(), final_angle);
+}
+
+TEST(MovePrimTest, get_final_destination_test)
+{
+    const Point destination = Point(-1, 2);
+
+    MovePrimitive move_prim = MovePrimitive(int(), destination, Angle(), double());
+
+    EXPECT_EQ(move_prim.getDestination(), destination);
 }
 
 int main(int argc, char **argv)
