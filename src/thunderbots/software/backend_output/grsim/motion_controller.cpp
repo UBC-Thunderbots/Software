@@ -118,7 +118,8 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // the destination (used to calculate the X/Y velocity magnitudes
     const Angle direction_angle = (dest - robot.position()).norm().orientation();
 
-    double delta_speed_x, delta_speed_y;
+    double delta_speed_x = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.cos();
+    double delta_speed_y = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.sin();
 
     // if the robot is required to stop at a destination check to see if it is "close
     // enough" and return zero speed to avoid jittering
