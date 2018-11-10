@@ -58,4 +58,3 @@ std::vector<bool> MovePrimitive::getExtraBitArray() const
 {
     return std::vector<bool>();
 }
-
