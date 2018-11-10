@@ -31,7 +31,7 @@ class MovePrimitive : public Primitive
      *
      * @param primtiive_msg The message from which to create the Move Primitive
      */
-    explicit MovePrimitive(const thunderbots_msgs::Primitive &primtiive_msg);
+    explicit MovePrimitive(const thunderbots_msgs::Primitive &primtive_msg);
 
     std::string getPrimitiveName() const override;
 
