@@ -37,21 +37,21 @@ class MovePrimitive : public Primitive
 
     unsigned int getRobotId() const override;
     /**
-     * gets the robots destination
+     * gets the robot's destination
      *
      * @return The robots destination as a Point(X,Y)
      */
     Point getDestination() const;
 
     /**
-     * Gets the robots destination orientation
+     * Gets the robot's destination orientation
      *
      * @return The robots final orientation as an Angle
      */
     Angle getFinalAngle() const;
 
     /**
-     * Gets the robots final speed in m/s
+     * Gets the robot's final speed in m/s
      *
      * @return The robots speed in m/s
      */

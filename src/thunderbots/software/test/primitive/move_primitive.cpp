@@ -82,10 +82,10 @@ TEST(MovePrimTest, get_extra_bit_array_test)
 
 TEST(MovePrimitiveTest, create_primitive_from_message_test)
 {
-    const Point destination  = Point(2, -3);
-    const Angle final_angle  = Angle::ofRadians(3.55);
-    const double final_speed = 2.22;
-    const int robot_id       = 3U;
+    const Point destination     = Point(2, -3);
+    const Angle final_angle     = Angle::ofRadians(3.55);
+    const double final_speed    = 2.22;
+    const unsigned int robot_id = 3U;
 
     MovePrimitive move_prim =
         MovePrimitive(robot_id, destination, final_angle, final_speed);
