@@ -16,7 +16,8 @@ public:
      * @param velocity Velocity to move robot forwards/backwards
      * to catch the ball without it bouncing off the dribbler; units are m/s
      * @param dribbler_speed Speed to rotate dribbler at. Units are RPM.
-     * @param margin
+     * @param margin THe margin of allowed error in the robot catch velocity.
+     * The exact use of this parameter needs to be confirmed.
      */
     explicit CatchPrimitive(unsigned int robot_id, double velocity, double dribbler_speed, double margin);
 
