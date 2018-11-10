@@ -1,3 +1,8 @@
+/**
+ * This file includes the definition of the MovePrimitive class and it's member functions
+ * and data
+ */
+
 #pragma once
 
 #include "ai/primitive/primitive.h"

@@ -1,3 +1,7 @@
+/**
+ * This file contains the unit tests for the MovePrimitive class
+ */
+
 #include "ai/primitive/move_primitive.h"
 
 #include <gtest/gtest.h>
