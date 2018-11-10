@@ -71,6 +71,40 @@ TEST(MovePrimTest, get_final_destination_test)
     EXPECT_EQ(move_prim.getDestination(), destination);
 }
 
+TEST(MovePrimTest, get_extra_bit_array_test)
+{
+    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), double());
+
+    std::vector<bool> extra_bit_array = move_prim.getExtraBitArray();
+
+    EXPECT_EQ(extra_bit_array, std::vector<bool>());
+}
+
+TEST(MovePrimitiveTest, create_primitive_from_message_test)
+{
+    const Point destination  = Point(2, -3);
+    const Angle final_angle  = Angle::ofRadians(3.55);
+    const double final_speed = 2.22;
+    const int robot_id       = 3U;
+
+    MovePrimitive move_prim =
+        MovePrimitive(robot_id, destination, final_angle, final_speed);
+
+    thunderbots_msgs::Primitive prim_message = move_prim.createMsg();
+
+    MovePrimitive new_prim = MovePrimitive(prim_message);
+
+    std::vector<double> parameters = new_prim.getParameterArray();
+
+    EXPECT_EQ("Move Primitive", new_prim.getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim.getRobotId());
+    EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
+    EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
+    EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
+    EXPECT_DOUBLE_EQ(final_speed, parameters[3]);
+    EXPECT_EQ(move_prim.getExtraBitArray(), std::vector<bool>());
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

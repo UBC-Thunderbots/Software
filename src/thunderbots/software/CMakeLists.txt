@@ -255,6 +255,14 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(primitive_test
+            test/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+
+    target_link_libraries(primitive_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(move_primitive_test
             test/primitive/move_primitive.cpp
             ai/primitive/move_primitive.cpp
