@@ -8,23 +8,6 @@
 
 #include "ai/primitive/move_primitive.h"
 
-TEST(PrimitiveTest, create_message_empty_test)
-{
-    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), double());
-
-    thunderbots_msgs::Primitive prim = move_prim.createMsg();
-
-    EXPECT_EQ(prim.primitive_name, "Move Primitive");
-    EXPECT_EQ(prim.robot_id, int());
-
-    EXPECT_DOUBLE_EQ(double(), prim.parameters[0]);
-    EXPECT_DOUBLE_EQ(double(), prim.parameters[1]);
-    EXPECT_DOUBLE_EQ(double(), prim.parameters[2]);
-    EXPECT_DOUBLE_EQ(double(), prim.parameters[3]);
-    EXPECT_EQ(move_prim.getExtraBitArray(), std::vector<bool>());
-}
-
-
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
     const Point destination  = Point(2, -3);

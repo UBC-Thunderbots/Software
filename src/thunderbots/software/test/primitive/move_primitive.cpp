@@ -48,7 +48,7 @@ TEST(MovePrimTest, get_final_speed_test)
 {
     const double final_speed = 2.11;
 
-    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), final_speed);
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), final_speed);
 
     EXPECT_DOUBLE_EQ(move_prim.getFinalSpeed(), final_speed);
 }
@@ -57,7 +57,7 @@ TEST(MovePrimTest, get_final_orientation_test)
 {
     const Angle final_angle = Angle::ofRadians(3.15);
 
-    MovePrimitive move_prim = MovePrimitive(int(), Point(), final_angle, double());
+    MovePrimitive move_prim = MovePrimitive(0, Point(), final_angle, double());
 
     EXPECT_EQ(move_prim.getFinalAngle(), final_angle);
 }
@@ -66,14 +66,14 @@ TEST(MovePrimTest, get_final_destination_test)
 {
     const Point destination = Point(-1, 2);
 
-    MovePrimitive move_prim = MovePrimitive(int(), destination, Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(0, destination, Angle(), double());
 
     EXPECT_EQ(move_prim.getDestination(), destination);
 }
 
 TEST(MovePrimTest, get_extra_bit_array_test)
 {
-    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), double());
 
     std::vector<bool> extra_bit_array = move_prim.getExtraBitArray();
 
