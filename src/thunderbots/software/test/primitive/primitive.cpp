@@ -33,7 +33,7 @@ TEST(PrimitiveTest, validate_primitive_test)
 {
     // TODO: Finish this unit test when exception handling is implemented
     // Issue #133
-    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
     move_prim.validatePrimitiveMessage(move_prim.createMsg(), "Move Primitive");
 }

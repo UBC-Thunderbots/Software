@@ -11,7 +11,7 @@ TEST(MovePrimTest, construct_with_no_params_test)
 {
     const std::string move_prim_name = "Move Primitive";
 
-    MovePrimitive move_prim = MovePrimitive(int(), Point(), Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
     EXPECT_EQ(int(), move_prim.getRobotId());
     EXPECT_EQ(move_prim_name, move_prim.getPrimitiveName());
@@ -21,7 +21,7 @@ TEST(MovePrimTest, get_robot_id_test)
 {
     int robot_id = 4U;
 
-    MovePrimitive move_prim = MovePrimitive(robot_id, Point(), Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(robot_id, Point(), Angle(), 0.0);
 
     EXPECT_EQ(robot_id, move_prim.getRobotId());
 }
@@ -57,7 +57,7 @@ TEST(MovePrimTest, get_final_orientation_test)
 {
     const Angle final_angle = Angle::ofRadians(3.15);
 
-    MovePrimitive move_prim = MovePrimitive(0, Point(), final_angle, double());
+    MovePrimitive move_prim = MovePrimitive(0, Point(), final_angle, 0.0);
 
     EXPECT_EQ(move_prim.getFinalAngle(), final_angle);
 }
@@ -66,14 +66,14 @@ TEST(MovePrimTest, get_final_destination_test)
 {
     const Point destination = Point(-1, 2);
 
-    MovePrimitive move_prim = MovePrimitive(0, destination, Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(0, destination, Angle(), 0.0);
 
     EXPECT_EQ(move_prim.getDestination(), destination);
 }
 
 TEST(MovePrimTest, get_extra_bit_array_test)
 {
-    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), double());
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
     std::vector<bool> extra_bit_array = move_prim.getExtraBitArray();
 
