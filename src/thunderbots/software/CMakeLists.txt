@@ -24,7 +24,7 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 ### Set compiler flags only for cpp code. These flags do not work for C files ###
 # Warn if parent classes do not define a virtual destructor
 # See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
-set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 
 
 #############################################
