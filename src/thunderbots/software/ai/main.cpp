@@ -116,7 +116,7 @@ int main(int argc, char **argv)
         {
             thunderbots_msgs::Primitive msg = prim->createMsg();
             primitive_array_message.primitives.emplace_back(msg);
-            std::cout << msg << std::endl;
+            LOG(INFO) << msg << std::endl;
         }
         primitive_publisher.publish(primitive_array_message);
     }
