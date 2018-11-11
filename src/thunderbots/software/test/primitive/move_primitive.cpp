@@ -19,7 +19,7 @@ TEST(MovePrimTest, construct_with_no_params_test)
 
 TEST(MovePrimTest, get_robot_id_test)
 {
-    int robot_id = 4U;
+    unsigned int robot_id = 4U;
 
     MovePrimitive move_prim = MovePrimitive(robot_id, Point(), Angle(), 0.0);
 
@@ -28,10 +28,10 @@ TEST(MovePrimTest, get_robot_id_test)
 
 TEST(MovePrimTest, parameter_array_test)
 {
-    const Point destination  = Point(-1, 2);
-    const Angle final_angle  = Angle::ofRadians(3.15);
-    const double final_speed = 2.11;
-    const int robot_id       = 2U;
+    const Point destination     = Point(-1, 2);
+    const Angle final_angle     = Angle::ofRadians(3.15);
+    const double final_speed    = 2.11;
+    const unsigned int robot_id = 2U;
 
     MovePrimitive move_prim =
         MovePrimitive(robot_id, destination, final_angle, final_speed);

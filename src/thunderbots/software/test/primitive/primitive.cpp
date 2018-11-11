@@ -10,10 +10,10 @@
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
-    const Point destination  = Point(2, -3);
-    const Angle final_angle  = Angle::ofRadians(3.55);
-    const double final_speed = 2.22;
-    const int robot_id       = 3U;
+    const Point destination     = Point(2, -3);
+    const Angle final_angle     = Angle::ofRadians(3.55);
+    const double final_speed    = 2.22;
+    const unsigned int robot_id = 3U;
 
     MovePrimitive move_prim =
         MovePrimitive(robot_id, destination, final_angle, final_speed);
@@ -40,10 +40,10 @@ TEST(PrimitiveTest, validate_primitive_test)
 
 TEST(PrimitiveTest, create_primitive_from_message_test)
 {
-    const Point destination  = Point(-3, -3);
-    const Angle final_angle  = Angle::ofRadians(4.55);
-    const double final_speed = 4.22;
-    const int robot_id       = 0U;
+    const Point destination     = Point(-3, -3);
+    const Angle final_angle     = Angle::ofRadians(4.55);
+    const double final_speed    = 4.22;
+    const unsigned int robot_id = 0U;
 
     MovePrimitive move_prim =
         MovePrimitive(robot_id, destination, final_angle, final_speed);
