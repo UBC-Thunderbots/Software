@@ -130,3 +130,117 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
 
     return std::nullopt;
 }
+
+std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(const Referee &packet) {
+    thunderbots_msgs::RefboxData refbox_data;
+    thunderbots_msgs::RefboxCommand command;
+    command.command = getTeamCommand(packet.command(), Util::Constants::FRIENDLY_TEAM_COLOUR);
+
+    return std::optional<thunderbots_msgs::RefboxData>();
+}
+
+// my apologies for another monster switch statement
+int32_t Backend::getTeamCommand(Referee::Command command, TeamColour our_team_colour) {
+    switch(command) {
+        case Referee_Command_HALT:
+            return thunderbots_msgs::RefboxCommand::HALT;
+        case Referee_Command_STOP:
+            return thunderbots_msgs::RefboxCommand::STOP;
+        case Referee_Command_NORMAL_START:
+            return thunderbots_msgs::RefboxCommand::NORMAL_START;
+        case Referee_Command_FORCE_START:
+            return thunderbots_msgs::RefboxCommand::FORCE_START;
+        case Referee_Command_PREPARE_KICKOFF_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM;
+            }
+        case Referee_Command_PREPARE_KICKOFF_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US;
+            }
+        case Referee_Command_PREPARE_PENALTY_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM;
+            }
+        case Referee_Command_PREPARE_PENALTY_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US;
+            }
+        case Referee_Command_DIRECT_FREE_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM;
+            }
+        case Referee_Command_DIRECT_FREE_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_US;
+            }
+        case Referee_Command_INDIRECT_FREE_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM;
+            }
+        case Referee_Command_INDIRECT_FREE_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US;
+            }
+        case Referee_Command_TIMEOUT_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::TIMEOUT_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::TIMEOUT_THEM;
+            }
+        case Referee_Command_TIMEOUT_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::TIMEOUT_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::TIMEOUT_US;
+            }
+        case Referee_Command_GOAL_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::GOAL_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::GOAL_THEM;
+            }
+        case Referee_Command_GOAL_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::GOAL_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::GOAL_US;
+            }
+        case Referee_Command_BALL_PLACEMENT_YELLOW:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US;
+            } else {
+                return thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM;
+            }
+        case Referee_Command_BALL_PLACEMENT_BLUE:
+            if(our_team_colour == TeamColour::YELLOW) {
+                return thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM;
+            } else {
+                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM;
+            }
+    }
+}
+
+Point Backend::getTeamLocalCoordinates(Referee::Point point) {
+    if (Util::Constants::FRIENDLY_FIELD_SIDE == FieldSide::WEST) {
+        return Point(point.x(), point.y());
+    } else {
+        return Point(- point.x(), - point.y());
+    }
+}

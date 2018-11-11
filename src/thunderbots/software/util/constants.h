@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "ai/world/field.h"
 #include "ai/world/team.h"
 
 namespace Util
@@ -17,6 +18,9 @@ namespace Util
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = TeamColour::YELLOW;
+
+        // TODO: Make this a tunable parameter
+        static const FieldSide FRIENDLY_FIELD_SIDE = TeamSide::WEST;
 
         // Networking and vision
         static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";

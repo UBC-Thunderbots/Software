@@ -5,9 +5,6 @@
 # Divide by 1,000,000 to get a time_t.
 uint64 packet_timestamp
 
-# The "coarse" stage of the game.
-RefboxStage stage
-
 # The number of microseconds left in the stage.
 # Becomes negative when a stage runs over its specified time.
 int32 stage_time_left
@@ -26,10 +23,4 @@ uint64 command_timestamp
 RefboxTeamInfo us
 RefboxTeamInfo them
 
-Vector2f designated_position
-
-# Information about the direction of play.
-# True, if the blue team will have it's goal on the positive x-axis of the ssl-vision coordinate system
-# Obviously, the yellow team will play on the opposite half
-# For compatibility, this field is optional
-bool blueTeamOnPositiveHalf
+Point2D designated_position

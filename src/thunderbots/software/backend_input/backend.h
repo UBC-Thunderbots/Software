@@ -6,11 +6,14 @@
 #include "backend_input/filter/robot_filter.h"
 #include "backend_input/filter/robot_team_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_referee.pb.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
+#include "thunderbots_msgs/RefboxData.h"
 #include "util/timestamp.h"
+#include "ai/world/team.h"
 
 class Backend
 {
@@ -70,10 +73,15 @@ class Backend
     std::optional<thunderbots_msgs::Team> getFilteredEnemyTeamMsg(
         const SSL_WrapperPacket &packet, const AITimestamp &timestamp);
 
+    std::optional<thunderbots_msgs::RefboxData> getRefboxDataMsg(const Referee &packet);
+
     virtual ~Backend() = default;
 
    private:
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    int32_t getTeamCommand(Referee::Command command, TeamColour our_team_colour);
+    Point getTeamLocalCoordinates(Referee::Point point);
 };
