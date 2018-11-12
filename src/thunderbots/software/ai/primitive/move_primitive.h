@@ -10,6 +10,8 @@ class MovePrimitive : public Primitive
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Move Primitive
+     * Moves the robot in a straight line between its current position and the given
+     * destination.
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param dest The final destination of the movement
@@ -26,7 +28,7 @@ class MovePrimitive : public Primitive
      *
      * @param primtiive_msg The message from which to create the Move Primitive
      */
-    explicit MovePrimitive(const thunderbots_msgs::Primitive &primtiive_msg);
+    explicit MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
     std::string getPrimitiveName() const override;
 
