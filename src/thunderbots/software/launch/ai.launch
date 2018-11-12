@@ -11,6 +11,9 @@
     <node name="backend_output" pkg="thunderbots" type="backend_output" output="screen">
     </node>
 
+    <!-- Launch the dynamic parameters node -->
     <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
 
+    <!-- Launch the rqt_reconfigure gui -->
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
 </launch>
