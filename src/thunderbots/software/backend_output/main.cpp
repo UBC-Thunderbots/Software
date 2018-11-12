@@ -3,8 +3,6 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
-#include <g3log/g3log.hpp>
-#include <g3log/logworker.hpp>
 #include <iostream>
 
 #include "ai/primitive/move_primitive.h"
@@ -12,7 +10,7 @@
 #include "backend_output/grsim/grsim_backend.h"
 #include "geom/point.h"
 #include "util/constants.h"
-#include "util/logger/custom_g3log_sinks.h"
+#include "util/logger/init.h"
 
 // Constants
 const std::string NETWORK_ADDRESS       = "127.0.0.1";
@@ -47,10 +45,7 @@ int main(int argc, char** argv)
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
     // Initialize the logger
-    std::unique_ptr<g3::LogWorker> logWorker{g3::LogWorker::createLogWorker()};
-    logWorker->addSink(std::make_unique<Util::Logger::RosoutSink>(),
-                       &Util::Logger::RosoutSink::ReceiveLogMessage);
-    g3::initializeLogging(logWorker.get());
+    Util::Logger::init_logger();
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();

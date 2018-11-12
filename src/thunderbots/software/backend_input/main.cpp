@@ -1,8 +1,6 @@
 #include <ros/ros.h>
 
 #include <boost/exception/diagnostic_information.hpp>
-#include <g3log/g3log.hpp>
-#include <g3log/logworker.hpp>
 #include "backend_input/backend.h"
 #include "backend_input/networking/ssl_vision_client.h"
 #include "geom/point.h"
@@ -10,7 +8,7 @@
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
-#include "util/logger/custom_g3log_sinks.h"
+#include "util/logger/init.h"
 #include "util/timestamp.h"
 
 int main(int argc, char **argv)
@@ -53,10 +51,7 @@ int main(int argc, char **argv)
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
     // Initialize the logger
-    std::unique_ptr<g3::LogWorker> logWorker{g3::LogWorker::createLogWorker()};
-    logWorker->addSink(std::make_unique<Util::Logger::RosoutSink>(),
-                       &Util::Logger::RosoutSink::ReceiveLogMessage);
-    g3::initializeLogging(logWorker.get());
+    Util::Logger::init_logger();
 
     // Main loop
     while (ros::ok())
