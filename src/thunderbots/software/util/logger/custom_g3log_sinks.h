@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * This file contains custom sinks for g3log. Custom sinks allow us to control how the
+ * logs are processed, such as sending them to stdout or to the /rosout topic
+ */
+
 #include <ros/ros.h>
 
 #include <g3log/logmessage.hpp>
