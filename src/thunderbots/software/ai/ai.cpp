@@ -1,6 +1,9 @@
 #include "ai.h"
 
-AI::AI() : navigator(std::make_unique<RRTNav>()), high_level(std::make_unique<STP_HL>())
+AI::AI(const World &world)
+    : world(world),
+      navigator(std::make_unique<RRTNav>()),
+      high_level(std::make_unique<STP_HL>())
 {
 }
 

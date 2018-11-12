@@ -4,9 +4,9 @@
 
 #include "../ai/world/team.h"
 
-namespace UTIL
+namespace Util
 {
-    namespace CONSTANTS
+    namespace Constants
     {
         // Constants for ROS nodes, message, and topics
         static const std::string BACKEND_INPUT_BALL_TOPIC  = "backend/ball";
@@ -17,6 +17,10 @@ namespace UTIL
         static const std::string AI_PRIMITIVES_TOPIC            = "backend/primitives";
 
         // TODO: Make this a tuneable parameter
-        const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
-    }  // namespace CONSTANTS
-}  // namespace UTIL
+        static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
+
+        // Networking and vision
+        static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
+        static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
+    }  // namespace Constants
+}  // namespace Util

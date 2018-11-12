@@ -24,13 +24,16 @@ install:
     # Tests default to false if not set
     - RUN_BUILD=${RUN_BUILD:-"false"}
     - RUN_TESTS=${RUN_TESTS:-"false"}
+    - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
     - docker run 
       --env RUN_BUILD
       --env RUN_TESTS
+      --env RUN_COVERAGE
       --env RUN_FORMATTING_CHECKS
+      --env ROS_DISTRO 
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
@@ -38,22 +41,36 @@ install:
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
 
+after_success: 
+    # If Code Coverage ran, then upload the report. We do this from here because
+    # CodeCov's Travis-CI integration requires it to be run directly within
+    # Travis (will not work from within the docker container)
+    - ./codecov.sh
+
 env:
   # Global Variables that are set at the start of every CI run
   global:
     # Get the name of this repository from the `TRAVIS_REPO_SLUG`
     # ex. "UBC-Thunderbots/Software" would give "Software"
     - REPOSITORY_NAME=$(basename $TRAVIS_REPO_SLUG)
-    # Set the ROS Distro we're using (determines what Docker container we use)
-    - ROS_DISTRO=kinetic 
 
-  # Each entry here represents a different CI run
-  # The variables here are uniquely set at the start of each different test
-  matrix:
-  # Test building the repo and running tests
-    # NOTE: this is a single test
-    - RUN_BUILD="true"
-      RUN_TESTS="true"
-    # Test Formatting
-    - RUN_FORMATTING_CHECKS="true"
-
+# Each entry here represents a different CI run
+# The variables here are uniquely set at the start of each different test
+matrix:
+  include:
+  - name: "ROS Melodic / Ubuntu 18.04 - Build and Test"
+    env: RUN_BUILD="true"
+         RUN_TESTS="true"
+         RUN_COVERAGE="true"
+         ROS_DISTRO=melodic
+  - name: "ROS Melodic / Ubuntu 18.04 - Check Formatting"
+    env: RUN_FORMATTING_CHECKS="true"
+         ROS_DISTRO=melodic
+  - name: "ROS Kinetic / Ubuntu 16.04 - Build and Test"
+    env: RUN_BUILD="true"
+         RUN_TESTS="true"
+         RUN_COVERAGE="true"
+         ROS_DISTRO=kinetic
+  - name: "ROS Kinetic / Ubuntu 16.04 - Check Formatting"
+    env: RUN_FORMATTING_CHECKS="true"
+         ROS_DISTRO=kinetic

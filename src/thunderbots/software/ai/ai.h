@@ -17,8 +17,10 @@ class AI final
    public:
     /**
      * Creates a new AI
+     *
+     * @param world The initial state of the world for the AI
      */
-    explicit AI();
+    explicit AI(const World& world);
 
     /**
      * Calculates the Primitives that should be run by our Robots given the current
