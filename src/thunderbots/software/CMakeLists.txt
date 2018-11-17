@@ -98,7 +98,7 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-        test/primitive/direct_velocity_primitive.cpp)
+        )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
@@ -250,6 +250,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -258,6 +259,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(move_primitive_test
             test/primitive/move_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/move_primitive.h
             )
@@ -267,6 +269,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(direct_velocity_primitive_test
             test/primitive/direct_velocity_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/direct_velocity_primitive.h
             )

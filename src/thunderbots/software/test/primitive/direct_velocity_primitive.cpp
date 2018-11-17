@@ -50,9 +50,9 @@ TEST(DirectVelocityPrimTest, get_x_velocity_test)
 {
     const double x_velocity = 2.11;
 
-    DirectVelocityPrimitive direct_velcoity_prim = DirectVelocityPrimitive(0, x_velocity, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(0, x_velocity, 0.0, 0.0, 0.0);
 
-    EXPECT_DOUBLE_EQ(direct_velcoity_prim.getXVelocity(), x_velocity);
+    EXPECT_DOUBLE_EQ(direct_velocity_prim.getXVelocity(), x_velocity);
 }
 
 TEST(DirectVelocityPrimTest, get_y_velocity_test)
@@ -85,9 +85,9 @@ TEST(DirectVelocityPrimTest, get_dribbler_rpm_test)
 
 TEST(DirectVelocityPrimTest, get_extra_bit_array_test)
 {
-    DirectVelocityPrimitive move_prim = DirectVelocityPrimitive(0, 0.0 , 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(0, 0.0 , 0.0, 0.0, 0.0);
 
-    std::vector<bool> extra_bit_array = move_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = direct_velocity_prim.getExtraBitArray();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
