@@ -2,10 +2,10 @@
  * This file contains unit tests for the Catch Primitive class
  */
 
-#include "ai/primitive/catch_primative.h"
-
-#include <string.h>
 #include <gtest/gtest.h>
+#include <string.h>
+
+#include "ai/primitive/catch_primative.h"
 
 TEST(CatchPrimTest, constuct_with_no_params_test)
 {
@@ -29,11 +29,12 @@ TEST(CatchPrimTest, get_robot_id_test)
 TEST(CatchPrimTest, parameter_array_test)
 {
     const unsigned int robot_id = 14;
-    const double velocity = 3.24;
+    const double velocity       = 3.24;
     const double dribbler_speed = 4.20;
-    const double margin = 17.38;
+    const double margin         = 17.38;
 
-    CatchPrimitive catch_prim = CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
+    CatchPrimitive catch_prim =
+        CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
 
     std::vector<double> param_array = catch_prim.getParameterArray();
 
@@ -48,7 +49,7 @@ TEST(CatchPrimTest, get_velocity_test)
 
     CatchPrimitive catch_prim = CatchPrimitive(0, velocity, 0, 0);
 
-    //EXPECT_EQ(velocity, catch_prim.getVelocity();
+     EXPECT_EQ(velocity, catch_prim.getVelocity();
 }
 
 TEST(CatchPrimTest, get_dribbler_speed_test)
@@ -66,7 +67,7 @@ TEST(CatchPrimTest, get_margin_test)
 
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, margin);
 
-    EXPECT_DOUBLE_EQ(margin,  catch_prim.getMargin());
+    EXPECT_DOUBLE_EQ(margin, catch_prim.getMargin());
 }
 
 TEST(CatchPrimTest, get_extra_bit_array_test)
@@ -81,11 +82,12 @@ TEST(CatchPrimTest, get_extra_bit_array_test)
 TEST(CatchPrimTest, create_primitive_from_message_test)
 {
     const unsigned int robot_id = 14;
-    const double velocity = 3.24;
+    const double velocity       = 3.24;
     const double dribbler_speed = 4.20;
-    const double margin = 17.38;
+    const double margin         = 17.38;
 
-    CatchPrimitive catch_prim = CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
+    CatchPrimitive catch_prim =
+        CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
 
     thunderbots_msgs::Primitive prim_message = catch_prim.createMsg();
 
