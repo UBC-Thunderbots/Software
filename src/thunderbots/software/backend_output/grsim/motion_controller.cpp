@@ -118,87 +118,29 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         return Vector(0, 0);
     }
 
-    // calculates robot angle based on unit vector that points from the robot location to
-    // the destination (used to calculate the X/Y velocity magnitudes
-    const Angle direction_angle = (dest - robot.position()).norm().orientation();
+    // calculate the angle between the robot and it's destination
+    const Angle angle_to_destination = (dest - robot.position()).norm().orientation();
+
+    // calculate the angle between the robot's velocity and the angle to it's destination.
+    // velocity_error_angle will be used to calculate the error in the robots velocity
+    // to it's ideal velocity pointing directly at the destination
+    const Angle velocity_error_angle = (angle_to_destination - robot.velocity().orientation());
 
 
-    double delta_speed_x = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.cos();
-    double delta_speed_y = (ROBOT_MAX_ACCELERATION * delta_time) * direction_angle.sin();
+    // if the robot velocity error is in the left-hand quadrants then slow down
+    if (velocity_error_angle >= Angle::ofDegrees(90) && velocity_error_angle <= Angle::ofDegrees(270)) {
 
-    // if robot is moving towards destination in x
-    bool moving_towards_dest_x = (dest.x() - robot.position().x() > 0) && (robot.velocity().x() > 0) ||
-                            (dest.x() - robot.position().x() < 0) && (robot.velocity().x() < 0);
-
-    // if robot is moving towards destination in y
-    bool moving_towards_dest_y = (dest.x() - robot.position().x() > 0) && (robot.velocity().x() > 0) ||
-                            (dest.x() - robot.position().x() < 0) && (robot.velocity().x() < 0);
-
-    // calculate if the robot can stop in time to achieve the target speed at the target
-    // destination based on acceleration Vf = sqrt( Vi^2 - 2*a*d) if the robot can stop in
-    // time ( Vi^2 < 2*a*d)
+        double delta_speed_x = (ROBOT_MAX_ACCELERATION * delta_time) * velocity_error_angle.cos();
+        double delta_speed_y = (ROBOT_MAX_ACCELERATION * delta_time) * velocity_error_angle.sin();
+    }
     bool can_stop_in_time = (pow(robot.velocity().len(), 2) -
          2 * ROBOT_MAX_ACCELERATION * distance_to_dest) <= desired_final_speed;
 
 
-    // check for directions
-    if (moving_towards_dest_x && moving_towards_dest_y)
-    {
-        if (can_stop_in_time)
-        {
-            delta_speed_x *= 1;
-            delta_speed_y *= 1;
-        }
-        else
-        {
-            delta_speed_x *=
-                -1;
-            delta_speed_y *=
-                -1;
-        }
-    }
-    else if (moving_towards_dest_x && !moving_towards_dest_y)
-    {
-        if (can_stop_in_time)
-        {
-            delta_speed_x *= 1;
-            delta_speed_y *=
-                -1;
-        }
-        else
-        {
-            delta_speed_x *=
-                -1;
-            delta_speed_y *= 1;
-        }
-    }
-    else if (!moving_towards_dest_x && moving_towards_dest_y)
-    {
-        if (can_stop_in_time)
-        {
-            delta_speed_x *=
-                -1;
-            delta_speed_y *= 1;
-        }
-        else
-        {
-            delta_speed_x *= 1;
-            delta_speed_y *=
-                -1;
-        }
-    }
-    else
-    {
-        // if the robot is moving in the opposite direction of the destination, then slow
-        // down
-        delta_speed_x *= 1;
-        delta_speed_y *= 1;
-    }
-
     // calculate new X/Y velocities based on the
     // current robot speeds and calculated delta speeds
-    robot_linear_velocities = Vector(robot.velocity().x() + delta_speed_x,
-                                     robot.velocity().y() + delta_speed_y);
+    robot_linear_velocities = Vector(robot.velocity().x() - delta_speed_x,
+                                     robot.velocity().y() - delta_speed_y);
 
     if (robot_linear_velocities.len() >= ROBOT_MAX_SPEED)
     {

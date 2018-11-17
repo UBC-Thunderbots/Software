@@ -17,7 +17,7 @@ namespace MotionController
     // tolerance distance measurement in meters
     const double VELOCITY_STOP_TOLERANCE = 0.015;
     const double POSITION_STOP_TOLERANCE = 0.01;
-
+    const Angle DESTINATION_VELOCITY_TOLERENCE = Angle::ofDegrees(1);
     /**
      * Calculate new robot velocities based on current robot state and destination criteria using Bang-bang motion controller
      *

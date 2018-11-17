@@ -1,3 +1,8 @@
+/**
+ * This file includes the definition of the MovePrimitive class and it's member functions
+ * and data
+ */
+
 #pragma once
 
 #include "ai/primitive/primitive.h"
@@ -26,7 +31,11 @@ class MovePrimitive : public Primitive
      *
      * @param primtiive_msg The message from which to create the Move Primitive
      */
+<<<<<<< HEAD
     explicit MovePrimitive(const thunderbots_msgs::Primitive &primtive_msg);
+=======
+    explicit MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+>>>>>>> a0731ec75f4b21519023a4b86a5485452bcda0b9
 
     /**
      * Gets the primitive name
@@ -41,6 +50,26 @@ class MovePrimitive : public Primitive
      * @return The robot ID as an unsigned integer
      */
     unsigned int getRobotId() const override;
+    /**
+     * gets the robot's destination
+     *
+     * @return The robots destination as a Point(X,Y)
+     */
+    Point getDestination() const;
+
+    /**
+     * Gets the robot's destination orientation
+     *
+     * @return The robots final orientation as an Angle
+     */
+    Angle getFinalAngle() const;
+
+    /**
+     * Gets the robot's final speed in m/s
+     *
+     * @return The robots speed in m/s
+     */
+    double getFinalSpeed() const;
 
     /**
      * gets the robot's destination

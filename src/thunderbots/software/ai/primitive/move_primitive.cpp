@@ -31,6 +31,14 @@ unsigned int MovePrimitive::getRobotId() const
     return robot_id;
 }
 
+<<<<<<< HEAD
+=======
+Point MovePrimitive::getDestination() const
+{
+    return dest;
+}
+
+>>>>>>> a0731ec75f4b21519023a4b86a5485452bcda0b9
 Angle MovePrimitive::getFinalAngle() const
 {
     return final_angle;
@@ -41,11 +49,14 @@ double MovePrimitive::getFinalSpeed() const
     return final_speed;
 }
 
+<<<<<<< HEAD
 Point MovePrimitive::getDestination() const
 {
     return dest;
 }
 
+=======
+>>>>>>> a0731ec75f4b21519023a4b86a5485452bcda0b9
 std::vector<double> MovePrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),
