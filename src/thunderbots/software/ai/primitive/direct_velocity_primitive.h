@@ -37,6 +37,14 @@ class DirectVelocityPrimitive : public Primitive
 
     unsigned int getRobotId() const override;
 
+    double getXVelocity() const ;
+
+    double getYVelocity() const ;
+
+    double getAngularVelocity() const;
+
+    double getDribblerRpm() const;
+
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;

@@ -1,4 +1,6 @@
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "direct_velocity_primitive.h"
+
 
 const std::string DirectVelocityPrimitive::PRIMITIVE_NAME = "Direct Velocity Primitive";
 
@@ -37,6 +39,26 @@ unsigned int DirectVelocityPrimitive::getRobotId() const
     return robot_id;
 }
 
+double DirectVelocityPrimitive::getXVelocity() const
+{
+    return x_velocity;
+}
+
+double DirectVelocityPrimitive::getYVelocity() const
+{
+    return y_velocity;
+}
+
+double DirectVelocityPrimitive::getAngularVelocity() const
+{
+    return angular_velocity;
+}
+
+double DirectVelocityPrimitive::getDribblerRpm() const
+{
+    return dribbler_rpm;
+}
+
 std::vector<double> DirectVelocityPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {x_velocity, y_velocity, angular_velocity,
@@ -49,3 +71,5 @@ std::vector<bool> DirectVelocityPrimitive::getExtraBitArray() const
 {
     return std::vector<bool>();
 }
+
+

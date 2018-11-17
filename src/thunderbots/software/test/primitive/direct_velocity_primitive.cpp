@@ -52,7 +52,7 @@ TEST(DirectVelocityPrimTest, get_x_velocity_test)
 
     DirectVelocityPrimitive direct_velcoity_prim = DirectVelocityPrimitive(0, x_velocity, 0.0, 0.0, 0.0);
 
-    EXPECT_DOUBLE_EQ(direct_velcoity_prim.getFinalSpeed(), x_velocity);
+    EXPECT_DOUBLE_EQ(direct_velcoity_prim.getXVelocity(), x_velocity);
 }
 
 TEST(DirectVelocityPrimTest, get_y_velocity_test)
@@ -61,7 +61,7 @@ TEST(DirectVelocityPrimTest, get_y_velocity_test)
 
     DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(0, 0.0,y_velocity,0.0 , 0.0);
 
-    EXPECT_EQ(direct_velocity_prim.getFinalAngle(), y_velocity);
+    EXPECT_DOUBLE_EQ(direct_velocity_prim.getYVelocity(), y_velocity);
 }
 
 TEST(DirectVelocityPrimTest, get_angular_velocity_test)
@@ -70,16 +70,16 @@ TEST(DirectVelocityPrimTest, get_angular_velocity_test)
 
     DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(0, 0.0, 0.0, angular_velocity, 0.0);
 
-    EXPECT_EQ(direct_velocity_prim.getDestination(), angular_velocity);
+    EXPECT_DOUBLE_EQ(direct_velocity_prim.getAngularVelocity(), angular_velocity);
 }
 
-TEST(DirectVelocityPrimTest, get_angular_velocity_test)
+TEST(DirectVelocityPrimTest, get_dribbler_rpm_test)
 {
     const double dribbler_rpm = -0.4;
 
     DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, dribbler_rpm);
 
-    EXPECT_EQ(direct_velocity_prim.getDestination(), dribbler_rpm);
+    EXPECT_DOUBLE_EQ(direct_velocity_prim.getDribblerRpm(), dribbler_rpm);
 }
 
 
