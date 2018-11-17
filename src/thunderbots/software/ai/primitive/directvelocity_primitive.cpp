@@ -29,6 +29,27 @@ unsigned int DirectVelocityPrimitive::getRobotId() const
     return robot_id;
 }
 
+double DirectVelocityPrimitive::getXVelocity() const
+{
+    return x_vel;
+}
+
+double DirectVelocityPrimitive::getYVelocity() const
+{
+    return y_vel;
+}
+
+AngularVelocity DirectVelocityPrimitive::getAngularVelocity() const
+{
+    return angular_vel;
+}
+
+double DirectVelocityPrimitive::getDribblerRPM() const
+{
+    return dribbler_rpm;
+}
+
+
 std::vector<double> DirectVelocityPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {x_vel, y_vel, angular_vel.toRadians(),

@@ -30,6 +30,20 @@ class MoveSpinPrimitive : public Primitive
 
     unsigned int getRobotId() const override;
 
+    /**
+     * Gets the robot's destination
+     *
+     * @return The robot's destination as a Point(X,Y)
+     */
+    Point getDestination() const;
+
+    /**
+     * Gets the robot's angular velocity in rad/s
+     *
+     * @return The robot's angular velocity in rad/s
+     */
+    AngularVelocity getAngularVelocity() const;
+
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;

@@ -6,6 +6,9 @@
 #include <iostream>
 
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/directvelocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "backend_output/grsim/grsim_backend.h"
 #include "geom/point.h"
@@ -50,11 +53,22 @@ int main(int argc, char** argv)
     // We loop at 30Hz so we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
+    //Test Primitives
+
+    DirectWheelsPrimitive * pp;
+
+    primitives.emplace_back(pp->createPrimitive(pp->createMsg()));
+    ros::spinOnce();
+    backend.sendPrimitives(primitives);
+
+
+
     // Main loop
     while (ros::ok())
     {
         // Clear all primitives each tick
         primitives.clear();
+
 
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector

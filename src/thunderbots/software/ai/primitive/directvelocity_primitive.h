@@ -31,6 +31,36 @@ public:
 
     unsigned int getRobotId() const override;
 
+
+    /**
+     * Gets the robot's X velocity in m/s
+     *
+     * @return the robot's X velocity in m/s
+     */
+    double getXVelocity() const;
+
+    /**
+     * Gets the robot's Y velocity in m/s
+     *
+     * @return the robot's Y velocity in m/s
+     */
+    double getYVelocity() const;
+
+    /**
+     * Gets the robot's angular velocity in rad/s
+     *
+     * @return the robot's angular velocity in rad/s
+     */
+    AngularVelocity getAngularVelocity() const;
+
+    /**
+     * Gets the RPM of the dribbler
+     *
+     * @return the RPM of the dribbler
+     */
+
+    double getDribblerRPM() const;
+
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;

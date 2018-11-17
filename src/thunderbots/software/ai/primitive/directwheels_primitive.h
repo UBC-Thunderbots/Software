@@ -32,6 +32,41 @@ public:
 
     unsigned int getRobotId() const override;
 
+    /**
+     * Gets the power of wheel 0
+     *
+     * @return the power of wheel 0
+     */
+    unsigned int getWheel0Power() const;
+
+    /**
+     * Gets the power of wheel 1
+     *
+     * @return the power of wheel 1
+     */
+    unsigned int getWheel1Power() const;
+
+    /**
+     * Gets the power of wheel 2
+     *
+     * @return the power of wheel 2
+     */
+    unsigned int getWheel2Power() const;
+
+    /**
+     * Gets the power of wheel 3
+     *
+     * @return the power of wheel 3
+     */
+    unsigned int getWheel3Power() const;
+
+    /**
+     * Gets the RPM of the dribbler
+     *
+     * @return the RPM of the dribbler
+     */
+    unsigned int getDribblerRPM() const;
+
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;

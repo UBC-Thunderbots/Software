@@ -1,6 +1,10 @@
 #include "ai/primitive/primitive.h"
 
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
+#include "ai/primitive/directvelocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
+
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
 {
@@ -28,6 +32,18 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
+    /*else if (primitive_msg.primitive_name == MoveSpinPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<MoveSpinPrimitive(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<DirectVelocityPrimitive(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == DirectWheelsPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<DirectWheelsPrimitive(primitive_msg);
+    }*/
     else
     {
         // TODO: Throw unknown primitive exception here

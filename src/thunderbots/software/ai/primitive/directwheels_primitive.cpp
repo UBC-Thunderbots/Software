@@ -31,6 +31,31 @@ unsigned int DirectWheelsPrimitive::getRobotId() const
     return robot_id;
 }
 
+unsigned int DirectWheelsPrimmitive::getWheel0Power() const
+{
+    return wheel0_power;
+}
+
+unsigned int DirectWheelsPrimitive::getWheel1Power() const
+{
+    return wheel1_power;
+}
+
+unsigned int DirectWheelsPrimmitive::getWheel2Power() const
+{
+    return wheel2_power;
+}
+
+unsigned int DirectWheelsPrimitive::getWheel3Power() const
+{
+    return wheel3_power;
+}
+
+double DirectWheelsPrimitive::getDribblerRPM() const
+{
+    return dribbler_rpm;
+}
+
 std::vector<double> DirectWheelsPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {wheel0_power, wheel1_power, wheel2_power, wheel3_power,
@@ -42,3 +67,4 @@ std::vector<double> DirectWheelsPrimitive::getParameterArray() const
 std::vector<bool> DirectWheelsPrimitive::getExtraBitArray() const
 {
     return std::vector<bool>();
+}
