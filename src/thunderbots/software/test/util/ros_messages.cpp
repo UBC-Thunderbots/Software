@@ -81,9 +81,8 @@ TEST_F(ROSMessageUtilTest, create_field_from_ros_message)
 
     Field field = Util::ROSMessages::createFieldFromROSMessage(field_msg);
 
-    Field field_other = Field();
-    field_other.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                                 boundary_width, center_circle_radius);
+    Field field_other = Field(length, width, defense_length, defense_width, goal_width,
+                              boundary_width, center_circle_radius);
 
     EXPECT_EQ(field_other, field);
 }

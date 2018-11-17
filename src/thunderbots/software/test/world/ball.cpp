@@ -28,7 +28,7 @@ class BallTest : public ::testing::Test
 
 TEST_F(BallTest, construct_with_no_params)
 {
-    Ball ball = Ball();
+    Ball ball = Ball(Point(), Vector());
 
     EXPECT_EQ(Point(), ball.position());
     EXPECT_EQ(Vector(), ball.velocity());
@@ -205,7 +205,7 @@ TEST_F(BallTest, get_last_update_timestamp)
 
 TEST_F(BallTest, equality_operator_compare_ball_with_itself)
 {
-    Ball ball_0 = Ball();
+    Ball ball_0 = Ball(Point(), Vector());
 
     Ball ball_1 = Ball(Point(2, -3), Vector(0, 1), one_hundred_fifty_milliseconds_future);
 

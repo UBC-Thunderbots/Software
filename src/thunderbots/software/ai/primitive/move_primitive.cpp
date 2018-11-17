@@ -31,6 +31,21 @@ unsigned int MovePrimitive::getRobotId() const
     return robot_id;
 }
 
+Point MovePrimitive::getDestination() const
+{
+    return dest;
+}
+
+Angle MovePrimitive::getFinalAngle() const
+{
+    return final_angle;
+}
+
+double MovePrimitive::getFinalSpeed() const
+{
+    return final_speed;
+}
+
 std::vector<double> MovePrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),

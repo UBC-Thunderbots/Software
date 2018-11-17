@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
-        UTIL::CONSTANTS::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+        Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();

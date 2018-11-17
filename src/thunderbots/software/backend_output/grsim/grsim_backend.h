@@ -45,11 +45,20 @@ class GrSimBackend : public Backend
      *   Y <--- Robot
      *
      * @param angular_velocity The angular velocity to set for the robot, in Radians per
-     * second.
+     * second. A negative value results in counter-clockwise rotation, and positive
+     * values result in clockwise rotation
+     * @param kick_speed_meters_per_second How hard to kick/chip the ball, in
+     * meters/second. If chip is false, the ball is kicked along the ground. If chip is
+     * true, the ball is chipped in the air
+     * @param chip Whether or not to chip the ball. If chip is true, the ball is chipped
+     * in the air, otherwise it is kicked along the ground
+     * @param dribbler_on Whether or not to turn on the dribbler. If dribbler_on is true,
+     * the dribbler will be turned on, otherwise the dribbler remains off
      */
     grSim_Packet createGrSimPacket(unsigned int robot_id, TeamColour team_colour,
-                                   Vector velocity,
-                                   AngularVelocity angular_velocity) const;
+                                   Vector velocity, AngularVelocity angular_velocity,
+                                   double kick_speed_meters_per_second, bool chip,
+                                   bool dribbler_on) const;
 
 
     // TODO: Implement grSim bang bang controller

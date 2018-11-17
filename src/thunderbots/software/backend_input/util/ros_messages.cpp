@@ -1,8 +1,8 @@
-#include "message_util.h"
+#include "backend_input/util/ros_messages.h"
 
 #include "shared/constants.h"
 
-thunderbots_msgs::Field MessageUtil::createFieldMsg(
+thunderbots_msgs::Field MessageUtil::createFieldMsgFromFieldGeometry(
     const SSL_GeometryFieldSize &field_data)
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
@@ -77,7 +77,7 @@ thunderbots_msgs::Field MessageUtil::createFieldMsg(
     return field_msg;
 }
 
-thunderbots_msgs::Ball MessageUtil::createBallMsg(
+thunderbots_msgs::Ball MessageUtil::createBallMsgFromFilteredBallData(
     const FilteredBallData &filtered_ball_data)
 {
     thunderbots_msgs::Ball ball_msg;
@@ -94,7 +94,7 @@ thunderbots_msgs::Ball MessageUtil::createBallMsg(
     return ball_msg;
 }
 
-thunderbots_msgs::Robot MessageUtil::createRobotMsg(
+thunderbots_msgs::Robot MessageUtil::createRobotMsgFromFilteredRobotData(
     const FilteredRobotData &filtered_robot_data)
 {
     thunderbots_msgs::Robot robot_msg;
@@ -118,14 +118,15 @@ thunderbots_msgs::Robot MessageUtil::createRobotMsg(
     return robot_msg;
 }
 
-thunderbots_msgs::Team MessageUtil::createTeamMsg(
+thunderbots_msgs::Team MessageUtil::createTeamMsgFromFilteredRobotData(
     const std::vector<FilteredRobotData> &filtered_team_data)
 {
     thunderbots_msgs::Team team_msg;
 
     for (const FilteredRobotData &filtered_robot_data : filtered_team_data)
     {
-        thunderbots_msgs::Robot robot_msg = createRobotMsg(filtered_robot_data);
+        thunderbots_msgs::Robot robot_msg =
+            createRobotMsgFromFilteredRobotData(filtered_robot_data);
         team_msg.robots.emplace_back(robot_msg);
     }
 

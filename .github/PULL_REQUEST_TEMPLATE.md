@@ -5,7 +5,7 @@ This file outlines a list of common things that should be addressed when opening
 ## Please fill out the following before requesting review on this PR
 
 ### Description
-*Give a high-level desciprion of the changes in this PR*
+*Give a high-level description of the changes in this PR*
 
 ### Testing Done
 *Outline any testing that was done for these changes. This could be unit tests, integration tests, etc.*
