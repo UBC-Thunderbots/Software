@@ -16,13 +16,6 @@ class AI final
 {
    public:
     /**
-     * Creates a new AI with a default world. The ball will be at the center of the field
-     * with 0 velocity, and the friendly and enemy teams will both be empty and have
-     * initial robot_expiry_buffers of 0 milliseconds.
-     */
-    explicit AI();
-
-    /**
      * Creates a new AI
      *
      * @param world The initial state of the world for the AI
