@@ -49,7 +49,7 @@ TEST(CatchPrimTest, get_velocity_test)
 
     CatchPrimitive catch_prim = CatchPrimitive(0, velocity, 0, 0);
 
-     EXPECT_EQ(velocity, catch_prim.getVelocity();
+    EXPECT_DOUBLE_EQ(velocity, catch_prim.getVelocity());
 }
 
 TEST(CatchPrimTest, get_dribbler_speed_test)
