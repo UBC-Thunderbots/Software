@@ -264,4 +264,12 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(direct_velocity_primitive_test
+            test/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/direct_velocity_primitive.h
+            )
+    target_link_libraries(direct_velocity_primitive_test ${catkin_LIBRARIES})
+
 endif()

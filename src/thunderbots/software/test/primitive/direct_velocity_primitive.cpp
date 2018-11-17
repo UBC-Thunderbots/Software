@@ -13,7 +13,7 @@ TEST(DirectVelocityPrimTest, construct_with_no_params_test)
 
     DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive( 0U ,0.0, 0.0, 0.0, 0.0);
 
-    EXPECT_EQ((unsigned int)int(), direct_velocity_prim.getRobotId()); // why we want compare robot id here when it is compared below
+    EXPECT_EQ(0U, direct_velocity_prim.getRobotId());
     EXPECT_EQ(direct_velocity_prim_name, direct_velocity_prim.getPrimitiveName());
 }
 
@@ -29,7 +29,7 @@ TEST(DirectVelocityPrimTest, get_robot_id_test)
 TEST(DirectVelocityPrimTest, parameter_array_test)
 {
     const unsigned int robot_id = 2U;
-    const double x_velocity     = 1.25; //why const  . and :: ?
+    const double x_velocity     = 1.25;
     const double y_velocity     = -0.29;
     const double angular_velocity    = 0.0;
     const double dribbler_rpm = 5.5;
@@ -109,7 +109,7 @@ TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameterArray();
 
-    EXPECT_EQ("Direct Velocity Primitive", new_prim.getPrimitiveName()); // ok to define global variable for same variable?
+    EXPECT_EQ("Direct Velocity Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
     EXPECT_DOUBLE_EQ(x_velocity, parameters[0]);
     EXPECT_DOUBLE_EQ(y_velocity, parameters[1]);
