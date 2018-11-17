@@ -250,6 +250,8 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -263,5 +265,23 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(chip_primitive_test
+            test/primitive/chip_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/chip_primitive.h
+            )
+
+    target_link_libraries(chip_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(kick_primitive_test
+            test/primitive/kick_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/kick_primitive.h
+            )
+
+    target_link_libraries(kick_primitive_test ${catkin_LIBRARIES})
 
 endif()

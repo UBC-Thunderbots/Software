@@ -34,6 +34,21 @@ unsigned int ChipPrimitive::getRobotId() const
     return robot_id;
 }
 
+Point ChipPrimitive::getChipOrigin() const
+{
+    return chip_origin;
+}
+
+Angle ChipPrimitive::getChipDirection() const
+{
+    return chip_direction;
+}
+
+double ChipPrimitive::getChipDistance() const
+{
+    return chip_distance_meters;
+}
+
 std::vector<double> ChipPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {chip_origin.x(), chip_origin.y(),

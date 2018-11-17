@@ -1,3 +1,8 @@
+/**
+ * This file includes the definition of the KickPrimitive class and it's member functions
+ * and data
+ */
+
 #pragma once
 
 #include "ai/primitive/primitive.h"
@@ -32,6 +37,26 @@ class KickPrimitive : public Primitive
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
+    /**
+     * Gets the location of where the kick will be taken
+     *
+     * @return The origin location of kicking as a Point(X,Y)
+     */
+    Point getKickOrigin() const;
+
+    /**
+     * Gets the robot's kicking orientation
+     *
+     * @return The robot's kicking orientation as an Angle
+     */
+    Angle getKickDirection() const;
+
+    /**
+     * Gets the speed of how fast the robot will kick the ball in m/s
+     *
+     * @return The robot's kicking speed in m/s
+     */
+    double getKickSpeed() const;
 
     std::vector<double> getParameterArray() const override;
 

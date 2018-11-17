@@ -1,3 +1,8 @@
+/**
+ * This file includes the definition of the ChipPrimitive class and it's member functions
+ * and data
+ */
+
 #pragma once
 
 #include "ai/primitive/primitive.h"
@@ -32,6 +37,27 @@ class ChipPrimitive : public Primitive
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
+    /**
+     * Gets the location of where the chip will be taken
+     *
+     * @return The origin location of chipping as a Point(X,Y)
+     */
+    Point getChipOrigin() const;
+
+    /**
+     * Gets the robot's chipping orientation
+     *
+     * @return The robot's chipping orientation as an Angle
+     */
+    Angle getChipDirection() const;
+
+    /**
+     * Gets the distance of the chip between the origin and the location of the first
+     * bounce in metres
+     *
+     * @return The chipping distance in metres
+     */
+    double getChipDistance() const;
 
     std::vector<double> getParameterArray() const override;
 

@@ -35,6 +35,21 @@ unsigned int KickPrimitive::getRobotId() const
     return robot_id;
 }
 
+Point KickPrimitive::getKickOrigin() const
+{
+    return kick_origin;
+}
+
+Angle KickPrimitive::getKickDirection() const
+{
+    return kick_direction;
+}
+
+double KickPrimitive::getKickSpeed() const
+{
+    return kick_speed_meters_per_second;
+}
+
 std::vector<double> KickPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {kick_origin.x(), kick_origin.y(),
