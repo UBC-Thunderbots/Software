@@ -31,11 +31,15 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
 
     if (primitive_msg.primitive_name == MovePrimitive::PRIMITIVE_NAME)
 <<<<<<< HEAD
+<<<<<<< HEAD
     { 
 =======
     {
         
 >>>>>>> Added simple exceptions for rrt and primitives
+=======
+    { 
+>>>>>>> removed spacing and added exceptions to ball.cpp
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
     else if (primitive_msg.primitive_name == CatchPrimitive::PRIMITIVE_NAME)
@@ -57,6 +61,7 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     else
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
         throw std::invalid_argument("Error: Unknown Primitive (" + primitive_msg.primitive_name + ") ");
 =======
       
@@ -64,6 +69,9 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
        
 
 >>>>>>> Added simple exceptions for rrt and primitives
+=======
+        throw std::invalid_argument("Error: Unknown Primitive (" + primitive_msg.primitive_name + ") ");
+>>>>>>> removed spacing and added exceptions to ball.cpp
     }
 
     return prim_ptr;
@@ -73,6 +81,7 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
                                          std::string prim_name) const
 {
     if (prim_msg.primitive_name != prim_name)
+<<<<<<< HEAD
 <<<<<<< HEAD
     {   
         throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);  
@@ -87,5 +96,9 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
 =======
        
 >>>>>>> removed comments
+=======
+    {   
+        throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);  
+>>>>>>> removed spacing and added exceptions to ball.cpp
     }
 }
