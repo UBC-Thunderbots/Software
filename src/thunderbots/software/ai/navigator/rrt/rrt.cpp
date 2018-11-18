@@ -40,7 +40,7 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
         }
         else
         {
-             throw std::invalid_argument("Error: Unrecognized Intent given to navigator STAAP OR ELSE");
+             throw std::invalid_argument("Error: Unrecognized Intent (" + intent->getIntentName() + ") given to navigator");
         }
     }
 

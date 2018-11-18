@@ -26,16 +26,12 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     std::unique_ptr<Primitive> prim_ptr;
 
     if (primitive_msg.primitive_name == MovePrimitive::PRIMITIVE_NAME)
-    {
-        
+    { 
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
     else
     {
-      
         throw std::invalid_argument("Error: Unknown Primitive (" + primitive_msg.primitive_name + ") ");
-       
-
     }
 
     return prim_ptr;
@@ -45,10 +41,7 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
                                          std::string prim_name) const
 {
     if (prim_msg.primitive_name != prim_name)
-    {
-        
-        throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);
-       
-       
+    {   
+        throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);  
     }
 }

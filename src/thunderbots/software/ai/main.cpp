@@ -90,7 +90,8 @@ int main(int argc, char **argv)
         // Spin once to let all necessary callbacks run
         // These callbacks will update the AI's world state
         ros::spinOnce();
-
+        try
+        {
         // Get the Primitives the Robots should run from the AI
         // We pass a timestamp with the current time (the time we initiate the call)
         // to let the AI update its predictors so that decisions are always made with the
@@ -109,6 +110,12 @@ int main(int argc, char **argv)
             std::cout << msg << std::endl;
         }
         primitive_publisher.publish(primitive_array_message);
+        }
+        catch (const std::invalid_argument& e)
+        {
+            std::cout<< e.what()<< std::endl;
+        }
+        
     }
 
     return 0;
