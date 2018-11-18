@@ -1,5 +1,7 @@
 #include "ai/primitive/primitive.h"
 
+#include "ai/primitive/chip_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
@@ -27,6 +29,14 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     if (primitive_msg.primitive_name == MovePrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == ChipPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<ChipPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == KickPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<KickPrimitive>(primitive_msg);
     }
     else
     {

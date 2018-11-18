@@ -66,9 +66,9 @@ TEST(ChipPrimTest, get_chip_distance_test)
 {
     const double chip_distance_meters = 1.23;
 
-    ChipPrimitive chip_prim = ChipPrimitive(0, Point(), Angle(), chip_distance_meters;
+    ChipPrimitive chip_prim = ChipPrimitive(0, Point(), Angle(), chip_distance_meters);
 
-    EXPECT_DOUBLE_EQ(chip_prim.getFinalSpeed(), chip_distance_meters);
+    EXPECT_DOUBLE_EQ(chip_prim.getChipDistance(), chip_distance_meters);
 }
 
 TEST(ChipPrimTest, get_extra_bit_array_test)
