@@ -1,4 +1,5 @@
 #include "ai/primitive/direct_velocity_primitive.h"
+
 #include "direct_velocity_primitive.h"
 
 
@@ -71,5 +72,3 @@ std::vector<bool> DirectVelocityPrimitive::getExtraBitArray() const
 {
     return std::vector<bool>();
 }
-
-

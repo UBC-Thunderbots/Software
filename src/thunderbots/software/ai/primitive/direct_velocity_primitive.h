@@ -37,9 +37,9 @@ class DirectVelocityPrimitive : public Primitive
 
     unsigned int getRobotId() const override;
 
-    double getXVelocity() const ;
+    double getXVelocity() const;
 
-    double getYVelocity() const ;
+    double getYVelocity() const;
 
     double getAngularVelocity() const;
 

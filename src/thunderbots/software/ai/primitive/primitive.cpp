@@ -1,8 +1,7 @@
 #include "ai/primitive/primitive.h"
 
-#include "ai/primitive/move_primitive.h"
-
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/move_primitive.h"
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
 {
@@ -30,7 +29,7 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
-    else if(primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
+    else if (primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<DirectVelocityPrimitive>(primitive_msg);
     }
