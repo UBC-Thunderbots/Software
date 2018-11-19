@@ -25,7 +25,9 @@ class Primitive
      *
      * @return The Primitive message containing the information from this Primitive
      */
-    thunderbots_msgs::Primitive createMsg() const;
+       thunderbots_msgs::Primitive createMsg(
+
+               ) const;
 
     /**
      * Returns the name of the Primitive
