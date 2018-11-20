@@ -27,6 +27,8 @@ int main(int argc, char **argv)
             Util::Constants::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
+    ros::Publisher gamecontroller_publisher = node_handle.advertise<thunderbots_msgs::RefboxData>(
+            Util::Constants::BACKEND_INPUT_GAMECONTROLLER_TOPIC, 1);
 
     // Set up our backend
     Backend backend = Backend();
@@ -79,6 +81,10 @@ int main(int argc, char **argv)
         auto gamecontroller_packet_ptr = game_controller_client.getGameControllerPacket();
         if(gamecontroller_packet_ptr) {
             std::cout << Referee_Command_Name(gamecontroller_packet_ptr->command()) << std::endl;
+            auto refbox_data_msg = backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
+            if(refbox_data_msg) {
+                gamecontroller_publisher.publish(*refbox_data_msg);
+            }
         }
 
         // We spin once here so any callbacks in this node can run (if we ever add them)

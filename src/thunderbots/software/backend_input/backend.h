@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <ai/world/field.h>
 
 #include "backend_input/filter/ball_filter.h"
 #include "backend_input/filter/robot_filter.h"
@@ -82,6 +83,13 @@ class Backend
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
 
-    int32_t getTeamCommand(Referee::Command command, TeamColour our_team_colour);
-    Point getTeamLocalCoordinates(Referee::Point point);
+    // backend *should* be the only part of the system that is aware of Refbox/Vision
+    // global coordinates. To AI, +x will always be enemy and -x will always be friendly.
+    FieldSide our_field_side;
+    // TODO: the rest of backend should be spitting out team-local coordinates
+
+    void updateOurFieldSide(bool blue_team_on_positive_half);
+
+    int32_t getTeamCommand(const Referee::Command& command);
+    Point getTeamLocalCoordinates(const Referee::Point& point);
 };

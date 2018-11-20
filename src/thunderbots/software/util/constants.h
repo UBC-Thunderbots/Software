@@ -14,13 +14,11 @@ namespace Util
         static const std::string BACKEND_INPUT_FRIENDLY_TEAM_TOPIC =
             "backend/friendly_team";
         static const std::string BACKEND_INPUT_ENEMY_TEAM_TOPIC = "backend/enemy_team";
+        static const std::string BACKEND_INPUT_GAMECONTROLLER_TOPIC = "backend/gamecontroller";
         static const std::string AI_PRIMITIVES_TOPIC            = "backend/primitives";
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = TeamColour::YELLOW;
-
-        // TODO: Make this a tunable parameter
-        static const FieldSide FRIENDLY_FIELD_SIDE = TeamSide::WEST;
 
         // Networking and vision
         static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
