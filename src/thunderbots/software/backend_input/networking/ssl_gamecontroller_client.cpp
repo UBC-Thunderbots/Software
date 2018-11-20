@@ -33,8 +33,6 @@ void SSLGameControllerClient::handleDataReception(const boost::system::error_cod
         packet_data->ParseFromArray(raw_received_data_,
                                     static_cast<int>(num_bytes_received));
 
-        std::cout << "Received refbox command: " << Referee_Command_Name(packet_data->command()) << std::endl;
-
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
             boost::asio::buffer(raw_received_data_, max_buffer_length), sender_endpoint_,

@@ -80,7 +80,6 @@ int main(int argc, char **argv)
 
         auto gamecontroller_packet_ptr = game_controller_client.getGameControllerPacket();
         if(gamecontroller_packet_ptr) {
-            std::cout << Referee_Command_Name(gamecontroller_packet_ptr->command()) << std::endl;
             auto refbox_data_msg = backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
             if(refbox_data_msg) {
                 gamecontroller_publisher.publish(*refbox_data_msg);

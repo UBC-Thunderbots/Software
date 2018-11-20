@@ -133,15 +133,25 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
 
 std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(const Referee &packet) {
     thunderbots_msgs::RefboxData refbox_data;
-    thunderbots_msgs::RefboxCommand command;
-    command.command = getTeamCommand(packet.command());
-    std::cout << "REFBOX COMMAND: " << Referee::Command_Name(packet.command()) << std::endl;
-    updateOurFieldSide(packet.blue_team_on_positive_half());
-    std::cout << "BLUE TEAM SIDE: " << (packet.blue_team_on_positive_half() ? "EAST" : "WEST") << std::endl;
+    refbox_data.command.command = getTeamCommand(packet.command());
+    setOurFieldSide(packet.blue_team_on_positive_half());
     auto designated_position = getTeamLocalCoordinates(packet.designated_position());
-    std::cout << "DESIGNATED POSITION: " << designated_position << std::endl;
     refbox_data.designated_position.x = designated_position.x();
     refbox_data.designated_position.y = designated_position.y();
+    refbox_data.packet_timestamp = packet.packet_timestamp();
+    refbox_data.command_timestamp = packet.command_timestamp();
+
+    thunderbots_msgs::RefboxTeamInfo blue = getTeamInfo(packet.blue());
+    thunderbots_msgs::RefboxTeamInfo yellow = getTeamInfo(packet.yellow());
+
+    if(Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE) {
+        refbox_data.us = blue;
+        refbox_data.them = yellow;
+    } else {
+        refbox_data.us = yellow;
+        refbox_data.them = blue;
+    }
+
     return std::make_optional<thunderbots_msgs::RefboxData>(refbox_data);
 }
 
@@ -252,7 +262,7 @@ Point Backend::getTeamLocalCoordinates(const Referee::Point& point) {
     }
 }
 
-void Backend::updateOurFieldSide(bool blue_team_on_positive_half) {
+void Backend::setOurFieldSide(bool blue_team_on_positive_half) {
     if (blue_team_on_positive_half) {
         if (Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE) {
             our_field_side = FieldSide::WEST;
@@ -266,4 +276,18 @@ void Backend::updateOurFieldSide(bool blue_team_on_positive_half) {
             our_field_side = FieldSide::WEST;
         }
     }
+}
+
+thunderbots_msgs::RefboxTeamInfo Backend::getTeamInfo(const Referee::TeamInfo& team_info) {
+    thunderbots_msgs::RefboxTeamInfo refbox_team_info;
+    refbox_team_info.name = team_info.name();
+    refbox_team_info.score = team_info.score();
+    refbox_team_info.red_cards = team_info.red_cards();
+    for (auto card_time : team_info.yellow_card_times()) {
+        refbox_team_info.yellow_card_times.push_back(card_time);
+    }
+    refbox_team_info.timeouts = team_info.timeouts();
+    refbox_team_info.timeout_time = team_info.timeout_time();
+    refbox_team_info.goalie = team_info.goalie();
+    return thunderbots_msgs::RefboxTeamInfo();
 }

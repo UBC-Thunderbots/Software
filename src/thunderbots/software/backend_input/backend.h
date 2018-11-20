@@ -88,8 +88,9 @@ class Backend
     FieldSide our_field_side;
     // TODO: the rest of backend should be spitting out team-local coordinates
 
-    void updateOurFieldSide(bool blue_team_on_positive_half);
+    void setOurFieldSide(bool blue_team_on_positive_half);
 
     int32_t getTeamCommand(const Referee::Command& command);
     Point getTeamLocalCoordinates(const Referee::Point& point);
+    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo& team_info);
 };
