@@ -24,6 +24,3 @@ RefboxTeamInfo us
 RefboxTeamInfo them
 
 Point2D designated_position
-
-# if our team is on the positive X axis (east) side
-bool our_team_on_east_side
