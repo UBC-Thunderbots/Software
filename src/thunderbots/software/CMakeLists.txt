@@ -290,4 +290,13 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(kick_primitive_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(catch_primitive_test
+            test/primitive/catch_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            )
+
+    target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
+
 endif()
