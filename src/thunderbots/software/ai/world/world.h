@@ -1,6 +1,7 @@
 #pragma once
 
 #include <util/refbox_constants.h>
+
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
@@ -58,7 +59,7 @@ class World final
      *
      * @param game_state the game state sent by refbox
      */
-     void updateRefboxGameState(const RefboxGameState& game_state);
+    void updateRefboxGameState(const RefboxGameState& game_state);
 
     /**
      * Returns a const reference to the Field in the world
@@ -121,7 +122,7 @@ class World final
      *
      * @return a const reference to the Game State
      */
-     const GameState& gameState() const;
+    const GameState& gameState() const;
 
    private:
     Field field_;

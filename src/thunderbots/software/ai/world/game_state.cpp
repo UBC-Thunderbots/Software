@@ -33,9 +33,9 @@ bool GameState::ballPlacement() const
     return restart == BALL_PLACEMENT;
 }
 
-bool GameState::isOurRestart() const
+bool GameState::ourRestart() const
 {
-    return ourRestart;
+    return our_restart;
 }
 
 bool GameState::direct() const
@@ -50,22 +50,22 @@ bool GameState::indirect() const
 
 bool GameState::ourKickoff() const
 {
-    return kickoff() && ourRestart;
+    return kickoff() && our_restart;
 }
 
 bool GameState::ourPenalty() const
 {
-    return penalty() && ourRestart;
+    return penalty() && our_restart;
 }
 
 bool GameState::ourDirect() const
 {
-    return direct() && ourRestart;
+    return direct() && our_restart;
 }
 
 bool GameState::ourIndirect() const
 {
-    return indirect() && ourRestart;
+    return indirect() && our_restart;
 }
 
 bool GameState::ourFreeKick() const
@@ -75,27 +75,27 @@ bool GameState::ourFreeKick() const
 
 bool GameState::ourPlacement() const
 {
-    return ballPlacement() && ourRestart;
+    return ballPlacement() && our_restart;
 }
 
 bool GameState::theirKickoff() const
 {
-    return kickoff() && !ourRestart;
+    return kickoff() && !our_restart;
 }
 
 bool GameState::theirPenalty() const
 {
-    return penalty() && !ourRestart;
+    return penalty() && !our_restart;
 }
 
 bool GameState::theirDirect() const
 {
-    return direct() && !ourRestart;
+    return direct() && !our_restart;
 }
 
 bool GameState::theirIndirect() const
 {
-    return indirect() && !ourRestart;
+    return indirect() && !our_restart;
 }
 
 bool GameState::theirFreeKick() const
@@ -105,7 +105,7 @@ bool GameState::theirFreeKick() const
 
 bool GameState::theirPlacement() const
 {
-    return ballPlacement() && !ourRestart;
+    return ballPlacement() && !our_restart;
 }
 
 // Robots must be in position for a restart
@@ -114,12 +114,12 @@ bool GameState::setupRestart() const
     return state == SETUP || state == READY;
 }
 
-bool GameState::inSetupState() const
+bool GameState::setupState() const
 {
     return state == SETUP;
 }
 
-bool GameState::inReadyState() const
+bool GameState::readyState() const
 {
     return state == READY;
 }
@@ -127,13 +127,12 @@ bool GameState::inReadyState() const
 // One of our robots can kick the ball
 bool GameState::canKick() const
 {
-    return state == PLAYING || (ourRestart && state == PLAYING);
+    return state == PLAYING || (our_restart && state == PLAYING);
 }
 
-// Our robots must stay 500mm away from the ball
 bool GameState::stayAwayFromBall() const
 {
-    return state != PLAYING && !ourRestart;
+    return state != PLAYING && !our_restart;
 }
 
 // Our robots must stay on our half of the field
@@ -149,10 +148,9 @@ bool GameState::stayBehindPenaltyLine() const
     return restart == PENALTY;
 }
 
-void GameState::setBallPlacementPoint(double x, double y)
+void GameState::setBallPlacementPoint(Point placementPoint)
 {
-    // TODO: potentially do coordinate transform so that our side is always negative x
-    ballPlacementPoint = Point(x, y);
+    ballPlacementPoint = placementPoint;
 }
 
 Point GameState::getBallPlacementPoint() const
@@ -170,9 +168,9 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             restart = NONE;
             break;
         case RefboxGameState::STOP:
-            state      = STOP;
-            restart    = NONE;
-            ourRestart = false;
+            state       = STOP;
+            restart     = NONE;
+            our_restart = false;
             break;
         case RefboxGameState::NORMAL_START:
             state = PLAYING;
@@ -182,44 +180,44 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             restart = NONE;
             break;
         case RefboxGameState::PREPARE_KICKOFF_US:
-            state      = SETUP;
-            restart    = KICKOFF;
-            ourRestart = true;
+            state       = SETUP;
+            restart     = KICKOFF;
+            our_restart = true;
             break;
         case RefboxGameState::PREPARE_KICKOFF_THEM:
-            state      = READY;
-            restart    = KICKOFF;
-            ourRestart = false;
+            state       = READY;
+            restart     = KICKOFF;
+            our_restart = false;
             break;
         case RefboxGameState::PREPARE_PENALTY_US:
-            state      = SETUP;
-            restart    = PENALTY;
-            ourRestart = true;
+            state       = SETUP;
+            restart     = PENALTY;
+            our_restart = true;
             break;
         case RefboxGameState::PREPARE_PENALTY_THEM:
-            state      = READY;
-            restart    = PENALTY;
-            ourRestart = false;
+            state       = READY;
+            restart     = PENALTY;
+            our_restart = false;
             break;
         case RefboxGameState::DIRECT_FREE_US:
-            state      = SETUP;
-            restart    = DIRECT;
-            ourRestart = true;
+            state       = SETUP;
+            restart     = DIRECT;
+            our_restart = true;
             break;
         case RefboxGameState::DIRECT_FREE_THEM:
-            state      = READY;
-            restart    = DIRECT;
-            ourRestart = false;
+            state       = READY;
+            restart     = DIRECT;
+            our_restart = false;
             break;
         case RefboxGameState::INDIRECT_FREE_US:
-            state      = SETUP;
-            restart    = INDIRECT;
-            ourRestart = true;
+            state       = SETUP;
+            restart     = INDIRECT;
+            our_restart = true;
             break;
         case RefboxGameState::INDIRECT_FREE_THEM:
-            state      = READY;
-            restart    = INDIRECT;
-            ourRestart = false;
+            state       = READY;
+            restart     = INDIRECT;
+            our_restart = false;
             break;
         case RefboxGameState::TIMEOUT_US:
             state   = HALT;
@@ -238,14 +236,14 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             restart = NONE;
             break;
         case RefboxGameState::BALL_PLACEMENT_US:
-            state      = READY;
-            restart    = BALL_PLACEMENT;
-            ourRestart = true;
+            state       = READY;
+            restart     = BALL_PLACEMENT;
+            our_restart = true;
             break;
         case RefboxGameState::BALL_PLACEMENT_THEM:
-            state      = SETUP;
-            restart    = BALL_PLACEMENT;
-            ourRestart = false;
+            state       = SETUP;
+            restart     = BALL_PLACEMENT;
+            our_restart = false;
             break;
     }
 }

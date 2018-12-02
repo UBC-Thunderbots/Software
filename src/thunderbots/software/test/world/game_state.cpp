@@ -29,9 +29,9 @@ TEST(GameStateTest, test_our_kickoff_restart)
 {
     GameState state;
     state.updateRefboxGameState(RefboxGameState::PREPARE_KICKOFF_US);
-    EXPECT_TRUE(state.inSetupState());
+    EXPECT_TRUE(state.setupState());
     EXPECT_TRUE(state.ourKickoff());
-    EXPECT_TRUE(state.isOurRestart());
+    EXPECT_TRUE(state.ourRestart());
     state.updateRefboxGameState(RefboxGameState::NORMAL_START);
     EXPECT_TRUE(state.ourKickoff());
     EXPECT_TRUE(state.playing());
@@ -44,7 +44,7 @@ TEST(GameStateTest, test_their_kickoff_restart)
     EXPECT_TRUE(state.theirKickoff());
     EXPECT_TRUE(state.stayAwayFromBall());
     EXPECT_TRUE(state.stayOnSide());
-    EXPECT_FALSE(state.isOurRestart());
+    EXPECT_FALSE(state.ourRestart());
     state.updateRefboxGameState(RefboxGameState::NORMAL_START);
     EXPECT_TRUE(state.theirKickoff());
     EXPECT_TRUE(state.playing());
@@ -56,7 +56,7 @@ TEST(GameStateTest, test_our_indirect_restart)
     state.updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US);
     EXPECT_TRUE(state.ourIndirect());
     EXPECT_TRUE(state.setupRestart());
-    EXPECT_TRUE(state.isOurRestart());
+    EXPECT_TRUE(state.ourRestart());
     EXPECT_TRUE(state.ourFreeKick());
     state.updateRefboxGameState(RefboxGameState::NORMAL_START);
     EXPECT_TRUE(state.ourIndirect());
@@ -70,7 +70,7 @@ TEST(GameStateTest, test_their_indirect_restart)
     EXPECT_TRUE(state.theirIndirect());
     EXPECT_TRUE(state.setupRestart());
     EXPECT_TRUE(state.stayAwayFromBall());
-    EXPECT_FALSE(state.isOurRestart());
+    EXPECT_FALSE(state.ourRestart());
     EXPECT_FALSE(state.ourFreeKick());
     state.updateRefboxGameState(RefboxGameState::NORMAL_START);
     EXPECT_TRUE(state.theirIndirect());
@@ -83,7 +83,7 @@ TEST(GameStateTest, test_our_placement)
     state.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_US);
     EXPECT_TRUE(state.ballPlacement());
     EXPECT_TRUE(state.setupRestart());
-    EXPECT_TRUE(state.isOurRestart());
+    EXPECT_TRUE(state.ourRestart());
 }
 
 TEST(GameStateTest, test_their_placement)
@@ -91,7 +91,7 @@ TEST(GameStateTest, test_their_placement)
     GameState state;
     state.updateRefboxGameState(RefboxGameState::BALL_PLACEMENT_THEM);
     EXPECT_TRUE(state.ballPlacement());
-    EXPECT_FALSE(state.isOurRestart());
+    EXPECT_FALSE(state.ourRestart());
 }
 
 int main(int argc, char **argv)
