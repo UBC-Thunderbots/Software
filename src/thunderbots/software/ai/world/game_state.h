@@ -12,7 +12,7 @@
  * refbox](https://github.com/RoboCup-SSL/ssl-refbox)
  * program over the network.
  *
- * Taken from
+ * Taken from https://github.com/RoboJackets/robocup-software/
  */
 class GameState
 {
