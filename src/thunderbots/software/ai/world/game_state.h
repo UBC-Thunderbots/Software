@@ -45,12 +45,11 @@ class GameState
 
     Point ballPlacementPoint;
 
-    GameState()
-    {
-        state       = HALT;
-        restart     = NONE;
-        our_restart = false;
-    }
+    GameState():
+    state(HALT),
+    restart(NONE),
+    our_restart(false)
+    {}
 
     void updateRefboxGameState(RefboxGameState gameState);
 
