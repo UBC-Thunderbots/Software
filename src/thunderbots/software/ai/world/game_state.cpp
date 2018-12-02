@@ -3,123 +3,123 @@
 #include "game_state.h"
 
 
-bool GameState::halt() const
+bool GameState::isHalted() const
 {
     return state == HALT;
 }
 
-bool GameState::stopped() const
+bool GameState::isStopped() const
 {
     return state == STOP;
 }
 
-bool GameState::playing() const
+bool GameState::isPlaying() const
 {
     return state == PLAYING;
 }
 
-bool GameState::kickoff() const
+bool GameState::isKickoff() const
 {
     return restart == KICKOFF;
 }
 
-bool GameState::penalty() const
+bool GameState::isPenalty() const
 {
     return restart == PENALTY;
 }
 
-bool GameState::ballPlacement() const
+bool GameState::isBallPlacement() const
 {
     return restart == BALL_PLACEMENT;
 }
 
-bool GameState::ourRestart() const
+bool GameState::isOurRestart() const
 {
     return our_restart;
 }
 
-bool GameState::direct() const
+bool GameState::isDirectFree() const
 {
     return restart == DIRECT;
 }
 
-bool GameState::indirect() const
+bool GameState::isIndirectFree() const
 {
     return restart == INDIRECT;
 }
 
-bool GameState::ourKickoff() const
+bool GameState::isOurKickoff() const
 {
-    return kickoff() && our_restart;
+    return isKickoff() && our_restart;
 }
 
-bool GameState::ourPenalty() const
+bool GameState::isOurPenalty() const
 {
-    return penalty() && our_restart;
+    return isPenalty() && our_restart;
 }
 
-bool GameState::ourDirect() const
+bool GameState::isOurDirect() const
 {
-    return direct() && our_restart;
+    return isDirectFree() && our_restart;
 }
 
-bool GameState::ourIndirect() const
+bool GameState::isOurIndirect() const
 {
-    return indirect() && our_restart;
+    return isIndirectFree() && our_restart;
 }
 
-bool GameState::ourFreeKick() const
+bool GameState::isOurFreeKick() const
 {
-    return ourDirect() || ourIndirect();
+    return isOurDirect() || isOurIndirect();
 }
 
-bool GameState::ourPlacement() const
+bool GameState::isOurPlacement() const
 {
-    return ballPlacement() && our_restart;
+    return isBallPlacement() && our_restart;
 }
 
-bool GameState::theirKickoff() const
+bool GameState::isTheirKickoff() const
 {
-    return kickoff() && !our_restart;
+    return isKickoff() && !our_restart;
 }
 
-bool GameState::theirPenalty() const
+bool GameState::isTheirPenalty() const
 {
-    return penalty() && !our_restart;
+    return isPenalty() && !our_restart;
 }
 
-bool GameState::theirDirect() const
+bool GameState::isTheirDirectFree() const
 {
-    return direct() && !our_restart;
+    return isDirectFree() && !our_restart;
 }
 
-bool GameState::theirIndirect() const
+bool GameState::isTheirIndirectFree() const
 {
-    return indirect() && !our_restart;
+    return isIndirectFree() && !our_restart;
 }
 
-bool GameState::theirFreeKick() const
+bool GameState::isTheirFreeKick() const
 {
-    return theirDirect() || theirIndirect();
+    return isTheirDirectFree() || isTheirIndirectFree();
 }
 
-bool GameState::theirPlacement() const
+bool GameState::isTheirBallPlacement() const
 {
-    return ballPlacement() && !our_restart;
+    return isBallPlacement() && !our_restart;
 }
 
 // Robots must be in position for a restart
-bool GameState::setupRestart() const
+bool GameState::isSetupRestart() const
 {
     return state == SETUP || state == READY;
 }
 
-bool GameState::setupState() const
+bool GameState::isSetupState() const
 {
     return state == SETUP;
 }
 
-bool GameState::readyState() const
+bool GameState::isReadyState() const
 {
     return state == READY;
 }
@@ -138,7 +138,7 @@ bool GameState::stayAwayFromBall() const
 // Our robots must stay on our half of the field
 bool GameState::stayOnSide() const
 {
-    return setupRestart() && restart == KICKOFF;
+    return isSetupRestart() && restart == KICKOFF;
 }
 
 // Our robots (except the penalty kicker) must stay 400mm behind the penalty

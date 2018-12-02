@@ -65,7 +65,7 @@ class GameState
      *
      * @return true if robots should halt.
      */
-    bool halt() const;
+    bool isHalted() const;
 
     /**
      * Returns true if robots must stay a set distance away from the ball.
@@ -73,14 +73,14 @@ class GameState
      *
      * @return true if robots should stay away from the ball.
      */
-    bool stopped() const;
+    bool isStopped() const;
 
     /**
      * Returns true if the game is in play.
      *
      * @return true if game is in play.
      */
-    bool playing() const;
+    bool isPlaying() const;
 
     /**
      * Returns true if a kickoff is occuring.
@@ -88,7 +88,7 @@ class GameState
      *
      * @return true if a kickoff is occuring.
      */
-    bool kickoff() const;
+    bool isKickoff() const;
 
     /**
      * Returns true if a penalty is occuring.
@@ -96,7 +96,7 @@ class GameState
      *
      * @return true if a penalty is occuring.
      */
-    bool penalty() const;
+    bool isPenalty() const;
 
     /**
      * Returns true if ball placement is occuring.
@@ -104,7 +104,7 @@ class GameState
      *
      * @return true if ball placement is occuring.
      */
-    bool ballPlacement() const;
+    bool isBallPlacement() const;
 
     /**
      * Returns true if our team is doing the restart, e.g. when
@@ -112,7 +112,7 @@ class GameState
      *
      * @return true if our team is doing the restart
      */
-    bool ourRestart() const;
+    bool isOurRestart() const;
 
     /**
      * Returns true if a direct free kick is occuring.
@@ -121,7 +121,7 @@ class GameState
      *
      * @return true if a direct free kick is occuring
      */
-    bool direct() const;
+    bool isDirectFree() const;
 
     /**
      * Returns true if an indirect free kick is occuring.
@@ -130,7 +130,7 @@ class GameState
      *
      * @return true if a direct free kick is occuring
      */
-    bool indirect() const;
+    bool isIndirectFree() const;
 
     /**
      * Returns true if we are taking the kickoff.
@@ -138,7 +138,7 @@ class GameState
      *
      * @return true if we are taking the kickoff.
      */
-    bool ourKickoff() const;
+    bool isOurKickoff() const;
 
     /**
      * Returns true if we are taking the penalty kick.
@@ -146,7 +146,7 @@ class GameState
      *
      * @return true if we are taking the penalty kick.
      */
-    bool ourPenalty() const;
+    bool isOurPenalty() const;
 
     /**
      * Returns true if we are taking a direct free kick.
@@ -154,7 +154,7 @@ class GameState
      *
      * @return true if we are taking a direct free kick.
      */
-    bool ourDirect() const;
+    bool isOurDirect() const;
 
     /**
      * Returns true if we are taking an indirect free kick.
@@ -162,7 +162,7 @@ class GameState
      *
      * @return true if we are taking an indirect free kick.
      */
-    bool ourIndirect() const;
+    bool isOurIndirect() const;
 
     /**
      * Returns true if we are doing any type of free kick.
@@ -170,7 +170,7 @@ class GameState
      *
      * @return true if we are doing any type of free kick.
      */
-    bool ourFreeKick() const;
+    bool isOurFreeKick() const;
 
     /**
      * Returns true if we are doing ball placement.
@@ -178,7 +178,7 @@ class GameState
      *
      * @return true if we are doing ball placement.
      */
-    bool ourPlacement() const;
+    bool isOurPlacement() const;
 
     /**
      * Returns true if opposing side is doing kickoff.
@@ -186,7 +186,7 @@ class GameState
      *
      * @return true if opposing side is doing kickoff.
      */
-    bool theirKickoff() const;
+    bool isTheirKickoff() const;
 
     /**
      * Returns true if opposing side is taking a penalty kick.
@@ -194,28 +194,28 @@ class GameState
      *
      * @return true if opposing side is taking a penalty kick.
      */
-    bool theirPenalty() const;
+    bool isTheirPenalty() const;
 
     /**
      * Returns true if opposing side is taking a direct free kick.
      *
      * @return true if opposing side is tkaing a direct free kick.
      */
-    bool theirDirect() const;
+    bool isTheirDirectFree() const;
 
     /**
      * Returns true if opposing side is taking an indirect free kick.
      *
      * @return true if opposing side is taking an indirect free kick.
      */
-    bool theirIndirect() const;
+    bool isTheirIndirectFree() const;
 
     /**
      * Returns true if opposing side is taking any type of free kick.
      *
      * @return true if opposing side is taking any type of free kick.
      */
-    bool theirFreeKick() const;
+    bool isTheirFreeKick() const;
 
     /**
      * Returns true if opposing side is doing ball placement.
@@ -223,7 +223,7 @@ class GameState
      *
      * @return true if opposing side is doing ball placement.
      */
-    bool theirPlacement() const;
+    bool isTheirBallPlacement() const;
 
     /**
      * Returns true if robots should be setting up for a restart e.g.
@@ -231,7 +231,7 @@ class GameState
      *
      * @return true if robots should be setting up for a restart
      */
-    bool setupRestart() const;
+    bool isSetupRestart() const;
 
     /**
      * Returns true if we are currently getting ready for a kickoff or restart.
@@ -239,13 +239,13 @@ class GameState
      *
      * @return true if we are currently getting ready for a kickoff or restart
      */
-    bool setupState() const;
+    bool isSetupState() const;
     /**
      * Returns true if we are ready for a kickoff or restart.
      *
      * @return  true if we are ready for a kickoff or restart.
      */
-    bool readyState() const;
+    bool isReadyState() const;
 
     /**
      * Returns true if we can kick the ball.
