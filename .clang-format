@@ -1,7 +1,4 @@
 ﻿---
-# Don't format unrecognized files
-DisableFormat: true
----
 BasedOnStyle: Google
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'true'
