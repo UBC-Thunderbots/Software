@@ -56,6 +56,8 @@ while test $# -gt 0; do
         -a|--all)
             echo "Formatting all files..."
 
+            # Generate extension string
+            # Formatted as -iname *.EXTENSION -o
             EXTENSION_STRING=""
             for value in "${EXTENSIONS[@]}"
             do
@@ -64,6 +66,7 @@ while test $# -gt 0; do
             
             # Find all the files that we want to format, and pass them to
             # clang-format as arguments
+            # We remove the last -o flag from the extension string
             find $CURR_DIR/../src/ ${EXTENSION_STRING::-2} \
                 | xargs $CURR_DIR/clang-format-$CLANG_VERSION -i -style=file
 
@@ -84,6 +87,8 @@ while test $# -gt 0; do
             # The name of the branch to diff against
             BRANCH_NAME="$1"
 
+            # Generate extension string
+            # Formatted as EXTENSION,
             EXTENSION_STRING=""
             for value in "${EXTENSIONS[@]}"
             do
@@ -91,6 +96,7 @@ while test $# -gt 0; do
             done
 
             # Fix formatting on all changes between this branch and the target branch
+            # Remove the last comma from the extension string
             OUTPUT="$($CURR_DIR/git-clang-format --extensions ${EXTENSION_STRING::-1} --binary $CURR_DIR/clang-format-$CLANG_VERSION --commit $BRANCH_NAME)"
 
             # Check the results of clang-format
