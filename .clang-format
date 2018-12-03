@@ -1,4 +1,5 @@
 ﻿---
+Language: Cpp
 BasedOnStyle: Google
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'true'
@@ -17,7 +18,6 @@ Cpp11BracedListStyle: 'true'
 IncludeBlocks: Regroup
 IndentCaseLabels: 'true'
 IndentWidth: '4'
-Language: Cpp
 MaxEmptyLinesToKeep: '3'
 NamespaceIndentation: All
 ReflowComments: 'true'
@@ -34,4 +34,3 @@ Language: Proto
 # Don't format proto files.
 DisableFormat: true
 ---
-
