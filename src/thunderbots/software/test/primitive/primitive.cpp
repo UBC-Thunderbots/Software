@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/move_primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
@@ -61,6 +62,30 @@ TEST(PrimitiveTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), param_array[2]);
     EXPECT_DOUBLE_EQ(final_speed, param_array[3]);
     EXPECT_EQ(new_prim->getExtraBitArray(), std::vector<bool>());
+}
+
+TEST(PrimitiveTest, creat_DirectVelocityPrimitive_from_message_test)
+{
+    const unsigned int robot_id                  = 1U;
+    const double x_velocity                      = 2.78;
+    const double y_velocity                      = -1.414;
+    const double angular_velocity                = -0.98;
+    const double dribbler_rpm                    = 9.047;
+    DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(
+        robot_id, x_velocity, y_velocity, angular_velocity, dribbler_rpm);
+
+    thunderbots_msgs::Primitive prim_message = direct_velocity_prim.createMsg();
+    std::unique_ptr<Primitive> new_prim =
+        DirectVelocityPrimitive::createPrimitive(prim_message);
+    std::vector<double> params = new_prim->getParameterArray();
+
+    EXPECT_EQ("Direct Velocity Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_DOUBLE_EQ(x_velocity, params[0]);
+    EXPECT_DOUBLE_EQ(y_velocity, params[1]);
+    EXPECT_DOUBLE_EQ(angular_velocity, params[2]);
+    EXPECT_DOUBLE_EQ(dribbler_rpm, params[3]);
+    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBitArray());
 }
 int main(int argc, char **argv)
 {
