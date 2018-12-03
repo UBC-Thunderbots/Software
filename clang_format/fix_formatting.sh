@@ -77,7 +77,7 @@ while test $# -gt 0; do
             BRANCH_NAME="$1"
 
             # Fix formatting on all changes between this branch and the target branch
-            OUTPUT="$($CURR_DIR/git-clang-format --extensions h, cpp, c, hpp, tpp --binary $CURR_DIR/clang-format-$CLANG_VERSION --commit $BRANCH_NAME)"
+            OUTPUT="$($CURR_DIR/git-clang-format --extensions h,cpp,c,hpp,tpp --binary $CURR_DIR/clang-format-$CLANG_VERSION --commit $BRANCH_NAME)"
 
             # Check the results of clang-format
             if [[ $OUTPUT == *"no modified files to format"* ]] || [[ $OUTPUT == *"clang-format did not modify any files"* ]] ; then
