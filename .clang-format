@@ -1,4 +1,7 @@
 ﻿---
+# Don't format unrecognized files
+DisableFormat: true
+---
 BasedOnStyle: Google
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: 'true'
@@ -25,6 +28,10 @@ SortIncludes: 'true'
 Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
+---
+Language: JavaScript
+# Don't format javascript files
+DisableFormat: true
 ---
 Language: Proto
 # Don't format proto files.
