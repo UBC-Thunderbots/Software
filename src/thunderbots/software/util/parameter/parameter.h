@@ -4,7 +4,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 //messages for dynamic_reconfigure
 #include <dynamic_reconfigure/BoolParameter.h>
@@ -30,8 +29,8 @@
  * */
 
 namespace {
-	// the namespaces related to the param_server
-	const std::string NamespaceForParameters = "/parameters";
+    // the namespaces related to the param_server
+    const std::string NamespaceForParameters = "/parameters";
 }
 
 template <class T>
@@ -48,9 +47,8 @@ class Parameter
         {
             this->name_ = parameter_name;
             this->value_ = default_value;
-	    this->internal_param_ = std::make_shared<Parameter<T>>(*this);
 
-            Parameter<T>::registerParameter(this->internal_param_);
+            Parameter<T>::registerParameter(std::make_shared<Parameter<T>>(*this));
         }
 
         /**
@@ -70,11 +68,13 @@ class Parameter
          */
         const T value() const
         {
-	    if (internal_param_.get() != nullptr){
-            	return this->internal_param_->value();
-	    } else {
-		return this->value_;
-	    }
+            // get the value from the parameter in the registry
+            if (Parameter<T>::getMutableRegistry().count(this->name_)){
+                auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
+                return param_in_registry->value_;
+            }
+            // if the parameter hasn't been registered yet, return default value
+            return this->value_;
         }
         /**
          * Returns the name of this parameter
@@ -101,7 +101,7 @@ class Parameter
          *
          * @return An immutable reference to the Parameter registry
          */
-        static const std::vector<std::shared_ptr<Parameter<T>>>& getRegistry()
+        static const std::map<std::string, std::shared_ptr<Parameter<T>>>& getRegistry()
         {
             return Parameter<T>::getMutableRegistry();
         }
@@ -167,10 +167,11 @@ class Parameter
             }
 
             else {
-	    	// TODO (Issue #16): Replace with proper exception once exception handling is implemented	     
+                // TODO (Issue #16): Replace with proper exception once exception handling is implemented	     
                 ROS_WARN("Attempting to configure with unkown type");
             }
-            Parameter<T>::getMutableRegistry().emplace_back(parameter);
+            Parameter<T>::getMutableRegistry().insert(
+                    std::pair<std::string, std::shared_ptr<Parameter<T>>>(parameter->name(), parameter));
         }
 
         /**
@@ -179,9 +180,9 @@ class Parameter
          */
         static void updateAllParametersFromROSParameterServer()
         {
-            for (const auto& p : Parameter<T>::getRegistry())
+            for (const auto& pair : Parameter<T>::getRegistry())
             {
-                p->updateValueFromROSParameterServer();
+                pair.second->updateValueFromROSParameterServer();
             }
         }
 
@@ -194,9 +195,9 @@ class Parameter
          *
          * @return A mutable reference to the Parameter registry
          */
-        static std::vector<std::shared_ptr<Parameter>>& getMutableRegistry()
+        static std::map<std::string, std::shared_ptr<Parameter<T>>>& getMutableRegistry()
         {
-            static std::vector<std::shared_ptr<Parameter<T>>> instance;
+            static std::map<std::string, std::shared_ptr<Parameter<T>>> instance;
             return instance;
         }
 
@@ -205,9 +206,6 @@ class Parameter
 
         // Store the name of the parameter
         std::string name_;
-
-	// Store a pointer to the parameter in the registry
-	std::shared_ptr<Parameter<T>> internal_param_;
 
         /**
          * Returns a mutable configuration struct that will hold all the
