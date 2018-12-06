@@ -1,5 +1,7 @@
 #include <ros/ros.h>
 
+#include <boost/exception/diagnostic_information.hpp>
+
 #include "backend_input/backend.h"
 #include "backend_input/networking/ssl_vision_client.h"
 #include "geom/point.h"
@@ -10,8 +12,30 @@
 #include "util/timestamp.h"
 
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
+    // Set up our connection over udp to receive camera packets
+    // NOTE: We do this before initializing the ROS node so that if it
+    // fails because there is another instance of this node running
+    // and connected to the port we want, we don't kill that other node.
+    std::unique_ptr<SSLVisionClient> ssl_vision_client;
+    try
+    {
+        ssl_vision_client = std::make_unique<SSLVisionClient>(
+            Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+            Util::Constants::SSL_VISION_MULTICAST_PORT);
+    }
+    catch (const boost::exception& ex)
+    {
+        std::cerr << "An error occured while setting up the SSL Vision Client:"
+                  << std::endl
+                  << boost::diagnostic_information(ex) << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    // Init our backend class
+    Backend backend = Backend();
+
     // Init ROS node
     ros::init(argc, argv, "backend_input");
     ros::NodeHandle node_handle;
@@ -27,16 +51,11 @@ int main(int argc, char **argv)
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
-    // Set up our backend
-    Backend backend = Backend();
-    SSLVisionClient ssl_vision_client =
-        SSLVisionClient(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
-                        Util::Constants::SSL_VISION_MULTICAST_PORT);
 
     // Main loop
     while (ros::ok())
     {
-        auto ssl_vision_packet_ptr = ssl_vision_client.getVisionPacket();
+        auto ssl_vision_packet_ptr = ssl_vision_client->getVisionPacket();
         if (ssl_vision_packet_ptr)
         {
             auto ssl_vision_packet = *ssl_vision_packet_ptr;

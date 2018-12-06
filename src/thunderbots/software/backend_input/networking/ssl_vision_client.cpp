@@ -6,7 +6,22 @@ SSLVisionClient::SSLVisionClient(const std::string ip_address, const unsigned sh
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::address::from_string(ip_address), port);
     socket_.open(listen_endpoint.protocol());
-    socket_.bind(listen_endpoint);
+    try
+    {
+        socket_.bind(listen_endpoint);
+    }
+    catch (const boost::exception& ex)
+    {
+        // TODO (Issue #33): Add a log message with something like the
+        // following here:
+        // "there was an issue binding the socket to the endpoint when trying to
+        // connect to the SSL vision server. This may be due to another instance
+        // of backend_input running and using the port already"
+
+        // Throw this exception up to top-level, as we have no valid
+        // recovery action here
+        throw;
+    }
 
     // Join the multicast group.
     socket_.set_option(boost::asio::ip::multicast::join_group(
@@ -20,7 +35,7 @@ SSLVisionClient::SSLVisionClient(const std::string ip_address, const unsigned sh
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-void SSLVisionClient::handleDataReception(const boost::system::error_code &error,
+void SSLVisionClient::handleDataReception(const boost::system::error_code& error,
                                           size_t num_bytes_received)
 {
     if (!error)
