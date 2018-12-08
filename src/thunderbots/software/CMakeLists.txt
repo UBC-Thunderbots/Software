@@ -284,4 +284,12 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(dynamic_parameters_test
+            test/util/test_dynamic_parameters.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+
+    target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
+
+
 endif()
