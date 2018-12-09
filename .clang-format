@@ -27,13 +27,10 @@ TabWidth: '4'
 UseTab: Never
 ---
 Language: JavaScript
-BasedOnStyle: Google
-ColumnLimit: '90'
-JavaScriptWrapImports: 'true'
-SpacesInContainerLiterals: 'false'
+# Don't format javascript files
+DisableFormat: true
 ---
 Language: Proto
 # Don't format proto files.
 DisableFormat: true
 ---
-
