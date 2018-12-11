@@ -1,0 +1,38 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "build/dist",
+        "module": "esnext",
+        "target": "esnext",
+        "lib": ["esnext", "dom"],
+        "sourceMap": true,
+        "allowJs": false,
+        "jsx": "react",
+        "moduleResolution": "node",
+        "rootDir": "src",
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "noUnusedLocals": true,
+        "paths": {
+            "RENDERER/*": ["src/renderer/*"],
+            "MAIN/*": ["src/main/*"],
+            "SHARED/*": ["src/shared/*"]
+        }
+    },
+    "exclude": [
+        "config",
+        "node_modules",
+        "build",
+        "public",
+        "dist",
+        "scripts",
+        "acceptance-tests",
+        "webpack",
+        "jest",
+        "src/setupTests.ts"
+    ]
+}

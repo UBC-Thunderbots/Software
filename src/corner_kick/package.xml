@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>corner_kick</name>
+  <version>1.0.0</version>
+  <description>A visualization tool for UBC Thunderbots</description>
+
+  <maintainer email="ubcthunderbots@gmail.com">UBC Thunderbots</maintainer>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>rosbridge_server</exec_depend>
+
+  <export>
+  </export>
+</package>
