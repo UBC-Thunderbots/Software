@@ -24,7 +24,7 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 ### Set compiler flags only for cpp code. These flags do not work for C files ###
 # Warn if parent classes do not define a virtual destructor
 # See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
-set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 
 
 #############################################
@@ -33,14 +33,6 @@ set(CMAKE_CXX_FLAGS "-Wnon-virtual-dtor")
 
 # Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
-
-# Create a list of files from the shared folder
-file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
-        )
-
 
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
@@ -281,7 +273,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             )
-
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(dynamic_parameters_test
@@ -290,6 +281,44 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(primitive_test
+            test/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+
+    target_link_libraries(primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(move_primitive_test
+            test/primitive/move_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.h
+            )
+
+    target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(direct_velocity_primitive_test
+            test/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/direct_velocity_primitive.h
+            )
+    target_link_libraries(direct_velocity_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(catch_primitive_test
+            test/primitive/catch_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            )
+
+    target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
 
 
 endif()
