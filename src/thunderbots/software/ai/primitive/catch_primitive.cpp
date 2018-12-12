@@ -1,4 +1,4 @@
-#include "ai/primitive/catch_primative.h"
+#include "ai/primitive/catch_primitive.h"
 
 const std::string CatchPrimitive::PRIMITIVE_NAME = "Catch Primitive";
 
