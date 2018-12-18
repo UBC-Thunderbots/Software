@@ -51,7 +51,9 @@ if [ "$RUN_BUILD" == "true" ] || \
     travis_run catkin_make ${CMAKE_FLAGS}
 fi
 
-if [ "$RUN_TESTS" == "true" ]; then
+# Note that we must run tests to get coverage
+if [ "$RUN_TESTS" == "true" || \
+    [ "$RUN_COVERAGE" == "true" ]; then
     travis_run catkin_make run_tests ${CMAKE_FLAGS}
 
     # Report the results of the tests
@@ -60,8 +62,7 @@ if [ "$RUN_TESTS" == "true" ]; then
 fi
 
 # We need to run tests in order to get coverage
-if [ "$RUN_FORMATTING_CHECKS" == "true" ] || \
-    [ "$RUN_COVERAGE" == "true" ]; then    
+if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then    
     CLANG_VERSION="7.0"
 
     # Determine what we should compare this branch against to figure out what
