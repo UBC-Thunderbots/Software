@@ -267,6 +267,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             )
 

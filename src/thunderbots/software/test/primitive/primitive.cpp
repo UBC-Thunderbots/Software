@@ -143,7 +143,7 @@ TEST(PrimitiveTest, creat_DirectVelocityPrimitive_from_message_test)
     thunderbots_msgs::Primitive prim_message = direct_velocity_prim.createMsg();
     std::unique_ptr<Primitive> new_prim =
         DirectVelocityPrimitive::createPrimitive(prim_message);
-    std::vector<double> params = new_prim->getParameterArray();
+    std::vector<double> params = new_prim->getParameters();
 
     EXPECT_EQ("Direct Velocity Primitive", new_prim->getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim->getRobotId());
@@ -151,7 +151,7 @@ TEST(PrimitiveTest, creat_DirectVelocityPrimitive_from_message_test)
     EXPECT_DOUBLE_EQ(y_velocity, params[1]);
     EXPECT_DOUBLE_EQ(angular_velocity, params[2]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, params[3]);
-    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBitArray());
+    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
 }
 int main(int argc, char **argv)
 {
