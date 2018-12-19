@@ -45,9 +45,9 @@ class DirectVelocityPrimitive : public Primitive
 
     double getDribblerRpm() const;
 
-    std::vector<double> getParameterArray() const override;
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    std::vector<bool> getExtraBits() const override;
 
 
    private:

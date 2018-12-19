@@ -16,9 +16,7 @@ class CatchPrimitive : public Primitive
      * already in the general direction of the ball's travel.
      *
      * @param robot_id The id of tCmhe Robot to run this Primitive
-     * @param velocity Velocity to move robot forwards/backwards
-     * to catch the ball without it bouncing off the dribbler; units are m/s
-     * @param dribbler_speed Speed to rotate dribbler at. Units are RPM.
+     * @param velocity Velocity to move robot forwards/backwards * to catch the ball without it bouncing off the dribbler; units are m/s * @param dribbler_speed Speed to rotate dribbler at. Units are RPM.
      * @param margin A scaling factor for how far in front of the ball to make the point
      * of intercept. It scales based on the difference in velocity between the
      * robot and the ball.
@@ -43,9 +41,9 @@ class CatchPrimitive : public Primitive
 
     double getMargin() const;
 
-    std::vector<double> getParameterArray() const override;
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    std::vector<bool> getExtraBits() const override;
 
    private:
     unsigned int robot_id;
