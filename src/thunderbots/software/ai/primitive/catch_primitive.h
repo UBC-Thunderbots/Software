@@ -41,8 +41,18 @@ class CatchPrimitive : public Primitive
 
     double getMargin() const;
 
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {velocity, dribbler_speed, margin}
+     */
     std::vector<double> getParameters() const override;
 
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
     std::vector<bool> getExtraBits() const override;
 
    private:
