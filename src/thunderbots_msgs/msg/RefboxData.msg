@@ -1,3 +1,7 @@
+# The RefboxData message encapsulates all the data we obtain from Refbox, including
+# the stage of the game, information on each team (see RefboxTeamInfo.msg), the current
+# Refbox command (e.g. free indirect kick for blue) and the ball placement point.
+
 # Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeData.msg
 
 

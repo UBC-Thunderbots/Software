@@ -1,18 +1,20 @@
+# The RefboxTeamInfo message encapsulates the information provided by Refbox for a team,
+# including name, score, yellow cards and their corresponding durations, and the goalie pattern number.
 # Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeTeamInfo.msg
 
 string name
 
-# The amount of goals scored during normal play and overtime.
+# The amount of goals scored by this team during normal play and overtime.
 uint32 score
 
 uint32 red_cards
 
-# The amount of time (in microseconds) left on each yellow card issued to the team.
+# The amount of time (in microseconds) left on each yellow card issued to this team.
 # If no yellow cards are issued, this array has no elements.
 # Otherwise, times are ordered from smallest to largest.
 uint32[] yellow_card_times
 
-# The total number of yellow cards issued during this game.
+# The total number of yellow cards issued to this team during the current game.
 uint32 yellow_cards
 
 # The number of timeouts this team can still call.

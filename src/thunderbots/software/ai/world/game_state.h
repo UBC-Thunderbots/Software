@@ -1,15 +1,15 @@
 #pragma once
 
-#include <geom/point.h>
-#include <util/refbox_constants.h>
+#include "geom/point.h"
+#include "util/refbox_constants.h"
 
 /**
  * @brief Holds the state of the game according to the referee
  *
  * @details Contains information on what period of the game it is, what type of
  * play to run, team scores, time remaining, etc.  During normal gameplay, the
- * information in this class is received from the [ssl
- * refbox](https://github.com/RoboCup-SSL/ssl-refbox)
+ * information in this class is received from the
+ * [ssl-refbox](https://github.com/RoboCup-SSL/ssl-refbox)
  * program over the network.
  *
  * Taken from https://github.com/RoboJackets/robocup-software/
@@ -20,8 +20,8 @@ class GameState
     enum State
     {
         HALT,    // Robots must not move
-        STOP,    // Robots must stay 500mm away from ball
-        SETUP,   // Robots not on starting team must stay 500mm away from ball
+        STOP,    // Robots must stay a set distance away from ball
+        SETUP,   // Robots not on starting team must stay a set distance away from ball
         READY,   // A robot on the starting team may kick the ball
         PLAYING  // Normal play
     };

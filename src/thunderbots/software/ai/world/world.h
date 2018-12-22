@@ -5,7 +5,7 @@
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
-#include "game_state.h"
+#include "ai/world/game_state.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -123,6 +123,13 @@ class World final
      * @return a const reference to the Game State
      */
     const GameState& gameState() const;
+
+    /**
+     * Returns a mutable reference to the Game State
+     *
+     * @return a mutable reference to the Game State
+     */
+     GameState& mutableGameState();
 
    private:
     Field field_;

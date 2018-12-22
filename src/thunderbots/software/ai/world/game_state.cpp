@@ -141,8 +141,7 @@ bool GameState::stayOnSide() const
     return isSetupRestart() && restart == KICKOFF;
 }
 
-// Our robots (except the penalty kicker) must stay 400mm behind the penalty
-// line
+// Our robots (except the penalty kicker) must stay a set distance behind the penalty line
 bool GameState::stayBehindPenaltyLine() const
 {
     return restart == PENALTY;

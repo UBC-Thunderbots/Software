@@ -1,3 +1,4 @@
+# A RefboxCommand message describes the Refbox command, such as kickoff or indirect kicks
 # Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeCommand.msg
 
 # A referee command.
