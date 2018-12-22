@@ -80,6 +80,7 @@ const GameState &World::gameState() const
     return game_state_;
 }
 
-GameState &World::mutableGameState() {
+GameState &World::mutableGameState()
+{
     return game_state_;
 }

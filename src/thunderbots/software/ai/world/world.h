@@ -4,8 +4,8 @@
 
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
-#include "ai/world/team.h"
 #include "ai/world/game_state.h"
+#include "ai/world/team.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -129,7 +129,7 @@ class World final
      *
      * @return a mutable reference to the Game State
      */
-     GameState& mutableGameState();
+    GameState& mutableGameState();
 
    private:
     Field field_;

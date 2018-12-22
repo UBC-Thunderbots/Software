@@ -19,6 +19,7 @@
 # user decide which one to install.
 
 ros_distro="kinetic"
+ubuntu_distro="xenial"
 
 function show_help()
 {
@@ -49,9 +50,11 @@ while [ "$1" != "" ]; do
             ;;
         kinetic)
             ros_distro="kinetic"
+	    ubuntu_distro="xenial"
             ;;
         melodic)
             ros_distro="melodic"
+	    ubuntu_distro="bionic"
             ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
@@ -131,7 +134,7 @@ echo "================================================================"
 
 if [ "$ros_distro" == "kinetic" ]; then
     # See http://wiki.ros.org/kinetic/Installation/Ubuntu for instructions
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
     sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
     sudo apt-get update
     sudo apt-get install ros-kinetic-desktop -y
@@ -141,10 +144,10 @@ if [ "$ros_distro" == "kinetic" ]; then
         echo "##############################################################"
         exit 1
     fi
-    sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+    sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
 elif [ "$ros_distro" == "melodic" ]; then
     # See http://wiki.ros.org/melodic/Installation/Ubuntu for instructions
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros-latest.list'
     sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
     sudo apt-get update
     sudo apt-get install ros-melodic-desktop -y
@@ -173,7 +176,7 @@ fi
 
 rosdep update
 # Install all required dependencies to build this repo
-rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro $ros_distro -y 
+rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro $ros_distro -y --os=ubuntu:$ubuntu_distro
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing ROS dependencies failed"
@@ -192,6 +195,13 @@ sudo apt-get install -y software-properties-common # required for add-apt-reposi
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 # Required to make sure we install protobuf version 3.0.0 or greater
 sudo add-apt-repository ppa:maarten-fonville/protobuf -y
+
+# Running a PPA setup script to give us access to the correct node and yarn version
+# on non-Ubuntu 18.04 systems. 
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
 sudo apt-get update
 
 host_software_packages=(
@@ -199,8 +209,11 @@ host_software_packages=(
     python-rosinstall
     protobuf-compiler
     libprotobuf-dev
+    nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
+    yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
 )
 sudo apt-get install ${host_software_packages[@]} -y
+
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing utilities failed"
