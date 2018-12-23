@@ -43,7 +43,7 @@ TEST(PrimitiveTest, validate_primitive_test)
 // Test that we can correctly translate a MovePrimitive like:
 // `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
 // started with
-TEST(PrimitiveTest, create_MovePrimitive_from_message_test)
+TEST(PrimitiveTest, convert_MovePrimitive_to_message_and_back_to_MovePrimitive)
 {
     const Point destination     = Point(-3, -3);
     const Angle final_angle     = Angle::ofRadians(4.55);
@@ -73,7 +73,7 @@ TEST(PrimitiveTest, create_MovePrimitive_from_message_test)
 // Test that we can correctly translate a ChipPrimitive like:
 // `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
 // started with
-TEST(PrimitiveTest, create_ChipPrimitive_from_message_test)
+TEST(PrimitiveTest, convert_ChipPrimitive_to_message_and_back_to_ChipPrimitive)
 {
     const unsigned int robot_id = 0U;
     const Point chip_origin = Point(-3, -2.5);
@@ -103,7 +103,7 @@ TEST(PrimitiveTest, create_ChipPrimitive_from_message_test)
 // Test that we can correctly translate a KickPrimitive like:
 // `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
 // started with
-TEST(PrimitiveTest, create_KickPrimitive_from_message_test)
+TEST(PrimitiveTest, convert_KickPrimitive_to_message_and_back_to_KickPrimitive)
 {
     const unsigned int robot_id = 0U;
     const Point kick_origin = Point(-3, -2.5);
@@ -130,7 +130,8 @@ TEST(PrimitiveTest, create_KickPrimitive_from_message_test)
     EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
-TEST(PrimitiveTest, creat_DirectVelocityPrimitive_from_message_test)
+TEST(PrimitiveTest,
+        convert_DirectVelocityPrimitive_to_message_and_back_to_DirectVelocityPrimitive)
 {
     const unsigned int robot_id                  = 1U;
     const double x_velocity                      = 2.78;
