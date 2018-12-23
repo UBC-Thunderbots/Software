@@ -1,5 +1,9 @@
 #include "ai/primitive/primitive.h"
 
+#include "ai/primitive/catch_primitive.h"
+#include "ai/primitive/chip_primitive.h"
+#include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
@@ -38,6 +42,22 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     else if (primitive_msg.primitive_name == DirectWheelsPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<DirectWheelsPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == CatchPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<CatchPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == ChipPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<ChipPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<DirectVelocityPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == KickPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<KickPrimitive>(primitive_msg);
     }
     else
     {

@@ -1,0 +1,9 @@
+<!-- ROS launch file for corner-kick -->
+<launch>
+    <node pkg="corner_kick" type="start_corner_kick.sh" name="corner_kick" output="screen">
+    </node>
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
+        <!-- Default ROSBridge port -->
+        <arg name="port" value="9090"/>
+    </include>
+</launch>

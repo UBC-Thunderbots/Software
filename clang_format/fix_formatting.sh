@@ -21,6 +21,9 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # The name of this script, used for help info
 SCRIPT_NAME="$0"
 
+# Extensions to check formatting
+EXTENSIONS=(h cpp c hpp tpp)
+
 # Check that we have at least some arguments
 if (( $# == 0 )); then
     echo "Missing arguments (\"$SCRIPT_NAME --help\" for help)"
@@ -52,20 +55,19 @@ while test $# -gt 0; do
             ;;
         -a|--all)
             echo "Formatting all files..."
+
+            # Generate extension string
+            # Formatted as -iname *.EXTENSION -o
+            EXTENSION_STRING=""
+            for value in "${EXTENSIONS[@]}"
+            do
+                EXTENSION_STRING="$EXTENSION_STRING -iname *.$value -o"
+            done
             
             # Find all the files that we want to format, and pass them to
             # clang-format as arguments
-            find $CURR_DIR/../src/ \
-                -path "*node_modules*" -prune \
-                -o -iname *.h \
-                -o -iname *.cpp \
-                -o -iname *.c \
-                -o -iname *.hpp \
-                -o -iname *.tpp \
-                -o -iname *.tpp \
-                -o -iname *.ts \
-                -o -iname *.js \
-                -o -iname *.tsx \
+            # We remove the last -o flag from the extension string
+            find $CURR_DIR/../src/ ${EXTENSION_STRING::-2} \
                 | xargs $CURR_DIR/clang-format-$CLANG_VERSION -i -style=file
 
             shift
@@ -85,8 +87,17 @@ while test $# -gt 0; do
             # The name of the branch to diff against
             BRANCH_NAME="$1"
 
+            # Generate extension string
+            # Formatted as EXTENSION,
+            EXTENSION_STRING=""
+            for value in "${EXTENSIONS[@]}"
+            do
+                EXTENSION_STRING="$EXTENSION_STRING$value,"
+            done
+
             # Fix formatting on all changes between this branch and the target branch
-            OUTPUT="$($CURR_DIR/git-clang-format --binary $CURR_DIR/clang-format-$CLANG_VERSION --commit $BRANCH_NAME)"
+            # Remove the last comma from the extension string
+            OUTPUT="$($CURR_DIR/git-clang-format --extensions ${EXTENSION_STRING::-1} --binary $CURR_DIR/clang-format-$CLANG_VERSION --commit $BRANCH_NAME)"
 
             # Check the results of clang-format
             if [[ $OUTPUT == *"no modified files to format"* ]] || [[ $OUTPUT == *"clang-format did not modify any files"* ]] ; then
