@@ -37,35 +37,35 @@ public:
      *
      * @return the power of wheel 0
      */
-    unsigned int getWheel0Power() const;
+    signed int getWheel0Power() const;
 
     /**
      * Gets the power of wheel 1
      *
      * @return the power of wheel 1
      */
-    unsigned int getWheel1Power() const;
+    signed int getWheel1Power() const;
 
     /**
      * Gets the power of wheel 2
      *
      * @return the power of wheel 2
      */
-    unsigned int getWheel2Power() const;
+    signed int getWheel2Power() const;
 
     /**
      * Gets the power of wheel 3
      *
      * @return the power of wheel 3
      */
-    unsigned int getWheel3Power() const;
+    signed int getWheel3Power() const;
 
     /**
      * Gets the RPM of the dribbler
      *
      * @return the RPM of the dribbler
      */
-    unsigned int getDribblerRPM() const;
+    double getDribblerRPM() const;
 
     std::vector<double> getParameterArray() const override;
 

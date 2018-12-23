@@ -8,14 +8,14 @@ DirectVelocityPrimitive::DirectVelocityPrimitive(unsigned int robot_id, double x
 {
 }
 
-MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
+DirectVelocityPrimitive::DirectVelocityPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
     robot_id         = primitive_msg.robot_id;
     double x_vel     = primitive_msg.parameters.at(0);
     double y_vel     = primitive_msg.parameters.at(1);
-    angular_velocity = Angle::ofRadians(primitive_msg.parameters.at(2));
+    angular_vel      = Angle::ofRadians(primitive_msg.parameters.at(2));
     dribbler_rpm     = primitive_msg.parameters.at(3);
 }
 

@@ -32,18 +32,18 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
-    /*else if (primitive_msg.primitive_name == MoveSpinPrimitive::PRIMITIVE_NAME)
+    else if (primitive_msg.primitive_name == MoveSpinPrimitive::PRIMITIVE_NAME)//MoveSpinPrimitive::PRIMITIVE_NAME)
     {
-        prim_ptr = std::make_unique<MoveSpinPrimitive(primitive_msg);
+        prim_ptr = std::make_unique<MoveSpinPrimitive>(primitive_msg);
     }
     else if (primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
     {
-        prim_ptr = std::make_unique<DirectVelocityPrimitive(primitive_msg);
+        prim_ptr = std::make_unique<DirectVelocityPrimitive>(primitive_msg);
     }
     else if (primitive_msg.primitive_name == DirectWheelsPrimitive::PRIMITIVE_NAME)
     {
-        prim_ptr = std::make_unique<DirectWheelsPrimitive(primitive_msg);
-    }*/
+        prim_ptr = std::make_unique<DirectWheelsPrimitive>(primitive_msg);
+    }
     else
     {
         // TODO: Throw unknown primitive exception here
