@@ -17,7 +17,7 @@ class MoveSpinPrimitive : public Primitive
      * of the movement
      */
     explicit MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
-                           const AngularVelocity &angular_vel);
+                               const AngularVelocity &angular_vel);
 
     /**
      * Creates a new MoveSpin Primitive from a Primitive message
@@ -48,7 +48,7 @@ class MoveSpinPrimitive : public Primitive
 
     std::vector<bool> getExtraBitArray() const override;
 
-private:
+   private:
     unsigned int robot_id;
     Point dest;
     AngularVelocity angular_vel;

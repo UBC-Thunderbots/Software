@@ -6,7 +6,7 @@
 
 class DirectWheelsPrimitive : public Primitive
 {
-public:
+   public:
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Move Primitive
@@ -18,8 +18,9 @@ public:
      * @param wheel3_power a value between -255 and 255, where positive is clockwise
      * @param dribbler_rpm the dribbler rpm
      */
-    explicit DirectWheelsPrimitive(unsigned int robot_id, signed int wheel0_power, signed int wheel1_power,
-            signed int wheel2_power, signed int wheel3_power, double dribbler_rpm);
+    explicit DirectWheelsPrimitive(unsigned int robot_id, signed int wheel0_power,
+                                   signed int wheel1_power, signed int wheel2_power,
+                                   signed int wheel3_power, double dribbler_rpm);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -71,7 +72,7 @@ public:
 
     std::vector<bool> getExtraBitArray() const override;
 
-private:
+   private:
     unsigned int robot_id;
     signed int wheel0_power;
     signed int wheel1_power;

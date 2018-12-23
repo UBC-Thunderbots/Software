@@ -21,22 +21,23 @@ TEST(DirectWheelsPrimTest, get_robot_id_test)
 {
     unsigned int robot_id = 3U;
 
-    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(robot_id, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_prim =
+        DirectWheelsPrimitive(robot_id, 0, 0, 0, 0, 0.0);
 
     EXPECT_EQ(robot_id, directwheels_prim.getRobotId());
 }
 
 TEST(DirectWheelsPrimTest, parameter_array_test)
 {
-    const signed int wheel0_power   = 1;
-    const signed int wheel1_power   = 2;
-    const signed int wheel2_power   = 3;
-    const signed int wheel3_power   = 4;
-    const double dribbler_rpm       = 10.0;
-    const unsigned int robot_id     = 1U;
+    const signed int wheel0_power = 1;
+    const signed int wheel1_power = 2;
+    const signed int wheel2_power = 3;
+    const signed int wheel3_power = 4;
+    const double dribbler_rpm     = 10.0;
+    const unsigned int robot_id   = 1U;
 
-    DirectWheelsPrimitive directwheels_prim =
-            DirectWheelsPrimitive(robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
+    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(
+        robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
 
     std::vector<double> param_array = directwheels_prim.getParameterArray();
 
@@ -51,7 +52,8 @@ TEST(DirectWheelsPrimTest, get_wheel0_power_test)
 {
     const signed int wheel0_power = 5;
 
-    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, wheel0_power, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_prim =
+        DirectWheelsPrimitive(0, wheel0_power, 0, 0, 0, 0.0);
 
     EXPECT_EQ(directwheels_prim.getWheel0Power(), 5);
 }
@@ -60,7 +62,8 @@ TEST(DirectWheelsPrimTest, get_wheel1_power_test)
 {
     const signed int wheel1_power = 6;
 
-    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, wheel1_power, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_prim =
+        DirectWheelsPrimitive(0, 0, wheel1_power, 0, 0, 0.0);
 
     EXPECT_EQ(directwheels_prim.getWheel1Power(), 6);
 }
@@ -69,7 +72,8 @@ TEST(DirectWheelsPrimTest, get_wheel2_power_test)
 {
     const signed int wheel2_power = 7;
 
-    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, wheel2_power, 0, 0.0);
+    DirectWheelsPrimitive directwheels_prim =
+        DirectWheelsPrimitive(0, 0, 0, wheel2_power, 0, 0.0);
 
     EXPECT_EQ(directwheels_prim.getWheel2Power(), 7);
 }
@@ -78,7 +82,8 @@ TEST(DirectWheelsPrimTest, get_wheel3_power_test)
 {
     const signed int wheel3_power = 8;
 
-    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, wheel3_power, 0.0);
+    DirectWheelsPrimitive directwheels_prim =
+        DirectWheelsPrimitive(0, 0, 0, 0, wheel3_power, 0.0);
 
     EXPECT_EQ(directwheels_prim.getWheel3Power(), 8);
 }
@@ -87,7 +92,8 @@ TEST(DirectWheelsPrimTest, get_dribbler_rpm_test)
 {
     const double dribbler_rpm = 99.9;
 
-    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, 0, dribbler_rpm);
+    DirectWheelsPrimitive directwheels_prim =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, dribbler_rpm);
 
     EXPECT_EQ(directwheels_prim.getDribblerRPM(), dribbler_rpm);
 }
@@ -103,15 +109,15 @@ TEST(DirectWheelsPrimTest, get_extra_bit_array_test)
 
 TEST(DirectWheelsPrimTest, create_primitive_from_message_test)
 {
-    const signed int wheel0_power   = 1;
-    const signed int wheel1_power   = 2;
-    const signed int wheel2_power   = 3;
-    const signed int wheel3_power   = 4;
-    const double dribbler_rpm       = 13.37;
-    const unsigned int robot_id     = 2U;
+    const signed int wheel0_power = 1;
+    const signed int wheel1_power = 2;
+    const signed int wheel2_power = 3;
+    const signed int wheel3_power = 4;
+    const double dribbler_rpm     = 13.37;
+    const unsigned int robot_id   = 2U;
 
-    DirectWheelsPrimitive directwheels_prim =
-            DirectWheelsPrimitive(robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
+    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(
+        robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
 
     thunderbots_msgs::Primitive prim_message = directwheels_prim.createMsg();
 

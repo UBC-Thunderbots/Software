@@ -21,19 +21,20 @@ TEST(MoveSpinPrimTest, get_robot_id_test)
 {
     unsigned int robot_id = 3U;
 
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(robot_id, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(robot_id, Point(), AngularVelocity());
 
     EXPECT_EQ(robot_id, movespin_prim.getRobotId());
 }
 
 TEST(MoveSpinPrimTest, parameter_array_test)
 {
-    const Point destination             = Point(1, -2);
-    const AngularVelocity angular_vel   = AngularVelocity::ofRadians(2.5);
-    const unsigned int robot_id         = 1U;
+    const Point destination           = Point(1, -2);
+    const AngularVelocity angular_vel = AngularVelocity::ofRadians(2.5);
+    const unsigned int robot_id       = 1U;
 
     MoveSpinPrimitive movespin_prim =
-            MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel);
 
     std::vector<double> param_array = movespin_prim.getParameterArray();
 
@@ -55,7 +56,8 @@ TEST(MoveSpinPrimTest, get_final_destination_test)
 {
     const Point destination = Point(1, -2);
 
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, destination, AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, destination, AngularVelocity());
 
     EXPECT_EQ(movespin_prim.getDestination(), destination);
 }
@@ -76,7 +78,7 @@ TEST(MoveSpinPrimTest, create_primitive_from_message_test)
     const unsigned int robot_id = 2U;
 
     MoveSpinPrimitive movespin_prim =
-            MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel);
 
     thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
 

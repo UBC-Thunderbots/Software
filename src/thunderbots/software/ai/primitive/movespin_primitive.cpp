@@ -4,7 +4,7 @@ const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";
 
 MoveSpinPrimitive::MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
                                      const AngularVelocity &angular_vel)
-        : robot_id(robot_id), dest(dest), angular_vel(angular_vel)
+    : robot_id(robot_id), dest(dest), angular_vel(angular_vel)
 {
 }
 

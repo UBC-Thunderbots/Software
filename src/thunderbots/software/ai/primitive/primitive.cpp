@@ -3,10 +3,10 @@
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
-#include "ai/primitive/directwheels_primitive.h"
 
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
@@ -35,7 +35,8 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
-    else if (primitive_msg.primitive_name == MoveSpinPrimitive::PRIMITIVE_NAME)//MoveSpinPrimitive::PRIMITIVE_NAME)
+    else if (primitive_msg.primitive_name ==
+             MoveSpinPrimitive::PRIMITIVE_NAME)  // MoveSpinPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<MoveSpinPrimitive>(primitive_msg);
     }
