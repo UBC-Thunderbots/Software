@@ -251,7 +251,6 @@ if (CATKIN_ENABLE_TESTING)
             test/primitive/primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
-            ai/primitive/directvelocity_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
             )
@@ -265,7 +264,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.h
 
             ai/primitive/movespin_primitive.cpp
-            ai/primitive/directvelocity_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
             )
 
@@ -278,24 +276,10 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/movespin_primitive.h
 
             ai/primitive/move_primitive.cpp
-            ai/primitive/directvelocity_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
             )
 
     target_link_libraries(movespin_primitive_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(directvelocity_primitive_test
-            test/primitive/directvelocity_primitive.cpp
-            ai/primitive/directvelocity_primitive.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/directvelocity_primitive.h
-
-            ai/primitive/move_primitive.cpp
-            ai/primitive/movespin_primitive.cpp
-            ai/primitive/directwheels_primitive.cpp
-            )
-
-    target_link_libraries(directvelocity_primitive_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(directwheels_primitive_test
             test/primitive/directwheels_primitive.cpp
@@ -305,7 +289,6 @@ if (CATKIN_ENABLE_TESTING)
 
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
-            ai/primitive/directvelocity_primitive.cpp
             )
 
     target_link_libraries(directwheels_primitive_test ${catkin_LIBRARIES})
