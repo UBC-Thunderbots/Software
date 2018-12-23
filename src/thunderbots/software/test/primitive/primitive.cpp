@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/kick_primitive.h"
@@ -152,6 +153,28 @@ TEST(PrimitiveTest,
     EXPECT_DOUBLE_EQ(y_velocity, params[1]);
     EXPECT_DOUBLE_EQ(angular_velocity, params[2]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, params[3]);
+    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+}
+
+TEST(PrimitiveTest,
+     convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive)
+{
+    const unsigned int robot_id                  = 1U;
+    const double velocity           = 7.0;
+    const double dribbler_rpm = 60;
+    const double ball_intercept_margin = 0.5;
+    CatchPrimitive catch_prim(robot_id, velocity, dribbler_rpm, ball_intercept_margin);
+
+    thunderbots_msgs::Primitive prim_message = catch_prim.createMsg();
+    std::unique_ptr<Primitive> new_prim =
+            CatchPrimitive::createPrimitive(prim_message);
+    std::vector<double> params = new_prim->getParameters();
+
+    EXPECT_EQ("Catch Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_DOUBLE_EQ(velocity, params[0]);
+    EXPECT_DOUBLE_EQ(dribbler_rpm, params[1]);
+    EXPECT_DOUBLE_EQ(ball_intercept_margin, params[2]);
     EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
 }
 int main(int argc, char **argv)
