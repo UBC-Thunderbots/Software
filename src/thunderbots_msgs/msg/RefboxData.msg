@@ -32,7 +32,8 @@ RefboxTeamInfo us
 # Team info for other team
 RefboxTeamInfo them
 
-Vector2f designated_position
+# The point for ball placement. See Robocup SSL Rules
+Vector2f ball_placement_point
 
 # Information about the direction of play.
 # True, if the blue team will have it's goal on the positive x-axis of the ssl-vision coordinate system
