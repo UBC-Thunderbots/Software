@@ -20,17 +20,17 @@ bool GameState::isPlaying() const
 
 bool GameState::isKickoff() const
 {
-    return restart == KICKOFF;
+    return restart_reason == KICKOFF;
 }
 
 bool GameState::isPenalty() const
 {
-    return restart == PENALTY;
+    return restart_reason == PENALTY;
 }
 
 bool GameState::isBallPlacement() const
 {
-    return restart == BALL_PLACEMENT;
+    return restart_reason == BALL_PLACEMENT;
 }
 
 bool GameState::isOurRestart() const
@@ -40,12 +40,12 @@ bool GameState::isOurRestart() const
 
 bool GameState::isDirectFree() const
 {
-    return restart == DIRECT;
+    return restart_reason == DIRECT;
 }
 
 bool GameState::isIndirectFree() const
 {
-    return restart == INDIRECT;
+    return restart_reason == INDIRECT;
 }
 
 bool GameState::isOurKickoff() const
@@ -138,23 +138,23 @@ bool GameState::stayAwayFromBall() const
 // Our robots must stay on our half of the field
 bool GameState::stayOnSide() const
 {
-    return isSetupRestart() && restart == KICKOFF;
+    return isSetupRestart() && restart_reason == KICKOFF;
 }
 
 // Our robots (except the penalty kicker) must stay a set distance behind the penalty line
 bool GameState::stayBehindPenaltyLine() const
 {
-    return restart == PENALTY;
+    return restart_reason == PENALTY;
 }
 
 void GameState::setBallPlacementPoint(Point placementPoint)
 {
-    ballPlacementPoint = placementPoint;
+    ball_placement_point = placementPoint;
 }
 
 Point GameState::getBallPlacementPoint() const
 {
-    return ballPlacementPoint;
+    return ball_placement_point;
 }
 
 // apologies for this monster switch statement
@@ -164,11 +164,11 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
     {
         case RefboxGameState::HALT:
             state   = HALT;
-            restart = NONE;
+            restart_reason = NONE;
             break;
         case RefboxGameState::STOP:
             state       = STOP;
-            restart     = NONE;
+            restart_reason     = NONE;
             our_restart = false;
             break;
         case RefboxGameState::NORMAL_START:
@@ -176,72 +176,72 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             break;
         case RefboxGameState::FORCE_START:
             state   = PLAYING;
-            restart = NONE;
+            restart_reason = NONE;
             break;
         case RefboxGameState::PREPARE_KICKOFF_US:
             state       = SETUP;
-            restart     = KICKOFF;
+            restart_reason     = KICKOFF;
             our_restart = true;
             break;
         case RefboxGameState::PREPARE_KICKOFF_THEM:
             state       = READY;
-            restart     = KICKOFF;
+            restart_reason     = KICKOFF;
             our_restart = false;
             break;
         case RefboxGameState::PREPARE_PENALTY_US:
             state       = SETUP;
-            restart     = PENALTY;
+            restart_reason     = PENALTY;
             our_restart = true;
             break;
         case RefboxGameState::PREPARE_PENALTY_THEM:
             state       = READY;
-            restart     = PENALTY;
+            restart_reason     = PENALTY;
             our_restart = false;
             break;
         case RefboxGameState::DIRECT_FREE_US:
             state       = SETUP;
-            restart     = DIRECT;
+            restart_reason     = DIRECT;
             our_restart = true;
             break;
         case RefboxGameState::DIRECT_FREE_THEM:
             state       = READY;
-            restart     = DIRECT;
+            restart_reason     = DIRECT;
             our_restart = false;
             break;
         case RefboxGameState::INDIRECT_FREE_US:
             state       = SETUP;
-            restart     = INDIRECT;
+            restart_reason     = INDIRECT;
             our_restart = true;
             break;
         case RefboxGameState::INDIRECT_FREE_THEM:
             state       = READY;
-            restart     = INDIRECT;
+            restart_reason     = INDIRECT;
             our_restart = false;
             break;
         case RefboxGameState::TIMEOUT_US:
             state   = HALT;
-            restart = NONE;
+            restart_reason = NONE;
             break;
         case RefboxGameState::TIMEOUT_THEM:
             state   = HALT;
-            restart = NONE;
+            restart_reason = NONE;
             break;
         case RefboxGameState::GOAL_US:
             state   = STOP;
-            restart = NONE;
+            restart_reason = NONE;
             break;
         case RefboxGameState::GOAL_THEM:
             state   = STOP;
-            restart = NONE;
+            restart_reason = NONE;
             break;
         case RefboxGameState::BALL_PLACEMENT_US:
             state       = READY;
-            restart     = BALL_PLACEMENT;
+            restart_reason     = BALL_PLACEMENT;
             our_restart = true;
             break;
         case RefboxGameState::BALL_PLACEMENT_THEM:
             state       = SETUP;
-            restart     = BALL_PLACEMENT;
+            restart_reason     = BALL_PLACEMENT;
             our_restart = false;
             break;
     }

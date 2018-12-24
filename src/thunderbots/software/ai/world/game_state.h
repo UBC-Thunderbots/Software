@@ -27,7 +27,7 @@ class GameState
     };
 
     // Types of restarts
-    enum Restart
+    enum RestartReason
     {
         NONE,
         KICKOFF,
@@ -38,14 +38,15 @@ class GameState
     };
 
     State state;
-    Restart restart;
+    RestartReason restart_reason;
 
     // True if our team can kick the ball during a restart
     bool our_restart;
 
-    Point ballPlacementPoint;
+    // The point at which the ball should be placed by robots before a restart. See Robocup SSL Rules 9.2.
+    Point ball_placement_point;
 
-    GameState() : state(HALT), restart(NONE), our_restart(false) {}
+    GameState() : state(HALT), restart_reason(NONE), our_restart(false) {}
 
     void updateRefboxGameState(RefboxGameState gameState);
 
