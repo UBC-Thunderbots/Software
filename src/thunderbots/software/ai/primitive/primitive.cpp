@@ -1,13 +1,19 @@
 #include "ai/primitive/primitive.h"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> upstream/master
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/kick_primitive.h"
+<<<<<<< HEAD
 =======
 #include "ai/primitive/direct_velocity_primitive.h"
 >>>>>>> Direct velocity primitive class (#120)
+=======
+>>>>>>> upstream/master
 #include "ai/primitive/move_primitive.h"
 #include <exception>
 
@@ -47,6 +53,9 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> upstream/master
     else if (primitive_msg.primitive_name == CatchPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<CatchPrimitive>(primitive_msg);
@@ -55,19 +64,28 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<ChipPrimitive>(primitive_msg);
     }
+<<<<<<< HEAD
 =======
 >>>>>>> Direct velocity primitive class (#120)
+=======
+>>>>>>> upstream/master
     else if (primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<DirectVelocityPrimitive>(primitive_msg);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> upstream/master
     else if (primitive_msg.primitive_name == KickPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<KickPrimitive>(primitive_msg);
     }
+<<<<<<< HEAD
 =======
 >>>>>>> Direct velocity primitive class (#120)
+=======
+>>>>>>> upstream/master
     else
     {
 <<<<<<< HEAD
