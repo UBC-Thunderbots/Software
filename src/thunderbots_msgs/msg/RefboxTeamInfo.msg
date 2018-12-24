@@ -2,7 +2,8 @@
 # including name, score, yellow cards and their corresponding durations, and the goalie pattern number.
 # Taken from https://github.com/RoboTeamTwente/roboteam_msgs/tree/master/msg/RefereeTeamInfo.msg
 
-string name
+# the name of this team
+string team_name
 
 # The amount of goals scored by this team during normal play and overtime.
 uint32 score
