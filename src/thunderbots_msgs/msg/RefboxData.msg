@@ -27,7 +27,9 @@ uint32 command_counter
 # Value changes only when a new command gets issued, not on each packet.
 uint64 command_timestamp
 
+# Team info for us, including team name, score, and yellow/red card count and remaining time.
 RefboxTeamInfo us
+# Team info for other team
 RefboxTeamInfo them
 
 Vector2f designated_position
