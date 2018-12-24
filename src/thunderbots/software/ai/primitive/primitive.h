@@ -7,7 +7,7 @@
 
 #include "thunderbots_msgs/Primitive.h"
 
-/** 
+/**
  * Defines a Robot Primitive, which is the most basic action / unit of work a robot can
  * do. For example, moving straight to a point, pivoting around a point,
  * or shooting the ball at a target.

@@ -2,6 +2,8 @@
  * This file contains the unit tests for the Primitive class
  */
 
+#include "ai/primitive/primitive.h"
+
 #include <gtest/gtest.h>
 
 #include "ai/primitive/catch_primitive.h"
@@ -9,7 +11,6 @@
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
-#include "ai/primitive/primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
@@ -76,9 +77,9 @@ TEST(PrimitiveTest, convert_MovePrimitive_to_message_and_back_to_MovePrimitive)
 // started with
 TEST(PrimitiveTest, convert_ChipPrimitive_to_message_and_back_to_ChipPrimitive)
 {
-    const unsigned int robot_id = 0U;
-    const Point chip_origin = Point(-3, -2.5);
-    const Angle chip_direction = Angle::ofRadians(2.37);
+    const unsigned int robot_id       = 0U;
+    const Point chip_origin           = Point(-3, -2.5);
+    const Angle chip_direction        = Angle::ofRadians(2.37);
     const double chip_distance_meters = 4.2;
 
     ChipPrimitive chip_prim =
@@ -106,13 +107,13 @@ TEST(PrimitiveTest, convert_ChipPrimitive_to_message_and_back_to_ChipPrimitive)
 // started with
 TEST(PrimitiveTest, convert_KickPrimitive_to_message_and_back_to_KickPrimitive)
 {
-    const unsigned int robot_id = 0U;
-    const Point kick_origin = Point(-3, -2.5);
-    const Angle kick_direction = Angle::ofRadians(2.37);
+    const unsigned int robot_id       = 0U;
+    const Point kick_origin           = Point(-3, -2.5);
+    const Angle kick_direction        = Angle::ofRadians(2.37);
     const double kick_distance_meters = 4.2;
 
     KickPrimitive kick_prim =
-            KickPrimitive(robot_id, kick_origin, kick_direction, kick_distance_meters);
+        KickPrimitive(robot_id, kick_origin, kick_direction, kick_distance_meters);
 
     thunderbots_msgs::Primitive prim_message = kick_prim.createMsg();
 
@@ -132,7 +133,7 @@ TEST(PrimitiveTest, convert_KickPrimitive_to_message_and_back_to_KickPrimitive)
 }
 
 TEST(PrimitiveTest,
-        convert_DirectVelocityPrimitive_to_message_and_back_to_DirectVelocityPrimitive)
+     convert_DirectVelocityPrimitive_to_message_and_back_to_DirectVelocityPrimitive)
 {
     const unsigned int robot_id                  = 1U;
     const double x_velocity                      = 2.78;
@@ -156,19 +157,17 @@ TEST(PrimitiveTest,
     EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
 }
 
-TEST(PrimitiveTest,
-     convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive)
+TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive)
 {
-    const unsigned int robot_id                  = 1U;
-    const double velocity           = 7.0;
-    const double dribbler_rpm = 60;
+    const unsigned int robot_id        = 1U;
+    const double velocity              = 7.0;
+    const double dribbler_rpm          = 60;
     const double ball_intercept_margin = 0.5;
     CatchPrimitive catch_prim(robot_id, velocity, dribbler_rpm, ball_intercept_margin);
 
     thunderbots_msgs::Primitive prim_message = catch_prim.createMsg();
-    std::unique_ptr<Primitive> new_prim =
-            CatchPrimitive::createPrimitive(prim_message);
-    std::vector<double> params = new_prim->getParameters();
+    std::unique_ptr<Primitive> new_prim = CatchPrimitive::createPrimitive(prim_message);
+    std::vector<double> params          = new_prim->getParameters();
 
     EXPECT_EQ("Catch Primitive", new_prim->getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim->getRobotId());
