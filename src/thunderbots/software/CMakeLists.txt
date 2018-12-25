@@ -250,9 +250,6 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
-            ai/primitive/move_primitive.cpp
-            ai/primitive/movespin_primitive.cpp
-            ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
 
             ai/primitive/catch_primitive.cpp
@@ -260,6 +257,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             )
 
     target_link_libraries(primitive_test ${catkin_LIBRARIES})

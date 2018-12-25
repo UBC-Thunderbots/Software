@@ -52,16 +52,6 @@ int main(int argc, char** argv)
     // We loop at 30Hz so we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
-    // Test Primitives
-
-    DirectWheelsPrimitive* pp;
-
-    primitives.emplace_back(pp->createPrimitive(pp->createMsg()));
-    ros::spinOnce();
-    backend.sendPrimitives(primitives);
-
-
-
     // Main loop
     while (ros::ok())
     {

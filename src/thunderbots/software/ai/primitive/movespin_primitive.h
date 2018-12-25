@@ -13,7 +13,7 @@ class MoveSpinPrimitive : public Primitive
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param dest The final destination of the movement
-     * @param final_angle The final orientation the robot should have at the end
+     * @param angular_vel The angular velocity of the robot
      * of the movement
      */
     explicit MoveSpinPrimitive(unsigned int robot_id, const Point &dest,

@@ -8,6 +8,8 @@ class DirectWheelsPrimitive : public Primitive
 {
    public:
     static const std::string PRIMITIVE_NAME;
+    //Power is a fraction of the total power we can apply to the robots,
+    //with +-255 being the max/min, and 0 being no power.
     /**
      * Creates a new Move Primitive
      *
