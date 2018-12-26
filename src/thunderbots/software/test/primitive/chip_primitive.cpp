@@ -36,7 +36,7 @@ TEST(ChipPrimTest, parameter_array_test)
     ChipPrimitive chip_prim =
         ChipPrimitive(robot_id, chip_origin, chip_direction, chip_distance_meters);
 
-    std::vector<double> param_array = chip_prim.getParameterArray();
+    std::vector<double> param_array = chip_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(chip_origin.x(), param_array[0]);
     EXPECT_DOUBLE_EQ(chip_origin.y(), param_array[1]);
@@ -75,7 +75,7 @@ TEST(ChipPrimTest, get_extra_bit_array_test)
 {
     ChipPrimitive chip_prim = ChipPrimitive(0, Point(), Angle(), 0.0);
 
-    std::vector<bool> extra_bit_array = chip_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = chip_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -94,7 +94,7 @@ TEST(ChipPrimitiveTest, create_primitive_from_message_test)
 
     ChipPrimitive new_prim = ChipPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("Chip Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
@@ -102,7 +102,7 @@ TEST(ChipPrimitiveTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(chip_origin.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(chip_direction.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(chip_distance_meters, parameters[3]);
-    EXPECT_EQ(chip_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(chip_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)

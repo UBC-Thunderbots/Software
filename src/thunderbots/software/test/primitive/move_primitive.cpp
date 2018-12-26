@@ -36,7 +36,7 @@ TEST(MovePrimTest, parameter_array_test)
     MovePrimitive move_prim =
         MovePrimitive(robot_id, destination, final_angle, final_speed);
 
-    std::vector<double> param_array = move_prim.getParameterArray();
+    std::vector<double> param_array = move_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(destination.x(), param_array[0]);
     EXPECT_DOUBLE_EQ(destination.y(), param_array[1]);
@@ -75,7 +75,7 @@ TEST(MovePrimTest, get_extra_bit_array_test)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
-    std::vector<bool> extra_bit_array = move_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = move_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -94,7 +94,7 @@ TEST(MovePrimitiveTest, create_primitive_from_message_test)
 
     MovePrimitive new_prim = MovePrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("Move Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
@@ -102,7 +102,7 @@ TEST(MovePrimitiveTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(final_speed, parameters[3]);
-    EXPECT_EQ(move_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(move_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)
