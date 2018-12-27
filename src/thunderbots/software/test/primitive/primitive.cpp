@@ -5,10 +5,11 @@
 #include "ai/primitive/primitive.h"
 
 #include <gtest/gtest.h>
-#include "ai/primitive/movespin_primitive.h"
-#include "ai/primitive/directwheels_primitive.h"
+
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
@@ -72,7 +73,7 @@ TEST(PrimitiveTest, creat_MoveSpinPrimitive_from_message_test)
     const unsigned int robot_id = 2U;
 
     MoveSpinPrimitive movespin_prim =
-            MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel);
 
     thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
 
@@ -98,7 +99,7 @@ TEST(PrimitiveTest, creat_DirectWheelsPrimitive_from_message_test)
     const unsigned int robot_id   = 3U;
 
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(
-            robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
+        robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
 
     thunderbots_msgs::Primitive prim_message = directwheels_prim.createMsg();
 
