@@ -13,11 +13,11 @@ class MoveSpinPrimitive : public Primitive
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param dest The final destination of the movement
-     * @param final_angle The final orientation the robot should have at the end
+     * @param angular_vel The angular velocity of the robot
      * of the movement
      */
     explicit MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
-                           const AngularVelocity &angular_vel);
+                               const AngularVelocity &angular_vel);
 
     /**
      * Creates a new MoveSpin Primitive from a Primitive message
@@ -30,11 +30,25 @@ class MoveSpinPrimitive : public Primitive
 
     unsigned int getRobotId() const override;
 
+    /**
+     * Gets the robot's destination
+     *
+     * @return The robot's destination as a Point(X,Y)
+     */
+    Point getDestination() const;
+
+    /**
+     * Gets the robot's angular velocity in rad/s
+     *
+     * @return The robot's angular velocity in rad/s
+     */
+    AngularVelocity getAngularVelocity() const;
+
     std::vector<double> getParameterArray() const override;
 
     std::vector<bool> getExtraBitArray() const override;
 
-private:
+   private:
     unsigned int robot_id;
     Point dest;
     AngularVelocity angular_vel;

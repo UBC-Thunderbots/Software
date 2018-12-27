@@ -3,8 +3,8 @@
 const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";
 
 MoveSpinPrimitive::MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
-                                     const AngularVelocity angular_vel)
-        : robot_id(robot_id), dest(dest), angular_vel(angular_vel)
+                                     const AngularVelocity &angular_vel)
+    : robot_id(robot_id), dest(dest), angular_vel(angular_vel)
 {
 }
 
@@ -29,6 +29,16 @@ unsigned int MoveSpinPrimitive::getRobotId() const
     return robot_id;
 }
 
+Point MoveSpinPrimitive::getDestination() const
+{
+    return dest;
+}
+
+AngularVelocity MoveSpinPrimitive::getAngularVelocity() const
+{
+    return angular_vel;
+}
+
 std::vector<double> MoveSpinPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), angular_vel.toRadians()};
@@ -36,7 +46,7 @@ std::vector<double> MoveSpinPrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> MovePrimitive::getExtraBitArray() const
+std::vector<bool> MoveSpinPrimitive::getExtraBitArray() const
 {
     return std::vector<bool>();
 }
