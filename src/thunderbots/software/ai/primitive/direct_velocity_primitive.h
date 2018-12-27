@@ -45,9 +45,20 @@ class DirectVelocityPrimitive : public Primitive
 
     double getDribblerRpm() const;
 
-    std::vector<double> getParameterArray() const override;
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {x_velocity, y_velocity, angular_velocity,
+     *                                dribbler_rpm}
+     */
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
+    std::vector<bool> getExtraBits() const override;
 
 
    private:

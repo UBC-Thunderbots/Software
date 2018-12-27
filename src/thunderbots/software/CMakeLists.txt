@@ -251,10 +251,10 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
             ai/primitive/primitive.cpp
-
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
@@ -265,13 +265,11 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(move_primitive_test
             test/primitive/move_primitive.cpp
-            ai/primitive/move_primitive.h
-            ai/primitive/move_primitive.cpp
-
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
@@ -313,10 +311,8 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(chip_primitive_test
             test/primitive/chip_primitive.cpp
-            ai/primitive/chip_primitive.h
-            ai/primitive/chip_primitive.cpp
-
             ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
@@ -329,12 +325,10 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(kick_primitive_test
             test/primitive/kick_primitive.cpp
-            ai/primitive/kick_primitive.h
-            ai/primitive/kick_primitive.cpp
-            
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
@@ -345,11 +339,9 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(direct_velocity_primitive_test
             test/primitive/direct_velocity_primitive.cpp
-            ai/primitive/direct_velocity_primitive.h
-            ai/primitive/direct_velocity_primitive.cpp
-            
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
@@ -361,9 +353,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(catch_primitive_test
             test/primitive/catch_primitive.cpp
-            ai/primitive/catch_primitive.h
             ai/primitive/catch_primitive.cpp
-            
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp

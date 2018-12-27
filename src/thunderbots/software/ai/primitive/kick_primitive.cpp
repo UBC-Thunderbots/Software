@@ -50,7 +50,7 @@ double KickPrimitive::getKickSpeed() const
     return kick_speed_meters_per_second;
 }
 
-std::vector<double> KickPrimitive::getParameterArray() const
+std::vector<double> KickPrimitive::getParameters() const
 {
     std::vector<double> parameters = {kick_origin.x(), kick_origin.y(),
                                       kick_direction.toRadians(),
@@ -59,7 +59,7 @@ std::vector<double> KickPrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> KickPrimitive::getExtraBitArray() const
+std::vector<bool> KickPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }
