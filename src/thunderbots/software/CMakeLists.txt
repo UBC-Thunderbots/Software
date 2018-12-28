@@ -251,6 +251,7 @@ if (CATKIN_ENABLE_TESTING)
             test/primitive/primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
+	    ai/primitive/pivot_primitive.cpp
             )
 
     target_link_libraries(primitive_test ${catkin_LIBRARIES})
@@ -260,8 +261,19 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/move_primitive.h
+	    ai/primitive/pivot_primitive.cpp
             )
 
     target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(pivot_primitive_test
+	    test/primitive/pivot_primitive.cpp
+	    ai/primitive/pivot_primitive.cpp
+	    ai/primitive/primitive.cpp
+	    ai/primitive/pivot_primitive.h
+	    ai/primitive/move_primitive.cpp
+	    )
+
+    target_link_libraries(pivot_primitive_test ${catkin_LIBRARIES})
 
 endif()

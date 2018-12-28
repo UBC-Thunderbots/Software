@@ -43,6 +43,30 @@ class PivotPrimitive : public Primitive
     unsigned int getRobotId() const override;
 
 
+    /**
+     * get the point around which the robot pivots
+     *
+     * @return the robot's pivot point as a Point(x,y)
+     */
+    Point getPivotPoint() const;
+
+
+     /**
+      * Get the (global) angle of the robot after pivot
+      *
+      * @return the final pivot angle position as an Angle
+      */
+     Angle getFinalAngle() const;
+
+
+     /**
+      * Get the robot's final orientation
+      *
+      * @return the robot's orientation after a pivot as an Angle
+      */
+     Angle getRobotOrientation() const;
+
+
     std::vector<double> getParameterArray() const override;
 
 

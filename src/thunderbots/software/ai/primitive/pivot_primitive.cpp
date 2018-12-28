@@ -38,6 +38,25 @@ unsigned int PivotPrimitive::getRobotId() const
     return robot_id;
 }
 
+
+Point PivotPrimitive::getPivotPoint() const
+{
+    return pivot_point;
+}
+
+
+Angle PivotPrimitive::getFinalAngle() const
+{
+    return final_angle;
+}
+
+
+Angle PivotPrimitive::getRobotOrientation() const
+{
+    return robot_orientation;
+}
+
+
 std::vector<double> PivotPrimitive::getParameterArray() const
 {
     std::vector<double> parameters = {pivot_point.x(),
