@@ -15,6 +15,8 @@ class MovePrimitive : public Primitive
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Move Primitive
+     * Moves the robot in a straight line between its current position and the given
+     * destination.
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param dest The final destination of the movement
@@ -57,9 +59,20 @@ class MovePrimitive : public Primitive
      */
     double getFinalSpeed() const;
 
-    std::vector<double> getParameterArray() const override;
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {dest.x(), dest.y(), final_angle.toRadians(),
+     *                               final_speed}
+     */
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
+    std::vector<bool> getExtraBits() const override;
 
    private:
     unsigned int robot_id;

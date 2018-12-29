@@ -46,7 +46,7 @@ double MovePrimitive::getFinalSpeed() const
     return final_speed;
 }
 
-std::vector<double> MovePrimitive::getParameterArray() const
+std::vector<double> MovePrimitive::getParameters() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),
                                       final_speed};
@@ -54,7 +54,7 @@ std::vector<double> MovePrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> MovePrimitive::getExtraBitArray() const
+std::vector<bool> MovePrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }
