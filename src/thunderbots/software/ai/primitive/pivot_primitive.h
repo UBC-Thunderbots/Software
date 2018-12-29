@@ -67,10 +67,22 @@ class PivotPrimitive : public Primitive
      Angle getRobotOrientation() const;
 
 
-    std::vector<double> getParameterArray() const override;
+    /**
+    * Returns the generic vector of parameters for this Primitive
+    *
+    * @return A vector of the form {pivot_point.x(), pivot_point.y(),
+    *                               final_angle.toRadians(),
+    *                               robot_orientation.toRadians()}
+    */
+    std::vector<double> getParameters() const override;
 
 
-    std::vector<bool> getExtraBitArray() const override;
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
+    std::vector<bool> getExtraBits() const override;
 
 
    private:

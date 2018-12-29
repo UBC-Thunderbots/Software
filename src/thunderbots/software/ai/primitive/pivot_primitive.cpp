@@ -57,7 +57,7 @@ Angle PivotPrimitive::getRobotOrientation() const
 }
 
 
-std::vector<double> PivotPrimitive::getParameterArray() const
+std::vector<double> PivotPrimitive::getParameters() const
 {
     std::vector<double> parameters = {pivot_point.x(),
                                       pivot_point.y(),
@@ -67,7 +67,7 @@ std::vector<double> PivotPrimitive::getParameterArray() const
 }
 
 
-std::vector<bool> PivotPrimitive::getExtraBitArray() const
+std::vector<bool> PivotPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }

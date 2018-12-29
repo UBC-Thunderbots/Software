@@ -6,7 +6,7 @@
 #include "ai/primitive/pivot_primitive.h"
 
 #include <gtest/gtest.h>
-#include "string.h"
+#include <string.h>
 
 TEST(PivotPrimTest, construct_with_no_params_test)
 {
@@ -39,7 +39,7 @@ TEST(PivotPrimTest, parameter_array_test)
     PivotPrimitive pivot_prim =
             PivotPrimitive(robot_id, pivot_point, final_angle, orientation);
 
-    std::vector<double> param_array = pivot_prim.getParameterArray();
+    std::vector<double> param_array = pivot_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(pivot_point.x(), param_array[0]);
     EXPECT_DOUBLE_EQ(pivot_point.y(), param_array[1]);
@@ -82,7 +82,7 @@ TEST(PivotPrimTest, get_extra_bit_array_test)
 {
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle());
 
-    std::vector<bool> extra_bit_array = pivot_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = pivot_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -102,7 +102,7 @@ TEST(PivotPrimTest, create_primitive_from_message_test)
 
     PivotPrimitive new_prim = PivotPrimitive(prim_msg);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("Pivot Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
@@ -110,7 +110,7 @@ TEST(PivotPrimTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(pivot_point.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(robot_orientation.toRadians(), parameters[3]);
-    EXPECT_EQ(pivot_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(pivot_prim.getExtraBits(), std::vector<bool>());
 }
 
 
