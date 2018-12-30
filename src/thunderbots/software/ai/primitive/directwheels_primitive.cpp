@@ -3,10 +3,10 @@
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
 
 DirectWheelsPrimitive::DirectWheelsPrimitive(unsigned int robot_id,
-                                             signed int wheel0_power,
-                                             signed int wheel1_power,
-                                             signed int wheel2_power,
-                                             signed int wheel3_power, double dribbler_rpm)
+                                             int wheel0_power,
+                                             int wheel1_power,
+                                             int wheel2_power,
+                                             int wheel3_power, double dribbler_rpm)
     : robot_id(robot_id),
       wheel0_power(wheel0_power),
       wheel1_power(wheel1_power),
@@ -39,22 +39,22 @@ unsigned int DirectWheelsPrimitive::getRobotId() const
     return robot_id;
 }
 
-signed int DirectWheelsPrimitive::getWheel0Power() const
+int DirectWheelsPrimitive::getWheel0Power() const
 {
     return wheel0_power;
 }
 
-signed int DirectWheelsPrimitive::getWheel1Power() const
+int DirectWheelsPrimitive::getWheel1Power() const
 {
     return wheel1_power;
 }
 
-signed int DirectWheelsPrimitive::getWheel2Power() const
+int DirectWheelsPrimitive::getWheel2Power() const
 {
     return wheel2_power;
 }
 
-signed int DirectWheelsPrimitive::getWheel3Power() const
+int DirectWheelsPrimitive::getWheel3Power() const
 {
     return wheel3_power;
 }

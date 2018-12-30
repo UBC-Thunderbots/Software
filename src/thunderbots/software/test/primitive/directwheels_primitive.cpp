@@ -13,7 +13,7 @@ TEST(DirectWheelsPrimTest, construct_with_no_params_test)
 
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
 
-    EXPECT_EQ(int(), directwheels_prim.getRobotId());
+    EXPECT_EQ(0, directwheels_prim.getRobotId());
     EXPECT_EQ(directwheels_prim_name, directwheels_prim.getPrimitiveName());
 }
 
@@ -29,10 +29,10 @@ TEST(DirectWheelsPrimTest, get_robot_id_test)
 
 TEST(DirectWheelsPrimTest, parameter_array_test)
 {
-    const signed int wheel0_power = 1;
-    const signed int wheel1_power = 2;
-    const signed int wheel2_power = 3;
-    const signed int wheel3_power = 4;
+    const int wheel0_power = 1;
+    const int wheel1_power = 2;
+    const int wheel2_power = 3;
+    const int wheel3_power = 4;
     const double dribbler_rpm     = 10.0;
     const unsigned int robot_id   = 1U;
 
@@ -50,7 +50,7 @@ TEST(DirectWheelsPrimTest, parameter_array_test)
 
 TEST(DirectWheelsPrimTest, get_wheel0_power_test)
 {
-    const signed int wheel0_power = 5;
+    const int wheel0_power = 5;
 
     DirectWheelsPrimitive directwheels_prim =
         DirectWheelsPrimitive(0, wheel0_power, 0, 0, 0, 0.0);
@@ -60,7 +60,7 @@ TEST(DirectWheelsPrimTest, get_wheel0_power_test)
 
 TEST(DirectWheelsPrimTest, get_wheel1_power_test)
 {
-    const signed int wheel1_power = 6;
+    const int wheel1_power = 6;
 
     DirectWheelsPrimitive directwheels_prim =
         DirectWheelsPrimitive(0, 0, wheel1_power, 0, 0, 0.0);
@@ -70,7 +70,7 @@ TEST(DirectWheelsPrimTest, get_wheel1_power_test)
 
 TEST(DirectWheelsPrimTest, get_wheel2_power_test)
 {
-    const signed int wheel2_power = 7;
+    const int wheel2_power = 7;
 
     DirectWheelsPrimitive directwheels_prim =
         DirectWheelsPrimitive(0, 0, 0, wheel2_power, 0, 0.0);
@@ -80,7 +80,7 @@ TEST(DirectWheelsPrimTest, get_wheel2_power_test)
 
 TEST(DirectWheelsPrimTest, get_wheel3_power_test)
 {
-    const signed int wheel3_power = 8;
+    const int wheel3_power = 8;
 
     DirectWheelsPrimitive directwheels_prim =
         DirectWheelsPrimitive(0, 0, 0, 0, wheel3_power, 0.0);
@@ -109,10 +109,10 @@ TEST(DirectWheelsPrimTest, get_extra_bit_array_test)
 
 TEST(DirectWheelsPrimTest, create_primitive_from_message_test)
 {
-    const signed int wheel0_power = 1;
-    const signed int wheel1_power = 2;
-    const signed int wheel2_power = 3;
-    const signed int wheel3_power = 4;
+    const int wheel0_power = 1;
+    const int wheel1_power = 2;
+    const int wheel2_power = 3;
+    const int wheel3_power = 4;
     const double dribbler_rpm     = 13.37;
     const unsigned int robot_id   = 2U;
 
