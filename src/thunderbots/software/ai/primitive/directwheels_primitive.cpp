@@ -2,10 +2,8 @@
 
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
 
-DirectWheelsPrimitive::DirectWheelsPrimitive(unsigned int robot_id,
-                                             int wheel0_power,
-                                             int wheel1_power,
-                                             int wheel2_power,
+DirectWheelsPrimitive::DirectWheelsPrimitive(unsigned int robot_id, int wheel0_power,
+                                             int wheel1_power, int wheel2_power,
                                              int wheel3_power, double dribbler_rpm)
     : robot_id(robot_id),
       wheel0_power(wheel0_power),

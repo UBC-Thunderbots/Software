@@ -35,8 +35,7 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
-    else if (primitive_msg.primitive_name ==
-             MoveSpinPrimitive::PRIMITIVE_NAME)
+    else if (primitive_msg.primitive_name == MoveSpinPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<MoveSpinPrimitive>(primitive_msg);
     }
