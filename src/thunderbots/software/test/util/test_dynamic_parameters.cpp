@@ -22,35 +22,29 @@ class RegistryTest : public ::testing::Test
     /*
      * Returns a unique value, according to the
      * constructed type
+     *
+     * NOTE: The tests return a changing value every time to
+     * help test when the parameter value changes
+     *
+     * The boolean alternates between True/False
      */
     T get_unique_value()
     {
         if constexpr (std::is_same<T, bool>::value)
         {
-            // on consecutive calls, alternates from returning true/false
-            if (state)
-            {
-                state = false;
-                return true;
-            }
-            else
-            {
-                state = true;
-                return false;
-            }
+            return (unique_value_counter += 1) & 1;
         }
-        // unix time is just make
         else if constexpr (std::is_same<T, int32_t>::value)
         {
-            return std::rand();
+            return unique_value_counter += 1;
         }
         else if constexpr (std::is_same<T, double>::value)
         {
-            return std::rand() / 7.0;
+            return static_cast<double>(unique_value_counter += 1);
         }
         else if constexpr (std::is_same<T, std::string>::value)
         {
-            return "test" + std::to_string(std::rand());
+            return std::to_string(unique_value_counter += 1);
         }
         else
         {
@@ -67,7 +61,7 @@ class RegistryTest : public ::testing::Test
         return std::to_string(std::rand());
     }
 
-    bool state = true;  // state used to flip between returning true/false
+    int unique_value_counter = 0;
     T value_;
 };
 

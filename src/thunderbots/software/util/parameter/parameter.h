@@ -49,7 +49,7 @@ class Parameter
         this->name_  = parameter_name;
         this->value_ = default_value;
 
-        Parameter<T>::registerParameter(std::make_shared<Parameter<T>>(*this));
+        Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
     }
 
     /**
@@ -103,7 +103,7 @@ class Parameter
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string, std::shared_ptr<Parameter<T>>>& getRegistry()
+    static const std::map<std::string, std::unique_ptr<Parameter<T>>>& getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
     }
@@ -120,17 +120,17 @@ class Parameter
     }
 
     /**
-     * Registers (adds) a Parameter to the registry. Since the shared pointer is moved
+     * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
      * into the registry, the pointer may not be accessed by the caller after this
      * function has been called.
      *
      * Also registers params to the static configuration struct used to
      * set parameters
      *
-     * @param parameter A shared pointer to the Parameter to add. This pointer may not
+     * @param parameter A unique pointer to the Parameter to add. This pointer may not
      * be accessed by the caller after this function has been called.
      */
-    static void registerParameter(std::shared_ptr<Parameter<T>> parameter)
+    static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
     {
         if constexpr (std::is_same<T, bool>::value)
         {
@@ -178,9 +178,10 @@ class Parameter
             // implemented
             ROS_WARN("Attempting to configure with unkown type");
         }
+
         Parameter<T>::getMutableRegistry().insert(
-            std::pair<std::string, std::shared_ptr<Parameter<T>>>(parameter->name(),
-                                                                  parameter));
+            std::pair<std::string, std::unique_ptr<Parameter<T>>>(parameter->name(),
+                                                                  std::move(parameter)));
     }
 
     /**
@@ -204,9 +205,9 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::map<std::string, std::shared_ptr<Parameter<T>>>& getMutableRegistry()
+    static std::map<std::string, std::unique_ptr<Parameter<T>>>& getMutableRegistry()
     {
-        static std::map<std::string, std::shared_ptr<Parameter<T>>> instance;
+        static std::map<std::string, std::unique_ptr<Parameter<T>>> instance;
         return instance;
     }
 
