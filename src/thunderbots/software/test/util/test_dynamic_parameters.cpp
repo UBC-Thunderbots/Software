@@ -1,69 +1,84 @@
 #include <gtest/gtest.h>
 #include <ros/ros.h>
+
 #include <random>
+
 #include "util/parameter/dynamic_parameters.h"
 #include "util/parameter/parameter.h"
 
 /* * Registry Test Fixutre:
- *      This fixture is used everywhere to return a unique_value value 
+ *      This fixture is used everywhere to return a unique_value value
  *      specific to the type its instantiated with.
  */
-template<typename T>
-class RegistryTest : public ::testing::Test {
-    protected:
-        RegistryTest() { 
-            value_ = get_unique_value();
-        }
+template <typename T>
+class RegistryTest : public ::testing::Test
+{
+   protected:
+    RegistryTest()
+    {
+        value_ = get_unique_value();
+    }
 
-        /* 
-         * Returns a unique value, according to the 
-         * constructed type
-         */
-        T get_unique_value() {
-            if constexpr(std::is_same<T, bool>::value){
-                // on consecutive calls, alternates from returning true/false
-                if(state){
-                    state = false;
-                    return true;
-                } else {
-                    state = true; 
-                    return false;
-                }
+    /*
+     * Returns a unique value, according to the
+     * constructed type
+     */
+    T get_unique_value()
+    {
+        if constexpr (std::is_same<T, bool>::value)
+        {
+            // on consecutive calls, alternates from returning true/false
+            if (state)
+            {
+                state = false;
+                return true;
             }
-            // unix time is just make 
-            else if  constexpr(std::is_same<T, int32_t>::value){
-                return std::rand();
-            }
-            else if constexpr(std::is_same<T, double>::value){
-                return std::rand()/7.0;
-            }
-            else if constexpr(std::is_same<T, std::string>::value){
-                return "test"+std::to_string(std::rand());
-            }
-            else {
-                std::cerr<<"Testing with unsupported type"<<std::endl;
+            else
+            {
+                state = true;
+                return false;
             }
         }
-
-        /* 
-         * Returns a unique string to use for 
-         * a parameter name (unique enough for our tests)
-         */
-        std::string get_unique_param_name(){
-            return std::to_string(std::rand());
+        // unix time is just make
+        else if constexpr (std::is_same<T, int32_t>::value)
+        {
+            return std::rand();
         }
+        else if constexpr (std::is_same<T, double>::value)
+        {
+            return std::rand() / 7.0;
+        }
+        else if constexpr (std::is_same<T, std::string>::value)
+        {
+            return "test" + std::to_string(std::rand());
+        }
+        else
+        {
+            std::cerr << "Testing with unsupported type" << std::endl;
+        }
+    }
 
-        bool state = true; // state used to flip between returning true/false
-        T value_; 
+    /*
+     * Returns a unique string to use for
+     * a parameter name (unique enough for our tests)
+     */
+    std::string get_unique_param_name()
+    {
+        return std::to_string(std::rand());
+    }
+
+    bool state = true;  // state used to flip between returning true/false
+    T value_;
 };
 
 /**********************************************************************
  *                               TESTS                                *
  **********************************************************************/
-// all tests are grouped into the RegistryTest test case 
+// all tests are grouped into the RegistryTest test case
 
 // gtest getROSParameterPath
-TEST(RegistryTest, get_param_test) {
+TEST(RegistryTest, get_param_test)
+{
     Parameter<bool> test_param = Parameter<bool>("test_param", false);
     EXPECT_EQ(test_param.getROSParameterPath(), "/parameters/test_param");
 }
@@ -73,50 +88,59 @@ using XmlRpcTypes = ::testing::Types<bool, int32_t, std::string, double>;
 TYPED_TEST_CASE(RegistryTest, XmlRpcTypes);
 
 // test to make sure the call to registerParameter works as expected
-TYPED_TEST(RegistryTest, constructor_test) {
+TYPED_TEST(RegistryTest, constructor_test)
+{
     // each type gets its own registry, same name should not conflict
     auto unique_value = RegistryTest<TypeParam>::get_unique_value();
-    Parameter<TypeParam> test_param = Parameter<TypeParam>("test_all_type_params", unique_value);
-    try {
+    Parameter<TypeParam> test_param =
+        Parameter<TypeParam>("test_all_type_params", unique_value);
+    try
+    {
         ASSERT_EQ(test_param.getRegistry().count("test_all_type_params"), 1);
-        ASSERT_EQ(test_param.getRegistry().at("test_all_type_params")->value(), unique_value);
-    } catch (...) {
+        ASSERT_EQ(test_param.getRegistry().at("test_all_type_params")->value(),
+                  unique_value);
+    }
+    catch (...)
+    {
         ADD_FAILURE() << "Parameter added to registry with improper key";
     }
 }
 
 // rostest UpdateParameterFromRosParameterServer (for all XmlRpcTypes)
-TYPED_TEST(RegistryTest, update_parameter_test){
+TYPED_TEST(RegistryTest, update_parameter_test)
+{
     ros::NodeHandle nh_;
     TypeParam unique_value = RegistryTest<TypeParam>::get_unique_value();
 
     // set ros param
     std::string unique_param_name = RegistryTest<TypeParam>::get_unique_param_name();
-    nh_.setParam("/parameters/"+unique_param_name, unique_value);
+    nh_.setParam("/parameters/" + unique_param_name, unique_value);
 
     // create parameter
-    Parameter<TypeParam> test_param = Parameter<TypeParam>(unique_param_name, unique_value);
+    Parameter<TypeParam> test_param =
+        Parameter<TypeParam>(unique_param_name, unique_value);
 
-    // sanity check 
+    // sanity check
     TypeParam stored_val;
-    nh_.getParam("/parameters/"+unique_param_name, stored_val);
+    nh_.getParam("/parameters/" + unique_param_name, stored_val);
     ASSERT_EQ(test_param.value(), stored_val);
 
     // change param (this would normally be through the reconf GUI)
     unique_value = RegistryTest<TypeParam>::get_unique_value();
-    nh_.setParam("/parameters/"+unique_param_name, unique_value);
-    nh_.getParam("/parameters/"+unique_param_name, stored_val);
+    nh_.setParam("/parameters/" + unique_param_name, unique_value);
+    nh_.getParam("/parameters/" + unique_param_name, stored_val);
     ASSERT_NE(test_param.value(), stored_val);
 
-    // Calling updateAll...() will loop through the registry and update all 
-    // the values (internally calling updateValueFromROSParameterServer on each param in the 
-    // registry) this is due to the different references after calling make_shared
+    // Calling updateAll...() will loop through the registry and update all
+    // the values (internally calling updateValueFromROSParameterServer on each param in
+    // the registry) this is due to the different references after calling make_shared
     Util::DynamicParameters::updateAllParametersFromROSParameterServer();
     ASSERT_EQ(test_param.value(), stored_val);
     ros::spinOnce();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     ros::init(argc, argv, "dynamic_parameters_ros_test");
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

@@ -1,24 +1,23 @@
-#include <ros/ros.h>
-
-#include <dynamic_reconfigure/server.h>
 #include <dynamic_reconfigure/Config.h>
 #include <dynamic_reconfigure/Reconfigure.h>
-
+#include <dynamic_reconfigure/server.h>
+#include <ros/ros.h>
+#include <thunderbots/ParamsConfig.h>
 #include <util/parameter/dynamic_parameters.h>
 #include <util/parameter/parameter.h>
 
-#include <thunderbots/ParamsConfig.h>
-
 // constants used by this node
-namespace {
+namespace
+{
     // specifies the rate at which the parameter values are refreshed
     constexpr int REFRESH_RATE_HZ = 1;
     // specifies the number of threads this node spins with
     constexpr int NUMBER_OF_THREADS = 1;
-}
+}  // namespace
 
 // callback for the param timer
-void updateAllParameters(const ros::TimerEvent& event) {
+void updateAllParameters(const ros::TimerEvent& event)
+{
     Util::DynamicParameters::updateAllParametersFromROSParameterServer();
 }
 
@@ -31,8 +30,8 @@ void updateAllParameters(const ros::TimerEvent& event) {
  * with the rqt_reconfigure node see this node's README.md
  *
  */
-int main(int argc, char **argv) {
-
+int main(int argc, char** argv)
+{
     // init node
     ros::init(argc, argv, "dynamic_param");
     ros::NodeHandle node_handle;
@@ -41,19 +40,22 @@ int main(int argc, char **argv) {
     dynamic_reconfigure::Server<param_server::ParamsConfig> server;
 
     ros::service::waitForService("/parameters/set_parameters", 1);
-    ros::ServiceClient client = node_handle.serviceClient<dynamic_reconfigure::Reconfigure>("/parameters/set_parameters");
+    ros::ServiceClient client =
+        node_handle.serviceClient<dynamic_reconfigure::Reconfigure>(
+            "/parameters/set_parameters");
 
     // create configuration message
     dynamic_reconfigure::Reconfigure srv;
 
     // get all configuration structs
-    srv.request.config.ints = Parameter<int32_t>::getConfigStruct().ints;
-    srv.request.config.strs = Parameter<std::string>::getConfigStruct().strs;
+    srv.request.config.ints    = Parameter<int32_t>::getConfigStruct().ints;
+    srv.request.config.strs    = Parameter<std::string>::getConfigStruct().strs;
     srv.request.config.doubles = Parameter<double>::getConfigStruct().doubles;
-    srv.request.config.bools = Parameter<bool>::getConfigStruct().bools;
+    srv.request.config.bools   = Parameter<bool>::getConfigStruct().bools;
 
     // start the timer to update Parameters
-    ros::Timer timer = node_handle.createTimer(ros::Duration(static_cast<double>(1/REFRESH_RATE_HZ)), updateAllParameters);
+    ros::Timer timer = node_handle.createTimer(
+        ros::Duration(static_cast<double>(1 / REFRESH_RATE_HZ)), updateAllParameters);
     timer.start();
 
     // spin asynchronously to allow for service call in the same node
@@ -61,9 +63,12 @@ int main(int argc, char **argv) {
     spinner.start();
 
     // call the service to set params
-    if(client.call(srv)) {
+    if (client.call(srv))
+    {
         ROS_INFO("All parameters have been configured");
-    } else {
+    }
+    else
+    {
         ROS_FATAL("Parameters have not been configured, showing default values");
         return 1;
     }
@@ -71,4 +76,3 @@ int main(int argc, char **argv) {
     ros::waitForShutdown();
     return 0;
 }
-
