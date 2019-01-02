@@ -10,7 +10,7 @@ class PivotPrimitive : public Primitive
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Pivot Primitive
-     * 
+     *
      * Pivots the robot around the specified point, maintaining a constant
      * distance from this point.
      * 	   The robot will pivot in the direction of the shortest path
@@ -23,10 +23,8 @@ class PivotPrimitive : public Primitive
      * @param robot_orientation The orientation of robot (facing direction)
      *                          during pivot (radians; Not used)
      */
-    explicit PivotPrimitive(unsigned int robot_id,
-                            const Point &pivot_point,
-                            const Angle &final_angle,
-                            const Angle &robot_orientation);
+    explicit PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
+                            const Angle &final_angle, const Angle &robot_orientation);
 
     /**
      * Create a new Pivot Primitive from a Primitive message
@@ -61,12 +59,12 @@ class PivotPrimitive : public Primitive
     Angle getRobotOrientation() const;
 
     /**
-    * Returns the generic vector of parameters for this Primitive
-    *
-    * @return A vector of the form {pivot_point.x(), pivot_point.y(),
-    *                               final_angle.toRadians(),
-    *                               robot_orientation.toRadians()}
-    */
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {pivot_point.x(), pivot_point.y(),
+     *                               final_angle.toRadians(),
+     *                               robot_orientation.toRadians()}
+     */
     std::vector<double> getParameters() const override;
 
     /**

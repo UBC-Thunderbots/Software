@@ -30,12 +30,12 @@ TEST(PivotPrimTest, get_robot_id_test)
 TEST(PivotPrimTest, parameter_array_test)
 {
     const unsigned int robot_id = 6U;
-    const Point pivot_point = Point(-1,2);
-    const Angle final_angle = Angle::ofRadians(1.5);
-    const Angle orientation = Angle::ofRadians(0.0);
+    const Point pivot_point     = Point(-1, 2);
+    const Angle final_angle     = Angle::ofRadians(1.5);
+    const Angle orientation     = Angle::ofRadians(0.0);
 
     PivotPrimitive pivot_prim =
-            PivotPrimitive(robot_id, pivot_point, final_angle, orientation);
+        PivotPrimitive(robot_id, pivot_point, final_angle, orientation);
 
     std::vector<double> param_array = pivot_prim.getParameters();
 
@@ -47,7 +47,7 @@ TEST(PivotPrimTest, parameter_array_test)
 
 TEST(PivotPrimTest, get_pivot_point_test)
 {
-    Point pivot_point = Point(-4,3);
+    Point pivot_point = Point(-4, 3);
 
     PivotPrimitive pivot_prim = PivotPrimitive(0, pivot_point, Angle(), Angle());
 
@@ -84,12 +84,12 @@ TEST(PivotPrimTest, get_extra_bit_array_test)
 TEST(PivotPrimTest, create_primitive_from_message_test)
 {
     const unsigned int robot_id   = 2U;
-    const Point pivot_point       = Point(2,-1);
+    const Point pivot_point       = Point(2, -1);
     const Angle final_angle       = Angle::ofRadians(2.56);
-    const Angle robot_orientation  = Angle::ofRadians(0.78);
+    const Angle robot_orientation = Angle::ofRadians(0.78);
 
     PivotPrimitive pivot_prim =
-            PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
+        PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
 
