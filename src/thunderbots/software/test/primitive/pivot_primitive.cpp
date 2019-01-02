@@ -14,10 +14,9 @@ TEST(PivotPrimTest, construct_with_no_params_test)
 
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle());
 
-    EXPECT_EQ(int(), pivot_prim.getRobotId());
+    EXPECT_EQ(0, pivot_prim.getRobotId());
     EXPECT_EQ(pivot_prim_name, pivot_prim.getPrimitiveName());
 }
-
 
 TEST(PivotPrimTest, get_robot_id_test)
 {
@@ -27,7 +26,6 @@ TEST(PivotPrimTest, get_robot_id_test)
 
     EXPECT_EQ(robot_id, pivot_prim.getRobotId());
 }
-
 
 TEST(PivotPrimTest, parameter_array_test)
 {
@@ -47,7 +45,6 @@ TEST(PivotPrimTest, parameter_array_test)
     EXPECT_DOUBLE_EQ(orientation.toRadians(), param_array[3]);
 }
 
-
 TEST(PivotPrimTest, get_pivot_point_test)
 {
     Point pivot_point = Point(-4,3);
@@ -56,7 +53,6 @@ TEST(PivotPrimTest, get_pivot_point_test)
 
     EXPECT_EQ(pivot_point, pivot_prim.getPivotPoint());
 }
-
 
 TEST(PivotPrimTest, get_final_angle_test)
 {
@@ -67,7 +63,6 @@ TEST(PivotPrimTest, get_final_angle_test)
     EXPECT_EQ(final_angle, pivot_prim.getFinalAngle());
 }
 
-
 TEST(PivotPrimTest, get_robot_orientation_test)
 {
     Angle robot_orient = Angle::ofRadians(3.16);
@@ -77,7 +72,6 @@ TEST(PivotPrimTest, get_robot_orientation_test)
     EXPECT_EQ(robot_orient, pivot_prim.getRobotOrientation());
 }
 
-
 TEST(PivotPrimTest, get_extra_bit_array_test)
 {
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle());
@@ -86,7 +80,6 @@ TEST(PivotPrimTest, get_extra_bit_array_test)
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
-
 
 TEST(PivotPrimTest, create_primitive_from_message_test)
 {
@@ -112,7 +105,6 @@ TEST(PivotPrimTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(robot_orientation.toRadians(), parameters[3]);
     EXPECT_EQ(pivot_prim.getExtraBits(), std::vector<bool>());
 }
-
 
 int main(int argc, char **argv)
 {

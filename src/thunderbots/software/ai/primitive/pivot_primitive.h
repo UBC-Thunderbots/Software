@@ -28,7 +28,6 @@ class PivotPrimitive : public Primitive
                             const Angle &final_angle,
                             const Angle &robot_orientation);
 
-
     /**
      * Create a new Pivot Primitive from a Primitive message
      *
@@ -36,12 +35,9 @@ class PivotPrimitive : public Primitive
      */
     explicit PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
-
     std::string getPrimitiveName() const override;
 
-
     unsigned int getRobotId() const override;
-
 
     /**
      * get the point around which the robot pivots
@@ -50,22 +46,19 @@ class PivotPrimitive : public Primitive
      */
     Point getPivotPoint() const;
 
+    /**
+     * Get the (global) angle of the robot after pivot
+     *
+     * @return the final pivot angle position as an Angle
+     */
+    Angle getFinalAngle() const;
 
-     /**
-      * Get the (global) angle of the robot after pivot
-      *
-      * @return the final pivot angle position as an Angle
-      */
-     Angle getFinalAngle() const;
-
-
-     /**
-      * Get the robot's final orientation
-      *
-      * @return the robot's orientation after a pivot as an Angle
-      */
-     Angle getRobotOrientation() const;
-
+    /**
+     * Get the robot's final orientation
+     *
+     * @return the robot's orientation after a pivot as an Angle
+     */
+    Angle getRobotOrientation() const;
 
     /**
     * Returns the generic vector of parameters for this Primitive
@@ -76,14 +69,12 @@ class PivotPrimitive : public Primitive
     */
     std::vector<double> getParameters() const override;
 
-
     /**
      * This primitive has no extra bits
      *
      * @return an empty vector
      */
     std::vector<bool> getExtraBits() const override;
-
 
    private:
     unsigned int robot_id;
