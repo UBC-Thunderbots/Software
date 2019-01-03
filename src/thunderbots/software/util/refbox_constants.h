@@ -19,5 +19,6 @@ enum class RefboxGameState
     GOAL_US,
     GOAL_THEM,
     BALL_PLACEMENT_US,
-    BALL_PLACEMENT_THEM
+    BALL_PLACEMENT_THEM,
+    LAST_ENUM_ITEM_UNUSED
 };

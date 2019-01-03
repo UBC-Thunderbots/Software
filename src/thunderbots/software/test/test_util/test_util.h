@@ -76,6 +76,8 @@ namespace Test
          */
         static World setBallVelocity(World world, Vector ball_velocity);
 
+        static std::vector<RefboxGameState> getAllRefboxGameStates();
+
        private:
         /**
          * Returns a new team with robots placed at the given positions. Robots in the

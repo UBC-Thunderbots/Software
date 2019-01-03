@@ -244,6 +244,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/field.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
+            ai/world/game_state.cpp
             )
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
