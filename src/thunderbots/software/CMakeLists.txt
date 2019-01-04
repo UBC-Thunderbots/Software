@@ -157,6 +157,8 @@ target_link_libraries(backend_output ${catkin_LIBRARIES}
 # picking up other files that may affect test behaviour. Unit tests should not need too many files to be specified
 # and we want to make sure the minimum set of files required for the test are being used.
 
+##### Unit Tests #####
+
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
     #gtest
@@ -350,5 +352,26 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
 
+endif()
+
+##### ROSTests / Integration Tests #####
+
+if (CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+
+    # The test node that verifies the logger is working correctly
+    add_rostest_gtest(logger_test_node test/util/logger_test.test
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            test/util/logger_test_node.cpp
+            )
+    target_link_libraries(logger_test_node ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    # The test node that verifies the rostest utils are working correctly
+    add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
+            test/test_util/rostest_util_test.cpp
+            )
+    target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
 endif()
