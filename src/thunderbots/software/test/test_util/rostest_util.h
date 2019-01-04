@@ -7,7 +7,7 @@
 #include <string>
 #include <thread>
 
-namespace RosTest
+namespace RosTestUtil
 {
     /**
      * This is a utility function primarily designed for use in RosTests. Given a
@@ -32,7 +32,8 @@ namespace RosTest
     {
         std::optional<T> msg_ptr;
 
-        // Do NOT use the 'auto' keyword here. The type is uses fails compilation.
+        // Do NOT use the 'auto' keyword here. The type it auto resolves to
+        // fails compilation
         boost::function<void(T)> callback = [&](T msg) { msg_ptr = msg; };
 
         // We need to store the subscriber in a variable to it doesn't immediately go out
@@ -55,4 +56,4 @@ namespace RosTest
             std::string("Error: Timed out while waiting for message on topic ") +
             topic_name);
     }
-}  // namespace RosTest
+}  // namespace RosTestUtil

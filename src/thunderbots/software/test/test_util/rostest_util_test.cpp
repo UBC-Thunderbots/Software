@@ -38,8 +38,9 @@ TEST_F(RosTestUtilsTest, test_publish_and_receive_message_within_timeout)
     msg.data = "C++ is my favorite language";
 
     test_publisher.publish(msg);
-    auto received_message = RosTest::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
-        node_handle, topic_name, ten_seconds);
+    auto received_message =
+        RosTestUtil::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
+            node_handle, topic_name, ten_seconds);
 
     EXPECT_EQ(msg.data, received_message->data);
 }
@@ -48,7 +49,7 @@ TEST_F(RosTestUtilsTest, test_do_not_receive_message_within_timeout)
 {
     // We don't publish a message here so that no message will be received by the waiting
     // function
-    EXPECT_THROW(RosTest::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
+    EXPECT_THROW(RosTestUtil::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
                      node_handle, topic_name, one_second),
                  std::runtime_error);
 }

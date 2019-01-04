@@ -352,12 +352,12 @@ if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
     # The test node that verifies the logger is working correctly
-    add_rostest_gtest(logger_test_node test/util/logger_test.test
+    add_rostest_gtest(logger_test test/util/logger_test.test
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
-            test/util/logger_test_node.cpp
+            test/util/logger_test.cpp
             )
-    target_link_libraries(logger_test_node ${catkin_LIBRARIES}
+    target_link_libraries(logger_test ${catkin_LIBRARIES}
             ${G3LOG})
 
     # The test node that verifies the rostest utils are working correctly

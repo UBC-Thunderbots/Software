@@ -28,7 +28,7 @@ TEST_F(LoggerTest, test_log_messages_with_INFO_severity_are_sent_to_rosout_topic
     // We MUST use the /rosout topic rather than the commonly suggested /rosout_agg,
     // because messages are not re-published to /rosout_agg during rostests
     auto message =
-        RosTest::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
+        RosTestUtil::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
 
     std::string log_output                    = message->msg;
     rosgraph_msgs::Log::_level_type log_level = message->level;
@@ -51,7 +51,7 @@ TEST_F(LoggerTest, test_log_messages_with_DEBUG_severity_are_sent_to_rosout_topi
     // We MUST use the /rosout topic rather than the commonly suggested /rosout_agg,
     // because messages are not re-published to /rosout_agg during rostests
     auto message =
-        RosTest::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
+        RosTestUtil::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
 
     std::string log_output                    = message->msg;
     rosgraph_msgs::Log::_level_type log_level = message->level;
@@ -74,7 +74,7 @@ TEST_F(LoggerTest, test_log_messages_with_WARNING_severity_are_sent_to_rosout_to
     // We MUST use the /rosout topic rather than the commonly suggested /rosout_agg,
     // because messages are not re-published to /rosout_agg during rostests
     auto message =
-        RosTest::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
+        RosTestUtil::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
 
     std::string log_output                    = message->msg;
     rosgraph_msgs::Log::_level_type log_level = message->level;
@@ -91,7 +91,7 @@ TEST_F(LoggerTest, test_log_messages_with_WARNING_severity_are_sent_to_rosout_to
 int main(int argc, char **argv)
 {
     // !! Don't forget to initialize ROS, since this is a test within the ros framework !!
-    ros::init(argc, argv, "logger_test_node");
+    ros::init(argc, argv, "logger_test");
     ::testing::InitGoogleTest(&argc, argv);
     // Because of https://github.com/ros/ros_comm/issues/688 we create an extra NodeHandle
     // here that will stay in scope until all the tests have been completed. Otherwise
