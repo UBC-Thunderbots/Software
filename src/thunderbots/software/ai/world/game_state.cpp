@@ -164,86 +164,86 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
     switch (gameState)
     {
         case RefboxGameState::HALT:
-            state   = HALT;
+            state          = HALT;
             restart_reason = NONE;
             break;
         case RefboxGameState::STOP:
-            state       = STOP;
-            restart_reason     = NONE;
-            our_restart = false;
+            state          = STOP;
+            restart_reason = NONE;
+            our_restart    = false;
             break;
         case RefboxGameState::NORMAL_START:
             state = PLAYING;
             break;
         case RefboxGameState::FORCE_START:
-            state   = PLAYING;
+            state          = PLAYING;
             restart_reason = NONE;
             break;
         case RefboxGameState::PREPARE_KICKOFF_US:
-            state       = SETUP;
-            restart_reason     = KICKOFF;
-            our_restart = true;
+            state          = SETUP;
+            restart_reason = KICKOFF;
+            our_restart    = true;
             break;
         case RefboxGameState::PREPARE_KICKOFF_THEM:
-            state       = READY;
-            restart_reason     = KICKOFF;
-            our_restart = false;
+            state          = READY;
+            restart_reason = KICKOFF;
+            our_restart    = false;
             break;
         case RefboxGameState::PREPARE_PENALTY_US:
-            state       = SETUP;
-            restart_reason     = PENALTY;
-            our_restart = true;
+            state          = SETUP;
+            restart_reason = PENALTY;
+            our_restart    = true;
             break;
         case RefboxGameState::PREPARE_PENALTY_THEM:
-            state       = READY;
-            restart_reason     = PENALTY;
-            our_restart = false;
+            state          = READY;
+            restart_reason = PENALTY;
+            our_restart    = false;
             break;
         case RefboxGameState::DIRECT_FREE_US:
-            state       = SETUP;
-            restart_reason     = DIRECT;
-            our_restart = true;
+            state          = SETUP;
+            restart_reason = DIRECT;
+            our_restart    = true;
             break;
         case RefboxGameState::DIRECT_FREE_THEM:
-            state       = READY;
-            restart_reason     = DIRECT;
-            our_restart = false;
+            state          = READY;
+            restart_reason = DIRECT;
+            our_restart    = false;
             break;
         case RefboxGameState::INDIRECT_FREE_US:
-            state       = SETUP;
-            restart_reason     = INDIRECT;
-            our_restart = true;
+            state          = SETUP;
+            restart_reason = INDIRECT;
+            our_restart    = true;
             break;
         case RefboxGameState::INDIRECT_FREE_THEM:
-            state       = READY;
-            restart_reason     = INDIRECT;
-            our_restart = false;
+            state          = READY;
+            restart_reason = INDIRECT;
+            our_restart    = false;
             break;
         case RefboxGameState::TIMEOUT_US:
-            state   = HALT;
+            state          = HALT;
             restart_reason = NONE;
             break;
         case RefboxGameState::TIMEOUT_THEM:
-            state   = HALT;
+            state          = HALT;
             restart_reason = NONE;
             break;
         case RefboxGameState::GOAL_US:
-            state   = STOP;
+            state          = STOP;
             restart_reason = NONE;
             break;
         case RefboxGameState::GOAL_THEM:
-            state   = STOP;
+            state          = STOP;
             restart_reason = NONE;
             break;
         case RefboxGameState::BALL_PLACEMENT_US:
-            state       = READY;
-            restart_reason     = BALL_PLACEMENT;
-            our_restart = true;
+            state          = READY;
+            restart_reason = BALL_PLACEMENT;
+            our_restart    = true;
             break;
         case RefboxGameState::BALL_PLACEMENT_THEM:
-            state       = SETUP;
-            restart_reason     = BALL_PLACEMENT;
-            our_restart = false;
+            state          = SETUP;
+            restart_reason = BALL_PLACEMENT;
+            our_restart    = false;
             break;
     }
 }

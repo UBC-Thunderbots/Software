@@ -1,6 +1,7 @@
 #include "test/test_util/test_util.h"
 
 #include <gtest/gtest.h>
+
 #include <algorithm>
 
 /*
@@ -122,18 +123,30 @@ TEST(TestUtilsTest, has_all_valid_refbox_game_states)
     // of the implementation
     // note that this array does not contain RefboxGameState::LAST_ENUM_ITEM_UNUSED,
     // this is intentional
-    std::vector<RefboxGameState> expected_game_states = 
-            {RefboxGameState::HALT, RefboxGameState::STOP, RefboxGameState::NORMAL_START,
-             RefboxGameState::FORCE_START, RefboxGameState::PREPARE_KICKOFF_US, 
-             RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::PREPARE_PENALTY_US, 
-             RefboxGameState::PREPARE_PENALTY_THEM, RefboxGameState::DIRECT_FREE_US, 
-             RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_US, 
-             RefboxGameState::INDIRECT_FREE_THEM, RefboxGameState::TIMEOUT_US,
-             RefboxGameState::TIMEOUT_THEM, RefboxGameState::GOAL_US, RefboxGameState::GOAL_THEM,
-             RefboxGameState::BALL_PLACEMENT_US, RefboxGameState::BALL_PLACEMENT_THEM};
-    
-    for(RefboxGameState state : expected_game_states) {
-        EXPECT_TRUE(std::find(game_states.begin(), game_states.end(), state) != game_states.end());
+    std::vector<RefboxGameState> expected_game_states = {
+        RefboxGameState::HALT,
+        RefboxGameState::STOP,
+        RefboxGameState::NORMAL_START,
+        RefboxGameState::FORCE_START,
+        RefboxGameState::PREPARE_KICKOFF_US,
+        RefboxGameState::PREPARE_KICKOFF_THEM,
+        RefboxGameState::PREPARE_PENALTY_US,
+        RefboxGameState::PREPARE_PENALTY_THEM,
+        RefboxGameState::DIRECT_FREE_US,
+        RefboxGameState::DIRECT_FREE_THEM,
+        RefboxGameState::INDIRECT_FREE_US,
+        RefboxGameState::INDIRECT_FREE_THEM,
+        RefboxGameState::TIMEOUT_US,
+        RefboxGameState::TIMEOUT_THEM,
+        RefboxGameState::GOAL_US,
+        RefboxGameState::GOAL_THEM,
+        RefboxGameState::BALL_PLACEMENT_US,
+        RefboxGameState::BALL_PLACEMENT_THEM};
+
+    for (RefboxGameState state : expected_game_states)
+    {
+        EXPECT_TRUE(std::find(game_states.begin(), game_states.end(), state) !=
+                    game_states.end());
     }
 }
 

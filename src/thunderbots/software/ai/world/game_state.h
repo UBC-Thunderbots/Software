@@ -43,7 +43,8 @@ class GameState
     // True if our team can kick the ball during a restart
     bool our_restart;
 
-    // The point at which the ball should be placed by robots before a restart. See Robocup SSL Rules 9.2.
+    // The point at which the ball should be placed by robots before a restart. See
+    // Robocup SSL Rules 9.2.
     Point ball_placement_point;
 
     GameState() : state(HALT), restart_reason(NONE), our_restart(false) {}

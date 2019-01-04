@@ -1,13 +1,12 @@
-#include "test/test_util/test_util.h"
-
 #include <gtest/gtest.h>
 
+#include "test/test_util/test_util.h"
 #include "util/refbox_constants.h"
 
-class GameStateTest: public ::testing::TestWithParam<RefboxGameState> {
-protected:
-    void SetUp() override
-    {}
+class GameStateTest : public ::testing::TestWithParam<RefboxGameState>
+{
+   protected:
+    void SetUp() override {}
 };
 
 TEST_P(GameStateTest, test_all_state_transitions_to_halt)
@@ -45,7 +44,7 @@ TEST_P(GameStateTest, test_all_state_transitions_to_halt)
 }
 
 INSTANTIATE_TEST_CASE_P(AllStates, GameStateTest,
-        ::testing::ValuesIn(::Test::TestUtil::getAllRefboxGameStates()));
+                        ::testing::ValuesIn(::Test::TestUtil::getAllRefboxGameStates()));
 
 int main(int argc, char **argv)
 {
