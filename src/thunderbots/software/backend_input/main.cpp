@@ -51,7 +51,7 @@ int main(int argc, char **argv)
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
     // Initialize the logger
-    Util::Logger::init_logger();
+    Util::Logger::LoggerSingleton::initializeLogger();
 
     // Main loop
     while (ros::ok())

@@ -45,7 +45,7 @@ int main(int argc, char** argv)
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
     // Initialize the logger
-    Util::Logger::init_logger();
+    Util::Logger::LoggerSingleton::initializeLogger();
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();
