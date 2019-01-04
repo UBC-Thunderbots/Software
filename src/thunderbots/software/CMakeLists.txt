@@ -46,6 +46,9 @@ file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 SET(G3_LIBRARY_PATH "/usr/local/include")
 message("g3log lib path: ${G3_LIBRARY_PATH}")
 find_library(G3LOG g3logger PATHS ${G3_LIBRARY_PATH})
+if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
+    message(FATAL_ERROR "G3LOG library not found")
+endif()
 message("g3log path: ${G3LOG}")
 
 ## Find catkin macros and libraries
