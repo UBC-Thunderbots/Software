@@ -1,12 +1,14 @@
 #pragma once
 
-#include <string>
-#include <optional>
 #include <ros/ros.h>
+
 #include <chrono>
+#include <optional>
+#include <string>
 #include <thread>
 
-namespace RosTest {
+namespace RosTest
+{
     /**
      * This is a utility function primarily designed for use in RosTests. Given a
      * NodeHandle and topic name, this function blocks until a message is received on the
@@ -25,29 +27,32 @@ namespace RosTest {
      * @return A pointer to the message class of the topic
      */
     template <typename T>
-    T waitForMessageOnTopic(ros::NodeHandle &node_handle, std::string topic_name, std::chrono::seconds timeout=std::chrono::seconds(10))
+    T waitForMessageOnTopic(ros::NodeHandle &node_handle, std::string topic_name,
+                            std::chrono::seconds timeout = std::chrono::seconds(10))
     {
         std::optional<T> msg_ptr;
 
         // Do NOT use the 'auto' keyword here. The type is uses fails compilation.
-        boost::function<void (T)> callback = [&] (T msg) {
-            msg_ptr = msg;
-        };
+        boost::function<void(T)> callback = [&](T msg) { msg_ptr = msg; };
 
-        // We need to store the subscriber in a variable to it doesn't immediately go out of scope and get deconstructed
+        // We need to store the subscriber in a variable to it doesn't immediately go out
+        // of scope and get deconstructed
         auto sub = node_handle.subscribe<T>(topic_name, 1, callback);
 
         std::chrono::time_point start = std::chrono::steady_clock::now();
-        while(!msg_ptr && (std::chrono::steady_clock::now() - start) < timeout)
+        while (!msg_ptr && (std::chrono::steady_clock::now() - start) < timeout)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
             ros::spinOnce();
         }
 
-        if(msg_ptr) {
+        if (msg_ptr)
+        {
             return msg_ptr.value();
         }
 
-        throw std::runtime_error(std::string("Error: Timed out while waiting for message on topic ") + topic_name);
+        throw std::runtime_error(
+            std::string("Error: Timed out while waiting for message on topic ") +
+            topic_name);
     }
-}
+}  // namespace RosTest

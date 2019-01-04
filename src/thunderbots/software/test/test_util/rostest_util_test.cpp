@@ -1,22 +1,25 @@
 #include "test/test_util/rostest_util.h"
-#include <std_msgs/String.h>
+
 #include <gtest/gtest.h>
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 
 /*
  * Unit tests for the rostest utilities
  */
 
-class RosTestUtilsTest : public testing::Test{
-protected:
-    virtual void SetUp(){
+class RosTestUtilsTest : public testing::Test
+{
+   protected:
+    virtual void SetUp()
+    {
         // Enable latching for this publisher so that if messages are published before
         // the subscriber from the waitForMessageOnTopic function is connected, it will
         // still receive the message. Otherwise the function may "miss" the message and
         // the tests will fail
         test_publisher = node_handle.advertise<std_msgs::String>(topic_name, 1, true);
 
-        one_second = std::chrono::seconds(1);
+        one_second  = std::chrono::seconds(1);
         ten_seconds = std::chrono::seconds(10);
     }
 
@@ -35,15 +38,19 @@ TEST_F(RosTestUtilsTest, test_publish_and_receive_message_within_timeout)
     msg.data = "C++ is my favorite language";
 
     test_publisher.publish(msg);
-    auto received_message = RosTest::waitForMessageOnTopic<std_msgs::String::ConstPtr>(node_handle, topic_name, ten_seconds);
+    auto received_message = RosTest::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
+        node_handle, topic_name, ten_seconds);
 
     EXPECT_EQ(msg.data, received_message->data);
 }
 
 TEST_F(RosTestUtilsTest, test_do_not_receive_message_within_timeout)
 {
-    // We don't publish a message here so that no message will be received by the waiting function
-    EXPECT_THROW(RosTest::waitForMessageOnTopic<std_msgs::String::ConstPtr>(node_handle, topic_name, one_second), std::runtime_error);
+    // We don't publish a message here so that no message will be received by the waiting
+    // function
+    EXPECT_THROW(RosTest::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
+                     node_handle, topic_name, one_second),
+                 std::runtime_error);
 }
 
 int main(int argc, char **argv)

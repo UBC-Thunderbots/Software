@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 
 #include <boost/exception/diagnostic_information.hpp>
+
 #include "backend_input/backend.h"
 #include "backend_input/networking/ssl_vision_client.h"
 #include "geom/point.h"
@@ -11,7 +12,7 @@
 #include "util/logger/init.h"
 #include "util/timestamp.h"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     // Set up our connection over udp to receive camera packets
     // NOTE: We do this before initializing the ROS node so that if it
