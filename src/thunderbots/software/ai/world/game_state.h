@@ -106,6 +106,9 @@ class GameState
     /**
      * Returns true if our team is doing the restart, e.g. when
      * we get an indirect kick
+     * This function will have undefined behaviour if a restart is
+     * not being prepared for or occuring, such as after a transition to
+     * HALT or STOP, because of how Refbox state transitions work.
      *
      * @return true if our team is doing the restart
      */

@@ -35,7 +35,8 @@ bool GameState::isBallPlacement() const
 
 bool GameState::isOurRestart() const
 {
-    return our_restart;
+    // it has to be a restart for it to be our restart
+    return our_restart && restart_reason != RestartReason::NONE;
 }
 
 bool GameState::isDirectFree() const

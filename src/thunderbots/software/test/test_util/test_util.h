@@ -76,6 +76,11 @@ namespace Test
          */
         static World setBallVelocity(World world, Vector ball_velocity);
 
+        /**
+         * Returns a vector containing all Refbox game states except for LAST_ENUM_ITEM_UNUSED
+         *
+         * @return A vector containing all Refbox game states except for LAST_ENUM_ITEM_UNUSED
+         */
         static std::vector<RefboxGameState> getAllRefboxGameStates();
 
        private:

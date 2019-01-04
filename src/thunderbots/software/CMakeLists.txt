@@ -251,6 +251,13 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(game_state_test
             test/world/game_state.cpp
+            ai/world/game_state.cpp
+            test/test_util/test_util.cpp
+            ai/world/world.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
             ai/world/game_state.cpp)
 
     target_link_libraries(game_state_test ${catkin_LIBRARIES})
