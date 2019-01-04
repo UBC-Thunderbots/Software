@@ -12,10 +12,10 @@ thunderbots_msgs::Primitive Primitive::createMsg() const
 
     primitive_msg.primitive_name = getPrimitiveName();
     primitive_msg.robot_id       = getRobotId();
-    primitive_msg.parameters     = getParameterArray();
+    primitive_msg.parameters     = getParameters();
     // Boolean arrays can't be directly assigned, so we need
     // to use a loop
-    for (auto data : getExtraBitArray())
+    for (auto data : getExtraBits())
     {
         primitive_msg.extra_bits.emplace_back(data);
     }

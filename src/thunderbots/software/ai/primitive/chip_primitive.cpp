@@ -49,7 +49,7 @@ double ChipPrimitive::getChipDistance() const
     return chip_distance_meters;
 }
 
-std::vector<double> ChipPrimitive::getParameterArray() const
+std::vector<double> ChipPrimitive::getParameters() const
 {
     std::vector<double> parameters = {chip_origin.x(), chip_origin.y(),
                                       chip_direction.toRadians(), chip_distance_meters};
@@ -57,7 +57,7 @@ std::vector<double> ChipPrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> ChipPrimitive::getExtraBitArray() const
+std::vector<bool> ChipPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }
