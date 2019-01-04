@@ -170,6 +170,10 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp)
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
