@@ -101,7 +101,7 @@ TEST_F(MotionControllerTest, over_speed_test)
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    EXPECT_EQ(expected_speed, robot_velocities.linear_velocity.len());
+    EXPECT_DOUBLE_EQ(expected_speed, robot_velocities.linear_velocity.len());
     EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 
@@ -122,7 +122,7 @@ TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    EXPECT_EQ(expected_speed, robot_velocities.linear_velocity.len());
+    EXPECT_DOUBLE_EQ(expected_speed, robot_velocities.linear_velocity.len());
     EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 
@@ -143,7 +143,7 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
 
     Angle expected_angular_speed = Angle::ofRadians(4);
 
-    EXPECT_EQ(expected_speed, robot_velocities.linear_velocity.len());
+    EXPECT_DOUBLE_EQ(expected_speed, robot_velocities.linear_velocity.len());
     EXPECT_EQ(expected_angular_speed, robot_velocities.angular_velocity);
 }
 
