@@ -1,6 +1,9 @@
 #include "ai/primitive/primitive.h"
 
+#include "ai/primitive/catch_primitive.h"
+#include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
@@ -9,10 +12,10 @@ thunderbots_msgs::Primitive Primitive::createMsg() const
 
     primitive_msg.primitive_name = getPrimitiveName();
     primitive_msg.robot_id       = getRobotId();
-    primitive_msg.parameters     = getParameterArray();
+    primitive_msg.parameters     = getParameters();
     // Boolean arrays can't be directly assigned, so we need
     // to use a loop
-    for (auto data : getExtraBitArray())
+    for (auto data : getExtraBits())
     {
         primitive_msg.extra_bits.emplace_back(data);
     }
@@ -29,9 +32,21 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
+    else if (primitive_msg.primitive_name == CatchPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<CatchPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == ChipPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<ChipPrimitive>(primitive_msg);
+    }
     else if (primitive_msg.primitive_name == DirectVelocityPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<DirectVelocityPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == KickPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<KickPrimitive>(primitive_msg);
     }
     else
     {

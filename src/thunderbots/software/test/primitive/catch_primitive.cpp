@@ -2,10 +2,10 @@
  * This file contains unit tests for the Catch Primitive class
  */
 
+#include "ai/primitive/catch_primitive.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
-
-#include "ai/primitive/catch_primative.h"
 
 TEST(CatchPrimTest, constuct_with_no_params_test)
 {
@@ -36,7 +36,7 @@ TEST(CatchPrimTest, parameter_array_test)
     CatchPrimitive catch_prim =
         CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
 
-    std::vector<double> param_array = catch_prim.getParameterArray();
+    std::vector<double> param_array = catch_prim.getParameters();
 
     EXPECT_EQ(velocity, param_array[0]);
     EXPECT_EQ(dribbler_speed, param_array[1]);
@@ -74,7 +74,7 @@ TEST(CatchPrimTest, get_extra_bit_array_test)
 {
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, 0);
 
-    std::vector<bool> extra_bit_array = catch_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = catch_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -93,14 +93,14 @@ TEST(CatchPrimTest, create_primitive_from_message_test)
 
     CatchPrimitive new_prim = CatchPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("Catch Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
     EXPECT_EQ(velocity, parameters[0]);
     EXPECT_EQ(dribbler_speed, parameters[1]);
     EXPECT_EQ(margin, parameters[2]);
-    EXPECT_EQ(catch_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(catch_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)
