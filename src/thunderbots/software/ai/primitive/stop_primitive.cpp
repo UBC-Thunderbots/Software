@@ -2,7 +2,7 @@
 
 const std::string StopPrimitive::PRIMITIVE_NAME = "Stop Primitive";
 
-StopPrimitive::StopPrimitive(unsigned int robot_id, bool stop) : robot_id(robot_id), stop(stop)
+StopPrimitive::StopPrimitive(unsigned int robot_id, bool coast) : robot_id(robot_id), coast(coast)
 {
 }
 
@@ -11,6 +11,7 @@ StopPrimitive::StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
     robot_id = primitive_msg.robot_id;
+    coast = primitive_msg.extra_bits.at(0);
 }
 
 std::string StopPrimitive::getPrimitiveName() const
@@ -23,12 +24,19 @@ unsigned int StopPrimitive::getRobotId() const
     return robot_id;
 }
 
-std::vector<double> StopPrimitive::getParameterArray() const
+bool StopPrimitive::coastRobot() const
 {
-    return std::vector<double>(0);
+    return coast;
 }
 
-std::vector<bool> StopPrimitive::getExtraBitArray() const
+std::vector<double> StopPrimitive::getParameters() const
 {
-    return std::vector<bool>(stop);
+    return std::vector<double>();
+}
+
+std::vector<bool> StopPrimitive::getExtraBits() const
+{
+    std::vector<bool> parameter = {coast};
+
+    return parameter;
 }

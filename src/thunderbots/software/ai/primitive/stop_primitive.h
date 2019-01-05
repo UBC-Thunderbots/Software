@@ -13,7 +13,7 @@ class StopPrimitive : public Primitive
      * @param robot_id The id of the Robot to run this Primitive
      * @param stop to stop the robot or not
      */
-     explicit StopPrimitive(unsigned int robot_id, bool stop);
+     explicit StopPrimitive(unsigned int robot_id, bool coast);
 
     /**
      * Creates a new Stop Primitive from a Primitive message
@@ -26,12 +26,14 @@ class StopPrimitive : public Primitive
 
      unsigned int getRobotId() const override;
 
-     std::vector<double> getParameterArray() const override;
+     bool coastRobot() const;
 
-     std::vector<bool> getExtraBitArray() const override;
+     std::vector<double> getParameters() const override;
+
+     std::vector<bool> getExtraBits() const override;
 
     private:
      unsigned int robot_id;
-     bool stop;
+     bool coast;
 
 };
