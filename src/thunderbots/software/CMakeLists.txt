@@ -276,12 +276,6 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(dynamic_parameters_test
-            test/util/test_dynamic_parameters.cpp
-            util/parameter/dynamic_parameters.cpp
-            )
-
-    target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
@@ -356,5 +350,17 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
 
+
+endif()
+
+if (CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+
+     # The test node that verifies the dynamic_parameters are working
+    add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
+            test/util/test_dynamic_parameters.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+    target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
 endif()

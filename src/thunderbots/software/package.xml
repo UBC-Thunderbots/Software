@@ -64,6 +64,7 @@
   <exec_depend>thunderbots_msgs</exec_depend>
 
   <depend>dynamic_reconfigure</depend>
+  <depend>rostest</depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
