@@ -5,12 +5,13 @@
 
 const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const nodeExternal = require('webpack-node-externals');
 
 /**
- * @description Webpack build shared by renderer and main build.
+ * @description Webpack build.
  */
 const generalWebpackBuild = {
-    // We support js, typescript, html and css files.
+    // We support js, typescript, html, css, and image files.
     // To add additional file support, add the required loader here.
     module: {
         rules: [
@@ -34,47 +35,52 @@ const generalWebpackBuild = {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader'],
             },
+            {
+                test: /\.(png|jpg|gif|svg)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {},
+                    },
+                ],
+            },
         ],
     },
-
     resolve: {
         // Make sure if you add a new file support to add its extension here.
-        extensions: ['.js', '.ts', '.tsx', '.json'],
+        extensions: ['.mjs', '.js', '.ts', '.tsx', '.json'],
 
         // We set an alias to our src directory to reduce the need for relative paths.
         alias: {
-            RENDERER: path.resolve(__dirname, '../src/renderer'),
-            MAIN: path.resolve(__dirname, '../src/main'),
-            SHARED: path.resolve(__dirname, '../src/shared'),
+            SRC: path.resolve(__dirname, '../src/client'),
         },
     },
 };
 
 module.exports = [
-    // Renderer build configuration
+    // Client build configuration
     {
         ...generalWebpackBuild,
         // Our project entry point.
-        entry: path.resolve(__dirname, '../src/renderer/index.ts'),
+        entry: path.resolve(__dirname, '../src/client/index.ts'),
 
         // We generate a bundle in the build folder
         output: {
             path: path.resolve(__dirname, '../build'),
-            filename: 'renderer.js',
+            filename: 'client.js',
         },
 
-        // This target allows us to access DOM and Node libraries simultaneously
-        target: 'electron-renderer',
+        // This target allows us to access DOM libraries simultaneously
+        target: 'web',
         // Our plugins go here.
         plugins: [
             // This plugins autogenerates our index.html files and links the javascript bundle.
             new HtmlWebPackPlugin({
-                template: './src/renderer/index.html',
+                template: './src/client/index.html',
                 filename: './index.html',
             }),
         ],
     },
-    // Main build configuration
     {
         ...generalWebpackBuild,
         // Our project entry point.
@@ -86,7 +92,7 @@ module.exports = [
             filename: 'main.js',
         },
 
-        // This target allows us to access Node libraries
+        // This target allows us to access DOM libraries simultaneously
         target: 'electron-main',
     },
 ];

@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "baseUrl": ".",
+        "esModuleInterop": true,
         "outDir": "build/dist",
         "module": "esnext",
         "target": "esnext",
@@ -18,9 +19,7 @@
         "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": true,
         "paths": {
-            "RENDERER/*": ["src/renderer/*"],
-            "MAIN/*": ["src/main/*"],
-            "SHARED/*": ["src/shared/*"]
+            "SRC/*": ["src/client/*"]
         }
     },
     "exclude": [

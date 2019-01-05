@@ -1,91 +1,43 @@
-/**
- * @fileoverview This file defines our Electron main process. This process
- * is responsible for starting our renderer process.
- *
- * To learn more about the Electron process system, visit this link:
- * {@link https://electronjs.org/docs/tutorial/application-architecture}
- */
-
 import { app, BrowserWindow } from 'electron';
 
-import * as path from 'path';
+// Keep a global reference of the window object, if you don't, the window will
+// be closed automatically when the JavaScript object is garbage collected.
+let win: BrowserWindow | null;
 
-import * as storage from 'electron-json-storage';
-import {
-    DEFAULT_WINDOW_HEIGHT,
-    DEFAULT_WINDOW_WIDTH,
-    DEV_SERVER_URL,
-    RENDERER_START_FILE,
-} from 'SHARED/constants';
+function createWindow() {
+    // Create the browser window.
+    win = new BrowserWindow({ width: 800, height: 600, frame: false });
 
-let mainWindow: BrowserWindow | null;
+    // and load the index.html of the app.
+    win.loadFile('./build/index.html');
 
-function main() {
-    // Needed to enable WebGL for all systems. We need WebGL to avoid
-    // using the CPU for visualizer features.
-    app.commandLine.appendSwitch('--ignore-gpu-blacklist');
+    // Emitted when the window is closed.
+    win.on('closed', () => {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        win = null;
+    });
+}
 
-    // Default behaviour: kill process when last window is closed.
-    app.on('window-all-closed', () => {
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', createWindow);
+
+// Quit when all windows are closed.
+app.on('window-all-closed', () => {
+    // On macOS it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
         app.quit();
-    });
-
-    // Get last saved window bound from persistent data.
-    storage.get('windowBounds', (error, data) => {
-        if (error) {
-            throw error;
-        } else {
-            createWindow(data);
-        }
-    });
-}
-
-/**
- * Creates a new rendering process and opens a window with the specified bounds.
- * @param {*} windowBounds bounds our window should have
- */
-function createWindow(windowBounds: any) {
-    mainWindow = new BrowserWindow({
-        height: windowBounds.height || DEFAULT_WINDOW_HEIGHT,
-        width: windowBounds.width || DEFAULT_WINDOW_WIDTH,
-        x: windowBounds.x || undefined,
-        y: windowBounds.y || undefined,
-    });
-
-    // We differentiate whether we are running in production or development mode.
-    // Production mode will be using the prebundled file.
-    // Development mode will be connecting to a localhost web server. This allows us
-    // to have hot-reloading as we modify the source code.
-    if (process.env.ELECTRON_ENV === 'production') {
-        mainWindow.loadURL(`file://${path.join(app.getAppPath(), RENDERER_START_FILE)}`);
-    } else {
-        mainWindow.loadURL(DEV_SERVER_URL);
     }
+});
 
-    mainWindow.on('closed', () => (mainWindow = null));
-
-    // Save new bounds as we resize the window. Ensures that they persist between
-    // application run.
-    mainWindow.on('resize', () => {
-        const { x, y, width, height } = mainWindow!.getBounds();
-        storage.set('windowBounds', { x, y, width, height }, (error) => {
-            if (error) {
-                throw error;
-            }
-        });
-    });
-
-    // Save new bounds as we move the window. Ensures that they persist between
-    // application run.
-    mainWindow.on('move', () => {
-        const { x, y } = mainWindow!.getBounds();
-        storage.set('windowBounds', { x, y }, (error) => {
-            if (error) {
-                throw error;
-            }
-        });
-    });
-}
-
-// Start our main function when we are ready.
-app.on('ready', main);
+app.on('activate', () => {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (win === null) {
+        createWindow();
+    }
+});
