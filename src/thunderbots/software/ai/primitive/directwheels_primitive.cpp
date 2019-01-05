@@ -62,7 +62,7 @@ double DirectWheelsPrimitive::getDribblerRPM() const
     return dribbler_rpm;
 }
 
-std::vector<double> DirectWheelsPrimitive::getParameterArray() const
+std::vector<double> DirectWheelsPrimitive::getParameters() const
 {
     std::vector<double> parameters = {double(wheel0_power), double(wheel1_power),
                                       double(wheel2_power), double(wheel3_power),
@@ -71,7 +71,7 @@ std::vector<double> DirectWheelsPrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> DirectWheelsPrimitive::getExtraBitArray() const
+std::vector<bool> DirectWheelsPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }

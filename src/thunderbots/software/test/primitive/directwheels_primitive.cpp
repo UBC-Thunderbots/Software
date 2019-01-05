@@ -39,7 +39,7 @@ TEST(DirectWheelsPrimTest, parameter_array_test)
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(
         robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
 
-    std::vector<double> param_array = directwheels_prim.getParameterArray();
+    std::vector<double> param_array = directwheels_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(wheel0_power, param_array[0]);
     EXPECT_DOUBLE_EQ(wheel1_power, param_array[1]);
@@ -102,7 +102,7 @@ TEST(DirectWheelsPrimTest, get_extra_bit_array_test)
 {
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
 
-    std::vector<bool> extra_bit_array = directwheels_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = directwheels_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -123,7 +123,7 @@ TEST(DirectWheelsPrimTest, create_primitive_from_message_test)
 
     DirectWheelsPrimitive new_prim = DirectWheelsPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("DirectWheels Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
@@ -132,7 +132,7 @@ TEST(DirectWheelsPrimTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(wheel2_power, parameters[2]);
     EXPECT_DOUBLE_EQ(wheel3_power, parameters[3]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[4]);
-    EXPECT_EQ(directwheels_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(directwheels_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)
