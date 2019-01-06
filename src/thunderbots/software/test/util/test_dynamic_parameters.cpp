@@ -48,7 +48,7 @@ class RegistryTest : public ::testing::Test
         }
         else
         {
-            std::cerr << "Testing with unsupported type" << std::endl;
+            ADD_FAILURE() << "Attempting to test with unsupported type";
         }
     }
 
@@ -96,7 +96,7 @@ TYPED_TEST(RegistryTest, constructor_test)
     }
     catch (...)
     {
-        ADD_FAILURE() << "Parameter added to registry with improper key";
+        FAIL() << "Uncaught exception occured";
     }
 }
 
