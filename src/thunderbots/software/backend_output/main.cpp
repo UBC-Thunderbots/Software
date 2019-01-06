@@ -11,6 +11,7 @@
 #include "geom/point.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 #include "util/ros_messages.h"
 
 // Constants
@@ -60,6 +61,9 @@ int main(int argc, char** argv)
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger();
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();
