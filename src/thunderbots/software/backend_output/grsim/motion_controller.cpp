@@ -135,24 +135,28 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
 
 
     // calculate the robot's velocity projection along the axis towards it's destination and determine if it can stop in time
-    // TODO why does this fail so bad
-    bool can_stop_in_time = (pow( robot.velocity().project(dest).len() , 2) -
-                             2 * ROBOT_MAX_ACCELERATION*distance_to_dest) <= desired_final_speed;
+    bool can_stop_in_time = ( (double)pow( robot.velocity().project(dest).len() , 2) - 2 * ROBOT_MAX_ACCELERATION*distance_to_dest) <= desired_final_speed;
 
     // Case 1: Robot is moving slower than speed tolerance (can't trust velocity angle due to noise)
-    if (robot.velocity().len() < VELOCITY_STOP_TOLERANCE) {
+    if (robot.velocity().len() < VELOCITY_STOP_TOLERANCE || (fabs(velocity_error_angle.toDegrees()) <= 1 && can_stop_in_time) ) {
         delta_speed_x = max_delta_speed*angle_to_destination.cos();
-        delta_speed_y = max_delta_speed*delta_speed_y*angle_to_destination.sin();
+        delta_speed_y = max_delta_speed*angle_to_destination.sin();
     }
 
-    // Case 2: Robot can stop in time (Accelerate and correct velocity angle)
+    // Case 2: Robot velocity is opposite to the direction of the destination
+    else if (can_stop_in_time && (fabs(velocity_error_angle.toDegrees()) > 179 && (fabs(velocity_error_angle.toDegrees()) <= 181) ) ) {
+        delta_speed_x = max_delta_speed*(velocity_error_angle + robot.velocity().orientation()).cos();
+        delta_speed_y = max_delta_speed*(velocity_error_angle + robot.velocity().orientation()).sin();
+    }
+
+    // Case 3: Robot can stop in time (Accelerate and correct velocity angle)
     else if (can_stop_in_time) {
-        delta_speed_x = max_delta_speed*(angle_to_destination - velocity_error_angle).cos();
-        delta_speed_y = max_delta_speed*(angle_to_destination - velocity_error_angle).sin();
+        delta_speed_x = max_delta_speed*(velocity_error_angle + angle_to_destination).cos();
+        delta_speed_y = max_delta_speed*(velocity_error_angle + angle_to_destination).sin();
     }
 
+    // Case 4: Robot can't stop in time (accelerate opposite to robot velocity)
     else {
-        // Case 3: Robot can't stop in time (Decelerate and correct velocity angle)
         delta_speed_x = max_delta_speed * (robot.velocity().orientation() + Angle::ofDegrees(180)).cos();
         delta_speed_y = max_delta_speed * (robot.velocity().orientation() + Angle::ofDegrees(180)).sin();
     }

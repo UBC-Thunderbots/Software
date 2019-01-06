@@ -191,7 +191,9 @@ TEST_F(MotionControllerTest, zero_time_test)
 
 TEST_F(MotionControllerTest, negative_x_velocity_test)
 {
-    Robot robot              = Robot(4, Point(0, 0), Vector(1, 0), Angle::ofRadians(0),
+    const double initialSpeed = 1;
+
+    Robot robot              = Robot(4, Point(0, 0), Vector(initialSpeed, 0), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(3.9), current_time);
     double delta_time        = 1;
     Point destination        = Point(-8, 0);
@@ -202,26 +204,26 @@ TEST_F(MotionControllerTest, negative_x_velocity_test)
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(-ROBOT_MAX_SPEED, 0);
+    Vector expected_velocity = Vector(initialSpeed -ROBOT_MAX_ACCELERATION*delta_time, 0);
 
     EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
 }
 
 TEST_F(MotionControllerTest, negative_y_velocity_test)
 {
-    Robot robot              = Robot(4, Point(0, 0), Vector(0, 1), Angle::ofRadians(0),
+    const double initialSpeed = 1;
+    Robot robot              = Robot(4, Point(0, 0), Vector(0, initialSpeed), Angle::ofRadians(0),
                         AngularVelocity::ofRadians(3.9), current_time);
     double delta_time        = 1;
     Point destination        = Point(0, -8);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 3;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time);
 
-    Vector expected_velocity = Vector(0, -ROBOT_MAX_SPEED);
+    Vector expected_velocity = Vector(0, initialSpeed -ROBOT_MAX_ACCELERATION*delta_time);
 
 
     EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);

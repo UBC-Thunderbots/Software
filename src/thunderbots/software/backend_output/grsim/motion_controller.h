@@ -15,7 +15,7 @@ namespace MotionController
     };
 
     // tolerance distance measurement in meters
-    const double VELOCITY_STOP_TOLERANCE = 0.015;
+    const double VELOCITY_STOP_TOLERANCE = 0.02;
     const double POSITION_STOP_TOLERANCE = 0.01;
     const Angle DESTINATION_VELOCITY_TOLERENCE = Angle::ofDegrees(1);
     /**
