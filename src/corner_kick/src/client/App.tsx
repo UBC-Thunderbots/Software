@@ -5,11 +5,14 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Global } from './Global';
 import { createStore } from './store';
 
+import { Console } from './components/portals/Console';
 import { Page } from './components/portals/Page';
 
 import { ROSPage } from './pages/ros';
 import { SettingsPage } from './pages/settings';
 import { VisualizerPage } from './pages/visualizer';
+
+import { LoggerConsole } from './consoles/logger';
 
 const store = createStore();
 
@@ -30,6 +33,9 @@ export const App = () => (
                 path="/settings"
                 component={SettingsPage}
             />
+            <Console>
+                <LoggerConsole />
+            </Console>
         </Provider>
     </Router>
 );

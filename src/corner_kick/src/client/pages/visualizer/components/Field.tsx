@@ -38,11 +38,6 @@ export const Field = (props: {
                     x2={props.fieldLength / 2}
                     y2={props.fieldWidth}
                 />
-                <line
-                    x2={props.fieldLength}
-                    y1={props.fieldWidth / 2}
-                    y2={props.fieldWidth / 2}
-                />
                 <circle
                     cx={props.fieldLength / 2}
                     cy={props.fieldWidth / 2}

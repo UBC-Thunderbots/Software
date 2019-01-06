@@ -63,8 +63,6 @@ function* stopROS() {
 
 function subscribeToROSTopic(action: ReturnType<typeof subscribeTopic>) {
     if (ros !== null) {
-        console.log(action);
-
         const topic = new ROSLIB.Topic({
             ros,
             messageType: action.payload.messageType,

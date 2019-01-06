@@ -43,7 +43,7 @@ export const Style = createGlobalStyle`
 
         display: grid;
         grid-template-columns: 56px 300px 1fr;
-        grid-template-rows: 40px 1fr 20px;
+        grid-template-rows: 40px 1fr 300px 20px;
     }
 
     #sidebarTitle {
@@ -55,7 +55,7 @@ export const Style = createGlobalStyle`
     }
 
     #sidebarControl {
-        grid-row: 1 / 3;
+        grid-row: 1 / 4;
         grid-column: 1;
         border-top: 1px solid ${dark.ui.line};
         border-right: 1px solid ${dark.ui.line};
@@ -67,7 +67,7 @@ export const Style = createGlobalStyle`
     }
 
     #sidebar {
-        grid-row: 2;
+        grid-row: 2 / 4;
         grid-column: 2;
         border-top: 1px solid ${dark.ui.line};
         border-right: 1px solid ${dark.ui.line};
@@ -91,8 +91,15 @@ export const Style = createGlobalStyle`
         border-top: 1px solid ${dark.ui.line.hex()};
     }
 
-    #footerLeft {
+    #console {
         grid-row: 3;
+        grid-column: 3;
+        overflow: hidden;
+        border-top: 1px solid ${dark.ui.line.hex()};
+    }
+
+    #footerLeft {
+        grid-row: 4;
         grid-column: 1 / 3;
         border-top: 1px solid ${dark.ui.line};
 
@@ -104,7 +111,7 @@ export const Style = createGlobalStyle`
     }
 
     #footerRight {
-        grid-row: 3;
+        grid-row: 4;
         grid-column: 3;
         border-top: 1px solid ${dark.ui.line};
 
