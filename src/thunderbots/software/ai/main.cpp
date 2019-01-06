@@ -7,6 +7,7 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
@@ -84,6 +85,9 @@ int main(int argc, char **argv)
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger();
+
     // Main loop
     while (ros::ok())
     {
@@ -106,7 +110,7 @@ int main(int argc, char **argv)
         {
             thunderbots_msgs::Primitive msg = prim->createMsg();
             primitive_array_message.primitives.emplace_back(msg);
-            std::cout << msg << std::endl;
+            LOG(INFO) << msg << std::endl;
         }
         primitive_publisher.publish(primitive_array_message);
     }
