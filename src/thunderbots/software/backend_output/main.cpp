@@ -10,6 +10,7 @@
 #include "backend_output/grsim/grsim_backend.h"
 #include "geom/point.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 
 // Constants
 const std::string NETWORK_ADDRESS       = "127.0.0.1";
@@ -42,6 +43,9 @@ int main(int argc, char** argv)
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger();
 
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();

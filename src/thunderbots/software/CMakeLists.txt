@@ -34,6 +34,23 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 # Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
+# Create a list of files from the shared folder
+file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
+        )
+
+# Find the g3log library, the logger we use for our AI
+# See: https://github.com/KjellKod/g3log
+SET(G3_LIBRARY_PATH "/usr/local/include")
+message("g3log lib path: ${G3_LIBRARY_PATH}")
+find_library(G3LOG g3logger PATHS ${G3_LIBRARY_PATH})
+if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
+    message(FATAL_ERROR "G3LOG library not found")
+endif()
+message("g3log path: ${G3LOG}")
+
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -95,6 +112,7 @@ add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
 target_link_libraries(backend_input
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
+        ${G3LOG}
         )
 
 file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -112,7 +130,9 @@ add_executable (ai_logic
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ai_logic ${catkin_LIBRARIES})
+target_link_libraries(ai_logic ${catkin_LIBRARIES}
+        ${G3LOG}
+        )
 
 file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.cpp
@@ -137,6 +157,7 @@ add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(backend_output ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
+        ${G3LOG}
         )
 file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.h
@@ -166,6 +187,8 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
 # This is to make sure we know exactly what files/interfaces are being tested and that we are not accidentally
 # picking up other files that may affect test behaviour. Unit tests should not need too many files to be specified
 # and we want to make sure the minimum set of files required for the test are being used.
+
+##### Unit Tests #####
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
@@ -350,11 +373,27 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
 
-
 endif()
+
+##### ROSTests / Integration Tests #####
 
 if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
+
+    # The test node that verifies the logger is working correctly
+    add_rostest_gtest(logger_test test/util/logger_test.test
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            test/util/logger_test.cpp
+            )
+    target_link_libraries(logger_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    # The test node that verifies the rostest utils are working correctly
+    add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
+            test/test_util/rostest_util_test.cpp
+            )
+    target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
      # The test node that verifies the dynamic_parameters are working
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
