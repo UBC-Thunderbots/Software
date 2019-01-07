@@ -7,8 +7,8 @@
 
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
-#include "robot_communication/grsim/grsim_backend.h"
 #include "geom/point.h"
+#include "robot_communication/grsim/grsim_backend.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 
