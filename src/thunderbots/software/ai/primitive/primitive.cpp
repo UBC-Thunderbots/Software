@@ -1,5 +1,6 @@
 #include "ai/primitive/primitive.h"
 
+#include "ai/primitive/stop_primitive.h"
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
@@ -52,6 +53,10 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     else if (primitive_msg.primitive_name == PivotPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<PivotPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == StopPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<StopPrimitive>(primitive_msg);
     }
     else
     {

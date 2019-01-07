@@ -1,5 +1,5 @@
 /**
- * This file contains the unit tests for the MovePrimitive class
+ * This file contains the unit tests for the StopPrimitive class
  */
 
 #include "ai/primitive/stop_primitive.h"
@@ -13,7 +13,7 @@ TEST(StopPrimTest, construct_with_no_params_test)
 
     StopPrimitive stop_prim = StopPrimitive(0, true);
 
-    EXPECT_EQ(int(), stop_prim.getRobotId());
+    EXPECT_EQ(0, stop_prim.getRobotId());
     EXPECT_EQ(stop_prim_name, stop_prim.getPrimitiveName());
 }
 
@@ -57,7 +57,7 @@ TEST(StopPrimTest, get_coast_test)
 
     StopPrimitive stop_prim = StopPrimitive(0, coast);
 
-    EXPECT_EQ(coast, stop_prim.coastRobot());
+    EXPECT_EQ(coast, stop_prim.robotShouldCoast());
 }
 
 TEST(StopPrimitiveTest, create_primitive_from_message_test)

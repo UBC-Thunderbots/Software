@@ -10,8 +10,10 @@ class StopPrimitive : public Primitive
     /**
      * Creates a new Stop Primitive
      *
+     * Stops the robot with the option to coast to a stop rather than stop immediately
+     *
      * @param robot_id The id of the Robot to run this Primitive
-     * @param stop to stop the robot or not
+     * @param coast to coast to a stop or not
      */
      explicit StopPrimitive(unsigned int robot_id, bool coast);
 
@@ -26,12 +28,32 @@ class StopPrimitive : public Primitive
 
      unsigned int getRobotId() const override;
 
-     bool coastRobot() const;
+    /**
+     * Gets whether the robot should coast or not
+     *
+     * @return whether the robot should coast to a stop
+     */
+     bool robotShouldCoast() const;
 
+    /**
+     * This primitive has no parameters, @see getExtraBits()
+     *
+     * @return an empty vector
+     */
      std::vector<double> getParameters() const override;
 
+    /**
+     * This primitive uses the extra_bit array as its parameter array
+     *
+     *
+     * @return a vector that contains whether the robot should coast
+     */
      std::vector<bool> getExtraBits() const override;
 
+    /**
+     *
+     * @var coast represents whether the robot should coast or not
+     */
     private:
      unsigned int robot_id;
      bool coast;

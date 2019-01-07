@@ -24,7 +24,8 @@ unsigned int StopPrimitive::getRobotId() const
     return robot_id;
 }
 
-bool StopPrimitive::coastRobot() const
+
+bool StopPrimitive::robotShouldCoast() const
 {
     return coast;
 }
