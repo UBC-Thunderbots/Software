@@ -18,7 +18,6 @@ export const createStore = () => {
     return store;
 };
 
-export { IRootState } from './state';
 export { actions } from './actions';
 export { selectors } from './selectors';
 export { RootAction } from './reducers';

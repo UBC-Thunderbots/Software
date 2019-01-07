@@ -1,4 +1,4 @@
-import { IRootState } from '../state';
+import { IRootState } from 'SRC/types';
 
 export const nodesSelector = (state: IRootState) => state.ros.nodes;
 export const topicsSelector = (state: IRootState) => state.ros.topics;

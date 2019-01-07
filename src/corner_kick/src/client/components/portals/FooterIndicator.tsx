@@ -3,11 +3,11 @@
  * adds a small indicator in the footer area of the application.
  */
 
-import { dark } from 'ayu';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 /** Main styling for the indicator */
 const Wrapper = styled.div`
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
 
-    color: ${dark.syntax.comment};
+    color: ${(props) => props.theme.colors.subdued};
     font-size: 12px;
     text-decoration: none !important;
 
@@ -26,7 +26,7 @@ const Wrapper = styled.div`
     transition: all 0.2s;
 
     &:hover {
-        background: ${dark.ui.selection.bg};
+        background: ${(props) => props.theme.colors.selected};
     }
 `;
 

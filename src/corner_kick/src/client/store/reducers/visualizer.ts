@@ -1,9 +1,10 @@
 import { getType } from 'typesafe-actions';
 
+import { IVisualizerState } from 'SRC/types';
+
 import { ROSAction } from './ros';
 
 import { actions } from '../actions';
-import { IVisualizerState } from '../state/visualizer';
 
 const defaultState: IVisualizerState = {
     ball: {

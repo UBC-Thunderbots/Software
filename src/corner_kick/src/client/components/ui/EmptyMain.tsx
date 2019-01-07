@@ -1,6 +1,6 @@
-import { dark } from 'ayu';
 import * as React from 'react';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 const quotes = [
     [
@@ -66,7 +66,7 @@ const Wrapper = styled.div`
 
     padding: 16px;
 
-    color: ${dark.syntax.comment};
+    color: ${(props) => props.theme.colors.subdued};
 `;
 
 const Icon = styled.i`
@@ -85,7 +85,7 @@ const Author = styled.div`
 `;
 
 export const EmptyMain = () => {
-    const i = Math.round(Math.random() * quotes.length);
+    const i = Math.round(Math.random() * quotes.length - 1);
 
     return (
         <Wrapper>

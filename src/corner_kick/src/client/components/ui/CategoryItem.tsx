@@ -1,14 +1,14 @@
-import { dark } from 'ayu';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 const Wrapper = styled.div`
     width: 100%;
     height: 48px;
 
     font-size: 12px;
-    color: ${dark.common.fg};
+    color: ${(props) => props.theme.colors.fg};
     text-transform: uppercase;
     font-weight: 700;
 
@@ -22,7 +22,7 @@ const Wrapper = styled.div`
     padding: 8px 8px 8px 16px;
 
     &:hover {
-        background: ${dark.ui.selection.bg};
+        background: ${(props) => props.theme.colors.selected};
     }
 `;
 

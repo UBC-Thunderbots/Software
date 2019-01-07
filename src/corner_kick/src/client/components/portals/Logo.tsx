@@ -2,10 +2,10 @@
  * @fileoverview Defines the main logo of the application
  */
 
-import { dark } from 'ayu';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 // We import the logo
 import logo from 'SRC/assets/logo.svg';
@@ -21,7 +21,7 @@ const Wrapper = styled.div`
     justify-content: center;
     align-items: center;
 
-    border-bottom: 1px solid ${dark.ui.line.hex()};
+    border-bottom: 1px solid ${(props) => props.theme.colors.border};
 `;
 
 /**

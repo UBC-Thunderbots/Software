@@ -1,17 +1,13 @@
 import { ActionType, getType } from 'typesafe-actions';
 
+import { defaultSettings } from 'SRC/constants';
+import { ISettingsState } from 'SRC/types';
+
 import * as settings from '../actions/settings';
-import { ISettingsState } from '../state/settings';
 
 export type SettingsAction = ActionType<typeof settings>;
 
-const defaultState: ISettingsState = {
-    fg_color: '#FFF',
-    ros_refresh_rate: '5000',
-    visualizer_refresh_rate: '32',
-};
-
-export default (state: ISettingsState = defaultState, action: SettingsAction) => {
+export default (state: ISettingsState = defaultSettings, action: SettingsAction) => {
     switch (action.type) {
         case getType(settings.hydrateSettings):
             return {

@@ -1,9 +1,9 @@
 import { getType } from 'typesafe-actions';
 
-import { ROSAction } from './ros';
+import { ILoggerState, IRosoutMessage } from 'SRC/types';
 
 import { actions } from '../actions';
-import { ILoggerState } from '../state/logger';
+import { ROSAction } from './ros';
 
 const defaultState: ILoggerState = {
     rosout: [],
@@ -13,16 +13,10 @@ export default (state: ILoggerState = defaultState, action: ROSAction): ILoggerS
     switch (action.type) {
         case getType(actions.ros.newMessage):
             if (action.payload.topic === '/rosout') {
+                const message = action.payload.message as IRosoutMessage;
                 return {
                     ...state,
-                    rosout: [
-                        ...state.rosout,
-                        {
-                            level: action.payload.message['level'],
-                            msg: action.payload.message['msg'],
-                            name: action.payload.message['name'],
-                        },
-                    ],
+                    rosout: [...state.rosout, message],
                 };
             } else {
                 return state;

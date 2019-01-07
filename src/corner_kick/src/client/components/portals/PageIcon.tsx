@@ -3,10 +3,10 @@
  * sidebar control area of the application.
  */
 
-import { dark } from 'ayu';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 /** Defines the styling of the page icon */
 const Wrapper = styled.div`
@@ -17,19 +17,27 @@ const Wrapper = styled.div`
     justify-content: center;
     align-items: center;
 
-    color: ${dark.syntax.comment};
+    color: ${(props) => props.theme.colors.subdued};
 
     cursor: pointer;
     transition: all 0.2s;
 
     &:hover {
-        background: ${dark.ui.selection.bg};
+        background: ${(props) => props.theme.colors.selected};
+    }
+
+    &.active {
+        background: ${(props) => props.theme.colors.selected};
     }
 `;
 
 /** Defines the styling of the icon itself */
 const Icon = styled.i`
     font-size: 32px;
+
+    .active & {
+        color: ${(props) => props.theme.colors.accent};
+    }
 `;
 
 interface IFooterItemProps {
@@ -53,18 +61,8 @@ export const PageIcon = (props: IFooterItemProps) => {
      * area of the application.
      */
     return ReactDOM.createPortal(
-        <Wrapper
-            title={props.title}
-            style={{ background: props.active ? dark.ui.selection.bg.hex() : undefined }}
-        >
-            <Icon
-                className="material-icons"
-                style={{
-                    color: props.active ? dark.common.accent.hex() : undefined,
-                }}
-            >
-                {props.icon}
-            </Icon>
+        <Wrapper title={props.title} className={props.active ? 'active' : ''}>
+            <Icon className="material-icons">{props.icon}</Icon>
         </Wrapper>,
         document.getElementById('sidebarControl')!,
     );

@@ -3,10 +3,10 @@
  * of the application
  */
 
-import { dark } from 'ayu';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 /**
  * Defines the styling of the sidebar title area
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
 
-    color: ${dark.common.ui};
+    color: ${(props) => props.theme.colors.subdued};
 
     padding: 8px;
 `;

@@ -1,5 +1,7 @@
 import { put, spawn, takeEvery } from 'redux-saga/effects';
 
+import { ISettingsState } from 'SRC/types';
+
 import { hydrateSettings, set } from '../actions/settings';
 
 const SETTINGS_KEY = 'settings';
@@ -15,7 +17,7 @@ function* startSettings() {
 
     if (storedSettingsString !== null) {
         storedSettings = JSON.parse(storedSettingsString);
-        yield put(hydrateSettings(storedSettings));
+        yield put(hydrateSettings(storedSettings as ISettingsState));
     }
 
     yield takeEvery('settings/SET', onSettingUpdate);

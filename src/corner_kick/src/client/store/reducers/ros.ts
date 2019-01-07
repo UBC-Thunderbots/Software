@@ -1,7 +1,8 @@
 import { ActionType, getType } from 'typesafe-actions';
 
+import { IROSState } from 'SRC/types';
+
 import * as ros from '../actions/ros';
-import { IROSState } from '../state/ros';
 
 export type ROSAction = ActionType<typeof ros>;
 

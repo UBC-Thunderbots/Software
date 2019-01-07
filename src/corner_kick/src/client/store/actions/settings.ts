@@ -1,5 +1,6 @@
 import { createAction } from 'typesafe-actions';
-import { ISettingsState } from '../state/settings';
+
+import { ISettingsState } from 'SRC/types';
 
 export const hydrateSettings = createAction('settings/HYDRATE', (resolve) => {
     return (settings: ISettingsState) => resolve({ settings });

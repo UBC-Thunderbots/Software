@@ -1,6 +1,6 @@
-import { dark } from 'ayu';
 import * as React from 'react';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 const Input = styled.input`
     width: 100%;
@@ -8,13 +8,13 @@ const Input = styled.input`
     padding: 4px 8px;
     margin: 2px 0;
     border-radius: 4px;
-    border: 1px solid ${dark.common.ui.hex()};
+    border: 1px solid ${(props) => props.theme.colors.subdued};
     background: transparent;
-    color: ${dark.common.fg};
+    color: ${(props) => props.theme.colors.fg};
     outline: none;
 
     &:focus {
-        border: 1px solid ${dark.common.accent.hex()};
+        border: 1px solid ${(props) => props.theme.colors.accent};
     }
 `;
 

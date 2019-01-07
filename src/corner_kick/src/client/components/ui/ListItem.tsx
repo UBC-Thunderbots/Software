@@ -1,6 +1,6 @@
-import { dark } from 'ayu';
 import * as React from 'react';
-import styled from 'styled-components';
+
+import styled from 'SRC/utils/styled-components';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     padding: 8px;
 
     &:hover {
-        background: ${dark.ui.selection.bg};
+        background: ${(props) => props.theme.colors.selected};
     }
 `;
 
