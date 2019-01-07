@@ -4,8 +4,8 @@
 
 class StopPrimitive : public Primitive
 {
-    public:
-     static const std::string PRIMITIVE_NAME;
+   public:
+    static const std::string PRIMITIVE_NAME;
 
     /**
      * Creates a new Stop Primitive
@@ -15,32 +15,32 @@ class StopPrimitive : public Primitive
      * @param robot_id The id of the Robot to run this Primitive
      * @param coast to coast to a stop or not
      */
-     explicit StopPrimitive(unsigned int robot_id, bool coast);
+    explicit StopPrimitive(unsigned int robot_id, bool coast);
 
     /**
      * Creates a new Stop Primitive from a Primitive message
      *
      * @param primitive_msg The message from which to create the Stop Primitive
      */
-     explicit StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    explicit StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
-     std::string getPrimitiveName() const override;
+    std::string getPrimitiveName() const override;
 
-     unsigned int getRobotId() const override;
+    unsigned int getRobotId() const override;
 
     /**
      * Gets whether the robot should coast or not
      *
      * @return whether the robot should coast to a stop
      */
-     bool robotShouldCoast() const;
+    bool robotShouldCoast() const;
 
     /**
      * This primitive has no parameters, @see getExtraBits()
      *
      * @return an empty vector
      */
-     std::vector<double> getParameters() const override;
+    std::vector<double> getParameters() const override;
 
     /**
      * This primitive uses the extra_bit array as its parameter array
@@ -48,14 +48,13 @@ class StopPrimitive : public Primitive
      *
      * @return a vector that contains whether the robot should coast
      */
-     std::vector<bool> getExtraBits() const override;
+    std::vector<bool> getExtraBits() const override;
 
     /**
      *
      * @var coast represents whether the robot should coast or not
      */
-    private:
-     unsigned int robot_id;
-     bool coast;
-
+   private:
+    unsigned int robot_id;
+    bool coast;
 };

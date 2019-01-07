@@ -6,13 +6,13 @@
 
 #include <gtest/gtest.h>
 
-#include "ai/primitive/stop_primitive.h"
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
@@ -211,7 +211,7 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
 TEST(PrimitiveTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
 {
     const unsigned int robot_id = 0U;
-    const bool coast = false;
+    const bool coast            = false;
 
     StopPrimitive stop_prim = StopPrimitive(robot_id, coast);
 
@@ -221,13 +221,14 @@ TEST(PrimitiveTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
 
     // Since we have a `Primitive` and NOT a `StopPrimitive`, we have to check that the
     // values are correct by getting them from the generic extra_bits array
-    // we use the extra_bits array instead of the parameters array because `StopPrimitive` has only one variable, coast
-    std::vector<bool> extra_bits = new_prim -> getExtraBits();
+    // we use the extra_bits array instead of the parameters array because `StopPrimitive`
+    // has only one variable, coast
+    std::vector<bool> extra_bits = new_prim->getExtraBits();
 
-    EXPECT_EQ("Stop Primitive", new_prim -> getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim -> getRobotId());
+    EXPECT_EQ("Stop Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
     EXPECT_EQ(coast, extra_bits[0]);
-    EXPECT_EQ(new_prim -> getParameters(), std::vector<double>());
+    EXPECT_EQ(new_prim->getParameters(), std::vector<double>());
 }
 
 int main(int argc, char **argv)

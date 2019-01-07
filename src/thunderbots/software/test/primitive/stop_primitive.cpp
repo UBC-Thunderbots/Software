@@ -30,8 +30,7 @@ TEST(StopPrimTest, extra_bits_test)
 {
     const bool coast = false;
 
-    StopPrimitive stop_prim =
-        StopPrimitive(0, coast);
+    StopPrimitive stop_prim = StopPrimitive(0, coast);
 
     std::vector<bool> extra_bits = stop_prim.getExtraBits();
 
@@ -41,10 +40,9 @@ TEST(StopPrimTest, extra_bits_test)
 TEST(StopPrimTest, paramater_array_test)
 {
     const unsigned int robot_id = 2U;
-    const bool coast = false;
+    const bool coast            = false;
 
-    StopPrimitive stop_primitive =
-            StopPrimitive(robot_id, coast);
+    StopPrimitive stop_primitive = StopPrimitive(robot_id, coast);
 
     std::vector<double> param_array = stop_primitive.getParameters();
 
@@ -63,7 +61,7 @@ TEST(StopPrimTest, get_coast_test)
 TEST(StopPrimitiveTest, create_primitive_from_message_test)
 {
     const unsigned int robot_id = 3U;
-    const bool coast = false;
+    const bool coast            = false;
 
     StopPrimitive stop_prim = StopPrimitive(robot_id, coast);
 
