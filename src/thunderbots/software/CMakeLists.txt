@@ -81,9 +81,9 @@ include_directories(
 # Find all the generated protobuf source files
 file(GLOB PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 
-file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
+file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
@@ -91,15 +91,15 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
-add_executable (backend_input
+add_executable (network_input
         ${PROTO_SRCS}
-        ${BACKEND_INPUT_SRC}
+        ${NETWORK_INPUT_SRC}
         ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
-target_link_libraries(backend_input
+add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
+target_link_libraries(network_input
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
