@@ -8,7 +8,7 @@
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "motion_controller.h"
+#include "backend_output/grsim/motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"
 
