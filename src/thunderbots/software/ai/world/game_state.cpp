@@ -161,6 +161,7 @@ Point GameState::getBallPlacementPoint() const
 // apologies for this monster switch statement
 void GameState::updateRefboxGameState(RefboxGameState gameState)
 {
+    game_state = gameState;
     switch (gameState)
     {
         case RefboxGameState::HALT:
@@ -246,4 +247,12 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = false;
             break;
     }
+}
+
+RefboxGameState GameState::getRefboxGameState() {
+    return game_state;
+}
+
+GameState::RestartReason GameState::getRestartReason() {
+    return restart_reason;
 }

@@ -39,6 +39,7 @@ class GameState
 
     State state;
     RestartReason restart_reason;
+    RefboxGameState game_state;
 
     // True if our team can kick the ball during a restart
     bool our_restart;
@@ -49,7 +50,26 @@ class GameState
 
     GameState() : state(HALT), restart_reason(NONE), our_restart(false) {}
 
+    /**
+     * Updates the game state with a value from backend_input
+     *
+     * @param gameState the RefboxGameState from backend_input
+     */
     void updateRefboxGameState(RefboxGameState gameState);
+
+    /**
+     * Returns the current Refbox game state
+     *
+     * @return the current Refbox game state
+     */
+    RefboxGameState getRefboxGameState();
+
+    /**
+     * Returns the current restart reason
+     *
+     * @return the current restart reason
+     */
+    RestartReason getRestartReason();
 
     /*
      * Rule queries
