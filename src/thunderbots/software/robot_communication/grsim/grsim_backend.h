@@ -4,7 +4,7 @@
 #include <string>
 
 #include "ai/world/team.h"
-#include "backend_output/backend.h"
+#include "robot_communication/backend.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "proto/grSim_Packet.pb.h"

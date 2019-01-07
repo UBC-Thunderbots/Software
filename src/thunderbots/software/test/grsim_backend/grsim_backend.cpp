@@ -1,11 +1,11 @@
-#include "backend_output/grsim/grsim_backend.h"
+#include "robot_communication/grsim/grsim_backend.h"
 
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 #include <limits>
 
-#include "backend_output/backend.h"
+#include "robot_communication/backend.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Packet.pb.h"
 
