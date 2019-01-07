@@ -9,8 +9,8 @@
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 #include "util/timestamp.h"
-
 
 int main(int argc, char** argv)
 {
@@ -51,6 +51,8 @@ int main(int argc, char** argv)
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
         Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
 
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger();
 
     // Main loop
     while (ros::ok())
