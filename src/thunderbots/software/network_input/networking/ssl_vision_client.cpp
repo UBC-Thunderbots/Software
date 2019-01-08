@@ -1,4 +1,4 @@
-#include "backend_input/networking/ssl_vision_client.h"
+#include "network_input/networking/ssl_vision_client.h"
 
 SSLVisionClient::SSLVisionClient(const std::string ip_address, const unsigned short port)
     : socket_(io_service)
@@ -16,7 +16,7 @@ SSLVisionClient::SSLVisionClient(const std::string ip_address, const unsigned sh
         // following here:
         // "there was an issue binding the socket to the endpoint when trying to
         // connect to the SSL vision server. This may be due to another instance
-        // of backend_input running and using the port already"
+        // of network_input running and using the port already"
 
         // Throw this exception up to top-level, as we have no valid
         // recovery action here
