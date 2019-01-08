@@ -41,7 +41,6 @@ class MotionControllerTest : public ::testing::Test
     }
 };
 
-
 TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
 {
     Robot robot = Robot(1, Point(0, 0), Vector(0, 0), Angle::ofRadians(0.0),
@@ -304,7 +303,6 @@ TEST_F(MotionControllerTest, positive_y_negative_x_velocity_test)
     Point destination        = Point(-2, 2);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 6;
-    bool speeds_equal;
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
@@ -471,6 +469,44 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_negative_y_position_tes
                         AngularVelocity::ofRadians(0), current_time);
     double delta_time = TIME_STEP;
     Point destination = Point(-0.025, -0.025);
+    Angle destination_angle  = Angle::ofDegrees(0);
+    double destination_speed = 0;
+    int iteration_count;
+    MotionController::Velocity robot_velocities;
+    double new_x_position;
+    double new_y_position;
+
+    for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
+    {
+        robot_velocities = MotionController::bangBangVelocityController(
+            robot, destination, destination_speed, destination_angle, delta_time);
+
+        new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
+        new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
+
+        robot.updateState(Point(new_x_position, new_y_position),
+                          robot_velocities.linear_velocity, robot.orientation(),
+                          robot_velocities.angular_velocity, current_time);
+    }
+
+
+    Vector expected_velocity = Vector(0, 0);
+
+
+    EXPECT_NEAR(robot.position().x(), destination.x(), POSITION_TOLERANCE);
+    EXPECT_NEAR(robot.position().y(), destination.y(), POSITION_TOLERANCE);
+    EXPECT_NEAR(robot.velocity().x(), expected_velocity.x(),
+                calculateVelocityTolerance(destination_speed));
+    EXPECT_NEAR(robot.velocity().y(), expected_velocity.y(),
+                calculateVelocityTolerance(destination_speed));
+}
+
+TEST_F(MotionControllerTest, asymetric_reach_des_test)
+{
+    Robot robot       = Robot(4, Point(0.08, 0.05), Vector(0.0, 0.0), Angle::ofRadians(0),
+                        AngularVelocity::ofRadians(0), current_time);
+    double delta_time = TIME_STEP;
+    Point destination = Point(-1.25, -0.78);
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 0;
     int iteration_count;

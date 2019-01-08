@@ -73,8 +73,8 @@ void GrSimBackend::sendPrimitives(
     grSim_Packet grsim_packet;
 
 
-    // get timestamp before running bang-bang controller for all robots
-    auto bangbang_timestamp = std::chrono::steady_clock::now();
+    // initial timestamp for bang-bang set as current time
+    static auto bangbang_timestamp = std::chrono::steady_clock::now();
 
     std::chrono::duration<double> delta_time;
 
@@ -84,12 +84,10 @@ void GrSimBackend::sendPrimitives(
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
 
-        auto current_time =
-            std::chrono::steady_clock::now();  // get the current time right before
-                                               // running bang-bang to get a time-delta
-                                               // for acceleration
-
-        delta_time = current_time - bangbang_timestamp;
+        delta_time = std::chrono::steady_clock::now() -
+                     bangbang_timestamp;  // get the current time right before
+                                          // running bang-bang to get a time-delta
+                                          // for acceleration
 
         // Motion controller determines the speeds to send to the robots based on their
         // state, maximum linear and angular accelerations, and the robots target
@@ -103,6 +101,10 @@ void GrSimBackend::sendPrimitives(
             movePrim.getRobotId(), YELLOW, robot_velocities.linear_velocity,
             robot_velocities.angular_velocity, 0, false, false);
     }
+
+    // timestamp of when the motion controller was last run (to be used for calculating
+    // delta_time in the future)
+    bangbang_timestamp = std::chrono::steady_clock::now();
 
     sendGrSimPacket(grsim_packet);
 }
