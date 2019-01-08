@@ -35,10 +35,36 @@ TEST_P(GameStateTransitionTest, test_state_transitions)
                                                     bool, GameState::RestartReason> \
                                                     (RefboxGameState::start, RefboxGameState::update, \
                                                     RefboxGameState::end, our_restart, \
-                                                    GameState::RestartReason::restart_reason) \
-                                    )) \
+                                                    GameState::RestartReason::restart_reason)))
 
 STATE_TRANSITION_TEST(HALT, STOP, STOP, false, NONE);
+
+class GameStatePredicateTest : public ::testing::Test
+{
+protected:
+    void SetUp() override {
+        allRefboxGameStates = ::Test::TestUtil::getAllRefboxGameStates();
+    }
+    std::vector<RefboxGameState> allRefboxGameStates;
+};
+
+#define PREDICATE_TEST(predicate, ...) \
+TEST_F(GameStatePredicateTest, predicate##_test) \
+{ \
+    std::set<RefboxGameState> true_states = {__VA_ARGS__}; \
+    for (auto refbox_game_state : allRefboxGameStates) { \
+    GameState game_state; \
+    game_state.updateRefboxGameState(refbox_game_state); \
+    std::cout << "Testing predicate " << #predicate << " with state " << refbox_game_state << std::endl; \
+    if(true_states.find(refbox_game_state) != true_states.end()) { \
+    EXPECT_TRUE(game_state.predicate()); \
+    } else { \
+    EXPECT_FALSE(game_state.predicate()); \
+    } \
+    } \
+} \
+
+PREDICATE_TEST(isHalted, RefboxGameState::HALT, RefboxGameState::TIMEOUT_US, RefboxGameState::TIMEOUT_THEM)
 
 // testing state transitions
 // parameterize over a tuple of start state, update state, end state, our_restart, restart_reason?

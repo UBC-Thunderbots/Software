@@ -258,7 +258,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/field.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
-            ai/world/game_state.cpp)
+            ai/world/game_state.cpp
+            util/refbox_constants.cpp)
 
     target_link_libraries(game_state_test ${catkin_LIBRARIES})
 

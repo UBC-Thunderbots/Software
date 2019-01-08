@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 enum class RefboxGameState
 {
     HALT = 0,
@@ -22,3 +24,5 @@ enum class RefboxGameState
     BALL_PLACEMENT_THEM,
     LAST_ENUM_ITEM_UNUSED
 };
+
+std::ostream& operator<<(std::ostream& os, const RefboxGameState& state);
