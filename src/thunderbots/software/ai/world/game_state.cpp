@@ -249,10 +249,12 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
     }
 }
 
-RefboxGameState GameState::getRefboxGameState() {
+RefboxGameState GameState::getRefboxGameState()
+{
     return game_state;
 }
 
-GameState::RestartReason GameState::getRestartReason() {
+GameState::RestartReason GameState::getRestartReason()
+{
     return restart_reason;
 }
