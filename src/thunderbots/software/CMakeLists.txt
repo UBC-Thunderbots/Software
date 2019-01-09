@@ -279,6 +279,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -291,10 +292,24 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
     target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(pivot_primitive_test
+            test/primitive/pivot_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+
+    target_link_libraries(pivot_primitive_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(chip_primitive_test
             test/primitive/chip_primitive.cpp
@@ -303,6 +318,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -315,6 +331,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -326,6 +343,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             )
@@ -338,6 +356,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             )
