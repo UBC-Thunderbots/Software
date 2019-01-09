@@ -174,7 +174,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = false;
             break;
         case RefboxGameState::NORMAL_START:
-            state = PLAYING;
+            state = READY;
             break;
         case RefboxGameState::FORCE_START:
             state          = PLAYING;
@@ -257,4 +257,9 @@ RefboxGameState GameState::getRefboxGameState()
 GameState::RestartReason GameState::getRestartReason()
 {
     return restart_reason;
+}
+
+void GameState::setRestartCompleted() {
+    state = PLAYING;
+    restart_reason = NONE;
 }

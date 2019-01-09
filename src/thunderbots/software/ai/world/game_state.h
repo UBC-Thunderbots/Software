@@ -58,6 +58,13 @@ class GameState
     void updateRefboxGameState(RefboxGameState gameState);
 
     /**
+     * Clears restart state and enters normal play. Should be
+     * called when state transitions from a restart setup state
+     * such as PREPARE_KICKOFF_FRIENDLY into NORMAL_START.
+     */
+    void setRestartCompleted();
+
+    /**
      * Returns the current Refbox game state
      *
      * @return the current Refbox game state

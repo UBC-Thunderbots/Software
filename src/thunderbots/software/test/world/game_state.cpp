@@ -8,7 +8,6 @@ typedef std::tuple<RefboxGameState, RefboxGameState, RefboxGameState, bool,
                    GameState::RestartReason>
     StateTransitionTestParams;
 
-// tuple of start state, update state, end state, our_restart, restart reason
 class GameStateTransitionTest : public ::testing::TestWithParam<StateTransitionTestParams>
 {
 };
@@ -29,16 +28,16 @@ TEST_P(GameStateTransitionTest, test_state_transitions)
     EXPECT_EQ(game_state.getRestartReason(), restart_reason);
 }
 
-#define STATE_TRANSITION_TEST(start, update, end, our_restart, restart_reason)           \
-    INSTANTIATE_TEST_CASE_P(                                                             \
-        start##_##update##_Transition, GameStateTransitionTest,                          \
-        testing::Values(                                                                 \
-            std::make_tuple<RefboxGameState, RefboxGameState, RefboxGameState, bool,     \
-                            GameState::RestartReason>(                                   \
-                RefboxGameState::start, RefboxGameState::update, RefboxGameState::end,   \
-                our_restart, GameState::RestartReason::restart_reason)))
+#define STATE_TRANSITION_PARAMS(start, update, end, our_restart, restart_reason) \
+    std::make_tuple<RefboxGameState, RefboxGameState, RefboxGameState, \
+                    bool, GameState::RestartReason>(RefboxGameState::start, RefboxGameState::update, \
+                                                    RefboxGameState::end, our_restart, \
+                                                    GameState::RestartReason::restart_reason)
 
-STATE_TRANSITION_TEST(HALT, STOP, STOP, false, NONE);
+INSTANTIATE_TEST_CASE_P(All, GameStateTransitionTest, ::testing::Values(
+        STATE_TRANSITION_PARAMS(HALT, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(STOP, PREPARE_KICKOFF_US, PREPARE_KICKOFF_US, true, KICKOFF)
+        ));
 
 class GameStatePredicateTest : public ::testing::Test
 {
