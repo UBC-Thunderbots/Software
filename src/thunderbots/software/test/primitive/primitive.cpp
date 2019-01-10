@@ -184,17 +184,17 @@ TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive
 // started with
 TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive)
 {
-    const unsigned int robot_id = 2U;
-    const Point pivot_point = Point(2, -1);
-    const Angle final_angle = Angle::ofRadians(2.56);
+    const unsigned int robot_id   = 2U;
+    const Point pivot_point       = Point(2, -1);
+    const Angle final_angle       = Angle::ofRadians(2.56);
     const Angle robot_orientation = Angle::ofRadians(0.78);
 
     PivotPrimitive pivot_prim =
-            PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
+        PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
-    std::unique_ptr<Primitive> new_prim = PivotPrimitive::createPrimitive(prim_msg);
-    std::vector<double> parameters = new_prim->getParameters();
+    std::unique_ptr<Primitive> new_prim  = PivotPrimitive::createPrimitive(prim_msg);
+    std::vector<double> parameters       = new_prim->getParameters();
 
     EXPECT_EQ("Pivot Primitive", new_prim->getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim->getRobotId());
@@ -211,9 +211,9 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
 TEST(StopPrimTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
 {
     const unsigned int robot_id = 2U;
-    const bool coast = false;
+    const bool coast            = false;
 
-    StopPrimitive stop_prim = StopPrimitive(robot_id, coast);
+    StopPrimitive stop_prim                  = StopPrimitive(robot_id, coast);
     thunderbots_msgs::Primitive prim_message = stop_prim.createMsg();
 
     std::unique_ptr<Primitive> new_prim = StopPrimitive::createPrimitive(prim_message);
