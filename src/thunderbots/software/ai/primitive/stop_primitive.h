@@ -50,11 +50,10 @@ class StopPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
-    /**
-     *
-     * @var coast represents whether the robot should coast or not
-     */
    private:
     unsigned int robot_id;
+
+    // whether the robot should apply power to its wheels to stop
+    // or should stop naturally, not applying power
     bool coast;
 };

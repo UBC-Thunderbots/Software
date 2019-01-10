@@ -208,13 +208,12 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
 // Test that we can correctly translate a StopPrimitive like:
 // `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
 // started with
-TEST(PrimitiveTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
+TEST(StopPrimTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
 {
-    const unsigned int robot_id = 0U;
-    const bool coast            = false;
+    const unsigned int robot_id = 2U;
+    const bool coast = false;
 
     StopPrimitive stop_prim = StopPrimitive(robot_id, coast);
-
     thunderbots_msgs::Primitive prim_message = stop_prim.createMsg();
 
     std::unique_ptr<Primitive> new_prim = StopPrimitive::createPrimitive(prim_message);
@@ -229,6 +228,7 @@ TEST(PrimitiveTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
     EXPECT_EQ(robot_id, new_prim->getRobotId());
     EXPECT_EQ(coast, extra_bits[0]);
     EXPECT_EQ(new_prim->getParameters(), std::vector<double>());
+    EXPECT_EQ(std::vector<double>(), new_prim->getParameters());
 }
 
 int main(int argc, char **argv)
