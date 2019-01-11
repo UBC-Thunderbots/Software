@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include "backend_input/filter/ball_filter.h"
-#include "backend_input/filter/robot_filter.h"
-#include "backend_input/filter/robot_team_filter.h"
+#include "network_input/filter/ball_filter.h"
+#include "network_input/filter/robot_filter.h"
+#include "network_input/filter/robot_team_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"

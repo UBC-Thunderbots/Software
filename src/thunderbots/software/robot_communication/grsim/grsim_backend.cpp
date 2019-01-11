@@ -1,4 +1,4 @@
-#include "backend_output/grsim/grsim_backend.h"
+#include "robot_communication/grsim/grsim_backend.h"
 
 #include <iostream>
 #include <optional>

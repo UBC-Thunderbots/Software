@@ -11,6 +11,7 @@
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/pivot_primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
@@ -176,6 +177,33 @@ TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive
     EXPECT_DOUBLE_EQ(ball_intercept_margin, params[2]);
     EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
 }
+
+// Test that we can correctly translate a PivotPrimitive like:
+// `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
+// started with
+TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive)
+{
+    const unsigned int robot_id   = 2U;
+    const Point pivot_point       = Point(2, -1);
+    const Angle final_angle       = Angle::ofRadians(2.56);
+    const Angle robot_orientation = Angle::ofRadians(0.78);
+
+    PivotPrimitive pivot_prim =
+        PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
+
+    thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
+    std::unique_ptr<Primitive> new_prim  = PivotPrimitive::createPrimitive(prim_msg);
+    std::vector<double> parameters       = new_prim->getParameters();
+
+    EXPECT_EQ("Pivot Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_DOUBLE_EQ(pivot_point.x(), parameters[0]);
+    EXPECT_DOUBLE_EQ(pivot_point.y(), parameters[1]);
+    EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
+    EXPECT_DOUBLE_EQ(robot_orientation.toRadians(), parameters[3]);
+    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
