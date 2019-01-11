@@ -171,8 +171,7 @@ add_executable (parameters
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(parameters thukderbots_gencfg ${catkin_EXPORTED_TARGETS})
-
+add_dependencies(parameters thunderbots_gencfg ${catkin_EXPORTED_TARGETS})
 target_link_libraries(parameters  ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
