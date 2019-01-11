@@ -259,7 +259,8 @@ GameState::RestartReason GameState::getRestartReason()
     return restart_reason;
 }
 
-void GameState::setRestartCompleted() {
-    state = PLAYING;
+void GameState::setRestartCompleted()
+{
+    state          = PLAYING;
     restart_reason = NONE;
 }
