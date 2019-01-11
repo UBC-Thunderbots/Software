@@ -12,6 +12,15 @@ namespace Util
             Parameter<std::string>::updateAllParametersFromROSParameterServer();
         }
 
+        void updateAllParametersFromConfigMsg(
+            const dynamic_reconfigure::Config::ConstPtr& updates)
+        {
+            Parameter<bool>::updateAllParametersFromConfigMsg(updates);
+            Parameter<int32_t>::updateAllParametersFromConfigMsg(updates);
+            Parameter<double>::updateAllParametersFromConfigMsg(updates);
+            Parameter<std::string>::updateAllParametersFromConfigMsg(updates);
+        }
+
         Parameter<int32_t> robot_expiry_buffer_milliseconds(
             "robot_expiry_buffer_milliseconds", 1000);
 

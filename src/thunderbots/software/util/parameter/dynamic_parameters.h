@@ -15,6 +15,14 @@ namespace Util
          */
         void updateAllParametersFromROSParameterServer();
 
+        /**
+         * Updates all known parameters with the latest values from config lists
+         * in the dynamic_reconfigure::Config msgs
+         *
+         */
+        void updateAllParametersFromConfigMsg(
+            const dynamic_reconfigure::Config::ConstPtr&);
+
         // How long in milliseconds a Robot must not appear in vision before it is removed
         // from the AI
         extern Parameter<int32_t> robot_expiry_buffer_milliseconds;

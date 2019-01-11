@@ -15,10 +15,25 @@ namespace
     constexpr int NUMBER_OF_THREADS = 1;
 }  // namespace
 
-// callback for the param timer
+/**
+ * This callback is attatched to an update timer. All the changes are fetched
+ * from the Parameter Server and the parameter objects are updated
+ *
+ */
 void updateAllParameters(const ros::TimerEvent& event)
 {
     Util::DynamicParameters::updateAllParametersFromROSParameterServer();
+}
+
+/**
+ * This callback is attatched to the /parameter/parameter_updates topic
+ * The new values arrive on this topic and the parameter objects are updated
+ * from the Config msg
+ *
+ */
+void parameterUpdateCallback(const dynamic_reconfigure::Config::ConstPtr& updates)
+{
+    Util::DynamicParameters::updateAllParametersFromConfigMsg(updates);
 }
 
 /**
@@ -48,15 +63,19 @@ int main(int argc, char** argv)
     dynamic_reconfigure::Reconfigure srv;
 
     // get all configuration structs
-    srv.request.config.ints    = Parameter<int32_t>::getConfigStruct().ints;
-    srv.request.config.strs    = Parameter<std::string>::getConfigStruct().strs;
-    srv.request.config.doubles = Parameter<double>::getConfigStruct().doubles;
-    srv.request.config.bools   = Parameter<bool>::getConfigStruct().bools;
+    srv.request.config.ints    = Parameter<int32_t>::getConfigMsg().ints;
+    srv.request.config.strs    = Parameter<std::string>::getConfigMsg().strs;
+    srv.request.config.doubles = Parameter<double>::getConfigMsg().doubles;
+    srv.request.config.bools   = Parameter<bool>::getConfigMsg().bools;
 
     // start the timer to update Parameters
     ros::Timer timer = node_handle.createTimer(
         ros::Duration(static_cast<double>(1 / REFRESH_RATE_HZ)), updateAllParameters);
     timer.start();
+
+    // setup the subscriber to the updates topic to update parameters
+    ros::Subscriber updater = node_handle.subscribe("/parameters/parameter_updates", 1,
+                                                    parameterUpdateCallback);
 
     // spin asynchronously to allow for service call in the same node
     ros::AsyncSpinner spinner(NUMBER_OF_THREADS);

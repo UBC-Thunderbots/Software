@@ -16,7 +16,7 @@
 
 // message for the reconfigure srv, takes a config msg
 #include <dynamic_reconfigure/Reconfigure.h>
-
+#include <dynamic_reconfigure/config_tools.h>
 
 /**
  * This class defines a dynamic parameter, meaning the parameter
@@ -98,6 +98,19 @@ class Parameter
     }
 
     /**
+     * Updates the value of this Parameter with the value from a
+     * 'dynamic_reconfigure::Config' msg. The parameter fetches the update from the update
+     * msg and updates its value
+     *
+     */
+    void updateParameterFromConfigMsg(
+        const dynamic_reconfigure::Config::ConstPtr& updates)
+    {
+        dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
+                                                       this->value_);
+    }
+
+    /**
      * Returns a reference to the Parameter registry. The registry is a list of
      * pointers to all the existing Parameters.
      *
@@ -109,14 +122,14 @@ class Parameter
     }
 
     /**
-     * Returns a reference to the config struct. The config struct contains
+     * Returns a reference to the config msg. The config msg contains
      * all the current configurations
      *
-     * @return An immutable reference to the Config struct
+     * @return An immutable reference to the Config msg
      */
-    static const dynamic_reconfigure::Config& getConfigStruct()
+    static const dynamic_reconfigure::Config& getConfigMsg()
     {
-        return Parameter<T>::getMutableConfigStruct();
+        return Parameter<T>::getMutableConfigMsg();
     }
 
     /**
@@ -124,7 +137,7 @@ class Parameter
      * into the registry, the pointer may not be accessed by the caller after this
      * function has been called.
      *
-     * Also registers params to the static configuration struct used to
+     * Also registers params to the static configuration msg used to
      * set parameters
      *
      * @param parameter A unique pointer to the Parameter to add. This pointer may not
@@ -132,47 +145,13 @@ class Parameter
      */
     static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
     {
-        if constexpr (std::is_same<T, bool>::value)
+        try
         {
-            dynamic_reconfigure::BoolParameter bool_msg;
-
-            bool_msg.name  = parameter->name();
-            bool_msg.value = static_cast<bool>(parameter->value());
-
-            Parameter<T>::getMutableConfigStruct().bools.push_back(bool_msg);
+            dynamic_reconfigure::ConfigTools::appendParameter(
+                Parameter<T>::getMutableConfigMsg(), parameter->name(),
+                parameter->value());
         }
-
-        else if constexpr (std::is_same<T, int32_t>::value)
-        {
-            dynamic_reconfigure::IntParameter int_msg;
-
-            int_msg.name  = parameter->name();
-            int_msg.value = static_cast<int32_t>(parameter->value());
-
-            Parameter<T>::getMutableConfigStruct().ints.push_back(int_msg);
-        }
-
-        else if constexpr (std::is_same<T, double>::value)
-        {
-            dynamic_reconfigure::DoubleParameter double_msg;
-
-            double_msg.name  = parameter->name();
-            double_msg.value = static_cast<double>(parameter->value());
-
-            Parameter<T>::getMutableConfigStruct().doubles.push_back(double_msg);
-        }
-
-        else if constexpr (std::is_same<T, std::string>::value)
-        {
-            dynamic_reconfigure::StrParameter str_msg;
-
-            str_msg.name  = parameter->name();
-            str_msg.value = static_cast<std::string>(parameter->value());
-
-            Parameter<T>::getMutableConfigStruct().strs.push_back(str_msg);
-        }
-
-        else
+        catch (...)
         {
             // TODO (Issue #16): Replace with proper exception once exception handling is
             // implemented
@@ -193,6 +172,20 @@ class Parameter
         for (const auto& pair : Parameter<T>::getRegistry())
         {
             pair.second->updateValueFromROSParameterServer();
+        }
+    }
+
+    /**
+     * Takes a list from the dynamic_reconfigure::Config msg and updates the parameters
+     * based on the information in that list.
+     *
+     */
+    static void updateAllParametersFromConfigMsg(
+        const dynamic_reconfigure::Config::ConstPtr& updates)
+    {
+        for (const auto& pair : Parameter<T>::getRegistry())
+        {
+            pair.second->updateParameterFromConfigMsg(updates);
         }
     }
 
@@ -218,13 +211,13 @@ class Parameter
     std::string name_;
 
     /**
-     * Returns a mutable configuration struct that will hold all the
+     * Returns a mutable configuration msg that will hold all the
      * information related to the parameters created
-     * Struct contains bool,strs,ints,doubles vectors which are inherently mutable
+     * msg contains bool,strs,ints,doubles vectors which are inherently mutable
      *
-     * @return A mutable reference to the configuration struct
+     * @return A mutable reference to the configuration msg
      */
-    static dynamic_reconfigure::Config& getMutableConfigStruct()
+    static dynamic_reconfigure::Config& getMutableConfigMsg()
     {
         static dynamic_reconfigure::Config config;
         return config;
