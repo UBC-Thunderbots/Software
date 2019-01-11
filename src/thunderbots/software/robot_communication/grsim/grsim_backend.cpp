@@ -8,8 +8,8 @@
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "robot_communication/grsim/motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
+#include "robot_communication/grsim/motion_controller.h"
 #include "shared/constants.h"
 
 using namespace boost::asio;
@@ -78,16 +78,13 @@ void GrSimBackend::sendPrimitives(
 
     std::chrono::duration<double> delta_time;
 
-    // TODO: Implement this
-    // https://github.com/UBC-Thunderbots/Software/issues/99
     for (auto& prim : primitives)
     {
         MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
 
-        delta_time = std::chrono::steady_clock::now() -
-                     bangbang_timestamp;  // get the current time right before
-                                          // running bang-bang to get a time-delta
-                                          // for acceleration
+        // get the current time right before
+        // running bang-bang to get a time-delta for acceleration
+        delta_time = std::chrono::steady_clock::now() - bangbang_timestamp;
 
         // Motion controller determines the speeds to send to the robots based on their
         // state, maximum linear and angular accelerations, and the robots target
