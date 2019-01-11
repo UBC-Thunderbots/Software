@@ -11,7 +11,7 @@
  * See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
  */
 
-#include "backend_output/grsim/motion_controller.h"
+#include "robot_communication/grsim/motion_controller.h"
 
 #include <chrono>
 #include <iostream>

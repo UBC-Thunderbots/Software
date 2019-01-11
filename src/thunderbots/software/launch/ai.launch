@@ -1,15 +1,15 @@
 <launch>
 
-    <!-- Launch the backend_input node -->
-    <node name="backend_input" pkg="thunderbots" type="backend_input" output="screen">
+    <!-- Launch the network_input node -->
+    <node name="network_input" pkg="thunderbots" type="network_input" output="screen">
     </node>
 
     <!-- Launch the ai logic node -->
     <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen">
     </node>
 
-    <!-- Launch the backend_output node -->
-    <node name="backend_output" pkg="thunderbots" type="backend_output" output="screen">
+    <!-- Launch the robot_communication node -->
+    <node name="robot_communication" pkg="thunderbots" type="robot_communication" output="screen">
     </node>
 
 </launch>

@@ -7,9 +7,7 @@
 
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
-#include "backend_output/grsim/grsim_backend.h"
-#include "geom/point.h"
-#include "thunderbots_msgs/Team.h"
+#include "robot_communication/grsim/grsim_backend.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/ros_messages.h"
@@ -55,7 +53,7 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
 int main(int argc, char** argv)
 {
     // Init ROS node
-    ros::init(argc, argv, "backend_output");
+    ros::init(argc, argv, "robot_communication");
     ros::NodeHandle node_handle;
 
     // Create subscribers to topics we care about

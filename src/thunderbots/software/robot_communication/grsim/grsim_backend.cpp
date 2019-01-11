@@ -1,4 +1,4 @@
-#include "backend_output/grsim/grsim_backend.h"
+#include "robot_communication/grsim/grsim_backend.h"
 
 #include <chrono>
 #include <iostream>
@@ -8,7 +8,7 @@
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "backend_output/grsim/motion_controller.h"
+#include "robot_communication/grsim/motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "shared/constants.h"
 
