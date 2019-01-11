@@ -91,9 +91,9 @@ include_directories(
 # Find all the generated protobuf source files
 file(GLOB PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 
-file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_input/*.h
+file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
@@ -101,15 +101,15 @@ file(GLOB_RECURSE BACKEND_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
-add_executable (backend_input
+add_executable (network_input
         ${PROTO_SRCS}
-        ${BACKEND_INPUT_SRC}
+        ${NETWORK_INPUT_SRC}
         ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(backend_input ${catkin_EXPORTED_TARGETS})
-target_link_libraries(backend_input
+add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
+target_link_libraries(network_input
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
@@ -134,9 +134,9 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES}
         ${G3LOG}
         )
 
-file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend_output/*.h
+file(GLOB_RECURSE ROBOT_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/robot_communication/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/robot_communication/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
@@ -146,16 +146,15 @@ file(GLOB_RECURSE BACKEND_OUTPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
-add_executable (backend_output
+add_executable (robot_communication
         ${PROTO_SRCS}
-        ${BACKEND_OUTPUT_SRC}
+        ${ROBOT_COMMUNICATION_SRC}
         ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(backend_output ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(backend_output ${catkin_LIBRARIES}
+add_dependencies(robot_communication ${catkin_EXPORTED_TARGETS})
+target_link_libraries(robot_communication ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         )
@@ -214,9 +213,9 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(grsim_backend_test
             ${PROTO_SRCS}
             test/grsim_backend/grsim_backend.cpp
-            backend_output/grsim/grsim_backend.cpp
-            backend_output/grsim/grsim_backend.h
-            backend_output/backend.h
+            robot_communication/grsim/grsim_backend.cpp
+            robot_communication/grsim/grsim_backend.h
+            robot_communication/backend.h
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
@@ -308,6 +307,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -320,10 +320,24 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
     target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(pivot_primitive_test
+            test/primitive/pivot_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+
+    target_link_libraries(pivot_primitive_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(chip_primitive_test
             test/primitive/chip_primitive.cpp
@@ -332,6 +346,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -344,6 +359,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -355,6 +371,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             )
@@ -367,6 +384,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             )
