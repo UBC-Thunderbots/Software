@@ -14,15 +14,15 @@ class DirectWheelsPrimitive : public Primitive
      * Creates a new Move Primitive
      *
      * @param robot_id the id of the robot
-     * @param wheel0_power a value between -255 and 255, where positive is clockwise
-     * @param wheel1_power a value between -255 and 255, where positive is clockwise
-     * @param wheel2_power a value between -255 and 255, where positive is clockwise
-     * @param wheel3_power a value between -255 and 255, where positive is clockwise
+     * @param front_left_wheel_power a value between -255 and 255, where positive is clockwise
+     * @param back_left_wheel_power a value between -255 and 255, where positive is clockwise
+     * @param front_right_wheel_power a value between -255 and 255, where positive is clockwise
+     * @param back_right_wheel_power a value between -255 and 255, where positive is clockwise
      * @param dribbler_rpm the dribbler rpm
      */
-    explicit DirectWheelsPrimitive(unsigned int robot_id, signed int wheel0_power,
-                                   signed int wheel1_power, signed int wheel2_power,
-                                   signed int wheel3_power, double dribbler_rpm);
+    explicit DirectWheelsPrimitive(unsigned int robot_id, int front_left_wheel_power,
+                                   int back_left_wheel_power, int front_right_wheel_power,
+                                   int back_right_wheel_power, double dribbler_rpm);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -40,28 +40,28 @@ class DirectWheelsPrimitive : public Primitive
      *
      * @return the power of wheel 0
      */
-    signed int getWheel0Power() const;
+    int getWheel0Power() const;
 
     /**
      * Gets the power of wheel 1
      *
      * @return the power of wheel 1
      */
-    signed int getWheel1Power() const;
+    int getWheel1Power() const;
 
     /**
      * Gets the power of wheel 2
      *
      * @return the power of wheel 2
      */
-    signed int getWheel2Power() const;
+    int getWheel2Power() const;
 
     /**
      * Gets the power of wheel 3
      *
      * @return the power of wheel 3
      */
-    signed int getWheel3Power() const;
+    int getWheel3Power() const;
 
     /**
      * Gets the RPM of the dribbler
@@ -70,15 +70,27 @@ class DirectWheelsPrimitive : public Primitive
      */
     double getDribblerRPM() const;
 
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {front_left_wheel_power, back_left_wheel_power,
+     *                               front_right_wheel_power, back_right_wheel_power,
+     *                               dribbler_rpm}
+     */
     std::vector<double> getParameters() const override;
 
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
     std::vector<bool> getExtraBits() const override;
 
    private:
     unsigned int robot_id;
-    signed int wheel0_power;
-    signed int wheel1_power;
-    signed int wheel2_power;
-    signed int wheel3_power;
+    int front_left_wheel_power;
+    int back_left_wheel_power;
+    int front_right_wheel_power;
+    int back_right_wheel_power;
     double dribbler_rpm;
 };

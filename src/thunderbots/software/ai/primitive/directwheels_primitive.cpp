@@ -1,17 +1,35 @@
 #include "ai/primitive/directwheels_primitive.h"
+#include "util/logger/init.h"
 
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
 
-DirectWheelsPrimitive::DirectWheelsPrimitive(unsigned int robot_id, int wheel0_power,
-                                             int wheel1_power, int wheel2_power,
-                                             int wheel3_power, double dribbler_rpm)
+DirectWheelsPrimitive::DirectWheelsPrimitive(unsigned int robot_id, int front_left_wheel_power,
+                                             int back_left_wheel_power, int front_right_wheel_power,
+                                             int back_right_wheel_power, double dribbler_rpm)
     : robot_id(robot_id),
-      wheel0_power(wheel0_power),
-      wheel1_power(wheel1_power),
-      wheel2_power(wheel2_power),
-      wheel3_power(wheel3_power),
+      front_left_wheel_power(front_left_wheel_power),
+      back_left_wheel_power(back_left_wheel_power),
+      front_right_wheel_power(front_right_wheel_power),
+      back_right_wheel_power(back_right_wheel_power),
       dribbler_rpm(dribbler_rpm)
 {
+    //Clamp wheel power if out of range, log a warning
+    if(abs(front_left_wheel_power) > 255) {
+        this->front_left_wheel_power = std::clamp(front_left_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: front left wheel power out of bounds";
+    }
+    if(abs(back_left_wheel_power) > 255) {
+        this->back_left_wheel_power = std::clamp(back_left_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: back left wheel power out of bounds";
+    }
+    if(abs(front_right_wheel_power) > 255) {
+        this->front_right_wheel_power = std::clamp(front_right_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: front right wheel power out of bounds";
+    }
+    if(abs(back_right_wheel_power) > 255) {
+        this->back_right_wheel_power = std::clamp(back_right_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: back right wheel power out of bounds";
+    }
 }
 
 DirectWheelsPrimitive::DirectWheelsPrimitive(
@@ -19,14 +37,30 @@ DirectWheelsPrimitive::DirectWheelsPrimitive(
 {
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
-    robot_id     = primitive_msg.robot_id;
-    wheel0_power = int(primitive_msg.parameters.at(0));
-    wheel1_power = int(primitive_msg.parameters.at(1));
-    wheel2_power = int(primitive_msg.parameters.at(2));
-    wheel3_power = int(primitive_msg.parameters.at(3));
-    dribbler_rpm = primitive_msg.parameters.at(4);
-}
+    robot_id                = primitive_msg.robot_id;
+    front_left_wheel_power  = int(primitive_msg.parameters.at(0));
+    back_left_wheel_power   = int(primitive_msg.parameters.at(1));
+    front_right_wheel_power = int(primitive_msg.parameters.at(2));
+    back_right_wheel_power  = int(primitive_msg.parameters.at(3));
 
+    //Clamp wheel power if out of range, log a warning
+    if(abs(front_left_wheel_power) > 255) {
+        front_left_wheel_power = std::clamp(front_left_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: front left wheel power out of bounds";
+    }
+    if(abs(back_left_wheel_power) > 255) {
+        back_left_wheel_power = std::clamp(back_left_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: back left wheel power out of bounds";
+    }
+    if(abs(front_right_wheel_power) > 255) {
+        front_right_wheel_power = std::clamp(front_right_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: front right wheel power out of bounds";
+    }
+    if(abs(back_right_wheel_power) > 255) {
+        back_right_wheel_power = std::clamp(back_right_wheel_power, -255, 255);
+        LOG(WARNING) << "direct wheels: back right wheel power out of bounds";
+    }
+}
 std::string DirectWheelsPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -39,22 +73,22 @@ unsigned int DirectWheelsPrimitive::getRobotId() const
 
 int DirectWheelsPrimitive::getWheel0Power() const
 {
-    return wheel0_power;
+    return front_left_wheel_power;
 }
 
 int DirectWheelsPrimitive::getWheel1Power() const
 {
-    return wheel1_power;
+    return back_left_wheel_power;
 }
 
 int DirectWheelsPrimitive::getWheel2Power() const
 {
-    return wheel2_power;
+    return front_right_wheel_power;
 }
 
 int DirectWheelsPrimitive::getWheel3Power() const
 {
-    return wheel3_power;
+    return back_right_wheel_power;
 }
 
 double DirectWheelsPrimitive::getDribblerRPM() const
@@ -64,8 +98,8 @@ double DirectWheelsPrimitive::getDribblerRPM() const
 
 std::vector<double> DirectWheelsPrimitive::getParameters() const
 {
-    std::vector<double> parameters = {double(wheel0_power), double(wheel1_power),
-                                      double(wheel2_power), double(wheel3_power),
+    std::vector<double> parameters = {double(front_left_wheel_power), double(back_left_wheel_power),
+                                      double(front_right_wheel_power), double(back_right_wheel_power),
                                       dribbler_rpm};
 
     return parameters;
