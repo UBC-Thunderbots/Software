@@ -7,9 +7,11 @@
 #include <limits>
 
 #include "geom/angle.h"
+#include "geom/rectangle.h"
+#include "geom/segment.h"
 
 
-double proj_len(const Seg &first, const Vector &second)
+double proj_len(const Segment &first, const Vector &second)
 {
     return proj_len(first.toVector(), second - first.start);
 }
@@ -24,7 +26,7 @@ double dist(const Vector &first, const Vector &second)
     return (first - second).len();
 }
 
-double dist(const Seg &first, const Seg &second)
+double dist(const Segment &first, const Segment &second)
 {
     if (intersects(first, second))
     {
@@ -50,17 +52,17 @@ double dist(const Vector &first, const Line &second)
     return dist(second, first);
 }
 
-double dist(const Vector &first, const Seg &second)
+double dist(const Vector &first, const Segment &second)
 {
     return std::sqrt(distsq(first, second));
 }
 
-double dist(const Seg &first, const Vector &second)
+double dist(const Segment &first, const Vector &second)
 {
     return dist(second, first);
 }
 
-double distsq(const Vector &first, const Seg &second)
+double distsq(const Vector &first, const Segment &second)
 {
     double seglensq    = lensq(second);
     Vector relsecond_s = first - second.start;
@@ -83,7 +85,7 @@ double distsq(const Vector &first, const Seg &second)
     return std::min(lensq_s, lensq_e);
 }
 
-double distsq(const Seg &first, const Vector &second)
+double distsq(const Segment &first, const Vector &second)
 {
     return distsq(second, first);
 }
@@ -93,9 +95,9 @@ double distsq(const Vector &first, const Vector &second)
     return (first - second).lensq();
 }
 
-bool isDegenerate(const Seg &seg)
+bool isDegenerate(const Segment &segment)
 {
-    return distsq(seg.start, seg.end) < EPS2;
+    return distsq(segment.start, segment.end) < EPS2;
 }
 
 bool isDegenerate(const Line &line)
@@ -105,17 +107,17 @@ bool isDegenerate(const Line &line)
 
 bool isDegenerate(const Ray &ray)
 {
-    return distsq(ray.start, ray.dir) < EPS2;
+    return distsq(ray.start, ray.direction) < EPS2;
 }
 
-double len(const Seg &seg)
+double len(const Segment &segment)
 {
-    return dist(seg.start, seg.end);
+    return dist(segment.start, segment.end);
 }
 
-double lensq(const Seg &seg)
+double lensq(const Segment &segment)
 {
-    return distsq(seg.start, seg.end);
+    return distsq(segment.start, segment.end);
 }
 
 double lensq(const Line &line)
@@ -145,12 +147,12 @@ bool contains(const Circle &out, const Vector &in)
     return distsq(out.origin, in) <= out.radius * out.radius;
 }
 
-bool contains(const Circle &out, const Seg &in)
+bool contains(const Circle &out, const Segment &in)
 {
     return dist(in, out.origin) < out.radius;
 }
 
-bool contains(const Seg &out, const Vector &in)
+bool contains(const Segment &out, const Vector &in)
 {
     if (collinear(in, out.start, out.end))
     {
@@ -165,16 +167,16 @@ bool contains(const Seg &out, const Vector &in)
 
 bool contains(const Ray &out, const Vector &in)
 {
-    if (collinear(in, out.start, out.dir))
+    if (collinear(in, out.start, out.direction))
     {
-        return sign(in.x() - out.start.x()) == sign(out.dir.x() - out.start.x()) &&
-               sign(in.y() - out.start.y()) == sign(out.dir.y() - out.start.y());
+        return sign(in.x() - out.start.x()) == sign(out.direction.x() - out.start.x()) &&
+               sign(in.y() - out.start.y()) == sign(out.direction.y() - out.start.y());
     }
 
     return false;
 }
 
-bool contains(const Rect &out, const Vector &in)
+bool contains(const Rectangle &out, const Vector &in)
 {
     return out.containsPoint(in);
 }
@@ -196,21 +198,21 @@ bool intersects(const Circle &first, const Circle &second)
     return (first.origin - second.origin).len() < (first.radius + second.radius);
 }
 
-bool intersects(const Ray &first, const Seg &second)
+bool intersects(const Ray &first, const Segment &second)
 {
-    auto isect = lineIntersection(first.start, first.dir, second.start, second.end);
+    auto isect = lineIntersection(first.start, first.direction, second.start, second.end);
     if (isect.has_value())
     {
         return contains(first, isect.value()) && contains(second, isect.value());
     }
-    return collinear(first.start, first.dir, second.start);
+    return collinear(first.start, first.direction, second.start);
 }
-bool intersects(const Seg &first, const Ray &second)
+bool intersects(const Segment &first, const Ray &second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Seg &first, const Circle &second)
+bool intersects(const Segment &first, const Circle &second)
 {
     // if the segment is inside the circle AND at least one of the points is
     // outside the circle
@@ -218,12 +220,12 @@ bool intersects(const Seg &first, const Circle &second)
            (distsq(first.start, second.origin) > second.radius * second.radius ||
             distsq(first.end, second.origin) > second.radius * second.radius);
 }
-bool intersects(const Circle &first, const Seg &second)
+bool intersects(const Circle &first, const Segment &second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Seg &first, const Seg &second)
+bool intersects(const Segment &first, const Segment &second)
 {
     if (sign((first.start - first.end).cross(second.start - second.end)) == 0)
     {
@@ -266,9 +268,9 @@ void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
 }
 
 template <size_t N>
-Seg getSide(const Poly<N> &poly, unsigned int i)
+Segment getSide(const Poly<N> &poly, unsigned int i)
 {
-    return Seg(getVertex(poly, i), getVertex(poly, (i + 1) % N));
+    return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
 std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
@@ -282,7 +284,7 @@ std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
     {
         // return a result that contains the direction of the line and zero angle if not
         // blocked by obstacles
-        Seg collinear_seg = Seg(src, p1);
+        Segment collinear_seg = Segment(src, p1);
         for (Point p : obstacles)
         {
             if (intersects(collinear_seg, Circle(p, radius)))
@@ -466,7 +468,7 @@ Vector clipPoint(const Vector &p, const Vector &bound1, const Vector &bound2)
     return ret;
 }
 
-Vector clipPoint(const Vector &p, const Rect &r)
+Vector clipPoint(const Vector &p, const Rectangle &r)
 {
     const double minx = r.swCorner().x();
     const double miny = r.swCorner().y();
@@ -528,7 +530,7 @@ std::vector<Vector> lineCircleIntersect(const Vector &centre, double radius,
     return ans;
 }
 
-std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
+std::vector<Vector> lineRectIntersect(const Rectangle &r, const Vector &segA,
                                       const Vector &segB)
 {
     std::vector<Vector> ans;
@@ -537,7 +539,7 @@ std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
         const Vector &a = r[i];
         // to draw a line segment from point 3 to point 0
         const Vector &b = r[(i + 1) % 4];
-        if (intersects(Seg(a, b), Seg(segA, segB)) &&
+        if (intersects(Segment(a, b), Segment(segA, segB)) &&
             uniqueLineIntersects(a, b, segA, segB))
         {
             ans.push_back(lineIntersection(a, b, segA, segB).value());
@@ -546,7 +548,7 @@ std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
     return ans;
 }
 
-Vector vectorRectIntersect(const Rect &r, const Vector &vecA, const Vector &vecB)
+Vector vectorRectIntersect(const Rectangle &r, const Vector &vecA, const Vector &vecB)
 {
     std::vector<Vector> points = lineRectIntersect(r, vecA, (vecB - vecA) * 100 + vecA);
     for (Vector i : points)
@@ -635,7 +637,7 @@ bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
     return std::abs((d - c).cross(b - a)) > EPS;
 }
 
-std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
+std::vector<Point> lineIntersection(const Segment &a, const Segment &b)
 {
     if (std::fabs((b.end - b.start).cross(a.end - a.start)) < EPS)
     {
@@ -701,7 +703,7 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
 std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Vector &c,
                                       const Vector &d)
 {
-    Seg line1(a, b), line2(c, d);
+    Segment line1(a, b), line2(c, d);
     double x1 = line1.start.x();
     double y1 = line1.start.y();
     double x2 = line1.end.x();
@@ -869,10 +871,10 @@ double closestPointTime(Point x1, Vector v1, Point x2, Vector v2)
     return t;
 }
 
-bool pointInFrontVector(Vector offset, Vector dir, Vector p)
+bool pointInFrontVector(Vector offset, Vector direction, Vector p)
 {
     // compare angle different
-    Angle a1   = dir.orientation();
+    Angle a1   = direction.orientation();
     Angle a2   = (p - offset).orientation();
     Angle diff = (a1 - a2).angleMod();
     return diff < Angle::quarter() && diff > -Angle::quarter();
@@ -904,7 +906,7 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
-bool pointIsRightOfLine(const Seg &line, const Point &point)
+bool pointIsRightOfLine(const Segment &line, const Point &point)
 {
     return (line.end.x() - line.start.x()) * (point.y() - line.start.y()) -
                (line.end.y() - line.start.y()) * (point.x() - line.start.x()) <

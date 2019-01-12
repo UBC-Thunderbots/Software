@@ -177,7 +177,10 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.h
             geom/point.h
             geom/angle.h
-            geom/shapes.h)
+            geom/segment.h
+            geom/ray.h
+            geom/circle.h
+            geom/line.h)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
 

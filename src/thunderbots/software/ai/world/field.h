@@ -1,7 +1,7 @@
 #pragma once
 
 #include "geom/point.h"
-#include "geom/rect.h"
+#include "geom/rectangle.h"
 
 /**
  * Exposes the dimensions of various parts of the field.
