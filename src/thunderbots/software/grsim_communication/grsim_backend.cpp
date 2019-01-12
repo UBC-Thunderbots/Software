@@ -1,4 +1,4 @@
-#include "robot_communication/grsim/grsim_backend.h"
+#include "grsim_communication/grsim_backend.h"
 
 #include <chrono>
 #include <iostream>
@@ -8,8 +8,8 @@
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
+#include "grsim_communication/motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
-#include "robot_communication/grsim/motion_controller.h"
 #include "shared/constants.h"
 
 using namespace boost::asio;

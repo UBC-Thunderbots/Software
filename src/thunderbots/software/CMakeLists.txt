@@ -124,9 +124,9 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES}
         ${G3LOG}
         )
 
-file(GLOB_RECURSE ROBOT_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/robot_communication/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/robot_communication/*.h
+file(GLOB_RECURSE GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
@@ -136,15 +136,15 @@ file(GLOB_RECURSE ROBOT_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPEN
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
-add_executable (robot_communication
+add_executable (grsim_communication
         ${PROTO_SRCS}
-        ${ROBOT_COMMUNICATION_SRC}
+        ${GRSIM_COMMUNICATION_SRC}
         ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(robot_communication ${catkin_EXPORTED_TARGETS})
-target_link_libraries(robot_communication ${catkin_LIBRARIES}
+add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
+target_link_libraries(grsim_communication ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         )
@@ -186,7 +186,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(grsim_backend_test
             ${PROTO_SRCS}
             test/grsim_backend/grsim_backend.cpp
-            robot_communication/grsim/motion_controller.cpp
+            grsim_communication/motion_controller.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/primitive.cpp
@@ -197,9 +197,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/pivot_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
-            robot_communication/grsim/grsim_backend.cpp
-            robot_communication/grsim/grsim_backend.h
-            robot_communication/backend.h
+            grsim_communication/grsim_backend.cpp
+            grsim_communication/grsim_backend.h
+            grsim_communication/grsim_backend.cpp
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
@@ -261,7 +261,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(motion_controller_test
             test/grsim_backend/motion_controller.cpp
-            robot_communication/grsim/motion_controller.cpp
+            grsim_communication/motion_controller.cpp
             ai/world/robot.cpp
             geom/point.h
             geom/angle.h)
