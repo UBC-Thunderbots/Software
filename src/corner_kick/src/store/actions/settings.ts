@@ -1,5 +1,8 @@
 /**
  * This files specifies settings specific actions
+ *
+ * We are using the format specified here
+ * @see https://github.com/piotrwitek/typesafe-actions#createaction
  */
 
 import { createAction } from 'typesafe-actions';
