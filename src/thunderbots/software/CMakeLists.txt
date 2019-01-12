@@ -221,6 +221,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             robot_communication/grsim/grsim_backend.cpp
