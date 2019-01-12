@@ -44,4 +44,3 @@ struct std::hash<Circle>
         return std::hash<Point>()(circle.origin) ^ std::hash<double>()(circle.radius);
     }
 };
-// test for blank line display at end of file
