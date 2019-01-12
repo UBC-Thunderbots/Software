@@ -1,11 +1,9 @@
 import { Setting } from './settings';
 import { IRosoutMessage } from './standardROSMessages';
-import { IBall, IField } from './visualizer';
 
 export interface IRootState {
     logger: ILoggerState;
     ros: IROSState;
-    visualizer: IVisualizerState;
     settings: ISettingsState;
 }
 
@@ -23,8 +21,3 @@ export interface IROSState {
 }
 
 export type ISettingsState = { [K in Setting]: string };
-
-export interface IVisualizerState {
-    ball: IBall;
-    field: IField;
-}
