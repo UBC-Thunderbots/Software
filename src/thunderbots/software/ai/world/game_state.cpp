@@ -89,19 +89,19 @@ bool GameState::isTheirPenalty() const
     return isPenalty() && !our_restart;
 }
 
-bool GameState::isTheirDirectFree() const
+bool GameState::isTheirDirect() const
 {
     return isDirectFree() && !our_restart;
 }
 
-bool GameState::isTheirIndirectFree() const
+bool GameState::isTheirIndirect() const
 {
     return isIndirectFree() && !our_restart;
 }
 
 bool GameState::isTheirFreeKick() const
 {
-    return isTheirDirectFree() || isTheirIndirectFree();
+    return isTheirDirect() || isTheirIndirect();
 }
 
 bool GameState::isTheirBallPlacement() const
@@ -128,7 +128,7 @@ bool GameState::isReadyState() const
 // One of our robots can kick the ball
 bool GameState::canKick() const
 {
-    return state == PLAYING || (our_restart && state == PLAYING);
+    return state == PLAYING || (our_restart && state == READY);
 }
 
 bool GameState::stayAwayFromBall() const
@@ -186,7 +186,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = true;
             break;
         case RefboxGameState::PREPARE_KICKOFF_THEM:
-            state          = READY;
+            state          = SETUP;
             restart_reason = KICKOFF;
             our_restart    = false;
             break;
@@ -196,7 +196,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = true;
             break;
         case RefboxGameState::PREPARE_PENALTY_THEM:
-            state          = READY;
+            state          = SETUP;
             restart_reason = PENALTY;
             our_restart    = false;
             break;
@@ -206,7 +206,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = true;
             break;
         case RefboxGameState::DIRECT_FREE_THEM:
-            state          = READY;
+            state          = SETUP;
             restart_reason = DIRECT;
             our_restart    = false;
             break;
@@ -216,7 +216,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = true;
             break;
         case RefboxGameState::INDIRECT_FREE_THEM:
-            state          = READY;
+            state          = SETUP;
             restart_reason = INDIRECT;
             our_restart    = false;
             break;
@@ -237,7 +237,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             restart_reason = NONE;
             break;
         case RefboxGameState::BALL_PLACEMENT_US:
-            state          = READY;
+            state          = SETUP;
             restart_reason = BALL_PLACEMENT;
             our_restart    = true;
             break;

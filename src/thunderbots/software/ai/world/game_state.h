@@ -229,14 +229,14 @@ class GameState
      *
      * @return true if opposing side is tkaing a direct free kick.
      */
-    bool isTheirDirectFree() const;
+    bool isTheirDirect() const;
 
     /**
      * Returns true if opposing side is taking an indirect free kick.
      *
      * @return true if opposing side is taking an indirect free kick.
      */
-    bool isTheirIndirectFree() const;
+    bool isTheirIndirect() const;
 
     /**
      * Returns true if opposing side is taking any type of free kick.
