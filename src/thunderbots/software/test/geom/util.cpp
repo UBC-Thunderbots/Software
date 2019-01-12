@@ -307,8 +307,8 @@ TEST(GeomUtilTest, test_line_circle_intersect)
 
 TEST(GeomUtilTest, test_line_rect_intersect)
 {
-    std::vector<Point> intersections =
-        lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)), Point(-1, -2), Point(1, 2));
+    std::vector<Point> intersections = lineRectIntersect(
+        Rectangle(Point(-1, -1), Point(1, 1)), Point(-1, -2), Point(1, 2));
 
     EXPECT_TRUE(intersections.size() == 2);
     EXPECT_TRUE((intersections[0] - Point(0.5, 1)).len() < 0.00001 ||
@@ -325,14 +325,14 @@ TEST(GeomUtilTest, test_line_rect_intersect)
     EXPECT_TRUE((intersections[1] - Point(0, 0.4)).len() < 0.00001 ||
                 (intersections[1] - Point(1, 0.8)).len() < 0.00001);
 
-    intersections =
-        lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)), Point(0, 0), Point(1, 2));
+    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)), Point(0, 0),
+                                      Point(1, 2));
 
     EXPECT_TRUE(intersections.size() == 1);
     EXPECT_TRUE((intersections[0] - Point(0.5, 1)).len() < 0.00001);
 
-    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)), Point(-0.5, -0.5),
-                                      Point(0.5, 0.5));
+    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)),
+                                      Point(-0.5, -0.5), Point(0.5, 0.5));
 
     EXPECT_TRUE(intersections.size() == 0);
 }
