@@ -8,7 +8,7 @@ RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
 {
     boundary = Circle(robot.position(), avoid_dist + ROBOT_MAX_RADIUS);
     velocity =
-        Seg(robot.position(),
+        Segment(robot.position(),
             robot.position() + robot.velocity() * collision_avoid_velocity_scale.value());
 }
 

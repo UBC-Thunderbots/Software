@@ -109,18 +109,18 @@ class Field
     double defenseAreaLength() const;
 
     /**
-     * Gets the friendly defense area as a Rect.
+     * Gets the friendly defense area as a Rectangle.
      *
      * @return defense area of the friendly team
      */
-    Rect friendlyDefenseArea() const;
+    Rectangle friendlyDefenseArea() const;
 
     /**
-     * Gets the enemy defense area as a Rect.
+     * Gets the enemy defense area as a Rectangle.
      *
      * @return defense area of the enemy team
      */
-    Rect enemyDefenseArea() const;
+    Rectangle enemyDefenseArea() const;
 
 
     /**

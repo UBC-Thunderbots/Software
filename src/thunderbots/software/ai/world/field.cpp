@@ -73,15 +73,15 @@ double Field::defenseAreaLength() const
     return defense_length_;
 }
 
-Rect Field::friendlyDefenseArea() const
+Rectangle Field::friendlyDefenseArea() const
 {
-    return Rect(Point(-field_length_ * 0.5, defense_width_ / 2.0),
+    return Rectangle(Point(-field_length_ * 0.5, defense_width_ / 2.0),
                 Point(-field_length_ * 0.5 + defense_length_, -defense_width_ / 2.0));
 }
 
-Rect Field::enemyDefenseArea() const
+Rectangle Field::enemyDefenseArea() const
 {
-    return Rect(Point(field_length_ * 0.5, defense_width_ / 2.0),
+    return Rectangle(Point(field_length_ * 0.5, defense_width_ / 2.0),
                 Point(field_length_ * 0.5 - defense_length_, -defense_width_ / 2.0));
 }
 
