@@ -14,10 +14,14 @@ class DirectWheelsPrimitive : public Primitive
      * Creates a new Move Primitive
      *
      * @param robot_id the id of the robot
-     * @param front_left_wheel_power a value between -255 and 255, where positive is clockwise
-     * @param back_left_wheel_power a value between -255 and 255, where positive is clockwise
-     * @param front_right_wheel_power a value between -255 and 255, where positive is clockwise
-     * @param back_right_wheel_power a value between -255 and 255, where positive is clockwise
+     * @param front_left_wheel_power a value between -255 and 255, where positive is
+     * clockwise
+     * @param back_left_wheel_power a value between -255 and 255, where positive is
+     * clockwise
+     * @param front_right_wheel_power a value between -255 and 255, where positive is
+     * clockwise
+     * @param back_right_wheel_power a value between -255 and 255, where positive is
+     * clockwise
      * @param dribbler_rpm the dribbler rpm
      */
     explicit DirectWheelsPrimitive(unsigned int robot_id, int front_left_wheel_power,

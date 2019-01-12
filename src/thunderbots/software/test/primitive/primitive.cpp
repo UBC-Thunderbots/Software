@@ -98,7 +98,8 @@ TEST(PrimitiveTest, convert_MoveSpinPrimitive_to_message_and_back_to_MoveSpinPri
     EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
-TEST(PrimitiveTest, convert_DirectWheelsPrimitive_to_message_and_back_to_DirectWheelsPrimitive)
+TEST(PrimitiveTest,
+     convert_DirectWheelsPrimitive_to_message_and_back_to_DirectWheelsPrimitive)
 {
     const signed int wheel0_power = 2;
     const signed int wheel1_power = 4;
