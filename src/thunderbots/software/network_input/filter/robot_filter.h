@@ -18,7 +18,7 @@ typedef struct
     Point position;
     Angle orientation;
     double confidence;
-    AITimestamp timestamp;
+    double timestamp;
 } SSLRobotData;
 
 /**
