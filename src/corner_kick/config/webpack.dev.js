@@ -1,11 +1,11 @@
 /**
- * @fileoverview Specifies the webpack configuration for the client
+ * Specifies the webpack configuration for the client
  * in development. Extends the general webpack configuration.
  *
  * @see {@link ./webpack.config.js}
  */
 
-const webpackConfig = require('./webpack.config.js');
+const webpackConfig = require('./webpack.base.config.js');
 
 module.exports = [
     // Client build configuration
@@ -22,6 +22,7 @@ module.exports = [
         devServer: {
             publicPath: '/',
             historyApiFallback: true,
+            quiet: true,
         },
     },
 ];
