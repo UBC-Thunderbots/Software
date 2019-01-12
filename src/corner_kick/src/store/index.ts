@@ -18,5 +18,4 @@ export const createStore = () => {
     return store;
 };
 
-export { actions } from './actions';
-export { RootAction } from './reducers';
+export { actions, RootAction } from './actions';

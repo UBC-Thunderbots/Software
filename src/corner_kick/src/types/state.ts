@@ -3,22 +3,13 @@
  */
 
 import { Setting } from './settings';
-import { IRosoutMessage } from './standardROSMessages';
 
 /**
  * The application state
  */
 export interface IRootState {
-    logger: ILoggerState;
     ros: IROSState;
     settings: ISettingsState;
-}
-
-/**
- * The state object for the logger
- */
-export interface ILoggerState {
-    rosout: IRosoutMessage[];
 }
 
 /**

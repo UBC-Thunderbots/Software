@@ -4,7 +4,6 @@
 
 import { combineReducers } from 'redux';
 
-import loggerReducer from './logger';
 import rosReducer from './ros';
 import settingsReducer from './settings';
 
@@ -13,7 +12,6 @@ import settingsReducer from './settings';
  * initialized
  */
 export default combineReducers({
-    logger: loggerReducer,
     ros: rosReducer,
     settings: settingsReducer,
 });

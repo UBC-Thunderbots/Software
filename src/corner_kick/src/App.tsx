@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
 
 import { Console } from './components/portals/Console';
-import { Page } from './components/portals/Page';
-import { LoggerConsole } from './containers/consoles/logger';
+import { Main } from './components/portals/Main';
+import { Sidebar } from './components/portals/Sidebar';
+import { SidebarTitle } from './components/portals/SidebarTitle';
 import { Global } from './containers/mainUI/Global';
-import { SettingsPage } from './containers/pages/settings';
 import { createStore } from './store';
 
 const store = createStore();
@@ -14,19 +13,10 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Global>
-            <Router>
-                <>
-                    <Page
-                        text="Settings"
-                        icon="settings"
-                        path="/"
-                        component={SettingsPage}
-                    />
-                </>
-            </Router>
-            <Console>
-                <LoggerConsole />
-            </Console>
+            <Sidebar>This is the sidebar</Sidebar>
+            <Main>This is main</Main>
+            <SidebarTitle text="This is the sidebar title" />
+            <Console>This is the console</Console>
         </Global>
     </Provider>
 );
