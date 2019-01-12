@@ -6,11 +6,14 @@
     "scripts": {
         "start": "webpack-dev-server --config ./config/webpack.dev.js --open",
         "build": "webpack --config ./config/webpack.prod.js",
-        "prod": "http-server ./build -o"
+        "prod": "http-server ./build -o",
+        "test": "jest",
+        "test:watch": "yarn test -- --watch"
     },
     "author": "Quentin Golsteyn",
     "license": "ISC",
     "devDependencies": {
+        "@types/jest": "23.3.12",
         "@types/lodash": "4.14.119",
         "@types/react": "16.7.17",
         "@types/react-custom-scrollbars": "4.0.5",
@@ -25,7 +28,9 @@
         "html-loader": "0.5.5",
         "html-webpack-plugin": "3.2.0",
         "http-server": "0.11.1",
+        "jest": "23.6.0",
         "style-loader": "0.23.1",
+        "ts-jest": "23.10.5",
         "ts-loader": "5.3.1",
         "tslint": "5.11.0",
         "typesafe-actions": "2.0.4",
