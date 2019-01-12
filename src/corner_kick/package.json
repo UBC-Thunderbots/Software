@@ -23,6 +23,7 @@
         "@types/roslib": "^0.18.3",
         "@types/storybook__react": "^4.0.0",
         "@types/styled-components": "^4.1.4",
+        "clean-webpack-plugin": "^1.0.0",
         "css-loader": "^2.0.0",
         "file-loader": "^2.0.0",
         "friendly-errors-webpack-plugin": "^1.7.0",
