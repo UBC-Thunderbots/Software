@@ -74,7 +74,7 @@ TEST(PrimitiveTest, convert_MovePrimitive_to_message_and_back_to_MovePrimitive)
     EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
-TEST(PrimitiveTest, creat_MoveSpinPrimitive_from_message_test)
+TEST(PrimitiveTest, convert_MoveSpinPrimitive_to_message_and_back_to_MoveSpinPrimitive)
 {
     const Point destination     = Point(-1, 4);
     const Angle angular_vel     = AngularVelocity::ofRadians(0.54);
@@ -85,19 +85,19 @@ TEST(PrimitiveTest, creat_MoveSpinPrimitive_from_message_test)
 
     thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
 
-    MoveSpinPrimitive new_prim = MoveSpinPrimitive(prim_message);
+    std::unique_ptr<Primitive> new_prim = Primitive::createPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameters();
+    std::vector<double> parameters = new_prim->getParameters();
 
-    EXPECT_EQ("MoveSpin Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
+    EXPECT_EQ("MoveSpin Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
     EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
     EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(angular_vel.toRadians(), parameters[2]);
-    EXPECT_EQ(movespin_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
-TEST(PrimitiveTest, creat_DirectWheelsPrimitive_from_message_test)
+TEST(PrimitiveTest, convert_DirectWheelsPrimitive_to_message_and_back_to_DirectWheelsPrimitive)
 {
     const signed int wheel0_power = 2;
     const signed int wheel1_power = 4;
@@ -111,18 +111,18 @@ TEST(PrimitiveTest, creat_DirectWheelsPrimitive_from_message_test)
 
     thunderbots_msgs::Primitive prim_message = directwheels_prim.createMsg();
 
-    DirectWheelsPrimitive new_prim = DirectWheelsPrimitive(prim_message);
+    std::unique_ptr<Primitive> new_prim = Primitive::createPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameters();
+    std::vector<double> parameters = new_prim->getParameters();
 
-    EXPECT_EQ("DirectWheels Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
+    EXPECT_EQ("DirectWheels Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
     EXPECT_DOUBLE_EQ(wheel0_power, parameters[0]);
     EXPECT_DOUBLE_EQ(wheel1_power, parameters[1]);
     EXPECT_DOUBLE_EQ(wheel2_power, parameters[2]);
     EXPECT_DOUBLE_EQ(wheel3_power, parameters[3]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[4]);
-    EXPECT_EQ(directwheels_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
 // Test that we can correctly translate a ChipPrimitive like:
