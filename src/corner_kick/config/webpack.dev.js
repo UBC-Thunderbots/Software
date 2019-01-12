@@ -8,7 +8,7 @@
 const webpackConfig = require('./webpack.base.config.js');
 
 module.exports = {
-    ...webpackConfig[0],
+    ...webpackConfig,
     mode: 'development',
 
     // We use source-maps to debug from our typescript files, rather than

@@ -59,33 +59,30 @@ const generalWebpackBuild = {
     },
 };
 
-module.exports = [
-    // Client build configuration
-    {
-        ...generalWebpackBuild,
-        // Our project entry point.
-        entry: path.resolve(__dirname, '../src/index.ts'),
+// Client build configuration
+module.exports = {
+    ...generalWebpackBuild,
+    // Our project entry point.
+    entry: path.resolve(__dirname, '../src/index.ts'),
 
-        // We generate a bundle in the build folder
-        output: {
-            path: path.resolve(__dirname, '../build'),
-            filename: '[name].[contenthash].js',
-        },
-
-        // This target allows us to access DOM libraries simultaneously
-        target: 'web',
-        // Our plugins go here.
-        plugins: [
-            // This plugins autogenerates our index.html files and links the javascript bundle.
-            new HtmlWebPackPlugin({
-                template: './src/index.html',
-                filename: './index.html',
-            }),
-            // This plugin simplifies the webpack output and provides easy to read suggestions
-            // when code does not compile.
-            new FriendlyErrorPlugin(),
-            new webpack.HashedModuleIdsPlugin(),
-        ],
+    // We generate a bundle in the build folder
+    output: {
+        path: path.resolve(__dirname, '../build'),
+        filename: '[name].[contenthash].js',
     },
-    generalWebpackBuild,
-];
+
+    // This target allows us to access DOM libraries simultaneously
+    target: 'web',
+    // Our plugins go here.
+    plugins: [
+        // This plugins autogenerates our index.html files and links the javascript bundle.
+        new HtmlWebPackPlugin({
+            template: './src/index.html',
+            filename: './index.html',
+        }),
+        // This plugin simplifies the webpack output and provides easy to read suggestions
+        // when code does not compile.
+        new FriendlyErrorPlugin(),
+        new webpack.HashedModuleIdsPlugin(),
+    ],
+};

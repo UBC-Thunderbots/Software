@@ -11,7 +11,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpackConfig = require('./webpack.base.config.js');
 
 module.exports = {
-    ...webpackConfig[0],
+    ...webpackConfig,
     mode: 'production',
     devtool: false,
     // Move node-modules to a separate individual bundles
@@ -46,7 +46,7 @@ module.exports = {
         maxAssetSize: 512000,
     },
     plugins: [
-        ...webpackConfig[0].plugins,
+        ...webpackConfig.plugins,
         // Removes the build folder
         new CleanWebpackPlugin(path.resolve(__dirname, '../build'), {
             allowExternal: true,

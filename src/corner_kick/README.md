@@ -36,18 +36,16 @@ The project is defined as follow:
 -   `config` - contains webpack (build tool) configuration files
 -   `launch` - contains roslaunch file
 -   `src`
-    -   `main` - contains code for the main process
-    -   `renderer` - contains code for the rendering process
-        -   `components`
-            -   `containers` - contains React stateful components
-            -   `ui` - contains repeatable UI components
-        -   `modules` - contains high-level UI components (logger, visualizer, etc.)
-    -   `shared` - contains code shared by the two process
-        -   `ros` - contains the service communicating with ROS
-            -   `types` - contains ROS message type schema
+    -   `assets` - contains image assets
+    -   `components` - contains repeatable UI components
+    -   `containers` - contains high-level UI components (logger, visualizer, etc.)
+    -   `constants` - contains fixed values used throughout the application
+    -   `store` - contains logic for the application Redux state
+    -   `types` - contains all Typescript types
+    -   `utils` - contains misc code
 -   `.prettierrc` - configuration for autoformating tool
 -   `CMakeLists.txt` - cmake build script
--   `module.d.ts` - definition file for non-typescript libraries
+-   `common.d.ts` - definition file for file assets
 -   `package.json` - specifies dependencies, dev and build scripts.
 -   `package.xml` - specifies ros dependencies
 -   `tsconfig.json` - configuration file for typescript compiler
