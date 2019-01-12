@@ -212,6 +212,17 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(grsim_backend_test
             ${PROTO_SRCS}
             test/grsim_backend/grsim_backend.cpp
+            robot_communication/grsim/motion_controller.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
             robot_communication/grsim/grsim_backend.cpp
             robot_communication/grsim/grsim_backend.h
             robot_communication/backend.h
@@ -273,6 +284,15 @@ if (CATKIN_ENABLE_TESTING)
             geom/angle.h)
 
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(motion_controller_test
+            test/grsim_backend/motion_controller.cpp
+            robot_communication/grsim/motion_controller.cpp
+            ai/world/robot.cpp
+            geom/point.h
+            geom/angle.h)
+
+    target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(world_test
             test/world/world.cpp
