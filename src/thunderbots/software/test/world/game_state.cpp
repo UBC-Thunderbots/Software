@@ -38,7 +38,34 @@ INSTANTIATE_TEST_CASE_P(
     All, GameStateTransitionTest,
     ::testing::Values(
         STATE_TRANSITION_PARAMS(HALT, STOP, STOP, false, NONE),
+        // transitions to HALT
         STATE_TRANSITION_PARAMS(STOP, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_KICKOFF_US, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_KICKOFF_THEM, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_PENALTY_US, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_PENALTY_THEM, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(DIRECT_FREE_US, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(DIRECT_FREE_THEM, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(TIMEOUT_US, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(TIMEOUT_THEM, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(GOAL_US, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(GOAL_THEM, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(BALL_PLACEMENT_US, HALT, HALT, false, NONE),
+        STATE_TRANSITION_PARAMS(BALL_PLACEMENT_THEM, HALT, HALT, false, NONE),
+        // transitions to STOP
+        STATE_TRANSITION_PARAMS(PREPARE_KICKOFF_US, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_KICKOFF_THEM, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_PENALTY_US, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(PREPARE_PENALTY_THEM, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(DIRECT_FREE_US, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(DIRECT_FREE_THEM, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(TIMEOUT_US, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(TIMEOUT_THEM, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(GOAL_US, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(GOAL_THEM, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(BALL_PLACEMENT_US, STOP, STOP, false, NONE),
+        STATE_TRANSITION_PARAMS(BALL_PLACEMENT_THEM, STOP, STOP, false, NONE),
+        // transitions from STOP to a restart state
         STATE_TRANSITION_PARAMS(STOP, PREPARE_KICKOFF_US, PREPARE_KICKOFF_US, true,
                                 KICKOFF),
         STATE_TRANSITION_PARAMS(STOP, PREPARE_KICKOFF_THEM, PREPARE_KICKOFF_THEM, false,
@@ -76,8 +103,12 @@ INSTANTIATE_TEST_CASE_P(
                                 INDIRECT),
         STATE_TRANSITION_PARAMS(INDIRECT_FREE_THEM, NORMAL_START, NORMAL_START, false,
                                 INDIRECT),
+        // transitions to a GOAL state
         STATE_TRANSITION_PARAMS(NORMAL_START, GOAL_US, GOAL_US, false, NONE),
-        STATE_TRANSITION_PARAMS(NORMAL_START, GOAL_THEM, GOAL_THEM, false, NONE)));
+        STATE_TRANSITION_PARAMS(NORMAL_START, GOAL_THEM, GOAL_THEM, false, NONE),
+        // transition to FORCE_START
+        STATE_TRANSITION_PARAMS(NORMAL_START, FORCE_START, FORCE_START, false, NONE)
+        ));
 
 class GameStatePredicateTest : public ::testing::Test
 {
@@ -97,21 +128,25 @@ class GameStatePredicateTest : public ::testing::Test
         {                                                                                \
             GameState game_state;                                                        \
             game_state.updateRefboxGameState(refbox_game_state);                         \
-            std::cout << "Testing predicate " << #predicate << " with state "            \
-                      << refbox_game_state << std::endl;                                 \
             if (true_states.find(refbox_game_state) != true_states.end())                \
             {                                                                            \
-                EXPECT_TRUE(game_state.predicate());                                     \
+                EXPECT_TRUE(game_state.predicate()) << "Expected " << #predicate         \
+                << " to be true for state " << refbox_game_state << std::endl;           \
             }                                                                            \
             else                                                                         \
             {                                                                            \
-                EXPECT_FALSE(game_state.predicate());                                    \
+                EXPECT_FALSE(game_state.predicate()) << "Expected " << #predicate        \
+                << " to be false for state " << refbox_game_state << std::endl;          \
             }                                                                            \
         }                                                                                \
     }
 
 PREDICATE_TEST(isHalted, RefboxGameState::HALT, RefboxGameState::TIMEOUT_US,
                RefboxGameState::TIMEOUT_THEM)
+PREDICATE_TEST(isStopped, RefboxGameState::STOP)
+PREDICATE_TEST(isPlaying, RefboxGameState::NORMAL_START, RefboxGameState::FORCE_START)
+
+
 
 // testing state transitions
 // parameterize over a tuple of start state, update state, end state, our_restart,
