@@ -149,6 +149,27 @@ target_link_libraries(grsim_communication ${catkin_LIBRARIES}
         ${G3LOG}
         )
 
+file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
+        )
+add_executable (radio_communication
+        ${RADIO_COMMUNICATION_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
+target_link_libraries(radio_communication ${catkin_LIBRARIES}
+        ${G3LOG}
+        )
+
 
 #############
 ## Testing ##
