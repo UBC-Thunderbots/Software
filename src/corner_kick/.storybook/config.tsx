@@ -1,5 +1,6 @@
 /**
  * File used to configure Storybook, a UI development tool.
+ * @see https://github.com/storybooks/storybook
  */
 
 import { addDecorator, configure } from '@storybook/react';

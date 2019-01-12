@@ -1,6 +1,6 @@
 /**
  * This file defines the main styling of the application and connects the
- * color theme to styled-components
+ * theme to all styled-components instances
  */
 
 import * as React from 'react';

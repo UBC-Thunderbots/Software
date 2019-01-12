@@ -80,6 +80,8 @@ module.exports = [
                 template: './src/index.html',
                 filename: './index.html',
             }),
+            // This plugin simplifies the webpack output and provides easy to read suggestions
+            // when code does not compile.
             new FriendlyErrorPlugin(),
         ],
     },

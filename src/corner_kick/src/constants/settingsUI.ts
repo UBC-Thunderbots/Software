@@ -33,10 +33,6 @@ export const settingsUI: ISettingsCategory[] = [
                 type: 'hex',
             },
             {
-                id: '',
-                type: 'spacer',
-            },
-            {
                 id: 'colors_selection',
                 title: 'Selection Color',
                 description: 'Color used for selected background',
@@ -59,10 +55,6 @@ export const settingsUI: ISettingsCategory[] = [
                 title: 'Border Color',
                 description: 'Color used for the border between application panels',
                 type: 'hex',
-            },
-            {
-                id: '',
-                type: 'spacer',
             },
             {
                 id: 'colors_success',
@@ -93,10 +85,6 @@ export const settingsUI: ISettingsCategory[] = [
                 title: 'Debug Color',
                 description: 'Color used for debug states',
                 type: 'hex',
-            },
-            {
-                id: '',
-                type: 'spacer',
             },
             {
                 id: 'colors_red',

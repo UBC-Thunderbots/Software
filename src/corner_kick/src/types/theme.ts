@@ -1,7 +1,18 @@
+/**
+ * This file defines the type of the application theme object
+ * @see https://www.styled-components.com/docs/advanced#theming
+ */
+
+/**
+ * The application theme
+ */
 export interface IThemeProvider {
     colors: IColorProvider;
 }
 
+/**
+ * The color available in the application
+ */
 interface IColorProvider {
     fg: string;
     bg: string;

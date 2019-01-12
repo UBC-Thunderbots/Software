@@ -1,5 +1,11 @@
+/**
+ * This file defines the available type ids for application settings
+ */
+
+/**
+ * Available application setting ids
+ */
 export type Setting =
-    | ''
     | 'colors_fg'
     | 'colors_bg'
     | 'colors_accent'

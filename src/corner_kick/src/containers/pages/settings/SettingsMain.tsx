@@ -7,8 +7,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 
-import { EditText } from 'SRC/components/forms/EditText';
-import { Spacer } from 'SRC/components/forms/Spacer';
+import { EditText } from 'SRC/components/ui/EditText';
 import { actions, RootAction } from 'SRC/store';
 import { IRootState, ISettingsCategory, ISettingsState } from 'SRC/types';
 
@@ -40,29 +39,16 @@ class SettingsMainInternal extends React.Component<ISettingsMainProps> {
         return (
             <SettingsCategory>
                 <SettingsHeading text={category.title} />
-                {category.settings.map((entry) => {
-                    switch (entry.type) {
-                        case 'spacer':
-                            return <Spacer />;
-                        case 'text':
-                        case 'hex':
-                            return (
-                                <SettingsEntry
-                                    title={entry.title}
-                                    description={entry.description}
-                                >
-                                    <EditText
-                                        value={this.props.settings[entry.id]}
-                                        onChange={(event) => {
-                                            this.props.set(entry.id, event.target.value);
-                                        }}
-                                    />
-                                </SettingsEntry>
-                            );
-                        default:
-                            return null;
-                    }
-                })}
+                {category.settings.map((entry) => (
+                    <SettingsEntry title={entry.title} description={entry.description}>
+                        <EditText
+                            value={this.props.settings[entry.id]}
+                            onChange={(event) => {
+                                this.props.set(entry.id, event.target.value);
+                            }}
+                        />
+                    </SettingsEntry>
+                ))}
             </SettingsCategory>
         );
     }

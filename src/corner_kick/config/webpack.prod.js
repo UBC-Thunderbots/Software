@@ -7,10 +7,7 @@
 
 const webpackConfig = require('./webpack.base.config.js');
 
-module.exports = [
-    // Client build configuration
-    {
-        ...webpackConfig[0],
-        mode: 'production',
-    },
-];
+module.exports = {
+    ...webpackConfig[0],
+    mode: 'production',
+};

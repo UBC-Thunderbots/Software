@@ -1,3 +1,7 @@
+/**
+ * This file specifies the theme typing for the style-component library
+ * @see https://www.styled-components.com/docs/api#typescript
+ */
 import * as styledComponents from 'styled-components';
 import { ThemedStyledComponentsModule } from 'styled-components';
 

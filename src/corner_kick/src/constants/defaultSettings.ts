@@ -9,7 +9,6 @@ import { ISettingsState } from 'SRC/types';
  * Object defining all the default parameters of the application
  */
 export const defaultSettings: ISettingsState = {
-    ['']: '',
     // Default settings for the color scheme
     colors_fg: '#B3B1AD',
     colors_bg: '#0A0E14',

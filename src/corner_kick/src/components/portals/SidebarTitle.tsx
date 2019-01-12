@@ -32,7 +32,6 @@ interface ISidebarTitle {
 
 /**
  * Displays a sidebar title in the correct area of the application
- * @param props the props for this React element
  */
 export const SidebarTitle = (props: ISidebarTitle) => {
     /*
