@@ -13,6 +13,9 @@ This file outlines a list of common things that should be addressed when opening
 ### Resolved Issues
 *Link any issues that this PR resolved. Eg `resolves #1, #2, and #5` (note that they MUST be specified like this so Github can automatically close them then this PR merges)*
 
+### Length Justification
+<!-- If this pull request is longer then **500** lines (additions + deletions), please justify here why we *cannot* break this up into multiple pull requests. -->
+
 ### Review Checklist
 *(Please check every item to indicate your code complies with it (by changing `[ ]`->`[x]`). This will hopefully save both you and the reviewer(s) a lot of time!)*
 ***It is the reviewers responsibility to also make sure every item here has been covered***

@@ -60,18 +60,25 @@ class GrSimBackend : public Backend
                                    double kick_speed_meters_per_second, bool chip,
                                    bool dribbler_on) const;
 
-
-    // TODO: Implement grSim bang bang controller
-    // https://github.com/UBC-Thunderbots/Software/issues/16
+    /**
+     * Helper function that updates the backend friendly team object
+     * @param new_friendly_team The updated instance of the friendly team
+     */
+    void updateBackendTeam(const Team& new_friendly_team)
+    {
+        team = new_friendly_team;
+    }
 
    private:
+    // construct default team
+    Team team = Team(std::chrono::milliseconds(1000));
+
     /**
      * Sends a grSim packet to grSim via UDP
      *
      * @param packet the grSim packet to send
      */
     void sendGrSimPacket(const grSim_Packet& packet);
-
 
     // Variables for networking
     std::string network_address;
