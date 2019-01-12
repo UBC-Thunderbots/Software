@@ -4,6 +4,7 @@
  */
 
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const FriendlyErrorPlugin = require('friendly-errors-webpack-plugin');
 
@@ -68,7 +69,7 @@ module.exports = [
         // We generate a bundle in the build folder
         output: {
             path: path.resolve(__dirname, '../build'),
-            filename: 'client.js',
+            filename: '[name].[contenthash].js',
         },
 
         // This target allows us to access DOM libraries simultaneously
@@ -83,6 +84,7 @@ module.exports = [
             // This plugin simplifies the webpack output and provides easy to read suggestions
             // when code does not compile.
             new FriendlyErrorPlugin(),
+            new webpack.HashedModuleIdsPlugin(),
         ],
     },
     generalWebpackBuild,
