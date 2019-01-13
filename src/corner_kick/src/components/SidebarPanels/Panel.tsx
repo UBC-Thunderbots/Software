@@ -6,6 +6,8 @@ const Wrapper = styled.div`
     width: 100%;
     border-bottom: 1px solid ${(props) => props.theme.colors.border};
 
+    flex-basis: 0;
+
     transition: 0.2s all;
 
     &.active {
