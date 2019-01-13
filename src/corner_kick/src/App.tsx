@@ -1,22 +1,18 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
-import { Console } from './components/portals/Console';
-import { Main } from './components/portals/Main';
-import { Sidebar } from './components/portals/Sidebar';
-import { SidebarTitle } from './components/portals/SidebarTitle';
-import { Global } from './containers/mainUI/Global';
+import { Visualizer } from 'SRC/scenes/visualizer';
+
+import { Global } from './components/Global';
 import { createStore } from './store';
 
 const store = createStore();
 
+// TODO: Add page navigation logic. See issue #216.
 export const App = () => (
     <Provider store={store}>
         <Global>
-            <Sidebar>This is the sidebar</Sidebar>
-            <Main>This is main</Main>
-            <SidebarTitle text="This is the sidebar title" />
-            <Console>This is the console</Console>
+            <Visualizer />
         </Global>
     </Provider>
 );

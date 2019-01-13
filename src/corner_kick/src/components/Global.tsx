@@ -6,7 +6,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 
-import { Logo } from 'SRC/components/portals/Logo';
 import { IRootState } from 'SRC/types';
 
 import { Theme } from './Theme';
@@ -21,12 +20,7 @@ interface IGlobalProps {
 
 class GlobalInternal extends React.Component<IGlobalProps> {
     public render() {
-        return (
-            <Theme>
-                <Logo />
-                {this.props.children}
-            </Theme>
-        );
+        return <Theme>{this.props.children}</Theme>;
     }
 }
 
