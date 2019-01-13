@@ -5,6 +5,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
+import './style.css';
+
 import { App } from './App';
 
 // Mount the React component App to the div `#react`
