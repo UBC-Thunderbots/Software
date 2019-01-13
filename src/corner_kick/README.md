@@ -4,7 +4,7 @@
   <h1 align="center">Corner Kick</h1>
 </p>
 
-Corner Kick is a web app that allows for the visualization of UBC Thunderbots' simulator.
+Corner Kick is a web app that allows for the visualization of UBC Thunderbots' AI.
 
 ![application screenshot](screenshot.png)
 

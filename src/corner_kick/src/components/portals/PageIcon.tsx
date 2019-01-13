@@ -40,7 +40,7 @@ const Icon = styled.i`
     }
 `;
 
-interface IFooterItemProps {
+interface IPageIconProps {
     /** Indicate if the page is currently active */
     active: boolean;
 
@@ -55,7 +55,7 @@ interface IFooterItemProps {
  * Displays an icon for a specific page of the application
  * @param props the props for this React component
  */
-export const PageIcon = (props: IFooterItemProps) => {
+export const PageIcon = (props: IPageIconProps) => {
     /*
      * Here, we define the layout of the page icon and add it to the sidebar control
      * area of the application.
