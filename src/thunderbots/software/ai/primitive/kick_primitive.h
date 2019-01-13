@@ -58,9 +58,20 @@ class KickPrimitive : public Primitive
      */
     double getKickSpeed() const;
 
-    std::vector<double> getParameterArray() const override;
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form: {kick_origin.x(), kick_origin.y(),
+     *                      kick_direction.toRadians(), kick_speed_meters_per_second};
+     */
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
+    std::vector<bool> getExtraBits() const override;
 
    private:
     unsigned int robot_id;

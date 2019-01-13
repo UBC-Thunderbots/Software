@@ -36,7 +36,7 @@ TEST(MoveSpinPrimTest, parameter_array_test)
     MoveSpinPrimitive movespin_prim =
         MoveSpinPrimitive(robot_id, destination, angular_vel);
 
-    std::vector<double> param_array = movespin_prim.getParameterArray();
+    std::vector<double> param_array = movespin_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(destination.x(), param_array[0]);
     EXPECT_DOUBLE_EQ(destination.y(), param_array[1]);
@@ -66,7 +66,7 @@ TEST(MoveSpinPrimTest, get_extra_bit_array_test)
 {
     MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
 
-    std::vector<bool> extra_bit_array = movespin_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = movespin_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -84,14 +84,14 @@ TEST(MoveSpinPrimTest, create_primitive_from_message_test)
 
     MoveSpinPrimitive new_prim = MoveSpinPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("MoveSpin Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
     EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
     EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(angular_vel.toRadians(), parameters[2]);
-    EXPECT_EQ(movespin_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(movespin_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)
