@@ -57,12 +57,18 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         message_generation
         thunderbots_msgs
+        dynamic_reconfigure
         )
+
+## Specify the configuration file for dynamic_reconfigure pkg
+generate_dynamic_reconfigure_options(
+    ${CMAKE_CURRENT_SOURCE_DIR}/param_server/cfg/Params.cfg
+)
 
 catkin_package(
         INCLUDE_DIRS
         LIBRARIES thunderbots
-        CATKIN_DEPENDS roscpp std_msgs
+        CATKIN_DEPENDS roscpp std_msgs dynamic_reconfigure
         DEPENDS message_runtime
         )
 
@@ -71,6 +77,10 @@ catkin_package(
 ###########
 
 # Specify additional locations of header files
+include_directories(SYSTEM
+	${catkin_INCLUDE_DIRS}
+	)
+
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
@@ -148,7 +158,23 @@ target_link_libraries(robot_communication ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         )
-
+file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
+        )
+add_executable (parameters
+        ${PROTO_SRCS}
+        ${PARAM_SERVER_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(parameters thunderbots_gencfg ${catkin_EXPORTED_TARGETS})
+target_link_libraries(parameters  ${catkin_LIBRARIES}
+        ${PROTOBUF_LIBRARIES}
+        )
 
 #############
 ## Testing ##
@@ -291,6 +317,7 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
 
+
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
@@ -404,5 +431,12 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/rostest_util_test.cpp
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
+
+     # The test node that verifies the dynamic_parameters are working
+    add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
+            test/util/test_dynamic_parameters.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+    target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
 endif()
