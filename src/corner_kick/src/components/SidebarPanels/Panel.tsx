@@ -46,10 +46,15 @@ const PanelTitle = styled.div`
     .inactive & .material-icons {
         transform: rotate(-90deg);
     }
+
+    .disabled & {
+        cursor: not-allowed;
+    }
 `;
 
 interface IPanelProps {
     title: string;
+    disabled?: boolean;
 }
 
 export class Panel extends React.Component<IPanelProps> {
@@ -58,22 +63,30 @@ export class Panel extends React.Component<IPanelProps> {
     };
 
     public render() {
-        const { children, title } = this.props;
+        const { children, disabled, title } = this.props;
         const { active } = this.state;
 
         return (
-            <Wrapper className={active ? 'active' : 'inactive'}>
+            <Wrapper
+                className={
+                    (active && !disabled ? 'active' : 'inactive') +
+                    (disabled ? ' disabled' : '')
+                }
+            >
                 <PanelTitle onClick={this.onTitleClick}>
                     <i className="material-icons">arrow_drop_down</i>
                     {title}
                 </PanelTitle>
-                {active ? children : null}
+                {active && !disabled ? children : null}
             </Wrapper>
         );
     }
 
     private onTitleClick = () => {
+        const { disabled } = this.props;
         const { active } = this.state;
-        this.setState({ active: !active });
+        if (!disabled) {
+            this.setState({ active: !active });
+        }
     };
 }

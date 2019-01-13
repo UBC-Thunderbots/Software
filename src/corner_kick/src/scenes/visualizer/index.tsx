@@ -9,8 +9,8 @@ export class Visualizer extends React.Component {
             <>
                 <SidebarPanels>
                     <Panel title="Layers">This is layers</Panel>
-                    <Panel title="AI Controls">This is ai controls</Panel>
-                    <Panel title="Game Status">This is game status</Panel>
+                    <Panel title="AI Controls" disabled={true} />
+                    <Panel title="Game Status" disabled={true} />
                 </SidebarPanels>
                 <Portal to="main">This is the visualizer</Portal>
             </>
