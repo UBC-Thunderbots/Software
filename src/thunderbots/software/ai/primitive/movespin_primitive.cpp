@@ -39,14 +39,14 @@ AngularVelocity MoveSpinPrimitive::getAngularVelocity() const
     return angular_vel;
 }
 
-std::vector<double> MoveSpinPrimitive::getParameterArray() const
+std::vector<double> MoveSpinPrimitive::getParameters() const
 {
     std::vector<double> parameters = {dest.x(), dest.y(), angular_vel.toRadians()};
 
     return parameters;
 }
 
-std::vector<bool> MoveSpinPrimitive::getExtraBitArray() const
+std::vector<bool> MoveSpinPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }
