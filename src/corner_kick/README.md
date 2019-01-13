@@ -16,6 +16,7 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' s
 - [Project Structure](#project-structure)
 - [Design notes](#design-notes)
   - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
+  - [Approach to the application state](#approach-to-the-application-state)
 
 ## How to use
 
@@ -78,6 +79,7 @@ be divided into sections as follow:
 -   **Sidebar title:** Contains the page title and additional options specific to the page
 -   **Sidebar:** Contains additional controls or information relevant to the current page
 -   **Sidebar control:** Contains navigation controls to switch between pages
+-   **Console:** Contains views visible across the application
 -   **Footer:** Contains simple breadcrumbs of information relevant to the application as a whole or to the current page
 
 The application's primary layout is defined in [index.html](src/index.html) and styling is
@@ -86,3 +88,21 @@ provided by [style.css](src/style.css).
 Access to those section in the React application is done via [React Portals](https://reactjs.org/docs/portals.html).
 Portals are used to ensure the application layout is enforced throughout all the pages while offering an
 easy way to access them.
+
+In essence then, the sections of the application are boxes where the React application can insert React components into.
+This allows us to insert and swap UI elements in the application without worrying about the global layout.
+
+### Approach to the application state
+
+We are using [Redux](https://redux.js.org/) to manage the application state. Simply put, in Redux, the state is an
+immutable object. It can only be replaced by a new version of itself when some sort of action occurs in the application.
+This action is captured by a reducer function, which accepts the current state and the action, and returns a new state,
+with potentially new values based on the action received.
+
+React, then, becomes an extension of the global Redux state and does not contain state of its own. When the global state
+changes, the React UI will automagically change to adapt to the new state.
+
+Reducer functions do not permit for any side-effects to ensure a deterministic behaviour. For a state and action, the same new
+state should be returned by the reducer funtion. This, however, does not permit for more complex logic, such as communicating
+with ROS, to occur. To allow for this, we introduce sagas, which can intercept and act on Redux action. They can conduct some
+business logic work, and reflect the result of this work in the state by emmiting a Redux action when needed.
