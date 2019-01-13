@@ -231,6 +231,132 @@ TEST_F(GameStateRestartTest, kickoff_us_restart_test)
     EXPECT_FALSE(game_state.isKickoff());
 }
 
+TEST_F(GameStateRestartTest, kickoff_them_restart_test)
+{
+    GameState game_state;
+
+    RefboxGameState restart_type = RefboxGameState::PREPARE_KICKOFF_THEM;
+
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isKickoff());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isTheirKickoff());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isKickoff());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isTheirKickoff());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isKickoff());
+}
+
+TEST_F(GameStateRestartTest, penalty_us_restart_test)
+{
+    GameState game_state;
+
+    RefboxGameState restart_type = RefboxGameState::PREPARE_PENALTY_US;
+
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isPenalty());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurPenalty());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isPenalty());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurPenalty());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isPenalty());
+}
+
+TEST_F(GameStateRestartTest, penalty_them_restart_test)
+{
+    GameState game_state;
+
+    RefboxGameState restart_type = RefboxGameState::PREPARE_PENALTY_THEM;
+
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isPenalty());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isTheirPenalty());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isPenalty());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isTheirPenalty());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isPenalty());
+}
+TEST_F(GameStateRestartTest, direct_free_us_restart_test)
+{
+    GameState game_state;
+
+    RefboxGameState restart_type = RefboxGameState::DIRECT_FREE_US;
+
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isDirectFree());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurDirect());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isDirectFree());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurDirect());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isDirectFree());
+}
 
 int main(int argc, char **argv)
 {
