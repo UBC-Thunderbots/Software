@@ -1,4 +1,8 @@
-# Corner Kick
+<p align="center">
+  <img src="./src/assets/logo.svg" width="64px">
+  <br>
+  <h1 align="center">Corner Kick</h1>
+</p>
 
 Corner Kick is an Electron app that allows for the visualization of UBC Thunderbots' simulator.
 
