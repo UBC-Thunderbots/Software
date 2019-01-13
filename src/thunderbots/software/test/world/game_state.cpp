@@ -192,16 +192,44 @@ PREDICATE_TEST(isReadyState, RefboxGameState::NORMAL_START)
 // canKick needs to be tested with a proper restart sequence
 PREDICATE_TEST(canKick, RefboxGameState::FORCE_START)
 PREDICATE_TEST(stayOnSide, RefboxGameState::PREPARE_KICKOFF_THEM)
-PREDICATE_TEST(stayBehindPenaltyLine, RefboxGameState::PREPARE_PENALTY_THEM)
+PREDICATE_TEST(stayBehindPenaltyLine, RefboxGameState::PREPARE_PENALTY_THEM,
+               RefboxGameState::PREPARE_PENALTY_US)
 
+class GameStateRestartTest : public ::testing::Test
+{
+};
 
+TEST_F(GameStateRestartTest, kickoff_us_restart_test)
+{
+    GameState game_state;
 
-// testing state transitions
-// parameterize over a tuple of start state, update state, end state, our_restart,
-// restart_reason? test for end state and restart reason
+    RefboxGameState restart_type = RefboxGameState::PREPARE_KICKOFF_US;
 
-// paramaterized test over refboxgamestates
-// test all predicates
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isKickoff());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurKickoff());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isKickoff());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurKickoff());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isKickoff());
+}
 
 
 int main(int argc, char **argv)

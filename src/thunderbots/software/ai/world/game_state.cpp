@@ -139,7 +139,7 @@ bool GameState::stayAwayFromBall() const
 // Our robots must stay on our half of the field
 bool GameState::stayOnSide() const
 {
-    return isSetupRestart() && restart_reason == KICKOFF;
+    return isSetupRestart() && restart_reason == KICKOFF && !our_restart;
 }
 
 // Our robots (except the penalty kicker) must stay a set distance behind the penalty line
