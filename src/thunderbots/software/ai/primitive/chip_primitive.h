@@ -36,6 +36,8 @@ class ChipPrimitive : public Primitive
 
     std::string getPrimitiveName() const override;
 
+    PrimitiveType getPrimitiveType() const override;
+
     unsigned int getRobotId() const override;
     /**
      * Gets the location of where the chip will be taken

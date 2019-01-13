@@ -28,6 +28,11 @@ std::string PivotPrimitive::getPrimitiveName() const
     return PRIMITIVE_NAME;
 }
 
+PrimitiveType PivotPrimitive::getPrimitiveType() const
+{
+    return PrimitiveType::PIVOT;
+}
+
 unsigned int PivotPrimitive::getRobotId() const
 {
     return robot_id;

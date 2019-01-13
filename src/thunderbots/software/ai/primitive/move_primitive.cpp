@@ -31,6 +31,11 @@ unsigned int MovePrimitive::getRobotId() const
     return robot_id;
 }
 
+PrimitiveType MovePrimitive::getPrimitiveType() const
+{
+    return PrimitiveType::MOVE;
+}
+
 Point MovePrimitive::getDestination() const
 {
     return dest;
@@ -56,5 +61,5 @@ std::vector<double> MovePrimitive::getParameters() const
 
 std::vector<bool> MovePrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return std::vector<bool>(false);
 }

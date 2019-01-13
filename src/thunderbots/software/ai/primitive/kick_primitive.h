@@ -36,6 +36,8 @@ class KickPrimitive : public Primitive
 
     std::string getPrimitiveName() const override;
 
+    PrimitiveType getPrimitiveType() const override;
+
     unsigned int getRobotId() const override;
     /**
      * Gets the location of where the kick will be taken

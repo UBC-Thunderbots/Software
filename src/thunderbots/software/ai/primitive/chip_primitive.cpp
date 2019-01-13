@@ -29,6 +29,12 @@ std::string ChipPrimitive::getPrimitiveName() const
     return PRIMITIVE_NAME;
 }
 
+PrimitiveType ChipPrimitive::getPrimitiveType() const
+{
+    // In firmware, kick and chip are the same primitive.
+    return PrimitiveType::SHOOT;
+}
+
 unsigned int ChipPrimitive::getRobotId() const
 {
     return robot_id;

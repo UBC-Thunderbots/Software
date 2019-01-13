@@ -35,6 +35,8 @@ class DirectVelocityPrimitive : public Primitive
 
     std::string getPrimitiveName() const override;
 
+    PrimitiveType getPrimitiveType() const override;
+
     unsigned int getRobotId() const override;
 
     double getXVelocity() const;

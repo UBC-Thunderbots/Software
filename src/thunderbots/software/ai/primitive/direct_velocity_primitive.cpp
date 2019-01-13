@@ -35,6 +35,11 @@ std::string DirectVelocityPrimitive::getPrimitiveName() const
     return PRIMITIVE_NAME;
 }
 
+PrimitiveType DirectVelocityPrimitive::getPrimitiveType() const
+{
+    return PrimitiveType::DIRECT_VELOCITY;
+}
+
 unsigned int DirectVelocityPrimitive::getRobotId() const
 {
     return robot_id;
