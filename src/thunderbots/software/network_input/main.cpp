@@ -2,15 +2,15 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 
-#include "backend_input/backend.h"
-#include "backend_input/networking/ssl_vision_client.h"
 #include "geom/point.h"
+#include "network_input/backend.h"
+#include "network_input/networking/ssl_vision_client.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 #include "util/timestamp.h"
-
 
 int main(int argc, char** argv)
 {
@@ -37,20 +37,22 @@ int main(int argc, char** argv)
     Backend backend = Backend();
 
     // Init ROS node
-    ros::init(argc, argv, "backend_input");
+    ros::init(argc, argv, "network_input");
     ros::NodeHandle node_handle;
 
     // Create publishers
     ros::Publisher ball_publisher = node_handle.advertise<thunderbots_msgs::Ball>(
-        Util::Constants::BACKEND_INPUT_BALL_TOPIC, 1);
+        Util::Constants::NETWORK_INPUT_BALL_TOPIC, 1);
     ros::Publisher field_publisher = node_handle.advertise<thunderbots_msgs::Field>(
-        Util::Constants::BACKEND_INPUT_FIELD_TOPIC, 1);
+        Util::Constants::NETWORK_INPUT_FIELD_TOPIC, 1);
     ros::Publisher friendly_team_publisher =
         node_handle.advertise<thunderbots_msgs::Team>(
-            Util::Constants::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1);
+            Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
-        Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1);
+        Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1);
 
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger();
 
     // Main loop
     while (ros::ok())
@@ -70,21 +72,21 @@ int main(int argc, char** argv)
             }
 
             std::optional<thunderbots_msgs::Ball> ball_msg =
-                backend.getFilteredBallMsg(ssl_vision_packet, timestamp);
+                backend.getFilteredBallMsg(ssl_vision_packet);
             if (ball_msg)
             {
                 ball_publisher.publish(*ball_msg);
             }
 
             std::optional<thunderbots_msgs::Team> friendly_team_msg =
-                backend.getFilteredFriendlyTeamMsg(ssl_vision_packet, timestamp);
+                backend.getFilteredFriendlyTeamMsg(ssl_vision_packet);
             if (friendly_team_msg)
             {
                 friendly_team_publisher.publish(*friendly_team_msg);
             }
 
             std::optional<thunderbots_msgs::Team> enemy_team_msg =
-                backend.getFilteredEnemyTeamMsg(ssl_vision_packet, timestamp);
+                backend.getFilteredEnemyTeamMsg(ssl_vision_packet);
             if (enemy_team_msg)
             {
                 enemy_team_publisher.publish(*enemy_team_msg);

@@ -11,7 +11,7 @@ class Backend
      * @param primitives the list of primitives to send
      */
     virtual void sendPrimitives(
-        const std::vector<std::unique_ptr<Primitive>> &primitives) = 0;
+        const std::vector<std::unique_ptr<Primitive>>& primitives) = 0;
 
     virtual ~Backend() = default;
 };

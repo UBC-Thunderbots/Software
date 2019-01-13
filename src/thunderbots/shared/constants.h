@@ -12,13 +12,17 @@ const double ROBOT_MAX_RADIUS = 0.09;
 // The approximate radius of the ball according to the SSL rulebook
 const double BALL_MAX_RADIUS = 0.0215;
 
+// TODO: Determine a more realistic value. See Issue #178.
 /* Robot Attributes */
 // The maximum speed achievable by our robots, in metres per second.
-// TODO: Determine a more realistic value
 const double ROBOT_MAX_SPEED = 2.0;
+// The maximum angular speed achievable by our robots, in rad/sec
+const double ROBOT_MAX_ANG_SPEED = 4.0;
 // The maximum acceleration achievable by our robots, in metres per seconds squared.
-// TODO: Determine a more realistic value
 const double ROBOT_MAX_ACCELERATION = 3.0;
+// The maximum angular acceleration achievable by our robots, in radians per second
+// squared
+const double ROBOT_MAX_ANG_ACCELERATION = 6.0;
 
 /* Unit Conversion */
 const double MILLIMETERS_PER_METER = 1000.0;
