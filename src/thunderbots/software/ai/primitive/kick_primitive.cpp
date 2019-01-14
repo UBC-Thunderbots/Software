@@ -59,7 +59,7 @@ std::vector<double> KickPrimitive::getParameters() const
     return parameters;
 }
 
-std::vector<bool> KickPrimitive::getExtraBits() const
+uint8_t KickPrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return 0;
 }

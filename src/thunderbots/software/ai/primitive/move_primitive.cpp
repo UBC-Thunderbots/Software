@@ -54,7 +54,7 @@ std::vector<double> MovePrimitive::getParameters() const
     return parameters;
 }
 
-std::vector<bool> MovePrimitive::getExtraBits() const
+uint8_t MovePrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return 0;
 }

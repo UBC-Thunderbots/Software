@@ -4,10 +4,10 @@ const std::string ChipPrimitive::PRIMITIVE_NAME = "Chip Primitive";
 
 ChipPrimitive::ChipPrimitive(unsigned int robot_id, const Point &chip_origin,
                              const Angle &chip_direction, double chip_distance_meters)
-    : robot_id(robot_id),
-      chip_origin(chip_origin),
-      chip_direction(chip_direction),
-      chip_distance_meters(chip_distance_meters)
+    : robot_id(robot_id)
+    , chip_origin(chip_origin)
+    , chip_direction(chip_direction)
+    , chip_distance_meters(chip_distance_meters)
 {
 }
 
@@ -57,7 +57,7 @@ std::vector<double> ChipPrimitive::getParameters() const
     return parameters;
 }
 
-std::vector<bool> ChipPrimitive::getExtraBits() const
+uint8_t ChipPrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return 0;
 }

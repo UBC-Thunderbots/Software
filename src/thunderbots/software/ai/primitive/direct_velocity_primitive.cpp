@@ -68,7 +68,7 @@ std::vector<double> DirectVelocityPrimitive::getParameters() const
     return parameters;
 }
 
-std::vector<bool> DirectVelocityPrimitive::getExtraBits() const
+uint8_t DirectVelocityPrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return 0;
 }

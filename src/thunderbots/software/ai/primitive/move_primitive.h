@@ -81,7 +81,7 @@ class MovePrimitive : public Primitive
      *
      * @return an empty vector
      */
-    std::vector<bool> getExtraBits() const override;
+    uint8_t getExtraBits() const override;
 
    private:
     unsigned int robot_id;

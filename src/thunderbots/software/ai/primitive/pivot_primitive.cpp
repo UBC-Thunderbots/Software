@@ -56,7 +56,7 @@ std::vector<double> PivotPrimitive::getParameters() const
     return parameters;
 }
 
-std::vector<bool> PivotPrimitive::getExtraBits() const
+uint8_t PivotPrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return 0;
 }

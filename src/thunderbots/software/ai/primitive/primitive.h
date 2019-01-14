@@ -57,7 +57,7 @@ class Primitive
      *
      * @return A vector of Booleans that are the extra bits used by the Primitive.
      */
-    virtual std::vector<bool> getExtraBits() const = 0;
+    virtual uint8_t getExtraBits() const = 0;
 
     /**
      * Validates that a primitive message is compatible with the primitive
