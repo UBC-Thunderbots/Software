@@ -28,6 +28,18 @@ TEST_P(GameStateTransitionTest, test_state_transitions)
     EXPECT_EQ(game_state.getRestartReason(), restart_reason);
 }
 
+/**
+ * Returns a tuple of start, update, end states, our restart?, and restart reason
+ *
+ * @param start refbox game state that the game state class is initially updated with
+ * @param update refbox game state that the game state class is updated with
+ * @param end refbox game state that the game state class is expected to end with
+ * @param our_restart whether it is our restart
+ * @param restart_reason the reason for restart, e.g. indirect free kick for us
+ *
+ * @return tuple of start, update, end states, our restart?, and restart reason
+ */
+
 #define STATE_TRANSITION_PARAMS(start, update, end, our_restart, restart_reason)         \
     std::make_tuple<RefboxGameState, RefboxGameState, RefboxGameState, bool,             \
                     GameState::RestartReason>(                                           \
@@ -119,6 +131,12 @@ class GameStatePredicateTest : public ::testing::Test
     std::vector<RefboxGameState> allRefboxGameStates;
 };
 
+/**
+ * Test if the given predicate returns true for all the given states, and false otherwise
+ *
+ *  @param predicate the predicate to test, e.g. isHalted
+ *  @param ... list of refbox game states the given predicate is true for
+ */
 #define PREDICATE_TEST(predicate, ...)                                                   \
     TEST_F(GameStatePredicateTest, predicate##_test)                                     \
     {                                                                                    \
@@ -326,6 +344,7 @@ TEST_F(GameStateRestartTest, penalty_them_restart_test)
     EXPECT_TRUE(game_state.isPlaying());
     EXPECT_FALSE(game_state.isPenalty());
 }
+
 TEST_F(GameStateRestartTest, direct_free_us_restart_test)
 {
     GameState game_state;
@@ -356,6 +375,69 @@ TEST_F(GameStateRestartTest, direct_free_us_restart_test)
     game_state.setRestartCompleted();
     EXPECT_TRUE(game_state.isPlaying());
     EXPECT_FALSE(game_state.isDirectFree());
+}
+
+TEST_F(GameStateRestartTest, direct_free_them_restart_test)
+{
+    GameState game_state;
+
+    RefboxGameState restart_type = RefboxGameState::DIRECT_FREE_THEM;
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isDirectFree());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isTheirDirect());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isDirectFree());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isTheirDirect());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isDirectFree());
+}
+
+TEST_F(GameStateRestartTest, indirect_free_us_restart_test)
+{
+    GameState game_state;
+
+    RefboxGameState restart_type = RefboxGameState::INDIRECT_FREE_US;
+
+    // STOP -> restart_type is how restarts occur during games
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+
+    // verify game_state is in the correct state
+    EXPECT_TRUE(game_state.isSetupState());
+    EXPECT_TRUE(game_state.isIndirectFree());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurIndirect());
+
+    // restart_type -> NORMAL_START happens next
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+
+    // verify state again
+    EXPECT_TRUE(game_state.isReadyState());
+    EXPECT_TRUE(game_state.isIndirectFree());
+    EXPECT_TRUE(game_state.isOurRestart());
+    EXPECT_TRUE(game_state.isOurIndirect());
+
+    // restart state is cleared when the ball is kicked, enter regular
+    // playing state
+    game_state.setRestartCompleted();
+    EXPECT_TRUE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isIndirectFree());
 }
 
 int main(int argc, char **argv)
