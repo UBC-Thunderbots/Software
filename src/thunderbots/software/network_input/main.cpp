@@ -72,21 +72,21 @@ int main(int argc, char** argv)
             }
 
             std::optional<thunderbots_msgs::Ball> ball_msg =
-                backend.getFilteredBallMsg(ssl_vision_packet, timestamp);
+                backend.getFilteredBallMsg(ssl_vision_packet);
             if (ball_msg)
             {
                 ball_publisher.publish(*ball_msg);
             }
 
             std::optional<thunderbots_msgs::Team> friendly_team_msg =
-                backend.getFilteredFriendlyTeamMsg(ssl_vision_packet, timestamp);
+                backend.getFilteredFriendlyTeamMsg(ssl_vision_packet);
             if (friendly_team_msg)
             {
                 friendly_team_publisher.publish(*friendly_team_msg);
             }
 
             std::optional<thunderbots_msgs::Team> enemy_team_msg =
-                backend.getFilteredEnemyTeamMsg(ssl_vision_packet, timestamp);
+                backend.getFilteredEnemyTeamMsg(ssl_vision_packet);
             if (enemy_team_msg)
             {
                 enemy_team_publisher.publish(*enemy_team_msg);
