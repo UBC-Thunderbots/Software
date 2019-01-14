@@ -23,6 +23,11 @@ class GrSimBackend
 
     ~GrSimBackend();
 
+    /**
+     * Sends the given primitives to be simulated in grSim
+     *
+     * @param primitives the list of primitives to send
+     */
     void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives);
 
     /**
