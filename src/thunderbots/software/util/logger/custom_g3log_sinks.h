@@ -31,20 +31,21 @@ namespace Util
          */
         struct RosoutSink
         {
-            ros::Publisher annunciator_publisher;
+            ros::Publisher robot_status_publisher;
 
             RosoutSink(ros::NodeHandle &node_handle)
             {
                 // The buffer queue for this topic is larger than our other ones so that
-                // we don't lose any messages if many are sent at once. The Annunciator
-                // does not have the same strict time constraints as the logic-based parts
-                // of the system, so ensuring no messages are lost is more important.
+                // we don't lose any messages if many are sent at once. The robot status
+                // messages do not have the same strict time constraints as the
+                // logic-based part of the system, so ensuring no messages are lost
+                // is more important.
                 //
                 // This publisher has latching enabled primarily for the purposes of the
                 // ROSTests. If it is disabled the test subscriber will miss the published
                 // test messages.
-                annunciator_publisher = node_handle.advertise<std_msgs::String>(
-                    Util::Constants::ANNUNCIATOR_LOG_TOPIC, 100, true);
+                robot_status_publisher = node_handle.advertise<std_msgs::String>(
+                    Util::Constants::ROBOT_STATUS_TOPIC, 100, true);
             }
 
             /**
@@ -74,14 +75,14 @@ namespace Util
                 {
                     ROS_ERROR("%s", log_text.c_str());
                 }
-                else if (g3log_log_level.value == ANNUNCIATOR.value)
+                else if (g3log_log_level.value == ROBOT_STATUS.value)
                 {
                     // Send the message to a special topic. The visualizer will listen
-                    // to this topic so it can distinguish Annunciator messages and
+                    // to this topic so it can distinguish robot status messages and
                     // display them differently
                     std_msgs::String msg;
                     msg.data = log_text;
-                    annunciator_publisher.publish(msg);
+                    robot_status_publisher.publish(msg);
 
                     // We still log these messages to stdout and /rosout so they can be
                     // see even when the Visualizer isn't running

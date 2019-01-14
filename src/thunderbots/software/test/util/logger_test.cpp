@@ -90,9 +90,9 @@ TEST_F(LoggerTest, test_log_messages_with_WARNING_severity_are_sent_to_rosout_to
 
 TEST_F(LoggerTest, test_log_messages_with_ANNUNCIATOR_severity_are_sent_to_rosout_topic)
 {
-    std::string msg_data = "ANNUNCIATOR log test message";
+    std::string msg_data = "ROBOT_STATUS log test message";
 
-    LOG(ANNUNCIATOR) << msg_data << std::endl;
+    LOG(ROBOT_STATUS) << msg_data << std::endl;
 
     // We MUST use the /rosout topic rather than the commonly suggested /rosout_agg,
     // because messages are not re-published to /rosout_agg during rostests
@@ -114,12 +114,12 @@ TEST_F(LoggerTest, test_log_messages_with_ANNUNCIATOR_severity_are_sent_to_rosou
 TEST_F(LoggerTest,
        test_log_messages_with_ANNUNCIATOR_severity_are_sent_to_the_Annunciator_log_topic)
 {
-    std::string msg_data = "ANNUNCIATOR log test message";
+    std::string msg_data = "ROBOT_STATUS log test message";
 
-    LOG(ANNUNCIATOR) << msg_data << std::endl;
+    LOG(ROBOT_STATUS) << msg_data << std::endl;
 
     auto message = RosTestUtil::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
-        nh_, Util::Constants::ANNUNCIATOR_LOG_TOPIC);
+        nh_, Util::Constants::ROBOT_STATUS_TOPIC);
 
     std::string log_output = message->data;
 

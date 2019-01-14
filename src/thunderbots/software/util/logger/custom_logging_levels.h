@@ -5,7 +5,8 @@
 // See https://github.com/KjellKod/g3log/blob/master/API.markdown#custom-logging-levels
 // for adding custom log levels
 
-// A custom level used to specify messages that should be displayed in the Annunciator
-// in the Visualizer. These are typically diagnostic messages received from the robots
+// A custom level used to specify messages that contain robot statuses, including various
+// diagnostic information like battery voltage and wheel encoder errors. These messages
+// are separate because they are shown separately in the Visualizer.
 // over radio
-const LEVELS ANNUNCIATOR{INFO.value + 1, {"ANNUNCIATOR"}};
+const LEVELS ROBOT_STATUS{INFO.value + 1, {"ROBOT_STATUS"}};
