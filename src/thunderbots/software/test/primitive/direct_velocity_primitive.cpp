@@ -40,7 +40,7 @@ TEST(DirectVelocityPrimTest, parameter_array_test)
     DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(
         robot_id, x_velocity, y_velocity, angular_velocity, dribbler_rpm);
 
-    std::vector<double> param_array = direct_velocity_prim.getParameterArray();
+    std::vector<double> param_array = direct_velocity_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(x_velocity, param_array[0]);
     EXPECT_DOUBLE_EQ(y_velocity, param_array[1]);
@@ -94,7 +94,7 @@ TEST(DirectVelocityPrimTest, get_extra_bit_array_test)
     DirectVelocityPrimitive direct_velocity_prim =
         DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
 
-    std::vector<bool> extra_bit_array = direct_velocity_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = direct_velocity_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -114,7 +114,7 @@ TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
 
     DirectVelocityPrimitive new_prim = DirectVelocityPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("Direct Velocity Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
@@ -122,7 +122,7 @@ TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(y_velocity, parameters[1]);
     EXPECT_DOUBLE_EQ(angular_velocity, parameters[2]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[3]);
-    EXPECT_EQ(new_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(new_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)

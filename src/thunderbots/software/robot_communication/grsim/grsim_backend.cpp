@@ -1,10 +1,15 @@
-#include "backend_output/grsim/grsim_backend.h"
+#include "robot_communication/grsim/grsim_backend.h"
 
+#include <chrono>
 #include <iostream>
 #include <optional>
+#include <utility>
 
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/primitive.h"
+#include "ai/world/team.h"
 #include "proto/grSim_Commands.pb.h"
+#include "robot_communication/grsim/motion_controller.h"
 #include "shared/constants.h"
 
 using namespace boost::asio;
@@ -58,12 +63,45 @@ void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
         remote_endpoint, 0, err);
 }
 
+
 void GrSimBackend::sendPrimitives(
     const std::vector<std::unique_ptr<Primitive>>& primitives)
 {
-    // TODO: Implement this
-    // https://github.com/UBC-Thunderbots/Software/issues/21
-    grSim_Packet grsim_packet = createGrSimPacket(
-        0, YELLOW, Point(0.5, -0.1), Angle::ofRadians(-0.8), 4.0, true, false);
+    std::vector<grSim_Packet> grsim_packets;
+
+    MotionController::Velocity robot_velocities;
+    grSim_Packet grsim_packet;
+
+
+    // initial timestamp for bang-bang set as current time
+    static auto bangbang_timestamp = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> delta_time;
+
+    for (auto& prim : primitives)
+    {
+        MovePrimitive movePrim = dynamic_cast<MovePrimitive&>(*prim);
+
+        // get the current time right before
+        // running bang-bang to get a time-delta for acceleration
+        delta_time = std::chrono::steady_clock::now() - bangbang_timestamp;
+
+        // Motion controller determines the speeds to send to the robots based on their
+        // state, maximum linear and angular accelerations, and the robots target
+        // destination location/orientation and speed
+        robot_velocities = MotionController::bangBangVelocityController(
+            *team.getRobotById(movePrim.getRobotId()), movePrim.getDestination(),
+            movePrim.getFinalSpeed(), movePrim.getFinalAngle(), delta_time.count());
+
+        // send the velocity data via grsim_packet
+        grsim_packet = createGrSimPacket(
+            movePrim.getRobotId(), YELLOW, robot_velocities.linear_velocity,
+            robot_velocities.angular_velocity, 0, false, false);
+    }
+
+    // timestamp of when the motion controller was last run (to be used for calculating
+    // delta_time in the future)
+    bangbang_timestamp = std::chrono::steady_clock::now();
+
     sendGrSimPacket(grsim_packet);
 }

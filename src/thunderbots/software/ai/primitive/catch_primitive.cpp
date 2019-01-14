@@ -3,11 +3,11 @@
 const std::string CatchPrimitive::PRIMITIVE_NAME = "Catch Primitive";
 
 CatchPrimitive::CatchPrimitive(unsigned int robot_id, double velocity,
-                               double dribbler_speed, double margin)
+                               double dribbler_rpm, double ball_intercept_margin)
     : robot_id(robot_id),
       velocity(velocity),
-      dribbler_speed(dribbler_speed),
-      margin(margin)
+      dribbler_speed(dribbler_rpm),
+      margin(ball_intercept_margin)
 {
 }
 
@@ -46,13 +46,13 @@ double CatchPrimitive::getMargin() const
     return margin;
 }
 
-std::vector<double> CatchPrimitive::getParameterArray() const
+std::vector<double> CatchPrimitive::getParameters() const
 {
     std::vector<double> parameters = {velocity, dribbler_speed, margin};
     return parameters;
 }
 
-std::vector<bool> CatchPrimitive::getExtraBitArray() const
+std::vector<bool> CatchPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
 }

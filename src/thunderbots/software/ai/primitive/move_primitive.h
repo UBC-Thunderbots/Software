@@ -34,9 +34,18 @@ class MovePrimitive : public Primitive
      * @param primtiive_msg The message from which to create the Move Primitive
      */
     explicit MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    /**
+     * Gets the primitive name
+     *
+     * @return The name of the primitive as a string
+     */
+    std::string getPrimitiveName() const;
 
-    std::string getPrimitiveName() const override;
-
+    /**
+     * Gets the robot ID
+     *
+     * @return The robot ID as an unsigned integer
+     */
     unsigned int getRobotId() const override;
     /**
      * gets the robot's destination
@@ -59,9 +68,20 @@ class MovePrimitive : public Primitive
      */
     double getFinalSpeed() const;
 
-    std::vector<double> getParameterArray() const override;
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {dest.x(), dest.y(), final_angle.toRadians(),
+     *                               final_speed}
+     */
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
+    std::vector<bool> getExtraBits() const override;
 
    private:
     unsigned int robot_id;

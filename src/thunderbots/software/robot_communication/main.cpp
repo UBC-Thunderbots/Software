@@ -7,9 +7,10 @@
 
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
-#include "backend_output/grsim/grsim_backend.h"
-#include "geom/point.h"
+#include "robot_communication/grsim/grsim_backend.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
+#include "util/ros_messages.h"
 
 // Constants
 const std::string NETWORK_ADDRESS       = "127.0.0.1";
@@ -23,6 +24,11 @@ static constexpr unsigned int TICK_RATE = 30;
 // the primitives to the system we have chosen (such as grSim, our radio, etc.)
 std::vector<std::unique_ptr<Primitive>> primitives;
 
+namespace
+{
+    Team friendly_team = Team(std::chrono::milliseconds(1000));
+}
+
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
@@ -33,21 +39,35 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     }
 }
 
+// Update the friendly team
+void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
+{
+    thunderbots_msgs::Team friendly_team_msg = *msg;
+
+    Team updated_friendly_team =
+        Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
+
+    friendly_team = updated_friendly_team;
+}
+
 int main(int argc, char** argv)
 {
     // Init ROS node
-    ros::init(argc, argv, "backend_output");
+    ros::init(argc, argv, "robot_communication");
     ros::NodeHandle node_handle;
 
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger();
+
     // Initialize variables
     primitives           = std::vector<std::unique_ptr<Primitive>>();
     GrSimBackend backend = GrSimBackend(NETWORK_ADDRESS, NETWORK_PORT);
 
-    // We loop at 30Hz so we don't overload the network with too many packets
+    // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
     // Main loop
@@ -59,6 +79,8 @@ int main(int argc, char** argv)
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
+
+        backend.updateBackendTeam(friendly_team);
 
         backend.sendPrimitives(primitives);
 
