@@ -1,0 +1,3 @@
+<launch>
+    <test test-name="dynamic_parameters_test" pkg="thunderbots" type="dynamic_parameters_test" />
+</launch>
