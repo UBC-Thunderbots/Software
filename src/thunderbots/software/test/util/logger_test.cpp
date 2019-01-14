@@ -88,7 +88,7 @@ TEST_F(LoggerTest, test_log_messages_with_WARNING_severity_are_sent_to_rosout_to
     EXPECT_EQ(rosgraph_msgs::Log::WARN, log_level);
 }
 
-TEST_F(LoggerTest, test_log_messages_with_ANNUNCIATOR_severity_are_sent_to_rosout_topic)
+TEST_F(LoggerTest, test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_rosout_topic)
 {
     std::string msg_data = "ROBOT_STATUS log test message";
 
@@ -112,7 +112,7 @@ TEST_F(LoggerTest, test_log_messages_with_ANNUNCIATOR_severity_are_sent_to_rosou
 }
 
 TEST_F(LoggerTest,
-       test_log_messages_with_ANNUNCIATOR_severity_are_sent_to_the_Annunciator_log_topic)
+       test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_the_robot_status_topic)
 {
     std::string msg_data = "ROBOT_STATUS log test message";
 
