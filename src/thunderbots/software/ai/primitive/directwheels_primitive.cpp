@@ -47,6 +47,7 @@ DirectWheelsPrimitive::DirectWheelsPrimitive(
     back_left_wheel_power   = int(primitive_msg.parameters.at(1));
     front_right_wheel_power = int(primitive_msg.parameters.at(2));
     back_right_wheel_power  = int(primitive_msg.parameters.at(3));
+    dribbler_rpm            = int(primitive_msg.parameters.at(4));
 
     // Clamp wheel power if out of range, log a warning
     if (abs(front_left_wheel_power) > 255)
@@ -108,8 +109,8 @@ double DirectWheelsPrimitive::getDribblerRPM() const
 std::vector<double> DirectWheelsPrimitive::getParameters() const
 {
     std::vector<double> parameters = {
-        double(front_left_wheel_power), double(back_left_wheel_power),
-        double(front_right_wheel_power), double(back_right_wheel_power), dribbler_rpm};
+            static_cast<double>(front_left_wheel_power), static_cast<double>(back_left_wheel_power),
+            static_cast<double>(front_right_wheel_power), static_cast<double>(back_right_wheel_power), dribbler_rpm};
 
     return parameters;
 }
