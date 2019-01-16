@@ -56,7 +56,7 @@ std::vector<double> CatchPrimitive::getParameters() const
     return parameters;
 }
 
-uin8_t CatchPrimitive::getExtraBits() const
+uint8_t CatchPrimitive::getExtraBits() const
 {
     return 0;
 }
