@@ -15,6 +15,12 @@ namespace RosTestUtil
      * topic, in which case the message pointer is returned, or the timeout expires.
      * If the timeout expires, a runtime error is thrown.
      *
+     * Because this function blocks while waiting to receive messages, publishers must be
+     * set up and test messages must be published before this function is called. In
+     * situations where the publisher will only be publishing a single message, the
+     * publisher will need to have latching enabled, otherwise the subscriber created in
+     * this function will be too late to receive the published message.
+     *
      * @tparam T A pointer to the message class of the topic.
      * Eg std_msgs::String::ConstPtr
      * @param node_handle A reference to the NodeHandle object that will be subscribing to

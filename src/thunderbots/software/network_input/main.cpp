@@ -30,7 +30,7 @@ int main(int argc, char** argv)
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1);
 
     // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger();
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Set up our connection over udp to receive camera packets
     // NOTE: We do this before initializing the ROS node so that if it
