@@ -1,4 +1,6 @@
-/* Defines the base styling for the application */
+/* Defines the base layout for the application
+ * This is where we place the various portals in our UI
+ */
 
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
