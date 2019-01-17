@@ -1,4 +1,4 @@
-#include "software/robot_communication/grsim/motion_controller.h"
+#include "grsim_communication/motion_controller.h"
 
 #include "geom/angle.h"
 #include "gtest/gtest.h"
