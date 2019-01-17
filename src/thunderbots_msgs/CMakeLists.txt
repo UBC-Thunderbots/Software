@@ -16,14 +16,15 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
     FILES
-    Circle2D.msg
-    Point2D.msg
     Ball.msg
-    Robot.msg
-    Team.msg
+    Circle2D.msg
     Field.msg
+    Point2D.msg
     Primitive.msg
     PrimitiveArray.msg
+    Robot.msg
+    Shape.msg
+    Team.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
