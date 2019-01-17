@@ -3,14 +3,14 @@
 #include <boost/asio.hpp>
 #include <string>
 
+#include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "proto/grSim_Packet.pb.h"
-#include "robot_communication/backend.h"
 
 
-class GrSimBackend : public Backend
+class GrSimBackend
 {
    public:
     /**
@@ -23,8 +23,12 @@ class GrSimBackend : public Backend
 
     ~GrSimBackend();
 
-    void sendPrimitives(
-        const std::vector<std::unique_ptr<Primitive>>& primitives) override;
+    /**
+     * Sends the given primitives to be simulated in grSim
+     *
+     * @param primitives the list of primitives to send
+     */
+    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives);
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.
