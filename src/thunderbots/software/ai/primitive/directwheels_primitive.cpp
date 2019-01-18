@@ -43,11 +43,11 @@ DirectWheelsPrimitive::DirectWheelsPrimitive(
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
     robot_id                = primitive_msg.robot_id;
-    front_left_wheel_power  = int(primitive_msg.parameters.at(0));
-    back_left_wheel_power   = int(primitive_msg.parameters.at(1));
-    front_right_wheel_power = int(primitive_msg.parameters.at(2));
-    back_right_wheel_power  = int(primitive_msg.parameters.at(3));
-    dribbler_rpm            = int(primitive_msg.parameters.at(4));
+    front_left_wheel_power  = static_cast<double>(primitive_msg.parameters.at(0));
+    back_left_wheel_power   = static_cast<double>(primitive_msg.parameters.at(1));
+    front_right_wheel_power = static_cast<double>(primitive_msg.parameters.at(2));
+    back_right_wheel_power  = static_cast<double>(primitive_msg.parameters.at(3));
+    dribbler_rpm            = static_cast<double>(primitive_msg.parameters.at(4));
 
     // Clamp wheel power if out of range, log a warning
     if (abs(front_left_wheel_power) > 255)
