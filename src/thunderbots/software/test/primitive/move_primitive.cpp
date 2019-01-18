@@ -75,9 +75,9 @@ TEST(MovePrimTest, get_extra_bit_array_test)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
-    std::vector<bool> extra_bit_array = move_prim.getExtraBits();
+    uint8_t extra_bits = move_prim.getExtraBits();
 
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
+    EXPECT_EQ(extra_bits, 0);
 }
 
 TEST(MovePrimitiveTest, create_primitive_from_message_test)

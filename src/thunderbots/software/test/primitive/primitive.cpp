@@ -31,7 +31,7 @@ TEST(PrimitiveTest, create_message_from_primitive_test)
     EXPECT_DOUBLE_EQ(destination.y(), prim.parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), prim.parameters[2]);
     EXPECT_DOUBLE_EQ(final_speed, prim.parameters[3]);
-    EXPECT_EQ(move_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(move_prim.getExtraBits(), 0);
 }
 
 TEST(PrimitiveTest, validate_primitive_test)
@@ -70,7 +70,7 @@ TEST(PrimitiveTest, convert_MovePrimitive_to_message_and_back_to_MovePrimitive)
     EXPECT_DOUBLE_EQ(destination.y(), params[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), params[2]);
     EXPECT_DOUBLE_EQ(final_speed, params[3]);
-    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(new_prim->getExtraBits(), 0);
 }
 
 // Test that we can correctly translate a ChipPrimitive like:
@@ -100,7 +100,7 @@ TEST(PrimitiveTest, convert_ChipPrimitive_to_message_and_back_to_ChipPrimitive)
     EXPECT_DOUBLE_EQ(chip_origin.y(), params[1]);
     EXPECT_DOUBLE_EQ(chip_direction.toRadians(), params[2]);
     EXPECT_DOUBLE_EQ(chip_distance_meters, params[3]);
-    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(new_prim->getExtraBits(), 0);
 }
 
 // Test that we can correctly translate a KickPrimitive like:
@@ -130,7 +130,7 @@ TEST(PrimitiveTest, convert_KickPrimitive_to_message_and_back_to_KickPrimitive)
     EXPECT_DOUBLE_EQ(kick_origin.y(), params[1]);
     EXPECT_DOUBLE_EQ(kick_direction.toRadians(), params[2]);
     EXPECT_DOUBLE_EQ(kick_distance_meters, params[3]);
-    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(new_prim->getExtraBits(), 0);
 }
 
 TEST(PrimitiveTest,
@@ -155,7 +155,7 @@ TEST(PrimitiveTest,
     EXPECT_DOUBLE_EQ(y_velocity, params[1]);
     EXPECT_DOUBLE_EQ(angular_velocity, params[2]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, params[3]);
-    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+    EXPECT_EQ(0, new_prim->getExtraBits());
 }
 
 TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive)
@@ -175,7 +175,7 @@ TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive
     EXPECT_DOUBLE_EQ(velocity, params[0]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, params[1]);
     EXPECT_DOUBLE_EQ(ball_intercept_margin, params[2]);
-    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+    EXPECT_EQ(0, new_prim->getExtraBits());
 }
 
 // Test that we can correctly translate a PivotPrimitive like:
@@ -201,7 +201,7 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     EXPECT_DOUBLE_EQ(pivot_point.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(robot_orientation.toRadians(), parameters[3]);
-    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+    EXPECT_EQ(0, new_prim->getExtraBits());
 }
 
 int main(int argc, char **argv)

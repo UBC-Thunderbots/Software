@@ -94,9 +94,9 @@ TEST(DirectVelocityPrimTest, get_extra_bit_array_test)
     DirectVelocityPrimitive direct_velocity_prim =
         DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
 
-    std::vector<bool> extra_bit_array = direct_velocity_prim.getExtraBits();
+    uint8_t extra_bits = direct_velocity_prim.getExtraBits();
 
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
+    EXPECT_EQ(extra_bits, 0);
 }
 
 TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
@@ -122,7 +122,7 @@ TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(y_velocity, parameters[1]);
     EXPECT_DOUBLE_EQ(angular_velocity, parameters[2]);
     EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[3]);
-    EXPECT_EQ(new_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(new_prim.getExtraBits(), 0);
 }
 
 int main(int argc, char **argv)

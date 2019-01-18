@@ -74,9 +74,9 @@ TEST(CatchPrimTest, get_extra_bit_array_test)
 {
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, 0);
 
-    std::vector<bool> extra_bit_array = catch_prim.getExtraBits();
+    uint8_t extra_bits = catch_prim.getExtraBits();
 
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
+    EXPECT_EQ(extra_bits, 0);
 }
 
 TEST(CatchPrimTest, create_primitive_from_message_test)
@@ -100,7 +100,7 @@ TEST(CatchPrimTest, create_primitive_from_message_test)
     EXPECT_EQ(velocity, parameters[0]);
     EXPECT_EQ(dribbler_speed, parameters[1]);
     EXPECT_EQ(margin, parameters[2]);
-    EXPECT_EQ(catch_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(catch_prim.getExtraBits(), 0);
 }
 
 int main(int argc, char **argv)

@@ -75,9 +75,9 @@ TEST(ChipPrimTest, get_extra_bit_array_test)
 {
     ChipPrimitive chip_prim = ChipPrimitive(0, Point(), Angle(), 0.0);
 
-    std::vector<bool> extra_bit_array = chip_prim.getExtraBits();
+    uint8_t extra_bits = chip_prim.getExtraBits();
 
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
+    EXPECT_EQ(extra_bits, 0);
 }
 
 TEST(ChipPrimitiveTest, create_primitive_from_message_test)
@@ -102,7 +102,7 @@ TEST(ChipPrimitiveTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(chip_origin.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(chip_direction.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(chip_distance_meters, parameters[3]);
-    EXPECT_EQ(chip_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(chip_prim.getExtraBits(), 0);
 }
 
 int main(int argc, char **argv)

@@ -76,9 +76,9 @@ TEST(KickPrimTest, get_extra_bit_array_test)
 {
     KickPrimitive kick_prim = KickPrimitive(0, Point(), Angle(), 0.0);
 
-    std::vector<bool> extra_bit_array = kick_prim.getExtraBits();
+    uint8_t extra_bits = kick_prim.getExtraBits();
 
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
+    EXPECT_EQ(extra_bits, 0);
 }
 
 TEST(KickPrimitiveTest, create_primitive_from_message_test)
@@ -103,7 +103,7 @@ TEST(KickPrimitiveTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(kick_origin.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(kick_direction.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(kick_speed_meters_per_second, parameters[3]);
-    EXPECT_EQ(kick_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(kick_prim.getExtraBits(), 0);
 }
 
 int main(int argc, char **argv)
