@@ -6,11 +6,14 @@
 #include "network_input/filter/robot_filter.h"
 #include "network_input/filter/robot_team_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "proto/ssl_referee.pb.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
+#include "thunderbots_msgs/RefboxData.h"
 #include "util/timestamp.h"
+#include "ai/world/field.h"
 
 class Backend
 {
@@ -67,10 +70,24 @@ class Backend
     std::optional<thunderbots_msgs::Team> getFilteredEnemyTeamMsg(
         const SSL_WrapperPacket &packet);
 
+    std::optional<thunderbots_msgs::RefboxData> getRefboxDataMsg(const Referee &packet);
+
+
     virtual ~Backend() = default;
 
    private:
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    // backend *should* be the only part of the system that is aware of Refbox/Vision
+    // global coordinates. To AI, +x will always be enemy and -x will always be friendly.
+    FieldSide our_field_side;
+    // TODO: the rest of backend should be spitting out team-local coordinates
+
+    void setOurFieldSide(bool blue_team_on_positive_half);
+
+    int32_t getTeamCommand(const Referee::Command& command);
+    Point getTeamLocalCoordinates(const Referee::Point& point);
+    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo& team_info);
 };

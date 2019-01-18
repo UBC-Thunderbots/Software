@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 
 #include <boost/exception/diagnostic_information.hpp>
+#include <network_input/networking/ssl_gamecontroller_client.h>
 
 #include "geom/point.h"
 #include "network_input/backend.h"
@@ -28,6 +29,8 @@ int main(int argc, char** argv)
             Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1);
+    ros::Publisher gamecontroller_publisher = node_handle.advertise<thunderbots_msgs::RefboxData>(
+            Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger();
@@ -46,6 +49,21 @@ int main(int argc, char** argv)
     catch (const boost::exception& ex)
     {
         std::cerr << "An error occured while setting up the SSL Vision Client:"
+                  << std::endl
+                  << boost::diagnostic_information(ex) << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    std::unique_ptr<SSLGameControllerClient> ssl_gamecontroller_client;
+    try
+    {
+        ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
+                Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+                Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT);
+    }
+    catch (const boost::exception& ex)
+    {
+        std::cerr << "An error occured while setting up the SSL Game Controller Client:"
                   << std::endl
                   << boost::diagnostic_information(ex) << std::endl;
         return EXIT_FAILURE;
@@ -90,6 +108,15 @@ int main(int argc, char** argv)
             if (enemy_team_msg)
             {
                 enemy_team_publisher.publish(*enemy_team_msg);
+            }
+        }
+
+        auto gamecontroller_packet_ptr = ssl_gamecontroller_client->getGameControllerPacket();
+
+        if(gamecontroller_packet_ptr) {
+            auto refbox_data_msg = backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
+            if(refbox_data_msg) {
+                gamecontroller_publisher.publish(*refbox_data_msg);
             }
         }
 

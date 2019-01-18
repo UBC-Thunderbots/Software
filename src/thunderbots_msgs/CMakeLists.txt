@@ -24,6 +24,9 @@ add_message_files(
     Field.msg
     Primitive.msg
     PrimitiveArray.msg
+    RefboxCommand.msg
+    RefboxData.msg
+    RefboxTeamInfo.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
