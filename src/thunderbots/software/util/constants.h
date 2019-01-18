@@ -14,8 +14,9 @@ namespace Util
         static const std::string NETWORK_INPUT_FRIENDLY_TEAM_TOPIC =
             "backend/friendly_team";
         static const std::string NETWORK_INPUT_ENEMY_TEAM_TOPIC = "backend/enemy_team";
-        static const std::string NETWORK_INPUT_GAMECONTROLLER_TOPIC = "backend/gamecontroller";
-        static const std::string AI_PRIMITIVES_TOPIC            = "backend/primitives";
+        static const std::string NETWORK_INPUT_GAMECONTROLLER_TOPIC =
+            "backend/gamecontroller";
+        static const std::string AI_PRIMITIVES_TOPIC = "backend/primitives";
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;

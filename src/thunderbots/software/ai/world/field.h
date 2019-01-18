@@ -3,9 +3,10 @@
 #include "geom/point.h"
 #include "geom/rect.h"
 
-typedef enum {
-    EAST, // positive X side according to vision
-    WEST  // negative X side
+typedef enum
+{
+    EAST,  // positive X side according to vision
+    WEST   // negative X side
 } FieldSide;
 
 /**

@@ -8,7 +8,7 @@
 
 class SSLGameControllerClient
 {
-public:
+   public:
     /**
      * Creates an SSLVisionClient that will listen for data packets from SSL Vision
      * on the given address and port
@@ -28,7 +28,7 @@ public:
      */
     const std::unique_ptr<Referee> getGameControllerPacket();
 
-private:
+   private:
     /**
      * The function that is called to process any data received by the io_service.
      * This function will be called when poll() is called on the io_service.

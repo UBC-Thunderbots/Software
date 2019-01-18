@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "ai/world/field.h"
 #include "network_input/filter/ball_filter.h"
 #include "network_input/filter/robot_filter.h"
 #include "network_input/filter/robot_team_filter.h"
@@ -9,11 +10,10 @@
 #include "proto/ssl_referee.pb.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
+#include "thunderbots_msgs/RefboxData.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
-#include "thunderbots_msgs/RefboxData.h"
 #include "util/timestamp.h"
-#include "ai/world/field.h"
 
 class Backend
 {
@@ -87,7 +87,7 @@ class Backend
 
     void setOurFieldSide(bool blue_team_on_positive_half);
 
-    int32_t getTeamCommand(const Referee::Command& command);
-    Point getTeamLocalCoordinates(const Referee::Point& point);
-    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo& team_info);
+    int32_t getTeamCommand(const Referee::Command &command);
+    Point getTeamLocalCoordinates(const Referee::Point &point);
+    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo &team_info);
 };

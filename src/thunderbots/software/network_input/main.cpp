@@ -1,7 +1,7 @@
+#include <network_input/networking/ssl_gamecontroller_client.h>
 #include <ros/ros.h>
 
 #include <boost/exception/diagnostic_information.hpp>
-#include <network_input/networking/ssl_gamecontroller_client.h>
 
 #include "geom/point.h"
 #include "network_input/backend.h"
@@ -29,7 +29,8 @@ int main(int argc, char** argv)
             Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1);
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1);
-    ros::Publisher gamecontroller_publisher = node_handle.advertise<thunderbots_msgs::RefboxData>(
+    ros::Publisher gamecontroller_publisher =
+        node_handle.advertise<thunderbots_msgs::RefboxData>(
             Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1);
 
     // Initialize the logger
@@ -58,8 +59,8 @@ int main(int argc, char** argv)
     try
     {
         ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
-                Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-                Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT);
+            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT);
     }
     catch (const boost::exception& ex)
     {
@@ -111,11 +112,14 @@ int main(int argc, char** argv)
             }
         }
 
-        auto gamecontroller_packet_ptr = ssl_gamecontroller_client->getGameControllerPacket();
+        auto gamecontroller_packet_ptr =
+            ssl_gamecontroller_client->getGameControllerPacket();
 
-        if(gamecontroller_packet_ptr) {
+        if (gamecontroller_packet_ptr)
+        {
             auto refbox_data_msg = backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
-            if(refbox_data_msg) {
+            if (refbox_data_msg)
+            {
                 gamecontroller_publisher.publish(*refbox_data_msg);
             }
         }
