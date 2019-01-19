@@ -39,7 +39,7 @@ class MovePrimitive : public Primitive
      *
      * @return The name of the primitive as a string
      */
-    std::string getPrimitiveName() const;
+    std::string getPrimitiveName() const override;
 
     /**
      * Gets the robot ID
@@ -82,6 +82,8 @@ class MovePrimitive : public Primitive
      * @return an empty vector
      */
     std::vector<bool> getExtraBits() const override;
+
+    void accept(PrimitiveVisitor &visitor) const override;
 
    private:
     unsigned int robot_id;

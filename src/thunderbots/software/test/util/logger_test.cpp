@@ -13,7 +13,7 @@ class LoggerTest : public testing::Test
     virtual void SetUp()
     {
         // Initialize the logger
-        Util::Logger::LoggerSingleton::initializeLogger();
+        Util::Logger::LoggerSingleton::initializeLogger(nh_);
     }
 
     ros::NodeHandle nh_;
@@ -86,6 +86,49 @@ TEST_F(LoggerTest, test_log_messages_with_WARNING_severity_are_sent_to_rosout_to
 
     EXPECT_TRUE(log_output_contains_msg_data);
     EXPECT_EQ(rosgraph_msgs::Log::WARN, log_level);
+}
+
+TEST_F(LoggerTest, test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_rosout_topic)
+{
+    std::string msg_data = "ROBOT_STATUS log test message";
+
+    LOG(ROBOT_STATUS) << msg_data << std::endl;
+
+    // We MUST use the /rosout topic rather than the commonly suggested /rosout_agg,
+    // because messages are not re-published to /rosout_agg during rostests
+    auto message =
+        RosTestUtil::waitForMessageOnTopic<rosgraph_msgs::Log::ConstPtr>(nh_, "/rosout");
+
+    std::string log_output                    = message->msg;
+    rosgraph_msgs::Log::_level_type log_level = message->level;
+
+    // Because messages published on /rosout also contain other metadata (such as a
+    // timestamp, the name of the file where the message originated etc.), we just check
+    // that our initial log message is contained in the /rosout output
+    bool log_output_contains_msg_data = log_output.find(msg_data) != std::string::npos;
+
+    EXPECT_TRUE(log_output_contains_msg_data);
+    EXPECT_EQ(rosgraph_msgs::Log::INFO, log_level);
+}
+
+TEST_F(LoggerTest,
+       test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_the_robot_status_topic)
+{
+    std::string msg_data = "ROBOT_STATUS log test message";
+
+    LOG(ROBOT_STATUS) << msg_data << std::endl;
+
+    auto message = RosTestUtil::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
+        nh_, Util::Constants::ROBOT_STATUS_TOPIC);
+
+    std::string log_output = message->data;
+
+    // Since log messages contain extra metadata (such as a timestamp, the name of the
+    // file where the message originated etc.), we just check that our initial log message
+    // is contained in the message received on the topic
+    bool log_output_contains_msg_data = log_output.find(msg_data) != std::string::npos;
+
+    EXPECT_TRUE(log_output_contains_msg_data);
 }
 
 int main(int argc, char **argv)
