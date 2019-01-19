@@ -10,12 +10,15 @@
 #include "util/logger/init.h"
 
 // Member variables we need to maintain state
-
-// A vector of primitives. It is cleared each tick, populated by the callbacks
-// that receive primitive commands, and is processed by the backend to send
-// the primitives to the system we have chosen (such as grSim, our radio, etc.)
-std::vector<std::unique_ptr<Primitive>> primitives;
-
+// They are kept in an anonymous namespace so they are not accessible outside this
+// file and are not created as global static variables.
+namespace
+{
+    // A vector of primitives. It is cleared each tick, populated by the callbacks
+    // that receive primitive commands, and is processed by the backend to send
+    // the Primitives to the robots using the radio.
+    std::vector<std::unique_ptr<Primitive>> primitives;
+}  // namespace
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {

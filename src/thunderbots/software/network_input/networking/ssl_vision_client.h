@@ -2,6 +2,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <queue>
 #include <string>
 
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
@@ -20,18 +21,20 @@ class SSLVisionClient
     SSLVisionClient(const std::string ip_address, const unsigned short port);
 
     /**
-     * Returns a unique_ptr to the latest SSL Vision WrapperPacket. If no new data was
-     * received since the last time this function was called, the unique_ptr will be empty
+     * Returns a queue of new SSL Vision WrapperPackets that were received since last time
+     * this function was called. If no new data was received since the last time this
+     * function was called, the queue will be empty
      *
-     * @return A unique_ptr to an SSL_WrapperPacket if data was received since the last
-     * time this function was called, otherwise returns an empty unique_ptr
+     * @return A queue of SSL_WrapperPackets received since the last time this function
+     * was called.
      */
-    const std::unique_ptr<SSL_WrapperPacket> getVisionPacket();
+    const std::queue<SSL_WrapperPacket> getVisionPacketQueue();
 
    private:
     /**
      * The function that is called to process any data received by the io_service.
-     * This function will be called when poll() is called on the io_service.
+     * When io_service.poll() is called, this function will be run for EVERY packet
+     * received, which may be more than once.
      *
      * @param error The error code obtained when receiving the incoming data
      * @param num_bytes_received How many bytes of data were received
@@ -43,14 +46,10 @@ class SSLVisionClient
     boost::asio::ip::udp::socket socket_;
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
-    // The actual length (in bytes) of the ssl_wrapper packets is around 263 bytes
-    // (determined empirically by printing the size of the received packet). We set the
-    // max buffer length to be the largest possible size of a UDP datagram. This way
-    // we don't need to worry about buffer overflow, or about our data getting truncated
-    // to fit into the buffer
-    static constexpr unsigned int max_buffer_length = 65535;
-    char raw_received_data_[max_buffer_length];
-
-    // Stores the most up to date packet data received by the client
-    std::unique_ptr<SSL_WrapperPacket> packet_data;
+    // The maximum length of the buffer we use to receive data packets from the network
+    static constexpr unsigned int max_buffer_length = 4096;
+    // Acts as a buffer to store the raw received data from the network
+    std::array<char, max_buffer_length> raw_received_data_;
+    // Stores the SSL_WrapperPackets that were received
+    std::queue<SSL_WrapperPacket> packet_queue;
 };

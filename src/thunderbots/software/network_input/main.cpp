@@ -19,15 +19,24 @@ int main(int argc, char** argv)
     ros::NodeHandle node_handle;
 
     // Create publishers
+    // We give the publishers queue sizes equal to the number of cameras being used with
+    // the SSL Vision system. This is to be able to buffer data from each camera if we are
+    // receiving data faster than we can publish. This way the buffered data will contain
+    // data for the entire field (something from each camera) and we don't lose any
+    // information
     ros::Publisher ball_publisher = node_handle.advertise<thunderbots_msgs::Ball>(
-        Util::Constants::NETWORK_INPUT_BALL_TOPIC, 1);
+        Util::Constants::NETWORK_INPUT_BALL_TOPIC,
+        Util::Constants::NUMBER_OF_SSL_VISION_CAMERAS);
     ros::Publisher field_publisher = node_handle.advertise<thunderbots_msgs::Field>(
-        Util::Constants::NETWORK_INPUT_FIELD_TOPIC, 1);
+        Util::Constants::NETWORK_INPUT_FIELD_TOPIC,
+        Util::Constants::NUMBER_OF_SSL_VISION_CAMERAS);
     ros::Publisher friendly_team_publisher =
         node_handle.advertise<thunderbots_msgs::Team>(
-            Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1);
+            Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC,
+            Util::Constants::NUMBER_OF_SSL_VISION_CAMERAS);
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
-        Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1);
+        Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC,
+        Util::Constants::NUMBER_OF_SSL_VISION_CAMERAS);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
@@ -57,12 +66,11 @@ int main(int argc, char** argv)
     // Main loop
     while (ros::ok())
     {
-        auto ssl_vision_packet_ptr = ssl_vision_client->getVisionPacket();
-        if (ssl_vision_packet_ptr)
+        auto ssl_vision_packet_queue = ssl_vision_client->getVisionPacketQueue();
+        while (!ssl_vision_packet_queue.empty())
         {
-            auto ssl_vision_packet = *ssl_vision_packet_ptr;
-
-            AITimestamp timestamp = Timestamp::getTimestampNow();
+            auto ssl_vision_packet = ssl_vision_packet_queue.front();
+            ssl_vision_packet_queue.pop();
 
             std::optional<thunderbots_msgs::Field> field_msg =
                 backend.getFieldMsg(ssl_vision_packet);

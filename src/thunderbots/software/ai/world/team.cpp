@@ -18,7 +18,7 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
     for (const auto& robot : new_robots)
     {
         auto duplicate_id = robot_ids.insert(robot.id());
-        if (duplicate_id.second)
+        if (!duplicate_id.second)
         {
             // TODO: Multiple robots on the same team with the same id. Throw exception
             // See https://github.com/UBC-Thunderbots/Software/issues/16
