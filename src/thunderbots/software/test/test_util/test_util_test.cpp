@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+
 /*
  * Unit tests for the unit test utilities
  */
@@ -112,6 +114,40 @@ TEST(TestUtilsTest, set_ball_velocity_in_world)
     world = ::Test::TestUtil::setBallVelocity(world, Vector(0, -2));
     EXPECT_EQ(Point(), world.ball().position());
     EXPECT_EQ(Vector(0, -2), world.ball().velocity());
+}
+
+TEST(TestUtilsTest, has_all_valid_refbox_game_states)
+{
+    std::vector game_states = ::Test::TestUtil::getAllRefboxGameStates();
+    // only way to test this getAllRefboxGameStates() without a literal copy-paste
+    // of the implementation
+    // note that this array does not contain RefboxGameState::LAST_ENUM_ITEM_UNUSED,
+    // this is intentional
+    std::vector<RefboxGameState> expected_game_states = {
+        RefboxGameState::HALT,
+        RefboxGameState::STOP,
+        RefboxGameState::NORMAL_START,
+        RefboxGameState::FORCE_START,
+        RefboxGameState::PREPARE_KICKOFF_US,
+        RefboxGameState::PREPARE_KICKOFF_THEM,
+        RefboxGameState::PREPARE_PENALTY_US,
+        RefboxGameState::PREPARE_PENALTY_THEM,
+        RefboxGameState::DIRECT_FREE_US,
+        RefboxGameState::DIRECT_FREE_THEM,
+        RefboxGameState::INDIRECT_FREE_US,
+        RefboxGameState::INDIRECT_FREE_THEM,
+        RefboxGameState::TIMEOUT_US,
+        RefboxGameState::TIMEOUT_THEM,
+        RefboxGameState::GOAL_US,
+        RefboxGameState::GOAL_THEM,
+        RefboxGameState::BALL_PLACEMENT_US,
+        RefboxGameState::BALL_PLACEMENT_THEM};
+
+    for (RefboxGameState state : expected_game_states)
+    {
+        EXPECT_TRUE(std::find(game_states.begin(), game_states.end(), state) !=
+                    game_states.end());
+    }
 }
 
 int main(int argc, char **argv)

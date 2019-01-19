@@ -109,6 +109,8 @@ thunderbots_msgs::Robot MessageUtil::createRobotMsgFromFilteredRobotData(
 
     robot_msg.orientation = filtered_robot_data.orientation.toRadians();
 
+    robot_msg.angular_velocity = filtered_robot_data.angular_velocity.toRadians();
+
     robot_msg.timestamp_nanoseconds_since_epoch = static_cast<unsigned long>(
         std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::microseconds(

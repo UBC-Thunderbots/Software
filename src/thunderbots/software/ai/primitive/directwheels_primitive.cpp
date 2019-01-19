@@ -1,5 +1,7 @@
 #include "ai/primitive/directwheels_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
 
 DirectWheelsPrimitive::DirectWheelsPrimitive(unsigned int robot_id, int wheel0_power,
@@ -74,4 +76,9 @@ std::vector<double> DirectWheelsPrimitive::getParameters() const
 std::vector<bool> DirectWheelsPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void DirectWheelsPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
