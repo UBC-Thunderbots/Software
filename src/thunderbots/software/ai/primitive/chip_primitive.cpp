@@ -1,5 +1,7 @@
 #include "ai/primitive/chip_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string ChipPrimitive::PRIMITIVE_NAME = "Chip Primitive";
 
 ChipPrimitive::ChipPrimitive(unsigned int robot_id, const Point &chip_origin,
@@ -60,4 +62,9 @@ std::vector<double> ChipPrimitive::getParameters() const
 std::vector<bool> ChipPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void ChipPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
