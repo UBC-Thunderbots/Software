@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 #include "geom/point.h"
 
 class Line final

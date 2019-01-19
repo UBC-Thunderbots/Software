@@ -6,13 +6,34 @@
 
 class Circle final
 {
-   public:
+   private:
     Point origin;
     double radius;
-
     /**
      * Creates a circle with origin (0, 0) and radius 0.
      */
+
+   public:
+    void setOrigin(Point o)
+    {
+        origin = o;
+    }
+
+    Point getOrigin() const
+    {
+        return origin;
+    }
+
+    void setRadius(double r)
+    {
+        radius = r;
+    }
+
+    double getRadius() const
+    {
+        return radius;
+    }
+
     inline explicit constexpr Circle() : radius(0) {}
 
     inline explicit constexpr Circle(const Point& origin, double r)
@@ -41,6 +62,7 @@ struct std::hash<Circle>
 {
     size_t operator()(const Circle& circle) const
     {
-        return std::hash<Point>()(circle.origin) ^ std::hash<double>()(circle.radius);
+        return std::hash<Point>()(circle.getOrigin()) ^
+               std::hash<double>()(circle.getRadius());
     }
 };
