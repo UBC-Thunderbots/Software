@@ -23,7 +23,7 @@ const Wrapper = styled.div`
     padding: 8px;
 `;
 
-interface ISidebarTitle {
+interface ISidebarTitleProps {
     /**
      * The sidebar title
      */
@@ -33,7 +33,7 @@ interface ISidebarTitle {
 /**
  * Displays a sidebar title in the correct area of the application
  */
-export const SidebarTitle = (props: ISidebarTitle) => {
+export const SidebarTitle = (props: ISidebarTitleProps) => {
     /*
      * Here, we add the sidebar title in the correct area of the application.
      */

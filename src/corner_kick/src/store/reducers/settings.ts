@@ -11,6 +11,9 @@ import * as settings from '../actions/settings';
 
 export type SettingsAction = ActionType<typeof settings>;
 
+/**
+ * Reducer function for settings
+ */
 export default (state: ISettingsState = defaultSettings, action: SettingsAction) => {
     switch (action.type) {
         // Hydrate the settings when we get a hydrate action (received settings from
