@@ -14,19 +14,20 @@
 // Constants
 const std::string NETWORK_ADDRESS       = "127.0.0.1";
 static constexpr short NETWORK_PORT     = 20011;
-static constexpr unsigned int TICK_RATE = 30;
+static constexpr unsigned int TICK_RATE = 60;
 
 // Member variables we need to maintain state
-
-// A vector of primitives. It is cleared each tick, populated by the callbacks
-// that receive primitive commands, and is processed by the backend to send
-// the primitives to the system we have chosen (such as grSim, our radio, etc.)
-std::vector<std::unique_ptr<Primitive>> primitives;
-
+// They are kept in an anonymous namespace so they are not accessible outside this
+// file and are not created as global static variables.
 namespace
 {
+    // A vector of primitives. It is cleared each tick, populated by the callbacks
+    // that receive primitive commands, and is processed by the backend to simulate
+    // the Primitives in grSim
+    std::vector<std::unique_ptr<Primitive>> primitives;
+
     Team friendly_team = Team(std::chrono::milliseconds(1000));
-}
+}  // namespace
 
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
@@ -46,7 +47,7 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
     Team updated_friendly_team =
         Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
 
-    friendly_team = updated_friendly_team;
+    friendly_team.updateState(updated_friendly_team);
 }
 
 int main(int argc, char** argv)
@@ -58,6 +59,9 @@ int main(int argc, char** argv)
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+    ros::Subscriber friendly_team_subscriber =
+        node_handle.subscribe(Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 10,
+                              friendlyTeamUpdateCallback);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
@@ -79,8 +83,7 @@ int main(int argc, char** argv)
         // The callbacks will populate the primitives vector
         ros::spinOnce();
 
-        grsim_backend.updateBackendTeam(friendly_team);
-        grsim_backend.sendPrimitives(primitives);
+        grsim_backend.sendPrimitives(primitives, friendly_team);
 
         tick_rate.sleep();
     }

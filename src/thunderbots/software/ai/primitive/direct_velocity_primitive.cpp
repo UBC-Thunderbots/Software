@@ -1,7 +1,6 @@
 #include "ai/primitive/direct_velocity_primitive.h"
 
-#include "direct_velocity_primitive.h"
-
+#include "ai/primitive/visitor/primitive_visitor.h"
 
 const std::string DirectVelocityPrimitive::PRIMITIVE_NAME = "Direct Velocity Primitive";
 
@@ -71,4 +70,9 @@ std::vector<double> DirectVelocityPrimitive::getParameters() const
 std::vector<bool> DirectVelocityPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void DirectVelocityPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
