@@ -36,7 +36,7 @@ TEST(KickPrimTest, parameter_array_test)
     KickPrimitive kick_prim = KickPrimitive(robot_id, kick_origin, kick_direction,
                                             kick_speed_meters_per_second);
 
-    std::vector<double> param_array = kick_prim.getParameterArray();
+    std::vector<double> param_array = kick_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(kick_origin.x(), param_array[0]);
     EXPECT_DOUBLE_EQ(kick_origin.y(), param_array[1]);
@@ -76,7 +76,7 @@ TEST(KickPrimTest, get_extra_bit_array_test)
 {
     KickPrimitive kick_prim = KickPrimitive(0, Point(), Angle(), 0.0);
 
-    std::vector<bool> extra_bit_array = kick_prim.getExtraBitArray();
+    std::vector<bool> extra_bit_array = kick_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
@@ -95,7 +95,7 @@ TEST(KickPrimitiveTest, create_primitive_from_message_test)
 
     KickPrimitive new_prim = KickPrimitive(prim_message);
 
-    std::vector<double> parameters = new_prim.getParameterArray();
+    std::vector<double> parameters = new_prim.getParameters();
 
     EXPECT_EQ("Kick Primitive", new_prim.getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim.getRobotId());
@@ -103,7 +103,7 @@ TEST(KickPrimitiveTest, create_primitive_from_message_test)
     EXPECT_DOUBLE_EQ(kick_origin.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(kick_direction.toRadians(), parameters[2]);
     EXPECT_DOUBLE_EQ(kick_speed_meters_per_second, parameters[3]);
-    EXPECT_EQ(kick_prim.getExtraBitArray(), std::vector<bool>());
+    EXPECT_EQ(kick_prim.getExtraBits(), std::vector<bool>());
 }
 
 int main(int argc, char **argv)

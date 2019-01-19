@@ -59,9 +59,22 @@ class ChipPrimitive : public Primitive
      */
     double getChipDistance() const;
 
-    std::vector<double> getParameterArray() const override;
+    /**
+     * Returns the generic vector of parameters for this Primitive
+     *
+     * @return A vector of the form {chip_origin.x(), chip_origin.y(),
+     *                               chip_direction.toRadians(), chip_distance_meters}
+     */
+    std::vector<double> getParameters() const override;
 
-    std::vector<bool> getExtraBitArray() const override;
+    /**
+     * This primitive has no extra bits
+     *
+     * @return an empty vector
+     */
+    std::vector<bool> getExtraBits() const override;
+
+    void accept(PrimitiveVisitor &visitor) const override;
 
    private:
     unsigned int robot_id;

@@ -17,6 +17,8 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
     std::set<unsigned int> robot_ids;
     for (const auto& robot : new_robots)
     {
+        // The second value of the pair that is returned indicates whether or not the
+        // value was already present in the set. We use this to detect duplicate robots
         auto duplicate_id = robot_ids.insert(robot.id());
         if (!duplicate_id.second)
         {

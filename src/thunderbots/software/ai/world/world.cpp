@@ -2,7 +2,11 @@
 
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
              const Team &enemy_team)
-    : field_(field), ball_(ball), friendly_team_(friendly_team), enemy_team_(enemy_team)
+    : field_(field),
+      ball_(ball),
+      friendly_team_(friendly_team),
+      enemy_team_(enemy_team),
+      game_state_()
 {
 }
 
@@ -64,4 +68,19 @@ const Team &World::enemyTeam() const
 Team &World::mutableEnemyTeam()
 {
     return enemy_team_;
+}
+
+void World::updateRefboxGameState(const RefboxGameState &game_state)
+{
+    game_state_.updateRefboxGameState(game_state);
+}
+
+const GameState &World::gameState() const
+{
+    return game_state_;
+}
+
+GameState &World::mutableGameState()
+{
+    return game_state_;
 }

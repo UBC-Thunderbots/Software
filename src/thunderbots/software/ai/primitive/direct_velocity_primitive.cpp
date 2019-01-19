@@ -1,7 +1,6 @@
 #include "ai/primitive/direct_velocity_primitive.h"
 
-#include "direct_velocity_primitive.h"
-
+#include "ai/primitive/visitor/primitive_visitor.h"
 
 const std::string DirectVelocityPrimitive::PRIMITIVE_NAME = "Direct Velocity Primitive";
 
@@ -60,7 +59,7 @@ double DirectVelocityPrimitive::getDribblerRpm() const
     return dribbler_rpm;
 }
 
-std::vector<double> DirectVelocityPrimitive::getParameterArray() const
+std::vector<double> DirectVelocityPrimitive::getParameters() const
 {
     std::vector<double> parameters = {x_velocity, y_velocity, angular_velocity,
                                       dribbler_rpm};
@@ -68,7 +67,12 @@ std::vector<double> DirectVelocityPrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> DirectVelocityPrimitive::getExtraBitArray() const
+std::vector<bool> DirectVelocityPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void DirectVelocityPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
