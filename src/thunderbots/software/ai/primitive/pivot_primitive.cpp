@@ -1,5 +1,7 @@
 #include "ai/primitive/pivot_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string PivotPrimitive::PRIMITIVE_NAME = "Pivot Primitive";
 
 PivotPrimitive::PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
@@ -59,4 +61,9 @@ std::vector<double> PivotPrimitive::getParameters() const
 std::vector<bool> PivotPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void PivotPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

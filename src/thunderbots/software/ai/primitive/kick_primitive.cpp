@@ -1,5 +1,7 @@
 #include "ai/primitive/kick_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string KickPrimitive::PRIMITIVE_NAME = "Kick Primitive";
 
 KickPrimitive::KickPrimitive(unsigned int robot_id, const Point &kick_origin,
@@ -62,4 +64,9 @@ std::vector<double> KickPrimitive::getParameters() const
 std::vector<bool> KickPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void KickPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
