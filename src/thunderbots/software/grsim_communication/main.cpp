@@ -3,11 +3,10 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
-#include <iostream>
-
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
-#include "robot_communication/grsim/grsim_backend.h"
+#include "geom/point.h"
+#include "grsim_communication/grsim_backend.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/ros_messages.h"
@@ -53,7 +52,7 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
 int main(int argc, char** argv)
 {
     // Init ROS node
-    ros::init(argc, argv, "robot_communication");
+    ros::init(argc, argv, "grsim_communication");
     ros::NodeHandle node_handle;
 
     // Create subscribers to topics we care about
@@ -61,11 +60,11 @@ int main(int argc, char** argv)
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
 
     // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger();
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Initialize variables
-    primitives           = std::vector<std::unique_ptr<Primitive>>();
-    GrSimBackend backend = GrSimBackend(NETWORK_ADDRESS, NETWORK_PORT);
+    primitives                 = std::vector<std::unique_ptr<Primitive>>();
+    GrSimBackend grsim_backend = GrSimBackend(NETWORK_ADDRESS, NETWORK_PORT);
 
     // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
@@ -80,9 +79,8 @@ int main(int argc, char** argv)
         // The callbacks will populate the primitives vector
         ros::spinOnce();
 
-        backend.updateBackendTeam(friendly_team);
-
-        backend.sendPrimitives(primitives);
+        grsim_backend.updateBackendTeam(friendly_team);
+        grsim_backend.sendPrimitives(primitives);
 
         tick_rate.sleep();
     }

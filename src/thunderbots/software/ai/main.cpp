@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger();
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Main loop
     while (ros::ok())

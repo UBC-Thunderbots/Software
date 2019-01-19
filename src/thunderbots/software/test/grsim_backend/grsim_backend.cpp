@@ -1,4 +1,4 @@
-#include "robot_communication/grsim/grsim_backend.h"
+#include "grsim_communication/grsim_backend.h"
 
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
@@ -7,7 +7,6 @@
 
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Packet.pb.h"
-#include "robot_communication/backend.h"
 
 TEST(GrSimBackendTest, create_grsim_packet_zero_vel)
 {
