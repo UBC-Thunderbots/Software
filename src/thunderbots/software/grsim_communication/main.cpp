@@ -83,9 +83,6 @@ int main(int argc, char** argv)
         // The callbacks will populate the primitives vector
         ros::spinOnce();
 
-        primitives.emplace_back(std::unique_ptr<Primitive>(
-            new MovePrimitive(0, Point(0, 0), Angle::zero(), 0.0)));
-
         grsim_backend.sendPrimitives(primitives, friendly_team);
 
         tick_rate.sleep();

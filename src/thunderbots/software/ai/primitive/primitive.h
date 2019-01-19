@@ -9,10 +9,10 @@
 
 // We forward-declare the PrimitiveVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
-// accept() function. We cannot use an #inlude statement because this creates a cyclic
+// accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
 //
-// This class can be found in robot_communication/grsim/grsim_primitive_visitor.h
+// This class can be found in ai/primitive/visitor/primitive_visitor.h
 class PrimitiveVisitor;
 
 /**

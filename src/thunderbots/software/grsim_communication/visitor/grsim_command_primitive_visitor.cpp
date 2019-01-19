@@ -17,24 +17,23 @@ GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot)
 
 void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
-    LOG(DEBUG) << "In " << catch_primitive.getPrimitiveName() << " visitor" << std::endl;
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/134
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    LOG(DEBUG) << "In " << chip_primitive.getPrimitiveName() << " visitor" << std::endl;
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
-    LOG(DEBUG) << "In " << direct_velocity_primitive.getPrimitiveName() << " visitor"
-               << std::endl;
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/97
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    LOG(DEBUG) << "In " << kick_primitive.getPrimitiveName() << " visitor" << std::endl;
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
@@ -46,7 +45,7 @@ void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    LOG(DEBUG) << "In " << pivot_primitive.getPrimitiveName() << " visitor" << std::endl;
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
 }
 
 MotionController::MotionControllerCommand

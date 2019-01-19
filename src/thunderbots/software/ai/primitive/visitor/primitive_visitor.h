@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../catch_primitive.h"
-#include "../chip_primitive.h"
-#include "../direct_velocity_primitive.h"
-#include "../kick_primitive.h"
-#include "../move_primitive.h"
-#include "../pivot_primitive.h"
+#include "ai/primitive/catch_primitive.h"
+#include "ai/primitive/chip_primitive.h"
+#include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/kick_primitive.h"
+#include "ai/primitive/move_primitive.h"
+#include "ai/primitive/pivot_primitive.h"
 
 /**
  * This class provides an interface for all Primitive Visitors. The Visitor design pattern
