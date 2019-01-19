@@ -7,6 +7,7 @@ import { ThemedStyledComponentsModule } from 'styled-components';
 
 import { IThemeProvider } from 'SRC/types';
 
+// We recreate styled-components with theme typings attached
 const {
     default: styled,
     css,

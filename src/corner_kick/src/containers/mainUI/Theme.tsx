@@ -1,6 +1,7 @@
 /**
- * This file defines the main styling of the application and connects the
- * theme to all styled-components instances
+ * This file defines the main theme of the application and connects the
+ * theme to all styled-components instances. The application layout is
+ * specified in style.css
  */
 
 import * as React from 'react';
@@ -32,6 +33,9 @@ interface ISettingsMainProps {
     settings: ISettingsState;
 }
 
+/**
+ * Adds application theme to the React tree
+ */
 class ThemeInternal extends React.Component<ISettingsMainProps> {
     public render() {
         const { settings } = this.props;
