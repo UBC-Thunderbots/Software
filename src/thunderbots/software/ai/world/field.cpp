@@ -1,4 +1,5 @@
 #include "field.h"
+
 #include "geom/rectangle.h"
 
 Field::Field(double field_length, double field_width, double defense_length,

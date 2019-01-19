@@ -195,7 +195,8 @@ bool intersects(const Circle &first, const Triangle &second)
 
 bool intersects(const Circle &first, const Circle &second)
 {
-    return (first.getOrigin() - second.getOrigin()).len() < (first.getRadius() + second.getRadius());
+    return (first.getOrigin() - second.getOrigin()).len() <
+           (first.getRadius() + second.getRadius());
 }
 
 bool intersects(const Ray &first, const Segment &second)
@@ -216,9 +217,10 @@ bool intersects(const Segment &first, const Circle &second)
 {
     // if the segment is inside the circle AND at least one of the points is
     // outside the circle
-    return contains(second, first) &&
-           (distsq(first.start, second.getOrigin()) > second.getRadius() * second.getRadius() ||
-            distsq(first.end, second.getOrigin()) > second.getRadius() * second.getRadius());
+    return contains(second, first) && (distsq(first.start, second.getOrigin()) >
+                                           second.getRadius() * second.getRadius() ||
+                                       distsq(first.end, second.getOrigin()) >
+                                           second.getRadius() * second.getRadius());
 }
 bool intersects(const Circle &first, const Segment &second)
 {
@@ -887,21 +889,22 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     // the perp points
     if (contains(circle, start))
     {
-        double perpDist =
-            std::sqrt(circle.getRadius() * circle.getRadius() - (circle.getOrigin() - start).lensq());
+        double perpDist = std::sqrt(circle.getRadius() * circle.getRadius() -
+                                    (circle.getOrigin() - start).lensq());
         Point p1 = start + (circle.getOrigin() - start).perp().norm(perpDist + buffer);
         Point p2 = start - (circle.getOrigin() - start).perp().norm(perpDist + buffer);
         return std::make_pair(p1, p2);
     }
     else
     {
-        double radiusAngle = std::acos(circle.getRadius() / (start - circle.getOrigin()).len());
-        Point p1           = circle.getOrigin() + (start - circle.getOrigin())
-                                       .rotate(Angle::ofRadians(radiusAngle))
-                                       .norm(circle.getRadius() + buffer);
+        double radiusAngle =
+            std::acos(circle.getRadius() / (start - circle.getOrigin()).len());
+        Point p1 = circle.getOrigin() + (start - circle.getOrigin())
+                                            .rotate(Angle::ofRadians(radiusAngle))
+                                            .norm(circle.getRadius() + buffer);
         Point p2 = circle.getOrigin() + (start - circle.getOrigin())
-                                       .rotate(-Angle::ofRadians(radiusAngle))
-                                       .norm(circle.getRadius() + buffer);
+                                            .rotate(-Angle::ofRadians(radiusAngle))
+                                            .norm(circle.getRadius() + buffer);
         return std::make_pair(p1, p2);
     }
 }
