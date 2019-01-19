@@ -90,6 +90,8 @@ class DirectWheelsPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
+    void accept(PrimitiveVisitor &visitor) const override;
+
    private:
     unsigned int robot_id;
     int front_left_wheel_power;

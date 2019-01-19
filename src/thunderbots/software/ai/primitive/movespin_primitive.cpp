@@ -1,5 +1,7 @@
 #include "ai/primitive/movespin_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";
 
 MoveSpinPrimitive::MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
@@ -49,4 +51,9 @@ std::vector<double> MoveSpinPrimitive::getParameters() const
 std::vector<bool> MoveSpinPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void MoveSpinPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

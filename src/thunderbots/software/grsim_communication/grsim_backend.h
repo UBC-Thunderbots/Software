@@ -3,14 +3,14 @@
 #include <boost/asio.hpp>
 #include <string>
 
+#include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "proto/grSim_Packet.pb.h"
-#include "robot_communication/backend.h"
 
 
-class GrSimBackend : public Backend
+class GrSimBackend
 {
    public:
     /**
@@ -23,18 +23,24 @@ class GrSimBackend : public Backend
 
     ~GrSimBackend();
 
-    void sendPrimitives(
-        const std::vector<std::unique_ptr<Primitive>>& primitives) override;
+    /**
+     * Sends the given primitives to be simulated in grSim
+     *
+     * @param primitives the list of primitives to send
+     * @param friendly_team A Team object containing the latest data for the friendly team
+     */
+    void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives,
+                        const Team& friendly_team);
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.
      * Velocities are in the Robot's local coordinate system. This function is left public
-     * so that it's easily testable
+     * so it is easy to test.
      *
      * @param robot_id The id of the robot to send the command to
      * @param team_colour_yellow Specifies if the robot to send the command to is on the
      * yellow team
-     * @param velocity The velocity to set for the robot, in robot coordinates. X
+     * @param robot_velocity The velocity to set for the robot, in robot coordinates. X
      * corresponds to "forward" from the robot's perspective, and Y corresponds to the
      * left of the robot. Values are in metres per second.
      *
@@ -45,7 +51,7 @@ class GrSimBackend : public Backend
      *   Y <--- Robot
      *
      * @param angular_velocity The angular velocity to set for the robot, in Radians per
-     * second. A negative value results in counter-clockwise rotation, and positive
+     * second. A positive value results in counter-clockwise rotation, and a negative
      * values result in clockwise rotation
      * @param kick_speed_meters_per_second How hard to kick/chip the ball, in
      * meters/second. If chip is false, the ball is kicked along the ground. If chip is
@@ -53,26 +59,17 @@ class GrSimBackend : public Backend
      * @param chip Whether or not to chip the ball. If chip is true, the ball is chipped
      * in the air, otherwise it is kicked along the ground
      * @param dribbler_on Whether or not to turn on the dribbler. If dribbler_on is true,
-     * the dribbler will be turned on, otherwise the dribbler remains off
+     * the dribbler will be turned on, otherwise the dribbler remains off. Dribbler speed
+     * cannot be controlled in grSim
      */
-    grSim_Packet createGrSimPacket(unsigned int robot_id, TeamColour team_colour,
-                                   Vector velocity, AngularVelocity angular_velocity,
-                                   double kick_speed_meters_per_second, bool chip,
-                                   bool dribbler_on) const;
-
-    /**
-     * Helper function that updates the backend friendly team object
-     * @param new_friendly_team The updated instance of the friendly team
-     */
-    void updateBackendTeam(const Team& new_friendly_team)
-    {
-        team = new_friendly_team;
-    }
+    grSim_Packet createGrSimPacketWithRobotVelocity(unsigned int robot_id,
+                                                    TeamColour team_colour,
+                                                    Vector robot_velocity,
+                                                    AngularVelocity angular_velocity,
+                                                    double kick_speed_meters_per_second,
+                                                    bool chip, bool dribbler_on) const;
 
    private:
-    // construct default team
-    Team team = Team(std::chrono::milliseconds(1000));
-
     /**
      * Sends a grSim packet to grSim via UDP
      *

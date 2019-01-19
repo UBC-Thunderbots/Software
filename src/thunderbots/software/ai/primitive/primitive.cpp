@@ -9,7 +9,6 @@
 #include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
 
-
 thunderbots_msgs::Primitive Primitive::createMsg() const
 {
     thunderbots_msgs::Primitive primitive_msg;

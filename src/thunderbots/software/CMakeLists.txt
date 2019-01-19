@@ -134,9 +134,9 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES}
         ${G3LOG}
         )
 
-file(GLOB_RECURSE ROBOT_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/robot_communication/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/robot_communication/*.h
+file(GLOB_RECURSE GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
@@ -146,18 +146,40 @@ file(GLOB_RECURSE ROBOT_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPEN
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
         )
-add_executable (robot_communication
+add_executable (grsim_communication
         ${PROTO_SRCS}
-        ${ROBOT_COMMUNICATION_SRC}
+        ${GRSIM_COMMUNICATION_SRC}
         ${SHARED_UTIL_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(robot_communication ${catkin_EXPORTED_TARGETS})
-target_link_libraries(robot_communication ${catkin_LIBRARIES}
+add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
+target_link_libraries(grsim_communication ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         )
+
+file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
+        )
+add_executable (radio_communication
+        ${RADIO_COMMUNICATION_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
+target_link_libraries(radio_communication ${catkin_LIBRARIES}
+        ${G3LOG}
+        )
+
 file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/param_server/*.cpp
@@ -212,7 +234,8 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(grsim_backend_test
             ${PROTO_SRCS}
             test/grsim_backend/grsim_backend.cpp
-            robot_communication/grsim/motion_controller.cpp
+            grsim_communication/motion_controller/motion_controller.cpp
+            ai/primitive/move_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
@@ -224,15 +247,15 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/pivot_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
-            robot_communication/grsim/grsim_backend.cpp
-            robot_communication/grsim/grsim_backend.h
-            robot_communication/backend.h
-            util/logger/custom_g3log_sinks.h
-            util/logger/init.h
+            grsim_communication/grsim_backend.cpp
+            grsim_communication/grsim_backend.h
+            grsim_communication/grsim_backend.cpp
+            grsim_communication/visitor/grsim_command_primitive_visitor.cpp
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
-            ${G3LOG})
+            ${G3LOG}
+            )
 
     catkin_add_gtest(geom_util_test
             test/geom/util.cpp
@@ -290,7 +313,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(motion_controller_test
             test/grsim_backend/motion_controller.cpp
-            robot_communication/grsim/motion_controller.cpp
+            grsim_communication/motion_controller/motion_controller.cpp
             ai/world/robot.cpp
             geom/point.h
             geom/angle.h)
@@ -339,6 +362,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -347,7 +371,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -357,6 +380,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(move_primitive_test
             test/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -365,7 +389,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -375,6 +398,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(movespin_primitive_test
             test/primitive/movespin_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -383,7 +407,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -393,6 +416,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(directwheels_primitive_test
             test/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -401,7 +425,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -411,6 +434,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(pivot_primitive_test
             test/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -419,7 +443,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -429,6 +452,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(chip_primitive_test
             test/primitive/chip_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -437,7 +461,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -447,6 +470,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(kick_primitive_test
             test/primitive/kick_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -455,7 +479,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -465,6 +488,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(direct_velocity_primitive_test
             test/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -473,7 +497,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -483,6 +506,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(catch_primitive_test
             test/primitive/catch_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -491,7 +515,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )

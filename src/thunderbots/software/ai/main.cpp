@@ -12,9 +12,9 @@
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
 
-// Variables we need to maintain state. They are declared "globally" in the file so they
-// can be seen/used by the callback functions as well as the main function.
-// In an anonymous namespace so they cannot be seen/accessed outside this file.
+// Member variables we need to maintain state
+// They are kept in an anonymous namespace so they are not accessible outside this
+// file and are not created as global static variables.
 namespace
 {
     // Initialize our AI, which is the main object that maintains state
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
 
     // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger();
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Main loop
     while (ros::ok())

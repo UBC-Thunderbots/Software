@@ -1,5 +1,6 @@
 #include "ai/primitive/directwheels_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
 #include "util/logger/init.h"
 
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
@@ -120,4 +121,9 @@ std::vector<double> DirectWheelsPrimitive::getParameters() const
 std::vector<bool> DirectWheelsPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void DirectWheelsPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
