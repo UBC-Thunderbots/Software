@@ -6,6 +6,7 @@
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "util/logger/init.h"
@@ -44,6 +45,11 @@ void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
+}
+
+void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
 }

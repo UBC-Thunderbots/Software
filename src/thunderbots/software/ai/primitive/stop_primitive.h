@@ -50,6 +50,8 @@ class StopPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
+    void accept(PrimitiveVisitor &visitor) const override;
+
    private:
     unsigned int robot_id;
 
