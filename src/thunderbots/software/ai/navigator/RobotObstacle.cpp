@@ -14,17 +14,17 @@ RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
 
 double RobotObstacle::getViolationDistance(const Point& point)
 {
-    // Check if distance between p and center of boundary is less than the radius;
+    // Check if distance between p and center of boundary is less than the radius
     // if so then we have a violation.
-    double dist1 = (point - boundary.origin).len();
-    return std::max(0.0, boundary.radius - dist1);
+    double dist1 = (point - boundary.getOrigin()).len();
+    return std::max(0.0, boundary.getRadius() - dist1);
 }
 
 Point RobotObstacle::getNearestValidPoint(const Point& point)
 {
     if (getViolationDistance(point) > 0.0)
     {
-        return boundary.origin + (point - boundary.origin).norm(boundary.radius);
+        return boundary.getOrigin() + (point - boundary.getOrigin()).norm(boundary.getRadius());
     }
     return point;
 }

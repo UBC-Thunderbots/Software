@@ -144,12 +144,12 @@ bool contains(const Triangle &out, const Vector &in)
 
 bool contains(const Circle &out, const Vector &in)
 {
-    return distsq(out.origin, in) <= out.radius * out.radius;
+    return distsq(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
 }
 
 bool contains(const Circle &out, const Segment &in)
 {
-    return dist(in, out.origin) < out.radius;
+    return dist(in, out.getOrigin()) < out.getRadius();
 }
 
 bool contains(const Segment &out, const Vector &in)
@@ -183,10 +183,10 @@ bool contains(const Rectangle &out, const Vector &in)
 
 bool intersects(const Triangle &first, const Circle &second)
 {
-    return contains(first, second.origin) ||
-           dist(getSide(first, 0), second.origin) < second.radius ||
-           dist(getSide(first, 1), second.origin) < second.radius ||
-           dist(getSide(first, 2), second.origin) < second.radius;
+    return contains(first, second.getOrigin()) ||
+           dist(getSide(first, 0), second.getOrigin()) < second.getRadius() ||
+           dist(getSide(first, 1), second.getOrigin()) < second.getRadius() ||
+           dist(getSide(first, 2), second.getOrigin()) < second.getRadius();
 }
 bool intersects(const Circle &first, const Triangle &second)
 {
@@ -195,7 +195,7 @@ bool intersects(const Circle &first, const Triangle &second)
 
 bool intersects(const Circle &first, const Circle &second)
 {
-    return (first.origin - second.origin).len() < (first.radius + second.radius);
+    return (first.getOrigin() - second.getOrigin()).len() < (first.getRadius() + second.getRadius());
 }
 
 bool intersects(const Ray &first, const Segment &second)
@@ -217,8 +217,8 @@ bool intersects(const Segment &first, const Circle &second)
     // if the segment is inside the circle AND at least one of the points is
     // outside the circle
     return contains(second, first) &&
-           (distsq(first.start, second.origin) > second.radius * second.radius ||
-            distsq(first.end, second.origin) > second.radius * second.radius);
+           (distsq(first.start, second.getOrigin()) > second.getRadius() * second.getRadius() ||
+            distsq(first.end, second.getOrigin()) > second.getRadius() * second.getRadius());
 }
 bool intersects(const Circle &first, const Segment &second)
 {
@@ -888,20 +888,20 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     if (contains(circle, start))
     {
         double perpDist =
-            std::sqrt(circle.radius * circle.radius - (circle.origin - start).lensq());
-        Point p1 = start + (circle.origin - start).perp().norm(perpDist + buffer);
-        Point p2 = start - (circle.origin - start).perp().norm(perpDist + buffer);
+            std::sqrt(circle.getRadius() * circle.getRadius() - (circle.getOrigin() - start).lensq());
+        Point p1 = start + (circle.getOrigin() - start).perp().norm(perpDist + buffer);
+        Point p2 = start - (circle.getOrigin() - start).perp().norm(perpDist + buffer);
         return std::make_pair(p1, p2);
     }
     else
     {
-        double radiusAngle = std::acos(circle.radius / (start - circle.origin).len());
-        Point p1           = circle.origin + (start - circle.origin)
+        double radiusAngle = std::acos(circle.getRadius() / (start - circle.getOrigin()).len());
+        Point p1           = circle.getOrigin() + (start - circle.getOrigin())
                                        .rotate(Angle::ofRadians(radiusAngle))
-                                       .norm(circle.radius + buffer);
-        Point p2 = circle.origin + (start - circle.origin)
+                                       .norm(circle.getRadius() + buffer);
+        Point p2 = circle.getOrigin() + (start - circle.getOrigin())
                                        .rotate(-Angle::ofRadians(radiusAngle))
-                                       .norm(circle.radius + buffer);
+                                       .norm(circle.getRadius() + buffer);
         return std::make_pair(p1, p2);
     }
 }
