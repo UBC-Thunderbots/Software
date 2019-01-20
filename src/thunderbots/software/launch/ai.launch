@@ -8,8 +8,8 @@
     <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen">
     </node>
 
-    <!-- Launch the robot_communication node -->
-    <node name="robot_communication" pkg="thunderbots" type="robot_communication" output="screen">
+    <!-- Launch the grsim_communication node -->
+    <node name="grsim_communication" pkg="thunderbots" type="grsim_communication" output="screen">
     </node>
 
     <!-- Launch the dynamic parameters node -->
