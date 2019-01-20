@@ -1,4 +1,4 @@
-/**
+/*
  * This file defines a React component which adds other elements
  * in the main area of the application
  */

@@ -1,4 +1,4 @@
-/**
+/*
  * This file combines all reducers to be consumed by the Redux store
  */
 

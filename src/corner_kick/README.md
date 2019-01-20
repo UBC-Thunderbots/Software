@@ -16,6 +16,7 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 - [Project Structure](#project-structure)
 - [Design notes](#design-notes)
   - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
+    - [React Portals](#react-portals)
   - [Approach to the application state](#approach-to-the-application-state)
 
 ## How to use
@@ -85,6 +86,8 @@ be divided into sections as follow:
 
 The application's primary layout is defined in [index.html](src/index.html). The theme for the application is defined
 in [Theme.tsx](src/style/Theme.tsx)
+
+#### React Portals
 
 Access to those section in the React application is done via [React Portals](https://reactjs.org/docs/portals.html).
 Portals are used to ensure the application layout is enforced throughout all the pages while offering an

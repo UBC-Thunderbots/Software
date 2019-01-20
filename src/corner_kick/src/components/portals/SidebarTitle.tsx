@@ -1,4 +1,4 @@
-/**
+/*
  * This file defines the layout for the sidebar title area
  * of the application
  */

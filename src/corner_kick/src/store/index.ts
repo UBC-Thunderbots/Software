@@ -1,4 +1,4 @@
-/**
+/*
  * This file groups all Redux related exports and creates the Redux store
  */
 

@@ -1,4 +1,4 @@
-/**
+/*
  * This file specifies the theme typing for the style-component library
  * @see https://www.styled-components.com/docs/api#typescript
  */

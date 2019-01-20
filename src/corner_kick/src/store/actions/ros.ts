@@ -1,4 +1,4 @@
-/**
+/*
  * This file specifies ROS specific action
  *
  * We are using the format specified here

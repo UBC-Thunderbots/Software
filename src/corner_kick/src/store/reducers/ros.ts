@@ -1,4 +1,4 @@
-/**
+/*
  * This file specifies the ROS reducer
  */
 

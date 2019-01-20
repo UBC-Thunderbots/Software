@@ -1,4 +1,4 @@
-/**
+/*
  * This file specifies the mount point for our application
  */
 

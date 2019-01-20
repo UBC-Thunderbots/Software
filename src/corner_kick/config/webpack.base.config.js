@@ -49,7 +49,8 @@ const generalWebpackBuild = {
         ],
     },
     resolve: {
-        // Make sure if you add a new file support to add its extension here.
+        // These are the extensions that Webpack will try to resolve (aka transpile into
+        // a .js bundle)
         extensions: ['.js', '.ts', '.tsx', '.json'],
 
         // We set an alias to our src directory to reduce the need for relative paths.
@@ -71,8 +72,10 @@ module.exports = {
         filename: '[name].[contenthash].js',
     },
 
-    // This target allows us to access DOM libraries simultaneously
+    // We use the web target to give us access to DOM-related JS functions
+    // A good analogy is selecting the STD library used in a C/C++ project
     target: 'web',
+
     // Our plugins go here.
     plugins: [
         // This plugins autogenerates our index.html files and links the javascript bundle.
