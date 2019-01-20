@@ -57,6 +57,7 @@ The project is defined as follow:
     -   `containers` - contains high-level UI components (logger, visualizer, etc.)
     -   `constants` - contains fixed values used throughout the application
     -   `store` - contains logic for the application Redux state
+    -   `style` - contains application styling and theming
     -   `types` - contains all Typescript types
     -   `utils` - contains misc code
 -   `.prettierrc` - configuration for autoformating tool
@@ -82,8 +83,8 @@ be divided into sections as follow:
 -   **Console:** Contains views visible across the application
 -   **Footer:** Contains simple breadcrumbs of information relevant to the application as a whole or to the current page
 
-The application's primary layout is defined in [index.html](src/index.html) and styling for the layout is
-defined in [style.css](src/style.css). The theme for the application is defined in [Theme.tsx](src/containers/mainUI/Theme.tsx)
+The application's primary layout is defined in [index.html](src/index.html). The theme for the application is defined
+in [Theme.tsx](src/style/Theme.tsx)
 
 Access to those section in the React application is done via [React Portals](https://reactjs.org/docs/portals.html).
 Portals are used to ensure the application layout is enforced throughout all the pages while offering an

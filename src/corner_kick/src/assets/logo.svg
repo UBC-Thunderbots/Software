@@ -1,0 +1,48 @@
+<!-- Logo for Corner Kick -->
+<!-- This file was generated using Illustrator -->
+<svg 
+    width="32" 
+    height="32" 
+    viewBox="0 0 32 32" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <path 
+        fill-rule="evenodd" 
+        clip-rule="evenodd" 
+        d="
+            M32 2C32 
+            0.895431
+            31.1046 
+            0 
+            30 
+            0V0C28.8954 
+            0 
+            28 
+            0.895431 
+            28 
+            2V14C28 21.732 
+            21.732 
+            28 
+            14 
+            28L2 
+            28C0.895431 
+            28 
+            0 
+            28.8954 
+            0 
+            30V30C0 
+            31.1046 
+            0.895431 
+            32 
+            2 
+            32H28V32C30.2091 
+            32 
+            32 
+            30.2091 
+            32 
+            28V28V2Z
+        " 
+        fill="#c2d94c"/>
+    <circle cx="13" cy="13" r="9" fill="#c2d94c"/>
+</svg>

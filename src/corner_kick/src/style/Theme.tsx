@@ -17,7 +17,7 @@ const GlobalStylesheet = createGlobalStyle`
     }
 
     #root > div {
-        border-color: ${(props) => props.theme.colors.border};
+        border-color: ${(props) => props.theme.colors.border} !important;
     }
 
     #main {
