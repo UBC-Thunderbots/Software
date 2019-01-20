@@ -74,7 +74,7 @@ The project is defined as follow:
 
 ### Approach to the application UI layout
 
-The visualizer will consist of multiple page which serve a single purpose. Each page will
+The visualizer will consist of multiple pages, each of which serve a single purpose. Each page will
 be divided into sections as follow:
 
 -   **Main:** Contains the primary focus of the page
