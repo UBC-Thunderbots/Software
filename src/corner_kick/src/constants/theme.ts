@@ -9,6 +9,12 @@ import { IThemeProvider } from 'SRC/types';
  * Object defining the theme of the application
  */
 export const theme: IThemeProvider = {
+    // This is the application's color palette. They need
+    // to be strings as that is what our CSS code accepts.
+    // Some of those attributes define color for a purpose
+    // (`fg` defines the color for a foreground elements - like text)
+    // while others define shades of a particular color (red defines the
+    // shade of red we use)
     colors: {
         fg: '#B3B1AD',
         bg: '#0A0E14',
