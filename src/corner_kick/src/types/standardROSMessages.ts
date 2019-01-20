@@ -1,4 +1,4 @@
-/**
+/*
  * This file defines standard ROS message types
  */
 

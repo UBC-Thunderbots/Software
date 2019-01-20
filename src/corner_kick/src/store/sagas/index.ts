@@ -8,12 +8,10 @@
 import { spawn } from 'redux-saga/effects';
 
 import initROS from './ros';
-import initSettings from './settings';
 
 /**
  * Starts all application sagas
  */
 export function* init() {
-    yield spawn(initSettings);
     yield spawn(initROS);
 }

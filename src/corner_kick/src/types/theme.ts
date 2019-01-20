@@ -1,3 +1,5 @@
+import { Color } from './primitives';
+
 /**
  * This file defines the type of the application theme object
  * @see https://www.styled-components.com/docs/advanced#theming
@@ -14,27 +16,27 @@ export interface IThemeProvider {
  * The color available in the application
  */
 interface IColorProvider {
-    fg: string;
-    bg: string;
+    fg: Color;
+    bg: Color;
 
-    accent: string;
-    subdued: string;
-    selected: string;
+    accent: Color;
+    subdued: Color;
+    selected: Color;
 
-    panel: string;
-    border: string;
+    panel: Color;
+    border: Color;
 
-    success: string;
-    error: string;
-    warn: string;
-    info: string;
-    debug: string;
+    success: Color;
+    error: Color;
+    warn: Color;
+    info: Color;
+    debug: Color;
 
-    red: string;
-    orange: string;
-    yellow: string;
-    green: string;
-    cyan: string;
-    blue: string;
-    purple: string;
+    red: Color;
+    orange: Color;
+    yellow: Color;
+    green: Color;
+    cyan: Color;
+    blue: Color;
+    purple: Color;
 }

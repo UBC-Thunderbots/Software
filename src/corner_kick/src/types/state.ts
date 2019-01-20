@@ -1,15 +1,12 @@
-/**
+/*
  * This file specifies the format of the application state
  */
-
-import { Setting } from './settings';
 
 /**
  * The application state
  */
 export interface IRootState {
     ros: IROSState;
-    settings: ISettingsState;
 }
 
 /**
@@ -23,8 +20,3 @@ export interface IROSState {
     services: string[];
     params: string[];
 }
-
-/**
- * The state object for settings
- */
-export type ISettingsState = { [K in Setting]: string };

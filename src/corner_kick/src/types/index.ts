@@ -1,8 +1,8 @@
-/**
+/*
  * This file merges all types in the types folder for easy import
  */
 
+export { Color } from './primitives';
 export { IThemeProvider } from './theme';
-export { Setting } from './settings';
 export { IRosoutMessage } from './standardROSMessages';
-export { IRootState, IROSState, ISettingsState } from './state';
+export { IRootState, IROSState } from './state';
