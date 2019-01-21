@@ -18,6 +18,7 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
   - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
     - [React Portals](#react-portals)
   - [Approach to the application state](#approach-to-the-application-state)
+    - [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
 
 ## How to use
 
@@ -106,7 +107,14 @@ with potentially new values based on the action received.
 React, then, becomes an extension of the global Redux state and does not contain state of its own. When the global state
 changes, the React UI will automagically change to adapt to the new state.
 
-Reducer functions do not permit for any side-effects to ensure a deterministic behaviour. For a state and action, the same new
-state should be returned by the reducer funtion. This, however, does not permit for more complex logic, such as communicating
-with ROS, to occur. To allow for this, we introduce sagas, which can intercept and act on Redux action. They can conduct some
+#### Reducer functions and Redux saga
+
+Reducer functions are the cornerstone of the Redux approach. Once a Redux action is dispatched, reducer functions
+determine what the new state will look like as a result of the action sent. Reducer functions do not permit for
+any side-effects to ensure a deterministic behaviour. For a state and action, the same new state should be returned
+by the reducer funtion. This, however, does not permit for more complex logic, such as communicating with ROS,
+to occur. To allow for this, we introduce sagas, which can intercept and act on Redux action. They can conduct some
 business logic work, and reflect the result of this work in the state by emmiting a Redux action when needed.
+
+For more information about reducer functions, read the [official Redux doc on that topic](https://redux.js.org/basics/reducers).
+For more information about Redux sagas, read the [official Redux saga doc](https://redux-saga.js.org/).
