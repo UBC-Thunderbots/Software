@@ -13,7 +13,7 @@ export interface IThemeProvider {
 }
 
 /**
- * The color available in the application
+ * The colors available in the application
  */
 interface IColorProvider {
     fg: Color;
