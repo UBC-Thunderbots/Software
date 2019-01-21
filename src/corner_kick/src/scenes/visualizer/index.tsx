@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { Portal } from 'SRC/components/Portal';
-import { SidebarPanels } from 'SRC/components/SidebarPanels';
-import { Panel } from 'SRC/components/SidebarPanels/Panel';
+import { Sidebar } from 'SRC/components/Sidebar';
+import { Panel } from 'SRC/components/Sidebar/Panel';
 import { Layers } from './Layers';
 
 export class Visualizer extends React.Component {
     public render() {
         return (
             <>
-                <SidebarPanels>
+                <Sidebar>
                     <Panel title="Layers">
                         <Layers
                             layers={[
@@ -36,8 +36,9 @@ export class Visualizer extends React.Component {
                         />
                     </Panel>
                     <Panel title="AI Controls" />
-                    <Panel title="Game Status" disabled={true} />
-                </SidebarPanels>
+                    <Panel title="Game Status" />
+                    <Panel title="Game Status" />
+                </Sidebar>
                 <Portal to="main">This is the visualizer</Portal>
             </>
         );
