@@ -10,15 +10,15 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 
 **Table of content**
 
-- [How to use](#how-to-use)
-- [Contribute](#contribute)
-  - [Running the dev server](#running-the-dev-server)
-- [Project Structure](#project-structure)
-- [Design notes](#design-notes)
-  - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
-    - [React Portals](#react-portals)
-  - [Approach to the application state](#approach-to-the-application-state)
-    - [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
+-   [How to use](#how-to-use)
+-   [Contribute](#contribute)
+    -   [Running the dev server](#running-the-dev-server)
+-   [Project Structure](#project-structure)
+-   [Design notes](#design-notes)
+    -   [Approach to the application UI layout](#approach-to-the-application-ui-layout)
+        -   [React Portals](#react-portals)
+    -   [Approach to the application state](#approach-to-the-application-state)
+        -   [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
 
 ## How to use
 
@@ -106,6 +106,13 @@ with potentially new values based on the action received.
 
 React, then, becomes an extension of the global Redux state and does not contain state of its own. When the global state
 changes, the React UI will automagically change to adapt to the new state.
+
+#### Debugging the Redux store
+
+You can debug the Redux store by installing the Redux debugger on
+[Chrome](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/reduxdevtools/). It
+allows to observe all actions and changes to the Redux state happening inside the application.
 
 #### Reducer functions and Redux saga
 

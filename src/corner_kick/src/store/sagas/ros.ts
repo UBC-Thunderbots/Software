@@ -5,6 +5,7 @@
 import { channel, delay } from 'redux-saga';
 import { put, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects';
 import ROSLIB from 'roslib';
+import { getType } from 'typesafe-actions';
 
 import {
     connected,
@@ -28,7 +29,7 @@ const rosChannel = channel();
  */
 export default function* init() {
     // Listen to start actions and start ROS
-    yield takeLatest('ros/START', startROS);
+    yield takeLatest(getType(start), startROS);
 
     // Start listening to ROS messages
     yield spawn(listenToROSChannel);
@@ -63,8 +64,8 @@ function* startROS() {
     ros.on('close', () => rosChannel.put(disconnected()));
 
     // Start listening for actions to subscribe or unsubscribe to ROS topics
-    yield takeEvery('ros/SUBSCRIBE_TOPIC', subscribeToROSTopic);
-    yield takeEvery('ros/UNSUBSCRIBE_TOPIC', unsubscribeFromROSTopic);
+    yield takeEvery(getType(subscribeTopic), subscribeToROSTopic);
+    yield takeEvery(getType(unsubscribeTopic), unsubscribeFromROSTopic);
 
     while (true) {
         // Every five seconds, check if any new nodes, topics, services or params

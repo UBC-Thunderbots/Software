@@ -16,7 +16,8 @@ export const createStore = () => {
     // interact with our Redux application
     const reduxSaga = createSagaMiddleware();
 
-    // We use the Redux debug Chrome extension to see what happens inside our Redux store
+    // We use the Redux debug Chrome/Firefox extension to see what
+    // happens inside our Redux store
     const composeEnhancers =
         (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
