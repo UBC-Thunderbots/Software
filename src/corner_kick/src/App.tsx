@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
-import { Visualizer } from './scenes/visualizer';
+import { Visualizer } from './pages/visualizer';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
 

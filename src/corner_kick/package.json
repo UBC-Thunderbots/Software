@@ -43,7 +43,7 @@
         "react-redux": "6.0.0",
         "redux": "4.0.1",
         "redux-saga": "0.16.2",
-        "resize-observer": "^1.0.0",
+        "resize-observer": "1.0.0",
         "roslib": "0.20.0",
         "styled-components": "4.1.2"
     }
