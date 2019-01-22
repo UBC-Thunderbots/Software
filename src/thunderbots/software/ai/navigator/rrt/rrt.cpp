@@ -1,5 +1,7 @@
 #include "rrt.h"
 
+#include <exception>
+
 #include "ai/intent/move_intent.h"
 #include "ai/navigator/RobotObstacle.h"
 #include "ai/primitive/move_primitive.h"
@@ -39,10 +41,8 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
         }
         else
         {
-            // TODO: Throw a proper exception here
-            // https://github.com/UBC-Thunderbots/Software/issues/16
-            std::cerr << "Error: Unrecognized Intent given to navigator" << std::endl;
-            exit(1);
+            throw std::invalid_argument("Error: Unrecognized Intent (" +
+                                        intent->getIntentName() + ") given to navigator");
         }
     }
 

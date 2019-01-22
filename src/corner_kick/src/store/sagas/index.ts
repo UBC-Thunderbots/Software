@@ -1,4 +1,4 @@
-/**
+/*
  * This file groups all application saga's and specifies a way to start them all
  *
  * Sagas provide asynchronous business logic to a Redux state-driven application.
@@ -8,12 +8,10 @@
 import { spawn } from 'redux-saga/effects';
 
 import initROS from './ros';
-import initSettings from './settings';
 
 /**
  * Starts all application sagas
  */
 export function* init() {
-    yield spawn(initSettings);
     yield spawn(initROS);
 }

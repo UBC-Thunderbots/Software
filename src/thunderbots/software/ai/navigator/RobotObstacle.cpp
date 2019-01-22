@@ -6,7 +6,7 @@ using namespace Util::DynamicParameters::Navigator;
 
 RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
 {
-    boundary = Circle(robot.position(), avoid_dist + ROBOT_MAX_RADIUS);
+    boundary = Circle(robot.position(), avoid_dist + ROBOT_MAX_RADIUS_METERS);
     velocity =
         Seg(robot.position(),
             robot.position() + robot.velocity() * collision_avoid_velocity_scale.value());

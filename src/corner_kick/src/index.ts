@@ -1,11 +1,11 @@
-/**
+/*
  * This file specifies the mount point for our application
  */
 
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 
-import './style.css';
+import './style/base.css';
 
 import { App } from './App';
 

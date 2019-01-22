@@ -15,7 +15,7 @@ typedef struct
 {
     Point position;
     double confidence;
-    AITimestamp timestamp;
+    double timestamp;
 } SSLBallData;
 
 /**

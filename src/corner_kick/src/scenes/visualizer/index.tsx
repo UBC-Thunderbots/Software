@@ -35,7 +35,7 @@ export class Visualizer extends React.Component {
                             ]}
                         />
                     </Panel>
-                    <Panel title="AI Controls" />
+                    <Panel title="AI Controls">Hello World</Panel>
                     <Panel title="Game Status" />
                     <Panel title="Game Status" />
                 </Sidebar>

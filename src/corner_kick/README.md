@@ -10,13 +10,15 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 
 **Table of content**
 
-- [How to use](#how-to-use)
-- [Contribute](#contribute)
-  - [Running the dev server](#running-the-dev-server)
-- [Project Structure](#project-structure)
-- [Design notes](#design-notes)
-  - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
-  - [Approach to the application state](#approach-to-the-application-state)
+-   [How to use](#how-to-use)
+-   [Contribute](#contribute)
+    -   [Running the dev server](#running-the-dev-server)
+-   [Project Structure](#project-structure)
+-   [Design notes](#design-notes)
+    -   [Approach to the application UI layout](#approach-to-the-application-ui-layout)
+        -   [React Portals](#react-portals)
+    -   [Approach to the application state](#approach-to-the-application-state)
+        -   [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
 
 ## How to use
 
@@ -57,6 +59,7 @@ The project is defined as follow:
     -   `containers` - contains high-level UI components (logger, visualizer, etc.)
     -   `constants` - contains fixed values used throughout the application
     -   `store` - contains logic for the application Redux state
+    -   `style` - contains application styling and theming
     -   `types` - contains all Typescript types
     -   `utils` - contains misc code
 -   `.prettierrc` - configuration for autoformating tool
@@ -72,7 +75,7 @@ The project is defined as follow:
 
 ### Approach to the application UI layout
 
-The visualizer will consist of multiple page which serve a single purpose. Each page will
+The visualizer will consist of multiple pages, each of which serve a single purpose. Each page will
 be divided into sections as follow:
 
 -   **Main:** Contains the primary focus of the page
@@ -82,8 +85,10 @@ be divided into sections as follow:
 -   **Console:** Contains views visible across the application
 -   **Footer:** Contains simple breadcrumbs of information relevant to the application as a whole or to the current page
 
-The application's primary layout is defined in [index.html](src/index.html) and styling is
-provided by [style.css](src/style.css).
+The application's primary layout is defined in [index.html](src/index.html). The theme for the application is defined
+in [Theme.tsx](src/style/Theme.tsx)
+
+#### React Portals
 
 Access to those section in the React application is done via [React Portals](https://reactjs.org/docs/portals.html).
 Portals are used to ensure the application layout is enforced throughout all the pages while offering an
@@ -102,7 +107,21 @@ with potentially new values based on the action received.
 React, then, becomes an extension of the global Redux state and does not contain state of its own. When the global state
 changes, the React UI will automagically change to adapt to the new state.
 
-Reducer functions do not permit for any side-effects to ensure a deterministic behaviour. For a state and action, the same new
-state should be returned by the reducer funtion. This, however, does not permit for more complex logic, such as communicating
-with ROS, to occur. To allow for this, we introduce sagas, which can intercept and act on Redux action. They can conduct some
+#### Debugging the Redux store
+
+You can debug the Redux store by installing the Redux debugger on
+[Chrome](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd)
+or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/reduxdevtools/). It
+allows to observe all actions and changes to the Redux state happening inside the application.
+
+#### Reducer functions and Redux saga
+
+Reducer functions are the cornerstone of the Redux approach. Once a Redux action is dispatched, reducer functions
+determine what the new state will look like as a result of the action sent. Reducer functions do not permit for
+any side-effects to ensure a deterministic behaviour. For a state and action, the same new state should be returned
+by the reducer funtion. This, however, does not permit for more complex logic, such as communicating with ROS,
+to occur. To allow for this, we introduce sagas, which can intercept and act on Redux action. They can conduct some
 business logic work, and reflect the result of this work in the state by emmiting a Redux action when needed.
+
+For more information about reducer functions, read the [official Redux doc on that topic](https://redux.js.org/basics/reducers).
+For more information about Redux sagas, read the [official Redux saga doc](https://redux-saga.js.org/).

@@ -26,14 +26,15 @@ namespace Util
              * Initializes a g3log logger for the calling program. This should only be
              * called once at the start of a program.
              */
-            static void initializeLogger()
+            static void initializeLogger(ros::NodeHandle &node_handle)
             {
-                static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton);
+                static std::shared_ptr<LoggerSingleton> s(
+                    new LoggerSingleton(node_handle));
             }
 
 
            private:
-            LoggerSingleton()
+            LoggerSingleton(ros::NodeHandle &node_handle)
             {
                 // Set the logger level to DEBUG so that all log messages show up
                 // regardless of severity. The default is INFO, which does not show DEBUG
@@ -49,8 +50,9 @@ namespace Util
                 // Add our custom sink to the logWorker. This custom sink logs messages
                 // to both stdout and stderr, and the /rosout topic. A sink MUST be
                 // provided here or the logger won't do anything.
-                logWorker->addSink(std::make_unique<Util::Logger::RosoutSink>(),
-                                   &Util::Logger::RosoutSink::ReceiveLogMessage);
+                logWorker->addSink(
+                    std::make_unique<Util::Logger::RosoutSink>(node_handle),
+                    &Util::Logger::RosoutSink::ReceiveLogMessage);
                 g3::initializeLogging(logWorker.get());
             }
 

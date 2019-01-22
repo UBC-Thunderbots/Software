@@ -1,4 +1,4 @@
-/**
+/*
  * This file specifies the ROS reducer
  */
 
@@ -19,6 +19,9 @@ const defaultState: IROSState = {
     topics: [],
 };
 
+/**
+ * Reducer function for ROS
+ */
 export default (state: IROSState = defaultState, action: ROSAction) => {
     switch (action.type) {
         // Set status to connected when we get a connected action

@@ -8,8 +8,14 @@
     <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen">
     </node>
 
-    <!-- Launch the robot_communication node -->
-    <node name="robot_communication" pkg="thunderbots" type="robot_communication" output="screen">
+    <!-- Launch the grsim_communication node -->
+    <node name="grsim_communication" pkg="thunderbots" type="grsim_communication" output="screen">
     </node>
+
+    <!-- Launch the dynamic parameters node -->
+    <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
+
+    <!-- Launch the rqt_reconfigure gui -->
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
 
 </launch>
