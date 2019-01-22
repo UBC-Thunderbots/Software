@@ -73,7 +73,8 @@ class Primitive
      *
      * @param prim_msg The primitive message
      * @param prim_name The name of the primitive
-     * @throws //TODO: Add exception
+     * @throws std::invalid_argument if the primitive given does not match the expected
+     * primitive name
      */
     void validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim_msg,
                                   std::string prim_name) const;
@@ -91,6 +92,7 @@ class Primitive
      * factory.
      *
      * @param primitive_msg the Primitive message from which to construct the Primitive
+     * @throws std::invalid_argument if primitive is unknown
      * @return a unique_ptr to a Primitive object
      */
     static std::unique_ptr<Primitive> createPrimitive(
