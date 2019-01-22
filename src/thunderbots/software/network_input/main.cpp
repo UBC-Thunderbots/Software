@@ -117,10 +117,11 @@ int main(int argc, char** argv)
 
         if (gamecontroller_packet_ptr)
         {
-            auto refbox_data_msg = backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
-            if (refbox_data_msg)
+            auto gamecontroller_data_msg =
+                backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
+            if (gamecontroller_data_msg)
             {
-                gamecontroller_publisher.publish(*refbox_data_msg);
+                gamecontroller_publisher.publish(*gamecontroller_data_msg);
             }
         }
 

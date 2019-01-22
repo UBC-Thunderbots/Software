@@ -83,7 +83,8 @@ class Backend
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.
     FieldSide our_field_side;
-    // TODO: the rest of backend should be spitting out team-local coordinates
+    // TODO: the rest of backend should be spitting out coordinates transformed as above
+    // https://github.com/UBC-Thunderbots/Software/issues/163
 
     void setOurFieldSide(bool blue_team_on_positive_half);
 
