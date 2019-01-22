@@ -30,6 +30,7 @@ class Robot
     /**
      * Updates the state of the robot.
      *
+     * @throws std::invalid_argument if the robot is updated with a time from the past
      * @param new_position the new position of the robot. Coordinates are in metres.
      * @param new_velocity the new velocity of the robot, in metres / second.
      * @param new_orientation the new orientation of the robot, in Radians.
@@ -55,6 +56,7 @@ class Robot
      * Updates the robot's state to be its predicted state at the given timestamp.
      * The timestamp must be >= the robot's last update timestamp
      *
+     * @throws std::invalid_argument if the robot is updated with a time from the past
      * @param timestamp The timestamp at which to update the robot's state to. Must
      * be >= the robot's last update timestamp
      */
@@ -90,6 +92,8 @@ class Robot
      * For example, a value of 1500 would return the estimated position of the robot
      * 1.5 seconds in the future.
      *
+     * @throws std::invalid_argument if the robot is estimating the position with a time
+     * from the past
      * @return the estimated position of the robot at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
@@ -112,6 +116,8 @@ class Robot
      * For example, a value of 1500 would return the estimated velocity of the robot
      * 1.5 seconds in the future.
      *
+     * @throws std::invalid_argument if the robot is estimating the velocity with a time
+     * from the past
      * @return the estimated velocity of the robot at the given number of milliseconds
      * in the future, in metres per second
      */
@@ -134,6 +140,8 @@ class Robot
      * For example, a value of 1500 would return the estimated orientation of the robot
      * 1.5 seconds in the future.
      *
+     * @throws std::invalid_argument if the robot is estimating the orientation with a
+     * time from the past
      * @return the estimated orientation of the robot at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
@@ -157,6 +165,8 @@ class Robot
      * >= 0. For example, a value of 1500 would return the estimated angular velocity of
      * the robot 1.5 seconds in the future.
      *
+     * @throws std::invalid_argument if the robot is estimating the angular velocity with
+     * a time from the past
      * @return the estimated angular velocity of the robot at the given number of
      * milliseconds in the future. Coordinates are in metres. Coordinates are in metres.
      */
