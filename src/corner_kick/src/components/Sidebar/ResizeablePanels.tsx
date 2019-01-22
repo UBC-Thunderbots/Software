@@ -1,14 +1,26 @@
-import * as _ from 'lodash';
 import * as React from 'react';
+import { ResizeObserver } from 'resize-observer';
 
 import styled from 'SRC/utils/styled-components';
 
 import { IInternalPanelProps, Panel } from './Panel';
+import {
+    getInitialSize,
+    IPanel,
+    makePanelActive,
+    makePanelInactive,
+    resize,
+    resizeParent,
+} from './utils';
+
+const minSize = 100;
 
 const Wrapper = styled.div`
     position: relative;
     width: 100%;
     height: 100%;
+
+    overflow: hidden;
 `;
 
 const Resizer = styled.div`
@@ -29,27 +41,39 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
 
     private resizeIndex = -1;
     private mouseDelta = 0;
-    private childrenSize: number[];
+    private parentHeight = 0;
+    private panels: IPanel[];
+
+    private resizeObserver: ResizeObserver;
 
     constructor(props: IResizeablePanelsProps) {
         super(props);
 
         this.wrapperRef = React.createRef();
+
+        this.panels = getInitialSize(React.Children.count(this.props.children), 100);
     }
 
     public componentDidMount() {
+        this.parentHeight = this.wrapperRef.current!.clientHeight;
+        this.resizeObserver = new ResizeObserver(this.onResizeParent);
+        this.resizeObserver.observe(this.wrapperRef.current!);
+
         this.styleElement = document.createElement('style');
         this.styleElement.type = 'text/css';
 
         const head = document.querySelector('head');
         head!.appendChild(this.styleElement);
 
-        const count = React.Children.count(this.props.children);
-        this.childrenSize = React.Children.map(this.props.children, (child) =>
-            Math.round(100 / count),
+        this.panels = getInitialSize(
+            React.Children.count(this.props.children),
+            this.parentHeight,
         );
-
         this.setSizes();
+    }
+
+    public componentWillUnmount() {
+        this.resizeObserver.unobserve(this.wrapperRef.current!);
     }
 
     public render() {
@@ -58,14 +82,14 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         const count = React.Children.count(children);
 
         return (
-            <Wrapper ref={this.wrapperRef}>
+            <Wrapper ref={this.wrapperRef} style={{ minHeight: count * minSize }}>
                 {React.Children.map(
                     children,
                     (child: React.ReactElement<IInternalPanelProps>, index) => {
                         return (
                             <>
                                 {React.cloneElement(child, {
-                                    active: true,
+                                    active: this.panels[index].active,
                                     id: `${index}`,
                                     onTitleClick: this.onTitleClick(index),
                                 })}
@@ -83,23 +107,19 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         );
     }
 
-    private onTitleClick = (index: number) => () => {
-        //
-    };
-
     private setSizes = () => {
         let currSize = 0;
-        const style = this.childrenSize.reduce((currStyle, size, index) => {
-            currSize += size;
+        const style = this.panels.reduce((currStyle, panel, index) => {
+            currSize += panel.size;
             return `
                 ${currStyle}
 
                 [data-panel-id='${index}'] {
-                    height: ${size}%;
+                    height: ${panel.size}px;
                 }
 
                 [data-resizer-id='${index}'] {
-                    top: calc(${currSize}% - 10px);
+                    top: calc(${currSize}px - 10px);
                 }
             `;
         }, '');
@@ -107,31 +127,40 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         this.styleElement.innerHTML = style;
     };
 
+    private onTitleClick = (index: number) => () => {
+        if (this.panels[index].active) {
+            makePanelInactive(index, this.panels, 32);
+        } else {
+            makePanelActive(index, this.panels, this.parentHeight, minSize);
+        }
+        this.setSizes();
+        this.forceUpdate();
+    };
+
     private onResizeStart = (index: number) => () => {
         this.resizeIndex = index;
         this.mouseDelta = 0;
+        this.parentHeight = this.wrapperRef.current!.clientHeight;
 
-        setTimeout(this.onResize, 100);
+        console.log(this.parentHeight);
+
+        setTimeout(this.onResize, 50);
         window.addEventListener('mousemove', this.onMouseMove);
         window.addEventListener('mouseup', this.onResizeEnd);
     };
 
     private onMouseMove = (e: MouseEvent) => {
-        this.mouseDelta += e.movementY;
+        this.mouseDelta += e.movementY / window.devicePixelRatio;
     };
 
     private onResize = () => {
         if (this.resizeIndex !== -1) {
-            const { childrenSize, resizeIndex } = this;
+            const { resizeIndex } = this;
 
-            childrenSize[resizeIndex] += Math.round((this.mouseDelta / 920) * 100);
-            childrenSize[resizeIndex + 1] -= Math.round((this.mouseDelta / 920) * 100);
-
+            this.mouseDelta = resize(resizeIndex, this.panels, this.mouseDelta, minSize);
             this.setSizes();
 
-            this.mouseDelta = 0;
-
-            setTimeout(this.onResize, 100);
+            setTimeout(this.onResize, 50);
         }
     };
 
@@ -141,5 +170,12 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
 
         window.removeEventListener('mousemove', this.onMouseMove);
         window.removeEventListener('mouseup', this.onResizeEnd);
+    };
+
+    private onResizeParent = () => {
+        const newParentHeight = this.wrapperRef.current!.clientHeight;
+        resizeParent(this.panels, newParentHeight - this.parentHeight, 100);
+        this.parentHeight = newParentHeight;
+        this.setSizes();
     };
 }

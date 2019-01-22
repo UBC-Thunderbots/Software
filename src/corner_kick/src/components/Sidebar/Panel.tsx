@@ -5,6 +5,7 @@ import styled from 'SRC/utils/styled-components';
 
 const Wrapper = styled.div`
     width: 100%;
+
     border-bottom: 1px solid ${(props) => props.theme.colors.border};
 
     display: flex;
@@ -14,7 +15,7 @@ const Wrapper = styled.div`
 
     overflow: hidden;
 
-    transition: height 0.1s;
+    transition: height 0.05s;
 
     &:last-child {
         border-bottom: none;
