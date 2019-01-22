@@ -5,18 +5,16 @@
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
-#include <exception>
-
+#include "ai/primitive/pivot_primitive.h"
 thunderbots_msgs::Primitive Primitive::createMsg() const
-{
     thunderbots_msgs::Primitive primitive_msg;
 
     primitive_msg.primitive_name = getPrimitiveName();
     primitive_msg.robot_id       = getRobotId();
-    primitive_msg.parameters     = getParameterArray();
+    primitive_msg.parameters     = getParameters();
     // Boolean arrays can't be directly assigned, so we need
     // to use a loop
-    for (auto data : getExtraBitArray())
+    for (auto data : getExtraBits())
     {
         primitive_msg.extra_bits.emplace_back(data);
     }
@@ -48,6 +46,10 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     else if (primitive_msg.primitive_name == KickPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<KickPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == PivotPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<PivotPrimitive>(primitive_msg);
     }
     else
     {

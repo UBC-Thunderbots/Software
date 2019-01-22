@@ -7,13 +7,14 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
 
-// Variables we need to maintain state. They are declared "globally" in the file so they
-// can be seen/used by the callback functions as well as the main function.
-// In an anonymous namespace so they cannot be seen/accessed outside this file.
+// Member variables we need to maintain state
+// They are kept in an anonymous namespace so they are not accessible outside this
+// file and are not created as global static variables.
 namespace
 {
     // Initialize our AI, which is the main object that maintains state
@@ -75,14 +76,17 @@ int main(int argc, char **argv)
 
     // Create subscribers
     ros::Subscriber field_sub = node_handle.subscribe(
-        Util::Constants::BACKEND_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
+        Util::Constants::NETWORK_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
     ros::Subscriber ball_sub = node_handle.subscribe(
-        Util::Constants::BACKEND_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
+        Util::Constants::NETWORK_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
     ros::Subscriber friendly_team_sub =
-        node_handle.subscribe(Util::Constants::BACKEND_INPUT_FRIENDLY_TEAM_TOPIC, 1,
+        node_handle.subscribe(Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1,
                               friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
-        Util::Constants::BACKEND_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
+        Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
+
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Main loop
     while (ros::ok())
@@ -107,7 +111,7 @@ int main(int argc, char **argv)
         {
             thunderbots_msgs::Primitive msg = prim->createMsg();
             primitive_array_message.primitives.emplace_back(msg);
-            std::cout << msg << std::endl;
+            LOG(INFO) << msg << std::endl;
         }
         primitive_publisher.publish(primitive_array_message);
         }

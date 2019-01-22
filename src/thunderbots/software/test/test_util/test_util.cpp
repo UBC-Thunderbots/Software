@@ -1,5 +1,8 @@
 #include "test/test_util/test_util.h"
 
+#include "test_util.h"
+
+
 namespace Test
 {
     Field TestUtil::createSSLDivBField()
@@ -79,5 +82,15 @@ namespace Test
         world.updateBallState(ball);
 
         return world;
+    }
+
+    std::vector<RefboxGameState> TestUtil::getAllRefboxGameStates()
+    {
+        std::vector<RefboxGameState> game_states;
+        for (int i = 0; i < static_cast<int>(RefboxGameState::LAST_ENUM_ITEM_UNUSED); i++)
+        {
+            game_states.push_back(static_cast<RefboxGameState>(i));
+        }
+        return game_states;
     }
 }  // namespace Test

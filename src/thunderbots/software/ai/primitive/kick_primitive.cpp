@@ -1,5 +1,7 @@
 #include "ai/primitive/kick_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string KickPrimitive::PRIMITIVE_NAME = "Kick Primitive";
 
 KickPrimitive::KickPrimitive(unsigned int robot_id, const Point &kick_origin,
@@ -50,7 +52,7 @@ double KickPrimitive::getKickSpeed() const
     return kick_speed_meters_per_second;
 }
 
-std::vector<double> KickPrimitive::getParameterArray() const
+std::vector<double> KickPrimitive::getParameters() const
 {
     std::vector<double> parameters = {kick_origin.x(), kick_origin.y(),
                                       kick_direction.toRadians(),
@@ -59,7 +61,12 @@ std::vector<double> KickPrimitive::getParameterArray() const
     return parameters;
 }
 
-std::vector<bool> KickPrimitive::getExtraBitArray() const
+std::vector<bool> KickPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void KickPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
