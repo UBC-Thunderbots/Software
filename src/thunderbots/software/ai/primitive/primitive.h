@@ -73,7 +73,8 @@ class Primitive
      *
      * @param prim_msg The primitive message
      * @param prim_name The name of the primitive
-     * @throws std::invalid_argument if the primitive given does not match the expected primitive name
+     * @throws std::invalid_argument if the primitive given does not match the expected
+     * primitive name
      */
     void validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim_msg,
                                   std::string prim_name) const;

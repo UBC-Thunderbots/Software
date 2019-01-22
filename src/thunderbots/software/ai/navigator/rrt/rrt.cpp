@@ -1,9 +1,10 @@
 #include "rrt.h"
 
+#include <exception>
+
 #include "ai/intent/move_intent.h"
 #include "ai/navigator/RobotObstacle.h"
 #include "ai/primitive/move_primitive.h"
-#include <exception>
 
 RRTNav::RRTNav() {}
 
@@ -40,7 +41,8 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
         }
         else
         {
-             throw std::invalid_argument("Error: Unrecognized Intent (" + intent->getIntentName() + ") given to navigator");
+            throw std::invalid_argument("Error: Unrecognized Intent (" +
+                                        intent->getIntentName() + ") given to navigator");
         }
     }
 

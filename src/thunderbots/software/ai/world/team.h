@@ -80,16 +80,17 @@ class Team
      * Assigns the goalie for this team, making it the robot with the newly given id.
      * A robot with the given id must already exist on the team.
      *
-     * @throws std::invalid_argument if the goalie is assigned to a robot that is not on the team
+     * @throws std::invalid_argument if the goalie is assigned to a robot that is not on
+     * the team
      * @param new_goalie_id The id of the new goalie for this team
-     * 
+     *
      */
     void assignGoalie(unsigned int new_goalie_id);
 
     /**
      * Clears the goalie for this team. There will be no goalie assigned after
      * this operation
-     * 
+     *
      */
     void clearGoalie();
 

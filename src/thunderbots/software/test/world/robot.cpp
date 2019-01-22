@@ -98,7 +98,8 @@ TEST_F(RobotTest, update_state_to_predicted_state_with_past_timestamp)
     Robot robot = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                         AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW(robot.updateStateToPredictedState(one_second_past), std::invalid_argument);
+    ASSERT_THROW(robot.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_position_at_current_time)
@@ -134,11 +135,13 @@ TEST_F(RobotTest, get_position_at_future_time_with_positive_robot_velocity)
 
 TEST_F(RobotTest, get_position_at_past_time)
 {
-     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+    Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-100))), std::invalid_argument);
-    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-1000))), std::invalid_argument);
+    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-100))),
+                 std::invalid_argument);
+    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-1000))),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_velocity_at_current_time)
@@ -176,8 +179,10 @@ TEST_F(RobotTest, get_velocity_at_past_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-100))), std::invalid_argument);
-    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-1000))), std::invalid_argument);
+    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-100))),
+                 std::invalid_argument);
+    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-1000))),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_orientation_at_current_time)
@@ -216,11 +221,13 @@ TEST_F(RobotTest, get_orientation_at_future_time_with_negative_robot_angular_vel
 
 TEST_F(RobotTest, get_orientation_at_past_time)
 {
-     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+    Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-100)), std::invalid_argument);
-    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-1000)), std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-100)),
+                 std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-1000)),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_angular_velocity_at_current_time)
@@ -264,8 +271,10 @@ TEST_F(RobotTest, get_angular_velocity_at_past_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-100)), std::invalid_argument);
-    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-1000)), std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-100)),
+                 std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-1000)),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_last_update_timestamp)

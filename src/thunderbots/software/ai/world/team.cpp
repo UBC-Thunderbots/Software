@@ -22,7 +22,8 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
         auto duplicate_id = robot_ids.insert(robot.id());
         if (!duplicate_id.second)
         {
-            throw std::invalid_argument("Error: Multiple robots on the same team with the same id");
+            throw std::invalid_argument(
+                "Error: Multiple robots on the same team with the same id");
         }
 
         auto it = team_robots.find(robot.id());
@@ -80,10 +81,10 @@ void Team::assignGoalie(unsigned int new_goalie_id)
         goalie_id = new_goalie_id;
     }
     else
-    { 
-        throw std::invalid_argument("Error: Assigning the goalie to a robot that is not a member of the team");
+    {
+        throw std::invalid_argument(
+            "Error: Assigning the goalie to a robot that is not a member of the team");
     }
-    
 }
 
 void Team::clearGoalie()

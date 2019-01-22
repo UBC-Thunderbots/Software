@@ -91,7 +91,8 @@ TEST_F(BallTest, update_state_with_past_timestamp)
 {
     Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
 
-    ASSERT_THROW(ball.updateState(Point(-4.23, 1.07), Vector(1, 2), one_second_past), std::invalid_argument);
+    ASSERT_THROW(ball.updateState(Point(-4.23, 1.07), Vector(1, 2), one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp)
@@ -113,7 +114,8 @@ TEST_F(BallTest, update_state_to_predicted_state_with_past_timestamp)
 {
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
-    ASSERT_THROW(ball.updateStateToPredictedState(one_second_past), std::invalid_argument);
+    ASSERT_THROW(ball.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, get_position_at_current_time)
@@ -144,9 +146,11 @@ TEST_F(BallTest, get_position_at_future_time_with_negative_ball_velocity)
 TEST_F(BallTest, get_position_at_past_time)
 {
     Ball ball = Ball(Point(3, 7), Vector(1, 0.12), current_time);
-    
-    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-200)), std::invalid_argument);
-    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-2000)), std::invalid_argument);
+
+    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-200)),
+                 std::invalid_argument);
+    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-2000)),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, get_velocity_at_current_time)
@@ -196,8 +200,10 @@ TEST_F(BallTest, get_velocity_at_past_time)
 {
     Ball ball = Ball(Point(), Vector(1, 2), current_time);
 
-    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-150)), std::invalid_argument);
-    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-1000)), std::invalid_argument);
+    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-150)),
+                 std::invalid_argument);
+    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-1000)),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, get_last_update_timestamp)

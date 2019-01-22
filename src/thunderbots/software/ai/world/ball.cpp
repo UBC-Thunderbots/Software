@@ -17,7 +17,8 @@ void Ball::updateState(const Point &new_position, const Vector &new_velocity,
 {
     if (timestamp < last_update_timestamp)
     {
-        throw std::invalid_argument("Error: State of ball is updating times from the past");
+        throw std::invalid_argument(
+            "Error: State of ball is updating times from the past");
     }
 
     position_             = new_position;
@@ -29,7 +30,8 @@ void Ball::updateStateToPredictedState(std::chrono::steady_clock::time_point tim
 {
     if (timestamp < last_update_timestamp)
     {
-        throw std::invalid_argument("Error: Predicted state is updating times from the past");
+        throw std::invalid_argument(
+            "Error: Predicted state is updating times from the past");
     }
 
     auto milliseconds_in_future = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -55,7 +57,8 @@ Point Ball::estimatePositionAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
-        throw std::invalid_argument("Error: Position estimate is updating times from the past");
+        throw std::invalid_argument(
+            "Error: Position estimate is updating times from the past");
     }
 
     // TODO: This is a simple linear implementation that does not necessarily reflect
@@ -77,7 +80,8 @@ Vector Ball::estimateVelocityAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
-        throw std::invalid_argument("Error: Velocity estimate is updating times from the past");
+        throw std::invalid_argument(
+            "Error: Velocity estimate is updating times from the past");
     }
 
     // TODO: This is a implementation with an empirically determined time constant that

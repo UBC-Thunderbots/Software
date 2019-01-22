@@ -92,7 +92,8 @@ class Robot
      * For example, a value of 1500 would return the estimated position of the robot
      * 1.5 seconds in the future.
      *
-     * @throws std::invalid_argument if the robot is estimating the position with a time from the past
+     * @throws std::invalid_argument if the robot is estimating the position with a time
+     * from the past
      * @return the estimated position of the robot at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
@@ -115,7 +116,8 @@ class Robot
      * For example, a value of 1500 would return the estimated velocity of the robot
      * 1.5 seconds in the future.
      *
-     * @throws std::invalid_argument if the robot is estimating the velocity with a time from the past
+     * @throws std::invalid_argument if the robot is estimating the velocity with a time
+     * from the past
      * @return the estimated velocity of the robot at the given number of milliseconds
      * in the future, in metres per second
      */
@@ -138,7 +140,8 @@ class Robot
      * For example, a value of 1500 would return the estimated orientation of the robot
      * 1.5 seconds in the future.
      *
-     * @throws std::invalid_argument if the robot is estimating the orientation with a time from the past
+     * @throws std::invalid_argument if the robot is estimating the orientation with a
+     * time from the past
      * @return the estimated orientation of the robot at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
@@ -162,7 +165,8 @@ class Robot
      * >= 0. For example, a value of 1500 would return the estimated angular velocity of
      * the robot 1.5 seconds in the future.
      *
-     * @throws std::invalid_argument if the robot is estimating the angular velocity with a time from the past
+     * @throws std::invalid_argument if the robot is estimating the angular velocity with
+     * a time from the past
      * @return the estimated angular velocity of the robot at the given number of
      * milliseconds in the future. Coordinates are in metres. Coordinates are in metres.
      */

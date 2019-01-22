@@ -147,13 +147,16 @@ TEST_F(TeamTest, update_state_to_predicted_state_with_past_timestamp)
     team.updateRobots(robot_list);
     team.assignGoalie(0);
 
-    ASSERT_THROW(team.updateStateToPredictedState(one_second_past), std::invalid_argument);
+    ASSERT_THROW(team.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 
     Robot future_robot_0 = robot_0;
-    ASSERT_THROW(future_robot_0.updateStateToPredictedState(one_second_past), std::invalid_argument);
+    ASSERT_THROW(future_robot_0.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 
     Robot future_robot_1 = robot_1;
-    ASSERT_THROW(future_robot_1.updateStateToPredictedState(one_second_past), std::invalid_argument);
+    ASSERT_THROW(future_robot_1.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(TeamTest, remove_expired_robots_at_current_time_so_no_robots_expire)

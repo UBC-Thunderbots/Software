@@ -15,7 +15,7 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
     // "zero-time"
     // for any predictors (ie. modules that predict Robot, Ball position etc.). When those
     // are implemented we can update them in some way from here, if necessary.
-   
+
     std::vector<std::unique_ptr<Intent>> assignedIntents =
         high_level->getIntentAssignment(world);
 

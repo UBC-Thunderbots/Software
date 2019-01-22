@@ -145,7 +145,7 @@ TEST_F(ROSMessageUtilTest, create_team_from_ros_message_with_non_member)
         std::chrono::duration_cast<nanoseconds>(current_time.time_since_epoch());
 
     thunderbots_msgs::Robot robot_msg;
-    
+
     robot_msg.id               = robot_id;
     robot_msg.position.x       = position.x();
     robot_msg.position.y       = position.y();
@@ -157,21 +157,20 @@ TEST_F(ROSMessageUtilTest, create_team_from_ros_message_with_non_member)
         static_cast<uint64_t>(timestamp_nanoseconds_since_epoch.count());
 
     thunderbots_msgs::Team team_msg;
-    
+
     team_msg.robots.emplace_back(robot_msg);
     team_msg.goalie_id = goalie_id;
     team_msg.robot_expiry_buffer_milliseconds =
         static_cast<unsigned int>(robot_expiry_buffer_milliseconds.count());
-    
+
     ASSERT_THROW(Team team = Util::ROSMessages::createTeamFromROSMessage(team_msg);
 
-    Team team_other = Team(robot_expiry_buffer_milliseconds);
-    Robot robot =
-        Robot(robot_id, position, velocity, orientation, angular_velocity, current_time);
+                 Team team_other = Team(robot_expiry_buffer_milliseconds);
+                 Robot robot     = Robot(robot_id, position, velocity, orientation,
+                                     angular_velocity, current_time);
 
-    team_other.updateRobots({robot});
-    team_other.assignGoalie(goalie_id);, std::invalid_argument);
-
+                 team_other.updateRobots({robot}); team_other.assignGoalie(goalie_id);
+                 , std::invalid_argument);
 }
 
 int main(int argc, char **argv)
