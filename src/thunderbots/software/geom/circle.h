@@ -9,9 +9,7 @@ class Circle final
    private:
     Point origin;
     double radius;
-    /**
-     * Creates a circle with origin (0, 0) and radius 0.
-     */
+
 
    public:
     void setOrigin(Point o)
@@ -34,6 +32,9 @@ class Circle final
         return radius;
     }
 
+    /**
+     * Creates a circle with origin (0, 0) and radius 0.
+     */
     inline explicit constexpr Circle() : radius(0) {}
 
     inline explicit constexpr Circle(const Point& origin, double r)

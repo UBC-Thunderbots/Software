@@ -13,7 +13,7 @@
 
 double proj_len(const Segment &first, const Vector &second)
 {
-    return proj_len(first.toVector(), second - first.start);
+    return proj_len(first.toVector(), second - first.getSegStart());
 }
 
 double proj_len(const Vector &first, const Vector &second)
@@ -32,9 +32,9 @@ double dist(const Segment &first, const Segment &second)
     {
         return 0.0;
     }
-    return std::sqrt(
-        std::min(std::min(distsq(first, second.start), distsq(first, second.end)),
-                 std::min(distsq(second, first.start), distsq(second, first.end))));
+    return std::sqrt(std::min(
+        std::min(distsq(first, second.getSegStart()), distsq(first, second.getEnd())),
+        std::min(distsq(second, first.getSegStart()), distsq(second, first.getEnd()))));
 }
 
 double dist(const Line &first, const Vector &second)
@@ -65,8 +65,8 @@ double dist(const Segment &first, const Vector &second)
 double distsq(const Vector &first, const Segment &second)
 {
     double seglensq    = lensq(second);
-    Vector relsecond_s = first - second.start;
-    Vector relsecond_e = first - second.end;
+    Vector relsecond_s = first - second.getSegStart();
+    Vector relsecond_e = first - second.getEnd();
 
     Vector s_vec2 = second.toVector();
 
@@ -80,7 +80,8 @@ double distsq(const Vector &first, const Segment &second)
         return std::fabs(cross * cross / seglensq);
     }
 
-    double lensq_s = distsq(second.start, first), lensq_e = distsq(second.end, first);
+    double lensq_s = distsq(second.getSegStart(), first),
+           lensq_e = distsq(second.getEnd(), first);
 
     return std::min(lensq_s, lensq_e);
 }
@@ -97,7 +98,7 @@ double distsq(const Vector &first, const Vector &second)
 
 bool isDegenerate(const Segment &segment)
 {
-    return distsq(segment.start, segment.end) < EPS2;
+    return distsq(segment.getSegStart(), segment.getEnd()) < EPS2;
 }
 
 bool isDegenerate(const Line &line)
@@ -107,17 +108,17 @@ bool isDegenerate(const Line &line)
 
 bool isDegenerate(const Ray &ray)
 {
-    return distsq(ray.start, ray.direction) < EPS2;
+    return distsq(ray.getRayStart(), ray.getDirection()) < EPS2;
 }
 
 double len(const Segment &segment)
 {
-    return dist(segment.start, segment.end);
+    return dist(segment.getSegStart(), segment.getEnd());
 }
 
 double lensq(const Segment &segment)
 {
-    return distsq(segment.start, segment.end);
+    return distsq(segment.getSegStart(), segment.getEnd());
 }
 
 double lensq(const Line &line)
@@ -154,12 +155,12 @@ bool contains(const Circle &out, const Segment &in)
 
 bool contains(const Segment &out, const Vector &in)
 {
-    if (collinear(in, out.start, out.end))
+    if (collinear(in, out.getSegStart(), out.getEnd()))
     {
         // if collinear we only need to check one of the coordinates,
         // arbitrarily choose x
-        return (in.x() <= out.start.x() && in.x() >= out.end.x()) ||
-               (in.x() <= out.end.x() && in.x() >= out.start.x());
+        return (in.x() <= out.getSegStart().x() && in.x() >= out.getEnd().x()) ||
+               (in.x() <= out.getEnd().x() && in.x() >= out.getSegStart().x());
     }
 
     return false;
@@ -167,10 +168,12 @@ bool contains(const Segment &out, const Vector &in)
 
 bool contains(const Ray &out, const Vector &in)
 {
-    if (collinear(in, out.start, out.direction))
+    if (collinear(in, out.getRayStart(), out.getDirection()))
     {
-        return sign(in.x() - out.start.x()) == sign(out.direction.x() - out.start.x()) &&
-               sign(in.y() - out.start.y()) == sign(out.direction.y() - out.start.y());
+        return sign(in.x() - out.getRayStart().x()) ==
+                   sign(out.getDirection().x() - out.getRayStart().x()) &&
+               sign(in.y() - out.getRayStart().y()) ==
+                   sign(out.getDirection().y() - out.getRayStart().y());
     }
 
     return false;
@@ -201,12 +204,13 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Ray &first, const Segment &second)
 {
-    auto isect = lineIntersection(first.start, first.direction, second.start, second.end);
+    auto isect = lineIntersection(first.getRayStart(), first.getDirection(),
+                                  second.getSegStart(), second.getEnd());
     if (isect.has_value())
     {
         return contains(first, isect.value()) && contains(second, isect.value());
     }
-    return collinear(first.start, first.direction, second.start);
+    return collinear(first.getRayStart(), first.getDirection(), second.getSegStart());
 }
 bool intersects(const Segment &first, const Ray &second)
 {
@@ -217,9 +221,9 @@ bool intersects(const Segment &first, const Circle &second)
 {
     // if the segment is inside the circle AND at least one of the points is
     // outside the circle
-    return contains(second, first) && (distsq(first.start, second.getOrigin()) >
+    return contains(second, first) && (distsq(first.getSegStart(), second.getOrigin()) >
                                            second.getRadius() * second.getRadius() ||
-                                       distsq(first.end, second.getOrigin()) >
+                                       distsq(first.getEnd(), second.getOrigin()) >
                                            second.getRadius() * second.getRadius());
 }
 bool intersects(const Circle &first, const Segment &second)
@@ -229,25 +233,31 @@ bool intersects(const Circle &first, const Segment &second)
 
 bool intersects(const Segment &first, const Segment &second)
 {
-    if (sign((first.start - first.end).cross(second.start - second.end)) == 0)
+    if (sign((first.getSegStart() - first.getEnd())
+                 .cross(second.getSegStart() - second.getEnd())) == 0)
     {
         // find distance of two endpoints on segments furthest away from each
         // other
-        double mx_len = std::sqrt(std::max(std::max((second.start - first.end).lensq(),
-                                                    (second.end - first.end).lensq()),
-                                           std::max((second.start - first.start).lensq(),
-                                                    (second.end - first.start).lensq())));
+        double mx_len = std::sqrt(
+            std::max(std::max((second.getSegStart() - first.getEnd()).lensq(),
+                              (second.getEnd() - first.getEnd()).lensq()),
+                     std::max((second.getSegStart() - first.getSegStart()).lensq(),
+                              (second.getEnd() - first.getSegStart()).lensq())));
         // if the segments cross then this distance should be less than
         // the sum of the distances of the line segments
-        return mx_len <
-               (first.start - first.end).len() + (second.start - second.end).len() + EPS;
+        return mx_len < (first.getSegStart() - first.getEnd()).len() +
+                            (second.getSegStart() - second.getEnd()).len() + EPS;
     }
 
-    return sign((first.end - first.start).cross(second.start - first.start)) *
-                   sign((first.end - first.start).cross(second.end - first.start)) <=
+    return sign((first.getEnd() - first.getSegStart())
+                    .cross(second.getSegStart() - first.getSegStart())) *
+                   sign((first.getEnd() - first.getSegStart())
+                            .cross(second.getEnd() - first.getSegStart())) <=
                0 &&
-           sign((second.end - second.start).cross(first.start - second.start)) *
-                   sign((second.end - second.start).cross(first.end - second.start)) <=
+           sign((second.getEnd() - second.getSegStart())
+                    .cross(first.getSegStart() - second.getSegStart())) *
+                   sign((second.getEnd() - second.getSegStart())
+                            .cross(first.getEnd() - second.getSegStart())) <=
                0;
 }
 
@@ -641,28 +651,35 @@ bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
 
 std::vector<Point> lineIntersection(const Segment &a, const Segment &b)
 {
-    if (std::fabs((b.end - b.start).cross(a.end - a.start)) < EPS)
+    if (std::fabs((b.getEnd() - b.getSegStart()).cross(a.getEnd() - a.getSegStart())) <
+        EPS)
     {
         // parallel line segments, find if they're collinear and return the 2 points
         // on the line they both lay on if they are collinear and intersecting
         // shamelessly copypasted from
         // https://stackoverflow.com/questions/22456517/algorithm-for-finding-the-segment-overlapping-two-collinear-segments
-        if (collinear(a.start, b.start, b.end) && collinear(a.end, b.start, b.end))
+        if (collinear(a.getSegStart(), b.getSegStart(), b.getEnd()) &&
+            collinear(a.getEnd(), b.getSegStart(), b.getEnd()))
         {
-            double slope      = (a.end.y() - a.start.y()) / (a.end.x() - a.start.x());
+            double slope = (a.getEnd().y() - a.getSegStart().y()) /
+                           (a.getEnd().x() - a.getSegStart().x());
             bool isHorizontal = slope < EPS;
             bool isDescending = slope < 0 && !isHorizontal;
             double invertY    = isDescending || isHorizontal ? -1 : 1;
 
-            Point min1 = Point(std::min(a.start.x(), a.end.x()),
-                               std::min(a.start.y() * invertY, a.end.y() * invertY));
-            Point max1 = Point(std::max(a.start.x(), a.end.x()),
-                               std::max(a.start.y() * invertY, a.end.y() * invertY));
+            Point min1 =
+                Point(std::min(a.getSegStart().x(), a.getEnd().x()),
+                      std::min(a.getSegStart().y() * invertY, a.getEnd().y() * invertY));
+            Point max1 =
+                Point(std::max(a.getSegStart().x(), a.getEnd().x()),
+                      std::max(a.getSegStart().y() * invertY, a.getEnd().y() * invertY));
 
-            Point min2 = Point(std::min(b.start.x(), b.end.x()),
-                               std::min(b.start.y() * invertY, b.end.y() * invertY));
-            Point max2 = Point(std::max(b.start.x(), b.end.x()),
-                               std::max(b.start.y() * invertY, b.end.y() * invertY));
+            Point min2 =
+                Point(std::min(b.getSegStart().x(), b.getEnd().x()),
+                      std::min(b.getSegStart().y() * invertY, b.getEnd().y() * invertY));
+            Point max2 =
+                Point(std::max(b.getSegStart().x(), b.getEnd().x()),
+                      std::max(b.getSegStart().y() * invertY, b.getEnd().y() * invertY));
 
             Point minIntersection;
             if (isDescending)
@@ -696,9 +713,11 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b)
             return std::vector<Point>();
     }
 
-    return std::vector<Point>{a.start + (a.start - b.start).cross(b.end - b.start) /
-                                            (b.end - b.start).cross(a.end - a.start) *
-                                            (a.end - a.start)};
+    return std::vector<Point>{
+        a.getSegStart() +
+        (a.getSegStart() - b.getSegStart()).cross(b.getEnd() - b.getSegStart()) /
+            (b.getEnd() - b.getSegStart()).cross(a.getEnd() - a.getSegStart()) *
+            (a.getEnd() - a.getSegStart())};
 }
 
 // shamelessly copy-pasted from RoboJackets
@@ -706,14 +725,14 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
                                       const Vector &d)
 {
     Segment line1(a, b), line2(c, d);
-    double x1 = line1.start.x();
-    double y1 = line1.start.y();
-    double x2 = line1.end.x();
-    double y2 = line1.end.y();
-    double x3 = line2.start.x();
-    double y3 = line2.start.y();
-    double x4 = line2.end.x();
-    double y4 = line2.end.y();
+    double x1 = line1.getSegStart().x();
+    double y1 = line1.getSegStart().y();
+    double x2 = line1.getEnd().x();
+    double y2 = line1.getEnd().y();
+    double x3 = line2.getSegStart().x();
+    double y3 = line2.getSegStart().y();
+    double x4 = line2.getEnd().x();
+    double y4 = line2.getEnd().y();
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (denom == 0)
@@ -911,8 +930,10 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 
 bool pointIsRightOfLine(const Segment &line, const Point &point)
 {
-    return (line.end.x() - line.start.x()) * (point.y() - line.start.y()) -
-               (line.end.y() - line.start.y()) * (point.x() - line.start.x()) <
+    return (line.getEnd().x() - line.getSegStart().x()) *
+                   (point.y() - line.getSegStart().y()) -
+               (line.getEnd().y() - line.getSegStart().y()) *
+                   (point.x() - line.getSegStart().x()) <
            0.0;
 }
 

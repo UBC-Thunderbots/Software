@@ -8,9 +8,30 @@
 
 class Ray final
 {
-   public:
+   private:
     Point start;
     Vector direction;
+
+   public:
+    void setRayStart(Point o)
+    {
+        start = o;
+    }
+
+    Point getRayStart() const
+    {
+        return start;
+    }
+
+    void setDirection(Vector d)
+    {
+        direction = d;
+    }
+
+    Vector getDirection() const
+    {
+        return direction;
+    }
 
     /**
      * Creates a degenerate Ray at (0, 0)

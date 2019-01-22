@@ -5,9 +5,30 @@
 
 class Segment final
 {
-   public:
+   private:
     Point start;
     Point end;
+
+   public:
+    void setSegStart(Point o)
+    {
+        start = o;
+    }
+
+    Point getSegStart() const
+    {
+        return start;
+    }
+
+    void setEnd(Point f)
+    {
+        end = f;
+    }
+
+    Point getEnd() const
+    {
+        return end;
+    }
 
     /**
      * Creates a degenerate Segment at (0, 0)
