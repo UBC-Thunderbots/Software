@@ -68,6 +68,14 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
     void visit(const PivotPrimitive &pivot_primtiive) override;
 
     /**
+     * Generates and stores the MotionControllerCommand the robot should perform at the
+     * current moment in time in order to simulate the StopPrimitive
+     *
+     * @param stop_primitive The StopPrimitive to simulate
+     */
+    void visit(const StopPrimitive &stop_primitive) override;
+
+    /**
      * Returns the most recent MotionControllerCommand created by this
      * GrSimCommandPrimitiveVisitor. This is the MotionControllerCommand created by
      * one of the 'visit' functions.
