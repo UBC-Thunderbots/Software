@@ -59,12 +59,28 @@ case it changes
 
 ### The resize operation
 
+A resize operation when the user clicks near the bottom of a panel. This area is highlighted with the cursor changing to a resize symbol.
+Once the operation begins, the resizing logic is triggered once every frame, to sync the mouse movement with the height of the panels.
+Every time the cursor moves, its vertical movement (delta) is measured and added to a movement counter. The value of
+the counter is used to perform the resize operation.
+
 It is important to view a resize operation as a transaction between two panels. The parent is fixed and the panels as whole take the
 full height of the parent, so increasing the height of a panel must decrease the height of another panel and vice versa. An additional
 constraint is that all panels have a minimum height that must be respected. Panels that are at their minimum height cannot have their
 height decreased further.
 
-This presents three different scenarios during a resize operation, which we will describe in detail
+The currency of this transaction is the amount of mouse movement that occured between frames. This value is
+stored in the movement counter, which we will refer to as `mouseDelta`. If the transaction, aka the transfer of height between
+two panels, was performed successfully, `mouseDelta` is reset to 0. If the transaction was not performed in full (aka the transfer
+of height happened partially), `mouseDelta` will be reduced by the amount of height successfully transferred between two panels.
+If the transaction is unsuccessful, `mouseDelta` will not change.
+
+Why do we do this? This is to ensure that the mouse position accurately follows the position of the resize handle throughout the resize
+operation, up and until the resize operation cannot be performed further due to some constraint. If the constraint is removed (most likely
+due to the mouse moving in the other direction), we want to be able to sync back the mouse position with the resize handle. In essence then,
+`mouseDelta` describes the delta between the mouse position and the resize handle.
+
+Due to the constraints in the resize operations, there are three different scenarios that we have to account for.
 
 #### Scenario 1: both panel have sufficient height
 
