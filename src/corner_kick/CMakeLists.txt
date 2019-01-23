@@ -19,7 +19,7 @@ add_custom_target(
   COMMENT Packaging up ${PROJECT_NAME}
 
   # Get dependencies
-  COMMAND yarn
+  COMMAND yarn --silent --frozen-lockfile
 
   # Only build if src has changed
   COMMAND ./scripts/compare_src.sh || yarn build
