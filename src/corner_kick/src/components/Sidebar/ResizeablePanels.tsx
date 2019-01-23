@@ -49,6 +49,7 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
     private mouseDelta = 0;
     private parentHeight = 0;
     private panels: IPanel[];
+    private pixelRatio: number;
 
     private resizeObserver: ResizeObserver;
 
@@ -64,6 +65,8 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         this.parentHeight = this.wrapperRef.current!.clientHeight;
         this.resizeObserver = new ResizeObserver(this.onResizeParent);
         this.resizeObserver.observe(this.wrapperRef.current!);
+
+        this.pixelRatio = window.devicePixelRatio;
 
         this.styleElement = document.createElement('style');
         this.styleElement.type = 'text/css';
@@ -151,7 +154,7 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
 
         console.log(this.parentHeight);
 
-        setTimeout(this.onResize, 50);
+        requestAnimationFrame(this.onResize);
         window.addEventListener('mousemove', this.onMouseMove);
         window.addEventListener('mouseup', this.onResizeEnd);
     };
@@ -162,7 +165,7 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
             // CSS pixels, which is annoying to say the least. Here, we check if we are
             // running in Chrome, and apply the transformation from display pixel to CSS
             // pixel.
-            this.mouseDelta += e.movementY / window.devicePixelRatio;
+            this.mouseDelta += e.movementY / this.pixelRatio;
         } else {
             this.mouseDelta += e.movementY;
         }
@@ -175,7 +178,7 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
             this.mouseDelta = resize(resizeIndex, this.panels, this.mouseDelta, minSize);
             this.setSizes();
 
-            setTimeout(this.onResize, 50);
+            requestAnimationFrame(this.onResize);
         }
     };
 

@@ -12,11 +12,7 @@ const Wrapper = styled.div`
     display: flex;
     flex-flow: column nowrap;
 
-    transition: 0.2s all;
-
     overflow: hidden;
-
-    transition: height 0.05s, top 0.05s;
 
     &:last-child {
         border-bottom: none;
