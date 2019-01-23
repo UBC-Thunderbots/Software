@@ -19,8 +19,6 @@ import {
     resizeParent,
 } from './utils';
 
-const minSize = 100;
-
 const Wrapper = styled.div`
     position: relative;
     width: 100%;
@@ -38,6 +36,7 @@ const Resizer = styled.div`
 `;
 
 interface IResizeablePanelsProps {
+    minPanelSize: number;
     children: React.ReactElement<typeof Panel> | Array<React.ReactElement<typeof Panel>>;
 }
 
@@ -86,12 +85,12 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
     }
 
     public render() {
-        const { children } = this.props;
+        const { children, minPanelSize } = this.props;
 
         const count = React.Children.count(children);
 
         return (
-            <Wrapper ref={this.wrapperRef} style={{ minHeight: count * minSize }}>
+            <Wrapper ref={this.wrapperRef} style={{ minHeight: count * minPanelSize }}>
                 {React.Children.map(
                     children,
                     (child: React.ReactElement<IInternalPanelProps>, index) => {
@@ -141,7 +140,12 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         if (this.panels[index].active) {
             makePanelInactive(index, this.panels, 32);
         } else {
-            makePanelActive(index, this.panels, this.parentHeight, minSize);
+            makePanelActive(
+                index,
+                this.panels,
+                this.parentHeight,
+                this.props.minPanelSize,
+            );
         }
         this.setSizes();
         this.forceUpdate();
@@ -175,7 +179,12 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         if (this.resizeIndex !== -1) {
             const { resizeIndex } = this;
 
-            this.mouseDelta = resize(resizeIndex, this.panels, this.mouseDelta, minSize);
+            this.mouseDelta = resize(
+                resizeIndex,
+                this.panels,
+                this.mouseDelta,
+                this.props.minPanelSize,
+            );
             this.setSizes();
 
             requestAnimationFrame(this.onResize);
