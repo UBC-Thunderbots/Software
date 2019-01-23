@@ -18,6 +18,9 @@ add_custom_target(
   ALL
   COMMENT Packaging up ${PROJECT_NAME}
 
+  # Check current yarn version
+  COMMAND yarn -v
+
   # Get dependencies
   # We enforce `yarn.lock` with flag --frozen-lockfile 
   # at this step to ensure our dependencies remain
