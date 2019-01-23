@@ -4,6 +4,7 @@ import Scrollbars from 'react-custom-scrollbars';
 import styled from 'SRC/utils/styled-components';
 
 const Wrapper = styled.div`
+    position: absolute;
     width: 100%;
 
     border-bottom: 1px solid ${(props) => props.theme.colors.border};
@@ -15,7 +16,7 @@ const Wrapper = styled.div`
 
     overflow: hidden;
 
-    transition: height 0.05s;
+    transition: height 0.05s, top 0.05s;
 
     &:last-child {
         border-bottom: none;

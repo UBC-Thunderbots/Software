@@ -1,6 +1,12 @@
+/*
+ * This file specifies a React component enabling resizeable panels.
+ * The actual resizing logic is specified in utils.ts in the same directory
+ */
+
 import * as React from 'react';
 import { ResizeObserver } from 'resize-observer';
 
+import { isChrome } from 'SRC/utils/browserDetection';
 import styled from 'SRC/utils/styled-components';
 
 import { IInternalPanelProps, Panel } from './Panel';
@@ -115,6 +121,7 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
                 ${currStyle}
 
                 [data-panel-id='${index}'] {
+                    top: ${currSize - panel.size}px;
                     height: ${panel.size}px;
                 }
 
@@ -150,7 +157,15 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
     };
 
     private onMouseMove = (e: MouseEvent) => {
-        this.mouseDelta += e.movementY / window.devicePixelRatio;
+        if (isChrome) {
+            // It appears that Chrome returns mouse movement in device pixels rather than
+            // CSS pixels, which is annoying to say the least. Here, we check if we are
+            // running in Chrome, and apply the transformation from display pixel to CSS
+            // pixel.
+            this.mouseDelta += e.movementY / window.devicePixelRatio;
+        } else {
+            this.mouseDelta += e.movementY;
+        }
     };
 
     private onResize = () => {

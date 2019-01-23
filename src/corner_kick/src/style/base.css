@@ -14,6 +14,7 @@ body {
 
     overflow: hidden;
     user-select: none;
+    -moz-user-select: none;
 
     font-family: 'Open Sans', sans-serif;
     font-size: 14px;
