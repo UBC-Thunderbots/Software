@@ -1,5 +1,7 @@
 #include "ai/primitive/primitive.h"
 
+#include <exception>
+
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
@@ -60,11 +62,8 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     }
     else
     {
-        // TODO: Throw unknown primitive exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        std::cerr << "Error: Unexpected Primitive message of type "
-                  << primitive_msg.primitive_name << std::endl;
-        std::exit(1);
+        throw std::invalid_argument("Error: Unknown Primitive (" +
+                                    primitive_msg.primitive_name + ") ");
     }
 
     return prim_ptr;
@@ -75,10 +74,7 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
 {
     if (prim_msg.primitive_name != prim_name)
     {
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        std::cerr << "Error: Move Primitive constructed from wrong Primitive msg"
-                  << std::endl;
-        exit(1);
+        throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name +
+                                    ") does not match expected name" + prim_name);
     }
 }

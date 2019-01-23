@@ -92,7 +92,7 @@ TEST_F(ROSMessageUtilTest, create_team_from_ros_message)
     auto robot_expiry_buffer_milliseconds = milliseconds(1000);
     unsigned int goalie_id                = 5;
 
-    unsigned int robot_id            = 9;
+    unsigned int robot_id            = 5;
     Point position                   = Point(1.2, -8.07);
     Vector velocity                  = Vector(0, 3);
     Angle orientation                = Angle::ofRadians(1.16);
@@ -129,6 +129,48 @@ TEST_F(ROSMessageUtilTest, create_team_from_ros_message)
     team_other.assignGoalie(goalie_id);
 
     EXPECT_EQ(team_other, team);
+}
+
+TEST_F(ROSMessageUtilTest, create_team_from_ros_message_with_non_member)
+{
+    auto robot_expiry_buffer_milliseconds = milliseconds(1000);
+    unsigned int goalie_id                = 5;
+
+    unsigned int robot_id            = 9;
+    Point position                   = Point(1.2, -8.07);
+    Vector velocity                  = Vector(0, 3);
+    Angle orientation                = Angle::ofRadians(1.16);
+    AngularVelocity angular_velocity = AngularVelocity::ofRadians(-0.85);
+    auto timestamp_nanoseconds_since_epoch =
+        std::chrono::duration_cast<nanoseconds>(current_time.time_since_epoch());
+
+    thunderbots_msgs::Robot robot_msg;
+
+    robot_msg.id               = robot_id;
+    robot_msg.position.x       = position.x();
+    robot_msg.position.y       = position.y();
+    robot_msg.velocity.x       = velocity.x();
+    robot_msg.velocity.y       = velocity.y();
+    robot_msg.orientation      = orientation.toRadians();
+    robot_msg.angular_velocity = angular_velocity.toRadians();
+    robot_msg.timestamp_nanoseconds_since_epoch =
+        static_cast<uint64_t>(timestamp_nanoseconds_since_epoch.count());
+
+    thunderbots_msgs::Team team_msg;
+
+    team_msg.robots.emplace_back(robot_msg);
+    team_msg.goalie_id = goalie_id;
+    team_msg.robot_expiry_buffer_milliseconds =
+        static_cast<unsigned int>(robot_expiry_buffer_milliseconds.count());
+
+    ASSERT_THROW(Team team = Util::ROSMessages::createTeamFromROSMessage(team_msg);
+
+                 Team team_other = Team(robot_expiry_buffer_milliseconds);
+                 Robot robot     = Robot(robot_id, position, velocity, orientation,
+                                     angular_velocity, current_time);
+
+                 team_other.updateRobots({robot}); team_other.assignGoalie(goalie_id);
+                 , std::invalid_argument);
 }
 
 int main(int argc, char **argv)
