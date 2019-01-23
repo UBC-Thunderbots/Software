@@ -19,6 +19,9 @@ add_custom_target(
   COMMENT Packaging up ${PROJECT_NAME}
 
   # Get dependencies
+  # We enforce `yarn.lock` with flag --frozen-lockfile 
+  # at this step to ensure our dependencies remain
+  # consistent outside of development
   COMMAND yarn --silent --frozen-lockfile
 
   # Only build if src has changed
