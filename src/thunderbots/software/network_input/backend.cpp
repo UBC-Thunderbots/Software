@@ -161,146 +161,70 @@ std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
     return std::make_optional<thunderbots_msgs::RefboxData>(refbox_data);
 }
 
+const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
+    {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
+    {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
+    {Referee_Command_PREPARE_KICKOFF_BLUE,
+     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US},
+    {Referee_Command_PREPARE_KICKOFF_YELLOW,
+     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM},
+    {Referee_Command_PREPARE_PENALTY_BLUE,
+     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US},
+    {Referee_Command_PREPARE_PENALTY_YELLOW,
+     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM},
+    {Referee_Command_DIRECT_FREE_BLUE, thunderbots_msgs::RefboxCommand::DIRECT_FREE_US},
+    {Referee_Command_DIRECT_FREE_YELLOW,
+     thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM},
+    {Referee_Command_INDIRECT_FREE_BLUE,
+     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US},
+    {Referee_Command_INDIRECT_FREE_YELLOW,
+     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM},
+    {Referee_Command_TIMEOUT_BLUE, thunderbots_msgs::RefboxCommand::TIMEOUT_US},
+    {Referee_Command_TIMEOUT_YELLOW, thunderbots_msgs::RefboxCommand::TIMEOUT_THEM},
+    {Referee_Command_GOAL_BLUE, thunderbots_msgs::RefboxCommand::GOAL_US},
+    {Referee_Command_GOAL_YELLOW, thunderbots_msgs::RefboxCommand::GOAL_THEM},
+    {Referee_Command_BALL_PLACEMENT_BLUE,
+     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US},
+    {Referee_Command_BALL_PLACEMENT_YELLOW,
+     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM}};
+
+const static std::unordered_map<Referee::Command, int> yellow_team_command_map = {
+    {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
+    {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
+    {Referee_Command_PREPARE_KICKOFF_BLUE,
+     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM},
+    {Referee_Command_PREPARE_KICKOFF_YELLOW,
+     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US},
+    {Referee_Command_PREPARE_PENALTY_BLUE,
+     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM},
+    {Referee_Command_PREPARE_PENALTY_YELLOW,
+     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US},
+    {Referee_Command_DIRECT_FREE_BLUE, thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM},
+    {Referee_Command_DIRECT_FREE_YELLOW, thunderbots_msgs::RefboxCommand::DIRECT_FREE_US},
+    {Referee_Command_INDIRECT_FREE_BLUE,
+     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM},
+    {Referee_Command_INDIRECT_FREE_YELLOW,
+     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US},
+    {Referee_Command_TIMEOUT_BLUE, thunderbots_msgs::RefboxCommand::TIMEOUT_THEM},
+    {Referee_Command_TIMEOUT_YELLOW, thunderbots_msgs::RefboxCommand::TIMEOUT_US},
+    {Referee_Command_GOAL_BLUE, thunderbots_msgs::RefboxCommand::GOAL_THEM},
+    {Referee_Command_GOAL_YELLOW, thunderbots_msgs::RefboxCommand::GOAL_US},
+    {Referee_Command_BALL_PLACEMENT_BLUE,
+     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM},
+    {Referee_Command_BALL_PLACEMENT_YELLOW,
+     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US}};
+
 // my apologies for another monster switch statement
 int32_t Backend::getTeamCommand(const Referee::Command &command)
 {
     auto our_team_colour = Util::Constants::FRIENDLY_TEAM_COLOUR;
-    switch (command)
+    if (our_team_colour == TeamColour::BLUE)
     {
-        case Referee_Command_HALT:
-            return thunderbots_msgs::RefboxCommand::HALT;
-        case Referee_Command_STOP:
-            return thunderbots_msgs::RefboxCommand::STOP;
-        case Referee_Command_NORMAL_START:
-            return thunderbots_msgs::RefboxCommand::NORMAL_START;
-        case Referee_Command_FORCE_START:
-            return thunderbots_msgs::RefboxCommand::FORCE_START;
-        case Referee_Command_PREPARE_KICKOFF_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM;
-            }
-        case Referee_Command_PREPARE_KICKOFF_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US;
-            }
-        case Referee_Command_PREPARE_PENALTY_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM;
-            }
-        case Referee_Command_PREPARE_PENALTY_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US;
-            }
-        case Referee_Command_DIRECT_FREE_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM;
-            }
-        case Referee_Command_DIRECT_FREE_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::DIRECT_FREE_US;
-            }
-        case Referee_Command_INDIRECT_FREE_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM;
-            }
-        case Referee_Command_INDIRECT_FREE_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US;
-            }
-        case Referee_Command_TIMEOUT_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::TIMEOUT_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::TIMEOUT_THEM;
-            }
-        case Referee_Command_TIMEOUT_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::TIMEOUT_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::TIMEOUT_US;
-            }
-        case Referee_Command_GOAL_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::GOAL_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::GOAL_THEM;
-            }
-        case Referee_Command_GOAL_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::GOAL_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::GOAL_US;
-            }
-        case Referee_Command_BALL_PLACEMENT_YELLOW:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM;
-            }
-        case Referee_Command_BALL_PLACEMENT_BLUE:
-            if (our_team_colour == TeamColour::YELLOW)
-            {
-                return thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM;
-            }
-            else
-            {
-                return thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM;
-            }
+        return blue_team_command_map.at(command);
+    }
+    else
+    {
+        return yellow_team_command_map.at(command);
     }
 }
 
