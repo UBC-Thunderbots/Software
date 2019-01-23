@@ -45,5 +45,8 @@
         "redux-saga": "0.16.2",
         "roslib": "0.20.0",
         "styled-components": "4.1.2"
+    },
+    "engines": {
+        "yarn": "1.13.0"
     }
 }
