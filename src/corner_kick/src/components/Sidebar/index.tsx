@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 
-import { Portal } from '../Portal';
+import { Portal, PortalLocation } from '../Portal';
 import { IResizeablePanelsProps, ResizeablePanels } from './ResizeablePanels';
 
 export { Panel } from './Panel';
@@ -16,7 +16,7 @@ export { Panel } from './Panel';
 export const Sidebar = (props: IResizeablePanelsProps) => {
     const { children } = props;
     return (
-        <Portal to="sidebar">
+        <Portal portalLocation={PortalLocation.sidebar}>
             <ResizeablePanels {...props}>{children}</ResizeablePanels>
         </Portal>
     );

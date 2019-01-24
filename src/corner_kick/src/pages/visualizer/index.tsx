@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Portal } from 'SRC/components/Portal';
+
+import { Portal, PortalLocation } from 'SRC/components/Portal';
 import { Sidebar } from 'SRC/components/Sidebar';
 import { Panel } from 'SRC/components/Sidebar/Panel';
+
 import { Layers } from './Layers';
 
 export class Visualizer extends React.Component {
@@ -39,7 +41,9 @@ export class Visualizer extends React.Component {
                     <Panel title="Game Status" />
                     <Panel title="Game Status" />
                 </Sidebar>
-                <Portal to="main">This is the visualizer</Portal>
+                <Portal portalLocation={PortalLocation.main}>
+                    This is the visualizer
+                </Portal>
             </>
         );
     }
