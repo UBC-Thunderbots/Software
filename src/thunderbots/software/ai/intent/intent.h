@@ -35,5 +35,7 @@ class Intent
      */
     virtual unsigned int getRobotId() const = 0;
 
+    virtual int getPriority() const = 0;
+
     virtual ~Intent() = default;
 };
