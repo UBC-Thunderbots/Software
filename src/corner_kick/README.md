@@ -73,6 +73,15 @@ The project is defined as follow:
 
 ## Design notes
 
+### Yarn
+
+We are using a fixed version of Yarn in this project, to ensure that all developers
+are using the same tooling for this project. As such, Yarn is included in this project
+in the `scripts` directory. Regardless of the version of Yarn installed on your system,
+it will detect the committed version and use that instead.
+
+Currently, we are using Yarn version 1.13.0.
+
 ### Approach to the application UI layout
 
 The visualizer will consist of multiple pages, each of which serve a single purpose. Each page will
