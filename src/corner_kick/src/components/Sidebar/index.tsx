@@ -1,19 +1,23 @@
+/**
+ * This file defines a sidebar React component
+ */
+
 import * as React from 'react';
 
 import { Portal } from '../Portal';
-import { Panel } from './Panel';
-import { ResizeablePanels } from './ResizeablePanels';
+import { IResizeablePanelsProps, ResizeablePanels } from './ResizeablePanels';
 
-interface ISidebarProps {
-    minPanelSize: number;
-    children: React.ReactElement<typeof Panel> | Array<React.ReactElement<typeof Panel>>;
-}
+export { Panel } from './Panel';
 
-export const Sidebar = (props: ISidebarProps) => {
-    const { children, minPanelSize } = props;
+/**
+ * Adds a sidebar to the sidebar area of the application. The sidebar consists
+ * of a series of resizeable panels, provided by the user of the sidebar.
+ */
+export const Sidebar = (props: IResizeablePanelsProps) => {
+    const { children } = props;
     return (
         <Portal to="sidebar">
-            <ResizeablePanels minPanelSize={minPanelSize}>{children}</ResizeablePanels>
+            <ResizeablePanels {...props}>{children}</ResizeablePanels>
         </Portal>
     );
 };

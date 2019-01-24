@@ -19,6 +19,9 @@ import {
     resizeParent,
 } from './utils';
 
+/**
+ * Styling for the parent container
+ */
 const Wrapper = styled.div`
     position: relative;
     width: 100%;
@@ -27,6 +30,9 @@ const Wrapper = styled.div`
     overflow: hidden;
 `;
 
+/**
+ * Styling for the resizer
+ */
 const Resizer = styled.div`
     position: absolute;
     width: 100%;
@@ -35,62 +41,125 @@ const Resizer = styled.div`
     cursor: row-resize;
 `;
 
-interface IResizeablePanelsProps {
-    minPanelSize: number;
+export interface IResizeablePanelsProps {
+    /**
+     * The minimum height of the panel
+     */
+    minPanelHeight: number;
+
+    /**
+     * The height of an inactive panel
+     */
+    inactivePanelHeight: number;
+
+    /**
+     * The sidebar only supports Panel components as its children
+     */
     children: React.ReactElement<typeof Panel> | Array<React.ReactElement<typeof Panel>>;
 }
 
+/**
+ * Implements a resizeable panel container, allowing for the resizing of
+ * panels
+ *
+ * Some of the logic for resizing is defined in Panel
+ */
 export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
+    /**
+     *  Reference to the DOM node of the parent container
+     * Used to determine the height of the parent container
+     */
     private wrapperRef: React.RefObject<HTMLDivElement>;
+
+    /**
+     * Reference to the style node in `<head>`
+     * Used to change the height of panels in a performant way
+     */
     private styleElement: HTMLStyleElement;
 
+    /**
+     * Index of the resizer element currently being
+     * resized.
+     *
+     * Value is -1 if resize is not in progress
+     */
     private resizeIndex = -1;
+
+    /**
+     * Counter measuring the distance between the resizer and the mouse position
+     * Used to perform the resize operation
+     */
     private mouseDelta = 0;
+
+    /**
+     * Current height of the parent container
+     */
     private parentHeight = 0;
+
+    /**
+     * Information regarding the panel in the container
+     */
     private panels: IPanel[];
+
+    /**
+     * Current device pixel ratio
+     */
     private pixelRatio: number;
 
+    /**
+     * Allows to be notified when the parent container's height is changed
+     */
     private resizeObserver: ResizeObserver;
 
     constructor(props: IResizeablePanelsProps) {
         super(props);
 
+        // Fetch the reference of the parent container
         this.wrapperRef = React.createRef();
 
+        // Generate initial information for the panels
         this.panels = getInitialSize(React.Children.count(this.props.children), 100);
     }
 
     public componentDidMount() {
-        this.parentHeight = this.wrapperRef.current!.clientHeight;
+        // Start observing if the parent container has changed height
         this.resizeObserver = new ResizeObserver(this.onResizeParent);
         this.resizeObserver.observe(this.wrapperRef.current!);
 
+        // We need information regarding device pixel ratio
         this.pixelRatio = window.devicePixelRatio;
 
+        // Create a style element to allow for a performant panel height change
         this.styleElement = document.createElement('style');
         this.styleElement.type = 'text/css';
 
         const head = document.querySelector('head');
         head!.appendChild(this.styleElement);
 
+        // Update panels so they take the parent's height
+        this.parentHeight = this.wrapperRef.current!.clientHeight;
         this.panels = getInitialSize(
             React.Children.count(this.props.children),
             this.parentHeight,
         );
+
+        // Update panel heights
         this.setSizes();
     }
 
     public componentWillUnmount() {
+        // Always clean up after yourself
+        // Remove the listener of the parent container's height
         this.resizeObserver.unobserve(this.wrapperRef.current!);
     }
 
     public render() {
-        const { children, minPanelSize } = this.props;
+        const { children, minPanelHeight } = this.props;
 
         const count = React.Children.count(children);
 
         return (
-            <Wrapper ref={this.wrapperRef} style={{ minHeight: count * minPanelSize }}>
+            <Wrapper ref={this.wrapperRef} style={{ minHeight: count * minPanelHeight }}>
                 {React.Children.map(
                     children,
                     (child: React.ReactElement<IInternalPanelProps>, index) => {
@@ -118,13 +187,13 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
     private setSizes = () => {
         let currSize = 0;
         const style = this.panels.reduce((currStyle, panel, index) => {
-            currSize += panel.size;
+            currSize += panel.height;
             return `
                 ${currStyle}
 
                 [data-panel-id='${index}'] {
-                    top: ${currSize - panel.size}px;
-                    height: ${panel.size}px;
+                    top: ${currSize - panel.height}px;
+                    height: ${panel.height}px;
                 }
 
                 [data-resizer-id='${index}'] {
@@ -137,14 +206,16 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
     };
 
     private onTitleClick = (index: number) => () => {
+        const { inactivePanelHeight, minPanelHeight } = this.props;
         if (this.panels[index].active) {
-            makePanelInactive(index, this.panels, 32);
+            makePanelInactive(index, this.panels, inactivePanelHeight, minPanelHeight);
         } else {
             makePanelActive(
                 index,
                 this.panels,
                 this.parentHeight,
-                this.props.minPanelSize,
+                inactivePanelHeight,
+                minPanelHeight,
             );
         }
         this.setSizes();
@@ -155,8 +226,6 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
         this.resizeIndex = index;
         this.mouseDelta = 0;
         this.parentHeight = this.wrapperRef.current!.clientHeight;
-
-        console.log(this.parentHeight);
 
         requestAnimationFrame(this.onResize);
         window.addEventListener('mousemove', this.onMouseMove);
@@ -183,7 +252,7 @@ export class ResizeablePanels extends React.Component<IResizeablePanelsProps> {
                 resizeIndex,
                 this.panels,
                 this.mouseDelta,
-                this.props.minPanelSize,
+                this.props.minPanelHeight,
             );
             this.setSizes();
 

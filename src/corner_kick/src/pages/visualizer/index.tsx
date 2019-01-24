@@ -8,7 +8,7 @@ export class Visualizer extends React.Component {
     public render() {
         return (
             <>
-                <Sidebar minPanelSize={100}>
+                <Sidebar minPanelHeight={100} inactivePanelHeight={32}>
                     <Panel title="Layers">
                         <Layers
                             layers={[
