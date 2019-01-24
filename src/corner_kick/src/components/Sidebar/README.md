@@ -7,16 +7,19 @@ needs.
 
 ## Table of content<!-- omit in toc -->
 
--   [How to use](#how-to-use)
-    -   [Example](#example)
--   [Implementation overview](#implementation-overview)
-    -   [The resize operation](#the-resize-operation)
-        -   [Scenario 1: both panel have sufficient height](#scenario-1-both-panel-have-sufficient-height)
-        -   [Scenario 2: a panel is at minimum height](#scenario-2-a-panel-is-at-minimum-height)
-        -   [Scenario 3: all panels are at minimum height](#scenario-3-all-panels-are-at-minimum-height)
-    -   [Opening/closing panels](#openingclosing-panels)
-    -   [Resizing the window](#resizing-the-window)
-    -   [Performance](#performance)
+- [How to use](#how-to-use)
+  - [Example](#example)
+- [Implementation overview](#implementation-overview)
+  - [The resize operation](#the-resize-operation)
+    - [Scenario 1: both panel have sufficient height](#scenario-1-both-panel-have-sufficient-height)
+    - [Scenario 2: a panel is almost at minimum height](#scenario-2-a-panel-is-almost-at-minimum-height)
+    - [Scenario 3: a panel is at minimum height](#scenario-3-a-panel-is-at-minimum-height)
+    - [Scenario 4: all panels are at minimum height](#scenario-4-all-panels-are-at-minimum-height)
+  - [Opening/closing panels](#openingclosing-panels)
+    - [Closing a panel](#closing-a-panel)
+    - [Opening a panel](#opening-a-panel)
+  - [Resizing the window](#resizing-the-window)
+  - [Performance](#performance)
 
 ## How to use
 
@@ -128,6 +131,40 @@ If there are no panels with a height greater than the minimum height, then no tr
 
 ### Opening/closing panels
 
+Panels can be opened or closed by the user. This has an effect on panel's height. There are two scenarios to take into account.
+
+#### Closing a panel
+
+In this instance, the panel being closed must have its height assigned to other opened panels.
+
+The only edge case is if there are no other panel opened (the panel just closed was the last one
+open). In this case, the closed panel's height is reduced and no height is assigned to other panels.
+
+#### Opening a panel
+
+Here, we need to take height from other panel to make sure the recently opened panel's height is
+above its minimum height. We attempt transfer sufficient height from other open panel until the
+newly opened panel is at its minimum height.
+
+The only edge case is if the newly opened panel is the only panel open. In that case, the panel will
+take the height of its parent, minus the height of the closed panels.
+
 ### Resizing the window
 
+When resizing the window, we must ensure the height of all panels must not go over the height of the
+parent. When the window is resized, we apply the change in window height to the bottom-most
+opened panel.
+
+We also simplify the resize logic by mandating that the panel container cannot be smaller than
+the sum of the minimum height of all panels.
+
 ### Performance
+
+Performance for resizing panels is critical. In this situation, relying on React to
+perform height is not beneficial. The reconciliation process is too expansive to be
+conducted 60 times per second. Rather, we assign unique ids to each panel and modify
+the height using CSS styling. This prevents a React rerender and improves the frame
+rate of the resize.
+
+In addition, we use the CSS instruction `position: absolute` on the panels to remove
+them from the page flow. This helps with our frame rate by preventing a browser reflow.
