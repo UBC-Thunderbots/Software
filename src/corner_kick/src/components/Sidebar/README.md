@@ -7,16 +7,16 @@ needs.
 
 ## Table of content<!-- omit in toc -->
 
-- [How to use](#how-to-use)
-  - [Example](#example)
-- [Implementation overview](#implementation-overview)
-  - [The resize operation](#the-resize-operation)
-    - [Scenario 1: both panel have sufficient height](#scenario-1-both-panel-have-sufficient-height)
-    - [Scenario 2: a panel is at minimum height](#scenario-2-a-panel-is-at-minimum-height)
-    - [Scenario 3: all panels are at minimum height](#scenario-3-all-panels-are-at-minimum-height)
-  - [Opening/closing panels](#openingclosing-panels)
-  - [Resizing the window](#resizing-the-window)
-  - [Performance](#performance)
+-   [How to use](#how-to-use)
+    -   [Example](#example)
+-   [Implementation overview](#implementation-overview)
+    -   [The resize operation](#the-resize-operation)
+        -   [Scenario 1: both panel have sufficient height](#scenario-1-both-panel-have-sufficient-height)
+        -   [Scenario 2: a panel is at minimum height](#scenario-2-a-panel-is-at-minimum-height)
+        -   [Scenario 3: all panels are at minimum height](#scenario-3-all-panels-are-at-minimum-height)
+    -   [Opening/closing panels](#openingclosing-panels)
+    -   [Resizing the window](#resizing-the-window)
+    -   [Performance](#performance)
 
 ## How to use
 
@@ -80,25 +80,51 @@ operation, up and until the resize operation cannot be performed further due to 
 due to the mouse moving in the other direction), we want to be able to sync back the mouse position with the resize handle. In essence then,
 `mouseDelta` describes the delta between the mouse position and the resize handle.
 
-Due to the constraints in the resize operations, there are three different scenarios that we have to account for.
+Due to the constraints in the resize operations, there are four different scenarios that we have to account for.
 
 #### Scenario 1: both panel have sufficient height
 
 <p align="center">
-  <img src="./.github/scenario_1.png">
+  <img src="./__doc__/scenario_1.png">
 </p>
 
-#### Scenario 2: a panel is at minimum height
+In the case where both panels have sufficent height, then the panel surround the resize handle
+(in this example panel #1 and #2) will take part in the height transaction. After the resize
+logic has run, panel #1's height will be reduced by the amount specified in `mouseDelta` (here,
+the black arrow) and panel #2's height will be increased by the amount specified in `mouseDelta`.
+
+#### Scenario 2: a panel is almost at minimum height
 
 <p align="center">
-  <img src="./.github/scenario_2.png">
+  <img src="./__doc__/scenario_2.png">
 </p>
 
-#### Scenario 3: all panels are at minimum height
+In the case that a panel is not at its minimum height, but following scenario 1 would cause it
+to have its height reduced past its miminum height, not all of `mouseDelta` will be used in the
+height transaction. In this example, panel #1's height would be reduced until reaching its minimum
+height and panel #2's height would be increased by the same amount. `mouseDelta` value would be
+reduced by the amount used in this transaction and the remaining value would be kept for the
+following frame, which would most likely follow scenario 3.
+
+#### Scenario 3: a panel is at minimum height
 
 <p align="center">
-  <img src="./.github/scenario_3.png">
+  <img src="./__doc__/scenario_3.png">
 </p>
+
+If a panel is at minimum height, its height cannot be reduced further. The resize logic must then
+look at the next panel if it has a height suitable for this transaction. In this example, panel #2
+is at its minimum height, but panel #1 is not. Hence, the height transaction can occur between
+panel #3 and panel #1, following either scenario 1 or 2.
+
+#### Scenario 4: all panels are at minimum height
+
+<p align="center">
+  <img src="./__doc__/scenario_4.png">
+</p>
+
+If there are no panels with a height greater than the minimum height, then no transaction can occur.
+`mouseDelta` is not changed, and no panel has their height modified.
 
 ### Opening/closing panels
 
