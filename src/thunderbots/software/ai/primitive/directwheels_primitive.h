@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include "ai/primitive/primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -24,9 +26,10 @@ class DirectWheelsPrimitive : public Primitive
      * clockwise
      * @param dribbler_rpm the dribbler rpm
      */
-    explicit DirectWheelsPrimitive(unsigned int robot_id, int front_left_wheel_power,
-                                   int back_left_wheel_power, int front_right_wheel_power,
-                                   int back_right_wheel_power, double dribbler_rpm);
+    explicit DirectWheelsPrimitive(unsigned int robot_id, int16_t front_left_wheel_power,
+                                   int16_t back_left_wheel_power,
+                                   int16_t front_right_wheel_power,
+                                   int16_t back_right_wheel_power, double dribbler_rpm);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -44,28 +47,28 @@ class DirectWheelsPrimitive : public Primitive
      *
      * @return the power of wheel 0
      */
-    int getWheel0Power() const;
+    int16_t getWheel0Power() const;
 
     /**
      * Gets the power of wheel 1
      *
      * @return the power of wheel 1
      */
-    int getWheel1Power() const;
+    int16_t getWheel1Power() const;
 
     /**
      * Gets the power of wheel 2
      *
      * @return the power of wheel 2
      */
-    int getWheel2Power() const;
+    int16_t getWheel2Power() const;
 
     /**
      * Gets the power of wheel 3
      *
      * @return the power of wheel 3
      */
-    int getWheel3Power() const;
+    int16_t getWheel3Power() const;
 
     /**
      * Gets the RPM of the dribbler
@@ -94,9 +97,9 @@ class DirectWheelsPrimitive : public Primitive
 
    private:
     unsigned int robot_id;
-    int front_left_wheel_power;
-    int back_left_wheel_power;
-    int front_right_wheel_power;
-    int back_right_wheel_power;
+    int16_t front_left_wheel_power;
+    int16_t back_left_wheel_power;
+    int16_t front_right_wheel_power;
+    int16_t back_right_wheel_power;
     double dribbler_rpm;
 };

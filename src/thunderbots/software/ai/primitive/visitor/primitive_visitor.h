@@ -8,6 +8,7 @@
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
 
 /**
  * This class provides an interface for all Primitive Visitors. The Visitor design pattern
@@ -76,4 +77,11 @@ class PrimitiveVisitor
      * @param pivot_primitive The PivotPrimitive to visit
      */
     virtual void visit(const PivotPrimitive &pivot_primtiive) = 0;
+
+    /**
+     * Visits a StopPrimitive to perform an operation.
+     *
+     * @param stop_primitive The StopPrimitive to visit
+     */
+    virtual void visit(const StopPrimitive &stop_primtiive) = 0;
 };

@@ -245,6 +245,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             grsim_communication/grsim_backend.cpp
@@ -371,6 +372,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -389,6 +391,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -407,6 +410,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -425,6 +429,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -443,6 +448,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -461,6 +467,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -479,6 +486,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -497,6 +505,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -515,11 +524,31 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
 
     target_link_libraries(catch_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    catkin_add_gtest(stop_primitive_test
+            test/primitive/stop_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            )
+
+    target_link_libraries(stop_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
 
 endif()

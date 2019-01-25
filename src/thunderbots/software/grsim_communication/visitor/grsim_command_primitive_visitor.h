@@ -31,7 +31,7 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * Generates and stores the MotionControllerCommand the robot should perform at the
      * current moment in time in order to simulate the ChipPrimitive
      *
-     * @param catch_primitive The ChipPrimitive to simulate
+     * @param chip_primitive The ChipPrimitive to simulate
      */
     void visit(const ChipPrimitive &chip_primtiive) override;
 
@@ -57,7 +57,7 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * Generates and stores the MotionControllerCommand the robot should perform at the
      * current moment in time in order to simulate the KickPrimitive
      *
-     * @param catch_primitive The KickPrimitive to simulate
+     * @param kick_primitive The KickPrimitive to simulate
      */
     void visit(const KickPrimitive &kick_primtiive) override;
 
@@ -85,6 +85,14 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * @param pivot_primitive The PivotPrimitive to simulate
      */
     void visit(const PivotPrimitive &pivot_primtiive) override;
+
+    /**
+     * Generates and stores the MotionControllerCommand the robot should perform at the
+     * current moment in time in order to simulate the StopPrimitive
+     *
+     * @param stop_primitive The StopPrimitive to simulate
+     */
+    void visit(const StopPrimitive &stop_primitive) override;
 
     /**
      * Returns the most recent MotionControllerCommand created by this
