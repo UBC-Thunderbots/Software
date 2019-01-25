@@ -7,7 +7,7 @@
         "start": "webpack-dev-server --config ./config/webpack.dev.js --open",
         "build": "webpack --config ./config/webpack.prod.js",
         "prod": "http-server ./build -o",
-        "test": "jest",
+        "test": "jest --config ./config/jest.config.js",
         "test:watch": "yarn test -- --watch"
     },
     "author": "Quentin Golsteyn",
