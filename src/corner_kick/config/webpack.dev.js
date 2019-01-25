@@ -5,6 +5,8 @@
  * @see {@link ./webpack.config.js}
  */
 
+const ErrorOverlayPlugin = require('error-overlay-webpack-plugin');
+
 const webpackConfig = require('./webpack.base.config.js');
 
 module.exports = {
@@ -21,5 +23,10 @@ module.exports = {
         publicPath: '/',
         historyApiFallback: true,
         quiet: true,
+        overlay: true,
     },
+
+    // We use ErrorOverlayPlugin to see errors in a nice UI with a short
+    // summary of the location where the code crashed
+    plugins: [new ErrorOverlayPlugin(), ...webpackConfig.plugins],
 };

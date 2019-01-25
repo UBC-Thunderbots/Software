@@ -18,8 +18,14 @@ add_custom_target(
   ALL
   COMMENT Packaging up ${PROJECT_NAME}
 
+  # Check current yarn version
+  COMMAND yarn -v
+
   # Get dependencies
-  COMMAND yarn
+  # We enforce `yarn.lock` with flag --frozen-lockfile 
+  # at this step to ensure our dependencies remain
+  # consistent outside of development
+  COMMAND yarn --silent --frozen-lockfile
 
   # Only build if src has changed
   COMMAND ./scripts/compare_src.sh || yarn build
