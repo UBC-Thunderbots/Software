@@ -52,7 +52,7 @@ if [ "$RUN_BUILD" == "true" ] || \
 fi
 
 # Note that we must run tests to get coverage
-if [ "$RUN_TESTS" == "true" || \
+if [ "$RUN_TESTS" == "true" ] || \
     [ "$RUN_COVERAGE" == "true" ]; then
     # Run tests for AI
     travis_run catkin_make run_tests ${CMAKE_FLAGS}
