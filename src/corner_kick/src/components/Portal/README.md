@@ -1,13 +1,13 @@
-# Portals - Design notes<!-- omit in toc -->
+# Portals - Design notes
 
 This document outlines and specifies the implementation of portals, and why they are
 used in this application. I strongly recommend reading more about
 [React Portal in the React Doc](https://reactjs.org/docs/portals.html).
 
-## Table of content<!-- omit in toc -->
+**Table of content**
 
 - [How to use](#how-to-use)
-  - [Example](#example)
+    - [Example](#example)
 - [Implementation overview](#implementation-overview)
 
 ## How to use

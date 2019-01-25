@@ -12,14 +12,14 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 
 - [How to use](#how-to-use)
 - [Contribute](#contribute)
-  - [Running the dev server](#running-the-dev-server)
+    - [Running the dev server](#running-the-dev-server)
 - [Project Structure](#project-structure)
 - [Design notes](#design-notes)
-  - [Yarn](#yarn)
-  - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
-  - [Approach to the application state](#approach-to-the-application-state)
-    - [Debugging the Redux store](#debugging-the-redux-store)
-    - [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
+    - [Yarn](#yarn)
+    - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
+    - [Approach to the application state](#approach-to-the-application-state)
+        - [Debugging the Redux store](#debugging-the-redux-store)
+        - [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
 
 ## How to use
 
