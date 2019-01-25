@@ -13,6 +13,7 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 -   [How to use](#how-to-use)
 -   [Contribute](#contribute)
     -   [Running the dev server](#running-the-dev-server)
+    -   [Testing](#testing)
 -   [Project Structure](#project-structure)
 -   [Design notes](#design-notes)
     -   [Approach to the application UI layout](#approach-to-the-application-ui-layout)
@@ -32,7 +33,7 @@ roslaunch corner_kick corner_kick.launch
 
 ### Running the dev server
 
-You can test your code by running:
+You can launch the application by running:
 
 ```
 roslaunch rosbridge_server rosbridge_websocket.launch
@@ -46,6 +47,20 @@ yarn start
 ```
 
 A window should open with the application in development mode.
+
+### Testing
+
+You can test the code by running
+
+```
+yarn test
+```
+
+To be able to run tests everytime a file changes, run
+
+```
+yarn test:watch
+```
 
 ## Project Structure
 
