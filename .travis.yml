@@ -11,7 +11,13 @@ sudo: false
 dist: trusty
 services:
   - docker
-language: generic
+language:
+  node_js
+install:
+  - npm install -g codecov
+script:
+  - istanbul cover ./node_modules/mocha/bin/_mocha --reporter lcovonly -- -R spec
+  - codecov
 notifications:
   email:
     recipients:

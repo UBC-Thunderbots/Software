@@ -6,7 +6,10 @@
     "scripts": {
         "start": "webpack-dev-server --config ./config/webpack.dev.js --open",
         "build": "webpack --config ./config/webpack.prod.js",
-        "prod": "http-server ./build -o"
+        "prod": "http-server ./build -o",
+        "test": "jest --config ./config/jest.config.js",
+        "test:watch": "yarn test --watch",
+        "test:coverage": "yarn test --coverage"
     },
     "author": "Quentin Golsteyn",
     "license": "ISC",
@@ -19,6 +22,7 @@
         "@types/roslib": "0.18.3",
         "@types/styled-components": "4.1.4",
         "clean-webpack-plugin": "1.0.0",
+        "codecov": "3.1.0",
         "css-loader": "2.0.0",
         "error-overlay-webpack-plugin": "0.1.6",
         "file-loader": "2.0.0",
