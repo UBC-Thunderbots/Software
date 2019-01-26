@@ -41,10 +41,10 @@ double dist(const Line &first, const Vector &second)
 {
     if (isDegenerate(first))
     {
-        return dist(first.first, second);
+        return dist(first.getFirst(), second);
     }
-    return fabs((second - first.first).cross(first.second - first.first) /
-                (first.second - first.first).len());
+    return fabs((second - first.getFirst()).cross(first.getSecond() - first.getFirst()) /
+                (first.getSecond() - first.getFirst()).len());
 }
 
 double dist(const Vector &first, const Line &second)
@@ -103,7 +103,7 @@ bool isDegenerate(const Segment &segment)
 
 bool isDegenerate(const Line &line)
 {
-    return distsq(line.first, line.second) < EPS2;
+    return distsq(line.getFirst(), line.getSecond()) < EPS2;
 }
 
 bool isDegenerate(const Ray &ray)

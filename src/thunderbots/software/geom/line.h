@@ -4,10 +4,31 @@
 
 class Line final
 {
-   public:
+   private:
     Point first;
     Point second;
 
+
+   public:
+    void setFirst(Point f)
+    {
+        first = f;
+    }
+
+    Point getFirst() const
+    {
+        return first;
+    }
+
+    void setSecond(Point s)
+    {
+        second = s;
+    }
+
+    Point getSecond() const
+    {
+        return second;
+    }
     /**
      * Creates a degenerate Line at (0, 0)
      */
