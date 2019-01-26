@@ -161,6 +161,7 @@ std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
     return std::make_optional<thunderbots_msgs::RefboxData>(refbox_data);
 }
 
+// this maps a protobuf Referee_Command enum to its ROS message equivalent, for blue team
 const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
     {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
     {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
@@ -192,6 +193,7 @@ const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
     {Referee_Command_BALL_PLACEMENT_YELLOW,
      thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM}};
 
+// this maps a protobuf Referee_Command enum to its ROS message equivalent, for yellow team
 const static std::unordered_map<Referee::Command, int> yellow_team_command_map = {
     {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
     {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
@@ -222,7 +224,6 @@ const static std::unordered_map<Referee::Command, int> yellow_team_command_map =
     {Referee_Command_BALL_PLACEMENT_YELLOW,
      thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US}};
 
-// my apologies for another monster switch statement
 int32_t Backend::getTeamCommand(const Referee::Command &command)
 {
     auto our_team_colour = Util::Constants::FRIENDLY_TEAM_COLOUR;
