@@ -62,17 +62,6 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         pivot_primitive.getPivotPoint() + Point(pivot_primitive.getPivotRadius(), 0)
                                               .rotate(pivot_primitive.getFinalAngle());
 
-    //    double distance_to_travel = 0.4; // get the calc for that
-    //
-    //    Point next_step_midpoint = Point(); // this temporary
-    //
-    //    Point destination = Point(); // get from distance travelled and direction
-    //
-    //    Angle final_orientation = Angle(); // calc based on end relative to centre
-    //
-    //    double final_speed = .5; // based on current speed + accel
-
-
     double final_speed =
         (robot.position() - pivot_dest).len() > dist_stop_from_max_speed_metres
             ? ROBOT_MAX_SPEED_METERS_PER_SECOND
