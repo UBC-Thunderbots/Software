@@ -3,13 +3,13 @@
 #include "ai/intent/intent.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "ai/primitive/move_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 
-class MoveIntent : public Intent, public MovePrimitive
+class KickIntent : public Intent, public KickPrimitive
 {
    public:
     /**
-     * Creates a new Move Intent
+     * Creates a new Kick Intent
      *
      * @param robot_id The id of the robot that this Intent is for
      * @param dest The destination of the Movement
@@ -19,11 +19,11 @@ class MoveIntent : public Intent, public MovePrimitive
      * @param priority The priority that the intent has relative to other intents (to be defined)
      */
     // TODO: Add parameter override field/object/struct
-    explicit MoveIntent(unsigned int robot_id, const Point &dest,
+    explicit KickIntent(unsigned int robot_id, const Point &dest,
                         const Angle &final_angle, double final_speed, int priority);
 
     /**
-     * Creates a new Move Intent
+     * Creates a new Kick Intent
      *
      * @param robot_id The id of the robot that this Intent is for
      * @param dest The destination of the Movement
@@ -32,7 +32,7 @@ class MoveIntent : public Intent, public MovePrimitive
      * destination
      */
     // TODO: Add parameter override field/object/struct
-    explicit MoveIntent(unsigned int robot_id, const Point &dest,
+    explicit KickIntent(unsigned int robot_id, const Point &dest,
                         const Angle &final_angle, double final_speed);
 
     std::string getIntentName() const override;
