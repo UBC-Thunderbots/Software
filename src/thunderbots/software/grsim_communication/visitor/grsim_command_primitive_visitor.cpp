@@ -23,7 +23,9 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
+    motion_controller_command = MotionController::MotionControllerCommand(
+        chip_primitive.getChipOrigin(), chip_primitive.getChipDirection(), 0.0,
+        chip_primitive.getChipDistance(), true, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
@@ -40,7 +42,9 @@ void GrsimCommandPrimitiveVisitor::visit(
 
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
+    motion_controller_command = MotionController::MotionControllerCommand(
+        kick_primitive.getKickOrigin(), kick_primitive.getKickDirection(), 0.0,
+        kick_primitive.getKickSpeed(), false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)

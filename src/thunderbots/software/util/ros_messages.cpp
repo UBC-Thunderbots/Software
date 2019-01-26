@@ -59,14 +59,14 @@ namespace Util
 
             team.updateRobots(robots);
 
-            if (team_msg.goalie_id >= 0)
-            {
-                team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
-            }
-            else
-            {
-                team.clearGoalie();
-            }
+            // if (team_msg.goalie_id >= 0)
+            // {
+            //     team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
+            // }
+            // else
+            // {
+            //     team.clearGoalie();
+            // }
 
             return team;
         }

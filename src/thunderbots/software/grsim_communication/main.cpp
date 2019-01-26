@@ -3,7 +3,9 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
+#include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/primitive.h"
@@ -29,6 +31,8 @@ namespace
     std::vector<std::unique_ptr<Primitive>> primitives;
 
     Team friendly_team = Team(std::chrono::milliseconds(1000));
+
+    Ball ball;
 }  // namespace
 
 // Callbacks
@@ -52,6 +56,15 @@ void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
     friendly_team.updateState(updated_friendly_team);
 }
 
+void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr &msg)
+{
+    thunderbots_msgs::Ball ball_msg = *msg;
+
+    Ball ball = Util::ROSMessages::createBallFromROSMessage(ball_msg);
+
+    ball.updateState(ball);
+}
+
 int main(int argc, char** argv)
 {
     // Init ROS node
@@ -64,6 +77,8 @@ int main(int argc, char** argv)
     ros::Subscriber friendly_team_subscriber =
         node_handle.subscribe(Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 10,
                               friendlyTeamUpdateCallback);
+    ros::Subscriber ball_sub = node_handle.subscribe(
+        Util::Constants::NETWORK_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
@@ -85,6 +100,8 @@ int main(int argc, char** argv)
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
+
+        primitives.emplace_back(new KickPrimitive(0, ball.position(), Angle::zero(), 3));
 
         grsim_backend.sendPrimitives(primitives, friendly_team);
 
