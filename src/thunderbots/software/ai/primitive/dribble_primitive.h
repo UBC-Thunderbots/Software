@@ -11,7 +11,7 @@
 
 class DribblePrimitive : public Primitive
 {
-public:
+   public:
     static const std::string PRIMITIVE_NAME;
     /**
      * Creates a new Dribble Primitive
@@ -32,7 +32,8 @@ public:
      *
      */
     explicit DribblePrimitive(unsigned int robot_id, const Point &dest,
-                           const Angle &final_angle, double final_speed, double rpm, bool small_kick_allowed);
+                              const Angle &final_angle, double final_speed, double rpm,
+                              bool small_kick_allowed);
 
     /**
      * Creates a new Dribble Primitive from a Primitive message
@@ -108,7 +109,7 @@ public:
 
     void accept(PrimitiveVisitor &visitor) const override;
 
-private:
+   private:
     unsigned int robot_id;
     Point dest;
     Angle final_angle;

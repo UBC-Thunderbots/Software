@@ -5,13 +5,14 @@
 const std::string DribblePrimitive::PRIMITIVE_NAME = "Dribble Primitive";
 
 DribblePrimitive::DribblePrimitive(unsigned int robot_id, const Point &dest,
-                             const Angle &final_angle, double final_speed, double rpm, bool small_kick_allowed)
-        : robot_id(robot_id),
-          dest(dest),
-          final_angle(final_angle),
-          final_speed(final_speed),
-          rpm(rpm),
-          small_kick_allowed(small_kick_allowed)
+                                   const Angle &final_angle, double final_speed,
+                                   double rpm, bool small_kick_allowed)
+    : robot_id(robot_id),
+      dest(dest),
+      final_angle(final_angle),
+      final_speed(final_speed),
+      rpm(rpm),
+      small_kick_allowed(small_kick_allowed)
 
 {
 }
@@ -60,8 +61,8 @@ double DribblePrimitive::getRpm() const
     return rpm;
 }
 
-bool DribblePrimitive::isSmallKickAllowed() const {
-
+bool DribblePrimitive::isSmallKickAllowed() const
+{
     return small_kick_allowed;
 }
 
