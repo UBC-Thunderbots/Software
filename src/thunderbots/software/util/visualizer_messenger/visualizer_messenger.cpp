@@ -18,7 +18,7 @@ void VisualizerMessenger::clearLayers()
 }
 
 void VisualizerMessenger::ellipse(
-	std::string& layer,
+	const std::string& layer,
 	double cx, double cy, double r1, double r2,
 	DrawStyle draw_style,
 	DrawTransform draw_transform
@@ -38,7 +38,7 @@ void VisualizerMessenger::ellipse(
 }
 
 void VisualizerMessenger::rect(
-	std::string& layer,
+	const std::string& layer,
 	double x, double y, double w, double h,
 	DrawStyle draw_style,
 	DrawTransform draw_transform
@@ -58,7 +58,7 @@ void VisualizerMessenger::rect(
 }
 
 void VisualizerMessenger::arc(
-	std::string& layer,
+	const std::string& layer,
 	double cx, double cy, double radius, double theta_start, double theta_end,
 	DrawStyle draw_style,
 	DrawTransform draw_transform
@@ -79,7 +79,7 @@ void VisualizerMessenger::arc(
 }
 
 void VisualizerMessenger::line(
-	std::string& layer,
+	const std::string& layer,
 	double x1, double y1, double x2, double y2,
 	DrawStyle draw_style,
 	DrawTransform draw_transform
@@ -139,7 +139,7 @@ void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTrans
     shape_msg.transform_scale    = transform.scale;
 }
 
-void VisualizerMessenger::addShapeToLayer(std::string& layer, ShapeMsg& shape)
+void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
 {
 	if (m_draw_layers.find(layer) != m_draw_layers.end())
 	{

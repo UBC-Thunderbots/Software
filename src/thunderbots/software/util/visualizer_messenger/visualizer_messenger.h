@@ -96,7 +96,7 @@ namespace Util
 		 * @param draw_style: the drawing style of the shape
 		 * @param draw_transform: the transformation of the shape
 		 */
-		void ellipse(std::string& layer, double cx, double cy, double r1, double r2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+		void ellipse(const std::string& layer, double cx, double cy, double r1, double r2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
         /**
          * Request a message to draw a rectangle shape. The rectangle has origin on the upper left corner,
@@ -110,7 +110,7 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void rect(std::string& layer, double x, double y, double w, double h, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+        void rect(const std::string& layer, double x, double y, double w, double h, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
         // TODO: #258 polygon support
         void poly();
@@ -127,7 +127,7 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void arc(std::string& layer, double cx, double cy, double radius, double theta_start, double theta_end, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+        void arc(const std::string& layer, double cx, double cy, double radius, double theta_start, double theta_end, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
         /**
          * Request a message to draw a line. The origin is the first point
@@ -140,7 +140,7 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void line(std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+        void line(const std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
 	private:
 
@@ -183,7 +183,7 @@ namespace Util
 		 * @param layer: The name of the layer to push to
 		 * @param shape: The shape message
 		 */
-		void addShapeToLayer(std::string& layer, ShapeMsg& shape);
+		void addShapeToLayer(const std::string& layer, ShapeMsg& shape);
 
 	private:
 
