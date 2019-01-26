@@ -14,7 +14,7 @@ namespace Util
 	using LayerMsgMap = std::map<std::string, LayerMsg>;
 	using ShapeMsg = thunderbots_msgs::DrawShape;
 
-	class DrawLogger
+	class VisualizerMessenger
 	{
 
 	public:
@@ -45,9 +45,9 @@ namespace Util
 
 	public:
 		// Singleton getter
-		static std::shared_ptr<DrawLogger> getInstance()
+		static std::shared_ptr<VisualizerMessenger> getInstance()
 		{
-			static std::shared_ptr<DrawLogger> draw_logger(new DrawLogger);
+			static std::shared_ptr<VisualizerMessenger> draw_logger(new VisualizerMessenger);
 			return draw_logger;
 		}
 
@@ -79,7 +79,7 @@ namespace Util
 		void line(std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
 	private:
-		explicit DrawLogger()
+		explicit VisualizerMessenger()
 		: m_draw_layers()
 		{
 			buildLayers();

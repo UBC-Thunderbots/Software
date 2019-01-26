@@ -7,7 +7,7 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
-#include "util/draw_logger/draw_logger.h"
+#include "util/visualizer_messenger/visualizer_messenger.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
@@ -93,10 +93,6 @@ int main(int argc, char **argv)
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
-    // FIXME: not required
-    // Initailizer the draw logger
-    // Util::DrawLogger::getInstance()->
-
     // Main loop
     while (ros::ok())
     {
@@ -126,14 +122,14 @@ int main(int argc, char **argv)
 
 
             // On every tick, send the layer messages
-            for (const std::pair<std::string, Util::LayerMsg>& layer_msg_pair : Util::DrawLogger::getInstance()->getLayerMap())
+            for (const std::pair<std::string, Util::LayerMsg>& layer_msg_pair : Util::VisualizerMessenger::getInstance()->getLayerMap())
             {
                 if (!layer_msg_pair.second.shapes.empty())
                 {
                     visualizer_publisher.publish(layer_msg_pair.second);
                 }
             }
-            Util::DrawLogger::getInstance()->clearLayers();
+            Util::VisualizerMessenger::getInstance()->clearLayers();
         }
         catch (const std::invalid_argument &e)
         {
