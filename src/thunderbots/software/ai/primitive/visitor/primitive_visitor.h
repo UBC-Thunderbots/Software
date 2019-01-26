@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ai/primitive/dribble_primitive.h>
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
@@ -53,6 +54,13 @@ class PrimitiveVisitor
      * @param move_primitive The MovePrimitive to visit
      */
     virtual void visit(const MovePrimitive &move_primitive) = 0;
+
+    /**
+     * Visits a DribblePrimitive to perform an operation.
+     *
+     * @param dribble_primitive The DribblePrimitive to visit
+     */
+    virtual void visit(const DribblePrimitive &dribble_primitive) = 0;
 
     /**
      * Visits a PivotPrimitive to perform an operation.

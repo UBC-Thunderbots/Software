@@ -6,6 +6,8 @@
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include <ai/primitive/dribble_primitive.h>
+
 
 thunderbots_msgs::Primitive Primitive::createMsg() const
 {
@@ -48,6 +50,10 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     else if (primitive_msg.primitive_name == KickPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<KickPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == DribblePrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<DribblePrimitive>(primitive_msg);
     }
     else if (primitive_msg.primitive_name == PivotPrimitive::PRIMITIVE_NAME)
     {
