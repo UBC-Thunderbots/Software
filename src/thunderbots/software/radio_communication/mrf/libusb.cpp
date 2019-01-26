@@ -1,6 +1,5 @@
 #include "libusb.h"
 
-#include "util/logger/init.h"
 #include <poll.h>
 
 #include <algorithm>
@@ -12,6 +11,8 @@
 #include <iostream>
 #include <limits>
 #include <string>
+
+#include "util/logger/init.h"
 
 #define STALL_RETRIES 3
 
@@ -96,11 +97,11 @@ namespace
         throw USB::Error(s);
     }
 
-    std::string make_transfer_error_message(unsigned int endpoint,
-                                            const char *msg)
+    std::string make_transfer_error_message(unsigned int endpoint, const char *msg)
     {
         std::stringstream ss;
-        ss << msg << " on " << ((endpoint & 0x80) ? "IN" : "OUT") << " endpoint " << (endpoint & 0x7F) << std::endl;
+        ss << msg << " on " << ((endpoint & 0x80) ? "IN" : "OUT") << " endpoint "
+           << (endpoint & 0x7F) << std::endl;
         return ss.str();
     }
 
@@ -611,11 +612,16 @@ USB::Transfer::~Transfer()
             if (!device.shutting_down)
             {
                 LOG(WARNING) << "Destroying in-progress transfer to USB "
-                    << ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN ? "in": "out") 
-                    << " endpoint " 
-                    << static_cast<unsigned int>(transfer->endpoint & LIBUSB_ENDPOINT_ADDRESS_MASK)
-                    << "; this is unreliable and may be a problem if not "
-                    "happening during system shutdown!" << std::endl;
+                             << ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) ==
+                                         LIBUSB_ENDPOINT_IN
+                                     ? "in"
+                                     : "out")
+                             << " endpoint "
+                             << static_cast<unsigned int>(transfer->endpoint &
+                                                          LIBUSB_ENDPOINT_ADDRESS_MASK)
+                             << "; this is unreliable and may be a problem if not "
+                                "happening during system shutdown!"
+                             << std::endl;
             }
             libusb_cancel_transfer(transfer);
             TransferMetadata::get(transfer)->disown();
