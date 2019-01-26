@@ -32,6 +32,12 @@ void GrsimCommandPrimitiveVisitor::visit(
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/97
 }
 
+void GrsimCommandPrimitiveVisitor::visit(
+    const DirectWheelsPrimitive &direct_wheels_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/98
+}
+
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
@@ -42,6 +48,11 @@ void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
     motion_controller_command = MotionController::MotionControllerCommand(
         move_primitive.getDestination(), move_primitive.getFinalAngle(),
         move_primitive.getFinalSpeed(), 0.0, false, false);
+}
+
+void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/95
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
