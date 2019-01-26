@@ -3,8 +3,10 @@
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/stop_primitive.h"
 
@@ -42,6 +44,13 @@ class PrimitiveVisitor
     virtual void visit(const DirectVelocityPrimitive &direct_velocity_primtiive) = 0;
 
     /**
+     * Visits a DirectWheelsPrimitive to perform an operation.
+     *
+     * @param direct_wheels_primitive The DirectWheelsPrimitive to visit
+     */
+    virtual void visit(const DirectWheelsPrimitive &direct_wheels_primtiive) = 0;
+
+    /**
      * Visits a KickPrimitive to perform an operation.
      *
      * @param kick_primitive The KickPrimitive to visit
@@ -54,6 +63,13 @@ class PrimitiveVisitor
      * @param move_primitive The MovePrimitive to visit
      */
     virtual void visit(const MovePrimitive &move_primitive) = 0;
+
+    /**
+     * Visits a MoveSpinPrimitive to perform an operation.
+     *
+     * @param move_spin_primitive The MoveSpinPrimitive to visit
+     */
+    virtual void visit(const MoveSpinPrimitive &move_spin_primitive) = 0;
 
     /**
      * Visits a PivotPrimitive to perform an operation.
