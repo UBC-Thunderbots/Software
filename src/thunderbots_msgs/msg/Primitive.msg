@@ -15,4 +15,4 @@ float64[] parameters
 # Extra bits are used as flags for various behaviours or extra attribues.
 # Examples are indicating if the robot should kick vs chip, or if autokick should
 # be on.
-bool[] extra_bits
+uint8 extra_bits
