@@ -13,10 +13,10 @@ string type
 # If "line":   [x1, y1, x2, y2]
 float64[] data
 
-# Fill of the shape
+# Fill of the shape, which is colour filled into the shape
 string fill
 
-# Stroke of the shape
+# Stroke of the shape, which is the colour that outlines the shape
 string stroke
 
 # Weight of the stroke
