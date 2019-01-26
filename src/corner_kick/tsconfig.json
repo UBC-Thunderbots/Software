@@ -9,7 +9,7 @@
         "allowJs": false,
         "jsx": "react",
         "moduleResolution": "node",
-        "rootDir": "src",
+        "rootDirs": ["src", ".storybook"],
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
@@ -18,10 +18,9 @@
         "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": true,
         "paths": {
-            "RENDERER/*": ["src/renderer/*"],
-            "MAIN/*": ["src/main/*"],
-            "SHARED/*": ["src/shared/*"]
-        }
+            "SRC/*": ["src/*"]
+        },
+        "allowSyntheticDefaultImports": true
     },
     "exclude": [
         "config",

@@ -29,6 +29,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     }
 }
 
+
 int main(int argc, char** argv)
 {
     // Init ROS node

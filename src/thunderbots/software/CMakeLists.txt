@@ -243,6 +243,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             grsim_communication/grsim_backend.cpp
@@ -369,6 +370,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -382,6 +384,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -395,6 +398,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -408,6 +412,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -421,6 +426,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -434,6 +440,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
@@ -447,10 +454,25 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             )
 
     target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(stop_primitive_test
+            test/primitive/stop_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+
+    target_link_libraries(stop_primitive_test ${catkin_LIBRARIES})
 
 endif()
 

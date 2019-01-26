@@ -19,10 +19,8 @@ void Robot::updateState(const Point &new_position, const Vector &new_velocity,
 {
     if (timestamp < last_update_timestamp)
     {
-        // TODO: Error. We should never be updating with times from the past
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        exit(1);
+        throw std::invalid_argument(
+            "Error: State of ball is updating times from the past");
     }
 
     position_             = new_position;
@@ -36,12 +34,8 @@ void Robot::updateState(const Robot &new_robot_data)
 {
     if (new_robot_data.id() != id())
     {
-        // TODO: Throw a proper exception here. We should not update a robot using a robot
-        // with a different id (a different robot)
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        std::cerr << "Error: Robot updated using a robot with a mismatched id"
-                  << std::endl;
-        exit(1);
+        throw std::invalid_argument(
+            "Error: Robot updated using a robot with a mismatched id");
     }
 
     updateState(new_robot_data.position(), new_robot_data.velocity(),
@@ -53,10 +47,8 @@ void Robot::updateStateToPredictedState(std::chrono::steady_clock::time_point ti
 {
     if (timestamp < last_update_timestamp)
     {
-        // TODO: Error. We should never be updating with times from the past
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
-        exit(1);
+        throw std::invalid_argument(
+            "Error: Predicted state is updating times from the past");
     }
 
     auto milliseconds_in_future = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -91,9 +83,8 @@ Point Robot::estimatePositionAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
-        // TODO: Error. We should never be updating with times from the past
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
+        throw std::invalid_argument(
+            "Error: Position estimate is updating times from the past");
     }
 
     // TODO: This is a simple linear implementation that does not necessarily reflect
@@ -115,9 +106,8 @@ Vector Robot::estimateVelocityAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
-        // TODO: Error. We should never be updating with times from the past
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
+        throw std::invalid_argument(
+            "Error: Velocity estimate is updating times from the past");
     }
 
     // TODO: This simple implementation that assumes the robot maintains the same velocity
@@ -136,9 +126,8 @@ Angle Robot::estimateOrientationAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
-        // TODO: Error. We should never be updating with times from the past
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
+        throw std::invalid_argument(
+            "Error: Orientation estimate is updating times from the past");
     }
 
     // TODO: This is a simple linear implementation that does not necessarily reflect
@@ -160,9 +149,8 @@ AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
-        // TODO: Error. We should never be updating with times from the past
-        // TODO: Throw a proper exception here
-        // https://github.com/UBC-Thunderbots/Software/issues/16
+        throw std::invalid_argument(
+            "Error: Angular velocity estimate is updating times from the past");
     }
 
     // TODO: This simple implementation that assumes the robot maintains the same
