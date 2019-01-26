@@ -6,9 +6,10 @@ used in this application. I strongly recommend reading more about
 
 **Table of content**
 
-- [How to use](#how-to-use)
-    - [Example](#example)
-- [Implementation overview](#implementation-overview)
+- [Portals - Design notes](#portals---design-notes)
+    - [How to use](#how-to-use)
+        - [Example](#example)
+    - [Implementation overview](#implementation-overview)
 
 ## How to use
 
