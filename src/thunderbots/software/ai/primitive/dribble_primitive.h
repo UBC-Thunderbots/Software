@@ -1,5 +1,5 @@
 /**
- * This file includes the definition of the MovePrimitive class and it's member functions
+ * This file includes the definition of the DribblePrimitive class and it's member functions
  * and data
  */
 
