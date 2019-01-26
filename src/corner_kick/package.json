@@ -8,12 +8,8 @@
         "build": "webpack --config ./config/webpack.prod.js",
         "prod": "http-server ./build -o",
         "test": "jest --config ./config/jest.config.js",
-<<<<<<< HEAD
         "test:watch": "yarn test --watch",
         "test:coverage": "yarn test --coverage"
-=======
-        "test:watch": "yarn test -- --watch"
->>>>>>> 02caab567bd108dc95226d495103476411087fbe
     },
     "author": "Quentin Golsteyn",
     "license": "ISC",
