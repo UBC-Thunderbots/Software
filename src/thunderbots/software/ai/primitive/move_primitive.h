@@ -31,7 +31,7 @@ class MovePrimitive : public Primitive
     /**
      * Creates a new Move Primitive from a Primitive message
      *
-     * @param primtiive_msg The message from which to create the Move Primitive
+     * @param primitive_msg The message from which to create the Move Primitive
      */
     explicit MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
     /**
