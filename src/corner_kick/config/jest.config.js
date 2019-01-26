@@ -18,6 +18,9 @@ module.exports = {
     moduleNameMapper: {
         '^SRC(.*)$': '<rootDir>/src$1',
     },
+<<<<<<< HEAD
     coverageDirectory: './coverage/',
     collectCoverageFrom: ['**/*.{ts,tsx}', '!**/node_modules/**', '!**/build/**'],
+=======
+>>>>>>> 02caab567bd108dc95226d495103476411087fbe
 };
