@@ -1,12 +1,15 @@
 #pragma once
 
-#include <ai/primitive/dribble_primitive.h>
+#include "ai/primitive/dribble_primitive.h"
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
 
 /**
  * This class provides an interface for all Primitive Visitors. The Visitor design pattern
@@ -42,6 +45,13 @@ class PrimitiveVisitor
     virtual void visit(const DirectVelocityPrimitive &direct_velocity_primtiive) = 0;
 
     /**
+     * Visits a DirectWheelsPrimitive to perform an operation.
+     *
+     * @param direct_wheels_primitive The DirectWheelsPrimitive to visit
+     */
+    virtual void visit(const DirectWheelsPrimitive &direct_wheels_primtiive) = 0;
+
+    /**
      * Visits a KickPrimitive to perform an operation.
      *
      * @param kick_primitive The KickPrimitive to visit
@@ -56,6 +66,13 @@ class PrimitiveVisitor
     virtual void visit(const MovePrimitive &move_primitive) = 0;
 
     /**
+     * Visits a MoveSpinPrimitive to perform an operation.
+     *
+     * @param move_spin_primitive The MoveSpinPrimitive to visit
+     */
+    virtual void visit(const MoveSpinPrimitive &move_spin_primitive) = 0;
+
+    /**
      * Visits a DribblePrimitive to perform an operation.
      *
      * @param dribble_primitive The DribblePrimitive to visit
@@ -68,4 +85,11 @@ class PrimitiveVisitor
      * @param pivot_primitive The PivotPrimitive to visit
      */
     virtual void visit(const PivotPrimitive &pivot_primtiive) = 0;
+
+    /**
+     * Visits a StopPrimitive to perform an operation.
+     *
+     * @param stop_primitive The StopPrimitive to visit
+     */
+    virtual void visit(const StopPrimitive &stop_primtiive) = 0;
 };

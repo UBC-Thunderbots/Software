@@ -22,8 +22,8 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
         auto duplicate_id = robot_ids.insert(robot.id());
         if (!duplicate_id.second)
         {
-            // TODO: Multiple robots on the same team with the same id. Throw exception
-            // See https://github.com/UBC-Thunderbots/Software/issues/16
+            throw std::invalid_argument(
+                "Error: Multiple robots on the same team with the same id");
         }
 
         auto it = team_robots.find(robot.id());
@@ -80,10 +80,11 @@ void Team::assignGoalie(unsigned int new_goalie_id)
     {
         goalie_id = new_goalie_id;
     }
-
-    // TODO: We should not be assigning the goalie to a robot that is not a member
-    // of the team. Throw a proper exception here once
-    // https://github.com/UBC-Thunderbots/Software/issues/16 is completed
+    else
+    {
+        throw std::invalid_argument(
+            "Error: Assigning the goalie to a robot that is not a member of the team");
+    }
 }
 
 void Team::clearGoalie()
