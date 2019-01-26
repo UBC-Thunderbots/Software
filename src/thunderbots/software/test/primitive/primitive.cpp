@@ -238,13 +238,13 @@ TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive
 // started with
 TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive)
 {
-    const unsigned int robot_id   = 2U;
-    const Point pivot_point       = Point(2, -1);
-    const Angle final_angle       = Angle::ofRadians(2.56);
-    const Angle robot_orientation = Angle::ofRadians(0.78);
+    const unsigned int robot_id = 2U;
+    const Point pivot_point     = Point(2, -1);
+    const Angle final_angle     = Angle::ofRadians(2.56);
+    const double pivot_radius   = .78;
 
     PivotPrimitive pivot_prim =
-        PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
+        PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
     std::unique_ptr<Primitive> new_prim  = Primitive::createPrimitive(prim_msg);
@@ -255,7 +255,7 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     EXPECT_DOUBLE_EQ(pivot_point.x(), parameters[0]);
     EXPECT_DOUBLE_EQ(pivot_point.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(robot_orientation.toRadians(), parameters[3]);
+    EXPECT_DOUBLE_EQ(pivot_radius, parameters[3]);
     EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
 }
 
