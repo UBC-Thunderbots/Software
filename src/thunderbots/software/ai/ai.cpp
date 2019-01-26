@@ -50,10 +50,5 @@ void AI::updateWorldEnemyTeamState(const Team &new_enemy_team_data)
 
 void AI::updateWorldRefboxGameState(const RefboxGameState &game_state)
 {
-    // TODO: delete this logging message
-    if (game_state != world.gameState().getRefboxGameState())
-    {
-        LOG(INFO) << "Game state changed to: " << game_state;
-    }
     world.updateRefboxGameState(game_state);
 }
