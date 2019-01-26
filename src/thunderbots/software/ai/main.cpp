@@ -130,9 +130,6 @@ int main(int argc, char **argv)
                 }
             }
             Util::VisualizerMessenger::getInstance()->clearLayers();
-
-            // Visualizer message test
-            Util::VisualizerMessenger::getInstance()->ellipse("test", 0, 0, 100, 200);
         }
         catch (const std::invalid_argument &e)
         {

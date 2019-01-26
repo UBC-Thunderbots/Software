@@ -1,3 +1,11 @@
+/**
+ * Implemenation of visualizer messenger
+ * 
+ * Lasted edited by Muchen He (i@muchen.ca) on 2019-01-26
+ */
+
+#include <iostream>
+
 #include "visualizer_messenger.h"
 
 namespace Util
@@ -140,10 +148,14 @@ void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTrans
 }
 
 void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
-{
+{	
 	if (m_draw_layers.find(layer) != m_draw_layers.end())
 	{
 		m_draw_layers[layer].shapes.emplace_back(shape);
+	}
+	else
+	{
+		std::cerr << "ERROR: Referenced layer (" << layer << ") is undefined\n";
 	}
 }
 

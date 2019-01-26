@@ -190,4 +190,5 @@ namespace Util
 		// string to LayerMsg map
 		LayerMsgMap m_draw_layers;
 	};
+
 } // namespace Util
