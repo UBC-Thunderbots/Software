@@ -1,3 +1,13 @@
+/**
+ * The Visualizer messenger is a singleton object that receives draw calls
+ * to draw shapes such as ellipse and rectangle.
+ *
+ * The messenger constructs and queues the shapes into shape messages and layer
+ * messages to be sent via ROS visualizer topics (VISUALIZER_DRAW_LAYER_TOPIC)
+ *
+ * Lasted edited by Muchen He (i@muchen.ca) on 2019-01-26
+ */
+
 #pragma once
 
 #include <map>
@@ -16,8 +26,11 @@ namespace Util
 
 	class VisualizerMessenger
 	{
-
 	public:
+		/**
+		 * DrawStyle is a struct that packs the appearance properties that goes into a shape message
+		 * The default constructor contains the default value of the draw style
+		 */
 		typedef struct DrawStyle
 		{
 			// Struct constructor
@@ -32,7 +45,11 @@ namespace Util
 			uint8_t stroke_weight;
 		} DrawStyle;
 
-		typedef struct DrawTransform
+        /**
+         * DrawTransform is a struct that packs the transform properties that goes into a shape message
+         * The default constructor contains the default value of the transformation
+         */
+        typedef struct DrawTransform
 		{
 			DrawTransform()
 			: rotation(0.0)
@@ -44,53 +61,133 @@ namespace Util
 		} DrawTransform;
 
 	public:
-		// Singleton getter
+		/**
+		 * Getter of the singleton object.
+		 * 
+		 * @return A shared pointer of the static instance
+		 */
 		static std::shared_ptr<VisualizerMessenger> getInstance()
 		{
-			static std::shared_ptr<VisualizerMessenger> draw_logger(new VisualizerMessenger);
-			return draw_logger;
+			static std::shared_ptr<VisualizerMessenger> vm(new VisualizerMessenger);
+			return vm;
 		}
 
-		// Get map of layers
+		/**
+		 * Get a constant reference of the map of existing layers
+		 * 
+		 * @return Constant refernece of the layer message map
+		 */
 		const LayerMsgMap& getLayerMap() const;
 
-		// Clear the content of the layers on every update
+		/**
+		 * Clears the content (shape vector) in the layer message upon method call
+		 */
 		void clearLayers();
 
-		// TODO: Add cached drawing styles
-		// void setDrawStyle(DrawStyle style);
-		// void setFill(std::string color);
-		// void setStroke(std::string color);
-		// void setStrokeWeight(uint8_t weight);
-
-		// TODO: Add cached drawing transformations
-		// void setDrawTransforma(DrawTransform transform);
-		// void setRotation(double rad);
-		// void setscale(double scale);
-		
-		// TODO: Add cached layer
-		// void setLayer(std::string& name);
-
+		// Drawing methods
+		/**
+		 * Request a message to draw a ellipse shape. The origin is the center of the circle.
+		 * 
+		 * @param layer: The layer name this shape is being drawn to
+		 * @param cx: Ellipse's center X
+		 * @param cy: Ellipse's center Y
+		 * @param r1: Ellipse's horizontal radius
+		 * @param r2: Ellipse's vertical radius
+		 * @param draw_style: the drawing style of the shape
+		 * @param draw_transform: the transformation of the shape
+		 */
 		void ellipse(std::string& layer, double cx, double cy, double r1, double r2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
-		void rect(std::string& layer, double x, double y, double w, double h, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
-        // TODO: figure out a way to deal with variable length vertices
+
+        /**
+         * Request a message to draw a rectangle shape. The rectangle has origin on the upper left corner,
+		 * this is also the point specified in the parameter.
+		 * 
+         * @param layer: The layer name this shape is being drawn to
+         * @param x: Rectangle's starting point X
+         * @param y: Rectangle's starting point Y
+         * @param w: Rectangle width
+         * @param h: Rectangle height
+         * @param draw_style: the drawing style of the shape
+         * @param draw_transform: the transformation of the shape
+         */
+        void rect(std::string& layer, double x, double y, double w, double h, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+
+        // TODO: #258 polygon support
         void poly();
-		void arc(std::string& layer, double cx, double cy, double radius, double theta_start, double theta_end, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
-		void line(std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+
+        /**
+         * Request a message to draw an arc. The origin is the center point
+         *
+         * @param layer: The layer name this shape is being drawn to
+         * @param cx: Arc's center point X
+         * @param cy: Arc's center point Y
+         * @param radius: Arc's radius
+         * @param theta_start: The starting angle of the arc in rad (where 0 is pointed to +X horizontal heading, and PI/2 is south)
+		 * @param theta_end: The ending angle of the arc in rad
+         * @param draw_style: the drawing style of the shape
+         * @param draw_transform: the transformation of the shape
+         */
+        void arc(std::string& layer, double cx, double cy, double radius, double theta_start, double theta_end, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+
+        /**
+         * Request a message to draw a line. The origin is the first point
+         *
+         * @param layer: The layer name this shape is being drawn to
+         * @param x1: Starting point X
+         * @param y1: Starting point Y
+         * @param x2: Ending point X
+         * @param y2: Ending point Y
+         * @param draw_style: the drawing style of the shape
+         * @param draw_transform: the transformation of the shape
+         */
+        void line(std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
 	private:
+
+		/**
+		 * Constructor; initializes an empty layers map then populates it
+		 */
 		explicit VisualizerMessenger()
 		: m_draw_layers()
 		{
 			buildLayers();
 		}
 
+		/**
+		 * Populates the layers map with some pre-defined layers
+		 */
 		void buildLayers();
+
+		/**
+		 * Helper function for the shape draw methods that copies the attributes in DrawStyle
+		 * struct into the actual shape message
+		 * 
+		 * @param shape_msg: Reference to the shape message
+		 * @param style: The DrawStyle to be extracted
+		 */
 		void applyDrawStyleToMsg(ShapeMsg& shape_msg, DrawStyle& style);
-		void applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTransform& transform);
-		void addShapeToLayer(std::string& layer, ShapeMsg shape);
+
+        /**
+         * Helper function for the shape draw methods that copies the attributes in
+         * DrawTransform struct into the actual shape message
+         *
+         * @param shape_msg: Reference to the shape message
+         * @param transform: The DrawTransform struct to be extracted
+         */
+        void applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTransform& transform);
+
+		/**
+		 * Helper function that checks if the layer exists, 
+		 * and push the shape message to the corresponding layer's shape vector.
+		 * 
+		 * @param layer: The name of the layer to push to
+		 * @param shape: The shape message
+		 */
+		void addShapeToLayer(std::string& layer, ShapeMsg& shape);
 
 	private:
+
+		// string to LayerMsg map
 		LayerMsgMap m_draw_layers;
 	};
 } // namespace Util

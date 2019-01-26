@@ -10,6 +10,7 @@ const LayerMsgMap& VisualizerMessenger::getLayerMap() const
 
 void VisualizerMessenger::clearLayers()
 {
+	// Clears all shape vector in all the layers
 	for (std::pair<std::string, LayerMsg> layer : m_draw_layers)
 	{
 		layer.second.shapes.clear();
@@ -99,7 +100,7 @@ void VisualizerMessenger::line(
 
 void VisualizerMessenger::buildLayers()
 {
-	// TODO: list these existing layer names elsewhere where it's more obvious
+	// TODO: #259 list these existing layer names elsewhere where it's more obvious
 	std::vector<std::string> layer_names = std::vector<std::string>(
 		{
 			"field",
@@ -112,6 +113,7 @@ void VisualizerMessenger::buildLayers()
 			"nav",
 			"rule",
 			"passing",
+			"test",
 			"misc"
 		}
 	);
@@ -137,7 +139,7 @@ void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTrans
     shape_msg.transform_scale    = transform.scale;
 }
 
-void VisualizerMessenger::addShapeToLayer(std::string& layer, ShapeMsg shape)
+void VisualizerMessenger::addShapeToLayer(std::string& layer, ShapeMsg& shape)
 {
 	if (m_draw_layers.find(layer) != m_draw_layers.end())
 	{
