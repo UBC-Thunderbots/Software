@@ -561,7 +561,13 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             )
+
+    target_link_libraries(dribble_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
 endif()
 
