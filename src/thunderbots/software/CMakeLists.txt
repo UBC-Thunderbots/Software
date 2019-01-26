@@ -182,12 +182,6 @@ add_executable (radio_communication
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
 
-##### GLIB #####
-pkg_search_module("GLIBMM" REQUIRED "glibmm-2.4")
-include_directories(SYSTEM "${GLIBMM_INCLUDE_DIRS}")
-link_directories("${GLIBMM_LIBRARY_DIRS}")
-
-
 ##### LIBUSB #####
 pkg_search_module("LIBUSB_1" REQUIRED "libusb-1.0")
 include_directories(SYSTEM "${LIBUSB_1_INCLUDE_DIRS}")
@@ -201,7 +195,6 @@ link_directories("${SIGC_LIBRARY_DIRS}")
 
 target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
-        ${GLIBMM_LIBRARIES}
         ${LIBUSB_1_LIBRARIES}
 	${SIGC_LIBRARIES}
         )

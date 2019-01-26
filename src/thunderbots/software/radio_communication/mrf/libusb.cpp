@@ -1,8 +1,5 @@
 #include "libusb.h"
 
-#include <glibmm/convert.h>
-#include <glibmm/main.h>
-#include <glibmm/ustring.h>
 #include "util/logger/init.h"
 #include <poll.h>
 
@@ -100,11 +97,11 @@ namespace
     }
 
     std::string make_transfer_error_message(unsigned int endpoint,
-                                            const char *msg /* UTF8 */)
+                                            const char *msg)
     {
-        return Glib::locale_from_utf8(Glib::ustring::compose(
-            u8"%1 on %2 endpoint %3", msg, (endpoint & 0x80) ? u8"IN" : u8"OUT",
-            endpoint & 0x7F));
+        std::stringstream ss;
+        ss << msg << " on " << ((endpoint & 0x80) ? "IN" : "OUT") << " endpoint " << (endpoint & 0x7F) << std::endl;
+        return ss.str();
     }
 
     bool matches_vid_pid_serial(const USB::Device &device, unsigned int vendor_id,
@@ -200,17 +197,17 @@ USB::TransferError::TransferError(unsigned int endpoint, const char *msg)
 }
 
 USB::TransferTimeoutError::TransferTimeoutError(unsigned int endpoint)
-    : TransferError(endpoint, u8"Transfer timed out")
+    : TransferError(endpoint, "Transfer timed out")
 {
 }
 
 USB::TransferStallError::TransferStallError(unsigned int endpoint)
-    : TransferError(endpoint, u8"Transfer stalled")
+    : TransferError(endpoint, "Transfer stalled")
 {
 }
 
 USB::TransferCancelledError::TransferCancelledError(unsigned int endpoint)
-    : TransferError(endpoint, u8"Transfer cancelled")
+    : TransferError(endpoint, "Transfer cancelled")
 {
 }
 
@@ -341,7 +338,7 @@ USB::DeviceHandle::~DeviceHandle()
     {
         try
         {
-            LOG(WARNING) << Glib::locale_to_utf8(exp.what()) << std::endl;
+            LOG(WARNING) << exp.what() << std::endl;
         }
         catch (...)
         {
@@ -503,7 +500,7 @@ void USB::DeviceHandle::interrupt_out(unsigned char endpoint, const void *data,
              endpoint | LIBUSB_ENDPOINT_OUT);
     if (transferred != static_cast<int>(length))
     {
-        throw TransferError(1, u8"Device accepted wrong amount of data");
+        throw TransferError(1, "Device accepted wrong amount of data");
     }
 }
 
@@ -560,7 +557,7 @@ USB::ConfigurationSetter::~ConfigurationSetter()
     {
         try
         {
-            LOG(WARNING) << Glib::locale_to_utf8(exp.what()) << std::endl;
+            LOG(WARNING) << exp.what() << std::endl;
         }
         catch (...)
         {
@@ -584,7 +581,7 @@ USB::InterfaceClaimer::~InterfaceClaimer()
     {
         try
         {
-            LOG(WARNING) << Glib::locale_to_utf8(exp.what()) << std::endl;
+            LOG(WARNING) << exp.what() << std::endl;
         }
         catch (...)
         {
@@ -613,15 +610,12 @@ USB::Transfer::~Transfer()
             // unnecessary spam, so squelch those.
             if (!device.shutting_down)
             {
-                LOG(WARNING) << Glib::ustring::compose(
-                    u8"Destroying in-progress transfer to USB %1 endpoint %2; "
-                    u8"this is unreliable and may be a problem if not "
-                    u8"happening during system shutdown!",
-                    ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN
-                         ? u8"in"
-                         : u8"out"),
-                    static_cast<unsigned int>(transfer->endpoint &
-                                              LIBUSB_ENDPOINT_ADDRESS_MASK)) << std::endl;
+                LOG(WARNING) << "Destroying in-progress transfer to USB "
+                    << ((transfer->endpoint & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_IN ? "in": "out") 
+                    << " endpoint " 
+                    << static_cast<unsigned int>(transfer->endpoint & LIBUSB_ENDPOINT_ADDRESS_MASK)
+                    << "; this is unreliable and may be a problem if not "
+                    "happening during system shutdown!" << std::endl;
             }
             libusb_cancel_transfer(transfer);
             TransferMetadata::get(transfer)->disown();
@@ -638,7 +632,7 @@ USB::Transfer::~Transfer()
     {
         try
         {
-            LOG(WARNING) << Glib::locale_to_utf8(exp.what()) << std::endl;
+            LOG(WARNING) << exp.what() << std::endl;
         }
         catch (...)
         {
@@ -655,7 +649,7 @@ void USB::Transfer::result() const
             return;
 
         case LIBUSB_TRANSFER_ERROR:
-            throw TransferError(transfer->endpoint, u8"Transfer error");
+            throw TransferError(transfer->endpoint, "Transfer error");
 
         case LIBUSB_TRANSFER_TIMED_OUT:
             throw TransferTimeoutError(transfer->endpoint);
@@ -667,11 +661,11 @@ void USB::Transfer::result() const
             throw TransferStallError(transfer->endpoint);
 
         case LIBUSB_TRANSFER_NO_DEVICE:
-            throw TransferError(transfer->endpoint, u8"Device was disconnected");
+            throw TransferError(transfer->endpoint, "Device was disconnected");
 
         case LIBUSB_TRANSFER_OVERFLOW:
             throw TransferError(transfer->endpoint,
-                                u8"Device sent more data than requested");
+                                "Device sent more data than requested");
 
         default:
             throw std::runtime_error("Error fetching error message");
@@ -717,7 +711,7 @@ void USB::Transfer::handle_completed_transfer()
 {
     if (transfer->status == LIBUSB_TRANSFER_STALL && stall_retries_left)
     {
-        LOG(INFO) << u8"Retrying stalled transfer." << std::endl;
+        LOG(INFO) << "Retrying stalled transfer." << std::endl;
         --stall_retries_left;
         check_fn("libusb_submit_transfer", libusb_submit_transfer(transfer),
                  transfer->endpoint);

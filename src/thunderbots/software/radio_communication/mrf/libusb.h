@@ -149,7 +149,7 @@ namespace USB
         /**
          * Destroys the device information record.
          */
-        ~Device(;
+        ~Device();
 
         /**
          * Assigns a device information record.
