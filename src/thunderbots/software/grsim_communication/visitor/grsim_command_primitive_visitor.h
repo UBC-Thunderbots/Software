@@ -43,6 +43,16 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      */
     void visit(const DirectVelocityPrimitive &direct_velocity_primtiive) override;
 
+
+
+    /**
+     * Generates and stores the MotionControllerCommand the robot should perform at the
+     * current moment in time in order to simulate the DirectWheelsPrimitive
+     *
+     * @param direct_wheels_primitive The DirectWheelsPrimitive to simulate
+     */
+    void visit(const DirectWheelsPrimitive &direct_wheels_primtiive) override;
+
     /**
      * Generates and stores the MotionControllerCommand the robot should perform at the
      * current moment in time in order to simulate the KickPrimitive
@@ -59,6 +69,15 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      */
     void visit(const MovePrimitive &move_primitive) override;
 
+
+    /**
+     * Generates and stores the MotionControllerCommand the robot should perform at the
+     * current moment in time in order to simulate the MovePrimitive
+     *
+     * @param move_spin_primitive The MoveSpinPrimitive to simulate
+     */
+    void visit(const MoveSpinPrimitive &move_spin_primitive) override;
+
     /**
      * Generates and stores the MotionControllerCommand the robot should perform at the
      * current moment in time in order to simulate the PivotPrimitive
@@ -66,6 +85,14 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * @param pivot_primitive The PivotPrimitive to simulate
      */
     void visit(const PivotPrimitive &pivot_primtiive) override;
+
+    /**
+     * Generates and stores the MotionControllerCommand the robot should perform at the
+     * current moment in time in order to simulate the StopPrimitive
+     *
+     * @param stop_primitive The StopPrimitive to simulate
+     */
+    void visit(const StopPrimitive &stop_primitive) override;
 
     /**
      * Returns the most recent MotionControllerCommand created by this

@@ -1,11 +1,17 @@
 #include "ai/primitive/primitive.h"
 
+#include <exception>
+
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
+
 thunderbots_msgs::Primitive Primitive::createMsg() const
     thunderbots_msgs::Primitive primitive_msg;
 
@@ -31,6 +37,14 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     { 
         prim_ptr = std::make_unique<MovePrimitive>(primitive_msg);
     }
+    else if (primitive_msg.primitive_name == MoveSpinPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<MoveSpinPrimitive>(primitive_msg);
+    }
+    else if (primitive_msg.primitive_name == DirectWheelsPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<DirectWheelsPrimitive>(primitive_msg);
+    }
     else if (primitive_msg.primitive_name == CatchPrimitive::PRIMITIVE_NAME)
     {
         prim_ptr = std::make_unique<CatchPrimitive>(primitive_msg);
@@ -51,9 +65,18 @@ std::unique_ptr<Primitive> Primitive::createPrimitive(
     {
         prim_ptr = std::make_unique<PivotPrimitive>(primitive_msg);
     }
+    else if (primitive_msg.primitive_name == StopPrimitive::PRIMITIVE_NAME)
+    {
+        prim_ptr = std::make_unique<StopPrimitive>(primitive_msg);
+    }
     else
     {
+<<<<<<< HEAD
         throw std::invalid_argument("Error: Unknown Primitive (" + primitive_msg.primitive_name + ") ");
+=======
+        throw std::invalid_argument("Error: Unknown Primitive (" +
+                                    primitive_msg.primitive_name + ") ");
+>>>>>>> 02caab567bd108dc95226d495103476411087fbe
     }
 
     return prim_ptr;
@@ -63,7 +86,13 @@ void Primitive::validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim
                                          std::string prim_name) const
 {
     if (prim_msg.primitive_name != prim_name)
+<<<<<<< HEAD
     {   
         throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name + ") does not match expected name" + prim_name);  
+=======
+    {
+        throw std::invalid_argument("Primitive given (" + prim_msg.primitive_name +
+                                    ") does not match expected name" + prim_name);
+>>>>>>> 02caab567bd108dc95226d495103476411087fbe
     }
 }
