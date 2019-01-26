@@ -165,10 +165,8 @@ std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
 const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
     {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
     {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
-    {Referee_Command_NORMAL_START,
-            thunderbots_msgs::RefboxCommand::NORMAL_START},
-    {Referee_Command_FORCE_START,
-            thunderbots_msgs::RefboxCommand::FORCE_START},
+    {Referee_Command_NORMAL_START, thunderbots_msgs::RefboxCommand::NORMAL_START},
+    {Referee_Command_FORCE_START, thunderbots_msgs::RefboxCommand::FORCE_START},
     {Referee_Command_PREPARE_KICKOFF_BLUE,
      thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US},
     {Referee_Command_PREPARE_KICKOFF_YELLOW,
@@ -193,14 +191,13 @@ const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
     {Referee_Command_BALL_PLACEMENT_YELLOW,
      thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM}};
 
-// this maps a protobuf Referee_Command enum to its ROS message equivalent, for yellow team
+// this maps a protobuf Referee_Command enum to its ROS message equivalent, for yellow
+// team
 const static std::unordered_map<Referee::Command, int> yellow_team_command_map = {
     {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
     {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
-    {Referee_Command_NORMAL_START,
-            thunderbots_msgs::RefboxCommand::NORMAL_START},
-    {Referee_Command_FORCE_START,
-            thunderbots_msgs::RefboxCommand::FORCE_START},
+    {Referee_Command_NORMAL_START, thunderbots_msgs::RefboxCommand::NORMAL_START},
+    {Referee_Command_FORCE_START, thunderbots_msgs::RefboxCommand::FORCE_START},
     {Referee_Command_PREPARE_KICKOFF_BLUE,
      thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM},
     {Referee_Command_PREPARE_KICKOFF_YELLOW,

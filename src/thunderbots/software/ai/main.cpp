@@ -64,10 +64,11 @@ void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
     ai.updateWorldEnemyTeamState(enemy_team);
 }
 
-void refboxGameStateUpdateCallback(const thunderbots_msgs::RefboxData::ConstPtr& msg)
+void refboxGameStateUpdateCallback(const thunderbots_msgs::RefboxData::ConstPtr &msg)
 {
     thunderbots_msgs::RefboxCommand command = msg->command;
-    RefboxGameState game_state = Util::ROSMessages::createGameStateFromROSMessage(command);
+    RefboxGameState game_state =
+        Util::ROSMessages::createGameStateFromROSMessage(command);
     ai.updateWorldRefboxGameState(game_state);
 }
 
@@ -92,8 +93,9 @@ int main(int argc, char **argv)
                               friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
-    ros::Subscriber game_state_sub = node_handle.subscribe(
-            Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1, refboxGameStateUpdateCallback);
+    ros::Subscriber game_state_sub =
+        node_handle.subscribe(Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1,
+                              refboxGameStateUpdateCallback);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger();

@@ -1,6 +1,7 @@
-#include <g3log/loglevels.hpp>
-#include <g3log/g3log.hpp>
 #include "ai.h"
+
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 AI::AI(const World &world)
     : world(world),
@@ -47,9 +48,11 @@ void AI::updateWorldEnemyTeamState(const Team &new_enemy_team_data)
     world.updateEnemyTeamState(new_enemy_team_data);
 }
 
-void AI::updateWorldRefboxGameState(const RefboxGameState &game_state) {
+void AI::updateWorldRefboxGameState(const RefboxGameState &game_state)
+{
     // TODO: delete this logging message
-    if(game_state != world.gameState().getRefboxGameState()) {
+    if (game_state != world.gameState().getRefboxGameState())
+    {
         LOG(INFO) << "Game state changed to: " << game_state;
     }
     world.updateRefboxGameState(game_state);
