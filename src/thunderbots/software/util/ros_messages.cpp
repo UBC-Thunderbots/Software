@@ -1,4 +1,6 @@
 #include "util/ros_messages.h"
+#include "ros_messages.h"
+
 
 namespace Util
 {
@@ -69,6 +71,11 @@ namespace Util
             }
 
             return team;
+        }
+
+        RefboxGameState createGameStateFromROSMessage(const thunderbots_msgs::RefboxCommand &command) {
+            // the values in RefboxGameState correspond to the constants in RefboxCommand.msg
+            return (RefboxGameState) command.command;
         }
     }  // namespace ROSMessages
 }  // namespace Util

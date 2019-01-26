@@ -8,6 +8,8 @@
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
+#include "thunderbots_msgs/RefboxCommand.h"
+#include "refbox_constants.h"
 
 namespace Util
 {
@@ -48,5 +50,13 @@ namespace Util
          * @return A Team object created with the given team message data
          */
         Team createTeamFromROSMessage(const thunderbots_msgs::Team& team_msg);
+
+        /**
+         * Given a Team message, constructs and returns a Team object
+         *
+         * @param command The message containing the refbox game state data
+         * @return A RefboxGameState corresponding to the current game state
+         */
+        RefboxGameState createGameStateFromROSMessage(const thunderbots_msgs::RefboxCommand& command);
     }  // namespace ROSMessages
 }  // namespace Util
