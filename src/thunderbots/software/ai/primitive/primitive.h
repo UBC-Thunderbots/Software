@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "thunderbots_msgs/Primitive.h"
+#include <shared/primitive_type.h>
 
 // We forward-declare the PrimitiveVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
@@ -49,23 +50,6 @@ class Primitive
      * @return The ID of the robot this Primitive is controlling
      */
     virtual unsigned int getRobotId() const = 0;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of doubles that are the generic parameters for this Primitive
-     */
-    virtual std::vector<double> getParameters() const = 0;
-
-    /**
-     * Returns the generic vector of Booleans, that represent the extra bits used by
-     * the Primitive. These extra bits are typically used to toggle behaviour of the
-     * Primitive, such as if the kicker or chipper should be used, or if autokick
-     * should be enabled.
-     *
-     * @return A vector of Booleans that are the extra bits used by the Primitive.
-     */
-    virtual std::vector<bool> getExtraBits() const = 0;
 
     /**
      * Validates that a primitive message is compatible with the primitive

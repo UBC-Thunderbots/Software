@@ -33,18 +33,6 @@ bool StopPrimitive::robotShouldCoast() const
     return coast;
 }
 
-std::vector<double> StopPrimitive::getParameters() const
-{
-    return std::vector<double>();
-}
-
-std::vector<bool> StopPrimitive::getExtraBits() const
-{
-    std::vector<bool> parameter = {coast};
-
-    return parameter;
-}
-
 void StopPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);

@@ -89,22 +89,6 @@ double DirectWheelsPrimitive::getDribblerRPM() const
     return dribbler_rpm;
 }
 
-std::vector<double> DirectWheelsPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {static_cast<double>(front_left_wheel_power),
-                                      static_cast<double>(back_left_wheel_power),
-                                      static_cast<double>(front_right_wheel_power),
-                                      static_cast<double>(back_right_wheel_power),
-                                      dribbler_rpm};
-
-    return parameters;
-}
-
-std::vector<bool> DirectWheelsPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
-}
-
 void DirectWheelsPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);

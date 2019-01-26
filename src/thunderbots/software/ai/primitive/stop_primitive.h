@@ -35,21 +35,6 @@ class StopPrimitive : public Primitive
      */
     bool robotShouldCoast() const;
 
-    /**
-     * This primitive has no parameters, @see getExtraBits()
-     *
-     * @return an empty vector
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive uses the extra_bit array as its parameter array
-     *
-     *
-     * @return a vector that contains whether the robot should coast
-     */
-    std::vector<bool> getExtraBits() const override;
-
     void accept(PrimitiveVisitor &visitor) const override;
 
    private:

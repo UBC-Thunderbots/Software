@@ -59,19 +59,6 @@ double DirectVelocityPrimitive::getDribblerRpm() const
     return dribbler_rpm;
 }
 
-std::vector<double> DirectVelocityPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {x_velocity, y_velocity, angular_velocity,
-                                      dribbler_rpm};
-
-    return parameters;
-}
-
-std::vector<bool> DirectVelocityPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
-}
-
 void DirectVelocityPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);

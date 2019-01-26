@@ -77,22 +77,6 @@ class DirectWheelsPrimitive : public Primitive
      */
     double getDribblerRPM() const;
 
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {front_left_wheel_power, back_left_wheel_power,
-     *                               front_right_wheel_power, back_right_wheel_power,
-     *                               dribbler_rpm}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
-
     void accept(PrimitiveVisitor &visitor) const override;
 
    private:

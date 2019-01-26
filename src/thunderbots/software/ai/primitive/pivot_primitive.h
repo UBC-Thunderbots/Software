@@ -57,22 +57,6 @@ class PivotPrimitive : public Primitive
      */
     double getPivotRadius() const;
 
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {pivot_point.x(), pivot_point.y(),
-     *                               final_angle.toRadians(),
-     *                               pivot_radius}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
-
     void accept(PrimitiveVisitor &visitor) const override;
 
    private:
