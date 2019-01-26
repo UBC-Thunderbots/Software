@@ -35,6 +35,7 @@ class Ball final
      * Updates the ball with new data, updating the current data as well as the predictive
      * model
      *
+     * @throws std::invalid_argument if the ball is updated with a time from the past
      * @param new_ball_data A ball containing new ball data
      */
     void updateState(const Ball& new_ball_data);
@@ -43,6 +44,7 @@ class Ball final
      * Updates the ball's state to be its predicted state at the given timestamp.
      * The timestamp must be >= the ball's last update timestamp
      *
+     * @throws std::invalid_argument if the ball is updated with a time from the past
      * @param timestamp The timestamp at which to update the ball's state to. Must
      * be >= the ball's last update timestamp
      */
@@ -71,6 +73,8 @@ class Ball final
      * For example, a value of 1500 would return the estimated position of the ball
      * 1.5 seconds in the future.
      *
+     * @throws std::invalid_argument if the ball is estimating the position with a time
+     * from the past
      * @return the estimated position of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
@@ -93,6 +97,8 @@ class Ball final
      * For example, a value of 1500 would return the estimated velocity of the ball
      * 1.5 seconds in the future.
      *
+     * @throws std::invalid_argument if the ball is estimating the velocity with a time
+     * from the past
      * @return the estimated velocity of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */

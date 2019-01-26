@@ -5,3 +5,13 @@
 # will actually *look* like the same commit in the repo.
 # See https://help.github.com/articles/dealing-with-line-endings/ for more details
 * text=auto
+
+# Set yarn.lock and package-lock.json as binary
+# This helps with diffing as those files can generate extremely
+# large diffs
+package-lock.json   binary
+yarn.lock           binary
+
+# Set yarn release as a binary
+yarn-*.js	    binary
+

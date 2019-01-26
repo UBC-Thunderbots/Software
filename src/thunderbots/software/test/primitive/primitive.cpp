@@ -12,6 +12,7 @@
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {
@@ -183,13 +184,13 @@ TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive
 // started with
 TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive)
 {
-    const unsigned int robot_id   = 2U;
-    const Point pivot_point       = Point(2, -1);
-    const Angle final_angle       = Angle::ofRadians(2.56);
-    const Angle robot_orientation = Angle::ofRadians(0.78);
+    const unsigned int robot_id = 2U;
+    const Point pivot_point     = Point(2, -1);
+    const Angle final_angle     = Angle::ofRadians(2.56);
+    const double pivot_radius   = .78;
 
     PivotPrimitive pivot_prim =
-        PivotPrimitive(robot_id, pivot_point, final_angle, robot_orientation);
+        PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
     std::unique_ptr<Primitive> new_prim  = PivotPrimitive::createPrimitive(prim_msg);
@@ -200,8 +201,34 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     EXPECT_DOUBLE_EQ(pivot_point.x(), parameters[0]);
     EXPECT_DOUBLE_EQ(pivot_point.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(robot_orientation.toRadians(), parameters[3]);
+    EXPECT_DOUBLE_EQ(pivot_radius, parameters[3]);
     EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+}
+
+// Test that we can correctly translate a StopPrimitive like:
+// `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
+// started with
+TEST(StopPrimTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
+{
+    const unsigned int robot_id = 2U;
+    const bool coast            = false;
+
+    StopPrimitive stop_prim                  = StopPrimitive(robot_id, coast);
+    thunderbots_msgs::Primitive prim_message = stop_prim.createMsg();
+
+    std::unique_ptr<Primitive> new_prim = StopPrimitive::createPrimitive(prim_message);
+
+    // Since we have a `Primitive` and NOT a `StopPrimitive`, we have to check that the
+    // values are correct by getting them from the generic extra_bits array
+    // we use the extra_bits array instead of the parameters array because `StopPrimitive`
+    // has only one variable, coast
+    std::vector<bool> extra_bits = new_prim->getExtraBits();
+
+    EXPECT_EQ("Stop Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_EQ(coast, extra_bits[0]);
+    EXPECT_EQ(new_prim->getParameters(), std::vector<double>());
+    EXPECT_EQ(std::vector<double>(), new_prim->getParameters());
 }
 
 int main(int argc, char **argv)
