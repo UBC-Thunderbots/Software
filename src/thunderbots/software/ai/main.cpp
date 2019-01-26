@@ -7,6 +7,7 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
+#include "util/draw_logger/draw_logger.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
@@ -74,6 +75,10 @@ int main(int argc, char **argv)
         node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
             Util::Constants::AI_PRIMITIVES_TOPIC, 1);
 
+    ros::Publisher visualizer_publisher =
+        node_handle.advertise<thunderbots_msgs::DrawLayer>(
+            Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, 8);
+
     // Create subscribers
     ros::Subscriber field_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
@@ -87,6 +92,10 @@ int main(int argc, char **argv)
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+
+    // FIXME: not required
+    // Initailizer the draw logger
+    // Util::DrawLogger::getInstance()->
 
     // Main loop
     while (ros::ok())
@@ -114,6 +123,17 @@ int main(int argc, char **argv)
                 LOG(INFO) << msg << std::endl;
             }
             primitive_publisher.publish(primitive_array_message);
+
+
+            // On every tick, send the layer messages
+            for (const std::pair<std::string, Util::LayerMsg>& layer_msg_pair : Util::DrawLogger::getInstance()->getLayerMap())
+            {
+                if (!layer_msg_pair.second.shapes.empty())
+                {
+                    visualizer_publisher.publish(layer_msg_pair.second);
+                }
+            }
+            Util::DrawLogger::getInstance()->clearLayers();
         }
         catch (const std::invalid_argument &e)
         {
