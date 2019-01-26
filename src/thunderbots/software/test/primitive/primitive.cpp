@@ -184,10 +184,10 @@ TEST(PrimitiveTest, convert_CatchPrimitive_to_message_and_back_to_CatchPrimitive
 // started with
 TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive)
 {
-    const unsigned int robot_id  = 2U;
-    const Point pivot_point      = Point(2, -1);
-    const Angle final_angle      = Angle::ofRadians(2.56);
-    const double pivot_radius    = .78;
+    const unsigned int robot_id = 2U;
+    const Point pivot_point     = Point(2, -1);
+    const Angle final_angle     = Angle::ofRadians(2.56);
+    const double pivot_radius   = .78;
 
     PivotPrimitive pivot_prim =
         PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
