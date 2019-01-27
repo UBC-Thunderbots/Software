@@ -1,3 +1,7 @@
+/*
+ * This file creates an example story for Storybook
+ */
+
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
 

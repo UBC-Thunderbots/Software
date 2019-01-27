@@ -81,6 +81,7 @@ The project is defined as follow:
 
 -   `config` - contains webpack (build tool) configuration files
 -   `launch` - contains roslaunch file
+-   `scripts` - contains build related scripts
 -   `src`
     -   `assets` - contains image assets
     -   `components` - contains repeatable UI components
@@ -90,6 +91,7 @@ The project is defined as follow:
     -   `style` - contains application styling and theming
     -   `types` - contains all Typescript types
     -   `utils` - contains misc code
+-   `storybook` - contains Storybook config
 -   `.prettierrc` - configuration for autoformating tool
 -   `CMakeLists.txt` - cmake build script
 -   `common.d.ts` - definition file for file assets
