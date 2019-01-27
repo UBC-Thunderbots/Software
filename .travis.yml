@@ -26,7 +26,6 @@ install:
     - RUN_TESTS=${RUN_TESTS:-"false"}
     - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
-    - echo "Percy \"$PERCY_TOKEN\""
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
     - docker run 
@@ -38,7 +37,6 @@ install:
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
-      --env PERCY_TOKEN
       --volume $(pwd):/root/$REPOSITORY_NAME
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
