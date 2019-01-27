@@ -4,7 +4,9 @@
 #include <random>
 #include "geom/point.h"
 #include "util/parameter/parameter.h"
-
+/**
+ * Finds and filters the "real" ball from the received data 
+ */
 const unsigned int PARTICLE_FILTER_NUM_PARTICLES = 500;
 const double MAX_BALL_CONFIDENCE = 100.0;
 const double MAX_PARTICLE_STANDARD_DEV           = 0.05;
