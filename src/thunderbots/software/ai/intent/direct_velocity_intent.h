@@ -1,44 +1,26 @@
 #pragma once
 
 #include "ai/intent/intent.h"
+#include "ai/primitive/direct_velocity_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "ai/primitive/move_primitive.h"
 
 class DirectVelocityIntent : public Intent, public DirectVelocityPrimitive
 {
    public:
+    static const std::string INTENT_NAME;
     /**
      * Creates a new DirectVelocity Intent
      *
      * @param robot_id The id of the robot that this Intent is for
-     * @param dest The destination of the Movement
-     * @param final_angle The final angle the robot should have at the end of the movement
-     * @param final_speed The final speed the robot should have when it arrives at its
-     * destination
-     * @param priority The priority that the intent has relative to other intents (to be defined)
+     * @param x_velocity positive forward
+     * @param y_velocity positive forward
+     * @param angular_velocity positive clockwise
+     * @param dribbler_rpm The dribbler speed in rpm
      */
-    // TODO: Add parameter override field/object/struct
-    explicit DirectVelocityIntent(unsigned int robot_id, const Point &dest,
-                        const Angle &final_angle, double final_speed, int priority);
+    explicit DirectVelocityIntent(unsigned int robot_id, double x_velocity,
+                                  double y_velocity, double angular_velocity,
+                                  double dribbler_rpm);
 
-    /**
-     * Creates a new DirectVelocity Intent
-     *
-     * @param robot_id The id of the robot that this Intent is for
-     * @param dest The destination of the Movement
-     * @param final_angle The final angle the robot should have at the end of the movement
-     * @param final_speed The final speed the robot should have when it arrives at its
-     * destination
-     */
-    // TODO: Add parameter override field/object/struct
-    explicit DirectVelocityIntent(unsigned int robot_id, const Point &dest,
-                        const Angle &final_angle, double final_speed);
-
-    std::string getIntentName() const override;
-
-    int getPriority() const;
-
-   private:
-    int priority;
+    std::string getIntentName(void) const override;
 };

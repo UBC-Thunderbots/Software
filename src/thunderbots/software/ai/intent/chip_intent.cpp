@@ -1,11 +1,6 @@
 #include "chip_intent.h"
 
-ChipIntent::ChipIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, int priority)
-    : ChipPrimitive(robot_id, dest, final_angle, final_speed), priority(priority) 
-{
-}
-
+const std::string ChipIntent::INTENT_NAME = CHIP_INTENT_NAME;
 
 ChipIntent::ChipIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
                        double final_speed)
@@ -13,12 +8,7 @@ ChipIntent::ChipIntent(unsigned int robot_id, const Point &dest, const Angle &fi
 {
 }
 
-std::string ChipIntent::getIntentName() const
+std::string ChipIntent::getIntentName(void) const
 {
-    return CHIP_INTENT_NAME;
-}
-
-int ChipIntent::getPriority() const
-{
-    return priority;
+    return INTENT_NAME;
 }

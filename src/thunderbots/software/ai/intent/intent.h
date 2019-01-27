@@ -2,13 +2,15 @@
 
 #include <string>
 
-// TODO: should this be an enum instead?
-const static std::string CATCH_INTENT_NAME = "Catch Intent";
-const static std::string CHIP_INTENT_NAME = "Chip Intent";
+/**Used for initializing `INTENT_NAME`s and comparisons,
+ * for example getIntent() == XX_INTENT_NAME
+ */
+const static std::string CATCH_INTENT_NAME           = "Catch Intent";
+const static std::string CHIP_INTENT_NAME            = "Chip Intent";
 const static std::string DIRECT_VELOCITY_INTENT_NAME = "Direct Velocity Intent";
-const static std::string KICK_INTENT_NAME = "Kick Intent";
-const static std::string MOVE_INTENT_NAME = "Move Intent";
-const static std::string PIVOT_INTENT_NAME = "Pivot Intent";
+const static std::string KICK_INTENT_NAME            = "Kick Intent";
+const static std::string MOVE_INTENT_NAME            = "Move Intent";
+const static std::string PIVOT_INTENT_NAME           = "Pivot Intent";
 
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
@@ -32,13 +34,25 @@ class Intent
      *
      * @return the name of this Intent
      */
-    virtual std::string getIntentName() const = 0;
+    virtual std::string getIntentName(void) const = 0;
 
     /**
      * Returns the priority of this Intent
      * @return the priority of this Intent
      */
-    virtual int getPriority() const = 0;
+    int getPriority(void) const;
+
+    /**
+     * Sets the priority of this Intent
+     */
+    void setPriority(int);
 
     virtual ~Intent() = default;
+
+   private:
+    /**
+     * priority of this intent
+     * higher value => higher priority
+     */
+    int priority;
 };

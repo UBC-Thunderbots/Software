@@ -1,24 +1,14 @@
 #include "kick_intent.h"
 
-KickIntent::KickIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, int priority)
-    : KickPrimitive(robot_id, dest, final_angle, final_speed), priority(priority) 
+const std::string KickIntent::INTENT_NAME = KICK_INTENT_NAME;
+
+KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,
+                       const Angle &kick_direction, double kick_speed_meters_per_second)
+    : KickPrimitive(robot_id, kick_origin, kick_direction, kick_speed_meters_per_second)
 {
 }
 
-
-KickIntent::KickIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed)
-    : KickPrimitive(robot_id, dest, final_angle, final_speed)
+std::string KickIntent::getIntentName(void) const
 {
-}
-
-std::string KickIntent::getIntentName() const
-{
-    return KICK_INTENT_NAME;
-}
-
-int KickIntent::getPriority() const
-{
-    return priority;
+    return INTENT_NAME;
 }

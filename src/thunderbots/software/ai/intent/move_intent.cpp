@@ -1,11 +1,6 @@
 #include "move_intent.h"
 
-MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, int priority)
-    : MovePrimitive(robot_id, dest, final_angle, final_speed), priority(priority) 
-{
-}
-
+const std::string MoveIntent::INTENT_NAME = MOVE_INTENT_NAME;
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
                        double final_speed)
@@ -13,12 +8,7 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
 {
 }
 
-std::string MoveIntent::getIntentName() const
+std::string MoveIntent::getIntentName(void) const
 {
-    return MOVE_INTENT_NAME;
-}
-
-int MoveIntent::getPriority() const
-{
-    return priority;
+    return INTENT_NAME;
 }

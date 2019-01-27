@@ -1,24 +1,16 @@
 #include "direct_velocity_intent.h"
 
-DirectVelocityIntent::DirectVelocityIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, int priority)
-    : DirectVelocityPrimitive(robot_id, dest, final_angle, final_speed), priority(priority) 
+const std::string DirectVelocityIntent::INTENT_NAME = DIRECT_VELOCITY_INTENT_NAME;
+
+DirectVelocityIntent::DirectVelocityIntent(unsigned int robot_id, double x_velocity,
+                                           double y_velocity, double angular_velocity,
+                                           double dribbler_rpm)
+    : DirectVelocityPrimitive(robot_id, x_velocity, y_velocity, angular_velocity,
+                              dribbler_rpm)
 {
 }
 
-
-DirectVelocityIntent::DirectVelocityIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed)
-    : DirectVelocityPrimitive(robot_id, dest, final_angle, final_speed)
+std::string DirectVelocityIntent::getIntentName(void) const
 {
-}
-
-std::string DirectVelocityIntent::getIntentName() const
-{
-    return DIRECT_VELOCITY_INTENT_NAME;
-}
-
-int DirectVelocityIntent::getPriority() const
-{
-    return priority;
+    return INTENT_NAME;
 }

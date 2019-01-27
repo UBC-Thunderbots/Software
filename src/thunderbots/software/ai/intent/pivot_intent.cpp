@@ -1,24 +1,14 @@
 #include "pivot_intent.h"
 
-PivotIntent::PivotIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, int priority)
-    : PivotPrimitive(robot_id, dest, final_angle, final_speed), priority(priority) 
+const std::string PivotIntent::INTENT_NAME = PIVOT_INTENT_NAME;
+
+PivotIntent::PivotIntent(unsigned int robot_id, const Point &pivot_point,
+                         const Angle &final_angle, const double pivot_radius)
+    : PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius)
 {
 }
 
-
-PivotIntent::PivotIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed)
-    : PivotPrimitive(robot_id, dest, final_angle, final_speed)
+std::string PivotIntent::getIntentName(void) const
 {
-}
-
-std::string PivotIntent::getIntentName() const
-{
-    return PIVOT_INTENT_NAME;
-}
-
-int PivotIntent::getPriority() const
-{
-    return priority;
+    return INTENT_NAME;
 }
