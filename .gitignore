@@ -51,6 +51,7 @@ Makefile
 # Production
 *build
 *dist
+*storybook-static
 
 # Node error log
 *npm-debug.log*
