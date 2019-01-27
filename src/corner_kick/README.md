@@ -14,6 +14,7 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 - [Contribute](#contribute)
     - [Running the dev server](#running-the-dev-server)
     - [Testing](#testing)
+    - [Visual Testing](#visual-testing)
 - [Project Structure](#project-structure)
 - [Design notes](#design-notes)
 - [Additional notes](#additional-notes)
@@ -63,6 +64,16 @@ To be able to run tests everytime a file changes, run
 ```
 yarn test:watch
 ```
+
+### Visual Testing
+
+You can test the various UI elements by running
+
+```
+yarn storybook
+```
+
+A window should appear showing the various UI elements of Corner Kick
 
 ## Project Structure
 

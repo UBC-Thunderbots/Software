@@ -8,3 +8,4 @@ DIRECTORY=`dirname $0`
 # Corner Kick.
 cd $DIRECTORY
 yarn test
+yarn test:snapshot
