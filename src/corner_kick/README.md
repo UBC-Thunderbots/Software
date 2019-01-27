@@ -10,16 +10,18 @@ Corner Kick is a web app that allows for the visualization of UBC Thunderbots' A
 
 **Table of content**
 
--   [How to use](#how-to-use)
--   [Contribute](#contribute)
-    -   [Running the dev server](#running-the-dev-server)
-    -   [Testing](#testing)
--   [Project Structure](#project-structure)
--   [Design notes](#design-notes)
-    -   [Approach to the application UI layout](#approach-to-the-application-ui-layout)
-        -   [React Portals](#react-portals)
-    -   [Approach to the application state](#approach-to-the-application-state)
-        -   [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
+- [How to use](#how-to-use)
+- [Contribute](#contribute)
+    - [Running the dev server](#running-the-dev-server)
+    - [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Design notes](#design-notes)
+- [Additional notes](#additional-notes)
+    - [Yarn](#yarn)
+    - [Approach to the application UI layout](#approach-to-the-application-ui-layout)
+    - [Approach to the application state](#approach-to-the-application-state)
+        - [Debugging the Redux store](#debugging-the-redux-store)
+        - [Reducer functions and Redux saga](#reducer-functions-and-redux-saga)
 
 ## How to use
 
@@ -88,6 +90,10 @@ The project is defined as follow:
 
 ## Design notes
 
+-   [Portals](src/components/Portal/README.md)
+
+## Additional notes
+
 ### Yarn
 
 We are using a fixed version of Yarn in this project, to ensure that all developers
@@ -111,15 +117,6 @@ be divided into sections as follow:
 
 The application's primary layout is defined in [index.html](src/index.html). The theme for the application is defined
 in [Theme.tsx](src/style/Theme.tsx)
-
-#### React Portals
-
-Access to those section in the React application is done via [React Portals](https://reactjs.org/docs/portals.html).
-Portals are used to ensure the application layout is enforced throughout all the pages while offering an
-easy way to access them.
-
-In essence then, the sections of the application are boxes where the React application can insert React components into.
-This allows us to insert and swap UI elements in the application without worrying about the global layout.
 
 ### Approach to the application state
 
