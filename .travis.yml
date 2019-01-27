@@ -37,6 +37,7 @@ install:
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
+      --env PERCY_TOKEN
       --volume $(pwd):/root/$REPOSITORY_NAME
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
