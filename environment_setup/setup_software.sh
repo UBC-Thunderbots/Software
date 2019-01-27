@@ -211,6 +211,7 @@ host_software_packages=(
     libprotobuf-dev
     nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
     yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
+    libnss3
 )
 sudo apt-get install ${host_software_packages[@]} -y
 
