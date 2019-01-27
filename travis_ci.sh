@@ -8,8 +8,6 @@
 # called. This setup is dictated in the `.travis.yml` file                  # 
 #############################################################################
 
-echo $PERCY_TOKEN
-
 # The current directory
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
