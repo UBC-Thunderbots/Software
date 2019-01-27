@@ -8,3 +8,4 @@ import * as React from 'react';
 const stories = storiesOf('Hello World', module);
 
 stories.add('Hello World!', () => <div>Hello World!</div>);
+stories.add('Testing!', () => <div>Testing!</div>);
