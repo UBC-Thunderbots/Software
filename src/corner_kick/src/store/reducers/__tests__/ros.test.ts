@@ -3,6 +3,7 @@
  * Each test case has a description of what it tests
  */
 
+import { IROSState } from 'SRC/types';
 import * as ros from '../../actions/ros';
 import rosReducer from '../ros';
 
@@ -73,10 +74,18 @@ describe('ros reducer', () => {
     describe('when we receive other actions', () => {
         it('should return state from action payload', () => {
             const mockAction = ros.newMessage('topic', 'message');
+            const mockState: IROSState = {
+                errorMessage: 'testMessage',
+                nodes: ['node1', 'node2'],
+                params: ['param1', 'param2'],
+                services: ['service1', 'service2'],
+                status: 'connected',
+                topics: [],
+            };
 
-            const state = rosReducer(undefined, mockAction);
+            const state = rosReducer(mockState, mockAction);
 
-            expect(state).toEqual(state);
+            expect(state).toEqual(mockState);
         });
     });
 });
