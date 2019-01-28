@@ -5,7 +5,7 @@ about: Defines an item of work for the project
 
 <!--
     Make sure to complete the following before submitting this ticket
-    - Add the ticket an epic
+    - Add the ticket to an epic
     - Add an estimate of the work required for this task
     - Add to a release
     - Add relevant labels
