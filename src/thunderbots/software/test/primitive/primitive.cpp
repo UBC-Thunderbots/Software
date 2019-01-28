@@ -9,8 +9,10 @@
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/stop_primitive.h"
 
@@ -71,6 +73,58 @@ TEST(PrimitiveTest, convert_MovePrimitive_to_message_and_back_to_MovePrimitive)
     EXPECT_DOUBLE_EQ(destination.y(), params[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), params[2]);
     EXPECT_DOUBLE_EQ(final_speed, params[3]);
+    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
+}
+
+TEST(PrimitiveTest, convert_MoveSpinPrimitive_to_message_and_back_to_MoveSpinPrimitive)
+{
+    const Point destination     = Point(-1, 4);
+    const Angle angular_vel     = AngularVelocity::ofRadians(0.54);
+    const unsigned int robot_id = 2U;
+
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(robot_id, destination, angular_vel);
+
+    thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
+
+    std::unique_ptr<Primitive> new_prim = Primitive::createPrimitive(prim_message);
+
+    std::vector<double> parameters = new_prim->getParameters();
+
+    EXPECT_EQ("MoveSpin Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
+    EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
+    EXPECT_DOUBLE_EQ(angular_vel.toRadians(), parameters[2]);
+    EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
+}
+
+TEST(PrimitiveTest,
+     convert_DirectWheelsPrimitive_to_message_and_back_to_DirectWheelsPrimitive)
+{
+    const signed int wheel0_power = 2;
+    const signed int wheel1_power = 4;
+    const signed int wheel2_power = 6;
+    const signed int wheel3_power = 8;
+    const double dribbler_rpm     = 49.6;
+    const unsigned int robot_id   = 3U;
+
+    DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(
+        robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
+
+    thunderbots_msgs::Primitive prim_message = directwheels_prim.createMsg();
+
+    std::unique_ptr<Primitive> new_prim = Primitive::createPrimitive(prim_message);
+
+    std::vector<double> parameters = new_prim->getParameters();
+
+    EXPECT_EQ("DirectWheels Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_DOUBLE_EQ(wheel0_power, parameters[0]);
+    EXPECT_DOUBLE_EQ(wheel1_power, parameters[1]);
+    EXPECT_DOUBLE_EQ(wheel2_power, parameters[2]);
+    EXPECT_DOUBLE_EQ(wheel3_power, parameters[3]);
+    EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[4]);
     EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
@@ -193,7 +247,7 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
         PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
-    std::unique_ptr<Primitive> new_prim  = PivotPrimitive::createPrimitive(prim_msg);
+    std::unique_ptr<Primitive> new_prim  = Primitive::createPrimitive(prim_msg);
     std::vector<double> parameters       = new_prim->getParameters();
 
     EXPECT_EQ("Pivot Primitive", new_prim->getPrimitiveName());
