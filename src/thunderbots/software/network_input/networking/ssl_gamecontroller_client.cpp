@@ -1,6 +1,6 @@
 #include "network_input/networking/ssl_gamecontroller_client.h"
 
-#include <g3log/g3log.hpp>
+#include "util/logger/init.h"
 
 SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
                                                  const unsigned short port)

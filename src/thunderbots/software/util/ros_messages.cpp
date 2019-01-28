@@ -1,8 +1,5 @@
 #include "util/ros_messages.h"
 
-#include "ros_messages.h"
-
-
 namespace Util
 {
     namespace ROSMessages
