@@ -10,8 +10,8 @@ class SSLGameControllerClient
 {
    public:
     /**
-     * Creates an SSLGameControllerClient that will listen for data packets from SSL Game Controller
-     * on the given address and port
+     * Creates an SSLGameControllerClient that will listen for data packets from SSL Game
+     * Controller on the given address and port
      *
      * @param ip_address The ip address of the multicast group on which to listen for
      * SSL Vision packets
@@ -20,8 +20,9 @@ class SSLGameControllerClient
     SSLGameControllerClient(std::string ip_address, unsigned short port);
 
     /**
-     * Returns a unique_ptr to the latest SSL GameController Referee packet. If no new data was
-     * received since the last time this function was called, the unique_ptr will be empty
+     * Returns a unique_ptr to the latest SSL GameController Referee packet. If no new
+     * data was received since the last time this function was called, the unique_ptr will
+     * be empty
      *
      * @return A unique_ptr to an Referee packet if data was received since the last
      * time this function was called, otherwise returns an empty unique_ptr
@@ -43,9 +44,9 @@ class SSLGameControllerClient
     boost::asio::ip::udp::socket socket_;
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
-    // We set the max buffer length to be the largest possible size of a UDP datagram. This way
-    // we don't need to worry about buffer overflow, or about our data getting truncated
-    // to fit into the buffer
+    // We set the max buffer length to be the largest possible size of a UDP datagram.
+    // This way we don't need to worry about buffer overflow, or about our data getting
+    // truncated to fit into the buffer
     static constexpr unsigned int max_buffer_length = 65535;
     char raw_received_data_[max_buffer_length];
 
