@@ -1,3 +1,4 @@
+#include <g3log/g3log.hpp>
 #include "network_input/networking/ssl_gamecontroller_client.h"
 
 SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
@@ -7,7 +8,15 @@ SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::address::from_string(ip_address), port);
     socket_.open(listen_endpoint.protocol());
-    socket_.bind(listen_endpoint);
+    try
+    {
+        socket_.bind(listen_endpoint);
+    }
+    catch (const boost::exception& ex)
+    {
+        LOG(INFO) << "SSL Game Controller client could not bind to socket!";
+        throw;
+    }
 
     // Join the multicast group.
     socket_.set_option(boost::asio::ip::multicast::join_group(
@@ -50,9 +59,7 @@ void SSLGameControllerClient::handleDataReception(const boost::system::error_cod
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
 
-        // TODO: Log a proper warning here so we can be notified that there was an error
-        // while handling received data. Can be done once
-        // https://github.com/UBC-Thunderbots/Software/issues/33 is done
+        LOG(WARNING) << "Error while receiving data from SSL Game Controller: " << error;
     }
 }
 
