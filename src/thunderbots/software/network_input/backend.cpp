@@ -138,7 +138,7 @@ std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
     thunderbots_msgs::RefboxData refbox_data;
     refbox_data.command.command = getTeamCommand(packet.command());
     setOurFieldSide(packet.blue_team_on_positive_half());
-    auto designated_position = getTeamLocalCoordinates(packet.designated_position());
+    auto designated_position = refboxGlobalToLocalPoint(packet.designated_position());
     refbox_data.ball_placement_point.x = designated_position.x();
     refbox_data.ball_placement_point.y = designated_position.y();
     refbox_data.packet_timestamp       = packet.packet_timestamp();
@@ -161,7 +161,8 @@ std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
     return std::make_optional<thunderbots_msgs::RefboxData>(refbox_data);
 }
 
-// this maps a protobuf Referee_Command enum to its ROS message equivalent, for blue team
+// this maps a protobuf Referee_Command enum to its ROS message equivalent
+// this map is used when we are on the blue team
 const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
     {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
     {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
@@ -191,8 +192,8 @@ const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
     {Referee_Command_BALL_PLACEMENT_YELLOW,
      thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM}};
 
-// this maps a protobuf Referee_Command enum to its ROS message equivalent, for yellow
-// team
+// this maps a protobuf Referee_Command enum to its ROS message equivalent
+// this map is used when we are on the yellow team
 const static std::unordered_map<Referee::Command, int> yellow_team_command_map = {
     {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
     {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
@@ -234,7 +235,7 @@ int32_t Backend::getTeamCommand(const Referee::Command &command)
     }
 }
 
-Point Backend::getTeamLocalCoordinates(const Referee::Point &point)
+Point Backend::refboxGlobalToLocalPoint(const Referee::Point &point)
 {
     if (our_field_side == FieldSide::WEST)
     {
