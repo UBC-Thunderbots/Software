@@ -8,11 +8,14 @@
         "build": "webpack --config ./config/webpack.prod.js",
         "prod": "http-server ./build -o",
         "test": "jest --config ./config/jest.config.js",
-        "test:watch": "yarn test -- --watch"
+        "test:watch": "yarn test -- --watch",
+        "storybook": "start-storybook -p 9001 -c ./storybook"
     },
     "author": "Quentin Golsteyn",
     "license": "ISC",
     "devDependencies": {
+        "@babel/core": "7.2.2",
+        "@storybook/react": "4.1.11",
         "@types/jest": "23.3.12",
         "@types/lodash": "4.14.119",
         "@types/react": "16.7.17",
@@ -20,7 +23,9 @@
         "@types/react-dom": "16.0.11",
         "@types/react-redux": "6.0.11",
         "@types/roslib": "0.18.3",
+        "@types/storybook__react": "4.0.0",
         "@types/styled-components": "4.1.4",
+        "babel-loader": "8.0.5",
         "clean-webpack-plugin": "1.0.0",
         "css-loader": "2.0.0",
         "error-overlay-webpack-plugin": "0.1.6",
