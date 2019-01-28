@@ -8,7 +8,7 @@
 const path = require('path');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-const webpackConfig = require('./webpack.base.config.js');
+const webpackConfig = require('./webpack.base.config.js').web;
 
 module.exports = {
     ...webpackConfig,
