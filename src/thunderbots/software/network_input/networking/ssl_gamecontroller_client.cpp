@@ -1,5 +1,6 @@
-#include <g3log/g3log.hpp>
 #include "network_input/networking/ssl_gamecontroller_client.h"
+
+#include <g3log/g3log.hpp>
 
 SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
                                                  const unsigned short port)
@@ -30,7 +31,7 @@ SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
                                            boost::asio::placeholders::bytes_transferred));
 }
 
-void SSLGameControllerClient::handleDataReception(const boost::system::error_code &error,
+void SSLGameControllerClient::handleDataReception(const boost::system::error_code& error,
                                                   size_t num_bytes_received)
 {
     if (!error)

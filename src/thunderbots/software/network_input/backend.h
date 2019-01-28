@@ -87,16 +87,16 @@ class Backend
     // https://github.com/UBC-Thunderbots/Software/issues/163
 
     /**
-     * Sets which side of the field we are on (global +x or global -x), based on which colour
-     * we are and whether blue team is on the global +x or -x side.
+     * Sets which side of the field we are on (global +x or global -x), based on which
+     * colour we are and whether blue team is on the global +x or -x side.
      *
      * @param blue_team_on_positive_half Whether blue team is on the +x side of the field.
      */
     void setOurFieldSide(bool blue_team_on_positive_half);
 
     /**
-     * Converts a protobuf Referee::Command into a RefboxCommand constant for the corresponding
-     * Refbox command, based on which team we are (blue or yellow).
+     * Converts a protobuf Referee::Command into a RefboxCommand constant for the
+     * corresponding Refbox command, based on which team we are (blue or yellow).
      *
      * @param command a referee command from the protobuf message
      * @return a ROS message RefboxCommand constant corresponding to the input command
