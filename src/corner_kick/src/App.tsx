@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
-import { Visualizer } from './pages/visualizer';
+import { Portal, PortalLocation } from './components/Portal';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
 
@@ -18,7 +18,9 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
-            <Visualizer />
+            <Portal portalLocation={PortalLocation.SIDEBAR}>This is the sidebar</Portal>
+            <Portal portalLocation={PortalLocation.MAIN}>This is main</Portal>
+            <Portal portalLocation={PortalLocation.CONSOLE}>This is the console</Portal>
         </Theme>
     </Provider>
 );
