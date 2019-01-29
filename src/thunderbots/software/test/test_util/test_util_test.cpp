@@ -28,8 +28,9 @@ TEST(TestUtilsTest, create_testing_field)
     EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
     EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+              field.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
 
     EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
