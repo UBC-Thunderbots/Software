@@ -23,7 +23,6 @@
         "@types/roslib": "0.18.3",
         "@types/styled-components": "4.1.4",
         "clean-webpack-plugin": "1.0.0",
-        "codecov": "3.1.0",
         "css-loader": "2.0.0",
         "error-overlay-webpack-plugin": "0.1.6",
         "file-loader": "2.0.0",
