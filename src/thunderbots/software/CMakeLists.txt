@@ -554,10 +554,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(stop_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
 
-    catkin_add_gtest(refbox_msg_test
-                    test/network_input/refbox_msg_test.cpp
-                    network_input/backend.cpp)
-
 endif()
 
 ##### ROSTests / Integration Tests #####
