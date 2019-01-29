@@ -7,7 +7,7 @@ import * as React from 'react';
 import { ILayer } from 'SRC/types';
 import styled from 'SRC/utils/styled-components';
 
-const LayerItem = styled('div')`
+const LayerItem = styled.div`
     width: 100%;
     height: 32px;
 
@@ -25,30 +25,23 @@ const LayerItem = styled('div')`
         background: ${(props) => props.theme.colors.selected};
         color: ${(props) => props.theme.colors.fg};
     }
-`
+`;
 
+const LayerVisibilityToggle = styled('div')<{ visible: boolean }>`
+    padding: 4px;
+    margin-left: auto;
 
-    & .material-icons {
-        padding: 4px;
-        margin-left: auto;
+    border-radius: 4px;
 
-        border-radius: 4px;
+    color: ${(props) =>
+        props.visible ? props.theme.colors.fg : props.theme.colors.subdued};
 
-        font-size: 14px;
+    font-size: 14px;
 
-        transition: 0.2s all;
-    }
+    transition: 0.2s all;
 
-    & .material-icons:hover {
+    &:hover {
         background: ${(props) => props.theme.colors.bg};
-    }
-
-    &.visible .material-icons {
-        color: ${(props) => props.theme.colors.fg};
-    }
-
-    &.hidden .material-icons {
-        color: ${(props) => props.theme.colors.subdued};
     }
 `;
 
@@ -63,7 +56,12 @@ export const LayersPanel = (props: ILayersProps) => {
             {layers.map((layer) => (
                 <LayerItem key={layer.id}>
                     {layer.name}
-                    <i className="material-icons">remove_red_eye</i>
+                    <LayerVisibilityToggle
+                        visible={layer.visible}
+                        className="material-icons"
+                    >
+                        remove_red_eye
+                    </LayerVisibilityToggle>
                 </LayerItem>
             ))}
         </>
