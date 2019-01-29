@@ -5,7 +5,7 @@
  * The messenger constructs and queues the shapes into shape messages and layer
  * messages to be sent via ROS visualizer topics (VISUALIZER_DRAW_LAYER_TOPIC)
  *
- * Lasted edited by Muchen He (i@muchen.ca) on 2019-01-26
+ * Lasted edited by Muchen He on 2019-01-28
  */
 
 #pragma once
@@ -75,7 +75,7 @@ namespace Util
 		/**
 		 * Get a constant reference of the map of existing layers
 		 * 
-		 * @return Constant refernece of the layer message map
+		 * @return Constant reference of the layer message map
 		 */
 		const LayerMsgMap& getLayerMap() const;
 
@@ -96,7 +96,7 @@ namespace Util
 		 * @param draw_style: the drawing style of the shape
 		 * @param draw_transform: the transformation of the shape
 		 */
-		void ellipse(const std::string& layer, double cx, double cy, double r1, double r2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+		void drawEllipse(const std::string& layer, double cx, double cy, double r1, double r2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
         /**
          * Request a message to draw a rectangle shape. The rectangle has origin on the upper left corner,
@@ -110,10 +110,10 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void rect(const std::string& layer, double x, double y, double w, double h, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+        void drawRect(const std::string& layer, double x, double y, double w, double h, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
         // TODO: #258 polygon support
-        void poly();
+        void drawPoly();
 
         /**
          * Request a message to draw an arc. The origin is the center point
@@ -127,7 +127,7 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void arc(const std::string& layer, double cx, double cy, double radius, double theta_start, double theta_end, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+        void drawArc(const std::string& layer, double cx, double cy, double radius, double theta_start, double theta_end, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
         /**
          * Request a message to draw a line. The origin is the first point
@@ -140,7 +140,7 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void line(const std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
+        void drawLine(const std::string& layer, double x1, double y1, double x2, double y2, DrawStyle draw_style = DrawStyle(), DrawTransform draw_transform = DrawTransform());
 
 	private:
 
@@ -148,7 +148,7 @@ namespace Util
 		 * Constructor; initializes an empty layers map then populates it
 		 */
 		explicit VisualizerMessenger()
-		: m_draw_layers()
+		: m_layers_name_to_msg_map()
 		{
 			buildLayers();
 		}
@@ -188,7 +188,7 @@ namespace Util
 	private:
 
 		// string to LayerMsg map
-		LayerMsgMap m_draw_layers;
+		LayerMsgMap m_layers_name_to_msg_map;
 	};
 
 } // namespace Util

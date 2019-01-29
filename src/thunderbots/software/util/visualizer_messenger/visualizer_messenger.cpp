@@ -1,11 +1,3 @@
-/**
- * Implemenation of visualizer messenger
- * 
- * Lasted edited by Muchen He (i@muchen.ca) on 2019-01-26
- */
-
-#include <iostream>
-
 #include "visualizer_messenger.h"
 
 namespace Util
@@ -13,19 +5,19 @@ namespace Util
 
 const LayerMsgMap& VisualizerMessenger::getLayerMap() const
 {
-	return m_draw_layers;
+	return m_layers_name_to_msg_map;
 }
 
 void VisualizerMessenger::clearLayers()
 {
 	// Clears all shape vector in all the layers
-	for (std::pair<std::string, LayerMsg> layer : m_draw_layers)
+	for (std::pair<std::string, LayerMsg> layer : m_layers_name_to_msg_map)
 	{
 		layer.second.shapes.clear();
 	}
 }
 
-void VisualizerMessenger::ellipse(
+void VisualizerMessenger::drawEllipse(
 	const std::string& layer,
 	double cx, double cy, double r1, double r2,
 	DrawStyle draw_style,
@@ -45,7 +37,7 @@ void VisualizerMessenger::ellipse(
     addShapeToLayer(layer, new_shape);
 }
 
-void VisualizerMessenger::rect(
+void VisualizerMessenger::drawRect(
 	const std::string& layer,
 	double x, double y, double w, double h,
 	DrawStyle draw_style,
@@ -65,7 +57,7 @@ void VisualizerMessenger::rect(
 	addShapeToLayer(layer, new_shape);
 }
 
-void VisualizerMessenger::arc(
+void VisualizerMessenger::drawArc(
 	const std::string& layer,
 	double cx, double cy, double radius, double theta_start, double theta_end,
 	DrawStyle draw_style,
@@ -86,7 +78,7 @@ void VisualizerMessenger::arc(
     addShapeToLayer(layer, new_shape);
 }
 
-void VisualizerMessenger::line(
+void VisualizerMessenger::drawLine(
 	const std::string& layer,
 	double x1, double y1, double x2, double y2,
 	DrawStyle draw_style,
@@ -108,7 +100,7 @@ void VisualizerMessenger::line(
 
 void VisualizerMessenger::buildLayers()
 {
-	// TODO: #259 list these existing layer names elsewhere where it's more obvious
+	// TODO: #268 list these existing layer names elsewhere where it's more obvious
 	std::vector<std::string> layer_names = std::vector<std::string>(
 		{
 			"field",
@@ -129,8 +121,8 @@ void VisualizerMessenger::buildLayers()
 	for (std::string layer_name : layer_names)
 	{
 		LayerMsg new_layer_msg;
-		new_layer_msg.name = layer_name;
-		m_draw_layers.insert(std::pair<std::string, LayerMsg>(layer_name, new_layer_msg));
+		new_layer_msg.layer_name = layer_name;
+		m_layers_name_to_msg_map.insert(std::pair<std::string, LayerMsg>(layer_name, new_layer_msg));
 	}
 }
 
@@ -149,13 +141,13 @@ void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTrans
 
 void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
 {	
-	if (m_draw_layers.find(layer) != m_draw_layers.end())
+	if (m_layers_name_to_msg_map.find(layer) != m_layers_name_to_msg_map.end())
 	{
-		m_draw_layers[layer].shapes.emplace_back(shape);
+		m_layers_name_to_msg_map[layer].shapes.emplace_back(shape);
 	}
 	else
 	{
-		std::cerr << "ERROR: Referenced layer (" << layer << ") is undefined\n";
+		LOG(ERROR) << "Referenced layer (" << layer << ") is undefined\n";
 	}
 }
 
