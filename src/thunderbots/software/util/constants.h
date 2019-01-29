@@ -17,6 +17,7 @@ namespace Util
         static const std::string NETWORK_INPUT_GAMECONTROLLER_TOPIC =
             "backend/gamecontroller";
         static const std::string AI_PRIMITIVES_TOPIC = "backend/primitives";
+        static const std::string ROBOT_STATUS_TOPIC  = "log/robot_status";
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
@@ -28,5 +29,8 @@ namespace Util
         // Refbox address
         static const std::string SSL_GAMECONTROLLER_MULTICAST_ADDRESS = "224.5.23.1";
         static const unsigned short SSL_GAMECONTROLLER_MULTICAST_PORT = 10003;
+
+        // There are 4 cameras for SSL Division B
+        static const unsigned int NUMBER_OF_SSL_VISION_CAMERAS = 4;
     }  // namespace Constants
 }  // namespace Util

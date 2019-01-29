@@ -7,6 +7,14 @@
 
 #include "thunderbots_msgs/Primitive.h"
 
+// We forward-declare the PrimitiveVisitor interface (pure virtual class) because we need
+// to know about the existence of this class in order to accept visitors with the
+// accept() function. We cannot use an #include statement because this creates a cyclic
+// dependency
+//
+// This class can be found in ai/primitive/visitor/primitive_visitor.h
+class PrimitiveVisitor;
+
 /**
  * Defines a Robot Primitive, which is the most basic action / unit of work a robot can
  * do. For example, moving straight to a point, pivoting around a point,
@@ -65,10 +73,18 @@ class Primitive
      *
      * @param prim_msg The primitive message
      * @param prim_name The name of the primitive
-     * @throws //TODO: Add exception
+     * @throws std::invalid_argument if the primitive given does not match the expected
+     * primitive name
      */
     void validatePrimitiveMessage(const thunderbots_msgs::Primitive& prim_msg,
                                   std::string prim_name) const;
+
+    /**
+     * Accepts a Primitive Visitor and calls the visit function
+     *
+     * @param visitor A Primitive Visitor
+     */
+    virtual void accept(PrimitiveVisitor& visitor) const = 0;
 
     /**
      * Given a ROS Primitive message, constructs a concrete Primitive object and returns
@@ -76,6 +92,7 @@ class Primitive
      * factory.
      *
      * @param primitive_msg the Primitive message from which to construct the Primitive
+     * @throws std::invalid_argument if primitive is unknown
      * @return a unique_ptr to a Primitive object
      */
     static std::unique_ptr<Primitive> createPrimitive(

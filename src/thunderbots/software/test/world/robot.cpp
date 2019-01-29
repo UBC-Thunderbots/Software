@@ -17,11 +17,13 @@ class RobotTest : public ::testing::Test
         current_time       = epoch + since_epoch;
         half_second_future = current_time + milliseconds(500);
         one_second_future  = current_time + seconds(1);
+        one_second_past    = current_time - seconds(1);
     }
 
     steady_clock::time_point current_time;
     steady_clock::time_point half_second_future;
     steady_clock::time_point one_second_future;
+    steady_clock::time_point one_second_past;
 };
 
 TEST_F(RobotTest, construct_with_all_params)
@@ -68,8 +70,13 @@ TEST_F(RobotTest, update_state_with_new_robot_with_same_id)
 
 TEST_F(RobotTest, update_state_with_new_robot_with_different_id)
 {
-    // TODO: Add unit test to check for a thrown exception when a robot with a different
-    // id is used once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Robot robot =
+        Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(), current_time);
+
+    Robot update_robot = Robot(1, Point(-1.2, 3), robot.velocity(), Angle::quarter(),
+                               robot.angularVelocity(), current_time);
+
+    ASSERT_THROW(robot.updateState(update_robot), std::invalid_argument);
 }
 
 TEST_F(RobotTest, update_state_to_predicted_state_with_future_timestamp)
@@ -88,8 +95,11 @@ TEST_F(RobotTest, update_state_to_predicted_state_with_future_timestamp)
 
 TEST_F(RobotTest, update_state_to_predicted_state_with_past_timestamp)
 {
-    // TODO: Add unit tests to check for thrown exceptions when past timestamps are used
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Robot robot = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                        AngularVelocity::ofRadians(2), current_time);
+
+    ASSERT_THROW(robot.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_position_at_current_time)
@@ -125,8 +135,13 @@ TEST_F(RobotTest, get_position_at_future_time_with_positive_robot_velocity)
 
 TEST_F(RobotTest, get_position_at_past_time)
 {
-    // TODO: Add unit tests to check for thrown exceptions when a negative value is passed
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                              AngularVelocity::ofRadians(2), current_time);
+
+    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-100))),
+                 std::invalid_argument);
+    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-1000))),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_velocity_at_current_time)
@@ -161,8 +176,13 @@ TEST_F(RobotTest, get_velocity_at_future_time_with_positive_robot_velocity)
 
 TEST_F(RobotTest, get_velocity_at_past_time)
 {
-    // TODO: Add unit tests to check for thrown exceptions when a negative value is passed
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                              AngularVelocity::ofRadians(2), current_time);
+
+    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-100))),
+                 std::invalid_argument);
+    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-1000))),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_orientation_at_current_time)
@@ -201,8 +221,13 @@ TEST_F(RobotTest, get_orientation_at_future_time_with_negative_robot_angular_vel
 
 TEST_F(RobotTest, get_orientation_at_past_time)
 {
-    // TODO: Add unit tests to check for thrown exceptions when a negative value is passed
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                              AngularVelocity::ofRadians(2), current_time);
+
+    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-100)),
+                 std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-1000)),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_angular_velocity_at_current_time)
@@ -243,8 +268,13 @@ TEST_F(RobotTest,
 
 TEST_F(RobotTest, get_angular_velocity_at_past_time)
 {
-    // TODO: Add unit tests to check for thrown exceptions when a negative value is passed
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                              AngularVelocity::ofRadians(2), current_time);
+
+    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-100)),
+                 std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-1000)),
+                 std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_last_update_timestamp)
