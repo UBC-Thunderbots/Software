@@ -300,6 +300,6 @@ thunderbots_msgs::RefboxTeamInfo Backend::getTeamInfo(const Referee::TeamInfo &t
     }
     refbox_team_info.timeouts     = team_info.timeouts();
     refbox_team_info.timeout_time = team_info.timeout_time();
-    refbox_team_info.goalie       = team_info.goalie();
+    refbox_team_info.goalie       = team_info.goalkeeper();
     return refbox_team_info;
 }
