@@ -1,5 +1,5 @@
 /*
- * This file defines the UI to control the various layers of the visualizer
+ * This file defines the UI to control the layers of the visualizer
  */
 
 import * as React from 'react';
