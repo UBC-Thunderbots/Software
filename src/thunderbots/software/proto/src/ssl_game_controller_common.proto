@@ -1,0 +1,72 @@
+syntax = "proto2";
+
+// Team is either blue or yellow
+enum Team {
+    // team not set
+    UNKNOWN = 0;
+    // yellow team
+    YELLOW = 1;
+    // blue team
+    BLUE = 2;
+}
+
+// BotId is the combination of a team and a robot id
+message BotId {
+    // the robot id - a negative value indicates that the id is not set
+    optional int32 id = 1;
+    // the team that the robot belongs to
+    optional Team team = 2;
+}
+
+// Location is a 2d-coordinate on the field in ssl-vision coordinate system. Units are in meters.
+message Location {
+    // the x-coordinate in [m] in the ssl-vision coordinate system
+    required float x = 1;
+    // the y-coordinate in [m] in the ssl-vision coordinate system
+    required float y = 2;
+}
+
+// a reply that is sent by the controller for each request from teams or autoRefs
+message ControllerReply {
+    // status_code is an optional code that indicates the result of the last request
+    optional StatusCode status_code = 1;
+    // reason is an optional explanation of the status code
+    optional string reason = 2;
+    // next_token must be send with the next request, if secure communication is used
+    // the token is used to avoid replay attacks
+    // the token is always present in the very first message before the registration starts
+    // the token is not present, if secure communication is not used
+    optional string next_token = 3;
+    // verification indicates if the last request could be verified (secure communication)
+    optional Verification verification = 4;
+
+    enum StatusCode {
+        UNKNOWN_STATUS_CODE = 0;
+        OK = 1;
+        REJECTED = 2;
+    }
+
+    enum Verification {
+        UNKNOWN_VERIFICATION = 0;
+        VERIFIED = 1;
+        UNVERIFIED = 2;
+    }
+}
+
+// Signature can be added to a request to let it be verfied by the controller
+message Signature {
+    // the token that was received with the last controller reply
+    required string token = 1;
+    // the PKCS1v15 signature of this message
+    required bytes pkcs1v15 = 2;
+}
+
+// BallSpeedMeasurement is a single measurement sample of the ball speed
+message BallSpeedMeasurement {
+    // The UNIX timestamp [μs] when the measurement was taken.
+    required uint64 timestamp = 1;
+    // the ball speed measurement [m/s]
+    required float ball_speed = 2;
+    // the estimated initial ball speed (kick speed) [m/s]
+    optional float initial_ball_speed = 3;
+}
