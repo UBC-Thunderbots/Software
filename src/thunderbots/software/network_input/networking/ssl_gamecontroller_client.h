@@ -39,9 +39,11 @@ class SSLGameControllerClient
      */
     void handleDataReception(const boost::system::error_code &error,
                              size_t num_bytes_received);
-
+    // provides core I/O functionality for boost asynchronous I/O objects such as a socket
     boost::asio::io_service io_service;
+    // a UDP socket that we listen on for protobuf messages from SSL Game Controller
     boost::asio::ip::udp::socket socket_;
+    // the endpoint for the sender, in this case SSL Game Controller
     boost::asio::ip::udp::endpoint sender_endpoint_;
 
     // We set the max buffer length to be the largest possible size of a UDP datagram.
