@@ -1,10 +1,10 @@
 #include "network_input/backend.h"
 
 #include "network_input/util/ros_messages.h"
-#include "proto/messages_robocup_ssl_detection.pb.h"
-#include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "shared/constants.h"
 #include "util/constants.h"
+#include "proto/messages_robocup_ssl_detection.pb.h"
+#include "proto/messages_robocup_ssl_geometry.pb.h"
 
 Backend::Backend() : ball_filter(), friendly_team_filter(), enemy_team_filter() {}
 
