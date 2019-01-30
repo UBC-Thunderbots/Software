@@ -1,3 +1,7 @@
+/*
+ * This file describes a layer datatype
+ */
+
 export interface ILayerMessage {
     name: string;
     shapes: IShape[];
