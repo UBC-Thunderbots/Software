@@ -602,7 +602,7 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(stop_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
-
+        
     catkin_add_gtest(grsim_catch_primitive_test
             grsim_communication/visitor/grsim_command_primitive_visitor.cpp
             test/grsim_command_primitive_visitor/catch_primitive.cpp
@@ -633,6 +633,13 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
+
+    catkin_add_gtest(timestamp_test
+            test/util/timestamp.cpp
+            util/timestamp.cpp
+            )
+
+    target_link_libraries(timestamp_test ${catkin_LIBRARIES})
 
 endif()
 
