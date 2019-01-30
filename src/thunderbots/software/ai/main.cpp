@@ -7,11 +7,11 @@
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/Team.h"
 #include "util/constants.h"
-#include "util/visualizer_messenger/visualizer_messenger.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
+#include "util/visualizer_messenger/visualizer_messenger.h"
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
