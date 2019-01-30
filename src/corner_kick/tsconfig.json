@@ -20,7 +20,8 @@
         "paths": {
             "SRC/*": ["src/*"]
         },
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "resolveJsonModule": true
     },
     "exclude": [
         "config",

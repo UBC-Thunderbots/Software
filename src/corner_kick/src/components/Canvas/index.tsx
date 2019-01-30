@@ -16,16 +16,20 @@ const Wrapper = styled.svg`
 `;
 
 interface ICanvasProps {
+    startX?: number;
+    startY?: number;
+    worldWidth: number;
+    worldHeight: number;
     layers: ILayer[];
 }
 
 export const Canvas = (props: ICanvasProps) => {
-    const { layers } = props;
+    const { layers, startX, startY, worldWidth, worldHeight } = props;
     return (
         <Wrapper
             width="100%"
             height="100%"
-            viewBox={[0, 0, 12.6, 9.6].join(' ')}
+            viewBox={[startX || 0, startY || 0, worldWidth, worldHeight].join(' ')}
             xmlns="http://www.w3.org/2000/svg"
         >
             {layers

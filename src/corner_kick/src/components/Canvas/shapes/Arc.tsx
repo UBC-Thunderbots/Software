@@ -10,8 +10,15 @@ export const Arc = (props: IArcProps) => {
     const cx = data[0];
     const cy = data[1];
     const r = data[2];
-    const thetaStart = data[3] % 360;
-    const thetaEnd = data[4] % 360;
+
+    let thetaStart = data[3] % 360;
+    let thetaEnd = data[4] % 360;
+
+    if (thetaStart > thetaEnd) {
+        const temp = thetaEnd;
+        thetaEnd = thetaStart;
+        thetaStart = temp;
+    }
 
     const xStart = cx + r * Math.cos((thetaStart * Math.PI) / 180);
     const yStart = cy + r * Math.sin((thetaStart * Math.PI) / 180);
@@ -19,16 +26,18 @@ export const Arc = (props: IArcProps) => {
     const yEnd = cy + r * Math.sin((thetaEnd * Math.PI) / 180);
 
     return (
-        <path
-            d={`
+        <>
+            <path
+                d={`
             M ${xStart} ${yStart}
             A ${r} ${r} 0 ${thetaEnd - thetaStart > 180 ? 1 : 0} 1 ${xEnd} ${yEnd}
             `}
-            style={{
-                fill,
-                stroke,
-                strokeWidth: stroke_weight,
-            }}
-        />
+                style={{
+                    fill,
+                    stroke,
+                    strokeWidth: stroke_weight,
+                }}
+            />
+        </>
     );
 };

@@ -1,0 +1,44 @@
+[
+    {
+        "name": "Rect",
+        "shapes": [
+            {
+                "data": [0.6, 1, 0.6, 1.6],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "line"
+            },
+            {
+                "data": [2.0, 1, 2.0, 2.2],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "line"
+            },
+            {
+                "data": [3.4, 1, 4.0, 1],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "line"
+            },
+            {
+                "data": [4.8, 1, 6.0, 1],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "line"
+            },
+            {
+                "data": [6.2, 1, 6.8, 1.6],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "line"
+            },
+            {
+                "data": [7.6, 1, 8.8, 2.2],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "line"
+            }
+        ],
+        "visible": true
+    }
+]

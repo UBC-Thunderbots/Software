@@ -1,0 +1,85 @@
+[
+    {
+        "name": "Arcs",
+        "shapes": [
+            {
+                "data": [0.6, 1, 0.5, 0, 45],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [2.0, 1, 0.5, 0, 90],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [3.4, 1, 0.5, 0, 135],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [4.8, 1, 0.5, 0, 180],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [6.2, 1, 0.5, 0, 225],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [7.6, 1, 0.5, 0, 270],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [9.0, 1, 0.5, 0, 315],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "arc"
+            },
+            {
+                "data": [0.6, 2.4, 0.5, 0, 45],
+                "fill": "white",
+                "type": "arc"
+            },
+            {
+                "data": [2.0, 2.4, 0.5, 0, 90],
+                "fill": "white",
+                "type": "arc"
+            },
+            {
+                "data": [3.4, 2.4, 0.5, 0, 135],
+                "fill": "white",
+                "type": "arc"
+            },
+            {
+                "data": [4.8, 2.4, 0.5, 0, 180],
+                "fill": "white",
+                "type": "arc"
+            },
+            {
+                "data": [6.2, 2.4, 0.5, 0, 225],
+                "fill": "white",
+                "type": "arc"
+            },
+            {
+                "data": [7.6, 2.4, 0.5, 0, 270],
+                "fill": "white",
+                "type": "arc"
+            },
+            {
+                "data": [9.0, 2.4, 0.5, 0, 315],
+                "fill": "white",
+                "type": "arc"
+            }
+        ],
+        "visible": true
+    }
+]

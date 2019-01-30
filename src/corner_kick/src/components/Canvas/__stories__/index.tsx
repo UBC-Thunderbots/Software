@@ -9,25 +9,33 @@ import { StorybookStage } from 'SRC/components/StorybookStage';
 
 import { Canvas } from '..';
 
+import arcs from './fixtures/arcs.json';
+import ellipses from './fixtures/ellipses.json';
+import lines from './fixtures/lines.json';
+import rect from './fixtures/rect.json';
+
 const stories = storiesOf('Shape Canvas', module);
 
-stories.add('with an example game', () => (
+stories.add('with arcs', () => (
     <StorybookStage width="60%" height="80%">
-        <Canvas
-            layers={[
-                {
-                    name: 'Ball',
-                    shapes: [
-                        {
-                            data: [1, 1, 0.5, -70, 30],
-                            stroke: 'white',
-                            stroke_weight: 0.03,
-                            type: 'arc',
-                        },
-                    ],
-                    visible: true,
-                },
-            ]}
-        />
+        <Canvas layers={arcs} worldWidth={9.7} worldHeight={3.1} />
+    </StorybookStage>
+));
+
+stories.add('with ellipses', () => (
+    <StorybookStage width="60%" height="80%">
+        <Canvas layers={ellipses} worldWidth={9.3} worldHeight={3.1} />
+    </StorybookStage>
+));
+
+stories.add('with rects', () => (
+    <StorybookStage width="60%" height="80%">
+        <Canvas layers={rect} worldWidth={10} worldHeight={4.4} />
+    </StorybookStage>
+));
+
+stories.add('with lines', () => (
+    <StorybookStage width="60%" height="80%">
+        <Canvas layers={lines} worldWidth={9.4} worldHeight={3.2} />
     </StorybookStage>
 ));

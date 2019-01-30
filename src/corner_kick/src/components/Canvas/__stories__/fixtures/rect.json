@@ -1,0 +1,85 @@
+[
+    {
+        "name": "Rect",
+        "shapes": [
+            {
+                "data": [0.6, 1, 1, 1],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [2.0, 1, 1, 0.8],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [3.4, 1, 1, 0.6],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [4.8, 1, 1, 0.4],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [6.2, 1, 0.8, 0.4],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [7.6, 1, 0.6, 0.4],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [9.0, 1, 0.4, 0.4],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "rect"
+            },
+            {
+                "data": [0.6, 2.4, 1, 1],
+                "fill": "white",
+                "type": "rect"
+            },
+            {
+                "data": [2.0, 2.4, 1, 0.8],
+                "fill": "white",
+                "type": "rect"
+            },
+            {
+                "data": [3.4, 2.4, 1, 0.6],
+                "fill": "white",
+                "type": "rect"
+            },
+            {
+                "data": [4.8, 2.4, 1, 0.4],
+                "fill": "white",
+                "type": "rect"
+            },
+            {
+                "data": [6.2, 2.4, 0.8, 0.4],
+                "fill": "white",
+                "type": "rect"
+            },
+            {
+                "data": [7.6, 2.4, 0.6, 0.4],
+                "fill": "white",
+                "type": "rect"
+            },
+            {
+                "data": [9.0, 2.4, 0.4, 0.4],
+                "fill": "white",
+                "type": "rect"
+            }
+        ],
+        "visible": true
+    }
+]
