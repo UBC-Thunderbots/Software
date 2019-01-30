@@ -1,10 +1,14 @@
 #include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
 
+#include <shared/constants.h>
+
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/stop_primitive.h"
 #include "geom/angle.h"
@@ -52,7 +56,14 @@ void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/95
+    Angle targetAngle = robot.orientation();
+
+    (move_spin_primitive.getAngularVelocity() > AngularVelocity::zero()
+         ? targetAngle += Angle::ofDegrees(45)
+         : targetAngle -= Angle::ofDegrees(45));
+
+    motion_controller_command = MotionController::MotionControllerCommand(
+        move_spin_primitive.getDestination(), targetAngle, 0.0, 0.0, false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
