@@ -6,6 +6,7 @@
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
+#include "ai/primitive/stop_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "util/logger/init.h"
@@ -47,6 +48,12 @@ void GrsimCommandPrimitiveVisitor::visit(
             linear_velocity_in_robot_coordinates.len() , 0.0, false, dribbler_rpm>0);
 }
 
+void GrsimCommandPrimitiveVisitor::visit(
+    const DirectWheelsPrimitive &direct_wheels_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/98
+}
+
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
@@ -59,7 +66,17 @@ void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
         move_primitive.getFinalSpeed(), 0.0, false, false);
 }
 
+void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/95
+}
+
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
+}
+
+void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
 }

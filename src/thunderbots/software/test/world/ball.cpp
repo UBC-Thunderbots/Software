@@ -18,12 +18,14 @@ class BallTest : public ::testing::Test
         one_hundred_fifty_milliseconds_future = current_time + milliseconds(150);
         half_second_future                    = current_time + milliseconds(500);
         one_second_future                     = current_time + seconds(1);
+        one_second_past                       = current_time - seconds(1);
     }
 
     steady_clock::time_point current_time;
     steady_clock::time_point half_second_future;
     steady_clock::time_point one_second_future;
     steady_clock::time_point one_hundred_fifty_milliseconds_future;
+    steady_clock::time_point one_second_past;
 };
 
 TEST_F(BallTest, construct_with_no_params)
@@ -87,8 +89,10 @@ TEST_F(BallTest, update_state_with_new_ball)
 
 TEST_F(BallTest, update_state_with_past_timestamp)
 {
-    // TODO: Add unit tests to check for thrown exceptions when past timestamps are used
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Ball ball = Ball(Point(-4.23, 1.07), Vector(1, 2), current_time);
+
+    ASSERT_THROW(ball.updateState(Point(-4.23, 1.07), Vector(1, 2), one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp)
@@ -108,8 +112,10 @@ TEST_F(BallTest, update_state_to_predicted_state_with_future_timestamp)
 
 TEST_F(BallTest, update_state_to_predicted_state_with_past_timestamp)
 {
-    // TODO: Add unit tests to check for thrown exceptions when past timestamps are used
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
+
+    ASSERT_THROW(ball.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, get_position_at_current_time)
@@ -139,8 +145,12 @@ TEST_F(BallTest, get_position_at_future_time_with_negative_ball_velocity)
 
 TEST_F(BallTest, get_position_at_past_time)
 {
-    // TODO: Add unit tests to check for thrown exceptions when a negative value is passed
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Ball ball = Ball(Point(3, 7), Vector(1, 0.12), current_time);
+
+    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-200)),
+                 std::invalid_argument);
+    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-2000)),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, get_velocity_at_current_time)
@@ -188,8 +198,12 @@ TEST_F(BallTest, get_velocity_at_future_time_with_negative_ball_velocity)
 
 TEST_F(BallTest, get_velocity_at_past_time)
 {
-    // TODO: Add unit tests to check for thrown exceptions when a negative value is passed
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Ball ball = Ball(Point(), Vector(1, 2), current_time);
+
+    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-150)),
+                 std::invalid_argument);
+    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-1000)),
+                 std::invalid_argument);
 }
 
 TEST_F(BallTest, get_last_update_timestamp)

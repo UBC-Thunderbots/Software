@@ -64,7 +64,7 @@ TEST(GeomUtilTest, test_proj_len)
     Point test1p1(0, 0);
     Point test1p2(4, 4);
     Point test1p3(4, 0);
-    calculated_val = proj_len(Seg(test1p1, test1p2), test1p3);
+    calculated_val = proj_len(Segment(test1p1, test1p2), test1p3);
     expected_val   = 2 * sqrt(2);
     EXPECT_DOUBLE_EQ(expected_val, calculated_val);
 
@@ -72,7 +72,7 @@ TEST(GeomUtilTest, test_proj_len)
     Point test2p1(0, 0);
     Point test2p2(4, 0);
     Point test2p3(4, 4);
-    calculated_val = proj_len(Seg(test2p1, test2p2), test2p3);
+    calculated_val = proj_len(Segment(test2p1, test2p2), test2p3);
     expected_val   = 4;
     EXPECT_EQ(expected_val, calculated_val);
 
@@ -80,7 +80,7 @@ TEST(GeomUtilTest, test_proj_len)
     Point test3p1(0, 0);
     Point test3p2(4, 4);
     Point test3p3(-4, -4);
-    calculated_val = proj_len(Seg(test3p1, test3p2), test3p3);
+    calculated_val = proj_len(Segment(test3p1, test3p2), test3p3);
     expected_val   = -4 * sqrt(2);
     EXPECT_DOUBLE_EQ(expected_val, calculated_val);
 
@@ -88,7 +88,7 @@ TEST(GeomUtilTest, test_proj_len)
     Point test4p1(0, 0);
     Point test4p2(4, 1);
     Point test4p3(-4, -4);
-    calculated_val = proj_len(Seg(test4p1, test4p2), test4p3);
+    calculated_val = proj_len(Segment(test4p1, test4p2), test4p3);
     expected_val   = -sqrt(32) * (cos((M_PI / 4.0f) - atan(1.0f / 4.0f)));
     EXPECT_DOUBLE_EQ(expected_val, calculated_val);
 }
@@ -227,35 +227,35 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all)
 TEST(GeomUtilTest, test_point_in_rectangle)
 {
     // Point in 1st quadrant, rectangle in the 3rd quadrant. Should fail!
-    EXPECT_TRUE(!contains(Rect(Point(0, 0), Point(-2, -2)), Point(1, 1)));
+    EXPECT_TRUE(!contains(Rectangle(Point(0, 0), Point(-2, -2)), Point(1, 1)));
 
     // Point in 3rd quadrant, rectangle in the 3rd quadrant. Pass!
-    EXPECT_TRUE(contains(Rect(Point(0, 0), Point(-2, -2)), Point(-1, -1)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(-2, -2)), Point(-1, -1)));
 
     // Point is one of the corners of the rectangle. Pass
-    EXPECT_TRUE(contains(Rect(Point(0, 0), Point(2, 2)), Point(2, 2)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(2, 2)), Point(2, 2)));
 
     // Point is on the edge of the rectangle. Pass
-    EXPECT_TRUE(contains(Rect(Point(0, 0), Point(3, 3)), Point(0, 1)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)), Point(0, 1)));
 
     // Point in the 1st quadrant, rectangle in the 1st quadrant. Pass
-    EXPECT_TRUE(contains(Rect(Point(0, 0), Point(3, 3)), Point(1, 2)));
+    EXPECT_TRUE(contains(Rectangle(Point(0, 0), Point(3, 3)), Point(1, 2)));
 
     // Point in the 2nd quadrant, rectangle in the 2nd quadrant. Point is off
     // above, Fail.
-    EXPECT_TRUE(!contains(Rect(Point(0, 0), Point(-4, 4)), Point(-2, 5)));
+    EXPECT_TRUE(!contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-2, 5)));
 
     // Point in the 2nd quadrant, rectangle in the 4th quadrant. Point is off to
     // the left, Fail.
-    EXPECT_TRUE(!contains(Rect(Point(0, 0), Point(-4, 4)), Point(-7, 2)));
+    EXPECT_TRUE(!contains(Rectangle(Point(0, 0), Point(-4, 4)), Point(-7, 2)));
 
     // Point in the 2nd quadrant, rectangle centered at origin. Point is off
     // above, Fail.
-    EXPECT_TRUE(contains(Rect(Point(1, 1), Point(-1, -1)), Point(0.5, 0.5)));
+    EXPECT_TRUE(contains(Rectangle(Point(1, 1), Point(-1, -1)), Point(0.5, 0.5)));
 
     // Point in the 2nd quadrant, rectangle centered at origin. Point is off to
     // the left, Fail.
-    EXPECT_TRUE(!contains(Rect(Point(1, 1), Point(-1, -1)), Point(2, 2)));
+    EXPECT_TRUE(!contains(Rectangle(Point(1, 1), Point(-1, -1)), Point(2, 2)));
 }
 
 TEST(GeomUtilTest, test_circle_boundaries)
@@ -307,8 +307,8 @@ TEST(GeomUtilTest, test_line_circle_intersect)
 
 TEST(GeomUtilTest, test_line_rect_intersect)
 {
-    std::vector<Point> intersections =
-        lineRectIntersect(Rect(Point(-1, -1), Point(1, 1)), Point(-1, -2), Point(1, 2));
+    std::vector<Point> intersections = lineRectIntersect(
+        Rectangle(Point(-1, -1), Point(1, 1)), Point(-1, -2), Point(1, 2));
 
     EXPECT_TRUE(intersections.size() == 2);
     EXPECT_TRUE((intersections[0] - Point(0.5, 1)).len() < 0.00001 ||
@@ -317,7 +317,7 @@ TEST(GeomUtilTest, test_line_rect_intersect)
                 (intersections[1] - Point(-0.5, -1)).len() < 0.00001);
 
     intersections =
-        lineRectIntersect(Rect(Point(0, 0), Point(1, 2)), Point(-1, 0), Point(4, 2));
+        lineRectIntersect(Rectangle(Point(0, 0), Point(1, 2)), Point(-1, 0), Point(4, 2));
 
     EXPECT_TRUE(intersections.size() == 2);
     EXPECT_TRUE((intersections[0] - Point(0, 0.4)).len() < 0.00001 ||
@@ -325,14 +325,14 @@ TEST(GeomUtilTest, test_line_rect_intersect)
     EXPECT_TRUE((intersections[1] - Point(0, 0.4)).len() < 0.00001 ||
                 (intersections[1] - Point(1, 0.8)).len() < 0.00001);
 
-    intersections =
-        lineRectIntersect(Rect(Point(-1, -1), Point(1, 1)), Point(0, 0), Point(1, 2));
+    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)), Point(0, 0),
+                                      Point(1, 2));
 
     EXPECT_TRUE(intersections.size() == 1);
     EXPECT_TRUE((intersections[0] - Point(0.5, 1)).len() < 0.00001);
 
-    intersections = lineRectIntersect(Rect(Point(-1, -1), Point(1, 1)), Point(-0.5, -0.5),
-                                      Point(0.5, 0.5));
+    intersections = lineRectIntersect(Rectangle(Point(-1, -1), Point(1, 1)),
+                                      Point(-0.5, -0.5), Point(0.5, 0.5));
 
     EXPECT_TRUE(intersections.size() == 0);
 }
@@ -340,7 +340,7 @@ TEST(GeomUtilTest, test_line_rect_intersect)
 TEST(GeomUtilTest, test_vector_rect_intersect)
 {
     dbgout << "========= Enter vectorRectIntersect Test =========" << std::endl;
-    Rect rect({1.0, 1.0}, {-1.0, -1.0});
+    Rectangle rect({1.0, 1.0}, {-1.0, -1.0});
     Point pr1(((std::rand() % 200) - 100) / 100.0, 1.0);
     Point pr2(((std::rand() % 200) - 100) / 100.0, -1.0);
     Point pr3(1.0, ((std::rand() % 200) - 100) / 100.0);
@@ -388,7 +388,7 @@ TEST(GeomUtilTest, test_clip_point)
 
 TEST(GeomUtilTest, test_clip_point2)
 {
-    Rect r(Point(-2, -1), Point(2, 1));
+    Rectangle r(Point(-2, -1), Point(2, 1));
 
     EXPECT_TRUE((clipPoint(Point(1, 1), r) - Point(1, 1)).len() < 0.00001);
     EXPECT_TRUE((clipPoint(Point(3, 1), r) - Point(2, 1)).len() < 0.00001);
@@ -466,7 +466,7 @@ TEST(GeomUtilTest, test_seg_crosses_seg)
                                  (b_over ? 1 : -1));  // as a scaling factor for a2 and b2
 
         bool expected = a_over && b_over;
-        bool found    = intersects(Seg(a1, a2), Seg(b1, b2));
+        bool found    = intersects(Segment(a1, a2), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -507,7 +507,7 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
             b1 + (i0 - b1) * (1 + std::rand() % 100 / 100.0 *
                                       (expected ? 1 : -1));  // as a scaling factor for b2
 
-        bool found = intersects(Ray(a1, a2), Seg(b1, b2));
+        bool found = intersects(Ray(a1, a2), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -540,7 +540,7 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         // make sure it
         // is long enough
 
-        bool found = intersects(Ray(a1, a2), Seg(b1, b2));
+        bool found = intersects(Ray(a1, a2), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -690,8 +690,8 @@ TEST(GeomUtilTest, test_intersection)
 
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
 {
-    Seg seg1(Point(0, 0), Point(2, 2));
-    Seg seg2(Point(1, 1), Point(3, 3));
+    Segment seg1(Point(0, 0), Point(2, 2));
+    Segment seg2(Point(1, 1), Point(3, 3));
 
     auto retval = lineIntersection(seg1, seg2);
     EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1, 1)) != retval.end());
@@ -700,8 +700,8 @@ TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
 
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
 {
-    Seg seg1(Point(0, 0), Point(1, 1));
-    Seg seg2(Point(2, 2), Point(3, 3));
+    Segment seg1(Point(0, 0), Point(1, 1));
+    Segment seg2(Point(2, 2), Point(3, 3));
 
     auto retval = lineIntersection(seg1, seg2);
     EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(1, 1)) == retval.end());
@@ -750,16 +750,16 @@ TEST(GeomUtilTest, test_dist_point_seg)
     Point a1(0, 0);
     Point b1(1, 0);
 
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(0, 1), Seg(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(2, 0), Seg(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(1, -1), Seg(a1, b1)));
-    EXPECT_DOUBLE_EQ(1.0, dist(Point(-1, 0), Seg(a1, b1)));
+    EXPECT_DOUBLE_EQ(1.0, dist(Point(0, 1), Segment(a1, b1)));
+    EXPECT_DOUBLE_EQ(1.0, dist(Point(2, 0), Segment(a1, b1)));
+    EXPECT_DOUBLE_EQ(1.0, dist(Point(1, -1), Segment(a1, b1)));
+    EXPECT_DOUBLE_EQ(1.0, dist(Point(-1, 0), Segment(a1, b1)));
 
     Point a2(5, 2);
     Point b2(2, 7);
     Point c2(6.5369, 7.2131);
 
-    EXPECT_NEAR(4.0, dist(c2, Seg(a2, b2)), 1e-5);
+    EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
 }
 
 int main(int argc, char **argv)
