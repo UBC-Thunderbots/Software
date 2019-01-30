@@ -3,79 +3,79 @@
         "name": "Arcs",
         "shapes": [
             {
-                "data": [0.6, 1, 0.5, 0, 45],
+                "data": [0.6, 1, 0.5, 0, 0.785398],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [2.0, 1, 0.5, 0, 90],
+                "data": [2.0, 1, 0.5, 0, 1.5708],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [3.4, 1, 0.5, 0, 135],
+                "data": [3.4, 1, 0.5, 0, 2.35619],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [4.8, 1, 0.5, 0, 180],
+                "data": [4.8, 1, 0.5, 0, 3.14159],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [6.2, 1, 0.5, 0, 225],
+                "data": [6.2, 1, 0.5, 0, 3.92699],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [7.6, 1, 0.5, 0, 270],
+                "data": [7.6, 1, 0.5, 0, 4.71239],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [9.0, 1, 0.5, 0, 315],
+                "data": [9.0, 1, 0.5, 0, 5.49779],
                 "stroke": "white",
                 "stroke_weight": 0.03,
                 "type": "arc"
             },
             {
-                "data": [0.6, 2.4, 0.5, 0, 45],
+                "data": [0.6, 2.4, 0.5, 0, 0.785398],
                 "fill": "white",
                 "type": "arc"
             },
             {
-                "data": [2.0, 2.4, 0.5, 0, 90],
+                "data": [2.0, 2.4, 0.5, 0, 1.5708],
                 "fill": "white",
                 "type": "arc"
             },
             {
-                "data": [3.4, 2.4, 0.5, 0, 135],
+                "data": [3.4, 2.4, 0.5, 0, 2.35619],
                 "fill": "white",
                 "type": "arc"
             },
             {
-                "data": [4.8, 2.4, 0.5, 0, 180],
+                "data": [4.8, 2.4, 0.5, 0, 3.14159],
                 "fill": "white",
                 "type": "arc"
             },
             {
-                "data": [6.2, 2.4, 0.5, 0, 225],
+                "data": [6.2, 2.4, 0.5, 0, 3.92699],
                 "fill": "white",
                 "type": "arc"
             },
             {
-                "data": [7.6, 2.4, 0.5, 0, 270],
+                "data": [7.6, 2.4, 0.5, 0, 4.71239],
                 "fill": "white",
                 "type": "arc"
             },
             {
-                "data": [9.0, 2.4, 0.5, 0, 315],
+                "data": [9.0, 2.4, 0.5, 0, 5.49779],
                 "fill": "white",
                 "type": "arc"
             }

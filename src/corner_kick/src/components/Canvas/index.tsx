@@ -6,6 +6,7 @@ import styled from 'SRC/utils/styled-components';
 import { Arc } from './shapes/Arc';
 import { Ellipse } from './shapes/Ellipse';
 import { Line } from './shapes/Line';
+import { Polygon } from './shapes/Polygon';
 import { Rect } from './shapes/Rect';
 
 const Wrapper = styled.svg`
@@ -63,6 +64,13 @@ export const Canvas = (props: ICanvasProps) => {
                                 case 'arc':
                                     return (
                                         <Arc
+                                            key={`${layer.name}${index}`}
+                                            shape={shape}
+                                        />
+                                    );
+                                case 'poly':
+                                    return (
+                                        <Polygon
                                             key={`${layer.name}${index}`}
                                             shape={shape}
                                         />

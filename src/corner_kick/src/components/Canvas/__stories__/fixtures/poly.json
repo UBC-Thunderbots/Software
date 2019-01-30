@@ -1,0 +1,19 @@
+[
+    {
+        "name": "Rect",
+        "shapes": [
+            {
+                "data": [1, 1, 3, 1, 2, 3],
+                "stroke": "white",
+                "stroke_weight": 0.03,
+                "type": "poly"
+            },
+            {
+                "data": [5, 1, 7, 1, 6, 3],
+                "fill": "white",
+                "type": "poly"
+            }
+        ],
+        "visible": true
+    }
+]
