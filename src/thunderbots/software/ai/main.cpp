@@ -75,10 +75,6 @@ int main(int argc, char **argv)
         node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
             Util::Constants::AI_PRIMITIVES_TOPIC, 1);
 
-    ros::Publisher visualizer_publisher =
-        node_handle.advertise<thunderbots_msgs::DrawLayer>(
-            Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, 8);
-
     // Create subscribers
     ros::Subscriber field_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_FIELD_TOPIC, 1, fieldUpdateCallback);
@@ -92,6 +88,9 @@ int main(int argc, char **argv)
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+
+    // Initialize the draw visualizer messenger
+    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
 
     // Main loop
     while (ros::ok())
@@ -120,16 +119,8 @@ int main(int argc, char **argv)
             }
             primitive_publisher.publish(primitive_array_message);
 
-
             // On every tick, send the layer messages
-            for (const std::pair<std::string, Util::LayerMsg>& layer_msg_pair : Util::VisualizerMessenger::getInstance()->getLayerMap())
-            {
-                if (!layer_msg_pair.second.shapes.empty())
-                {
-                    visualizer_publisher.publish(layer_msg_pair.second);
-                }
-            }
-            Util::VisualizerMessenger::getInstance()->clearLayers();
+            Util::VisualizerMessenger::getInstance()->update();
         }
         catch (const std::invalid_argument &e)
         {

@@ -1,154 +1,165 @@
 #include "visualizer_messenger.h"
 
+#include "util/constants.h"
+#include "util/logger/init.h"
+
 namespace Util
 {
+    void VisualizerMessenger::initializePublisher(ros::NodeHandle node_handle)
+    {
+        if (m_publisher)
+        {
+            LOG(WARNING) << "Re-initializing visualizer messenger singleton publisher";
+        }
 
-const LayerMsgMap& VisualizerMessenger::getLayerMap() const
-{
-	return m_layers_name_to_msg_map;
-}
+        m_publisher = node_handle.advertise<LayerMsg>(
+            Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, 8);
+    }
 
-void VisualizerMessenger::clearLayers()
-{
-	// Clears all shape vector in all the layers
-	for (std::pair<std::string, LayerMsg> layer : m_layers_name_to_msg_map)
-	{
-		layer.second.shapes.clear();
-	}
-}
+    const LayerMsgMap& VisualizerMessenger::getLayerMap() const
+    {
+        return m_layers_name_to_msg_map;
+    }
 
-void VisualizerMessenger::drawEllipse(
-	const std::string& layer,
-	double cx, double cy, double r1, double r2,
-	DrawStyle draw_style,
-	DrawTransform draw_transform
-)
-{
-	ShapeMsg new_shape;
-	new_shape.type = "ellipse";
-	new_shape.data.clear();
-	new_shape.data.push_back(cx);
-	new_shape.data.push_back(cy);
-	new_shape.data.push_back(r1);
-	new_shape.data.push_back(r2);
+    void VisualizerMessenger::update()
+    {
+        // Check if publisher is initialized before publishing messages
+        if (!m_publisher)
+        {
+            LOG(WARNING)
+                << "Update requested when visualizer messenger publisher is not initialized";
+            clearLayers();
+            return;
+        }
 
-	applyDrawStyleToMsg(new_shape, draw_style);
-	applyDrawTransformToMsg(new_shape, draw_transform);
-    addShapeToLayer(layer, new_shape);
-}
+        // Send layer messages
+        for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
+        {
+            if (!layer_msg_pair.second.shapes.empty())
+            {
+                m_publisher.publish(layer_msg_pair.second);
+            }
+        }
+    }
 
-void VisualizerMessenger::drawRect(
-	const std::string& layer,
-	double x, double y, double w, double h,
-	DrawStyle draw_style,
-	DrawTransform draw_transform
-)
-{
-	ShapeMsg new_shape;
-	new_shape.type = "rect";
-	new_shape.data.clear();
-	new_shape.data.push_back(x);
-	new_shape.data.push_back(y);
-	new_shape.data.push_back(w);
-	new_shape.data.push_back(h);
+    void VisualizerMessenger::clearLayers()
+    {
+        // Clears all shape vector in all the layers
+        for (std::pair<std::string, LayerMsg> layer : m_layers_name_to_msg_map)
+        {
+            layer.second.shapes.clear();
+        }
+    }
 
-    applyDrawStyleToMsg(new_shape, draw_style);
-    applyDrawTransformToMsg(new_shape, draw_transform);
-	addShapeToLayer(layer, new_shape);
-}
+    void VisualizerMessenger::drawEllipse(const std::string& layer, double cx, double cy,
+                                          double r1, double r2, DrawStyle draw_style,
+                                          DrawTransform draw_transform)
+    {
+        ShapeMsg new_shape;
+        new_shape.type = "ellipse";
+        new_shape.data.clear();
+        new_shape.data.push_back(cx);
+        new_shape.data.push_back(cy);
+        new_shape.data.push_back(r1);
+        new_shape.data.push_back(r2);
 
-void VisualizerMessenger::drawArc(
-	const std::string& layer,
-	double cx, double cy, double radius, double theta_start, double theta_end,
-	DrawStyle draw_style,
-	DrawTransform draw_transform
-)
-{
-	ShapeMsg new_shape;
-	new_shape.type = "arc";
-	new_shape.data.clear();
-	new_shape.data.push_back(cx);
-	new_shape.data.push_back(cy);
-	new_shape.data.push_back(radius);
-	new_shape.data.push_back(theta_start);
-	new_shape.data.push_back(theta_end);
+        applyDrawStyleToMsg(new_shape, draw_style);
+        applyDrawTransformToMsg(new_shape, draw_transform);
+        addShapeToLayer(layer, new_shape);
+    }
 
-	applyDrawStyleToMsg(new_shape, draw_style);
-	applyDrawTransformToMsg(new_shape, draw_transform);
-    addShapeToLayer(layer, new_shape);
-}
+    void VisualizerMessenger::drawRect(const std::string& layer, double x, double y,
+                                       double w, double h, DrawStyle draw_style,
+                                       DrawTransform draw_transform)
+    {
+        ShapeMsg new_shape;
+        new_shape.type = "rect";
+        new_shape.data.clear();
+        new_shape.data.push_back(x);
+        new_shape.data.push_back(y);
+        new_shape.data.push_back(w);
+        new_shape.data.push_back(h);
 
-void VisualizerMessenger::drawLine(
-	const std::string& layer,
-	double x1, double y1, double x2, double y2,
-	DrawStyle draw_style,
-	DrawTransform draw_transform
-)
-{
-    ShapeMsg new_shape;
-    new_shape.type = "line";
-    new_shape.data.clear();
-    new_shape.data.push_back(x1);
-    new_shape.data.push_back(y1);
-    new_shape.data.push_back(x2);
-    new_shape.data.push_back(y2);
+        applyDrawStyleToMsg(new_shape, draw_style);
+        applyDrawTransformToMsg(new_shape, draw_transform);
+        addShapeToLayer(layer, new_shape);
+    }
 
-    applyDrawStyleToMsg(new_shape, draw_style);
-    applyDrawTransformToMsg(new_shape, draw_transform);
-    addShapeToLayer(layer, new_shape);
-}
+    void VisualizerMessenger::drawArc(const std::string& layer, double cx, double cy,
+                                      double radius, double theta_start, double theta_end,
+                                      DrawStyle draw_style, DrawTransform draw_transform)
+    {
+        ShapeMsg new_shape;
+        new_shape.type = "arc";
+        new_shape.data.clear();
+        new_shape.data.push_back(cx);
+        new_shape.data.push_back(cy);
+        new_shape.data.push_back(radius);
+        new_shape.data.push_back(theta_start);
+        new_shape.data.push_back(theta_end);
 
-void VisualizerMessenger::buildLayers()
-{
-	// TODO: #268 list these existing layer names elsewhere where it's more obvious
-	std::vector<std::string> layer_names = std::vector<std::string>(
-		{
-			"field",
-			"ball",
-			"ball_vel",
-			"fiendly_robot",
-			"fiendly_robot_vel",
-			"enemy_robot",
-			"enemy_robot_vel",
-			"nav",
-			"rule",
-			"passing",
-			"test",
-			"misc"
-		}
-	);
+        applyDrawStyleToMsg(new_shape, draw_style);
+        applyDrawTransformToMsg(new_shape, draw_transform);
+        addShapeToLayer(layer, new_shape);
+    }
 
-	for (std::string layer_name : layer_names)
-	{
-		LayerMsg new_layer_msg;
-		new_layer_msg.layer_name = layer_name;
-		m_layers_name_to_msg_map.insert(std::pair<std::string, LayerMsg>(layer_name, new_layer_msg));
-	}
-}
+    void VisualizerMessenger::drawLine(const std::string& layer, double x1, double y1,
+                                       double x2, double y2, DrawStyle draw_style,
+                                       DrawTransform draw_transform)
+    {
+        ShapeMsg new_shape;
+        new_shape.type = "line";
+        new_shape.data.clear();
+        new_shape.data.push_back(x1);
+        new_shape.data.push_back(y1);
+        new_shape.data.push_back(x2);
+        new_shape.data.push_back(y2);
 
-void VisualizerMessenger::applyDrawStyleToMsg(ShapeMsg& shape_msg, DrawStyle& style)
-{
-    shape_msg.fill          = style.fill;
-    shape_msg.stroke        = style.stroke;
-    shape_msg.stroke_weight = style.stroke_weight;
-}
+        applyDrawStyleToMsg(new_shape, draw_style);
+        applyDrawTransformToMsg(new_shape, draw_transform);
+        addShapeToLayer(layer, new_shape);
+    }
 
-void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg, DrawTransform& transform)
-{
-    shape_msg.transform_rotation = transform.rotation;
-    shape_msg.transform_scale    = transform.scale;
-}
+    void VisualizerMessenger::buildLayers()
+    {
+        // TODO: #268 list these existing layer names elsewhere where it's more obvious
+        std::vector<std::string> layer_names = std::vector<std::string>(
+            {"field", "ball", "ball_vel", "fiendly_robot", "fiendly_robot_vel",
+             "enemy_robot", "enemy_robot_vel", "nav", "rule", "passing", "test", "misc"});
 
-void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
-{	
-	if (m_layers_name_to_msg_map.find(layer) != m_layers_name_to_msg_map.end())
-	{
-		m_layers_name_to_msg_map[layer].shapes.emplace_back(shape);
-	}
-	else
-	{
-		LOG(ERROR) << "Referenced layer (" << layer << ") is undefined\n";
-	}
-}
+        for (std::string layer_name : layer_names)
+        {
+            LayerMsg new_layer_msg;
+            new_layer_msg.layer_name = layer_name;
+            m_layers_name_to_msg_map.insert(
+                std::pair<std::string, LayerMsg>(layer_name, new_layer_msg));
+        }
+    }
 
-} // namespace Util
+    void VisualizerMessenger::applyDrawStyleToMsg(ShapeMsg& shape_msg, DrawStyle& style)
+    {
+        shape_msg.fill          = style.fill;
+        shape_msg.stroke        = style.stroke;
+        shape_msg.stroke_weight = style.stroke_weight;
+    }
+
+    void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg,
+                                                      DrawTransform& transform)
+    {
+        shape_msg.transform_rotation = transform.rotation;
+        shape_msg.transform_scale    = transform.scale;
+    }
+
+    void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
+    {
+        if (m_layers_name_to_msg_map.find(layer) != m_layers_name_to_msg_map.end())
+        {
+            m_layers_name_to_msg_map[layer].shapes.emplace_back(shape);
+        }
+        else
+        {
+            LOG(WARNING) << "Referenced layer (" << layer << ") is undefined\n";
+        }
+    }
+
+}  // namespace Util
