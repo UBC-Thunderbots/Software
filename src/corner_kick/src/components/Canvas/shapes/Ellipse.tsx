@@ -1,21 +1,23 @@
 import * as React from 'react';
 import { IShape } from 'SRC/types';
 
-interface ICircleProps {
+interface IEllipseProps {
     shape: IShape;
 }
 
-export const Circle = (props: ICircleProps) => {
+export const Ellipse = (props: IEllipseProps) => {
     const { data, fill, stroke, stroke_weight } = props.shape;
     const cx = data[0];
     const cy = data[1];
-    const r = data[2];
+    const rx = data[2];
+    const ry = data[3];
 
     return (
-        <circle
+        <ellipse
             cx={cx}
             cy={cy}
-            r={r}
+            rx={rx}
+            ry={ry}
             style={{
                 fill,
                 stroke,

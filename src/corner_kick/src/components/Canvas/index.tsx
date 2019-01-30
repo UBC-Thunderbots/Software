@@ -3,7 +3,8 @@ import * as React from 'react';
 import { ILayer } from 'SRC/types';
 import styled from 'SRC/utils/styled-components';
 
-import { Circle } from './shapes/Circle';
+import { Arc } from './shapes/Arc';
+import { Ellipse } from './shapes/Ellipse';
 import { Line } from './shapes/Line';
 import { Rect } from './shapes/Rect';
 
@@ -25,7 +26,6 @@ export const Canvas = (props: ICanvasProps) => {
             width="100%"
             height="100%"
             viewBox={[0, 0, 12.6, 9.6].join(' ')}
-            preserveAspectRatio="meet"
             xmlns="http://www.w3.org/2000/svg"
         >
             {layers
@@ -37,7 +37,7 @@ export const Canvas = (props: ICanvasProps) => {
                             switch (shape.type) {
                                 case 'ellipse':
                                     return (
-                                        <Circle
+                                        <Ellipse
                                             key={`${layer.name}${index}`}
                                             shape={shape}
                                         />
@@ -52,6 +52,13 @@ export const Canvas = (props: ICanvasProps) => {
                                 case 'line':
                                     return (
                                         <Line
+                                            key={`${layer.name}${index}`}
+                                            shape={shape}
+                                        />
+                                    );
+                                case 'arc':
+                                    return (
+                                        <Arc
                                             key={`${layer.name}${index}`}
                                             shape={shape}
                                         />
