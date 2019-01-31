@@ -62,7 +62,7 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
+    motion_controller_command = MotionController::MotionControllerCommand(robot.position(), robot.orientation(), 0, 0.0, false, false);
 }
 
 MotionController::MotionControllerCommand
