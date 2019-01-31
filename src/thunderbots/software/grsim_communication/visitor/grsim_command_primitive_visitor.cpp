@@ -9,6 +9,7 @@
 #include "ai/primitive/stop_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "geom/util.h"
 #include "shared/constants.h"  // move to header file?
 #include "util/logger/init.h"
 
@@ -78,14 +79,35 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
             ? ROBOT_MAX_SPEED_METERS_PER_SECOND
             : 0;
 
+    Vector pivot_point_to_robot = robot.position() - pivot_primitive.getPivotPoint();
 
-    Point expected_destination;  // todo
+    Vector pivot_point_to_pivot_circle =
+        pivot_point_to_robot.norm(pivot_primitive.getPivotRadius());
 
-    // the distance we expect to travel
-    double expected_distance = (expected_destination - robot.position()).len();
+    // expect robot to not be on circle; define an error vector from the robot's position
+    // to the point on the circle with the same angle
+    Vector radial_error = pivot_point_to_pivot_circle - pivot_point_to_robot;
 
-    // the unit vector representing the direction the robot will travel
-    Vector travel_direction = (expected_destination - robot.position()).norm();
+    Vector tangent_to_circle_CCW =
+        pivot_point_to_pivot_circle.rotate(Angle::ofDegrees(90));
+
+    // if the shortest direction is a clockwise rotation, invert this vector
+    Angle rotation_angle = ((pivot_dest - pivot_primitive.getPivotPoint()).orientation() -
+                            pivot_point_to_pivot_circle.orientation())
+                               .clamp();
+    Vector tangent_correct_direction = (rotation_angle < Angle().zero())
+                                           ? -1 * tangent_to_circle_CCW
+                                           : tangent_to_circle_CCW;
+
+    // unit vector representing direction robot will travel
+    Vector travel_direction = (tangent_correct_direction + radial_error).norm();
+
+    // how far we expect to travel
+    // assume current speed, time interval grSim is using TODO; verify latter is fine
+    double expected_distance = robot.velocity().len() * assumed_t_step_seconds;
+
+
+    Point expected_destination = expected_distance * travel_direction + robot.position();
 
     // a point twice the distance from robot to expected destination in same direction to
     // absorb errors in calculations and prevent decelerating and accelerating in a
