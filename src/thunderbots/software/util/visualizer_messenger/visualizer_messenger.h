@@ -88,7 +88,7 @@ namespace Util
 
         /**
          * Update call to the visualizer class
-         * 
+         *
          * Uses ROS publishers to publish layer messeges stored in the member layers map
          * and then clear the shapes in the layers in the member layers map
          */

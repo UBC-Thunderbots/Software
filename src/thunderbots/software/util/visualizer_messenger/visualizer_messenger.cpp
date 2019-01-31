@@ -161,7 +161,8 @@ namespace Util
 
     void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
     {
-        if (this->layers_name_to_msg_map.find(layer) != this->layers_name_to_msg_map.end())
+        if (this->layers_name_to_msg_map.find(layer) !=
+            this->layers_name_to_msg_map.end())
         {
             this->layers_name_to_msg_map[layer].shapes.emplace_back(shape);
         }
