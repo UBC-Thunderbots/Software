@@ -88,8 +88,11 @@ namespace Util
 
         /**
          * Update call to the visualizer class
+         * 
+         * Uses ROS publishers to publish layer messeges stored in the member layers map
+         * and then clear the shapes in the layers in the member layers map
          */
-        void update();
+        void publishAndClearLayers();
 
         /**
          * Clears the content (shape vector) in the layer message upon method call
@@ -169,7 +172,7 @@ namespace Util
         /**
          * Constructor; initializes an empty layers map then populates it
          */
-        explicit VisualizerMessenger() : m_layers_name_to_msg_map(), m_publisher()
+        explicit VisualizerMessenger() : layers_name_to_msg_map(), publisher()
         {
             buildLayers();
         }
@@ -208,8 +211,8 @@ namespace Util
 
        private:
         // string to LayerMsg map
-        LayerMsgMap m_layers_name_to_msg_map;
-        ros::Publisher m_publisher;
+        LayerMsgMap layers_name_to_msg_map;
+        ros::Publisher publisher;
     };
 
 }  // namespace Util

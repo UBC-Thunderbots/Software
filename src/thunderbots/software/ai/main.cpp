@@ -120,7 +120,7 @@ int main(int argc, char **argv)
             primitive_publisher.publish(primitive_array_message);
 
             // On every tick, send the layer messages
-            Util::VisualizerMessenger::getInstance()->update();
+            Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
         }
         catch (const std::invalid_argument &e)
         {

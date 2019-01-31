@@ -13,45 +13,48 @@ namespace Util
 
     void VisualizerMessenger::initializePublisher(ros::NodeHandle node_handle)
     {
-        if (m_publisher)
+        if (this->publisher)
         {
             LOG(WARNING) << "Re-initializing visualizer messenger singleton publisher";
         }
 
-        m_publisher = node_handle.advertise<LayerMsg>(
+        this->publisher = node_handle.advertise<LayerMsg>(
             Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, 8);
     }
 
     const LayerMsgMap& VisualizerMessenger::getLayerMap() const
     {
-        return m_layers_name_to_msg_map;
+        return this->layers_name_to_msg_map;
     }
 
-    void VisualizerMessenger::update()
+    void VisualizerMessenger::publishAndClearLayers()
     {
         // Check if publisher is initialized before publishing messages
-        if (!m_publisher)
+        if (!this->publisher)
         {
             LOG(WARNING)
-                << "Update requested when visualizer messenger publisher is not initialized";
-            clearLayers();
-            return;
+                << "Publishing requested when visualizer messenger publisher is not initialized";
         }
-
-        // Send layer messages
-        for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
+        else
         {
-            if (!layer_msg_pair.second.shapes.empty())
+            // Send layer messages
+            for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
             {
-                m_publisher.publish(layer_msg_pair.second);
+                if (!layer_msg_pair.second.shapes.empty())
+                {
+                    this->publisher.publish(layer_msg_pair.second);
+                }
             }
         }
+
+        // Clear shapes in layers of current frame/tick
+        clearLayers();
     }
 
     void VisualizerMessenger::clearLayers()
     {
         // Clears all shape vector in all the layers
-        for (std::pair<std::string, LayerMsg> layer : m_layers_name_to_msg_map)
+        for (std::pair<std::string, LayerMsg> layer : this->layers_name_to_msg_map)
         {
             layer.second.shapes.clear();
         }
@@ -137,7 +140,7 @@ namespace Util
         {
             LayerMsg new_layer_msg;
             new_layer_msg.layer_name = layer_name;
-            m_layers_name_to_msg_map.insert(
+            this->layers_name_to_msg_map.insert(
                 std::pair<std::string, LayerMsg>(layer_name, new_layer_msg));
         }
     }
@@ -158,9 +161,9 @@ namespace Util
 
     void VisualizerMessenger::addShapeToLayer(const std::string& layer, ShapeMsg& shape)
     {
-        if (m_layers_name_to_msg_map.find(layer) != m_layers_name_to_msg_map.end())
+        if (this->layers_name_to_msg_map.find(layer) != this->layers_name_to_msg_map.end())
         {
-            m_layers_name_to_msg_map[layer].shapes.emplace_back(shape);
+            this->layers_name_to_msg_map[layer].shapes.emplace_back(shape);
         }
         else
         {
