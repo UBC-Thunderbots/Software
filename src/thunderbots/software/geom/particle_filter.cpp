@@ -18,44 +18,6 @@
  * detection closest to the ball
  *   (which should be the detection for the real ball)
  */
-PARTICLE_FILTER_NUM_CONDENSATIONS(
-    u8"Particle Filter number of condensations", u8"AI/Backend/Vision/Particle",
-    5, 1, 50);
-// TOP_PERCENTAGE_OF_PARTICLES SHOULD ***NEVER*** be > 1.0, OTHERWISE THE FILTER
-// WILL TRY SELECT MORE BASEPOINTS THEN THERE ARE PARTICLES
-TOP_PERCENTAGE_OF_PARTICLES(
-    u8"The top fraction of particles that are used as basepoints for the next "
-    u8"sample",
-    u8"AI/Backend/Vision/Particle", 0.1, 0.0, 1.0);
-MAX_DETECTION_WEIGHT(
-    u8"The weight of vision detections", u8"AI/Backend/Vision/Particle", 100.0,
-    0.0, 1000.0);
-DETECTION_WEIGHT_DECAY(
-    u8"The decay rate (per meter) of the detection weight",
-    u8"AI/Backend/Vision/Particle", 200.0, 0.0, 10000.0);
-PREVIOUS_BALL_WEIGHT(
-    u8"The weight of the previous ball's position",
-    u8"AI/Backend/Vision/Particle", 1.0, 0.0, 1000.0);
-PREDICTION_WEIGHT(
-    u8"The weight of the previous ball's predicted position",
-    u8"AI/Backend/Vision/Particle", 15.0, 0.0, 1000.0);
-BALL_DIST_THRESHOLD(
-    u8"How close a particle must be to the ball to get the extra "
-    u8"PREVIOUS_BALL_WEIGHT",
-    u8"AI/Backend/Vision/Particle", 0.5, 0.0, 100.0);
-BALL_CONFIDENCE_THRESHOLD(
-    u8"The confidence threshold for being confident or not of the ball's "
-    u8"position",
-    u8"AI/Backend/Vision/Particle", 60.0, 0.0, 100.0);
-BALL_VALID_DIST_THRESHOLD(
-    u8"How much the detected ball can move per tick without losing confidence",
-    u8"AI/Backend/Vision/Particle", 0.1, 0.0, 100.0);
-BALL_CONFIDENCE_DELTA(
-    u8"How much the ball's confidence changes at a time",
-    u8"AI/Backend/Vision/Particle", 5.0, 0.0, 100.0);
-BALL_MAX_VARIANCE(
-    u8"The max variance a ball detection can have without losing confidence",
-    u8"AI/Backend/Vision/Particle", 1.0, 0.0, 10.0);
 
 ParticleFilter::ParticleFilter(double length, double width)
 {
@@ -89,7 +51,7 @@ void ParticleFilter::add(const Point pos)
 {
     // We only care about points that are within the field. The ball can't
     // be outside the field, and we don't need to track it there
-    if (!std::isnan(pos.x + pos.y) && isInField(pos))
+    if (!std::isnan(pos.x() + pos.y()) && isInField(pos))
     {
         detections.push_back(pos);
     }
@@ -276,8 +238,8 @@ void ParticleFilter::generateParticles(
             count             = 0;
             do
             {
-                double x = particleNormalDistribution(generator) + basepoint.x;
-                double y = particleNormalDistribution(generator) + basepoint.y;
+                double x = particleNormalDistribution(generator) + basepoint.x();
+                double y = particleNormalDistribution(generator) + basepoint.y();
 
                 newParticle = Point(x, y);
                 count++;
@@ -401,7 +363,7 @@ double ParticleFilter::getDetectionWeight(const double dist)
 
 bool ParticleFilter::isInField(const Point &p)
 {
-    return fabs(p.x) <= length_ / 2 && fabs(p.y) <= width_ / 2;
+    return fabs(p.x()) <= length_ / 2 && fabs(p.y()) <= width_ / 2;
 }
 
 Point ParticleFilter::getEstimate()
