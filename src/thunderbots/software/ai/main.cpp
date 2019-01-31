@@ -12,6 +12,7 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
+#include "util/visualizer_messenger/visualizer_messenger.h"
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
@@ -100,6 +101,9 @@ int main(int argc, char **argv)
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
+    // Initialize the draw visualizer messenger
+    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
+
     // Main loop
     while (ros::ok())
     {
@@ -126,6 +130,9 @@ int main(int argc, char **argv)
                 LOG(INFO) << msg << std::endl;
             }
             primitive_publisher.publish(primitive_array_message);
+
+            // On every tick, send the layer messages
+            Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
         }
         catch (const std::invalid_argument &e)
         {
