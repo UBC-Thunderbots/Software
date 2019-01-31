@@ -23,7 +23,7 @@ enum class RefboxGameState
     GOAL_THEM            = 15,
     BALL_PLACEMENT_US    = 16,
     BALL_PLACEMENT_THEM  = 17,
-    LAST_ENUM_ITEM_UNUSED
+    REFBOX_GAME_STATE_COUNT
 };
 
 std::ostream& operator<<(std::ostream& os, const RefboxGameState& state);
