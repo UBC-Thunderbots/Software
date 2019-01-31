@@ -60,32 +60,37 @@ const generalWebpackBuild = {
     },
 };
 
-// Client build configuration
+// Build configurations
 module.exports = {
-    ...generalWebpackBuild,
-    // Our project entry point.
-    entry: path.resolve(__dirname, '../src/index.ts'),
+    // General build, does not contain any assumption about the base HTML file
+    general: generalWebpackBuild,
+    // Build for the web client, contains assumption about the base HTML file
+    web: {
+        ...generalWebpackBuild,
+        // Our project entry point.
+        entry: path.resolve(__dirname, '../src/index.ts'),
 
-    // We generate a bundle in the build folder
-    output: {
-        path: path.resolve(__dirname, '../build'),
-        filename: '[name].[contenthash].js',
+        // We generate a bundle in the build folder
+        output: {
+            path: path.resolve(__dirname, '../build'),
+            filename: '[name].[contenthash].js',
+        },
+
+        // We use the web target to give us access to DOM-related JS functions
+        // A good analogy is selecting the STD library used in a C/C++ project
+        target: 'web',
+
+        // Our plugins go here.
+        plugins: [
+            // This plugins autogenerates our index.html files and links the javascript bundle.
+            new HtmlWebPackPlugin({
+                template: './src/index.html',
+                filename: './index.html',
+            }),
+            // This plugin simplifies the webpack output and provides easy to read suggestions
+            // when code does not compile.
+            new FriendlyErrorPlugin(),
+            new webpack.HashedModuleIdsPlugin(),
+        ],
     },
-
-    // We use the web target to give us access to DOM-related JS functions
-    // A good analogy is selecting the STD library used in a C/C++ project
-    target: 'web',
-
-    // Our plugins go here.
-    plugins: [
-        // This plugins autogenerates our index.html files and links the javascript bundle.
-        new HtmlWebPackPlugin({
-            template: './src/index.html',
-            filename: './index.html',
-        }),
-        // This plugin simplifies the webpack output and provides easy to read suggestions
-        // when code does not compile.
-        new FriendlyErrorPlugin(),
-        new webpack.HashedModuleIdsPlugin(),
-    ],
 };
