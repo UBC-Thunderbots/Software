@@ -62,7 +62,9 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
-    motion_controller_command = MotionController::MotionControllerCommand(robot.position(), robot.orientation(), 0, 0.0, false, false);
+    // intentionally leaving out the option to coast until later
+    motion_controller_command = MotionController::MotionControllerCommand(
+        robot.position(), robot.orientation(), 0, 0.0, false, false);
 }
 
 MotionController::MotionControllerCommand
