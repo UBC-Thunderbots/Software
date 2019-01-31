@@ -5,10 +5,12 @@
  * The messenger constructs and queues the shapes into shape messages and layer
  * messages to be sent via ROS visualizer topics (VISUALIZER_DRAW_LAYER_TOPIC)
  *
- * Lasted edited by Muchen He on 2019-01-28
+ * Lasted edited by Muchen He on 2019-01-30
  */
 
 #pragma once
+
+#include <ros/ros.h>
 
 #include <map>
 #include <memory>
@@ -16,6 +18,14 @@
 
 #include "thunderbots_msgs/DrawLayer.h"
 #include "thunderbots_msgs/DrawShape.h"
+
+
+// Forward declaration
+namespace ros
+{
+    class NodeHandle;
+    class Publisher;
+}  // namespace ros
 
 namespace Util
 {
@@ -60,11 +70,7 @@ namespace Util
          *
          * @return A shared pointer of the static instance
          */
-        static std::shared_ptr<VisualizerMessenger> getInstance()
-        {
-            static std::shared_ptr<VisualizerMessenger> vm(new VisualizerMessenger);
-            return vm;
-        }
+        static std::shared_ptr<VisualizerMessenger> getInstance();
 
         /**
          * Initialize publisher for the visualizer

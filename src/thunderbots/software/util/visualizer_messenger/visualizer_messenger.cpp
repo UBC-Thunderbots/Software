@@ -5,6 +5,12 @@
 
 namespace Util
 {
+    std::shared_ptr<VisualizerMessenger> VisualizerMessenger::getInstance()
+    {
+        static std::shared_ptr<VisualizerMessenger> vm(new VisualizerMessenger);
+        return vm;
+    }
+
     void VisualizerMessenger::initializePublisher(ros::NodeHandle node_handle)
     {
         if (m_publisher)
