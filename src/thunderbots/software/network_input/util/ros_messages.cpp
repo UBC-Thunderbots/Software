@@ -88,8 +88,7 @@ thunderbots_msgs::Ball MessageUtil::createBallMsgFromFilteredBallData(
     ball_msg.velocity.x = filtered_ball_data.velocity.x();
     ball_msg.velocity.y = filtered_ball_data.velocity.y();
 
-    ball_msg.timestamp_microseconds =
-        Timestamp::getMicroseconds(filtered_ball_data.timestamp);
+    ball_msg.timestamp_seconds = filtered_ball_data.timestamp.getSeconds();
 
     return ball_msg;
 }
@@ -111,11 +110,7 @@ thunderbots_msgs::Robot MessageUtil::createRobotMsgFromFilteredRobotData(
 
     robot_msg.angular_velocity = filtered_robot_data.angular_velocity.toRadians();
 
-    robot_msg.timestamp_nanoseconds_since_epoch = static_cast<unsigned long>(
-        std::chrono::duration_cast<std::chrono::nanoseconds>(
-            std::chrono::microseconds(
-                Timestamp::getMicroseconds(filtered_robot_data.timestamp)))
-            .count());
+    robot_msg.timestamp_seconds = filtered_robot_data.timestamp.getSeconds();
 
     return robot_msg;
 }

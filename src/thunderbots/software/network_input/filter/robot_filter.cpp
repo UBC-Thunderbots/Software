@@ -7,7 +7,8 @@ RobotFilter::RobotFilter(unsigned int id) : robot_id(id) {}
 FilteredRobotData RobotFilter::getFilteredData(
     const std::vector<SSLRobotData> &new_robot_data)
 {
-    return FilteredRobotData();
+    return FilteredRobotData(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                             Timestamp::fromSeconds(0));
 }
 
 unsigned int RobotFilter::getRobotId() const

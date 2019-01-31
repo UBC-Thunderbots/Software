@@ -10,7 +10,7 @@ AI::AI(const World &world)
 }
 
 std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
-    const AITimestamp &timestamp) const
+    const Timestamp &timestamp) const
 {
     // NOTE: The only thing the AI really needs an updated timestamp for (updated relative
     // to the timestamp when the state/world was last updated) is to update the

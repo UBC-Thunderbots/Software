@@ -23,11 +23,23 @@ typedef struct
  * something like std::pair so it's very explicit what data is being accessed, since
  * it's accessed by name rather than by index (first/second)
  */
-typedef struct
+typedef struct FilteredBallData
 {
+    /**
+     * Creates a new FilteredBallData struct
+     *
+     * @param position The position of the ball
+     * @param velocity The velocity of the ball
+     * @param timestamp The timestamp of the data
+     */
+    FilteredBallData(Point position, Vector velocity, Timestamp timestamp)
+        : position(position), velocity(velocity), timestamp(timestamp)
+    {
+    }
+
     Point position;
     Vector velocity;
-    AITimestamp timestamp;
+    Timestamp timestamp;
 } FilteredBallData;
 
 /**

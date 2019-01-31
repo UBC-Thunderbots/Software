@@ -41,7 +41,7 @@ TEST_F(TeamTest, construction)
     EXPECT_EQ(std::nullopt, team.getRobotById(2));
     EXPECT_EQ(std::nullopt, team.goalie());
     EXPECT_EQ(std::vector<Robot>(), team.getAllRobots());
-    EXPECT_EQ(milliseconds(1000), team.getRobotExpiryBufferMilliseconds());
+    EXPECT_EQ(milliseconds(1000), team.getRobotExpiryBufferDuration());
 }
 
 TEST_F(TeamTest, update_with_3_robots)
@@ -354,7 +354,7 @@ TEST_F(TeamTest, get_robot_expiry_buffer)
 {
     Team team = Team(milliseconds(500));
 
-    EXPECT_EQ(milliseconds(500), team.getRobotExpiryBufferMilliseconds());
+    EXPECT_EQ(milliseconds(500), team.getRobotExpiryBufferDuration());
 }
 
 TEST_F(TeamTest, set_robot_expiry_buffer)
@@ -363,7 +363,7 @@ TEST_F(TeamTest, set_robot_expiry_buffer)
 
     team.setRobotExpiryBuffer(milliseconds(831));
 
-    EXPECT_EQ(milliseconds(831), team.getRobotExpiryBufferMilliseconds());
+    EXPECT_EQ(milliseconds(831), team.getRobotExpiryBufferDuration());
 }
 
 TEST_F(TeamTest, equality_operator_compare_team_with_itself)
