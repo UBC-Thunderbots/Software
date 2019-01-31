@@ -5,10 +5,7 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
-import { Console } from './components/portals/Console';
-import { Main } from './components/portals/Main';
-import { Sidebar } from './components/portals/Sidebar';
-import { SidebarTitle } from './components/portals/SidebarTitle';
+import { Portal, PortalLocation } from './components/Portal';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
 
@@ -21,10 +18,9 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
-            <Sidebar>This is the sidebar</Sidebar>
-            <Main>This is main</Main>
-            <SidebarTitle text="This is the sidebar title" />
-            <Console>This is the console</Console>
+            <Portal portalLocation={PortalLocation.SIDEBAR}>This is the sidebar</Portal>
+            <Portal portalLocation={PortalLocation.MAIN}>This is main</Portal>
+            <Portal portalLocation={PortalLocation.CONSOLE}>This is the console</Portal>
         </Theme>
     </Provider>
 );
