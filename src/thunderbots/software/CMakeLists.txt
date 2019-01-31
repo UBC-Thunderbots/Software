@@ -272,6 +272,7 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/grsim_backend.h
             grsim_communication/grsim_backend.cpp
             grsim_communication/visitor/grsim_command_primitive_visitor.cpp
+            util/timestamp.cpp
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
@@ -301,6 +302,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(ball_test
             test/world/ball.cpp
             ai/world/ball.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -309,6 +311,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(robot_test
             test/world/robot.cpp
             ai/world/robot.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -318,6 +321,7 @@ if (CATKIN_ENABLE_TESTING)
             test/world/team.cpp
             ai/world/team.cpp
             ai/world/robot.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -330,6 +334,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/field.cpp
             ai/world/team.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -340,7 +345,8 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/motion_controller/motion_controller.cpp
             ai/world/robot.cpp
             geom/point.h
-            geom/angle.h)
+            geom/angle.h
+            util/timestamp.cpp)
 
     target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
 
@@ -352,7 +358,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/field.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
-            ai/world/game_state.cpp)
+            ai/world/game_state.cpp
+            util/timestamp.cpp)
 
     target_link_libraries(world_test ${catkin_LIBRARIES})
 
@@ -365,6 +372,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
+            util/timestamp.cpp
             )
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
@@ -379,7 +387,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
-            util/refbox_constants.cpp)
+            util/refbox_constants.cpp
+            util/timestamp.cpp)
 
     target_link_libraries(game_state_test ${catkin_LIBRARIES})
 
