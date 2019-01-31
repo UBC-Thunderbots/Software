@@ -49,6 +49,9 @@ int main(int argc, char** argv)
     // NOTE: We do this before initializing the ROS node so that if it
     // fails because there is another instance of this node running
     // and connected to the port we want, we don't kill that other node.
+
+    // TODO: Log error messages when this throws, then throw exception upwards
+    // https://github.com/UBC-Thunderbots/Software/issues/275
     std::unique_ptr<SSLVisionClient> ssl_vision_client;
     try
     {
@@ -64,6 +67,8 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+    // TODO: Log error messages when this throws, then throw exception upwards
+    // https://github.com/UBC-Thunderbots/Software/issues/275
     std::unique_ptr<SSLGameControllerClient> ssl_gamecontroller_client;
     try
     {
