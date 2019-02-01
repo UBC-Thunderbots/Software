@@ -60,7 +60,7 @@ class RobotObstacle
      * Segment extending from robot in direction of robot travel with length
      * proportional to current velocity. Used for collision avoidance.
      */
-    Seg velocity;
+    Segment velocity;
 };
 
 /**
