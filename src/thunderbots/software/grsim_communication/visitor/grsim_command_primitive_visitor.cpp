@@ -36,7 +36,7 @@ void GrsimCommandPrimitiveVisitor::visit(
     // create linear velocity vector from direct velocity primitive
     Vector linear_velocity_in_robot_coordinates =
         Vector(direct_velocity_primitive.getXVelocity(),
-               direct_velocity_primitive.getXVelocity());
+               direct_velocity_primitive.getYVelocity());
 
     // transfer velocity into global coordinate by rotating the vector in robot
     // coordinates by the angle of robot
