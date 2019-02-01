@@ -234,23 +234,28 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(grsim_backend_test
             ${PROTO_SRCS}
             test/grsim_backend/grsim_backend.cpp
-            grsim_communication/motion_controller.cpp
+            grsim_communication/motion_controller/motion_controller.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_backend.h
             grsim_communication/grsim_backend.cpp
+            grsim_communication/visitor/grsim_command_primitive_visitor.cpp
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
+            ${G3LOG}
             )
 
     catkin_add_gtest(geom_util_test
@@ -259,7 +264,10 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.h
             geom/point.h
             geom/angle.h
-            geom/shapes.h)
+            geom/segment.h
+            geom/ray.h
+            geom/circle.h
+            geom/line.h)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
 
@@ -309,7 +317,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(motion_controller_test
             test/grsim_backend/motion_controller.cpp
-            grsim_communication/motion_controller.cpp
+            grsim_communication/motion_controller/motion_controller.cpp
             ai/world/robot.cpp
             geom/point.h
             geom/angle.h)
@@ -358,95 +366,193 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
-            ai/primitive/kick_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(move_primitive_test
             test/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(move_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(move_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    catkin_add_gtest(movespin_primitive_test
+            test/primitive/movespin_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            )
+
+    target_link_libraries(movespin_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    catkin_add_gtest(directwheels_primitive_test
+            test/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            )
+
+    target_link_libraries(directwheels_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(pivot_primitive_test
             test/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(pivot_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(pivot_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(chip_primitive_test
             test/primitive/chip_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(chip_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(chip_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(kick_primitive_test
             test/primitive/kick_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(kick_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(kick_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(direct_velocity_primitive_test
             test/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
-            ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(direct_velocity_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(direct_velocity_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(catch_primitive_test
             test/primitive/catch_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            )
+
+    target_link_libraries(catch_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    catkin_add_gtest(stop_primitive_test
+            test/primitive/stop_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
-    target_link_libraries(catch_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(stop_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
 endif()
 

@@ -1,5 +1,7 @@
 #include "ai/primitive/catch_primitive.h"
 
+#include "ai/primitive/visitor/primitive_visitor.h"
+
 const std::string CatchPrimitive::PRIMITIVE_NAME = "Catch Primitive";
 
 CatchPrimitive::CatchPrimitive(unsigned int robot_id, double velocity,
@@ -55,4 +57,9 @@ std::vector<double> CatchPrimitive::getParameters() const
 std::vector<bool> CatchPrimitive::getExtraBits() const
 {
     return std::vector<bool>();
+}
+
+void CatchPrimitive::accept(PrimitiveVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

@@ -134,8 +134,29 @@ TEST_F(TeamTest, update_state_to_predicted_state_with_future_timestamp)
 
 TEST_F(TeamTest, update_state_to_predicted_state_with_past_timestamp)
 {
-    // TODO: Add unit tests to check for thrown exceptions when past timestamps are used
-    // once https://github.com/UBC-Thunderbots/Software/issues/16 is done
+    Team team = Team(milliseconds(1000));
+
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    std::vector<Robot> robot_list = {robot_0, robot_1};
+
+    team.updateRobots(robot_list);
+    team.assignGoalie(0);
+
+    ASSERT_THROW(team.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
+
+    Robot future_robot_0 = robot_0;
+    ASSERT_THROW(future_robot_0.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
+
+    Robot future_robot_1 = robot_1;
+    ASSERT_THROW(future_robot_1.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
 }
 
 TEST_F(TeamTest, remove_expired_robots_at_current_time_so_no_robots_expire)

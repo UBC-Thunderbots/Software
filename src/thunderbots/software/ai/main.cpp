@@ -11,10 +11,11 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
+#include "util/visualizer_messenger/visualizer_messenger.h"
 
-// Variables we need to maintain state. They are declared "globally" in the file so they
-// can be seen/used by the callback functions as well as the main function.
-// In an anonymous namespace so they cannot be seen/accessed outside this file.
+// Member variables we need to maintain state
+// They are kept in an anonymous namespace so they are not accessible outside this
+// file and are not created as global static variables.
 namespace
 {
     // Initialize our AI, which is the main object that maintains state
@@ -88,31 +89,43 @@ int main(int argc, char **argv)
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
+    // Initialize the draw visualizer messenger
+    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
+
     // Main loop
     while (ros::ok())
     {
         // Spin once to let all necessary callbacks run
         // These callbacks will update the AI's world state
         ros::spinOnce();
-
-        // Get the Primitives the Robots should run from the AI
-        // We pass a timestamp with the current time (the time we initiate the call)
-        // to let the AI update its predictors so that decisions are always made with the
-        // most up to date predicted data (eg. future Robot or Ball position), even if
-        // some time has passed since the AI's state was last updated.
-        AITimestamp timestamp = Timestamp::getTimestampNow();
-        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-            ai.getPrimitives(timestamp);
-
-        // Put these Primitives into a message and publish it
-        thunderbots_msgs::PrimitiveArray primitive_array_message;
-        for (auto const &prim : assignedPrimitives)
+        try
         {
-            thunderbots_msgs::Primitive msg = prim->createMsg();
-            primitive_array_message.primitives.emplace_back(msg);
-            LOG(INFO) << msg << std::endl;
+            // Get the Primitives the Robots should run from the AI
+            // We pass a timestamp with the current time (the time we initiate the call)
+            // to let the AI update its predictors so that decisions are always made with
+            // the most up to date predicted data (eg. future Robot or Ball position),
+            // even if some time has passed since the AI's state was last updated.
+            AITimestamp timestamp = Timestamp::getTimestampNow();
+            std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+                ai.getPrimitives(timestamp);
+
+            // Put these Primitives into a message and publish it
+            thunderbots_msgs::PrimitiveArray primitive_array_message;
+            for (auto const &prim : assignedPrimitives)
+            {
+                thunderbots_msgs::Primitive msg = prim->createMsg();
+                primitive_array_message.primitives.emplace_back(msg);
+                LOG(INFO) << msg << std::endl;
+            }
+            primitive_publisher.publish(primitive_array_message);
+
+            // On every tick, send the layer messages
+            Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
         }
-        primitive_publisher.publish(primitive_array_message);
+        catch (const std::invalid_argument &e)
+        {
+            std::cout << e.what() << std::endl;
+        }
     }
 
     return 0;

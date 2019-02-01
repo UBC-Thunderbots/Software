@@ -25,4 +25,22 @@ class RobotTeamFilter
      */
     std::vector<FilteredRobotData> getFilteredData(
         const std::vector<SSLRobotData> &new_team_data);
+
+   private:
+    // This struct is just a placeholder for now. A proper team filter that utilizes the
+    // Robot filters should be completed as part of
+    // https://github.com/UBC-Thunderbots/Software/issues/200
+    struct RobotData
+    {
+        RobotData(Point position, Angle orientation, double timestamp)
+            : position(position), orientation(orientation), timestamp(timestamp)
+        {
+        }
+
+        Point position;
+        Angle orientation;
+        double timestamp;
+    };
+
+    std::map<unsigned int, RobotData> robot_map;
 };
