@@ -43,8 +43,10 @@ void GrsimCommandPrimitiveVisitor::visit(
     Vector linear_velocity_in_global_coordinates =
         linear_velocity_in_robot_coordinates.rotate(robot.orientation());
 
-    // TODO final reasonable scalars to multiply linear and angular velocity to get
-    // reasonable speed final destination is the parameter that can control the robot to
+    // TODO find reasonable scalars to multiply linear and angular velocity to get
+    // reasonable speed
+
+    // final destination is the parameter that can control the robot to
     // move in the direction of velocity vector from current robot position
     Vector final_destination = linear_velocity_in_global_coordinates + robot_position;
     // final orientation is the parameter that can control the robot to rotate in the
