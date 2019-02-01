@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "ai/primitive/movespin_primitive.h"
+#include "ai/world/robot.h"
 #include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
 
 TEST(MoveSpinPrimitiveTest, move_spin_primitive_test)
