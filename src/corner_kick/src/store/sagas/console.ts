@@ -1,29 +1,16 @@
+import { put, takeLatest } from 'redux-saga/effects';
+import { getType } from 'typesafe-actions';
+
+import * as ros from '../actions/ros';
+
 /*
  * This file specifies the saga for the Console
  */
 
-import { channel } from 'redux-saga';
-import { put } from 'redux-saga/effects';
-import ROSLIB from 'roslib';
+export default function* init() {
+    yield takeLatest(getType(ros.connected), startConsole);
+}
 
-import { newMessage, subscribeTopic } from '../actions/ros';
-
-const ros: ROSLIB.Ros | null = null;
-const rosChannel = channel();
-
-/**
- * Subscribe to /rosout topic
- */
-function subscribeToRosout(action: ReturnType<typeof subscribeTopic>) {
-    if (ros !== null) {
-        const topic = new ROSLIB.Topic({
-            ros,
-            messageType: action.payload.messageType,
-            name: '/rosout',
-        });
-
-        topic.subscribe((message) =>
-            rosChannel.put(newMessage(action.payload.topic, message)),
-        );
-    }
+function* startConsole() {
+    yield put(ros.subscribeTopic('/rosout', 'rosgraph_msgs/Log'));
 }

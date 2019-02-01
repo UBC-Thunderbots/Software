@@ -7,8 +7,7 @@ import { ActionType, getType } from 'typesafe-actions';
 import { IMessagesState } from 'SRC/types/state';
 
 import * as ros from '../actions/ros';
-
-export type ROSAction = ActionType<typeof ros>;
+import { ROSAction } from './ros';
 
 const defaultState: IMessagesState = {
     messages: [],
