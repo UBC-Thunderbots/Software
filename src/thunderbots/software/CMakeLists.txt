@@ -367,7 +367,7 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_command_primitive_visitor/move_spin_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             )
-    target_link_libraries(move_spin_primitive_test, ${catkin_LIBRARIES}
+    target_link_libraries(move_spin_primitive_test ${catkin_LIBRARIES}
             ${GRSIM_COMMUNICATION_SRC})
 
     catkin_add_gtest(primitive_test

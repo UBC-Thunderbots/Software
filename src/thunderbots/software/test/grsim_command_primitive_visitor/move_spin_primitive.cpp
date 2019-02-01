@@ -6,17 +6,30 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "ai/grsim_communication/visitor/grsim_command_primitive_visitor.h"
 #include "ai/primitive/movespin_primitive.h"
+#include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
 
 TEST(MoveSpinPrimitiveTest, move_spin_primitive_test)
 {
-    // test test
-    int b = 1;
-    EXPECT_EQ(b, 1);
+    MoveSpinPrimitive* move_spin_primitive =
+        new MoveSpinPrimitive(1, Point(3, -1), AngularVelocity::ofDegrees(50));
+    Robot* test_robot =
+        new Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(), AngularVelocity::zero(),
+                  std::chrono::steady_clock::time_point(std::chrono::seconds(4)));
+    auto* grsimCommandPrimitiveVisitor = new GrsimCommandPrimitiveVisitor(*test_robot);
+    move_spin_primitive->accept(*grsimCommandPrimitiveVisitor);
+
+    auto motion_controller_command =
+        grsimCommandPrimitiveVisitor->getMotionControllerCommand();
+
+    EXPECT_EQ(motion_controller_command.global_destination, Point(3, -1));
+    EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(45));
+    EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 0.0);
+    EXPECT_FALSE(motion_controller_command.dribbler_on);
+    EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     std::cout << argv[0] << std::endl;
     testing::InitGoogleTest(&argc, argv);
