@@ -568,7 +568,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
             geom/point.h
             ai/world/world.cpp
@@ -577,9 +579,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/game_state.cpp
             geom/angle.h
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
     )
 
-    target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES})
+    target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
 endif()
 

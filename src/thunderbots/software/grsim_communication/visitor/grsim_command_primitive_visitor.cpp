@@ -19,11 +19,9 @@ GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
 
 void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
-    // Calculate the theoretical catch point based on how the distance to the ball and how
-    // fast the robot is moving.
+    // Calculate the theoretical catch point based on the robots's distance to the ball
+    // and how fast the robot is moving.
     double distanceToBall = (ball.position() - robot.position()).len();
-    double interceptonMargin =
-        CatchPrimitive::STANDARD_INTERCEPT_MARGIN * catch_primitive.getMargin();
     Point finalDest;
     if (robot.velocity().len() != 0)
     {
@@ -39,8 +37,8 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
         finalDest = Point(finalDest.x(), finalDest.y());
     }
 
-    // Get unit vectors in the direction the ball is moving
-    // This allows the interceptor margin to be applied in the correct direction
+    // Get unit vectors in the direction the ball is moving.
+    // This allows the interceptor margin to be applied in the correct direction.
     double ballDirX = 0, ballDirY = 0;
     if (ball.velocity().x() != 0)
     {
@@ -52,14 +50,16 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     }
 
     // Robot should be facing in the opposite direction the ball in moving to have ball
-    // hit its dribbler
+    // hit its dribbler.
     Angle robotDirection =
         Angle::ofRadians(std::atan2(ball.velocity().y(), ball.velocity().x())) +
         Angle::half();
 
-    // If ball is far enough way from robot, add extra margin of error to ensure robot get
-    // in line with the ball correctly In addition if the robot is not yet facing the ball
-    // move away to give it time to adjust.
+    // If ball is far enough way from robot, add extra margin of error to ensure robot
+    // gets in line with the ball correctly. In addition, if the robot is not yet facing
+    // the ball move away to give it time to adjust.
+    double interceptonMargin =
+        CatchPrimitive::STANDARD_INTERCEPT_MARGIN * catch_primitive.getMargin();
     if (distanceToBall > interceptonMargin || robot.orientation() == robotDirection)
     {
         finalDest.set(finalDest.x() + interceptonMargin * ballDirX,

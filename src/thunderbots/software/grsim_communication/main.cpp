@@ -50,7 +50,6 @@ void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr& msg)
     ball.updateState(updated_ball);
 }
 
-
 // Update the friendly team
 void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
 {
@@ -97,6 +96,7 @@ int main(int argc, char** argv)
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
+
         grsim_backend.sendPrimitives(primitives, friendly_team, ball);
 
         tick_rate.sleep();
