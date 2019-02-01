@@ -29,19 +29,24 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 void GrsimCommandPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
-
-
+    //get current robot position and orientation(angle)
     Point robot_position = robot.position();
     Angle robot_orientation = robot.orientation();
 
+    //create linear velocity vector from direct velocity primitive
     Vector linear_velocity_in_robot_coordinates  = Vector(direct_velocity_primitive.getXVelocity(), direct_velocity_primitive.getXVelocity());
+
+    //transfer velocity into global coordinate by rotating the vector in robot coordinates by the angle of robot
     Vector linear_velocity_in_global_coordinates = linear_velocity_in_robot_coordinates.rotate(robot.orientation());
 
-    Vector global_destination = linear_velocity_in_global_coordinates + robot_position;
-    Angle final_orientation = robot_orientation + ((Angle::full()*(direct_velocity_primitive.getAngularVelocity()/30.0)/Angle::full().toRadians()));
+    //TODO final reasonable scalars to multiply linear and angular velocity to get reasonable speed
+    //final destination is the parameter that can control the robot to move in the direction of velocity vector from current robot position
+    Vector final_destination = linear_velocity_in_global_coordinates + robot_position;
+    // final orientation is the parameter that can control the robot to rotate in the direction of angular velocity from current robot orientation
+    Angle final_orientation = robot_orientation + Angle::ofRadians(direct_velocity_primitive.getAngularVelocity());
 
     motion_controller_command = MotionController::MotionControllerCommand(
-            global_destination, final_orientation,
+            final_destination, final_orientation,
             linear_velocity_in_robot_coordinates.len() , 0.0, false, direct_velocity_primitive.getDribblerRpm()>0);
 }
 
