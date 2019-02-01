@@ -29,9 +29,10 @@ void GrSimBackend::sendPrimitives(
     const Ball& ball)
 {
     // TODO: Can't replace this timestamp as part of issue #228 because the Timestamp
-    // class doesn't support absolute "wall time". The MotionController will need to be
+    // class doesn't support absolute "wall time". This function will need to be
     // changed to make use of the timestamps stored with the robots
-    // TODO: Make ticket
+    // https://github.com/UBC-Thunderbots/Software/issues/279
+    //
     // initial timestamp for bang-bang set as current time
     static auto bangbang_timestamp = std::chrono::steady_clock::now();
 

@@ -54,6 +54,7 @@ std::vector<FilteredRobotData> RobotTeamFilter::getFilteredData(
                 new_robot_data.orientation, robot_angular_velocity,
                 // TODO: This timestamp is a placeholder and should be fixed once the
                 // robot filter PR is merged
+                // https://github.com/UBC-Thunderbots/Software/issues/199
                 Timestamp::fromSeconds(0)};
 
             result.push_back(filtered_data);
