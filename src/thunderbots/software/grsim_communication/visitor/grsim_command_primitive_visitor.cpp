@@ -71,7 +71,7 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
                                         pivot_primitive.getPivotRadius());
 
     // assume grSim is running at 60Hz TODO: this should go somewhere else
-    double assumed_t_step_seconds = 1 / 60;
+    double assumed_t_step_seconds = 1.0 / 60;
 
     // the target point for the pivot
     Point pivot_dest =
