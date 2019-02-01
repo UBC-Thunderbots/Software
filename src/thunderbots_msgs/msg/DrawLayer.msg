@@ -1,5 +1,8 @@
-# This message is for basic communication from AI to the visualizr
+# This message is for basic communication from AI to the visualizer
 # regarding shape drawing
 
-string name
+# Name of layer
+string layer_name
+
+# Shape contained in this layer
 DrawShape[] shapes
