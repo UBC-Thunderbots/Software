@@ -9,7 +9,7 @@
         "allowJs": false,
         "jsx": "react",
         "moduleResolution": "node",
-        "rootDirs": ["src", ".storybook"],
+        "rootDirs": ["src", "storybook"],
         "forceConsistentCasingInFileNames": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,

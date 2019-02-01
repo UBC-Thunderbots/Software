@@ -4,7 +4,9 @@
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <ai/primitive/catch_primitive.h>
 
+#include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "geom/point.h"
 #include "grsim_communication/grsim_backend.h"
@@ -90,6 +92,7 @@ int main(int argc, char** argv)
     {
         // Clear all primitives each tick
         primitives.clear();
+
 
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector

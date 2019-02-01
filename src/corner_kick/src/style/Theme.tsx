@@ -10,9 +10,28 @@ import { theme } from 'SRC/constants';
 import { createGlobalStyle, ThemeProvider } from 'SRC/utils/styled-components';
 
 const GlobalStylesheet = createGlobalStyle`
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+    * {
+        box-sizing: border-box;
+    }
+
+
     body {
+        margin: 0;
+
+        overflow: hidden;
+        user-select: none;
+
         background: ${(props) => props.theme.colors.bg};
         color: ${(props) => props.theme.colors.fg};
+
+        font-family: 'Open Sans', sans-serif;
+        font-size: 14px;
+    }
+
+    a {
+        text-decoration: none;
     }
 
     #root > div {

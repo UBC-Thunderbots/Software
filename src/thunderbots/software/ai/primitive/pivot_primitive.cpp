@@ -5,11 +5,11 @@
 const std::string PivotPrimitive::PRIMITIVE_NAME = "Pivot Primitive";
 
 PivotPrimitive::PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                               const Angle &final_angle, const Angle &robot_orientation)
+                               const Angle &final_angle, const double pivot_radius)
     : robot_id(robot_id),
       pivot_point(pivot_point),
       final_angle(final_angle),
-      robot_orientation(robot_orientation)
+      pivot_radius(pivot_radius)
 {
 }
 
@@ -17,12 +17,12 @@ PivotPrimitive::PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
-    robot_id          = primitive_msg.robot_id;
-    double center_x   = primitive_msg.parameters.at(0);
-    double center_y   = primitive_msg.parameters.at(1);
-    pivot_point       = Point(center_x, center_y);
-    final_angle       = Angle::ofRadians(primitive_msg.parameters.at(2));
-    robot_orientation = Angle::ofRadians(primitive_msg.parameters.at(3));
+    robot_id        = primitive_msg.robot_id;
+    double center_x = primitive_msg.parameters.at(0);
+    double center_y = primitive_msg.parameters.at(1);
+    pivot_point     = Point(center_x, center_y);
+    final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
+    pivot_radius    = primitive_msg.parameters.at(3);
 }
 
 std::string PivotPrimitive::getPrimitiveName() const
@@ -45,16 +45,15 @@ Angle PivotPrimitive::getFinalAngle() const
     return final_angle;
 }
 
-Angle PivotPrimitive::getRobotOrientation() const
+double PivotPrimitive::getPivotRadius() const
 {
-    return robot_orientation;
+    return pivot_radius;
 }
 
 std::vector<double> PivotPrimitive::getParameters() const
 {
     std::vector<double> parameters = {pivot_point.x(), pivot_point.y(),
-                                      final_angle.toRadians(),
-                                      robot_orientation.toRadians()};
+                                      final_angle.toRadians(), pivot_radius};
     return parameters;
 }
 
