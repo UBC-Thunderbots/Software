@@ -15,6 +15,7 @@
     "license": "ISC",
     "devDependencies": {
         "@babel/core": "7.2.2",
+        "@storybook/addon-knobs": "4.1.11",
         "@storybook/react": "4.1.11",
         "@types/jest": "23.3.12",
         "@types/lodash": "4.14.119",
