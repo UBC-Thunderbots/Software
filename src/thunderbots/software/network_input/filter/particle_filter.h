@@ -1,28 +1,29 @@
-#ifndef GEOM_PARTICLE_PARTICLE_FILTER_H
-#define GEOM_PARTICLE_PARTICLE_FILTER_H
+#ifndef NETWORK_INPUT_FILTER_PARTICLE_FILTER_H
+#define NETWORK_INPUT_FILTER_PARTICLE_FILTER_H
 
 #include <random>
+
 #include "geom/point.h"
 #include "util/parameter/parameter.h"
 /**
- * Finds and filters the "real" ball from the received data 
+ * Finds and filters the "real" ball from the received data
  */
 const unsigned int PARTICLE_FILTER_NUM_PARTICLES = 500;
-const double MAX_BALL_CONFIDENCE = 100.0;
+const double MAX_BALL_CONFIDENCE                 = 100.0;
 const double MAX_PARTICLE_STANDARD_DEV           = 0.05;
 const double MIN_PARTICLE_STANDARD_DEV           = 0.001;
 
 const int PARTICLE_FILTER_NUM_CONDENSATIONS = 0.25;
-const double TOP_PERCENTAGE_OF_PARTICLES = 1.0;
-const double MAX_DETECTION_WEIGHT = 500.0;
-const double DETECTION_WEIGHT_DECAY = 2.0;
-const double PREVIOUS_BALL_WEIGHT = 1.5;
-const double PREDICTION_WEIGHT = 2.3;
-const double BALL_DIST_THRESHOLD = 0.5;
-const double BALL_CONFIDENCE_THRESHOLD = 70.0;
-const double BALL_VALID_DIST_THRESHOLD = 0.2;
-const double BALL_CONFIDENCE_DELTA = 6.0;
-const double BALL_MAX_VARIANCE = 5.0;
+const double TOP_PERCENTAGE_OF_PARTICLES    = 1.0;
+const double MAX_DETECTION_WEIGHT           = 500.0;
+const double DETECTION_WEIGHT_DECAY         = 2.0;
+const double PREVIOUS_BALL_WEIGHT           = 1.5;
+const double PREDICTION_WEIGHT              = 2.3;
+const double BALL_DIST_THRESHOLD            = 0.5;
+const double BALL_CONFIDENCE_THRESHOLD      = 70.0;
+const double BALL_VALID_DIST_THRESHOLD      = 0.2;
+const double BALL_CONFIDENCE_DELTA          = 6.0;
+const double BALL_MAX_VARIANCE              = 5.0;
 
 // This is used as a placeholder point for when we don't have real data
 const Point TMP_POINT = Point(-99.99, -99.99);
@@ -36,9 +37,7 @@ const Point TMP_POINT = Point(-99.99, -99.99);
  */
 struct Particle
 {
-    Particle(Point p = Point(), double c = 0.0) : position(p), confidence(c)
-    {
-    }
+    Particle(Point p = Point(), double c = 0.0) : position(p), confidence(c) {}
 
     Point position;
     double confidence;
@@ -174,8 +173,7 @@ class ParticleFilter final
      * @param variance The variance to use for the Gaussian Distribution that
      * the filter uses to generate the particles
      */
-    void generateParticles(
-        const std::vector<Point>& basepoints, double standard_dev);
+    void generateParticles(const std::vector<Point>& basepoints, double standard_dev);
 
     /**
      * Updates the confidence of each Particle in the list of particles
@@ -226,4 +224,4 @@ class ParticleFilter final
 };
 
 
-#endif  // GEOM_PARTICLE_PARTICLE_FILTER_H
+#endif  // NETWORK_INPUT_FILTER_PARTICLE_FILTER_H

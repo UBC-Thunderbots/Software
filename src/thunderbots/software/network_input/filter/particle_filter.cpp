@@ -1,5 +1,7 @@
-#include "geom/particle_filter.h"
+#include "particle_filter.h"
+
 #include <chrono>
+
 #include "geom/util.h"
 
 /* Notes on the weights and evaluation:
@@ -25,8 +27,7 @@ ParticleFilter::ParticleFilter(double length, double width)
     width_  = width;
 
     // initialize vector with PARTICLE_FILTER_NUM_PARTICLES Particle() objects
-    particles =
-        std::vector<Particle>(PARTICLE_FILTER_NUM_PARTICLES, Particle());
+    particles = std::vector<Particle>(PARTICLE_FILTER_NUM_PARTICLES, Particle());
 
     // Set the seed for the random number generator
     seed = static_cast<unsigned int>(
@@ -94,9 +95,8 @@ void ParticleFilter::update(Point ballPredictedPos)
 
         // Make sure the denominator is never negative or 0
         double particle_standard_dev_decrement_denominator =
-            PARTICLE_FILTER_NUM_CONDENSATIONS < 1
-                ? 1
-                : PARTICLE_FILTER_NUM_CONDENSATIONS - 1;
+            PARTICLE_FILTER_NUM_CONDENSATIONS < 1 ? 1
+                                                  : PARTICLE_FILTER_NUM_CONDENSATIONS - 1;
         double particle_standard_dev_decrement =
             (MAX_PARTICLE_STANDARD_DEV - MIN_PARTICLE_STANDARD_DEV) /
             particle_standard_dev_decrement_denominator;
@@ -124,8 +124,7 @@ void ParticleFilter::update(Point ballPredictedPos)
         // where the particles
         // with the most confidence are because of the sort
         basepoints.clear();
-        for (auto it = particles.end() - numParticlesToKeep;
-             it != particles.end(); it++)
+        for (auto it = particles.end() - numParticlesToKeep; it != particles.end(); it++)
         {
             basepoints.push_back(it->position);
         }
@@ -174,9 +173,8 @@ void ParticleFilter::update(Point ballPredictedPos)
     // in the ball, we use the ball's filtered position since if we don't, we
     // can get stuck in this "state"
     // if the ball reappears far away.
-    else if (
-        (newBallPosition - ballPosition).len() > BALL_VALID_DIST_THRESHOLD ||
-        newBallPositionVariance > BALL_MAX_VARIANCE)
+    else if ((newBallPosition - ballPosition).len() > BALL_VALID_DIST_THRESHOLD ||
+             newBallPositionVariance > BALL_MAX_VARIANCE)
     {
         if (ballConfidence < BALL_CONFIDENCE_THRESHOLD)
         {
@@ -204,8 +202,8 @@ void ParticleFilter::update(Point ballPredictedPos)
     detections.clear();  // Clear the detections for the next tick
 }
 
-void ParticleFilter::generateParticles(
-    const std::vector<Point> &basepoints, double standard_dev)
+void ParticleFilter::generateParticles(const std::vector<Point> &basepoints,
+                                       double standard_dev)
 {
     if (basepoints.empty())
     {
@@ -232,7 +230,7 @@ void ParticleFilter::generateParticles(
         int count;
         for (unsigned int i = 0; i < particles.size(); i++)
         {
-            Point basepoint = basepoints[static_cast<unsigned int>(
+            Point basepoint   = basepoints[static_cast<unsigned int>(
                 i / (particles.size() / basepoints.size()))];
             Point newParticle = Point();
             count             = 0;
@@ -305,9 +303,8 @@ double ParticleFilter::evaluateParticle(const Point &particle)
         double detectionDist = (particle - detections[i]).len();
         if (ballPosition != TMP_POINT)
         {
-            detectionScore +=
-                getDetectionWeight((detections[i] - ballPosition).len()) *
-                exp(-detectionDist);
+            detectionScore += getDetectionWeight((detections[i] - ballPosition).len()) *
+                              exp(-detectionDist);
         }
         else
         {
@@ -327,8 +324,7 @@ double ParticleFilter::evaluateParticle(const Point &particle)
 
         // This weight will drop to 0 if ballDist is greater than
         // BALL_DIST_THRESHOLD
-        previousBallScore +=
-            PREVIOUS_BALL_WEIGHT * sqrt(-ballDist + BALL_DIST_THRESHOLD);
+        previousBallScore += PREVIOUS_BALL_WEIGHT * sqrt(-ballDist + BALL_DIST_THRESHOLD);
     }
 
     double predictionScore = 0.0;
@@ -375,4 +371,3 @@ double ParticleFilter::getEstimateVariance()
 {
     return ballPositionVariance;
 }
-
