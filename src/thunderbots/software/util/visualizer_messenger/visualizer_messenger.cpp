@@ -133,7 +133,7 @@ namespace Util
     {
         // TODO: #268 list these existing layer names elsewhere where it's more obvious
         std::vector<std::string> layer_names = std::vector<std::string>(
-            {"field", "ball", "ball_vel", "fiendly_robot", "fiendly_robot_vel",
+            {"field", "ball", "ball_vel", "friendly_robot", "friendly_robot_vel",
              "enemy_robot", "enemy_robot_vel", "nav", "rule", "passing", "test", "misc"});
 
         for (std::string layer_name : layer_names)
