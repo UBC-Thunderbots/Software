@@ -20,3 +20,10 @@ export interface IROSState {
     services: string[];
     params: string[];
 }
+
+/**
+ * The messages state
+ */
+export interface IMessagesState {
+    messages: string[];
+}
