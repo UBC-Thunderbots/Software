@@ -47,17 +47,18 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
         ballDirY = ball.velocity().y()/abs(ball.velocity().y());
     }
 
-    // If ball is far enough way from robot, add extra margin of error to ensure robot get in line with the ball correctly
-    if (distanceToBall > interceptonMargin) {
-        finalDest.set(finalDest.x() + interceptonMargin*ballDirX,
-                      finalDest.y() + interceptonMargin*ballDirY);
-    }
-
     // Robot should be facing in the opposite direction the ball in moving to have ball hit its dribbler
     Angle robotDirection = Angle::ofRadians(std::atan2(ball.velocity().y(), ball.velocity().x())) + Angle::half();
 
+    // If ball is far enough way from robot, add extra margin of error to ensure robot get in line with the ball correctly
+    // In addition if the robot is not yet facing the ball move away to give it time to adjust.
+    if (distanceToBall > interceptonMargin || robot.orientation() == robotDirection) {
+        finalDest.set(finalDest.x() + interceptonMargin * ballDirX,
+                      finalDest.y() + interceptonMargin * ballDirY);
+    }
+
     motion_controller_command = MotionController::MotionControllerCommand(
-            finalDest, robotDirection + Angle::half(), catch_primitive.getVelocity(), 0.0, false, catch_primitive.getDribblerSpeed() > 0);
+            finalDest, robotDirection, catch_primitive.getVelocity(), 0.0, false, catch_primitive.getDribblerSpeed() > 0);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
