@@ -61,7 +61,18 @@ namespace Util
 
             if (team_msg.goalie_id >= 0)
             {
-                team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
+                // TODO: Remove this exception handling. It is a temporary fix for
+                // https://github.com/UBC-Thunderbots/Software/issues/287
+                // and should be fixed and removed as part of
+                // https://github.com/UBC-Thunderbots/Software/issues/230
+                try
+                {
+                    team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
+                }
+                catch (std::invalid_argument)
+                {
+                    // Do nothing
+                }
             }
             else
             {
