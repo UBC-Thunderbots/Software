@@ -11,14 +11,53 @@
 #include "geom/point.h"
 #include "util/logger/init.h"
 
-GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot)
+GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot, const Ball &ball)
     : robot(robot)
+    , ball(ball)
 {
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/134
+    // Calculate the theoretical catch point based on how the distance to the ball and how fast the robot is moving.
+    double distanceToBall = (ball.position() - robot.position()).len();
+    double interceptonMargin = CatchPrimitive::STANDARD_INTERCEPT_MARGIN * catch_primitive.getMargin();
+    Point finalDest;
+    if (robot.velocity().len() != 0)
+    {
+        finalDest = ball.estimatePositionAtFutureTime(std::chrono::milliseconds((int) fabs(distanceToBall / robot.velocity().len()) * 1000 ));
+        finalDest = Point(finalDest.x(),
+                          finalDest.y());
+    }
+    else
+    {
+        // If Robot is not moving, estimate position based on a standard velocity of 1
+        finalDest = ball.estimatePositionAtFutureTime(std::chrono::milliseconds((int) fabs(distanceToBall / 1) * 1000 ));
+        finalDest = Point(finalDest.x(),
+                          finalDest.y());
+    }
+
+    // Get unit vectors in the direction the ball is moving
+    // This allows the interceptor margin to be applied in the correct direction
+    double ballDirX = 0, ballDirY = 0;
+    if (ball.velocity().x() != 0) {
+        ballDirX = ball.velocity().x()/abs(ball.velocity().x());
+    }
+    if (ball.velocity().y() != 0) {
+        ballDirY = ball.velocity().y()/abs(ball.velocity().y());
+    }
+
+    // If ball is far enough way from robot, add extra margin of error to ensure robot get in line with the ball correctly
+    if (distanceToBall > interceptonMargin) {
+        finalDest.set(finalDest.x() + interceptonMargin*ballDirX,
+                      finalDest.y() + interceptonMargin*ballDirY);
+    }
+
+    // Robot should be facing in the opposite direction the ball in moving to have ball hit its dribbler
+    Angle robotDirection = Angle::ofRadians(std::atan2(ball.velocity().y(), ball.velocity().x())) + Angle::half();
+
+    motion_controller_command = MotionController::MotionControllerCommand(
+            finalDest, robotDirection + Angle::half(), catch_primitive.getVelocity(), 0.0, false, catch_primitive.getDribblerSpeed() > 0);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)

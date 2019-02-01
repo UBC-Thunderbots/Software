@@ -8,6 +8,7 @@ class CatchPrimitive : public Primitive
 {
    public:
     static const std::string PRIMITIVE_NAME;
+    static constexpr double STANDARD_INTERCEPT_MARGIN = 1.0;
 
     /**
      *

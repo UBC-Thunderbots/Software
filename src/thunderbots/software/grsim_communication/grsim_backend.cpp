@@ -25,7 +25,7 @@ GrSimBackend::~GrSimBackend()
 }
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team)
+    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team, const Ball& ball)
 {
     // initial timestamp for bang-bang set as current time
     static auto bangbang_timestamp = std::chrono::steady_clock::now();
@@ -40,7 +40,7 @@ void GrSimBackend::sendPrimitives(
             Robot robot = *friendly_team.getRobotById(prim->getRobotId());
 
             GrsimCommandPrimitiveVisitor grsim_command_primitive_visitor =
-                GrsimCommandPrimitiveVisitor(robot);
+                GrsimCommandPrimitiveVisitor(robot, ball);
             prim->accept(grsim_command_primitive_visitor);
 
             MotionController::MotionControllerCommand motion_controller_command =

@@ -57,6 +57,7 @@ Point Ball::estimatePositionAtFutureTime(
 {
     if (milliseconds_in_future < std::chrono::milliseconds(0))
     {
+        std::cout << milliseconds_in_future.count() << std::endl;
         throw std::invalid_argument(
             "Error: Position estimate is updating times from the past");
     }

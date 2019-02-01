@@ -50,4 +50,20 @@ class BallFilter
      * @return The filtered data for the ball
      */
     FilteredBallData getFilteredData(std::vector<SSLBallData> new_ball_data);
+
+private:
+
+    struct BallData
+    {
+        BallData(Point position, Vector velocity, double timestamp)
+                : position(position), velocity(velocity), timestamp(timestamp)
+        {
+        }
+
+        Point position;
+        Vector velocity;
+        double timestamp;
+    };
+
+    BallData *ball_data;
 };

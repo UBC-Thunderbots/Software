@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ai/world/ball.h>
 #include "ai/primitive/visitor/primitive_visitor.h"
 #include "ai/world/robot.h"
 #include "grsim_communication/motion_controller/motion_controller.h"
@@ -17,7 +18,7 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * @param robot The robot that will be performing the Primitive. This is the robot
      * that the resultant MotionControllerCommand will be sent to.
      */
-    GrsimCommandPrimitiveVisitor(const Robot &robot);
+    GrsimCommandPrimitiveVisitor(const Robot &robot, const Ball &ball);
 
     /**
      * Generates and stores the MotionControllerCommand the robot should perform at the
@@ -94,4 +95,5 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
     // The MotionControllerCommand created by the 'visit' functions that is to be sent
     // to the MotionController
     MotionController::MotionControllerCommand motion_controller_command;
+    Ball ball;
 };
