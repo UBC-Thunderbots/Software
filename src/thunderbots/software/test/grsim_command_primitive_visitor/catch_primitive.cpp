@@ -138,9 +138,6 @@ TEST_F(CatchPrimitiveTest, robot_close_to_ball)
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
     EXPECT_NEAR(0.2, motionCommand.final_speed_at_destination, POSITION_TOLERANCE);
 }
-
-
-
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
