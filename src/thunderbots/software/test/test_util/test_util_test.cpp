@@ -122,7 +122,7 @@ TEST(TestUtilsTest, has_all_valid_refbox_game_states)
     std::vector game_states = ::Test::TestUtil::getAllRefboxGameStates();
     // only way to test this getAllRefboxGameStates() without a literal copy-paste
     // of the implementation
-    // note that this array does not contain RefboxGameState::LAST_ENUM_ITEM_UNUSED,
+    // note that this array does not contain RefboxGameState::REFBOX_GAME_STATE_COUNT,
     // this is intentional
     std::vector<RefboxGameState> expected_game_states = {
         RefboxGameState::HALT,
