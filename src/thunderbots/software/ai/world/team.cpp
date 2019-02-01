@@ -76,7 +76,7 @@ void Team::removeExpiredRobots(const std::chrono::steady_clock::time_point times
 
 void Team::assignGoalie(unsigned int new_goalie_id)
 {
-    if (getRobotById(new_goalie_id))
+    /*if (getRobotById(new_goalie_id))
     {
         goalie_id = new_goalie_id;
     }
@@ -84,7 +84,7 @@ void Team::assignGoalie(unsigned int new_goalie_id)
     {
         throw std::invalid_argument(
             "Error: Assigning the goalie to a robot that is not a member of the team");
-    }
+    }*/
 }
 
 void Team::clearGoalie()

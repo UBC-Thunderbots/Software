@@ -86,7 +86,7 @@ int main(int argc, char** argv)
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
-        //primitives.emplace_back(new MovePrimitive(0, Point(0, 0), Angle::zero(), 1));
+        //primitives.emplace_back(new MovePrimitive(1, Point(0, 0), Angle::zero(), 0));
 
         primitives.emplace_back(new DirectVelocityPrimitive(0,0,0,1,0));
 
