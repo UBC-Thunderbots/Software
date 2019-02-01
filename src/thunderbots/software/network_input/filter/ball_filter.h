@@ -51,12 +51,11 @@ class BallFilter
      */
     FilteredBallData getFilteredData(std::vector<SSLBallData> new_ball_data);
 
-private:
-
+   private:
     struct BallData
     {
         BallData(Point position, Vector velocity, double timestamp)
-                : position(position), velocity(velocity), timestamp(timestamp)
+            : position(position), velocity(velocity), timestamp(timestamp)
         {
         }
 

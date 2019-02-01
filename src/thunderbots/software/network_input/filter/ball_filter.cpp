@@ -8,7 +8,8 @@ FilteredBallData BallFilter::getFilteredData(std::vector<SSLBallData> new_ball_d
     // calculate it based on the balls current and previous position.
     if (ball_data == nullptr)
     {
-        ball_data = new BallData(new_ball_data[0].position, Vector(), new_ball_data[0].timestamp);
+        ball_data =
+            new BallData(new_ball_data[0].position, Vector(), new_ball_data[0].timestamp);
     }
     else
     {
@@ -16,11 +17,12 @@ FilteredBallData BallFilter::getFilteredData(std::vector<SSLBallData> new_ball_d
 
         if (time_diff != 0)
         {
-            Vector ball_velocity = (new_ball_data[0].position - ball_data->position) / time_diff;
+            Vector ball_velocity =
+                (new_ball_data[0].position - ball_data->position) / time_diff;
             ball_data->velocity = ball_velocity;
         }
 
-        ball_data->position = new_ball_data[0].position;
+        ball_data->position  = new_ball_data[0].position;
         ball_data->timestamp = new_ball_data[0].timestamp;
     }
 

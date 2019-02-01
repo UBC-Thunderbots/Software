@@ -25,7 +25,8 @@ GrSimBackend::~GrSimBackend()
 }
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team, const Ball& ball)
+    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team,
+    const Ball& ball)
 {
     // initial timestamp for bang-bang set as current time
     static auto bangbang_timestamp = std::chrono::steady_clock::now();

@@ -1,8 +1,9 @@
 #pragma once
 
+#include <ai/world/ball.h>
+
 #include <boost/asio.hpp>
 #include <string>
-#include <ai/world/ball.h>
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
@@ -31,8 +32,7 @@ class GrSimBackend
      * @param friendly_team A Team object containing the latest data for the friendly team
      */
     void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives,
-                        const Team& friendly_team,
-                        const Ball& ball);
+                        const Team& friendly_team, const Ball& ball);
 
     /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.

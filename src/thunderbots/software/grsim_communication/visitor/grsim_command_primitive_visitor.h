@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ai/world/ball.h>
+
 #include "ai/primitive/visitor/primitive_visitor.h"
 #include "ai/world/robot.h"
 #include "grsim_communication/motion_controller/motion_controller.h"
