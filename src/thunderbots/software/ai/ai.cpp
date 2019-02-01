@@ -1,5 +1,7 @@
 #include "ai.h"
 
+#include "util/logger/init.h"
+
 AI::AI(const World &world)
     : world(world),
       navigator(std::make_unique<RRTNav>()),
@@ -43,4 +45,9 @@ void AI::updateWorldFriendlyTeamState(const Team &new_friendly_team_data)
 void AI::updateWorldEnemyTeamState(const Team &new_enemy_team_data)
 {
     world.updateEnemyTeamState(new_enemy_team_data);
+}
+
+void AI::updateWorldRefboxGameState(const RefboxGameState &game_state)
+{
+    world.updateRefboxGameState(game_state);
 }

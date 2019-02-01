@@ -69,14 +69,14 @@ class GameState
      *
      * @return the current Refbox game state
      */
-    RefboxGameState getRefboxGameState();
+    RefboxGameState getRefboxGameState() const;
 
     /**
      * Returns the current restart reason
      *
      * @return the current restart reason
      */
-    RestartReason getRestartReason();
+    RestartReason getRestartReason() const;
 
     /*
      * Rule queries
