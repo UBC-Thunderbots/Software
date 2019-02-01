@@ -66,6 +66,10 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         ROBOT_MAX_SPEED_METERS_PER_SECOND * ROBOT_MAX_SPEED_METERS_PER_SECOND / 2 /
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
 
+    // when the robot is this angle away from end location, should be slowing down
+    Angle stop_angle = Angle::ofRadians(dist_stop_from_max_speed_metres /
+                                        pivot_primitive.getPivotRadius());
+
     // assume grSim is running at 60Hz TODO: this should go somewhere else
     double assumed_t_step_seconds = 1 / 60;
 
@@ -92,10 +96,11 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         pivot_point_to_pivot_circle.rotate(Angle::ofDegrees(90));
 
     // if the shortest direction is a clockwise rotation, invert this vector
-    Angle rotation_angle = ((pivot_dest - pivot_primitive.getPivotPoint()).orientation() -
-                            pivot_point_to_pivot_circle.orientation())
-                               .clamp();
-    Vector tangent_correct_direction = (rotation_angle < Angle().zero())
+    Angle rotation_remaining =
+        ((pivot_dest - pivot_primitive.getPivotPoint()).orientation() -
+         pivot_point_to_pivot_circle.orientation())
+            .clamp();
+    Vector tangent_correct_direction = (rotation_remaining < Angle().zero())
                                            ? -1 * tangent_to_circle_CCW
                                            : tangent_to_circle_CCW;
 
@@ -106,10 +111,12 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // assume current speed, time interval grSim is using TODO; verify latter is fine
     double robot_speed = robot.velocity().len();
     double expected_distance =
-        assumed_t_step_seconds * (robot_speed > 0.05 * ROBOT_MAX_SPEED_METERS_PER_SECOND)
-            ? robot_speed
-            : robot_speed + assumed_t_step_seconds *
-                                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+        assumed_t_step_seconds *
+                    (robot_speed < 0.05 * ROBOT_MAX_SPEED_METERS_PER_SECOND) &&
+                (rotation_remaining > stop_angle)
+            ? robot_speed + assumed_t_step_seconds *
+                                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
+            : robot_speed;
 
 
     Point expected_destination = expected_distance * travel_direction + robot.position();
