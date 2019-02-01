@@ -106,7 +106,7 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // assume current speed, time interval grSim is using TODO; verify latter is fine
     double robot_speed = robot.velocity().len();
     double expected_distance =
-        assumed_t_step_seconds * (robot_speed > 0.9 * ROBOT_MAX_SPEED_METERS_PER_SECOND)
+        assumed_t_step_seconds * (robot_speed > 0.05 * ROBOT_MAX_SPEED_METERS_PER_SECOND)
             ? robot_speed
             : robot_speed + assumed_t_step_seconds *
                                 ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
