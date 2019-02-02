@@ -59,6 +59,7 @@ namespace Util
 
             team.updateRobots(robots);
 
+<<<<<<< HEAD
             // if (team_msg.goalie_id >= 0)
             // {
             //     team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
@@ -67,8 +68,37 @@ namespace Util
             // {
             //     team.clearGoalie();
             // }
+=======
+            if (team_msg.goalie_id >= 0)
+            {
+                // TODO: Remove this exception handling. It is a temporary fix for
+                // https://github.com/UBC-Thunderbots/Software/issues/287
+                // and should be fixed and removed as part of
+                // https://github.com/UBC-Thunderbots/Software/issues/230
+                try
+                {
+                    team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
+                }
+                catch (std::invalid_argument)
+                {
+                    // Do nothing
+                }
+            }
+            else
+            {
+                team.clearGoalie();
+            }
+>>>>>>> 4a1802e619cef1aec11d7531316833d971094b5b
 
             return team;
+        }
+
+        RefboxGameState createGameStateFromROSMessage(
+            const thunderbots_msgs::RefboxCommand& command)
+        {
+            // the values in RefboxGameState correspond to the constants in
+            // RefboxCommand.msg
+            return (RefboxGameState)command.command;
         }
     }  // namespace ROSMessages
 }  // namespace Util
