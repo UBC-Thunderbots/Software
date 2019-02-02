@@ -1,9 +1,14 @@
 #pragma once
 #include <libusb.h>
+#include <string>
+#include <cstddef>
+#include <cstdint>
+
 #include "util/noncopyable.h"
 
 namespace USB
 {
+    /* Forward declaration of the libusb context */
     class Context;
     
     /**

@@ -1,4 +1,6 @@
+#include "libusb.h"
 #include "libusb_device.h"
+#include "libusb_misc.h"
 
 USB::Device::Device(const Device &copyref) : device(libusb_ref_device(copyref.device))
 {
