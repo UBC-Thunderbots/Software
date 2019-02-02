@@ -17,7 +17,11 @@ TEST(MoveSpinPrimitiveTest, move_spin_primitive_test)
     Robot* test_robot =
         new Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(), AngularVelocity::zero(),
                   std::chrono::steady_clock::time_point(std::chrono::seconds(4)));
-    auto* grsimCommandPrimitiveVisitor = new GrsimCommandPrimitiveVisitor(*test_robot);
+    Ball* test_ball =
+        new Ball(Point(1, 0), Vector(-1, -1),
+                 std::chrono::steady_clock::time_point(std::chrono::seconds(4)));
+    auto* grsimCommandPrimitiveVisitor =
+        new GrsimCommandPrimitiveVisitor(*test_robot, *test_ball);
     move_spin_primitive->accept(*grsimCommandPrimitiveVisitor);
 
     auto motion_controller_command =
