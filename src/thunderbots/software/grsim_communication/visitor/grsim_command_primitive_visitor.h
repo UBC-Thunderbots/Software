@@ -110,6 +110,8 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
     MotionController::MotionControllerCommand getMotionControllerCommand();
 
    private:
+    static constexpr double STANDARD_INTERCEPT_MARGIN = 1.0;
+
     // The robot that the Primitive calculations will be performed for
     Robot robot;
     // The MotionControllerCommand created by the 'visit' functions that is to be sent

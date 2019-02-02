@@ -58,8 +58,7 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     // If ball is far enough way from robot, add extra margin of error to ensure robot
     // gets in line with the ball correctly. In addition, if the robot is not yet facing
     // the ball move away to give it time to adjust.
-    double interceptonMargin =
-        CatchPrimitive::STANDARD_INTERCEPT_MARGIN * catch_primitive.getMargin();
+    double interceptonMargin = STANDARD_INTERCEPT_MARGIN * catch_primitive.getMargin();
     if (distanceToBall > interceptonMargin || robot.orientation() == robotDirection)
     {
         finalDest.set(finalDest.x() + interceptonMargin * ballDirX,
