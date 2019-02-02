@@ -4,6 +4,7 @@
 
 import { combineReducers } from 'redux';
 
+import consoleReducer from './console';
 import rosReducer from './ros';
 
 /**
@@ -11,5 +12,6 @@ import rosReducer from './ros';
  * initialized
  */
 export default combineReducers({
+    console: consoleReducer,
     ros: rosReducer,
 });
