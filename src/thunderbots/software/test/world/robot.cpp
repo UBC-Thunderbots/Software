@@ -5,17 +5,6 @@
 class RobotTest : public ::testing::Test
 {
    protected:
-    // We need to provide a constructor that initializes the Timestamp variables
-    // since the Timestamp class has no default constructor
-    RobotTest()
-        : ::testing::Test(),
-          current_time(Timestamp::fromSeconds(0)),
-          half_second_future(Timestamp::fromSeconds(0)),
-          one_second_future(Timestamp::fromSeconds(0)),
-          one_second_past(Timestamp::fromSeconds(0))
-    {
-    }
-
     void SetUp() override
     {
         // An arbitrary fixed point in time

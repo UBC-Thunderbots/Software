@@ -25,18 +25,6 @@ typedef struct
  */
 typedef struct FilteredBallData
 {
-    /**
-     * Creates a new FilteredBallData struct
-     *
-     * @param position The position of the ball
-     * @param velocity The velocity of the ball
-     * @param timestamp The timestamp of the data
-     */
-    FilteredBallData(Point position, Vector velocity, Timestamp timestamp)
-        : position(position), velocity(velocity), timestamp(timestamp)
-    {
-    }
-
     Point position;
     Vector velocity;
     Timestamp timestamp;

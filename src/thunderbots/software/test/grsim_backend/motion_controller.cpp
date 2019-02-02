@@ -25,8 +25,6 @@ using namespace std::chrono;
 class MotionControllerTest : public ::testing::Test
 {
    protected:
-    MotionControllerTest() : current_time(Timestamp::fromSeconds(0)) {}
-
     void SetUp() override
     {
         // An arbitrary fixed point in time

@@ -7,18 +7,6 @@
 class TeamTest : public ::testing::Test
 {
    protected:
-    // We need to provide a constructor that initializes the Timestamp variables
-    // since the Timestamp class has no default constructor
-    TeamTest()
-        : ::testing::Test(),
-          current_time(Timestamp::fromSeconds(0)),
-          one_second_future(Timestamp::fromSeconds(0)),
-          two_seconds_future(Timestamp::fromSeconds(0)),
-          two_seconds_100ms_future(Timestamp::fromSeconds(0)),
-          one_second_past(Timestamp::fromSeconds(0))
-    {
-    }
-
     void SetUp() override
     {
         current_time = Timestamp::fromSeconds(123);

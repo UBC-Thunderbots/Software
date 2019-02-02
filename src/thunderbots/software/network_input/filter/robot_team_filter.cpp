@@ -49,13 +49,16 @@ std::vector<FilteredRobotData> RobotTeamFilter::getFilteredData(
                 RobotData(new_robot_data.position, new_robot_data.orientation,
                           new_robot_data.timestamp);
 
-            FilteredRobotData filtered_data{
-                new_robot_data.id, new_robot_data.position, robot_velocity,
-                new_robot_data.orientation, robot_angular_velocity,
-                // TODO: This timestamp is a placeholder and should be fixed once the
-                // robot filter PR is merged
-                // https://github.com/UBC-Thunderbots/Software/issues/199
-                Timestamp::fromSeconds(0)};
+            FilteredRobotData filtered_data;
+            filtered_data.id               = new_robot_data.id;
+            filtered_data.position         = new_robot_data.position;
+            filtered_data.velocity         = robot_velocity;
+            filtered_data.orientation      = new_robot_data.orientation;
+            filtered_data.angular_velocity = robot_angular_velocity;
+            // TODO: This timestamp is a placeholder and should be fixed once the
+            // robot filter PR is merged
+            // https://github.com/UBC-Thunderbots/Software/issues/199
+            filtered_data.timestamp = Timestamp::fromSeconds(0);
 
             result.push_back(filtered_data);
         }

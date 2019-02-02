@@ -7,8 +7,6 @@
 class WorldTest : public ::testing::Test
 {
    protected:
-    WorldTest() : ::testing::Test(), current_time(Timestamp::fromSeconds(0)) {}
-
     void SetUp() override
     {
         // An arbitrary fixed point in time

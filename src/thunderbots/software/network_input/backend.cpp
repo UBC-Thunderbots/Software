@@ -73,13 +73,16 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
         {
             for (const SSL_DetectionRobot &friendly_robot : ssl_robots)
             {
-                SSLRobotData new_robot_data{
-                    friendly_robot.robot_id(),
+                SSLRobotData new_robot_data;
+
+                new_robot_data.id = friendly_robot.robot_id();
+                new_robot_data.position =
                     Point(friendly_robot.x() * METERS_PER_MILLIMETER,
-                          friendly_robot.y() * METERS_PER_MILLIMETER),
-                    Angle::ofRadians(friendly_robot.orientation()),
-                    friendly_robot.confidence(),
-                    Timestamp::fromSeconds(detection.t_capture())};
+                          friendly_robot.y() * METERS_PER_MILLIMETER);
+                new_robot_data.orientation =
+                    Angle::ofRadians(friendly_robot.orientation());
+                new_robot_data.confidence = friendly_robot.confidence();
+                new_robot_data.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
                 friendly_team_robot_data.emplace_back(new_robot_data);
             }
@@ -118,12 +121,14 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
         {
             for (const SSL_DetectionRobot &enemy_robot : ssl_robots)
             {
-                SSLRobotData new_robot_data{
-                    enemy_robot.robot_id(),
-                    Point(enemy_robot.x() * METERS_PER_MILLIMETER,
-                          enemy_robot.y() * METERS_PER_MILLIMETER),
-                    Angle::ofRadians(enemy_robot.orientation()), enemy_robot.confidence(),
-                    Timestamp::fromSeconds(detection.t_capture())};
+                SSLRobotData new_robot_data;
+
+                new_robot_data.id       = enemy_robot.robot_id();
+                new_robot_data.position = Point(enemy_robot.x() * METERS_PER_MILLIMETER,
+                                                enemy_robot.y() * METERS_PER_MILLIMETER);
+                new_robot_data.orientation = Angle::ofRadians(enemy_robot.orientation());
+                new_robot_data.confidence  = enemy_robot.confidence();
+                new_robot_data.timestamp = Timestamp::fromSeconds(detection.t_capture());
 
                 enemy_team_robot_data.emplace_back(new_robot_data);
             }

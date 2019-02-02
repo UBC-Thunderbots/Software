@@ -25,6 +25,7 @@ FilteredBallData BallFilter::getFilteredData(std::vector<SSLBallData> new_ball_d
     FilteredBallData filtered_data;
     filtered_data.position = new_ball_data[0].position;
     filtered_data.velocity = ball_data.velocity;
+    // TODO: This is a placeholder timestamp. It should be
     // This is a placeholder timestamp for now. Timestamps should be fixed in
     // https://github.com/UBC-Thunderbots/Software/issues/228
     filtered_data.timestamp = Timestamp::fromSeconds(new_ball_data[0].timestamp);
