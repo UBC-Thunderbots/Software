@@ -23,7 +23,7 @@ static const std::map<RefboxGameState, std::string> refbox_game_state_names = {
     {RefboxGameState::GOAL_THEM, "GOAL_THEM"},
     {RefboxGameState::BALL_PLACEMENT_US, "BALL_PLACEMENT_US"},
     {RefboxGameState::BALL_PLACEMENT_THEM, "BALL_PLACEMENT_THEM"},
-    {RefboxGameState::LAST_ENUM_ITEM_UNUSED, "LAST_ENUM_ITEM_UNUSED"}};
+    {RefboxGameState::REFBOX_GAME_STATE_COUNT, "REFBOX_GAME_STATE_COUNT"}};
 
 std::ostream& operator<<(std::ostream& os, const RefboxGameState& state)
 {
