@@ -30,6 +30,7 @@ namespace Util
     void VisualizerMessenger::publishAndClearLayers()
     {
         // Check if publisher is initialized before publishing messages
+        // TODO: #312: refresh rate limit by comparing time delta
         if (!this->publisher)
         {
             LOG(WARNING)
@@ -88,6 +89,26 @@ namespace Util
         new_shape.data.push_back(y);
         new_shape.data.push_back(w);
         new_shape.data.push_back(h);
+
+        applyDrawStyleToMsg(new_shape, draw_style);
+        applyDrawTransformToMsg(new_shape, draw_transform);
+        addShapeToLayer(layer, new_shape);
+    }
+
+    void VisualizerMessenger::drawPoly(const std::string& layer,
+                                       std::vector<std::pair<double, double>>& vertices,
+                                       DrawStyle draw_style, DrawTransform draw_transform)
+    {
+        ShapeMsg new_shape;
+        new_shape.type = "poly";
+        new_shape.data.clear();
+
+        for (auto vertexIter = vertices.begin(); vertexIter != vertices.end();
+             vertexIter++)
+        {
+            new_shape.data.push_back((*vertexIter).first);
+            new_shape.data.push_back((*vertexIter).second);
+        }
 
         applyDrawStyleToMsg(new_shape, draw_style);
         applyDrawTransformToMsg(new_shape, draw_transform);

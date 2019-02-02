@@ -132,8 +132,19 @@ namespace Util
                       DrawStyle draw_style         = DrawStyle(),
                       DrawTransform draw_transform = DrawTransform());
 
-        // TODO: #258 polygon support
-        void drawPoly();
+        /**
+         * Reuqest a message to draw a polygon shape. The origin is the
+         * first vertex passed in.
+         *
+         * @param layer: The layer name this shape is being drawn to
+         * @param vertices: A vector of pairs of vertex positions
+         * @param draw_style: the drawing style of the shape
+         * @param draw_transform: the transformation of the shape
+         */
+        void drawPoly(const std::string& layer,
+                      std::vector<std::pair<double, double>>& vertices,
+                      DrawStyle draw_style         = DrawStyle(),
+                      DrawTransform draw_transform = DrawTransform());
 
         /**
          * Request a message to draw an arc. The origin is the center point
