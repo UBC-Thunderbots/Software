@@ -50,8 +50,6 @@ int main(int argc, char** argv)
     // fails because there is another instance of this node running
     // and connected to the port we want, we don't kill that other node.
 
-    // TODO: Log error messages when this throws, then throw exception upwards
-    // https://github.com/UBC-Thunderbots/Software/issues/275
     std::unique_ptr<SSLVisionClient> ssl_vision_client;
     try
     {
@@ -61,14 +59,12 @@ int main(int argc, char** argv)
     }
     catch (const boost::exception& ex)
     {
-        std::cerr << "An error occured while setting up the SSL Vision Client:"
-                  << std::endl
-                  << boost::diagnostic_information(ex) << std::endl;
-        return EXIT_FAILURE;
+        // LOG(FATAL) will terminate the network_input process
+        LOG(FATAL) << "An error occured while setting up the SSL Vision Client:"
+                   << std::endl
+                   << boost::diagnostic_information(ex) << std::endl;
     }
 
-    // TODO: Log error messages when this throws, then throw exception upwards
-    // https://github.com/UBC-Thunderbots/Software/issues/275
     std::unique_ptr<SSLGameControllerClient> ssl_gamecontroller_client;
     try
     {
@@ -78,10 +74,10 @@ int main(int argc, char** argv)
     }
     catch (const boost::exception& ex)
     {
-        std::cerr << "An error occured while setting up the SSL Game Controller Client:"
-                  << std::endl
-                  << boost::diagnostic_information(ex) << std::endl;
-        return EXIT_FAILURE;
+        // LOG(FATAL) will terminate the network_input process
+        LOG(FATAL) << "An error occured while setting up the SSL Game Controller Client:"
+                   << std::endl
+                   << boost::diagnostic_information(ex) << std::endl;
     }
 
     // Init our backend class
