@@ -22,4 +22,4 @@ blocks:
           commands:
             - checkout
             - pwd
-            - travis_ci.sh
+            - ./travis_ci.sh
