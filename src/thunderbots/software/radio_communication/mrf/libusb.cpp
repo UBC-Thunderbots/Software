@@ -97,14 +97,6 @@ namespace
         throw USB::Error(s);
     }
 
-    std::string make_transfer_error_message(unsigned int endpoint, const char *msg)
-    {
-        std::stringstream ss;
-        ss << msg << " on " << ((endpoint & 0x80) ? "IN" : "OUT") << " endpoint "
-           << (endpoint & 0x7F) << std::endl;
-        return ss.str();
-    }
-
     bool matches_vid_pid_serial(const USB::Device &device, unsigned int vendor_id,
                                 unsigned int product_id, const char *serial_number)
     {
@@ -190,28 +182,6 @@ void USB::usb_transfer_handle_completed_transfer_trampoline(libusb_transfer *tra
     }
 }
 
-USB::Error::Error(const std::string &msg) : std::runtime_error(msg) {}
-
-USB::TransferError::TransferError(unsigned int endpoint, const char *msg)
-    : Error(make_transfer_error_message(endpoint, msg))
-{
-}
-
-USB::TransferTimeoutError::TransferTimeoutError(unsigned int endpoint)
-    : TransferError(endpoint, "Transfer timed out")
-{
-}
-
-USB::TransferStallError::TransferStallError(unsigned int endpoint)
-    : TransferError(endpoint, "Transfer stalled")
-{
-}
-
-USB::TransferCancelledError::TransferCancelledError(unsigned int endpoint)
-    : TransferError(endpoint, "Transfer cancelled")
-{
-}
-
 USB::Context::Context()
 {
     check_fn("libusb_init", libusb_init(&context), 0);
@@ -228,67 +198,6 @@ void USB::Context::handle_usb_fds()
     timeval tv = {0, 0};
     check_fn("libusb_handle_events_timeout", libusb_handle_events_timeout(context, &tv),
              0);
-}
-
-USB::Device::Device(const Device &copyref) : device(libusb_ref_device(copyref.device))
-{
-    check_fn("libusb_get_device_descriptor",
-             libusb_get_device_descriptor(device, &device_descriptor), 0);
-}
-
-USB::Device::~Device()
-{
-    libusb_unref_device(device);
-}
-
-USB::Device &USB::Device::operator=(const Device &assgref)
-{
-    if (assgref.device != device)
-    {
-        libusb_unref_device(device);
-        device = libusb_ref_device(assgref.device);
-    }
-    return *this;
-}
-
-USB::Device::Device(libusb_device *device) : device(libusb_ref_device(device))
-{
-    check_fn("libusb_get_device_descriptor",
-             libusb_get_device_descriptor(device, &device_descriptor), 0);
-}
-
-std::string USB::Device::serial_number() const
-{
-    if (!device_descriptor.iSerialNumber)
-    {
-        return "";
-    }
-
-    std::string value;
-    {
-        DeviceHandle devh(*this);
-        value = devh.string_descriptor(device_descriptor.iSerialNumber);
-    }
-    return value;
-}
-
-USB::DeviceList::DeviceList(Context &context)
-{
-    ssize_t ssz;
-    check_fn("libusb_get_device_list",
-             ssz = libusb_get_device_list(context.context, &devices), 0);
-    size_ = static_cast<std::size_t>(ssz);
-}
-
-USB::DeviceList::~DeviceList()
-{
-    libusb_free_device_list(devices, 1);
-}
-
-USB::Device USB::DeviceList::operator[](const std::size_t i) const
-{
-    assert(i < size());
-    return Device(devices[i]);
 }
 
 USB::DeviceHandle::DeviceHandle(const Device &device)

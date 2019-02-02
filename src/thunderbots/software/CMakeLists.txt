@@ -196,7 +196,7 @@ link_directories("${SIGC_LIBRARY_DIRS}")
 target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
         ${LIBUSB_1_LIBRARIES}
-	${SIGC_LIBRARIES}
+        ${SIGC_LIBRARIES}
         )
 
 file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
