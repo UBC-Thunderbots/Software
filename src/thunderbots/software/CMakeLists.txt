@@ -583,4 +583,11 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
+     # The test node that verifies the dynamic_parameters are working
+    add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
+            test/util/test_parameter_exists.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+    target_link_libraries(check_parameter_existance_test ${catkin_LIBRARIES})
+
 endif()
