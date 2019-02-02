@@ -207,7 +207,6 @@ sudo apt-get update
 host_software_packages=(
     g++-7 # We need g++ 7 or greater to support the C++17 standard
     python-rosinstall
-    protobuf-compiler
     libprotobuf-dev
     nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
     yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
