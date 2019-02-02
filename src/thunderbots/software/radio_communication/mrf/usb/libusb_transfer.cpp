@@ -172,7 +172,7 @@ void USB::usb_transfer_handle_completed_transfer_trampoline(libusb_transfer *tra
         // Save the exception in the main loop and do a normal return, which
         // will let libusb unwind itself properly before the exception continues
         // unwinding.
-        std::cerr << "Something went wrong with libusb: " << e.what() << std::endl;
+        LOG(FATAL) << "Something went wrong with libusb: " << e.what() << std::endl;
         throw;
     }
 }

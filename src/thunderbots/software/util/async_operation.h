@@ -35,6 +35,7 @@ class AsyncOperation : public NonCopyable
      * If the operation failed, this function throws the relevant exception.
      *
      * @return the return value.
+     * @throws an exception if operation has failed
      */
     virtual T result() const = 0;
 
@@ -44,7 +45,7 @@ class AsyncOperation : public NonCopyable
      * The default implementation calls result() and checks whether it throws an
      * exception.
      *
-     * @return \c true if the operation failed, or \c false if not.
+     * @return true if the operation failed, or false if not.
      */
     virtual bool succeeded() const
     {

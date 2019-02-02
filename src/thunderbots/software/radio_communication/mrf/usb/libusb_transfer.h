@@ -3,7 +3,7 @@
 #include <libusb.h>
 #include "libusb_devicehandle.h"
 #include "util/noncopyable.h"
-#include "async_operation.h"
+#include "util/async_operation.h"
 
 namespace USB {
     /* Forward declarations for C linkage */
