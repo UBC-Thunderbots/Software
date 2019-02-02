@@ -64,6 +64,8 @@ class AI final
      */
     void updateWorldEnemyTeamState(const Team& new_enemy_team_data);
 
+    void updateWorldRefboxGameState(const RefboxGameState& game_state);
+
 
    private:
     World world;
