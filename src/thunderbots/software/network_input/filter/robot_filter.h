@@ -12,7 +12,7 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
-typedef struct SSLRobotData
+typedef struct SSLRobotData_t
 {
     unsigned int id;
     Point position;
@@ -24,7 +24,7 @@ typedef struct SSLRobotData
 /**
  * A lightweight datatype used to pass filtered robot data
  */
-typedef struct FilteredRobotData
+typedef struct FilteredRobotData_t
 {
     unsigned int id;
     Point position;

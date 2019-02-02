@@ -23,7 +23,7 @@ typedef struct
  * something like std::pair so it's very explicit what data is being accessed, since
  * it's accessed by name rather than by index (first/second)
  */
-typedef struct FilteredBallData
+typedef struct FilteredBallData_t
 {
     Point position;
     Vector velocity;
