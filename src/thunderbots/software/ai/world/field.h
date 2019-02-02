@@ -3,6 +3,12 @@
 #include "geom/point.h"
 #include "geom/rectangle.h"
 
+typedef enum
+{
+    EAST,  // positive X side according to vision
+    WEST   // negative X side
+} FieldSide;
+
 /**
  * Exposes the dimensions of various parts of the field.
  */
