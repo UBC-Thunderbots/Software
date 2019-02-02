@@ -3,6 +3,7 @@
  * styling decorators
  */
 
+import { withKnobs } from '@storybook/addon-knobs';
 import { addDecorator, configure } from '@storybook/react';
 import * as React from 'react';
 
@@ -19,6 +20,9 @@ function loadStories() {
 // Add application styling to all stories
 const StyleDecorator = (storyFn: () => JSX.Element) => <Theme>{storyFn()}</Theme>;
 addDecorator(StyleDecorator);
+
+// Add Storybook knobs
+addDecorator(withKnobs);
 
 // Init Storybook
 configure(loadStories, module);
