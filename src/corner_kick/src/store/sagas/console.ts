@@ -4,6 +4,8 @@
 import { put, takeLatest } from 'redux-saga/effects';
 import { getType } from 'typesafe-actions';
 
+import { TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE } from 'SRC/constants';
+
 import * as ros from '../actions/ros';
 
 export default function* init() {
@@ -14,5 +16,5 @@ export default function* init() {
  * We subscribe to topic rosout to start receiving messages
  */
 function* startConsole() {
-    yield put(ros.subscribeTopic('/rosout', 'rosgraph_msgs/Log'));
+    yield put(ros.subscribeTopic(TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE));
 }

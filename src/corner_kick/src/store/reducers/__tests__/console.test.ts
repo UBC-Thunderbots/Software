@@ -3,7 +3,9 @@
  * Each test case has a description of what it tests
  */
 
+import { TOPIC_ROSOUT } from 'SRC/constants';
 import { IMessagesState } from 'SRC/types';
+
 import * as ros from '../../actions/ros';
 import consoleReducer from '../console';
 
@@ -20,7 +22,7 @@ const mockMessage = {
 describe('console reducer', () => {
     describe('when we receive action ros_NEW_MESSAGE', () => {
         it('should push messages to the state', () => {
-            const mockAction = ros.newMessage('/rosout', mockMessage);
+            const mockAction = ros.newMessage(TOPIC_ROSOUT, mockMessage);
 
             const state = consoleReducer(undefined, mockAction);
 
