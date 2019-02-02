@@ -94,7 +94,7 @@ class Parameter
      * @return true if the parameter exists, false otherwise
      *
      */
-    const bool existsInParameterServer()
+    const bool existsInParameterServer() const
     {
         return ros::param::has(this->getROSParameterPath());
     }
