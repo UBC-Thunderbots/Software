@@ -23,10 +23,7 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    // Determine if robot is at least 1 robot radius from the line perpendicular to the
-    // direction of the shot at the given location
-
-    // Todo: Implement perpendicular line to direction of shot
+    // Determine if robot is at least 1 robot radius from the given location
     if ((chip_primitive.getChipOrigin() - robot.position()).len() >= 1)
     {
         // Travel in straight line from current position to given location
@@ -70,10 +67,7 @@ void GrsimCommandPrimitiveVisitor::visit(
 
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    // Determine if robot is at least 1 robot radius from the line perpendicular to
-    // the direction of the shot at the given location
-
-    // Todo: Implement perpendicular line to direction of shot
+    // Determine if robot is at least 1 robot radius from the given location
     if ((kick_primitive.getKickOrigin() - robot.position()).len() >= 1)
     {
         // Travel in straight line from current position to given location
