@@ -4,6 +4,7 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
+#include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "geom/point.h"
