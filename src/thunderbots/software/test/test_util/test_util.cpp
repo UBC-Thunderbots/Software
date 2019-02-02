@@ -87,7 +87,8 @@ namespace Test
     std::vector<RefboxGameState> TestUtil::getAllRefboxGameStates()
     {
         std::vector<RefboxGameState> game_states;
-        for (int i = 0; i < static_cast<int>(RefboxGameState::LAST_ENUM_ITEM_UNUSED); i++)
+        for (int i = 0; i < static_cast<int>(RefboxGameState::REFBOX_GAME_STATE_COUNT);
+             i++)
         {
             game_states.push_back(static_cast<RefboxGameState>(i));
         }
