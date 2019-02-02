@@ -1,6 +1,6 @@
 #include "direct_velocity_intent.h"
 
-const std::string DirectVelocityIntent::INTENT_NAME = DIRECT_VELOCITY_INTENT_NAME;
+const std::string DirectVelocityIntent::INTENT_NAME = "Direct Velocity Intent";
 
 DirectVelocityIntent::DirectVelocityIntent(unsigned int robot_id, double x_velocity,
                                            double y_velocity, double angular_velocity,

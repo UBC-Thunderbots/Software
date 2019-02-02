@@ -1,6 +1,6 @@
 #include "catch_intent.h"
 
-const std::string CatchIntent::INTENT_NAME = CATCH_INTENT_NAME;
+const std::string CatchIntent::INTENT_NAME = "Catch Intent";
 
 CatchIntent::CatchIntent(unsigned int robot_id, double velocity, double dribbler_rpm,
                          double ball_intercept_margin)

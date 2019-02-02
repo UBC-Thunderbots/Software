@@ -2,16 +2,6 @@
 
 #include <string>
 
-/**Used for initializing `INTENT_NAME`s and comparisons,
- * for example getIntent() == XX_INTENT_NAME
- */
-const static std::string CATCH_INTENT_NAME           = "Catch Intent";
-const static std::string CHIP_INTENT_NAME            = "Chip Intent";
-const static std::string DIRECT_VELOCITY_INTENT_NAME = "Direct Velocity Intent";
-const static std::string KICK_INTENT_NAME            = "Kick Intent";
-const static std::string MOVE_INTENT_NAME            = "Move Intent";
-const static std::string PIVOT_INTENT_NAME           = "Pivot Intent";
-
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
  * robot should do, not necessarily exactly how it will do it. Examples are shooting at

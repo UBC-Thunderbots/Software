@@ -7,7 +7,7 @@ int Intent::getPriority(void) const
     return priority;
 }
 
-void setPriority(int new_priority)
+void Intent::setPriority(int new_priority)
 {
     priority = new_priority;
 }

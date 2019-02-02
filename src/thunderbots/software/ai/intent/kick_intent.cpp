@@ -1,6 +1,6 @@
 #include "kick_intent.h"
 
-const std::string KickIntent::INTENT_NAME = KICK_INTENT_NAME;
+const std::string KickIntent::INTENT_NAME = "Kick Intent";
 
 KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,
                        const Angle &kick_direction, double kick_speed_meters_per_second)

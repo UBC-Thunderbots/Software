@@ -1,6 +1,6 @@
 #include "pivot_intent.h"
 
-const std::string PivotIntent::INTENT_NAME = PIVOT_INTENT_NAME;
+const std::string PivotIntent::INTENT_NAME = "Pivot Intent";
 
 PivotIntent::PivotIntent(unsigned int robot_id, const Point &pivot_point,
                          const Angle &final_angle, const double pivot_radius)
