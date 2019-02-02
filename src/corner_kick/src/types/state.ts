@@ -1,3 +1,5 @@
+import { ILayer } from './visualizer';
+
 /*
  * This file specifies the format of the application state
  */
@@ -19,4 +21,12 @@ export interface IROSState {
     topics: string[];
     services: string[];
     params: string[];
+}
+
+/**
+ * The state object for the visualizer
+ */
+export interface IVisualizerState {
+    layerOrder: string[];
+    layers: { [K: string]: ILayer };
 }
