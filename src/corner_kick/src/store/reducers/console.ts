@@ -2,7 +2,7 @@
  * This file specifies the Console reducer
  */
 
-import { ActionType, getType } from 'typesafe-actions';
+import { getType } from 'typesafe-actions';
 
 import { IMessagesState } from 'SRC/types/state';
 

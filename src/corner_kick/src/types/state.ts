@@ -1,3 +1,5 @@
+import { IRosoutMessage } from './standardROSMessages';
+
 /*
  * This file specifies the format of the application state
  */
@@ -25,5 +27,5 @@ export interface IROSState {
  * The messages state
  */
 export interface IMessagesState {
-    messages: string[];
+    messages: IRosoutMessage[];
 }
