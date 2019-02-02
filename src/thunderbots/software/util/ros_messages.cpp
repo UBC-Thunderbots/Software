@@ -59,16 +59,6 @@ namespace Util
 
             team.updateRobots(robots);
 
-<<<<<<< HEAD
-            // if (team_msg.goalie_id >= 0)
-            // {
-            //     team.assignGoalie(static_cast<unsigned int>(team_msg.goalie_id));
-            // }
-            // else
-            // {
-            //     team.clearGoalie();
-            // }
-=======
             if (team_msg.goalie_id >= 0)
             {
                 // TODO: Remove this exception handling. It is a temporary fix for
@@ -88,7 +78,6 @@ namespace Util
             {
                 team.clearGoalie();
             }
->>>>>>> 4a1802e619cef1aec11d7531316833d971094b5b
 
             return team;
         }
