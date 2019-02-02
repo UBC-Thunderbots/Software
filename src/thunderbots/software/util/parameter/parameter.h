@@ -89,6 +89,17 @@ class Parameter
     }
 
     /**
+     * Checks if the parameter currently exists in the ros parameter server
+     *
+     * @return true if the parameter exists, false otherwise
+     *
+     */
+    const bool existsInParameterServer() const
+    {
+        return ros::param::has(this->getROSParameterPath());
+    }
+
+    /**
      * Updates the value of this Parameter with the value from the ROS
      * Parameter Server
      */
