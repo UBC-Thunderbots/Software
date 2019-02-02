@@ -1,8 +1,8 @@
-#include "libusb_errors.h"
+#include "errors.h"
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace
 {
@@ -14,7 +14,7 @@ namespace
         return ss.str();
     }
 
-}
+}  // namespace
 
 USB::Error::Error(const std::string &msg) : std::runtime_error(msg) {}
 

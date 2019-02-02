@@ -1,8 +1,9 @@
 #pragma once
 #include <libusb.h>
-#include <string>
+
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 #include "util/noncopyable.h"
 
@@ -10,7 +11,7 @@ namespace USB
 {
     /* Forward declaration of the libusb context */
     class Context;
-    
+
     /**
      * A collection of information about a USB device.
      */
@@ -119,4 +120,4 @@ namespace USB
         std::size_t size_;
         libusb_device **devices;
     };
-}
+}  // namespace USB

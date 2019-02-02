@@ -14,15 +14,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "libusb_misc.h"
-#include "libusb_errors.h"
-#include "libusb_device.h"
-#include "libusb_transfer.h"
-#include "libusb_devicehandle.h"
-#include "libusb_bulktransfer.h"
-#include "libusb_interrupttransfer.h"
-#include "libusb_controltransfer.h"
-
+#include "bulktransfer.h"
+#include "controltransfer.h"
+#include "device.h"
+#include "devicehandle.h"
+#include "errors.h"
+#include "interrupttransfer.h"
+#include "misc.h"
+#include "transfer.h"
 #include "util/async_operation.h"
 #include "util/noncopyable.h"
 

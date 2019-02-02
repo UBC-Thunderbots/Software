@@ -1,8 +1,9 @@
+#include "transfer.h"
+
 #include <iostream>
 
-#include "libusb_transfer.h"
-#include "libusb_errors.h"
-#include "libusb_misc.h"
+#include "errors.h"
+#include "misc.h"
 #include "util/logger/init.h"
 
 USB::Transfer::~Transfer()

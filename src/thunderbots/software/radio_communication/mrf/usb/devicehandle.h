@@ -1,22 +1,23 @@
 #pragma once
 
 #include <libusb.h>
-#include <string>
-#include <cstdint>
-#include <cstddef>
-#include <cassert>
-#include <vector>
-#include <memory>
 
-#include "libusb_device.h"
+#include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "device.h"
 #include "util/noncopyable.h"
 
-namespace USB {
-
+namespace USB
+{
     /* Forward declaration of the libusb context */
     class Context;
     extern "C" void usb_transfer_handle_completed_transfer_trampoline(
-            libusb_transfer *transfer);
+        libusb_transfer *transfer);
 
     /**
      * A libusb device handle which can be used to communicate with a device.
@@ -296,4 +297,4 @@ namespace USB {
         void init_descriptors();
     };
 
-}
+}  // namespace USB

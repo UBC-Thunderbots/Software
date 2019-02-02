@@ -1,14 +1,16 @@
 #pragma once
 
 #include <libusb.h>
-#include "libusb_devicehandle.h"
-#include "util/noncopyable.h"
-#include "util/async_operation.h"
 
-namespace USB {
+#include "devicehandle.h"
+#include "util/async_operation.h"
+#include "util/noncopyable.h"
+
+namespace USB
+{
     /* Forward declarations for C linkage */
     extern "C" void usb_transfer_handle_completed_transfer_trampoline(
-            libusb_transfer *transfer);
+        libusb_transfer *transfer);
 
     /**
      * A libusb transfer.
@@ -100,4 +102,4 @@ namespace USB {
     {
         void usb_transfer_handle_completed_transfer_trampoline(libusb_transfer *transfer);
     }
-}
+}  // namespace USB

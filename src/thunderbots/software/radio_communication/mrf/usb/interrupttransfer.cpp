@@ -1,5 +1,6 @@
+#include "interrupttransfer.h"
+
 #include <cstring>
-#include "libusb_interrupttransfer.h"
 
 USB::InterruptInTransfer::InterruptInTransfer(DeviceHandle &dev, unsigned char endpoint,
                                               std::size_t len, bool exact_len,

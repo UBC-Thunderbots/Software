@@ -1,6 +1,7 @@
-#include "libusb_misc.h"
-#include "libusb_transfer.h"
-#include "libusb_errors.h"
+#include "misc.h"
+
+#include "errors.h"
+#include "transfer.h"
 
 long USB::check_fn(const char *call, long err, unsigned int endpoint)
 {
@@ -68,7 +69,7 @@ long USB::check_fn(const char *call, long err, unsigned int endpoint)
     }
     std::string s;
     s.reserve(std::strlen(call) + 2 + std::strlen(msg) +
-                (detail ? (3 + std::strlen(detail)) : 0));
+              (detail ? (3 + std::strlen(detail)) : 0));
     s.append(call);
     s.append(": ");
     s.append(msg);

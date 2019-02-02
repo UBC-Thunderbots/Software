@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libusb_transfer.h"
+#include "transfer.h"
 
 namespace USB
 {
@@ -86,4 +86,4 @@ namespace USB
         }
     };
 
-}
+}  // namespace USB

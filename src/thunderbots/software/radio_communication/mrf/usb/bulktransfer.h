@@ -1,5 +1,5 @@
 #pragma once
-#include "libusb_transfer.h"
+#include "transfer.h"
 
 namespace USB
 {
@@ -79,4 +79,4 @@ namespace USB
                                  const void *data, std::size_t len, std::size_t max_len,
                                  unsigned int timeout);
     };
-}
+}  // namespace USB

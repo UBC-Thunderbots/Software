@@ -1,6 +1,7 @@
+#include "devicehandle.h"
+
 #include "libusb.h"
-#include "libusb_devicehandle.h"
-#include "libusb_misc.h"
+#include "misc.h"
 #include "util/logger/init.h"
 
 namespace

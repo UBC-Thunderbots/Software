@@ -1,5 +1,6 @@
+#include "bulktransfer.h"
+
 #include <cstring>
-#include "libusb_bulktransfer.h"
 
 USB::BulkInTransfer::BulkInTransfer(DeviceHandle &dev, unsigned char endpoint,
                                     std::size_t len, bool exact_len, unsigned int timeout)

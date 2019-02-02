@@ -23,7 +23,8 @@ const char* const MRF::ERROR_LT_MESSAGES[] = {
     "dribbler Hall sensor stuck high",
 };
 
-// Assert that there are the correct number of level-triggered messages in the array of chars.
+// Assert that there are the correct number of level-triggered messages in the array of
+// chars.
 static_assert(sizeof(MRF::ERROR_LT_MESSAGES) / sizeof(*MRF::ERROR_LT_MESSAGES) ==
                   MRF::ERROR_LT_COUNT,
               "Wrong number of level-triggered error messages.");
@@ -35,7 +36,8 @@ const char* const MRF::ERROR_ET_MESSAGES[] = {
     "crashed (no core dump)",
 };
 
-// Assert that there are the correct number of edge-triggered messages in the array of chars.
+// Assert that there are the correct number of edge-triggered messages in the array of
+// chars.
 static_assert(sizeof(MRF::ERROR_ET_MESSAGES) / sizeof(*MRF::ERROR_ET_MESSAGES) ==
                   MRF::ERROR_ET_COUNT,
               "Wrong number of edge-triggered error messages.");

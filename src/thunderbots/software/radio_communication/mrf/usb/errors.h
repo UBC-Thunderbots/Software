@@ -80,4 +80,4 @@ namespace USB
         explicit TransferCancelledError(unsigned int endpoint);
     };
 
-}
+}  // namespace USB
