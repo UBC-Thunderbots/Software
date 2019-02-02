@@ -20,6 +20,7 @@ blocks:
       jobs:
         - name: Build
           commands:
+            - change-gcc-version 4.8
             - checkout
             - pwd
             - ./travis_ci.sh
