@@ -10,11 +10,11 @@ blocks:
     task:
       env_vars:
         - name: RUN_BUILD
-          value: true
+          value: "true"
         - name: RUN_TESTS
-          value: true
+          value: "true"
         - name: RUN_COVERAGE
-          value: true
+          value: "true"
         - name: ROS_DISTRO
           value: melodic
       jobs:
