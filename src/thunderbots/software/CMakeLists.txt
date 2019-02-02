@@ -9,6 +9,10 @@ endif()
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Use PkgConfig to find some packages using pkg_check_modules
+find_package(PkgConfig REQUIRED)
+include(FindPkgConfig)
+
 ####################
 ## Compiler Flags ##
 ####################
@@ -151,6 +155,7 @@ add_executable (grsim_communication
         ${GRSIM_COMMUNICATION_SRC}
         ${SHARED_UTIL_SRC}
         )
+
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
@@ -176,8 +181,22 @@ add_executable (radio_communication
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
+
+##### LIBUSB #####
+pkg_search_module("LIBUSB_1" REQUIRED "libusb-1.0")
+include_directories(SYSTEM "${LIBUSB_1_INCLUDE_DIRS}")
+link_directories("${LIBUSB_1_LIBRARY_DIRS}")
+add_definitions("${LIBUSB_1_DEFINITIONS}")
+
+##### SIGC++  ######
+pkg_search_module("SIGC" REQUIRED "sigc++-2.0")
+include_directories(SYSTEM "${SIGC_INCLUDE_DIRS}")
+link_directories("${SIGC_LIBRARY_DIRS}")
+
 target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
+        ${LIBUSB_1_LIBRARIES}
+        ${SIGC_LIBRARIES}
         )
 
 file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
