@@ -7,11 +7,13 @@
 #include <limits>
 
 #include "geom/angle.h"
+#include "geom/rectangle.h"
+#include "geom/segment.h"
 
 
-double proj_len(const Seg &first, const Vector &second)
+double proj_len(const Segment &first, const Vector &second)
 {
-    return proj_len(first.toVector(), second - first.start);
+    return proj_len(first.toVector(), second - first.getSegStart());
 }
 
 double proj_len(const Vector &first, const Vector &second)
@@ -24,25 +26,25 @@ double dist(const Vector &first, const Vector &second)
     return (first - second).len();
 }
 
-double dist(const Seg &first, const Seg &second)
+double dist(const Segment &first, const Segment &second)
 {
     if (intersects(first, second))
     {
         return 0.0;
     }
-    return std::sqrt(
-        std::min(std::min(distsq(first, second.start), distsq(first, second.end)),
-                 std::min(distsq(second, first.start), distsq(second, first.end))));
+    return std::sqrt(std::min(
+        std::min(distsq(first, second.getSegStart()), distsq(first, second.getEnd())),
+        std::min(distsq(second, first.getSegStart()), distsq(second, first.getEnd()))));
 }
 
 double dist(const Line &first, const Vector &second)
 {
     if (isDegenerate(first))
     {
-        return dist(first.first, second);
+        return dist(first.getFirst(), second);
     }
-    return fabs((second - first.first).cross(first.second - first.first) /
-                (first.second - first.first).len());
+    return fabs((second - first.getFirst()).cross(first.getSecond() - first.getFirst()) /
+                (first.getSecond() - first.getFirst()).len());
 }
 
 double dist(const Vector &first, const Line &second)
@@ -50,21 +52,21 @@ double dist(const Vector &first, const Line &second)
     return dist(second, first);
 }
 
-double dist(const Vector &first, const Seg &second)
+double dist(const Vector &first, const Segment &second)
 {
     return std::sqrt(distsq(first, second));
 }
 
-double dist(const Seg &first, const Vector &second)
+double dist(const Segment &first, const Vector &second)
 {
     return dist(second, first);
 }
 
-double distsq(const Vector &first, const Seg &second)
+double distsq(const Vector &first, const Segment &second)
 {
     double seglensq    = lensq(second);
-    Vector relsecond_s = first - second.start;
-    Vector relsecond_e = first - second.end;
+    Vector relsecond_s = first - second.getSegStart();
+    Vector relsecond_e = first - second.getEnd();
 
     Vector s_vec2 = second.toVector();
 
@@ -78,12 +80,13 @@ double distsq(const Vector &first, const Seg &second)
         return std::fabs(cross * cross / seglensq);
     }
 
-    double lensq_s = distsq(second.start, first), lensq_e = distsq(second.end, first);
+    double lensq_s = distsq(second.getSegStart(), first),
+           lensq_e = distsq(second.getEnd(), first);
 
     return std::min(lensq_s, lensq_e);
 }
 
-double distsq(const Seg &first, const Vector &second)
+double distsq(const Segment &first, const Vector &second)
 {
     return distsq(second, first);
 }
@@ -93,29 +96,29 @@ double distsq(const Vector &first, const Vector &second)
     return (first - second).lensq();
 }
 
-bool isDegenerate(const Seg &seg)
+bool isDegenerate(const Segment &segment)
 {
-    return distsq(seg.start, seg.end) < EPS2;
+    return distsq(segment.getSegStart(), segment.getEnd()) < EPS2;
 }
 
 bool isDegenerate(const Line &line)
 {
-    return distsq(line.first, line.second) < EPS2;
+    return distsq(line.getFirst(), line.getSecond()) < EPS2;
 }
 
 bool isDegenerate(const Ray &ray)
 {
-    return distsq(ray.start, ray.dir) < EPS2;
+    return distsq(ray.getRayStart(), ray.getDirection()) < EPS2;
 }
 
-double len(const Seg &seg)
+double len(const Segment &segment)
 {
-    return dist(seg.start, seg.end);
+    return dist(segment.getSegStart(), segment.getEnd());
 }
 
-double lensq(const Seg &seg)
+double lensq(const Segment &segment)
 {
-    return distsq(seg.start, seg.end);
+    return distsq(segment.getSegStart(), segment.getEnd());
 }
 
 double lensq(const Line &line)
@@ -142,22 +145,22 @@ bool contains(const Triangle &out, const Vector &in)
 
 bool contains(const Circle &out, const Vector &in)
 {
-    return distsq(out.origin, in) <= out.radius * out.radius;
+    return distsq(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
 }
 
-bool contains(const Circle &out, const Seg &in)
+bool contains(const Circle &out, const Segment &in)
 {
-    return dist(in, out.origin) < out.radius;
+    return dist(in, out.getOrigin()) < out.getRadius();
 }
 
-bool contains(const Seg &out, const Vector &in)
+bool contains(const Segment &out, const Vector &in)
 {
-    if (collinear(in, out.start, out.end))
+    if (collinear(in, out.getSegStart(), out.getEnd()))
     {
         // if collinear we only need to check one of the coordinates,
         // arbitrarily choose x
-        return (in.x() <= out.start.x() && in.x() >= out.end.x()) ||
-               (in.x() <= out.end.x() && in.x() >= out.start.x());
+        return (in.x() <= out.getSegStart().x() && in.x() >= out.getEnd().x()) ||
+               (in.x() <= out.getEnd().x() && in.x() >= out.getSegStart().x());
     }
 
     return false;
@@ -165,26 +168,28 @@ bool contains(const Seg &out, const Vector &in)
 
 bool contains(const Ray &out, const Vector &in)
 {
-    if (collinear(in, out.start, out.dir))
+    if (collinear(in, out.getRayStart(), out.getDirection()))
     {
-        return sign(in.x() - out.start.x()) == sign(out.dir.x() - out.start.x()) &&
-               sign(in.y() - out.start.y()) == sign(out.dir.y() - out.start.y());
+        return sign(in.x() - out.getRayStart().x()) ==
+                   sign(out.getDirection().x() - out.getRayStart().x()) &&
+               sign(in.y() - out.getRayStart().y()) ==
+                   sign(out.getDirection().y() - out.getRayStart().y());
     }
 
     return false;
 }
 
-bool contains(const Rect &out, const Vector &in)
+bool contains(const Rectangle &out, const Vector &in)
 {
     return out.containsPoint(in);
 }
 
 bool intersects(const Triangle &first, const Circle &second)
 {
-    return contains(first, second.origin) ||
-           dist(getSide(first, 0), second.origin) < second.radius ||
-           dist(getSide(first, 1), second.origin) < second.radius ||
-           dist(getSide(first, 2), second.origin) < second.radius;
+    return contains(first, second.getOrigin()) ||
+           dist(getSide(first, 0), second.getOrigin()) < second.getRadius() ||
+           dist(getSide(first, 1), second.getOrigin()) < second.getRadius() ||
+           dist(getSide(first, 2), second.getOrigin()) < second.getRadius();
 }
 bool intersects(const Circle &first, const Triangle &second)
 {
@@ -193,57 +198,66 @@ bool intersects(const Circle &first, const Triangle &second)
 
 bool intersects(const Circle &first, const Circle &second)
 {
-    return (first.origin - second.origin).len() < (first.radius + second.radius);
+    return (first.getOrigin() - second.getOrigin()).len() <
+           (first.getRadius() + second.getRadius());
 }
 
-bool intersects(const Ray &first, const Seg &second)
+bool intersects(const Ray &first, const Segment &second)
 {
-    auto isect = lineIntersection(first.start, first.dir, second.start, second.end);
+    auto isect = lineIntersection(first.getRayStart(), first.getDirection(),
+                                  second.getSegStart(), second.getEnd());
     if (isect.has_value())
     {
         return contains(first, isect.value()) && contains(second, isect.value());
     }
-    return collinear(first.start, first.dir, second.start);
+    return collinear(first.getRayStart(), first.getDirection(), second.getSegStart());
 }
-bool intersects(const Seg &first, const Ray &second)
+bool intersects(const Segment &first, const Ray &second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Seg &first, const Circle &second)
+bool intersects(const Segment &first, const Circle &second)
 {
     // if the segment is inside the circle AND at least one of the points is
     // outside the circle
-    return contains(second, first) &&
-           (distsq(first.start, second.origin) > second.radius * second.radius ||
-            distsq(first.end, second.origin) > second.radius * second.radius);
+    return contains(second, first) && (distsq(first.getSegStart(), second.getOrigin()) >
+                                           second.getRadius() * second.getRadius() ||
+                                       distsq(first.getEnd(), second.getOrigin()) >
+                                           second.getRadius() * second.getRadius());
 }
-bool intersects(const Circle &first, const Seg &second)
+bool intersects(const Circle &first, const Segment &second)
 {
     return intersects(second, first);
 }
 
-bool intersects(const Seg &first, const Seg &second)
+bool intersects(const Segment &first, const Segment &second)
 {
-    if (sign((first.start - first.end).cross(second.start - second.end)) == 0)
+    if (sign((first.getSegStart() - first.getEnd())
+                 .cross(second.getSegStart() - second.getEnd())) == 0)
     {
         // find distance of two endpoints on segments furthest away from each
         // other
-        double mx_len = std::sqrt(std::max(std::max((second.start - first.end).lensq(),
-                                                    (second.end - first.end).lensq()),
-                                           std::max((second.start - first.start).lensq(),
-                                                    (second.end - first.start).lensq())));
+        double mx_len = std::sqrt(
+            std::max(std::max((second.getSegStart() - first.getEnd()).lensq(),
+                              (second.getEnd() - first.getEnd()).lensq()),
+                     std::max((second.getSegStart() - first.getSegStart()).lensq(),
+                              (second.getEnd() - first.getSegStart()).lensq())));
         // if the segments cross then this distance should be less than
         // the sum of the distances of the line segments
-        return mx_len <
-               (first.start - first.end).len() + (second.start - second.end).len() + EPS;
+        return mx_len < (first.getSegStart() - first.getEnd()).len() +
+                            (second.getSegStart() - second.getEnd()).len() + EPS;
     }
 
-    return sign((first.end - first.start).cross(second.start - first.start)) *
-                   sign((first.end - first.start).cross(second.end - first.start)) <=
+    return sign((first.getEnd() - first.getSegStart())
+                    .cross(second.getSegStart() - first.getSegStart())) *
+                   sign((first.getEnd() - first.getSegStart())
+                            .cross(second.getEnd() - first.getSegStart())) <=
                0 &&
-           sign((second.end - second.start).cross(first.start - second.start)) *
-                   sign((second.end - second.start).cross(first.end - second.start)) <=
+           sign((second.getEnd() - second.getSegStart())
+                    .cross(first.getSegStart() - second.getSegStart())) *
+                   sign((second.getEnd() - second.getSegStart())
+                            .cross(first.getEnd() - second.getSegStart())) <=
                0;
 }
 
@@ -266,9 +280,9 @@ void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
 }
 
 template <size_t N>
-Seg getSide(const Poly<N> &poly, unsigned int i)
+Segment getSide(const Poly<N> &poly, unsigned int i)
 {
-    return Seg(getVertex(poly, i), getVertex(poly, (i + 1) % N));
+    return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
 
 std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
@@ -282,7 +296,7 @@ std::vector<std::pair<Vector, Angle>> angleSweepCirclesAll(
     {
         // return a result that contains the direction of the line and zero angle if not
         // blocked by obstacles
-        Seg collinear_seg = Seg(src, p1);
+        Segment collinear_seg = Segment(src, p1);
         for (Point p : obstacles)
         {
             if (intersects(collinear_seg, Circle(p, radius)))
@@ -466,7 +480,7 @@ Vector clipPoint(const Vector &p, const Vector &bound1, const Vector &bound2)
     return ret;
 }
 
-Vector clipPoint(const Vector &p, const Rect &r)
+Vector clipPoint(const Vector &p, const Rectangle &r)
 {
     const double minx = r.swCorner().x();
     const double miny = r.swCorner().y();
@@ -528,7 +542,7 @@ std::vector<Vector> lineCircleIntersect(const Vector &centre, double radius,
     return ans;
 }
 
-std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
+std::vector<Vector> lineRectIntersect(const Rectangle &r, const Vector &segA,
                                       const Vector &segB)
 {
     std::vector<Vector> ans;
@@ -537,7 +551,7 @@ std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
         const Vector &a = r[i];
         // to draw a line segment from point 3 to point 0
         const Vector &b = r[(i + 1) % 4];
-        if (intersects(Seg(a, b), Seg(segA, segB)) &&
+        if (intersects(Segment(a, b), Segment(segA, segB)) &&
             uniqueLineIntersects(a, b, segA, segB))
         {
             ans.push_back(lineIntersection(a, b, segA, segB).value());
@@ -546,7 +560,7 @@ std::vector<Vector> lineRectIntersect(const Rect &r, const Vector &segA,
     return ans;
 }
 
-Vector vectorRectIntersect(const Rect &r, const Vector &vecA, const Vector &vecB)
+Vector vectorRectIntersect(const Rectangle &r, const Vector &vecA, const Vector &vecB)
 {
     std::vector<Vector> points = lineRectIntersect(r, vecA, (vecB - vecA) * 100 + vecA);
     for (Vector i : points)
@@ -635,30 +649,37 @@ bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
     return std::abs((d - c).cross(b - a)) > EPS;
 }
 
-std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
+std::vector<Point> lineIntersection(const Segment &a, const Segment &b)
 {
-    if (std::fabs((b.end - b.start).cross(a.end - a.start)) < EPS)
+    if (std::fabs((b.getEnd() - b.getSegStart()).cross(a.getEnd() - a.getSegStart())) <
+        EPS)
     {
         // parallel line segments, find if they're collinear and return the 2 points
         // on the line they both lay on if they are collinear and intersecting
         // shamelessly copypasted from
         // https://stackoverflow.com/questions/22456517/algorithm-for-finding-the-segment-overlapping-two-collinear-segments
-        if (collinear(a.start, b.start, b.end) && collinear(a.end, b.start, b.end))
+        if (collinear(a.getSegStart(), b.getSegStart(), b.getEnd()) &&
+            collinear(a.getEnd(), b.getSegStart(), b.getEnd()))
         {
-            double slope      = (a.end.y() - a.start.y()) / (a.end.x() - a.start.x());
+            double slope = (a.getEnd().y() - a.getSegStart().y()) /
+                           (a.getEnd().x() - a.getSegStart().x());
             bool isHorizontal = slope < EPS;
             bool isDescending = slope < 0 && !isHorizontal;
             double invertY    = isDescending || isHorizontal ? -1 : 1;
 
-            Point min1 = Point(std::min(a.start.x(), a.end.x()),
-                               std::min(a.start.y() * invertY, a.end.y() * invertY));
-            Point max1 = Point(std::max(a.start.x(), a.end.x()),
-                               std::max(a.start.y() * invertY, a.end.y() * invertY));
+            Point min1 =
+                Point(std::min(a.getSegStart().x(), a.getEnd().x()),
+                      std::min(a.getSegStart().y() * invertY, a.getEnd().y() * invertY));
+            Point max1 =
+                Point(std::max(a.getSegStart().x(), a.getEnd().x()),
+                      std::max(a.getSegStart().y() * invertY, a.getEnd().y() * invertY));
 
-            Point min2 = Point(std::min(b.start.x(), b.end.x()),
-                               std::min(b.start.y() * invertY, b.end.y() * invertY));
-            Point max2 = Point(std::max(b.start.x(), b.end.x()),
-                               std::max(b.start.y() * invertY, b.end.y() * invertY));
+            Point min2 =
+                Point(std::min(b.getSegStart().x(), b.getEnd().x()),
+                      std::min(b.getSegStart().y() * invertY, b.getEnd().y() * invertY));
+            Point max2 =
+                Point(std::max(b.getSegStart().x(), b.getEnd().x()),
+                      std::max(b.getSegStart().y() * invertY, b.getEnd().y() * invertY));
 
             Point minIntersection;
             if (isDescending)
@@ -692,24 +713,26 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b)
             return std::vector<Point>();
     }
 
-    return std::vector<Point>{a.start + (a.start - b.start).cross(b.end - b.start) /
-                                            (b.end - b.start).cross(a.end - a.start) *
-                                            (a.end - a.start)};
+    return std::vector<Point>{
+        a.getSegStart() +
+        (a.getSegStart() - b.getSegStart()).cross(b.getEnd() - b.getSegStart()) /
+            (b.getEnd() - b.getSegStart()).cross(a.getEnd() - a.getSegStart()) *
+            (a.getEnd() - a.getSegStart())};
 }
 
 // shamelessly copy-pasted from RoboJackets
 std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Vector &c,
                                       const Vector &d)
 {
-    Seg line1(a, b), line2(c, d);
-    double x1 = line1.start.x();
-    double y1 = line1.start.y();
-    double x2 = line1.end.x();
-    double y2 = line1.end.y();
-    double x3 = line2.start.x();
-    double y3 = line2.start.y();
-    double x4 = line2.end.x();
-    double y4 = line2.end.y();
+    Segment line1(a, b), line2(c, d);
+    double x1 = line1.getSegStart().x();
+    double y1 = line1.getSegStart().y();
+    double x2 = line1.getEnd().x();
+    double y2 = line1.getEnd().y();
+    double x3 = line2.getSegStart().x();
+    double y3 = line2.getSegStart().y();
+    double x4 = line2.getEnd().x();
+    double y4 = line2.getEnd().y();
 
     double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
     if (denom == 0)
@@ -869,10 +892,10 @@ double closestPointTime(Point x1, Vector v1, Point x2, Vector v2)
     return t;
 }
 
-bool pointInFrontVector(Vector offset, Vector dir, Vector p)
+bool pointInFrontVector(Vector offset, Vector direction, Vector p)
 {
     // compare angle different
-    Angle a1   = dir.orientation();
+    Angle a1   = direction.orientation();
     Angle a2   = (p - offset).orientation();
     Angle diff = (a1 - a2).angleMod();
     return diff < Angle::quarter() && diff > -Angle::quarter();
@@ -885,29 +908,32 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     // the perp points
     if (contains(circle, start))
     {
-        double perpDist =
-            std::sqrt(circle.radius * circle.radius - (circle.origin - start).lensq());
-        Point p1 = start + (circle.origin - start).perp().norm(perpDist + buffer);
-        Point p2 = start - (circle.origin - start).perp().norm(perpDist + buffer);
+        double perpDist = std::sqrt(circle.getRadius() * circle.getRadius() -
+                                    (circle.getOrigin() - start).lensq());
+        Point p1 = start + (circle.getOrigin() - start).perp().norm(perpDist + buffer);
+        Point p2 = start - (circle.getOrigin() - start).perp().norm(perpDist + buffer);
         return std::make_pair(p1, p2);
     }
     else
     {
-        double radiusAngle = std::acos(circle.radius / (start - circle.origin).len());
-        Point p1           = circle.origin + (start - circle.origin)
-                                       .rotate(Angle::ofRadians(radiusAngle))
-                                       .norm(circle.radius + buffer);
-        Point p2 = circle.origin + (start - circle.origin)
-                                       .rotate(-Angle::ofRadians(radiusAngle))
-                                       .norm(circle.radius + buffer);
+        double radiusAngle =
+            std::acos(circle.getRadius() / (start - circle.getOrigin()).len());
+        Point p1 = circle.getOrigin() + (start - circle.getOrigin())
+                                            .rotate(Angle::ofRadians(radiusAngle))
+                                            .norm(circle.getRadius() + buffer);
+        Point p2 = circle.getOrigin() + (start - circle.getOrigin())
+                                            .rotate(-Angle::ofRadians(radiusAngle))
+                                            .norm(circle.getRadius() + buffer);
         return std::make_pair(p1, p2);
     }
 }
 
-bool pointIsRightOfLine(const Seg &line, const Point &point)
+bool pointIsRightOfLine(const Segment &line, const Point &point)
 {
-    return (line.end.x() - line.start.x()) * (point.y() - line.start.y()) -
-               (line.end.y() - line.start.y()) * (point.x() - line.start.x()) <
+    return (line.getEnd().x() - line.getSegStart().x()) *
+                   (point.y() - line.getSegStart().y()) -
+               (line.getEnd().y() - line.getSegStart().y()) *
+                   (point.x() - line.getSegStart().x()) <
            0.0;
 }
 

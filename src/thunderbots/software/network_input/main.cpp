@@ -4,6 +4,7 @@
 
 #include "geom/point.h"
 #include "network_input/backend.h"
+#include "network_input/networking/ssl_gamecontroller_client.h"
 #include "network_input/networking/ssl_vision_client.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
@@ -37,6 +38,9 @@ int main(int argc, char** argv)
     ros::Publisher enemy_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC,
         Util::Constants::NUMBER_OF_SSL_VISION_CAMERAS);
+    ros::Publisher gamecontroller_publisher =
+        node_handle.advertise<thunderbots_msgs::RefboxData>(
+            Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
@@ -45,6 +49,9 @@ int main(int argc, char** argv)
     // NOTE: We do this before initializing the ROS node so that if it
     // fails because there is another instance of this node running
     // and connected to the port we want, we don't kill that other node.
+
+    // TODO: Log error messages when this throws, then throw exception upwards
+    // https://github.com/UBC-Thunderbots/Software/issues/275
     std::unique_ptr<SSLVisionClient> ssl_vision_client;
     try
     {
@@ -55,6 +62,23 @@ int main(int argc, char** argv)
     catch (const boost::exception& ex)
     {
         std::cerr << "An error occured while setting up the SSL Vision Client:"
+                  << std::endl
+                  << boost::diagnostic_information(ex) << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    // TODO: Log error messages when this throws, then throw exception upwards
+    // https://github.com/UBC-Thunderbots/Software/issues/275
+    std::unique_ptr<SSLGameControllerClient> ssl_gamecontroller_client;
+    try
+    {
+        ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
+            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
+            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT);
+    }
+    catch (const boost::exception& ex)
+    {
+        std::cerr << "An error occured while setting up the SSL Game Controller Client:"
                   << std::endl
                   << boost::diagnostic_information(ex) << std::endl;
         return EXIT_FAILURE;
@@ -98,6 +122,19 @@ int main(int argc, char** argv)
             if (enemy_team_msg)
             {
                 enemy_team_publisher.publish(*enemy_team_msg);
+            }
+        }
+
+        auto gamecontroller_packet_ptr =
+            ssl_gamecontroller_client->getGameControllerPacket();
+
+        if (gamecontroller_packet_ptr)
+        {
+            auto gamecontroller_data_msg =
+                backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
+            if (gamecontroller_data_msg)
+            {
+                gamecontroller_publisher.publish(*gamecontroller_data_msg);
             }
         }
 

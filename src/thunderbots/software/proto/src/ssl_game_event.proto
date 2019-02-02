@@ -1,0 +1,100 @@
+syntax = "proto2";
+
+// a game event that caused a referee command
+message Game_Event {
+
+    enum GameEventType {
+        // not set
+        UNKNOWN = 0;
+
+        // an event that is not listed in this enum yet.
+        // Give further details in the message below
+        CUSTOM = 1;
+
+        // Law 3: Number of players
+        NUMBER_OF_PLAYERS = 2;
+
+        // Law 9: Ball out of play
+        BALL_LEFT_FIELD = 3;
+
+        // Law 10: Team scored a goal
+        GOAL = 4;
+
+        // Law 9.3: lack of progress while bringing the ball into play
+        KICK_TIMEOUT = 5;
+
+        // Law ?: There is no progress in game for (10|15)? seconds
+        NO_PROGRESS_IN_GAME = 6;
+
+        // Law 12: Pushing / Substantial Contact
+        BOT_COLLISION = 7;
+
+        // Law 12.2: Defender is completely inside penalty area
+        MULTIPLE_DEFENDER = 8;
+
+        // Law 12: Defender is partially inside penalty area
+        MULTIPLE_DEFENDER_PARTIALLY = 9;
+
+        // Law 12.3: Attacker in defense area
+        ATTACKER_IN_DEFENSE_AREA = 10;
+
+        // Law 12: Icing (kicking over midline and opponent goal line)
+        ICING = 11;
+
+        // Law 12: Ball speed
+        BALL_SPEED = 12;
+
+        // Law 12: Robot speed during STOP
+        ROBOT_STOP_SPEED = 13;
+
+        // Law 12: Maximum dribbling distance
+        BALL_DRIBBLING = 14;
+
+        // Law 12: Touching the opponent goalkeeper
+        ATTACKER_TOUCH_KEEPER = 15;
+
+        // Law 12: Double touch
+        DOUBLE_TOUCH = 16;
+
+        // Law 13-17: Attacker not too close to the opponent's penalty area when ball enters play
+        ATTACKER_TO_DEFENCE_AREA = 17;
+
+        // Law 13-17: Keeping the correct distance to the ball during opponents freekicks
+        DEFENDER_TO_KICK_POINT_DISTANCE = 18;
+
+        // Law 12: A robot holds the ball deliberately
+        BALL_HOLDING = 19;
+
+        // Law 12: The ball entered the goal directly after an indirect kick was performed
+        INDIRECT_GOAL = 20;
+
+        // Law 9.2: Ball placement
+        BALL_PLACEMENT_FAILED = 21;
+
+        // Law 10: A goal is only scored if the ball has not exceeded a robot height (150mm) between the last
+        // kick of an attacker and the time the ball crossed the goal line.
+        CHIP_ON_GOAL = 22;
+    }
+
+    // the game event type that happened
+    required GameEventType gameEventType = 1;
+
+    // a team
+    enum Team {
+        TEAM_UNKNOWN = 0;
+        TEAM_YELLOW = 1;
+        TEAM_BLUE = 2;
+    }
+
+    // information about an originator
+    message Originator {
+        required Team team = 1;
+        optional uint32 botId = 2;
+    }
+
+    // the team and optionally a designated robot that is the originator of the game event
+    optional Originator originator = 2;
+
+    // a message describing further details of this game event
+    optional string message = 3;
+}

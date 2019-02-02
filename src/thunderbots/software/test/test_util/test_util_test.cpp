@@ -28,8 +28,9 @@ TEST(TestUtilsTest, create_testing_field)
     EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
     EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+              field.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
 
     EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
@@ -121,7 +122,7 @@ TEST(TestUtilsTest, has_all_valid_refbox_game_states)
     std::vector game_states = ::Test::TestUtil::getAllRefboxGameStates();
     // only way to test this getAllRefboxGameStates() without a literal copy-paste
     // of the implementation
-    // note that this array does not contain RefboxGameState::LAST_ENUM_ITEM_UNUSED,
+    // note that this array does not contain RefboxGameState::REFBOX_GAME_STATE_COUNT,
     // this is intentional
     std::vector<RefboxGameState> expected_game_states = {
         RefboxGameState::HALT,

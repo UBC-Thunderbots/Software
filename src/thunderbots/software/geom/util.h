@@ -3,8 +3,12 @@
 #include <cstddef>
 #include <vector>
 
+#include "geom/circle.h"
+#include "geom/line.h"
 #include "geom/point.h"
-#include "geom/shapes.h"
+#include "geom/ray.h"
+#include "geom/rectangle.h"
+#include "geom/segment.h"
 
 template <size_t N>
 using Poly     = std::array<Vector, N>;
@@ -37,7 +41,7 @@ double proj_len(const Vector &first, const Vector &second);
 /**
  * Signed magnitude of the projection of `first.start -> second` on `first`
  */
-double proj_len(const Seg &first, const Vector &second);
+double proj_len(const Segment &first, const Vector &second);
 
 /*
  * The family of `contains` functions determins whether
@@ -47,10 +51,10 @@ double proj_len(const Seg &first, const Vector &second);
 
 bool contains(const Triangle &out, const Vector &in);
 bool contains(const Circle &out, const Vector &in);
-bool contains(const Circle &out, const Seg &in);
+bool contains(const Circle &out, const Segment &in);
 bool contains(const Ray &out, const Vector &in);
-bool contains(const Seg &out, const Vector &in);
-bool contains(const Rect &out, const Vector &in);
+bool contains(const Segment &out, const Vector &in);
+bool contains(const Rectangle &out, const Vector &in);
 
 /*
  * The family of `intersects` functions determines whether there
@@ -60,36 +64,37 @@ bool contains(const Rect &out, const Vector &in);
 bool intersects(const Triangle &first, const Circle &second);
 bool intersects(const Circle &first, const Triangle &second);
 bool intersects(const Circle &first, const Circle &second);
-bool intersects(const Seg &first, const Circle &second);
-bool intersects(const Circle &first, const Seg &second);
-bool intersects(const Seg &first, const Seg &second);
-bool intersects(const Ray &first, const Seg &second);
-bool intersects(const Seg &first, const Ray &second);
+bool intersects(const Segment &first, const Circle &second);
+bool intersects(const Circle &first, const Segment &second);
+bool intersects(const Segment &first, const Segment &second);
+bool intersects(const Ray &first, const Segment &second);
+bool intersects(const Segment &first, const Ray &second);
 
 /*
  * The family of `dist` functions calculates the unsigned distance
  * between one object and another.
  */
-double dist(const Point &first, const Point &second);
-double dist(const Seg &first, const Seg &second);
 
-double dist(const Point &first, const Seg &second);
-double dist(const Seg &first, const Point &second);
+double dist(const Point &first, const Point &second);
+double dist(const Segment &first, const Segment &second);
+
+double dist(const Point &first, const Segment &second);
+double dist(const Segment &first, const Point &second);
 
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
 
-double distsq(const Point &first, const Seg &second);
-double distsq(const Seg &first, const Point &second);
+double distsq(const Point &first, const Segment &second);
+double distsq(const Segment &first, const Point &second);
 double distsq(const Point &first, const Point &second);
 
-bool isDegenerate(const Seg &seg);
-bool isDegenerate(const Ray &seg);
+bool isDegenerate(const Segment &segment);
+bool isDegenerate(const Ray &segment);
 bool isDegenerate(const Line &line);
 
-double len(const Seg &seg);
+double len(const Segment &segment);
 
-double lensq(const Seg &seg);
+double lensq(const Segment &segment);
 double lensq(const Line &line);
 
 template <size_t N>
@@ -102,7 +107,7 @@ void setVertex(Poly<N> &poly, unsigned int i, Vector &v);
  * and also connected to the vertex with the next index.
  */
 template <size_t N>
-Seg getSide(const Poly<N> &poly, unsigned int i);
+Segment getSide(const Poly<N> &poly, unsigned int i);
 
 /**
  * Checks if 3 points are collinear.
@@ -229,7 +234,8 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
  *
  * @return the points of intersection.
  */
-std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Point &segB);
+std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
+                                     const Point &segB);
 
 /**
  * Find where a vector intersect a rectangle
@@ -243,7 +249,7 @@ std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Poi
  *
  * @return the points of intersection.
  */
-Point vectorRectIntersect(const Rect &r, const Point &segA, const Point &segB);
+Point vectorRectIntersect(const Rectangle &r, const Point &segA, const Point &segB);
 
 /**
  * Clips a point to a rectangle boundary.
@@ -267,7 +273,7 @@ Point clipPoint(const Point &p, const Point &bound1, const Point &bound2);
  *
  * @return the closest point to \p p that lies within the rectangle.
  */
-Point clipPoint(const Point &p, const Rect &r);
+Point clipPoint(const Point &p, const Rectangle &r);
 
 /**
  * Computes whether there is a unique intersection of two lines.
@@ -317,7 +323,7 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
  *         and overlapping
  *         otherwise, an empty vector
  */
-std::vector<Point> lineIntersection(const Seg &a, const Seg &b);
+std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 
 /**
  * Reflects a ray incident on origin given the normal of the reflecting plane.
@@ -449,7 +455,7 @@ bool pointInFrontVector(Point offset, Point dir, Point p);
 std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle &circle,
                                                double buffer = 0.0);
 
-bool pointIsRightOfLine(const Seg &line, const Point &point);
+bool pointIsRightOfLine(const Segment &line, const Point &point);
 
 /**
  * Returns the mean of a list of points
