@@ -25,8 +25,14 @@ GrSimBackend::~GrSimBackend()
 }
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team)
+    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team,
+    const Ball& ball)
 {
+    // TODO: Can't replace this timestamp as part of issue #228 because the Timestamp
+    // class doesn't support absolute "wall time". This function will need to be
+    // changed to make use of the timestamps stored with the robots
+    // https://github.com/UBC-Thunderbots/Software/issues/279
+    //
     // initial timestamp for bang-bang set as current time
     static auto bangbang_timestamp = std::chrono::steady_clock::now();
 
@@ -40,7 +46,7 @@ void GrSimBackend::sendPrimitives(
             Robot robot = *friendly_team.getRobotById(prim->getRobotId());
 
             GrsimCommandPrimitiveVisitor grsim_command_primitive_visitor =
-                GrsimCommandPrimitiveVisitor(robot);
+                GrsimCommandPrimitiveVisitor(robot, ball);
             prim->accept(grsim_command_primitive_visitor);
 
             MotionController::MotionControllerCommand motion_controller_command =
