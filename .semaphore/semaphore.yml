@@ -20,7 +20,7 @@ blocks:
       jobs:
         - name: Build
           commands:
-            - change-gcc-version 4.8
+            - sem-version cpp 6
             - checkout
             - pwd
             - ./travis_ci.sh

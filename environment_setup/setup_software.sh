@@ -205,6 +205,7 @@ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/source
 sudo apt-get update
 
 host_software_packages=(
+    g++-7
     python-rosinstall
     protobuf-compiler
     libprotobuf-dev
