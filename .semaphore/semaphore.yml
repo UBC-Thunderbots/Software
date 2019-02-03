@@ -13,7 +13,7 @@ blocks:
           commands:
             - checkout
             - sem-version cpp 7
-            - ./environment_setup/setup_software.sh
+            - ./environment_setup/setup_software.sh melodic
   - name: "Build"
     task:
       jobs:
