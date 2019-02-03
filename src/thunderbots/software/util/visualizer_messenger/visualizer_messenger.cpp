@@ -11,6 +11,85 @@ namespace Util
         return vm;
     }
 
+    void VisualizerMessenger::testShapes()
+    {
+        if (!this)
+            return;
+
+        // Helper function
+        auto drawAllShapes = [](DrawStyle style, DrawTransform transform, offset = 100)
+        {
+            // Circle test
+            this->drawEllipse("test", 100, offset, 50, 50, style, transform);
+
+            // Ellipse test
+            this->drawEllipse("test", 200, offset, 50, 50, style, transform);
+
+            // Square test
+            this->drawRect("test", 300, offset, 50, 50, style, transform);
+
+            // Rectangle test
+            this->drawRect("test", 400, offset, 20, 80, style, transform);
+
+            // TODO: polygon test
+
+            // Arc standard test (about half pi clockwise)
+            this->drawArc("test", 500, offset, 50, 0, 1.5, style, transform);
+
+            // Arc test (> pi)
+            this->drawArc("test", 600, offset, 50, 0, 3, style, transform);
+
+            // Arc test (> 2pi; should expect angle mod'd)
+            this->drawArc("test", 700, offset, 50, 0, 4, style, transform);
+
+            // Arc test (negative starting angle, about half pi ccw)
+            this->drawArc("test", 800, offset, 50, -1.5, 0, style, transform);
+
+            // Arc test (negative starting angle and > 2 pi)
+            this->drawArc("test", 900, offset, 50, -4, 5, style, transform);
+            
+            // Line test
+            this->drawLine("test", 1000, offset, 150, 250, style, transform);
+        };
+
+        // Try different styles and transform
+        DrawStyle standard_style = DrawStyle();
+
+        DrawStyle no_stroke_style = DrawStyle();
+        no_stroke_style.stroke_weight = 0;
+
+        DrawStyle patriot_style = DrawStyle();
+        patriot_style.fill = "blue";
+        patriot_style.stroke = "red";
+        patriot_style.stroke_weight = 5;
+
+        DrawTransform standard_trans = DrawTransform();
+
+        DrawTransform enlarged_trans = DrawTransform();
+        enlarged_trans.scale = 1.5;
+
+        DrawTransform shrunk_trans = DrawTransform();
+        shrunk_trans.scale = 0.75;
+
+        DrawTransform rotated_trans = DrawTransform();
+        rotated_trans.rotation = 0.52; /* ~60 deg */
+
+        drawAllShapes(standard_style, standard_trans, 100);
+        drawAllShapes(standard_style, enlarged_trans, 200);
+        drawAllShapes(standard_style, shrunk_trans, 300);
+        drawAllShapes(standard_style, rotated_trans, 400);
+
+        drawAllShapes(no_stroke_style, standard_trans, 500);
+        drawAllShapes(no_stroke_style, enlarged_trans, 600);
+        drawAllShapes(no_stroke_style, shrunk_trans, 700);
+        drawAllShapes(no_stroke_style, rotated_trans, 800);
+
+        drawAllShapes(patriot_style, standard_trans, 900);
+        drawAllShapes(patriot_style, enlarged_trans, 1000);
+        drawAllShapes(patriot_style, shrunk_trans, 1100);
+        drawAllShapes(patriot_style, rotated_trans, 1200);
+    }
+
     void VisualizerMessenger::initializePublisher(ros::NodeHandle node_handle)
     {
         if (this->publisher)

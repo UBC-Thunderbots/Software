@@ -130,6 +130,9 @@ int main(int argc, char **argv)
                 LOG(INFO) << msg << std::endl;
             }
             primitive_publisher.publish(primitive_array_message);
+            
+            // CHANGED: on every tick, push testing layer objects
+            Util::VisualizerMessenger::testShapes();
 
             // On every tick, send the layer messages
             Util::VisualizerMessenger::getInstance()->publishAndClearLayers();

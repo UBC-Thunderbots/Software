@@ -73,6 +73,11 @@ namespace Util
         static std::shared_ptr<VisualizerMessenger> getInstance();
 
         /**
+         * Send a bunch of testing shapes to the test layer
+         */
+        static void testShapes();
+
+        /**
          * Initialize publisher for the visualizer
          *
          * @param node_handle: The ROS node handle to create the message publisher
