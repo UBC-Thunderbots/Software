@@ -220,10 +220,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
-                         --slave /usr/bin/g++ g++ /usr/bin/g++-7 
-sudo update-alternatives --config gcc
-
 # Clone, build, and install g3log. Adapted from instructions at:
 # https://github.com/KjellKod/g3log
 g3log_path="/tmp/g3log"
