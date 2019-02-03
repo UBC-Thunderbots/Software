@@ -32,14 +32,14 @@ class RobotTeamFilter
     // https://github.com/UBC-Thunderbots/Software/issues/200
     struct RobotData
     {
-        RobotData(Point position, Angle orientation, double timestamp)
+        RobotData(Point position, Angle orientation, Timestamp timestamp)
             : position(position), orientation(orientation), timestamp(timestamp)
         {
         }
 
         Point position;
         Angle orientation;
-        double timestamp;
+        Timestamp timestamp;
     };
 
     std::map<unsigned int, RobotData> robot_map;

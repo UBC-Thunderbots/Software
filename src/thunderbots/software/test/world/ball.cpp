@@ -2,42 +2,35 @@
 
 #include <gtest/gtest.h>
 
-using namespace std::chrono;
-
 class BallTest : public ::testing::Test
 {
    protected:
     void SetUp() override
     {
-        auto epoch       = time_point<std::chrono::steady_clock>();
-        auto since_epoch = std::chrono::seconds(10000);
-
-        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // An arbitrary fixed point in time.
         // We use this fixed point in time to make the tests deterministic.
-        current_time                          = epoch + since_epoch;
-        one_hundred_fifty_milliseconds_future = current_time + milliseconds(150);
-        half_second_future                    = current_time + milliseconds(500);
-        one_second_future                     = current_time + seconds(1);
-        one_second_past                       = current_time - seconds(1);
+        current_time = Timestamp::fromSeconds(123);
+        one_hundred_fifty_milliseconds_future =
+            current_time + Duration::fromMilliseconds(150);
+        half_second_future = current_time + Duration::fromMilliseconds(500);
+        one_second_future  = current_time + Duration::fromSeconds(1);
+        one_second_past    = current_time - Duration::fromSeconds(1);
     }
 
-    steady_clock::time_point current_time;
-    steady_clock::time_point half_second_future;
-    steady_clock::time_point one_second_future;
-    steady_clock::time_point one_hundred_fifty_milliseconds_future;
-    steady_clock::time_point one_second_past;
+    Timestamp current_time;
+    Timestamp half_second_future;
+    Timestamp one_second_future;
+    Timestamp one_hundred_fifty_milliseconds_future;
+    Timestamp one_second_past;
 };
 
 TEST_F(BallTest, construct_with_no_params)
 {
-    Ball ball = Ball(Point(), Vector());
+    Ball ball = Ball(Point(), Vector(), current_time);
 
     EXPECT_EQ(Point(), ball.position());
     EXPECT_EQ(Vector(), ball.velocity());
-    // Can't compare timestamp values here because the ball and the expected timestamp
-    // would not be createdx at the same time, and would not be equal. We could check
-    // that the timestamps are within a certain threshold, but that is not robust and
-    // makes the test dependant on the speed of the system executing it
+    EXPECT_EQ(current_time, ball.lastUpdateTimestamp());
 }
 
 TEST_F(BallTest, construct_with_params)
@@ -129,27 +122,33 @@ TEST_F(BallTest, get_position_at_future_time_with_positive_ball_velocity)
 {
     Ball ball = Ball(Point(), Vector(1, 2), current_time);
 
-    EXPECT_EQ(Point(0.15, 0.3), ball.estimatePositionAtFutureTime(milliseconds(150)));
-    EXPECT_EQ(Point(1, 2), ball.estimatePositionAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Point(2, 4), ball.estimatePositionAtFutureTime(milliseconds(2000)));
+    EXPECT_EQ(Point(0.15, 0.3),
+              ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(150)));
+    EXPECT_EQ(Point(1, 2),
+              ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(2, 4),
+              ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(2000)));
 }
 
 TEST_F(BallTest, get_position_at_future_time_with_negative_ball_velocity)
 {
     Ball ball = Ball(Point(3, 7), Vector(-4.5, -0.12), current_time);
 
-    EXPECT_EQ(Point(2.325, 6.982), ball.estimatePositionAtFutureTime(milliseconds(150)));
-    EXPECT_EQ(Point(-1.5, 6.88), ball.estimatePositionAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Point(-6, 6.76), ball.estimatePositionAtFutureTime(milliseconds(2000)));
+    EXPECT_EQ(Point(2.325, 6.982),
+              ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(150)));
+    EXPECT_EQ(Point(-1.5, 6.88),
+              ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(-6, 6.76),
+              ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(2000)));
 }
 
 TEST_F(BallTest, get_position_at_past_time)
 {
     Ball ball = Ball(Point(3, 7), Vector(1, 0.12), current_time);
 
-    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-200)),
+    ASSERT_THROW(ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(-200)),
                  std::invalid_argument);
-    ASSERT_THROW(ball.estimatePositionAtFutureTime(milliseconds(-2000)),
+    ASSERT_THROW(ball.estimatePositionAtFutureTime(Duration::fromMilliseconds(-2000)),
                  std::invalid_argument);
 }
 
@@ -169,13 +168,16 @@ TEST_F(BallTest, get_velocity_at_future_time_with_positive_ball_velocity)
 
     EXPECT_TRUE(
         Vector(0.9851, 1.9702)
-            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(150)), EPSILON));
+            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(150)),
+                     EPSILON));
     EXPECT_TRUE(
         Vector(0.9048, 1.8097)
-            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(1000)), EPSILON));
+            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000)),
+                     EPSILON));
     EXPECT_TRUE(
         Vector(0.8187, 1.6375)
-            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
+            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(2000)),
+                     EPSILON));
 }
 
 TEST_F(BallTest, get_velocity_at_future_time_with_negative_ball_velocity)
@@ -187,22 +189,25 @@ TEST_F(BallTest, get_velocity_at_future_time_with_negative_ball_velocity)
 
     EXPECT_TRUE(
         Vector(-4.4330, -0.1182)
-            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(150)), EPSILON));
+            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(150)),
+                     EPSILON));
     EXPECT_TRUE(
         Vector(-4.0717, -0.1086)
-            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(1000)), EPSILON));
+            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000)),
+                     EPSILON));
     EXPECT_TRUE(
         Vector(-3.6843, -0.0982)
-            .isClose(ball.estimateVelocityAtFutureTime(milliseconds(2000)), EPSILON));
+            .isClose(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(2000)),
+                     EPSILON));
 }
 
 TEST_F(BallTest, get_velocity_at_past_time)
 {
     Ball ball = Ball(Point(), Vector(1, 2), current_time);
 
-    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-150)),
+    ASSERT_THROW(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(-150)),
                  std::invalid_argument);
-    ASSERT_THROW(ball.estimateVelocityAtFutureTime(milliseconds(-1000)),
+    ASSERT_THROW(ball.estimateVelocityAtFutureTime(Duration::fromMilliseconds(-1000)),
                  std::invalid_argument);
 }
 
@@ -219,7 +224,7 @@ TEST_F(BallTest, get_last_update_timestamp)
 
 TEST_F(BallTest, equality_operator_compare_ball_with_itself)
 {
-    Ball ball_0 = Ball(Point(), Vector());
+    Ball ball_0 = Ball(Point(), Vector(), current_time);
 
     Ball ball_1 = Ball(Point(2, -3), Vector(0, 1), one_hundred_fifty_milliseconds_future);
 

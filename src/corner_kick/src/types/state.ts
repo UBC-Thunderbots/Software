@@ -1,3 +1,4 @@
+import { IRosoutMessage } from './standardROSMessages';
 import { ILayer } from './visualizer';
 
 /*
@@ -29,4 +30,11 @@ export interface IROSState {
 export interface IVisualizerState {
     layerOrder: string[];
     layers: { [K: string]: ILayer };
+}
+
+/*
+ * The messages state
+ */
+export interface IMessagesState {
+    messages: IRosoutMessage[];
 }
