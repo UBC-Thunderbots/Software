@@ -54,6 +54,8 @@ class BallFilter
    private:
     struct BallData
     {
+        BallData() = default;
+
         BallData(Point position, Vector velocity, double timestamp)
             : position(position), velocity(velocity), timestamp(timestamp)
         {
@@ -64,5 +66,5 @@ class BallFilter
         double timestamp;
     };
 
-    BallData *ball_data;
+    BallData ball_data;
 };
