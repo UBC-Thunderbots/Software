@@ -418,6 +418,7 @@ if (CATKIN_ENABLE_TESTING)
             geom/angle.h
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
+            util/timestamp.cpp
             )
     target_link_libraries(move_spin_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
@@ -638,6 +639,7 @@ if (CATKIN_ENABLE_TESTING)
             geom/angle.h
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
+            util/timestamp.cpp
     )
 
     target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
@@ -662,6 +664,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             test/util/logger_test.cpp
+            util/timestamp.cpp
             )
     target_link_libraries(logger_test ${catkin_LIBRARIES}
             ${G3LOG})
@@ -669,6 +672,7 @@ if (CATKIN_ENABLE_TESTING)
     # The test node that verifies the rostest utils are working correctly
     add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
             test/test_util/rostest_util_test.cpp
+            util/timestamp.cpp
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 

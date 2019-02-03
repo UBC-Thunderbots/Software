@@ -19,15 +19,15 @@ class RosTestUtilsTest : public testing::Test
         // the tests will fail
         test_publisher = node_handle.advertise<std_msgs::String>(topic_name, 1, true);
 
-        one_second  = std::chrono::seconds(1);
-        ten_seconds = std::chrono::seconds(10);
+        one_second  = Duration::fromSeconds(1);
+        ten_seconds = Duration::fromSeconds(10);
     }
 
     ros::NodeHandle node_handle;
     ros::Publisher test_publisher;
 
-    std::chrono::seconds one_second;
-    std::chrono::seconds ten_seconds;
+    Duration one_second;
+    Duration ten_seconds;
 
     const std::string topic_name = "/rostest_utils_test";
 };
