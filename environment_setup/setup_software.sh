@@ -205,7 +205,7 @@ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/source
 sudo apt-get update
 
 host_software_packages=(
-    python-rosinstall
+    g++-7
     protobuf-compiler
     libprotobuf-dev
     nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
