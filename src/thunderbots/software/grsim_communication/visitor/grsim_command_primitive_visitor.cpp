@@ -29,15 +29,15 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     Point finalDest;
     if (robot.velocity().len() != 0)
     {
-        finalDest = ball.estimatePositionAtFutureTime(std::chrono::milliseconds(
-            (int)fabs(distanceToBall / robot.velocity().len()) * 1000));
+        finalDest = ball.estimatePositionAtFutureTime(
+            Duration::fromSeconds((int)fabs(distanceToBall / robot.velocity().len())));
         finalDest = Point(finalDest.x(), finalDest.y());
     }
     else
     {
         // If Robot is not moving, estimate position based on a standard velocity of 1
         finalDest = ball.estimatePositionAtFutureTime(
-            std::chrono::milliseconds((int)fabs(distanceToBall / 1) * 1000));
+            Duration::fromSeconds((int)fabs(distanceToBall / 1)));
         finalDest = Point(finalDest.x(), finalDest.y());
     }
 

@@ -4,22 +4,17 @@
 
 #include "test/test_util/test_util.h"
 
-using namespace std::chrono;
-
 class WorldTest : public ::testing::Test
 {
    protected:
     void SetUp() override
     {
-        auto epoch       = time_point<std::chrono::steady_clock>();
-        auto since_epoch = std::chrono::seconds(10000);
-
-        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // An arbitrary fixed point in time
         // We use this fixed point in time to make the tests deterministic.
-        current_time = epoch + since_epoch;
+        current_time = Timestamp::fromSeconds(123);
     }
 
-    steady_clock::time_point current_time;
+    Timestamp current_time;
 };
 
 TEST_F(WorldTest, construction_with_parameters)
@@ -34,7 +29,7 @@ TEST_F(WorldTest, construction_with_parameters)
     Robot friendly_robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
                                    AngularVelocity::zero(), current_time);
 
-    Team friendly_team = Team(milliseconds(1000));
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
     friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
     friendly_team.assignGoalie(1);
 
@@ -44,7 +39,7 @@ TEST_F(WorldTest, construction_with_parameters)
     Robot enemy_robot_1 = Robot(1, Point(), Vector(-0.5, 4), Angle::quarter(),
                                 AngularVelocity::half(), current_time);
 
-    Team enemy_team = Team(milliseconds(1000));
+    Team enemy_team = Team(Duration::fromMilliseconds(1000));
     enemy_team.updateRobots({enemy_robot_0, enemy_robot_1});
     enemy_team.assignGoalie(0);
 

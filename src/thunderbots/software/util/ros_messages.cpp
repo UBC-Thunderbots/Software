@@ -1,5 +1,7 @@
 #include "util/ros_messages.h"
 
+#include "util/timestamp.h"
+
 namespace Util
 {
     namespace ROSMessages
@@ -8,8 +10,9 @@ namespace Util
         {
             Point ball_position  = Point(ball_msg.position.x, ball_msg.position.y);
             Vector ball_velocity = Vector(ball_msg.velocity.x, ball_msg.velocity.y);
+            Timestamp timestamp  = Timestamp::fromSeconds(ball_msg.timestamp_seconds);
 
-            Ball ball = Ball(ball_position, ball_velocity);
+            Ball ball = Ball(ball_position, ball_velocity, timestamp);
 
             return ball;
         }
@@ -22,10 +25,7 @@ namespace Util
             Angle robot_orientation = Angle::ofRadians(robot_msg.orientation);
             AngularVelocity robot_angular_velocity =
                 Angle::ofRadians(robot_msg.angular_velocity);
-            auto epoch = std::chrono::steady_clock::time_point();
-            auto since_epoch =
-                std::chrono::nanoseconds(robot_msg.timestamp_nanoseconds_since_epoch);
-            auto timestamp = epoch + since_epoch;
+            Timestamp timestamp = Timestamp::fromSeconds(robot_msg.timestamp_seconds);
 
             Robot robot = Robot(robot_id, robot_position, robot_velocity,
                                 robot_orientation, robot_angular_velocity, timestamp);
@@ -53,7 +53,7 @@ namespace Util
             }
 
             auto expiry_buffer =
-                std::chrono::milliseconds(team_msg.robot_expiry_buffer_milliseconds);
+                Duration::fromMilliseconds(team_msg.robot_expiry_buffer_milliseconds);
 
             Team team = Team(expiry_buffer);
 

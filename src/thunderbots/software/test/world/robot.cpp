@@ -2,28 +2,23 @@
 
 #include <gtest/gtest.h>
 
-using namespace std::chrono;
-
 class RobotTest : public ::testing::Test
 {
    protected:
     void SetUp() override
     {
-        auto epoch       = time_point<std::chrono::steady_clock>();
-        auto since_epoch = std::chrono::seconds(10000);
-
-        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // An arbitrary fixed point in time
         // We use this fixed point in time to make the tests deterministic.
-        current_time       = epoch + since_epoch;
-        half_second_future = current_time + milliseconds(500);
-        one_second_future  = current_time + seconds(1);
-        one_second_past    = current_time - seconds(1);
+        current_time       = Timestamp::fromSeconds(123);
+        half_second_future = current_time + Duration::fromMilliseconds(500);
+        one_second_future  = current_time + Duration::fromSeconds(1);
+        one_second_past    = current_time - Duration::fromSeconds(1);
     }
 
-    steady_clock::time_point current_time;
-    steady_clock::time_point half_second_future;
-    steady_clock::time_point one_second_future;
-    steady_clock::time_point one_second_past;
+    Timestamp current_time;
+    Timestamp half_second_future;
+    Timestamp one_second_future;
+    Timestamp one_second_past;
 };
 
 TEST_F(RobotTest, construct_with_all_params)
@@ -115,9 +110,12 @@ TEST_F(RobotTest, get_position_at_future_time_with_negative_robot_velocity)
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, -2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7), current_time);
 
-    EXPECT_EQ(Point(-1.4, 1.96), robot.estimatePositionAtFutureTime(milliseconds(400)));
-    EXPECT_EQ(Point(-1.7, 0.4), robot.estimatePositionAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Point(-2.7, -4.8), robot.estimatePositionAtFutureTime(milliseconds(3000)));
+    EXPECT_EQ(Point(-1.4, 1.96),
+              robot.estimatePositionAtFutureTime(Duration::fromMilliseconds(400)));
+    EXPECT_EQ(Point(-1.7, 0.4),
+              robot.estimatePositionAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(-2.7, -4.8),
+              robot.estimatePositionAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_position_at_future_time_with_positive_robot_velocity)
@@ -126,11 +124,11 @@ TEST_F(RobotTest, get_position_at_future_time_with_positive_robot_velocity)
                               AngularVelocity::ofRadians(2), current_time);
 
     EXPECT_EQ(Point(2.4, -1.6),
-              robot_other.estimatePositionAtFutureTime(milliseconds(400)));
+              robot_other.estimatePositionAtFutureTime(Duration::fromMilliseconds(400)));
     EXPECT_EQ(Point(4.5, -1),
-              robot_other.estimatePositionAtFutureTime(milliseconds(1000)));
+              robot_other.estimatePositionAtFutureTime(Duration::fromMilliseconds(1000)));
     EXPECT_EQ(Point(11.5, 1),
-              robot_other.estimatePositionAtFutureTime(milliseconds(3000)));
+              robot_other.estimatePositionAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_position_at_past_time)
@@ -138,10 +136,12 @@ TEST_F(RobotTest, get_position_at_past_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-100))),
-                 std::invalid_argument);
-    ASSERT_THROW((robot_other.estimatePositionAtFutureTime(milliseconds(-1000))),
-                 std::invalid_argument);
+    ASSERT_THROW(
+        (robot_other.estimatePositionAtFutureTime(Duration::fromMilliseconds(-100))),
+        std::invalid_argument);
+    ASSERT_THROW(
+        (robot_other.estimatePositionAtFutureTime(Duration::fromMilliseconds(-1000))),
+        std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_velocity_at_current_time)
@@ -157,9 +157,12 @@ TEST_F(RobotTest, get_velocity_at_future_time_with_negative_robot_velocity)
     Robot robot = Robot(0, Point(-1.2, 3), Vector(-0.5, -2.6), Angle::quarter(),
                         AngularVelocity::ofRadians(0.7), current_time);
 
-    EXPECT_EQ(Point(-0.5, -2.6), robot.estimateVelocityAtFutureTime(milliseconds(400)));
-    EXPECT_EQ(Point(-0.5, -2.6), robot.estimateVelocityAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Point(-0.5, -2.6), robot.estimateVelocityAtFutureTime(milliseconds(3000)));
+    EXPECT_EQ(Point(-0.5, -2.6),
+              robot.estimateVelocityAtFutureTime(Duration::fromMilliseconds(400)));
+    EXPECT_EQ(Point(-0.5, -2.6),
+              robot.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(-0.5, -2.6),
+              robot.estimateVelocityAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_velocity_at_future_time_with_positive_robot_velocity)
@@ -167,11 +170,12 @@ TEST_F(RobotTest, get_velocity_at_future_time_with_positive_robot_velocity)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    EXPECT_EQ(Point(3.5, 1), robot_other.estimateVelocityAtFutureTime(milliseconds(400)));
     EXPECT_EQ(Point(3.5, 1),
-              robot_other.estimateVelocityAtFutureTime(milliseconds(1000)));
+              robot_other.estimateVelocityAtFutureTime(Duration::fromMilliseconds(400)));
     EXPECT_EQ(Point(3.5, 1),
-              robot_other.estimateVelocityAtFutureTime(milliseconds(3000)));
+              robot_other.estimateVelocityAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(Point(3.5, 1),
+              robot_other.estimateVelocityAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_velocity_at_past_time)
@@ -179,10 +183,12 @@ TEST_F(RobotTest, get_velocity_at_past_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-100))),
-                 std::invalid_argument);
-    ASSERT_THROW((robot_other.estimateVelocityAtFutureTime(milliseconds(-1000))),
-                 std::invalid_argument);
+    ASSERT_THROW(
+        (robot_other.estimateVelocityAtFutureTime(Duration::fromMilliseconds(-100))),
+        std::invalid_argument);
+    ASSERT_THROW(
+        (robot_other.estimateVelocityAtFutureTime(Duration::fromMilliseconds(-1000))),
+        std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_orientation_at_current_time)
@@ -199,11 +205,11 @@ TEST_F(RobotTest, get_orientation_at_future_time_with_positive_robot_angular_vel
                         AngularVelocity::ofRadians(0.7), current_time);
 
     EXPECT_EQ(Angle::quarter() + Angle::ofRadians(0.28),
-              robot.estimateOrientationAtFutureTime(milliseconds(400)));
+              robot.estimateOrientationAtFutureTime(Duration::fromMilliseconds(400)));
     EXPECT_EQ(Angle::quarter() + Angle::ofRadians(0.7),
-              robot.estimateOrientationAtFutureTime(milliseconds(1000)));
+              robot.estimateOrientationAtFutureTime(Duration::fromMilliseconds(1000)));
     EXPECT_EQ(Angle::quarter() + Angle::ofRadians(2.1),
-              robot.estimateOrientationAtFutureTime(milliseconds(3000)));
+              robot.estimateOrientationAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_orientation_at_future_time_with_negative_robot_angular_velocity)
@@ -211,12 +217,15 @@ TEST_F(RobotTest, get_orientation_at_future_time_with_negative_robot_angular_vel
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(0.8),
-              robot_other.estimateOrientationAtFutureTime(milliseconds(400)));
-    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(2),
-              robot_other.estimateOrientationAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(6),
-              robot_other.estimateOrientationAtFutureTime(milliseconds(3000)));
+    EXPECT_EQ(
+        Angle::ofRadians(-0.3) + Angle::ofRadians(0.8),
+        robot_other.estimateOrientationAtFutureTime(Duration::fromMilliseconds(400)));
+    EXPECT_EQ(
+        Angle::ofRadians(-0.3) + Angle::ofRadians(2),
+        robot_other.estimateOrientationAtFutureTime(Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(
+        Angle::ofRadians(-0.3) + Angle::ofRadians(6),
+        robot_other.estimateOrientationAtFutureTime(Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_orientation_at_past_time)
@@ -224,10 +233,12 @@ TEST_F(RobotTest, get_orientation_at_past_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-100)),
-                 std::invalid_argument);
-    ASSERT_THROW(robot_other.estimateOrientationAtFutureTime(milliseconds(-1000)),
-                 std::invalid_argument);
+    ASSERT_THROW(
+        robot_other.estimateOrientationAtFutureTime(Duration::fromMilliseconds(-100)),
+        std::invalid_argument);
+    ASSERT_THROW(
+        robot_other.estimateOrientationAtFutureTime(Duration::fromMilliseconds(-1000)),
+        std::invalid_argument);
 }
 
 TEST_F(RobotTest, get_angular_velocity_at_current_time)
@@ -245,11 +256,11 @@ TEST_F(RobotTest,
                         AngularVelocity::ofRadians(0.7), current_time);
 
     EXPECT_EQ(AngularVelocity::ofRadians(0.7),
-              robot.estimateAngularVelocityAtFutureTime(milliseconds(400)));
-    EXPECT_EQ(AngularVelocity::ofRadians(0.7),
-              robot.estimateAngularVelocityAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(AngularVelocity::ofRadians(0.7),
-              robot.estimateAngularVelocityAtFutureTime(milliseconds(3000)));
+              robot.estimateAngularVelocityAtFutureTime(Duration::fromMilliseconds(400)));
+    EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.estimateAngularVelocityAtFutureTime(
+                                                   Duration::fromMilliseconds(1000)));
+    EXPECT_EQ(AngularVelocity::ofRadians(0.7), robot.estimateAngularVelocityAtFutureTime(
+                                                   Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest,
@@ -258,12 +269,15 @@ TEST_F(RobotTest,
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
+    EXPECT_EQ(
+        AngularVelocity::ofRadians(2),
+        robot_other.estimateAngularVelocityAtFutureTime(Duration::fromMilliseconds(400)));
     EXPECT_EQ(AngularVelocity::ofRadians(2),
-              robot_other.estimateAngularVelocityAtFutureTime(milliseconds(400)));
+              robot_other.estimateAngularVelocityAtFutureTime(
+                  Duration::fromMilliseconds(1000)));
     EXPECT_EQ(AngularVelocity::ofRadians(2),
-              robot_other.estimateAngularVelocityAtFutureTime(milliseconds(1000)));
-    EXPECT_EQ(AngularVelocity::ofRadians(2),
-              robot_other.estimateAngularVelocityAtFutureTime(milliseconds(3000)));
+              robot_other.estimateAngularVelocityAtFutureTime(
+                  Duration::fromMilliseconds(3000)));
 }
 
 TEST_F(RobotTest, get_angular_velocity_at_past_time)
@@ -271,9 +285,11 @@ TEST_F(RobotTest, get_angular_velocity_at_past_time)
     Robot robot_other = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                               AngularVelocity::ofRadians(2), current_time);
 
-    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-100)),
-                 std::invalid_argument);
-    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(milliseconds(-1000)),
+    ASSERT_THROW(
+        robot_other.estimateAngularVelocityAtFutureTime(Duration::fromMilliseconds(-100)),
+        std::invalid_argument);
+    ASSERT_THROW(robot_other.estimateAngularVelocityAtFutureTime(
+                     Duration::fromMilliseconds(-1000)),
                  std::invalid_argument);
 }
 
