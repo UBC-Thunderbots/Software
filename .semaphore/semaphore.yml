@@ -6,21 +6,18 @@ agent:
     os_image: ubuntu1804
 
 blocks:
-  - name: "ROS Melodic / Ubuntu 18.04 - Build and Test"
+  - name: "Prep"
     task:
-      env_vars:
-        - name: RUN_BUILD
-          value: "true"
-        - name: RUN_TESTS
-          value: "true"
-        - name: RUN_COVERAGE
-          value: "true"
-        - name: ROS_DISTRO
-          value: melodic
       jobs:
-        - name: Build
+        - name: Run setup_software.sh
           commands:
-            - sem-version cpp 6
             - checkout
-            - pwd
-            - ./travis_ci.sh
+            - sem-version cpp 7
+            - ./environment_setup/setup_software.sh
+  - name: "Build"
+    task:
+      jobs:
+        - name: Run catkin_make
+          commands:
+            - checkout
+            - catkin_make
