@@ -133,7 +133,7 @@ namespace Util
                       DrawTransform draw_transform = DrawTransform());
 
         /**
-         * Reuqest a message to draw a polygon shape. The origin is the
+         * Request a message to draw a polygon shape. The origin is the
          * first vertex passed in.
          *
          * @param layer: The layer name this shape is being drawn to
