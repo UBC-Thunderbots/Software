@@ -29,3 +29,10 @@ export interface IROSState {
 export interface IMessagesState {
     messages: IRosoutMessage[];
 }
+
+/**
+ * The data to persist state
+ */
+export interface IPersistDataState {
+    [key: string]: string;
+}
