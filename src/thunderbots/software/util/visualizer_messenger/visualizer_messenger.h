@@ -18,6 +18,7 @@
 
 #include "thunderbots_msgs/DrawLayer.h"
 #include "thunderbots_msgs/DrawShape.h"
+#include "thunderbots_msgs/Point2D.h"
 
 
 // Forward declaration
@@ -32,6 +33,7 @@ namespace Util
     using LayerMsg    = thunderbots_msgs::DrawLayer;
     using LayerMsgMap = std::map<std::string, LayerMsg>;
     using ShapeMsg    = thunderbots_msgs::DrawShape;
+    using Point2D     = thunderbots_msgs::Point2D;
 
     class VisualizerMessenger
     {
@@ -137,12 +139,11 @@ namespace Util
          * first vertex passed in.
          *
          * @param layer: The layer name this shape is being drawn to
-         * @param vertices: A vector of pairs of vertex positions
+         * @param vertices: A vector of Point2Ds that specifies x and y of vertices
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void drawPoly(const std::string& layer,
-                      std::vector<std::pair<double, double>>& vertices,
+        void drawPoly(const std::string& layer, std::vector<Point2D>& vertices,
                       DrawStyle draw_style         = DrawStyle(),
                       DrawTransform draw_transform = DrawTransform());
 
