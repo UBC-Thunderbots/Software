@@ -29,6 +29,19 @@ namespace Util
 
     void VisualizerMessenger::publishAndClearLayers()
     {
+        // Limit rate of the message publishing
+        // Get the time right now
+        const time_point now = std::chrono::system_clock::now();
+        const auto elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                    now - time_last_published)
+                                    .count();
+
+        // Do not do anything if the time passed hasn't been 
+        // long enough
+        if (elapsed_ns < DESIRED_PERIOD_NS)
+            return;
+        
+
         // Check if publisher is initialized before publishing messages
         if (!this->publisher)
         {
@@ -38,7 +51,8 @@ namespace Util
         else
         {
             // Send layer messages
-            for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
+            for (const std::pair<std::string, LayerMsg>& layer_msg_pair :
+                    getLayerMap())
             {
                 if (!layer_msg_pair.second.shapes.empty())
                 {
@@ -47,8 +61,14 @@ namespace Util
             }
         }
 
+        // DEBUG:
+        LOG(INFO) << DESIRED_PERIOD_NS << "..." << elapsed_ns << "\n";
+
         // Clear shapes in layers of current frame/tick
         clearLayers();
+
+        // Update last published time
+        time_last_published = now;
     }
 
     void VisualizerMessenger::clearLayers()
