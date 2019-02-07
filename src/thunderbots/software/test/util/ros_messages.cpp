@@ -57,8 +57,10 @@ TEST(ROSMessageUtilTest, create_robot_from_ros_message)
 
 TEST(ROSMessageUtilTest, convert_robot_to_ros_message)
 {
-    Robot robot = Robot(1, Point(0, -5.01), Vector(0, 0), Angle::quarter(), AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
-    thunderbots_msgs::Robot robot_msg = Util::ROSMessages::convertRobotToROSMessage(robot);
+    Robot robot = Robot(1, Point(0, -5.01), Vector(0, 0), Angle::quarter(),
+                        AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
+    thunderbots_msgs::Robot robot_msg =
+        Util::ROSMessages::convertRobotToROSMessage(robot);
 
     EXPECT_EQ(1, robot_msg.id);
     EXPECT_EQ(0, robot_msg.position.x);
@@ -109,9 +111,10 @@ TEST(ROSMessageUtilTest, convert_field_to_ros_message)
     double center_circle_radius = 0.5;
 
     Field field = Field(length, width, defense_length, defense_width, goal_width,
-                              boundary_width, center_circle_radius);
+                        boundary_width, center_circle_radius);
 
-    thunderbots_msgs::Field field_msg = Util::ROSMessages::convertFieldToROSMessage(field);
+    thunderbots_msgs::Field field_msg =
+        Util::ROSMessages::convertFieldToROSMessage(field);
 
     EXPECT_EQ(length, field_msg.field_length);
     EXPECT_EQ(width, field_msg.field_width);
@@ -204,7 +207,8 @@ TEST(ROSMessageUtilTest, create_team_from_ros_message_with_non_member)
 
 TEST(ROSMessageUtilTest, convert_team_with_goalie_to_ros_message)
 {
-    Robot robot = Robot(1, Point(0, -5.01), Vector(0, 0), Angle::quarter(), AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
+    Robot robot = Robot(1, Point(0, -5.01), Vector(0, 0), Angle::quarter(),
+                        AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
 
     Team team = Team(Duration::fromMilliseconds(500));
     team.updateRobots({robot});
@@ -228,7 +232,8 @@ TEST(ROSMessageUtilTest, convert_team_with_goalie_to_ros_message)
 
 TEST(ROSMessageUtilTest, convert_team_with_no_goalie_to_ros_message)
 {
-    Robot robot = Robot(1, Point(0, -5.01), Vector(0, 0), Angle::quarter(), AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
+    Robot robot = Robot(1, Point(0, -5.01), Vector(0, 0), Angle::quarter(),
+                        AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
 
     Team team = Team(Duration::fromMilliseconds(500));
     team.updateRobots({robot});

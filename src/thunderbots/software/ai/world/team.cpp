@@ -126,7 +126,8 @@ std::optional<Robot> Team::goalie() const
     return std::nullopt;
 }
 
-std::optional<unsigned int> Team::getGoalieID() const {
+std::optional<unsigned int> Team::getGoalieID() const
+{
     return goalie_id;
 }
 

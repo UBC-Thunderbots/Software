@@ -17,7 +17,8 @@ namespace Util
             return ball;
         }
 
-        thunderbots_msgs::Ball convertBallToROSMessage(const Ball& ball) {
+        thunderbots_msgs::Ball convertBallToROSMessage(const Ball& ball)
+        {
             thunderbots_msgs::Ball ball_msg;
 
             ball_msg.position.x = ball.position().x();
@@ -47,7 +48,8 @@ namespace Util
             return robot;
         }
 
-        thunderbots_msgs::Robot convertRobotToROSMessage(const Robot& robot) {
+        thunderbots_msgs::Robot convertRobotToROSMessage(const Robot& robot)
+        {
             thunderbots_msgs::Robot robot_msg;
 
             robot_msg.id = robot.id();
@@ -58,8 +60,8 @@ namespace Util
             robot_msg.velocity.x = robot.velocity().x();
             robot_msg.velocity.y = robot.velocity().y();
 
-            robot_msg.orientation = robot.orientation().toRadians();
-            robot_msg.angular_velocity = robot.angularVelocity().toRadians();
+            robot_msg.orientation       = robot.orientation().toRadians();
+            robot_msg.angular_velocity  = robot.angularVelocity().toRadians();
             robot_msg.timestamp_seconds = robot.lastUpdateTimestamp().getSeconds();
 
             return robot_msg;
@@ -75,15 +77,16 @@ namespace Util
             return field;
         }
 
-        thunderbots_msgs::Field convertFieldToROSMessage(const Field& field) {
+        thunderbots_msgs::Field convertFieldToROSMessage(const Field& field)
+        {
             thunderbots_msgs::Field field_msg;
 
-            field_msg.field_length = field.length();
-            field_msg.field_width = field.width();
-            field_msg.defense_length = field.defenseAreaLength();
-            field_msg.defense_width = field.defenseAreaWidth();
-            field_msg.goal_width = field.goalWidth();
-            field_msg.boundary_width = field.boundaryWidth();
+            field_msg.field_length         = field.length();
+            field_msg.field_width          = field.width();
+            field_msg.defense_length       = field.defenseAreaLength();
+            field_msg.defense_width        = field.defenseAreaWidth();
+            field_msg.goal_width           = field.goalWidth();
+            field_msg.boundary_width       = field.boundaryWidth();
             field_msg.center_circle_radius = field.centreCircleRadius();
 
             return field_msg;
@@ -128,20 +131,26 @@ namespace Util
             return team;
         }
 
-        thunderbots_msgs::Team convertTeamToROSMessage(const Team& team) {
+        thunderbots_msgs::Team convertTeamToROSMessage(const Team& team)
+        {
             thunderbots_msgs::Team team_msg;
 
-            team_msg.robot_expiry_buffer_milliseconds = team.getRobotExpiryBufferDuration().getMilliseconds();
+            team_msg.robot_expiry_buffer_milliseconds =
+                team.getRobotExpiryBufferDuration().getMilliseconds();
 
-            if(team.getGoalieID()) {
+            if (team.getGoalieID())
+            {
                 team_msg.goalie_id = *team.getGoalieID();
-            } else {
+            }
+            else
+            {
                 team_msg.goalie_id = -1;
             }
 
-            auto robots = team.getAllRobots();
+            auto robots     = team.getAllRobots();
             auto robot_msgs = std::vector<thunderbots_msgs::Robot>();
-            for(auto robot : robots) {
+            for (auto robot : robots)
+            {
                 robot_msgs.emplace_back(convertRobotToROSMessage(robot));
             }
             team_msg.robots = robot_msgs;
