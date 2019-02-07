@@ -32,15 +32,15 @@ namespace
         else
             closestEdgeY = world.field().friendlyCornerPos().y;
 
-        Line ball_to_goal_neg = new Line(world.ball().postion(), enemy_goal_negative);
-        Line ball_to_goal_pos = new Line(world.ball().postion(), enemy_goal_negative);
         // Find the enemy that's blocking a shot that's closest to the edge of the
         // field
-        for (auto i : world.enemyTeam())
+        for (Robot i : world.enemyTeam().team_robots)
         {
             if ((contains(chip_target_area, i.position()) ||
-                 ball_to_goal_neg.offset_to_line(i.position()) <= MAX_RADIUS ||
-                 ball_to_goal_pos.offset_to_line(i.position()) <= MAX_RADIUS) &&
+                 offsetToLine(enemy_goal_negative, world.ball().position(),
+                              i.position()) <= MAX_RADIUS ||
+                 offsetToLine(enemy_goal_positive, world.ball().position(),
+                              i.position()) <= MAX_RADIUS) &&
                 (i.position().x > world.ball().position().x))
             {
                 if (abs(i.position().y - closestEdgeY) < shortestLenToEdge)
@@ -54,7 +54,7 @@ namespace
         // want to shoot at the edge of a robot so the ball deflects towards the
         // edge of the field
         Point dir     = enemyClosestToEdge.position() - world.ball().position();
-        Point dirPerp = dir.perp().norm(Robot::MAX_RADIUS * 0.75);
+        Point dirPerp = dir.perp().norm(MAX_RADIUS * 0.75);
         Point target  = Point(0, 0);
 
         // choose point closest to edge of field
