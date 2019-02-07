@@ -7,6 +7,8 @@
 #include <string>
 #include <thread>
 
+#include "util/timestamp.h"
+
 namespace RosTestUtil
 {
     /**
@@ -26,7 +28,7 @@ namespace RosTestUtil
      * @param node_handle A reference to the NodeHandle object that will be subscribing to
      * the topic
      * @param topic_name A string containing the name of the topic to subscribe to
-     * @param timeout The number of seconds the function will wait for a message to be
+     * @param timeout The duration the function will wait for a message to be
      * received on the topic before an exception is thrown
      * @throw std::runtime_error If no messages are received on the topic before the
      * timout expires
@@ -34,7 +36,7 @@ namespace RosTestUtil
      */
     template <typename T>
     T waitForMessageOnTopic(ros::NodeHandle &node_handle, std::string topic_name,
-                            std::chrono::seconds timeout = std::chrono::seconds(10))
+                            Duration timeout = Duration::fromSeconds(10))
     {
         std::optional<T> msg_ptr;
 
@@ -47,7 +49,9 @@ namespace RosTestUtil
         auto sub = node_handle.subscribe<T>(topic_name, 1, callback);
 
         std::chrono::time_point start = std::chrono::steady_clock::now();
-        while (!msg_ptr && (std::chrono::steady_clock::now() - start) < timeout)
+        while (!msg_ptr && std::chrono::duration_cast<std::chrono::seconds>(
+                               std::chrono::steady_clock::now() - start)
+                                   .count() < timeout.getSeconds())
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(5));
             ros::spinOnce();

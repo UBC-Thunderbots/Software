@@ -209,6 +209,8 @@ host_software_packages=(
     python-rosinstall
     protobuf-compiler
     libprotobuf-dev
+    libsigc++-2.0-dev
+    libusb-1.0-0-dev
     nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
     yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
 )

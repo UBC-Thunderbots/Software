@@ -12,26 +12,26 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
-typedef struct
+typedef struct SSLRobotData_t
 {
     unsigned int id;
     Point position;
     Angle orientation;
     double confidence;
-    double timestamp;
+    Timestamp timestamp;
 } SSLRobotData;
 
 /**
  * A lightweight datatype used to pass filtered robot data
  */
-typedef struct
+typedef struct FilteredRobotData_t
 {
     unsigned int id;
     Point position;
     Vector velocity;
     Angle orientation;
     AngularVelocity angular_velocity;
-    AITimestamp timestamp;
+    Timestamp timestamp;
 } FilteredRobotData;
 
 class RobotFilter
