@@ -3,9 +3,6 @@
 using namespace AI::HL::STP;
 
 
-
-
-
 bool Evaluation::playerOrientationWithinAngleThresholdOfTarget(const Point position, const Angle orientation, const Point target,
                                                    Angle threshold) {
 
