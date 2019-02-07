@@ -2,24 +2,12 @@
  * This file specifies the saga for ROS
  */
 
-import { channel, delay } from 'redux-saga';
-import { put, spawn, take, takeEvery, takeLatest } from 'redux-saga/effects';
+import { channel } from 'redux-saga';
+import { put, spawn, take, takeLatest } from 'redux-saga/effects';
 import ROSLIB from 'roslib';
 import { getType } from 'typesafe-actions';
 
-import {
-    connected,
-    disconnected,
-    error,
-    newMessage,
-    setNodes,
-    setParams,
-    setServices,
-    setTopics,
-    start,
-    subscribeTopic,
-    unsubscribeTopic,
-} from '../actions/ros';
+import { connected, disconnected, error, start } from '../actions/ros';
 
 let ros: ROSLIB.Ros | null = null;
 const rosChannel = channel();
@@ -49,8 +37,7 @@ function* listenToROSChannel() {
 }
 
 /**
- * Start ROS and sets up listeners for new nodes, topics, services
- * and params
+ * Start ROS
  */
 function* startROS() {
     yield stopROS();
@@ -62,20 +49,6 @@ function* startROS() {
     ros.on('connection', () => rosChannel.put(connected()));
     ros.on('error', () => rosChannel.put(error('There was an error')));
     ros.on('close', () => rosChannel.put(disconnected()));
-
-    // Start listening for actions to subscribe or unsubscribe to ROS topics
-    yield takeEvery(getType(subscribeTopic), subscribeToROSTopic);
-    yield takeEvery(getType(unsubscribeTopic), unsubscribeFromROSTopic);
-
-    while (true) {
-        // Every five seconds, check if any new nodes, topics, services or params
-        // where added
-        ros.getNodes((nodes) => rosChannel.put(setNodes(nodes)));
-        ros.getTopics((topics) => rosChannel.put(setTopics((topics as any).topics)));
-        ros.getServices((nodes) => rosChannel.put(setServices(nodes)));
-        ros.getParams((nodes) => rosChannel.put(setParams(nodes)));
-        yield delay(5000);
-    }
 }
 
 /**
@@ -89,33 +62,39 @@ function* stopROS() {
 }
 
 /**
- * Subscribe to a ROS topic and emit messages as Redux actions
+ * Subscribe to a ROS topic and send messages to the callback
  */
-function subscribeToROSTopic(action: ReturnType<typeof subscribeTopic>) {
+export function subscribeToROSTopic(
+    name: string,
+    messageType: string,
+    callback: (message: ROSLIB.Message) => void,
+) {
     if (ros !== null) {
         const topic = new ROSLIB.Topic({
+            messageType,
+            name,
             ros,
-            messageType: action.payload.messageType,
-            name: action.payload.topic,
         });
 
-        topic.subscribe((message) =>
-            rosChannel.put(newMessage(action.payload.topic, message)),
-        );
+        topic.subscribe(callback);
     }
 }
 
 /**
  * Unsubscribe from a ROS topic
  */
-function unsubscribeFromROSTopic(action: ReturnType<typeof unsubscribeTopic>) {
+export function unsubscribeToROSTopic(
+    name: string,
+    messageType: string,
+    callback: (message: ROSLIB.Message) => void,
+) {
     if (ros !== null) {
         const topic = new ROSLIB.Topic({
+            messageType,
+            name,
             ros,
-            messageType: action.payload.messageType,
-            name: action.payload.topic,
         });
 
-        topic.unsubscribe();
+        topic.unsubscribe(callback);
     }
 }
