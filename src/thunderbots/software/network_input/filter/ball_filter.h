@@ -23,11 +23,11 @@ typedef struct
  * something like std::pair so it's very explicit what data is being accessed, since
  * it's accessed by name rather than by index (first/second)
  */
-typedef struct
+typedef struct FilteredBallData_t
 {
     Point position;
     Vector velocity;
-    AITimestamp timestamp;
+    Timestamp timestamp;
 } FilteredBallData;
 
 /**
@@ -54,6 +54,8 @@ class BallFilter
    private:
     struct BallData
     {
+        BallData() = default;
+
         BallData(Point position, Vector velocity, double timestamp)
             : position(position), velocity(velocity), timestamp(timestamp)
         {
@@ -64,5 +66,5 @@ class BallFilter
         double timestamp;
     };
 
-    BallData *ball_data;
+    BallData ball_data;
 };

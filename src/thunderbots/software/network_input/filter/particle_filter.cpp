@@ -1,7 +1,5 @@
 #include "particle_filter.h"
 
-#include <chrono>
-
 #include "geom/util.h"
 
 /* Notes on the weights and evaluation:
@@ -30,8 +28,7 @@ ParticleFilter::ParticleFilter(double length, double width)
     particles = std::vector<Particle>(PARTICLE_FILTER_NUM_PARTICLES, Particle());
 
     // Set the seed for the random number generator
-    seed = static_cast<unsigned int>(
-        std::chrono::system_clock::now().time_since_epoch().count());
+    seed = static_cast<unsigned int>(time(NULL));
 
     // These will be used to generate Points with a gaussian distribution
     generator = std::default_random_engine(seed);

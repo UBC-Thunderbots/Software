@@ -16,7 +16,7 @@ namespace
     std::vector<Parameter<std::string>> string_parameters;
 
     // how long to wait for before running the tests, allowing time for the node to spawn
-    const int WAIT_FOR_PARAMS_S = 5;
+    const int WAIT_FOR_PARAMS_SECONDS = 5;
     // msg to display before the name of the paramter that is not found
     const std::string MISMATCH_MSG = "Parameter mismatch with: ";
 }  // namespace
@@ -102,6 +102,6 @@ int main(int argc, char** argv)
     // run tests
     ros::init(argc, argv, "parameter_existance_test");
     testing::InitGoogleTest(&argc, argv);
-    std::this_thread::sleep_for(std::chrono::seconds(WAIT_FOR_PARAMS_S));
+    std::this_thread::sleep_for(std::chrono::seconds(WAIT_FOR_PARAMS_SECONDS));
     return RUN_ALL_TESTS();
 }

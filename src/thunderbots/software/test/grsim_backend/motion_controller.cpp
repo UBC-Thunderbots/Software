@@ -1,5 +1,7 @@
 #include "grsim_communication/motion_controller/motion_controller.h"
 
+#include <chrono>
+
 #include "geom/angle.h"
 #include "gtest/gtest.h"
 #include "shared/constants.h"
@@ -25,15 +27,12 @@ class MotionControllerTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        auto epoch       = time_point<std::chrono::steady_clock>();
-        auto since_epoch = std::chrono::seconds(10000);
-
-        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // An arbitrary fixed point in time
         // We use this fixed point in time to make the tests deterministic.
-        current_time = epoch + since_epoch;
+        current_time = Timestamp::fromSeconds(300);
     }
 
-    steady_clock::time_point current_time;
+    Timestamp current_time;
 
     double calculateVelocityTolerance(double velocity)
     {

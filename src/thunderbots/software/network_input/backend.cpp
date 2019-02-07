@@ -82,8 +82,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredFriendlyTeamMsg(
                 new_robot_data.orientation =
                     Angle::ofRadians(friendly_robot.orientation());
                 new_robot_data.confidence = friendly_robot.confidence();
-                new_robot_data.timestamp =
-                    detection.t_capture();  // Units of t_capture is seconds
+                new_robot_data.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
                 friendly_team_robot_data.emplace_back(new_robot_data);
             }
@@ -129,7 +128,7 @@ std::optional<thunderbots_msgs::Team> Backend::getFilteredEnemyTeamMsg(
                                                 enemy_robot.y() * METERS_PER_MILLIMETER);
                 new_robot_data.orientation = Angle::ofRadians(enemy_robot.orientation());
                 new_robot_data.confidence  = enemy_robot.confidence();
-                new_robot_data.timestamp   = detection.t_capture();
+                new_robot_data.timestamp = Timestamp::fromSeconds(detection.t_capture());
 
                 enemy_team_robot_data.emplace_back(new_robot_data);
             }
