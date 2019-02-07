@@ -1,10 +1,11 @@
 #ifndef AI_HL_STP_EVALUATION_PLAYER_H_
 #define AI_HL_STP_EVALUATION_PLAYER_H_
 
-//#include "ai/hl/stp/world.h"
-//#include "util/param.h"
-
 #include "geom/point.h"
+
+/**
+ * Contain independent Evaluation function to evaluate whether player orientation at position is within threshold
+ */
 
 namespace AI
 {
