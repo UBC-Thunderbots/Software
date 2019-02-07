@@ -1,23 +1,35 @@
 /*
  * This file specifies the saga for ROS
  */
-
+import * as _ from 'lodash';
 import { channel } from 'redux-saga';
-import { put, spawn, take, takeLatest } from 'redux-saga/effects';
+import { call, put, spawn, take, takeLatest } from 'redux-saga/effects';
 import ROSLIB from 'roslib';
 import { getType } from 'typesafe-actions';
 
 import { connected, disconnected, error, start } from '../actions/ros';
 
-let ros: ROSLIB.Ros | null = null;
 const rosChannel = channel();
+
+export let subscribeToROSTopic: (
+    name: string,
+    messageType: string,
+    callback: (message: ROSLIB.Message) => void,
+) => void;
+export let unsubscribeToROSTopic: (
+    name: string,
+    messageType: string,
+    callback: (message: ROSLIB.Message) => void,
+) => void;
 
 /**
  * Function first called when the application first starts
  */
 export default function* init() {
+    const ros: ROSLIB.Ros = new ROSLIB.Ros({});
+
     // Listen to start actions and start ROS
-    yield takeLatest(getType(start), startROS);
+    yield takeLatest(getType(start), startROS, ros);
 
     // Start listening to ROS messages
     yield spawn(listenToROSChannel);
@@ -39,62 +51,59 @@ function* listenToROSChannel() {
 /**
  * Start ROS
  */
-function* startROS() {
-    yield stopROS();
+export function* startROS(ros: ROSLIB.Ros) {
+    yield call(stopROS, ros);
 
-    ros = new ROSLIB.Ros({});
-    ros.connect('ws://localhost:9090');
+    yield call([ros, ros.connect], 'ws://localhost:9090');
 
     // Send Redux actions when connected, disconnected to ROS or on error
-    ros.on('connection', () => rosChannel.put(connected()));
-    ros.on('error', () => rosChannel.put(error('There was an error')));
-    ros.on('close', () => rosChannel.put(disconnected()));
+    yield call([ros, ros.on], 'connection', () => rosChannel.put(connected()));
+    yield call([ros, ros.on], 'error', () => rosChannel.put(error('There was an error')));
+    yield call([ros, ros.on], 'close', () => rosChannel.put(disconnected()));
+
+    subscribeToROSTopic = _.curry(subscribeToROSTopicInternal)(ros);
+    unsubscribeToROSTopic = _.curry(subscribeToROSTopicInternal)(ros);
 }
 
 /**
  * Disconnect from ROS if we are connected
  */
-function* stopROS() {
-    if (ros !== null) {
-        yield ros.close();
-        ros = null;
-    }
+export function* stopROS(ros: ROSLIB.Ros) {
+    yield call([ros, ros.close]);
 }
 
 /**
  * Subscribe to a ROS topic and send messages to the callback
  */
-export function subscribeToROSTopic(
+export function* subscribeToROSTopicInternal(
+    ros: ROSLIB.Ros,
     name: string,
     messageType: string,
     callback: (message: ROSLIB.Message) => void,
 ) {
-    if (ros !== null) {
-        const topic = new ROSLIB.Topic({
-            messageType,
-            name,
-            ros,
-        });
+    const topic = new ROSLIB.Topic({
+        messageType,
+        name,
+        ros,
+    });
 
-        topic.subscribe(callback);
-    }
+    yield call([topic, topic.subscribe], callback);
 }
 
 /**
  * Unsubscribe from a ROS topic
  */
-export function unsubscribeToROSTopic(
+export function* unsubscribeToROSTopicInternal(
+    ros: ROSLIB.Ros,
     name: string,
     messageType: string,
     callback: (message: ROSLIB.Message) => void,
 ) {
-    if (ros !== null) {
-        const topic = new ROSLIB.Topic({
-            messageType,
-            name,
-            ros,
-        });
+    const topic = new ROSLIB.Topic({
+        messageType,
+        name,
+        ros,
+    });
 
-        topic.unsubscribe(callback);
-    }
+    yield call([topic, topic.unsubscribe], callback);
 }

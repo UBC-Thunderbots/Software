@@ -34,8 +34,12 @@ function* listenToConsoleChannel() {
 /**
  * We subscribe to topic rosout to start receiving messages
  */
-function startConsole() {
-    subscribeToROSTopic(TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE, (message: IRosoutMessage) => {
-        consoleChannel.put(actions.console.newRosoutMessage(message));
-    });
+function* startConsole() {
+    yield subscribeToROSTopic(
+        TOPIC_ROSOUT,
+        TOPIC_ROSOUT_TYPE,
+        (message: IRosoutMessage) => {
+            consoleChannel.put(actions.console.newRosoutMessage(message));
+        },
+    );
 }
