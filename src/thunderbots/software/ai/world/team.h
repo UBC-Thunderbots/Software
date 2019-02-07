@@ -107,7 +107,7 @@ class Team
      * @return the Duration for which a Robot must not have been updated for before
      * being removed from this team.
      */
-    Duration getRobotExpiryBufferDuration();
+    Duration getRobotExpiryBufferDuration() const;
 
     /**
      * Sets the Duration for which a Robot must not have been updated for before being

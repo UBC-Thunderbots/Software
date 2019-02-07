@@ -95,7 +95,7 @@ std::size_t Team::numRobots() const
     return team_robots.size();
 }
 
-Duration Team::getRobotExpiryBufferDuration()
+Duration Team::getRobotExpiryBufferDuration() const
 {
     return robot_expiry_buffer_duration;
 }
