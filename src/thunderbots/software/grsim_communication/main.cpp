@@ -3,9 +3,11 @@
 #include <ros/time.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
+#include <grsim_communication/motion_controller/motion_controller.h>
 
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "geom/point.h"
 #include "grsim_communication/grsim_backend.h"
@@ -85,12 +87,31 @@ int main(int argc, char** argv)
     // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
+    std::stringstream csv_filename;
+    csv_filename << "motion_controller_log-" << std::time(nullptr) << ".csv";
+
+    MotionController::csv_output_path = boost::filesystem::current_path()
+            /= boost::filesystem::path(csv_filename.str());
+
+    LOG(WARNING) << MotionController::csv_output_path.string();
+
+    boost::filesystem::ofstream csv_ostream(MotionController::csv_output_path);
+
+    // write the columns to the CSV file
+    // timestamp, absolute position, absolute ball position,
+    // angle to ball (deg), delta v, angle between delta v and ball
+    csv_ostream << "time,pos_x,pos_y,ball_pos_x,ball_pos_y,angle_to_ball,v_x,v_y,v_to_dest_angle,dv_x,dv_y,dv_to_dest_angle"
+            << MotionController::CRLF;
+
+    csv_ostream.close();
+
     // Main loop
     while (ros::ok())
     {
         // Clear all primitives each tick
         primitives.clear();
 
+        primitives.emplace_back(new MovePrimitive(0, ball.position(), Angle(), 0.5));
 
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector

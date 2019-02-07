@@ -14,9 +14,13 @@
 #include "grsim_communication/motion_controller/motion_controller.h"
 
 #include <algorithm>
+#include <chrono>
 
 #include "shared/constants.h"
 
+boost::filesystem::path MotionController::csv_output_path;
+
+std::string MotionController::CRLF = "\r\n";
 
 MotionController::Velocity MotionController::bangBangVelocityController(
     const Robot robot, const Point dest, const double desired_final_speed,
@@ -128,6 +132,41 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // Translate velocities into robot coordinates
     Vector new_robot_velocity_in_robot_coordinates =
         new_robot_velocity.rotate(-robot.orientation());
+
+    // time, pos_x, pos_y, ball_pos_x, ball_pos_y, angle_to_ball, dv_x, dv_y, dv_to_dest_angle
+
+    boost::filesystem::ofstream csv_ostream(MotionController::csv_output_path,
+                                            boost::filesystem::ofstream::out | boost::filesystem::ofstream::app);
+    using MotionController::CRLF;
+
+    // write timestamp to csv
+    csv_ostream << std::chrono::steady_clock::now().time_since_epoch().count() << ",";
+
+    // write pos to csv
+    csv_ostream << robot.position().x() << "," << robot.position().y() << ",";
+
+    // write ball_pos to csv
+    csv_ostream <<  dest.x() << "," << dest.y() << ",";
+
+    // write angle_to_ball to csv
+    csv_ostream << vector_to_dest.orientation().toDegrees() << ",";
+
+    // write v to csv
+    csv_ostream << new_robot_velocity.x() << "," << new_robot_velocity.y() << ",";
+
+    // write v_to_dest_angle to csv
+    csv_ostream << (new_robot_velocity.orientation() - vector_to_dest.orientation()).toDegrees() << ",";
+
+    // write dv to csv
+    csv_ostream << additional_velocity.x() << "," << additional_velocity.y() << ",";
+
+    // write dv_to_dest_angle to csv
+    csv_ostream << (additional_velocity.orientation() - vector_to_dest.orientation()).toDegrees();
+
+    // end line
+    csv_ostream << CRLF;
+
+    csv_ostream.close();
 
     return new_robot_velocity_in_robot_coordinates;
 }
