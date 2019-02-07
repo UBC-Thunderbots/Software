@@ -132,6 +132,21 @@ namespace Util
             thunderbots_msgs::Team team_msg;
 
             team_msg.robot_expiry_buffer_milliseconds = team.getRobotExpiryBufferDuration().getMilliseconds();
+
+            if(team.getGoalieID()) {
+                team_msg.goalie_id = *team.getGoalieID();
+            } else {
+                team_msg.goalie_id = -1;
+            }
+
+            auto robots = team.getAllRobots();
+            auto robot_msgs = std::vector<thunderbots_msgs::Robot>();
+            for(auto robot : robots) {
+                robot_msgs.emplace_back(convertRobotToROSMessage(robot));
+            }
+            team_msg.robots = robot_msgs;
+
+            return team_msg;
         }
 
         RefboxGameState createGameStateFromROSMessage(

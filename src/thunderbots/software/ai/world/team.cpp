@@ -126,6 +126,10 @@ std::optional<Robot> Team::goalie() const
     return std::nullopt;
 }
 
+std::optional<unsigned int> Team::getGoalieID() const {
+    return goalie_id;
+}
+
 std::vector<Robot> Team::getAllRobots() const
 {
     std::vector<Robot> all_robots;

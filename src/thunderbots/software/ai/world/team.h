@@ -139,6 +139,15 @@ class Team
     std::optional<Robot> goalie() const;
 
     /**
+     * Returns the ID of the goalie for this team, if one has been specified. Otherwise
+     * returns std::nullopt
+     *
+     * @return The ID of the goalie robot for this team if one is specified, otherwise
+     * returns std::nullopt
+     */
+    std::optional<unsigned int> getGoalieID() const;
+
+    /**
      * Returns a vector of all the robots on this team.
      *
      * @return a vector of all the robots on this team.
