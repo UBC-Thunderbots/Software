@@ -4,7 +4,8 @@
 #include "geom/point.h"
 
 /**
- * Contain independent Evaluation function to evaluate whether player orientation at position is within threshold
+ * Contain independent Evaluation function to evaluate whether player orientation at
+ * position is within threshold
  */
 
 namespace AI
