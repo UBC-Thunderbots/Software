@@ -6,9 +6,11 @@
 #ifndef THUNDERBOTS_ALL_DEFLECT_OFF_ENEMY_TARGET_H
 #define THUNDERBOTS_ALL_DEFLECT_OFF_ENEMY_TARGET_H
 
-
-/* Returns the point to which the player taking the friendly
- * indirect kick should chip to, to chip over the first blocker (and aim at the
- * net)
- */
-std::pair<Point, Angle> indirect_chip_target(World world, Player player);
+namespace Evaluation
+{
+    /* Returns the point at which the player should shoot to deflect the ball of an
+     * enemy
+     * to the outside of the field to get another kick/corner
+     */
+    Point deflect_off_enemy_target(World world);
+}  // namespace Evaluation

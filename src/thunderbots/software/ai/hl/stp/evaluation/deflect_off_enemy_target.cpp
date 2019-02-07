@@ -4,13 +4,15 @@
 
 #include "ai/world/field.h"
 #include "ai/world/world.h"
+#include "software/geom/line.h"
+#include "software/geom/util.h"
 
 auto CHIP_TARGET_FRACTION = 0.5;
 auto MAX_RADIUS           = 0.15;
 
 namespace
 {
-    std::pair<Point, Angle> AI::indirect_chip_target(World world, Player player)
+    Point AI::HL::STP::Evaluation::deflect_off_enemy_target(World world)
     {
         Point enemy_goal_positive = world.field().enemyGoalpostPos();
         Point enemy_goal_negative = world.field().enemyGoalpostNeg();
@@ -19,101 +21,50 @@ namespace
         // this triangle could block a chip/shot
         Triangle chip_target_area =
             triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
-        double rough_chip_dist =
-            (world.field().enemyGoal() - world.ball().position()).len() *
-            (CHIP_TARGET_FRACTION * 0.9);
 
-        std::vector<Vector2> blocking_robots;
+        Robot enemyClosestToEdge = world.enemyTeam()[0];
+        double shortestLenToEdge = 100.0;
+        double closestEdgeY;
+        // Finds the y value of the closest edge of the field (likely where the ball
+        // is)
+        if (world.ball().position().y <= 0.0)
+            closestEdgeY = world.field().friendlyCornerNeg().y;
+        else
+            closestEdgeY = world.field().friendlyCornerPos().y;
 
-        // Adds any enemies that are in the block triangle and further than the chip
-        // dist to the blocking_robots vector
+        Line ball_to_goal_neg = new Line(world.ball().postion(), enemy_goal_negative);
+        Line ball_to_goal_pos = new Line(world.ball().postion(), enemy_goal_negative);
+        // Find the enemy that's blocking a shot that's closest to the edge of the
+        // field
         for (auto i : world.enemyTeam())
         {
             if ((contains(chip_target_area, i.position()) ||
-                 offset_to_line(world.ball().position(), enemy_goal_negative,
-                                i.position()) <= MAX_RADIUS ||
-                 offset_to_line(world.ball().position(), enemy_goal_positive,
-                                i.position()) <= MAX_RADIUS) &&
-                ((i.position() - world.ball().position()).len() >
-                 rough_chip_dist + Robot::MAX_RADIUS))
+                 ball_to_goal_neg.offset_to_line(i.position()) <= MAX_RADIUS ||
+                 ball_to_goal_pos.offset_to_line(i.position()) <= MAX_RADIUS) &&
+                (i.position().x > world.ball().position().x))
             {
-                blocking_robots.push_back(i.position());
+                if (abs(i.position().y - closestEdgeY) < shortestLenToEdge)
+                {
+                    enemyClosestToEdge = i;
+                    shortestLenToEdge  = abs(i.position().y - closestEdgeY);
+                }
             }
         }
 
-        // Adds any friendly robots that are in the block triangle and further than
-        // the chip dist to the blocking_robots vector
-        for (auto i : world.friendlyTeam())
-        {
-            if ((contains(chip_target_area, i.position()) ||
-                 offset_to_line(world.ball().position(), enemy_goal_negative,
-                                i.position()) <= Robot::MAX_RADIUS ||
-                 offset_to_line(world.ball().position(), enemy_goal_positive,
-                                i.position()) <= Robot::MAX_RADIUS) &&
-                ((i.position() - world.ball().position()).len() >
-                 rough_chip_dist + Robot::MAX_RADIUS))
-            {
-                blocking_robots.push_back(i.position());
-            }
-        }
+        // want to shoot at the edge of a robot so the ball deflects towards the
+        // edge of the field
+        Point dir     = enemyClosestToEdge.position() - world.ball().position();
+        Point dirPerp = dir.perp().norm(Robot::MAX_RADIUS * 0.75);
+        Point target  = Point(0, 0);
 
-        // should not consider first blocker
-        Point chip_net_target =
-            angle_sweep_circles(world.ball().position(), enemy_goal_positive,
-                                enemy_goal_negative, blocking_robots, Robot::MAX_RADIUS)
-                .first;
-        Angle chip_angle =
-            angle_sweep_circles(world.ball().position(), enemy_goal_positive,
-                                enemy_goal_negative, blocking_robots, Robot::MAX_RADIUS)
-                .second;
-        Point chip_dir =
-            chip_net_target - world.ball().position();  // from ball to point in net
-        double total_chip_dist = chip_dir.len();  // dist between ball an target in net
-        Point max_target       = world.ball().position() +
-                           chip_dir.norm(total_chip_dist * CHIP_POWER_BOUNCE_THRESHOLD);
-        Point target;
-
-        // Chipper is in our half of the field. Set target to center of net so no
-        // carpeting
-        if (player.position().x < 0.0)
-        {
-            target = world.ball().position() +
-                     (world.field().enemyGoal() - world.ball().position())
-                         .norm(total_chip_dist * CHIP_TARGET_FRACTION);
-
-            // target should never be further than max_target
-            if ((target - world.ball().position()).len() -
-                    (max_target - world.ball().position()).len() >
-                0.0)
-                target = world.ball().position() +
-                         (world.field().enemyGoal() - world.ball().position())
-                             .norm(total_chip_dist * CHIP_POWER_BOUNCE_THRESHOLD);
-
-            // target should never be furhter than MAX_CHIP_POWER
-            if ((target - world.ball().position()).len() > MAX_CHIP_POWER)
-                target = world.ball().position() +
-                         (world.field().enemyGoal() - world.ball().position())
-                             .norm(MAX_CHIP_POWER);
-        }
+        // choose point closest to edge of field
+        if (abs((world.ball().position() + dir + dirPerp).y - closestEdgeY) >
+            abs((world.ball().position() + dir - dirPerp).y - closestEdgeY))
+            target = world.ball().position() + dir - dirPerp;
         else
-        {  // Try to chip for a (indirect) goal
-            target = world.ball().position() +
-                     (chip_dir.norm(total_chip_dist * CHIP_TARGET_FRACTION));
+            target = world.ball().position() + dir + dirPerp;
 
-            // target should never be further than max_target
-            if ((target - world.ball().position()).len() -
-                    (max_target - world.ball().position()).len() >
-                0.0)
-                target = world.ball().position() +
-                         chip_dir.norm(total_chip_dist * CHIP_POWER_BOUNCE_THRESHOLD);
-
-            // target should never be furhter than MAX_CHIP_POWER
-            if ((target - world.ball().position()).len() > MAX_CHIP_POWER)
-                target = world.ball().position() + chip_dir.norm(MAX_CHIP_POWER);
-        }
-
-        // LOGF_INFO(u8"Chipper can see: %1/1 of net, CHIP_DIST: %2", chip_angle,
-        // (target - world.ball().position()).len());
-        return std::make_pair(target, chip_angle);
+        return target;
     }
+
 }  // namespace

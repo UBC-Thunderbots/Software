@@ -46,4 +46,12 @@ class Line final
     {
         return (second.y() - first.y()) / (second.x() - first.x());
     }
+
+    inline double offset_to_line(Point p) const
+    {
+        double returnVal = fabs(p.x() + slope() * p.y() + first.x() * second.y() -
+                                first.x() * slope() - second.y()) /
+                           slope();
+        return returnVal;
+    }
 };
