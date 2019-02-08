@@ -7,12 +7,10 @@
 #include "software/geom/line.h"
 #include "software/geom/util.h"
 
-auto CHIP_TARGET_FRACTION = 0.5;
-auto MAX_RADIUS           = 0.15;
-
-namespace
+auto MAX_RADIUS = 0.15;
+namespace Evaluation
 {
-    Point AI::HL::STP::Evaluation::deflect_off_enemy_target(World world)
+    Point deflect_off_enemy_target(const World &world)
     {
         Point enemy_goal_positive = world.field().enemyGoalpostPos();
         Point enemy_goal_negative = world.field().enemyGoalpostNeg();
@@ -22,31 +20,31 @@ namespace
         Triangle chip_target_area =
             triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
 
-        Robot enemyClosestToEdge = world.enemyTeam()[0];
+        Robot enemyClosestToEdge = world.enemyTeam().getRobotById(0).value();
         double shortestLenToEdge = 100.0;
         double closestEdgeY;
         // Finds the y value of the closest edge of the field (likely where the ball
         // is)
-        if (world.ball().position().y <= 0.0)
-            closestEdgeY = world.field().friendlyCornerNeg().y;
+        if (world.ball().position().y() <= 0.0)
+            closestEdgeY = world.field().friendlyCornerNeg().y();
         else
-            closestEdgeY = world.field().friendlyCornerPos().y;
+            closestEdgeY = world.field().friendlyCornerPos().y();
 
         // Find the enemy that's blocking a shot that's closest to the edge of the
         // field
-        for (Robot i : world.enemyTeam().team_robots)
+        for (const auto &i : world.enemyTeam().getAllRobots())
         {
             if ((contains(chip_target_area, i.position()) ||
                  offsetToLine(enemy_goal_negative, world.ball().position(),
                               i.position()) <= MAX_RADIUS ||
                  offsetToLine(enemy_goal_positive, world.ball().position(),
                               i.position()) <= MAX_RADIUS) &&
-                (i.position().x > world.ball().position().x))
+                (i.position().x() > world.ball().position().x()))
             {
-                if (abs(i.position().y - closestEdgeY) < shortestLenToEdge)
+                if (fabs(i.position().y() - closestEdgeY) < shortestLenToEdge)
                 {
-                    enemyClosestToEdge = i;
-                    shortestLenToEdge  = abs(i.position().y - closestEdgeY);
+                    enemyClosestToEdge.updateState(i);
+                    shortestLenToEdge = fabs(i.position().y() - closestEdgeY);
                 }
             }
         }
@@ -58,13 +56,12 @@ namespace
         Point target  = Point(0, 0);
 
         // choose point closest to edge of field
-        if (abs((world.ball().position() + dir + dirPerp).y - closestEdgeY) >
-            abs((world.ball().position() + dir - dirPerp).y - closestEdgeY))
+        if (fabs((world.ball().position() + dir + dirPerp).y() - closestEdgeY) >
+            fabs((world.ball().position() + dir - dirPerp).y() - closestEdgeY))
             target = world.ball().position() + dir - dirPerp;
         else
             target = world.ball().position() + dir + dirPerp;
 
         return target;
     }
-
-}  // namespace
+}  // namespace Evaluation
