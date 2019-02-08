@@ -95,7 +95,7 @@ std::size_t Team::numRobots() const
     return team_robots.size();
 }
 
-Duration Team::getRobotExpiryBufferDuration()
+Duration Team::getRobotExpiryBufferDuration() const
 {
     return robot_expiry_buffer_duration;
 }
@@ -124,6 +124,11 @@ std::optional<Robot> Team::goalie() const
     }
 
     return std::nullopt;
+}
+
+std::optional<unsigned int> Team::getGoalieID() const
+{
+    return goalie_id;
 }
 
 std::vector<Robot> Team::getAllRobots() const
