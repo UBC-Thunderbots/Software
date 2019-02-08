@@ -10,7 +10,7 @@
 auto MAX_RADIUS = 0.15;
 namespace Evaluation
 {
-    Point deflect_off_enemy_target(const World &world)
+    Point deflect_off_enemy_target(World world)
     {
         Point enemy_goal_positive = world.field().enemyGoalpostPos();
         Point enemy_goal_negative = world.field().enemyGoalpostNeg();
@@ -32,7 +32,7 @@ namespace Evaluation
 
         // Find the enemy that's blocking a shot that's closest to the edge of the
         // field
-        for (const auto &i : world.enemyTeam().getAllRobots())
+        for (Robot i : world.enemyTeam().getAllRobots())
         {
             if ((contains(chip_target_area, i.position()) ||
                  offsetToLine(enemy_goal_negative, world.ball().position(),
