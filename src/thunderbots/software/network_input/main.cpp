@@ -9,8 +9,10 @@
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
+#include "thunderbots_msgs/World.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
+#include "util/ros_messages.h"
 #include "util/timestamp.h"
 
 int main(int argc, char** argv)
@@ -41,6 +43,8 @@ int main(int argc, char** argv)
     ros::Publisher gamecontroller_publisher =
         node_handle.advertise<thunderbots_msgs::RefboxData>(
             Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1);
+    ros::Publisher world_publisher = node_handle.advertise<thunderbots_msgs::World>(
+        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
@@ -83,55 +87,55 @@ int main(int argc, char** argv)
     // Init our backend class
     Backend backend = Backend();
 
+    // Store the state of the most up to date World message
+    thunderbots_msgs::World world_msg;
+
     // Main loop
     while (ros::ok())
     {
         auto ssl_vision_packet_queue = ssl_vision_client->getVisionPacketQueue();
-        while (!ssl_vision_packet_queue.empty())
-        {
-            auto ssl_vision_packet = ssl_vision_packet_queue.front();
-            ssl_vision_packet_queue.pop();
-
-            std::optional<thunderbots_msgs::Field> field_msg =
-                backend.getFieldMsg(ssl_vision_packet);
-            if (field_msg)
-            {
-                field_publisher.publish(*field_msg);
-            }
-
-            std::optional<thunderbots_msgs::Ball> ball_msg =
-                backend.getFilteredBallMsg(ssl_vision_packet);
-            if (ball_msg)
-            {
-                ball_publisher.publish(*ball_msg);
-            }
-
-            std::optional<thunderbots_msgs::Team> friendly_team_msg =
-                backend.getFilteredFriendlyTeamMsg(ssl_vision_packet);
-            if (friendly_team_msg)
-            {
-                friendly_team_publisher.publish(*friendly_team_msg);
-            }
-
-            std::optional<thunderbots_msgs::Team> enemy_team_msg =
-                backend.getFilteredEnemyTeamMsg(ssl_vision_packet);
-            if (enemy_team_msg)
-            {
-                enemy_team_publisher.publish(*enemy_team_msg);
-            }
-        }
-
         auto gamecontroller_packet_ptr =
             ssl_gamecontroller_client->getGameControllerPacket();
 
-        if (gamecontroller_packet_ptr)
+        if (!ssl_vision_packet_queue.empty() || gamecontroller_packet_ptr)
         {
-            auto gamecontroller_data_msg =
-                backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
-            if (gamecontroller_data_msg)
+            while (!ssl_vision_packet_queue.empty())
             {
-                gamecontroller_publisher.publish(*gamecontroller_data_msg);
+                auto ssl_vision_packet = ssl_vision_packet_queue.front();
+                ssl_vision_packet_queue.pop();
+
+                Field field     = backend.getFieldData(ssl_vision_packet);
+                world_msg.field = Util::ROSMessages::convertFieldToROSMessage(field);
+
+                Ball ball      = backend.getFilteredBallData(ssl_vision_packet);
+                world_msg.ball = Util::ROSMessages::convertBallToROSMessage(ball);
+
+                Team friendly_team =
+                    backend.getFilteredFriendlyTeamData(ssl_vision_packet);
+                world_msg.friendly_team =
+                    Util::ROSMessages::convertTeamToROSMessage(friendly_team);
+
+                Team enemy_team = backend.getFilteredEnemyTeamData(ssl_vision_packet);
+                world_msg.enemy_team =
+                    Util::ROSMessages::convertTeamToROSMessage(enemy_team);
             }
+
+            if (gamecontroller_packet_ptr)
+            {
+                auto gamecontroller_data_msg =
+                    backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
+                if (gamecontroller_data_msg)
+                {
+                    world_msg.refbox_data = *gamecontroller_data_msg;
+                }
+            }
+
+            ball_publisher.publish(world_msg.ball);
+            field_publisher.publish(world_msg.field);
+            friendly_team_publisher.publish(world_msg.friendly_team);
+            enemy_team_publisher.publish(world_msg.enemy_team);
+            gamecontroller_publisher.publish(world_msg.refbox_data);
+            world_publisher.publish(world_msg);
         }
 
         // We spin once here so any callbacks in this node can run (if we ever add them)
