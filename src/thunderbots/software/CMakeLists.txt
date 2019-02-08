@@ -652,6 +652,14 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(timestamp_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(robot_filter_test
+            test/network_input/test_robot_filter.cpp
+            network_input/filter/robot_filter.cpp
+            util/timestamp.cpp
+            )
+
+    target_link_libraries(robot_filter_test ${catkin_LIBRARIES})
+
 endif()
 
 ##### ROSTests / Integration Tests #####

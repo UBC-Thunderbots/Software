@@ -27,6 +27,7 @@ typedef struct SSLRobotData_t
 typedef struct FilteredRobotData_t
 {
     unsigned int id;
+    bool cached;
     Point position;
     Vector velocity;
     Angle orientation;
@@ -54,7 +55,7 @@ class RobotFilter
      *
      * @return The filtered data for the robot
      */
-    FilteredRobotData getFilteredData(const std::vector<SSLRobotData> &new_robot_data);
+    FilteredRobotData getFilteredData(const std::vector<SSLRobotData>& new_robot_data);
 
     /**
      * Returns the id of the Robot that this filter is filtering for
@@ -65,4 +66,6 @@ class RobotFilter
 
    private:
     unsigned int robot_id;
+    // stores the most up to date robot data
+    FilteredRobotData cached_robot_data;
 };

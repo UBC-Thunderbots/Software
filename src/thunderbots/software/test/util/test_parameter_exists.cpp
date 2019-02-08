@@ -67,17 +67,17 @@ TEST_P(CheckParameterExistanceStr, StringTest)
 
 // setup all test cases for the 4 XmlRpc types
 INSTANTIATE_TEST_CASE_P(Int32Test, CheckParameterExistanceInt32,
-        ::testing::ValuesIn(int_parameters.begin(),
-            int_parameters.end()));
+                        ::testing::ValuesIn(int_parameters.begin(),
+                                            int_parameters.end()));
 INSTANTIATE_TEST_CASE_P(DoubleTest, CheckParameterExistanceDouble,
-        ::testing::ValuesIn(double_parameters.begin(),
-            double_parameters.end()));
+                        ::testing::ValuesIn(double_parameters.begin(),
+                                            double_parameters.end()));
 INSTANTIATE_TEST_CASE_P(BoolTest, CheckParameterExistanceBool,
-        ::testing::ValuesIn(bool_parameters.begin(),
-            bool_parameters.end()));
+                        ::testing::ValuesIn(bool_parameters.begin(),
+                                            bool_parameters.end()));
 INSTANTIATE_TEST_CASE_P(StringTest, CheckParameterExistanceStr,
-        ::testing::ValuesIn(string_parameters.begin(),
-            string_parameters.end()));
+                        ::testing::ValuesIn(string_parameters.begin(),
+                                            string_parameters.end()));
 
 int main(int argc, char** argv)
 {
