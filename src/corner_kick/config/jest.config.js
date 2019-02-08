@@ -4,6 +4,7 @@
  * Jest is the library used for unit testing components
  * such as actions and reducers
  */
+
 module.exports = {
     rootDir: '..',
     roots: ['<rootDir>/src'],
