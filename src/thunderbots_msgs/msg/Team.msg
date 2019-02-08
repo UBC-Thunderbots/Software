@@ -9,4 +9,4 @@ int32 goalie_id
 
 # The number of milliseconds a robot must not have
 # been updated for before it is removed from the team
-uint32 robot_expiry_buffer_milliseconds
+float64 robot_expiry_buffer_milliseconds
