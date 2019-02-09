@@ -29,15 +29,15 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
     Point finalDest;
     if (robot.velocity().len() != 0)
     {
-        finalDest = ball.estimatePositionAtFutureTime(std::chrono::milliseconds(
-            (int)fabs(distanceToBall / robot.velocity().len()) * 1000));
+        finalDest = ball.estimatePositionAtFutureTime(
+            Duration::fromSeconds((int)fabs(distanceToBall / robot.velocity().len())));
         finalDest = Point(finalDest.x(), finalDest.y());
     }
     else
     {
         // If Robot is not moving, estimate position based on a standard velocity of 1
         finalDest = ball.estimatePositionAtFutureTime(
-            std::chrono::milliseconds((int)fabs(distanceToBall / 1) * 1000));
+            Duration::fromSeconds((int)fabs(distanceToBall / 1)));
         finalDest = Point(finalDest.x(), finalDest.y());
     }
 
@@ -82,7 +82,37 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 void GrsimCommandPrimitiveVisitor::visit(
     const DirectVelocityPrimitive &direct_velocity_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/97
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/286
+
+    // get current robot position and orientation(angle)
+    Point robot_position    = robot.position();
+    Angle robot_orientation = robot.orientation();
+
+    // create linear velocity vector from direct velocity primitive
+    Vector linear_velocity_in_robot_coordinates =
+        Vector(direct_velocity_primitive.getXVelocity(),
+               direct_velocity_primitive.getYVelocity());
+
+    // transfer velocity into global coordinate by rotating the vector in robot
+    // coordinates by the angle of robot
+    Vector linear_velocity_in_global_coordinates =
+        linear_velocity_in_robot_coordinates.rotate(robot.orientation());
+
+    // final destination is the parameter that can control the robot to
+    // move in the direction of velocity vector from current robot position
+    Vector final_destination = linear_velocity_in_global_coordinates + robot_position;
+
+    // final orientation is the parameter that can control the robot to rotate in the
+    // direction of angular velocity from current robot orientation, clamp the angular
+    // velocity between [-pi/2,pi/2]
+    Angle final_orientation =
+        robot_orientation +
+        Angle::ofRadians(direct_velocity_primitive.getAngularVelocity())
+            .mod(Angle::half());
+
+    motion_controller_command = MotionController::MotionControllerCommand(
+        final_destination, final_orientation, linear_velocity_in_robot_coordinates.len(),
+        0.0, false, direct_velocity_primitive.getDribblerRpm() > 0);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
@@ -122,7 +152,9 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
+    // intentionally leaving out the option to coast until later
+    motion_controller_command = MotionController::MotionControllerCommand(
+        robot.position(), robot.orientation(), 0, 0.0, false, false);
 }
 
 MotionController::MotionControllerCommand
