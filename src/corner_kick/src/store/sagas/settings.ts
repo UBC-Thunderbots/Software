@@ -1,13 +1,15 @@
 /*
  * This file specifies the saga for Settings
  */
-import { put, spawn, takeEvery } from 'redux-saga/effects';
+import { call, put, spawn, takeEvery } from 'redux-saga/effects';
 import { getType } from 'typesafe-actions';
 
 import * as settings from '../actions/settings';
 
 export default function* init() {
     yield spawn(startSettings);
+    // Listen for updateSettings
+    yield takeEvery(getType(settings.updateSettings), updateSettings);
 }
 
 let settingsStored = {};
@@ -23,18 +25,16 @@ function* startSettings() {
         // Put hydrateSettings action from item
         yield put(settings.hydrateSettings(settingsStored));
     }
-    // Listen for updateSettings
-    yield takeEvery(getType(settings.updateSettings), updateSettings);
 }
 
 /**
  * Update settings by putting into local storage
  */
-function updateSettings(action: ReturnType<typeof settings.updateSettings>) {
+function* updateSettings(action: ReturnType<typeof settings.updateSettings>) {
     // Use localStorage.setItem
     settingsStored = {
         ...settingsStored,
         [action.payload.key]: action.payload.value,
     };
-    localStorage.setItem('settings', JSON.stringify(settingsStored));
+    yield call(localStorage.setItem, 'settings', JSON.stringify(settingsStored));
 }
