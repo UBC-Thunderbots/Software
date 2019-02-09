@@ -18,7 +18,7 @@
 #include <unordered_map>
 
 #include "constants.h"
-#include "radio_communication/visitor/primitive_serializer_visitor.h"
+#include "radio_communication/visitor/mrf_primitive_visitor.h"
 
 namespace
 {
@@ -38,21 +38,6 @@ namespace
 
     const unsigned int ANNUNCIATOR_BEEP_LENGTH = 750;
 
-    std::unique_ptr<USB::BulkOutTransfer> create_reliable_message_transfer(
-        USB::DeviceHandle &device, unsigned int robot, uint8_t message_id,
-        unsigned int tries, const void *data, std::size_t length)
-    {
-        assert(robot < 8);
-        assert((1 <= tries) && (tries <= 256));
-        uint8_t buffer[3 + length];
-        buffer[0] = static_cast<uint8_t>(robot | 0x10);
-        buffer[1] = message_id;
-        buffer[2] = static_cast<uint8_t>(tries & 0xFF);
-        std::memcpy(buffer + 3, data, length);
-        std::unique_ptr<USB::BulkOutTransfer> ptr(
-            new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
-        return ptr;
-    }
 }  // namespace
 
 MRFDongle::MRFDongle()
@@ -479,8 +464,8 @@ bool MRFDongle::submit_drive_transfer()
         drive_transfer->signal_done.connect(
             sigc::mem_fun(this, &MRFDongle::handle_drive_transfer_done));
         drive_transfer->submit();
-        std::cout << "Drive transfer of length " << drive_packet_length << " submitted"
-                  << std::endl;
+        // std::cout << "Drive transfer of length " << drive_packet_length << " submitted"
+        //           << std::endl;
     }
     return false;
 }
@@ -488,8 +473,8 @@ bool MRFDongle::submit_drive_transfer()
 void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *out)
 {
     uint16_t words[4];
-    RadioPacketSerializerPrimitiveVisitor visitor =
-        RadioPacketSerializerPrimitiveVisitor();
+    MRFPrimitiveVisitor visitor =
+        MRFPrimitiveVisitor();
 
     // Visit the primitive.
     prim->accept(visitor);
@@ -549,7 +534,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     //         words[1] |= 2 << 14;
     //         break;
     // }
-    words[1] |= 1 << 14;  // Discharged for now
+    words[1] |= 2 << 14;  // Charged for now
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?
@@ -574,7 +559,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 {
-    std::cout << "Drive Transfer done" << std::endl;
+    // std::cout << "Drive Transfer done" << std::endl;
     op.result();
     drive_transfer.reset();
 }

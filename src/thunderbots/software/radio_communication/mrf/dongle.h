@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "ai/primitive/primitive.h"
-#include "async_operation.h"
+#include "util/async_operation.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "send_reliable_message_operation.h"

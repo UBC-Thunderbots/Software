@@ -2,6 +2,25 @@
 
 #include "constants.h"
 
+namespace
+{
+    std::unique_ptr<USB::BulkOutTransfer> create_reliable_message_transfer(
+        USB::DeviceHandle &device, unsigned int robot, uint8_t message_id,
+        unsigned int tries, const void *data, std::size_t length)
+    {
+        assert(robot < 8);
+        assert((1 <= tries) && (tries <= 256));
+        uint8_t buffer[3 + length];
+        buffer[0] = static_cast<uint8_t>(robot | 0x10);
+        buffer[1] = message_id;
+        buffer[2] = static_cast<uint8_t>(tries & 0xFF);
+        std::memcpy(buffer + 3, data, length);
+        std::unique_ptr<USB::BulkOutTransfer> ptr(
+            new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
+        return ptr;
+    }
+}
+
 SendReliableMessageOperation::SendReliableMessageOperation(MRFDongle &dongle,
                                                            unsigned int robot,
                                                            unsigned int tries,
