@@ -35,8 +35,7 @@ FilteredRobotData RobotFilter::getFilteredData(
     for (SSLRobotData data : new_robot_data)
     {
         filtered_robot_data.position = filtered_robot_data.position + data.position;
-        filtered_robot_data.orientation =
-            filtered_robot_data.orientation + data.orientation;
+        filtered_robot_data.orientation += data.orientation;
     }
 
     filtered_robot_data.position /= new_robot_data.size();
