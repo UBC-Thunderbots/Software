@@ -26,8 +26,8 @@
 namespace
 {
     // A vector of primitives. It is cleared each tick, populated by the callbacks
-    // that receive primitive commands, and is processed by the backend to simulate
-    // the Primitives in grSim
+    // that receive primitive commands, and is processed by the backend to send primitives
+    // to the robots over radio.
     std::vector<std::unique_ptr<Primitive>> primitives;
 
     // The MRFBackend instance that connects to the dongle
