@@ -32,7 +32,7 @@ class AI final
      * of the world.
      */
     std::vector<std::unique_ptr<Primitive>> getPrimitives(
-        const AITimestamp& timestamp) const;
+        const Timestamp& timestamp) const;
 
     /**
      * Updates the state of the ball in the AI's world with the new ball data
@@ -63,6 +63,8 @@ class AI final
      * @param new_enemy_team_msg The message containing new enemy team information
      */
     void updateWorldEnemyTeamState(const Team& new_enemy_team_data);
+
+    void updateWorldRefboxGameState(const RefboxGameState& game_state);
 
 
    private:

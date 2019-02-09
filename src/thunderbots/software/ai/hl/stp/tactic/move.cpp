@@ -7,7 +7,7 @@ Robot MoveTactic::selectRobot(const World &world,
 {
     // Placeholder for now
     return Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                 std::chrono::steady_clock::now());
+                 Timestamp::fromSeconds(0));
 }
 
 std::unique_ptr<Intent> MoveTactic::getNextIntent(const World &world, const Robot &robot)

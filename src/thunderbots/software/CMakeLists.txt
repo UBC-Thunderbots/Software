@@ -9,6 +9,10 @@ endif()
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Use PkgConfig to find some packages using pkg_check_modules
+find_package(PkgConfig REQUIRED)
+include(FindPkgConfig)
+
 ####################
 ## Compiler Flags ##
 ####################
@@ -151,6 +155,7 @@ add_executable (grsim_communication
         ${GRSIM_COMMUNICATION_SRC}
         ${SHARED_UTIL_SRC}
         )
+
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
@@ -176,8 +181,22 @@ add_executable (radio_communication
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
+
+##### LIBUSB #####
+pkg_search_module("LIBUSB_1" REQUIRED "libusb-1.0")
+include_directories(SYSTEM "${LIBUSB_1_INCLUDE_DIRS}")
+link_directories("${LIBUSB_1_LIBRARY_DIRS}")
+add_definitions("${LIBUSB_1_DEFINITIONS}")
+
+##### SIGC++  ######
+pkg_search_module("SIGC" REQUIRED "sigc++-2.0")
+include_directories(SYSTEM "${SIGC_INCLUDE_DIRS}")
+link_directories("${SIGC_LIBRARY_DIRS}")
+
 target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
+        ${LIBUSB_1_LIBRARIES}
+        ${SIGC_LIBRARIES}
         )
 
 file(GLOB_RECURSE PARAM_SERVER_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -248,10 +267,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/stop_primitive.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
+            ai/world/ball.cpp
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_backend.h
             grsim_communication/grsim_backend.cpp
             grsim_communication/visitor/grsim_command_primitive_visitor.cpp
+            util/timestamp.cpp
             )
     target_link_libraries(grsim_backend_test ${catkin_LIBRARIES}
             ${PROTOBUF_LIBRARIES}
@@ -264,7 +285,10 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.h
             geom/point.h
             geom/angle.h
-            geom/shapes.h)
+            geom/segment.h
+            geom/ray.h
+            geom/circle.h
+            geom/line.h)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
 
@@ -278,6 +302,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(ball_test
             test/world/ball.cpp
             ai/world/ball.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -286,6 +311,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(robot_test
             test/world/robot.cpp
             ai/world/robot.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -295,6 +321,7 @@ if (CATKIN_ENABLE_TESTING)
             test/world/team.cpp
             ai/world/team.cpp
             ai/world/robot.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -307,6 +334,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/field.cpp
             ai/world/team.cpp
+            util/timestamp.cpp
             geom/point.h
             geom/angle.h)
 
@@ -317,7 +345,8 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/motion_controller/motion_controller.cpp
             ai/world/robot.cpp
             geom/point.h
-            geom/angle.h)
+            geom/angle.h
+            util/timestamp.cpp)
 
     target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
 
@@ -329,7 +358,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/field.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
-            ai/world/game_state.cpp)
+            ai/world/game_state.cpp
+            util/timestamp.cpp)
 
     target_link_libraries(world_test ${catkin_LIBRARIES})
 
@@ -342,6 +372,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
+            util/timestamp.cpp
             )
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
@@ -356,10 +387,41 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
-            util/refbox_constants.cpp)
+            util/refbox_constants.cpp
+            util/timestamp.cpp)
 
     target_link_libraries(game_state_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(move_spin_primitive_test
+            test/grsim_command_primitive_visitor/move_spin_primitive.cpp
+            grsim_communication/visitor/grsim_command_primitive_visitor.cpp
+            util/ros_messages.cpp
+            ai/world/ball.cpp
+            test/test_util/test_util.cpp
+            grsim_communication/motion_controller/motion_controller.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            geom/point.h
+            ai/world/world.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/game_state.cpp
+            geom/angle.h
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/timestamp.cpp
+            )
+    target_link_libraries(move_spin_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
 
     catkin_add_gtest(primitive_test
             test/primitive/primitive.cpp
@@ -569,6 +631,54 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(dribble_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
 
+    catkin_add_gtest(grsim_catch_primitive_test
+            grsim_communication/visitor/grsim_command_primitive_visitor.cpp
+            test/grsim_command_primitive_visitor/catch_primitive.cpp
+            util/ros_messages.cpp
+            ai/world/ball.cpp
+            test/test_util/test_util.cpp
+            grsim_communication/motion_controller/motion_controller.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            geom/point.h
+            ai/world/world.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/game_state.cpp
+            geom/angle.h
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/timestamp.cpp
+    )
+
+    target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    catkin_add_gtest(timestamp_test
+            test/util/timestamp.cpp
+            util/timestamp.cpp
+            )
+
+    target_link_libraries(timestamp_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(evaluation_robot_orientation_within_angle_threshold_of_target_test
+            test/evaluation/robot.cpp
+            ai/hl/stp/evaluation/robot.cpp
+            )
+
+    target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
+
+
+
 endif()
 
 ##### ROSTests / Integration Tests #####
@@ -581,6 +691,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             test/util/logger_test.cpp
+            util/timestamp.cpp
             )
     target_link_libraries(logger_test ${catkin_LIBRARIES}
             ${G3LOG})
@@ -588,6 +699,7 @@ if (CATKIN_ENABLE_TESTING)
     # The test node that verifies the rostest utils are working correctly
     add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
             test/test_util/rostest_util_test.cpp
+            util/timestamp.cpp
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
@@ -597,5 +709,12 @@ if (CATKIN_ENABLE_TESTING)
             util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
+
+     # The test node that verifies the dynamic_parameters exist in the parameter server
+    add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
+            test/util/test_parameter_exists.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+    target_link_libraries(check_parameter_existance_test ${catkin_LIBRARIES})
 
 endif()

@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <thunderbots_msgs/RefboxData.h>
 
 #include "ai/ai.h"
 #include "thunderbots_msgs/Ball.h"
@@ -11,6 +12,7 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/timestamp.h"
+#include "util/visualizer_messenger/visualizer_messenger.h"
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
@@ -18,12 +20,12 @@
 namespace
 {
     // Initialize our AI, which is the main object that maintains state
-    AI ai = AI(
-        World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
-              Team(std::chrono::milliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
-              Team(std::chrono::milliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
+    AI ai = AI(World(
+        Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
+        Team(Duration::fromMilliseconds(
+            Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+        Team(Duration::fromMilliseconds(
+            Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
 }  // namespace
 
 // Callbacks to update the state of the world
@@ -63,6 +65,14 @@ void enemyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr &msg)
     ai.updateWorldEnemyTeamState(enemy_team);
 }
 
+void refboxGameStateUpdateCallback(const thunderbots_msgs::RefboxData::ConstPtr &msg)
+{
+    thunderbots_msgs::RefboxCommand command = msg->command;
+    RefboxGameState game_state =
+        Util::ROSMessages::createGameStateFromROSMessage(command);
+    ai.updateWorldRefboxGameState(game_state);
+}
+
 int main(int argc, char **argv)
 {
     // Init ROS node
@@ -84,9 +94,15 @@ int main(int argc, char **argv)
                               friendlyTeamUpdateCallback);
     ros::Subscriber enemy_team_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_ENEMY_TEAM_TOPIC, 1, enemyTeamUpdateCallback);
+    ros::Subscriber game_state_sub =
+        node_handle.subscribe(Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1,
+                              refboxGameStateUpdateCallback);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+
+    // Initialize the draw visualizer messenger
+    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
 
     // Main loop
     while (ros::ok())
@@ -101,7 +117,9 @@ int main(int argc, char **argv)
             // to let the AI update its predictors so that decisions are always made with
             // the most up to date predicted data (eg. future Robot or Ball position),
             // even if some time has passed since the AI's state was last updated.
-            AITimestamp timestamp = Timestamp::getTimestampNow();
+            // TODO: This is a placeholder timestamp. It should be removed as part of
+            // https://github.com/UBC-Thunderbots/Software/issues/227
+            Timestamp timestamp = Timestamp::fromSeconds(0);
             std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
                 ai.getPrimitives(timestamp);
 
@@ -114,6 +132,9 @@ int main(int argc, char **argv)
                 LOG(INFO) << msg << std::endl;
             }
             primitive_publisher.publish(primitive_array_message);
+
+            // On every tick, send the layer messages
+            Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
         }
         catch (const std::invalid_argument &e)
         {

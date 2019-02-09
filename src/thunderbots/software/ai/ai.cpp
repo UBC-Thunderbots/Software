@@ -1,5 +1,7 @@
 #include "ai.h"
 
+#include "util/logger/init.h"
+
 AI::AI(const World &world)
     : world(world),
       navigator(std::make_unique<RRTNav>()),
@@ -8,7 +10,7 @@ AI::AI(const World &world)
 }
 
 std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(
-    const AITimestamp &timestamp) const
+    const Timestamp &timestamp) const
 {
     // NOTE: The only thing the AI really needs an updated timestamp for (updated relative
     // to the timestamp when the state/world was last updated) is to update the
@@ -43,4 +45,9 @@ void AI::updateWorldFriendlyTeamState(const Team &new_friendly_team_data)
 void AI::updateWorldEnemyTeamState(const Team &new_enemy_team_data)
 {
     world.updateEnemyTeamState(new_enemy_team_data);
+}
+
+void AI::updateWorldRefboxGameState(const RefboxGameState &game_state)
+{
+    world.updateRefboxGameState(game_state);
 }

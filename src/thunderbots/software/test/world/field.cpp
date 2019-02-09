@@ -60,9 +60,9 @@ TEST_F(FieldTest, update_with_all_parameters)
     EXPECT_EQ(Point(4.5, 0.5), field_to_update.enemyGoalpostPos());
     EXPECT_EQ(Point(4.5, -0.5), field_to_update.enemyGoalpostNeg());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+    EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
               field_to_update.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)),
+    EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
@@ -92,9 +92,9 @@ TEST_F(FieldTest, update_with_new_field)
     EXPECT_EQ(Point(4.5, 0.5), field_to_update.enemyGoalpostPos());
     EXPECT_EQ(Point(4.5, -0.5), field_to_update.enemyGoalpostNeg());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+    EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
               field_to_update.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)),
+    EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
