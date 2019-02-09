@@ -246,7 +246,6 @@ void MRFDongle::beep(unsigned int length)
         beep_transfer->signal_done.connect(
             sigc::mem_fun(this, &MRFDongle::handle_beep_done));
         beep_transfer->submit();
-        std::cout << "Beep submitted" << std::endl;
         pending_beep_length = 0;
     }
 }
@@ -369,13 +368,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         *rptr++ = static_cast<int8_t>(robotY >> 8);
         *rptr++ = static_cast<int8_t>(robotT);
         *rptr++ = static_cast<int8_t>(robotT >> 8);
-
-        /* This was here when I ported the code, no idea what this is for */
-        //*rptr = ((int16_t)(std::get<1>(detbots[i])).x) +
-        //((int16_t)((std::get<1>(detbots[i])).y) << 16) +
-        //((int16_t)((std::get<2>(detbots[i])).to_radians() * 1000) << 32);
-        // rptr += 6;
     }
+
     // Write out the timestamp
     for (std::size_t i = 0; i < 8; i++)
     {
@@ -411,7 +405,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
     (*i).first->submit();
 
-    std::cout << "Submitted camera transfer in position:" << camera_transfers.size()
+    std::cout << "Submitted camera transfer in kposition:" << camera_transfers.size()
               << std::endl;
 };
 
@@ -464,9 +458,8 @@ bool MRFDongle::submit_drive_transfer()
         drive_transfer->signal_done.connect(
             sigc::mem_fun(this, &MRFDongle::handle_drive_transfer_done));
         drive_transfer->submit();
-        // std::cout << "Drive transfer of length " << drive_packet_length << " submitted"
-        //           << std::endl;
     }
+
     return false;
 }
 
