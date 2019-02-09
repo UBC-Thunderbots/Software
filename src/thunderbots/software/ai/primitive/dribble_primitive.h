@@ -1,6 +1,6 @@
 /**
- * This file includes the definition of the DribblePrimitive class and it's member functions
- * and data
+ * This file includes the definition of the DribblePrimitive class and it's member
+ * functions and data
  */
 
 #pragma once

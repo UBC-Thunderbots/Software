@@ -255,6 +255,7 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_backend/grsim_backend.cpp
             grsim_communication/motion_controller/motion_controller.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
@@ -262,6 +263,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -405,6 +407,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
@@ -435,6 +438,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -451,6 +455,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -470,6 +475,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -489,6 +495,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -508,6 +515,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -527,6 +535,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -546,6 +555,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -565,6 +575,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -584,6 +595,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -603,6 +615,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
@@ -618,14 +631,17 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/dribble_primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/kick_primitive.cpp
-            ai/primitive/move_primitive.cpp
             ai/primitive/pivot_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
-            ai/primitive/directwheels_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
             )
 
     target_link_libraries(dribble_primitive_test ${catkin_LIBRARIES}
@@ -644,6 +660,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
