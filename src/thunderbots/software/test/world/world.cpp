@@ -51,6 +51,26 @@ TEST_F(WorldTest, construction_with_parameters)
     EXPECT_EQ(ball, world.ball());
     EXPECT_EQ(friendly_team, world.friendlyTeam());
     EXPECT_EQ(enemy_team, world.enemyTeam());
+
+    // Test logic for world calculations
+    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
+    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
+    Ball ballfriendly = Ball(Point(-4, 0.5), Vector(-0.3, 0), current_time);
+    world.updateBallState(ballfriendly);
+    EXPECT_EQ(true, world.ballInFriendlyDefenseArea());
+    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
+    Ball ballenemy = Ball(Point(4, -1.0), Vector(-0.3, 0), current_time);
+    world.updateBallState(ballenemy);
+    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
+    EXPECT_EQ(true, world.ballInEnemyDefenseArea());
+    Ball ballnotenemy = Ball(Point(4, -1.5), Vector(-0.3, 0), current_time);
+    world.updateBallState(ballnotenemy);
+    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
+    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
+    Ball ballnotfriendly = Ball(Point(-2, -.5), Vector(-0.3, 0), current_time);
+    world.updateBallState(ballnotfriendly);
+    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
+    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
 }
 
 int main(int argc, char **argv)
