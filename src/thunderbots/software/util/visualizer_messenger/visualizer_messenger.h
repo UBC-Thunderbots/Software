@@ -16,9 +16,9 @@
 #include <memory>
 #include <string>
 
+#include "geom/point.h"
 #include "thunderbots_msgs/DrawLayer.h"
 #include "thunderbots_msgs/DrawShape.h"
-#include "thunderbots_msgs/Point2D.h"
 
 
 // Forward declaration
@@ -33,7 +33,7 @@ namespace Util
     using LayerMsg    = thunderbots_msgs::DrawLayer;
     using LayerMsgMap = std::map<std::string, LayerMsg>;
     using ShapeMsg    = thunderbots_msgs::DrawShape;
-    using Point2D     = thunderbots_msgs::Point2D;
+    // using Point2D     = thunderbots_msgs::Point2D;
 
     class VisualizerMessenger
     {
@@ -143,7 +143,7 @@ namespace Util
          * @param draw_style: the drawing style of the shape
          * @param draw_transform: the transformation of the shape
          */
-        void drawPoly(const std::string& layer, std::vector<Point2D>& vertices,
+        void drawPoly(const std::string& layer, std::vector<Point>& vertices,
                       DrawStyle draw_style         = DrawStyle(),
                       DrawTransform draw_transform = DrawTransform());
 
@@ -179,6 +179,12 @@ namespace Util
         void drawLine(const std::string& layer, double x1, double y1, double x2,
                       double y2, DrawStyle draw_style = DrawStyle(),
                       DrawTransform draw_transform = DrawTransform());
+
+        /**
+         * A method to send a reference test layer to the visualizer
+         * to qualitatively verify shape rendering and performance
+         */
+        void drawTestLayer();
 
        private:
         /**

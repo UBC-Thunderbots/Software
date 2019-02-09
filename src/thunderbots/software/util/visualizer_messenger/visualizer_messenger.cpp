@@ -95,9 +95,10 @@ namespace Util
         addShapeToLayer(layer, new_shape);
     }
 
+    // TODO: Point2D switch to point class
     void VisualizerMessenger::drawPoly(const std::string& layer,
-                                       std::vector<Point2D>& vertices,
-                                       DrawStyle draw_style, DrawTransform draw_transform)
+                                       std::vector<Point>& vertices, DrawStyle draw_style,
+                                       DrawTransform draw_transform)
     {
         ShapeMsg new_shape;
         new_shape.type = "poly";
@@ -106,8 +107,8 @@ namespace Util
         for (auto vertexIter = vertices.begin(); vertexIter != vertices.end();
              vertexIter++)
         {
-            new_shape.data.push_back((*vertexIter).x);
-            new_shape.data.push_back((*vertexIter).y);
+            new_shape.data.push_back((*vertexIter).x());
+            new_shape.data.push_back((*vertexIter).y());
         }
 
         applyDrawStyleToMsg(new_shape, draw_style);
@@ -148,6 +149,92 @@ namespace Util
         applyDrawStyleToMsg(new_shape, draw_style);
         applyDrawTransformToMsg(new_shape, draw_transform);
         addShapeToLayer(layer, new_shape);
+    }
+
+    void VisualizerMessenger::drawTestLayer()
+    {
+        const auto vm = VisualizerMessenger::getInstance();
+
+        auto drawAllShapes = [vm](double x, double y, DrawStyle style,
+                                  DrawTransform transform) {
+            // Circle test
+            vm->drawEllipse("test", x + 40, y + 40, 40, 40, style, transform);
+
+            // Ellipse test
+            vm->drawEllipse("test", x + 200, y + 40, 40, 20, style, transform);
+
+            // Square test
+            vm->drawRect("test", x + 160, 20, 40, 40, style, transform);
+
+            // Rectangle test
+            vm->drawRect("test", x + 220, y + 20, 80, 20, style, transform);
+
+            // Arc test (0 to theta < pi)
+            vm->drawArc("test", x + 340, y + 40, 40, 0, 1.5, style, transform);
+
+            // Arc test (0 to theta > pi)
+            vm->drawArc("test", x + 400, y + 40, 40, 0, 4.5, style, transform);
+
+            // Arc test (0 to theta > 2 pi)
+            vm->drawArc("test", x + 460, y + 40, 40, 0, 7, style, transform);
+
+            // Arc test (0 to negative)
+            vm->drawArc("test", x + 520, y + 40, 40, 0, -0.5, style, transform);
+
+            // Arc test (negative to 0)
+            vm->drawArc("test", x + 580, y + 40, 40, -1.5, 0, style, transform);
+
+            // Arc test (negative to > pi)
+            vm->drawArc("test", x + 640, y + 40, 40, -4, 5, style, transform);
+
+            // Line test
+            vm->drawLine("test", x + 660, y + 20, 700, 40, style, transform);
+
+            // Polygon test
+            std::vector<Point> test_polygon = {
+                Point(x + 720, y + 20), Point(x + 725, y + 40), Point(x + 720, y + 40),
+                Point(x + 750, y + 50), Point(x + 770, y + 30), Point(x + 730, y + 20),
+                Point(x + 740, y + 30)};
+            vm->drawPoly("test", test_polygon, style, transform);
+        };
+
+        // Try different styles and transform
+        DrawStyle standard_style = DrawStyle();
+
+        DrawStyle no_stroke_style     = DrawStyle();
+        no_stroke_style.stroke_weight = 0;
+
+        DrawStyle patriot_style     = DrawStyle();
+        patriot_style.fill          = "blue";
+        patriot_style.stroke        = "red";
+        patriot_style.stroke_weight = 5;
+
+        DrawTransform standard_trans = DrawTransform();
+
+        DrawTransform enlarged_trans = DrawTransform();
+        enlarged_trans.scale         = 1.5;
+
+        DrawTransform shrunk_trans = DrawTransform();
+        shrunk_trans.scale         = 0.75;
+
+        DrawTransform rotated_trans = DrawTransform();
+        rotated_trans.rotation      = 0.52; /* ~60 deg */
+
+        // call the different things
+        drawAllShapes(0, 0, standard_style, standard_trans);
+        drawAllShapes(0, 100, standard_style, enlarged_trans);
+        drawAllShapes(0, 200, standard_style, shrunk_trans);
+        drawAllShapes(0, 300, standard_style, rotated_trans);
+
+        drawAllShapes(0, 400, no_stroke_style, standard_trans);
+        drawAllShapes(0, 500, no_stroke_style, enlarged_trans);
+        drawAllShapes(0, 600, no_stroke_style, shrunk_trans);
+        drawAllShapes(0, 700, no_stroke_style, rotated_trans);
+
+        drawAllShapes(0, 800, patriot_style, standard_trans);
+        drawAllShapes(0, 900, patriot_style, enlarged_trans);
+        drawAllShapes(0, 1000, patriot_style, shrunk_trans);
+        drawAllShapes(0, 1100, patriot_style, rotated_trans);
     }
 
     void VisualizerMessenger::buildLayers()
