@@ -473,8 +473,7 @@ bool MRFDongle::submit_drive_transfer()
 void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *out)
 {
     uint16_t words[4];
-    MRFPrimitiveVisitor visitor =
-        MRFPrimitiveVisitor();
+    MRFPrimitiveVisitor visitor = MRFPrimitiveVisitor();
 
     // Visit the primitive.
     prim->accept(visitor);

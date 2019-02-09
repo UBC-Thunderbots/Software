@@ -19,7 +19,7 @@ namespace
             new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
         return ptr;
     }
-}
+}  // namespace
 
 SendReliableMessageOperation::SendReliableMessageOperation(MRFDongle &dongle,
                                                            unsigned int robot,

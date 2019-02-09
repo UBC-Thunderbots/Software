@@ -7,7 +7,7 @@ enum class PrimitiveType
 {
     /**
      * Stop Primitive
-     * 
+     *
      * The parameters are unused.
      *
      * The extra field is 0 for coasting or 1 for braking.
@@ -37,7 +37,7 @@ enum class PrimitiveType
 
     /**
      * Shoot Primitive
-     * 
+     *
      * Note that in HL, this is split into kick and chip.
      *
      * The parameters are the relative position, relative orientation, and
