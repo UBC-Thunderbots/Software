@@ -1,20 +1,20 @@
 #include "radio_communication/visitor/mrf_primitive_visitor.h"
 
-RadioPrimitive RadioPacketSerializerPrimitiveVisitor::getSerializedRadioPacket()
+RadioPrimitive MRFPrimitiveVisitor::getSerializedRadioPacket()
 {
     return r_prim;
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
+void MRFPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 {
     r_prim.prim_type   = PrimitiveType::CATCH;
-    r_prim.param_array = {catch_primitive.getVelocity() * 1000,
+    r_prim.param_array = {catch_primitive.getVelocity(),
                           catch_primitive.getDribblerSpeed(),
-                          catch_primitive.getMargin() * 1000};
+                          catch_primitive.getMargin()};
     r_prim.extra_bits  = 0;
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
+void MRFPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
     r_prim.prim_type   = PrimitiveType::SHOOT;
     r_prim.param_array = {chip_primitive.getChipOrigin().x() * 1000,
@@ -24,8 +24,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(const ChipPrimitive &chip_prim
     r_prim.extra_bits  = static_cast<uint8_t>(2 | 1);
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(
-    const DirectVelocityPrimitive &direct_velocity_primitive)
+void MRFPrimitiveVisitor::visit(const DirectVelocityPrimitive &direct_velocity_primitive)
 {
     r_prim.prim_type   = PrimitiveType::DIRECT_VELOCITY;
     r_prim.param_array = {direct_velocity_primitive.getXVelocity() * 1000,
@@ -34,8 +33,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(
     r_prim.extra_bits  = 0;
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(
-    const DirectWheelsPrimitive &direct_wheels_primitive)
+void MRFPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primitive)
 {
     r_prim.prim_type   = PrimitiveType::DIRECT_WHEELS;
     r_prim.param_array = {static_cast<double>(direct_wheels_primitive.getWheel0Power()),
@@ -45,7 +43,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(
     r_prim.extra_bits  = 0;
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
+void MRFPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
     r_prim.prim_type   = PrimitiveType::SHOOT;
     r_prim.param_array = {kick_primitive.getKickOrigin().x() * 1000,
@@ -55,7 +53,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(const KickPrimitive &kick_prim
     r_prim.extra_bits  = static_cast<uint8_t>(2 | 0);
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
+void MRFPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
     r_prim.prim_type   = PrimitiveType::MOVE;
     r_prim.param_array = {move_primitive.getDestination().x() * 1000,
@@ -66,8 +64,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(const MovePrimitive &move_prim
     r_prim.extra_bits = 0;
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(
-    const MoveSpinPrimitive &movespin_primitive)
+void MRFPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
 {
     r_prim.prim_type   = PrimitiveType::SPIN;
     r_prim.param_array = {movespin_primitive.getDestination().x() * 1000,
@@ -76,7 +73,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(
 
     r_prim.extra_bits = 0;
 }
-void RadioPacketSerializerPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
+void MRFPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
     r_prim.prim_type   = PrimitiveType::PIVOT;
     r_prim.param_array = {pivot_primitive.getPivotPoint().x() * 1000,
@@ -87,7 +84,7 @@ void RadioPacketSerializerPrimitiveVisitor::visit(const PivotPrimitive &pivot_pr
     r_prim.extra_bits = 0;
 }
 
-void RadioPacketSerializerPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
+void MRFPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
     r_prim.prim_type   = PrimitiveType::STOP;
     r_prim.param_array = {0, 0, 0, 0};

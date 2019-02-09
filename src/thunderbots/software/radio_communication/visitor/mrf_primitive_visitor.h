@@ -1,8 +1,12 @@
 #pragma once
 
 #include "ai/primitive/visitor/primitive_visitor.h"
+#include "shared/primitive_type.h"
 
-class RadioPrimitive
+/**
+ * This struct stores the components of a translated primitive to be sent over radio.
+ */
+typedef struct _RadioPrimitive
 {
    public:
     // A numeric ID representing the primitive for firmware
@@ -11,9 +15,9 @@ class RadioPrimitive
     // The parameter array to be encoded into the radio packet
     std::vector<double> param_array;
 
-    // Extra bits
+    // Extra bits used for flags and/or additional information
     uint8_t extra_bits;
-};
+} RadioPrimitive;
 
 /**
  * This class implements a Visitor that serializes the Primitive classes into packets
