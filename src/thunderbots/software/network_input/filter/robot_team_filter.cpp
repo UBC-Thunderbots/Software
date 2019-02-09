@@ -17,7 +17,15 @@ Team RobotTeamFilter::getFilteredData(
     {
         if (new_team_state.getRobotById(robot_detection.id))
         {
-            Robot previous_robot_state = *new_team_state.getRobotById(robot_detection.id);
+            Robot previous_robot_state =
+                *current_team_state.getRobotById(robot_detection.id);
+
+            // Discard any data with an older timestamp. It's likely from a frame that
+            // hasn't been updated yet
+            if (previous_robot_state.lastUpdateTimestamp() >= robot_detection.timestamp)
+            {
+                continue;
+            }
             Duration time_diff =
                 robot_detection.timestamp - previous_robot_state.lastUpdateTimestamp();
 
@@ -40,7 +48,7 @@ Team RobotTeamFilter::getFilteredData(
         else
         {
             Robot new_robot_state =
-                Robot(robot_detection.id, robot_detection.position, Vector(),
+                Robot(robot_detection.id, robot_detection.position, Vector(69, 69),
                       robot_detection.orientation, AngularVelocity::zero(),
                       robot_detection.timestamp);
 

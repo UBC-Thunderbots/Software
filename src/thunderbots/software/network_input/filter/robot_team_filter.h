@@ -14,12 +14,13 @@ class RobotTeamFilter
     explicit RobotTeamFilter();
 
     /**
-     * Returns the most up to date state of the Team by filtering the new robot data and
-     * using it to update the current state.
+     * Filters the new robot detection data, and returns the updated state of the team
+     * given the new data
      *
+     * @param current_team_state The current state of the Team
      * @param new_robot_detections A list of new SSL Robot detections
      *
-     * @return The filtered and updated state of the Team
+     * @return The updated state of the team given the new data
      */
     Team getFilteredData(const Team& current_team_state,
                          const std::vector<SSLRobotDetection>& new_robot_detections);

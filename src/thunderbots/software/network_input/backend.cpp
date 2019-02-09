@@ -21,11 +21,11 @@ Backend::Backend()
 {
 }
 
-Field Backend::getFieldData(const SSL_WrapperPacket &packet)
+Field Backend::getFieldData(const SSL_GeometryData &geometry_packet)
 {
-    if (packet.has_geometry() && packet.geometry().has_field())
+    if (geometry_packet.has_field())
     {
-        SSL_GeometryFieldSize field_data = packet.geometry().field();
+        SSL_GeometryFieldSize field_data = geometry_packet.field();
         Field field                      = createFieldFromPacketGeometry(field_data);
 
         field_state = field;
@@ -115,48 +115,45 @@ Field Backend::createFieldFromPacketGeometry(
     return field;
 }
 
-Ball Backend::getFilteredBallData(const SSL_WrapperPacket &packet)
+Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections)
 {
-    if (packet.has_detection())
-    {
-        SSL_DetectionFrame packet_detection = packet.detection();
+    std::vector<SSLBallDetection> ball_detections = std::vector<SSLBallDetection>();
 
-        std::vector<SSLBallDetection> ball_detections = std::vector<SSLBallDetection>();
-        for (const SSL_DetectionBall &ball : packet_detection.balls())
+    for (const auto &detection : detections)
+    {
+        for (const SSL_DetectionBall &ball : detection.balls())
         {
             // Convert all data to meters and radians
             SSLBallDetection ball_detection;
             ball_detection.position =
                 Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
             ball_detection.confidence = ball.confidence();
-            ball_detection.timestamp =
-                Timestamp::fromSeconds(packet_detection.t_capture());
+            ball_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
             ball_detections.push_back(ball_detection);
         }
-
-        Ball updated_ball_state =
-            ball_filter.getFilteredData(ball_state, ball_detections);
-        ball_state = updated_ball_state;
     }
+
+    Ball updated_ball_state = ball_filter.getFilteredData(ball_state, ball_detections);
+    ball_state              = updated_ball_state;
 
     return ball_state;
 }
 
-Team Backend::getFilteredFriendlyTeamData(const SSL_WrapperPacket &packet)
+Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detections)
 {
-    if (packet.has_detection())
-    {
-        SSL_DetectionFrame packet_detection = packet.detection();
+    std::vector<SSLRobotDetection> friendly_robot_detections =
+        std::vector<SSLRobotDetection>();
 
-        auto ssl_robots = packet_detection.robots_yellow();
+    // Collect all the visible robots from all camera frames
+    for (const auto &detection : detections)
+    {
+        auto ssl_robots = detection.robots_yellow();
         if (Util::Constants::FRIENDLY_TEAM_COLOUR == BLUE)
         {
-            ssl_robots = packet_detection.robots_blue();
+            ssl_robots = detection.robots_blue();
         }
 
-        std::vector<SSLRobotDetection> friendly_robot_detections =
-            std::vector<SSLRobotDetection>();
-        for (const SSL_DetectionRobot &friendly_robot_detection : ssl_robots)
+        for (const auto &friendly_robot_detection : ssl_robots)
         {
             SSLRobotDetection robot_detection;
 
@@ -167,36 +164,34 @@ Team Backend::getFilteredFriendlyTeamData(const SSL_WrapperPacket &packet)
             robot_detection.orientation =
                 Angle::ofRadians(friendly_robot_detection.orientation());
             robot_detection.confidence = friendly_robot_detection.confidence();
-            robot_detection.timestamp =
-                Timestamp::fromSeconds(packet_detection.t_capture());
+            robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
             friendly_robot_detections.push_back(robot_detection);
         }
-
-        Team updated_team_state = friendly_team_filter.getFilteredData(
-            friendly_team_state, friendly_robot_detections);
-        friendly_team_state = updated_team_state;
     }
+
+    Team updated_team_state = friendly_team_filter.getFilteredData(
+        friendly_team_state, friendly_robot_detections);
+    friendly_team_state = updated_team_state;
 
     return friendly_team_state;
 }
 
-
-Team Backend::getFilteredEnemyTeamData(const SSL_WrapperPacket &packet)
+Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections)
 {
-    if (packet.has_detection())
-    {
-        SSL_DetectionFrame packet_detection = packet.detection();
+    std::vector<SSLRobotDetection> enemy_robot_detections =
+        std::vector<SSLRobotDetection>();
 
-        auto ssl_robots = packet_detection.robots_blue();
+    // Collect all the visible robots from all camera frames
+    for (const auto &detection : detections)
+    {
+        auto ssl_robots = detection.robots_blue();
         if (Util::Constants::FRIENDLY_TEAM_COLOUR == BLUE)
         {
-            ssl_robots = packet_detection.robots_yellow();
+            ssl_robots = detection.robots_yellow();
         }
 
-        std::vector<SSLRobotDetection> enemy_robot_detections =
-            std::vector<SSLRobotDetection>();
-        for (const SSL_DetectionRobot &enemy_robot_detection : ssl_robots)
+        for (const auto &enemy_robot_detection : ssl_robots)
         {
             SSLRobotDetection robot_detection;
 
@@ -207,16 +202,15 @@ Team Backend::getFilteredEnemyTeamData(const SSL_WrapperPacket &packet)
             robot_detection.orientation =
                 Angle::ofRadians(enemy_robot_detection.orientation());
             robot_detection.confidence = enemy_robot_detection.confidence();
-            robot_detection.timestamp =
-                Timestamp::fromSeconds(packet_detection.t_capture());
+            robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
             enemy_robot_detections.push_back(robot_detection);
         }
-
-        Team updated_team_state =
-            enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
-        enemy_team_state = updated_team_state;
     }
+
+    Team updated_team_state =
+        enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
+    enemy_team_state = updated_team_state;
 
     return enemy_team_state;
 }

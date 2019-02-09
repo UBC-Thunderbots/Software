@@ -32,11 +32,13 @@ class BallFilter
     explicit BallFilter() = default;
 
     /**
-     * Returns the most up to date state of the Ball by filtering the new data
-     * and using it to update the current state.
+     * Filters the new ball detection data, and returns the updated state of the ball
+     * given the new data
      *
-     * @param new_ball_detections A list of new detection for the ball
-     * @return The filtered and updated state of the ball
+     * @param current_ball_state The current state of the Ball
+     * @param new_ball_detections A list of new SSL Ball detections
+     *
+     * @return The updated state of the ball given the new data
      */
     Ball getFilteredData(const Ball& current_ball_state,
                          const std::vector<SSLBallDetection>& new_ball_detections);

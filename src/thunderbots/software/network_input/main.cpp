@@ -89,35 +89,75 @@ int main(int argc, char** argv)
 
     // Store the state of the most up to date World message
     thunderbots_msgs::World world_msg;
+    // A map used to store the latest detection data for each camera
+    std::map<unsigned int, SSL_DetectionFrame> latest_detection_data;
+    // Stores the most recent geometry data received
+    SSL_GeometryData latest_geometry_data;
 
     // Main loop
     while (ros::ok())
     {
-        auto ssl_vision_packet_queue = ssl_vision_client->getVisionPacketQueue();
+        auto ssl_vision_packets = ssl_vision_client->getVisionPacketVector();
+        for (const auto& packet : ssl_vision_packets)
+        {
+            if (packet.has_geometry())
+            {
+                latest_geometry_data = packet.geometry();
+            }
+
+            if (packet.has_detection())
+            {
+                auto detection = packet.detection();
+                // Add the detection to the map, replacing any existing values
+                auto ret = latest_detection_data.insert(
+                    std::make_pair(detection.camera_id(), detection));
+                if (!ret.second)
+                {
+                    ret.first->second = detection;
+                }
+            }
+        }
+
+        // Create a vector of the latest detection data for each camera
+        std::vector<SSL_DetectionFrame> latest_detections;
+        for (auto it = latest_detection_data.begin(); it != latest_detection_data.end();
+             it++)
+        {
+            latest_detections.push_back(it->second);
+        }
+
         auto gamecontroller_packet_ptr =
             ssl_gamecontroller_client->getGameControllerPacket();
 
-        if (!ssl_vision_packet_queue.empty() || gamecontroller_packet_ptr)
+        // Update data and publish the World message if any data changed
+        if (!ssl_vision_packets.empty() || gamecontroller_packet_ptr)
         {
-            while (!ssl_vision_packet_queue.empty())
+            if (!ssl_vision_packets.empty())
             {
-                auto ssl_vision_packet = ssl_vision_packet_queue.front();
-                ssl_vision_packet_queue.pop();
+                Field field = backend.getFieldData(latest_geometry_data);
+                thunderbots_msgs::Field field_msg =
+                    Util::ROSMessages::convertFieldToROSMessage(field);
+                field_publisher.publish(field_msg);
+                world_msg.field = field_msg;
 
-                Field field     = backend.getFieldData(ssl_vision_packet);
-                world_msg.field = Util::ROSMessages::convertFieldToROSMessage(field);
-
-                Ball ball      = backend.getFilteredBallData(ssl_vision_packet);
-                world_msg.ball = Util::ROSMessages::convertBallToROSMessage(ball);
+                Ball ball = backend.getFilteredBallData(latest_detections);
+                thunderbots_msgs::Ball ball_msg =
+                    Util::ROSMessages::convertBallToROSMessage(ball);
+                ball_publisher.publish(ball_msg);
+                world_msg.ball = ball_msg;
 
                 Team friendly_team =
-                    backend.getFilteredFriendlyTeamData(ssl_vision_packet);
-                world_msg.friendly_team =
+                    backend.getFilteredFriendlyTeamData(latest_detections);
+                thunderbots_msgs::Team friendly_team_msg =
                     Util::ROSMessages::convertTeamToROSMessage(friendly_team);
+                friendly_team_publisher.publish(friendly_team_msg);
+                world_msg.friendly_team = friendly_team_msg;
 
-                Team enemy_team = backend.getFilteredEnemyTeamData(ssl_vision_packet);
-                world_msg.enemy_team =
+                Team enemy_team = backend.getFilteredEnemyTeamData(latest_detections);
+                thunderbots_msgs::Team enemy_team_msg =
                     Util::ROSMessages::convertTeamToROSMessage(enemy_team);
+                enemy_team_publisher.publish(enemy_team_msg);
+                world_msg.enemy_team = enemy_team_msg;
             }
 
             if (gamecontroller_packet_ptr)
@@ -126,15 +166,11 @@ int main(int argc, char** argv)
                     backend.getRefboxDataMsg(*gamecontroller_packet_ptr);
                 if (gamecontroller_data_msg)
                 {
+                    gamecontroller_publisher.publish(*gamecontroller_data_msg);
                     world_msg.refbox_data = *gamecontroller_data_msg;
                 }
             }
 
-            ball_publisher.publish(world_msg.ball);
-            field_publisher.publish(world_msg.field);
-            friendly_team_publisher.publish(world_msg.friendly_team);
-            enemy_team_publisher.publish(world_msg.enemy_team);
-            gamecontroller_publisher.publish(world_msg.refbox_data);
             world_publisher.publish(world_msg);
         }
 
