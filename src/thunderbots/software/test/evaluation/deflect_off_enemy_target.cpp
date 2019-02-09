@@ -29,7 +29,7 @@ TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
 
     Point p = Evaluation::deflect_off_enemy_target(test_world);
 
-    EXPECT_EQ(p, Point(-3, -0.675));
+    EXPECT_EQ(p, Point(-3, -0.0675));
 }
 
 int main(int argc, char **argv)
