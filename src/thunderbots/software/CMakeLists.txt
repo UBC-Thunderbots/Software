@@ -651,7 +651,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(timestamp_test ${catkin_LIBRARIES})
-
+        
     catkin_add_gtest(deflect_off_enemy_target_test
             test/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
@@ -668,6 +668,13 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(evaluation_robot_orientation_within_angle_threshold_of_target_test
+            test/evaluation/robot.cpp
+            ai/hl/stp/evaluation/robot.cpp
+            )
+
+    target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
 endif()
 
