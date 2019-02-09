@@ -1,24 +1,39 @@
 #include <ros/ros.h>
+#include <ros/time.h>
+#include <thunderbots_msgs/Ball.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
+#include <thunderbots_msgs/Team.h>
 
+#include <iostream>
+#include <random>
+#include <thread>
+
+#include "ai/primitive/catch_primitive.h"
+#include "ai/primitive/chip_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
+#include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "geom/point.h"
-#include "grsim_communication/grsim_backend.h"
+#include "mrf_backend.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
+#include "util/ros_messages.h"
 
-// Member variables we need to maintain state
-// They are kept in an anonymous namespace so they are not accessible outside this
-// file and are not created as global static variables.
+
 namespace
 {
     // A vector of primitives. It is cleared each tick, populated by the callbacks
-    // that receive primitive commands, and is processed by the backend to send
-    // the Primitives to the robots using the radio.
+    // that receive primitive commands, and is processed by the backend to simulate
+    // the Primitives in grSim
     std::vector<std::unique_ptr<Primitive>> primitives;
+
+    // The MRFBackend instance that connects to the dongle
+    MRFBackend backend = MRFBackend();
 }  // namespace
+
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
@@ -27,8 +42,40 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     {
         primitives.emplace_back(Primitive::createPrimitive(prim_msg));
     }
+
+    // Send primitives
+    backend.sendPrimitives(primitives);
 }
 
+void ballUpdateCallback(const thunderbots_msgs::Ball::ConstPtr& msg)
+{
+    thunderbots_msgs::Ball ball_msg = *msg;
+
+    Ball ball = Util::ROSMessages::createBallFromROSMessage(ball_msg);
+    backend.update_ball(ball);
+
+    // Send vision packet
+    // TODO test this; I have a feeling that it may be
+    // better to have a combined ball + team callback
+    // backend.send_vision_packet();
+}
+
+void friendlyTeamUpdateCallback(const thunderbots_msgs::Team::ConstPtr& msg)
+{
+    thunderbots_msgs::Team friendly_team_msg = *msg;
+
+    Team friendly_team = Util::ROSMessages::createTeamFromROSMessage(friendly_team_msg);
+
+    std::vector<std::tuple<uint8_t, Point, Angle>> detbots;
+    for (const Robot& r : friendly_team.getAllRobots())
+    {
+        detbots.push_back(std::make_tuple(r.id(), r.position(), r.orientation()));
+    }
+    backend.update_detbots(detbots);
+
+    // Send vision packet
+    backend.send_vision_packet();
+}
 
 int main(int argc, char** argv)
 {
@@ -39,6 +86,11 @@ int main(int argc, char** argv)
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+    ros::Subscriber friendly_team_sub =
+        node_handle.subscribe(Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1,
+                              friendlyTeamUpdateCallback);
+    ros::Subscriber ball_sub = node_handle.subscribe(
+        Util::Constants::NETWORK_INPUT_BALL_TOPIC, 1, ballUpdateCallback);
 
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
@@ -51,6 +103,9 @@ int main(int argc, char** argv)
     {
         // Clear all primitives each tick
         primitives.clear();
+
+        // Handle libusb events for the dongle
+        backend.update_dongle_events();
 
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
