@@ -95,3 +95,10 @@ Makefile
 *.exe
 *.out
 *.app
+
+#vim
+*~
+.*
+
+#cscope
+cscope*
