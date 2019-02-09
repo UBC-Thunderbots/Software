@@ -2,9 +2,6 @@
 
 #include <string>
 
-// TODO: should this be an enum instead?
-const static std::string MOVE_INTENT_NAME = "Move Intent";
-
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
  * robot should do, not necessarily exactly how it will do it. Examples are shooting at
@@ -27,13 +24,25 @@ class Intent
      *
      * @return the name of this Intent
      */
-    virtual std::string getIntentName() const = 0;
+    virtual std::string getIntentName(void) const = 0;
 
     /**
-     * Returns the id of the robot this Intent corresponds to
-     * @return the id of the robot this Intent corresponds to
+     * Returns the priority of this Intent
+     * @return the priority of this Intent
      */
-    virtual unsigned int getRobotId() const = 0;
+    int getPriority(void) const;
+
+    /**
+     * Sets the priority of this Intent
+     */
+    void setPriority(int);
 
     virtual ~Intent() = default;
+
+   private:
+    /**
+     * priority of this intent
+     * higher value => higher priority
+     */
+    int priority;
 };

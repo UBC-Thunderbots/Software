@@ -2,32 +2,29 @@
  * This file specifies the Console reducer
  */
 
-import { getType } from 'typesafe-actions';
+import { ActionType, getType } from 'typesafe-actions';
 
-import { TOPIC_ROSOUT } from 'SRC/constants';
 import { IMessagesState } from 'SRC/types';
 
-import * as ros from '../actions/ros';
-import { ROSAction } from './ros';
+import * as console from '../actions/console';
+
+export type ConsoleAction = ActionType<typeof console>;
 
 const defaultState: IMessagesState = {
-    messages: [],
+    rosout: [],
 };
 
 /**
  * Reducer function for Console
  */
-export default (state: IMessagesState = defaultState, action: ROSAction) => {
+export default (state: IMessagesState = defaultState, action: ConsoleAction) => {
     switch (action.type) {
         // Push messages to state if subscribed to /rosout
-        case getType(ros.newMessage):
-            if (action.payload.topic === TOPIC_ROSOUT) {
-                return {
-                    ...state,
-                    messages: [...state.messages, action.payload.message],
-                };
-            }
-
+        case getType(console.newRosoutMessage):
+            return {
+                ...state,
+                rosout: [...state.rosout, action.payload.message],
+            };
         default:
             return state;
     }

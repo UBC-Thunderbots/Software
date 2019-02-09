@@ -345,6 +345,25 @@ TEST_F(TeamTest, clear_goalie)
     EXPECT_EQ(std::nullopt, team.goalie());
 }
 
+TEST_F(TeamTest, get_goalie_id_with_no_goalie)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    EXPECT_EQ(std::nullopt, team.getGoalieID());
+}
+
+TEST_F(TeamTest, get_goalie_id_with_goalie)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+    team.updateRobots({robot_0});
+    team.assignGoalie(0);
+
+    EXPECT_EQ(0, team.getGoalieID());
+}
+
 TEST_F(TeamTest, get_robot_expiry_buffer)
 {
     Team team = Team(Duration::fromMilliseconds(500));
