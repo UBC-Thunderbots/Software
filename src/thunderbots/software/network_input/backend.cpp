@@ -117,7 +117,7 @@ Field Backend::createFieldFromPacketGeometry(
 
 Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections)
 {
-    std::vector<SSLBallDetection> ball_detections = std::vector<SSLBallDetection>();
+    auto ball_detections = std::vector<SSLBallDetection>();
 
     for (const auto &detection : detections)
     {
@@ -141,8 +141,7 @@ Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detecti
 
 Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detections)
 {
-    std::vector<SSLRobotDetection> friendly_robot_detections =
-        std::vector<SSLRobotDetection>();
+    auto friendly_robot_detections = std::vector<SSLRobotDetection>();
 
     // Collect all the visible robots from all camera frames
     for (const auto &detection : detections)
@@ -179,8 +178,7 @@ Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detect
 
 Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections)
 {
-    std::vector<SSLRobotDetection> enemy_robot_detections =
-        std::vector<SSLRobotDetection>();
+    auto enemy_robot_detections = std::vector<SSLRobotDetection>();
 
     // Collect all the visible robots from all camera frames
     for (const auto &detection : detections)

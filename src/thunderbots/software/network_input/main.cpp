@@ -111,6 +111,8 @@ int main(int argc, char** argv)
                 // Add the detection to the map, replacing any existing values
                 auto ret = latest_detection_data.insert(
                     std::make_pair(detection.camera_id(), detection));
+                // Check if we inserted successfully. If not, modify the existing
+                // entry to be our new value
                 if (!ret.second)
                 {
                     ret.first->second = detection;
