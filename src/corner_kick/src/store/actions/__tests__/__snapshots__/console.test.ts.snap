@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`consoleActions when we receive a new /rosout message Dispatches the new /rosout message 1`] = `
+Object {
+  "meta": undefined,
+  "payload": Object {
+    "message": Object {
+      "file": "test.ts",
+      "function": "test()",
+      "level": 1,
+      "line": 123,
+      "msg": "Test message",
+      "name": "Test",
+      "topics": Array [
+        "testTopic",
+      ],
+    },
+  },
+  "type": "console_NEW_ROSOUT",
+}
+`;

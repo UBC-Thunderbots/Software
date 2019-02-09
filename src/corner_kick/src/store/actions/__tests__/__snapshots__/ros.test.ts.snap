@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`rosActions when there is an error connecting to ROS dispatches the correct error action and payload 1`] = `
+Object {
+  "meta": undefined,
+  "payload": Object {
+    "errorMessage": "Error getting pan-tilt limit",
+  },
+  "type": "ros_ERROR",
+}
+`;
+
+exports[`rosActions when we are connected to ROS dispatches the correct connect action and payload 1`] = `
+Object {
+  "meta": undefined,
+  "payload": undefined,
+  "type": "ros_CONNECTED",
+}
+`;
+
+exports[`rosActions when we are disconnected to ROS dispatches the correct disconnect action and payload 1`] = `
+Object {
+  "meta": undefined,
+  "payload": undefined,
+  "type": "ros_DISCONNECTED",
+}
+`;
+
+exports[`rosActions when we connect to ROS dispatches the correct start action and payload 1`] = `
+Object {
+  "meta": undefined,
+  "payload": undefined,
+  "type": "ros_START",
+}
+`;
+
+exports[`rosActions when we disconnect to ROS dispatches the correct stop action and payload 1`] = `
+Object {
+  "meta": undefined,
+  "payload": undefined,
+  "type": "ros_STOP",
+}
+`;
