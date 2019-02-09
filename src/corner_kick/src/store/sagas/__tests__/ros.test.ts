@@ -1,68 +1,22 @@
 import { expectSaga } from 'redux-saga-test-plan';
+import { call } from 'redux-saga-test-plan/matchers';
 import { Ros } from 'roslib';
+
 jest.mock('roslib');
 
-import {
-    connectedROS,
-    disconnectedROS,
-    errorROS,
-    startROS,
-    stopROS,
-    subscribeToROSTopic,
-    unsubscribeToROSTopic,
-} from '../ros';
+import * as rosSaga from '../ros';
 
 describe('startROS', () => {
     it('connects to ROS and adds listeners for connection states', () => {
-        const ros = new Ros({});
+        const rosObject = new Ros({});
 
         return (
-            expectSaga(startROS, ros)
-                .call([ros, ros.connect], 'ws://localhost:9090')
-                .call([ros, ros.on], 'connection', connectedROS)
-                .call([ros, ros.on], 'close', disconnectedROS)
-                .call([ros, ros.on], 'error', errorROS)
-                // Start the test. Returns a Promise.
-                .run()
-        );
-    });
-
-    it('sets subscribe and unsubscribe methods', () => {
-        expect(subscribeToROSTopic).toBeDefined();
-        expect(unsubscribeToROSTopic).toBeDefined();
-    });
-});
-
-describe('subscribeToROSTopic', () => {
-    it('should subscribe to topic with callback', () => {
-        const callback = jest.fn();
-
-        return (
-            expectSaga(
-                subscribeToROSTopic as any,
-                'test_TOPIC',
-                'test_TOPIC_TYPE',
-                callback,
-            )
-                .call.like({ args: [callback] })
-                // Start the test. Returns a Promise.
-                .run()
-        );
-    });
-});
-
-describe('unsubscribeToROSTopic', () => {
-    it('should unsubscribe from topic with callback', () => {
-        const callback = jest.fn();
-
-        return (
-            expectSaga(
-                unsubscribeToROSTopic as any,
-                'test_TOPIC',
-                'test_TOPIC_TYPE',
-                callback,
-            )
-                .call.like({ args: [callback] })
+            expectSaga(rosSaga.startROS)
+                .provide([[call(rosSaga.getROS), rosObject]])
+                .call([rosObject, rosObject.connect], 'ws://localhost:9090')
+                .call([rosObject, rosObject.on], 'connection', rosSaga.connectedROS)
+                .call([rosObject, rosObject.on], 'close', rosSaga.disconnectedROS)
+                .call([rosObject, rosObject.on], 'error', rosSaga.errorROS)
                 // Start the test. Returns a Promise.
                 .run()
         );
@@ -71,18 +25,36 @@ describe('unsubscribeToROSTopic', () => {
 
 describe('stopROS', () => {
     it('disconnects from ROS', () => {
-        const ros = new Ros({});
+        const rosObject = new Ros({});
 
         return (
-            expectSaga(stopROS, ros)
-                .call([ros, ros.close])
+            expectSaga(rosSaga.stopROS)
+                .provide([[call(rosSaga.getROS), rosObject]])
+                .call([rosObject, rosObject.close])
                 // Start the test. Returns a Promise.
                 .run()
         );
     });
+});
 
-    it('unsets subscribe and unsubscribe methods', () => {
-        expect(subscribeToROSTopic).toBeNull();
-        expect(unsubscribeToROSTopic).toBeNull();
+describe('subscribeToROSTopic', () => {
+    it('subscribe to the correct topic with the correct callback', () => {
+        return (
+            expectSaga(rosSaga.subscribeToROSTopic, 'testTopic', 'testTopicType')
+                .call(rosSaga.getTopic, 'testTopic', 'testTopicType')
+                // Start the test. Returns a Promise.
+                .run()
+        );
+    });
+});
+
+describe('unsubscribeToROSTopic', () => {
+    it('unsubscribe from the correct topic with the correct callback', () => {
+        return (
+            expectSaga(rosSaga.unsubscribeToROSTopic, 'testTopic', 'testTopicType')
+                .call(rosSaga.getTopic, 'testTopic', 'testTopicType')
+                // Start the test. Returns a Promise.
+                .run()
+        );
     });
 });

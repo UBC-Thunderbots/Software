@@ -1,7 +1,6 @@
 /*
  * This file specifies the saga for ROS
  */
-import * as _ from 'lodash';
 import { channel } from 'redux-saga';
 import { call, put, spawn, take, takeLatest } from 'redux-saga/effects';
 import { Message, Ros, Topic } from 'roslib';
@@ -9,23 +8,19 @@ import { getType } from 'typesafe-actions';
 
 import { connected, disconnected, error, start } from '../actions/ros';
 
-const rosChannel = channel();
+const rosObject = new Ros({});
+export const getROS = () => rosObject;
+export const getTopic = (name: string, messageType: string) =>
+    new Topic({ ros: rosObject, name, messageType });
 
-export let subscribeToROSTopic:
-    | ((name: string, messageType: string, callback: (message: Message) => void) => void)
-    | null = null;
-export let unsubscribeToROSTopic:
-    | ((name: string, messageType: string, callback: (message: Message) => void) => void)
-    | null = null;
+const rosChannel = channel();
 
 /**
  * Function first called when the application first starts
  */
 export default function* init() {
-    const ros: Ros = new Ros({});
-
     // Listen to start actions and start ROS
-    yield takeLatest(getType(start), startROS, ros);
+    yield takeLatest(getType(start), startROS);
 
     // Start listening to ROS messages
     yield spawn(listenToROSChannel);
@@ -47,8 +42,8 @@ export function* listenToROSChannel() {
 /**
  * Start ROS
  */
-export function* startROS(ros: Ros) {
-    yield call(stopROS, ros);
+export function* startROS() {
+    const ros = yield call(getROS);
 
     yield call([ros, ros.connect], 'ws://localhost:9090');
 
@@ -56,54 +51,37 @@ export function* startROS(ros: Ros) {
     yield call([ros, ros.on], 'connection', connectedROS);
     yield call([ros, ros.on], 'error', errorROS);
     yield call([ros, ros.on], 'close', disconnectedROS);
-
-    subscribeToROSTopic = _.curry(subscribeToROSTopicInternal)(ros);
-    unsubscribeToROSTopic = _.curry(subscribeToROSTopicInternal)(ros);
 }
 
 /**
  * Disconnect from ROS if we are connected
  */
-export function* stopROS(ros: Ros) {
+export function* stopROS() {
+    const ros = yield call(getROS);
     yield call([ros, ros.close]);
-
-    subscribeToROSTopic = null;
-    unsubscribeToROSTopic = null;
 }
 
 /**
  * Subscribe to a ROS topic and send messages to the callback
  */
-export function* subscribeToROSTopicInternal(
-    ros: Ros,
+export function* subscribeToROSTopic(
     name: string,
     messageType: string,
     callback: (message: Message) => void,
 ) {
-    const topic = new Topic({
-        messageType,
-        name,
-        ros,
-    });
-
+    const topic = yield call(getTopic, name, messageType);
     yield call([topic, topic.subscribe], callback);
 }
 
 /**
  * Unsubscribe from a ROS topic
  */
-export function* unsubscribeToROSTopicInternal(
-    ros: Ros,
+export function* unsubscribeToROSTopic(
     name: string,
     messageType: string,
     callback: (message: Message) => void,
 ) {
-    const topic = new Topic({
-        messageType,
-        name,
-        ros,
-    });
-
+    const topic = yield call(getTopic, name, messageType);
     yield call([topic, topic.unsubscribe], callback);
 }
 

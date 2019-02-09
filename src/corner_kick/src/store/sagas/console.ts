@@ -2,7 +2,7 @@
  * This file specifies the saga for the Console
  */
 import { channel } from 'redux-saga';
-import { put, spawn, take, takeLatest } from 'redux-saga/effects';
+import { call, put, spawn, take, takeLatest } from 'redux-saga/effects';
 import { getType } from 'typesafe-actions';
 
 import { TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE } from 'SRC/constants';
@@ -34,12 +34,10 @@ function* listenToConsoleChannel() {
 /**
  * We subscribe to topic rosout to start receiving messages
  */
-function* startConsole() {
-    yield subscribeToROSTopic(
-        TOPIC_ROSOUT,
-        TOPIC_ROSOUT_TYPE,
-        (message: IRosoutMessage) => {
-            consoleChannel.put(actions.console.newRosoutMessage(message));
-        },
-    );
+export function* startConsole() {
+    yield call(subscribeToROSTopic, TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE, onNewRosoutMessage);
+}
+
+export function* onNewRosoutMessage(message: IRosoutMessage) {
+    yield call(consoleChannel.put, actions.console.newRosoutMessage(message));
 }
