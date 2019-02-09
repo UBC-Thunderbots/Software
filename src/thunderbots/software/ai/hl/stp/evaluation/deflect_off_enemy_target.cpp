@@ -4,10 +4,10 @@
 
 #include "ai/world/field.h"
 #include "ai/world/world.h"
+#include "shared/constants.h"
 #include "software/geom/line.h"
 #include "software/geom/util.h"
 
-auto MAX_RADIUS = 0.15;
 namespace Evaluation
 {
     Point deflect_off_enemy_target(World world)
@@ -36,9 +36,9 @@ namespace Evaluation
         {
             if ((contains(chip_target_area, i.position()) ||
                  offsetToLine(enemy_goal_negative, world.ball().position(),
-                              i.position()) <= MAX_RADIUS ||
+                              i.position()) <= ROBOT_MAX_RADIUS_METERS ||
                  offsetToLine(enemy_goal_positive, world.ball().position(),
-                              i.position()) <= MAX_RADIUS) &&
+                              i.position()) <= ROBOT_MAX_RADIUS_METERS) &&
                 (i.position().x() > world.ball().position().x()))
             {
                 if (fabs(i.position().y() - closestEdgeY) < shortestLenToEdge)
@@ -52,7 +52,7 @@ namespace Evaluation
         // want to shoot at the edge of a robot so the ball deflects towards the
         // edge of the field
         Point dir     = enemyClosestToEdge.position() - world.ball().position();
-        Point dirPerp = dir.perp().norm(MAX_RADIUS * 0.75);
+        Point dirPerp = dir.perp().norm(ROBOT_MAX_RADIUS_METERS * 0.75);
         Point target  = Point(0, 0);
 
         // choose point closest to edge of field

@@ -664,6 +664,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            test/test_util/test_util.cpp
             )
 
     target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})

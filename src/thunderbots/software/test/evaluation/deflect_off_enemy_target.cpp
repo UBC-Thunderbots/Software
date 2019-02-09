@@ -7,37 +7,29 @@
 #include <gtest/gtest.h>
 
 #include "geom/util.h"
+#include "test/test_util/test_util.h"
 
 
 TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
 {
-    auto test_ball = new Ball(Point(-1, 0), Vector(0, 0), Timestamp::fromMilliseconds(0));
-    auto test_field    = new Field(9.0f, 6.0f, 1.0f, 2.5f, 1.0f, 1.4f, 1.0f);
-    auto friendly_team = new Team(Duration::fromMilliseconds(0));
-    auto enemy_team    = new Team(Duration::fromMilliseconds(0));
-
-    Robot *test_robot =
-        new Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromMilliseconds(0));
-
-    Robot *enemy_robot =
-        new Robot(0, Point(-3, 0), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromMilliseconds(0));
-
+    Robot friendly_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
+    Robot enemy_robot    = Robot(0, Point(-3, 0), Vector(0, 0), Angle::zero(),
+                              AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
     std::vector<Robot> friendly_robots;
-    friendly_robots.emplace_back(*test_robot);
-    friendly_team->updateRobots(friendly_robots);
-
     std::vector<Robot> enemy_robots;
-    enemy_robots.emplace_back(*enemy_robot);
-    enemy_team->updateRobots(enemy_robots);
+    friendly_robots.emplace_back(friendly_robot);
+    enemy_robots.emplace_back(enemy_robot);
+    using namespace Test;
 
-    auto *test_world = new World(*test_field, *test_ball, *friendly_team, *enemy_team);
-    using namespace Evaluation;
+    World test_world = TestUtil::createBlankTestingWorld();
+    test_world.mutableFriendlyTeam().updateRobots(friendly_robots);
+    test_world.mutableEnemyTeam().updateRobots(enemy_robots);
+    TestUtil::setBallPosition(test_world, Point(-1, 0), Timestamp::fromMilliseconds(0));
 
-    Point p = Evaluation::deflect_off_enemy_target(*test_world);
+    Point p = Evaluation::deflect_off_enemy_target(test_world);
 
-    EXPECT_EQ(p, Point(-3, -0.1125));
+    EXPECT_EQ(p, Point(-3, -0.675));
 }
 
 int main(int argc, char **argv)
