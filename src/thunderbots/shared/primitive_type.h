@@ -1,13 +1,13 @@
 #pragma once
 
 /**
- * These represent the IDs of the primitives implemented in firmware.
- *
+ * This enum represents the IDs of the primitives implemented in firmware.
  */
 enum class PrimitiveType
 {
     /**
-     * Stop primitive.
+     * Stop Primitive
+     * 
      * The parameters are unused.
      *
      * The extra field is 0 for coasting or 1 for braking.
@@ -15,8 +15,7 @@ enum class PrimitiveType
     STOP = 0,
 
     /**
-     * \brief Implements the \ref Drive::Robot::move_move family of
-     * primitives.
+     * Move Primitive
      *
      * The parameters are the relative position, the relative orientation,
      * and the time delta.
@@ -27,7 +26,7 @@ enum class PrimitiveType
     MOVE = 1,
 
     /**
-     * \brief Implements the \ref Drive::Robot::move_dribble primitive.
+     * Dribble Primitive
      *
      * The parameters are the relative position and orientation.
      *
@@ -37,8 +36,9 @@ enum class PrimitiveType
     DRIBBLE = 2,
 
     /**
-     * \brief Implements the \ref Drive::Robot::move_shoot family of
-     * primitives.
+     * Shoot Primitive
+     * 
+     * Note that in HL, this is split into kick and chip.
      *
      * The parameters are the relative position, relative orientation, and
      * power (either m/s or m).
@@ -49,15 +49,14 @@ enum class PrimitiveType
     SHOOT = 3,
 
     /**
-     * \brief Implements the \ref Drive::Robot::move_catch primitive.
+     * Catch Primitive
      *
-     * The parameters are the angle difference, the left/right
-     * displacement, and the speed.
+     * The parameters are the velocity, dribble speed, and margin.
      */
     CATCH = 4,
 
     /**
-     * \brief Implements the \ref Drive::Robot::move_pivot primitive.
+     * Pivot Primitive
      *
      * The parameters are the relative centre point, the swing, and the
      * orientation.
@@ -65,20 +64,20 @@ enum class PrimitiveType
     PIVOT = 5,
 
     /**
-     * \brief Implements the \ref Drive::Robot::move_spin primitive.
+     * Spin Primitive
      *
      * The parameters are the relative position and angular velocity.
      */
     SPIN = 6,
 
     /**
-     * \brief Specifies that direct control is in use and wheels are being
+     * Specifies that direct control is in use and wheels are being
      * driven with individual power levels.
      */
     DIRECT_WHEELS = 7,
 
     /**
-     * \brief Specifies that direct control is in use and robot-relative
+     * Specifies that direct control is in use and robot-relative
      * linear and angular velocities are being sent.
      */
     DIRECT_VELOCITY = 8,
