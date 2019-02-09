@@ -107,7 +107,7 @@ class Team
      * @return the Duration for which a Robot must not have been updated for before
      * being removed from this team.
      */
-    Duration getRobotExpiryBufferDuration();
+    Duration getRobotExpiryBufferDuration() const;
 
     /**
      * Sets the Duration for which a Robot must not have been updated for before being
@@ -137,6 +137,15 @@ class Team
      * returns std::nullopt
      */
     std::optional<Robot> goalie() const;
+
+    /**
+     * Returns the ID of the goalie for this team, if one has been specified. Otherwise
+     * returns std::nullopt
+     *
+     * @return The ID of the goalie robot for this team if one is specified, otherwise
+     * returns std::nullopt
+     */
+    std::optional<unsigned int> getGoalieID() const;
 
     /**
      * Returns a vector of all the robots on this team.

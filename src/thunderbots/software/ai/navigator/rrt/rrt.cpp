@@ -17,7 +17,7 @@ std::vector<std::unique_ptr<Primitive>> RRTNav::getAssignedPrimitives(
     // Hand the different types of Intents here
     for (const auto &intent : assignedIntents)
     {
-        if (intent->getIntentName() == MOVE_INTENT_NAME)
+        if (intent->getIntentName() == MoveIntent::INTENT_NAME)
         {
             // TODO: Implement this
             // https://github.com/UBC-Thunderbots/Software/issues/23
