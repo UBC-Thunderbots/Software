@@ -17,10 +17,7 @@
 #include <chrono>
 
 #include "shared/constants.h"
-
-boost::filesystem::path MotionController::csv_output_path;
-
-std::string MotionController::CRLF = "\r\n";
+#include "util/logger/init.h"
 
 MotionController::Velocity MotionController::bangBangVelocityController(
     const Robot robot, const Point dest, const double desired_final_speed,
@@ -88,19 +85,16 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     double max_magnitude_of_velocity_to_apply =
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time;
 
-    // Calculate a vector from the robot to the destination
-    Vector vector_to_dest = dest - robot.position();
+    // Calculate a unit vector from the robot to the destination
+    Vector unit_vector_to_dest = (dest - robot.position()).norm();
 
     // Calculate the component of our current velocity pointing towards the destination
-    double magnitude_of_robot_velocity_towards_dest =
-        robot.velocity().len() *
-        (vector_to_dest.orientation() - robot.velocity().orientation()).cos();
+    // by projecting the vector of our velocity onto the vector toward the destination
     Vector robot_velocity_towards_dest =
-        vector_to_dest.norm(magnitude_of_robot_velocity_towards_dest);
+        robot.velocity().dot(unit_vector_to_dest) * unit_vector_to_dest;
 
-    // Calculate the vector required to counteract our movement perpendicular to the
-    // vector towards the dest. This "pushes" us onto a velocity vector straight towards
-    // the destination
+    // Calculate the vector of our velocity perpendicular to the vector toward the
+    // destination
     Vector robot_velocity_perpendicular_to_dest =
         robot.velocity() - robot_velocity_towards_dest;
 
@@ -110,7 +104,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         std::max<double>(0, max_magnitude_of_velocity_to_apply -
                                 robot_velocity_perpendicular_to_dest.len());
     Vector additional_velocity_towards_dest =
-        vector_to_dest.norm(magnitude_additional_velocity_towards_dest);
+        magnitude_additional_velocity_towards_dest * unit_vector_to_dest;
 
     // The resulting additional velocity to apply to the robot is the velocity required to
     // counteract our movement perpendicular to the vector towards the destination, with
@@ -122,51 +116,31 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // a square root-esque function of the distance to the destination. This allows us to
     // bring the robot velocity to zero as we approach the destination
     double new_robot_velocity_magnitude =
-        std::sqrt(std::max<double>((dest - robot.position()).len() - 0.01, 0)) * 2 +
+        std::sqrt(std::fabs((dest - robot.position()).len() - 0.01)) * 2 +
         desired_final_speed;
-    new_robot_velocity_magnitude = std::clamp<double>(new_robot_velocity_magnitude, 0,
+
+    // https://github.com/UBC-Thunderbots/Software/issues/270
+    // Check for the case where we are moving away from the target, as this function
+    // will increase in magnitude as the distance to the destination increases
+    if ((robot.velocity().orientation() - unit_vector_to_dest.orientation()).abs() >
+        Angle::quarter() / 2)
+    {
+        new_robot_velocity_magnitude *= -1;
+    }
+    new_robot_velocity_magnitude = std::clamp<double>(new_robot_velocity_magnitude,
+                                                      -ROBOT_MAX_SPEED_METERS_PER_SECOND,
                                                       ROBOT_MAX_SPEED_METERS_PER_SECOND);
+
     Vector new_robot_velocity =
-        (robot.velocity() + additional_velocity).norm(new_robot_velocity_magnitude);
+        new_robot_velocity_magnitude * (robot.velocity() + additional_velocity).norm();
 
     // Translate velocities into robot coordinates
     Vector new_robot_velocity_in_robot_coordinates =
         new_robot_velocity.rotate(-robot.orientation());
 
-    // time, pos_x, pos_y, ball_pos_x, ball_pos_y, angle_to_ball, dv_x, dv_y, dv_to_dest_angle
-
-    boost::filesystem::ofstream csv_ostream(MotionController::csv_output_path,
-                                            boost::filesystem::ofstream::out | boost::filesystem::ofstream::app);
-    using MotionController::CRLF;
-
-    // write timestamp to csv
-    csv_ostream << std::chrono::steady_clock::now().time_since_epoch().count() << ",";
-
-    // write pos to csv
-    csv_ostream << robot.position().x() << "," << robot.position().y() << ",";
-
-    // write ball_pos to csv
-    csv_ostream <<  dest.x() << "," << dest.y() << ",";
-
-    // write angle_to_ball to csv
-    csv_ostream << vector_to_dest.orientation().toDegrees() << ",";
-
-    // write v to csv
-    csv_ostream << new_robot_velocity.x() << "," << new_robot_velocity.y() << ",";
-
-    // write v_to_dest_angle to csv
-    csv_ostream << (new_robot_velocity.orientation() - vector_to_dest.orientation()).toDegrees() << ",";
-
-    // write dv to csv
-    csv_ostream << additional_velocity.x() << "," << additional_velocity.y() << ",";
-
-    // write dv_to_dest_angle to csv
-    csv_ostream << (additional_velocity.orientation() - vector_to_dest.orientation()).toDegrees();
-
-    // end line
-    csv_ostream << CRLF;
-
-    csv_ostream.close();
+    double magnitude_new_velocity_toward_destination =
+        new_robot_velocity.dot(unit_vector_to_dest);
+    double mag_dv_proj_dest = additional_velocity.dot(unit_vector_to_dest);
 
     return new_robot_velocity_in_robot_coordinates;
 }

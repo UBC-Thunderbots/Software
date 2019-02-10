@@ -4,20 +4,12 @@
 
 #pragma once
 
-#include <boost/filesystem.hpp>
-
 #include "ai/world/robot.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 
 namespace MotionController
 {
-    // this might have to be some of the stupidest spaghetti code
-    // i've ever written
-    // one day, i'll make smth cleaner for writing to a csv
-    extern boost::filesystem::path csv_output_path;
-    extern std::string CRLF;
-
     struct Velocity
     {
         Vector linear_velocity;
