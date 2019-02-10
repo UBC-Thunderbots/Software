@@ -62,45 +62,6 @@ TEST_F(WorldTest, construction_with_parameters)
     EXPECT_EQ(enemy_team, world.enemyTeam());
 }
 
-TEST_F(WorldTest, ball_not_in_defense_area)
-{
-    // ball around centre
-    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
-    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
-}
-
-TEST_F(WorldTest, ball_in_friendly_defense_area)
-{
-    Ball ballfriendly = Ball(Point(-4, 0.5), Vector(-0.3, 0), current_time);
-    world.updateBallState(ballfriendly);
-    EXPECT_EQ(true, world.ballInFriendlyDefenseArea());
-    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
-}
-
-TEST_F(WorldTest, ball_in_enemy_defense_area)
-{
-    Ball ballenemy = Ball(Point(4, -1.0), Vector(-0.3, 0), current_time);
-    world.updateBallState(ballenemy);
-    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
-    EXPECT_EQ(true, world.ballInEnemyDefenseArea());
-}
-
-TEST_F(WorldTest, ball_just_outside_enemy_defense_area)
-{
-    Ball ballnotenemy = Ball(Point(4, -1.5), Vector(-0.3, 0), current_time);
-    world.updateBallState(ballnotenemy);
-    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
-    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
-}
-
-TEST_F(WorldTest, ball_just_outside_friendly_defense_area)
-{
-    Ball ballnotfriendly = Ball(Point(-2, -.5), Vector(-0.3, 0), current_time);
-    world.updateBallState(ballnotfriendly);
-    EXPECT_EQ(false, world.ballInFriendlyDefenseArea());
-    EXPECT_EQ(false, world.ballInEnemyDefenseArea());
-}
-
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

@@ -84,14 +84,3 @@ GameState &World::mutableGameState()
 {
     return game_state_;
 }
-
-bool World::ballInFriendlyDefenseArea() const
-{
-    return field_.friendlyDefenseArea().containsPoint(ball_.position());
-}
-
-
-bool World::ballInEnemyDefenseArea() const
-{
-    return field_.enemyDefenseArea().containsPoint(ball_.position());
-}

@@ -130,20 +130,6 @@ class World final
      */
     GameState& mutableGameState();
 
-    /**
-     * Returns whether the ball is in the friendly defense area
-     *
-     * @returns true if ball is in friendly defense area
-     */
-    bool ballInFriendlyDefenseArea() const;
-
-    /**
-     * Returns whether the ball is in the enemy defense area
-     *
-     * @returns true if ball is in enemy defense area
-     */
-    bool ballInEnemyDefenseArea() const;
-
    private:
     Field field_;
     Ball ball_;
