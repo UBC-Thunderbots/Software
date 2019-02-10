@@ -20,6 +20,7 @@
 #include "thunderbots_msgs/DrawLayer.h"
 #include "thunderbots_msgs/DrawShape.h"
 #include "thunderbots_msgs/Point2D.h"
+#include "util/constants.h"
 
 
 // Forward declaration
@@ -229,11 +230,9 @@ namespace Util
         LayerMsgMap layers_name_to_msg_map;
         ros::Publisher publisher;
 
-        // 15 fps
-        const uint DESIRED_FREQUENCY = 15;
-
         // Period in nanoseconds
-        const double DESIRED_PERIOD_NS = 1.0e9 / DESIRED_FREQUENCY;
+        const double DESIRED_PERIOD_NS =
+            1.0e9 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
 
         // Time point
         time_point time_last_published;

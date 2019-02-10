@@ -33,5 +33,8 @@ namespace Util
 
         // There are 4 cameras for SSL Division B
         static const unsigned int NUMBER_OF_SSL_VISION_CAMERAS = 4;
+
+        // Visualizer messenger message publishing frequency
+        static const unsigned int DESIRED_VISUALIZER_MESSAGE_FREQ = 60;
     }  // namespace Constants
 }  // namespace Util

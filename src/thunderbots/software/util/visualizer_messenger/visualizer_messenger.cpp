@@ -43,7 +43,6 @@ namespace Util
 
 
         // Check if publisher is initialized before publishing messages
-        // TODO: #312: refresh rate limit by comparing time delta
         if (!this->publisher)
         {
             LOG(WARNING)
