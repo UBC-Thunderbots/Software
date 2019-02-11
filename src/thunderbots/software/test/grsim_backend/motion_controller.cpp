@@ -696,24 +696,25 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
 
 TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_test)
 {
-    // basic sanity test to make sure we don't continue accelerating in the wrong direction
-    // when we accelerate slightly in the opposite direction of the destination
+    // basic sanity test to make sure we don't continue accelerating in the wrong
+    // direction when we accelerate slightly in the opposite direction of the destination
     // https://github.com/UBC-Thunderbots/Software/issues/270
 
     // we need to test the case that we have a small velocity away from the destination
     // while we are trying to accelerate toward the destination
     Vector initial_velocity(-0.1, 0);
-    Robot robot = Robot(0, Point(0, 0), initial_velocity,
-            Angle::ofRadians(0), AngularVelocity::ofRadians(0), current_time);
+    Robot robot             = Robot(0, Point(0, 0), initial_velocity, Angle::ofRadians(0),
+                        AngularVelocity::ofRadians(0), current_time);
     const double delta_time = TIME_STEP;
-    Point destination = Point(0.1, 0);
+    Point destination       = Point(0.1, 0);
     Angle destination_angle = Angle::ofRadians(0);
 
-    MotionController::Velocity robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, 2, destination_angle, delta_time);
-    // if the destination is on the +x side of the robot, the velocity should always have x > 0
+    MotionController::Velocity robot_velocities =
+        MotionController::bangBangVelocityController(robot, destination, 2,
+                                                     destination_angle, delta_time);
+    // if the destination is on the +x side of the robot, the velocity should always have
+    // x > 0
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
-
 }
 
 int main(int argc, char **argv)
