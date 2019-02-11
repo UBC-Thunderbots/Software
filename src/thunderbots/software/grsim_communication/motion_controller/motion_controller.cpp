@@ -88,15 +88,10 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // Calculate a unit vector from the robot to the destination
     Vector unit_vector_to_dest = (dest - robot.position()).norm();
 
-    // Calculate the component of our current velocity pointing towards the destination
-    // by projecting the vector of our velocity onto the vector toward the destination
-    Vector robot_velocity_towards_dest =
-        robot.velocity().dot(unit_vector_to_dest) * unit_vector_to_dest;
-
     // Calculate the vector of our velocity perpendicular to the vector toward the
     // destination
     Vector robot_velocity_perpendicular_to_dest =
-        robot.velocity() - robot_velocity_towards_dest;
+        robot.velocity().dot(unit_vector_to_dest.perp()) * unit_vector_to_dest.perp();
 
     // Use the "remaining" velocity (based on physical limits) to move us along the vector
     // towards the destination
@@ -120,10 +115,11 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         desired_final_speed;
 
     // https://github.com/UBC-Thunderbots/Software/issues/270
-    // Check for the case where we are moving away from the target, as this function
-    // will increase in magnitude as the distance to the destination increases
-    if ((robot.velocity().orientation() - unit_vector_to_dest.orientation()).abs() >
-        Angle::quarter() / 2)
+    // Check for the case where we are moving away from the target AND the additional
+    // velocity is greater in magnitude than the current velocity, as the above
+    // function will increase in magnitude as the distance to the destination increases
+    if ((robot.velocity().orientation() - unit_vector_to_dest.orientation()).angleMod().abs() >
+        Angle::quarter() && additional_velocity.len() < robot.velocity().len())
     {
         new_robot_velocity_magnitude *= -1;
     }
@@ -137,10 +133,6 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // Translate velocities into robot coordinates
     Vector new_robot_velocity_in_robot_coordinates =
         new_robot_velocity.rotate(-robot.orientation());
-
-    double magnitude_new_velocity_toward_destination =
-        new_robot_velocity.dot(unit_vector_to_dest);
-    double mag_dv_proj_dest = additional_velocity.dot(unit_vector_to_dest);
 
     return new_robot_velocity_in_robot_coordinates;
 }
