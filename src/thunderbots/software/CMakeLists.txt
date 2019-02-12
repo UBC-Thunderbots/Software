@@ -8,8 +8,8 @@ endif()
 
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_C_COMPILER clang-6.0)
+set(CMAKE_CXX_COMPILER clang++-6.0)
 
 # Use PkgConfig to find some packages using pkg_check_modules
 find_package(PkgConfig REQUIRED)
