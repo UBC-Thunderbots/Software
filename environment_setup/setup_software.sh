@@ -188,7 +188,6 @@ echo "================================================================"
 echo "Installing Misc. Utilities"
 echo "================================================================"
 
-sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
 # Required to install g++-7 on Ubuntu 16
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
@@ -200,6 +199,11 @@ sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
+if [ "$ros_distro" == "kinetic" ]; then
+    wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    sudo apt-add-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-6.0 main"
+fi
 
 sudo apt-get update
 
