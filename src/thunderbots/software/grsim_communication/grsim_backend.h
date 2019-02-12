@@ -35,6 +35,16 @@ class GrSimBackend
                         const Team& friendly_team, const Ball& ball);
 
     /**
+     * Takes a position and velocity vector for the ball
+     * and use these to construct a grSim_packet with a replacement command.
+     *
+     * @param position the new position of the ball
+     * @param velocity the new velocity of the ball
+     */
+
+    grSim_Packet setBallState(Point position, Vector velocity);
+
+    /**
      * Creates a grSim Packet protobuf message given velocity information for a robot.
      * Velocities are in the Robot's local coordinate system. This function is left public
      * so it is easy to test.

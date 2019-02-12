@@ -8,6 +8,7 @@
 #include "grsim_communication/motion_controller/motion_controller.h"
 #include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
 #include "proto/grSim_Commands.pb.h"
+#include "proto/grSim_Replacement.pb.h"
 #include "util/logger/init.h"
 
 using namespace boost::asio;
@@ -73,6 +74,18 @@ void GrSimBackend::sendPrimitives(
     // timestamp of when the motion controller was last run (to be used for calculating
     // delta_time in the future)
     bangbang_timestamp = std::chrono::steady_clock::now();
+}
+
+grSim_Packet GrSimBackend::setBallState(Point destination, Vector velocity)
+{
+    grSim_Packet packet;
+    grSim_Replacement* replacement          = packet.mutable_replacement();
+    grSim_BallReplacement* ball_replacement = replacement->mutable_ball();
+    ball_replacement->set_x(destination.x());
+    ball_replacement->set_y(destination.y());
+    ball_replacement->set_vx(velocity.x());
+    ball_replacement->set_vy(velocity.y());
+    return packet;
 }
 
 grSim_Packet GrSimBackend::createGrSimPacketWithRobotVelocity(

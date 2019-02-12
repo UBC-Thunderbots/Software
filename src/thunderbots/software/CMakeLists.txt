@@ -651,7 +651,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(timestamp_test ${catkin_LIBRARIES})
-        
+
     catkin_add_gtest(deflect_off_enemy_target_test
             test/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
