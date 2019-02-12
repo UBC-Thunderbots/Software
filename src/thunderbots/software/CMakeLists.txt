@@ -8,6 +8,8 @@ endif()
 
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
 
 ####################
 ## Compiler Flags ##
