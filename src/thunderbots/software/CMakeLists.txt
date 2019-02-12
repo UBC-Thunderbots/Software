@@ -19,8 +19,7 @@ include(FindPkgConfig)
 ## Compiler Flags ##
 ####################
 
-### Set cmake standard to c++ 17 ###
-#set(CMAKE_CXX_STANDARD 20)
+### Set cmake standard to c++ 20 ###
 add_definitions(-std=gnu++2a)
 
 
