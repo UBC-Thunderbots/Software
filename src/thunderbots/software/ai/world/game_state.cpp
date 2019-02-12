@@ -246,6 +246,8 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             restart_reason = BALL_PLACEMENT;
             our_restart    = false;
             break;
+        case RefboxGameState::LAST_ENUM_ITEM_UNUSED:
+            break;
     }
 }
 

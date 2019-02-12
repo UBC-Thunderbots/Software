@@ -8,6 +8,8 @@ endif()
 
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
 
 # Use PkgConfig to find some packages using pkg_check_modules
 find_package(PkgConfig REQUIRED)
@@ -17,8 +19,9 @@ include(FindPkgConfig)
 ## Compiler Flags ##
 ####################
 
-### Set cmake standard to c++ 17 ###
-set(CMAKE_CXX_STANDARD 17)
+### Set cmake standard to c++ 20 ###
+add_definitions(-std=gnu++2a)
+
 
 ### Set compiler flags for all code ###
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
@@ -29,7 +32,14 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 # Warn if parent classes do not define a virtual destructor
 # See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
+# Enable coroutines in clang
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts")
+# Use the clang standard library
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 
+### Set linker flags only for cpp code. These flags do not work for C files ###
+# Link against the clang standard library
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
 
 #############################################
 ## Find and include pacakges and libraries ##
