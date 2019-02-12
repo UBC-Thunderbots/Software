@@ -14,7 +14,6 @@
 #include "grsim_communication/motion_controller/motion_controller.h"
 
 #include <algorithm>
-#include <chrono>
 
 #include "shared/constants.h"
 #include "util/logger/init.h"
@@ -118,9 +117,13 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // Check for the case where we are moving away from the target AND the additional
     // velocity is greater in magnitude than the current velocity, as the above
     // function will increase in magnitude as the distance to the destination increases
-    if ((robot.velocity().orientation() - unit_vector_to_dest.orientation())
-                .angleMod()
-                .abs() > Angle::quarter() &&
+
+    bool moving_in_opposite_direction =
+        (robot.velocity().orientation() - unit_vector_to_dest.orientation())
+            .angleMod()
+            .abs() > Angle::quarter();
+
+    if (moving_in_opposite_direction &&
         additional_velocity.len() < robot.velocity().len())
     {
         new_robot_velocity_magnitude *= -1;

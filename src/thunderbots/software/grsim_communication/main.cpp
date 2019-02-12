@@ -93,9 +93,6 @@ int main(int argc, char** argv)
         // Clear all primitives each tick
         primitives.clear();
 
-        primitives.emplace_back(
-            new MovePrimitive(0, ball.position(), Angle::full(), 0.5));
-
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
