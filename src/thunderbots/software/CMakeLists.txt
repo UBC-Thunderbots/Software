@@ -11,6 +11,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 
+# Use PkgConfig to find some packages using pkg_check_modules
+find_package(PkgConfig REQUIRED)
+include(FindPkgConfig)
+
 ####################
 ## Compiler Flags ##
 ####################
