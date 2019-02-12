@@ -717,6 +717,24 @@ TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
 }
 
+TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_2_test)
+{
+    // same as above, test with a large initial velocity this time
+    Vector initial_velocity(-2, 0);
+    Robot robot             = Robot(0, Point(0, 0), initial_velocity, Angle::ofRadians(0),
+                        AngularVelocity::ofRadians(0), current_time);
+    const double delta_time = TIME_STEP;
+    Point destination       = Point(0.1, 0);
+    Angle destination_angle = Angle::ofRadians(0);
+
+    MotionController::Velocity robot_velocities =
+        MotionController::bangBangVelocityController(robot, destination, 2,
+                                                     destination_angle, delta_time);
+    // if the destination is on the +x side of the robot, the velocity should always have
+    // x > 0
+    EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
