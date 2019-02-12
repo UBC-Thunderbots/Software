@@ -15,8 +15,7 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
 # Here we handle arguments provided to the script. Because this script allows
-# the installation of different versions of ROS, we use a parameter to let the
-# user decide which one to install.
+# the installation of different versions of ROS, we use a parameter to let the user decide which one to install.
 
 ros_distro="kinetic"
 ubuntu_distro="xenial"
@@ -205,7 +204,10 @@ echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/source
 sudo apt-get update
 
 host_software_packages=(
-    g++-7 # We need g++ 7 or greater to support the C++17 standard
+    clang-6.0       # Clang C compiler
+    clang++-6.0     # Clang C++ compiler
+    libc++-dev      # Clang Standard Library
+    libc++abi-dev   # Clang ABI
     python-rosinstall
     protobuf-compiler
     libprotobuf-dev
