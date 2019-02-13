@@ -20,7 +20,7 @@ void Robot::updateState(const Point &new_position, const Vector &new_velocity,
     if (timestamp < last_update_timestamp)
     {
         throw std::invalid_argument(
-            "Error: State of ball is updating times from the past");
+            "Error: State of robot is updating times from the past");
     }
 
     position_             = new_position;
