@@ -118,12 +118,12 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     // velocity is greater in magnitude than the current velocity, as the above
     // function will increase in magnitude as the distance to the destination increases
 
-    bool moving_in_opposite_direction =
+    bool moving_away_from_dest =
         (robot.velocity().orientation() - unit_vector_to_dest.orientation())
             .angleMod()
             .abs() > Angle::quarter();
 
-    if (moving_in_opposite_direction &&
+    if (moving_away_from_dest &&
         additional_velocity.len() < robot.velocity().len())
     {
         new_robot_velocity_magnitude *= -1;
