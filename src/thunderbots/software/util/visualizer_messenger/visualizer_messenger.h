@@ -33,7 +33,6 @@ namespace Util
     using LayerMsg    = thunderbots_msgs::DrawLayer;
     using LayerMsgMap = std::map<std::string, LayerMsg>;
     using ShapeMsg    = thunderbots_msgs::DrawShape;
-    // using Point2D     = thunderbots_msgs::Point2D;
 
     class VisualizerMessenger
     {
