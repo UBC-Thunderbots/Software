@@ -694,7 +694,7 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
                 POSITION_TOLERANCE);
 }
 
-TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_test)
+TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_small_initial_velocity_test)
 {
     // basic sanity test to make sure we don't continue accelerating in the wrong
     // direction when we accelerate slightly in the opposite direction of the destination
