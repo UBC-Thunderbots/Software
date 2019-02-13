@@ -2,6 +2,8 @@
 
 #include <cstddef>
 #include <vector>
+#include <array>
+#include <optional>
 
 #include "geom/circle.h"
 #include "geom/line.h"

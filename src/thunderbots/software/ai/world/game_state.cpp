@@ -1,6 +1,7 @@
 #include "ai/world/game_state.h"
+#include "util/logger/init.h"
 
-#include "game_state.h"
+#include "ai/world/game_state.h"
 
 
 bool GameState::isHalted() const
@@ -246,7 +247,8 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             restart_reason = BALL_PLACEMENT;
             our_restart    = false;
             break;
-        case RefboxGameState::LAST_ENUM_ITEM_UNUSED:
+        case RefboxGameState::REFBOX_GAME_STATE_COUNT:
+            LOG(WARNING) << "Invalid enum REFBOX_GAME_STATE_COUNT provided to updateRefboxGamestate function" << std::endl;
             break;
     }
 }

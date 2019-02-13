@@ -19,9 +19,8 @@ include(FindPkgConfig)
 ## Compiler Flags ##
 ####################
 
-### Set cmake standard to c++ 20 ###
-add_definitions(-std=gnu++2a)
-
+### Set cmake standard to c++ 20 for c++ ###
+set(CMAKE_CXX_FLAGS -std=gnu++2a)
 
 ### Set compiler flags for all code ###
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
@@ -46,7 +45,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
 #############################################
 
 # Call our CMake file to include and build protobuf
-include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
+#include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
 # Create a list of files from the shared folder
 file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS

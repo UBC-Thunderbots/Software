@@ -178,7 +178,7 @@ class Point final
      *
      * @return true if either coordinate is NaN, and false otherwise
      */
-    constexpr bool isnan() const;
+    bool isnan() const;
 
     /**
      * Checks whether this Point is close to another Point, where “close”
@@ -200,7 +200,7 @@ class Point final
      * @return true if the other point is within the given distance (not inclusive) of
      * this Point
      */
-    constexpr bool isClose(const Point &other, double dist) const;
+    bool isClose(const Point &other, double dist) const;
 
     /**
      * Assigns one Point to another
@@ -441,7 +441,7 @@ inline Angle Point::orientation() const
     return Angle::ofRadians(std::atan2(_y, _x));
 }
 
-inline constexpr bool Point::isnan() const
+inline bool Point::isnan() const
 {
     return std::isnan(_x) || std::isnan(_y);
 }
@@ -451,7 +451,7 @@ inline constexpr bool Point::isClose(const Point &other) const
     return Point(_x - other.x(), _y - other.y()).lensq() < 1e-9;
 }
 
-inline constexpr bool Point::isClose(const Point &other, double dist) const
+inline bool Point::isClose(const Point &other, double dist) const
 {
     return std::pow(_x - other.x(), 2) + std::pow(_y - other.y(), 2) < dist * dist;
 }
