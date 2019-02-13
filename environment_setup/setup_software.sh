@@ -208,6 +208,7 @@ host_software_packages=(
     clang++-6.0     # Clang C++ compiler
     libc++-dev      # Clang Standard Library
     libc++abi-dev   # Clang ABI
+    libsigc++-2.0-dev   # SigC
     python-rosinstall
     protobuf-compiler
     libprotobuf-dev
