@@ -717,7 +717,7 @@ TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
 }
 
-TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_2_test)
+TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_large_initial_velocity_test)
 {
     // same as above, test with a large initial velocity this time
     Vector initial_velocity(-2, 0);
