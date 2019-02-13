@@ -182,7 +182,7 @@ namespace Util
 
         /**
          * A method to send a reference test layer to the visualizer
-         * to qualitatively verify shape rendering and performance
+         * to verify shape rendering and performance
          */
         void drawTestLayer();
 

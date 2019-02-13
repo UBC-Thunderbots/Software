@@ -95,7 +95,6 @@ namespace Util
         addShapeToLayer(layer, new_shape);
     }
 
-    // TODO: Point2D switch to point class
     void VisualizerMessenger::drawPoly(const std::string& layer,
                                        std::vector<Point>& vertices, DrawStyle draw_style,
                                        DrawTransform draw_transform)
