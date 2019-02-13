@@ -123,8 +123,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
             .angleMod()
             .abs() > Angle::quarter();
 
-    if (moving_away_from_dest &&
-        additional_velocity.len() < robot.velocity().len())
+    if (moving_away_from_dest && additional_velocity.len() < robot.velocity().len())
     {
         new_robot_velocity_magnitude *= -1;
     }

@@ -694,7 +694,8 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
                 POSITION_TOLERANCE);
 }
 
-TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_small_initial_velocity_test)
+TEST_F(MotionControllerTest,
+       wrong_direction_impulse_while_close_to_destination_small_initial_velocity_test)
 {
     // basic sanity test to make sure we don't continue accelerating in the wrong
     // direction when we accelerate slightly in the opposite direction of the destination
@@ -717,7 +718,8 @@ TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
 }
 
-TEST_F(MotionControllerTest, wrong_direction_impulse_while_close_to_destination_large_initial_velocity_test)
+TEST_F(MotionControllerTest,
+       wrong_direction_impulse_while_close_to_destination_large_initial_velocity_test)
 {
     // same as above, test with a large initial velocity this time
     Vector initial_velocity(-2, 0);
