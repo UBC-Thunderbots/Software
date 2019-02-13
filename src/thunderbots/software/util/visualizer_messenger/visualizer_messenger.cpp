@@ -31,16 +31,16 @@ namespace Util
     {
         // Limit rate of the message publishing
         // Get the time right now
-        const time_point now  = std::chrono::system_clock::now();
-        const auto elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                                    now - time_last_published)
-                                    .count();
+        const time_point now     = std::chrono::system_clock::now();
+        const int64_t elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       now - time_last_published)
+                                       .count();
+        const double elapsed_ms = elapsed_ns / 1.0e6;
 
         // Do not do anything if the time passed hasn't been
         // long enough
-        if (elapsed_ns < DESIRED_PERIOD_NS)
+        if (elapsed_ms < DESIRED_PERIOD_MS)
             return;
-
 
         // Check if publisher is initialized before publishing messages
         if (!this->publisher)

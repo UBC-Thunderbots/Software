@@ -231,8 +231,8 @@ namespace Util
         ros::Publisher publisher;
 
         // Period in nanoseconds
-        const double DESIRED_PERIOD_NS =
-            1.0e9 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
+        const double DESIRED_PERIOD_MS =
+            1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
 
         // Time point
         time_point time_last_published;
