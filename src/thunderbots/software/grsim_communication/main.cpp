@@ -1,13 +1,8 @@
-#include <ai/primitive/catch_primitive.h>
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
-#include "ai/primitive/direct_velocity_primitive.h"
-#include "ai/primitive/directwheels_primitive.h"
-#include "ai/primitive/kick_primitive.h"
-#include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "geom/point.h"
 #include "grsim_communication/grsim_backend.h"
