@@ -1,16 +1,16 @@
 #pragma once
 
 #include "ai/intent/intent.h"
-#include "ai/primitive/move_primitive.h"
+#include "ai/primitive/pivot_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 
-class MoveIntent : public Intent, public MovePrimitive
+class PivotIntent : public Intent, public PivotPrimitive
 {
    public:
     static const std::string INTENT_NAME;
     /**
-     * Creates a new Move Intent
+     * Creates a new Pivot Intent
      *
      * @param robot_id The id of the robot that this Intent is for
      * @param dest The destination of the Movement
@@ -18,8 +18,8 @@ class MoveIntent : public Intent, public MovePrimitive
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
      */
-    explicit MoveIntent(unsigned int robot_id, const Point &dest,
-                        const Angle &final_angle, double final_speed);
+    explicit PivotIntent(unsigned int robot_id, const Point &pivot_point,
+                         const Angle &final_angle, const double pivot_radius);
 
     std::string getIntentName(void) const override;
 };
