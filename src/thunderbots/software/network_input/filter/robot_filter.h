@@ -12,26 +12,26 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
-typedef struct
+typedef struct SSLRobotData_t
 {
     unsigned int id;
     Point position;
     Angle orientation;
     double confidence;
-    double timestamp;
-} SSLRobotData;
+    Timestamp timestamp;
+} SSLRobotDetection;
 
 /**
  * A lightweight datatype used to pass filtered robot data
  */
-typedef struct
+typedef struct FilteredRobotData_t
 {
     unsigned int id;
     Point position;
     Vector velocity;
     Angle orientation;
     AngularVelocity angular_velocity;
-    AITimestamp timestamp;
+    Timestamp timestamp;
 } FilteredRobotData;
 
 class RobotFilter
@@ -54,7 +54,8 @@ class RobotFilter
      *
      * @return The filtered data for the robot
      */
-    FilteredRobotData getFilteredData(const std::vector<SSLRobotData> &new_robot_data);
+    FilteredRobotData getFilteredData(
+        const std::vector<SSLRobotDetection> &new_robot_data);
 
     /**
      * Returns the id of the Robot that this filter is filtering for

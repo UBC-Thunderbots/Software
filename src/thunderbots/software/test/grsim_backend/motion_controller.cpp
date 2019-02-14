@@ -1,5 +1,7 @@
 #include "grsim_communication/motion_controller/motion_controller.h"
 
+#include <chrono>
+
 #include "geom/angle.h"
 #include "gtest/gtest.h"
 #include "shared/constants.h"
@@ -25,15 +27,12 @@ class MotionControllerTest : public ::testing::Test
    protected:
     void SetUp() override
     {
-        auto epoch       = time_point<std::chrono::steady_clock>();
-        auto since_epoch = std::chrono::seconds(10000);
-
-        // An arbitrary fixed point in time. 10000 seconds after the epoch.
+        // An arbitrary fixed point in time
         // We use this fixed point in time to make the tests deterministic.
-        current_time = epoch + since_epoch;
+        current_time = Timestamp::fromSeconds(300);
     }
 
-    steady_clock::time_point current_time;
+    Timestamp current_time;
 
     double calculateVelocityTolerance(double velocity)
     {
@@ -693,6 +692,49 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
                 POSITION_TOLERANCE);
     EXPECT_NEAR(robot.angularVelocity().toRadians(), final_angular_speed.toRadians(),
                 POSITION_TOLERANCE);
+}
+
+TEST_F(MotionControllerTest,
+       wrong_direction_impulse_while_close_to_destination_small_initial_velocity_test)
+{
+    // basic sanity test to make sure we don't continue accelerating in the wrong
+    // direction when we accelerate slightly in the opposite direction of the destination
+    // https://github.com/UBC-Thunderbots/Software/issues/270
+
+    // we need to test the case that we have a small velocity away from the destination
+    // while we are trying to accelerate toward the destination
+    Vector initial_velocity(-0.1, 0);
+    Robot robot             = Robot(0, Point(0, 0), initial_velocity, Angle::ofRadians(0),
+                        AngularVelocity::ofRadians(0), current_time);
+    const double delta_time = TIME_STEP;
+    Point destination       = Point(0.1, 0);
+    Angle destination_angle = Angle::ofRadians(0);
+
+    MotionController::Velocity robot_velocities =
+        MotionController::bangBangVelocityController(robot, destination, 2,
+                                                     destination_angle, delta_time);
+    // if the destination is on the +x side of the robot, the velocity should always have
+    // x > 0
+    EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
+}
+
+TEST_F(MotionControllerTest,
+       wrong_direction_impulse_while_close_to_destination_large_initial_velocity_test)
+{
+    // same as above, test with a large initial velocity this time
+    Vector initial_velocity(-2, 0);
+    Robot robot             = Robot(0, Point(0, 0), initial_velocity, Angle::ofRadians(0),
+                        AngularVelocity::ofRadians(0), current_time);
+    const double delta_time = TIME_STEP;
+    Point destination       = Point(0.1, 0);
+    Angle destination_angle = Angle::ofRadians(0);
+
+    MotionController::Velocity robot_velocities =
+        MotionController::bangBangVelocityController(robot, destination, 2,
+                                                     destination_angle, delta_time);
+    // if the destination is on the +x side of the robot, the velocity should always have
+    // x > 0
+    EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
 }
 
 int main(int argc, char **argv)

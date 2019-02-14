@@ -2,7 +2,7 @@
 
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
-             std::chrono::steady_clock::time_point timestamp)
+             const Timestamp &timestamp)
     : id_(id),
       position_(position),
       velocity_(velocity),
@@ -15,12 +15,12 @@ Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
 void Robot::updateState(const Point &new_position, const Vector &new_velocity,
                         const Angle &new_orientation,
                         const AngularVelocity &new_angular_velocity,
-                        std::chrono::steady_clock::time_point timestamp)
+                        const Timestamp &timestamp)
 {
     if (timestamp < last_update_timestamp)
     {
         throw std::invalid_argument(
-            "Error: State of ball is updating times from the past");
+            "Error: State of robot is updating times from the past");
     }
 
     position_             = new_position;
@@ -43,7 +43,7 @@ void Robot::updateState(const Robot &new_robot_data)
                 new_robot_data.lastUpdateTimestamp());
 }
 
-void Robot::updateStateToPredictedState(std::chrono::steady_clock::time_point timestamp)
+void Robot::updateStateToPredictedState(const Timestamp &timestamp)
 {
     if (timestamp < last_update_timestamp)
     {
@@ -51,19 +51,18 @@ void Robot::updateStateToPredictedState(std::chrono::steady_clock::time_point ti
             "Error: Predicted state is updating times from the past");
     }
 
-    auto milliseconds_in_future = std::chrono::duration_cast<std::chrono::milliseconds>(
-        timestamp - last_update_timestamp);
-    Point new_position    = estimatePositionAtFutureTime(milliseconds_in_future);
-    Vector new_velocity   = estimateVelocityAtFutureTime(milliseconds_in_future);
-    Angle new_orientation = estimateOrientationAtFutureTime(milliseconds_in_future);
+    Duration duration_in_future = timestamp - last_update_timestamp;
+    Point new_position          = estimatePositionAtFutureTime(duration_in_future);
+    Vector new_velocity         = estimateVelocityAtFutureTime(duration_in_future);
+    Angle new_orientation       = estimateOrientationAtFutureTime(duration_in_future);
     AngularVelocity new_angular_velocity =
-        estimateAngularVelocityAtFutureTime(milliseconds_in_future);
+        estimateAngularVelocityAtFutureTime(duration_in_future);
 
     updateState(new_position, new_velocity, new_orientation, new_angular_velocity,
                 timestamp);
 }
 
-std::chrono::steady_clock::time_point Robot::lastUpdateTimestamp() const
+Timestamp Robot::lastUpdateTimestamp() const
 {
     return last_update_timestamp;
 }
@@ -78,10 +77,9 @@ Point Robot::position() const
     return position_;
 }
 
-Point Robot::estimatePositionAtFutureTime(
-    const std::chrono::milliseconds &milliseconds_in_future) const
+Point Robot::estimatePositionAtFutureTime(const Duration &duration_in_future) const
 {
-    if (milliseconds_in_future < std::chrono::milliseconds(0))
+    if (duration_in_future < Duration::fromSeconds(0))
     {
         throw std::invalid_argument(
             "Error: Position estimate is updating times from the past");
@@ -90,9 +88,7 @@ Point Robot::estimatePositionAtFutureTime(
     // TODO: This is a simple linear implementation that does not necessarily reflect
     // real-world behavior. Position prediction should be improved as outlined in
     // https://github.com/UBC-Thunderbots/Software/issues/50
-    typedef std::chrono::duration<double> double_seconds;
-    double seconds_in_future =
-        std::chrono::duration_cast<double_seconds>(milliseconds_in_future).count();
+    double seconds_in_future = duration_in_future.getSeconds();
     return position_ + velocity_.norm(velocity_.len() * seconds_in_future);
 }
 
@@ -101,10 +97,9 @@ Vector Robot::velocity() const
     return velocity_;
 }
 
-Vector Robot::estimateVelocityAtFutureTime(
-    const std::chrono::milliseconds &milliseconds_in_future) const
+Vector Robot::estimateVelocityAtFutureTime(const Duration &duration_in_future) const
 {
-    if (milliseconds_in_future < std::chrono::milliseconds(0))
+    if (duration_in_future < Duration::fromSeconds(0))
     {
         throw std::invalid_argument(
             "Error: Velocity estimate is updating times from the past");
@@ -121,10 +116,9 @@ Angle Robot::orientation() const
     return orientation_;
 }
 
-Angle Robot::estimateOrientationAtFutureTime(
-    const std::chrono::milliseconds &milliseconds_in_future) const
+Angle Robot::estimateOrientationAtFutureTime(const Duration &duration_in_future) const
 {
-    if (milliseconds_in_future < std::chrono::milliseconds(0))
+    if (duration_in_future < Duration::fromSeconds(0))
     {
         throw std::invalid_argument(
             "Error: Orientation estimate is updating times from the past");
@@ -133,9 +127,7 @@ Angle Robot::estimateOrientationAtFutureTime(
     // TODO: This is a simple linear implementation that does not necessarily reflect
     // real-world behavior. Orientation prediction should be improved as outlined in
     // https://github.com/UBC-Thunderbots/Software/issues/50
-    typedef std::chrono::duration<double> double_seconds;
-    double seconds_in_future =
-        std::chrono::duration_cast<double_seconds>(milliseconds_in_future).count();
+    double seconds_in_future = duration_in_future.getSeconds();
     return orientation_ + angularVelocity_ * seconds_in_future;
 }
 
@@ -145,9 +137,9 @@ AngularVelocity Robot::angularVelocity() const
 }
 
 AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
-    const std::chrono::milliseconds &milliseconds_in_future) const
+    const Duration &duration_in_future) const
 {
-    if (milliseconds_in_future < std::chrono::milliseconds(0))
+    if (duration_in_future < Duration::fromSeconds(0))
     {
         throw std::invalid_argument(
             "Error: Angular velocity estimate is updating times from the past");

@@ -1,63 +1,60 @@
-#include "robot_team_filter.h"
+#include "network_input/filter/robot_team_filter.h"
 
 #include <algorithm>
-#include <iomanip>
+#include <cmath>
 #include <vector>
 
-#include "robot_filter.h"
 
 RobotTeamFilter::RobotTeamFilter() {}
 
-std::vector<FilteredRobotData> RobotTeamFilter::getFilteredData(
-    const std::vector<SSLRobotData> &new_team_data)
+Team RobotTeamFilter::getFilteredData(
+    const Team &current_team_state,
+    const std::vector<SSLRobotDetection> &new_robot_detections)
 {
-    std::vector<FilteredRobotData> result;
+    Team new_team_state = current_team_state;
 
-    for (auto new_robot_data : new_team_data)
+    for (auto robot_detection : new_robot_detections)
     {
-        if (robot_map.count(new_robot_data.id) == 0)
+        if (new_team_state.getRobotById(robot_detection.id))
         {
-            robot_map.insert(std::make_pair(
-                new_robot_data.id,
-                RobotData(new_robot_data.position, new_robot_data.orientation,
-                          new_robot_data.timestamp)));
-        }
-        else
-        {
-            double time_difference = std::fabs(new_robot_data.timestamp -
-                                               robot_map.at(new_robot_data.id).timestamp);
-            // If the time difference is 0, we have already received and processed this
-            // data. Do nothing so we do not calculate false values
-            if (time_difference == 0)
+            Robot previous_robot_state =
+                *current_team_state.getRobotById(robot_detection.id);
+
+            // Discard any data with an older timestamp. It's likely from a frame that
+            // hasn't been updated yet
+            if (previous_robot_state.lastUpdateTimestamp() >= robot_detection.timestamp)
             {
                 continue;
             }
+            Duration time_diff =
+                robot_detection.timestamp - previous_robot_state.lastUpdateTimestamp();
 
-            // Calculate velocities based on previous values
-            Vector robot_velocity =
-                (new_robot_data.position - robot_map.at(new_robot_data.id).position) /
-                time_difference;
-            AngularVelocity robot_angular_velocity =
-                (new_robot_data.orientation -
-                 robot_map.at(new_robot_data.id).orientation) /
-                time_difference;
+            Vector new_robot_velocity =
+                robot_detection.position - previous_robot_state.position();
+            new_robot_velocity = new_robot_velocity.norm(new_robot_velocity.len() /
+                                                         time_diff.getSeconds());
 
-            // Update the robot data in the map
-            robot_map.at(new_robot_data.id) =
-                RobotData(new_robot_data.position, new_robot_data.orientation,
-                          new_robot_data.timestamp);
+            AngularVelocity new_robot_angular_velocity =
+                robot_detection.orientation - previous_robot_state.orientation();
+            new_robot_angular_velocity /= time_diff.getSeconds();
 
-            FilteredRobotData filtered_data;
-            filtered_data.position         = new_robot_data.position;
-            filtered_data.velocity         = robot_velocity;
-            filtered_data.orientation      = new_robot_data.orientation;
-            filtered_data.angular_velocity = robot_angular_velocity;
-            filtered_data.timestamp        = Timestamp::getTimestampNow();
-            filtered_data.id               = new_robot_data.id;
+            Robot new_robot_state =
+                Robot(robot_detection.id, robot_detection.position, new_robot_velocity,
+                      robot_detection.orientation, new_robot_angular_velocity,
+                      robot_detection.timestamp);
 
-            result.push_back(filtered_data);
+            new_team_state.updateRobots({new_robot_state});
+        }
+        else
+        {
+            Robot new_robot_state =
+                Robot(robot_detection.id, robot_detection.position, Vector(69, 69),
+                      robot_detection.orientation, AngularVelocity::zero(),
+                      robot_detection.timestamp);
+
+            new_team_state.updateRobots({new_robot_state});
         }
     }
 
-    return result;
+    return new_team_state;
 }

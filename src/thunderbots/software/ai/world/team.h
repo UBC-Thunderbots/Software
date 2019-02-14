@@ -1,12 +1,12 @@
 #pragma once
 
-#include <chrono>
 #include <cstdlib>
 #include <map>
 #include <optional>
 #include <vector>
 
 #include "ai/world/robot.h"
+#include "util/timestamp.h"
 
 
 /**
@@ -27,10 +27,10 @@ class Team
     /**
      * Create a new team
      *
-     * @param robot_expiry_buffer_milliseconds The number of milliseconds a robot must not
+     * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
      */
-    explicit Team(const std::chrono::milliseconds robot_expiry_buffer_milliseconds);
+    explicit Team(const Duration& robot_expiry_buffer_duration);
 
     /**
      * Updates this team with new robots.
@@ -61,8 +61,7 @@ class Team
      * @param timestamp The timestamp at which to update the team's state to. Must
      * be >= the last update timestamp of the robots on the team
      */
-    void updateStateToPredictedState(
-        const std::chrono::steady_clock::time_point timestamp);
+    void updateStateToPredictedState(const Timestamp& timestamp);
 
     /**
      * Removes expired robots from the team. Robots are expired if it has been more than
@@ -74,7 +73,7 @@ class Team
      *
      * @param timestamp The timestamp for when this removal is taking place
      */
-    void removeExpiredRobots(const std::chrono::steady_clock::time_point timestamp);
+    void removeExpiredRobots(const Timestamp& timestamp);
 
     /**
      * Assigns the goalie for this team, making it the robot with the newly given id.
@@ -102,23 +101,22 @@ class Team
     std::size_t numRobots() const;
 
     /**
-     * Returns the number of milliseconds a Robot must not have been updated for before
+     * Returns the Duration for which a Robot must not have been updated for before
      * being removed from this team.
      *
-     * @return the number of milliseconds a Robot must not have been updated for before
+     * @return the Duration for which a Robot must not have been updated for before
      * being removed from this team.
      */
-    std::chrono::milliseconds getRobotExpiryBufferMilliseconds();
+    Duration getRobotExpiryBufferDuration() const;
 
     /**
-     * Sets the number of milliseconds a Robot must not have been updated for before being
+     * Sets the Duration for which a Robot must not have been updated for before being
      * removed from this team.
      *
-     * @param new_robot_expiry_buffer_milliseconds the number of milliseconds a Robot must
+     * @param new_robot_expiry_buffer_duration the Duration for which a Robot must
      * not have been updated for before being removed from this team.
      */
-    void setRobotExpiryBuffer(
-        std::chrono::milliseconds new_robot_expiry_buffer_milliseconds);
+    void setRobotExpiryBuffer(const Duration& new_robot_expiry_buffer_duration);
 
     /**
      * Returns the robot with the given id. If this team does not have that robot,
@@ -139,6 +137,15 @@ class Team
      * returns std::nullopt
      */
     std::optional<Robot> goalie() const;
+
+    /**
+     * Returns the ID of the goalie for this team, if one has been specified. Otherwise
+     * returns std::nullopt
+     *
+     * @return The ID of the goalie robot for this team if one is specified, otherwise
+     * returns std::nullopt
+     */
+    std::optional<unsigned int> getGoalieID() const;
 
     /**
      * Returns a vector of all the robots on this team.
@@ -177,7 +184,7 @@ class Team
     // The robot id of the goalie for this team
     std::optional<unsigned int> goalie_id;
 
-    // The number of milliseconds a Robot must not have been updated for before
+    // The duration for which a Robot must not have been updated for before
     // being removed from this team.
-    std::chrono::milliseconds robot_expiry_buffer_milliseconds;
+    Duration robot_expiry_buffer_duration;
 };

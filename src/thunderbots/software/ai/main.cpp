@@ -20,12 +20,12 @@
 namespace
 {
     // Initialize our AI, which is the main object that maintains state
-    AI ai = AI(
-        World(Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector()),
-              Team(std::chrono::milliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
-              Team(std::chrono::milliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
+    AI ai = AI(World(
+        Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
+        Team(Duration::fromMilliseconds(
+            Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+        Team(Duration::fromMilliseconds(
+            Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))));
 }  // namespace
 
 // Callbacks to update the state of the world
@@ -117,7 +117,9 @@ int main(int argc, char **argv)
             // to let the AI update its predictors so that decisions are always made with
             // the most up to date predicted data (eg. future Robot or Ball position),
             // even if some time has passed since the AI's state was last updated.
-            AITimestamp timestamp = Timestamp::getTimestampNow();
+            // TODO: This is a placeholder timestamp. It should be removed as part of
+            // https://github.com/UBC-Thunderbots/Software/issues/227
+            Timestamp timestamp = Timestamp::fromSeconds(0);
             std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
                 ai.getPrimitives(timestamp);
 

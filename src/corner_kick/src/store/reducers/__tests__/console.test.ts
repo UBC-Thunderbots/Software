@@ -3,10 +3,9 @@
  * Each test case has a description of what it tests
  */
 
-import { TOPIC_ROSOUT } from 'SRC/constants';
 import { IMessagesState } from 'SRC/types';
 
-import * as ros from '../../actions/ros';
+import { actions } from '../../actions';
 import consoleReducer from '../console';
 
 const mockMessage = {
@@ -22,21 +21,24 @@ const mockMessage = {
 describe('console reducer', () => {
     describe('when we receive action ros_NEW_MESSAGE', () => {
         it('should push messages to the state', () => {
-            const mockAction = ros.newMessage(TOPIC_ROSOUT, mockMessage);
+            const mockAction = actions.console.newRosoutMessage(mockMessage);
 
             const state = consoleReducer(undefined, mockAction);
 
-            expect(state.messages).toEqual([mockMessage]);
+            expect(state.rosout).toEqual([mockMessage]);
         });
     });
     describe('when we receive other actions', () => {
         it('should return state from action payload', () => {
-            const mockAction = ros.connected();
+            const mockAction = {
+                payload: null,
+                type: 'test_ACTION',
+            };
             const mockState: IMessagesState = {
-                messages: [mockMessage],
+                rosout: [mockMessage],
             };
 
-            const state = consoleReducer(mockState, mockAction);
+            const state = consoleReducer(mockState, mockAction as any);
 
             expect(state).toEqual(mockState);
         });

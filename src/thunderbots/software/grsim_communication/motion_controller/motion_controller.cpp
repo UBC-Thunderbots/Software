@@ -14,10 +14,9 @@
 #include "grsim_communication/motion_controller/motion_controller.h"
 
 #include <algorithm>
-#include <chrono>
 
 #include "shared/constants.h"
-
+#include "util/logger/init.h"
 
 MotionController::Velocity MotionController::bangBangVelocityController(
     const Robot robot, const Point dest, const double desired_final_speed,
@@ -85,21 +84,13 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     double max_magnitude_of_velocity_to_apply =
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time;
 
-    // Calculate a vector from the robot to the destination
-    Vector vector_to_dest = dest - robot.position();
+    // Calculate a unit vector from the robot to the destination
+    Vector unit_vector_to_dest = (dest - robot.position()).norm();
 
-    // Calculate the component of our current velocity pointing towards the destination
-    double magnitude_of_robot_velocity_towards_dest =
-        robot.velocity().len() *
-        (vector_to_dest.orientation() - robot.velocity().orientation()).cos();
-    Vector robot_velocity_towards_dest =
-        vector_to_dest.norm(magnitude_of_robot_velocity_towards_dest);
-
-    // Calculate the vector required to counteract our movement perpendicular to the
-    // vector towards the dest. This "pushes" us onto a velocity vector straight towards
-    // the destination
+    // Calculate the vector of our velocity perpendicular to the vector toward the
+    // destination
     Vector robot_velocity_perpendicular_to_dest =
-        robot.velocity() - robot_velocity_towards_dest;
+        robot.velocity().dot(unit_vector_to_dest.perp()) * unit_vector_to_dest.perp();
 
     // Use the "remaining" velocity (based on physical limits) to move us along the vector
     // towards the destination
@@ -107,7 +98,7 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
         std::max<double>(0, max_magnitude_of_velocity_to_apply -
                                 robot_velocity_perpendicular_to_dest.len());
     Vector additional_velocity_towards_dest =
-        vector_to_dest.norm(magnitude_additional_velocity_towards_dest);
+        magnitude_additional_velocity_towards_dest * unit_vector_to_dest;
 
     // The resulting additional velocity to apply to the robot is the velocity required to
     // counteract our movement perpendicular to the vector towards the destination, with
@@ -121,10 +112,27 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     double new_robot_velocity_magnitude =
         std::sqrt(std::max<double>((dest - robot.position()).len() - 0.01, 0)) * 2 +
         desired_final_speed;
-    new_robot_velocity_magnitude = std::clamp<double>(new_robot_velocity_magnitude, 0,
+
+    // https://github.com/UBC-Thunderbots/Software/issues/270
+    // Check for the case where we are moving away from the target AND the additional
+    // velocity is greater in magnitude than the current velocity, as the above
+    // function will increase in magnitude as the distance to the destination increases
+
+    bool moving_away_from_dest =
+        (robot.velocity().orientation() - unit_vector_to_dest.orientation())
+            .angleMod()
+            .abs() > Angle::quarter();
+
+    if (moving_away_from_dest && additional_velocity.len() < robot.velocity().len())
+    {
+        new_robot_velocity_magnitude *= -1;
+    }
+    new_robot_velocity_magnitude = std::clamp<double>(new_robot_velocity_magnitude,
+                                                      -ROBOT_MAX_SPEED_METERS_PER_SECOND,
                                                       ROBOT_MAX_SPEED_METERS_PER_SECOND);
+
     Vector new_robot_velocity =
-        (robot.velocity() + additional_velocity).norm(new_robot_velocity_magnitude);
+        new_robot_velocity_magnitude * (robot.velocity() + additional_velocity).norm();
 
     // Translate velocities into robot coordinates
     Vector new_robot_velocity_in_robot_coordinates =

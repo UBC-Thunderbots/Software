@@ -4,14 +4,14 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
-#include "ai/primitive/chip_primitive.h"
+#include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
-#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "geom/point.h"
 #include "grsim_communication/grsim_backend.h"
+#include "grsim_communication/motion_controller/motion_controller.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/ros_messages.h"
@@ -31,8 +31,8 @@ namespace
     // the Primitives in grSim
     std::vector<std::unique_ptr<Primitive>> primitives;
 
-    Team friendly_team = Team(std::chrono::milliseconds(1000));
-    Ball ball          = Ball(Point(0, 0), Vector());
+    Team friendly_team = Team(Duration::fromMilliseconds(1000));
+    Ball ball          = Ball(Point(0, 0), Vector(), Timestamp::fromSeconds(0));
 }  // namespace
 
 // Callbacks
@@ -93,7 +93,6 @@ int main(int argc, char** argv)
     {
         // Clear all primitives each tick
         primitives.clear();
-
 
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
