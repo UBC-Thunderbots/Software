@@ -13,5 +13,5 @@ namespace Evaluation
      *
      * @return Robot that is closest to the reference point.
      */
-    Robot nearest_friendly(Team friendly_team, Point ref_point);
+    Robot nearest_friendly(const Team friendly_team, const Point ref_point);
 };

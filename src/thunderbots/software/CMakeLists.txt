@@ -232,7 +232,7 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
     #gtest
-    #[[catkin_add_gtest(geom_angle_test
+    catkin_add_gtest(geom_angle_test
             test/geom/angle.cpp
             geom/angle.h
             )
@@ -650,9 +650,6 @@ if (CATKIN_ENABLE_TESTING)
             util/timestamp.cpp
             )
 
-    target_link_libraries(timestamp_test ${catkin_LIBRARIES})]]
-
-
     target_link_libraries(timestamp_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(deflect_off_enemy_target_test
@@ -681,7 +678,6 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(evaluation_nearest_friendly_robot_test
             test/evaluation/team.cpp
-            ai/hl/stp/evaluation/team.h
             ai/hl/stp/evaluation/team.cpp
             ai/world/team.cpp
             ai/world/robot.cpp

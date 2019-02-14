@@ -1,7 +1,7 @@
 
-#include "ai/hl/stp/evaluation/team.h"
-
 #include <gtest/gtest.h>
+
+#include "ai/hl/stp/evaluation/team.h"
 
 //using namespace Evaluation;
 
@@ -20,7 +20,7 @@ TEST_F(EvaluationTeamTest, one_robot)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
-    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(), Angle::half(),
                           AngularVelocity::threeQuarter(), current_time);
 
     Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
@@ -30,8 +30,6 @@ TEST_F(EvaluationTeamTest, one_robot)
                           AngularVelocity::half(), current_time);
 
     team.updateRobots({robot_0, robot_1});
-
-//    nearest_friendly(team, Point(0,0));
 
     EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0,0)));
 }
