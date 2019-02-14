@@ -2,7 +2,7 @@
 
 #include "geom/util.h"
 
-/* Notes on the weights and evaluation:
+/* Notes on the weights and Evaluation:
  * - PREDICTION_WEIGHT should always be greater than PREVIOUS_BALL_WEIGHT
  * because
  *   in the case where there is no vision detection, we want to take the
