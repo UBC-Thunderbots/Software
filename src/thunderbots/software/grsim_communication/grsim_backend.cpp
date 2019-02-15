@@ -85,7 +85,7 @@ grSim_Packet GrSimBackend::setBallState(Point destination, Vector velocity)
     ball_replacement->set_y(destination.y());
     ball_replacement->set_vx(velocity.x());
     ball_replacement->set_vy(velocity.y());
-    return packet;
+    sendGrSimPacket(packet);
 }
 
 grSim_Packet GrSimBackend::createGrSimPacketWithRobotVelocity(
