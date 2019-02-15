@@ -222,6 +222,20 @@ class Field
     double boundaryWidth() const;
 
     /**
+     * Returns whether p is in the friendly defense area
+     *
+     * @returns true if point p is in friendly defense area
+     */
+    bool pointInFriendlyDefenseArea(const Point p) const;
+
+    /**
+     * Returns whether p is in the enemy defense area
+     *
+     * @returns true if point p is in enemy defense area
+     */
+    bool pointInEnemyDefenseArea(const Point p) const;
+
+    /**
      * Compares two fields for equality
      *
      * @param other the field to compare to

@@ -46,13 +46,13 @@ void SSLVisionClient::handleDataReception(const boost::system::error_code& error
         // This function will be run for EVERY packet received from the network since the
         // last time poll() was called. This means that this function may be called
         // several times to process several packets. This is why we immediately store any
-        // received and processed data into the packet_queue. If we didn't save the
+        // received and processed data into the packet_vector. If we didn't save the
         // received data somewhere else, the data would be overwritten by the packet
         // being handled in the next handleDataReception function call
         auto packet_data = SSL_WrapperPacket();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
-        packet_queue.emplace(packet_data);
+        packet_vector.emplace_back(packet_data);
 
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
@@ -76,20 +76,20 @@ void SSLVisionClient::handleDataReception(const boost::system::error_code& error
     }
 }
 
-const std::queue<SSL_WrapperPacket> SSLVisionClient::getVisionPacketQueue()
+const std::vector<SSL_WrapperPacket> SSLVisionClient::getVisionPacketVector()
 {
     // Calling the poll() function will cause a handleDataReception() function to run for
     // EVERY packet of data that was received since the last time poll() was called.
     // Note that handleDataReception() may run multiple times in order to handle the
     // multiple received packets. This is why we move the data from the buffer into the
-    // packet_queue, so that any subsequent handleDataReception() calls do not overwrite
+    // packet_vector, so that any subsequent handleDataReception() calls do not overwrite
     // the data
     io_service.poll();
 
     // Make a copy of the data to return
-    std::queue<SSL_WrapperPacket> packet_queue_copy = packet_queue;
-    // Clear the packet_queue
-    packet_queue = {};
+    std::vector<SSL_WrapperPacket> packet_vector_copy = packet_vector;
+    // Clear the packet_vector
+    packet_vector.clear();
 
-    return packet_queue_copy;
+    return packet_vector_copy;
 }
