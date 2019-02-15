@@ -1,13 +1,13 @@
 
-#include <gtest/gtest.h>
-
 #include "ai/hl/stp/evaluation/team.h"
 
-//using namespace Evaluation;
+#include <gtest/gtest.h>
+
+// using namespace Evaluation;
 
 class EvaluationTeamTest : public ::testing::Test
 {
-protected:
+   protected:
     void SetUp() override
     {
         current_time = Timestamp::fromSeconds(123);
@@ -26,7 +26,7 @@ TEST_F(EvaluationTeamTest, one_robot)
 
     team.updateRobots({robot_0});
 
-    EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0,0)));
+    EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
 TEST_F(EvaluationTeamTest, multiple_robots)
@@ -45,7 +45,7 @@ TEST_F(EvaluationTeamTest, multiple_robots)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0,0)));
+    EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
 TEST_F(EvaluationTeamTest, multiple_robots_closest_is_moving)
@@ -64,7 +64,7 @@ TEST_F(EvaluationTeamTest, multiple_robots_closest_is_moving)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0,0)));
+    EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
 TEST_F(EvaluationTeamTest, multiple_robots_all_moving)
@@ -83,7 +83,7 @@ TEST_F(EvaluationTeamTest, multiple_robots_all_moving)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_2, Evaluation::nearest_friendly(team, Point(0,0)));
+    EXPECT_EQ(robot_2, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
 TEST_F(EvaluationTeamTest, one_robot_on_ball)
@@ -102,7 +102,7 @@ TEST_F(EvaluationTeamTest, one_robot_on_ball)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0,0)));
+    EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
 int main(int argc, char **argv)

@@ -3,7 +3,6 @@
 
 Robot Evaluation::nearest_friendly(const Team friendly_team, const Point ref_point)
 {
-
     unsigned nearestRobotId = friendly_team.getAllRobots()[0].id();
     double minDist = (ref_point - friendly_team.getAllRobots()[0].position()).len();
 
@@ -13,7 +12,7 @@ Robot Evaluation::nearest_friendly(const Team friendly_team, const Point ref_poi
         if (curDistance < minDist)
         {
             nearestRobotId = curRobot.id();
-            minDist = curDistance;
+            minDist        = curDistance;
         }
     }
 
