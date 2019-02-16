@@ -1,8 +1,14 @@
 #include "ai/hl/stp/evaluation/team.h"
 
 
-Robot Evaluation::nearest_friendly(const Team friendly_team, const Point ref_point)
+std::optional<Robot> Evaluation::nearest_friendly(const Team friendly_team,
+                                                  const Point ref_point)
 {
+    if (friendly_team.getAllRobots().empty())
+    {
+        return std::nullopt;
+    }
+
     unsigned nearestRobotId = friendly_team.getAllRobots()[0].id();
     double minDist = (ref_point - friendly_team.getAllRobots()[0].position()).len();
 

@@ -105,6 +105,13 @@ TEST_F(EvaluationTeamTest, one_robot_on_ball)
     EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
+TEST_F(EvaluationTeamTest, zero_robots)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    EXPECT_EQ(std::nullopt, Evaluation::nearest_friendly(team, Point(0, 0)));
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
