@@ -473,7 +473,8 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     std::optional<RadioPrimitive> r_prim = visitor.getSerializedRadioPacket();
     if (!r_prim.has_value())
     {
-        throw std::invalid_argument("MRF Primitive Visitor was not called on a primitive");
+        throw std::invalid_argument(
+            "MRF Primitive Visitor was not called on a primitive");
     }
 
     // Encode the parameter words.
