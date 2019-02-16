@@ -676,8 +676,8 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(indirect_chip_and_chase_evaluation_test
-            # To be added: test/evaluation/indirect_chip_and_chase.cpp
+    catkin_add_gtest(indirect_chip_and_chase_target_evaluation_test
+            test/evaluation/indirect_chip_and_chase_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/indirect_chip.h
             ai/world/world.h
@@ -686,7 +686,7 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.h
             )
 
-    target_link_libraries(indirect_chip_and_chase_evaluation_test ${catkin_LIBRARIES})
+    target_link_libraries(indirect_chip_and_chase_target_evaluation_test ${catkin_LIBRARIES})
 
 endif()
 

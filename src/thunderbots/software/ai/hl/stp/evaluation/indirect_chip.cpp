@@ -168,8 +168,8 @@ std::vector<Triangle> Evaluation::remove_outofbounds_triangles(
     {
         Triangle t = triangles[i];
         center     = get_triangle_center_and_area(triangles[i]).first;
-        if (center.x() <= largest_x && center.x() >= smallest_x && center.y() <= largest_y &&
-            center.y() >= smallest_y)
+        if (center.x() <= largest_x && center.x() >= smallest_x &&
+            center.y() <= largest_y && center.y() >= smallest_y)
         {
             valid_triangles.push_back(t);
         }

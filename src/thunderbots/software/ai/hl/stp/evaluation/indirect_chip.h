@@ -1,6 +1,11 @@
 #include "ai/world/world.h"
 #include "geom/point.h"
 
+/**
+ * The indirect chip and chase target evaluation function returns a target point for the
+ * chipper and chaser. 
+ * Other related evaluation functions are also included in this file.
+ */
 namespace Evaluation
 {
     typedef Point Vector2;
@@ -26,6 +31,7 @@ namespace Evaluation
      * @param World Object
      *
      * @return Target point to chip and chase at
+     * @return valid Target is within reach 
      */
     std::pair<Point, bool> indirect_chip_and_chase_target(const World& world);
 
@@ -99,7 +105,7 @@ namespace Evaluation
      * @param min_edge_angle = 0
      *
      * @return Largest triangle
-     * @return true Largest triangle is found
+     * @return valid Largest triangle is found
      */
     std::pair<Triangle, bool> get_largest_triangle(std::vector<Triangle> allTriangles,
                                                    double min_area       = 0,
