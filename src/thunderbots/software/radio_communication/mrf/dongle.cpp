@@ -470,12 +470,16 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
     // Visit the primitive.
     prim->accept(visitor);
-    RadioPrimitive r_prim = visitor.getSerializedRadioPacket();
+    std::optional<RadioPrimitive> r_prim = visitor.getSerializedRadioPacket();
+    if (!r_prim.has_value())
+    {
+        throw std::invalid_argument("MRF Primitive Visitor was not called on a primitive");
+    }
 
     // Encode the parameter words.
-    for (std::size_t i = 0; i < r_prim.param_array.size(); ++i)
+    for (std::size_t i = 0; i < r_prim->param_array.size(); ++i)
     {
-        double value = r_prim.param_array[i];
+        double value = r_prim->param_array[i];
         switch (std::fpclassify(value))
         {
             case FP_NAN:
@@ -512,7 +516,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
     // Encode the movement primitive number.
     words[0] = static_cast<uint16_t>(words[0] |
-                                     static_cast<unsigned int>(r_prim.prim_type) << 12);
+                                     static_cast<unsigned int>(r_prim->prim_type) << 12);
 
     // Encode the charger state. TODO add this (#223)
     // switch (charger_state)
@@ -530,7 +534,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?
-    uint8_t extra = r_prim.extra_bits;
+    uint8_t extra = r_prim->extra_bits;
     bool slow     = false;
     assert(extra <= 127);
     uint8_t extra_encoded = static_cast<uint8_t>(extra | (slow ? 0x80 : 0x00));
