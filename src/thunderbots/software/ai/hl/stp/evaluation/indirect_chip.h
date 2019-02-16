@@ -77,7 +77,7 @@ namespace Evaluation
      * @param World Object
      * @param triangles
      *
-     * @return Valid triangless
+     * @return Valid triangles
      */
     std::vector<Triangle> remove_outofbounds_triangles(const World& world,
                                                        std::vector<Triangle> triangles);

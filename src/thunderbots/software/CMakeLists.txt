@@ -679,11 +679,17 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(indirect_chip_and_chase_target_evaluation_test
             test/evaluation/indirect_chip_and_chase_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
-            ai/hl/stp/evaluation/indirect_chip.h
-            ai/world/world.h
+            ai/world/world.cpp
+            ai/world/ball.cpp
+            util/timestamp.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
             geom/angle.h
             geom/point.h
-            geom/util.h
+            geom/util.cpp
+            test/test_util/test_util.cpp
             )
 
     target_link_libraries(indirect_chip_and_chase_target_evaluation_test ${catkin_LIBRARIES})
