@@ -3,7 +3,7 @@
 /**
  * This enum represents the IDs of the primitives implemented in firmware.
  */
-enum class PrimitiveType
+enum class FirmwarePrimitiveType
 {
     /**
      * Stop Primitive

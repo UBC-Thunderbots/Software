@@ -1,16 +1,17 @@
 #pragma once
 
+#include <optional>
+
 #include "ai/primitive/visitor/primitive_visitor.h"
-#include "shared/primitive_type.h"
+#include "shared/firmware_primitive_type.h"
 
 /**
  * This struct stores the components of a translated primitive to be sent over radio.
  */
-typedef struct _RadioPrimitive
+typedef struct RadioPrimitive_t
 {
-   public:
     // A numeric ID representing the primitive for firmware
-    PrimitiveType prim_type;
+    FirmwarePrimitiveType prim_type;
 
     // The parameter array to be encoded into the radio packet
     std::vector<double> param_array;
@@ -96,17 +97,16 @@ class MRFPrimitiveVisitor : public PrimitiveVisitor
 
     /**
      * Returns the most recent serialized packet created by this
-     * MRFPrimitiveVisitor. This is the radio packet created by
-     * one of the 'visit' functions
+     * MRFPrimitiveVisitor (std::nullopt if no packet has been created).
      *
-     * Calling this function before this Visitor has been called at least once has
-     * undefined behavior
+     * This is the radio packet created by one of the 'visit' functions.
      *
      * @return The most recent serialized packet created by this
      * MRFPrimitiveVisitor
      */
-    RadioPrimitive getSerializedRadioPacket();
+    std::optional<RadioPrimitive> getSerializedRadioPacket();
 
    private:
+    std::optional<RadioPrimitive> prim;
     RadioPrimitive r_prim;
 };
