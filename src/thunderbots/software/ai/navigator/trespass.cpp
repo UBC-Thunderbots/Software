@@ -2,7 +2,7 @@
 
 namespace Navigator
 {
-    namespace Tresspass
+    namespace Trespass
     {
     }
 }  // namespace Navigator
