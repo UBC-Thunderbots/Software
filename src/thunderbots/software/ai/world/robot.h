@@ -188,7 +188,7 @@ class Robot
 
    private:
     // The id of this robot
-    const unsigned int id_;
+    unsigned int id_;
     // The current position of the robot, with coordinates in metres
     Point position_;
     // The current velocity of the robot, in metres per second
