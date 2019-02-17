@@ -49,6 +49,10 @@ class MRFBackend
      */
     void send_vision_packet();
 
+
+    static void MRFBackend::handle_message(
+        int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi);
+
    private:
     MRFDongle dongle;
     std::vector<std::tuple<uint8_t, Point, Angle>> detbots;

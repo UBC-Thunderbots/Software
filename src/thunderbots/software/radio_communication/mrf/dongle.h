@@ -163,9 +163,9 @@ class MRFDongle final
     std::array<std::unique_ptr<USB::BulkInTransfer>, 32> message_transfers;
     USB::InterruptInTransfer status_transfer;
     std::list<std::unique_ptr<USB::BulkOutTransfer>> unreliable_messages;
-
     std::queue<uint8_t> free_message_ids;
     sigc::signal<void, uint8_t, uint8_t> signal_message_delivery_report;
+    void (*robot_msg_handler)(int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi);
 
     uint8_t alloc_message_id();
     void free_message_id(uint8_t id);

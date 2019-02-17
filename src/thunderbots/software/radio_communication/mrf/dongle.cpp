@@ -286,21 +286,14 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
     transfer.result();
-    // if (transfer.size() > 2)
-    // {
-    //     unsigned int robot = transfer.data()[0];
-    //     if (logger)
-    //     {
-    //         logger->log_mrf_message_in(
-    //             robot, transfer.data() + 1, transfer.size() - 3,
-    //             transfer.data()[transfer.size() - 2],
-    //             transfer.data()[transfer.size() - 1]);
-    //     }
-    //     robots[robot]->handle_message(
-    //         transfer.data() + 1, transfer.size() - 3,
-    //         transfer.data()[transfer.size() - 2],
-    //         transfer.data()[transfer.size() - 1]);
-    // }
+    if (transfer.size() > 2)
+    {
+        unsigned int robot = transfer.data()[0];
+        robot_msg_handler(robot, 
+            transfer.data() + 1, transfer.size() - 3,
+            transfer.data()[transfer.size() - 2],
+            transfer.data()[transfer.size() - 1]);
+    }
     transfer.submit();
 }
 
