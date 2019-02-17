@@ -12,6 +12,7 @@
 
 #include <ros/ros.h>
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <string>
@@ -19,6 +20,7 @@
 #include "geom/point.h"
 #include "thunderbots_msgs/DrawLayer.h"
 #include "thunderbots_msgs/DrawShape.h"
+#include "util/constants.h"
 
 
 // Forward declaration
@@ -33,6 +35,7 @@ namespace Util
     using LayerMsg    = thunderbots_msgs::DrawLayer;
     using LayerMsgMap = std::map<std::string, LayerMsg>;
     using ShapeMsg    = thunderbots_msgs::DrawShape;
+    using time_point  = std::chrono::time_point<std::chrono::system_clock>;
 
     class VisualizerMessenger
     {
@@ -189,7 +192,8 @@ namespace Util
         /**
          * Constructor; initializes an empty layers map then populates it
          */
-        explicit VisualizerMessenger() : layers_name_to_msg_map(), publisher()
+        explicit VisualizerMessenger()
+            : layers_name_to_msg_map(), publisher(), time_last_published()
         {
             buildLayers();
         }
@@ -230,6 +234,13 @@ namespace Util
         // string to LayerMsg map
         LayerMsgMap layers_name_to_msg_map;
         ros::Publisher publisher;
+
+        // Period in nanoseconds
+        const double DESIRED_PERIOD_MS =
+            1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
+
+        // Time point
+        time_point time_last_published;
     };
 
 }  // namespace Util
