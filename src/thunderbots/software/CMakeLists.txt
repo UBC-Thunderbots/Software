@@ -683,6 +683,29 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(move_action_test
+            test/action/move_action.cpp
+            ai/hl/stp/action/move_action.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/intent.cpp
+            ai/world/robot.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/timestamp.cpp
+            )
+    target_link_libraries(move_action_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
 endif()
 
 ##### ROSTests / Integration Tests #####
