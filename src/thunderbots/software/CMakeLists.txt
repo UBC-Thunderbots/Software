@@ -55,6 +55,11 @@ if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
 endif()
 message("g3log path: ${G3LOG}")
 
+# Find boost components
+find_package(Boost REQUIRED COMPONENTS
+        coroutine
+        )
+
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -88,6 +93,7 @@ include_directories(SYSTEM
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         )
@@ -135,6 +141,7 @@ add_executable (ai_logic
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ai_logic ${catkin_LIBRARIES}
+        ${Boost_LIBRARIES}
         ${G3LOG}
         )
 
