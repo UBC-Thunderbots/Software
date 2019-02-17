@@ -2,9 +2,10 @@
 
 #include "ai/intent/move_intent.h"
 
-MoveAction::MoveAction(const Robot& robot)
+MoveAction::MoveAction(const Robot& robot, double close_to_dest_threshold)
     :  // Robot has no default constructor, so must be initalized here
       robot(robot),
+      close_to_dest_threshold(close_to_dest_threshold),
       intent_sequence(boost::bind(&MoveAction::calculateNextIntent, this, _1))
 {
 }
@@ -35,8 +36,7 @@ std::unique_ptr<Intent> MoveAction::calculateNextIntent(
 {
     do
     {
-        auto mi = std::make_unique<MoveIntent>(robot.id(), destination, final_orientation,
-                                               final_speed);
-        yield(std::move(mi));
-    } while ((robot.position() - destination).len() > ROBOT_CLOSE_TO_DEST);
+        yield(std::make_unique<MoveIntent>(robot.id(), destination, final_orientation,
+                                           final_speed));
+    } while ((robot.position() - destination).len() > close_to_dest_threshold);
 }

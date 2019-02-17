@@ -10,7 +10,7 @@ TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot);
+    MoveAction action = MoveAction(robot, 0.05);
 
     auto intent_ptr =
         action.updateStateAndGetNextIntent(robot, Point(1, 0), Angle::quarter(), 1.0);
@@ -29,7 +29,7 @@ TEST(MoveActionTest, robot_at_destination)
 {
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot);
+    MoveAction action = MoveAction(robot, 0.02);
 
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
