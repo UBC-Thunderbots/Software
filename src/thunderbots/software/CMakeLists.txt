@@ -55,6 +55,11 @@ if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
 endif()
 message("g3log path: ${G3LOG}")
 
+# Find boost components
+find_package(Boost REQUIRED COMPONENTS
+        coroutine
+        )
+
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -88,6 +93,7 @@ include_directories(SYSTEM
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         )
@@ -135,6 +141,7 @@ add_executable (ai_logic
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ai_logic ${catkin_LIBRARIES}
+        ${Boost_LIBRARIES}
         ${G3LOG}
         )
 
@@ -712,16 +719,41 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(evaluation_nearest_friendly_robot_test
-            test/evaluation/team.cpp
-            ai/hl/stp/evaluation/team.cpp
-            ai/world/team.cpp
-            ai/world/robot.cpp
-            util/timestamp.cpp
-            geom/point.h
-            geom/angle.h
-            )
-
+    test/evaluation/team.cpp
+    ai/hl/stp/evaluation/team.cpp
+    ai/world/team.cpp
+    ai/world/robot.cpp
+    util/timestamp.cpp
+    geom/point.h
+    geom/angle.h
+    )
     target_link_libraries(evaluation_nearest_friendly_robot_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(move_action_test
+            test/action/move_action.cpp
+            ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/move_action.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/intent.cpp
+            ai/world/robot.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/timestamp.cpp
+            )
+    target_link_libraries(move_action_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
 
 endif()
 
