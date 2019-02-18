@@ -8,6 +8,9 @@ Tactic::Tactic(const Robot &robot)
 
 bool Tactic::done() const
 {
+    // If the coroutine "iterator" is done (ie. evaluates to false, has no more values
+    // to iterate), the calculateNextIntent function has completed and therefore
+    // the Tactic is done
     return !static_cast<bool>(intent_sequence);
 }
 

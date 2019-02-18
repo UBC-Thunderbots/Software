@@ -4,6 +4,7 @@
 
 #include "ai/hl/stp/action/action.h"
 #include "ai/intent/intent.h"
+#include "ai/world/field.h"
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot. For
@@ -21,7 +22,7 @@ class Tactic
      *
      * @param robot The robot that should perform this Tactic
      */
-    explicit Tactic(const Robot& robot);
+    explicit Tactic(const Robot &robot);
 
     /**
      * Returns true if the Tactic is done and false otherwise
@@ -31,16 +32,20 @@ class Tactic
     bool done() const;
 
     /**
-     * Evaluates the given Robot and returns a score indicating how optimal it would be
-     * for that Robot to perform this Tactic. A lower score indicates a more optimal
-     * robot, and returned score values must be >= 0.
+     * Calculates the cost of assigning the given robot to this Tactic. The returned cost
+     * value must be in the range [0, 1], with smaller values indicating a higher
+     * preference for the robot.
      *
-     * @param robot The Robot to evaluate for this Tactic
+     * For example, a tactic that wanted a robot to shoot the ball would return lower
+     * costs for robots closer to the ball than for robots far from the ball.
      *
-     * @return A score value >= 0 that indicates how optimal it would be for the given
-     * robot to perform this Tactic. Lower scores indicate more optimal/preferred robots.
+     * @param robot The Robot to calculate the cost for
+     * @param field The field the Robot is on
+     *
+     * @return A cost value in the range [0, 1] indicating the cost of assigning the given
+     * robot to this Tactic. Lower cost values indicate more preferred robots.
      */
-    virtual double evaluateRobot(const Robot& robot) = 0;
+    virtual double calculateRobotCost(const Robot &robot, const Field &field) = 0;
 
     virtual ~Tactic() = default;
 
@@ -84,7 +89,7 @@ class Tactic
      * signify the Tactic is done).
      */
     std::unique_ptr<Intent> calculateNextIntentWrapper(
-        intent_coroutine::push_type& yield);
+        intent_coroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Tactic. If the Tactic is done
@@ -97,5 +102,5 @@ class Tactic
      * If the Tactic is done, an empty/null unique pointer is returned.
      */
     virtual std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) = 0;
+        intent_coroutine::push_type &yield) = 0;
 };

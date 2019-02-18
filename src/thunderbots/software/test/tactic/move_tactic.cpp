@@ -5,6 +5,7 @@
 #include <boost/coroutine2/all.hpp>
 
 #include "ai/intent/move_intent.h"
+#include "test/test_util/test_util.h"
 
 TEST(MoveTacticTest, robot_far_from_destination)
 {
@@ -100,6 +101,7 @@ TEST(MoveActionTest, test_action_not_done)
 
 TEST(MoveActionTest, test_evaluate_robot_function)
 {
+    Field field = ::Test::TestUtil::createSSLDivBField();
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveTactic tactic = MoveTactic(robot);
@@ -107,7 +109,7 @@ TEST(MoveActionTest, test_evaluate_robot_function)
     auto intent_ptr =
         tactic.updateStateAndGetNextIntent(robot, Point(3, -4), Angle::zero(), 0.0);
 
-    EXPECT_EQ(5, tactic.evaluateRobot(robot));
+    EXPECT_EQ(5 / field.totalLength(), tactic.calculateRobotCost(robot, field));
 }
 
 int main(int argc, char **argv)

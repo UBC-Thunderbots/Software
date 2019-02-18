@@ -26,7 +26,7 @@ class MoveTactic : public Tactic
                                                         Angle final_orientation,
                                                         double final_speed);
 
-    double evaluateRobot(const Robot& robot) override;
+    double calculateRobotCost(const Robot& robot, const Field& field) override;
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(

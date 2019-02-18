@@ -1,5 +1,7 @@
 #include "ai/hl/stp/tactic/move_tactic.h"
 
+#include <algorithm>
+
 MoveTactic::MoveTactic(const Robot &robot) : Tactic(robot) {}
 
 std::unique_ptr<Intent> MoveTactic::updateStateAndGetNextIntent(const Robot &robot,
@@ -16,10 +18,13 @@ std::unique_ptr<Intent> MoveTactic::updateStateAndGetNextIntent(const Robot &rob
     return getNextIntent();
 }
 
-double MoveTactic::evaluateRobot(const Robot &robot)
+double MoveTactic::calculateRobotCost(const Robot &robot, const Field &field)
 {
     // Prefer robots closer to the destination
-    return (robot.position() - destination).len();
+    // We normalize with the total field length so that robots that are within the field
+    // have a cost less than 1
+    double cost = (robot.position() - destination).len() / field.totalLength();
+    return std::clamp<double>(cost, 0, 1);
 }
 
 std::unique_ptr<Intent> MoveTactic::calculateNextIntent(

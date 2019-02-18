@@ -768,6 +768,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(move_tactic_test
             test/tactic/move_tactic.cpp
+            test/test_util/test_util.cpp
             ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/hl/stp/action/move_action.cpp
@@ -786,9 +787,15 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/move_intent.cpp
             ai/intent/intent.cpp
             ai/world/robot.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/team.cpp
+            ai/world/game_state.cpp
+            ai/world/world.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(move_tactic_test
             ${catkin_LIBRARIES}
