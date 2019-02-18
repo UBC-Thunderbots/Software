@@ -8,7 +8,9 @@ namespace Util
 {
     namespace Constants
     {
-        // Constants for ROS nodes, message, and topics
+        //// Constants for ROS nodes, message, and topics
+
+        // Message Topics (NOTE: all topics are prefixed with the node they are *from*)
         static const std::string NETWORK_INPUT_BALL_TOPIC  = "backend/ball";
         static const std::string NETWORK_INPUT_FIELD_TOPIC = "backend/field";
         static const std::string NETWORK_INPUT_FRIENDLY_TEAM_TOPIC =
@@ -17,9 +19,11 @@ namespace Util
         static const std::string NETWORK_INPUT_GAMECONTROLLER_TOPIC =
             "backend/gamecontroller";
         static const std::string NETWORK_INPUT_WORLD_TOPIC   = "backend/world";
-        static const std::string AI_PRIMITIVES_TOPIC         = "backend/primitives";
+        static const std::string AI_PRIMITIVES_TOPIC         = "ai/primitives";
         static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
+        static const std::string PASSING_GRADIENT_DESCENT_PASS_TOPIC = "passing_gradient_descent/pass";
+        static const std::string AI_DESIRED_PASS_REGION = "ai/desired_pass_region";
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
