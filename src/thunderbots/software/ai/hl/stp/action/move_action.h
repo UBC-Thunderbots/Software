@@ -35,7 +35,8 @@ class MoveAction : public Action
      * @return A unique pointer to the Intent the MoveAction wants to run. If the
      * MoveAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(Robot robot, Point destination,
+    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
+                                                        Point destination,
                                                         Angle final_orientation,
                                                         double final_speed);
 
@@ -44,13 +45,8 @@ class MoveAction : public Action
         intent_coroutine::push_type& yield) override;
 
     // Action parameters
-    Robot robot;
     Point destination;
     Angle final_orientation;
     double final_speed;
     double close_to_dest_threshold;
-
-    // Variables to sore the Intent the Action wants to run, and the coroutine pull_type
-    std::unique_ptr<Intent> curr_intent;
-    intent_coroutine::pull_type intent_sequence;
 };

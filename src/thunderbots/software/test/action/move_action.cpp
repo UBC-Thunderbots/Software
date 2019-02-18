@@ -44,6 +44,60 @@ TEST(MoveActionTest, robot_at_destination)
     EXPECT_FALSE(intent_ptr);
 }
 
+TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(robot, 0.05);
+
+    // Run the Action several times
+    auto intent_ptr = std::unique_ptr<Intent>{};
+    for (int i = 0; i < 10; i++)
+    {
+        intent_ptr =
+            action.updateStateAndGetNextIntent(robot, Point(1, 0), Angle::quarter(), 1.0);
+    }
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_TRUE(intent_ptr);
+}
+
+TEST(MoveActionTest, test_action_done)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(robot, 0.05);
+
+    // Run the Action several times
+    auto intent_ptr = std::unique_ptr<Intent>{};
+    for (int i = 0; i < 5; i++)
+    {
+        intent_ptr =
+            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 0.0);
+    }
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_TRUE(action.done());
+}
+
+TEST(MoveActionTest, test_action_not_done)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(robot, 0.05);
+
+    // Run the Action several times
+    auto intent_ptr = std::unique_ptr<Intent>{};
+    for (int i = 0; i < 5; i++)
+    {
+        intent_ptr =
+            action.updateStateAndGetNextIntent(robot, Point(2, -1), Angle::zero(), 0.0);
+    }
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_FALSE(action.done());
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);

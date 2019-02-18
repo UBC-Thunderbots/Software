@@ -685,6 +685,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(move_action_test
             test/action/move_action.cpp
+            ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
