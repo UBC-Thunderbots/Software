@@ -110,6 +110,11 @@ private:
         // TODO: javadoc comment
         GradientDescentPass(std::array<double, NUM_OPTIMIZE_PARAMS> params) : Pass(params) {};
 
+        // TODO: javadoc comment
+        bool operator<(const GradientDescentPass other){
+            return ratePass(*this) < ratePass(other);
+        }
+
         // TODO: make sure this comment is still accuarate
         // These values are used for the concept of "momentum" in gradient descent
         // (https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum)
@@ -120,9 +125,6 @@ private:
         std::array<double, NUM_OPTIMIZE_PARAMS> past_gradient_averages;
         std::array<double, NUM_OPTIMIZE_PARAMS> past_squared_gradient_averages;
     };
-
-    static constexpr double eps = 1e-10;
-
     /**
      * Optimize the given pass for the given number of iterations using gradient descent
      *
@@ -135,18 +137,27 @@ private:
     PassingGradientDescent::GradientDescentPass optimizePass(GradientDescentPass pass);
 
     /**
-     * Approximate the gradient
-     * @param pass
-     * @param step_size
+     * Approximate the gradient for a given pass
+     * @param pass The pass to approximate the gradient around
      * @return
      */
     std::array<double, NUM_OPTIMIZE_PARAMS> approximateGradient(GradientDescentPass pass);
 
-    // The number of points to use for gradient descent
-    unsigned int num_gradient_descent_points;
+
+    // This constant is used to prevent division by 0 in our implementation of Adam
+    // (gradient descent)
+    static constexpr double eps = 1e-10;
+
+    // The number of paths to use for gradient descent. This is the number of paths
+    // that we will be trying to optimize at any given time
+    unsigned int num_gradient_descent_paths;
 
     // The step size to take when approximating the gradient
     double gradient_approx_step_size;
+
+    // The minimum pass quality that we would consider a "reasonable" path
+    // TODO: set this in the constructor
+    double min_reasonable_pass_quality;
 
     // The most recent world we know about
     World world;

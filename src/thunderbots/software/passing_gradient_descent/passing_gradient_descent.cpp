@@ -9,7 +9,7 @@
 using namespace PassingGradientDescent;
 
 PassingGradientDescent::PassingGradientDescent(unsigned int num_gradient_descent_points, double gradient_approx_step_size) :
-num_gradient_descent_points(num_gradient_descent_points),
+num_gradient_descent_paths(num_gradient_descent_points),
 gradient_approx_step_size(gradient_approx_step_size)
 {
 
@@ -25,19 +25,29 @@ void PassingGradientDescent::setPasserPoint(Point passer_point) {
 
 void PassingGradientDescent::runGradientDescent(unsigned int num_iterations) {
 
-    // Run gradient descent for the requested number of iterations
+    // Run gradient descent on each pass for the requested number of iterations
     for (GradientDescentPass& pass: passes_to_optimize){
         for (unsigned int i = 0; i < num_iterations; i++){
             pass = optimizePass(pass);
         }
     }
 
-    // Prune the least promising points and replace them with random points
-    // TODO
+    // Prune the least promising 1/2 of the paths
+    std::sort(passes_to_optimize.begin(), passes_to_optimize.end());
+    passes_to_optimize = std::vector<GradientDescentPass>(passes_to_optimize.begin(),
+            passes_to_optimize.begin() + passes_to_optimize.size()/2);
+
+    // Replace the paths we just removed
+    unsigned int num_paths_needed = num_gradient_descent_paths - passes_to_optimize.size();
+    std::vector<GradientDescentPass> new_paths = generatePaths(num_paths_needed);
+    passes_to_optimize.insert(passes_to_optimize.end(), new_paths.begin(), new_paths.end());
 }
 
 std::optional<Pass> PassingGradientDescent::getBestPass() {
-    // TODO
+    std::sort(passes_to_optimize.begin(), passes_to_optimize.end());
+    if (passes_to_optimize.size() > 0 && ratePass(passes_to_optimize[0]) > min_reasonable_pass_quality){
+        return std::optional(passes_to_optimize[0]);
+    }
     return std::optional<Pass>();
 }
 
