@@ -703,7 +703,8 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/init.h
             util/timestamp.cpp
             )
-    target_link_libraries(move_action_test ${catkin_LIBRARIES}
+    target_link_libraries(move_action_test
+            ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES})
 endif()

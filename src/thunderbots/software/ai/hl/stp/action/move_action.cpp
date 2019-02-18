@@ -34,6 +34,11 @@ std::unique_ptr<Intent> MoveAction::updateStateAndGetNextIntent(Robot robot,
 std::unique_ptr<Intent> MoveAction::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
+    // We use a do-while loop so that we return the Intent at least once. If the robot was
+    // already moving somewhere else, but was told to run the MoveAction to a destination
+    // while it happened to be crossing that point, we want to make sure we send the
+    // Intent so we don't report the Action as done while still moving to a different
+    // location
     do
     {
         yield(std::make_unique<MoveIntent>(robot.id(), destination, final_orientation,
