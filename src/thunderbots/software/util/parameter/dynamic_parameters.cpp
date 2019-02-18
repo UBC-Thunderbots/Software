@@ -1,4 +1,5 @@
 #include "util/parameter/dynamic_parameters.h"
+#include "shared/constants.h"
 
 namespace Util::DynamicParameters
 {
@@ -34,6 +35,16 @@ namespace Util::DynamicParameters
                                                          2.0);
     }  // namespace Navigator
 
+    // Default avoid distance around robots.
+    Parameter<double> default_avoid_dist("default_avoid_dist", 0.15);
+
+        // Scaling factor for collision avoidance.
+        // TODO this is arbitrary for now; could be determined as part of
+        // #23: https://github.com/UBC-Thunderbots/Software/issues/23
+        Parameter<double> collision_avoid_velocity_scale(
+            "collision_avoid_velocity_scale", 2.0);
+    }  // namespace Navigator
+
     namespace AI
     {
         namespace Passing
@@ -58,5 +69,15 @@ namespace Util::DynamicParameters
         }  // namespace Passing
     }      // namespace AI
 
-
-}  // namespace Util::DynamicParameters
+    namespace XBoxControllerDemo
+    {
+        Parameter<int32_t> robot_id("xbox_demo_robot_ID", 0);
+        Parameter<double> kick_speed_meters_per_second(
+            "xbox_demo_kick_speed_meters_per_second",
+            BALL_MAX_SPEED_METERS_PER_SECOND);
+        Parameter<double> chip_distance_meters("xbox_demo_chip_distance_meters", 1.0);
+        Parameter<double> dribbler_rpm("xbox_demo_dribbler_rpm", 1000.0);
+        Parameter<double> linear_sensitivity("xbox_demo_linear_sensitivity", 1.0);
+        Parameter<double> angular_sensitivity("xbox_demo_angular_sensitivity", 1.0);
+    }  // namespace XBoxControllerDemo
+}  // namespace Util
