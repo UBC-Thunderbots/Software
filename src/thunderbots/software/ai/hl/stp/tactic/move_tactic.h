@@ -9,7 +9,7 @@ class MoveTactic : public Tactic
     explicit MoveTactic(const Robot& robot);
 
     /**
-     * Returns the next Intent this MoveAction wants to run, given the parameters.
+     * Returns the next Intent this MoveTactic wants to run, given the parameters.
      * Moves the robot in a straight line to the given destination.
      *
      * @param robot The robot to move
