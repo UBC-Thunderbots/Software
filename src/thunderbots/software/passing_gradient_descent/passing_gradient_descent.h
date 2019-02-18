@@ -121,14 +121,18 @@ private:
         std::array<double, NUM_OPTIMIZE_PARAMS> past_squared_gradient_averages;
     };
 
+    static const double eps = std::pow(10, -8);
+
     /**
      * Optimize the given pass for the given number of iterations using gradient descent
      *
+     * This runs one iteration of Adam (basically Stochastic Gradient Descent)
+     *
      * @param pass The pass to optimize
      * @param max_num_iterations The number of iterations to try to optimize the path for
-     * @
+     * @return The pass optimized by one iteration
      */
-    GradientDescentPass optimizePass(GradientDescentPass pass, unsigned int num_iterations);
+    PassingGradientDescent::GradientDescentPass optimizePass(GradientDescentPass pass);
 
     /**
      * Approximate the gradient
@@ -142,7 +146,7 @@ private:
     unsigned int num_gradient_descent_points;
 
     // The step size to take when approximating the gradient
-    unsigned double gradient_approx_step_size;
+    double gradient_approx_step_size;
 
     // The most recent world we know about
     World world;
