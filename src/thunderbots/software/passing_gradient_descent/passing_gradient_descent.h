@@ -107,11 +107,18 @@ private:
     // A Pass with additional information for gradient descent
     class GradientDescentPass : public Pass {
     public:
+        // TODO: javadoc comment
         GradientDescentPass(std::array<double, NUM_OPTIMIZE_PARAMS> params) : Pass(params) {};
-    private:
-        // This constant is used for the concept of "momentum" in gradient descent
+
+        // TODO: make sure this comment is still accuarate
+        // These values are used for the concept of "momentum" in gradient descent
         // (https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Momentum)
-        double momentum_constant;
+        // We have one per parameter because we're using an implementation of Adam:
+        // ( https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam )
+        // ( http://ruder.io/optimizing-gradient-descent/index.html#adam )
+        // ( https://en.wikipedia.org/wiki/Moment_(mathematics) )
+        std::array<double, NUM_OPTIMIZE_PARAMS> past_gradient_averages;
+        std::array<double, NUM_OPTIMIZE_PARAMS> past_squared_gradient_averages;
     };
 
     /**
@@ -119,8 +126,9 @@ private:
      *
      * @param pass The pass to optimize
      * @param max_num_iterations The number of iterations to try to optimize the path for
+     * @
      */
-    void optimizePass(GradientDescentPass pass, unsigned int num_iterations);
+    GradientDescentPass optimizePass(GradientDescentPass pass, unsigned int num_iterations);
 
     /**
      * Approximate the gradient
@@ -128,11 +136,13 @@ private:
      * @param step_size
      * @return
      */
-    static std::array<double, NUM_OPTIMIZE_PARAMS> approximateGradient(
-            GradientDescentPass pass, double step_size);
+    std::array<double, NUM_OPTIMIZE_PARAMS> approximateGradient(GradientDescentPass pass);
 
     // The number of points to use for gradient descent
     unsigned int num_gradient_descent_points;
+
+    // The step size to take when approximating the gradient
+    unsigned double gradient_approx_step_size;
 
     // The most recent world we know about
     World world;
@@ -150,4 +160,12 @@ private:
     // the weights are used as an attempt to make the ratePass function more
     // homogenous
     std::array<double, NUM_OPTIMIZE_PARAMS> param_weights;
+
+    // TODO: set these in the constructor
+    // Decay rates used for Adam
+    // ( https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam )
+    // ( http://ruder.io/optimizing-gradient-descent/index.html#adam )
+    // ( https://en.wikipedia.org/wiki/Moment_(mathematics) )
+    double past_gradient_decay_rate;
+    double past_squared_gradient_decay_rate;
 };
