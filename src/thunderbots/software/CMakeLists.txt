@@ -359,7 +359,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
-            util/timestamp.cpp)
+            util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
 
     target_link_libraries(world_test ${catkin_LIBRARIES})
 
