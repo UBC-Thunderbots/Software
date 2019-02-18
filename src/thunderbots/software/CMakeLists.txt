@@ -247,6 +247,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(field_test
             test/world/field.cpp
             ai/world/field.cpp
+            util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
 
@@ -359,7 +360,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
-            util/timestamp.cpp)
+            util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
 
     target_link_libraries(world_test ${catkin_LIBRARIES})
 
@@ -373,6 +376,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/game_state.cpp
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             )
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
@@ -388,7 +392,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/game_state.cpp
             util/refbox_constants.cpp
-            util/timestamp.cpp)
+            util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
 
     target_link_libraries(game_state_test ${catkin_LIBRARIES})
 
@@ -419,6 +425,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(move_spin_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
@@ -640,6 +647,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
     )
 
     target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
@@ -665,6 +673,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             test/test_util/test_util.cpp
+            util/parameter/dynamic_parameters.cpp
             )
 
     target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})
@@ -672,6 +681,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(evaluation_robot_orientation_within_angle_threshold_of_target_test
             test/evaluation/robot.cpp
             ai/hl/stp/evaluation/robot.cpp
+            util/parameter/dynamic_parameters.cpp
             )
 
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
