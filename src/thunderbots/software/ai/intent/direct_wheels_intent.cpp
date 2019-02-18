@@ -1,4 +1,5 @@
 #include "ai/intent/direct_wheels_intent.h"
+#include "ai/intent/visitor/intent_visitor.h"
 
 const std::string DirectWheelsIntent::INTENT_NAME = "Direct Wheels Intent";
 
@@ -13,6 +14,10 @@ DirectWheelsIntent::DirectWheelsIntent(unsigned int robot_id,
                             dribbler_rpm),
       Intent(priority)
 {
+}
+
+void DirectWheelsIntent::accept(IntentVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
 std::string DirectWheelsIntent::getIntentName(void) const

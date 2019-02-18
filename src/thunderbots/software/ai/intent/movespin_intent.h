@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ai/intent/intent.h"
-#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
+#include "ai/primitive/movespin_primitive.h"
 
 class MoveSpinIntent : public Intent, public MoveSpinPrimitive
 {
@@ -21,6 +21,8 @@ class MoveSpinIntent : public Intent, public MoveSpinPrimitive
                             const AngularVelocity& angular_vel, unsigned int priority);
 
     std::string getIntentName(void) const override;
+
+    void accept(IntentVisitor &visitor) const override;
 
     /**
      * Compares MoveSpinIntents for equality. MoveSpinIntents are considered equal if all

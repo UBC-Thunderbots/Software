@@ -356,8 +356,8 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
             test/ai/grsim_communication/grsim_backend.cpp
-            test/ai/grsim_communication/grsim_command_primitive_visitor_catch.cpp
-            test/ai/grsim_communication/grsim_command_primitive_visitor_movespin.cpp
+            test/ai/grsim_communication/catch_primitive.cpp
+            test/ai/grsim_communication/movespin_primitive.cpp
             test/ai/grsim_communication/main.cpp
             test/ai/grsim_communication/motion_controller.cpp
             test/test_util/test_util.cpp

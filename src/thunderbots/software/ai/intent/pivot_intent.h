@@ -26,6 +26,8 @@ class PivotIntent : public Intent, public PivotPrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor &visitor) const override;
+
     /**
      * Compares PivotIntents for equality. PivotIntents are considered equal if all
      * their member variables are equal.

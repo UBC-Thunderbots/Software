@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
+#include "ai/primitive/movespin_primitive.h"
 
 TEST(MoveSpinPrimTest, primitive_name_test)
 {

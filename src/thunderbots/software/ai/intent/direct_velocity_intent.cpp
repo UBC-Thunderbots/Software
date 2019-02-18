@@ -1,4 +1,5 @@
-#include "direct_velocity_intent.h"
+#include "ai/intent/direct_velocity_intent.h"
+#include "ai/intent/visitor/intent_visitor.h"
 
 const std::string DirectVelocityIntent::INTENT_NAME = "Direct Velocity Intent";
 
@@ -9,6 +10,10 @@ DirectVelocityIntent::DirectVelocityIntent(unsigned int robot_id, double x_veloc
                               dribbler_rpm),
       Intent(priority)
 {
+}
+
+void DirectVelocityIntent::accept(IntentVisitor &visitor) const {
+    visitor.visit(*this);
 }
 
 std::string DirectVelocityIntent::getIntentName(void) const

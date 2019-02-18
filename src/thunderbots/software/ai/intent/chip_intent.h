@@ -26,6 +26,8 @@ class ChipIntent : public Intent, public ChipPrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor &visitor) const override;
+
     /**
      * Compares ChipIntents for equality. ChipIntents are considered equal if all
      * their member variables are equal.

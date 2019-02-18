@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
+#include "ai/primitive/catch_primitive.h"
 
 TEST(CatchPrimTest, primitive_name_test)
 {

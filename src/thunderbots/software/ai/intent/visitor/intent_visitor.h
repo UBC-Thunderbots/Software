@@ -4,6 +4,7 @@
 #include "ai/intent/chip_intent.h"
 #include "ai/intent/direct_velocity_intent.h"
 #include "ai/intent/direct_wheels_intent.h"
+#include "ai/intent/dribble_intent.h"
 #include "ai/intent/kick_intent.h"
 #include "ai/intent/move_intent.h"
 #include "ai/intent/movespin_intent.h"
@@ -49,6 +50,13 @@ class IntentVisitor
      * @param direct_wheels_intent The DirectWheelsIntent to visit
      */
     virtual void visit(const DirectWheelsIntent &direct_wheels_intent) = 0;
+
+    /**
+     * Visits a DribbleIntent to perform an operation.
+     *
+     * @param direct_wheels_intent The DribbleIntent to visit
+     */
+    virtual void visit(const DribbleIntent &direct_wheels_intent) = 0;
 
     /**
      * Visits a KickIntent to perform an operation.

@@ -34,6 +34,8 @@ class DirectWheelsIntent : public Intent, public DirectWheelsPrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor &visitor) const override;
+
     /**
      * Compares DirectWheelsIntents for equality. DirectWheelsIntents are considered equal
      * if all their member variables are equal.
