@@ -175,6 +175,22 @@ make
 sudo make install
 cd $CURR_DIR
 
+# Clone, build, and install munkres-cpp (Our Hungarian library algorithm)
+hungarian_path="/tmp/hungarian-cpp"
+if [ -d $hungarian_path ]; then
+    echo "Removing old hungarian-cpp library..."
+    sudo rm -r $hungarian_path
+fi
+
+git clone https://github.com/saebyn/munkres-cpp.git $hungarian_path
+cd $hungarian_path
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+sudo make install
+cd $CURR_DIR
+
 # Done
 echo "================================================================"
 echo "Done Software Setup"
