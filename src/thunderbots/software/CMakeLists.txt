@@ -424,6 +424,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
             ai/primitive/primitive.cpp
             geom/point.h
             ai/world/world.cpp
@@ -600,6 +601,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
             ai/primitive/primitive.cpp
             geom/point.h
             ai/world/world.cpp
