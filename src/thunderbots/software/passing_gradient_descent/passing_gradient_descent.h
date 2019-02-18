@@ -121,7 +121,7 @@ private:
         std::array<double, NUM_OPTIMIZE_PARAMS> past_squared_gradient_averages;
     };
 
-    static const double eps = std::pow(10, -8);
+    static constexpr double eps = 1e-10;
 
     /**
      * Optimize the given pass for the given number of iterations using gradient descent
