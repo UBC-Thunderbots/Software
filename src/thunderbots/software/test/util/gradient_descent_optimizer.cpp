@@ -81,7 +81,7 @@ TEST(GradientDescentOptimizerTest, maximize_sigmoid)
 TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
 {
     // This test can be used to judge if the performance of gradient descent
-    // has decrease, as we here we are checking if it took _exactly_ the number
+    // has decreased, as we here we are checking if it took _exactly_ the number
     // of iterations to get past the main "S" part of a sigmoid
 
     GradientDescentOptimizer<1> gradientDescentOptimizer({0.1});
@@ -94,8 +94,8 @@ TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
     auto min = gradientDescentOptimizer.maximize(
         f, {0}, EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE);
 
-    // We expect that the gradient descent will make it over the
-    // main part of the "S" in the sigmoid
+    // We expect that the gradient descent will make it over the main part of 
+    // the "S" in the sigmoid within the given number of iterations
     EXPECT_GE(min.at(0), 3);
 }
 
