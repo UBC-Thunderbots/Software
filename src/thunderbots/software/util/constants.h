@@ -22,7 +22,7 @@ namespace Util
         static const std::string AI_PRIMITIVES_TOPIC         = "ai/primitives";
         static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
-        static const std::string PASSING_GRADIENT_DESCENT_PASS_TOPIC = "passing_gradient_descent/pass";
+        static const std::string PASSING_GRADIENT_DESCENT_PASS_TOPIC = "passing/pass";
         static const std::string AI_DESIRED_PASS_REGION = "ai/desired_pass_region";
 
         // TODO: Make this a tuneable parameter

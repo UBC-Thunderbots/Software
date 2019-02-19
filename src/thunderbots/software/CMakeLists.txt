@@ -138,16 +138,6 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES}
         ${G3LOG}
         )
 
-add_executable (passing_gradient_descent
-        passing_gradient_descent/main.cpp
-        )
-# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-# This way the message headers are always generated before they are used in compilation here.
-add_dependencies(passing_gradient_descent ${catkin_EXPORTED_TARGETS})
-target_link_libraries(passing_gradient_descent ${catkin_LIBRARIES}
-        ${G3LOG}
-        )
-
 file(GLOB_RECURSE GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.h
@@ -687,10 +677,20 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(passin_gradient_descent_test
+    catkin_add_gtest(passing_gradient_descent_test
             test/passing_gradient_descent/passing_gradient_descent_test.cpp
-            passing_gradient_descent/passing_gradient_descent.cpp
+            test/test_util/test_util.cpp
+            ai/passing/passing_gradient_descent.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/ball.cpp
+            ai/world/game_state.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/timestamp.cpp
             )
+    target_link_libraries(passing_gradient_descent_test ${catkin_LIBRARIES})
 
 endif()
 

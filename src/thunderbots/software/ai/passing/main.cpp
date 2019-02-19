@@ -37,7 +37,7 @@ void desiredRegionUpdateCallback(const thunderbots_msgs::Circle2D::ConstPtr &msg
 
 int main(int argc, char** argv) {
     // Init ROS node
-    ros::init(argc, argv, "passing_gradient_descent");
+    ros::init(argc, argv, "passing");
     ros::NodeHandle node_handle;
 
     // Create Publishers
