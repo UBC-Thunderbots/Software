@@ -11,7 +11,7 @@
 using namespace AI::Passing;
 
 TEST(GradientDescentTest, todo_test_name_here){
-    GradientDescent grad_descent;
+    PassGenerator grad_descent;
 
     World w = ::Test::TestUtil::createBlankTestingWorld();
     w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());

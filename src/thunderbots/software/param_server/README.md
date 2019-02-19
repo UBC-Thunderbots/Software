@@ -4,11 +4,11 @@ The param server node initializes the dynamic_reconfigure server and calls the `
 
 We currently support `int32_t`, `double`, `bool` and `string`
 ### Registering a parameter to be configured through rqt_reconfigure
-Add the following code in the Params.cfg file found at `param_server/cfg/Params.cfg`
+Add the following code in the ParamArray.cfg file found at `param_server/cfg/ParamArray.cfg`
 ~~~python
 navigator = gen.add_group("Navigator")
 ~~~
-The namespace in `dynamic_parameter.cpp` should correspond to the group defined in `Params.cfg`.
+The namespace in `dynamic_parameter.cpp` should correspond to the group defined in `ParamArray.cfg`.
 Note that calling `add_group("child")` on a group object, will nest that group.
 
 Calling `add` on the group object will put the parameter in that group. 
