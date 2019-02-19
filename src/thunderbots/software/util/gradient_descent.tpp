@@ -77,7 +77,7 @@ std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::follo
     // This is basically just to change the name so the below code reads more nicely
     ParamArray params = initial_value;
 
-    // TODO: comment here
+    // The past gradient and squared gradient averages for each parameter
     ParamArray past_gradient_averages         = {0};
     ParamArray past_squared_gradient_averages = {0};
 
