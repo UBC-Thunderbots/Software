@@ -692,6 +692,10 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(passing_gradient_descent_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(gradient_descent_optimizer_test
+            util/gradient_descent.cpp
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
