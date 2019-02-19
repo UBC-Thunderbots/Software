@@ -18,7 +18,7 @@
 #include <unordered_map>
 
 #include "constants.h"
-#include "radio_communication/visitor/primitive_serializer_visitor.h"
+#include "radio_communication/visitor/mrf_primitive_visitor.h"
 
 namespace
 {
@@ -38,21 +38,6 @@ namespace
 
     const unsigned int ANNUNCIATOR_BEEP_LENGTH = 750;
 
-    std::unique_ptr<USB::BulkOutTransfer> create_reliable_message_transfer(
-        USB::DeviceHandle &device, unsigned int robot, uint8_t message_id,
-        unsigned int tries, const void *data, std::size_t length)
-    {
-        assert(robot < 8);
-        assert((1 <= tries) && (tries <= 256));
-        uint8_t buffer[3 + length];
-        buffer[0] = static_cast<uint8_t>(robot | 0x10);
-        buffer[1] = message_id;
-        buffer[2] = static_cast<uint8_t>(tries & 0xFF);
-        std::memcpy(buffer + 3, data, length);
-        std::unique_ptr<USB::BulkOutTransfer> ptr(
-            new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
-        return ptr;
-    }
 }  // namespace
 
 MRFDongle::MRFDongle()
@@ -261,7 +246,6 @@ void MRFDongle::beep(unsigned int length)
         beep_transfer->signal_done.connect(
             sigc::mem_fun(this, &MRFDongle::handle_beep_done));
         beep_transfer->submit();
-        std::cout << "Beep submitted" << std::endl;
         pending_beep_length = 0;
     }
 }
@@ -384,13 +368,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         *rptr++ = static_cast<int8_t>(robotY >> 8);
         *rptr++ = static_cast<int8_t>(robotT);
         *rptr++ = static_cast<int8_t>(robotT >> 8);
-
-        /* This was here when I ported the code, no idea what this is for */
-        //*rptr = ((int16_t)(std::get<1>(detbots[i])).x) +
-        //((int16_t)((std::get<1>(detbots[i])).y) << 16) +
-        //((int16_t)((std::get<2>(detbots[i])).to_radians() * 1000) << 32);
-        // rptr += 6;
     }
+
     // Write out the timestamp
     for (std::size_t i = 0; i < 8; i++)
     {
@@ -426,7 +405,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
     (*i).first->submit();
 
-    std::cout << "Submitted camera transfer in position:" << camera_transfers.size()
+    std::cout << "Submitted camera transfer in kposition:" << camera_transfers.size()
               << std::endl;
 };
 
@@ -479,17 +458,15 @@ bool MRFDongle::submit_drive_transfer()
         drive_transfer->signal_done.connect(
             sigc::mem_fun(this, &MRFDongle::handle_drive_transfer_done));
         drive_transfer->submit();
-        std::cout << "Drive transfer of length " << drive_packet_length << " submitted"
-                  << std::endl;
     }
+
     return false;
 }
 
 void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *out)
 {
     uint16_t words[4];
-    RadioPacketSerializerPrimitiveVisitor visitor =
-        RadioPacketSerializerPrimitiveVisitor();
+    MRFPrimitiveVisitor visitor = MRFPrimitiveVisitor();
 
     // Visit the primitive.
     prim->accept(visitor);
@@ -549,7 +526,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     //         words[1] |= 2 << 14;
     //         break;
     // }
-    words[1] |= 1 << 14;  // Discharged for now
+    words[1] |= 2 << 14;  // Charged for now
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?
@@ -574,7 +551,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 {
-    std::cout << "Drive Transfer done" << std::endl;
+    // std::cout << "Drive Transfer done" << std::endl;
     op.result();
     drive_transfer.reset();
 }
