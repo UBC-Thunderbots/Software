@@ -24,7 +24,6 @@ const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
 // squared
 const double ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED = 10.0;
 
-
 /* Unit Conversion */
 const double MILLIMETERS_PER_METER = 1000.0;
 const double METERS_PER_MILLIMETER = 1.0 / 1000.0;
