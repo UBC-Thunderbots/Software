@@ -1,6 +1,5 @@
-#include "ai/hl/stp/tactic/move.h"
-
 #include "ai/hl/stp/play/play.h"
+#include "ai/hl/stp/tactic/move_tactic.h"
 
 class MovePlay : public Play
 {
@@ -27,8 +26,6 @@ class MovePlay : public Play
     std::vector<std::unique_ptr<Tactic>> getTactics(const World &world) override
     {
         auto tactics = std::vector<std::unique_ptr<Tactic>>();
-
-        tactics.emplace_back(std::make_unique<MoveTactic>(Point()));
 
         return tactics;
     }

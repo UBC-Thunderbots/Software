@@ -15,6 +15,11 @@ class World final
 {
    public:
     /**
+     * Creates an Empty World
+     */
+    explicit World();
+
+    /**
      * Creates a new world.
      *
      * @param field the field for the world
