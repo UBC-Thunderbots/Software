@@ -74,11 +74,11 @@ TEST(MRFPrimitiveVisitorTest, visit_chip_primitive)
 
 TEST(MRFPrimitiveVisitorTest, visit_direct_velocity_primitive)
 {
-    DirectVelocityPrimitive primitive(11, 23.2, 32.3, 556, 3000);
+    DirectVelocityPrimitive primitive(11, 23.2, 32.3, 556, 30000);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::DIRECT_VELOCITY;
     expected_radio_primitive.param_array = {23.2 * 1000, 32.3 * 1000, 556 * 100};
-    expected_radio_primitive.extra_bits  = 0;
+    expected_radio_primitive.extra_bits  = 100;
 
     MRFPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
@@ -88,11 +88,11 @@ TEST(MRFPrimitiveVisitorTest, visit_direct_velocity_primitive)
 
 TEST(MRFPrimitiveVisitorTest, visit_direct_wheels_primitive)
 {
-    DirectWheelsPrimitive primitive(11, 22, 33, 44, 160, 3);
+    DirectWheelsPrimitive primitive(11, 22, 33, 44, 160, 30000);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::DIRECT_WHEELS;
     expected_radio_primitive.param_array = {22, 33, 44, 160};
-    expected_radio_primitive.extra_bits  = 0;
+    expected_radio_primitive.extra_bits  = 100;
 
     MRFPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);

@@ -46,7 +46,8 @@ void MRFPrimitiveVisitor::visit(const DirectVelocityPrimitive &direct_velocity_p
         direct_velocity_primitive.getXVelocity() * MILLIMETERS_PER_METER,
         direct_velocity_primitive.getYVelocity() * MILLIMETERS_PER_METER,
         direct_velocity_primitive.getAngularVelocity() * CENTIRADIANS_PER_RADIAN, 0};
-    radio_prim->extra_bits = 0;
+    radio_prim->extra_bits = direct_velocity_primitive.getDribblerRpm() *
+                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR;
 }
 
 void MRFPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primitive)
@@ -58,7 +59,8 @@ void MRFPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primi
         static_cast<double>(direct_wheels_primitive.getWheel1Power()),
         static_cast<double>(direct_wheels_primitive.getWheel2Power()),
         static_cast<double>(direct_wheels_primitive.getWheel3Power())};
-    radio_prim->extra_bits = 0;
+    radio_prim->extra_bits = direct_wheels_primitive.getDribblerRPM() *
+                             DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR;
 }
 
 void MRFPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
@@ -81,7 +83,7 @@ void MRFPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
         move_primitive.getDestination().x() * MILLIMETERS_PER_METER,
         move_primitive.getDestination().y() * MILLIMETERS_PER_METER,
         move_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN,
-        move_primitive.getFinalSpeed()};
+        move_primitive.getFinalSpeed() * MILLIMETERS_PER_METER};
     radio_prim->extra_bits = 0;
 }
 

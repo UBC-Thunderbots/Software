@@ -24,6 +24,7 @@ const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
 // squared
 const double ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED = 10.0;
 
+
 /* Unit Conversion */
 const double MILLIMETERS_PER_METER = 1000.0;
 const double METERS_PER_MILLIMETER = 1.0 / 1000.0;
@@ -37,3 +38,6 @@ const double MILLISECONDS_PER_SECOND      = 1000.0;
 const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
+
+// Converts dribbler RPM to a smaller number firmware uses
+const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
