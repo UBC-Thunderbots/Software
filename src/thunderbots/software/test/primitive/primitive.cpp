@@ -10,6 +10,7 @@
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/dribble_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
@@ -283,6 +284,40 @@ TEST(StopPrimTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
     EXPECT_EQ(coast, extra_bits[0]);
     EXPECT_EQ(new_prim->getParameters(), std::vector<double>());
     EXPECT_EQ(std::vector<double>(), new_prim->getParameters());
+}
+
+// Test that we can correctly translate a MovePrimitive like:
+// `Primitive` -> `ROS Message` -> `Primitive` and get back the same primitive we
+// started with
+TEST(PrimitiveTest, convert_DribblePrimitive_to_message_and_back_to_MovePrimitive)
+{
+    const Point destination       = Point(-3, -3);
+    const Angle final_angle       = Angle::ofRadians(4.55);
+    const double final_speed      = 4.22;
+    const double rpm              = 4.5;
+    const bool small_kick_allowed = false;
+    const unsigned int robot_id   = 0U;
+
+    DribblePrimitive dribble_prim = DribblePrimitive(
+        robot_id, destination, final_angle, final_speed, rpm, small_kick_allowed);
+
+    thunderbots_msgs::Primitive prim_message = dribble_prim.createMsg();
+
+    std::unique_ptr<Primitive> new_prim = Primitive::createPrimitive(prim_message);
+
+    // Since we have a `Primitive` and NOT a `MovePrimitive`, we have to check that the
+    // values are correct by getting them from the generic parameter array
+    std::vector<double> params  = new_prim->getParameters();
+    std::vector<bool> extraBits = new_prim->getExtraBits();
+
+    EXPECT_EQ("Dribble Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ(robot_id, new_prim->getRobotId());
+    EXPECT_DOUBLE_EQ(destination.x(), params[0]);
+    EXPECT_DOUBLE_EQ(destination.y(), params[1]);
+    EXPECT_DOUBLE_EQ(final_angle.toRadians(), params[2]);
+    EXPECT_DOUBLE_EQ(final_speed, params[3]);
+    EXPECT_DOUBLE_EQ(rpm, params[4]);
+    EXPECT_EQ(small_kick_allowed, extraBits[0]);
 }
 
 int main(int argc, char **argv)

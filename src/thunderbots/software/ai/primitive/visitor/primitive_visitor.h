@@ -4,6 +4,7 @@
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/dribble_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
@@ -70,6 +71,13 @@ class PrimitiveVisitor
      * @param move_spin_primitive The MoveSpinPrimitive to visit
      */
     virtual void visit(const MoveSpinPrimitive &move_spin_primitive) = 0;
+
+    /**
+     * Visits a DribblePrimitive to perform an operation.
+     *
+     * @param dribble_primitive The DribblePrimitive to visit
+     */
+    virtual void visit(const DribblePrimitive &dribble_primitive) = 0;
 
     /**
      * Visits a PivotPrimitive to perform an operation.
