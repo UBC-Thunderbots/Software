@@ -3,12 +3,12 @@
  */
 #pragma once
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <functional>
 
-namespace Util {
-
+namespace Util
+{
     /**
      * This class implements a version of Stochastic Gradient Descent (SGD), namely Adam
      * (see links below for details). It provides functionality for both maximizing
@@ -25,13 +25,14 @@ namespace Util {
      *                    will optimize over.
      */
     template <size_t NUM_PARAMS>
-    class GradientDescentOptimizer {
-    public:
+    class GradientDescentOptimizer
+    {
+       public:
         using ParamArray = std::array<double, NUM_PARAMS>;
 
         // Almost always good values for the decay rates, taken from:
         // http://ruder.io/optimizing-gradient-descent/index.html#adam
-        static constexpr double DEFAULT_PAST_GRADIENT_DECAY_RATE = 0.9;
+        static constexpr double DEFAULT_PAST_GRADIENT_DECAY_RATE         = 0.9;
         static constexpr double DEFAULT_PAST_SQUARED_GRADIENT_DECAY_RATE = 0.999;
 
         // Default step size for approximating the gradient of functions
@@ -48,9 +49,7 @@ namespace Util {
          *
          * @param param_weights The weight to multiply
          */
-        explicit GradientDescentOptimizer(
-                ParamArray param_weights
-        );
+        explicit GradientDescentOptimizer(ParamArray param_weights);
 
         /**
          * Creates a GradientDescentOptimizer
@@ -62,10 +61,8 @@ namespace Util {
          * @param gradient_approx_step_size The size of step to take forward when
          *                                  approximating the gradient of a function
          */
-        GradientDescentOptimizer(
-                ParamArray param_weights,
-                double gradient_approx_step_size
-        );
+        GradientDescentOptimizer(ParamArray param_weights,
+                                 double gradient_approx_step_size);
 
         /**
          * Creates a GradientDescentOptimizer
@@ -83,12 +80,10 @@ namespace Util {
          *                                         rate, see corresponding class member
          *                                         variable for details
          */
-        GradientDescentOptimizer(
-                ParamArray param_weights,
-                double gradient_approx_step_size,
-                double past_gradient_decay_rate,
-                double past_squared_gradient_decay_rate
-                );
+        GradientDescentOptimizer(ParamArray param_weights,
+                                 double gradient_approx_step_size,
+                                 double past_gradient_decay_rate,
+                                 double past_squared_gradient_decay_rate);
 
         /**
          * Attempts to maximize the given objective function
@@ -103,10 +98,8 @@ namespace Util {
          * @return The parameters corresponding to the maximum value of the objective
          *         found
          */
-        ParamArray maximize(
-                std::function<double(ParamArray)> objective_function,
-                ParamArray initial_value,
-                unsigned int num_iters);
+        ParamArray maximize(std::function<double(ParamArray)> objective_function,
+                            ParamArray initial_value, unsigned int num_iters);
 
         /**
          * Attempts to minimize the given objective function
@@ -121,10 +114,8 @@ namespace Util {
          * @return The parameters corresponding to the minimum value of the objective
          *         found
          */
-        ParamArray minimize(
-                std::function<double(ParamArray)> objective_function,
-                ParamArray initial_value,
-                unsigned int num_iters);
+        ParamArray minimize(std::function<double(ParamArray)> objective_function,
+                            ParamArray initial_value, unsigned int num_iters);
 
         /**
          * Attempts to minimize or maximize the given objective function
@@ -143,15 +134,12 @@ namespace Util {
          *         objective found, depending on what gradient_movement_func was given
          */
         ParamArray followGradient(
-                std::function<double(ParamArray)> objective_function,
-                ParamArray initial_value,
-                unsigned int num_iters,
-                std::function<double(double, double)> gradient_movement_func
-        );
+            std::function<double(ParamArray)> objective_function,
+            ParamArray initial_value, unsigned int num_iters,
+            std::function<double(double, double)> gradient_movement_func);
 
 
-    private:
-
+       private:
         /**
          * Approximate the gradient of the objective function around a given point
          *
@@ -160,8 +148,8 @@ namespace Util {
          * @return A ParamArray, where each "param" is the derivative with respect to the
          *         corresponding input param.
          */
-        ParamArray approximateGradient(ParamArray params,
-                std::function<double(ParamArray)> objective_function);
+        ParamArray approximateGradient(
+            ParamArray params, std::function<double(ParamArray)> objective_function);
 
         // This constant is used to prevent division by 0 in our implementation of Adam
         // (gradient descent)
@@ -184,6 +172,6 @@ namespace Util {
         double gradient_approx_step_size;
     };
 
-}
+}  // namespace Util
 
 #include "util/gradient_descent.tpp"

@@ -2,9 +2,11 @@
  * Tests for the `GradientDescentOptimizer`
  */
 
-#include "util/gradient_descent.h"
 #include <gtest/gtest.h>
+
 #include <cmath>
+
+#include "util/gradient_descent.h"
 
 using namespace Util;
 
@@ -13,9 +15,7 @@ TEST(GradientDescentOptimizerTest, minimize_single_valued_function)
     GradientDescentOptimizer<1> gradientDescentOptimizer({0.1});
 
     // f = x^2
-    auto f = [](std::array<double, 1> x){
-        return std::pow(x.at(0), 2.0);
-    };
+    auto f = [](std::array<double, 1> x) { return std::pow(x.at(0), 2.0); };
 
     auto min = gradientDescentOptimizer.minimize(f, {1}, 100);
 
@@ -27,9 +27,7 @@ TEST(GradientDescentOptimizerTest, maximize_single_valued_function)
     GradientDescentOptimizer<1> gradientDescentOptimizer({0.1});
 
     // f = -x^2
-    auto f = [](std::array<double, 1> x){
-        return -std::pow(x.at(0), 2.0);
-    };
+    auto f = [](std::array<double, 1> x) { return -std::pow(x.at(0), 2.0); };
 
     auto max = gradientDescentOptimizer.maximize(f, {1}, 100);
 
@@ -41,8 +39,8 @@ TEST(GradientDescentOptimizerTest, minimize_multi_valued_function)
     GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.1});
 
     // f = x^2 + 2*y^2 + 20
-    auto f = [](std::array<double, 2> x){
-        return std::pow(x.at(0), 2) + 2*std::pow(x.at(1), 2) + 20;
+    auto f = [](std::array<double, 2> x) {
+        return std::pow(x.at(0), 2) + 2 * std::pow(x.at(1), 2) + 20;
     };
 
     auto min = gradientDescentOptimizer.minimize(f, {1, -1}, 100);
@@ -56,8 +54,8 @@ TEST(GradientDescentOptimizerTest, minimize_multi_valued_function_with_offsets)
     GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.1});
 
     // f = (x+5)^2 + 2*(y-4)^2 + 20
-    auto f = [](std::array<double, 2> x){
-        return std::pow(x.at(0) + 5, 2) + 2*std::pow(x.at(1) - 4, 2) + 20;
+    auto f = [](std::array<double, 2> x) {
+        return std::pow(x.at(0) + 5, 2) + 2 * std::pow(x.at(1) - 4, 2) + 20;
     };
 
     auto min = gradientDescentOptimizer.minimize(f, {0, 0}, 100);
@@ -71,9 +69,7 @@ TEST(GradientDescentOptimizerTest, maximize_sigmoid)
     GradientDescentOptimizer<1> gradientDescentOptimizer({0.1});
 
     // f = 1 / (1 + exp(2-2x))
-    auto f = [](std::array<double, 1> x){
-        return 1 / (1 + std::exp(2 - 2*x[0]));
-    };
+    auto f = [](std::array<double, 1> x) { return 1 / (1 + std::exp(2 - 2 * x[0])); };
 
     auto min = gradientDescentOptimizer.maximize(f, {0}, 100);
 
@@ -82,7 +78,8 @@ TEST(GradientDescentOptimizerTest, maximize_sigmoid)
     EXPECT_GE(min.at(0), 3);
 }
 
-TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test){
+TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
+{
     // This test can be used to judge if the performance of gradient descent
     // has decrease, as we here we are checking if it took _exactly_ the number
     // of iterations to get past the main "S" part of a sigmoid
@@ -90,14 +87,12 @@ TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test){
     GradientDescentOptimizer<1> gradientDescentOptimizer({0.1});
 
     // f = 1 / (1 + exp(2-2x))
-    auto f = [](std::array<double, 1> x){
-        return 1 / (1 + std::exp(2 - 2*x[0]));
-    };
+    auto f = [](std::array<double, 1> x) { return 1 / (1 + std::exp(2 - 2 * x[0])); };
 
     static const unsigned int EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE = 23;
 
-    auto min = gradientDescentOptimizer.maximize(f, {0},
-            EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE);
+    auto min = gradientDescentOptimizer.maximize(
+        f, {0}, EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE);
 
     // We expect that the gradient descent will make it over the
     // main part of the "S" in the sigmoid
