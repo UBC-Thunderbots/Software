@@ -66,6 +66,13 @@ class MRFPrimitiveVisitor : public PrimitiveVisitor
     void visit(const DirectWheelsPrimitive &direct_wheels_primitive) override;
 
     /**
+     * Visits a DribblePrimitive to perform an operation.
+     *
+     * @param dribble_primitive The DribblePrimitive to visit
+     */
+    void visit(const DribblePrimitive &dribble_primitive) override;
+
+    /**
      * Serializes the given KickPrimitive into a radio packet
      *
      * @param kick_primitive The KickPrimitive to simulate

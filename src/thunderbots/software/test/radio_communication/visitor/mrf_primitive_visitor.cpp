@@ -100,6 +100,21 @@ TEST(MRFPrimitiveVisitorTest, visit_direct_wheels_primitive)
     EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
 }
 
+TEST(MRFPrimitiveVisitorTest, visit_dribble_primitive)
+{
+    DribblePrimitive primitive(11, Point(22, 33.3), Angle::half(), 1.60, 30000, true);
+    RadioPrimitive expected_radio_primitive;
+    expected_radio_primitive.prim_type   = FirmwarePrimitiveType::DRIBBLE;
+    expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,
+                                            Angle::half().toRadians() * 100, 30000};
+    expected_radio_primitive.extra_bits  = 1;
+
+    MRFPrimitiveVisitor prim_visitor;
+    primitive.accept(prim_visitor);
+    RadioPrimitive actual_radio_primitive = prim_visitor.getSerializedRadioPacket();
+    EXPECT_RADIO_PRIMITIVES_EQ(expected_radio_primitive, actual_radio_primitive);
+}
+
 TEST(MRFPrimitiveVisitorTest, visit_kick_primitive)
 {
     KickPrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33);

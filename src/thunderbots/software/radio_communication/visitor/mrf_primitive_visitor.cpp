@@ -63,6 +63,19 @@ void MRFPrimitiveVisitor::visit(const DirectWheelsPrimitive &direct_wheels_primi
                              DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR;
 }
 
+void MRFPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
+{
+    radio_prim              = RadioPrimitive();
+    radio_prim->prim_type   = FirmwarePrimitiveType::DRIBBLE;
+    radio_prim->param_array = {
+        dribble_primitive.getDestination().x() * MILLIMETERS_PER_METER,
+        dribble_primitive.getDestination().y() * MILLIMETERS_PER_METER,
+        dribble_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN,
+        // There is no division by 300 for RPM in this primitive
+        dribble_primitive.getRpm()};
+    radio_prim->extra_bits = dribble_primitive.isSmallKickAllowed();
+}
+
 void MRFPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
     radio_prim              = RadioPrimitive();
