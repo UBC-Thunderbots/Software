@@ -642,6 +642,9 @@ if (CATKIN_ENABLE_TESTING)
             util/timestamp.cpp
     )
 
+    target_link_libraries(catch_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
     catkin_add_gtest(mrf_primitive_visitor_test
             test/radio_communication/visitor/mrf_primitive_visitor.cpp
             radio_communication/visitor/mrf_primitive_visitor.cpp
