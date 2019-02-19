@@ -71,6 +71,14 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      */
     void visit(const MovePrimitive &move_primitive) override;
 
+    /**
+     * Generates and stores the MotionControllerCommand the robot should perform at the
+     * current moment in time in order to simulate the DribblePrimitive
+     *
+     * @param move_primitive The DribblePrimitive to simulate
+     */
+    void visit(const DribblePrimitive &dribble_primitive) override;
+
 
     /**
      * Generates and stores the MotionControllerCommand the robot should perform at the

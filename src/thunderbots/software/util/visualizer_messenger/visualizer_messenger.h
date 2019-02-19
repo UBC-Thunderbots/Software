@@ -12,12 +12,15 @@
 
 #include <ros/ros.h>
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <string>
 
 #include "thunderbots_msgs/DrawLayer.h"
 #include "thunderbots_msgs/DrawShape.h"
+#include "thunderbots_msgs/Point2D.h"
+#include "util/constants.h"
 
 
 // Forward declaration
@@ -32,6 +35,8 @@ namespace Util
     using LayerMsg    = thunderbots_msgs::DrawLayer;
     using LayerMsgMap = std::map<std::string, LayerMsg>;
     using ShapeMsg    = thunderbots_msgs::DrawShape;
+    using time_point  = std::chrono::time_point<std::chrono::system_clock>;
+    using Point2D     = thunderbots_msgs::Point2D;
 
     class VisualizerMessenger
     {
@@ -132,8 +137,18 @@ namespace Util
                       DrawStyle draw_style         = DrawStyle(),
                       DrawTransform draw_transform = DrawTransform());
 
-        // TODO: #258 polygon support
-        void drawPoly();
+        /**
+         * Request a message to draw a polygon shape. The origin is the
+         * first vertex passed in.
+         *
+         * @param layer: The layer name this shape is being drawn to
+         * @param vertices: A vector of Point2Ds that specifies x and y of vertices
+         * @param draw_style: the drawing style of the shape
+         * @param draw_transform: the transformation of the shape
+         */
+        void drawPoly(const std::string& layer, std::vector<Point2D>& vertices,
+                      DrawStyle draw_style         = DrawStyle(),
+                      DrawTransform draw_transform = DrawTransform());
 
         /**
          * Request a message to draw an arc. The origin is the center point
@@ -172,7 +187,8 @@ namespace Util
         /**
          * Constructor; initializes an empty layers map then populates it
          */
-        explicit VisualizerMessenger() : layers_name_to_msg_map(), publisher()
+        explicit VisualizerMessenger()
+            : layers_name_to_msg_map(), publisher(), time_last_published()
         {
             buildLayers();
         }
@@ -213,6 +229,13 @@ namespace Util
         // string to LayerMsg map
         LayerMsgMap layers_name_to_msg_map;
         ros::Publisher publisher;
+
+        // Period in nanoseconds
+        const double DESIRED_PERIOD_MS =
+            1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
+
+        // Time point
+        time_point time_last_published;
     };
 
 }  // namespace Util
