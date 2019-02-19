@@ -1,7 +1,9 @@
+/**
+ * Tests for the `GradientDescentOptimizer`
+ */
+
 #include "util/gradient_descent.h"
-
 #include <gtest/gtest.h>
-
 #include <cmath>
 
 using namespace Util;

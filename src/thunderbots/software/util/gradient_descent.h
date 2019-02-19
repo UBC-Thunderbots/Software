@@ -1,3 +1,6 @@
+/**
+ * This file contains the declaration for the GradientDescentOptimizer
+ */
 #pragma once
 
 #include <array>

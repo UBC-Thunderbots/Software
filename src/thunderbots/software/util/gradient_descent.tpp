@@ -1,11 +1,13 @@
 /**
- *  NOTE: We do not use `using namespace ...` here, because this is still a header file,
- *        and as such anything that includes `gradient_descent.h` (which includes this
- *        file), would get any namespaces we use here
- *  NOTE: We do not use `ParamArray` in any of the function signatures here, as
- *        `ParamArray` is dependent on a template parameter (`NUM_PARAMS`), and so you
- *        need quite a complex expression in order to use it here. As such, it was
- *        decided that just using `std::array<...>` was the better option
+ * This file contains the declaration for the GradientDescentOptimizer
+ *
+ * NOTE: We do not use `using namespace ...` here, because this is still a header file,
+ *       and as such anything that includes `gradient_descent.h` (which includes this
+ *       file), would get any namespaces we use here
+ * NOTE: We do not use `ParamArray` in any of the function signatures here, as
+ *       `ParamArray` is dependent on a template parameter (`NUM_PARAMS`), and so you
+ *       need quite a complex expression in order to use it here. As such, it was
+ *       decided that just using `std::array<...>` was the better option
  */
 
 #pragma once
