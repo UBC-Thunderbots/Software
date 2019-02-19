@@ -676,6 +676,10 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(gradient_descent_optimizer_test
+            test/util/gradient_descent_optimizer.cpp
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
