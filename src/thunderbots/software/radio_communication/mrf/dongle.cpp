@@ -412,7 +412,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
 {
     std::size_t num_prims = prims.size();
-    if (num_prims > MAX_ROBOTS)
+    if (num_prims > MAX_ROBOTS_OVER_RADIO)
     {
         throw std::invalid_argument("Too many primitives in vector.");
     }
@@ -420,7 +420,7 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
     // More than 1 prim.
     if (num_prims)
     {
-        if (num_prims == MAX_ROBOTS)
+        if (num_prims == MAX_ROBOTS_OVER_RADIO)
         {
             // All robots are present. Build a full-size packet with all the
             // robots’ data in index order.
@@ -430,7 +430,7 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
             }
             drive_packet_length = 64;
         }
-        else if (num_prims < MAX_ROBOTS)
+        else if (num_prims < MAX_ROBOTS_OVER_RADIO)
         {
             // Only some robots are present. Build a reduced-size packet
             // with robot indices prefixed.
