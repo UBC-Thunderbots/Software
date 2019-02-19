@@ -27,35 +27,35 @@ class PrimitiveVisitor
      *
      * @param catch_primitive The CatchPrimitive to visit
      */
-    virtual void visit(const CatchPrimitive &catch_primtiive) = 0;
+    virtual void visit(const CatchPrimitive &catch_primitive) = 0;
 
     /**
      * Visits a ChipPrimitive to perform an operation.
      *
      * @param chip_primitive The ChipPrimitive to visit
      */
-    virtual void visit(const ChipPrimitive &chip_primtiive) = 0;
+    virtual void visit(const ChipPrimitive &chip_primitive) = 0;
 
     /**
      * Visits a DirectVelocityPrimitive to perform an operation.
      *
      * @param direct_velocity_primitive The DirectVelocityPrimitive to visit
      */
-    virtual void visit(const DirectVelocityPrimitive &direct_velocity_primtiive) = 0;
+    virtual void visit(const DirectVelocityPrimitive &direct_velocity_primitive) = 0;
 
     /**
      * Visits a DirectWheelsPrimitive to perform an operation.
      *
      * @param direct_wheels_primitive The DirectWheelsPrimitive to visit
      */
-    virtual void visit(const DirectWheelsPrimitive &direct_wheels_primtiive) = 0;
+    virtual void visit(const DirectWheelsPrimitive &direct_wheels_primitive) = 0;
 
     /**
      * Visits a KickPrimitive to perform an operation.
      *
      * @param kick_primitive The KickPrimitive to visit
      */
-    virtual void visit(const KickPrimitive &kick_primtiive) = 0;
+    virtual void visit(const KickPrimitive &kick_primitive) = 0;
 
     /**
      * Visits a MovePrimitive to perform an operation.
@@ -76,12 +76,12 @@ class PrimitiveVisitor
      *
      * @param pivot_primitive The PivotPrimitive to visit
      */
-    virtual void visit(const PivotPrimitive &pivot_primtiive) = 0;
+    virtual void visit(const PivotPrimitive &pivot_primitive) = 0;
 
     /**
      * Visits a StopPrimitive to perform an operation.
      *
      * @param stop_primitive The StopPrimitive to visit
      */
-    virtual void visit(const StopPrimitive &stop_primtiive) = 0;
+    virtual void visit(const StopPrimitive &stop_primitive) = 0;
 };
