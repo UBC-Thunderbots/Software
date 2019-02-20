@@ -1,9 +1,11 @@
 #include "ai/world/world.h"
+#include "geom/angle.h"
 #include "geom/point.h"
+#include "util/parameter/dynamic_parameters.h"
 
 /**
  * The indirect chip and chase target evaluation function returns a target point for the
- * chipper and chaser. 
+ * chipper and chaser.
  * Other related evaluation functions are also included in this file.
  */
 namespace Evaluation
@@ -13,17 +15,6 @@ namespace Evaluation
     using Poly     = std::array<Vector2, N>;
     using Triangle = Poly<3>;
 
-    // Minimum area of chip target triangle
-    const double MIN_CHIP_TRI_AREA(0.5);
-    // Minimum edge length of chip target triangle
-    const double MIN_CHIP_TRI_EDGE_LEN(0.8);
-    // Percentage of distance to center of triangle to return as target
-    const double CHIP_CHERRY_POWER_DOWNSCALE(0.85);
-    // Maximum power the robot can chip the ball at without malfunctions
-    const double MAX_CHIP_POWER(8.0);
-    // Closest distance to edge of field that the robot could chip and chase to
-    const double CHIP_TARGET_AREA_INSET(0.3);
-
     /**
      * Returns the target point that the chipper will shoot at and the chaser will meet
      * ball at. The target is where ball will land according to chipping calibration.
@@ -31,7 +22,7 @@ namespace Evaluation
      * @param World Object
      *
      * @return Target point to chip and chase at
-     * @return valid Target is within reach 
+     * @return valid Target is within reach
      */
     std::pair<Point, bool> indirect_chip_and_chase_target(const World& world);
 

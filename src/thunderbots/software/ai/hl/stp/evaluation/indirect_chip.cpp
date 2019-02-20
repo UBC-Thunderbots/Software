@@ -6,6 +6,8 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
+using namespace Util::DynamicParameters::Indirect_Chip_Evaluation;
+
 std::pair<Point, bool> Evaluation::indirect_chip_and_chase_target(const World& world)
 {
     // Creates a vector of all non-goalie enemy robots
@@ -33,17 +35,17 @@ std::pair<Point, bool> Evaluation::indirect_chip_and_chase_target(const World& w
     if (!target_triangles.empty())
     {
         std::pair<Triangle, bool> largest_triangle = get_largest_triangle(
-            target_triangles, MIN_CHIP_TRI_AREA, MIN_CHIP_TRI_EDGE_LEN);
+            target_triangles, min_chip_tri_area.value(), min_chip_tri_edge_len.value());
         Triangle t   = largest_triangle.first;
         bool valid   = largest_triangle.second;
         Point target = get_triangle_center_and_area(t).first;
         target       = target.norm((target - world.ball().position()).len() *
-                             CHIP_CHERRY_POWER_DOWNSCALE);
+                             chip_cherry_power_downscale.value());
 
-        // Target should never be further away than MAX_CHIP_POWER
-        if ((target - world.ball().position()).len() > MAX_CHIP_POWER)
+        // Target should never be further away than maximum chip power
+        if ((target - world.ball().position()).len() > max_chip_power.value())
             target = world.ball().position() +
-                     (target - world.ball().position()).norm(MAX_CHIP_POWER);
+                     (target - world.ball().position()).norm(max_chip_power.value());
 
         return std::make_pair(target, valid);
     }
@@ -143,7 +145,7 @@ std::vector<Triangle> Evaluation::remove_outofbounds_triangles(
 {
     std::vector<Triangle> valid_triangles;
     std::vector<Point> chip_area_corners =
-        get_chip_target_area_corners(world, CHIP_TARGET_AREA_INSET);
+        get_chip_target_area_corners(world, chip_target_area_inset.value());
     Point center;
 
     double smallest_x = chip_area_corners[0].x();
