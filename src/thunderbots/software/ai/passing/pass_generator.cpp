@@ -47,7 +47,8 @@ std::optional<Pass> PassGenerator::getBestPassSoFar() {
 }
 
 PassGenerator::~PassGenerator() {
-    // Set this flag so pass_generation_thread knows to end
+    // Set this flag so pass_generation_thread knows to end (also making sure to
+    // properly take and give ownership of the flag)
     in_destructor_mutex.lock();
     in_destructor = true;
     in_destructor_mutex.unlock();
@@ -59,11 +60,6 @@ PassGenerator::~PassGenerator() {
 }
 
 void PassGenerator::continuouslyGeneratePasses() {
-    // We ignore the missing return error here, because this call is not
-    // supposed to ever return
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wmissing-noreturn"
-
     // Take ownership of the in_destructor flag so we can use it for the conditional
     // check
     in_destructor_mutex.lock();
@@ -84,7 +80,6 @@ void PassGenerator::continuouslyGeneratePasses() {
         // check
         in_destructor_mutex.lock();
     }
-#pragma clang diagnostic pop
 }
 
 void PassGenerator::optimizePasses() {
