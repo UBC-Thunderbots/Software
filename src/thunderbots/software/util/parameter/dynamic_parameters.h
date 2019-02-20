@@ -34,17 +34,18 @@ namespace Util
         }  // namespace Navigator
 
         // TODO: do all the other stuff for these parameters
-        namespace Passing
-        {
-            // TODO: javadoc comments here
-            extern Parameter<double> static_position_quality_x_offset;
-            extern Parameter<double> static_position_quality_y_offset;
+        namespace AI {
+            namespace Passing
+            {
+                // TODO: javadoc comments here
+                extern Parameter<double> static_position_quality_x_offset;
+                extern Parameter<double> static_position_quality_y_offset;
 
-            // The weight that being close to the goal will have on the static position
-            // quality. Lower, more negative weights result in the distance to the goal
-            // having less of an effect.
-            extern Parameter<double> static_position_quality_friendly_goal_distance_weight;
-        } // namespace Passing
-
+                // The weight that being close to the goal will have on the static position
+                // quality. Lower, more negative weights result in the distance to the goal
+                // having less of an effect.
+                extern Parameter<double> static_position_quality_friendly_goal_distance_weight;
+            } // namespace Passing
+        }
     }      // namespace DynamicParameters
 }  // namespace Util

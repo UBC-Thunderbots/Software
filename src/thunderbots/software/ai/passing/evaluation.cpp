@@ -13,9 +13,10 @@ double getStaticPositionQuality(Field field, Point position) {
     static const double sigmoid_steepness = 15;
 
     // The offset from the sides of the field for the center of the sigmoid functions
-    double x_offset = Util::DynamicParameters::Passing::static_position_quality_x_offset.value();
-    double y_offset = Util::DynamicParameters::Passing::static_position_quality_y_offset.value();
-    double goal_weight = Util::DynamicParameters::Passing::static_position_quality_friendly_goal_distance_weight.value();
+    // TODO: should we be using dynamic parameters like this here?
+    double x_offset = Util::DynamicParameters::AI::Passing::static_position_quality_x_offset.value();
+    double y_offset = Util::DynamicParameters::AI::Passing::static_position_quality_y_offset.value();
+    double goal_weight = Util::DynamicParameters::AI::Passing::static_position_quality_friendly_goal_distance_weight.value();
 
     if (position.x() >= 0)
     {

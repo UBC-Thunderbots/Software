@@ -12,10 +12,17 @@ namespace AI::Passing {
     class PassGenerator {
 
     public:
+        // Delete the default constructor
+        PassGenerator() = delete;
+
         /**
-         * Create a PassingGradientDescent
+         * Create a PassGenerator with given parameters
+         *
+         * @param min_reasonable_pass_quality A value in [0,1] representing the minimum
+         *                                    quality for a pass to be considered
+         *                                    "reasonable"
          */
-        PassGenerator();
+        explicit PassGenerator(double min_reasonable_pass_quality);
 
         /**
          * Updates the world
@@ -53,17 +60,39 @@ namespace AI::Passing {
         std::optional<Pass> getBestPass();
 
     private:
-
         // The number of parameters (representing a pass) that we optimize
         // (pass_start_x, pass_start_y, pass_speed, pass_start_time)
         static const int NUM_PARAMS_TO_OPTIMIZE = 4;
+
+        // The number of passes to try to optimize at any given time
+        // TODO: should this be a constant here? Maybe a dynamic parameter?
+        static const unsigned int num_passes_to_optimize = 50;
+
+        // The number of passes to keep after pruning
+        // TODO: should this be a constant here? Maybe a dynamic parameter?
+        static const unsigned int num_passes_to_keep_after_pruning = 10;
+
+        // Weights used to normalize the parameters that we pass to GradientDescent
+        // (see the GradientDescent documentation for details)
+        // TODO: should these be constants here? Maybe a dynamic parameter?
+        static constexpr double PASS_SPACE_WEIGHT = 0.01;
+        static constexpr double PASS_TIME_WEIGHT = 1;
+        static constexpr double PASS_SPEED_WEIGHT = 1;
+        std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
+                PASS_SPACE_WEIGHT,
+                PASS_SPACE_WEIGHT,
+                PASS_TIME_WEIGHT,
+                PASS_SPEED_WEIGHT
+        };
 
         /**
          * Convert the given pass to an array
          *
          * @param pass The pass to convert
          *
-         * @return An array containing the parts of the pass we want to optimize
+         * @return An array containing the parts of the pass we want to optimize, in the
+         *         form: {receiver_point.x, receiver_point.y, pass_speed_m_per_s
+         *                pass_start_time}
          */
         static std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(Pass pass);
 
@@ -73,7 +102,9 @@ namespace AI::Passing {
          * // TODO: better comment here?
          * Assumes that the passer point is the passer point held in this class
          *
-         * @param array The array to convert to a pass
+         * @param array The array to convert to a pass, in the form:
+         *              {receiver_point.x, receiver_point.y, pass_speed_m_per_s,
+         *              pass_start_time}
          *
          * @return The pass represented by the given array
          */
@@ -113,10 +144,6 @@ namespace AI::Passing {
 
         // The number of steps of gradient descent to perform in each iteration
         unsigned int number_of_gradient_descent_steps_per_iter;
-
-        // The number of passes to use for gradient descent. This is the number of passes
-        // that we will be trying to optimize at any given time
-        unsigned int num_passes_to_optimize;
 
         // The minimum pass quality that we would consider a "reasonable" pass
         double min_reasonable_pass_quality;

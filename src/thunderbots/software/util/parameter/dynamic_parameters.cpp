@@ -34,11 +34,14 @@ namespace Util::DynamicParameters {
             "collision_avoid_velocity_scale", 2.0);
     }  // namespace Navigator
 
-    namespace Passing
-    {
-        Parameter<double> static_position_quality_x_offset("static_position_quality_x_offset", 0.3);
-        Parameter<double> static_position_quality_y_offset("static_position_quality_y_offset", 0.4);
-        Parameter<double> static_position_quality_friendly_goal_distance_weight("static_position_quality_friendly_goal_distance_weight", -0.1);
-    } // namespace Passing
+    namespace AI {
+        namespace Passing
+        {
+            Parameter<double> static_position_quality_x_offset("static_position_quality_x_offset", 0.3);
+            Parameter<double> static_position_quality_y_offset("static_position_quality_y_offset", 0.4);
+            Parameter<double> static_position_quality_friendly_goal_distance_weight("static_position_quality_friendly_goal_distance_weight", -0.1);
+        } // namespace Passing
+    }
+
 
 }  // namespace Util::DynamicParameters

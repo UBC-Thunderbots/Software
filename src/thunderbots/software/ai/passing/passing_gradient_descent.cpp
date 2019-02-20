@@ -7,12 +7,12 @@
 
 using namespace AI::Passing;
 
-PassGenerator::PassGenerator() :
-num_passes_to_optimize(50),
-min_reasonable_pass_quality(0),
-optimizer({ 0.1, 0.1, 1, 1 })
+
+PassGenerator::PassGenerator(double min_reasonable_pass_quality):
+min_reasonable_pass_quality(min_reasonable_pass_quality),
+optimizer(optimizer_param_weights)
 {
-    passes_to_optimize = generatePasses(num_passes_to_optimize);
+    passes_to_optimize = generatePasses(this->num_passes_to_optimize);
 }
 
 void PassGenerator::setWorld(World world) {
@@ -20,7 +20,7 @@ void PassGenerator::setWorld(World world) {
 }
 
 void PassGenerator::setPasserPoint(Point passer_point) {
-    this->passer_point = std::move(passer_point);
+    this->passer_point = passer_point;
 }
 
 std::optional<Pass> PassGenerator::getBestPass() {
@@ -46,6 +46,7 @@ void PassGenerator::iterate() {
 
     // Run gradient descent to optimize the passes to for the requested number
     // of iterations
+    // TODO: Can we parallize this? Would it make it faster?
     for (Pass& pass : passes_to_optimize){
         auto pass_array = optimizer.maximize(
                 objective_function,
@@ -55,7 +56,15 @@ void PassGenerator::iterate() {
         pass = convertArrayToPass(pass_array);
     }
 
-    // TODO: prune (only keep top 5-10? make it a class memeber and parameter) and re-generate
+    // Replace un-promising passes with new passes
+    std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
+            [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); }
+            );
+    if (num_passes_to_keep_after_pruning < num_passes_to_optimize){
+        std::vector<Pass> new_passes = generatePasses(num_passes_to_optimize -
+                                                      num_passes_to_keep_after_pruning);
+        std::move(new_passes.begin(), new_passes.end(), passes_to_optimize.begin() + num_passes_to_keep_after_pruning);
+    }
 }
 
 double PassGenerator::ratePass(Pass pass) {
