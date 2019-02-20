@@ -6,8 +6,6 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-using namespace Util::DynamicParameters::Indirect_Chip_Evaluation;
-
 std::pair<Point, bool> Evaluation::indirect_chip_and_chase_target(const World& world)
 {
     // Creates a vector of all non-goalie enemy robots
