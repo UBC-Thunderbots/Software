@@ -802,9 +802,9 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES})
 
     catkin_add_gtest(passing_gradient_descent_test
-            test/passing_gradient_descent/passing_gradient_descent_test.cpp
+            test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
-            ai/passing/passing_gradient_descent.cpp
+            ai/passing/pass_generator.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/world/team.cpp

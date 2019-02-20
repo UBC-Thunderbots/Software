@@ -1,14 +1,22 @@
 #pragma once
 
-#include <util/parameter/dynamic_parameters.h>
-#include "ai/world/world.h"
+#include <thread>
+#include <mutex>
+
 #include "ai/passing/pass.h"
-#include "util/timestamp.h"
+#include "ai/world/world.h"
 #include "util/gradient_descent.h"
+#include "util/parameter/dynamic_parameters.h"
+#include "util/timestamp.h"
 
 namespace AI::Passing {
 
     // TODO: detailed Javadoc comment for this class
+    // TODO: explain the general idiom of: get in, lock what you need, exit (RAII?)
+    // TODO: explain how to make changes to this class:
+    //      - if you add data, consider if it could be accessed by two threads at once. If so, it needs a mutex
+    //      - for each function added/changed, consider: what data does this access? If any of that data has a mutex, you must take a `lock_guard` for it
+    //      (NOTE: this is only for data accessed _directly_ by the function, any data accessed by functions called by the function should be in _those_ functions
     class PassGenerator {
 
     public:
@@ -40,12 +48,6 @@ namespace AI::Passing {
 
         // TODO: Ability to set a target region
 
-        // TODO: better comment here?
-        /**
-         * Runs a full iteration of pass optimization, pruning, and generation
-         */
-        void iterate();
-
         /**
          * Gets the best pass we know of so far
          *
@@ -57,7 +59,13 @@ namespace AI::Passing {
          * @return The best currently known pass, or `std::nullopt` if there is no
          *         reasonable pass
          */
-        std::optional<Pass> getBestPass();
+        std::optional<Pass> getBestPassSoFar();
+
+        /**
+         * Destructs this PassGenerator
+         */
+        ~PassGenerator();
+
 
     private:
         // The number of parameters (representing a pass) that we optimize
@@ -84,6 +92,28 @@ namespace AI::Passing {
                 PASS_TIME_WEIGHT,
                 PASS_SPEED_WEIGHT
         };
+
+        /**
+         * Continuously optimizes, prunes, and re-generates passes based on known info
+         *
+         * This will only return when the in_destructor flag is set
+         */
+        void continuouslyGeneratePasses();
+
+        /**
+         * Optimizes all current passes
+         */
+        void optimizePasses();
+
+        /**
+         * Prunes un-promising passes and replaces them with newly generated ones
+         */
+        void pruneAndReplacePasses();
+
+        /**
+         * Saves the best currently known pass
+         */
+        void saveBestPath();
 
         /**
          * Convert the given pass to an array
@@ -148,11 +178,35 @@ namespace AI::Passing {
         // The minimum pass quality that we would consider a "reasonable" pass
         double min_reasonable_pass_quality;
 
+        // The thread running the pass optimization/pruning/re-generation in the
+        // background. This thread will run for the entire lifetime of the class
+        std::thread pass_generation_thread;
+
+        // The mutex for the in_destructor flag
+        std::mutex in_destructor_mutex;
+
+        // This flag is used to indicate that we are in the desctructor. We use this to
+        // communicate with pass_genereation_thread that it is
+        // time to stop
+        bool in_destructor;
+
+        // The mutex for the world
+        std::mutex world_mutex;
+
         // The most recent world we know about
         World world;
 
+        // The mutex for the passer_point
+        std::mutex passer_point_mutex;
+
         // The point we are passing from
         Point passer_point;
+
+        // The mutex for the passer_point
+        std::mutex best_known_pass_mutex;
+
+        // The best pass we currently know about
+        std::optional<Pass> best_known_pass;
 
         // All the passes that we are currently trying to optimize in gradient descent
         std::vector<Pass> passes_to_optimize;
