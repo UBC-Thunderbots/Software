@@ -20,8 +20,15 @@ namespace AI::Passing {
     class PassGenerator {
 
     public:
-        // Delete the default constructor
+        // Delete the default constructor, we want to force users to choose what
+        // pass quality they deem reasonable
         PassGenerator() = delete;
+
+        // Delete the copy and assignment operators because this class really shouldn't
+        // need them and we don't want to risk doing anything nasty with the internal
+        // threading this class uses
+        PassGenerator & operator=(const PassGenerator&) = delete;
+        PassGenerator(const PassGenerator&) = delete;
 
         /**
          * Create a PassGenerator with given parameters
@@ -79,6 +86,10 @@ namespace AI::Passing {
         // The number of passes to keep after pruning
         // TODO: should this be a constant here? Maybe a dynamic parameter?
         static const unsigned int num_passes_to_keep_after_pruning = 10;
+
+        // The number of steps of gradient descent to perform in each iteration
+        // TODO: should this be a constant here? Maybe a dynamic parameter?
+        static const unsigned int number_of_gradient_descent_steps_per_iter = 20;
 
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
@@ -172,9 +183,6 @@ namespace AI::Passing {
         // (gradient descent)
         static constexpr double eps = 1e-8;
 
-        // The number of steps of gradient descent to perform in each iteration
-        unsigned int number_of_gradient_descent_steps_per_iter;
-
         // The minimum pass quality that we would consider a "reasonable" pass
         double min_reasonable_pass_quality;
 
@@ -213,6 +221,7 @@ namespace AI::Passing {
 
         // The optimizer we're using to find passes
         Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+
     };
 
 

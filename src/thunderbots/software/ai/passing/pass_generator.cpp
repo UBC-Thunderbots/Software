@@ -83,10 +83,6 @@ void PassGenerator::continuouslyGeneratePasses() {
 }
 
 void PassGenerator::optimizePasses() {
-    // Take ownership of world, passer_point, for the duration of this function
-    std::lock_guard<std::mutex> world_lock(world_mutex);
-    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
-
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
     static const auto objective_function =
@@ -181,6 +177,9 @@ std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE> PassGenerator::convert
 }
 
 Pass PassGenerator::convertArrayToPass(std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE> array) {
+    // Take ownership of the passer_point for the duration of this function
+    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
+
     return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
             Timestamp::fromSeconds(array.at(3)));
 }
