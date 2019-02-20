@@ -10,11 +10,13 @@
 namespace AI::Primitive {
 
     /**
-     * Creates a Primitive from a given ROS message
+     * Given a ROS Primitive message, constructs a concrete Primitive object and returns
+     * a unique_ptr using the Abstract Primitive interface. This acts like a Primitive
+     * factory.
      *
-     * @param primitive_msg The Primitive ROS message
-     *
-     * @return The primitive class represented by the ROS message
+     * @param primitive_msg the Primitive message from which to construct the Primitive
+     * @throws std::invalid_argument if primitive is unknown
+     * @return a unique_ptr to a Primitive object
      */
     std::unique_ptr<::Primitive> createPrimitiveFromROSMessage(
             const thunderbots_msgs::Primitive& primitive_msg);
