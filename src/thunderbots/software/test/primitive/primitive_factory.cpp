@@ -2,11 +2,10 @@
  * This file contains unit tests for the PrimitiveFactory class
  */
 
+#include "ai/primitive/primitive_factory.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
-
-#include "ai/primitive/primitive_factory.h"
-#include "geom/point.h"
 
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
@@ -18,6 +17,7 @@
 #include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/stop_primitive.h"
+#include "geom/point.h"
 
 
 // Test that we can correctly translate a MovePrimitive like:
@@ -31,11 +31,12 @@ TEST(PrimitiveFactoryTest, convert_MovePrimitive_to_message_and_back_to_MovePrim
     const unsigned int robot_id = 0U;
 
     MovePrimitive move_prim =
-            MovePrimitive(robot_id, destination, final_angle, final_speed);
+        MovePrimitive(robot_id, destination, final_angle, final_speed);
 
     thunderbots_msgs::Primitive prim_message = move_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     // Since we have a `Primitive` and NOT a `MovePrimitive`, we have to check that the
     // values are correct by getting them from the generic parameter array
@@ -50,18 +51,20 @@ TEST(PrimitiveFactoryTest, convert_MovePrimitive_to_message_and_back_to_MovePrim
     EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 
-TEST(PrimitiveFactoryTest, convert_MoveSpinPrimitive_to_message_and_back_to_MoveSpinPrimitive)
+TEST(PrimitiveFactoryTest,
+     convert_MoveSpinPrimitive_to_message_and_back_to_MoveSpinPrimitive)
 {
     const Point destination     = Point(-1, 4);
     const Angle angular_vel     = AngularVelocity::ofRadians(0.54);
     const unsigned int robot_id = 2U;
 
     MoveSpinPrimitive movespin_prim =
-            MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel);
 
     thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     std::vector<double> parameters = new_prim->getParameters();
 
@@ -84,11 +87,12 @@ TEST(PrimitiveFactoryTest,
     const unsigned int robot_id   = 3U;
 
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(
-            robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
+        robot_id, wheel0_power, wheel1_power, wheel2_power, wheel3_power, dribbler_rpm);
 
     thunderbots_msgs::Primitive prim_message = directwheels_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     std::vector<double> parameters = new_prim->getParameters();
 
@@ -113,11 +117,12 @@ TEST(PrimitiveFactoryTest, convert_ChipPrimitive_to_message_and_back_to_ChipPrim
     const double chip_distance_meters = 4.2;
 
     ChipPrimitive chip_prim =
-            ChipPrimitive(robot_id, chip_origin, chip_direction, chip_distance_meters);
+        ChipPrimitive(robot_id, chip_origin, chip_direction, chip_distance_meters);
 
     thunderbots_msgs::Primitive prim_message = chip_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     // Since we have a `Primitive` and NOT a `MovePrimitive`, we have to check that the
     // values are correct by getting them from the generic parameter array
@@ -143,11 +148,12 @@ TEST(PrimitiveFactoryTest, convert_KickPrimitive_to_message_and_back_to_KickPrim
     const double kick_distance_meters = 4.2;
 
     KickPrimitive kick_prim =
-            KickPrimitive(robot_id, kick_origin, kick_direction, kick_distance_meters);
+        KickPrimitive(robot_id, kick_origin, kick_direction, kick_distance_meters);
 
     thunderbots_msgs::Primitive prim_message = kick_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     // Since we have a `Primitive` and NOT a `MovePrimitive`, we have to check that the
     // values are correct by getting them from the generic parameter array
@@ -171,11 +177,11 @@ TEST(PrimitiveFactoryTest,
     const double angular_velocity                = -0.98;
     const double dribbler_rpm                    = 9.047;
     DirectVelocityPrimitive direct_velocity_prim = DirectVelocityPrimitive(
-            robot_id, x_velocity, y_velocity, angular_velocity, dribbler_rpm);
+        robot_id, x_velocity, y_velocity, angular_velocity, dribbler_rpm);
 
     thunderbots_msgs::Primitive prim_message = direct_velocity_prim.createMsg();
     std::unique_ptr<Primitive> new_prim =
-            AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
     std::vector<double> params = new_prim->getParameters();
 
     EXPECT_EQ("Direct Velocity Primitive", new_prim->getPrimitiveName());
@@ -196,8 +202,9 @@ TEST(PrimitiveFactoryTest, convert_CatchPrimitive_to_message_and_back_to_CatchPr
     CatchPrimitive catch_prim(robot_id, velocity, dribbler_rpm, ball_intercept_margin);
 
     thunderbots_msgs::Primitive prim_message = catch_prim.createMsg();
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
-    std::vector<double> params          = new_prim->getParameters();
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::vector<double> params = new_prim->getParameters();
 
     EXPECT_EQ("Catch Primitive", new_prim->getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim->getRobotId());
@@ -218,11 +225,12 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     const double pivot_radius   = .78;
 
     PivotPrimitive pivot_prim =
-            PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
+        PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
-    std::unique_ptr<Primitive> new_prim  = AI::Primitive::createPrimitiveFromROSMessage(prim_msg);
-    std::vector<double> parameters       = new_prim->getParameters();
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_msg);
+    std::vector<double> parameters = new_prim->getParameters();
 
     EXPECT_EQ("Pivot Primitive", new_prim->getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim->getRobotId());
@@ -244,7 +252,8 @@ TEST(StopPrimTest, convert_StopPrimitive_to_message_and_back_to_StopPrimitive)
     StopPrimitive stop_prim                  = StopPrimitive(robot_id, coast);
     thunderbots_msgs::Primitive prim_message = stop_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     // Since we have a `Primitive` and NOT a `StopPrimitive`, we have to check that the
     // values are correct by getting them from the generic extra_bits array
@@ -272,11 +281,12 @@ TEST(PrimitiveFactoryTest, convert_DribblePrimitive_to_message_and_back_to_MoveP
     const unsigned int robot_id   = 0U;
 
     DribblePrimitive dribble_prim = DribblePrimitive(
-            robot_id, destination, final_angle, final_speed, rpm, small_kick_allowed);
+        robot_id, destination, final_angle, final_speed, rpm, small_kick_allowed);
 
     thunderbots_msgs::Primitive prim_message = dribble_prim.createMsg();
 
-    std::unique_ptr<Primitive> new_prim = AI::Primitive::createPrimitiveFromROSMessage(prim_message);
+    std::unique_ptr<Primitive> new_prim =
+        AI::Primitive::createPrimitiveFromROSMessage(prim_message);
 
     // Since we have a `Primitive` and NOT a `MovePrimitive`, we have to check that the
     // values are correct by getting them from the generic parameter array

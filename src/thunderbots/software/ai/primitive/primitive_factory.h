@@ -4,11 +4,12 @@
 #pragma once
 
 #include <memory>
-#include "thunderbots_msgs/Primitive.h"
+
 #include "ai/primitive/primitive.h"
+#include "thunderbots_msgs/Primitive.h"
 
-namespace AI::Primitive {
-
+namespace AI::Primitive
+{
     /**
      * Given a ROS Primitive message, constructs a concrete Primitive object and returns
      * a unique_ptr using the Abstract Primitive interface. This acts like a Primitive
@@ -19,6 +20,6 @@ namespace AI::Primitive {
      * @return a unique_ptr to a Primitive object
      */
     std::unique_ptr<::Primitive> createPrimitiveFromROSMessage(
-            const thunderbots_msgs::Primitive& primitive_msg);
+        const thunderbots_msgs::Primitive& primitive_msg);
 
-}
+}  // namespace AI::Primitive

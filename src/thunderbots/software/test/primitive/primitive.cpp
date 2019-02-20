@@ -3,10 +3,11 @@
  */
 
 #include "ai/primitive/primitive.h"
-#include "ai/primitive/move_primitive.h"
-#include "geom/point.h"
 
 #include <gtest/gtest.h>
+
+#include "ai/primitive/move_primitive.h"
+#include "geom/point.h"
 
 TEST(PrimitiveTest, validate_valid_primitive_test)
 {
@@ -21,9 +22,8 @@ TEST(PrimitiveTest, validate_invalid_primitive_test)
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
     EXPECT_THROW(
-            move_prim.validatePrimitiveMessage(move_prim.createMsg(), "Some other primitive"),
-            std::invalid_argument
-            );
+        move_prim.validatePrimitiveMessage(move_prim.createMsg(), "Some other primitive"),
+        std::invalid_argument);
 }
 
 

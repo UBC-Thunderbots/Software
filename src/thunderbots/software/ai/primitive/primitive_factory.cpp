@@ -2,9 +2,9 @@
  *  Implementations for functions to construct Primitives from various sources
  */
 
-#include <exception>
-
 #include "ai/primitive/primitive_factory.h"
+
+#include <exception>
 
 #include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
@@ -19,8 +19,8 @@
 
 
 std::unique_ptr<::Primitive> AI::Primitive::createPrimitiveFromROSMessage(
-        const thunderbots_msgs::Primitive& primitive_msg){
-
+    const thunderbots_msgs::Primitive& primitive_msg)
+{
     std::unique_ptr<::Primitive> prim_ptr;
 
     if (primitive_msg.primitive_name == MovePrimitive::PRIMITIVE_NAME)
@@ -71,4 +71,3 @@ std::unique_ptr<::Primitive> AI::Primitive::createPrimitiveFromROSMessage(
 
     return prim_ptr;
 }
-
