@@ -1,13 +1,15 @@
-#include <util/parameter/dynamic_parameters.h>
 #include "world.h"
 
-World::World() : World(
-        Field(0, 0, 0, 0, 0, 0, 0), Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
-        Team(Duration::fromMilliseconds(
+#include <util/parameter/dynamic_parameters.h>
+
+World::World()
+    : World(Field(0, 0, 0, 0, 0, 0, 0),
+            Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
+            Team(Duration::fromMilliseconds(
                 Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
-        Team(Duration::fromMilliseconds(
-                Util::DynamicParameters::robot_expiry_buffer_milliseconds.value()))
-        ) {
+            Team(Duration::fromMilliseconds(
+                Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())))
+{
 }
 
 World::World(const Field &field, const Ball &ball, const Team &friendly_team,
@@ -94,4 +96,3 @@ GameState &World::mutableGameState()
 {
     return game_state_;
 }
-

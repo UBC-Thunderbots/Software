@@ -55,6 +55,11 @@ if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
 endif()
 message("g3log path: ${G3LOG}")
 
+# Find boost components
+find_package(Boost REQUIRED COMPONENTS
+        coroutine
+        )
+
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -88,6 +93,7 @@ include_directories(SYSTEM
 include_directories(
         ${catkin_INCLUDE_DIRS}
         ${PROTOBUF_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         )
@@ -135,6 +141,7 @@ add_executable (ai_logic
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
 target_link_libraries(ai_logic ${catkin_LIBRARIES}
+        ${Boost_LIBRARIES}
         ${G3LOG}
         )
 
@@ -247,6 +254,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(field_test
             test/world/field.cpp
             ai/world/field.cpp
+            util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(field_test ${catkin_LIBRARIES})
 
@@ -255,6 +263,7 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_backend/grsim_backend.cpp
             grsim_communication/motion_controller/motion_controller.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/primitive.cpp
@@ -262,6 +271,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -375,6 +385,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/game_state.cpp
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             )
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
@@ -390,7 +401,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/game_state.cpp
             util/refbox_constants.cpp
-            util/timestamp.cpp)
+            util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
 
     target_link_libraries(game_state_test ${catkin_LIBRARIES})
 
@@ -407,6 +420,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
@@ -421,6 +435,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(move_spin_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
@@ -437,6 +452,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             )
@@ -453,6 +469,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -472,6 +489,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -491,6 +509,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -510,6 +529,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -529,6 +549,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -548,6 +569,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -567,6 +589,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -586,6 +609,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/directwheels_primitive.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/stop_primitive.cpp
@@ -605,6 +629,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
@@ -613,6 +638,27 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(stop_primitive_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
+    catkin_add_gtest(dribble_primitive_test
+            test/primitive/dribble_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            )
+
+    target_link_libraries(dribble_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
 
     catkin_add_gtest(grsim_catch_primitive_test
@@ -628,6 +674,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/kick_primitive.cpp
             ai/primitive/pivot_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/directwheels_primitive.cpp
@@ -642,6 +689,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
     )
 
     target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
@@ -653,7 +701,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(timestamp_test ${catkin_LIBRARIES})
-        
+
     catkin_add_gtest(deflect_off_enemy_target_test
             test/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
@@ -667,6 +715,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             test/test_util/test_util.cpp
+            util/parameter/dynamic_parameters.cpp
             )
 
     target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})
@@ -674,8 +723,87 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(evaluation_robot_orientation_within_angle_threshold_of_target_test
             test/evaluation/robot.cpp
             ai/hl/stp/evaluation/robot.cpp
+            util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(evaluation_nearest_friendly_robot_test
+    test/evaluation/team.cpp
+    ai/hl/stp/evaluation/team.cpp
+    ai/world/team.cpp
+    ai/world/robot.cpp
+    util/timestamp.cpp
+    geom/point.h
+    geom/angle.h
+    )
+    target_link_libraries(evaluation_nearest_friendly_robot_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(move_action_test
+            test/action/move_action.cpp
+            ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/move_action.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/intent.cpp
+            ai/world/robot.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/timestamp.cpp
+            )
+    target_link_libraries(move_action_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
+
+    catkin_add_gtest(move_tactic_test
+            test/tactic/move_tactic.cpp
+            test/test_util/test_util.cpp
+            ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/action.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/intent.cpp
+            ai/world/robot.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/team.cpp
+            ai/world/game_state.cpp
+            ai/world/world.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+    target_link_libraries(move_tactic_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
+
+    catkin_add_gtest(gradient_descent_optimizer_test
+            test/util/gradient_descent_optimizer.cpp
+            )
 
     catkin_add_gtest(passing_gradient_descent_test
             test/passing_gradient_descent/passing_gradient_descent_test.cpp
