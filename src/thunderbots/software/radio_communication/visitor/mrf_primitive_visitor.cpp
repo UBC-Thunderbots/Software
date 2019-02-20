@@ -71,7 +71,7 @@ void MRFPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
         dribble_primitive.getDestination().x() * MILLIMETERS_PER_METER,
         dribble_primitive.getDestination().y() * MILLIMETERS_PER_METER,
         dribble_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN,
-        // There is no division by 300 for RPM in this primitive
+        // For this primitive, we don't divide the RPM
         dribble_primitive.getRpm()};
     radio_prim->extra_bits = dribble_primitive.isSmallKickAllowed();
 }
