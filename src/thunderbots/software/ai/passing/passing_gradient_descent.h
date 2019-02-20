@@ -2,60 +2,11 @@
 
 #include <util/parameter/dynamic_parameters.h>
 #include "ai/world/world.h"
+#include "ai/passing/pass.h"
 #include "util/timestamp.h"
 #include "util/gradient_descent.h"
 
 namespace AI::Passing {
-
-    // TODO: functions and whatnot for this?
-    // TODO: this should be in it's own file and have a cpp
-    class Pass {
-    public:
-
-        // The number of parameters that make up a pass
-        static const size_t NUM_PARAMS = 4;
-
-        // TODO: properly implement
-        Pass() {}
-
-        // TODO: these should probably just be `GradientDescentPass`
-        // TODO: javadoc comment
-        Pass(std::array<double, NUM_PARAMS> params) :
-                Pass(params[0], params[1], params[2], params[3]) {}
-
-        // TODO: javadoc comment
-        // TODO: decide on what to do about clamping time and velocity here.......... we clamp to stop the gradient descent from trying values outside of acceptable ranges
-        Pass(double receiver_point_x, double receiver_point_y, double pass_speed_m_per_s, double pass_start_time_s) :
-                Pass(Point(receiver_point_x, receiver_point_y),
-                        std::max(0.0, pass_speed_m_per_s),
-                        Timestamp::fromSeconds(std::max(0.0, pass_start_time_s))) {}
-
-        // TODO: javadoc comment
-        Pass(Point receiver_point, double pass_speed_m_per_s, Timestamp pass_start_time) :
-                receiver_point(receiver_point), pass_speed_m_per_s(pass_speed_m_per_s), pass_start_time(pass_start_time) {}
-
-        // The location of the receiver
-        Point receiver_point;
-
-        // The speed of the pass in meters/second
-        double pass_speed_m_per_s;
-
-        // The time to preform the pass at
-        Timestamp pass_start_time;
-
-        // TODO: Test that outputing params from here and reading them back into the constructor results in the exact same pass
-        /**
-         * Get the parameters that define this Pass.
-         *
-         * These are the values that we actually optimize with gradient descent
-         *
-         * @return A vector of params defining this Pass
-         */
-        std::array<double, NUM_PARAMS> getParams() {
-            return {receiver_point.x(), receiver_point.y(), pass_speed_m_per_s,
-                    pass_start_time.getMilliseconds()};
-        }
-    };
 
     // TODO: detailed Javadoc comment for this class
     class PassGenerator {
@@ -103,21 +54,37 @@ namespace AI::Passing {
 
     private:
 
+        // The number of parameters (representing a pass) that we optimize
+        // (pass_start_x, pass_start_y, pass_speed, pass_start_time)
+        static const int NUM_PARAMS_TO_OPTIMIZE = 4;
+
+        /**
+         * Convert the given pass to an array
+         *
+         * @param pass The pass to convert
+         *
+         * @return An array containing the parts of the pass we want to optimize
+         */
+        static std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(Pass pass);
+
+        /**
+         * Convert a given array to a Pass
+         *
+         * // TODO: better comment here?
+         * Assumes that the passer point is the passer point held in this class
+         *
+         * @param array The array to convert to a pass
+         *
+         * @return The pass represented by the given array
+         */
+        Pass convertArrayToPass(std::array<double, NUM_PARAMS_TO_OPTIMIZE> array);
+
         /**
          * Calculate the quality of a given pass
-         *
-         * @param pass The pass to rate
+         * * @param pass The pass to rate
          * @return A value in [0,1] representing the quality of the pass
          */
         double ratePass(Pass pass);
-
-        /**
-         * Calculate the quality of a given pass, expressed in terms of params
-         *
-         * @param pass The pass to rate
-         * @return A value in [0,1] representing the quality of the pass
-         */
-        double ratePass(std::array<double, Pass::NUM_PARAMS> pass);
 
         /**
          * Compares the quality of the two given passes
@@ -144,9 +111,12 @@ namespace AI::Passing {
         // (gradient descent)
         static constexpr double eps = 1e-8;
 
+        // The number of steps of gradient descent to perform in each iteration
+        unsigned int number_of_gradient_descent_steps_per_iter;
+
         // The number of passes to use for gradient descent. This is the number of passes
         // that we will be trying to optimize at any given time
-        unsigned int num_gradient_descent_passes;
+        unsigned int num_passes_to_optimize;
 
         // The minimum pass quality that we would consider a "reasonable" pass
         double min_reasonable_pass_quality;
@@ -161,65 +131,9 @@ namespace AI::Passing {
         std::vector<Pass> passes_to_optimize;
 
         // The optimizer we're using to find passes
-        Util::GradientDescentOptimizer<Pass::NUM_PARAMS> optimizer;
-
+        Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
     };
 
-    // TODO: implement this in it's own file, and probably put the declaration there as well
-    /**
-     * Calculates the static position quality for a given position on a given field
-     *
-     * @param field The field on which to calculate the static position quality
-     * @param position The position on the field at which to calculate the quality
-     *
-     * @return A value in [0,1] representing the quality of the given point on the given field
-     */
-    inline double getStaticPositionQuality(Field field, Point position) {
-
-        double positionQuality = 1;
-        double length          = field.length() / 2;
-        double width           = field.width() / 2;
-
-        // This constant is used to determine how steep the sigmoid slopes below are
-        static const double sigmoid_steepness = 15;
-
-        // The offset from the sides of the field for the center of the sigmoid functions
-        double x_offset = Util::DynamicParameters::Passing::static_position_quality_x_offset.value();
-        double y_offset = Util::DynamicParameters::Passing::static_position_quality_y_offset.value();
-        double goal_weight = Util::DynamicParameters::Passing::static_position_quality_friendly_goal_distance_weight.value();
-
-        if (position.x() >= 0)
-        {
-            // Positive x is closer to the enemy goal, so the higher the better!
-            positionQuality =
-                    positionQuality / (1 + std::exp(sigmoid_steepness * (position.x() - (length - x_offset))));
-        }
-        else if (position.x() < 0)
-        {
-            // Negative x is closer to our goal, so the lower the worse it is
-            positionQuality =
-                    positionQuality / (1 + std::exp(sigmoid_steepness * (-position.x() - (length - x_offset))));
-        }
-
-        // Give a better score to positions in the center
-        if (position.y() >= 0)
-        {
-            positionQuality =
-                    positionQuality / (1 + std::exp(sigmoid_steepness * (position.y() - (width - y_offset))));
-        }
-        else if (position.y() < 0)
-        {
-            positionQuality =
-                    positionQuality / (1 + std::exp(sigmoid_steepness * (-position.y() - (width - y_offset))));
-        }
-
-        // Add a negative weight for positions closer to our goal
-        Vector vec_to_goal = Vector(field.friendlyGoal().x() - position.x(), field.friendlyGoal().y() - position.y());
-        positionQuality =
-                positionQuality * (1 - std::exp(goal_weight * (std::pow(2, vec_to_goal.len()))));
-
-        return positionQuality;
-    }
 
 }
 

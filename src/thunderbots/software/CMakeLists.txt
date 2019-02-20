@@ -805,6 +805,8 @@ if (CATKIN_ENABLE_TESTING)
             test/passing_gradient_descent/passing_gradient_descent_test.cpp
             test/test_util/test_util.cpp
             ai/passing/passing_gradient_descent.cpp
+            ai/passing/evaluation.cpp
+            ai/passing/pass.cpp
             ai/world/team.cpp
             ai/world/world.cpp
             ai/world/field.cpp

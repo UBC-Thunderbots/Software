@@ -117,6 +117,8 @@ namespace Util
         ParamArray minimize(std::function<double(ParamArray)> objective_function,
                             ParamArray initial_value, unsigned int num_iters);
 
+       private:
+
         /**
          * Attempts to minimize or maximize the given objective function
          *
@@ -134,12 +136,10 @@ namespace Util
          *         objective found, depending on what gradient_movement_func was given
          */
         ParamArray followGradient(
-            std::function<double(ParamArray)> objective_function,
-            ParamArray initial_value, unsigned int num_iters,
-            std::function<double(double, double)> gradient_movement_func);
+                std::function<double(ParamArray)> objective_function,
+                ParamArray initial_value, unsigned int num_iters,
+                std::function<double(double, double)> gradient_movement_func);
 
-
-       private:
         /**
          * Approximate the gradient of the objective function around a given point
          *
