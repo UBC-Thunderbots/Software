@@ -676,6 +676,22 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(evaluation_detect_threat_test
+            test/evaluation/detect_threat.cpp
+            ai/hl/stp/evaluation/detect_threat.cpp
+            test/test_util/test_util.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            util/timestamp.cpp
+            geom/util.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/robot.cpp
+            ai/world/game_state.cpp
+            )
+
+    target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
+
 endif()
 
 ##### ROSTests / Integration Tests #####

@@ -339,6 +339,17 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 Point reflect(const Point &v, const Point &n);
 
 /**
+ * Calculates the intersection point (if it exists) of an moving element with a line defined by 2 Points
+ *
+ * @param element_velocity: X/Y velocity of the element, defined in meters per second
+ * @param element_position: X/Y position of the element, defined in meters
+ * @param line_start: X/Y point where the line begins, defined in meters
+ * @param line_end: X/Y point where the line ends, defined in meters
+ * @param boundry_area: Defines the rectangular geometry that limits the scope of calculating an intersection
+ */
+std::optional<Point> velocity_line_intersection(const Vector &element_velocity, const Vector &element_position, const Point line_start, const Point line_end, const Rectangle boundry_area);
+
+/**
  * Reflects a point across a line.
  *
  * @param a a point on the line.

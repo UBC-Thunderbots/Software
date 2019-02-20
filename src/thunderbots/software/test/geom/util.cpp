@@ -762,6 +762,141 @@ TEST(GeomUtilTest, test_dist_point_seg)
     EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
 }
 
+TEST(GeomUtilTest, test_velocity_intersection_upper_bound)
+{
+    Vector velociity(0, 1);
+    Point position(0,0);
+
+    Point start(1,1);
+    Point end(-1,1);
+
+    Rectangle boundry( Point(2,2), Point(-2,-2) );
+
+    const std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(0, 1), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_lower_bound)
+{
+    Vector velociity(0, -1);
+    Point position(0,0);
+
+    Point start(1,-1);
+    Point end(-1,-1);
+
+    Rectangle boundry( Point(2,2), Point(-2,-2) );
+
+    const std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(0, -1), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_right_bound)
+{
+    Vector velocity(1, 0);
+    Point position(0,0);
+
+    Point start(1,-1);
+    Point end(1,1);
+
+    Rectangle boundry( Point(2,2), Point(-2,-2) );
+
+    const std::optional<Point> intersection = velocity_line_intersection(velocity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(1,0), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_left_bound)
+{
+    Vector velocity(-1, 0);
+    Point position(0,0);
+
+    Point start(-1,-1);
+    Point end(-1,1);
+
+    Rectangle boundry( Point(2,2), Point(-2,-2) );
+
+    const std::optional<Point> intersection = velocity_line_intersection(velocity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(-1,0), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_out_of_scope)
+{
+    Vector velociity(-1, 0);
+    Point position(0,0);
+
+    Point start(-5,5);
+    Point end(5,5);
+
+    Rectangle boundry( Point(2,2), Point(-2,-2) );
+
+    std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( std::nullopt, intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_diagonal_line)
+{
+    Vector velociity(0, 5);
+    Point position(0,0);
+
+    Point start(-4,1.25);
+    Point end(1,0);
+
+    Rectangle boundry( Point(3,3), Point(-3,-3) );
+
+    std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(0, 0.25), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_diagonal_line_diagonal_velocity)
+{
+    Vector velociity(1, 1);
+    Point position(0,0);
+
+    Point start(-4,1.25);
+    Point end(1,0);
+
+    Rectangle boundry( Point(3,3), Point(-3,-3) );
+
+    std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(0.2, 0.2), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_element_not_in_boundry)
+{
+    Vector velociity(1, 1);
+    Point position(4,4);
+
+    Point start(-4,1.25);
+    Point end(1,0);
+
+    Rectangle boundry( Point(3,3), Point(-3,-3) );
+
+    std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( std::nullopt, intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_intersection_limit_case)
+{
+    Vector velociity(-1, 0.00);
+    Point position(1,-0.2);
+
+    Point start(-4.5,2);
+    Point end(-4.5,-2);
+
+    Rectangle boundry( Point(-4.5,-3), Point(4.5,3) );
+
+    std::optional<Point> intersection = velocity_line_intersection(velociity, position, start, end, boundry);
+
+    EXPECT_EQ( Point(-4.5, -0.2), *intersection);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
