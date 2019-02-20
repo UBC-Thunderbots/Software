@@ -35,17 +35,27 @@ std::pair<Point, bool> Evaluation::indirect_chip_and_chase_target(const World& w
     if (!target_triangles.empty())
     {
         std::pair<Triangle, bool> largest_triangle = get_largest_triangle(
-            target_triangles, min_chip_tri_area.value(), min_chip_tri_edge_len.value());
+            target_triangles,
+            Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_area.value(),
+            Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_edge_len
+                .value());
         Triangle t   = largest_triangle.first;
         bool valid   = largest_triangle.second;
         Point target = get_triangle_center_and_area(t).first;
-        target       = target.norm((target - world.ball().position()).len() *
-                             chip_cherry_power_downscale.value());
+        target       = target.norm(
+            (target - world.ball().position()).len() *
+            Util::DynamicParameters::Indirect_Chip_Evaluation::chip_cherry_power_downscale
+                .value());
 
         // Target should never be further away than maximum chip power
-        if ((target - world.ball().position()).len() > max_chip_power.value())
-            target = world.ball().position() +
-                     (target - world.ball().position()).norm(max_chip_power.value());
+        if ((target - world.ball().position()).len() >
+            Util::DynamicParameters::Indirect_Chip_Evaluation::max_chip_power.value())
+            target =
+                world.ball().position() +
+                (target - world.ball().position())
+                    .norm(
+                        Util::DynamicParameters::Indirect_Chip_Evaluation::max_chip_power
+                            .value());
 
         return std::make_pair(target, valid);
     }
@@ -144,8 +154,9 @@ std::vector<Triangle> Evaluation::remove_outofbounds_triangles(
     const World& world, std::vector<Triangle> triangles)
 {
     std::vector<Triangle> valid_triangles;
-    std::vector<Point> chip_area_corners =
-        get_chip_target_area_corners(world, chip_target_area_inset.value());
+    std::vector<Point> chip_area_corners = get_chip_target_area_corners(
+        world, Util::DynamicParameters::Indirect_Chip_Evaluation::chip_target_area_inset
+                   .value());
     Point center;
 
     double smallest_x = chip_area_corners[0].x();
@@ -223,7 +234,7 @@ std::pair<Triangle, bool> Evaluation::get_largest_triangle(
         Angle a2 = vertexAngle(t[0], t[1], t[2]).angleMod().abs();
         Angle a3 = vertexAngle(t[0], t[2], t[1]).angleMod().abs();
 
-        if (area > largest_area && area >= min_area && l1 >= min_edge_len &&
+        if (area >= largest_area && area >= min_area && l1 >= min_edge_len &&
             l2 >= min_edge_len && l3 >= min_edge_len &&
             a1.toDegrees() >= min_edge_angle && a2.toDegrees() >= min_edge_angle &&
             a3.toDegrees() >= min_edge_angle)
