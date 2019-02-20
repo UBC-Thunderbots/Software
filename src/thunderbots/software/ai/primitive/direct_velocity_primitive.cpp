@@ -76,3 +76,16 @@ void DirectVelocityPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool DirectVelocityPrimitive::operator==(const DirectVelocityPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->x_velocity == other.x_velocity &&
+           this->y_velocity == other.y_velocity &&
+           this->angular_velocity == other.angular_velocity &&
+           this->dribbler_rpm == other.dribbler_rpm;
+}
+
+bool DirectVelocityPrimitive::operator!=(const DirectVelocityPrimitive &other) const
+{
+    return !((*this) == other);
+}

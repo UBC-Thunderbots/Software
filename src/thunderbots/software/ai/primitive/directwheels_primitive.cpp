@@ -110,3 +110,18 @@ void DirectWheelsPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool DirectWheelsPrimitive::operator==(const DirectWheelsPrimitive &other) const
+{
+    return this->robot_id == other.robot_id &&
+           this->front_left_wheel_power == other.front_left_wheel_power &&
+           this->back_left_wheel_power == other.back_left_wheel_power &&
+           this->front_right_wheel_power == other.front_right_wheel_power &&
+           this->back_right_wheel_power == other.back_right_wheel_power &&
+           this->dribbler_rpm == other.dribbler_rpm;
+}
+
+bool DirectWheelsPrimitive::operator!=(const DirectWheelsPrimitive &other) const
+{
+    return !((*this) == other);
+}

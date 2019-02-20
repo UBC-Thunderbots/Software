@@ -85,6 +85,23 @@ class MovePrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares MovePrimitives for equality. MovePrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the MovePrimitive to compare with for equality
+     * @return true if the MovePrimitives are equal and false otherwise
+     */
+    bool operator==(const MovePrimitive &other) const;
+
+    /**
+     * Compares MovePrimitives for inequality.
+     *
+     * @param other the MovePrimitive to compare with for inequality
+     * @return true if the MovePrimitives are not equal and false otherwise
+     */
+    bool operator!=(const MovePrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point dest;

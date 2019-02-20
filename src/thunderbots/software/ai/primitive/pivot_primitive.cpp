@@ -66,3 +66,15 @@ void PivotPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool PivotPrimitive::operator==(const PivotPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->pivot_point == other.pivot_point &&
+           this->final_angle == other.final_angle &&
+           this->pivot_radius == other.pivot_radius;
+}
+
+bool PivotPrimitive::operator!=(const PivotPrimitive &other) const
+{
+    return !((*this) == other);
+}
