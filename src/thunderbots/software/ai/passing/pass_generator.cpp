@@ -170,7 +170,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen) 
     std::vector<Pass> v;
 
     Pass p(Point(0,0), Point(0,0), 0, Timestamp::fromSeconds(0));
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < num_paths_to_gen; i++){
         v.emplace_back(p);
     }
 
@@ -180,7 +180,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen) 
 }
 
 bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2) {
-    return ratePass(pass1) > ratePass(pass2);
+    return ratePass(pass1) < ratePass(pass2);
 }
 
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE> PassGenerator::convertPassToArray(Pass pass) {
