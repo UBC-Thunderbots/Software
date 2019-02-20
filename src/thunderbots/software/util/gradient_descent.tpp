@@ -70,9 +70,8 @@ std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::follo
     std::array<double, NUM_PARAMS> initial_value, unsigned int num_iters,
     std::function<double(double, double)> gradient_movement_func)
 {
-    // Implementation of the "Adam" algorithm
-    // ( https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam )
-    // ( http://ruder.io/optimizing-gradient-descent/index.html#adam )
+    // Implementation of the "Adam" algorithm. See Javadoc class comment for this
+    // class (in the header) for details
 
     // This is basically just to change the name so the below code reads more nicely
     ParamArray params = initial_value;
