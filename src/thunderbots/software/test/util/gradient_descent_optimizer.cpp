@@ -94,7 +94,7 @@ TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
     auto min = gradientDescentOptimizer.maximize(
         f, {0}, EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE);
 
-    // We expect that the gradient descent will make it over the main part of 
+    // We expect that the gradient descent will make it over the main part of
     // the "S" in the sigmoid within the given number of iterations
     EXPECT_GE(min.at(0), 3);
 }
