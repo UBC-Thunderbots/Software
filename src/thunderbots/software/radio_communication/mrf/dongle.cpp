@@ -19,6 +19,7 @@
 
 #include "constants.h"
 #include "radio_communication/visitor/mrf_primitive_visitor.h"
+#include "util/logger/init.h"
 
 namespace
 {
@@ -37,6 +38,8 @@ namespace
     };
 
     const unsigned int ANNUNCIATOR_BEEP_LENGTH = 750;
+
+    static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
 
 }  // namespace
 
@@ -173,7 +176,6 @@ MRFDongle::MRFDongle()
         device.control_no_data(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
                                MRF::CONTROL_REQUEST_SET_PAN_ID, pan_,
                                static_cast<uint16_t>(radio_interface), 0);
-        static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
         device.control_out(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
                            MRF::CONTROL_REQUEST_SET_MAC_ADDRESS, 0,
                            static_cast<uint16_t>(radio_interface), &MAC, sizeof(MAC), 0);
@@ -384,7 +386,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
     if (camera_transfers.size() >= 8)
     {
-        std::cout << "Camera transfer queue is full, ignoring camera packet" << std::endl;
+        LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
+                     << std::endl;
         return;
     }
 
@@ -405,7 +408,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
     (*i).first->submit();
 
-    std::cout << "Submitted camera transfer in kposition:" << camera_transfers.size()
+    LOG(INFO) << "Submitted camera transfer in position:" << camera_transfers.size()
               << std::endl;
 };
 
@@ -551,7 +554,6 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 {
-    // std::cout << "Drive Transfer done" << std::endl;
     op.result();
     drive_transfer.reset();
 }
@@ -569,7 +571,7 @@ void MRFDongle::handle_camera_transfer_done(
     uint64_t stamp = static_cast<uint64_t>(micros.count());
 
     std::lock_guard<std::mutex> lock(cam_mtx);
-    std::cout << "Camera transfer done, took: " << stamp - (*iter).second
+    LOG(INFO) << "Camera transfer done, took: " << stamp - (*iter).second
               << " microseconds" << std::endl;
     (*iter).first->result();
     camera_transfers.erase(iter);
