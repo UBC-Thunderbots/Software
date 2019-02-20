@@ -801,10 +801,6 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES})
 
-    catkin_add_gtest(gradient_descent_optimizer_test
-            test/util/gradient_descent_optimizer.cpp
-            )
-
     catkin_add_gtest(passing_gradient_descent_test
             test/passing_gradient_descent/passing_gradient_descent_test.cpp
             test/test_util/test_util.cpp
