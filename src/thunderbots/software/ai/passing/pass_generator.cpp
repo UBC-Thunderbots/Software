@@ -110,16 +110,21 @@ void PassGenerator::pruneAndReplacePasses() {
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); }
     );
 
-    // TODO: clean this up
     // Replace the least promising passes with newly generated passes
     if (num_passes_to_keep_after_pruning < num_passes_to_optimize){
         std::vector<Pass> new_passes = generatePasses(num_passes_to_optimize -
                                                       num_passes_to_keep_after_pruning);
+
+        // Remove the worst paths
         if (num_passes_to_keep_after_pruning < passes_to_optimize.size()) {
             passes_to_optimize.erase(passes_to_optimize.begin() + num_passes_to_keep_after_pruning,
                     passes_to_optimize.end());
         }
-        passes_to_optimize.insert(passes_to_optimize.begin() + num_passes_to_keep_after_pruning, new_passes.begin(), new_passes.end());
+
+        // Append our newly generated passes to replace the passes we just removed
+        passes_to_optimize.insert(
+                passes_to_optimize.begin() + num_passes_to_keep_after_pruning,
+                new_passes.begin(), new_passes.end());
     }
 
 }
@@ -186,7 +191,10 @@ Pass PassGenerator::convertArrayToPass(std::array<double, PassGenerator::NUM_PAR
     // Take ownership of the passer_point for the duration of this function
     std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
 
+    // Clamp the time to be >= 0, otherwise the TimeStamp will throw an exception
+    double clamped_time = std::max(0.0, array.at(3));
+
     // TODO: Set the timestamp properly here, just setting to 0 to avoid negative values......
     return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
-            Timestamp::fromSeconds(0));
+            Timestamp::fromSeconds(clamped_time));
 }

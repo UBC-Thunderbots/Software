@@ -21,7 +21,7 @@ TEST(GradientDescentTest, todo_test_name_here){
 
     int num_iters = 10;
     for (int i = 0; i < num_iters; i++){
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         auto pass_op = pass_generator.getBestPassSoFar();
         if (!pass_op){
             std::cout << "No best path found" << std::endl;
@@ -29,19 +29,6 @@ TEST(GradientDescentTest, todo_test_name_here){
             std::cout << *pass_op << std::endl;
         }
     }
-
-    //int num_iters = 10;
-    //auto pass = grad_descent.getBestPassSoFar();
-    //for (auto v : pass->getParams())
-    //    std::cout << v << std::endl;
-    //std::cout << "====" << std::endl;
-    //for (int i = 0; i < num_iters; i++){
-    //    grad_descent.runGradientDescent(1);
-    //    auto pass = grad_descent.getBestPassSoFar();
-    //    for (auto v : pass->getParams())
-    //        std::cout << v << std::endl;
-    //    std::cout << "====" << std::endl;
-    //}
 
     auto pass_op = pass_generator.getBestPassSoFar();
     if (!pass_op){
