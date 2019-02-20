@@ -674,10 +674,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/evaluation/robot.cpp
             )
 
-    target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(indirect_chip_and_chase_target_evaluation_test
-            test/evaluation/indirect_chip_and_chase_target.cpp
+catkin_add_gtest(indirect_chip_and_chase_target_evaluation_test
+            test/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/world/world.cpp
             ai/world/ball.cpp
@@ -693,7 +691,26 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(indirect_chip_and_chase_target_evaluation_test ${catkin_LIBRARIES})
+    
+    target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(get_triangle_center_and_area_test
+            test/evaluation/indirect_chip.cpp
+            ai/hl/stp/evaluation/indirect_chip.cpp
+            ai/world/world.cpp
+            ai/world/ball.cpp
+            util/timestamp.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            geom/angle.h
+            geom/point.h
+            geom/util.cpp
+            test/test_util/test_util.cpp
+            )
+
+    target_link_libraries(get_triangle_center_and_area_test ${catkin_LIBRARIES})
 endif()
 
 ##### ROSTests / Integration Tests #####

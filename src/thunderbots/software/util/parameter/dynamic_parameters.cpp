@@ -35,5 +35,33 @@ namespace Util
             Parameter<double> collision_avoid_velocity_scale(
                 "collision_avoid_velocity_scale", 2.0);
         }  // namespace Navigator
+
+        namespace Indirect_Chip_Evaluation
+        {
+            // Adjusts how far between ball and target the robot will chip
+            Parameter<double> chip_target_fraction("",);
+
+            // Maximum fraction of distance between chipper and target the first bounce
+            // should be, so ball is rolling when it reaches the target
+            Parameter<double> chip_power_bounce_threshold;
+
+            // Maximum power the robot can chip the ball at without malfunctions
+            Parameter<double> max_chip_power;
+
+            // Closest distance to edge of field that the robot could chip and chase to
+            Parameter<double> chip_target_area_inset;
+
+            // Minimum area of chip target triangle
+            Parameter<double> min_chip_tri_area;
+
+            // Minimum edge length of chip target triangle
+            Parameter<double> min_chip_tri_edge_len;
+
+            // Minimum angle in degrees between chip triangle edges
+            Parameter<double> min_chip_tri_edge_angle;
+
+            // Closest distance to edge of field that the robot could chip and chase to
+            Parameter<double> chip_cherry_power_downscale;
+        }  // namespace Indirect_Chip_Evaluation
     }      // namespace DynamicParameters
 }  // namespace Util

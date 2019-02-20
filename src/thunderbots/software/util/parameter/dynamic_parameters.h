@@ -32,5 +32,17 @@ namespace Util
             extern Parameter<double> default_avoid_dist;
             extern Parameter<double> collision_avoid_velocity_scale;
         }  // namespace Navigator
+
+        namespace Indirect_Chip_Evaluation
+        {
+            extern Parameter<double> chip_target_fraction;
+            extern Parameter<double> chip_power_bounce_threshold;
+            extern Parameter<double> max_chip_power;
+            extern Parameter<double> chip_target_area_inset;
+            extern Parameter<double> min_chip_tri_area;
+            extern Parameter<double> min_chip_tri_edge_len;
+            extern Parameter<double> min_chip_tri_edge_angle;
+            extern Parameter<double> chip_cherry_power_downscale;
+        }  // namespace Indirect_Chip_Evaluation
     }      // namespace DynamicParameters
 }  // namespace Util
