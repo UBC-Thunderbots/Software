@@ -20,17 +20,7 @@ in_destructor(false)
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
     // `continuouslyGeneratePasses()`, which is not a static function
-    //pass_generation_thread = std::thread([this](){ return continuouslyGeneratePasses(); });
-
-    optimizePasses();
-    pruneAndReplacePasses();
-    saveBestPath();
-    optimizePasses();
-    pruneAndReplacePasses();
-    saveBestPath();
-    optimizePasses();
-    pruneAndReplacePasses();
-    saveBestPath();
+    pass_generation_thread = std::thread([this](){ return continuouslyGeneratePasses(); });
 }
 
 void PassGenerator::setWorld(World world) {
@@ -66,7 +56,7 @@ PassGenerator::~PassGenerator() {
     // Join to pass_generation_thread so that we wait for it to exit before destructing
     // the thread object. If we do not wait for thread to finish executing, it will
     // call `std::terminate` and kill our whole program when it finishes
-    //pass_generation_thread.join();
+    pass_generation_thread.join();
 }
 
 void PassGenerator::continuouslyGeneratePasses() {
