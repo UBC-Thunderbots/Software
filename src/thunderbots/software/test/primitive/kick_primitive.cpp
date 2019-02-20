@@ -106,6 +106,46 @@ TEST(KickPrimitiveTest, create_primitive_from_message_test)
     EXPECT_EQ(kick_prim.getExtraBits(), std::vector<bool>());
 }
 
+TEST(KickPrimitiveTest, test_equality_operator_primitives_equal)
+{
+    KickPrimitive kick_prim       = KickPrimitive(0, Point(), Angle(), 0.0);
+    KickPrimitive kick_prim_other = KickPrimitive(0, Point(), Angle(), 0.0);
+
+    EXPECT_EQ(kick_prim, kick_prim_other);
+}
+
+TEST(KickPrimitiveTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    KickPrimitive kick_prim       = KickPrimitive(0, Point(), Angle(), 0.0);
+    KickPrimitive kick_prim_other = KickPrimitive(10, Point(), Angle(), 0.0);
+
+    EXPECT_NE(kick_prim, kick_prim_other);
+}
+
+TEST(KickPrimitiveTest, test_inequality_operator_with_mismatched_kick_origin)
+{
+    KickPrimitive kick_prim       = KickPrimitive(0, Point(), Angle(), 0.0);
+    KickPrimitive kick_prim_other = KickPrimitive(0, Point(0.1, 0.34), Angle(), 0.0);
+
+    EXPECT_NE(kick_prim, kick_prim_other);
+}
+
+TEST(KickPrimitiveTest, test_inequality_operator_with_mismatched_kick_direction)
+{
+    KickPrimitive kick_prim       = KickPrimitive(0, Point(), Angle::quarter(), 0.0);
+    KickPrimitive kick_prim_other = KickPrimitive(0, Point(), Angle::full(), 0.0);
+
+    EXPECT_NE(kick_prim, kick_prim_other);
+}
+
+TEST(KickPrimitiveTest, test_inequality_operator_with_mismatched_kick_speed)
+{
+    KickPrimitive kick_prim       = KickPrimitive(0, Point(), Angle(), 0.0);
+    KickPrimitive kick_prim_other = KickPrimitive(0, Point(), Angle(), 3.08);
+
+    EXPECT_NE(kick_prim, kick_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

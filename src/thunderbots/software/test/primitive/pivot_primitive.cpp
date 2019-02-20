@@ -81,6 +81,47 @@ TEST(PivotPrimTest, get_extra_bit_array_test)
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
 }
 
+TEST(PivotPrimTest, test_equality_operator_primitives_equal)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle(), 0);
+
+    EXPECT_EQ(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(8, Point(), Angle(), 0);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_point)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(1, 1), Angle(), 0);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_final_angle)
+{
+    PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other =
+        PivotPrimitive(0, Point(), Angle::threeQuarter(), 0);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_radius)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 1);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle(), 1.25);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

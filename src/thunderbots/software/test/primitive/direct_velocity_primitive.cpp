@@ -125,6 +125,66 @@ TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
     EXPECT_EQ(new_prim.getExtraBits(), std::vector<bool>());
 }
 
+TEST(DirectVelocityPrimTest, test_equality_operator_primitives_equal)
+{
+    DirectVelocityPrimitive direct_velocity_prim =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim_other =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+
+    EXPECT_EQ(direct_velocity_prim, direct_velocity_prim_other);
+}
+
+TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_robot_ids)
+{
+    DirectVelocityPrimitive direct_velocity_prim =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim_other =
+        DirectVelocityPrimitive(6, 0.0, 0.0, 0.0, 0.0);
+
+    EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
+}
+
+TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_x_velocities)
+{
+    DirectVelocityPrimitive direct_velocity_prim =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim_other =
+        DirectVelocityPrimitive(0, -0.55, 0.0, 0.0, 0.0);
+
+    EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
+}
+
+TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_y_velocities)
+{
+    DirectVelocityPrimitive direct_velocity_prim =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim_other =
+        DirectVelocityPrimitive(0, 0.0, 1.0, 0.0, 0.0);
+
+    EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
+}
+
+TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_angular_velocities)
+{
+    DirectVelocityPrimitive direct_velocity_prim =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim_other =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 3.1, 0.0);
+
+    EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
+}
+
+TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_dribbler_rpm)
+{
+    DirectVelocityPrimitive direct_velocity_prim =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 0.0);
+    DirectVelocityPrimitive direct_velocity_prim_other =
+        DirectVelocityPrimitive(0, 0.0, 0.0, 0.0, 1000);
+
+    EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

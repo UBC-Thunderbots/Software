@@ -103,6 +103,46 @@ TEST(CatchPrimTest, create_primitive_from_message_test)
     EXPECT_EQ(catch_prim.getExtraBits(), std::vector<bool>());
 }
 
+TEST(CatchPrimTest, test_equality_operator_primitives_equal)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 900, 0.5);
+
+    EXPECT_EQ(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_robot_ids)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(1, 1, 900, 0.5);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_velocity)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, -0.5, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 900, 0.5);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_dribbler_speed)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 901, 0.5);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_margin)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 900, 0.8);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

@@ -94,6 +94,42 @@ TEST(MoveSpinPrimTest, create_primitive_from_message_test)
     EXPECT_EQ(movespin_prim.getExtraBits(), std::vector<bool>());
 }
 
+TEST(MoveSpinPrimTest, test_equality_operator_primitives_equal)
+{
+    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim_other =
+        MoveSpinPrimitive(0, Point(), AngularVelocity());
+
+    EXPECT_EQ(movespin_prim, movespin_prim_other);
+}
+
+TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim_other =
+        MoveSpinPrimitive(6, Point(), AngularVelocity());
+
+    EXPECT_NE(movespin_prim, movespin_prim_other);
+}
+
+TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_dest)
+{
+    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim_other =
+        MoveSpinPrimitive(0, Point(-0.3, 5), AngularVelocity());
+
+    EXPECT_NE(movespin_prim, movespin_prim_other);
+}
+
+TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_angular_velocity)
+{
+    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim_other =
+        MoveSpinPrimitive(0, Point(), AngularVelocity::half());
+
+    EXPECT_NE(movespin_prim, movespin_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

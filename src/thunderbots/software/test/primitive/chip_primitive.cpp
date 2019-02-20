@@ -105,6 +105,46 @@ TEST(ChipPrimitiveTest, create_primitive_from_message_test)
     EXPECT_EQ(chip_prim.getExtraBits(), std::vector<bool>());
 }
 
+TEST(ChipPrimitiveTest, test_equality_operator_primitives_equal)
+{
+    ChipPrimitive chip_prim       = ChipPrimitive(0, Point(), Angle(), 0.0);
+    ChipPrimitive chip_prim_other = ChipPrimitive(0, Point(), Angle(), 0.0);
+
+    EXPECT_EQ(chip_prim, chip_prim_other);
+}
+
+TEST(ChipPrimitiveTest, test_inequality_operator_with_mismatched_robot_ids)
+{
+    ChipPrimitive chip_prim       = ChipPrimitive(1, Point(), Angle(), 0.0);
+    ChipPrimitive chip_prim_other = ChipPrimitive(4, Point(), Angle(), 0.0);
+
+    EXPECT_NE(chip_prim, chip_prim_other);
+}
+
+TEST(ChipPrimitiveTest, test_inequality_operator_with_mismatched_chip_origins)
+{
+    ChipPrimitive chip_prim       = ChipPrimitive(0, Point(), Angle(), 0.0);
+    ChipPrimitive chip_prim_other = ChipPrimitive(0, Point(1, -5), Angle(), 0.0);
+
+    EXPECT_NE(chip_prim, chip_prim_other);
+}
+
+TEST(ChipPrimitiveTest, test_inequality_operator_with_mismatched_chip_directions)
+{
+    ChipPrimitive chip_prim       = ChipPrimitive(0, Point(), Angle::quarter(), 0.0);
+    ChipPrimitive chip_prim_other = ChipPrimitive(0, Point(), Angle::half(), 0.0);
+
+    EXPECT_NE(chip_prim, chip_prim_other);
+}
+
+TEST(ChipPrimitiveTest, test_inequality_operator_with_mismatched_chip_distance)
+{
+    ChipPrimitive chip_prim       = ChipPrimitive(0, Point(), Angle(), 1.0);
+    ChipPrimitive chip_prim_other = ChipPrimitive(0, Point(), Angle(), 3.14);
+
+    EXPECT_NE(chip_prim, chip_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

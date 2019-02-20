@@ -77,6 +77,30 @@ TEST(StopPrimitiveTest, create_primitive_from_message_test)
     EXPECT_EQ(stop_prim.getParameters(), std::vector<double>());
 }
 
+TEST(StopPrimitiveTest, test_equality_operator_primitives_equal)
+{
+    StopPrimitive stop_prim       = StopPrimitive(0, true);
+    StopPrimitive stop_prim_other = StopPrimitive(0, true);
+
+    EXPECT_EQ(stop_prim, stop_prim_other);
+}
+
+TEST(StopPrimitiveTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    StopPrimitive stop_prim       = StopPrimitive(0, true);
+    StopPrimitive stop_prim_other = StopPrimitive(3, true);
+
+    EXPECT_NE(stop_prim, stop_prim_other);
+}
+
+TEST(StopPrimitiveTest, test_inequality_operator_with_mismatched_coast_value)
+{
+    StopPrimitive stop_prim       = StopPrimitive(0, true);
+    StopPrimitive stop_prim_other = StopPrimitive(0, false);
+
+    EXPECT_NE(stop_prim, stop_prim_other);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
