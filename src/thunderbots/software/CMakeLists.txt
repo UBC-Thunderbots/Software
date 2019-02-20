@@ -695,6 +695,24 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(grsim_catch_primitive_test ${catkin_LIBRARIES}
             ${G3LOG})
 
+    catkin_add_gtest(mrf_primitive_visitor_test
+            test/radio_communication/visitor/mrf_primitive_visitor.cpp
+            radio_communication/visitor/mrf_primitive_visitor.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/directwheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(mrf_primitive_visitor_test ${catkin_LIBRARIES}
+            ${G3LOG})
+
     catkin_add_gtest(timestamp_test
             test/util/timestamp.cpp
             util/timestamp.cpp
