@@ -19,7 +19,16 @@ TEST(GradientDescentTest, todo_test_name_here){
     pass_generator.setWorld(w);
     pass_generator.setPasserPoint(Point(-2, 0));
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    int num_iters = 10;
+    for (int i = 0; i < num_iters; i++){
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        auto pass_op = pass_generator.getBestPassSoFar();
+        if (!pass_op){
+            std::cout << "No best path found" << std::endl;
+        } else {
+            std::cout << *pass_op << std::endl;
+        }
+    }
 
     //int num_iters = 10;
     //auto pass = grad_descent.getBestPassSoFar();

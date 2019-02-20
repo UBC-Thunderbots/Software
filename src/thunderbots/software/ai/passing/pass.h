@@ -4,6 +4,8 @@
 
 #include <cstdlib>
 #include <array>
+#include <iostream>
+
 #include "geom/point.h"
 #include "util/timestamp.h"
 
@@ -16,14 +18,10 @@ namespace AI::Passing {
      */
     class Pass {
     public:
-
-        // The number of parameters that make up a pass
-        static const size_t NUM_PARAMS = 4;
-
         /**
          * Creates a pass with all 0 values
          */
-        Pass();
+        //Pass();
 
         /**
          * Create a pass with given parameters
@@ -62,6 +60,25 @@ namespace AI::Passing {
          * @return A reference to the pass start time
          */
         Timestamp & passStartTime();
+
+        /**
+         * Implement the "<<" operator for printing
+         *
+         * // TODO: crap excuse. Try harder
+         * This is implemented in the header because there were namespace issues with
+         * putting it in the `.cpp`.
+         *
+         * @param output_stream The stream to print to
+         * @param pass The pass to print
+         * @return The output stream with the string representation of the class appended
+         */
+        friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass) {
+            output_stream << "Receiver: " << pass.receiver_point << ", Passer: " <<
+                          pass.passer_point << " Speed (m/s): " << pass.pass_speed_m_per_s << " Start Time (s): " <<
+                          pass.pass_start_time.getSeconds();
+
+            return output_stream;
+        }
 
     private:
         // The location of the passer

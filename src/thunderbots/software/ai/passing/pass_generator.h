@@ -165,7 +165,7 @@ namespace AI::Passing {
          * @param pass2
          * @return pass1.quality < pass2.quality
          */
-        bool comparePassQuality(Pass pass1, Pass pass2);
+        bool comparePassQuality(const Pass& pass1, const Pass& pass2);
 
         /**
          * Generate a given number of passes

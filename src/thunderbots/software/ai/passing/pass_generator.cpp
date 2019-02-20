@@ -15,7 +15,37 @@ best_known_pass(std::nullopt),
 in_destructor(false)
 {
     // Generate the initial set of passes
-    passes_to_optimize = generatePasses(this->num_passes_to_optimize);
+    //passes_to_optimize = generatePasses(this->num_passes_to_optimize);
+    std::vector<Pass> v;
+    Pass p(Point(0,0), Point(0,0), 0, Timestamp::fromSeconds(0));
+    v = {
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+            p,
+    };
+
+    std::sort(v.begin(), v.end(),
+              [this](Pass p1, Pass p2) { return !comparePassQuality(p1, p2); }
+    );
+
 
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
@@ -107,7 +137,7 @@ void PassGenerator::optimizePasses() {
 void PassGenerator::pruneAndReplacePasses() {
     // Sort the passes by quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
-              [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); }
+              [this](Pass p1, Pass p2) { return !comparePassQuality(p1, p2); }
     );
 
     // Replace the least promising passes with newly generated passes
@@ -124,13 +154,12 @@ void PassGenerator::saveBestPath() {
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
-              [this](auto pass1, auto pass2) {return comparePassQuality(pass1, pass2);}
-    );
+              [this](auto pass1, auto pass2) { return !comparePassQuality(pass1, pass2);});
     if (!passes_to_optimize.empty() && ratePass(passes_to_optimize[0]) > min_reasonable_pass_quality){
         best_known_pass = std::optional(passes_to_optimize[0]);
+    } else {
+        best_known_pass = std::nullopt;
     }
-
-    best_known_pass = std::nullopt;
 }
 
 double PassGenerator::ratePass(Pass pass) {
@@ -153,18 +182,24 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen) 
     // Take ownership of world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
 
-    Pass pass_to_center;
-    pass_to_center.passStartTime() = world.ball().lastUpdateTimestamp();
-    pass_to_center.receiverPoint() = Point(4, 0);
-    pass_to_center.passSpeed() = 2;
+    Pass pass_to_center(
+            Point(4,0),
+            Point(4,0),
+            0,
+            Timestamp::fromSeconds(0)
+            );
+//    pass_to_center.passStartTime() = world.ball().lastUpdateTimestamp();
+//    pass_to_center.receiverPoint() = Point(4, 0);
+//    pass_to_center.passerPoint() = Point(4, 0);
+//    pass_to_center.passSpeed() = 2;
 
     // TODO: implement this function properly; see the old code
 
     return std::vector<Pass>(num_paths_to_gen, pass_to_center);
 }
 
-bool PassGenerator::comparePassQuality(Pass pass1, Pass pass2) {
-    return ratePass(std::move(pass1)) < ratePass(std::move(pass2));
+bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2) {
+    return ratePass(pass1) < ratePass(pass2);
 }
 
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE> PassGenerator::convertPassToArray(Pass pass) {
