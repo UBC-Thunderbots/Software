@@ -2,8 +2,8 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
-#include "ai/primitive/move_primitive.h"
 #include "ai/primitive/primitive.h"
+#include "ai/primitive/primitive_factory.h"
 #include "geom/point.h"
 #include "grsim_communication/grsim_backend.h"
 #include "util/constants.h"
@@ -25,7 +25,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
-        primitives.emplace_back(Primitive::createPrimitive(prim_msg));
+        primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
     }
 }
 
