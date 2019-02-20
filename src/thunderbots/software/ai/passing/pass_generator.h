@@ -194,7 +194,7 @@ namespace AI::Passing {
         std::mutex in_destructor_mutex;
 
         // This flag is used to indicate that we are in the desctructor. We use this to
-        // communicate with pass_genereation_thread that it is
+        // communicate with pass_generation_thread that it is
         // time to stop
         bool in_destructor;
 

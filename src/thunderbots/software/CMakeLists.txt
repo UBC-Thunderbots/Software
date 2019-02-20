@@ -224,6 +224,12 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
 
+add_executable(repro
+        repro.cpp
+        ai/passing/pass.cpp
+        util/timestamp.cpp
+        )
+
 #############
 ## Testing ##
 #############
