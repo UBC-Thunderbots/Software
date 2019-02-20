@@ -20,19 +20,19 @@ pass_start_time(pass_start_time)
 
 }
 
-Point & Pass::receiverPoint() {
+Point Pass::receiverPoint() {
     return receiver_point;
 }
 
-Point &Pass::passerPoint() {
+Point Pass::passerPoint() {
     return passer_point;
 }
 
-double & Pass::passSpeed() {
+double Pass::passSpeed() {
     return pass_speed_m_per_s;
 }
 
-Timestamp & Pass::passStartTime() {
+Timestamp Pass::passStartTime() {
     return pass_start_time;
 }
 

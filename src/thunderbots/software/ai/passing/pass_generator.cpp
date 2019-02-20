@@ -43,7 +43,8 @@ in_destructor(false)
     };
 
     std::sort(v.begin(), v.end(),
-              [this](Pass p1, Pass p2) { return !comparePassQuality(p1, p2); }
+              [](Pass p1, Pass p2) { return
+              true; }
     );
 
 

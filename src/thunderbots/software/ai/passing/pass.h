@@ -38,28 +38,28 @@ namespace AI::Passing {
          *
          * @return A reference to the receiver point
          */
-        Point & receiverPoint();
+        Point receiverPoint();
 
         /**
          * Returns a reference to the passer point
          *
          * @return A reference to the passer point
          */
-        Point & passerPoint();
+        Point passerPoint();
 
         /**
          * Returns a reference to the pass speed, in meters per second
          *
          * @return A reference to the pass speed, in meters per second
          */
-        double & passSpeed();
+        double passSpeed();
 
         /**
          * Returns a reference to the pass start time
          *
          * @return A reference to the pass start time
          */
-        Timestamp & passStartTime();
+        Timestamp passStartTime();
 
         /**
          * Implement the "<<" operator for printing
