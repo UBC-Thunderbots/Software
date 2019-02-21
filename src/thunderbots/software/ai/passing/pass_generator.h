@@ -1,7 +1,7 @@
 #pragma once
 
-#include <thread>
 #include <mutex>
+#include <thread>
 
 #include "ai/passing/pass.h"
 #include "ai/world/world.h"
@@ -9,8 +9,8 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/timestamp.h"
 
-namespace AI::Passing {
-
+namespace AI::Passing
+{
     /**
      * This class is responsible for generating passes for us to perform
      *
@@ -32,9 +32,9 @@ namespace AI::Passing {
      * deadlock and everything will grind to a halt.
      *
      */
-    class PassGenerator {
-
-    public:
+    class PassGenerator
+    {
+       public:
         // Delete the default constructor, we want to force users to choose what
         // pass quality they deem reasonable
         PassGenerator() = delete;
@@ -42,8 +42,8 @@ namespace AI::Passing {
         // Delete the copy and assignment operators because this class really shouldn't
         // need them and we don't want to risk doing anything nasty with the internal
         // threading this class uses
-        PassGenerator & operator=(const PassGenerator&) = delete;
-        PassGenerator(const PassGenerator&) = delete;
+        PassGenerator& operator=(const PassGenerator&) = delete;
+        PassGenerator(const PassGenerator&)            = delete;
 
         /**
          * Create a PassGenerator with given parameters
@@ -94,7 +94,7 @@ namespace AI::Passing {
         ~PassGenerator();
 
 
-    private:
+       private:
         // The number of parameters (representing a pass) that we optimize
         // (pass_start_x, pass_start_y, pass_speed, pass_start_time)
         static const int NUM_PARAMS_TO_OPTIMIZE = 4;
@@ -102,15 +102,11 @@ namespace AI::Passing {
 
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
-        static constexpr double PASS_SPACE_WEIGHT = 0.01;
-        static constexpr double PASS_TIME_WEIGHT = 1;
-        static constexpr double PASS_SPEED_WEIGHT = 1;
+        static constexpr double PASS_SPACE_WEIGHT                          = 0.01;
+        static constexpr double PASS_TIME_WEIGHT                           = 1;
+        static constexpr double PASS_SPEED_WEIGHT                          = 1;
         std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
-                PASS_SPACE_WEIGHT,
-                PASS_SPACE_WEIGHT,
-                PASS_TIME_WEIGHT,
-                PASS_SPEED_WEIGHT
-        };
+            PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_TIME_WEIGHT, PASS_SPEED_WEIGHT};
 
         /**
          * Continuously optimizes, prunes, and re-generates passes based on known info
@@ -177,8 +173,8 @@ namespace AI::Passing {
         /**
          * Generate a given number of passes
          *
-         * This function is used to generate the initial passes that are then optimized via
-         * gradient descent.
+         * This function is used to generate the initial passes that are then optimized
+         * via gradient descent.
          *
          * @param num_passes_to_gen  The number of passes to generate
          *
@@ -234,9 +230,7 @@ namespace AI::Passing {
 
         // The optimizer we're using to find passes
         Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
-
     };
 
 
-}
-
+}  // namespace AI::Passing

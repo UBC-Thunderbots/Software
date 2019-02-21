@@ -2,18 +2,19 @@
  * Declaration of evaluation functions for passing
  */
 
-// TODO: if this file (or the corresponding `.cpp`) gets too big, they may need to be broken up
+// TODO: if this file (or the corresponding `.cpp`) gets too big, they may need to be
+// broken up
 #pragma once
 
 #include <functional>
 
 #include "ai/world/field.h"
+#include "geom/circle.h"
 #include "geom/point.h"
 #include "geom/rectangle.h"
-#include "geom/circle.h"
 
-namespace AI::Passing {
-
+namespace AI::Passing
+{
     /**
      * Calculates the static position quality for a given position on a given field
      *
@@ -75,4 +76,4 @@ namespace AI::Passing {
      */
     double sigmoid(double v, double offset, double sig_width);
 
-}
+}  // namespace AI::Passing

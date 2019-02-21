@@ -3,19 +3,22 @@
  */
 
 #include "ai/passing/pass_generator.h"
-#include "test/test_util/test_util.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
+
+#include "test/test_util/test_util.h"
 
 using namespace AI::Passing;
 
 // TODO: performance tests? That's gonna be tricky........
 
-class PassGeneratorTest : public testing::Test { protected:
-
-protected:
-    virtual void SetUp() {
+class PassGeneratorTest : public testing::Test
+{
+   protected:
+   protected:
+    virtual void SetUp()
+    {
         world = ::Test::TestUtil::createBlankTestingWorld();
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
         pass_generator = std::make_shared<PassGenerator>(0.0);
@@ -26,7 +29,8 @@ protected:
     std::shared_ptr<PassGenerator> pass_generator;
 };
 
-TEST_F(PassGeneratorTest, static_convergence_towards_target_region){
+TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
+{
     // Test that given enough time and a static world with no robots, we converge to a
     // pass near the enemy team goal
 

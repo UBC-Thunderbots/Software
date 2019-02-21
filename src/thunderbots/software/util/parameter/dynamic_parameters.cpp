@@ -1,7 +1,7 @@
 #include "util/parameter/dynamic_parameters.h"
 
-namespace Util::DynamicParameters {
-
+namespace Util::DynamicParameters
+{
     void updateAllParametersFromROSParameterServer()
     {
         Parameter<bool>::updateAllParametersFromROSParameterServer();
@@ -30,21 +30,27 @@ namespace Util::DynamicParameters {
         // Scaling factor for collision avoidance.
         // TODO this is arbitrary for now; could be determined as part of
         // #23: https://github.com/UBC-Thunderbots/Software/issues/23
-        Parameter<double> collision_avoid_velocity_scale(
-            "collision_avoid_velocity_scale", 2.0);
+        Parameter<double> collision_avoid_velocity_scale("collision_avoid_velocity_scale",
+                                                         2.0);
     }  // namespace Navigator
 
-    namespace AI {
+    namespace AI
+    {
         namespace Passing
         {
-            Parameter<double> static_position_quality_x_offset("static_position_quality_x_offset", 0.3);
-            Parameter<double> static_position_quality_y_offset("static_position_quality_y_offset", 0.3);
-            Parameter<double> static_position_quality_friendly_goal_distance_weight("static_position_quality_friendly_goal_distance_weight", 0.3);
+            Parameter<double> static_position_quality_x_offset(
+                "static_position_quality_x_offset", 0.3);
+            Parameter<double> static_position_quality_y_offset(
+                "static_position_quality_y_offset", 0.3);
+            Parameter<double> static_position_quality_friendly_goal_distance_weight(
+                "static_position_quality_friendly_goal_distance_weight", 0.3);
             Parameter<int32_t> num_passes_to_optimize("num_passes_to_optimize", 50);
-            Parameter<int32_t> num_passes_to_keep_after_pruning("num_passes_to_keep_after_pruning", 10);
-            Parameter<int32_t> number_of_gradient_descent_steps_per_iter("number_of_gradient_descent_steps_per_iter", 20);
-        } // namespace Passing
-    }
+            Parameter<int32_t> num_passes_to_keep_after_pruning(
+                "num_passes_to_keep_after_pruning", 10);
+            Parameter<int32_t> number_of_gradient_descent_steps_per_iter(
+                "number_of_gradient_descent_steps_per_iter", 20);
+        }  // namespace Passing
+    }      // namespace AI
 
 
 }  // namespace Util::DynamicParameters
