@@ -15,18 +15,23 @@ namespace AI::Passing {
     /**
      * Calculates the static position quality for a given position on a given field
      *
+     * Static position quality prefers good passing points on the field from the
+     * perspective of a "real soccer player". For example, passing in front of or towards
+     * your own net is less desirable than passing near the enemy's net
+     *
      * @param field The field on which to calculate the static position quality
      * @param position The position on the field at which to calculate the quality
      *
-     * @return A value in [0,1] representing the quality of the given point on the given field
+     * @return A value in [0,1] representing the quality of the given point on the given
+     *         field, with a higher value representing a more desirable position
      */
     double getStaticPositionQuality(Field field, Point position);
 
     /**
      * Calculates the value at the give point over a 2D sigmoid around the given rectangle
      *
-     * The sigmoid constructed will be 0 far enough outside the rectangle, and 1
-     * far enough within the rectangle
+     * The sigmoid constructed will approach 0 far enough outside the rectangle, and
+     * approach 1 far enough within the rectangle
      *
      * @param rect The rectangle over which to make sigmoid function. The width of the
      *             the rectangle is considered to be in x, and the height in y
@@ -35,6 +40,8 @@ namespace AI::Passing {
      * @return The value of the sigmoid over the rectangle at the given point
      */
     double rectangleSigmoid(Rectangle rect, Point point, double sig_width);
+
+    // TODO: circular sigmoid
 
     /**
      * A sigmoid function with a given offset from 0 and rate of change

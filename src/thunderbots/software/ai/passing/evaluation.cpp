@@ -10,9 +10,6 @@
 using namespace AI::Passing;
 
 double AI::Passing::getStaticPositionQuality(Field field, Point position) {
-    double length          = field.length() / 2;
-    double width           = field.width() / 2;
-
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sigmoid_width = 0.1;
 
@@ -20,22 +17,31 @@ double AI::Passing::getStaticPositionQuality(Field field, Point position) {
     // TODO: should we be using dynamic parameters like this here?
     double x_offset = Util::DynamicParameters::AI::Passing::static_position_quality_x_offset.value();
     double y_offset = Util::DynamicParameters::AI::Passing::static_position_quality_y_offset.value();
-    double goal_weight = Util::DynamicParameters::AI::Passing::static_position_quality_friendly_goal_distance_weight.value();
+    double friendly_goal_weight = Util::DynamicParameters::AI::Passing::static_position_quality_friendly_goal_distance_weight.value();
 
     // Make a slightly smaller field, and positive weight values in this reduced field
+    double half_field_length          = field.length() / 2;
+    double half_field_width           = field.width() / 2;
     Rectangle reduced_size_field(
-            Point(-length + x_offset, -width + y_offset),
-            Point( length - x_offset, width - y_offset)
+            Point(-half_field_length + x_offset, -half_field_width + y_offset),
+            Point( half_field_length - x_offset, half_field_width - y_offset)
     );
     double on_field_quality = rectangleSigmoid(reduced_size_field, position, sigmoid_width);
 
     // Add a negative weight for positions closer to our goal
-    Vector vec_to_goal = Vector(field.friendlyGoal().x() - position.x(), field.friendlyGoal().y() - position.y());
-    double distance_to_goal = vec_to_goal.len();
-    double near_goal_quality =
-             (1 - std::exp(-goal_weight * (std::pow(5, -2+distance_to_goal))));
+    Vector vec_to_friendly_goal = Vector(field.friendlyGoal().x() - position.x(), field.friendlyGoal().y() - position.y());
+    double distance_to_friendly_goal = vec_to_friendly_goal.len();
+    double near_friendly_goal_quality =
+             (1 - std::exp(-friendly_goal_weight * (std::pow(5, -2+distance_to_friendly_goal))));
 
-    return on_field_quality * near_goal_quality;
+    // Add a strong negative weight for positions very close to the enemy goal, as we can't
+    // actually receive passes there
+    Vector vec_to_enemy_goal = Vector(field.enemyGoal().x() - position.x(), field.enemyGoal().y() - position.y());
+    double distance_to_enemy_goal = vec_to_enemy_goal.len();
+    // TODO: need to use a circular sigmoid here when you've implemented those
+    double near_enemy_goal_quality = 1;
+
+    return on_field_quality * near_friendly_goal_quality;
 }
 
 double AI::Passing::rectangleSigmoid(Rectangle rect, Point point, double sig_width){

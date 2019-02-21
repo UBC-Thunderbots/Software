@@ -93,7 +93,7 @@ void PassGenerator::continuouslyGeneratePasses() {
 void PassGenerator::optimizePasses() {
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
-    static const auto objective_function =
+    const auto objective_function =
             [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array){
                 Pass pass = convertArrayToPass(pass_array);
                 return ratePass(pass);
@@ -101,6 +101,8 @@ void PassGenerator::optimizePasses() {
 
     // Run gradient descent to optimize the passes to for the requested number
     // of iterations
+    // NOTE: Parallelizing this `for` loop would probably be safe and potentially more
+    //       performant
     for (Pass& pass : passes_to_optimize){
         auto pass_array = optimizer.maximize(
                 objective_function,
@@ -112,7 +114,7 @@ void PassGenerator::optimizePasses() {
 }
 
 void PassGenerator::pruneAndReplacePasses() {
-    // Sort the passes by quality
+    // Sort the passes by decreasing quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); }
     );
@@ -140,6 +142,7 @@ void PassGenerator::saveBestPath() {
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
+    // Sort the passes by decreasing quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](auto pass1, auto pass2) { return comparePassQuality(pass1, pass2);});
     if (!passes_to_optimize.empty() && ratePass(passes_to_optimize[0]) >= min_reasonable_pass_quality){

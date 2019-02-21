@@ -34,30 +34,30 @@ namespace AI::Passing {
         Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s, Timestamp pass_start_time);
 
         /**
-         * Returns a reference to the receiver point
+         * Gets the value of the receiver point
          *
-         * @return A reference to the receiver point
+         * @return The value of the receiver point
          */
         Point receiverPoint();
 
         /**
-         * Returns a reference to the passer point
+         * Gets the value of the passer point
          *
-         * @return A reference to the passer point
+         * @return The value of the passer point
          */
         Point passerPoint();
 
         /**
-         * Returns a reference to the pass speed, in meters per second
+         * Gets the value of the pass speed
          *
-         * @return A reference to the pass speed, in meters per second
+         * @return The value of the pass speed, in meters/second
          */
         double passSpeed();
 
         /**
-         * Returns a reference to the pass start time
+         * Gets the value of the pass start time
          *
-         * @return A reference to the pass start time
+         * @return The value of the pass start time
          */
         Timestamp passStartTime();
 

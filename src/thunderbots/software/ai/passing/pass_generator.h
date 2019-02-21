@@ -35,7 +35,7 @@ namespace AI::Passing {
          *
          * @param min_reasonable_pass_quality A value in [0,1] representing the minimum
          *                                    quality for a pass to be considered
-         *                                    "reasonable"
+         *                                    "reasonable", with higher being better
          */
         explicit PassGenerator(double min_reasonable_pass_quality);
 
