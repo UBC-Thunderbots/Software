@@ -34,23 +34,24 @@ double AI::Passing::getStaticPositionQuality(Field field, Point position) {
     double near_friendly_goal_quality =
              (1 - std::exp(-friendly_goal_weight * (std::pow(5, -2+distance_to_friendly_goal))));
 
-    // Add a strong negative weight for positions very close to the enemy goal, as we can't
-    // actually receive passes there
-    Vector vec_to_enemy_goal = Vector(field.enemyGoal().x() - position.x(), field.enemyGoal().y() - position.y());
-    double distance_to_enemy_goal = vec_to_enemy_goal.len();
-    // TODO: need to use a circular sigmoid here when you've implemented those
-    double near_enemy_goal_quality = 1;
+    // Add a strong negative weight for positions within the enemy defense area, as we
+    // cannot pass there
+    double in_enemy_defense_area_quality =
+            1 - rectangleSigmoid(field.enemyDefenseArea(), position, 0.1);
 
-    return on_field_quality * near_friendly_goal_quality;
+    return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
 }
 
-double AI::Passing::rectangleSigmoid(Rectangle rect, Point point, double sig_width){
+double AI::Passing::rectangleSigmoid(Rectangle rect, Point point, double sig_width ){
     double x_offset = rect.centre().x();
-    double y_offset = rect.centre().x();
+    double y_offset = rect.centre().y();
     double x_size = rect.width()/2;
     double y_size = rect.height()/2;
     double x = point.x();
     double y = point.y();
+
+    // For both x and y here we use two sigmoid functions centered at the positive and
+    // negative edge of the rectangle respectively
 
     double x_val = std::min(
             sigmoid(x, x_offset + x_size, -sig_width),
@@ -65,11 +66,26 @@ double AI::Passing::rectangleSigmoid(Rectangle rect, Point point, double sig_wid
     return x_val * y_val;
 }
 
+double AI::Passing::circleSigmoid(Circle circle, Point point, double sig_width) {
+    // Calculate how far the point is from the circle center
+    double distance_from_circle_center = (point - circle.getOrigin()).len();
+
+    // Here we use two sigmoids mirrored over the center of the circle, with the center
+    // of each sigmoid lying on the +radius, -radius respectively
+    double sig_value = std::min(
+            sigmoid(distance_from_circle_center, circle.getRadius(), -sig_width),
+            sigmoid(distance_from_circle_center, -circle.getRadius(), sig_width)
+            );
+
+    return sig_value;
+}
+
 double AI::Passing::sigmoid(double v, double offset, double sig_width) {
     // This is factor that changes how quickly the sigmoid goes from 0 outside the
-    // rectangle to 1 inside it. We multiply it by 4 because that is the distance a
-    // sigmoid function centered about 0 takes to go from 0 to 0.982
-    double sig_change_factor =  4/sig_width;
+    // rectangle to 1 inside it. We divide 8 by it because that is the distance a
+    // sigmoid function centered about 0 takes to go from 0.018 to 0.982
+    // (and that is what the `sig_width` is, as per the javadoc comment for this function)
+    double sig_change_factor =  8/sig_width;
 
     return 1/(1+std::exp(sig_change_factor*(offset-v)));
 }
