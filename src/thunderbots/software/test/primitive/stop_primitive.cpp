@@ -7,12 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(StopPrimTest, construct_with_no_params_test)
+TEST(StopPrimTest, primitive_name_test)
 {
     StopPrimitive stop_prim = StopPrimitive(0, true);
 
-    EXPECT_EQ(0, stop_prim.getRobotId());
-    EXPECT_EQ(StopPrimitive::PRIMITIVE_NAME, stop_prim.getPrimitiveName());
+    EXPECT_EQ("Stop Primitive", stop_prim.getPrimitiveName());
 }
 
 TEST(StopPrimTest, get_robot_id_test)

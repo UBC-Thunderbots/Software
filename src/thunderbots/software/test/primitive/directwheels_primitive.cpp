@@ -7,13 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(DirectWheelsPrimTest, construct_with_no_params_test)
+TEST(DirectWheelsPrimTest, primitive_name_test)
 {
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
 
-    EXPECT_EQ(0, directwheels_prim.getRobotId());
-    EXPECT_EQ(DirectWheelsPrimitive::PRIMITIVE_NAME,
-              directwheels_prim.getPrimitiveName());
+    EXPECT_EQ("Direct Wheels Primitive", directwheels_prim.getPrimitiveName());
 }
 
 TEST(DirectWheelsPrimTest, get_robot_id_test)

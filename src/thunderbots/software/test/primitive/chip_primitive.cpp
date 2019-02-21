@@ -7,12 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(ChipPrimTest, construct_with_no_params_test)
+TEST(ChipPrimTest, primitive_name_test)
 {
     ChipPrimitive chip_prim = ChipPrimitive(0, Point(), Angle(), 0.0);
 
-    EXPECT_EQ(int(), chip_prim.getRobotId());
-    EXPECT_EQ(ChipPrimitive::PRIMITIVE_NAME, chip_prim.getPrimitiveName());
+    EXPECT_EQ("Chip Primitive", chip_prim.getPrimitiveName());
 }
 
 TEST(ChipPrimTest, get_robot_id_test)

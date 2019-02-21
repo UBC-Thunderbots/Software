@@ -7,13 +7,12 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(DribblePrimTest, construct_with_no_params_test)
+TEST(DribblePrimTest, primitive_name_test)
 {
     DribblePrimitive dribble_prim =
         DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
 
-    EXPECT_EQ(int(), dribble_prim.getRobotId());
-    EXPECT_EQ(DribblePrimitive::PRIMITIVE_NAME, dribble_prim.getPrimitiveName());
+    EXPECT_EQ("Dribble Primitive", dribble_prim.getPrimitiveName());
 }
 
 TEST(DribblePrimTest, get_robot_id_test)

@@ -7,12 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(KickPrimTest, construct_with_no_params_test)
+TEST(KickPrimTest, primitive_name_test)
 {
     KickPrimitive kick_prim = KickPrimitive(0, Point(), Angle(), 0.0);
 
-    EXPECT_EQ(int(), kick_prim.getRobotId());
-    EXPECT_EQ(KickPrimitive::PRIMITIVE_NAME, kick_prim.getPrimitiveName());
+    EXPECT_EQ("Kick Primitive", kick_prim.getPrimitiveName());
 }
 
 TEST(KickPrimTest, get_robot_id_test)

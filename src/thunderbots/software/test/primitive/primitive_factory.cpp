@@ -96,7 +96,7 @@ TEST(PrimitiveFactoryTest,
 
     std::vector<double> parameters = new_prim->getParameters();
 
-    EXPECT_EQ("DirectWheels Primitive", new_prim->getPrimitiveName());
+    EXPECT_EQ("Direct Wheels Primitive", new_prim->getPrimitiveName());
     EXPECT_EQ(robot_id, new_prim->getRobotId());
     EXPECT_DOUBLE_EQ(wheel0_power, parameters[0]);
     EXPECT_DOUBLE_EQ(wheel1_power, parameters[1]);

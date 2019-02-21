@@ -7,14 +7,12 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(DirectVelocityPrimTest, construct_with_no_params_test)
+TEST(DirectVelocityPrimTest, primitive_name_test)
 {
     DirectVelocityPrimitive direct_velocity_prim =
         DirectVelocityPrimitive(0U, 0.0, 0.0, 0.0, 0.0);
 
-    EXPECT_EQ(0U, direct_velocity_prim.getRobotId());
-    EXPECT_EQ(DirectVelocityPrimitive::PRIMITIVE_NAME,
-              direct_velocity_prim.getPrimitiveName());
+    EXPECT_EQ("Direct Velocity Primitive", direct_velocity_prim.getPrimitiveName());
 }
 
 TEST(DirectVelocityPrimTest, get_robot_id_test)

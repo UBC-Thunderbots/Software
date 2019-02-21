@@ -7,12 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(CatchPrimTest, constuct_with_no_params_test)
+TEST(CatchPrimTest, primitive_name_test)
 {
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, 0);
 
-    EXPECT_EQ(0, catch_prim.getRobotId());
-    EXPECT_EQ(CatchPrimitive::PRIMITIVE_NAME, catch_prim.getPrimitiveName());
+    EXPECT_EQ("Catch Primitive", catch_prim.getPrimitiveName());
 }
 
 TEST(CatchPrimTest, get_robot_id_test)

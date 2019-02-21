@@ -6,7 +6,7 @@
 #include "ai/primitive/visitor/primitive_visitor.h"
 #include "util/logger/init.h"
 
-const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
+const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "Direct Wheels Primitive";
 
 DirectWheelsPrimitive::DirectWheelsPrimitive(
     unsigned int robot_id, int16_t front_left_wheel_power, int16_t back_left_wheel_power,

@@ -7,12 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(MovePrimTest, construct_with_no_params_test)
+TEST(MovePrimTest, primitive_name_test)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
-    EXPECT_EQ(0, move_prim.getRobotId());
-    EXPECT_EQ(MovePrimitive::PRIMITIVE_NAME, move_prim.getPrimitiveName());
+    EXPECT_EQ("Move Primitive", move_prim.getPrimitiveName());
 }
 
 TEST(MovePrimTest, get_robot_id_test)

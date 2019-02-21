@@ -8,12 +8,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(PivotPrimTest, construct_with_no_params_test)
+TEST(PivotPrimTest, primitive_name_test)
 {
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), 0);
 
-    EXPECT_EQ(0, pivot_prim.getRobotId());
-    EXPECT_EQ(PivotPrimitive::PRIMITIVE_NAME, pivot_prim.getPrimitiveName());
+    EXPECT_EQ("Pivot Primitive", pivot_prim.getPrimitiveName());
 }
 
 TEST(PivotPrimTest, get_robot_id_test)
