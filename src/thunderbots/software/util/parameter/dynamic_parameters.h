@@ -19,10 +19,7 @@ namespace Util
          * Updates all known parameters with the latest values from config lists
          * in the dynamic_reconfigure::Config msgs
          *
-         */
-        void updateAllParametersFromConfigMsg(
-            const dynamic_reconfigure::Config::ConstPtr&);
-
+         */ void updateAllParametersFromConfigMsg( const dynamic_reconfigure::Config::ConstPtr&);
         // How long in milliseconds a Robot must not appear in vision before it is removed
         // from the AI
         extern Parameter<int32_t> robot_expiry_buffer_milliseconds;
@@ -37,7 +34,11 @@ namespace Util
         namespace AI {
             namespace Passing
             {
-                // TODO: javadoc comments here
+
+                // TODO: can we use an unsigned type for the unsigned values below?
+
+                // The offset from the sides of the field to place the rectangular
+                // sigmoid we use to determine what areas to pass to
                 extern Parameter<double> static_position_quality_x_offset;
                 extern Parameter<double> static_position_quality_y_offset;
 
@@ -45,6 +46,17 @@ namespace Util
                 // quality. Lower, more negative weights result in the distance to the goal
                 // having less of an effect.
                 extern Parameter<double> static_position_quality_friendly_goal_distance_weight;
+
+                // The number of passes to try to optimize at any given time
+                extern Parameter<int32_t> num_passes_to_optimize;
+
+                // The number of passes to keep after pruning
+                extern Parameter<int32_t> num_passes_to_keep_after_pruning;
+
+                // The number of steps of gradient descent to perform in each iteration
+                extern Parameter<int32_t> number_of_gradient_descent_steps_per_iter;
+
+                // The number of passe
             } // namespace Passing
         }
     }      // namespace DynamicParameters

@@ -6,6 +6,7 @@
 
 
 using namespace AI::Passing;
+using namespace Util::DynamicParameters::AI::Passing;
 
 PassGenerator::PassGenerator(double min_reasonable_pass_quality):
 min_reasonable_pass_quality(min_reasonable_pass_quality),
@@ -15,7 +16,7 @@ target_region(std::nullopt),
 in_destructor(false)
 {
     // Generate the initial set of passes
-    passes_to_optimize = generatePasses(this->num_passes_to_optimize);
+    passes_to_optimize = generatePasses(num_passes_to_optimize.value());
 
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
@@ -37,6 +38,11 @@ void PassGenerator::setPasserPoint(Point passer_point) {
 
     // Update the passer point
     this->passer_point = passer_point;
+
+    // Replace all the passes we're currently trying to optimize, as they are probably
+    // not going to converge to this new passer point if they've already been converging
+    // to another passer point for a while
+    passes_to_optimize = generatePasses(num_passes_to_optimize.value());
 }
 
 std::optional<Pass> PassGenerator::getBestPassSoFar() {
@@ -63,7 +69,8 @@ PassGenerator::~PassGenerator() {
 
     // Join to pass_generation_thread so that we wait for it to exit before destructing
     // the thread object. If we do not wait for thread to finish executing, it will
-    // call `std::terminate` and kill our whole program when it finishes
+    // call `std::terminate` when we deallocate the thread object and kill our whole
+    // program
     pass_generation_thread.join();
 }
 
@@ -107,7 +114,7 @@ void PassGenerator::optimizePasses() {
         auto pass_array = optimizer.maximize(
                 objective_function,
                 convertPassToArray(pass),
-                number_of_gradient_descent_steps_per_iter
+                number_of_gradient_descent_steps_per_iter.value()
         );
         pass = convertArrayToPass(pass_array);
     }
@@ -120,19 +127,19 @@ void PassGenerator::pruneAndReplacePasses() {
     );
 
     // Replace the least promising passes with newly generated passes
-    if (num_passes_to_keep_after_pruning < num_passes_to_optimize){
-        std::vector<Pass> new_passes = generatePasses(num_passes_to_optimize -
-                                                      num_passes_to_keep_after_pruning);
+    if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value()){
+        std::vector<Pass> new_passes = generatePasses(num_passes_to_optimize.value() -
+                                                      num_passes_to_keep_after_pruning.value());
 
         // Remove the worst paths
-        if (num_passes_to_keep_after_pruning < passes_to_optimize.size()) {
-            passes_to_optimize.erase(passes_to_optimize.begin() + num_passes_to_keep_after_pruning,
+        if (num_passes_to_keep_after_pruning.value() < passes_to_optimize.size()) {
+            passes_to_optimize.erase(passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
                     passes_to_optimize.end());
         }
 
         // Append our newly generated passes to replace the passes we just removed
         passes_to_optimize.insert(
-                passes_to_optimize.begin() + num_passes_to_keep_after_pruning,
+                passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
                 new_passes.begin(), new_passes.end());
     }
 
@@ -159,12 +166,12 @@ double PassGenerator::ratePass(Pass pass) {
 
     double static_pass_quality = getStaticPositionQuality(world.field(), pass.receiverPoint());
 
-    // TODO: the rest of this function; see the old code
+    // TODO (Issue #383): Implement this properly
 
     // Strongly weight positions in our target region, if we have one
     double in_region_quality = 1;
     if(target_region){
-        double in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
+        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
     }
 
     return static_pass_quality * in_region_quality;
@@ -173,6 +180,8 @@ double PassGenerator::ratePass(Pass pass) {
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen) {
 
     Pass p(Point(0,0), Point(0,0), 0, Timestamp::fromSeconds(0));
+
+    // TODO (Issue #382): Implement this properly
 
     return std::vector<Pass>(num_paths_to_gen, p);
 }

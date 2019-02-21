@@ -11,12 +11,27 @@
 
 namespace AI::Passing {
 
-    // TODO: detailed Javadoc comment for this class
-    // TODO: explain the general idiom of: get in, lock what you need, exit (RAII?)
-    // TODO: explain how to make changes to this class:
-    //      - if you add data, consider if it could be accessed by two threads at once. If so, it needs a mutex
-    //      - for each function added/changed, consider: what data does this access? If any of that data has a mutex, you must take a `lock_guard` for it
-    //      (NOTE: this is only for data accessed _directly_ by the function, any data accessed by functions called by the function should be in _those_ functions
+    /**
+     * This class is responsible for generating passes for us to perform
+     *
+     * == General Description ==
+     * It is built such that when it is constructed, a thread is immediately started in
+     * the background continuously optimizing/pruning/re-generating passes. As such, any
+     * modifications to data in this class through a public interface *must* be managed
+     * by mutexes. Generally in functions that touch data we use "std::lock_guard" to
+     * take ownership of the mutex protecting that data for the duration of the function.
+     *
+     * == Making Changes/Additions ==
+     * Whenever you change/add a function, you need to ask: "what data is this _directly_
+     * touching?". If the function is touching anything internal to the class, you should
+     * be getting a lock on the mutex for that data member for the duration of the
+     * function (see below for examples). Note the *directly* bit! If you are
+     * changing/adding function "A", and you have it call function "B", if B touches
+     * data, then B should be responsible for getting a lock on the data. If you acquire
+     * a lock in A, then call B, which also requires a lock, then the threads will
+     * deadlock and everything will grind to a halt.
+     *
+     */
     class PassGenerator {
 
     public:
@@ -84,21 +99,9 @@ namespace AI::Passing {
         // (pass_start_x, pass_start_y, pass_speed, pass_start_time)
         static const int NUM_PARAMS_TO_OPTIMIZE = 4;
 
-        // The number of passes to try to optimize at any given time
-        // TODO: should this be a constant here? Maybe a dynamic parameter?
-        static const unsigned int num_passes_to_optimize = 50;
-
-        // The number of passes to keep after pruning
-        // TODO: should this be a constant here? Maybe a dynamic parameter?
-        static const unsigned int num_passes_to_keep_after_pruning = 10;
-
-        // The number of steps of gradient descent to perform in each iteration
-        // TODO: should this be a constant here? Maybe a dynamic parameter?
-        static const unsigned int number_of_gradient_descent_steps_per_iter = 20;
 
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
-        // TODO: should these be constants here? Maybe a dynamic parameter?
         static constexpr double PASS_SPACE_WEIGHT = 0.01;
         static constexpr double PASS_TIME_WEIGHT = 1;
         static constexpr double PASS_SPEED_WEIGHT = 1;
@@ -145,20 +148,18 @@ namespace AI::Passing {
         /**
          * Convert a given array to a Pass
          *
-         * // TODO: better comment here?
-         * Assumes that the passer point is the passer point held in this class
-         *
          * @param array The array to convert to a pass, in the form:
          *              {receiver_point.x, receiver_point.y, pass_speed_m_per_s,
          *              pass_start_time}
          *
-         * @return The pass represented by the given array
+         * @return The pass represented by the given array, with the passer point being
+         *         the current `passer_point` we're optimizing for
          */
         Pass convertArrayToPass(std::array<double, NUM_PARAMS_TO_OPTIMIZE> array);
 
         /**
          * Calculate the quality of a given pass
-         * * @param pass The pass to rate
+         * @param pass The pass to rate
          * @return A value in [0,1] representing the quality of the pass
          */
         double ratePass(Pass pass);
@@ -168,6 +169,7 @@ namespace AI::Passing {
          *
          * @param pass1
          * @param pass2
+         *
          * @return pass1.quality < pass2.quality
          */
         bool comparePassQuality(const Pass& pass1, const Pass& pass2);
@@ -198,7 +200,7 @@ namespace AI::Passing {
         // The mutex for the in_destructor flag
         std::mutex in_destructor_mutex;
 
-        // This flag is used to indicate that we are in the desctructor. We use this to
+        // This flag is used to indicate that we are in the destructor. We use this to
         // communicate with pass_generation_thread that it is
         // time to stop
         bool in_destructor;

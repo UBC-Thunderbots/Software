@@ -10,61 +10,52 @@
 
 using namespace AI::Passing;
 
-TEST(GradientDescentTest, todo_test_name_here){
-    PassGenerator pass_generator(0.0);
+// TODO: performance tests? That's gonna be tricky........
 
-    World w = ::Test::TestUtil::createBlankTestingWorld();
-    w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
+class PassGeneratorTest : public testing::Test { protected:
 
-    pass_generator.setWorld(w);
-    pass_generator.setPasserPoint(Point(-2, 0));
-
-    int num_iters = 100;
-    for (int i = 0; i < num_iters; i++){
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        auto pass_op = pass_generator.getBestPassSoFar();
-        if (!pass_op){
-            std::cout << "No best path found" << std::endl;
-        } else {
-            std::cout << *pass_op << std::endl;
-        }
+protected:
+    virtual void SetUp() {
+        world = ::Test::TestUtil::createBlankTestingWorld();
+        world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
+        pass_generator = std::make_shared<PassGenerator>(0.0);
+        pass_generator->setWorld(world);
     }
 
-    auto pass_op = pass_generator.getBestPassSoFar();
-    if (!pass_op){
-        std::cout << "No best path found" << std::endl;
-    } else {
-        std::cout << "Best path found!!" << std::endl;
-    }
+    World world;
+    std::shared_ptr<PassGenerator> pass_generator;
+};
 
-    volatile  int a =10;
-}
+TEST_F(PassGeneratorTest, static_convergence_towards_target_region){
+    // Test that given enough time and a static world with no robots, we converge to a
+    // pass near the enemy team goal
 
-TEST(GradientDescentTest, todo_test_name_here2) {
-    PassGenerator pass_generator(0.0);
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
-    World w = ::Test::TestUtil::createBlankTestingWorld();
-    w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-    pass_generator.setWorld(w);
-    pass_generator.setPasserPoint(Point(-2, 0));
+    std::optional<Pass> pass1 = pass_generator->getBestPassSoFar();
 
-}
+    // Make sure we got some pass
+    ASSERT_TRUE(pass1);
 
-TEST(GradientDescentTest, todo_test_name_here1){
-    PassGenerator pass_generator(0.8);
+    // Check that the pass is across the half-line towards the enemy goal
+    EXPECT_GE(pass1->receiverPoint().x(), 0.1);
+    // Currently we just generate receiver points at (0,0), so y should be 0
+    EXPECT_EQ(pass1->receiverPoint().y(), 0);
 
-    World w = ::Test::TestUtil::createBlankTestingWorld();
-    w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
+    // Run a bit more
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::optional<Pass> pass2 = pass_generator->getBestPassSoFar();
 
-    pass_generator.setWorld(w);
-    pass_generator.setPasserPoint(Point(-2, 0));
+    // Check that we're moving towards the goal
+    ASSERT_TRUE(pass2);
+    EXPECT_GE(pass2->receiverPoint().x(), pass1->receiverPoint().x());
+    // Currently we just generate receiver points at (0,0), so y should be 0
+    EXPECT_EQ(pass2->receiverPoint().y(), 0);
 
-    std::optional<Pass> pass_op = std::nullopt;
-    while(!pass_op){
-        // yield()
-        pass_op = pass_generator.getBestPassSoFar();
-    }
-    std::cout << "Found Pass: " << *pass_op << std::endl;
+    std::cout << pass1->receiverPoint() << std::endl;
+    std::cout << pass2->receiverPoint() << std::endl;
+
+    // TODO: Check more things here when we have more sophisticated point generation
 }
 
 int main(int argc, char **argv)
