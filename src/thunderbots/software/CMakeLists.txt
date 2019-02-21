@@ -424,6 +424,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
             ai/primitive/primitive.cpp
             geom/point.h
             ai/world/world.cpp
@@ -600,6 +601,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/dribble_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/stop_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
             ai/primitive/primitive.cpp
             geom/point.h
             ai/world/world.cpp
@@ -723,6 +725,128 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES})
+
+    catkin_add_gtest(catch_intent_test
+            test/intent/catch_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/catch_intent.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(catch_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(chip_intent_test
+            test/intent/chip_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/chip_intent.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(chip_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(direct_velocity_intent_test
+            test/intent/direct_velocity_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/direct_velocity_intent.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(direct_velocity_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(direct_wheels_intent_test
+            test/intent/direct_wheels_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/direct_wheels_intent.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(direct_wheels_intent_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+
+    catkin_add_gtest(dribble_intent_test
+            test/intent/dribble_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(dribble_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(kick_intent_test
+            test/intent/kick_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(kick_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(move_intent_test
+            test/intent/move_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(move_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(movespin_intent_test
+            test/intent/movespin_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/movespin_intent.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(movespin_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(pivot_intent_test
+            test/intent/pivot_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/pivot_intent.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(pivot_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(stop_intent_test
+            test/intent/stop_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(stop_intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
+
+    catkin_add_gtest(intent_test
+            test/intent/intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            )
+    target_link_libraries(intent_test
+            ${G3LOG}
+            ${catkin_LIBRARIES})
 endif()
 
 ##### ROSTests / Integration Tests #####
