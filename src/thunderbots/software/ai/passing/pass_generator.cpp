@@ -215,8 +215,8 @@ bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>
 PassGenerator::convertPassToArray(Pass pass)
 {
-    return {pass.receiverPoint().x(), pass.receiverPoint().y(), pass.passSpeed(),
-            pass.passStartTime().getSeconds()};
+    return {pass.receiverPoint().x(), pass.receiverPoint().y(), pass.speed(),
+            pass.startTime().getSeconds()};
 }
 
 Pass PassGenerator::convertArrayToPass(

@@ -745,7 +745,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(gradient_descent_optimizer_test gmock_main)
 
-    catkin_add_gtest(passing_evaluation
+    catkin_add_gtest(passing_evaluation_test
             test/ai/passing/evaluation.cpp
             test/test_util/test_util.cpp
             ai/passing/evaluation.cpp
@@ -758,7 +758,13 @@ if (CATKIN_ENABLE_TESTING)
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
             )
-    target_link_libraries(passing_evaluation ${catkin_LIBRARIES})
+    target_link_libraries(passing_evaluation_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(pass_test
+            test/ai/passing/pass.cpp
+            ai/passing/pass.cpp
+            util/timestamp.cpp
+            )
 
 endif()
 

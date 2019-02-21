@@ -1,4 +1,6 @@
-// TODO: start of file comment
+/**
+ * Implementation of the "Pass" class
+ */
 
 #include "pass.h"
 
@@ -30,12 +32,24 @@ Point Pass::passerPoint()
     return passer_point;
 }
 
-double Pass::passSpeed()
+double Pass::speed()
 {
     return pass_speed_m_per_s;
 }
 
-Timestamp Pass::passStartTime()
+Timestamp Pass::startTime()
 {
     return pass_start_time;
+}
+
+namespace AI::Passing{
+    std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
+    {
+        output_stream << "Receiver: " << pass.receiver_point
+                      << ", Passer: " << pass.passer_point
+                      << " Speed (m/s): " << pass.pass_speed_m_per_s
+                      << " Start Time (s): " << pass.pass_start_time.getSeconds();
+
+        return output_stream;
+    }
 }

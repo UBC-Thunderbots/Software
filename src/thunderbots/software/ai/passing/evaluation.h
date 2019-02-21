@@ -2,8 +2,6 @@
  * Declaration of evaluation functions for passing
  */
 
-// TODO: if this file (or the corresponding `.cpp`) gets too big, they may need to be
-// broken up
 #pragma once
 
 #include <functional>
@@ -28,7 +26,7 @@ namespace AI::Passing
      * @return A value in [0,1] representing the quality of the given point on the given
      *         field, with a higher value representing a more desirable position
      */
-    double getStaticPositionQuality(Field field, Point position);
+    double getStaticPositionQuality(const  Field& field, const Point& position);
 
     /**
      * Calculates the value at the given point over a 2D sigmoid over the given rectangle
@@ -45,7 +43,7 @@ namespace AI::Passing
      * @return A value in [0,1], representing the value of the 2D sigmoid function over
      *         the given rectangle at the given point
      */
-    double rectangleSigmoid(Rectangle rect, Point point, double sig_width);
+    double rectangleSigmoid(const Rectangle& rect, const Point& point, const double& sig_width);
 
     /**
      * Calculates the value at the given point over a 2D sigmoid over the given circle
@@ -60,7 +58,7 @@ namespace AI::Passing
      * @return A value in [0,1], representing the value of the 2D sigmoid function over
      *         the given circle at the given point
      */
-    double circleSigmoid(Circle circle, Point point, double sig_width);
+    double circleSigmoid(const Circle& circle, const Point& point, const double& sig_width);
 
     /**
      * A sigmoid function with a given offset from 0 and rate of change
@@ -74,6 +72,6 @@ namespace AI::Passing
      *
      * @return A value in [0,1] that is the value of the sigmoid at the value v
      */
-    double sigmoid(double v, double offset, double sig_width);
+    double sigmoid(const double& v, const double& offset, const double& sig_width);
 
 }  // namespace AI::Passing

@@ -54,19 +54,18 @@ namespace AI::Passing
          *
          * @return The value of the pass speed, in meters/second
          */
-        double passSpeed();
+        double speed();
 
         /**
          * Gets the value of the pass start time
          *
          * @return The value of the pass start time
          */
-        Timestamp passStartTime();
+        Timestamp startTime();
 
         /**
          * Implement the "<<" operator for printing
          *
-         * // TODO: crap excuse. Try harder
          * This is implemented in the header because there were namespace issues with
          * putting it in the `.cpp`.
          *
@@ -74,15 +73,15 @@ namespace AI::Passing
          * @param pass The pass to print
          * @return The output stream with the string representation of the class appended
          */
-        friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
-        {
-            output_stream << "Receiver: " << pass.receiver_point
-                          << ", Passer: " << pass.passer_point
-                          << " Speed (m/s): " << pass.pass_speed_m_per_s
-                          << " Start Time (s): " << pass.pass_start_time.getSeconds();
+        friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
+        //{
+        //    output_stream << "Receiver: " << pass.receiver_point
+        //                  << ", Passer: " << pass.passer_point
+        //                  << " Speed (m/s): " << pass.pass_speed_m_per_s
+        //                  << " Start Time (s): " << pass.pass_start_time.getSeconds();
 
-            return output_stream;
-        }
+        //    return output_stream;
+        //}
 
        private:
         // The location of the passer

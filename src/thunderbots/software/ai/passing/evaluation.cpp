@@ -10,13 +10,12 @@
 
 using namespace AI::Passing;
 
-double AI::Passing::getStaticPositionQuality(Field field, Point position)
+double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
 {
     // This constant is used to determine how steep the sigmoid slopes below are
     static const double sigmoid_width = 0.1;
 
     // The offset from the sides of the field for the center of the sigmoid functions
-    // TODO: should we be using dynamic parameters like this here?
     double x_offset =
         Util::DynamicParameters::AI::Passing::static_position_quality_x_offset.value();
     double y_offset =
@@ -50,7 +49,7 @@ double AI::Passing::getStaticPositionQuality(Field field, Point position)
     return on_field_quality * near_friendly_goal_quality * in_enemy_defense_area_quality;
 }
 
-double AI::Passing::rectangleSigmoid(Rectangle rect, Point point, double sig_width)
+double AI::Passing::rectangleSigmoid(const Rectangle& rect, const Point& point, const double& sig_width)
 {
     double x_offset = rect.centre().x();
     double y_offset = rect.centre().y();
@@ -71,7 +70,7 @@ double AI::Passing::rectangleSigmoid(Rectangle rect, Point point, double sig_wid
     return x_val * y_val;
 }
 
-double AI::Passing::circleSigmoid(Circle circle, Point point, double sig_width)
+double AI::Passing::circleSigmoid(const Circle &circle, const Point& point, const double& sig_width)
 {
     // Calculate how far the point is from the circle center
     double distance_from_circle_center = (point - circle.getOrigin()).len();
@@ -85,7 +84,7 @@ double AI::Passing::circleSigmoid(Circle circle, Point point, double sig_width)
     return sig_value;
 }
 
-double AI::Passing::sigmoid(double v, double offset, double sig_width)
+double AI::Passing::sigmoid(const double& v, const double& offset, const double& sig_width)
 {
     // This is factor that changes how quickly the sigmoid goes from 0 outside the
     // rectangle to 1 inside it. We divide 8 by it because that is the distance a

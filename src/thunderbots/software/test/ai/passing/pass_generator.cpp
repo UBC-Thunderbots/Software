@@ -1,5 +1,5 @@
 /**
- * This file contains unit tests for the GradientDescent class
+ * this file contains unit tests for the gradientdescent class
  */
 
 #include "ai/passing/pass_generator.h"
@@ -9,62 +9,60 @@
 
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace ai::passing;
 
-// TODO: performance tests? That's gonna be tricky........
-
-class PassGeneratorTest : public testing::Test
+class passgeneratortest : public testing::test
 {
    protected:
    protected:
-    virtual void SetUp()
+    virtual void setup()
     {
-        world = ::Test::TestUtil::createBlankTestingWorld();
-        world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-        pass_generator = std::make_shared<PassGenerator>(0.0);
-        pass_generator->setWorld(world);
+        world = ::test::testutil::createblanktestingworld();
+        world.updatefieldgeometry(::test::testutil::createssldivbfield());
+        pass_generator = std::make_shared<passgenerator>(0.0);
+        pass_generator->setworld(world);
     }
 
-    World world;
-    std::shared_ptr<PassGenerator> pass_generator;
+    world world;
+    std::shared_ptr<passgenerator> pass_generator;
 };
 
-TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
+test_f(passgeneratortest, static_convergence_towards_target_region)
 {
-    // Test that given enough time and a static world with no robots, we converge to a
+    // test that given enough time and a static world with no robots, we converge to a
     // pass near the enemy team goal
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
 
-    std::optional<Pass> pass1 = pass_generator->getBestPassSoFar();
+    std::optional<pass> pass1 = pass_generator->getbestpasssofar();
 
-    // Make sure we got some pass
-    ASSERT_TRUE(pass1);
+    // make sure we got some pass
+    assert_true(pass1);
 
-    // Check that the pass is across the half-line towards the enemy goal
-    EXPECT_GE(pass1->receiverPoint().x(), 0.1);
-    // Currently we just generate receiver points at (0,0), so y should be 0
-    EXPECT_EQ(pass1->receiverPoint().y(), 0);
+    // check that the pass is across the half-line towards the enemy goal
+    expect_ge(pass1->receiverpoint().x(), 0.1);
+    // currently we just generate receiver points at (0,0), so y should be 0
+    expect_eq(pass1->receiverpoint().y(), 0);
 
-    // Run a bit more
+    // run a bit more
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::optional<Pass> pass2 = pass_generator->getBestPassSoFar();
+    std::optional<pass> pass2 = pass_generator->getbestpasssofar();
 
-    // Check that we're moving towards the goal
-    ASSERT_TRUE(pass2);
-    EXPECT_GE(pass2->receiverPoint().x(), pass1->receiverPoint().x());
-    // Currently we just generate receiver points at (0,0), so y should be 0
-    EXPECT_EQ(pass2->receiverPoint().y(), 0);
+    // check that we're moving towards the goal
+    assert_true(pass2);
+    expect_ge(pass2->receiverpoint().x(), pass1->receiverpoint().x());
+    // currently we just generate receiver points at (0,0), so y should be 0
+    expect_eq(pass2->receiverpoint().y(), 0);
 
-    std::cout << pass1->receiverPoint() << std::endl;
-    std::cout << pass2->receiverPoint() << std::endl;
+    std::cout << pass1->receiverpoint() << std::endl;
+    std::cout << pass2->receiverpoint() << std::endl;
 
-    // TODO (Issue #323): Check more things here when we're actually generating passes
+    // todo (issue #323): check more things here when we're actually generating passes
 }
 
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    testing::initgoogletest(&argc, argv);
+    return run_all_tests();
 }
