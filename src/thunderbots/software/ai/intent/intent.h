@@ -21,7 +21,7 @@ class Intent
    public:
     /**
      * Creates a new Intent with the given priority. A larger number indicates a higher
-     * priority
+     * priority. The priority value must be in the range [0, 100]
      *
      * @param priority The priority of this Intent
      */
@@ -35,13 +35,16 @@ class Intent
     virtual std::string getIntentName(void) const = 0;
 
     /**
-     * Returns the priority of this Intent
+     * Returns the priority of this Intent. The priority value is an integer in the range
+     * [0, 100] that indicates the priority of this Intent.
+     *
      * @return the priority of this Intent
      */
     unsigned int getPriority(void) const;
 
     /**
-     * Sets the priority of this Intent
+     * Sets the priority of this Intent. The priority value must be an integer in the
+     * range [0, 100]
      */
     void setPriority(unsigned int new_priority);
 
@@ -66,7 +69,7 @@ class Intent
 
    private:
     /**
-     * priority of this intent
+     * The priority of this intent. Must be in the range [0, 100]
      * higher value => higher priority
      */
     unsigned int priority;
