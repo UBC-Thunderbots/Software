@@ -11,6 +11,7 @@ class DribbleIntent : public Intent, public DribblePrimitive
     static const std::string INTENT_NAME;
     /**
      * Creates a new Dribble Intent
+     *
      * Moves the robot in a straight line between its current position and the given
      * destination with the dribbler on
      *

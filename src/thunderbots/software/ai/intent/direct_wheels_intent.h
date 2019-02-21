@@ -7,10 +7,11 @@ class DirectWheelsIntent : public Intent, public DirectWheelsPrimitive
 {
    public:
     static const std::string INTENT_NAME;
-    // Power is a fraction of the total power we can apply to the robots,
-    // with +-255 being the max/min, and 0 being no power.
     /**
      * Creates a new DirectWheels Intent
+     *
+     * Power is a fraction of the total power we can apply to the robots,
+     * with +-255 being the max/min, and 0 being no power.
      *
      * @param robot_id the id of the robot
      * @param front_left_wheel_power a value between -255 and 255, where positive is
