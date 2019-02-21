@@ -154,13 +154,17 @@ double PassGenerator::ratePass(Pass pass) {
     std::lock_guard<std::mutex> world_lock(world_mutex);
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
-    double pass_quality = getStaticPositionQuality(world.field(), pass.receiverPoint());
+    double static_pass_quality = getStaticPositionQuality(world.field(), pass.receiverPoint());
 
     // TODO: the rest of this function; see the old code
 
-    // Strongly weight positions in our target region
+    // Strongly weight positions in our target region, if we have one
+    double in_region_quality = 1;
+    if(target_region){
+        double in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
+    }
 
-    return pass_quality;
+    return static_pass_quality * in_region_quality;
 }
 
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen) {
