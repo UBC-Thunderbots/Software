@@ -36,7 +36,7 @@ class DirectWheelsPrimitive : public Primitive
      *
      * @param primitive_msg The message from which to create the Move Primitive
      */
-    explicit DirectWheelsPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    explicit DirectWheelsPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
 
     std::string getPrimitiveName() const override;
 
@@ -93,7 +93,24 @@ class DirectWheelsPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
-    void accept(PrimitiveVisitor &visitor) const override;
+    void accept(PrimitiveVisitor& visitor) const override;
+
+    /**
+     * Compares DirectWheelsPrimitives for equality. DirectWheelsPrimitives are considered
+     * equal if all their member variables are equal.
+     *
+     * @param other the DirectWheelsPrimitive to compare with for equality
+     * @return true if the DirectWheelsPrimitives are equal and false otherwise
+     */
+    bool operator==(const DirectWheelsPrimitive& other) const;
+
+    /**
+     * Compares DirectWheelsPrimitives for inequality.
+     *
+     * @param other the DirectWheelsPrimitive to compare with for inequality
+     * @return true if the DirectWheelsPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const DirectWheelsPrimitive& other) const;
 
    private:
     unsigned int robot_id;

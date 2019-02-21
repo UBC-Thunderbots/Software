@@ -109,6 +109,23 @@ class DribblePrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares DribblePrimitives for equality. DribblePrimitives are considered equal if
+     * all their member variables are equal.
+     *
+     * @param other the DribblePrimitive to compare with for equality
+     * @return true if the DribblePrimitives are equal and false otherwise
+     */
+    bool operator==(const DribblePrimitive &other) const;
+
+    /**
+     * Compares DribblePrimitives for inequality.
+     *
+     * @param other the DribblePrimitive to compare with for inequality
+     * @return true if the DribblePrimitives are not equal and false otherwise
+     */
+    bool operator!=(const DribblePrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point dest;

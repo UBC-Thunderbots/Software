@@ -2,19 +2,16 @@
  * This file contains the unit tests for the MoveSpinPrimitive class
  */
 
-#include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/direct_wheels_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(DirectWheelsPrimTest, construct_with_no_params_test)
+TEST(DirectWheelsPrimTest, primitive_name_test)
 {
-    const std::string directwheels_prim_name = "DirectWheels Primitive";
-
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
 
-    EXPECT_EQ(0, directwheels_prim.getRobotId());
-    EXPECT_EQ(directwheels_prim_name, directwheels_prim.getPrimitiveName());
+    EXPECT_EQ("Direct Wheels Primitive", directwheels_prim.getPrimitiveName());
 }
 
 TEST(DirectWheelsPrimTest, get_robot_id_test)
@@ -125,14 +122,81 @@ TEST(DirectWheelsPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("DirectWheels Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(wheel0_power, parameters[0]);
-    EXPECT_DOUBLE_EQ(wheel1_power, parameters[1]);
-    EXPECT_DOUBLE_EQ(wheel2_power, parameters[2]);
-    EXPECT_DOUBLE_EQ(wheel3_power, parameters[3]);
-    EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[4]);
-    EXPECT_EQ(directwheels_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(DirectWheelsPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, directwheels_prim);
+}
+
+TEST(DirectWheelsPrimTest, test_equality_operator_primitives_equal)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+
+    EXPECT_EQ(directwheels_primitive, directwheels_primitive_other);
+}
+
+TEST(DirectWheelsPrimTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(3, 0, 0, 0, 0, 0.0);
+
+    EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
+}
+
+TEST(DirectWheelsPrimTest,
+     test_inequality_operator_with_mismatched_front_left_wheel_power)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, -1, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(0, 1, 0, 0, 0, 0.0);
+
+    EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
+}
+
+TEST(DirectWheelsPrimTest, test_inequality_operator_with_mismatched_back_left_wheel_power)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(0, 0, -2, 0, 0, 0.0);
+
+    EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
+}
+
+TEST(DirectWheelsPrimTest,
+     test_inequality_operator_with_mismatched_front_right_wheel_power)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(0, 0, 0, 240, 0, 0.0);
+
+    EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
+}
+
+TEST(DirectWheelsPrimTest,
+     test_inequality_operator_with_mismatched_back_right_wheel_power)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(0, 0, 0, 0, -100.1, 0.0);
+
+    EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
+}
+
+TEST(DirectWheelsPrimTest, test_inequality_operator_with_mismatched_dribbler_rpm)
+{
+    DirectWheelsPrimitive directwheels_primitive =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
+    DirectWheelsPrimitive directwheels_primitive_other =
+        DirectWheelsPrimitive(0, 0, 0, 0, 0, 999.9);
+
+    EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
 }
 
 int main(int argc, char **argv)

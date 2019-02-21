@@ -1,12 +1,11 @@
-
-#include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/direct_wheels_primitive.h"
 
 #include <cstdint>
 
 #include "ai/primitive/visitor/primitive_visitor.h"
 #include "util/logger/init.h"
 
-const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "DirectWheels Primitive";
+const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "Direct Wheels Primitive";
 
 DirectWheelsPrimitive::DirectWheelsPrimitive(
     unsigned int robot_id, int16_t front_left_wheel_power, int16_t back_left_wheel_power,
@@ -109,4 +108,19 @@ std::vector<bool> DirectWheelsPrimitive::getExtraBits() const
 void DirectWheelsPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+bool DirectWheelsPrimitive::operator==(const DirectWheelsPrimitive &other) const
+{
+    return this->robot_id == other.robot_id &&
+           this->front_left_wheel_power == other.front_left_wheel_power &&
+           this->back_left_wheel_power == other.back_left_wheel_power &&
+           this->front_right_wheel_power == other.front_right_wheel_power &&
+           this->back_right_wheel_power == other.back_right_wheel_power &&
+           this->dribbler_rpm == other.dribbler_rpm;
+}
+
+bool DirectWheelsPrimitive::operator!=(const DirectWheelsPrimitive &other) const
+{
+    return !((*this) == other);
 }
