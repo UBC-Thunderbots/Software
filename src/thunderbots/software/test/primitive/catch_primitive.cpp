@@ -9,12 +9,10 @@
 
 TEST(CatchPrimTest, constuct_with_no_params_test)
 {
-    const std::string catch_prim_name = "Catch Primitive";
-
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, 0);
 
-    EXPECT_EQ(int(), catch_prim.getRobotId());
-    EXPECT_EQ(catch_prim_name, catch_prim.getPrimitiveName());
+    EXPECT_EQ(0, catch_prim.getRobotId());
+    EXPECT_EQ(CatchPrimitive::PRIMITIVE_NAME, catch_prim.getPrimitiveName());
 }
 
 TEST(CatchPrimTest, get_robot_id_test)
@@ -95,12 +93,8 @@ TEST(CatchPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("Catch Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_EQ(velocity, parameters[0]);
-    EXPECT_EQ(dribbler_speed, parameters[1]);
-    EXPECT_EQ(margin, parameters[2]);
-    EXPECT_EQ(catch_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(CatchPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, catch_prim);
 }
 
 TEST(CatchPrimTest, test_equality_operator_primitives_equal)

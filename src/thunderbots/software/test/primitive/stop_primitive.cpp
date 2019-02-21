@@ -9,12 +9,10 @@
 
 TEST(StopPrimTest, construct_with_no_params_test)
 {
-    const std::string stop_prim_name = "Stop Primitive";
-
     StopPrimitive stop_prim = StopPrimitive(0, true);
 
     EXPECT_EQ(0, stop_prim.getRobotId());
-    EXPECT_EQ(stop_prim_name, stop_prim.getPrimitiveName());
+    EXPECT_EQ(StopPrimitive::PRIMITIVE_NAME, stop_prim.getPrimitiveName());
 }
 
 TEST(StopPrimTest, get_robot_id_test)
@@ -71,10 +69,8 @@ TEST(StopPrimitiveTest, create_primitive_from_message_test)
 
     std::vector<bool> extra_bits = new_prim.getExtraBits();
 
-    EXPECT_EQ("Stop Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_EQ(coast, extra_bits[0]);
-    EXPECT_EQ(stop_prim.getParameters(), std::vector<double>());
+    EXPECT_EQ(StopPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, stop_prim);
 }
 
 TEST(StopPrimitiveTest, test_equality_operator_primitives_equal)

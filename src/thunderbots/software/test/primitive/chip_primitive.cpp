@@ -9,12 +9,10 @@
 
 TEST(ChipPrimTest, construct_with_no_params_test)
 {
-    const std::string chip_prim_name = "Chip Primitive";
-
     ChipPrimitive chip_prim = ChipPrimitive(0, Point(), Angle(), 0.0);
 
     EXPECT_EQ(int(), chip_prim.getRobotId());
-    EXPECT_EQ(chip_prim_name, chip_prim.getPrimitiveName());
+    EXPECT_EQ(ChipPrimitive::PRIMITIVE_NAME, chip_prim.getPrimitiveName());
 }
 
 TEST(ChipPrimTest, get_robot_id_test)
@@ -96,13 +94,8 @@ TEST(ChipPrimitiveTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("Chip Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(chip_origin.x(), parameters[0]);
-    EXPECT_DOUBLE_EQ(chip_origin.y(), parameters[1]);
-    EXPECT_DOUBLE_EQ(chip_direction.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(chip_distance_meters, parameters[3]);
-    EXPECT_EQ(chip_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(ChipPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, chip_prim);
 }
 
 TEST(ChipPrimitiveTest, test_equality_operator_primitives_equal)

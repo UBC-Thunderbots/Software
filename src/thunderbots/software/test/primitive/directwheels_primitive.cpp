@@ -9,12 +9,11 @@
 
 TEST(DirectWheelsPrimTest, construct_with_no_params_test)
 {
-    const std::string directwheels_prim_name = "DirectWheels Primitive";
-
     DirectWheelsPrimitive directwheels_prim = DirectWheelsPrimitive(0, 0, 0, 0, 0, 0.0);
 
     EXPECT_EQ(0, directwheels_prim.getRobotId());
-    EXPECT_EQ(directwheels_prim_name, directwheels_prim.getPrimitiveName());
+    EXPECT_EQ(DirectWheelsPrimitive::PRIMITIVE_NAME,
+              directwheels_prim.getPrimitiveName());
 }
 
 TEST(DirectWheelsPrimTest, get_robot_id_test)
@@ -125,14 +124,8 @@ TEST(DirectWheelsPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("DirectWheels Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(wheel0_power, parameters[0]);
-    EXPECT_DOUBLE_EQ(wheel1_power, parameters[1]);
-    EXPECT_DOUBLE_EQ(wheel2_power, parameters[2]);
-    EXPECT_DOUBLE_EQ(wheel3_power, parameters[3]);
-    EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[4]);
-    EXPECT_EQ(directwheels_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(DirectWheelsPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, directwheels_prim);
 }
 
 TEST(DirectWheelsPrimTest, test_equality_operator_primitives_equal)

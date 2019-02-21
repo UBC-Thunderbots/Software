@@ -10,12 +10,10 @@
 
 TEST(PivotPrimTest, construct_with_no_params_test)
 {
-    const std::string pivot_prim_name = "Pivot Primitive";
-
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), 0);
 
     EXPECT_EQ(0, pivot_prim.getRobotId());
-    EXPECT_EQ(pivot_prim_name, pivot_prim.getPrimitiveName());
+    EXPECT_EQ(PivotPrimitive::PRIMITIVE_NAME, pivot_prim.getPrimitiveName());
 }
 
 TEST(PivotPrimTest, get_robot_id_test)

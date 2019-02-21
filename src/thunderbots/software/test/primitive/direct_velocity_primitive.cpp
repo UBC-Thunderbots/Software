@@ -9,13 +9,12 @@
 
 TEST(DirectVelocityPrimTest, construct_with_no_params_test)
 {
-    const std::string direct_velocity_prim_name = "Direct Velocity Primitive";
-
     DirectVelocityPrimitive direct_velocity_prim =
         DirectVelocityPrimitive(0U, 0.0, 0.0, 0.0, 0.0);
 
     EXPECT_EQ(0U, direct_velocity_prim.getRobotId());
-    EXPECT_EQ(direct_velocity_prim_name, direct_velocity_prim.getPrimitiveName());
+    EXPECT_EQ(DirectVelocityPrimitive::PRIMITIVE_NAME,
+              direct_velocity_prim.getPrimitiveName());
 }
 
 TEST(DirectVelocityPrimTest, get_robot_id_test)
@@ -116,13 +115,8 @@ TEST(DirectVelocityPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("Direct Velocity Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(x_velocity, parameters[0]);
-    EXPECT_DOUBLE_EQ(y_velocity, parameters[1]);
-    EXPECT_DOUBLE_EQ(angular_velocity, parameters[2]);
-    EXPECT_DOUBLE_EQ(dribbler_rpm, parameters[3]);
-    EXPECT_EQ(new_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(DirectVelocityPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, direct_velocity_prim);
 }
 
 TEST(DirectVelocityPrimTest, test_equality_operator_primitives_equal)

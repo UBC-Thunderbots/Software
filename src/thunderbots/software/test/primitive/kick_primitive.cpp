@@ -9,12 +9,10 @@
 
 TEST(KickPrimTest, construct_with_no_params_test)
 {
-    const std::string kick_prim_name = "Kick Primitive";
-
     KickPrimitive kick_prim = KickPrimitive(0, Point(), Angle(), 0.0);
 
     EXPECT_EQ(int(), kick_prim.getRobotId());
-    EXPECT_EQ(kick_prim_name, kick_prim.getPrimitiveName());
+    EXPECT_EQ(KickPrimitive::PRIMITIVE_NAME, kick_prim.getPrimitiveName());
 }
 
 TEST(KickPrimTest, get_robot_id_test)
@@ -97,13 +95,8 @@ TEST(KickPrimitiveTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("Kick Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(kick_origin.x(), parameters[0]);
-    EXPECT_DOUBLE_EQ(kick_origin.y(), parameters[1]);
-    EXPECT_DOUBLE_EQ(kick_direction.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(kick_speed_meters_per_second, parameters[3]);
-    EXPECT_EQ(kick_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(KickPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, kick_prim);
 }
 
 TEST(KickPrimitiveTest, test_equality_operator_primitives_equal)

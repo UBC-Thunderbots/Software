@@ -9,13 +9,11 @@
 
 TEST(DribblePrimTest, construct_with_no_params_test)
 {
-    const std::string dribble_prim_name = "Dribble Primitive";
-
     DribblePrimitive dribble_prim =
         DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
 
     EXPECT_EQ(int(), dribble_prim.getRobotId());
-    EXPECT_EQ(dribble_prim_name, dribble_prim.getPrimitiveName());
+    EXPECT_EQ(DribblePrimitive::PRIMITIVE_NAME, dribble_prim.getPrimitiveName());
 }
 
 TEST(DribblePrimTest, get_robot_id_test)
@@ -130,14 +128,8 @@ TEST(DribblePrimTest, create_primitive_from_message_test)
 
     std::vector<bool> extraBits = new_prim.getExtraBits();
 
-    EXPECT_EQ("Dribble Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
-    EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
-    EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(final_speed, parameters[3]);
-    EXPECT_DOUBLE_EQ(rpm, parameters[4]);
-    EXPECT_EQ(small_kick_allowed, extraBits[0]);
+    EXPECT_EQ(DribblePrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, dribble_prim);
 }
 
 TEST(DribblePrimTest, test_equality_operator_primitives_equal)

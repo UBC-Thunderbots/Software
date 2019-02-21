@@ -9,12 +9,10 @@
 
 TEST(MoveSpinPrimTest, construct_with_no_params_test)
 {
-    const std::string movespin_prim_name = "MoveSpin Primitive";
-
     MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
 
     EXPECT_EQ(int(), movespin_prim.getRobotId());
-    EXPECT_EQ(movespin_prim_name, movespin_prim.getPrimitiveName());
+    EXPECT_EQ(MoveSpinPrimitive::PRIMITIVE_NAME, movespin_prim.getPrimitiveName());
 }
 
 TEST(MoveSpinPrimTest, get_robot_id_test)
@@ -86,12 +84,8 @@ TEST(MoveSpinPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("MoveSpin Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
-    EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
-    EXPECT_DOUBLE_EQ(angular_vel.toRadians(), parameters[2]);
-    EXPECT_EQ(movespin_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(MoveSpinPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, movespin_prim);
 }
 
 TEST(MoveSpinPrimTest, test_equality_operator_primitives_equal)
