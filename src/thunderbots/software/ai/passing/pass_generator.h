@@ -53,7 +53,12 @@ namespace AI::Passing {
          */
         void setPasserPoint(Point passer_point);
 
-        // TODO: Ability to set a target region
+        /**
+         * Set the target region that we would like to pass to
+         *
+         * @param area The area to pass to
+         */
+        void setTargetRegion(Rectangle area);
 
         /**
          * Gets the best pass we know of so far
@@ -209,6 +214,12 @@ namespace AI::Passing {
 
         // The point we are passing from
         Point passer_point;
+
+        // The mutex for the target region
+        std::mutex target_region_mutex;
+
+        // The area that we want to pass to
+        std::optional<Rectangle> target_region;
 
         // The mutex for the passer_point
         std::mutex best_known_pass_mutex;

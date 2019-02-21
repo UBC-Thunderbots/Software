@@ -1,18 +1,39 @@
-// TODO: start of file comment
+/**
+ * Declaration of evaluation functions for passing
+ */
 
 // TODO: if this file (or the corresponding `.cpp`) gets too big, they may need to be broken up
 #pragma once
 
+#include <functional>
+
 #include "ai/world/field.h"
 #include "geom/point.h"
 
-/**
- * Calculates the static position quality for a given position on a given field
- *
- * @param field The field on which to calculate the static position quality
- * @param position The position on the field at which to calculate the quality
- *
- * @return A value in [0,1] representing the quality of the given point on the given field
- */
-double getStaticPositionQuality(Field field, Point position);
+namespace AI::Passing {
 
+    /**
+     * Calculates the static position quality for a given position on a given field
+     *
+     * @param field The field on which to calculate the static position quality
+     * @param position The position on the field at which to calculate the quality
+     *
+     * @return A value in [0,1] representing the quality of the given point on the given field
+     */
+    double getStaticPositionQuality(Field field, Point position);
+
+    /**
+     * Calculates the value at the give point over a 2D sigmoid around the given rectangle
+     *
+     * The sigmoid constructed will be 0 far enough outside the rectangle, and 1
+     * far enough within the rectangle
+     *
+     * @param rect The rectangle over which to make sigmoid function. The width of the
+     *             the rectangle is considered to be in x, and the height in y
+     * @param sig_width The length (in either x or y) required to cause the value of the
+     *                 sigmoid to go from 0.5 to 0.982
+     * @return The value of the sigmoid over the rectangle at the given point
+     */
+    double rectangleSigmoid(Rectangle rect, Point point, double sig_width);
+
+}

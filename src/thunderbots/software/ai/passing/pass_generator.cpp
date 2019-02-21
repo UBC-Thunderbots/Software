@@ -7,11 +7,11 @@
 
 using namespace AI::Passing;
 
-
 PassGenerator::PassGenerator(double min_reasonable_pass_quality):
 min_reasonable_pass_quality(min_reasonable_pass_quality),
 optimizer(optimizer_param_weights),
 best_known_pass(std::nullopt),
+target_region(std::nullopt),
 in_destructor(false)
 {
     // Generate the initial set of passes
@@ -45,6 +45,14 @@ std::optional<Pass> PassGenerator::getBestPassSoFar() {
 
     return best_known_pass;
 }
+
+void PassGenerator::setTargetRegion(Rectangle area) {
+    // Take ownership of the target_region for the duration of this function
+    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
+
+    this->target_region = std::move(area);
+}
+
 
 PassGenerator::~PassGenerator() {
     // Set this flag so pass_generation_thread knows to end (also making sure to
@@ -93,7 +101,6 @@ void PassGenerator::optimizePasses() {
 
     // Run gradient descent to optimize the passes to for the requested number
     // of iterations
-    // TODO: Can we parallize this? Would it make it faster?
     for (Pass& pass : passes_to_optimize){
         auto pass_array = optimizer.maximize(
                 objective_function,
@@ -135,7 +142,7 @@ void PassGenerator::saveBestPath() {
 
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](auto pass1, auto pass2) { return comparePassQuality(pass1, pass2);});
-    if (!passes_to_optimize.empty() && ratePass(passes_to_optimize[0]) > min_reasonable_pass_quality){
+    if (!passes_to_optimize.empty() && ratePass(passes_to_optimize[0]) >= min_reasonable_pass_quality){
         best_known_pass = std::optional(passes_to_optimize[0]);
     } else {
         best_known_pass = std::nullopt;
@@ -143,35 +150,24 @@ void PassGenerator::saveBestPath() {
 }
 
 double PassGenerator::ratePass(Pass pass) {
-    // Take ownership of world for the duration of this function
+    // Take ownership of world, target_region for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
+    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
     double pass_quality = getStaticPositionQuality(world.field(), pass.receiverPoint());
 
-    double distance_to_goal = Vector(pass.receiverPoint().x() - world.field().enemyGoal().x(),
-            pass.receiverPoint().y() - world.field().enemyGoal().y()).len();
-
-    pass_quality = 1 / (1 + std::exp(distance_to_goal - 2.1));
-
     // TODO: the rest of this function; see the old code
+
+    // Strongly weight positions in our target region
 
     return pass_quality;
 }
 
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen) {
-    // Take ownership of world for the duration of this function
-    std::lock_guard<std::mutex> world_lock(world_mutex);
-
-    std::vector<Pass> v;
 
     Pass p(Point(0,0), Point(0,0), 0, Timestamp::fromSeconds(0));
-    for (int i = 0; i < num_paths_to_gen; i++){
-        v.emplace_back(p);
-    }
 
-    // TODO: implement this function properly; see the old code
-
-    return v;
+    return std::vector<Pass>(num_paths_to_gen, p);
 }
 
 bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2) {
@@ -194,7 +190,6 @@ Pass PassGenerator::convertArrayToPass(std::array<double, PassGenerator::NUM_PAR
     // Clamp the time to be >= 0, otherwise the TimeStamp will throw an exception
     double clamped_time = std::max(0.0, array.at(3));
 
-    // TODO: Set the timestamp properly here, just setting to 0 to avoid negative values......
     return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
             Timestamp::fromSeconds(clamped_time));
 }
