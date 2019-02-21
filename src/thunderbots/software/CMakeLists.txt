@@ -734,6 +734,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(catch_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(chip_intent_test
@@ -744,6 +745,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(chip_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(direct_velocity_intent_test
@@ -754,6 +756,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(direct_velocity_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(direct_wheels_intent_test
@@ -776,6 +779,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(dribble_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(kick_intent_test
@@ -786,6 +790,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(kick_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(move_intent_test
@@ -796,6 +801,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(move_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(movespin_intent_test
@@ -806,6 +812,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(movespin_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(pivot_intent_test
@@ -816,6 +823,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(pivot_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(stop_intent_test
@@ -826,6 +834,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(stop_intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 
     catkin_add_gtest(intent_test
@@ -836,6 +845,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             )
     target_link_libraries(intent_test
+            ${G3LOG}
             ${catkin_LIBRARIES})
 endif()
 
