@@ -1,5 +1,5 @@
 /**
- * This file contains the unit tests for the Intent class
+ * This file contains the unit tests for the Intent class (NOTE: `Intent` is virtual, so we use `MoveIntent` instead, but we're only testing functionality of the `Intent` class)
  */
 
 #include "ai/intent/intent.h"
