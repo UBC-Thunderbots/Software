@@ -5,7 +5,7 @@
 
 class StopIntent : public Intent, public StopPrimitive
 {
-public:
+   public:
     static const std::string INTENT_NAME;
     /**
      * Creates a new Stop Intent
@@ -14,8 +14,10 @@ public:
      *
      * @param robot_id The id of the Robot to run this Primitive
      * @param coast to coast to a stop or not
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
      */
-    explicit StopIntent(unsigned int robot_id, bool coast);
+    explicit StopIntent(unsigned int robot_id, bool coast, unsigned int priority);
 
     std::string getIntentName(void) const override;
 
@@ -36,4 +38,3 @@ public:
      */
     bool operator!=(const StopIntent& other) const;
 };
-

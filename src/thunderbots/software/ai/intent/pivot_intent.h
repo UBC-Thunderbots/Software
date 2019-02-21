@@ -17,9 +17,12 @@ class PivotIntent : public Intent, public PivotPrimitive
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
      */
-    explicit PivotIntent(unsigned int robot_id, const Point &pivot_point,
-                         const Angle &final_angle, const double pivot_radius);
+    explicit PivotIntent(unsigned int robot_id, const Point& pivot_point,
+                         const Angle& final_angle, const double pivot_radius,
+                         unsigned int priority);
 
     std::string getIntentName(void) const override;
 

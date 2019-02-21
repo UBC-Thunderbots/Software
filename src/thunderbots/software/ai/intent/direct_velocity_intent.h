@@ -17,16 +17,18 @@ class DirectVelocityIntent : public Intent, public DirectVelocityPrimitive
      * @param y_velocity positive forward
      * @param angular_velocity positive clockwise
      * @param dribbler_rpm The dribbler speed in rpm
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
      */
     explicit DirectVelocityIntent(unsigned int robot_id, double x_velocity,
                                   double y_velocity, double angular_velocity,
-                                  double dribbler_rpm);
+                                  double dribbler_rpm, unsigned int priority);
 
     std::string getIntentName(void) const override;
 
     /**
-     * Compares DirectVelocityIntents for equality. DirectVelocityIntents are considered equal if all
-     * their member variables are equal.
+     * Compares DirectVelocityIntents for equality. DirectVelocityIntents are considered
+     * equal if all their member variables are equal.
      *
      * @param other the DirectVelocityIntents to compare with for equality
      * @return true if the DirectVelocityIntents are equal and false otherwise

@@ -19,9 +19,11 @@ class CatchIntent : public Intent, public CatchPrimitive
      * @param ball_intercept_margin A scaling factor for how far in front of the ball to
      * make the point of intercept. It scales based on the difference in velocity between
      * the robot and the ball.
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
      */
     explicit CatchIntent(unsigned int robot_id, double velocity, double dribbler_rpm,
-                         double ball_intercept_margin);
+                         double ball_intercept_margin, unsigned int priority);
 
     std::string getIntentName(void) const override;
 

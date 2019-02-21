@@ -20,6 +20,14 @@ class Intent
 {
    public:
     /**
+     * Creates a new Intent with the given priority. A larger number indicates a higher
+     * priority
+     *
+     * @param priority The priority of this Intent
+     */
+    explicit Intent(unsigned int priority);
+
+    /**
      * Returns the name of this Intent
      *
      * @return the name of this Intent
@@ -30,12 +38,12 @@ class Intent
      * Returns the priority of this Intent
      * @return the priority of this Intent
      */
-    int getPriority(void) const;
+    unsigned int getPriority(void) const;
 
     /**
      * Sets the priority of this Intent
      */
-    void setPriority(int);
+    void setPriority(unsigned int new_priority);
 
     /**
      * Compares Intents for equality. Intents are considered equal if all
@@ -61,5 +69,5 @@ class Intent
      * priority of this intent
      * higher value => higher priority
      */
-    int priority;
+    unsigned int priority;
 };

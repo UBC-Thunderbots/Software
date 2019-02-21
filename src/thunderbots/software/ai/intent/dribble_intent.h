@@ -7,7 +7,7 @@
 
 class DribbleIntent : public Intent, public DribblePrimitive
 {
-public:
+   public:
     static const std::string INTENT_NAME;
     /**
      * Creates a new Dribble Intent
@@ -25,11 +25,13 @@ public:
      * kick while dribbling in order to release the ball. This is due to the rule that
      * a robot may not dribble more than 1 meter without releasing the ball. This is not
      * obeyed in firmware
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
      *
      */
-    explicit DribbleIntent(unsigned int robot_id, const Point &dest,
-                              const Angle &final_angle, double final_speed, double rpm,
-                              bool small_kick_allowed);
+    explicit DribbleIntent(unsigned int robot_id, const Point& dest,
+                           const Angle& final_angle, double final_speed, double rpm,
+                           bool small_kick_allowed, unsigned int priority);
 
     std::string getIntentName(void) const override;
 
@@ -50,4 +52,3 @@ public:
      */
     bool operator!=(const DribbleIntent& other) const;
 };
-
