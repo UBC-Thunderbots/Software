@@ -55,7 +55,7 @@ TEST_F(PassGeneratorTest, static_convergence_towards_target_region){
     std::cout << pass1->receiverPoint() << std::endl;
     std::cout << pass2->receiverPoint() << std::endl;
 
-    // TODO: Check more things here when we have more sophisticated point generation
+    // TODO (Issue #323): Check more things here when we're actually generating passes
 }
 
 int main(int argc, char **argv)
