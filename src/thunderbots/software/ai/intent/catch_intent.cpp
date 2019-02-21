@@ -12,3 +12,11 @@ std::string CatchIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
+
+bool CatchIntent::operator==(const CatchIntent &other) const {
+    return CatchPrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool CatchIntent::operator!=(const CatchIntent &other) const {
+    return !((*this) == other);
+}

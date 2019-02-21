@@ -22,4 +22,21 @@ class KickIntent : public Intent, public KickPrimitive
                         const Angle &final_angle, double final_speed);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares KickIntents for equality. KickIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the KickIntents to compare with for equality
+     * @return true if the KickIntents are equal and false otherwise
+     */
+    bool operator==(const KickIntent& other) const;
+
+    /**
+     * Compares KickIntents for inequality.
+     *
+     * @param other the KickIntent to compare with for inequality
+     * @return true if the KickIntents are not equal and false otherwise
+     */
+    bool operator!=(const KickIntent& other) const;
 };

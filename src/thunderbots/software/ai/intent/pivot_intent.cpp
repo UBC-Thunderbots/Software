@@ -12,3 +12,11 @@ std::string PivotIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
+
+bool PivotIntent::operator==(const PivotIntent &other) const {
+    return PivotPrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool PivotIntent::operator!=(const PivotIntent &other) const {
+    return !((*this) == other);
+}

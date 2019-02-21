@@ -12,3 +12,11 @@ std::string MoveIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
+
+bool MoveIntent::operator==(const MoveIntent &other) const {
+    return MovePrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool MoveIntent::operator!=(const MoveIntent &other) const {
+    return !((*this) == other);
+}

@@ -24,4 +24,21 @@ class CatchIntent : public Intent, public CatchPrimitive
                          double ball_intercept_margin);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares CatchIntents for equality. CatchIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the CatchIntents to compare with for equality
+     * @return true if the CatchIntents are equal and false otherwise
+     */
+    bool operator==(const CatchIntent& other) const;
+
+    /**
+     * Compares CatchIntents for inequality.
+     *
+     * @param other the CatchIntent to compare with for inequality
+     * @return true if the CatchIntents are not equal and false otherwise
+     */
+    bool operator!=(const CatchIntent& other) const;
 };

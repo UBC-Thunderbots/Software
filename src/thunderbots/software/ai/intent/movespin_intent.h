@@ -19,5 +19,22 @@ public:
                                const AngularVelocity &angular_vel);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares MoveSpinIntents for equality. MoveSpinIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the MoveSpinIntents to compare with for equality
+     * @return true if the MoveSpinIntents are equal and false otherwise
+     */
+    bool operator==(const MoveSpinIntent& other) const;
+
+    /**
+     * Compares MoveSpinIntents for inequality.
+     *
+     * @param other the MoveSpinIntent to compare with for inequality
+     * @return true if the MoveSpinIntents are not equal and false otherwise
+     */
+    bool operator!=(const MoveSpinIntent& other) const;
 };
 

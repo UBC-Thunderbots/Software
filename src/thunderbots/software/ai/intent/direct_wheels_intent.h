@@ -29,4 +29,21 @@ public:
                                    int16_t back_right_wheel_power, double dribbler_rpm);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares DirectWheelsIntents for equality. DirectWheelsIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the DirectWheelsIntents to compare with for equality
+     * @return true if the DirectWheelsIntents are equal and false otherwise
+     */
+    bool operator==(const DirectWheelsIntent& other) const;
+
+    /**
+     * Compares DirectWheelsIntents for inequality.
+     *
+     * @param other the DirectWheelsIntent to compare with for inequality
+     * @return true if the DirectWheelsIntents are not equal and false otherwise
+     */
+    bool operator!=(const DirectWheelsIntent& other) const;
 };

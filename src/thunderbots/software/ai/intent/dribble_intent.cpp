@@ -14,3 +14,11 @@ std::string DribbleIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
+
+bool DribbleIntent::operator==(const DribbleIntent &other) const {
+    return DribblePrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool DribbleIntent::operator!=(const DribbleIntent &other) const {
+    return !((*this) == other);
+}

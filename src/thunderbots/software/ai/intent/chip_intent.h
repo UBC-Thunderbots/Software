@@ -22,4 +22,21 @@ class ChipIntent : public Intent, public ChipPrimitive
                         const Angle &final_angle, double final_speed);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares ChipIntents for equality. ChipIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the ChipIntents to compare with for equality
+     * @return true if the ChipIntents are equal and false otherwise
+     */
+    bool operator==(const ChipIntent& other) const;
+
+    /**
+     * Compares ChipIntents for inequality.
+     *
+     * @param other the ChipIntent to compare with for inequality
+     * @return true if the ChipIntents are not equal and false otherwise
+     */
+    bool operator!=(const ChipIntent& other) const;
 };

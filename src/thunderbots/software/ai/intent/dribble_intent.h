@@ -32,5 +32,22 @@ public:
                               bool small_kick_allowed);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares DribbleIntents for equality. DribbleIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the DribbleIntents to compare with for equality
+     * @return true if the DribbleIntents are equal and false otherwise
+     */
+    bool operator==(const DribbleIntent& other) const;
+
+    /**
+     * Compares DribbleIntents for inequality.
+     *
+     * @param other the DribbleIntent to compare with for inequality
+     * @return true if the DribbleIntents are not equal and false otherwise
+     */
+    bool operator!=(const DribbleIntent& other) const;
 };
 

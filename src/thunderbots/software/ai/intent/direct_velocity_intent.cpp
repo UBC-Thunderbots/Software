@@ -14,3 +14,11 @@ std::string DirectVelocityIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
+
+bool DirectVelocityIntent::operator==(const DirectVelocityIntent &other) const {
+    return DirectVelocityPrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool DirectVelocityIntent::operator!=(const DirectVelocityIntent &other) const {
+    return !((*this) == other);
+}

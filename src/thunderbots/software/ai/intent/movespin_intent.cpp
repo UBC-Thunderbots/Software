@@ -12,3 +12,10 @@ std::string MoveSpinIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
+bool MoveSpinIntent::operator==(const MoveSpinIntent &other) const {
+    return MoveSpinPrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool MoveSpinIntent::operator!=(const MoveSpinIntent &other) const {
+    return !((*this) == other);
+}

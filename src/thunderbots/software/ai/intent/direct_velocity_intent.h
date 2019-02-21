@@ -23,4 +23,21 @@ class DirectVelocityIntent : public Intent, public DirectVelocityPrimitive
                                   double dribbler_rpm);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares DirectVelocityIntents for equality. DirectVelocityIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the DirectVelocityIntents to compare with for equality
+     * @return true if the DirectVelocityIntents are equal and false otherwise
+     */
+    bool operator==(const DirectVelocityIntent& other) const;
+
+    /**
+     * Compares DirectVelocityIntents for inequality.
+     *
+     * @param other the DirectVelocityIntent to compare with for inequality
+     * @return true if the DirectVelocityIntents are not equal and false otherwise
+     */
+    bool operator!=(const DirectVelocityIntent& other) const;
 };

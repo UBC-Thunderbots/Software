@@ -17,3 +17,11 @@ std::string DirectWheelsIntent::getIntentName(void) const
 {
     return INTENT_NAME;
 }
+
+bool DirectWheelsIntent::operator==(const DirectWheelsIntent &other) const {
+    return DirectWheelsPrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool DirectWheelsIntent::operator!=(const DirectWheelsIntent &other) const {
+    return !((*this) == other);
+}

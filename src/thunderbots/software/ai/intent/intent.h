@@ -37,6 +37,23 @@ class Intent
      */
     void setPriority(int);
 
+    /**
+     * Compares Intents for equality. Intents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the Intents to compare with for equality
+     * @return true if the Intents are equal and false otherwise
+     */
+    bool operator==(const Intent& other) const;
+
+    /**
+     * Compares Intents for inequality.
+     *
+     * @param other the Intent to compare with for inequality
+     * @return true if the Intents are not equal and false otherwise
+     */
+    bool operator!=(const Intent& other) const;
+
     virtual ~Intent() = default;
 
    private:

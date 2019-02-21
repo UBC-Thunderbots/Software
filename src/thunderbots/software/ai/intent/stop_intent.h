@@ -18,5 +18,22 @@ public:
     explicit StopIntent(unsigned int robot_id, bool coast);
 
     std::string getIntentName(void) const override;
+
+    /**
+     * Compares StopIntents for equality. StopIntents are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the StopIntents to compare with for equality
+     * @return true if the StopIntents are equal and false otherwise
+     */
+    bool operator==(const StopIntent& other) const;
+
+    /**
+     * Compares StopIntents for inequality.
+     *
+     * @param other the StopIntent to compare with for inequality
+     * @return true if the StopIntents are not equal and false otherwise
+     */
+    bool operator!=(const StopIntent& other) const;
 };
 
