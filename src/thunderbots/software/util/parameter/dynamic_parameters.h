@@ -30,12 +30,9 @@ namespace Util
             extern Parameter<double> collision_avoid_velocity_scale;
         }  // namespace Navigator
 
-        // TODO: do all the other stuff for these parameters
         namespace AI {
             namespace Passing
             {
-
-                // TODO: can we use an unsigned type for the unsigned values below?
 
                 // The offset from the sides of the field to place the rectangular
                 // sigmoid we use to determine what areas to pass to
