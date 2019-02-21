@@ -36,7 +36,10 @@ TEST(GradientDescentOptimizerTest, maximize_single_valued_function)
 
 TEST(GradientDescentOptimizerTest, minimize_multi_valued_function)
 {
-    GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.1});
+    // Note that we halve the weight for "y" here to make sure
+    // gradient descent can see the function in a more homogenous way.
+    // See the GradientDescentOptimizer class javadoc comment for more details.
+    GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.05});
 
     // f = x^2 + 2*y^2 + 20
     auto f = [](std::array<double, 2> x) {
@@ -51,14 +54,17 @@ TEST(GradientDescentOptimizerTest, minimize_multi_valued_function)
 
 TEST(GradientDescentOptimizerTest, minimize_multi_valued_function_with_offsets)
 {
-    GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.1});
+    // Note that we halve the weight for "y" here to make sure
+    // gradient descent can see the function in a more homogenous way.
+    // See the GradientDescentOptimizer class javadoc comment for more details.
+    GradientDescentOptimizer<2> gradientDescentOptimizer({0.1, 0.05});
 
     // f = (x+5)^2 + 2*(y-4)^2 + 20
     auto f = [](std::array<double, 2> x) {
         return std::pow(x.at(0) + 5, 2) + 2 * std::pow(x.at(1) - 4, 2) + 20;
     };
 
-    auto min = gradientDescentOptimizer.minimize(f, {0, 0}, 100);
+    auto min = gradientDescentOptimizer.minimize(f, {0, 0}, 150);
 
     EXPECT_NEAR(min.at(0), -5, 0.1);
     EXPECT_NEAR(min.at(1), 4, 0.1);
@@ -89,7 +95,7 @@ TEST(GradientDescentOptimizer, maximize_sigmoid_performance_test)
     // f = 1 / (1 + exp(2-2x))
     auto f = [](std::array<double, 1> x) { return 1 / (1 + std::exp(2 - 2 * x[0])); };
 
-    static const unsigned int EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE = 23;
+    const unsigned int EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE = 23;
 
     auto min = gradientDescentOptimizer.maximize(
         f, {0}, EXACT_NUMBER_OF_ITERATIONS_TO_PASS_S_CURVE);
