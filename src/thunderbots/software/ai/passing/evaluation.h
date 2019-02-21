@@ -36,4 +36,17 @@ namespace AI::Passing {
      */
     double rectangleSigmoid(Rectangle rect, Point point, double sig_width);
 
+    /**
+     * A sigmoid function with a given offset from 0 and rate of change
+     *
+     * To flip the sigmoid around, use a negative sig_width
+     *
+     * @param v The value to evaluate over the sigmoid
+     * @param offset The offset of the center of the  sigmoid from 0
+     * @param sig_width The length (in either x or y) required to cause the value of the
+     *                 sigmoid to go from 0.5 to 0.982
+     * @return A value in [0,1] that is the value of the sigmoid at the value v
+     */
+    double sigmoid(double v, double offset, double sig_width);
+
 }

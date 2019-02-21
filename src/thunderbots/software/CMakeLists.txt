@@ -729,7 +729,7 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES})
 
-    catkin_add_gtest(passing_gradient_descent_test
+    catkin_add_gtest(pass_generator_test
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             ai/passing/pass_generator.cpp
@@ -744,12 +744,27 @@ if (CATKIN_ENABLE_TESTING)
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
             )
-    target_link_libraries(passing_gradient_descent_test ${catkin_LIBRARIES})
+    target_link_libraries(pass_generator_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(gradient_descent_optimizer_test
             test/util/gradient_descent_optimizer.cpp
             )
     target_link_libraries(gradient_descent_optimizer_test gmock_main)
+
+    catkin_add_gtest(passing_evaluation
+            test/ai/passing/evaluation.cpp
+            test/test_util/test_util.cpp
+            ai/passing/evaluation.cpp
+            ai/world/field.cpp
+            ai/world/ball.cpp
+            ai/world/team.cpp
+            ai/world/robot.cpp
+            ai/world/world.cpp
+            ai/world/game_state.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/timestamp.cpp
+            )
+    target_link_libraries(passing_evaluation ${catkin_LIBRARIES})
 
 endif()
 

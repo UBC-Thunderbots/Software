@@ -38,8 +38,8 @@ namespace Util::DynamicParameters {
         namespace Passing
         {
             Parameter<double> static_position_quality_x_offset("static_position_quality_x_offset", 0.3);
-            Parameter<double> static_position_quality_y_offset("static_position_quality_y_offset", 0.4);
-            Parameter<double> static_position_quality_friendly_goal_distance_weight("static_position_quality_friendly_goal_distance_weight", -0.1);
+            Parameter<double> static_position_quality_y_offset("static_position_quality_y_offset", 0.3);
+            Parameter<double> static_position_quality_friendly_goal_distance_weight("static_position_quality_friendly_goal_distance_weight", 0.3);
         } // namespace Passing
     }
 

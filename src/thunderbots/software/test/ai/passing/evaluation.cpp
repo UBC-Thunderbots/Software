@@ -1,71 +1,70 @@
 /**
- * This file contains unit tests for the GradientDescent class
+ * This file contains unit tests passing evaluation functions
  */
 
-#include "ai/passing/pass_generator.h"
+#include "ai/passing/evaluation.h"
 #include "test/test_util/test_util.h"
 
 #include <gtest/gtest.h>
-#include <string.h>
 
 using namespace AI::Passing;
 
-TEST(GradientDescentTest, todo_test_name_here){
-    PassGenerator pass_generator(0.0);
+TEST(PassingEvaluationTest, getStaticPositionQuality_on_field_quality){
+    Field f = ::Test::TestUtil::createSSLDivBField();
 
-    World w = ::Test::TestUtil::createBlankTestingWorld();
-    w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
+    // Check that the static quality is basically 0 at the edge of the field
+    EXPECT_LE(getStaticPositionQuality(f, Point(-4.5, 0)), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(4.5, 0)), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(0, -3.0)), 0.13);
+    EXPECT_LE(getStaticPositionQuality(f, Point(0, 3.0)), 0.13);
 
-    pass_generator.setWorld(w);
-    pass_generator.setPasserPoint(Point(-2, 0));
+    // Check that we have a large static quality near the enemy goal
+    EXPECT_GE(getStaticPositionQuality(f, Point(4.0, 0)), 0.80);
 
-    int num_iters = 100;
-    for (int i = 0; i < num_iters; i++){
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        auto pass_op = pass_generator.getBestPassSoFar();
-        if (!pass_op){
-            std::cout << "No best path found" << std::endl;
-        } else {
-            std::cout << *pass_op << std::endl;
-        }
-    }
-
-    auto pass_op = pass_generator.getBestPassSoFar();
-    if (!pass_op){
-        std::cout << "No best path found" << std::endl;
-    } else {
-        std::cout << "Best path found!!" << std::endl;
-    }
-
-    volatile  int a =10;
+    // Check that we have a static quality of almost 0 near our goal
+    EXPECT_LE(getStaticPositionQuality(f, Point(-4.0, 0)), 0.14);
 }
 
-TEST(GradientDescentTest, todo_test_name_here2) {
-    PassGenerator pass_generator(0.0);
+TEST(PassingEvaluationTest, rectangleSigmoid){
+    Rectangle r1(Point(-1,-2), Point(1, 2));
 
-    World w = ::Test::TestUtil::createBlankTestingWorld();
-    w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-    pass_generator.setWorld(w);
-    pass_generator.setPasserPoint(Point(-2, 0));
+    // Check that value in the rectangle center is basically 1
+    EXPECT_GE(rectangleSigmoid(r1, {0,0}, 0.1), 0.9);
 
+    // Check that values off in x are basically 0
+    EXPECT_LE(rectangleSigmoid(r1, {-1.2,0}, 0.1), 0.1);
+    EXPECT_LE(rectangleSigmoid(r1, {1.2,0}, 0.1), 0.1);
+
+    // Check that values off in y are basically 0
+    EXPECT_LE(rectangleSigmoid(r1, {0,-2.1}, 0.1), 0.1);
+    EXPECT_LE(rectangleSigmoid(r1, {0,2.1}, 0.1), 0.1);
+
+    // Check that values off in x and y are basically 0
+    EXPECT_LE(rectangleSigmoid(r1, {-1.1,-2.1}, 0.1), 0.1);
+    EXPECT_LE(rectangleSigmoid(r1, {1.1,-2.1}, 0.1), 0.1);
+    EXPECT_LE(rectangleSigmoid(r1, {-1.1,2.1}, 0.1), 0.1);
+    EXPECT_LE(rectangleSigmoid(r1, {1.1,2.1}, 0.1), 0.1);
 }
 
-TEST(GradientDescentTest, todo_test_name_here1){
-    PassGenerator pass_generator(0.8);
+TEST(PassingEvaluationTest, sigmoid){
+    // Test the value after sig_width is >=0.982
+    EXPECT_GE(sigmoid(10.0001, 0, 10),0.982);
 
-    World w = ::Test::TestUtil::createBlankTestingWorld();
-    w.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
+    // Test the value after -sig_width is <=0.078
+    EXPECT_LE(sigmoid(-10.0001, 0, 10),0.078);
 
-    pass_generator.setWorld(w);
-    pass_generator.setPasserPoint(Point(-2, 0));
+    // Test that the value at 0 is 0.5 if no offset
+    EXPECT_DOUBLE_EQ(0.5, sigmoid(0, 0, 1));
 
-    std::optional<Pass> pass_op = std::nullopt;
-    while(!pass_op){
-        // yield()
-        pass_op = pass_generator.getBestPassSoFar();
-    }
-    std::cout << "Found Pass: " << *pass_op << std::endl;
+    // Test that the value at the offset is 0.5
+    EXPECT_DOUBLE_EQ(0.5, sigmoid(2, 2, 1));
+    EXPECT_DOUBLE_EQ(0.5, sigmoid(-2, -2, 1));
+
+    // Test that negating sig_width inverts the sigmoid
+    EXPECT_GE(sigmoid(-10.1, 0, -10),0.982);
+    EXPECT_LE(sigmoid(10.1, 0, -10),0.078);
 }
+
 
 int main(int argc, char **argv)
 {
