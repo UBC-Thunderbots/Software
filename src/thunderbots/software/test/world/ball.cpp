@@ -258,10 +258,3 @@ TEST_F(BallTest, equality_operator_balls_with_different_timestamps)
 
     EXPECT_EQ(ball_0, ball_1);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

@@ -439,10 +439,3 @@ TEST_F(GameStateRestartTest, indirect_free_us_restart_test)
     EXPECT_TRUE(game_state.isPlaying());
     EXPECT_FALSE(game_state.isIndirectFree());
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-};

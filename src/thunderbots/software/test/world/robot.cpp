@@ -378,10 +378,3 @@ TEST_F(RobotTest, equality_operator_robots_with_different_timestamp)
 
     EXPECT_EQ(robot, robot_other);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

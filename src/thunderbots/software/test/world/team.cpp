@@ -462,9 +462,3 @@ TEST_F(TeamTest, equality_operator_teams_with_different_goalie)
     EXPECT_NE(team_0, team_1);
 }
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

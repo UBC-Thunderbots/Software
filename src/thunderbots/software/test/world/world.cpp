@@ -76,10 +76,3 @@ TEST_F(WorldTest, construction_with_parameters)
     EXPECT_EQ(friendly_team, world.friendlyTeam());
     EXPECT_EQ(enemy_team, world.enemyTeam());
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

@@ -310,34 +310,6 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(shared_util_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(ball_test
-            test/world/ball.cpp
-            ai/world/ball.cpp
-            util/timestamp.cpp
-            geom/point.h
-            geom/angle.h)
-
-    target_link_libraries(ball_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(robot_test
-            test/world/robot.cpp
-            ai/world/robot.cpp
-            util/timestamp.cpp
-            geom/point.h
-            geom/angle.h)
-
-    target_link_libraries(robot_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(team_test
-            test/world/team.cpp
-            ai/world/team.cpp
-            ai/world/robot.cpp
-            util/timestamp.cpp
-            geom/point.h
-            geom/angle.h)
-
-    target_link_libraries(team_test ${catkin_LIBRARIES})
-
     catkin_add_gtest(ros_message_util_test
             test/util/ros_messages.cpp
             util/ros_messages.cpp
@@ -362,19 +334,25 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(motion_controller_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(world_test
-            test/world/world.cpp
-            test/test_util/test_util.cpp
-            ai/world/world.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
+            ai/world/game_state.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
-            ai/world/game_state.cpp
-            util/timestamp.cpp
+            ai/world/world.cpp
+            test/test_util/test_util.cpp
+            test/world/ball.cpp
+            test/world/game_state.cpp
+            test/world/main.cpp
+            test/world/robot.cpp
+            test/world/team.cpp
+            test/world/world.cpp
             util/parameter/dynamic_parameters.cpp
+            util/refbox_constants.cpp
+            util/timestamp.cpp
             )
-
     target_link_libraries(world_test ${catkin_LIBRARIES})
+
 
     catkin_add_gtest(test_util_test
             test/test_util/test_util_test.cpp
@@ -390,23 +368,6 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(test_util_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(game_state_test
-            test/world/game_state.cpp
-            ai/world/game_state.cpp
-            test/test_util/test_util.cpp
-            ai/world/world.cpp
-            ai/world/ball.cpp
-            ai/world/field.cpp
-            ai/world/robot.cpp
-            ai/world/team.cpp
-            ai/world/game_state.cpp
-            util/refbox_constants.cpp
-            util/timestamp.cpp
-            util/parameter/dynamic_parameters.cpp
-            )
-
-    target_link_libraries(game_state_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(grsim_movespin_primitive_test
             test/grsim_command_primitive_visitor/movespin_primitive.cpp

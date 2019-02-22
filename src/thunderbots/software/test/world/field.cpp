@@ -217,10 +217,3 @@ TEST_F(FieldTest, ball_just_outside_friendly_defense_area)
     EXPECT_EQ(false, field.pointInFriendlyDefenseArea(p));
     EXPECT_EQ(false, field.pointInEnemyDefenseArea(p));
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
