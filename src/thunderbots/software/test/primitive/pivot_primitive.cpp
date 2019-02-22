@@ -8,14 +8,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(PivotPrimTest, construct_with_no_params_test)
+TEST(PivotPrimTest, primitive_name_test)
 {
-    const std::string pivot_prim_name = "Pivot Primitive";
-
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), 0);
 
-    EXPECT_EQ(0, pivot_prim.getRobotId());
-    EXPECT_EQ(pivot_prim_name, pivot_prim.getPrimitiveName());
+    EXPECT_EQ("Pivot Primitive", pivot_prim.getPrimitiveName());
 }
 
 TEST(PivotPrimTest, get_robot_id_test)
@@ -79,6 +76,47 @@ TEST(PivotPrimTest, get_extra_bit_array_test)
     std::vector<bool> extra_bit_array = pivot_prim.getExtraBits();
 
     EXPECT_EQ(extra_bit_array, std::vector<bool>());
+}
+
+TEST(PivotPrimTest, test_equality_operator_primitives_equal)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle(), 0);
+
+    EXPECT_EQ(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(8, Point(), Angle(), 0);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_point)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(1, 1), Angle(), 0);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_final_angle)
+{
+    PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), 0);
+    PivotPrimitive pivot_prim_other =
+        PivotPrimitive(0, Point(), Angle::threeQuarter(), 0);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
+}
+
+TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_radius)
+{
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), 1);
+    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle(), 1.25);
+
+    EXPECT_NE(pivot_prim, pivot_prim_other);
 }
 
 int main(int argc, char **argv)

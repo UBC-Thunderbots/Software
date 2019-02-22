@@ -32,6 +32,6 @@ std::unique_ptr<Intent> MoveAction::calculateNextIntent(
     do
     {
         yield(std::make_unique<MoveIntent>(robot.id(), destination, final_orientation,
-                                           final_speed));
+                                           final_speed, 0));
     } while ((robot.position() - destination).len() > close_to_dest_threshold);
 }

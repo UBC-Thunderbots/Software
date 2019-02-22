@@ -60,6 +60,23 @@ class MoveSpinPrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares MoveSpinPrimitives for equality. MoveSpinPrimitives are considered equal
+     * if all their member variables are equal.
+     *
+     * @param other the MoveSpinPrimitive to compare with for equality
+     * @return true if the MoveSpinPrimitives are equal and false otherwise
+     */
+    bool operator==(const MoveSpinPrimitive &other) const;
+
+    /**
+     * Compares MoveSpinPrimitives for inequality.
+     *
+     * @param other the MoveSpinPrimitive to compare with for inequality
+     * @return true if the MoveSpinPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const MoveSpinPrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point dest;

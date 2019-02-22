@@ -13,7 +13,7 @@ class DirectWheelsPrimitive : public Primitive
     // Power is a fraction of the total power we can apply to the robots,
     // with +-255 being the max/min, and 0 being no power.
     /**
-     * Creates a new Move Primitive
+     * Creates a new DirectWheels Primitive
      *
      * @param robot_id the id of the robot
      * @param front_left_wheel_power a value between -255 and 255, where positive is
@@ -36,7 +36,7 @@ class DirectWheelsPrimitive : public Primitive
      *
      * @param primitive_msg The message from which to create the Move Primitive
      */
-    explicit DirectWheelsPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    explicit DirectWheelsPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
 
     std::string getPrimitiveName() const override;
 
@@ -93,7 +93,24 @@ class DirectWheelsPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
-    void accept(PrimitiveVisitor &visitor) const override;
+    void accept(PrimitiveVisitor& visitor) const override;
+
+    /**
+     * Compares DirectWheelsPrimitives for equality. DirectWheelsPrimitives are considered
+     * equal if all their member variables are equal.
+     *
+     * @param other the DirectWheelsPrimitive to compare with for equality
+     * @return true if the DirectWheelsPrimitives are equal and false otherwise
+     */
+    bool operator==(const DirectWheelsPrimitive& other) const;
+
+    /**
+     * Compares DirectWheelsPrimitives for inequality.
+     *
+     * @param other the DirectWheelsPrimitive to compare with for inequality
+     * @return true if the DirectWheelsPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const DirectWheelsPrimitive& other) const;
 
    private:
     unsigned int robot_id;

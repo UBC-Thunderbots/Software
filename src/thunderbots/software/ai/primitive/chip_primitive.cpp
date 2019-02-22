@@ -68,3 +68,15 @@ void ChipPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool ChipPrimitive::operator==(const ChipPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->chip_origin == other.chip_origin &&
+           this->chip_direction == other.chip_direction &&
+           this->chip_distance_meters == other.chip_distance_meters;
+}
+
+bool ChipPrimitive::operator!=(const ChipPrimitive &other) const
+{
+    return !((*this) == other);
+}

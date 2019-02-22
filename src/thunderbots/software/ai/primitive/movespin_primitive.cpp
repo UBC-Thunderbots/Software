@@ -57,3 +57,14 @@ void MoveSpinPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool MoveSpinPrimitive::operator==(const MoveSpinPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->dest == other.dest &&
+           this->angular_vel == other.angular_vel;
+}
+
+bool MoveSpinPrimitive::operator!=(const MoveSpinPrimitive &other) const
+{
+    return !((*this) == other);
+}
