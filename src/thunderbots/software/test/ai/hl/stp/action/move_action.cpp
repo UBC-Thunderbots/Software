@@ -97,9 +97,3 @@ TEST(MoveActionTest, test_action_not_done)
     // Check an intent was returned (the pointer is not null)
     EXPECT_FALSE(action.done());
 }
-
-int main(int argc, char **argv)
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

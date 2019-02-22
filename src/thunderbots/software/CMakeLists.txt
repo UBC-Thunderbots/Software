@@ -444,23 +444,25 @@ if (CATKIN_ENABLE_TESTING)
     )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(move_action_test
-            test/action/move_action.cpp
+    catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/move_primitive.cpp
-            ai/intent/move_intent.cpp
             ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/world/robot.cpp
+            test/ai/hl/stp/action/main.cpp
+            test/ai/hl/stp/action/move_action.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/timestamp.cpp
             )
-    target_link_libraries(move_action_test
+    target_link_libraries(action_test
             ${catkin_LIBRARIES}
             ${G3LOG}
-            ${Boost_LIBRARIES})
+            ${Boost_LIBRARIES}
+            )
 
     catkin_add_gtest(move_tactic_test
             test/tactic/move_tactic.cpp
