@@ -2,16 +2,9 @@
  * Implementation of the "Pass" class
  */
 
-#include "pass.h"
+#include "ai/passing/pass.h"
 
 using namespace AI::Passing;
-
-// Pass::Pass()  :
-// receiver_point(0, 0),
-// passer_point(0, 0),
-// pass_speed_m_per_s(0),
-// pass_start_time(Timestamp::fromSeconds(0))
-//{}
 
 Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
            Timestamp pass_start_time)
