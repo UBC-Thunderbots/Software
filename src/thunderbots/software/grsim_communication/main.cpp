@@ -3,11 +3,10 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 
-#include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/primitive.h"
+#include "ai/primitive/primitive_factory.h"
 #include "geom/point.h"
 #include "grsim_communication/grsim_backend.h"
-#include "grsim_communication/motion_controller/motion_controller.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/ros_messages.h"
@@ -37,7 +36,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
-        primitives.emplace_back(Primitive::createPrimitive(prim_msg));
+        primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
     }
 }
 
@@ -93,7 +92,6 @@ int main(int argc, char** argv)
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
-        primitives.emplace_back(new KickPrimitive(0, Point(1, 1), Angle::zero(), 1));
         grsim_backend.sendPrimitives(primitives, friendly_team, ball);
 
         tick_rate.sleep();

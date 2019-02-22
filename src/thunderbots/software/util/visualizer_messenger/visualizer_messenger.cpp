@@ -70,7 +70,7 @@ namespace Util
     void VisualizerMessenger::clearLayers()
     {
         // Clears all shape vector in all the layers
-        for (std::pair<std::string, LayerMsg> layer : this->layers_name_to_msg_map)
+        for (auto& layer : this->layers_name_to_msg_map)
         {
             layer.second.shapes.clear();
         }

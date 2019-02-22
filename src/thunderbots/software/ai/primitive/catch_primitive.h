@@ -31,7 +31,7 @@ class CatchPrimitive : public Primitive
      *
      * @param primitive_msg The message from which to create the Catch Primitive
      */
-    explicit CatchPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    explicit CatchPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
 
     std::string getPrimitiveName() const override;
 
@@ -58,7 +58,24 @@ class CatchPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
-    void accept(PrimitiveVisitor &visitor) const override;
+    void accept(PrimitiveVisitor& visitor) const override;
+
+    /**
+     * Compares CatchPrimitives for equality. CatchPrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the CatchPrimitive to compare with for equality
+     * @return true if the CatchPrimitives are equal and false otherwise
+     */
+    bool operator==(const CatchPrimitive& other) const;
+
+    /**
+     * Compares CatchPrimitives for inequality.
+     *
+     * @param other the CatchPrimitive to compare with for inequality
+     * @return true if the CatchPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const CatchPrimitive& other) const;
 
    private:
     unsigned int robot_id;

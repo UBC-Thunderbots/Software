@@ -63,3 +63,14 @@ void CatchPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool CatchPrimitive::operator==(const CatchPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->velocity == other.velocity &&
+           this->dribbler_speed == other.dribbler_speed && this->margin == other.margin;
+}
+
+bool CatchPrimitive::operator!=(const CatchPrimitive &other) const
+{
+    return !((*this) == other);
+}

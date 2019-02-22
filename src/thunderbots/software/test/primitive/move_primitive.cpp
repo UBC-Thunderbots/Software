@@ -7,14 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(MovePrimTest, construct_with_no_params_test)
+TEST(MovePrimTest, primitive_name_test)
 {
-    const std::string move_prim_name = "Move Primitive";
-
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
 
-    EXPECT_EQ(int(), move_prim.getRobotId());
-    EXPECT_EQ(move_prim_name, move_prim.getPrimitiveName());
+    EXPECT_EQ("Move Primitive", move_prim.getPrimitiveName());
 }
 
 TEST(MovePrimTest, get_robot_id_test)
@@ -96,13 +93,48 @@ TEST(MovePrimitiveTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("Move Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
-    EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
-    EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(final_speed, parameters[3]);
-    EXPECT_EQ(move_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(MovePrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, move_prim);
+}
+
+TEST(MovePrimitiveTest, test_equality_operator_primitives_equal)
+{
+    MovePrimitive move_prim       = MovePrimitive(0, Point(), Angle(), 0.0);
+    MovePrimitive move_prim_other = MovePrimitive(0, Point(), Angle(), 0.0);
+
+    EXPECT_EQ(move_prim, move_prim_other);
+}
+
+TEST(MovePrimitiveTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    MovePrimitive move_prim       = MovePrimitive(0, Point(), Angle(), 0.0);
+    MovePrimitive move_prim_other = MovePrimitive(4, Point(), Angle(), 0.0);
+
+    EXPECT_NE(move_prim, move_prim_other);
+}
+
+TEST(MovePrimitiveTest, test_inequality_operator_with_mismatched_dest)
+{
+    MovePrimitive move_prim       = MovePrimitive(0, Point(), Angle(), 0.0);
+    MovePrimitive move_prim_other = MovePrimitive(0, Point(4, 4), Angle(), 0.0);
+
+    EXPECT_NE(move_prim, move_prim_other);
+}
+
+TEST(MovePrimitiveTest, test_inequality_operator_with_mismatched_final_angle)
+{
+    MovePrimitive move_prim       = MovePrimitive(0, Point(), Angle::quarter(), 0.0);
+    MovePrimitive move_prim_other = MovePrimitive(0, Point(), Angle(), 0.0);
+
+    EXPECT_NE(move_prim, move_prim_other);
+}
+
+TEST(MovePrimitiveTest, test_inequality_operator_with_mismatched_final_speed)
+{
+    MovePrimitive move_prim       = MovePrimitive(0, Point(), Angle(), 0.0);
+    MovePrimitive move_prim_other = MovePrimitive(0, Point(), Angle(), 3.2);
+
+    EXPECT_NE(move_prim, move_prim_other);
 }
 
 int main(int argc, char **argv)

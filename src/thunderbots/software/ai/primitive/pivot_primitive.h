@@ -75,6 +75,23 @@ class PivotPrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares PivotPrimitives for equality. PivotPrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the PivotPrimitive to compare with for equality
+     * @return true if the PivotPrimitives are equal and false otherwise
+     */
+    bool operator==(const PivotPrimitive &other) const;
+
+    /**
+     * Compares PivotPrimitives for inequality.
+     *
+     * @param other the PivotPrimitive to compare with for inequality
+     * @return true if the PivotPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const PivotPrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point pivot_point;
