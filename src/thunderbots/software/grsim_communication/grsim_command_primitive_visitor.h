@@ -4,7 +4,7 @@
 
 #include "ai/primitive/visitor/primitive_visitor.h"
 #include "ai/world/robot.h"
-#include "grsim_communication/motion_controller/motion_controller.h"
+#include "motion_controller.h"
 
 /**
  * This class implements a Visitor that simulates the motion of our Primitives in grSim

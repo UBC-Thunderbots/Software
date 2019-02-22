@@ -2,7 +2,7 @@
  * This file contains unit tests for the Catch Primitive class
  */
 
-#include "ai/primitive/catch_primitive.h"
+#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

@@ -1,10 +1,8 @@
-#include "grsim_communication/grsim_backend.h"
-
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
-
 #include <limits>
 
+#include "grsim_communication/grsim_backend.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Packet.pb.h"
 
@@ -272,9 +270,3 @@ TEST(GrSimBackendTest, create_grsim_packet_with_dribbler_on)
     EXPECT_TRUE(messages_equal);
 }
 
-int main(int argc, char** argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

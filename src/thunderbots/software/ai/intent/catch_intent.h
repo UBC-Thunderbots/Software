@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ai/intent/intent.h"
-#include "ai/primitive/catch_primitive.h"
+#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 

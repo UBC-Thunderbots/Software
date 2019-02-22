@@ -3,15 +3,13 @@
  * of the MoveSpinPrimitive class
  */
 
-#include "ai/primitive/movespin_primitive.h"
-
 #include <gtest/gtest.h>
 #include <string.h>
 
 #include "ai/world/robot.h"
-#include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
+#include "grsim_communication/grsim_command_primitive_visitor.h"
 
-TEST(MoveSpinPrimitiveTest, move_spin_primitive_test)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_move_spin_primitive)
 {
     MoveSpinPrimitive* move_spin_primitive =
         new MoveSpinPrimitive(1, Point(3, -1), AngularVelocity::ofDegrees(50));
@@ -32,11 +30,4 @@ TEST(MoveSpinPrimitiveTest, move_spin_primitive_test)
     EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 0.0);
     EXPECT_FALSE(motion_controller_command.dribbler_on);
     EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);
-}
-
-int main(int argc, char** argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

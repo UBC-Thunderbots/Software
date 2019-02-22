@@ -1,12 +1,11 @@
-#include "grsim_communication/motion_controller/motion_controller.h"
-
 #include <chrono>
 
 #include "geom/angle.h"
+#include "grsim_communication/motion_controller.h"
 #include "gtest/gtest.h"
 #include "shared/constants.h"
-#include "software/ai/primitive/move_primitive.h"
-#include "software/ai/world/robot.h"
+#include "ai/primitive/move_primitive.h"
+#include "ai/world/robot.h"
 
 
 using namespace std::chrono;
@@ -735,11 +734,4 @@ TEST_F(MotionControllerTest,
     // if the destination is on the +x side of the robot, the velocity should always have
     // x > 0
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
-}
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

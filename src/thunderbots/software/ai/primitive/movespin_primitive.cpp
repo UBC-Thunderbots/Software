@@ -1,4 +1,4 @@
-#include "ai/primitive/movespin_primitive.h"
+#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
 
 #include "ai/primitive/visitor/primitive_visitor.h"
 

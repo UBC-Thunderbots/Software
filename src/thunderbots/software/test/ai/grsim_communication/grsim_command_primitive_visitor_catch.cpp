@@ -1,9 +1,7 @@
-#include "software/ai/primitive/catch_primitive.h"
-
 #include "ai/world/ball.h"
 #include "geom/angle.h"
-#include "grsim_communication/motion_controller/motion_controller.h"
-#include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
+#include "grsim_communication/grsim_command_primitive_visitor.h"
+#include "grsim_communication/motion_controller.h"
 #include "gtest/gtest.h"
 #include "shared/constants.h"
 #include "software/ai/world/robot.h"
@@ -17,7 +15,7 @@ double calculateVelocityTolerance(double velocity)
     return VELOCITY_BASE_TOLERANCE + VELOCITY_TOLERANCE_SCALE_FACTOR * velocity;
 }
 
-TEST(CatchPrimitiveTest, robot_stationary_meets_ball_on_x_axis)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_stationary_meets_ball_on_x_axis)
 {
     Robot robot = Robot(1, Point(2, 2), Vector(0, 0), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -37,7 +35,7 @@ TEST(CatchPrimitiveTest, robot_stationary_meets_ball_on_x_axis)
     EXPECT_NEAR(0, motionCommand.global_destination.y(), 0.1);
 }
 
-TEST(CatchPrimitiveTest, robot_moving_away_from_final_dest)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_moving_away_from_final_dest)
 {
     Robot robot = Robot(1, Point(2, 2), Vector(-1, 1), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -57,7 +55,7 @@ TEST(CatchPrimitiveTest, robot_moving_away_from_final_dest)
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
 }
 
-TEST(CatchPrimitiveTest, robot_moving_towards_final_dest)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_moving_towards_final_dest)
 {
     Robot robot = Robot(1, Point(2, 2), Vector(0, -1), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -77,7 +75,7 @@ TEST(CatchPrimitiveTest, robot_moving_towards_final_dest)
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
 }
 
-TEST(CatchPrimitiveTest, robot_already_in_final_dest_not_moving)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_already_in_final_dest_not_moving)
 {
     Robot robot = Robot(1, Point(2.3, 0), Vector(0, 0), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -97,7 +95,7 @@ TEST(CatchPrimitiveTest, robot_already_in_final_dest_not_moving)
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
 }
 
-TEST(CatchPrimitiveTest, robot_close_to_ball)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_close_to_ball)
 {
     Robot robot = Robot(1, Point(0.2, 0), Vector(1, 0), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -116,10 +114,4 @@ TEST(CatchPrimitiveTest, robot_close_to_ball)
     EXPECT_NEAR(0, motionCommand.global_destination.x(), POSITION_TOLERANCE);
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
     EXPECT_NEAR(0.2, motionCommand.final_speed_at_destination, POSITION_TOLERANCE);
-}
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

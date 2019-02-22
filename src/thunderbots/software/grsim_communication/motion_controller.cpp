@@ -11,7 +11,7 @@
  * See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
  */
 
-#include "grsim_communication/motion_controller/motion_controller.h"
+#include "motion_controller.h"
 
 #include <algorithm>
 
