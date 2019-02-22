@@ -254,7 +254,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(field_test
-            test/world/field.cpp
+            test/ai/world/field.cpp
             ai/world/field.cpp
             util/parameter/dynamic_parameters.cpp
             )
@@ -301,12 +301,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             test/test_util/test_util.cpp
-            test/world/ball.cpp
-            test/world/game_state.cpp
-            test/world/main.cpp
-            test/world/robot.cpp
-            test/world/team.cpp
-            test/world/world.cpp
+            test/ai/world/ball.cpp
+            test/ai/world/game_state.cpp
+            test/ai/world/main.cpp
+            test/ai/world/robot.cpp
+            test/ai/world/team.cpp
+            test/ai/world/world.cpp
             util/parameter/dynamic_parameters.cpp
             util/refbox_constants.cpp
             util/timestamp.cpp
