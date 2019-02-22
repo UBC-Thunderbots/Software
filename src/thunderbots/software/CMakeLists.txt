@@ -69,8 +69,6 @@ find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
         )
 
-## Find protobuf commands
-
 ## Specify the configuration file for dynamic_reconfigure pkg
 generate_dynamic_reconfigure_options(
     ${CMAKE_CURRENT_SOURCE_DIR}/param_server/cfg/Params.cfg
