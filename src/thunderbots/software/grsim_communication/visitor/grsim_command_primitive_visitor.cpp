@@ -80,11 +80,6 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
     // Determine if robot is at least 1 robot radius from the given location
     if ((chip_primitive.getChipOrigin() - robot.position()).len() >= 1)
     {
-        // Travel in straight line from current position to given location
-        motion_controller_command = MotionController::MotionControllerCommand(
-            chip_primitive.getChipOrigin(), chip_primitive.getChipDirection(), 0.0,
-            chip_primitive.getChipDistance(), true, false);
-
         // Move in a straight line directly behind the robot
         Point destBehind;
         destBehind = chip_primitive.getChipOrigin();
@@ -99,7 +94,7 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
         Point destForward;
         destForward = chip_primitive.getChipOrigin();
         destForward = Point(destForward.x(), destForward.y());
-        destForward.set(destForward.x() + 0.8, destForward.y() + 0.8);
+        destForward.set(destForward.x() + 0.5, destForward.y() + 0.5);
 
         motion_controller_command = MotionController::MotionControllerCommand(
             destForward, chip_primitive.getChipDirection(), 0.0,
@@ -154,11 +149,6 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     // Determine if robot is at least 1 robot radius from the given location
     if ((kick_primitive.getKickOrigin() - robot.position()).len() >= 1)
     {
-        // Travel in straight line from current position to given location
-        motion_controller_command = MotionController::MotionControllerCommand(
-            kick_primitive.getKickOrigin(), kick_primitive.getKickDirection(), 0.0,
-            kick_primitive.getKickSpeed(), false, false);
-
         // Move in a straight line directly behind the robot
         Point destBehind;
         destBehind = kick_primitive.getKickOrigin();
@@ -173,7 +163,7 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
         Point destForward;
         destForward = kick_primitive.getKickOrigin();
         destForward = Point(destForward.x(), destForward.y());
-        destForward.set(destForward.x() + 0.8, destForward.y() + 0.8);
+        destForward.set(destForward.x() + 0.5, destForward.y() + 0.5);
 
         motion_controller_command = MotionController::MotionControllerCommand(
             destForward, kick_primitive.getKickDirection(), 0.0,
