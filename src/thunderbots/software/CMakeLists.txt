@@ -669,23 +669,6 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(deflect_off_enemy_target_test
-            test/evaluation/deflect_off_enemy_target.cpp
-            ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
-            ai/hl/stp/evaluation/deflect_off_enemy_target.h
-            geom/util.cpp
-            util/timestamp.cpp
-            ai/world/ball.cpp
-            ai/world/field.cpp
-            ai/world/game_state.cpp
-            ai/world/robot.cpp
-            ai/world/team.cpp
-            ai/world/world.cpp
-            test/test_util/test_util.cpp
-            )
-
-    target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})
-
     catkin_add_gtest(evaluation_robot_orientation_within_angle_threshold_of_target_test
             test/evaluation/robot.cpp
             ai/hl/stp/evaluation/robot.cpp

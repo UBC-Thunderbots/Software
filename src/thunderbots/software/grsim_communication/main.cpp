@@ -87,17 +87,19 @@ int main(int argc, char** argv)
     // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
-    grsim_backend.setBallState(Point(1, 1), Vector(-1, -1)
+    // grsim_backend.setBallState(Point(2, 2), Vector(-1, -1));
 
     // Main loop
     while (ros::ok())
     {
         // Clear all primitives each tick
         primitives.clear();
-
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
+
+        // test setBallState function
+        grsim_backend.setBallState(Point(2, 2), Vector(-1, -1));
 
         grsim_backend.sendPrimitives(primitives, friendly_team, ball);
 
