@@ -96,9 +96,3 @@ TEST(StopPrimitiveTest, test_inequality_operator_with_mismatched_coast_value)
     EXPECT_NE(stop_prim, stop_prim_other);
 }
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

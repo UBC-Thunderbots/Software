@@ -31,10 +31,3 @@ TEST(StopIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(stop_intent, stop_intent_other);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

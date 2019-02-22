@@ -201,9 +201,3 @@ TEST(DribblePrimTest, test_inequality_operator_with_mismatched_small_kick_allowe
     EXPECT_NE(dribble_prim, dribble_prim_other);
 }
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

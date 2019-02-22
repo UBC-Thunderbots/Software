@@ -177,9 +177,3 @@ TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_dribbler_r
     EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
 }
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

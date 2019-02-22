@@ -123,9 +123,3 @@ TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_angular_velocity
     EXPECT_NE(movespin_prim, movespin_prim_other);
 }
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

@@ -137,9 +137,3 @@ TEST(MovePrimitiveTest, test_inequality_operator_with_mismatched_final_speed)
     EXPECT_NE(move_prim, move_prim_other);
 }
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

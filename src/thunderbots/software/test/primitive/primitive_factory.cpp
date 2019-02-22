@@ -302,10 +302,3 @@ TEST(PrimitiveFactoryTest, convert_DribblePrimitive_to_message_and_back_to_MoveP
     EXPECT_DOUBLE_EQ(rpm, params[4]);
     EXPECT_EQ(small_kick_allowed, extraBits[0]);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
