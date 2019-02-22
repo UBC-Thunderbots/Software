@@ -26,7 +26,7 @@ namespace AI::Passing
      * @return A value in [0,1] representing the quality of the given point on the given
      *         field, with a higher value representing a more desirable position
      */
-    double getStaticPositionQuality(const  Field& field, const Point& position);
+    double getStaticPositionQuality(const Field& field, const Point& position);
 
     /**
      * Calculates the value at the given point over a 2D sigmoid over the given rectangle
@@ -43,7 +43,8 @@ namespace AI::Passing
      * @return A value in [0,1], representing the value of the 2D sigmoid function over
      *         the given rectangle at the given point
      */
-    double rectangleSigmoid(const Rectangle& rect, const Point& point, const double& sig_width);
+    double rectangleSigmoid(const Rectangle& rect, const Point& point,
+                            const double& sig_width);
 
     /**
      * Calculates the value at the given point over a 2D sigmoid over the given circle
@@ -58,7 +59,8 @@ namespace AI::Passing
      * @return A value in [0,1], representing the value of the 2D sigmoid function over
      *         the given circle at the given point
      */
-    double circleSigmoid(const Circle& circle, const Point& point, const double& sig_width);
+    double circleSigmoid(const Circle& circle, const Point& point,
+                         const double& sig_width);
 
     /**
      * A sigmoid function with a given offset from 0 and rate of change

@@ -35,7 +35,8 @@ Timestamp Pass::startTime()
     return pass_start_time;
 }
 
-namespace AI::Passing{
+namespace AI::Passing
+{
     std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
     {
         output_stream << "Receiver: " << pass.receiver_point
@@ -45,4 +46,4 @@ namespace AI::Passing{
 
         return output_stream;
     }
-}
+}  // namespace AI::Passing
