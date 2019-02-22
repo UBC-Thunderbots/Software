@@ -7,14 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(StopPrimTest, construct_with_no_params_test)
+TEST(StopPrimTest, primitive_name_test)
 {
-    const std::string stop_prim_name = "Stop Primitive";
-
     StopPrimitive stop_prim = StopPrimitive(0, true);
 
-    EXPECT_EQ(0, stop_prim.getRobotId());
-    EXPECT_EQ(stop_prim_name, stop_prim.getPrimitiveName());
+    EXPECT_EQ("Stop Primitive", stop_prim.getPrimitiveName());
 }
 
 TEST(StopPrimTest, get_robot_id_test)
@@ -71,10 +68,32 @@ TEST(StopPrimitiveTest, create_primitive_from_message_test)
 
     std::vector<bool> extra_bits = new_prim.getExtraBits();
 
-    EXPECT_EQ("Stop Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_EQ(coast, extra_bits[0]);
-    EXPECT_EQ(stop_prim.getParameters(), std::vector<double>());
+    EXPECT_EQ(StopPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, stop_prim);
+}
+
+TEST(StopPrimitiveTest, test_equality_operator_primitives_equal)
+{
+    StopPrimitive stop_prim       = StopPrimitive(0, true);
+    StopPrimitive stop_prim_other = StopPrimitive(0, true);
+
+    EXPECT_EQ(stop_prim, stop_prim_other);
+}
+
+TEST(StopPrimitiveTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    StopPrimitive stop_prim       = StopPrimitive(0, true);
+    StopPrimitive stop_prim_other = StopPrimitive(3, true);
+
+    EXPECT_NE(stop_prim, stop_prim_other);
+}
+
+TEST(StopPrimitiveTest, test_inequality_operator_with_mismatched_coast_value)
+{
+    StopPrimitive stop_prim       = StopPrimitive(0, true);
+    StopPrimitive stop_prim_other = StopPrimitive(0, false);
+
+    EXPECT_NE(stop_prim, stop_prim_other);
 }
 
 int main(int argc, char **argv)

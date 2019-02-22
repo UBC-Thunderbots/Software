@@ -45,7 +45,7 @@ if [ "$RUN_BUILD" == "true" ] || \
     [ "$RUN_TESTS" == "true" ] || \
     [ "$RUN_COVERAGE" == "true" ]; then
     # Install all required dependecies
-    travis_run ./environment_setup/setup_software.sh $ROS_DISTRO 
+    travis_run ./environment_setup/setup_software.sh
 
     # Build the codebase
     travis_run catkin_make ${CMAKE_FLAGS}

@@ -17,8 +17,7 @@ Team RobotTeamFilter::getFilteredData(
     {
         if (new_team_state.getRobotById(robot_detection.id))
         {
-            Robot previous_robot_state =
-                *current_team_state.getRobotById(robot_detection.id);
+            Robot previous_robot_state = *new_team_state.getRobotById(robot_detection.id);
 
             // Discard any data with an older timestamp. It's likely from a frame that
             // hasn't been updated yet

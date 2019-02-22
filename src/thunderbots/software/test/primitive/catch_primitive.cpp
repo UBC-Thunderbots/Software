@@ -7,14 +7,11 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(CatchPrimTest, constuct_with_no_params_test)
+TEST(CatchPrimTest, primitive_name_test)
 {
-    const std::string catch_prim_name = "Catch Primitive";
-
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, 0);
 
-    EXPECT_EQ(int(), catch_prim.getRobotId());
-    EXPECT_EQ(catch_prim_name, catch_prim.getPrimitiveName());
+    EXPECT_EQ("Catch Primitive", catch_prim.getPrimitiveName());
 }
 
 TEST(CatchPrimTest, get_robot_id_test)
@@ -95,12 +92,48 @@ TEST(CatchPrimTest, create_primitive_from_message_test)
 
     std::vector<double> parameters = new_prim.getParameters();
 
-    EXPECT_EQ("Catch Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_EQ(velocity, parameters[0]);
-    EXPECT_EQ(dribbler_speed, parameters[1]);
-    EXPECT_EQ(margin, parameters[2]);
-    EXPECT_EQ(catch_prim.getExtraBits(), std::vector<bool>());
+    EXPECT_EQ(CatchPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, catch_prim);
+}
+
+TEST(CatchPrimTest, test_equality_operator_primitives_equal)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 900, 0.5);
+
+    EXPECT_EQ(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_robot_ids)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(1, 1, 900, 0.5);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_velocity)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, -0.5, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 900, 0.5);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_dribbler_speed)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 901, 0.5);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
+}
+
+TEST(CatchPrimTest, test_inequality_operator_with_mismatched_margin)
+{
+    CatchPrimitive catch_prim       = CatchPrimitive(0, 1, 900, 0.5);
+    CatchPrimitive catch_prim_other = CatchPrimitive(0, 1, 900, 0.8);
+
+    EXPECT_NE(catch_prim, catch_prim_other);
 }
 
 int main(int argc, char **argv)

@@ -29,11 +29,6 @@ std::vector<std::unique_ptr<Intent>> STP_HL::getIntentAssignment(const World &wo
     auto tactic_assignment = assignTacticsToRobots(world, current_tactics);
 
     std::vector<std::unique_ptr<Intent>> intents;
-    for (const auto &ta : tactic_assignment)
-    {
-        std::unique_ptr<Intent> intent = ta.second->getNextIntent(world, ta.first);
-        intents.emplace_back(std::move(intent));
-    }
 
     return intents;
 }

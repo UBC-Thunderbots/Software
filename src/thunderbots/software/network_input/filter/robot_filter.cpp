@@ -1,6 +1,4 @@
-#include "robot_filter.h"
-
-#include <ros/console.h>
+#include "network_input/filter/robot_filter.h"
 
 RobotFilter::RobotFilter(unsigned int id) : robot_id(id) {}
 
