@@ -7,15 +7,12 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-TEST(DribblePrimTest, construct_with_no_params_test)
+TEST(DribblePrimTest, primitive_name_test)
 {
-    const std::string dribble_prim_name = "Dribble Primitive";
-
     DribblePrimitive dribble_prim =
         DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
 
-    EXPECT_EQ(int(), dribble_prim.getRobotId());
-    EXPECT_EQ(dribble_prim_name, dribble_prim.getPrimitiveName());
+    EXPECT_EQ("Dribble Primitive", dribble_prim.getPrimitiveName());
 }
 
 TEST(DribblePrimTest, get_robot_id_test)
@@ -130,14 +127,78 @@ TEST(DribblePrimTest, create_primitive_from_message_test)
 
     std::vector<bool> extraBits = new_prim.getExtraBits();
 
-    EXPECT_EQ("Dribble Primitive", new_prim.getPrimitiveName());
-    EXPECT_EQ(robot_id, new_prim.getRobotId());
-    EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
-    EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
-    EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(final_speed, parameters[3]);
-    EXPECT_DOUBLE_EQ(rpm, parameters[4]);
-    EXPECT_EQ(small_kick_allowed, extraBits[0]);
+    EXPECT_EQ(DribblePrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
+    EXPECT_EQ(new_prim, dribble_prim);
+}
+
+TEST(DribblePrimTest, test_equality_operator_primitives_equal)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+
+    EXPECT_EQ(dribble_prim, dribble_prim_other);
+}
+
+TEST(DribblePrimTest, test_inequality_operator_with_mismatched_robot_id)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(7, Point(), Angle(), 0.0, 0.0, false);
+
+    EXPECT_NE(dribble_prim, dribble_prim_other);
+}
+
+TEST(DribblePrimTest, test_inequality_operator_with_mismatched_dest)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(0, Point(-4.0, 0), Angle(), 0.0, 0.0, false);
+
+    EXPECT_NE(dribble_prim, dribble_prim_other);
+}
+
+TEST(DribblePrimTest, test_inequality_operator_with_mismatched_final_angle)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle::threeQuarter(), 0.0, 0.0, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+
+    EXPECT_NE(dribble_prim, dribble_prim_other);
+}
+
+TEST(DribblePrimTest, test_inequality_operator_with_mismatched_final_speed)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(0, Point(), Angle(), 3.3, 0.0, false);
+
+    EXPECT_NE(dribble_prim, dribble_prim_other);
+}
+
+TEST(DribblePrimTest, test_inequality_operator_with_mismatched_rpm)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 500, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 698, false);
+
+    EXPECT_NE(dribble_prim, dribble_prim_other);
+}
+
+TEST(DribblePrimTest, test_inequality_operator_with_mismatched_small_kick_allowed)
+{
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, false);
+    DribblePrimitive dribble_prim_other =
+        DribblePrimitive(0, Point(), Angle(), 0.0, 0.0, true);
+
+    EXPECT_NE(dribble_prim, dribble_prim_other);
 }
 
 int main(int argc, char **argv)
