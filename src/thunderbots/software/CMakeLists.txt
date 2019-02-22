@@ -379,19 +379,19 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             ai/primitive/primitive_factory.cpp
             ai/primitive/stop_primitive.cpp
-            test/primitive/catch_primitive.cpp
-            test/primitive/chip_primitive.cpp
-            test/primitive/direct_velocity_primitive.cpp
-            test/primitive/direct_wheels_primitive.cpp
-            test/primitive/dribble_primitive.cpp
-            test/primitive/kick_primitive.cpp
-            test/primitive/move_primitive.cpp
-            test/primitive/movespin_primitive.cpp
-            test/primitive/pivot_primitive.cpp
-            test/primitive/primitive.cpp
-            test/primitive/primitive_factory.cpp
-            test/primitive/stop_primitive.cpp
-            test/primitive/main.cpp
+            test/ai/primitive/catch_primitive.cpp
+            test/ai/primitive/chip_primitive.cpp
+            test/ai/primitive/direct_velocity_primitive.cpp
+            test/ai/primitive/direct_wheels_primitive.cpp
+            test/ai/primitive/dribble_primitive.cpp
+            test/ai/primitive/kick_primitive.cpp
+            test/ai/primitive/move_primitive.cpp
+            test/ai/primitive/movespin_primitive.cpp
+            test/ai/primitive/pivot_primitive.cpp
+            test/ai/primitive/primitive.cpp
+            test/ai/primitive/primitive_factory.cpp
+            test/ai/primitive/stop_primitive.cpp
+            test/ai/primitive/main.cpp
             )
 
     target_link_libraries(primitive_test ${catkin_LIBRARIES}
