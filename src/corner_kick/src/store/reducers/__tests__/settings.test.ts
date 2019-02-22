@@ -3,8 +3,6 @@
  * Each test case has a description of what it tests
  */
 
-// import { IPersistDataState } from 'SRC/types';
-
 import * as settings from '../../actions/settings';
 import settingsReducer from '../settings';
 

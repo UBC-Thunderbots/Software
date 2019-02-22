@@ -30,7 +30,7 @@ function* startSettings() {
 /**
  * Update settings by putting into local storage
  */
-function* updateSettings(action: ReturnType<typeof settings.updateSettings>) {
+export function* updateSettings(action: ReturnType<typeof settings.updateSettings>) {
     // Use localStorage.setItem
     settingsStored = {
         ...settingsStored,

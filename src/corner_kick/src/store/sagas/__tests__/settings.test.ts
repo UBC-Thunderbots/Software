@@ -1,14 +1,21 @@
 import { expectSaga } from 'redux-saga-test-plan';
+import * as settingsSaga from '../settings';
 
-import { updateSettings } from '../../actions/settings';
+import * as settings from '../../actions/settings';
 
 describe('updateSettings', () => {
-    it('should update settings', () => {
-        const callback = jest.fn();
+    it('update the settings in local storage', () => {
+        const mockAction = {
+            payload: settings.updateSettings('testKey', 'testVal'),
+        };
 
         return (
-            expectSaga(updateSettings as any, 'testKey', 'testValue', callback)
-                .call.like({ args: [callback] })
+            expectSaga(settingsSaga.updateSettings, mockAction)
+                .call(
+                    localStorage.setItem,
+                    'settings',
+                    JSON.stringify({ testKey: 'testVal' }),
+                )
                 // Start the test. Returns a Promise.
                 .run()
         );
