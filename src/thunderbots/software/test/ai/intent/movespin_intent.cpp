@@ -31,4 +31,3 @@ TEST(MoveSpinIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(movespin_intent, movespin_intent_other);
 }
-

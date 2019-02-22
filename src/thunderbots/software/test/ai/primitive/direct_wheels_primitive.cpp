@@ -198,4 +198,3 @@ TEST(DirectWheelsPrimTest, test_inequality_operator_with_mismatched_dribbler_rpm
 
     EXPECT_NE(directwheels_primitive, directwheels_primitive_other);
 }
-

@@ -15,7 +15,8 @@ double calculateVelocityTolerance(double velocity)
     return VELOCITY_BASE_TOLERANCE + VELOCITY_TOLERANCE_SCALE_FACTOR * velocity;
 }
 
-TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_stationary_meets_ball_on_x_axis)
+TEST(GrsimCommandPrimitiveVisitorTest,
+     visit_catch_primitive_robot_stationary_meets_ball_on_x_axis)
 {
     Robot robot = Robot(1, Point(2, 2), Vector(0, 0), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -35,7 +36,8 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_stationary_me
     EXPECT_NEAR(0, motionCommand.global_destination.y(), 0.1);
 }
 
-TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_moving_away_from_final_dest)
+TEST(GrsimCommandPrimitiveVisitorTest,
+     visit_catch_primitive_robot_moving_away_from_final_dest)
 {
     Robot robot = Robot(1, Point(2, 2), Vector(-1, 1), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -55,7 +57,8 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_moving_away_f
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
 }
 
-TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_moving_towards_final_dest)
+TEST(GrsimCommandPrimitiveVisitorTest,
+     visit_catch_primitive_robot_moving_towards_final_dest)
 {
     Robot robot = Robot(1, Point(2, 2), Vector(0, -1), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
@@ -75,7 +78,8 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_moving_toward
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
 }
 
-TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_already_in_final_dest_not_moving)
+TEST(GrsimCommandPrimitiveVisitorTest,
+     visit_catch_primitive_robot_already_in_final_dest_not_moving)
 {
     Robot robot = Robot(1, Point(2.3, 0), Vector(0, 0), Angle::ofRadians(0.0),
                         AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));

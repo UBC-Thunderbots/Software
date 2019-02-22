@@ -24,4 +24,3 @@ TEST(IntentTest, test_set_priority)
 
     EXPECT_EQ(7, move_intent.getPriority());
 }
-

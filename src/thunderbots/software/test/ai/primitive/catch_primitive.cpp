@@ -2,10 +2,10 @@
  * This file contains unit tests for the Catch Primitive class
  */
 
-#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
-
 #include <gtest/gtest.h>
 #include <string.h>
+
+#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
 
 TEST(CatchPrimTest, primitive_name_test)
 {
@@ -135,4 +135,3 @@ TEST(CatchPrimTest, test_inequality_operator_with_mismatched_margin)
 
     EXPECT_NE(catch_prim, catch_prim_other);
 }
-

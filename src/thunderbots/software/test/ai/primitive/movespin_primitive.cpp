@@ -2,10 +2,10 @@
  * This file contains the unit tests for the MoveSpinPrimitive class
  */
 
-#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
-
 #include <gtest/gtest.h>
 #include <string.h>
+
+#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
 
 TEST(MoveSpinPrimTest, primitive_name_test)
 {
@@ -122,4 +122,3 @@ TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_angular_velocity
 
     EXPECT_NE(movespin_prim, movespin_prim_other);
 }
-

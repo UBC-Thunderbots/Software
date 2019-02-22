@@ -8,8 +8,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(RobotEvaluationTest,
-     orientation_in_threshold_facing_0_target_45_threshold_60)
+TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_45_threshold_60)
 {
     Point position    = Point(0, 0);
     Angle orientation = Angle::ofDegrees(0);
@@ -21,8 +20,7 @@ TEST(RobotEvaluationTest,
 }
 
 
-TEST(RobotEvaluationTest,
-     orientation_not_in_threshold_facing_0_target_45_threshold_30)
+TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_threshold_30)
 {
     Point position    = Point(0, 0);
     Angle orientation = Angle::ofDegrees(0);
@@ -33,8 +31,7 @@ TEST(RobotEvaluationTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotEvaluationTest,
-     orientation_not_in_threshold_facing_0_target_45_threshold_45)
+TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_45_threshold_45)
 {
     Point position    = Point(0, 0);
     Angle orientation = Angle::ofDegrees(0);
@@ -45,8 +42,7 @@ TEST(RobotEvaluationTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotEvaluationTest,
-     orientation_in_threshold_facing_0_target_135_threshold_150)
+TEST(RobotEvaluationTest, orientation_in_threshold_facing_0_target_135_threshold_150)
 {
     Point position    = Point(0, 0);
     Angle orientation = Angle::ofDegrees(0);
@@ -57,8 +53,7 @@ TEST(RobotEvaluationTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotEvaluationTest,
-     orientation_not_in_threshold_facing_0_target_135_threshold_90)
+TEST(RobotEvaluationTest, orientation_not_in_threshold_facing_0_target_135_threshold_90)
 {
     Point position    = Point(0, 0);
     Angle orientation = Angle::ofDegrees(0);
@@ -92,4 +87,3 @@ TEST(RobotEvaluationTest,
     EXPECT_FALSE(Evaluation::robotOrientationWithinAngleThresholdOfTarget(
         position, orientation, target, threshold));
 }
-

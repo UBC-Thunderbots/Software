@@ -137,4 +137,3 @@ TEST(KickPrimitiveTest, test_inequality_operator_with_mismatched_kick_speed)
 
     EXPECT_NE(kick_prim, kick_prim_other);
 }
-

@@ -136,4 +136,3 @@ TEST(ChipPrimitiveTest, test_inequality_operator_with_mismatched_chip_distance)
 
     EXPECT_NE(chip_prim, chip_prim_other);
 }
-

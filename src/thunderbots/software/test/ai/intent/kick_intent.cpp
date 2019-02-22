@@ -31,4 +31,3 @@ TEST(KickIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(kick_intent, kick_intent_other);
 }
-

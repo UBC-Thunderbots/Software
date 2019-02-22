@@ -461,4 +461,3 @@ TEST_F(TeamTest, equality_operator_teams_with_different_goalie)
 
     EXPECT_NE(team_0, team_1);
 }
-

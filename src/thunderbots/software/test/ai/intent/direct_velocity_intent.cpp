@@ -33,4 +33,3 @@ TEST(DirectVelocityIntentTest, test_inequality_operator_with_mismatched_prioriti
 
     EXPECT_NE(direct_velocity_intent, direct_velocity_intent_other);
 }
-

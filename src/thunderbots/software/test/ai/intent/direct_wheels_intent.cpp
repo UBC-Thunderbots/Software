@@ -33,4 +33,3 @@ TEST(DirectWheelsIntentTest, test_inequality_operator_with_mismatched_priorities
 
     EXPECT_NE(direct_wheels_intent, direct_wheels_intent_other);
 }
-

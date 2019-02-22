@@ -176,4 +176,3 @@ TEST(DirectVelocityPrimTest, test_inequality_operator_with_mismatched_dribbler_r
 
     EXPECT_NE(direct_velocity_prim, direct_velocity_prim_other);
 }
-

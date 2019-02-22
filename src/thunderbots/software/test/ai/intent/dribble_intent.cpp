@@ -36,4 +36,3 @@ TEST(DribbleIntentTest, test_inequality_operator_with_mismatched_priorities)
 
     EXPECT_NE(dribble_intent, dribble_intent_other);
 }
-

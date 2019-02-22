@@ -118,4 +118,3 @@ TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_radius)
 
     EXPECT_NE(pivot_prim, pivot_prim_other);
 }
-

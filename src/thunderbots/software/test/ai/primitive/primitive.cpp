@@ -25,4 +25,3 @@ TEST(PrimitiveTest, validate_invalid_primitive_test)
         move_prim.validatePrimitiveMessage(move_prim.createMsg(), "Some other primitive"),
         std::invalid_argument);
 }
-

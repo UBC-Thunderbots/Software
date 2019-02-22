@@ -136,4 +136,3 @@ TEST(MovePrimitiveTest, test_inequality_operator_with_mismatched_final_speed)
 
     EXPECT_NE(move_prim, move_prim_other);
 }
-

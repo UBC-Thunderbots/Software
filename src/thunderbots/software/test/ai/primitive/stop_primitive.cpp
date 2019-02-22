@@ -95,4 +95,3 @@ TEST(StopPrimitiveTest, test_inequality_operator_with_mismatched_coast_value)
 
     EXPECT_NE(stop_prim, stop_prim_other);
 }
-

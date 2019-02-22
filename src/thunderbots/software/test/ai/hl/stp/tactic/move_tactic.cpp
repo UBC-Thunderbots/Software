@@ -111,4 +111,3 @@ TEST(MoveActionTest, test_evaluate_robot_function)
 
     EXPECT_EQ(5 / field.totalLength(), tactic.calculateRobotCost(robot, field));
 }
-

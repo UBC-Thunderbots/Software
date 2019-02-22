@@ -1,8 +1,10 @@
+#include "grsim_communication/grsim_backend.h"
+
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
+
 #include <limits>
 
-#include "grsim_communication/grsim_backend.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Packet.pb.h"
 
@@ -269,4 +271,3 @@ TEST(GrSimBackendTest, create_grsim_packet_with_dribbler_on)
         google::protobuf::util::MessageDifferencer::Equals(result, expected);
     EXPECT_TRUE(messages_equal);
 }
-
