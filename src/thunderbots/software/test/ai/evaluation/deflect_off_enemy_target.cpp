@@ -31,10 +31,3 @@ TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)
 
     EXPECT_EQ(p, Point(-3, -0.0675));
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

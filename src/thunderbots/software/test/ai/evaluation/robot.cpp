@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_in_threshold_facing_0_target_45_threshold_60)
 {
     Point position    = Point(0, 0);
@@ -21,7 +21,7 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
 }
 
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_not_in_threshold_facing_0_target_45_threshold_30)
 {
     Point position    = Point(0, 0);
@@ -33,7 +33,7 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_not_in_threshold_facing_0_target_45_threshold_45)
 {
     Point position    = Point(0, 0);
@@ -45,7 +45,7 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_in_threshold_facing_0_target_135_threshold_150)
 {
     Point position    = Point(0, 0);
@@ -57,7 +57,7 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_not_in_threshold_facing_0_target_135_threshold_90)
 {
     Point position    = Point(0, 0);
@@ -69,7 +69,7 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_in_threshold_facing_150_target_minus_150_threshold_90)
 {
     Point position    = Point(0, 0);
@@ -81,7 +81,7 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
         position, orientation, target, threshold));
 }
 
-TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
+TEST(RobotEvaluationTest,
      orientation_not_in_threshold_facing_150_target_minus_150_threshold_30)
 {
     Point position    = Point(0, 0);
@@ -93,10 +93,3 @@ TEST(RobotOrientationWithinAngleThresholdOfTargetTest,
         position, orientation, target, threshold));
 }
 
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

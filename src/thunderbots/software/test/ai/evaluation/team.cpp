@@ -5,7 +5,7 @@
 
 // using namespace Evaluation;
 
-class EvaluationTeamTest : public ::testing::Test
+class TeamEvaluationTest : public ::testing::Test
 {
    protected:
     void SetUp() override
@@ -16,7 +16,7 @@ class EvaluationTeamTest : public ::testing::Test
     Timestamp current_time;
 };
 
-TEST_F(EvaluationTeamTest, one_robot)
+TEST_F(TeamEvaluationTest, one_robot)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -29,7 +29,7 @@ TEST_F(EvaluationTeamTest, one_robot)
     EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(EvaluationTeamTest, multiple_robots)
+TEST_F(TeamEvaluationTest, multiple_robots)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -48,7 +48,7 @@ TEST_F(EvaluationTeamTest, multiple_robots)
     EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(EvaluationTeamTest, multiple_robots_closest_is_moving)
+TEST_F(TeamEvaluationTest, multiple_robots_closest_is_moving)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -67,7 +67,7 @@ TEST_F(EvaluationTeamTest, multiple_robots_closest_is_moving)
     EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(EvaluationTeamTest, multiple_robots_all_moving)
+TEST_F(TeamEvaluationTest, multiple_robots_all_moving)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -86,7 +86,7 @@ TEST_F(EvaluationTeamTest, multiple_robots_all_moving)
     EXPECT_EQ(robot_2, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(EvaluationTeamTest, one_robot_on_ball)
+TEST_F(TeamEvaluationTest, one_robot_on_ball)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -105,16 +105,9 @@ TEST_F(EvaluationTeamTest, one_robot_on_ball)
     EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(EvaluationTeamTest, zero_robots)
+TEST_F(TeamEvaluationTest, zero_robots)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
     EXPECT_EQ(std::nullopt, Evaluation::nearest_friendly(team, Point(0, 0)));
-}
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
