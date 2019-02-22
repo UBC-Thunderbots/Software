@@ -112,8 +112,3 @@ TEST(MoveActionTest, test_evaluate_robot_function)
     EXPECT_EQ(5 / field.totalLength(), tactic.calculateRobotCost(robot, field));
 }
 
-int main(int argc, char **argv)
-{
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
