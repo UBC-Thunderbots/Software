@@ -514,18 +514,18 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/stop_primitive.cpp
-            test/intent/catch_intent.cpp
-            test/intent/chip_intent.cpp
-            test/intent/direct_velocity_intent.cpp
-            test/intent/direct_wheels_intent.cpp
-            test/intent/dribble_intent.cpp
-            test/intent/intent.cpp
-            test/intent/kick_intent.cpp
-            test/intent/main.cpp
-            test/intent/move_intent.cpp
-            test/intent/movespin_intent.cpp
-            test/intent/pivot_intent.cpp
-            test/intent/stop_intent.cpp
+            test/ai/intent/catch_intent.cpp
+            test/ai/intent/chip_intent.cpp
+            test/ai/intent/direct_velocity_intent.cpp
+            test/ai/intent/direct_wheels_intent.cpp
+            test/ai/intent/dribble_intent.cpp
+            test/ai/intent/intent.cpp
+            test/ai/intent/kick_intent.cpp
+            test/ai/intent/main.cpp
+            test/ai/intent/move_intent.cpp
+            test/ai/intent/movespin_intent.cpp
+            test/ai/intent/pivot_intent.cpp
+            test/ai/intent/stop_intent.cpp
             )
     target_link_libraries(intent_test
             ${G3LOG}
