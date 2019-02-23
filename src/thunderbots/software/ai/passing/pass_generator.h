@@ -171,6 +171,19 @@ namespace AI::Passing
         bool comparePassQuality(const Pass& pass1, const Pass& pass2);
 
         /**
+         * Check if the two given passes are equal
+         *
+         * Equality here is defined in the context of this class, in that we use it as a
+         * measure of whether or not to merge two passes
+         *
+         * @param pass1
+         * @param pass2
+         *
+         * @return True if the two passes are similar enough to be equal, false otherwise
+         */
+        bool passesEqual(Pass pass1, Pass pass2);
+
+        /**
          * Generate a given number of passes
          *
          * This function is used to generate the initial passes that are then optimized

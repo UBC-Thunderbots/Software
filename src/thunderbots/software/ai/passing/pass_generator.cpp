@@ -136,6 +136,20 @@ void PassGenerator::pruneAndReplacePasses()
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); });
 
+    // Merge Passes That Are Similar
+    // We start by assuming that the most similar passes will be right beside each other,
+    // then iterate over the entire list, building a new list as we go by only adding
+    // elements when they are dissimilar enough from the last element we added
+    passes_to_optimize = std::accumulate(passes_to_optimize.begin(), passes_to_optimize.end(), std::vector<Pass>(),
+            [this](std::vector<Pass>& passes, Pass curr_pass){
+        // Check if we have no passes, or if this pass is too similar to the
+        // last pass we added to the list
+        if (passes.empty() || !passesEqual(curr_pass, passes.back())){
+            passes.emplace_back(curr_pass);
+        }
+        return passes;
+    });
+
     // Replace the least promising passes with newly generated passes
     if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value())
     {
@@ -152,7 +166,7 @@ void PassGenerator::pruneAndReplacePasses()
 
         // Append our newly generated passes to replace the passes we just removed
         passes_to_optimize.insert(
-            passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
+            passes_to_optimize.end(),
             new_passes.begin(), new_passes.end());
     }
 }
@@ -210,6 +224,23 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen)
 bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
 {
     return ratePass(pass1) > ratePass(pass2);
+}
+
+bool PassGenerator::passesEqual(AI::Passing::Pass pass1, AI::Passing::Pass pass2) {
+    double max_position_difference_meters = Util::DynamicParameters::AI::Passing::pass_equality_max_position_difference_meters.value();
+    double max_time_difference_seconds = Util::DynamicParameters::AI::Passing::pass_equality_max_start_time_difference_seconds.value();
+    double max_speed_difference = Util::DynamicParameters::AI::Passing::pass_equality_max_speed_difference_meters_per_second.value();
+
+    double receiver_position_difference = (pass1.receiverPoint() - pass2.receiverPoint()).len();
+    double passer_position_difference = (pass1.passerPoint() - pass2.passerPoint()).len();
+    double time_difference = (pass1.startTime() - pass2.startTime()).getSeconds();
+    double speed_difference = pass1.speed() - pass2.speed();
+
+    return std::abs(receiver_position_difference) < max_position_difference_meters &&
+        std::abs(passer_position_difference) < max_position_difference_meters &&
+        std::abs(time_difference) < max_time_difference_seconds &&
+        std::abs(speed_difference) < max_speed_difference;
+
 }
 
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>

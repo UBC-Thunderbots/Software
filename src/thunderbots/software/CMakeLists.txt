@@ -531,51 +531,33 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(intent_test
             ${G3LOG}
-            ${catkin_LIBRARIES})
+            ${catkin_LIBRARIES}
+            )
 
-    catkin_add_gtest(passing_evaluation_test
-            test/ai/passing/evaluation.cpp
-            test/test_util/test_util.cpp
+    catkin_add_gtest(passing_test
             ai/passing/evaluation.cpp
-            ai/world/field.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/world/ball.cpp
-            ai/world/team.cpp
-            ai/world/robot.cpp
-            ai/world/world.cpp
+            ai/world/field.cpp
             ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            test/ai/passing/evaluation.cpp
+            test/ai/passing/main.cpp
+            test/ai/passing/pass.cpp
+            test/ai/passing/pass_generator.cpp
+            test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
             )
-    target_link_libraries(passing_evaluation_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(pass_test
-            test/ai/passing/pass.cpp
-            ai/passing/pass.cpp
-            util/timestamp.cpp
-            )
-    target_link_libraries(pass_test ${catkin_LIBRARIES})
+    target_link_libraries(passing_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(gradient_descent_optimizer_test
             test/util/gradient_descent_optimizer.cpp
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(pass_generator_test
-            test/ai/passing/pass_generator.cpp
-            test/test_util/test_util.cpp
-            ai/passing/pass_generator.cpp
-            ai/passing/evaluation.cpp
-            ai/passing/pass.cpp
-            ai/world/team.cpp
-            ai/world/world.cpp
-            ai/world/field.cpp
-            ai/world/robot.cpp
-            ai/world/ball.cpp
-            ai/world/game_state.cpp
-            util/parameter/dynamic_parameters.cpp
-            util/timestamp.cpp
-            )
-    target_link_libraries(pass_generator_test ${catkin_LIBRARIES})
 
 endif()
 

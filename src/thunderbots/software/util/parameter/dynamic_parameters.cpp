@@ -49,6 +49,9 @@ namespace Util::DynamicParameters
                 "num_passes_to_keep_after_pruning", 10);
             Parameter<int32_t> number_of_gradient_descent_steps_per_iter(
                 "number_of_gradient_descent_steps_per_iter", 20);
+            Parameter<double> pass_equality_max_position_difference_meters("pass_equality_max_position_difference_meters", 0.1);
+            Parameter<double> pass_equality_max_start_time_difference_seconds("pass_equality_max_start_time_difference_seconds", 0.5);
+            Parameter<double> pass_equality_max_speed_difference_meters_per_second("pass_equality_max_speed_difference_meters_per_second", 0.3);
         }  // namespace Passing
     }      // namespace AI
 
