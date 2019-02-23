@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <bitset>
-#include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -209,6 +208,7 @@ MRFDongle::MRFDongle()
     // Submit the message delivery report transfers.
     for (auto &i : mdr_transfers)
     {
+        // Attempt to receive at most 8 bytes from endpoint 1
         i.reset(new USB::BulkInTransfer(device, 1, 8, false, 0));
         i->signal_done.connect(sigc::mem_fun(this, &MRFDongle::handle_mdrs));
         i->submit();
@@ -217,6 +217,7 @@ MRFDongle::MRFDongle()
     // Submit the received message transfers.
     for (auto &i : message_transfers)
     {
+        // Attempt to receive at most 105 bytes from endpoint 2
         i.reset(new USB::BulkInTransfer(device, 2, 105, false, 0));
         i->signal_done.connect(sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_message),
                                           sigc::ref(*i.get())));
@@ -538,7 +539,10 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     // TODO: do we actually use the slow flag?
     uint8_t extra = r_prim.extra_bits;
     bool slow     = false;
-    assert(extra <= 127);
+    if (extra > 127)
+    {
+        throw std::invalid_argument("extra greater than 127");
+    }
     uint8_t extra_encoded = static_cast<uint8_t>(extra | (slow ? 0x80 : 0x00));
 
     words[2] = static_cast<uint16_t>(words[2] |
@@ -583,8 +587,16 @@ void MRFDongle::handle_camera_transfer_done(
 void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const void *data,
                                 std::size_t len)
 {
-    assert(robot < 8);
-    assert((1 <= tries) && (tries <= 256));
+    if (robot >= MAX_ROBOTS_OVER_RADIO)
+    {
+        throw std::out_of_range("Robot ID must be below 8");
+    }
+
+    if ((tries < 1) || (tries > 256))
+    {
+        throw std::out_of_range("Number of tries must be between 1 and 256 (inclusive)");
+    }
+
     uint8_t buffer[len + 2];
     buffer[0] = static_cast<uint8_t>(robot);
     buffer[1] = static_cast<uint8_t>(tries & 0xFF);
