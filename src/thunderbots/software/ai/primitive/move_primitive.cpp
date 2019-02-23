@@ -65,3 +65,15 @@ void MovePrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool MovePrimitive::operator==(const MovePrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->dest == other.dest &&
+           this->final_angle == other.final_angle &&
+           this->final_speed == other.final_speed;
+}
+
+bool MovePrimitive::operator!=(const MovePrimitive &other) const
+{
+    return !((*this) == other);
+}

@@ -75,6 +75,23 @@ class KickPrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares KickPrimitives for equality. KickPrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the KickPrimitive to compare with for equality
+     * @return true if the KickPrimitives are equal and false otherwise
+     */
+    bool operator==(const KickPrimitive &other) const;
+
+    /**
+     * Compares KickPrimitives for inequality.
+     *
+     * @param other the KickPrimitive to compare with for inequality
+     * @return true if the KickPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const KickPrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point kick_origin;

@@ -38,14 +38,14 @@ namespace Util
             {
                 // The offset from the sides of the field to place the rectangular
                 // sigmoid we use to determine what areas to pass to
-                extern Parameter<double> static_position_quality_x_offset;
-                extern Parameter<double> static_position_quality_y_offset;
+                extern Parameter<double> static_field_position_quality_x_offset;
+                extern Parameter<double> static_field_position_quality_y_offset;
 
                 // The weight that being close to the goal will have on the static
                 // position quality. Lower, more negative weights result in the distance
                 // to the goal having less of an effect.
                 extern Parameter<double>
-                    static_position_quality_friendly_goal_distance_weight;
+                    static_field_position_quality_friendly_goal_distance_weight;
 
                 // The number of passes to try to optimize at any given time
                 extern Parameter<int32_t> num_passes_to_optimize;
@@ -56,7 +56,6 @@ namespace Util
                 // The number of steps of gradient descent to perform in each iteration
                 extern Parameter<int32_t> number_of_gradient_descent_steps_per_iter;
 
-                // The number of passe
             }  // namespace Passing
         }      // namespace AI
     }      // namespace DynamicParameters

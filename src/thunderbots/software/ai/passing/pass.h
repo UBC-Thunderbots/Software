@@ -20,17 +20,13 @@ namespace AI::Passing
     {
        public:
         /**
-         * Creates a pass with all 0 values
-         */
-        // Pass();
-
-        /**
          * Create a pass with given parameters
          *
          * @param passer_point The point the pass should start at
          * @param receiver_point The point the receiver should be at to receive the pass
          * @param pass_speed_m_per_s The speed of the pass, in meters/second
-         * @param pass_start_time The time that the pass should start at
+         * @param pass_start_time The time that the pass should start at (ie. the time
+         *                        that the ball should be kicked)
          */
         Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
              Timestamp pass_start_time);
@@ -66,22 +62,11 @@ namespace AI::Passing
         /**
          * Implement the "<<" operator for printing
          *
-         * This is implemented in the header because there were namespace issues with
-         * putting it in the `.cpp`.
-         *
          * @param output_stream The stream to print to
          * @param pass The pass to print
          * @return The output stream with the string representation of the class appended
          */
         friend std::ostream& operator<<(std::ostream& output_stream, const Pass& pass);
-        //{
-        //    output_stream << "Receiver: " << pass.receiver_point
-        //                  << ", Passer: " << pass.passer_point
-        //                  << " Speed (m/s): " << pass.pass_speed_m_per_s
-        //                  << " Start Time (s): " << pass.pass_start_time.getSeconds();
-
-        //    return output_stream;
-        //}
 
        private:
         // The location of the passer

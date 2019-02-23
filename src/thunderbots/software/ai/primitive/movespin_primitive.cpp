@@ -1,5 +1,4 @@
-#include "ai/primitive/movespin_primitive.h"
-
+#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
 #include "ai/primitive/visitor/primitive_visitor.h"
 
 const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";
@@ -56,4 +55,15 @@ std::vector<bool> MoveSpinPrimitive::getExtraBits() const
 void MoveSpinPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+bool MoveSpinPrimitive::operator==(const MoveSpinPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->dest == other.dest &&
+           this->angular_vel == other.angular_vel;
+}
+
+bool MoveSpinPrimitive::operator!=(const MoveSpinPrimitive &other) const
+{
+    return !((*this) == other);
 }

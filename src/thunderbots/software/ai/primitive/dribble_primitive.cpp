@@ -86,3 +86,16 @@ void DribblePrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool DribblePrimitive::operator==(const DribblePrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->dest == other.dest &&
+           this->final_angle == other.final_angle &&
+           this->final_speed == other.final_speed && this->rpm == other.rpm &&
+           this->small_kick_allowed == other.small_kick_allowed;
+}
+
+bool DribblePrimitive::operator!=(const DribblePrimitive &other) const
+{
+    return !((*this) == other);
+}
