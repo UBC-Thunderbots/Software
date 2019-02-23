@@ -229,10 +229,19 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
 #############
 
 ###### IMPORTANT #####
-# DO NOT USE GLOBBING FOR TEST EXECUTABLES. SPECIFY EACH SOURCE FILE.
+
+## DO NOT USE GLOBBING FOR TEST EXECUTABLES. SPECIFY EACH SOURCE FILE. ##
 # This is to make sure we know exactly what files/interfaces are being tested and that we are not accidentally
 # picking up other files that may affect test behaviour. Unit tests should not need too many files to be specified
 # and we want to make sure the minimum set of files required for the test are being used.
+
+## Why We Have Tests Grouped ## 
+# When you build a test executable (or any executable) with cmake, it does not 
+# save any `.o` files it might have already built for other executables. That 
+# means if I require `move_primitive.cpp` for two test executables, CMake will 
+# build it _twice_. This has lead to a heck of a lot of build duplication in our 
+# system. See this PR for the original change in this direction:
+# https://github.com/UBC-Thunderbots/Software/pull/386
 
 ##### Unit Tests #####
 
