@@ -18,7 +18,7 @@ notifications:
 
 install:
     # Pull in MoveIt's ROS Docker CI image (piping to `/dev/null` to hide output)
-    - DOCKER_IMAGE=moveit/moveit:$ROS_DISTRO-ci
+    - DOCKER_IMAGE=moveit/moveit:melodic-ci
     - echo "Pulling in Docker Image \"$DOCKER_IMAGE\""
     - docker pull $DOCKER_IMAGE > /dev/null
     # Tests default to false if not set
@@ -33,7 +33,6 @@ install:
       --env RUN_TESTS
       --env RUN_COVERAGE
       --env RUN_FORMATTING_CHECKS
-      --env ROS_DISTRO 
       --env REPOSITORY_NAME
       --env TRAVIS_PULL_REQUEST
       --env TRAVIS_BRANCH
@@ -62,15 +61,5 @@ matrix:
     env: RUN_BUILD="true"
          RUN_TESTS="true"
          RUN_COVERAGE="true"
-         ROS_DISTRO=melodic
   - name: "ROS Melodic / Ubuntu 18.04 - Check Formatting"
     env: RUN_FORMATTING_CHECKS="true"
-         ROS_DISTRO=melodic
-  - name: "ROS Kinetic / Ubuntu 16.04 - Build and Test"
-    env: RUN_BUILD="true"
-         RUN_TESTS="true"
-         RUN_COVERAGE="true"
-         ROS_DISTRO=kinetic
-  - name: "ROS Kinetic / Ubuntu 16.04 - Check Formatting"
-    env: RUN_FORMATTING_CHECKS="true"
-         ROS_DISTRO=kinetic

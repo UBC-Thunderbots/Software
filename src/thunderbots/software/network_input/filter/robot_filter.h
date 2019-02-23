@@ -19,7 +19,7 @@ typedef struct SSLRobotData_t
     Angle orientation;
     double confidence;
     Timestamp timestamp;
-} SSLRobotData;
+} SSLRobotDetection;
 
 /**
  * A lightweight datatype used to pass filtered robot data
@@ -54,7 +54,8 @@ class RobotFilter
      *
      * @return The filtered data for the robot
      */
-    FilteredRobotData getFilteredData(const std::vector<SSLRobotData> &new_robot_data);
+    FilteredRobotData getFilteredData(
+        const std::vector<SSLRobotDetection> &new_robot_data);
 
     /**
      * Returns the id of the Robot that this filter is filtering for

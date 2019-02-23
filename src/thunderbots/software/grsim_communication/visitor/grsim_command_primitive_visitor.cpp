@@ -6,6 +6,7 @@
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/directwheels_primitive.h"
+#include "ai/primitive/dribble_primitive.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
 #include "ai/primitive/movespin_primitive.h"
@@ -148,6 +149,11 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
+}
+
+void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
+{
+    // TODO: https://github.com/UBC-Thunderbots/Software/issues/107
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)

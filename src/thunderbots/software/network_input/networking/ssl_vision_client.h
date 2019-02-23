@@ -21,14 +21,14 @@ class SSLVisionClient
     SSLVisionClient(const std::string ip_address, const unsigned short port);
 
     /**
-     * Returns a queue of new SSL Vision WrapperPackets that were received since last time
-     * this function was called. If no new data was received since the last time this
-     * function was called, the queue will be empty
+     * Returns a vector of new SSL Vision WrapperPackets that were received since last
+     * time this function was called. If no new data was received since the last time this
+     * function was called, the vector will be empty
      *
-     * @return A queue of SSL_WrapperPackets received since the last time this function
+     * @return A vector of SSL_WrapperPackets received since the last time this function
      * was called.
      */
-    const std::queue<SSL_WrapperPacket> getVisionPacketQueue();
+    const std::vector<SSL_WrapperPacket> getVisionPacketVector();
 
    private:
     /**
@@ -51,5 +51,5 @@ class SSLVisionClient
     // Acts as a buffer to store the raw received data from the network
     std::array<char, max_buffer_length> raw_received_data_;
     // Stores the SSL_WrapperPackets that were received
-    std::queue<SSL_WrapperPacket> packet_queue;
+    std::vector<SSL_WrapperPacket> packet_vector;
 };

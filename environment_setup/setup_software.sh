@@ -17,25 +17,16 @@
 # Here we handle arguments provided to the script. Because this script allows
 # the installation of different versions of ROS, we use a parameter to let the
 # user decide which one to install.
-
-ros_distro="kinetic"
-ubuntu_distro="xenial"
-
 function show_help()
 {
     echo "Thunderbots software setup script. Installs the programs"
     echo "and dependencies required to build and run our code"
     echo ""
-    echo "Requires 1 argument: The name of the ROS distro you want to install"
-    echo "Currently supported values are: 'kinetic' and 'melodic'"
-    echo "Use 'kinetic' if you are running Ubuntu 16.04 (or equivalent)"
-    echo "Use 'melodic' if you are running Ubuntu 18.04 (or equivalent)"
-    echo ""
 }
 
 # This script only accepts 1 argument
-if [ "$#" -ne 1 ]; then
-    echo "Error: Illegal number of arguments provided. Expected 1 argument"
+if [ "$#" -ne 0 ]; then
+    echo "Error: Illegal number of arguments provided. Expected 0 arguments"
     show_help
     exit 1
 fi
@@ -47,14 +38,6 @@ while [ "$1" != "" ]; do
         -h | --help)
             show_help
             exit
-            ;;
-        kinetic)
-            ros_distro="kinetic"
-	    ubuntu_distro="xenial"
-            ;;
-        melodic)
-            ros_distro="melodic"
-	    ubuntu_distro="bionic"
             ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
@@ -94,7 +77,7 @@ SHELL_CONFIG_FILES=(
 # http://wiki.ros.org/melodic/Installation/Ubuntu
 declare -a new_shell_config_lines=(
     # Source the ROS Environment Variables Automatically
-    "source /opt/ros/$ros_distro/setup.sh"\
+    "source /opt/ros/melodic/setup.sh"\
     # Source the setup script for our workspace. This normally needs to
     # be done manually each session before you can work on the workspace,
     # so we put it here for convenience.
@@ -102,7 +85,7 @@ declare -a new_shell_config_lines=(
     # Aliases to make development easier
     # You need to source the setup.sh script before launching CLion so it can
     # find catkin packages
-    "alias clion=\"source /opt/ros/$ros_distro/setup.sh \
+    "alias clion=\"source /opt/ros/melodic/setup.sh \
         && source $GIT_ROOT/devel/setup.sh \
         && clion & disown \
         && exit\""\
@@ -129,36 +112,21 @@ done
 
 # Install ROS
 echo "================================================================" 
-echo "Installing ROS $ros_distro"
+echo "Installing ROS Melodic"
 echo "================================================================"
 
-if [ "$ros_distro" == "kinetic" ]; then
-    # See http://wiki.ros.org/kinetic/Installation/Ubuntu for instructions
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
-    sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
-    sudo apt-get update
-    sudo apt-get install ros-kinetic-desktop -y
-    if [ $? -ne 0 ]; then
-        echo "##############################################################"
-        echo "Error: Installing ROS failed"
-        echo "##############################################################"
-        exit 1
-    fi
-    sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential -y
-elif [ "$ros_distro" == "melodic" ]; then
-    # See http://wiki.ros.org/melodic/Installation/Ubuntu for instructions
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros-latest.list'
-    sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
-    sudo apt-get update
-    sudo apt-get install ros-melodic-desktop -y
-    if [ $? -ne 0 ]; then
-        echo "##############################################################"
-        echo "Error: Installing ROS failed"
-        echo "##############################################################"
-        exit 1
-    fi
-    sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
+# See http://wiki.ros.org/melodic/Installation/Ubuntu for instructions
+sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros-latest.list'
+sudo apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net:80 --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+sudo apt-get update
+sudo apt-get install ros-melodic-desktop -y
+if [ $? -ne 0 ]; then
+    echo "##############################################################"
+    echo "Error: Installing ROS failed"
+    echo "##############################################################"
+    exit 1
 fi
+sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
 
 
 echo "================================================================"
@@ -176,7 +144,7 @@ fi
 
 rosdep update
 # Install all required dependencies to build this repo
-rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro $ros_distro -y --os=ubuntu:$ubuntu_distro
+rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro melodic -y
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing ROS dependencies failed"
@@ -191,8 +159,6 @@ echo "================================================================"
 
 sudo apt-get update
 sudo apt-get install -y software-properties-common # required for add-apt-repository
-# Required to install g++-7 on Ubuntu 16
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 # Required to make sure we install protobuf version 3.0.0 or greater
 sudo add-apt-repository ppa:maarten-fonville/protobuf -y
 
@@ -243,38 +209,6 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 sudo make install
 cd $CURR_DIR
-
-if [ "$ros_distro" == "kinetic" ]; then
-    # Since Ubuntu 16 and earlier do not ship with a new enough version
-    # of cmake (>= 3.8.2), we need to install a newer version manually.
-    # The following script installs cmake 3.10.2 (the same as Ubuntu 18).
-    # The script is from the cmake website (https://cmake.org/files/v3.10/)
-    # https://askubuntu.com/questions/355565/how-do-i-install-the-latest-version-of-cmake-from-the-command-line
-    sudo mkdir /opt/cmake
-    wget -P /tmp https://cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.sh
-    if [ $? -ne 0 ]; then
-        echo "##############################################################"
-        echo "Error: Failed to download cmake installation file"
-        echo "##############################################################"
-        exit 1
-    fi
-    chmod +x /tmp/cmake-3.10.2-Linux-x86_64.sh
-    sudo /tmp/cmake-3.10.2-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
-    if [ $? -ne 0 ]; then
-        echo "##############################################################"
-        echo "Error: Failed to run cmake installation script"
-        echo "##############################################################"
-        exit 1
-    fi
-    sudo ln -sf /opt/cmake/bin/cmake /usr/local/bin/cmake
-
-elif [ "$ros_distro" == "melodic" ]; then
-    # Ubuntu 18.04 and later ship with cmake versions >= 3.8.2,
-    # so we can just install from the default PPA
-    sudo apt-get install cmake
-fi
-
-
 
 # Done
 echo "================================================================"
