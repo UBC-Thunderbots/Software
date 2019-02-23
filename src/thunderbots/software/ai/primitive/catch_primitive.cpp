@@ -1,5 +1,4 @@
-#include "ai/primitive/catch_primitive.h"
-
+#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
 #include "ai/primitive/visitor/primitive_visitor.h"
 
 const std::string CatchPrimitive::PRIMITIVE_NAME = "Catch Primitive";
@@ -62,4 +61,15 @@ std::vector<bool> CatchPrimitive::getExtraBits() const
 void CatchPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
+}
+
+bool CatchPrimitive::operator==(const CatchPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->velocity == other.velocity &&
+           this->dribbler_speed == other.dribbler_speed && this->margin == other.margin;
+}
+
+bool CatchPrimitive::operator!=(const CatchPrimitive &other) const
+{
+    return !((*this) == other);
 }
