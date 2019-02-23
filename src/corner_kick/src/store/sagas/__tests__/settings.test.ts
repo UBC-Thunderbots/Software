@@ -5,9 +5,7 @@ import * as settings from '../../actions/settings';
 
 describe('updateSettings', () => {
     it('update the settings in local storage', () => {
-        const mockAction = {
-            payload: settings.updateSettings('testKey', 'testVal'),
-        };
+        const mockAction = settings.updateSettings('testKey', 'testVal');
 
         return (
             expectSaga(settingsSaga.updateSettings, mockAction)
