@@ -8,8 +8,17 @@ namespace
         USB::DeviceHandle &device, unsigned int robot, uint8_t message_id,
         unsigned int tries, const void *data, std::size_t length)
     {
-        assert(robot < 8);
-        assert((1 <= tries) && (tries <= 256));
+        if (robot >= MAX_ROBOTS_OVER_RADIO)
+        {
+            throw std::out_of_range("Robot ID must be below 8");
+        }
+
+        if ((tries < 1) || (tries > 256))
+        {
+            throw std::out_of_range(
+                "Number of tries must be between 1 and 256 (inclusive)");
+        }
+
         uint8_t buffer[3 + length];
         buffer[0] = static_cast<uint8_t>(robot | 0x10);
         buffer[1] = message_id;

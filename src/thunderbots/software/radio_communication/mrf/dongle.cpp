@@ -30,6 +30,8 @@ namespace
         uint16_t pan;
     };
 
+    // Different configs for the dongle, to allow for communication over
+    // different PANs and/or channels
     const RadioConfig DEFAULT_CONFIGS[4] = {
         {25U, 250, 0x1846U},
         {25U, 250, 0x1847U},
@@ -37,8 +39,9 @@ namespace
         {25U, 250, 0x1849U},
     };
 
-    const unsigned int ANNUNCIATOR_BEEP_LENGTH = 750;
+    const unsigned int ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS = 750;  // milliseconds
 
+    // The dongle's MAC address
     static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
 
 }  // namespace
@@ -408,21 +411,21 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
     (*i).first->submit();
 
-    LOG(INFO) << "Submitted camera transfer in position:" << camera_transfers.size()
-              << std::endl;
+    LOG(DEBUG) << "Submitted camera transfer in position:" << camera_transfers.size()
+               << std::endl;
 };
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
 {
-    std::size_t num_prims = prims.size();
-    if (num_prims > MAX_ROBOTS_OVER_RADIO)
-    {
-        throw std::invalid_argument("Too many primitives in vector.");
-    }
-
     // More than 1 prim.
-    if (num_prims)
+    if (!prims.empty())
     {
+        std::size_t num_prims = prims.size();
+        if (num_prims > MAX_ROBOTS_OVER_RADIO)
+        {
+            throw std::invalid_argument("Too many primitives in vector.");
+        }
+
         if (num_prims == MAX_ROBOTS_OVER_RADIO)
         {
             // All robots are present. Build a full-size packet with all the
@@ -571,8 +574,8 @@ void MRFDongle::handle_camera_transfer_done(
     uint64_t stamp = static_cast<uint64_t>(micros.count());
 
     std::lock_guard<std::mutex> lock(cam_mtx);
-    LOG(INFO) << "Camera transfer done, took: " << stamp - (*iter).second
-              << " microseconds" << std::endl;
+    LOG(DEBUG) << "Camera transfer done, took: " << stamp - (*iter).second
+               << " microseconds" << std::endl;
     (*iter).first->result();
     camera_transfers.erase(iter);
 }
