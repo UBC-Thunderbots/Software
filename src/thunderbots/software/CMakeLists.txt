@@ -868,6 +868,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/passing/pass.cpp
             util/timestamp.cpp
             )
+    target_link_libraries(pass_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(gradient_descent_optimizer_test
+            test/util/gradient_descent_optimizer.cpp
+            )
+    target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
 endif()
 
