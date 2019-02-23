@@ -75,5 +75,8 @@ int main(int argc, char** argv)
 
     ros::spin();
 
+    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+    // until the node is shutdown
+    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
     return 0;
 }

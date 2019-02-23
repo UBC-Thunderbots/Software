@@ -147,6 +147,9 @@ int main(int argc, char** argv)
     // SSLGameControllerClient
     std::thread network_thread([&io_service]() { io_service.run(); });
 
+    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+    // until the node is shutdown
+    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
     ros::spin();
 
     return 0;
