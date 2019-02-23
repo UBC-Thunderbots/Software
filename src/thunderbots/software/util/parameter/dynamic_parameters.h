@@ -66,7 +66,8 @@ namespace Util
 
                 // The maximum allowed difference between the speeds of two passes for
                 // which they are considered equal
-                extern Parameter<double> pass_equality_max_speed_difference_meters_per_second;
+                extern Parameter<double>
+                    pass_equality_max_speed_difference_meters_per_second;
 
             }  // namespace Passing
         }      // namespace AI

@@ -58,10 +58,3 @@ TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
 
     // TODO (Issue #323): Check more things here when we're actually generating passes
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
