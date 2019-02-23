@@ -244,10 +244,6 @@ void MRFBackend::handle_message(
      */
     Property<uint32_t> fpga_build_id;
 
-    /**
-     * \brief The current executing primitive.
-     */
-    Property<Primitive> primitive;
 
     {
         bool found = false;
@@ -473,7 +469,8 @@ void MRFBackend::handle_message(
 
             case 0x01:
                 // Autokick fired
-                signal_autokick_fired.emit();
+                // TODO handle this somehow
+                // signal_autokick_fired.emit();
                 break;
 
             case 0x04:
