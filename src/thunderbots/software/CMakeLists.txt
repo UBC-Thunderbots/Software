@@ -273,6 +273,14 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(geom_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(nav_util_test
+            test/ai/navigator/util.cpp
+            ai/navigator/util.cpp
+            ai/navigator/util.h
+            geom/point.h)
+
+    target_link_libraries(nav_util_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
             ../shared/util.c
