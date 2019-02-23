@@ -847,6 +847,11 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(intent_test
             ${G3LOG}
             ${catkin_LIBRARIES})
+
+    catkin_add_gtest(gradient_descent_optimizer_test
+            test/util/gradient_descent_optimizer.cpp
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
