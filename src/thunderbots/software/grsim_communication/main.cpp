@@ -83,8 +83,6 @@ int main(int argc, char** argv)
     // We loop at a set rate so that we don't overload the network with too many packets
     ros::Rate tick_rate(TICK_RATE);
 
-    // grsim_backend.setBallState(Point(2, 2), Vector(-1, -1));
-
     // Main loop
     while (ros::ok())
     {
@@ -95,7 +93,7 @@ int main(int argc, char** argv)
         ros::spinOnce();
 
         // test setBallState function
-        grsim_backend.setBallState(Point(2, 2), Vector(-1, -1));
+        grsim_backend.setBallState(Point(0, 0), Vector(0, 0));
 
         grsim_backend.sendPrimitives(primitives, friendly_team, ball);
 
