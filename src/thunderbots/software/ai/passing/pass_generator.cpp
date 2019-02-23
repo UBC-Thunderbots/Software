@@ -58,7 +58,7 @@ std::optional<Pass> PassGenerator::getBestPassSoFar()
     return best_known_pass;
 }
 
-void PassGenerator::setTargetRegion(Rectangle area)
+void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
 {
     // Take ownership of the target_region for the duration of this function
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
@@ -95,7 +95,7 @@ void PassGenerator::continuouslyGeneratePasses()
 
         optimizePasses();
         pruneAndReplacePasses();
-        saveBestPath();
+        saveBestPass();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -132,7 +132,7 @@ void PassGenerator::optimizePasses()
 
 void PassGenerator::pruneAndReplacePasses()
 {
-    // Sort the passes by decreasing quality
+    // Sort the passes by increasing quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); });
 
@@ -151,6 +151,8 @@ void PassGenerator::pruneAndReplacePasses()
             }
             return passes;
         });
+    // Reverse the list to sort by increasing quality
+    std::reverse(passes_to_optimize.begin(), passes_to_optimize.end());
 
     // Replace the least promising passes with newly generated passes
     if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value())
@@ -172,7 +174,7 @@ void PassGenerator::pruneAndReplacePasses()
     }
 }
 
-void PassGenerator::saveBestPath()
+void PassGenerator::saveBestPass()
 {
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);

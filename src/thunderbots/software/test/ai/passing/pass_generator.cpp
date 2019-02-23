@@ -53,7 +53,8 @@ TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
     // Check that we're moving towards the goal
     ASSERT_TRUE(pass2);
     EXPECT_GE(pass2->receiverPoint().x(), pass1->receiverPoint().x());
-    // Currently we just generate receiver points at (0,0), so y should be 0
+
+    // Check that we're aren't moving at all in y
     EXPECT_EQ(pass2->receiverPoint().y(), 0);
 
     // TODO (Issue #323): Check more things here when we're actually generating passes

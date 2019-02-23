@@ -64,6 +64,8 @@ namespace AI::Passing
         /**
          * Updates the point that we are passing from
          *
+         * WARNING: This will clear all passes currently being optimized
+         *
          * @param passer_point the point we are passing from
          */
         void setPasserPoint(Point passer_point);
@@ -71,9 +73,11 @@ namespace AI::Passing
         /**
          * Set the target region that we would like to pass to
          *
-         * @param area The area to pass to
+         * @param area An optional that may contain the area to pass to. If the
+         *             optional is empty (ie. `std::nullopt`) then this indicates
+         *             that there is no target region
          */
-        void setTargetRegion(Rectangle area);
+        void setTargetRegion(std::optional<Rectangle> area);
 
         /**
          * Gets the best pass we know of so far
@@ -128,7 +132,7 @@ namespace AI::Passing
         /**
          * Saves the best currently known pass
          */
-        void saveBestPath();
+        void saveBestPass();
 
         /**
          * Convert the given pass to an array
