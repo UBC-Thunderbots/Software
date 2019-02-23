@@ -121,35 +121,133 @@ void MRFBackend::update_dongle_events()
 }
 
 void MRFBackend::handle_message(
-    int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)
+    int index, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)
 {
-    // TODO: find better place to put this check. This isn't a good spot
-    // TODO: add in rest of params
-    /*if(send_tune_updates){
-            if(last_tp0 != tune_param0){
-                    last_tp0 = tune_param0;
-                    this->update_tunable_var(0, (uint8_t)tune_param0);
-            }
-            if(last_tp1 != tune_param1){
-                    last_tp1 = tune_param1;
-                    this->update_tunable_var(1, (uint8_t)tune_param1);
-            }
-            if(last_tp2 != tune_param2){
-                    last_tp2 = tune_param2;
-                    this->update_tunable_var(2, (uint8_t)tune_param2);
-            }
-            if(last_tp3 != tune_param3){
-                    last_tp3 = tune_param3;
-                    this->update_tunable_var(3, (uint8_t)tune_param3);
-            }
-            std::cout << "can send update" << std::endl;
-
-    }*/
-
     int link_quality = lqi / 255.0;
-    int received_signal_strength;
+    int received_signal_strength_db;
     bool alive;
 
+    /**
+     * \brief The rough maximum full-scale deflection of the laser
+     * sensor.
+     */
+    const double break_beam_scale;
+
+    /**
+     * \brief The maximum possible kick speed, in m/s.
+     */
+    const double kick_speed_max;
+
+    /**
+     * \brief The kick resolution for HScale.
+     */
+
+    const double kick_speed_resolution;
+
+    /**
+     * \brief The maximum possible chip distance, in m.
+     */
+    const double chip_distance_max;
+
+    /**
+     * \brief The chip resolution for HScale.
+     */
+
+    const double chip_distance_resolution;
+
+    /**
+     * \brief The maximum power level understood by the \ref
+     * direct_dribbler function.
+     */
+    const unsigned int direct_dribbler_max;
+
+    /**
+     * \brief Whether or not the robot is currently responding to radio
+     * communication.
+     */
+    Property<bool> alive;
+
+    /**
+     * \brief Whether the robot is in direct mode.
+     */
+    Property<bool> direct_control;
+
+    /**
+     * \brief Whether or not the ball is interrupting the robot’s laser
+     * beam.
+     */
+    Property<bool> ball_in_beam;
+
+    /**
+     * \brief Whether or not the robot’s capacitor is charged enough to
+     * kick the ball.
+     */
+    Property<bool> capacitor_charged;
+
+    /**
+     * \brief The voltage on the robot’s battery, in volts.
+     */
+    Property<double> battery_voltage;
+
+    /**
+     * \brief The voltage on the robot’s kicking capacitor, in volts.
+     */
+    Property<double> capacitor_voltage;
+
+    /**
+     * \brief The reading of the robot’s laser sensor.
+     */
+    Property<double> break_beam_reading;
+
+    /**
+     * \brief The temperature of the robot’s dribbler motor, in degrees
+     * Celsius.
+     */
+    Property<double> dribbler_temperature;
+
+    /**
+     * \brief The speed of the robot’s dribbler motor, in revolutions
+     * per minute.
+     */
+    Property<int> dribbler_speed;
+
+    /**
+     * \brief The temperature of the robot’s mainboard, in degrees
+     * Celsius.
+     */
+    Property<double> board_temperature;
+
+    /**
+     * \brief The link quality of the last received packet, from 0 to
+     * 1.
+     */
+    double link_quality;
+
+    /**
+     * \brief The received signal strength of the last received packet,
+     * in decibels.
+     */
+    Property<int> received_signal_strength;
+
+    /**
+     * \brief Whether or not the build ID information is valid.
+     */
+    Property<bool> build_ids_valid;
+
+    /**
+     * \brief The microcontroller firmware build ID.
+     */
+    Property<uint32_t> fw_build_id;
+
+    /**
+     * \brief The FPGA bitstream build ID.
+     */
+    Property<uint32_t> fpga_build_id;
+
+    /**
+     * \brief The current executing primitive.
+     */
+    Property<Primitive> primitive;
 
     {
         bool found = false;
@@ -158,13 +256,13 @@ void MRFBackend::handle_message(
         {
             if (RSSI_TABLE[i].rssi < rssi)
             {
-                received_signal_strength = RSSI_TABLE[i].db;
+                received_signal_strength_db = RSSI_TABLE[i].db;
                 found                    = true;
             }
         }
         if (!found)
         {
-            received_signal_strength = -90;
+            received_signal_strength_db = -90;
         }
     }
 
@@ -278,11 +376,9 @@ void MRFBackend::handle_message(
                                 }
                                 else
                                 {
-                                    LOG_ERROR(Glib::ustring::compose(
-                                        u8"Received general robot status "
-                                        u8"update with truncated error bits "
-                                        u8"extension of length %1",
-                                        len));
+                                    LOG(WARNING) << "Received general robot status "
+                                        "update with truncated error bits "
+                                        "extension of length " << len << std::endl;
                                 }
                                 break;
 
@@ -300,11 +396,10 @@ void MRFBackend::handle_message(
                                 }
                                 else
                                 {
-                                    LOG_ERROR(Glib::ustring::compose(
-                                        u8"Received general robot status "
-                                        u8"update with truncated build IDs "
-                                        u8"extension of length %1",
-                                        len));
+                                    LOG(WARNING) <<
+                                        "Received general robot status "
+                                        "update with truncated build IDs "
+                                        "extension of length " << len << std::endl;
                                 }
                                 break;
 
@@ -322,19 +417,18 @@ void MRFBackend::handle_message(
                                 }
                                 else
                                 {
-                                    LOG_ERROR(Glib::ustring::compose(
-                                        u8"Received general robot status "
-                                        u8"update with truncated LPS data "
-                                        u8"extension of length %1",
-                                        len));
+                                    LOG(WARNING) << 
+                                        "Received general robot status "
+                                        "update with truncated LPS data "
+                                        "extension of length " << len << std::endl;
                                 }
                                 break;
 
                             default:
-                                LOG_ERROR(Glib::ustring::compose(
-                                    u8"Received general status packet from "
-                                    u8"robot with unknown extension code %1",
-                                    static_cast<unsigned int>(*bptr)));
+                                LOG(WARNING) << 
+                                    "Received general status packet from "
+                                    "robot with unknown extension code " << 
+                                    static_cast<unsigned int>(*bptr) << std::endl;
                                 len = 0;
                                 break;
                         }
@@ -349,20 +443,12 @@ void MRFBackend::handle_message(
                             i->active(false);
                         }
                     }
-
-                    feedback_timeout_connection.disconnect();
-                    feedback_timeout_connection =
-                        Glib::signal_timeout().connect_seconds(
-                            sigc::mem_fun(
-                                this, &MRFRobot::handle_feedback_timeout),
-                            10);  // TODO: change this back to 3
                 }
                 else
                 {
-                    LOG_ERROR(Glib::ustring::compose(
-                        u8"Received general robot status update with wrong "
-                        u8"byte count %1",
-                        len));
+                    LOG(WARNING) << 
+                        "Received general robot status update with wrong "
+                        "byte count " << len << std::endl;
                 }
 
                 if (!build_ids_valid &&
@@ -401,9 +487,7 @@ void MRFBackend::handle_message(
                 break;
 
             default:
-                LOG_ERROR(Glib::ustring::compose(
-                    u8"Received packet from robot with unknown message type %1",
-                    static_cast<unsigned int>(*bptr)));
+                LOG(WARNING) << "Received packet from robot with unknown message type " << static_cast<unsigned int>(*bptr) << std::endl;
                 break;
         }
     }
