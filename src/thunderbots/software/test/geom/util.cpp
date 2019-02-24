@@ -897,6 +897,30 @@ TEST(GeomUtilTest, test_velocity_intersection_limit_case)
     EXPECT_EQ( Point(-4.5, -0.2), *intersection);
 }
 
+TEST(GeomUtilTest, test_velocity_finite_intersection_intersect)
+{
+    Point a = Point(1,1);
+    Point b = Point(-1,-1);
+    Point c = Point(1,0);
+    Point d = Point(-1,0);
+
+    std::optional<Point> intersection = finiteLengthLineIntersection(a, b, c, d);
+
+    EXPECT_EQ( Point(0, 0), *intersection);
+}
+
+TEST(GeomUtilTest, test_velocity_finite_intersection_not_intersecting)
+{
+    Point a = Point(1,1);
+    Point b = Point(1,-1);
+    Point c = Point(0.1,0);
+    Point d = Point(0.2,0);
+
+    std::optional<Point> intersection = finiteLengthLineIntersection(a, b, c, d);
+
+    EXPECT_EQ( std::nullopt, intersection);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

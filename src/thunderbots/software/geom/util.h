@@ -350,6 +350,23 @@ Point reflect(const Point &v, const Point &n);
 std::optional<Point> velocity_line_intersection(const Vector &element_velocity, const Vector &element_position, const Point line_start, const Point line_end, const Rectangle boundry_area);
 
 /**
+ * Computes the intersection of two finite lines.
+ *
+ * @pre The lines must be non-parallel.
+ *
+ * @param a a point on the first line.
+ *
+ * @param b another point on the first line.
+ *
+ * @param c a point on the second line.
+ *
+ * @param d another point on the second line.
+ *
+ * @return the point of intersection, or null if it doesn't exist.
+ */
+std::optional<Point> finiteLengthLineIntersection( const Vector &a, const Vector &b, const Vector &c, const Vector &d);
+
+/**
  * Reflects a point across a line.
  *
  * @param a a point on the line.

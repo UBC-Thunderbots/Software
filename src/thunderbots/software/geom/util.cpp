@@ -752,6 +752,24 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
     return std::make_optional(intersection);
 }
 
+std::optional<Point> finiteLengthLineIntersection( const Vector &a, const Vector &b, const Vector &c, const Vector &d) {
+
+    std::optional<Point> intersection = lineIntersection(a, b, c, d);
+
+    if( intersection != std::nullopt) {
+
+        // We know the point returned by lineIntersection() exists along the trajectory of one of the lines, now we must check that it is within the specified line points
+        // If point C exists on line A-B, DIST(AC) + DIST(CB) = DIST(AB)
+        // Calculated for lines a-b and c-d
+        if( ( fabs((a - *intersection).len()) + fabs((*intersection - b).len()) == fabs((a - b).len()) ) &&
+                fabs((c - *intersection).len()) + fabs((*intersection - d).len()) == fabs((c - d).len()) ) {
+            return intersection;
+        }
+    }
+
+    return std::nullopt;
+}
+
 std::optional<Point> velocity_line_intersection(const Vector &element_velocity, const Vector &element_position, const Point line_start, const Point line_end, const Rectangle boundry_area) {
 
     // If the element is not within the boundries, return null
@@ -760,7 +778,7 @@ std::optional<Point> velocity_line_intersection(const Vector &element_velocity, 
     }
 
     // Calculate the closest edge of the boundry based on element speed and position
-    const double seconds_to_x_field_edge = std::max( (-boundry_area.width() - element_position.x() )/element_velocity.x(), (boundry_area.width()/2 - element_position.x())/element_velocity.x());
+    const double seconds_to_x_field_edge = std::max( (-boundry_area.width()/2 - element_position.x() )/element_velocity.x(), (boundry_area.width()/2 - element_position.x())/element_velocity.x());
     const double seconds_to_y_field_edge = std::max( (-boundry_area.height()/2 - element_position.y() )/element_velocity.y(), (boundry_area.height()/2 - element_position.y())/element_velocity.y());
 
     // Grab the boundry edge that is intersected first
@@ -768,7 +786,7 @@ std::optional<Point> velocity_line_intersection(const Vector &element_velocity, 
 
     const Point field_edge_intersection = seconds_to_closest_edge*element_velocity + element_position;
 
-    return lineIntersection( line_start, line_end, element_position, field_edge_intersection);
+    return finiteLengthLineIntersection( line_start, line_end, element_position, field_edge_intersection);
 }
 
 Vector reflect(const Vector &v, const Vector &n)
