@@ -571,6 +571,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             ai/world/robot.cpp
             ai/world/game_state.cpp
+            util/parameter/dynamic_parameters.cpp
             )
 
     target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
