@@ -157,9 +157,6 @@ void PassGenerator::pruneAndReplacePasses()
     // Replace the least promising passes with newly generated passes
     if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value())
     {
-        std::vector<Pass> new_passes = generatePasses(
-            num_passes_to_optimize.value() - num_passes_to_keep_after_pruning.value());
-
         // Remove the worst paths
         if (num_passes_to_keep_after_pruning.value() < passes_to_optimize.size())
         {
@@ -167,6 +164,10 @@ void PassGenerator::pruneAndReplacePasses()
                 passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
                 passes_to_optimize.end());
         }
+
+        // Generate new passes to replace the ones we just removed
+        std::vector<Pass> new_passes = generatePasses(
+            num_passes_to_optimize.value() - passes_to_optimize.size());
 
         // Append our newly generated passes to replace the passes we just removed
         passes_to_optimize.insert(passes_to_optimize.end(), new_passes.begin(),
