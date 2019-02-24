@@ -15,9 +15,6 @@ NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_servi
         Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1);
 
     // Set up our connection over udp to receive vision packets
-    // NOTE: We do this before initializing the ROS node so that if it
-    // fails because there is another instance of this node running
-    // and connected to the port we want, we don't kill that other node.
     try
     {
         ssl_vision_client = std::make_unique<SSLVisionClient>(
@@ -35,9 +32,6 @@ NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_servi
 
 
     // Set up our connection over udp to receive gamecontroller packets
-    // NOTE: We do this before initializing the ROS node so that if it
-    // fails because there is another instance of this node running
-    // and connected to the port we want, we don't kill that other node.
     try
     {
         ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
