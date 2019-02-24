@@ -235,11 +235,11 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
 # picking up other files that may affect test behaviour. Unit tests should not need too many files to be specified
 # and we want to make sure the minimum set of files required for the test are being used.
 
-## Why We Have Tests Grouped ## 
-# When you build a test executable (or any executable) with cmake, it does not 
-# save any `.o` files it might have already built for other executables. That 
-# means if I require `move_primitive.cpp` for two test executables, CMake will 
-# build it _twice_. This has lead to a heck of a lot of build duplication in our 
+## Why We Have Tests Grouped ##
+# When you build a test executable (or any executable) with cmake, it does not
+# save any `.o` files it might have already built for other executables. That
+# means if I require `move_primitive.cpp` for two test executables, CMake will
+# build it _twice_. This has lead to a heck of a lot of build duplication in our
 # system. See this PR for the original change in this direction:
 # https://github.com/UBC-Thunderbots/Software/pull/386
 
@@ -531,29 +531,28 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(intent_test
             ${G3LOG}
-            ${catkin_LIBRARIES})
+            ${catkin_LIBRARIES}
+            )
 
-    catkin_add_gtest(passing_evaluation_test
-            test/ai/passing/evaluation.cpp
-            test/test_util/test_util.cpp
+    catkin_add_gtest(passing_test
             ai/passing/evaluation.cpp
-            ai/world/field.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/world/ball.cpp
-            ai/world/team.cpp
-            ai/world/robot.cpp
-            ai/world/world.cpp
+            ai/world/field.cpp
             ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            test/ai/passing/evaluation.cpp
+            test/ai/passing/main.cpp
+            test/ai/passing/pass.cpp
+            test/ai/passing/pass_generator.cpp
+            test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
             )
-    target_link_libraries(passing_evaluation_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(pass_test
-            test/ai/passing/pass.cpp
-            ai/passing/pass.cpp
-            util/timestamp.cpp
-            )
-    target_link_libraries(pass_test ${catkin_LIBRARIES})
+    target_link_libraries(passing_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(gradient_descent_optimizer_test
             test/util/gradient_descent_optimizer.cpp
