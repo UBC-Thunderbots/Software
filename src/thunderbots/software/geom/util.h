@@ -339,15 +339,21 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 Point reflect(const Point &v, const Point &n);
 
 /**
- * Calculates the intersection point (if it exists) of an moving element with a line defined by 2 Points
+ * Calculates the intersection point (if it exists) of an moving element with a line
+ * defined by 2 Points
  *
  * @param element_velocity: X/Y velocity of the element, defined in meters per second
  * @param element_position: X/Y position of the element, defined in meters
  * @param line_start: X/Y point where the line begins, defined in meters
  * @param line_end: X/Y point where the line ends, defined in meters
- * @param boundry_area: Defines the rectangular geometry that limits the scope of calculating an intersection
+ * @param boundry_area: Defines the rectangular geometry that limits the scope of
+ * calculating an intersection
  */
-std::optional<Point> velocity_line_intersection(const Vector &element_velocity, const Vector &element_position, const Point line_start, const Point line_end, const Rectangle boundry_area);
+std::optional<Point> velocity_line_intersection(const Vector &element_velocity,
+                                                const Vector &element_position,
+                                                const Point line_start,
+                                                const Point line_end,
+                                                const Rectangle boundry_area);
 
 /**
  * Computes the intersection of two finite lines.
@@ -364,7 +370,8 @@ std::optional<Point> velocity_line_intersection(const Vector &element_velocity, 
  *
  * @return the point of intersection, or null if it doesn't exist.
  */
-std::optional<Point> finiteLengthLineIntersection( const Vector &a, const Vector &b, const Vector &c, const Vector &d);
+std::optional<Point> finiteLengthLineIntersection(const Vector &a, const Vector &b,
+                                                  const Vector &c, const Vector &d);
 
 /**
  * Reflects a point across a line.
