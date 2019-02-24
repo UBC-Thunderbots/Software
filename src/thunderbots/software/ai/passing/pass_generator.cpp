@@ -166,8 +166,8 @@ void PassGenerator::pruneAndReplacePasses()
         }
 
         // Generate new passes to replace the ones we just removed
-        std::vector<Pass> new_passes = generatePasses(
-            num_passes_to_optimize.value() - passes_to_optimize.size());
+        std::vector<Pass> new_passes =
+            generatePasses(num_passes_to_optimize.value() - passes_to_optimize.size());
 
         // Append our newly generated passes to replace the passes we just removed
         passes_to_optimize.insert(passes_to_optimize.end(), new_passes.begin(),
