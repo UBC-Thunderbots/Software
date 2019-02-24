@@ -10,10 +10,21 @@
  * The world object describes the entire state of the world, which for us is all the
  * information we have about the field, robots, and ball. The world object acts as a
  * convenient way to pass all this information around to modules that may need it.
+ *
+ * WARNING: This class should _never_ hold any data that is pointed to anywhere else. This
+ * means no raw pointers, no shared pointers, no shared references. This is because in
+ * some cases we copy World's over multiple threads where having a shared member
+ * between multiple instances of a World on multiple threads could result in
+ * data corruption that would lead to absurdly hard to track bugs. YOU HAVE BEEN WARNED.
  */
 class World final
 {
    public:
+    /**
+     * Creates an Empty World
+     */
+    explicit World();
+
     /**
      * Creates a new world.
      *

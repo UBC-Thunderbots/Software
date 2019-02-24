@@ -41,7 +41,7 @@ namespace USB
         /**
          * This function must be called in order to update pending libusb events.
          */
-        void handle_usb_fds();
+        void handle_usb_events();
 
         /**
          * Deinitializes the library and destroys the context.

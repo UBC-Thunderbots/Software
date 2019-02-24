@@ -86,17 +86,5 @@ class Primitive
      */
     virtual void accept(PrimitiveVisitor& visitor) const = 0;
 
-    /**
-     * Given a ROS Primitive message, constructs a concrete Primitive object and returns
-     * a unique_ptr using the Abstract Primitive interface. This acts like a Primitive
-     * factory.
-     *
-     * @param primitive_msg the Primitive message from which to construct the Primitive
-     * @throws std::invalid_argument if primitive is unknown
-     * @return a unique_ptr to a Primitive object
-     */
-    static std::unique_ptr<Primitive> createPrimitive(
-        const thunderbots_msgs::Primitive& primitive_msg);
-
     virtual ~Primitive() = default;
 };

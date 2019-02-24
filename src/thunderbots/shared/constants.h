@@ -11,7 +11,8 @@ const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The approximate radius of the ball according to the SSL rulebook
 const double BALL_MAX_RADIUS_METERS = 0.0215;
-
+// The maximum number of robots we can communicate with over radio.
+const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 // TODO: Determine a more realistic value. See Issue #178.
 /* Robot Attributes */
 // The maximum speed achievable by our robots, in metres per second.
@@ -37,3 +38,6 @@ const double MILLISECONDS_PER_SECOND      = 1000.0;
 const double SECONDS_PER_MICROSECOND      = 1.0 / 1000000.0;
 const double SECONDS_PER_MILLISECOND      = 1.0 / 1000.0;
 const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
+
+// Converts dribbler RPM to a smaller number firmware uses
+const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
