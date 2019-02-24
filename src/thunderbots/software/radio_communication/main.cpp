@@ -42,17 +42,18 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     thunderbots_msgs::World world_msg = *msg;
 
     // Extract team and ball data
-    Team friendly_team = Util::ROSMessages::createTeamFromROSMessage(world_msg.friendly_team);
+    Team friendly_team =
+        Util::ROSMessages::createTeamFromROSMessage(world_msg.friendly_team);
     Ball ball = Util::ROSMessages::createBallFromROSMessage(world_msg.ball);
 
-    std::vector<std::tuple<uint8_t, Point, Angle>> detbots;
+    std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     for (const Robot& r : friendly_team.getAllRobots())
     {
-        detbots.push_back(std::make_tuple(r.id(), r.position(), r.orientation()));
+        robots.push_back(std::make_tuple(r.id(), r.position(), r.orientation()));
     }
 
     // Update robots and ball
-    backend.update_detbots(detbots);
+    backend.update_robots(robots);
     backend.update_ball(ball);
 
     // Send vision packet

@@ -33,9 +33,9 @@ class MRFBackend
     /**
      * Updates the detected robots from vision.
      *
-     * @param ft a vector of tuples of {robot id, robot location, robot orientation}
+     * @param robots a vector of tuples of {robot id, robot location, robot orientation}
      */
-    void update_detbots(std::vector<std::tuple<uint8_t, Point, Angle>> ft);
+    void update_robots(std::vector<std::tuple<uint8_t, Point, Angle>> robots);
 
     /**
      * Updates the backend with the latest ball.
@@ -51,6 +51,6 @@ class MRFBackend
 
    private:
     MRFDongle dongle;
-    std::vector<std::tuple<uint8_t, Point, Angle>> detbots;
+    std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     Ball ball;
 };

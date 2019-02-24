@@ -533,7 +533,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     //         words[1] |= 2 << 14;
     //         break;
     // }
-    words[1] |= 2 << 14;  // Charged for now
+    words[1] |= 1 << 14;  // discharged for now
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?
