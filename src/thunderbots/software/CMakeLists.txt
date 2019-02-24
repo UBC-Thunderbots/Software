@@ -287,7 +287,10 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/field.cpp
             ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/game_state.cpp
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             geom/point.h
             geom/angle.h)
 

@@ -2,6 +2,7 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/World.h>
+
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
 #include "mrf_backend.h"
@@ -55,6 +56,9 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     backend.send_vision_packet();
 
     // Handle libusb events for the dongle
+    // TODO: How badly does this need to be in the main loop?
+    // Can it be here if we assume this function is called all the time?
+    // Investigate as part of https://github.com/UBC-Thunderbots/Software/issues/222
     backend.update_dongle_events();
 }
 
@@ -73,10 +77,10 @@ int main(int argc, char** argv)
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
-    ros::spin();
-
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown
     // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
+    ros::spin();
+
     return 0;
 }
