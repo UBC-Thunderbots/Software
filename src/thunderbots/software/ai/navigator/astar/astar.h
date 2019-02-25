@@ -16,6 +16,10 @@ namespace AStar
     typedef boost::grid_graph<2> graph_t;
     typedef graph_t::vertex_descriptor grid_point;
 
+    struct grid_point_hash : std::unary_function<grid_point, std::size_t> {
+        std::size_t operator() (const grid_point& gp) const;
+    };
+
     class AStarGridGraph
     {
        public:
@@ -26,6 +30,8 @@ namespace AStar
         Point gridPointToPoint(const grid_point &grid_point);
 
         grid_point nearestGridPoint(const Point &point);
+
+        const graph_t& graph();
 
        private:
         std::unique_ptr<graph_t> field_graph;
@@ -43,14 +49,28 @@ namespace AStar
 
     class AStarHeuristic : public boost::astar_heuristic<grid_point, cost_t>
     {
-    public:
+       public:
         AStarHeuristic() = delete;
-        explicit AStarHeuristic(const std::shared_ptr<AStarGridGraph> _graph, grid_point _dest);
-        cost_t operator() (grid_point gp);
-    private:
+        explicit AStarHeuristic(const std::shared_ptr<AStarGridGraph> &_graph,
+                                grid_point _dest);
+        cost_t operator()(grid_point gp);
+
+       private:
         std::shared_ptr<AStarGridGraph> graph;
         const grid_point dest;
         const Point dest_point;
+    };
+
+    struct FoundGoal {};
+
+    class AStarVertexVisitor : public boost::default_astar_visitor
+    {
+    public:
+        AStarVertexVisitor() = delete;
+        explicit AStarVertexVisitor(grid_point _dest);
+        void examine_vertex(grid_point gp, const graph_t& graph);
+    private:
+        grid_point dest;
     };
 
     class AStarNav : public Navigator
@@ -76,6 +96,5 @@ namespace AStar
         // this is only a shared pointer so that AStarHeuristic can have a view
         // of the graph through a weak_ptr
         std::shared_ptr<AStarGridGraph> field_graph_ptr;
-
     };
 }  // namespace AStar

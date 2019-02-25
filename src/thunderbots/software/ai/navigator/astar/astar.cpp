@@ -1,11 +1,19 @@
 #include "astar.h"
 
 #include <boost/graph/astar_search.hpp>
+#include <boost/unordered_map.hpp>
 #include <exception>
 
 #include "ai/intent/move_intent.h"
 #include "ai/navigator/RobotObstacle.h"
 #include "ai/primitive/move_primitive.h"
+
+// struct grid_point_hash
+std::size_t AStar::grid_point_hash::operator() (const grid_point& gp) const {
+    std::size_t seed = 0;
+    boost::hash_combine(seed, gp[0]);
+    boost::hash_combine(seed, gp[1]);
+}
 
 // AStarGridGraph
 AStar::AStarGridGraph::AStarGridGraph(const Field &field)
@@ -44,25 +52,54 @@ AStar::grid_point AStar::AStarGridGraph::nearestGridPoint(const Point &point)
     return closest_point_it->second;
 }
 
+const AStar::graph_t& AStar::AStarGridGraph::graph() {
+    return *field_graph;
+}
+
 // AStarHeuristic
 
-AStar::AStarHeuristic::AStarHeuristic(const std::shared_ptr<AStar::AStarGridGraph> _graph,
-        grid_point _dest)
-: graph(_graph), dest(_dest), dest_point(graph->gridPointToPoint(dest))
-{}
+AStar::AStarHeuristic::AStarHeuristic(
+    const std::shared_ptr<AStar::AStarGridGraph> &_graph, grid_point _dest)
+    : graph(_graph), dest(_dest), dest_point(graph->gridPointToPoint(dest))
+{
+}
 
-AStar::cost_t AStar::AStarHeuristic::operator()(AStar::grid_point gp) {
+AStar::cost_t AStar::AStarHeuristic::operator()(AStar::grid_point gp)
+{
     Point p = graph->gridPointToPoint(gp);
     return dist(dest_point, p);
 }
 
+// AStarVertexVisitor
+AStar::AStarVertexVisitor::AStarVertexVisitor(AStar::grid_point _dest):
+        dest(_dest)
+{}
+
+void AStar::AStarVertexVisitor::examine_vertex(grid_point gp, const graph_t& graph)
+{
+    if (gp == dest)
+    {
+        // throw an exception because the people who came up with boost
+        // are crazy
+        throw AStar::FoundGoal();
+    }
+}
+
 // AStarNav
+AStar::AStarNav::AStarNav(const Field &field)
+    : field_graph_ptr(std::make_shared<AStarGridGraph>(field))
+{
+}
+
 std::vector<std::unique_ptr<Primitive>> AStar::AStarNav::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents) const
 {
     return std::vector<std::unique_ptr<Primitive>>();
 }
 
-std::vector<Point> AStar::AStarNav::findPath(const Point &start, const Point &dest)
-{
+std::vector<Point> AStar::AStarNav::findPath(const Point &start, const Point &dest) {
+    grid_point start_v = field_graph_ptr->nearestGridPoint(start);
+    grid_point dest_v = field_graph_ptr->nearestGridPoint(dest);
+
+    boost::unordered_map<grid_point, grid_point> predecessor_map;
 }
