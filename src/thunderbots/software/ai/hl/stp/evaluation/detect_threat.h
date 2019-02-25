@@ -11,9 +11,8 @@
 #include "ai/world/field.h"
 #include "software/ai/world/ball.h"
 
-class BallThreat
+namespace Evaluation
 {
-   public:
     /**
      * Calculates if the ball velocity will intersect with the friendly net.
      *
@@ -23,8 +22,7 @@ class BallThreat
      * @return Point containing the intersection of the ball velocity and the friendly
      * net, if the intersection does not exist returns std::nullopt
      */
-    static std::optional<Point> calc_ball_vel_intersect_friendly_net(Ball ball,
-                                                                     Field field);
+    std::optional<Point> calc_ball_vel_intersect_friendly_net(Ball ball, Field field);
 
     /**
      * Calculates if the ball velocity will intersect with the enemy net.
@@ -35,10 +33,8 @@ class BallThreat
      * @return Point containing the intersection of the ball velocity and the enemy net,
      * if the intersection does not exist returns std::nullopt
      */
-    static std::optional<Point> calc_ball_vel_intersect_enemy_net(Ball ball, Field field);
-
-   private:
-};
+    std::optional<Point> calc_ball_vel_intersect_enemy_net(Ball ball, Field field);
+};  // namespace Evaluation
 
 
 #endif  // THUNDERBOTS_ALL_DETECT_THREAT_H
