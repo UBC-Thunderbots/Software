@@ -26,7 +26,7 @@ class DirectVelocityIntent : public Intent, public DirectVelocityPrimitive
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor &visitor) const override;
+    void accept(IntentVisitor& visitor) const override;
 
     /**
      * Compares DirectVelocityIntents for equality. DirectVelocityIntents are considered

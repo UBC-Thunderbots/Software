@@ -1,4 +1,5 @@
 #include "ai/intent/kick_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string KickIntent::INTENT_NAME = "Kick Intent";
@@ -16,7 +17,8 @@ std::string KickIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void KickIntent::accept(IntentVisitor &visitor) const {
+void KickIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

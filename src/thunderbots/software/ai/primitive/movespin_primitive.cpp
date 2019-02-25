@@ -1,4 +1,5 @@
 #include "ai/primitive/movespin_primitive.h"
+
 #include "ai/primitive/visitor/primitive_visitor.h"
 
 const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";

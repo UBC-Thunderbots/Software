@@ -1,4 +1,5 @@
 #include "ai/intent/pivot_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string PivotIntent::INTENT_NAME = "Pivot Intent";
@@ -15,7 +16,8 @@ std::string PivotIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void PivotIntent::accept(IntentVisitor &visitor) const {
+void PivotIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

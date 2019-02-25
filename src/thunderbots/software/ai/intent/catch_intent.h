@@ -27,7 +27,7 @@ class CatchIntent : public Intent, public CatchPrimitive
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor &visitor) const override;
+    void accept(IntentVisitor& visitor) const override;
 
     /**
      * Compares CatchIntents for equality. CatchIntents are considered equal if all

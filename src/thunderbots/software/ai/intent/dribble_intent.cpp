@@ -1,4 +1,5 @@
 #include "ai/intent/dribble_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string DribbleIntent::INTENT_NAME = "Dribble Intent";
@@ -16,7 +17,8 @@ std::string DribbleIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void DribbleIntent::accept(IntentVisitor &visitor) const {
+void DribbleIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

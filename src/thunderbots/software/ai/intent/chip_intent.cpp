@@ -1,4 +1,5 @@
 #include "ai/intent/chip_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string ChipIntent::INTENT_NAME = "Chip Intent";
@@ -14,7 +15,8 @@ std::string ChipIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void ChipIntent::accept(IntentVisitor &visitor) const {
+void ChipIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

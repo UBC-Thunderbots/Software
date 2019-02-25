@@ -2,10 +2,10 @@
  * This file contains unit tests for the Catch Primitive class
  */
 
+#include "ai/primitive/catch_primitive.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
-
-#include "ai/primitive/catch_primitive.h"
 
 TEST(CatchPrimTest, primitive_name_test)
 {

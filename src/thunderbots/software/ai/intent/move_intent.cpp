@@ -1,4 +1,5 @@
 #include "ai/intent/move_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string MoveIntent::INTENT_NAME = "Move Intent";
@@ -14,7 +15,8 @@ std::string MoveIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void MoveIntent::accept(IntentVisitor &visitor) const {
+void MoveIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

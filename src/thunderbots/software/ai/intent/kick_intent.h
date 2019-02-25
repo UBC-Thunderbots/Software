@@ -26,7 +26,7 @@ class KickIntent : public Intent, public KickPrimitive
 
     std::string getIntentName(void) const override;
 
-    void accept(IntentVisitor &visitor) const override;
+    void accept(IntentVisitor& visitor) const override;
 
     /**
      * Compares KickIntents for equality. KickIntents are considered equal if all

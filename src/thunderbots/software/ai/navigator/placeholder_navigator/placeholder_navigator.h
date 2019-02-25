@@ -1,17 +1,18 @@
 #pragma once
 
-#include "ai/navigator/navigator.h"
-#include "ai/intent/visitor/intent_visitor.h"
 #include "ai/intent/intent.h"
+#include "ai/intent/visitor/intent_visitor.h"
+#include "ai/navigator/navigator.h"
 #include "ai/primitive/primitive.h"
 
-class PlaceholderNavigator : public Navigator, public IntentVisitor {
-public:
+class PlaceholderNavigator : public Navigator, public IntentVisitor
+{
+   public:
     explicit PlaceholderNavigator() = default;
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-            const World &world,
-            const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+        const World &world,
+        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
     /**
      * Visits a CatchIntent to perform an operation.
@@ -83,7 +84,7 @@ public:
      */
     void visit(const StopIntent &stop_intent) override;
 
-private:
+   private:
     World world;
     std::vector<std::unique_ptr<Intent>> assignedIntents;
     std::unique_ptr<Primitive> curr_prim;

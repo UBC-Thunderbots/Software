@@ -1,4 +1,5 @@
 #include "ai/intent/stop_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string StopIntent::INTENT_NAME = "Stop Intent";
@@ -13,7 +14,8 @@ std::string StopIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void StopIntent::accept(IntentVisitor &visitor) const {
+void StopIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 

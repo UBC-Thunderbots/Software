@@ -1,4 +1,5 @@
 #include "ai/intent/catch_intent.h"
+
 #include "ai/intent/visitor/intent_visitor.h"
 
 const std::string CatchIntent::INTENT_NAME = "Catch Intent";
@@ -15,7 +16,8 @@ std::string CatchIntent::getIntentName(void) const
     return INTENT_NAME;
 }
 
-void CatchIntent::accept(IntentVisitor &visitor) const {
+void CatchIntent::accept(IntentVisitor &visitor) const
+{
     visitor.visit(*this);
 }
 
