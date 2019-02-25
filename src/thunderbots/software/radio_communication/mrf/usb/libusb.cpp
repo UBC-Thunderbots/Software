@@ -27,7 +27,7 @@ USB::Context::~Context()
     context = nullptr;
 }
 
-void USB::Context::handle_usb_fds()
+void USB::Context::handle_usb_events()
 {
     timeval tv = {0, 0};
     check_fn("libusb_handle_events_timeout", libusb_handle_events_timeout(context, &tv),

@@ -5,8 +5,8 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "grsim_communication/motion_controller/motion_controller.h"
-#include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
+#include "grsim_command_primitive_visitor.h"
+#include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "util/logger/init.h"
 
