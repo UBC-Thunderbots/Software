@@ -47,6 +47,28 @@ namespace Util
                 extern Parameter<double>
                     static_field_position_quality_friendly_goal_distance_weight;
 
+                // The number of passes to try to optimize at any given time
+                extern Parameter<int32_t> num_passes_to_optimize;
+
+                // The number of passes to keep after pruning
+                extern Parameter<int32_t> num_passes_to_keep_after_pruning;
+
+                // The number of steps of gradient descent to perform in each iteration
+                extern Parameter<int32_t> number_of_gradient_descent_steps_per_iter;
+
+                // The maximum allowed difference between the reciever and passer points
+                // of two passes for which they are considered equal
+                extern Parameter<double> pass_equality_max_position_difference_meters;
+
+                // The maximum allowed difference between the start times of two passes
+                // for which they are considered equal
+                extern Parameter<double> pass_equality_max_start_time_difference_seconds;
+
+                // The maximum allowed difference between the speeds of two passes for
+                // which they are considered equal
+                extern Parameter<double>
+                    pass_equality_max_speed_difference_meters_per_second;
+
             }  // namespace Passing
         }      // namespace AI
     }          // namespace DynamicParameters
