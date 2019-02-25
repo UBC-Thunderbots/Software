@@ -2,13 +2,58 @@
  * Implementation of evaluation functions for passing
  */
 
-// TODO: declare things const& and whatnot to maybe improve speed
+#include <numeric>
 
+#include "../shared/constants.h"
 #include "ai/passing/evaluation.h"
-
 #include "util/parameter/dynamic_parameters.h"
 
 using namespace AI::Passing;
+
+double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass pass) {
+    // We need at least one robot to pass to
+    if (friendly_team.getAllRobots().empty()){
+        return 0;
+    }
+
+    // Get the robot that is closest to where the pass would be received
+    Robot best_receiver = friendly_team.getAllRobots()[0];
+    for (Robot& robot : friendly_team.getAllRobots()){
+        double distance = (robot.position() - pass.receiverPoint()).len();
+        double curr_best_distance = (best_receiver.position() - pass.receiverPoint()).len();
+        if (distance < curr_best_distance){
+            best_receiver = robot;
+        }
+    }
+
+    // Figure out what time the robot would have to receive the ball at
+    Timestamp ball_travel_time = Timestamp::fromSeconds((pass.receiverPoint() - pass.passerPoint()).len() / pass.speed());
+    Timestamp receive_time = pass.startTime() + ball_travel_time;
+
+    // Figure out if our best robot can get there in time
+    // We do this by assuming a linear acceleration profile:
+    // (1) velocity = MAX_ACCELERATION*time
+    // we integrate (1) to get:
+    // (2) displacement = MAX_ACCELERATION/2 * time^2
+    // we rearrange to get:
+    // (3) time = sqrt(2 * displacement / MAX_ACCELERATION)
+    // we sub. (3) into (1) to get:
+    // (4) velocity = MAX_ACCELERATION*sqrt(2 * displacement / MAX_ACCELERATION)
+
+    double dist = (best_receiver.position() - pass.receiverPoint()).len();
+    double max_accel = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+
+    // Calculate the max speed that we will reach halfway to the goal
+    // ie. before we have to start de-accelerating
+    double max_velocity = std::min(ROBOT_MAX_SPEED_METERS_PER_SECOND,
+            max_accel*std::sqrt(2*dist/2/max_accel));
+
+    // Calculate the time required to reach the max speed the robots are physically
+    // capable of
+    double time_to_max_speed = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / ROBOT_MAX_SPEED_METERS_PER_SECOND;
+
+
+}
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
 {

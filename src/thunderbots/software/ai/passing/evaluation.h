@@ -7,12 +7,31 @@
 #include <functional>
 
 #include "ai/world/field.h"
+#include "ai/passing/pass.h"
+#include "ai/world/team.h"
 #include "geom/circle.h"
 #include "geom/point.h"
 #include "geom/rectangle.h"
 
 namespace AI::Passing
 {
+
+    // TODO: better name for this function?
+    /**
+     * Calculate the probability of a friendly robot receiving the given pass
+     *
+     * Calculate how possible it would be for a robot on the friendly team to receive the
+     * given pass, based solely on the robots current position and velocity
+     *
+     * @param friendly_team The team of robots that might receive the given pass
+     * @param pass The pass we want a robot to receive
+     *
+     * @return A value in [0,1] indicating how likely it would be for a robot on the
+     *         friendly team to recive the given pass, with 1 being very likely, 0
+     *         being impossible
+     */
+    double getFriendlyCapability(Team friendly_team, Pass pass);
+
     /**
      * Calculates the static position quality for a given position on a given field
      *
