@@ -39,20 +39,32 @@ double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass 
     // (3) time = sqrt(2 * displacement / MAX_ACCELERATION)
     // we sub. (3) into (1) to get:
     // (4) velocity = MAX_ACCELERATION*sqrt(2 * displacement / MAX_ACCELERATION)
+    // and rearrange to get:
+    // (5) displacement = (velocity / MAX_ACCELERATION)^2 * MAX_ACCELERATION/2
 
     double dist = (best_receiver.position() - pass.receiverPoint()).len();
     double max_accel = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    double max_vel = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
-    // Calculate the max speed that we will reach halfway to the goal
-    // ie. before we have to start de-accelerating
-    double max_velocity = std::min(ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            max_accel*std::sqrt(2*dist/2/max_accel));
+    //// Calculate the max speed that we will reach halfway to the goal
+    //// ie. before we have to start de-accelerating
+    //double max_velocity = std::min(ROBOT_MAX_SPEED_METERS_PER_SECOND,
+    //        max_accel*std::sqrt(2*dist/2/max_accel));
 
-    // Calculate the time required to reach the max speed the robots are physically
-    // capable of
-    double time_to_max_speed = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / ROBOT_MAX_SPEED_METERS_PER_SECOND;
+    //// Calculate the time required to reach the max speed the robots are physically
+    //// capable of
+    //double time_to_max_speed = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
 
+    // Calculate the distance required to max possible velocity of the robot
+    double dist_to_max_possible_vel = std::pow(max_vel, 2) * max_accel/2;
+
+    // The time taken to get to the receiver point is:
+    // time to accelerate + time at the max velocity + time to de-accelerate
+    // Note that the acceleration time is the same as a de-acceleration time
+    double acceleration_time = std::sqrt(2 * std::min(dist/2, dist_to_max_possible_vel) / max_accel);
+    double time_at_max_vel = std::max(0.0, dist - 2*dist_to_max_possible_vel) / max_vel;
+    double movement_time = 2*acceleration_time + time_at_max_vel;
 }
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
