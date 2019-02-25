@@ -763,10 +763,10 @@ std::optional<Point> finiteLengthLineIntersection(const Vector &a, const Vector 
         // one of the lines, now we must check that it is within the specified line points
         // If point C exists on line A-B, DIST(AC) + DIST(CB) = DIST(AB)
         // Calculated for lines a-b and c-d
-        if ((fabs((a - *intersection).len()) + fabs((*intersection - b).len()) ==
-             fabs((a - b).len())) &&
-            fabs((c - *intersection).len()) + fabs((*intersection - d).len()) ==
-                fabs((c - d).len()))
+        if ((fabs(dist(a, *intersection)) + fabs(dist(*intersection, b)) ==
+             fabs(dist(a, b))) &&
+            fabs(dist(c, *intersection)) + fabs(dist(*intersection, d)) ==
+                fabs(dist(c, d)))
         {
             return intersection;
         }
@@ -775,8 +775,8 @@ std::optional<Point> finiteLengthLineIntersection(const Vector &a, const Vector 
     return std::nullopt;
 }
 
-std::optional<Point> velocity_line_intersection(const Vector &element_velocity,
-                                                const Vector &element_position,
+std::optional<Point> velocity_line_intersection(const Vector element_velocity,
+                                                const Vector element_position,
                                                 const Point line_start,
                                                 const Point line_end,
                                                 const Rectangle boundry_area)

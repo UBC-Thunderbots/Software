@@ -349,8 +349,8 @@ Point reflect(const Point &v, const Point &n);
  * @param boundry_area: Defines the rectangular geometry that limits the scope of
  * calculating an intersection
  */
-std::optional<Point> velocity_line_intersection(const Vector &element_velocity,
-                                                const Vector &element_position,
+std::optional<Point> velocity_line_intersection(const Vector element_velocity,
+                                                const Vector element_position,
                                                 const Point line_start,
                                                 const Point line_end,
                                                 const Rectangle boundry_area);
