@@ -5,6 +5,12 @@
 #include "ai/navigator/navigator.h"
 #include "ai/primitive/primitive.h"
 
+/**
+ * This PlaceholderNavigator is a simple navigator that will convert the given Intents
+ * into their respective Primitives, without doing any intelligent navigation. It is meant
+ * to provide an example of how to implement a navigator and act as a starting point for
+ * future navigators to build off of.
+ */
 class PlaceholderNavigator : public Navigator, public IntentVisitor
 {
    public:
