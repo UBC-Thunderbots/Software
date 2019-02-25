@@ -1,9 +1,12 @@
 #pragma once
 
+#include <thunderbots_msgs/World.h>
+
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
 #include "ai/world/team.h"
+#include "ai/world/world.h"
 #include "refbox_constants.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
@@ -91,5 +94,7 @@ namespace Util
          */
         RefboxGameState createGameStateFromROSMessage(
             const thunderbots_msgs::RefboxCommand& command);
+
+        World createWorldFromROSMessage(const thunderbots_msgs::World& world_msg);
     }  // namespace ROSMessages
 }  // namespace Util

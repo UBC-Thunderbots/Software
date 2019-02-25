@@ -1,25 +1,20 @@
 #include <ros/ros.h>
-#include <ros/time.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/World.h>
 
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
-#include "geom/point.h"
 #include "mrf_backend.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/ros_messages.h"
 
-
+// Member variables we need to maintain state
+// They are kept in an anonymous namespace so they are not accessible outside this
+// file and are not created as global static variables.
 namespace
 {
-    // A vector of primitives. It is cleared each tick, populated by the callbacks
-    // that receive primitive commands, and is processed by the backend to send primitives
-    // to the robots over radio.
-    std::vector<std::unique_ptr<Primitive>> primitives;
-
     // The MRFBackend instance that connects to the dongle
     MRFBackend backend = MRFBackend();
 }  // namespace
@@ -27,6 +22,7 @@ namespace
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
+    std::vector<std::unique_ptr<Primitive>> primitives;
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
@@ -49,7 +45,7 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     for (const Robot& r : friendly_team.getAllRobots())
     {
-        robots.push_back(std::make_tuple(r.id(), r.position(), r.orientation()));
+        robots.emplace_back(std::make_tuple(r.id(), r.position(), r.orientation()));
     }
 
     // Update robots and ball
@@ -58,6 +54,12 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
 
     // Send vision packet
     backend.send_vision_packet();
+
+    // Handle libusb events for the dongle
+    // TODO: How badly does this need to be in the main loop?
+    // Can it be here if we assume this function is called all the time?
+    // Investigate as part of https://github.com/UBC-Thunderbots/Software/issues/222
+    backend.update_dongle_events();
 }
 
 int main(int argc, char** argv)
@@ -67,7 +69,7 @@ int main(int argc, char** argv)
     ros::NodeHandle node_handle;
 
     // Create subscribers to topics we care about
-    ros::Subscriber prim_array_sub = node_handle.subscribe(
+    ros::Subscriber primitive_subscriber = node_handle.subscribe(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
     ros::Subscriber world_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
@@ -75,22 +77,10 @@ int main(int argc, char** argv)
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
-    // Initialize variables
-    primitives = std::vector<std::unique_ptr<Primitive>>();
-
-    // Main loop
-    while (ros::ok())
-    {
-        // Clear all primitives each tick
-        primitives.clear();
-
-        // Handle libusb events for the dongle
-        backend.update_dongle_events();
-
-        // Spin once to let all necessary callbacks run
-        // The callbacks will populate the primitives vector
-        ros::spinOnce();
-    }
+    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+    // until the node is shutdown
+    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
+    ros::spin();
 
     return 0;
 }

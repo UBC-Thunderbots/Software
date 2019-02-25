@@ -146,4 +146,3 @@ TEST(PassingEvaluationTest, sigmoid_negating_sig_width_flips_sigmoid)
     EXPECT_NEAR(sigmoid(-5, 0, -10), 0.982, 0.0001);
     EXPECT_NEAR(sigmoid(5, 0, -10), 0.018, 0.0001);
 }
-
