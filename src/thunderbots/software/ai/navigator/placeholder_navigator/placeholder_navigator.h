@@ -91,7 +91,9 @@ class PlaceholderNavigator : public Navigator, public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
+    // This navigators knowledge / state of the world
     World world;
-    std::vector<std::unique_ptr<Intent>> assignedIntents;
-    std::unique_ptr<Primitive> curr_prim;
+    // The current Primitive the navigator has created from an Intent.
+    // This variable is set by each `visit` function
+    std::unique_ptr<Primitive> current_primitive;
 };
