@@ -13,7 +13,8 @@ namespace Evaluation {
         Vector shot_direction;
     };
 
-  ShotDirAndScore getFriendlyRobotBestShot(Robot shooter, Team friendly_team, Team enemy_team, Field field);
+  ShotDirAndScore getFriendlyRobotBestShotGoal(Robot shooter, Team friendly_team, Team enemy_team, Field field);
+  ShotDirAndScore getEnemyRobotBestShotGoal(Robot shooter, Team friendly_team, Team enemy_team, Field field);
 
 };
 #endif //EVALUATION_GET_SHOOT_SCORE_H

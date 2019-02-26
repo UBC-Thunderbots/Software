@@ -32,12 +32,12 @@ namespace {
 
 namespace Evaluation {
 
-    ShotDirAndScore getFriendlyRobotBestShot( Robot shooter, std::vector<Robot> all_robots, Field field ) {
+    ShotDirAndScore getFriendlyRobotBestShotGoal( Robot shooter, std::vector<Robot> all_robots, Field field ) {
 
         return getBestShotAtLine(shooter, all_robots, field.enemyGoalpostPos(), field.enemyGoalpostNeg());
     }
 
-    ShotDirAndScore getEnemyRobotBestShot( Robot shooter, std::vector<Robot> all_robots, Field field ) {
+    ShotDirAndScore getEnemyRobotBestShotGoal( Robot shooter, std::vector<Robot> all_robots, Field field ) {
 
         return getBestShotAtLine(shooter, all_robots, field.friendlyGoalpostPos(), field.friendlyGoalpostNeg());
     }
