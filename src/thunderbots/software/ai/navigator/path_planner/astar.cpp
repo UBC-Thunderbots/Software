@@ -2,6 +2,7 @@
 // Created by jordan on 2/26/19.
 //
 #include <boost/unordered_map.hpp>
+#include <boost/property_map/function_property_map.hpp>
 #include "astar.h"
 #include "geom/util.h"
 
@@ -33,7 +34,7 @@ field_min_y(- (field.width() / 2))
 
 Point AStar::AStarGridGraph::gridPointToPoint(const grid_point &grid_point)
 {
-    double step_size = 1 / GRID_POINT_DENSITY;
+    double step_size = 1.0f / GRID_POINT_DENSITY;
     Point p(field_min_x + grid_point[0] * step_size, field_min_y + grid_point[1] * step_size);
     return p;
 }
@@ -82,9 +83,17 @@ void AStar::AStarVertexVisitor::examine_vertex(grid_point gp, const graph_t& gra
     }
 }
 
-std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const Point &start, const Point &dest) {
+std::optional<std::vector<Point>>
+AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const Point &dest) {
+    auto edge_weights = boost::make_function_property_map<graph_t::edge_descriptor>(
+            [](graph_t::edge_descriptor edge) -> cost_t {
+                // TODO: find edge costs including violation and whatnot
+                return 0.0f;
+            }
+            );
+
     return std::make_optional<std::vector<Point>>();
 }
 
-AStar::AStarPathPlanner::~AStarPathPlanner() {}
+AStar::AStarPathPlanner::~AStarPathPlanner() = default;
 

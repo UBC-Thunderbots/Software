@@ -4,7 +4,7 @@
 #include <boost/graph/grid_graph.hpp>
 #include "ai/world/field.h"
 #include "path_planner.h"
-namespace AStar { // TODO: rename this back to AStar after i move everything over
+namespace AStar {
     // TODO: move a lot of shit out of this header
 
     // number of graph vertices per metre
@@ -71,7 +71,9 @@ namespace AStar { // TODO: rename this back to AStar after i move everything ove
     class AStarPathPlanner : public PathPlanner {
     public:
         std::optional<std::vector<Point>>
-        findPath(const Point& start, const Point& dest) override;
+        findPath(const World &world, const Point &start, const Point &dest) override;
         ~AStarPathPlanner() override;
+    private:
+        std::shared_ptr<AStarGridGraph> field_graph_ptr;
     };
 }
