@@ -2,34 +2,43 @@
 #include <shared/constants.h>
 #include "shot_score.h"
 #include "geom/circle.h"
+#include "geom/util.h"
+
+
+namespace {
+
+    Evaluation::ShotDirAndScore getBestShotAtLine(Robot shooter, std::vector<Robot> all_robots, Point lower_point, Point upper_point) {
+
+        std::vector<Point> obstacles;
+
+        // Grab all robot positions as obstacles (Ignore the shooter)
+        for( Robot robot : all_robots) {
+            if( shooter.position() == robot.position() ) {
+                continue;
+            }
+            else {
+                obstacles.push_back(robot.position());
+            }
+
+        }
+        // Calculate the direction of the best shot, and the 'score' represented by the angle of deviation from the direction that would still result in a goal.
+        const std::pair<Vector, Angle> best_shot_data = angleSweepCircles(shooter.position(), lower_point, upper_point, obstacles, ROBOT_MAX_RADIUS_METERS);
+
+        Evaluation::ShotDirAndScore shot_dir_and_score = { .shot_direction = best_shot_data.first, .score = best_shot_data.second.toRadians() };
+
+        return shot_dir_and_score;
+    }
+}
 
 namespace Evaluation {
 
-    ShotAndScore get_best_shot( Robot shooter, std::vector<Robot> all_robots, Field field, bool shooter_is_friendly) {
+    ShotDirAndScore getFriendlyRobotBestShot( Robot shooter, std::vector<Robot> all_robots, Field field ) {
 
-        // remove shooter from friendly team and combine friendly/enemy
-        // model each robot as a 'circle' object and gather tangents of each circle to center of player
-        // Now have lots of line segments, see which ones have a intersect with the enemy net
-        // See which pair of adjacent lines have the greatest view of the net
-        std::vector<Circle> obstacles;
+        return getBestShotAtLine(shooter, all_robots, field.enemyGoalpostPos(), field.enemyGoalpostNeg());
+    }
 
-        // Set the goal posts to reflect where the shooter would be shooting
-        if(shooter_is_friendly) {
-            Point goal_post_pos = field.enemyGoalpostPos();
-            Point goal_post_neg = field.enemyGoalpostNeg();
-        }
-        else {
-            Point goal_post_pos = field.friendlyGoalpostPos();
-            Point goal_post_neg = field.friendlyGoalpostNeg();
-        }
+    ShotDirAndScore getEnemyRobotBestShot( Robot shooter, std::vector<Robot> all_robots, Field field ) {
 
-        // Create a circle object for all robots except the shooter bot
-        for( Robot robot : all_robots ) {
-            if( (shooter.position() - robot.position()).len() != 0 ) {
-                obstacles.push_back( Circle(robot.position(), ROBOT_MAX_RADIUS_METERS));
-            }
-        }
-
-
-
+        return getBestShotAtLine(shooter, all_robots, field.friendlyGoalpostPos(), field.friendlyGoalpostNeg());
+    }
 };

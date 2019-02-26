@@ -8,12 +8,12 @@
 
 namespace Evaluation {
 
-    typedef struct ShotAndScore {
+    typedef struct ShotDirAndScore {
         double score;
-        Point shot;
+        Vector shot_direction;
     };
 
-  ShotAndScore get_best_shot(Robot shooter, Team friendly_team, Team enemy_team, Field field);
+  ShotDirAndScore getFriendlyRobotBestShot(Robot shooter, Team friendly_team, Team enemy_team, Field field);
 
 };
 #endif //EVALUATION_GET_SHOOT_SCORE_H
