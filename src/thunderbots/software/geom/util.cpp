@@ -775,11 +775,11 @@ std::optional<Point> finiteLengthLineIntersection(const Vector &a, const Vector 
     return std::nullopt;
 }
 
-std::optional<Point> velocity_line_intersection(const Vector element_velocity,
-                                                const Vector element_position,
-                                                const Point line_start,
-                                                const Point line_end,
-                                                const Rectangle boundry_area)
+std::optional<Point> velocityLineIntersection(const Vector element_velocity,
+                                              const Vector element_position,
+                                              const Point line_start,
+                                              const Point line_end,
+                                              const Rectangle boundry_area)
 {
     // If the element is not within the boundries, return null
     if (!boundry_area.containsPoint(element_position))

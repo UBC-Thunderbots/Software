@@ -22,7 +22,7 @@ namespace Evaluation
      * @return Point containing the intersection of the ball velocity and the friendly
      * net, if the intersection does not exist returns std::nullopt
      */
-    std::optional<Point> calc_ball_vel_intersect_friendly_net(Ball ball, Field field);
+    std::optional<Point> calcBallVelIntersectFriendlyNet(Ball ball, Field field);
 
     /**
      * Calculates if the ball velocity will intersect with the enemy net.
@@ -33,7 +33,7 @@ namespace Evaluation
      * @return Point containing the intersection of the ball velocity and the enemy net,
      * if the intersection does not exist returns std::nullopt
      */
-    std::optional<Point> calc_ball_vel_intersect_enemy_net(Ball ball, Field field);
+    std::optional<Point> calcBallVelIntersectEnemyNet(Ball ball, Field field);
 };  // namespace Evaluation
 
 
