@@ -347,7 +347,8 @@ Point reflect(const Point &v, const Point &n);
  * @param line_start: X/Y point where the line begins, defined in meters
  * @param line_end: X/Y point where the line ends, defined in meters
  * @param boundry_area: Defines the rectangular geometry that limits the scope of
- * calculating an intersection
+ * calculating an intersection. Only intersections within boundry_area will be considered,
+ * and the element position must exist within the boundry.
  */
 std::optional<Point> velocity_line_intersection(const Vector element_velocity,
                                                 const Vector element_position,
