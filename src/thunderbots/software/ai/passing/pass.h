@@ -2,6 +2,8 @@
  * Declaration for the "Pass" Class
  */
 
+#pragma once
+
 #include <array>
 #include <cstdlib>
 #include <iostream>

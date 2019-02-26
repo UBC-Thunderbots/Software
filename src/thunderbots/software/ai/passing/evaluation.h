@@ -6,8 +6,8 @@
 
 #include <functional>
 
-#include "ai/world/field.h"
 #include "ai/passing/pass.h"
+#include "ai/world/field.h"
 #include "ai/world/team.h"
 #include "geom/circle.h"
 #include "geom/point.h"
@@ -31,6 +31,21 @@ namespace AI::Passing
      *         being impossible
      */
     double getFriendlyCapability(Team friendly_team, Pass pass);
+
+    /**
+     * Calculate minimum time it would take for the given robot to reach the given point
+     *
+     * NOTE: This assumes the robot is currently stationary. A further improvement could
+     * be to take into acount the current velocity of the robot
+     *
+     * @param robot The robot to calculate the time for
+     * @param dest The destination that the robot is going to
+     *
+     * @return The minimum theoretical time it would take the robot to reach the dest
+     * point
+     */
+     // TODO: `Timestamp` should really be `duration` here
+    Timestamp getTimeToPositionForRobot(Robot robot, Point dest);
 
     /**
      * Calculates the static position quality for a given position on a given field

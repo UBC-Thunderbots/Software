@@ -30,8 +30,19 @@ double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass 
     Timestamp ball_travel_time = Timestamp::fromSeconds((pass.receiverPoint() - pass.passerPoint()).len() / pass.speed());
     Timestamp receive_time = pass.startTime() + ball_travel_time;
 
-    // Figure out if our best robot can get there in time
-    // We do this by assuming a linear acceleration profile:
+    // Figure out how long it would take our robot to get there
+    Timestamp min_robot_travel_time = getTimeToPositionForRobot(best_receiver, pass.receiverPoint());
+    Timestamp earliest_time_to_receive_point = best_receiver.lastUpdateTimestamp() + min_robot_travel_time;
+
+    // TODO: Take into account rotation time
+
+    // Create a sigmoid that goes to 0 as the time required to get to the reception
+    // point exceeds the time we would need to get there by
+    return 1 - sigmoid(receive_time.getSeconds(), earliest_time_to_receive_point.getSeconds() - 0.5, 1);
+}
+
+Timestamp AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
+    // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
     // we integrate (1) to get:
     // (2) displacement = MAX_ACCELERATION/2 * time^2
@@ -41,30 +52,29 @@ double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass 
     // (4) velocity = MAX_ACCELERATION*sqrt(2 * displacement / MAX_ACCELERATION)
     // and rearrange to get:
     // (5) displacement = (velocity / MAX_ACCELERATION)^2 * MAX_ACCELERATION/2
+    // We re-arrange (3) to get:
+    // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = (best_receiver.position() - pass.receiverPoint()).len();
+    double dist = (robot.position() - dest).len();
     double max_accel = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
     double max_vel = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
-    //// Calculate the max speed that we will reach halfway to the goal
-    //// ie. before we have to start de-accelerating
-    //double max_velocity = std::min(ROBOT_MAX_SPEED_METERS_PER_SECOND,
-    //        max_accel*std::sqrt(2*dist/2/max_accel));
-
-    //// Calculate the time required to reach the max speed the robots are physically
-    //// capable of
-    //double time_to_max_speed = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED / ROBOT_MAX_SPEED_METERS_PER_SECOND;
-
-
-    // Calculate the distance required to max possible velocity of the robot
+    // Calculate the distance required to reach max possible velocity of the robot
+    // using (5)
     double dist_to_max_possible_vel = std::pow(max_vel, 2) * max_accel/2;
+
+    // Calculate how long we'll accelerate for using (6)
+    double acceleration_time = std::sqrt(2 * std::min(dist/2, dist_to_max_possible_vel) / max_accel);
+
+    // Calculate how long we'll be at the max possible velocity (if any time at all)
+    double time_at_max_vel = std::max(0.0, dist - 2*dist_to_max_possible_vel) / max_vel;
 
     // The time taken to get to the receiver point is:
     // time to accelerate + time at the max velocity + time to de-accelerate
     // Note that the acceleration time is the same as a de-acceleration time
-    double acceleration_time = std::sqrt(2 * std::min(dist/2, dist_to_max_possible_vel) / max_accel);
-    double time_at_max_vel = std::max(0.0, dist - 2*dist_to_max_possible_vel) / max_vel;
-    double movement_time = 2*acceleration_time + time_at_max_vel;
+    double travel_time = 2*acceleration_time + time_at_max_vel;
+
+    return Timestamp::fromSeconds(travel_time);
 }
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
