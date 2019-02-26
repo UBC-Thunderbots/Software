@@ -1,10 +1,11 @@
 #pragma once
 
 #include <boost/coroutine2/all.hpp>
+#include <optional>
 
 #include "ai/hl/stp/action/action.h"
 #include "ai/intent/intent.h"
-#include "ai/world/field.h"
+#include "ai/world/world.h"
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot. For
@@ -18,18 +19,34 @@ class Tactic
 {
    public:
     /**
-     * Creates a new Tactic with the given robot
-     *
-     * @param robot The robot that should perform this Tactic
+     * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
      */
-    explicit Tactic(const Robot &robot);
+    explicit Tactic();
 
     /**
-     * Returns true if the Tactic is done and false otherwise
+     * Returns true if the Tactic is done and false otherwise. The tactic is considered
+     * done when either its coroutine is done (the calculateNextIntent() function has no
+     * more work to do), or a nullptr has been returned
      *
      * @return true if the Tactic is done and false otherwise
      */
     bool done() const;
+
+    /**
+     * Returns the Robot assigned to this Tactic
+     *
+     * @return an std::optional containing the Robot assigned to this Tactic if one has
+     * been assigned, otherwise returns std::nullopt
+     */
+    std::optional<Robot> getAssignedRobot() const;
+
+    /**
+     * Updates the robot assigned to this Tactic
+     *
+     * @param robot The updated state of the Robot that should be performing
+     * this Tactic
+     */
+    void updateRobot(const Robot &robot);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. The returned cost
@@ -40,16 +57,13 @@ class Tactic
      * costs for robots closer to the ball than for robots far from the ball.
      *
      * @param robot The Robot to calculate the cost for
-     * @param field The field the Robot is on
+     * @param world The state of the world used to perform the cost calculation
      *
      * @return A cost value in the range [0, 1] indicating the cost of assigning the given
      * robot to this Tactic. Lower cost values indicate more preferred robots.
      */
-    virtual double calculateRobotCost(const Robot &robot, const Field &field) = 0;
+    virtual double calculateRobotCost(const Robot &robot, const World &world) = 0;
 
-    virtual ~Tactic() = default;
-
-   protected:
     /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
      * function. If the Tactic is not done, the next Intent is returned. If the Tactic
@@ -60,10 +74,13 @@ class Tactic
      */
     std::unique_ptr<Intent> getNextIntent();
 
+    virtual ~Tactic() = default;
+
+   protected:
     // The coroutine that sequentially returns the Intents the Tactic wants to run
     intent_coroutine::pull_type intent_sequence;
     // The robot performing this Tactic
-    Robot robot;
+    std::optional<Robot> robot;
 
    private:
     /**
@@ -103,4 +120,7 @@ class Tactic
      */
     virtual std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type &yield) = 0;
+
+    // Whether or not this Tactic is done
+    bool done_;
 };

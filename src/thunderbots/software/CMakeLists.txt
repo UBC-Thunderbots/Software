@@ -485,6 +485,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
+            test/ai/hl/stp/tactic/tactic.cpp
             test/test_util/test_util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
