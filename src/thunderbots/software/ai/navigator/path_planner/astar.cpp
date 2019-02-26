@@ -1,12 +1,9 @@
-#include "astar.h"
-
-#include <boost/graph/astar_search.hpp>
+//
+// Created by jordan on 2/26/19.
+//
 #include <boost/unordered_map.hpp>
-#include <exception>
-
-#include "ai/intent/move_intent.h"
-#include "ai/navigator/RobotObstacle.h"
-#include "ai/primitive/move_primitive.h"
+#include "astar.h"
+#include "geom/util.h"
 
 // struct grid_point_hash
 std::size_t AStar::grid_point_hash::operator() (const grid_point& gp) const {
@@ -16,16 +13,16 @@ std::size_t AStar::grid_point_hash::operator() (const grid_point& gp) const {
 }
 
 // AStarGridGraph
-AStar::AStarGridGraph::AStarGridGraph(const Field &field)
+AStar::AStarGridGraph::AStarGridGraph(const Field &field) :
+field_min_x(- (field.length() / 2)),
+field_min_y(- (field.width() / 2))
 {
     // TODO: allow configuring the field graph number of nodes with
     // dynamic parameters
-    boost::array<size_t, 2> dims = {FIELD_NUM_LENGTH_NODES, FIELD_NUM_WIDTH_NODES};
-    field_graph                  = std::make_unique<graph_t>(dims);
-    x_step_size                  = field_length / FIELD_NUM_LENGTH_NODES;
-    y_step_size                  = field_width / FIELD_NUM_WIDTH_NODES;
-    min_x                        = -(field_length / 2);
-    min_y                        = -(field_width / 2);
+    size_t field_length_nodes = field.totalLength() * GRID_POINT_DENSITY;
+    size_t field_width_nodes = field.totalWidth() * GRID_POINT_DENSITY;
+    boost::array<size_t, 2> graph_dimensions = {field_length_nodes, field_width_nodes};
+
     graph_t::vertex_iterator v, vbegin, vend;
     for (boost::tie(v, vend) = vertices(*field_graph); v != vend; v++)
     {
@@ -36,7 +33,8 @@ AStar::AStarGridGraph::AStarGridGraph(const Field &field)
 
 Point AStar::AStarGridGraph::gridPointToPoint(const grid_point &grid_point)
 {
-    Point p(min_x + grid_point[0] * x_step_size, min_y + grid_point[1] * y_step_size);
+    double step_size = 1 / GRID_POINT_DENSITY;
+    Point p(field_min_x + grid_point[0] * step_size, field_min_y + grid_point[1] * step_size);
     return p;
 }
 
@@ -56,11 +54,10 @@ const AStar::graph_t& AStar::AStarGridGraph::graph() {
     return *field_graph;
 }
 
-// AStarHeuristic
-
+//AStarHeuristic
 AStar::AStarHeuristic::AStarHeuristic(
-    const std::shared_ptr<AStar::AStarGridGraph> &_graph, grid_point _dest)
-    : graph(_graph), dest(_dest), dest_point(graph->gridPointToPoint(dest))
+        const std::shared_ptr<AStar::AStarGridGraph> &_graph, grid_point _dest)
+        : graph(_graph), dest(_dest), dest_point(graph->gridPointToPoint(dest))
 {
 }
 
@@ -85,21 +82,9 @@ void AStar::AStarVertexVisitor::examine_vertex(grid_point gp, const graph_t& gra
     }
 }
 
-// AStarNav
-AStar::AStarNav::AStarNav(const Field &field)
-    : field_graph_ptr(std::make_shared<AStarGridGraph>(field))
-{
+std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const Point &start, const Point &dest) {
+    return std::make_optional<std::vector<Point>>();
 }
 
-std::vector<std::unique_ptr<Primitive>> AStar::AStarNav::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents) const
-{
-    return std::vector<std::unique_ptr<Primitive>>();
-}
+AStar::AStarPathPlanner::~AStarPathPlanner() {}
 
-std::vector<Point> AStar::AStarNav::findPath(const Point &start, const Point &dest) {
-    grid_point start_v = field_graph_ptr->nearestGridPoint(start);
-    grid_point dest_v = field_graph_ptr->nearestGridPoint(dest);
-
-    boost::unordered_map<grid_point, grid_point> predecessor_map;
-}
