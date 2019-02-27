@@ -1,4 +1,6 @@
-#include "kick_intent.h"
+#include "ai/intent/kick_intent.h"
+
+#include "ai/intent/visitor/intent_visitor.h"
 
 const std::string KickIntent::INTENT_NAME = "Kick Intent";
 
@@ -13,6 +15,11 @@ KickIntent::KickIntent(unsigned int robot_id, const Point &kick_origin,
 std::string KickIntent::getIntentName(void) const
 {
     return INTENT_NAME;
+}
+
+void KickIntent::accept(IntentVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
 
 bool KickIntent::operator==(const KickIntent &other) const
