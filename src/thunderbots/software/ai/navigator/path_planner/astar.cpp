@@ -120,7 +120,7 @@ AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const 
     try {
         boost::astar_search(field_graph_ptr->graph(), start_v, heuristic,
                             boost::weight_map(edge_weights).
-                            predecessor_map(preds).
+                            predecessor_map(pred_pmap).
                             distance_map(dist_pmap).
                             visitor(visitor));
     } catch (FoundGoal fg) {
@@ -142,8 +142,5 @@ AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const 
                         return field_graph_ptr->gridPointToPoint(gp);
                     });
 
-    return path;
+    return std::make_optional(path);
 }
-
-AStar::AStarPathPlanner::~AStarPathPlanner() = default;
-

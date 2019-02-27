@@ -8,5 +8,5 @@ class PathPlanner {
 public:
     virtual std::optional<std::vector<Point>>
         findPath(const World &world, const Point &start, const Point &dest) = 0;
-    virtual ~PathPlanner() = 0;
+    virtual ~PathPlanner() = default;
 };

@@ -74,7 +74,7 @@ namespace AStar {
     public:
         std::optional<std::vector<Point>>
         findPath(const World &world, const Point &start, const Point &dest) override;
-        ~AStarPathPlanner() override;
+        ~AStarPathPlanner() override = default;
     private:
         std::shared_ptr<AStarGridGraph> field_graph_ptr;
     };
