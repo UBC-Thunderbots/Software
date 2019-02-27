@@ -3,14 +3,15 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/tactic/tactic.h"
 
+/**
+ * The MoveTactic will move the assigned robot to the given destination and arrive
+ * with the specified final orientation and speed
+ */
 class MoveTactic : public Tactic
 {
    public:
     /**
      * Creates a new MoveTactic
-     *
-     * The MoveTactic will move the assigned robot to the given destination and arrive
-     * with the specified final orientation and speed
      */
     explicit MoveTactic();
 

@@ -10,19 +10,7 @@ Tactic::Tactic()
 
 bool Tactic::done() const
 {
-    // If the coroutine "iterator" is done (ie. evaluates to false, has no more values
-    // to iterate), the calculateNextIntent function has completed and therefore
-    // the Tactic is done
-    //
-    // We also check out internal done_ variable. This is set automatically by the
-    // getNextIntent function if we ever return a nullptr. We do this extra check because
-    // Tactics can return a nullptr one "tick" (aka function call) before the coroutine
-    // actually evaluates as done. This way we ensure that the Tactic::done() function
-    // will always evaluate to true on the exact same call a nullptr is returned.
-    //
-    // This is important since higher-level functions rely on the done() function, and
-    // returning nullptr values "out of sync" with this could cause problems
-    return done_ || !static_cast<bool>(intent_sequence);
+    return done_;
 }
 
 std::optional<Robot> Tactic::getAssignedRobot() const
@@ -44,17 +32,22 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         return std::unique_ptr<Intent>{};
     }
 
-    // If the coroutine "iterator" is done, the calculateNextIntent function has completed
-    // and therefore the Tactic is done, so we return a null pointer
     if (intent_sequence)
     {
         // Calculate and return the next Intent
         intent_sequence();
         auto next_intent = intent_sequence.get();
         // The tactic is considered done once a nullptr is returned
+        // We set the done_ variable here in addition to below (once the coroutine is
+        // done) to make sure that the done() function will always return true at the same
+        // time a nullptr is returned (which also indicates the Tactic is done)
         done_ = !static_cast<bool>(next_intent);
         return next_intent;
     }
+    // If the coroutine "iterator" is done, the calculateNextIntent function has completed
+    // and has no more work to do. Therefore, the Tactic is done so we set done_ to true
+    // and return a nullptr
+    done_ = true;
     return std::unique_ptr<Intent>{};
 }
 
