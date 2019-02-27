@@ -24,6 +24,8 @@ field_min_y(- (field.width() / 2))
     size_t field_width_nodes = field.totalWidth() * GRID_POINT_DENSITY;
     boost::array<size_t, 2> graph_dimensions = {field_length_nodes, field_width_nodes};
 
+    field_graph = std::make_unique<graph_t>(graph_dimensions);
+
     graph_t::vertex_iterator v, vbegin, vend;
     for (boost::tie(v, vend) = vertices(*field_graph); v != vend; v++)
     {
@@ -90,7 +92,6 @@ void AStar::AStarVertexVisitor::examine_vertex(grid_point gp, const graph_t& gra
 
 std::optional<std::vector<Point>>
 AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const Point &dest) {
-
     // create a map that dynamically generates edge weights as we traverse the grid graph
     auto edge_weights = boost::make_function_property_map<graph_t::edge_descriptor>(
             [this](graph_t::edge_descriptor edge) -> cost_t {
@@ -144,3 +145,7 @@ AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const 
 
     return std::make_optional(path);
 }
+
+AStar::AStarPathPlanner::AStarPathPlanner(const Field& field) :
+    field_graph_ptr(new AStarGridGraph(field))
+{}

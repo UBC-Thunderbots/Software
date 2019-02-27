@@ -72,6 +72,7 @@ namespace AStar {
 
     class AStarPathPlanner : public PathPlanner {
     public:
+        explicit AStarPathPlanner(const Field& field);
         std::optional<std::vector<Point>>
         findPath(const World &world, const Point &start, const Point &dest) override;
         ~AStarPathPlanner() override = default;

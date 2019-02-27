@@ -847,6 +847,25 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(intent_test
             ${G3LOG}
             ${catkin_LIBRARIES})
+
+    catkin_add_gtest(astar_path_planner_test
+                    test/navigator/path_planner/astar.cpp
+                    ai/navigator/path_planner/astar.cpp
+                    ai/world/world.cpp
+                    ai/world/field.cpp
+                    ai/world/ball.cpp
+                    ai/world/game_state.cpp
+                    ai/world/team.cpp
+                    ai/world/robot.cpp
+                    geom/util.cpp
+                    util/parameter/dynamic_parameters.cpp
+                    util/timestamp.cpp
+                    )
+
+    target_link_libraries(astar_path_planner_test
+                        ${G3LOG}
+                        ${catkin_LIBRARIES})
+
 endif()
 
 ##### ROSTests / Integration Tests #####
