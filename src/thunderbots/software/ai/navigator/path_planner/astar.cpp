@@ -55,15 +55,20 @@ const AStar::graph_t& AStar::AStarGridGraph::graph() {
     return *field_graph;
 }
 
+constexpr double AStar::AStarGridGraph::gridPointDistance() {
+    return 1.0f / GRID_POINT_DENSITY;
+}
+
 //AStarHeuristic
 AStar::AStarHeuristic::AStarHeuristic(
-        const std::shared_ptr<AStar::AStarGridGraph> &_graph, grid_point _dest)
-        : graph(_graph), dest(_dest), dest_point(graph->gridPointToPoint(dest))
+        const std::shared_ptr<AStar::AStarGridGraph> &_graph, const Point& _dest)
+        : graph(_graph), dest_point(_dest)
 {
 }
 
 AStar::cost_t AStar::AStarHeuristic::operator()(AStar::grid_point gp)
 {
+    // TODO: add properly scaled obstacle component to heuristic
     Point p = graph->gridPointToPoint(gp);
     return dist(dest_point, p);
 }
@@ -85,14 +90,59 @@ void AStar::AStarVertexVisitor::examine_vertex(grid_point gp, const graph_t& gra
 
 std::optional<std::vector<Point>>
 AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const Point &dest) {
+
+    // create a map that dynamically generates edge weights as we traverse the grid graph
     auto edge_weights = boost::make_function_property_map<graph_t::edge_descriptor>(
-            [](graph_t::edge_descriptor edge) -> cost_t {
-                // TODO: find edge costs including violation and whatnot
-                return 0.0f;
+            [this](graph_t::edge_descriptor edge) -> cost_t {
+                // TODO: find edge costs including obstacles and whatnot
+                // TODO: memoizing this may improve performance eventually
+                // cost of an edge is the distance between grid points
+                return this->field_graph_ptr->gridPointDistance();
             }
             );
 
-    return std::make_optional<std::vector<Point>>();
+    grid_point start_v = field_graph_ptr->nearestGridPoint(start);
+    grid_point dest_v = field_graph_ptr->nearestGridPoint(dest);
+    AStarHeuristic heuristic(field_graph_ptr, dest);
+
+    using pred_map = boost::unordered_map<grid_point, grid_point, grid_point_hash>;
+    using distance_map = boost::unordered_map<grid_point, cost_t>;
+
+    pred_map preds;
+    distance_map dists;
+    boost::associative_property_map<pred_map> pred_pmap(preds);
+    boost::associative_property_map<distance_map> dist_pmap(dists);
+
+    AStarVertexVisitor visitor(dest_v);
+
+    std::list<grid_point> soln_grid_points;
+
+    try {
+        boost::astar_search(field_graph_ptr->graph(), start_v, heuristic,
+                            boost::weight_map(edge_weights).
+                            predecessor_map(preds).
+                            distance_map(dist_pmap).
+                            visitor(visitor));
+    } catch (FoundGoal fg) {
+        for (grid_point gp = dest_v; gp != start_v; gp = preds[gp]) {
+            soln_grid_points.push_front(gp);
+        }
+    }
+
+    if (soln_grid_points.empty()) {
+        return std::make_optional<std::vector<Point>>();
+    }
+
+    std::vector<Point> path(soln_grid_points.size() + 2);
+    path[0] = start;
+    path[soln_grid_points.size() - 1] = dest;
+
+    std::transform(soln_grid_points.begin(), soln_grid_points.end(), path.begin() + 1,
+                    [this](const auto& gp){
+                        return field_graph_ptr->gridPointToPoint(gp);
+                    });
+
+    return path;
 }
 
 AStar::AStarPathPlanner::~AStarPathPlanner() = default;

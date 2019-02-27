@@ -1,11 +1,12 @@
 #pragma once
 
+// I apologize if your CLion slows to a crawl
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/grid_graph.hpp>
 #include "ai/world/field.h"
 #include "path_planner.h"
 namespace AStar {
-    // TODO: move a lot of shit out of this header
+    // TODO: move a lot of stuff out of this header
 
     // number of graph vertices per metre
     // TODO: make this a dynamic parameter
@@ -34,6 +35,8 @@ namespace AStar {
 
         const graph_t& graph();
 
+        constexpr double gridPointDistance();
+
     private:
         std::unique_ptr<graph_t> field_graph;
         // this map is used to convert from the grid points that A* will
@@ -47,12 +50,11 @@ namespace AStar {
     public:
         AStarHeuristic() = delete;
         explicit AStarHeuristic(const std::shared_ptr<AStarGridGraph> &_graph,
-                                grid_point _dest);
+                                const Point& _dest);
         cost_t operator()(grid_point gp);
 
     private:
         std::shared_ptr<AStarGridGraph> graph;
-        const grid_point dest;
         const Point dest_point;
     };
 
