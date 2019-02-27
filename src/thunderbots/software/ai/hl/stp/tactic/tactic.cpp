@@ -1,30 +1,53 @@
 #include "ai/hl/stp/tactic/tactic.h"
 
-Tactic::Tactic(const Robot &robot)
-    : robot(robot),
-      intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1))
+#include "util/logger/init.h"
+
+Tactic::Tactic()
+    : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
+      done_(false)
 {
 }
 
 bool Tactic::done() const
 {
-    // If the coroutine "iterator" is done (ie. evaluates to false, has no more values
-    // to iterate), the calculateNextIntent function has completed and therefore
-    // the Tactic is done
-    return !static_cast<bool>(intent_sequence);
+    return done_;
+}
+
+std::optional<Robot> Tactic::getAssignedRobot() const
+{
+    return robot;
+}
+
+void Tactic::updateRobot(const Robot &robot)
+{
+    this->robot = robot;
 }
 
 std::unique_ptr<Intent> Tactic::getNextIntent()
 {
-    // If the coroutine "iterator" is done, the calculateNextIntent function has completed
-    // and therefore the Tactic is done, so we return a null pointer
+    if (!robot)
+    {
+        LOG(WARNING) << "Requesting the next Intent for a Tactic without a Robot assigned"
+                     << std::endl;
+        return std::unique_ptr<Intent>{};
+    }
+
     if (intent_sequence)
     {
         // Calculate and return the next Intent
         intent_sequence();
         auto next_intent = intent_sequence.get();
+        // The tactic is considered done once a nullptr is returned
+        // We set the done_ variable here in addition to below (once the coroutine is
+        // done) to make sure that the done() function will always return true at the same
+        // time a nullptr is returned (which also indicates the Tactic is done)
+        done_ = !static_cast<bool>(next_intent);
         return next_intent;
     }
+    // If the coroutine "iterator" is done, the calculateNextIntent function has completed
+    // and has no more work to do. Therefore, the Tactic is done so we set done_ to true
+    // and return a nullptr
+    done_ = true;
     return std::unique_ptr<Intent>{};
 }
 

@@ -26,7 +26,9 @@ class Action
     explicit Action(const Robot &robot);
 
     /**
-     * Returns true if the Action is done and false otherwise
+     * Returns true if the Action is done and false otherwise. The Action is considered
+     * done when its coroutine is done (the calculateNextIntent() function has no more
+     * work to do).
      *
      * @return true if the Action is done and false otherwise
      */

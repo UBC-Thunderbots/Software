@@ -17,6 +17,7 @@ TEST(MoveActionTest, robot_far_from_destination)
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
 
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
     EXPECT_EQ(0, move_intent.getRobotId());
@@ -39,9 +40,7 @@ TEST(MoveActionTest, robot_at_destination)
     intent_ptr =
         action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 0.0);
 
-    // We expect the resultant pointer to be null since the Action is done and has no more
-    // Intents to return, since the robot is already at the destination
-    EXPECT_FALSE(intent_ptr);
+    EXPECT_TRUE(action.done());
 }
 
 TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
@@ -60,40 +59,28 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
-}
-
-TEST(MoveActionTest, test_action_done)
-{
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot, 0.05);
-
-    // Run the Action several times
-    auto intent_ptr = std::unique_ptr<Intent>{};
-    for (int i = 0; i < 5; i++)
-    {
-        intent_ptr =
-            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 0.0);
-    }
-
-    // Check an intent was returned (the pointer is not null)
-    EXPECT_TRUE(action.done());
-}
-
-TEST(MoveActionTest, test_action_not_done)
-{
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot, 0.05);
-
-    // Run the Action several times
-    auto intent_ptr = std::unique_ptr<Intent>{};
-    for (int i = 0; i < 5; i++)
-    {
-        intent_ptr =
-            action.updateStateAndGetNextIntent(robot, Point(2, -1), Angle::zero(), 0.0);
-    }
-
-    // Check an intent was returned (the pointer is not null)
     EXPECT_FALSE(action.done());
+}
+
+TEST(MoveActionTest, test_action_reports_done_at_same_time_nullptr_returned)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(robot, 0.05);
+
+    // The first time the Action runs it will always return an Intent to make sure we
+    // are doing the correct thing
+    auto intent_ptr =
+        action.updateStateAndGetNextIntent(robot, Point(), Angle::zero(), 0.0);
+    EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
+
+    // For subsequent calls, we expect the Action to be done (in this case)
+    // We make sure that when a nullptr is returned, the action also evaluates to "done"
+    // This is important since higher-level functionality relies on the Action::done()
+    // function but returning nullptr values out of sync with this done() function could
+    // cause problems
+    intent_ptr = action.updateStateAndGetNextIntent(robot, Point(), Angle::zero(), 0.0);
+    EXPECT_FALSE(intent_ptr);
+    EXPECT_TRUE(action.done());
 }
