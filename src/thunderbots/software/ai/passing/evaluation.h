@@ -35,8 +35,8 @@ namespace AI::Passing
     /**
      * Calculate minimum time it would take for the given robot to reach the given point
      *
-     * NOTE: This assumes the robot is currently stationary. A further improvement could
-     * be to take into acount the current velocity of the robot
+     * This will likely provide an overestimate for the time required to reach the
+     * given point, provided all robot constants (max speed, max acceleration) are correct
      *
      * @param robot The robot to calculate the time for
      * @param dest The destination that the robot is going to
