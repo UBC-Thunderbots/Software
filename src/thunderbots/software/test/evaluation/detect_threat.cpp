@@ -21,7 +21,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_to_friendly_net)
     Field field = ::Test::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection =
-        Evaluation::calc_ball_vel_intersect_friendly_net(ball, field);
+        Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
 
 
     EXPECT_EQ(Point(-4.5, -0.145), *intersection);
@@ -38,7 +38,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_not_to_friendly_net)
     Field field = ::Test::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection =
-        Evaluation::calc_ball_vel_intersect_friendly_net(ball, field);
+        Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
 
 
     EXPECT_EQ(std::nullopt, intersection);
@@ -55,7 +55,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_to_enemy_net)
     Field field = ::Test::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection =
-        Evaluation::calc_ball_vel_intersect_enemy_net(ball, field);
+        Evaluation::calcBallVelIntersectEnemyNet(ball, field);
 
 
     EXPECT_EQ(Point(4.5, -0.165), *intersection);
@@ -72,7 +72,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_not_to_enemy_net)
     Field field = ::Test::TestUtil::createSSLDivBField();
 
     std::optional<Point> intersection =
-        Evaluation::calc_ball_vel_intersect_enemy_net(ball, field);
+        Evaluation::calcBallVelIntersectEnemyNet(ball, field);
 
 
     EXPECT_EQ(std::nullopt, intersection);
