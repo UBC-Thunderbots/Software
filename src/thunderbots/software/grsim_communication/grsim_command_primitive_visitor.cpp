@@ -162,7 +162,7 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     if (!(abs(offsetToLine(kick_origin, perp_line_to_shot, robot.position())) <=
               abs(offsetToLine(kick_origin, perp_line_to_shot,
                                Point(dest_behind_x, dest_behind_y))) &&
-          offsetToLine(kick_origin, dest_behind, robot.position()) <= 0))
+          offsetToLine(kick_origin, normal_line_to_shoot, robot.position()) <= 0))
     {
         motion_controller_command = MotionController::MotionControllerCommand(
             dest_behind, kick_direction, 0.0, kick_primitive.getKickSpeed(), false,
