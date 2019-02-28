@@ -164,4 +164,10 @@ AStar::AStarPathPlanner::AStarPathPlanner(const Field &field,
                                           const size_t grid_vertex_density)
     : field_graph_ptr(new AStarGridGraph(field, grid_vertex_density))
 {
+    if (grid_vertex_density < 1)
+    {
+        throw std::invalid_argument(
+            "grid_vertex_density == 0! "
+            "The graph must have vertices!");
+    }
 }

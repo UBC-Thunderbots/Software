@@ -33,6 +33,7 @@ namespace AStar
          * Constructs a grid graph from a Field object.
          *
          * @param field the field to create a graph for
+         * @param _grid_vertex_density how many vertices on the grid graph, per metre
          */
         explicit AStarGridGraph(const Field &field, const size_t _grid_vertex_density);
 
@@ -125,8 +126,9 @@ namespace AStar
         /**
          * Constructs an AStarPathPlanner for a given field.
          * @param field the field
+         * @param grid_vertex_density how many vertices on the grid graph per metre
          */
-        explicit AStarPathPlanner(const Field &field, const size_t grid_vertex_density);
+        explicit AStarPathPlanner(const Field &field, size_t grid_vertex_density);
         /**
          * Returns a path from start to dest if it is possible,
          * otherwise return std::nullopt
@@ -134,7 +136,7 @@ namespace AStar
          * @param world the world
          * @param start the start point
          * @param dest the destination point
-         * @return
+         * @return a vector of Points that are a path from start to dest
          */
         std::optional<std::vector<Point>> findPath(const World &world, const Point &start,
                                                    const Point &dest) override;
