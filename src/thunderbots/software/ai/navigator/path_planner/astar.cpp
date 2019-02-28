@@ -8,8 +8,8 @@
 
 #include "geom/util.h"
 
-// struct grid_point_hash
-std::size_t AStar::grid_point_hash::operator()(const grid_point &gp) const
+// struct grid_vertex_hash
+std::size_t AStar::grid_vertex_hash::operator()(const GridVertex &gp) const
 {
     std::size_t seed = 0;
     boost::hash_combine(seed, gp[0]);
@@ -22,13 +22,13 @@ AStar::AStarGridGraph::AStarGridGraph(const Field &field)
 {
     // TODO: allow configuring the field graph number of nodes with
     // dynamic parameters
-    size_t field_length_nodes                = field.totalLength() * GRID_POINT_DENSITY;
-    size_t field_width_nodes                 = field.totalWidth() * GRID_POINT_DENSITY;
+    size_t field_length_nodes                = field.totalLength() * GRID_VERTEX_DENSITY;
+    size_t field_width_nodes                 = field.totalWidth() * GRID_VERTEX_DENSITY;
     boost::array<size_t, 2> graph_dimensions = {field_length_nodes, field_width_nodes};
 
-    field_graph = std::make_unique<graph_t>(graph_dimensions);
+    field_graph = std::make_unique<GridGraph2D>(graph_dimensions);
 
-    graph_t::vertex_iterator v, vbegin, vend;
+    GridGraph2D::vertex_iterator v, vbegin, vend;
     for (boost::tie(v, vend) = vertices(*field_graph); v != vend; v++)
     {
         Point p = gridPointToPoint(*v);
@@ -36,15 +36,14 @@ AStar::AStarGridGraph::AStarGridGraph(const Field &field)
     }
 }
 
-Point AStar::AStarGridGraph::gridPointToPoint(const grid_point &grid_point)
+Point AStar::AStarGridGraph::gridPointToPoint(const GridVertex &grid_v)
 {
-    double step_size = 1.0f / GRID_POINT_DENSITY;
-    Point p(field_min_x + grid_point[0] * step_size,
-            field_min_y + grid_point[1] * step_size);
+    double step_size = 1.0f / GRID_VERTEX_DENSITY;
+    Point p(field_min_x + grid_v[0] * step_size, field_min_y + grid_v[1] * step_size);
     return p;
 }
 
-AStar::grid_point AStar::AStarGridGraph::nearestGridPoint(const Point &point)
+AStar::GridVertex AStar::AStarGridGraph::nearestGridVertex(const Point &point)
 {
     // this is unfortunately O(n) w.r.t. number of vertices
     // try not to call this too much during the actual search
@@ -56,14 +55,14 @@ AStar::grid_point AStar::AStarGridGraph::nearestGridPoint(const Point &point)
     return closest_point_it->second;
 }
 
-const AStar::graph_t &AStar::AStarGridGraph::graph()
+const AStar::GridGraph2D &AStar::AStarGridGraph::graph()
 {
     return *field_graph;
 }
 
 constexpr double AStar::AStarGridGraph::gridPointDistance()
 {
-    return 1.0f / GRID_POINT_DENSITY;
+    return 1.0f / GRID_VERTEX_DENSITY;
 }
 
 // AStarHeuristic
@@ -73,7 +72,7 @@ AStar::AStarHeuristic::AStarHeuristic(
 {
 }
 
-AStar::cost_t AStar::AStarHeuristic::operator()(AStar::grid_point gp)
+AStar::edge_cost_t AStar::AStarHeuristic::operator()(AStar::GridVertex gp)
 {
     // TODO: add properly scaled obstacle component to heuristic
     Point p = graph->gridPointToPoint(gp);
@@ -81,11 +80,12 @@ AStar::cost_t AStar::AStarHeuristic::operator()(AStar::grid_point gp)
 }
 
 // AStarVertexVisitor
-AStar::AStarVertexVisitor::AStarVertexVisitor(AStar::grid_point _dest) : dest(_dest) {}
+AStar::AStarVertexVisitor::AStarVertexVisitor(AStar::GridVertex _dest) : dest(_dest) {}
 
-void AStar::AStarVertexVisitor::examine_vertex(grid_point gp, const graph_t &graph)
+void AStar::AStarVertexVisitor::examine_vertex(GridVertex grid_v,
+                                               const GridGraph2D &graph)
 {
-    if (gp == dest)
+    if (grid_v == dest)
     {
         // throw an exception because the people who came up with boost
         // are crazy
@@ -98,20 +98,20 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const World 
                                                                     const Point &dest)
 {
     // create a map that dynamically generates edge weights as we traverse the grid graph
-    auto edge_weights = boost::make_function_property_map<graph_t::edge_descriptor>(
-        [this](graph_t::edge_descriptor edge) -> cost_t {
+    auto edge_weights = boost::make_function_property_map<GridGraph2D::edge_descriptor>(
+        [this](GridGraph2D::edge_descriptor edge) -> edge_cost_t {
             // TODO: find edge costs including obstacles and whatnot
             // TODO: memoizing this may improve performance eventually
             // cost of an edge is the distance between grid points
             return this->field_graph_ptr->gridPointDistance();
         });
 
-    grid_point start_v = field_graph_ptr->nearestGridPoint(start);
-    grid_point dest_v  = field_graph_ptr->nearestGridPoint(dest);
+    GridVertex start_v = field_graph_ptr->nearestGridVertex(start);
+    GridVertex dest_v  = field_graph_ptr->nearestGridVertex(dest);
     AStarHeuristic heuristic(field_graph_ptr, dest);
 
-    using pred_map     = boost::unordered_map<grid_point, grid_point, grid_point_hash>;
-    using distance_map = boost::unordered_map<grid_point, cost_t>;
+    using pred_map     = boost::unordered_map<GridVertex, GridVertex, grid_vertex_hash>;
+    using distance_map = boost::unordered_map<GridVertex, edge_cost_t>;
 
     pred_map preds;
     distance_map dists;
@@ -120,7 +120,8 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const World 
 
     AStarVertexVisitor visitor(dest_v);
 
-    std::list<grid_point> soln_grid_points;
+    std::list<GridVertex> soln_grid_points;
+    bool soln_found = false;
 
     try
     {
@@ -132,21 +133,23 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const World 
     }
     catch (FoundGoal fg)
     {
-        for (grid_point gp = dest_v; gp != start_v; gp = preds[gp])
+        soln_found = true;
+        for (GridVertex gp = dest_v; gp != start_v; gp = preds[gp])
         {
             soln_grid_points.push_front(gp);
         }
     }
 
-    if (soln_grid_points.empty())
+    if (!soln_found)
     {
-        return std::make_optional<std::vector<Point>>();
+        return std::nullopt;
     }
 
     std::vector<Point> path(soln_grid_points.size() + 2);
     path[0]               = start;
     path[path.size() - 1] = dest;
 
+    // fill the path from the 2nd item to the 2nd-last item with points that A* found
     std::transform(
         soln_grid_points.begin(), soln_grid_points.end(), path.begin() + 1,
         [this](const auto &gp) { return field_graph_ptr->gridPointToPoint(gp); });

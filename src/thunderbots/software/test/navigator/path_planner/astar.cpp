@@ -44,7 +44,8 @@ TEST_F(AStarPathPlannerTest, test_find_path_trivial)
         std::make_unique<AStar::AStarPathPlanner>(testField);
     Point start{0.0f, 0.0f}, end{0.0f, 0.0f};
     std::vector<Point> path = *planner->findPath(testWorld, start, end);
-    EXPECT_TRUE(path.empty());
+    EXPECT_EQ(path[0], Point(0, 0));
+    EXPECT_EQ(path[1], Point(0, 0));
 }
 
 TEST_F(AStarPathPlannerTest, test_find_path_diagonal)
