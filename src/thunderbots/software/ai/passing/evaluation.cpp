@@ -38,15 +38,15 @@ double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass 
     // Figure out what angle the robot would have to be at to receive the ball
     // TODO: should we flip passer and receiver point here??
     Angle receive_angle = (best_receiver.position() - pass.passerPoint()).orientation();
-    Duration time_to_receive_angle getTimeToOrientationForRobot(robot, receive_angle);
+    Duration time_to_receive_angle = getTimeToOrientationForRobot(best_receiver, receive_angle);
     Timestamp earliest_time_to_receive_angle = best_receiver.lastUpdateTimestamp() + time_to_receive_angle;
 
     // Figure out if rotation or moving will take us longer
-    Timestamp earliest_time_to_reciever_state = std::min(earliest_time_to_receive_angle, earliest_time_to_receive_point);
+    Timestamp latest_time_to_reciever_state = std::max(earliest_time_to_receive_angle, earliest_time_to_receive_point);
 
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
-    return 1 - sigmoid(receive_time.getSeconds(), earliest_time_to_reciever_state.getSeconds() - 0.5, 1);
+    return sigmoid(receive_time.getSeconds(), latest_time_to_reciever_state.getSeconds() + 0.5, 1);
 }
 
 Duration AI::Passing::getTimeToOrientationForRobot(Robot robot, Angle desired_orientation) {

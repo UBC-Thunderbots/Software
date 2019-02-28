@@ -1,6 +1,8 @@
 # This project name must match the name of the package defined in package.xml
 project(thunderbots)
 
+cmake_minimum_required(VERSION 3.10)
+
 # Build in "Release" (with lots of compiler optimizations) by default
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")

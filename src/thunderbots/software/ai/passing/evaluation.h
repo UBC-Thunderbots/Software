@@ -108,6 +108,7 @@ namespace AI::Passing
     /**
      * A sigmoid function with a given offset from 0 and rate of change
      *
+     * By default this increases from -v to positive v, ie. y = 1 / (1+e^(-x))
      * To flip the sigmoid around (ie. increasing from +v to -v), use a negative sig_width
      *
      * @param v The value to evaluate over the sigmoid

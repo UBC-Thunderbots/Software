@@ -11,6 +11,73 @@
 
 using namespace AI::Passing;
 
+TEST(PassingEvaluationTest, getFriendlyCapability_no_robots_on_team){
+    Team team(Duration::fromSeconds(10));
+    team.updateRobots({});
+    Pass pass({0,0}, {1,1}, 10, Timestamp::fromSeconds(10));
+
+    // If there are no robots on the team, then there is no way we can receive a pass
+    EXPECT_EQ(0, getFriendlyCapability(team, pass));
+}
+
+TEST(PassingEvaluationTest, getFriendlyCapability_one_robot_near_pass_one_far_away){
+    // Test getting friendly capability for a team with two robots, one near the pass
+    // reception point and the other far away
+    Team team(Duration::fromSeconds(10));
+    team.updateRobots({
+        Robot(0, {15.5, -10}, {0,0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
+        Robot(1, {100, -100}, {0,0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))
+    });
+    Pass pass({0,0}, {15, -10.1}, 10, Timestamp::fromSeconds(10));
+
+    // There should be a very high probability that we can receive this pass
+    EXPECT_LE(0.9, getFriendlyCapability(team, pass));
+    EXPECT_GE(1, getFriendlyCapability(team, pass));
+}
+
+TEST(PassingEvaluationTest, getFriendlyCapability_multiple_robots_all_too_far_from_reception_point){
+    // Test case where there are lots of robots far away from the reception point and
+    // there *is not* enough time for them to get to the reception point
+    Team team(Duration::fromSeconds(10));
+    team.updateRobots({
+                              Robot(0, {15.5, -10}, {0,0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
+                              Robot(1, {100, -100}, {0,0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))
+                      });
+    Pass pass({0,0}, {1, 1}, 10, Timestamp::fromSeconds(1));
+
+    EXPECT_GE(0.1, getFriendlyCapability(team, pass));
+    EXPECT_LE(0, getFriendlyCapability(team, pass));
+}
+
+TEST(PassingEvaluationTest, getFriendlyCapability_multiple_robots_close_enough_to_reception_point){
+    // Test case where there are lots of robots far away from the reception point, but
+    // when *there is* enough time for them to reach the receive point
+    Team team(Duration::fromSeconds(10));
+    team.updateRobots({
+                              Robot(0, {110, 110}, {0,0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(5)),
+                              Robot(1, {100, -100}, {0,0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(5))
+                      });
+    Pass pass({100,100}, {120, 105}, 1, Timestamp::fromSeconds(10));
+
+    EXPECT_LE(0.9, getFriendlyCapability(team, pass));
+    EXPECT_GE(1, getFriendlyCapability(team, pass));
+}
+
+TEST(PassingEvaluationTest, getFriendlyCapability_single_robot_cant_turn_in_time){
+    // Test case where this is one robot, but it is turned in the wrong direction and
+    // will not be able to turn in time to receive the pass
+    Team team(Duration::fromSeconds(10));
+    team.updateRobots({
+                              Robot(0, {1, 0}, {0,0}, Angle::quarter(), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))
+                      });
+    Pass pass({0,0}, {-1, -1}, 3, Timestamp::fromSeconds(0.1));
+
+    EXPECT_GE(0.1, getFriendlyCapability(team, pass));
+    EXPECT_LE(0, getFriendlyCapability(team, pass));
+}
+
+// TODO: Test case where a robot is facing away from a pass and there is no way it can turn in time
+
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle){
     Angle target_angle = Angle::half();
     Robot robot(0, {1,1}, Vector(0,0), Angle::half(), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
@@ -33,7 +100,7 @@ TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desir
     double min_time_to_rotate = ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND / ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED;
 
     // For the upper bound, just choose a time that's much greater then we would expect
-    double max_time_to_rotate = 5.0;
+    double max_time_to_rotate = 4.0;
 
     EXPECT_LE(Timestamp::fromSeconds(min_time_to_rotate), getTimeToOrientationForRobot(robot, target_angle));
     EXPECT_GE(Timestamp::fromSeconds(max_time_to_rotate), getTimeToOrientationForRobot(robot, target_angle));
