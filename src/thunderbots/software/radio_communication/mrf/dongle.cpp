@@ -544,7 +544,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     bool slow     = false;
     if (extra > 127)
     {
-//        throw std::invalid_argument("extra greater than 127");
+        throw std::invalid_argument("extra greater than 127");
     }
     uint8_t extra_encoded = static_cast<uint8_t>(extra | (slow ? 0x80 : 0x00));
 

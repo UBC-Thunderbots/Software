@@ -18,7 +18,7 @@ const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 // The maximum speed achievable by our robots, in metres per second.
 const double ROBOT_MAX_SPEED_METERS_PER_SECOND = 2.0;
 // The maximum angular speed achievable by our robots, in rad/sec
-const double ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND = 4.0;
+const double ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND = 4 * M_PI;
 // The maximum acceleration achievable by our robots, in metres per seconds squared.
 const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
 // The maximum angular acceleration achievable by our robots, in radians per second

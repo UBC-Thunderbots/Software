@@ -3,8 +3,12 @@
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/Robot.h>
+#include <thunderbots_msgs/Team.h>
+#include <thunderbots_msgs/World.h>
 
+#include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
+#include "ai/primitive/kick_primitive.h"
 #include "shared/constants.h"
 #include "util/constants.h"
 #include "util/parameter/dynamic_parameters.h"
@@ -18,9 +22,8 @@ namespace
     // The publisher to send our custom Primitive commands based on the controller
     // information
     ros::Publisher primitive_publisher;
-    // Publishers to spoof network_input data
-    ros::Publisher friendly_team_publisher;
-    ros::Publisher ball_publisher;
+    // Publishers to mock network_input data
+    ros::Publisher world_publisher;
 
     // Button mappings for a Microsoft Xbox 360 Wired Controller for Linux
     // http://wiki.ros.org/joy section 5.3
@@ -84,6 +87,9 @@ unsigned int toggleDribble(unsigned int button_pressed)
 
 void joystickUpdateCallback(const sensor_msgs::Joy::ConstPtr &msg)
 {
+    /************************************************************************************
+     *        Read XBox Controller Information and store relevant variables             *
+     ************************************************************************************/
     sensor_msgs::Joy::_axes_type axes       = msg->axes;
     sensor_msgs::Joy::_buttons_type buttons = msg->buttons;
 
@@ -109,15 +115,22 @@ void joystickUpdateCallback(const sensor_msgs::Joy::ConstPtr &msg)
     // The triggers report values in the range [-1.0, 1.0]. Values are < 0 when the
     // trigger is pressed/held down more than halfway, and > 0 otherwise
     double robot_kick_speed_meters_per_second =
-        (axes[RIGHT_TRIGGER] < 0.0)
-            ? Util::DynamicParameters::XBoxControllerDemo::kick_speed_meters_per_second
-                  .value()
-            : 0.0;
-    double robot_chip_distance_meters =
-        (axes[LEFT_TRIGGER] < 0.0)
-            ? Util::DynamicParameters::XBoxControllerDemo::chip_distance_meters.value()
-            : 0.0;
+        Util::DynamicParameters::XBoxControllerDemo::kick_speed_meters_per_second.value();
+    if (axes[RIGHT_TRIGGER] > 0.0)
+    {
+        robot_kick_speed_meters_per_second = 0.0;
+    }
 
+    double robot_chip_distance_meters =
+        Util::DynamicParameters::XBoxControllerDemo::chip_distance_meters.value();
+    if (axes[LEFT_TRIGGER] > 0.0)
+    {
+        robot_chip_distance_meters = 0.0;
+    }
+
+    /************************************************************************************
+     *               Create and publish mock data for the World state                   *
+     ************************************************************************************/
     // We spoof the information about the state of the robot because it is unnecessary for
     // the XBox controller demos. These demos typically run where we have no vision, so we
     // just simply report the robot is always at Point(0, 0), and just set the velocities
@@ -130,25 +143,48 @@ void joystickUpdateCallback(const sensor_msgs::Joy::ConstPtr &msg)
     Team team = Team(Duration::fromMilliseconds(
         Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS));
     team.updateRobots({robot});
-    thunderbots_msgs::Team team_msg = Util::ROSMessages::convertTeamToROSMessage(team);
-    friendly_team_publisher.publish(team_msg);
+    thunderbots_msgs::Team friendly_team_msg =
+        Util::ROSMessages::convertTeamToROSMessage(team);
 
     // We spoof the information about the state of the ball for similar reasons to the
     // robot above. Since the AI is not running (a human is controlling the robot) we
     // don't need to report the real ball information.
     Ball ball                       = Ball(Point(), Vector(), Timestamp::fromSeconds(0));
     thunderbots_msgs::Ball ball_msg = Util::ROSMessages::convertBallToROSMessage(ball);
-    ball_publisher.publish(ball_msg);
 
+    // Publish our spoofed World
+    thunderbots_msgs::World world_msg;
+    world_msg.friendly_team = friendly_team_msg;
+    world_msg.ball          = ball_msg;
+    world_publisher.publish(world_msg);
+
+    /************************************************************************************
+     *       Create and publish Primitives using the Controller information             *
+     ************************************************************************************/
     // Create and send the DirectVelocityPrimitive constructed from the commands received
     // from the XBox Controller
-    DirectVelocityPrimitive primitive =
-        DirectVelocityPrimitive(0, robot_x_velocity, robot_y_velocity,
-                                robot_angular_velocity, robot_dribbler_rpm);
-    thunderbots_msgs::Primitive primitive_msg = primitive.createMsg();
+    std::unique_ptr<Primitive> primitive = std::make_unique<DirectVelocityPrimitive>(
+        static_cast<unsigned int>(Util::DynamicParameters::XBoxControllerDemo::robot_id.value()), robot_x_velocity, robot_y_velocity, robot_angular_velocity,
+        robot_dribbler_rpm);
+
+    // Send a KickPrimitive if we want to kick
+    if (robot_kick_speed_meters_per_second != 0.0)
+    {
+        primitive = std::make_unique<KickPrimitive>(
+            Util::DynamicParameters::XBoxControllerDemo::robot_id.value(), robot.position(), robot.orientation(), robot_kick_speed_meters_per_second);
+    }
+
+    // Send a ChipPrimitive if we want to chip
+    if (robot_chip_distance_meters != 0.0)
+    {
+        primitive = std::make_unique<ChipPrimitive>(
+            Util::DynamicParameters::XBoxControllerDemo::robot_id.value(), robot.position(), robot.orientation(), robot_chip_distance_meters);
+    }
+
+    // Publish the primitive
+    thunderbots_msgs::Primitive primitive_msg = primitive->createMsg();
     thunderbots_msgs::PrimitiveArray primitive_array;
     primitive_array.primitives.emplace_back(primitive_msg);
-
     primitive_publisher.publish(primitive_array);
 }
 
@@ -161,15 +197,16 @@ int main(int argc, char **argv)
     // Create publishers
     primitive_publisher = node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1);
-    friendly_team_publisher = node_handle.advertise<thunderbots_msgs::Team>(
-        Util::Constants::NETWORK_INPUT_FRIENDLY_TEAM_TOPIC, 1);
-    ball_publisher = node_handle.advertise<thunderbots_msgs::Ball>(
-        Util::Constants::NETWORK_INPUT_BALL_TOPIC, 1);
+    world_publisher = node_handle.advertise<thunderbots_msgs::World>(
+        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1);
 
     // Create subscribers
     ros::Subscriber joy_node_subscriber =
         node_handle.subscribe(Util::Constants::JOY_NODE_TOPIC, 1, joystickUpdateCallback);
 
+    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+    // until the node is shutdown
+    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
     ros::spin();
 
     return 0;

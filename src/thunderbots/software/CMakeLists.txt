@@ -227,6 +227,8 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
 file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/direct_velocity_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/kick_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/chip_primitive.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/primitive.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.cpp
