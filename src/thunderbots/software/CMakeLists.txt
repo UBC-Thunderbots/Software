@@ -71,7 +71,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Specify the configuration file for dynamic_reconfigure pkg
 generate_dynamic_reconfigure_options(
-    ${CMAKE_CURRENT_SOURCE_DIR}/param_server/cfg/Params.cfg
+        ${CMAKE_CURRENT_SOURCE_DIR}/param_server/cfg/Params.cfg
 )
 
 catkin_package(
@@ -79,7 +79,7 @@ catkin_package(
         LIBRARIES thunderbots
         CATKIN_DEPENDS roscpp std_msgs dynamic_reconfigure
         DEPENDS message_runtime
-        )
+)
 
 ###########
 ## Build ##
@@ -87,8 +87,8 @@ catkin_package(
 
 # Specify additional locations of header files
 include_directories(SYSTEM
-	${catkin_INCLUDE_DIRS}
-	)
+        ${catkin_INCLUDE_DIRS}
+        )
 
 include_directories(
         ${catkin_INCLUDE_DIRS}
@@ -96,7 +96,7 @@ include_directories(
         ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
-        )
+)
 
 # Find all the generated protobuf source files
 file(GLOB PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
@@ -445,7 +445,7 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
-    )
+            )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(action_test
@@ -646,14 +646,14 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters are working
+    # The test node that verifies the dynamic_parameters are working
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp
             util/parameter/dynamic_parameters.cpp
             )
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters exist in the parameter server
+    # The test node that verifies the dynamic_parameters exist in the parameter server
     add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
             test/util/test_parameter_exists.cpp
             util/parameter/dynamic_parameters.cpp
