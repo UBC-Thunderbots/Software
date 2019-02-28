@@ -22,6 +22,8 @@ class MoveSpinIntent : public Intent, public MoveSpinPrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Compares MoveSpinIntents for equality. MoveSpinIntents are considered equal if all
      * their member variables are equal.

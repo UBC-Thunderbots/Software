@@ -68,9 +68,9 @@ class PrimitiveVisitor
     /**
      * Visits a MoveSpinPrimitive to perform an operation.
      *
-     * @param move_spin_primitive The MoveSpinPrimitive to visit
+     * @param movespin_primitive The MoveSpinPrimitive to visit
      */
-    virtual void visit(const MoveSpinPrimitive &move_spin_primitive) = 0;
+    virtual void visit(const MoveSpinPrimitive &movespin_primitive) = 0;
 
     /**
      * Visits a DribblePrimitive to perform an operation.

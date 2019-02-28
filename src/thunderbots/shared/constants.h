@@ -11,7 +11,8 @@ const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The approximate radius of the ball according to the SSL rulebook
 const double BALL_MAX_RADIUS_METERS = 0.0215;
-
+// The maximum number of robots we can communicate with over radio.
+const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 // TODO: Determine a more realistic value. See Issue #178.
 /* Robot Attributes */
 // The maximum speed achievable by our robots, in metres per second.

@@ -36,6 +36,8 @@ class DribbleIntent : public Intent, public DribblePrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Compares DribbleIntents for equality. DribbleIntents are considered equal if all
      * their member variables are equal.
