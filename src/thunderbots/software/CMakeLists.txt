@@ -241,7 +241,7 @@ add_executable (xbox_controller_mapping
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(parameters thunderbots_gencfg ${catkin_EXPORTED_TARGETS})
+add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
 target_link_libraries(xbox_controller_mapping
         ${catkin_LIBRARIES}
         )
