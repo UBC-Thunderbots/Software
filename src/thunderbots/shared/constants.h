@@ -1,4 +1,5 @@
 #pragma once
+#include <math.h>
 
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
