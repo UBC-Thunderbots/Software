@@ -35,8 +35,7 @@ namespace AI::Passing
     /**
      * Calculate minimum time it would take for the given robot to reach the given point
      *
-     * This will likely provide an overestimate for the time required to reach the
-     * given point, provided all robot constants (max speed, max acceleration) are correct
+     * This is only a rough calculation in order to be as performant as possible
      *
      * @param robot The robot to calculate the time for
      * @param dest The destination that the robot is going to
@@ -45,7 +44,7 @@ namespace AI::Passing
      * point
      */
      // TODO: `Timestamp` should really be `duration` here
-    Timestamp getTimeToPositionForRobot(Robot robot, Point dest);
+    Duration getTimeToPositionForRobot(Robot robot, Point dest);
 
     /**
      * Calculates the static position quality for a given position on a given field

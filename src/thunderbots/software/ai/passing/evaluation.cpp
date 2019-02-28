@@ -7,6 +7,7 @@
 #include "../shared/constants.h"
 #include "ai/passing/evaluation.h"
 #include "util/parameter/dynamic_parameters.h"
+#include "geom/util.h"
 
 using namespace AI::Passing;
 
@@ -41,13 +42,7 @@ double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass 
     return 1 - sigmoid(receive_time.getSeconds(), earliest_time_to_receive_point.getSeconds() - 0.5, 1);
 }
 
-Timestamp AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
-    // TODO:
-    // (1) Create a vector that is the sum of the compoenent of the velocity perpendicular to the goal and the velocity componenet moving you *directly* away from the goal
-    // (2) Figure out the time required to kill off the velocity vector from (1) and figure out where we would end up once we've killed it off (in position and velocity)
-    // (3) Figure out the time required to (accounting for the robots current velocity) move to the goal
-    // (3.5) Compare current stopping distance to distance to goal. If greater, "add" another sub-stage that adds the time required to fully stop to the total time
-    // (3.51) Figure out the time required to get to the goal from the current position (accounting for 3.5 if needed) based on a linear acceleration profile.
+Duration AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
     // we integrate (1) to get:
@@ -61,39 +56,26 @@ Timestamp AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    // We approximate the time required to get to goal by summing the time required to
-    // stop moving, and the time required to go from wherever we managed to stop moving
-    // by to the goal
-
+    double dist = (robot.position() - dest).len();
     double max_accel = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    double max_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND;
+    double max_vel = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
-    // Calculate the time required to stop the robot moving
-    double initial_speed = robot.velocity().len();
-    double time_to_stop = max_accel / initial_speed;
-
-    // Calculate how far the robot moved while it was trying to stop
-    // (x = ut + 1/2 * at^2)
-    double stop_distance = initial_speed*time_to_stop + 1.0/2.0 * max_accel*std::pow(time_to_stop, 2);
-    Point robot_stop_position = robot.position() + robot.velocity().norm() * stop_distance;
-
-    double dist = (robot_stop_position - dest).len();
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
-    double dist_to_max_possible_vel = std::pow(max_speed, 2) * max_accel/2;
+    double dist_to_max_possible_vel = std::pow(max_vel, 2) * max_accel/2;
 
     // Calculate how long we'll accelerate for using (6)
     double acceleration_time = std::sqrt(2 * std::min(dist/2, dist_to_max_possible_vel) / max_accel);
 
     // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_vel = std::max(0.0, dist - 2*dist_to_max_possible_vel) / max_speed;
+    double time_at_max_vel = std::max(0.0, dist - 2*dist_to_max_possible_vel) / max_vel;
 
     // The time taken to get to the receiver point is:
     // time to accelerate + time at the max velocity + time to de-accelerate
     // Note that the acceleration time is the same as a de-acceleration time
     double travel_time = 2*acceleration_time + time_at_max_vel;
 
-    return Timestamp::fromSeconds(travel_time);
+return Timestamp::fromSeconds(travel_time);
 }
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
