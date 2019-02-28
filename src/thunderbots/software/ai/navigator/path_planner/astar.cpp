@@ -136,7 +136,7 @@ AStar::AStarPathPlanner::findPath(const World &world, const Point &start, const 
 
     std::vector<Point> path(soln_grid_points.size() + 2);
     path[0] = start;
-    path[soln_grid_points.size() - 1] = dest;
+    path[path.size() - 1] = dest;
 
     std::transform(soln_grid_points.begin(), soln_grid_points.end(), path.begin() + 1,
                     [this](const auto& gp){
