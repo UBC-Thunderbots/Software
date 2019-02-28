@@ -3,6 +3,7 @@
  */
 
 #include "ai/passing/evaluation.h"
+#include "../shared/constants.h"
 
 #include <gtest/gtest.h>
 
@@ -20,6 +21,21 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest){
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity){
     // Check that the robot reaches the dest in the at the expected time when
     // it has enough time that it accelerates up to it's maximum velocity
+
+    Point dest(1,1);
+    Point robot_location(20, 20);
+    Robot robot(0, robot_location, Vector(0,0), Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+
+    double distance_to_dest = (robot_location - dest).len();
+
+    double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND / ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    // x = v*t + 1/2*a*t^2, v = initial velocity = 0
+    double acceleration_distance = 0.5 * ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED*std::pow(acceleration_time, 2);
+    double time_at_max_vel = (distance_to_dest - 2*acceleration_distance)/ROBOT_MAX_SPEED_METERS_PER_SECOND;
+
+    double travel_time = 2*acceleration_time + time_at_max_vel;
+
+    EXPECT_EQ(travel_time, getTimeToPositionForRobot(robot, dest).getSeconds());
 }
 
 TEST(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)

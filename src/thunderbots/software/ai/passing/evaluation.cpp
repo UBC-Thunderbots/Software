@@ -62,9 +62,10 @@ Duration AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
-    double dist_to_max_possible_vel = std::pow(max_vel, 2) * max_accel/2;
+    double dist_to_max_possible_vel = std::pow(max_vel/max_accel, 2) * max_accel/2;
 
-    // Calculate how long we'll accelerate for using (6)
+    // Calculate how long we'll accelerate for using (3), taking into account that we
+    // might not actually reach the max velocity if it will take too much distance
     double acceleration_time = std::sqrt(2 * std::min(dist/2, dist_to_max_possible_vel) / max_accel);
 
     // Calculate how long we'll be at the max possible velocity (if any time at all)
@@ -75,7 +76,7 @@ Duration AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
     // Note that the acceleration time is the same as a de-acceleration time
     double travel_time = 2*acceleration_time + time_at_max_vel;
 
-return Timestamp::fromSeconds(travel_time);
+    return Timestamp::fromSeconds(travel_time);
 }
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
