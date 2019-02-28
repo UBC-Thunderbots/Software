@@ -164,21 +164,24 @@ void joystickUpdateCallback(const sensor_msgs::Joy::ConstPtr &msg)
     // Create and send the DirectVelocityPrimitive constructed from the commands received
     // from the XBox Controller
     std::unique_ptr<Primitive> primitive = std::make_unique<DirectVelocityPrimitive>(
-        static_cast<unsigned int>(Util::DynamicParameters::XBoxControllerDemo::robot_id.value()), robot_x_velocity, robot_y_velocity, robot_angular_velocity,
-        robot_dribbler_rpm);
+        static_cast<unsigned int>(
+            Util::DynamicParameters::XBoxControllerDemo::robot_id.value()),
+        robot_x_velocity, robot_y_velocity, robot_angular_velocity, robot_dribbler_rpm);
 
     // Send a KickPrimitive if we want to kick
     if (robot_kick_speed_meters_per_second != 0.0)
     {
         primitive = std::make_unique<KickPrimitive>(
-            Util::DynamicParameters::XBoxControllerDemo::robot_id.value(), robot.position(), robot.orientation(), robot_kick_speed_meters_per_second);
+            Util::DynamicParameters::XBoxControllerDemo::robot_id.value(),
+            robot.position(), robot.orientation(), robot_kick_speed_meters_per_second);
     }
 
     // Send a ChipPrimitive if we want to chip
     if (robot_chip_distance_meters != 0.0)
     {
         primitive = std::make_unique<ChipPrimitive>(
-            Util::DynamicParameters::XBoxControllerDemo::robot_id.value(), robot.position(), robot.orientation(), robot_chip_distance_meters);
+            Util::DynamicParameters::XBoxControllerDemo::robot_id.value(),
+            robot.position(), robot.orientation(), robot_chip_distance_meters);
     }
 
     // Publish the primitive
