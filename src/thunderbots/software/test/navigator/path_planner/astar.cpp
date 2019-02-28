@@ -29,19 +29,20 @@ class AStarPathPlannerTest : public ::testing::Test
     void SetUp() override {}
     World testWorld;
     Field testField;
+    static constexpr size_t GRID_VERTEX_DENSITY = 10;
 };
 
 TEST_F(AStarPathPlannerTest, test_construct_path_planner)
 {
     std::unique_ptr<PathPlanner> planner =
-        std::make_unique<AStar::AStarPathPlanner>(testField);
+        std::make_unique<AStar::AStarPathPlanner>(testField, GRID_VERTEX_DENSITY);
     SUCCEED();
 }
 
 TEST_F(AStarPathPlannerTest, test_find_path_trivial)
 {
     std::unique_ptr<PathPlanner> planner =
-        std::make_unique<AStar::AStarPathPlanner>(testField);
+        std::make_unique<AStar::AStarPathPlanner>(testField, GRID_VERTEX_DENSITY);
     Point start{0.0f, 0.0f}, end{0.0f, 0.0f};
     std::vector<Point> path = *planner->findPath(testWorld, start, end);
     EXPECT_EQ(path[0], Point(0, 0));
@@ -51,7 +52,7 @@ TEST_F(AStarPathPlannerTest, test_find_path_trivial)
 TEST_F(AStarPathPlannerTest, test_find_path_diagonal)
 {
     std::unique_ptr<PathPlanner> planner =
-        std::make_unique<AStar::AStarPathPlanner>(testField);
+        std::make_unique<AStar::AStarPathPlanner>(testField, GRID_VERTEX_DENSITY);
     Point start{0.0f, 0.0f}, end{0.5f, 0.5f};
     std::vector<Point> path = *planner->findPath(testWorld, start, end);
     std::cout << path << std::endl;

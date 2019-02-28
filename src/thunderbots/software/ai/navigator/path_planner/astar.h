@@ -10,10 +10,6 @@ namespace AStar
 {
     // TODO: potentially move a lot of stuff out of this header
 
-    // number of graph vertices per metre
-    // TODO: make this a dynamic parameter or passed in the constructor
-    // to AStarGridGraph
-    static constexpr unsigned long GRID_VERTEX_DENSITY = 20;
     // edge cost type
     typedef double edge_cost_t;
     // 2D grid graph type
@@ -38,7 +34,7 @@ namespace AStar
          *
          * @param field the field to create a graph for
          */
-        explicit AStarGridGraph(const Field &field);
+        explicit AStarGridGraph(const Field &field, const size_t _grid_vertex_density);
 
         /**
          * Converts a grid point to a Point on the field.
@@ -65,7 +61,7 @@ namespace AStar
          * The distance between vertices on the grid graph.
          * @return the distance between vertices on the grid graph.
          */
-        constexpr double gridPointDistance();
+        constexpr double gridVertexDistance();
 
        private:
         std::unique_ptr<GridGraph2D> field_graph;
@@ -75,6 +71,7 @@ namespace AStar
         std::vector<std::pair<Point, GridVertex>> grid_points_list;
 
         const double field_min_x, field_min_y;
+        const size_t grid_vertex_density;
     };
 
     class AStarHeuristic : public boost::astar_heuristic<GridGraph2D, edge_cost_t>
@@ -129,7 +126,7 @@ namespace AStar
          * Constructs an AStarPathPlanner for a given field.
          * @param field the field
          */
-        explicit AStarPathPlanner(const Field &field);
+        explicit AStarPathPlanner(const Field &field, const size_t grid_vertex_density);
         /**
          * Returns a path from start to dest if it is possible,
          * otherwise return std::nullopt

@@ -17,13 +17,16 @@ std::size_t AStar::grid_vertex_hash::operator()(const GridVertex &gp) const
 }
 
 // AStarGridGraph
-AStar::AStarGridGraph::AStarGridGraph(const Field &field)
-    : field_min_x(-(field.length() / 2)), field_min_y(-(field.width() / 2))
+AStar::AStarGridGraph::AStarGridGraph(const Field &field,
+                                      const size_t _grid_vertex_density)
+    : field_min_x(-(field.length() / 2)),
+      field_min_y(-(field.width() / 2)),
+      grid_vertex_density(_grid_vertex_density)
 {
     // TODO: allow configuring the field graph number of nodes with
     // dynamic parameters
-    size_t field_length_nodes                = field.totalLength() * GRID_VERTEX_DENSITY;
-    size_t field_width_nodes                 = field.totalWidth() * GRID_VERTEX_DENSITY;
+    size_t field_length_nodes                = field.totalLength() * grid_vertex_density;
+    size_t field_width_nodes                 = field.totalWidth() * grid_vertex_density;
     boost::array<size_t, 2> graph_dimensions = {field_length_nodes, field_width_nodes};
 
     field_graph = std::make_unique<GridGraph2D>(graph_dimensions);
@@ -38,7 +41,7 @@ AStar::AStarGridGraph::AStarGridGraph(const Field &field)
 
 Point AStar::AStarGridGraph::gridPointToPoint(const GridVertex &grid_v)
 {
-    double step_size = 1.0f / GRID_VERTEX_DENSITY;
+    double step_size = 1.0f / grid_vertex_density;
     Point p(field_min_x + grid_v[0] * step_size, field_min_y + grid_v[1] * step_size);
     return p;
 }
@@ -60,9 +63,9 @@ const AStar::GridGraph2D &AStar::AStarGridGraph::graph()
     return *field_graph;
 }
 
-constexpr double AStar::AStarGridGraph::gridPointDistance()
+constexpr double AStar::AStarGridGraph::gridVertexDistance()
 {
-    return 1.0f / GRID_VERTEX_DENSITY;
+    return 1.0f / grid_vertex_density;
 }
 
 // AStarHeuristic
@@ -103,7 +106,7 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const World 
             // TODO: find edge costs including obstacles and whatnot
             // TODO: memoizing this may improve performance eventually
             // cost of an edge is the distance between grid points
-            return this->field_graph_ptr->gridPointDistance();
+            return this->field_graph_ptr->gridVertexDistance();
         });
 
     GridVertex start_v = field_graph_ptr->nearestGridVertex(start);
@@ -157,7 +160,8 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const World 
     return std::make_optional(path);
 }
 
-AStar::AStarPathPlanner::AStarPathPlanner(const Field &field)
-    : field_graph_ptr(new AStarGridGraph(field))
+AStar::AStarPathPlanner::AStarPathPlanner(const Field &field,
+                                          const size_t grid_vertex_density)
+    : field_graph_ptr(new AStarGridGraph(field, grid_vertex_density))
 {
 }
