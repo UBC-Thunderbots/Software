@@ -70,16 +70,18 @@ constexpr double AStar::AStarGridGraph::gridVertexDistance()
 
 // AStarHeuristic
 AStar::AStarHeuristic::AStarHeuristic(
-    const std::shared_ptr<AStar::AStarGridGraph> &_graph, const Point &_dest)
-    : graph(_graph), dest_point(_dest)
+    const std::shared_ptr<AStar::AStarGridGraph> &_graph,
+    const ViolationFunction &_violation_function, const Point &_dest)
+    : graph(_graph), violation_function(_violation_function), dest_point(_dest)
 {
 }
 
 AStar::edge_cost_t AStar::AStarHeuristic::operator()(AStar::GridVertex gp)
 {
-    // TODO: add properly scaled obstacle component to heuristic
-    Point p = graph->gridPointToPoint(gp);
-    return dist(dest_point, p);
+    // TODO: scale violation component based on grid density
+    Point p            = graph->gridPointToPoint(gp);
+    double p_violation = violation_function(p);
+    return dist(dest_point, p) + p_violation;
 }
 
 // AStarVertexVisitor
@@ -96,22 +98,28 @@ void AStar::AStarVertexVisitor::examine_vertex(GridVertex grid_v,
     }
 }
 
-std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(const World &world,
-                                                                    const Point &start,
-                                                                    const Point &dest)
+std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(
+    const ViolationFunction &violation_function, const Point &start, const Point &dest)
 {
     // create a map that dynamically generates edge weights as we traverse the grid graph
     auto edge_weights = boost::make_function_property_map<GridGraph2D::edge_descriptor>(
-        [this](GridGraph2D::edge_descriptor edge) -> edge_cost_t {
-            // TODO: find edge costs including obstacles and whatnot
+        [this, violation_function](GridGraph2D::edge_descriptor edge) -> edge_cost_t {
+            // TODO: scale violation based on grid density
             // TODO: memoizing this may improve performance eventually
             // cost of an edge is the distance between grid points
-            return this->field_graph_ptr->gridVertexDistance();
+            double cost            = this->field_graph_ptr->gridVertexDistance();
+            Point edge_start_point = this->field_graph_ptr->gridPointToPoint(edge.first);
+            Point edge_dest_point  = this->field_graph_ptr->gridPointToPoint(edge.second);
+            // increase the cost by the increase in violation between the start and end
+            // points of the edge
+            cost += (violation_function(edge_dest_point) -
+                     violation_function(edge_start_point));
+            return cost;
         });
 
     GridVertex start_v = field_graph_ptr->nearestGridVertex(start);
     GridVertex dest_v  = field_graph_ptr->nearestGridVertex(dest);
-    AStarHeuristic heuristic(field_graph_ptr, dest);
+    AStarHeuristic heuristic(field_graph_ptr, violation_function, dest);
 
     using pred_map     = boost::unordered_map<GridVertex, GridVertex, grid_vertex_hash>;
     using distance_map = boost::unordered_map<GridVertex, edge_cost_t>;

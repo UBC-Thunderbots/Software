@@ -83,15 +83,19 @@ namespace AStar
         /**
          * Constructs an AStarHeuristic for a given graph and destination point.
          * @param _graph the graph
+         * @param _violation_function a function that returns the violation distance for a
+         * given point
          * @param _dest the destination point
          */
         explicit AStarHeuristic(const std::shared_ptr<AStarGridGraph> &_graph,
+                                const ViolationFunction &_violation_function,
                                 const Point &_dest);
         edge_cost_t operator()(GridVertex gp);
 
        private:
         std::shared_ptr<AStarGridGraph> graph;
         const Point dest_point;
+        const ViolationFunction violation_function;
     };
 
     struct FoundGoal
@@ -133,13 +137,15 @@ namespace AStar
          * Returns a path from start to dest if it is possible,
          * otherwise return std::nullopt
          *
-         * @param world the world
+         * @param violation_function a function that returns the violation distance for a
+         * given point
          * @param start the start point
          * @param dest the destination point
          * @return a vector of Points that are a path from start to dest
          */
-        std::optional<std::vector<Point>> findPath(const World &world, const Point &start,
-                                                   const Point &dest) override;
+        std::optional<std::vector<Point>> findPath(
+            const ViolationFunction &violation_function, const Point &start,
+            const Point &dest) override;
         ~AStarPathPlanner() override = default;
 
        private:
