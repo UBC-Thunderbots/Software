@@ -111,8 +111,8 @@ namespace Util
     }
 
     void VisualizerMessenger::drawPoly(const std::string& layer,
-                                       std::vector<Point2D>& vertices,
-                                       DrawStyle draw_style, DrawTransform draw_transform)
+                                       std::vector<Point>& vertices, DrawStyle draw_style,
+                                       DrawTransform draw_transform)
     {
         ShapeMsg new_shape;
         new_shape.type = "poly";
@@ -121,8 +121,8 @@ namespace Util
         for (auto vertexIter = vertices.begin(); vertexIter != vertices.end();
              vertexIter++)
         {
-            new_shape.data.push_back((*vertexIter).x);
-            new_shape.data.push_back((*vertexIter).y);
+            new_shape.data.push_back((*vertexIter).x());
+            new_shape.data.push_back((*vertexIter).y());
         }
 
         applyDrawStyleToMsg(new_shape, draw_style);

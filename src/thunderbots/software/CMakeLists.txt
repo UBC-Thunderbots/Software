@@ -235,11 +235,11 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
 # picking up other files that may affect test behaviour. Unit tests should not need too many files to be specified
 # and we want to make sure the minimum set of files required for the test are being used.
 
-## Why We Have Tests Grouped ## 
-# When you build a test executable (or any executable) with cmake, it does not 
-# save any `.o` files it might have already built for other executables. That 
-# means if I require `move_primitive.cpp` for two test executables, CMake will 
-# build it _twice_. This has lead to a heck of a lot of build duplication in our 
+## Why We Have Tests Grouped ##
+# When you build a test executable (or any executable) with cmake, it does not
+# save any `.o` files it might have already built for other executables. That
+# means if I require `move_primitive.cpp` for two test executables, CMake will
+# build it _twice_. This has lead to a heck of a lot of build duplication in our
 # system. See this PR for the original change in this direction:
 # https://github.com/UBC-Thunderbots/Software/pull/386
 
@@ -287,7 +287,10 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/field.cpp
             ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/game_state.cpp
             util/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             geom/point.h
             geom/angle.h)
 
@@ -353,8 +356,8 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
             test/ai/grsim_communication/grsim_backend.cpp
-            test/ai/grsim_communication/grsim_command_primitive_visitor_catch.cpp
-            test/ai/grsim_communication/grsim_command_primitive_visitor_movespin.cpp
+            test/ai/grsim_communication/catch_primitive.cpp
+            test/ai/grsim_communication/movespin_primitive.cpp
             test/ai/grsim_communication/main.cpp
             test/ai/grsim_communication/motion_controller.cpp
             test/test_util/test_util.cpp
@@ -605,6 +608,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
+            test/ai/hl/stp/tactic/tactic.cpp
             test/test_util/test_util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
@@ -654,34 +658,74 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(intent_test
             ${G3LOG}
-            ${catkin_LIBRARIES})
+            ${catkin_LIBRARIES}
+            )
 
-    catkin_add_gtest(passing_evaluation_test
-            test/ai/passing/evaluation.cpp
-            test/test_util/test_util.cpp
+    catkin_add_gtest(passing_test
             ai/passing/evaluation.cpp
-            ai/world/field.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/world/ball.cpp
-            ai/world/team.cpp
-            ai/world/robot.cpp
-            ai/world/world.cpp
+            ai/world/field.cpp
             ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            test/ai/passing/evaluation.cpp
+            test/ai/passing/main.cpp
+            test/ai/passing/pass.cpp
+            test/ai/passing/pass_generator.cpp
+            test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
             )
-    target_link_libraries(passing_evaluation_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(pass_test
-            test/ai/passing/pass.cpp
-            ai/passing/pass.cpp
-            util/timestamp.cpp
-            )
-    target_link_libraries(pass_test ${catkin_LIBRARIES})
+    target_link_libraries(passing_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(gradient_descent_optimizer_test
             test/util/gradient_descent_optimizer.cpp
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(navigator_test
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/game_state.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/intent/catch_intent.cpp
+            ai/intent/chip_intent.cpp
+            ai/intent/direct_velocity_intent.cpp
+            ai/intent/direct_wheels_intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/movespin_intent.cpp
+            ai/intent/pivot_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            test/ai/navigator/main.cpp
+            test/test_util/test_util.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/timestamp.cpp
+            )
+    target_link_libraries(navigator_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
 endif()
 

@@ -1,0 +1,10 @@
+<launch>
+
+    <!-- Run all the shared AI nodes -->
+    <include file="$(find thunderbots)/launch/ai.launch" />
+
+    <!-- Launch the radio_communication node -->
+    <node name="radio_communication" pkg="thunderbots" type="radio_communication" output="screen">
+    </node>
+
+</launch>

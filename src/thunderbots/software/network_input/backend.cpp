@@ -213,8 +213,7 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
     return enemy_team_state;
 }
 
-std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
-    const Referee &packet)
+thunderbots_msgs::RefboxData Backend::getRefboxDataMsg(const Referee &packet)
 {
     thunderbots_msgs::RefboxData refbox_data;
     refbox_data.command.command = getTeamCommand(packet.command());
@@ -239,7 +238,7 @@ std::optional<thunderbots_msgs::RefboxData> Backend::getRefboxDataMsg(
         refbox_data.them = blue;
     }
 
-    return std::make_optional<thunderbots_msgs::RefboxData>(refbox_data);
+    return refbox_data;
 }
 
 // this maps a protobuf Referee_Command enum to its ROS message equivalent
