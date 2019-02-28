@@ -71,6 +71,7 @@ namespace AStar
         // return, into Points that can be used for navigation
         std::vector<std::pair<Point, GridVertex>> grid_points_list;
 
+        // the minimum and maximum x- and y-values on the field
         const double field_min_x, field_min_y;
         const size_t grid_vertex_density;
     };

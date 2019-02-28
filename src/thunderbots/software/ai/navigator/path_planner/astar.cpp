@@ -92,8 +92,7 @@ void AStar::AStarVertexVisitor::examine_vertex(GridVertex grid_v,
 {
     if (grid_v == dest)
     {
-        // throw an exception because the people who came up with boost
-        // are crazy
+        // throw an exception to indicate that the goal node was reached
         throw AStar::FoundGoal();
     }
 }
