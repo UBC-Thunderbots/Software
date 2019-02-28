@@ -11,6 +11,34 @@
 
 using namespace AI::Passing;
 
+TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle){
+    Angle target_angle = Angle::half();
+    Robot robot(0, {1,1}, Vector(0,0), Angle::half(), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+
+    EXPECT_EQ(Timestamp::fromSeconds(0), getTimeToOrientationForRobot(robot, target_angle));
+}
+
+TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desired_angle){
+    // Because we can't guarantee that the robot angular acceleration isn't going to
+    // increase to the point where we can't reach the the max angular speed within
+    // a half rotation, this is just a more loose test that checks if we got there
+    // within roughly the expected time. Any more strict test would have to
+    // basically re-write the function, which would be a bit pointless
+
+    Angle target_angle = Angle::zero();
+    Robot robot(0, {1,1}, Vector(0,0), Angle::half(), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+
+    // Figure out a lower bound on the time required, based on us being able to constantly
+    // accelerate at the max acceleration
+    double min_time_to_rotate = ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND / ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED;
+
+    // For the upper bound, just choose a time that's much greater then we would expect
+    double max_time_to_rotate = 5.0;
+
+    EXPECT_LE(Timestamp::fromSeconds(min_time_to_rotate), getTimeToOrientationForRobot(robot, target_angle));
+    EXPECT_GE(Timestamp::fromSeconds(max_time_to_rotate), getTimeToOrientationForRobot(robot, target_angle));
+}
+
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest){
     Point dest(1,1);
     Robot robot(0, dest, Vector(0,0), Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
@@ -21,9 +49,11 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest){
 TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity){
     // Check that the robot reaches the dest in the at the expected time when
     // it has enough time that it accelerates up to it's maximum velocity
+    // We set the distance here such that it the robot *should* always have time to
+    // get to the max velocity, unless our robots suddenly get *much* faster
 
     Point dest(1,1);
-    Point robot_location(20, 20);
+    Point robot_location(40, 40);
     Robot robot(0, robot_location, Vector(0,0), Angle::ofDegrees(0), AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
 
     double distance_to_dest = (robot_location - dest).len();
@@ -35,7 +65,7 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity){
 
     double travel_time = 2*acceleration_time + time_at_max_vel;
 
-    EXPECT_EQ(travel_time, getTimeToPositionForRobot(robot, dest).getSeconds());
+    EXPECT_EQ(Timestamp::fromSeconds(travel_time), getTimeToPositionForRobot(robot, dest));
 }
 
 TEST(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)

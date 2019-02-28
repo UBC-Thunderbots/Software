@@ -33,6 +33,16 @@ namespace AI::Passing
     double getFriendlyCapability(Team friendly_team, Pass pass);
 
     /**
+     * Calculate how long it would take the given robot to turn to the given orientation
+     *
+     * @param robot The robot to calculate the rotation time for
+     * @param desired_orientation The orientation which we want the robot to be at
+     *
+     * @return The time required for the given robot to rotate to the given orientation
+     */
+    Duration getTimeToOrientationForRobot(Robot robot, Angle desired_orientation);
+
+    /**
      * Calculate minimum time it would take for the given robot to reach the given point
      *
      * This is only a rough calculation in order to be as performant as possible
