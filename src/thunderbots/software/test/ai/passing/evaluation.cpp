@@ -17,6 +17,11 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest){
     EXPECT_EQ(Timestamp::fromSeconds(0), getTimeToPositionForRobot(robot, dest));
 }
 
+TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity){
+    // Check that the robot reaches the dest in the at the expected time when
+    // it has enough time that it accelerates up to it's maximum velocity
+}
+
 TEST(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
 {
     Field f = ::Test::TestUtil::createSSLDivBField();

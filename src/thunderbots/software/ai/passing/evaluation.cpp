@@ -42,6 +42,12 @@ double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass 
 }
 
 Timestamp AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
+    // TODO:
+    // (1) Create a vector that is the sum of the compoenent of the velocity perpendicular to the goal and the velocity componenet moving you *directly* away from the goal
+    // (2) Figure out the time required to kill off the velocity vector from (1) and figure out where we would end up once we've killed it off (in position and velocity)
+    // (3) Figure out the time required to (accounting for the robots current velocity) move to the goal
+    // (3.5) Compare current stopping distance to distance to goal. If greater, "add" another sub-stage that adds the time required to fully stop to the total time
+    // (3.51) Figure out the time required to get to the goal from the current position (accounting for 3.5 if needed) based on a linear acceleration profile.
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
     // we integrate (1) to get:
@@ -68,7 +74,7 @@ Timestamp AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
 
     // Calculate how far the robot moved while it was trying to stop
     // (x = ut + 1/2 * at^2)
-    double stop_distance = initial_speed*time_to_stop + 1/2 * max_accel*std::pow(time_to_stop, 2);
+    double stop_distance = initial_speed*time_to_stop + 1.0/2.0 * max_accel*std::pow(time_to_stop, 2);
     Point robot_stop_position = robot.position() + robot.velocity().norm() * stop_distance;
 
     double dist = (robot_stop_position - dest).len();
