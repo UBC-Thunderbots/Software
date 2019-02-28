@@ -3,9 +3,11 @@
 // I apologize if your CLion slows to a crawl
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/grid_graph.hpp>
+
 #include "ai/world/field.h"
 #include "path_planner.h"
-namespace AStar {
+namespace AStar
+{
     // TODO: move a lot of stuff out of this header
 
     // number of graph vertices per metre
@@ -18,13 +20,14 @@ namespace AStar {
     // vertex type - a 2D point on a grid
     typedef graph_t::vertex_descriptor grid_point;
 
-    struct grid_point_hash : std::unary_function<grid_point, std::size_t> {
-        std::size_t operator() (const grid_point& gp) const;
+    struct grid_point_hash : std::unary_function<grid_point, std::size_t>
+    {
+        std::size_t operator()(const grid_point &gp) const;
     };
 
     class AStarGridGraph
     {
-    public:
+       public:
         AStarGridGraph() = delete;
 
         explicit AStarGridGraph(const Field &field);
@@ -33,11 +36,11 @@ namespace AStar {
 
         grid_point nearestGridPoint(const Point &point);
 
-        const graph_t& graph();
+        const graph_t &graph();
 
         constexpr double gridPointDistance();
 
-    private:
+       private:
         std::unique_ptr<graph_t> field_graph;
         // this map is used to convert from the grid points that A* will
         // return, into Points that can be used for navigation
@@ -47,36 +50,41 @@ namespace AStar {
 
     class AStarHeuristic : public boost::astar_heuristic<graph_t, cost_t>
     {
-    public:
+       public:
         AStarHeuristic() = delete;
         explicit AStarHeuristic(const std::shared_ptr<AStarGridGraph> &_graph,
-                                const Point& _dest);
+                                const Point &_dest);
         cost_t operator()(grid_point gp);
 
-    private:
+       private:
         std::shared_ptr<AStarGridGraph> graph;
         const Point dest_point;
     };
 
-    struct FoundGoal {};
+    struct FoundGoal
+    {
+    };
 
     class AStarVertexVisitor : public boost::default_astar_visitor
     {
-    public:
+       public:
         AStarVertexVisitor() = delete;
         explicit AStarVertexVisitor(grid_point _dest);
-        void examine_vertex(grid_point gp, const graph_t& graph);
-    private:
+        void examine_vertex(grid_point gp, const graph_t &graph);
+
+       private:
         grid_point dest;
     };
 
-    class AStarPathPlanner : public PathPlanner {
-    public:
-        explicit AStarPathPlanner(const Field& field);
-        std::optional<std::vector<Point>>
-        findPath(const World &world, const Point &start, const Point &dest) override;
+    class AStarPathPlanner : public PathPlanner
+    {
+       public:
+        explicit AStarPathPlanner(const Field &field);
+        std::optional<std::vector<Point>> findPath(const World &world, const Point &start,
+                                                   const Point &dest) override;
         ~AStarPathPlanner() override = default;
-    private:
+
+       private:
         std::shared_ptr<AStarGridGraph> field_graph_ptr;
     };
-}
+}  // namespace AStar
