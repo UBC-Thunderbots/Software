@@ -32,7 +32,7 @@ namespace AStar
         const ViolationFunction violation_function;
     };
 
-    struct FoundGoal
+    struct FoundGoalException
     {
     };
 
@@ -66,7 +66,6 @@ namespace AStar
     };
 }  // namespace AStar
 
-// struct grid_vertex_hash
 std::size_t AStar::grid_vertex_hash::operator()(const GridVertex &gp) const
 {
     std::size_t seed = 0;
@@ -74,15 +73,12 @@ std::size_t AStar::grid_vertex_hash::operator()(const GridVertex &gp) const
     boost::hash_combine(seed, gp[1]);
 }
 
-// AStarGridGraph
 AStar::AStarGridGraph::AStarGridGraph(const Field &field,
                                       const size_t _grid_vertex_density)
     : field_min_x(-(field.length() / 2)),
       field_min_y(-(field.width() / 2)),
       grid_vertex_density(_grid_vertex_density)
 {
-    // TODO: allow configuring the field graph number of nodes with
-    // dynamic parameters
     size_t field_length_nodes                = field.totalLength() * grid_vertex_density;
     size_t field_width_nodes                 = field.totalWidth() * grid_vertex_density;
     boost::array<size_t, 2> graph_dimensions = {field_length_nodes, field_width_nodes};
@@ -126,7 +122,6 @@ constexpr double AStar::AStarGridGraph::gridVertexDistance()
     return 1.0f / grid_vertex_density;
 }
 
-// AStarHeuristic
 AStar::AStarHeuristic::AStarHeuristic(
     const std::shared_ptr<AStar::AStarGridGraph> &_graph,
     const ViolationFunction &_violation_function, const Point &_dest)
@@ -142,7 +137,6 @@ AStar::edge_cost_t AStar::AStarHeuristic::operator()(AStar::GridVertex gp)
     return dist(dest_point, p) + p_violation;
 }
 
-// AStarVertexVisitor
 AStar::AStarVertexVisitor::AStarVertexVisitor(AStar::GridVertex _dest) : dest(_dest) {}
 
 void AStar::AStarVertexVisitor::examine_vertex(GridVertex grid_v,
@@ -151,7 +145,7 @@ void AStar::AStarVertexVisitor::examine_vertex(GridVertex grid_v,
     if (grid_v == dest)
     {
         // throw an exception to indicate that the goal node was reached
-        throw AStar::FoundGoal();
+        throw AStar::FoundGoalException();
     }
 }
 
@@ -199,7 +193,7 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(
                                 .distance_map(dist_pmap)
                                 .visitor(visitor));
     }
-    catch (FoundGoal fg)
+    catch (FoundGoalException fg)
     {
         soln_found = true;
         for (GridVertex gp = dest_v; gp != start_v; gp = preds[gp])
