@@ -1,13 +1,13 @@
 #pragma once
 
+#include "ai/primitive/catch_primitive.h"
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/direct_velocity_primitive.h"
 #include "ai/primitive/direct_wheels_primitive.h"
 #include "ai/primitive/dribble_primitive.h"
-#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
-#include "ai/primitive/grsim_command_primitive_visitor_movespin.h"
 #include "ai/primitive/kick_primitive.h"
 #include "ai/primitive/move_primitive.h"
+#include "ai/primitive/movespin_primitive.h"
 #include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/stop_primitive.h"
 
@@ -68,9 +68,9 @@ class PrimitiveVisitor
     /**
      * Visits a MoveSpinPrimitive to perform an operation.
      *
-     * @param move_spin_primitive The MoveSpinPrimitive to visit
+     * @param movespin_primitive The MoveSpinPrimitive to visit
      */
-    virtual void visit(const MoveSpinPrimitive &move_spin_primitive) = 0;
+    virtual void visit(const MoveSpinPrimitive &movespin_primitive) = 0;
 
     /**
      * Visits a DribblePrimitive to perform an operation.

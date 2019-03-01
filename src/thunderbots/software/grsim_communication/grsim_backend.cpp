@@ -12,6 +12,7 @@
 #include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Replacement.pb.h"
+#include "shared/constants.h"
 #include "util/logger/init.h"
 
 
@@ -61,7 +62,10 @@ void GrSimBackend::sendPrimitives(
                 MotionController::bangBangVelocityController(
                     robot, motion_controller_command.global_destination,
                     motion_controller_command.final_speed_at_destination,
-                    motion_controller_command.final_orientation, delta_time.count());
+                    motion_controller_command.final_orientation, delta_time.count(),
+                    ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+                    ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(

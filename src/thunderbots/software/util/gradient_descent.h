@@ -18,6 +18,11 @@ namespace Util
      * implementation of functions has been moved to a `.tpp` file that is included at
      * the end of this file.
      *
+     * "Weights" are used throughout this class, and hence are documented here as follows:
+     *      Weights used to normalize parameters, as gradient descent works much better if
+     *      the function being optimized is homogeneous in direction
+     *      for example, f = x^2 + y^2 is easier to optimize than f = x^2 + 50*y^2
+     *
      * This class uses an implementation of "Adam" (Adaptive Moment) Gradient Descent:
      * https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/
      * https://en.wikipedia.org/wiki/Stochastic_gradient_descent#Adam
@@ -161,9 +166,8 @@ namespace Util
         // (gradient descent)
         static constexpr double eps = 1e-8;
 
-        // Weights used to normalize parameters, as gradient descent works much better if
-        // the function being optimized is homogeneous in direction
-        // for example f = x^2 + y^2 is easier to optimize than f = x^2 + 50*y^2
+        // Weights used to normalize parameters. See class javadoc comment above for
+        // details
         ParamArray param_weights;
 
         // Decay rates used for Adam (see class description for details)
