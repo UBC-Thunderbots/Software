@@ -1,7 +1,4 @@
 #include "geom/point.h"
-* Adds a Play to the Play registry.
-*
-*
 
 #include <gtest/gtest.h>
 
