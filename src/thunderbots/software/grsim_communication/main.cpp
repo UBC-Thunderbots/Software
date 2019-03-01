@@ -31,6 +31,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
         primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
     }
 
+    std::vector<std::unique_ptr<Primitive>> primitives;
     grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
 }
 
@@ -38,6 +39,10 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
 {
     thunderbots_msgs::World world_msg = *msg;
     world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+
+    std::vector<std::unique_ptr<Primitive>> primitives;
+    // add your primitive here
+    grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
 }
 
 int main(int argc, char** argv)

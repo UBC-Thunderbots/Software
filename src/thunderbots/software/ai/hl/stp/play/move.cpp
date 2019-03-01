@@ -1,6 +1,6 @@
 #include "ai/hl/stp/play/play.h"
+#include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
-
 class MovePlay : public Play
 {
     std::string name() override

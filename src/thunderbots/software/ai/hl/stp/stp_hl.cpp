@@ -14,7 +14,8 @@ std::vector<std::pair<Robot, std::unique_ptr<Tactic>>> STP_HL::assignTacticsToRo
 
 std::shared_ptr<Play> STP_HL::calculateNewPlay(const World &world) const
 {
-    return Play::getRegistry().at(0)->getInstance();
+    return {};
+//    return Play::getRegistry().at(0)->getInstance();
 }
 
 std::vector<std::unique_ptr<Intent>> STP_HL::getIntentAssignment(const World &world)

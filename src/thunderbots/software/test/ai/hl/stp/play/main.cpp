@@ -1,14 +1,10 @@
-#include "geom/point.h"
-* Adds a Play to the Play registry.
-*
-*
+/**
+ * main function for all Action tests
+ */
 
 #include <gtest/gtest.h>
 
-TEST(AngleTest, accesors)
-{
-    EXPECT_DOUBLE_EQ(0, Point().x());
-}
+#include <iostream>
 
 int main(int argc, char **argv)
 {
