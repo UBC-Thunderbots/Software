@@ -62,6 +62,24 @@ namespace AI::Passing
         Timestamp startTime();
 
         /**
+         * Estimate the time when the pass should be received
+         *
+         * This estimate does not account for friction on the ball
+         *
+         * @return An estimate of the time when the pass should be received
+         */
+        Timestamp estimateReceiveTime();
+
+        /**
+         * Estimate how long the pass will take, from kicking to receiving
+         *
+         * This estimate does not account for friction on the ball
+         *
+         * @return An estimate of how long the pass will take, from kicking to receiving
+         */
+        Duration estimatePassDuration();
+
+        /**
          * Implement the "<<" operator for printing
          *
          * @param output_stream The stream to print to

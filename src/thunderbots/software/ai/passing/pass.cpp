@@ -35,6 +35,14 @@ Timestamp Pass::startTime()
     return pass_start_time;
 }
 
+Timestamp Pass::estimateReceiveTime() {
+    return pass_start_time + estimatePassDuration();
+}
+
+Duration Pass::estimatePassDuration() {
+    return Timestamp::fromSeconds((receiver_point - passer_point).len()/pass_speed_m_per_s);
+}
+
 namespace AI::Passing
 {
     std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)

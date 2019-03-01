@@ -15,6 +15,43 @@
 
 namespace AI::Passing
 {
+    // TODO: better name for this function?
+    /**
+     * Calculates the risk of an enemy robot interfering with a given pass
+     *
+     * @param enemy_team The team of enemy robots
+     * @param pass The pass to rate
+     * @return A value in [0,1] indicating the quality of the pass based on the risk
+     *         that an enemy interfere with it, with 1 indicating the pass is guaranteed
+     *         to run without interference, and 0 indicating that the pass will certainly
+     *         be interfered with (and so is very poor)
+     */
+    double ratePassEnemyRisk(Team enemy_team, Pass pass);
+
+    /**
+     * Calculates the likelihood that the given pass will be intercepted
+     *
+     * @param enemy_team The team of robots that we're worried about intercepting our pass
+     * @param pass The pass we want to get the intercept probability for
+     * @return A value in [0,1] indicating the probability that the given pass will be
+     *         intercepted by a robot on the given team, with 1 indicating the pass is
+     *         guaranteed to be intercepted, and 0 indicating it's impossible for the
+     *         pass to be intercepted
+     */
+    double calculateInterceptRisk(Team enemy_team, Pass pass);
+
+    /**
+     * Calculates the likelihood that the given pass will be intercepted by a given robot
+     *
+     * @param enemy_robot The robot that might intercept our pass
+     * @param pass The pass we want to get the intercept probability for
+     * @return A value in [0,1] indicating the probability that the given pass will be
+     *         intercepted by the given robot, with 1 indicating the pass is guaranteed to
+     *         be intercepted, and 0 indicating it's impossible for the pass to be
+     *         intercepted
+     */
+    double calculateInterceptRisk(Robot enemy_robot, Pass pass);
+
 
     // TODO: better name for this function?
     /**
@@ -30,7 +67,7 @@ namespace AI::Passing
      *         friendly team to recive the given pass, with 1 being very likely, 0
      *         being impossible
      */
-    double getFriendlyCapability(Team friendly_team, Pass pass);
+    double ratePassFriendlyCapability(Team friendly_team, Pass pass);
 
     /**
      * Calculate how long it would take the given robot to turn to the given orientation

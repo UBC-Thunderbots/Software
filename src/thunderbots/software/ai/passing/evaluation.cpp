@@ -2,6 +2,8 @@
  * Implementation of evaluation functions for passing
  */
 
+// TODO: If this file gets too big we should break it up
+
 #include <numeric>
 
 #include "../shared/constants.h"
@@ -11,7 +13,64 @@
 
 using namespace AI::Passing;
 
-double AI::Passing::getFriendlyCapability(Team friendly_team, AI::Passing::Pass pass) {
+double AI::Passing::ratePassEnemyRisk(Team enemy_team, AI::Passing::Pass pass) {
+    // TODO: The old code adds risk based on the distance of enemies to the receive point, wait for James response on why this was before deciding whether or not to add it
+}
+
+double AI::Passing::calculateInterceptRisk(Team enemy_team, AI::Passing::Pass pass) {
+    // Return the highest risk for all the enemy robots, if there are any
+    auto enemy_robots = enemy_team.getAllRobots();
+    if (enemy_robots.empty()){
+        return 0;
+    }
+    std::vector<double> enemy_intercept_risks;
+    std::transform(enemy_robots.begin(), enemy_robots.end(), enemy_intercept_risks.begin(),
+                                           [&](Robot robot){
+                                               return calculateInterceptRisk(robot, pass);
+                                           });
+    return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
+}
+
+double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass pass) {
+    // We estimate the intercept risk by the distance that the enemy robot is
+    // from the pass trajectory. We assume the enemy continues moving at it's current
+    // velocity until the ball is kicked
+
+    // We force any negative duration to 0 here
+    Duration time_until_pass = std::max(Duration::fromSeconds(0), pass.startTime() - enemy_robot.lastUpdateTimestamp());
+
+    // Estimate where the enemy will be when we start the pass
+    enemy_robot.updateStateToPredictedState(time_until_pass);
+
+    // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
+    // the the receiver point for the pass, then it is guaranteed that it will not be
+    // able to intercept the pass anywhere.
+
+    Point closest_point_on_pass_to_robot = closestPointOnSeg(enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
+    Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(enemy_robot, closest_point_on_pass_to_robot);
+    Duration ball_time_to_closest_pass_point = Timestamp::fromSeconds((closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
+
+    // Figure out how long the enemy robot will take to reach the receive point for the
+    // pass.
+    Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(enemy_robot, pass.receiverPoint());
+    Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
+
+    Duration robot_ball_time_diff_at_closest_pass_point = enemy_robot_time_to_closest_pass_point - ball_time_to_closest_pass_point;
+    Duration robot_ball_time_diff_at_pass_receive_point = enemy_robot_time_to_pass_receive_position - ball_time_to_pass_receive_position;
+
+    // We take a smooth "max" of these two values using a log-sum-exp function
+    Duration max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point, robot_ball_time_diff_at_pass_receive_point);
+    double max_time_diff_smooth = max_time_diff_unsmooth.getSeconds() + std::log(std::exp((robot_ball_time_diff_at_closest_pass_point - max_time_diff_unsmooth).getSeconds()) + std::exp((robot_ball_time_diff_at_pass_receive_point - max_time_diff_unsmooth).getSeconds()));
+
+    // Whether or not the enemy will be able to intercept the pass can be determined
+    // by whether or not they will be able to reach the pass receive position before
+    // the pass does. As such, we construct a sigmoid centered at the time the pass
+    // will complete, and use the time the robot will get to the receive point as
+    // the "x" value along our sigmoid
+    return sigmoid(max_time_diff_smooth, -0.5, 1);
+}
+
+double AI::Passing::ratePassFriendlyCapability(Team friendly_team, AI::Passing::Pass pass) {
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty()){
         return 0;
