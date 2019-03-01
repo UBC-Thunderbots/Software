@@ -8,21 +8,12 @@
 #include "path_planner.h"
 namespace AStar
 {
-    // TODO: potentially move a lot of stuff out of this header
-
     // edge cost type
     typedef double edge_cost_t;
     // 2D grid graph type
     typedef boost::grid_graph<2> GridGraph2D;
     // vertex type - a 2D point on a grid
     typedef GridGraph2D::vertex_descriptor GridVertex;
-
-    // a hash function for a grid vertex, necessary for all the maps
-    // that boost::astar_search uses
-    struct grid_vertex_hash : std::unary_function<GridVertex, std::size_t>
-    {
-        std::size_t operator()(const GridVertex &gp) const;
-    };
 
     class AStarGridGraph
     {
@@ -74,55 +65,6 @@ namespace AStar
         // the minimum and maximum x- and y-values on the field
         const double field_min_x, field_min_y;
         const size_t grid_vertex_density;
-    };
-
-    class AStarHeuristic : public boost::astar_heuristic<GridGraph2D, edge_cost_t>
-    {
-       public:
-        AStarHeuristic() = delete;
-
-        /**
-         * Constructs an AStarHeuristic for a given graph and destination point.
-         * @param _graph the graph
-         * @param _violation_function a function that returns the violation distance for a
-         * given point
-         * @param _dest the destination point
-         */
-        explicit AStarHeuristic(const std::shared_ptr<AStarGridGraph> &_graph,
-                                const ViolationFunction &_violation_function,
-                                const Point &_dest);
-        edge_cost_t operator()(GridVertex gp);
-
-       private:
-        std::shared_ptr<AStarGridGraph> graph;
-        const Point dest_point;
-        const ViolationFunction violation_function;
-    };
-
-    struct FoundGoal
-    {
-    };
-
-    class AStarVertexVisitor : public boost::default_astar_visitor
-    {
-       public:
-        AStarVertexVisitor() = delete;
-
-        /**
-         * Construct a visitor for the given destination graph vertex.
-         * @param _dest destinaton graph vertex
-         */
-        explicit AStarVertexVisitor(GridVertex _dest);
-
-        /**
-         * Throws FoundGoal if the destination vertex is reached.
-         * @param grid_v the grid vertex that may or may not be the destination
-         * @param graph the graph
-         */
-        void examine_vertex(GridVertex grid_v, const GridGraph2D &graph);
-
-       private:
-        GridVertex dest;
     };
 
     class AStarPathPlanner : public PathPlanner
