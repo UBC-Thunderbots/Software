@@ -20,6 +20,9 @@ namespace Util
         static const std::string AI_PRIMITIVES_TOPIC         = "backend/primitives";
         static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
+        // The topic published by the joy_node that contains information about any plugged
+        // in joysticks / controllers
+        static const std::string JOY_NODE_TOPIC = "joy";
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
