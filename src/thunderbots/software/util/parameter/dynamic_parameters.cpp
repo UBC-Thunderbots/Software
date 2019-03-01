@@ -4,21 +4,27 @@
 
 namespace Util::DynamicParameters
 {
+    ros::Subscriber initCallbackSubscription(ros::NodeHandle& node_handle)
+    {
+        // return the subscriber that updates the parameters on change
+        return node_handle.subscribe("/parameters/parameter_updates", 1,
+                                     Util::DynamicParameters::parameterUpdateCallback);
+    }
+
+    void parameterUpdateCallback(const dynamic_reconfigure::Config::ConstPtr& updates)
+    {
+        Parameter<bool>::updateAllParametersFromConfigMsg(updates);
+        Parameter<int32_t>::updateAllParametersFromConfigMsg(updates);
+        Parameter<double>::updateAllParametersFromConfigMsg(updates);
+        Parameter<std::string>::updateAllParametersFromConfigMsg(updates);
+    }
+
     void updateAllParametersFromROSParameterServer()
     {
         Parameter<bool>::updateAllParametersFromROSParameterServer();
         Parameter<int32_t>::updateAllParametersFromROSParameterServer();
         Parameter<double>::updateAllParametersFromROSParameterServer();
         Parameter<std::string>::updateAllParametersFromROSParameterServer();
-    }
-
-    void updateAllParametersFromConfigMsg(
-        const dynamic_reconfigure::Config::ConstPtr& updates)
-    {
-        Parameter<bool>::updateAllParametersFromConfigMsg(updates);
-        Parameter<int32_t>::updateAllParametersFromConfigMsg(updates);
-        Parameter<double>::updateAllParametersFromConfigMsg(updates);
-        Parameter<std::string>::updateAllParametersFromConfigMsg(updates);
     }
 
     Parameter<int32_t> robot_expiry_buffer_milliseconds(

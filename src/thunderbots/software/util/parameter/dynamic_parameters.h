@@ -10,6 +10,20 @@ namespace Util
     namespace DynamicParameters
     {
         /**
+         * Initializes the callbacks for the dynamic reconfigure server so that
+         * the parameters are updated on callback
+         */
+        ros::Subscriber initCallbackSubscription(ros::NodeHandle& node_handle);
+
+        /**
+         * This callback is attatched to the /parameter/parameter_updates topic
+         * The new values arrive on this topic and the parameter objects are updated
+         * from the Config msg
+         */
+        void parameterUpdateCallback(
+            const dynamic_reconfigure::Config::ConstPtr& updates);
+
+        /**
          * Updates all known parameters with the latest values from the ROS Parameter
          * Server
          */

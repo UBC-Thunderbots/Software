@@ -26,17 +26,6 @@ void updateAllParameters(const ros::TimerEvent& event)
 }
 
 /**
- * This callback is attatched to the /parameter/parameter_updates topic
- * The new values arrive on this topic and the parameter objects are updated
- * from the Config msg
- *
- */
-void parameterUpdateCallback(const dynamic_reconfigure::Config::ConstPtr& updates)
-{
-    Util::DynamicParameters::updateAllParametersFromConfigMsg(updates);
-}
-
-/**
  * This node starts up the dynamic_reconfigure server and properly configures
  * all the default values for all the parameters. Depending on the REFRESH_RATE
  * defined, updateROSParameters...() is called, fetching the values from the server
@@ -74,8 +63,8 @@ int main(int argc, char** argv)
     timer.start();
 
     // setup the subscriber to the updates topic to update parameters
-    ros::Subscriber updater = node_handle.subscribe("/parameters/parameter_updates", 1,
-                                                    parameterUpdateCallback);
+    ros::Subscriber callback_subscription =
+        Util::DynamicParameters::initCallbackSubscription(node_handle);
 
     // spin asynchronously to allow for service call in the same node
     ros::AsyncSpinner spinner(NUMBER_OF_THREADS);
