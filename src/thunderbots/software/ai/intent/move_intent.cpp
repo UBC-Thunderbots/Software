@@ -1,32 +1,31 @@
-#include "move_intent.h"
+#include "ai/intent/move_intent.h"
+
+#include "ai/intent/visitor/intent_visitor.h"
+
+const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed)
-    : robot_id(robot_id), dest(dest), final_angle(final_angle), final_speed(final_speed)
+                       double final_speed, unsigned int priority)
+    : MovePrimitive(robot_id, dest, final_angle, final_speed), Intent(priority)
 {
 }
 
-unsigned int MoveIntent::getRobotId() const
+std::string MoveIntent::getIntentName(void) const
 {
-    return robot_id;
+    return INTENT_NAME;
 }
 
-std::string MoveIntent::getIntentName() const
+void MoveIntent::accept(IntentVisitor &visitor) const
 {
-    return MOVE_INTENT_NAME;
+    visitor.visit(*this);
 }
 
-Point MoveIntent::getDestination() const
+bool MoveIntent::operator==(const MoveIntent &other) const
 {
-    return dest;
+    return MovePrimitive::operator==(other) && Intent::operator==(other);
 }
 
-Angle MoveIntent::getFinalAngle() const
+bool MoveIntent::operator!=(const MoveIntent &other) const
 {
-    return final_angle;
-}
-
-double MoveIntent::getFinalSpeed() const
-{
-    return final_speed;
+    return !((*this) == other);
 }

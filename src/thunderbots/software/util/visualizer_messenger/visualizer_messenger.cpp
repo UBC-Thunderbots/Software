@@ -29,8 +29,20 @@ namespace Util
 
     void VisualizerMessenger::publishAndClearLayers()
     {
+        // Limit rate of the message publishing
+        // Get the time right now
+        const time_point now     = std::chrono::system_clock::now();
+        const int64_t elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       now - time_last_published)
+                                       .count();
+        const double elapsed_ms = elapsed_ns / 1.0e6;
+
+        // Do not do anything if the time passed hasn't been
+        // long enough
+        if (elapsed_ms < DESIRED_PERIOD_MS)
+            return;
+
         // Check if publisher is initialized before publishing messages
-        // TODO: #312: refresh rate limit by comparing time delta
         if (!this->publisher)
         {
             LOG(WARNING)
@@ -50,12 +62,15 @@ namespace Util
 
         // Clear shapes in layers of current frame/tick
         clearLayers();
+
+        // Update last published time
+        time_last_published = now;
     }
 
     void VisualizerMessenger::clearLayers()
     {
         // Clears all shape vector in all the layers
-        for (std::pair<std::string, LayerMsg> layer : this->layers_name_to_msg_map)
+        for (auto& layer : this->layers_name_to_msg_map)
         {
             layer.second.shapes.clear();
         }
@@ -96,8 +111,8 @@ namespace Util
     }
 
     void VisualizerMessenger::drawPoly(const std::string& layer,
-                                       std::vector<Point2D>& vertices,
-                                       DrawStyle draw_style, DrawTransform draw_transform)
+                                       std::vector<Point>& vertices, DrawStyle draw_style,
+                                       DrawTransform draw_transform)
     {
         ShapeMsg new_shape;
         new_shape.type = "poly";
@@ -106,8 +121,8 @@ namespace Util
         for (auto vertexIter = vertices.begin(); vertexIter != vertices.end();
              vertexIter++)
         {
-            new_shape.data.push_back((*vertexIter).x);
-            new_shape.data.push_back((*vertexIter).y);
+            new_shape.data.push_back((*vertexIter).x());
+            new_shape.data.push_back((*vertexIter).y());
         }
 
         applyDrawStyleToMsg(new_shape, draw_style);

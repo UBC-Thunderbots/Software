@@ -2,8 +2,10 @@
 
 #include "util/logger/init.h"
 
-SSLVisionClient::SSLVisionClient(const std::string ip_address, const unsigned short port)
-    : socket_(io_service)
+SSLVisionClient::SSLVisionClient(boost::asio::io_service& io_service,
+                                 const std::string ip_address, const unsigned short port,
+                                 std::function<void(SSL_WrapperPacket)> handle_function)
+    : socket_(io_service), handle_function(handle_function)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::address::from_string(ip_address), port);
@@ -43,16 +45,10 @@ void SSLVisionClient::handleDataReception(const boost::system::error_code& error
 {
     if (!error)
     {
-        // This function will be run for EVERY packet received from the network since the
-        // last time poll() was called. This means that this function may be called
-        // several times to process several packets. This is why we immediately store any
-        // received and processed data into the packet_queue. If we didn't save the
-        // received data somewhere else, the data would be overwritten by the packet
-        // being handled in the next handleDataReception function call
         auto packet_data = SSL_WrapperPacket();
         packet_data.ParseFromArray(raw_received_data_.data(),
                                    static_cast<int>(num_bytes_received));
-        packet_queue.emplace(packet_data);
+        handle_function(packet_data);
 
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
@@ -74,22 +70,4 @@ void SSLVisionClient::handleDataReception(const boost::system::error_code& error
             << "An unknown network error occurred when attempting to receive SSL Vision Data. The boost system error code is "
             << error << std::endl;
     }
-}
-
-const std::queue<SSL_WrapperPacket> SSLVisionClient::getVisionPacketQueue()
-{
-    // Calling the poll() function will cause a handleDataReception() function to run for
-    // EVERY packet of data that was received since the last time poll() was called.
-    // Note that handleDataReception() may run multiple times in order to handle the
-    // multiple received packets. This is why we move the data from the buffer into the
-    // packet_queue, so that any subsequent handleDataReception() calls do not overwrite
-    // the data
-    io_service.poll();
-
-    // Make a copy of the data to return
-    std::queue<SSL_WrapperPacket> packet_queue_copy = packet_queue;
-    // Clear the packet_queue
-    packet_queue = {};
-
-    return packet_queue_copy;
 }

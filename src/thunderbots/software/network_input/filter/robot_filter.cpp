@@ -1,11 +1,9 @@
-#include "robot_filter.h"
-
-#include <ros/console.h>
+#include "network_input/filter/robot_filter.h"
 
 RobotFilter::RobotFilter(unsigned int id) : robot_id(id) {}
 
 FilteredRobotData RobotFilter::getFilteredData(
-    const std::vector<SSLRobotData> &new_robot_data)
+    const std::vector<SSLRobotDetection> &new_robot_data)
 {
     FilteredRobotData filtered_data;
     filtered_data.id               = 0;
