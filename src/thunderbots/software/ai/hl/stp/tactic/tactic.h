@@ -91,8 +91,6 @@ class Tactic
     virtual ~Tactic() = default;
 
    protected:
-    // The coroutine that sequentially returns the Intents the Tactic wants to run
-    intent_coroutine::pull_type intent_sequence;
     // The robot performing this Tactic
     std::optional<Robot> robot;
 
@@ -102,7 +100,7 @@ class Tactic
      *
      * This function exists because when the coroutine (intent_sequence) is first
      * constructed the coroutine is called/entered. This would normally cause the
-     * calculateNextIntentWrapper to be run once and potentially return incorrect results
+     * calculateNextIntent to be run once and potentially return incorrect results
      * due to default constructed values.
      *
      * This wrapper function will yield a null pointer the first time it's called and
@@ -135,6 +133,8 @@ class Tactic
     virtual std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type &yield) = 0;
 
+    // The coroutine that sequentially returns the Intents the Tactic wants to run
+    intent_coroutine::pull_type intent_sequence;
     // Whether or not this Tactic is done
     bool done_;
 };
