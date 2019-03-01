@@ -4,7 +4,7 @@
 
 namespace Util::DynamicParameters
 {
-    ros::Subscriber initCallbackSubscription(ros::NodeHandle& node_handle)
+    ros::Subscriber initParamUpdateSubscription(ros::NodeHandle& node_handle)
     {
         // return the subscriber that updates the parameters on change
         return node_handle.subscribe("/parameters/parameter_updates", 1,

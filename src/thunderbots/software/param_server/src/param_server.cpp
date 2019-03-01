@@ -63,8 +63,8 @@ int main(int argc, char** argv)
     timer.start();
 
     // setup the subscriber to the updates topic to update parameters
-    ros::Subscriber callback_subscription =
-        Util::DynamicParameters::initCallbackSubscription(node_handle);
+    ros::Subscriber param_update_subscription =
+        Util::DynamicParameters::initParamUpdateSubscription(node_handle);
 
     // spin asynchronously to allow for service call in the same node
     ros::AsyncSpinner spinner(NUMBER_OF_THREADS);
