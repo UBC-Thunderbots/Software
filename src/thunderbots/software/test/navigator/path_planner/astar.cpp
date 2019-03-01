@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 
+#include "ai/navigator/RobotObstacle.h"
 #include "ai/world/world.h"
 
 // define operator<< for std::vector so I can debug paths
@@ -17,6 +18,12 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T> items)
         os << item << std::endl;
     }
     return os;
+}
+
+bool pathViolatesObstacles(const std::vector<Point>& path,
+                           const std::vector<RobotObstacle>& obstacles)
+{
+    // TODO: finish this function
 }
 
 class AStarPathPlannerTest : public ::testing::Test
@@ -32,7 +39,7 @@ class AStarPathPlannerTest : public ::testing::Test
     World testWorld;
     Field testField;
     const ViolationFunction testViolationFunction;
-    static constexpr size_t GRID_VERTEX_DENSITY = 10;
+    static constexpr size_t GRID_VERTEX_DENSITY = 20;
 };
 
 TEST_F(AStarPathPlannerTest, test_construct_path_planner)
@@ -61,6 +68,21 @@ TEST_F(AStarPathPlannerTest, test_find_path_diagonal)
     std::cout << path << std::endl;
     EXPECT_EQ(path[0], start);
     EXPECT_EQ(path[path.size() - 1], end);
+}
+
+TEST_F(AStarPathPlannerTest, test_find_path_vertical_with_obstacles)
+{
+    std::unique_ptr<PathPlanner> planner =
+        std::make_unique<AStar::AStarPathPlanner>(testField, GRID_VERTEX_DENSITY);
+    Point start{0.0f, 0.0f}, end{0.0f, 1.0f};
+    Robot obstacle_robot(0, Point(0.0f, 0.2f), Vector(), Angle(), AngularVelocity(),
+                         Timestamp());
+    RobotObstacle obstacle(obstacle_robot, 0.2f);
+    ViolationFunction violation_function = [&obstacle](const Point& p) {
+        return obstacle.getViolationDistance(p);
+    };
+    std::vector<Point> path = *planner->findPath(violation_function, start, end);
+    std::cout << path << std::endl;
 }
 
 int main(int argc, char** argv)

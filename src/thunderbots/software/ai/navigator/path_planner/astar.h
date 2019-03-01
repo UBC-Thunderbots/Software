@@ -1,6 +1,6 @@
 #pragma once
 
-// I apologize if your CLion slows to a crawl
+// Including these boost headers will have a performance hit on CLion
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/grid_graph.hpp>
 
@@ -14,6 +14,12 @@ namespace AStar
     typedef boost::grid_graph<2> GridGraph2D;
     // vertex type - a 2D point on a grid
     typedef GridGraph2D::vertex_descriptor GridVertex;
+
+    // the factor to multiply violation distance by in the cost and heuristic functions
+    // that A* uses
+    // gigantic number empirically determined by running unit tests until obstacles were
+    // actually avoided
+    static constexpr double VIOLATION_SCALE_FACTOR = 1000.0f;
 
     class AStarGridGraph
     {

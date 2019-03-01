@@ -7,6 +7,7 @@
 #include <boost/unordered_map.hpp>
 
 #include "geom/util.h"
+
 namespace AStar
 {
     class AStarHeuristic : public boost::astar_heuristic<GridGraph2D, edge_cost_t>
@@ -132,8 +133,9 @@ AStar::AStarHeuristic::AStarHeuristic(
 AStar::edge_cost_t AStar::AStarHeuristic::operator()(AStar::GridVertex gp)
 {
     // TODO: scale violation component based on grid density
-    Point p            = graph->gridPointToPoint(gp);
-    double p_violation = violation_function(p);
+    Point p = graph->gridPointToPoint(gp);
+    double p_violation =
+        VIOLATION_SCALE_FACTOR * graph->gridVertexDistance() * violation_function(p);
     return dist(dest_point, p) + p_violation;
 }
 
@@ -163,8 +165,15 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(
             Point edge_dest_point  = this->field_graph_ptr->gridPointToPoint(edge.second);
             // increase the cost by the increase in violation between the start and end
             // points of the edge
-            cost += (violation_function(edge_dest_point) -
-                     violation_function(edge_start_point));
+            double edge_start_violation = VIOLATION_SCALE_FACTOR *
+                                          field_graph_ptr->gridVertexDistance() *
+                                          violation_function(edge_start_point);
+
+            double edge_dest_violation = VIOLATION_SCALE_FACTOR *
+                                         field_graph_ptr->gridVertexDistance() *
+                                         violation_function(edge_start_point);
+
+            cost = edge_dest_violation - edge_start_violation;
             return cost;
         });
 

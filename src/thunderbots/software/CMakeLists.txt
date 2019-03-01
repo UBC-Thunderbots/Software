@@ -616,6 +616,7 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.cpp
             util/parameter/dynamic_parameters.cpp
             util/timestamp.cpp
+            ai/navigator/RobotObstacle.cpp
             )
 
     target_link_libraries(astar_path_planner_test
