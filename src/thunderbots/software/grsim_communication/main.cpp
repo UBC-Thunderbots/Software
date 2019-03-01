@@ -93,7 +93,7 @@ int main(int argc, char** argv)
         ros::spinOnce();
 
         // test setBallState function
-        grsim_backend.setBallState(Point(0, 0), Vector(0, 0));
+        grsim_backend.setBallState(Point(3, -2), Vector(0, 0));
 
         grsim_backend.sendPrimitives(primitives, friendly_team, ball);
 

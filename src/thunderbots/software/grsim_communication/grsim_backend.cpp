@@ -121,13 +121,16 @@ grSim_Packet GrSimBackend::createGrSimReplacementWithBallState(Point destination
                                                                Vector velocity)
 {
     grSim_Packet packet;
-    grSim_Replacement* replacement          = packet.mutable_replacement();
-    grSim_BallReplacement* ball_replacement = replacement->mutable_ball();
-    ball_replacement->set_x(destination.x());
-    ball_replacement->set_y(destination.y());
-    ball_replacement->set_vx(velocity.x());
-    ball_replacement->set_vy(velocity.y());
-
+    // grSim_Replacement* replacement          = packet.mutable_replacement();
+    // grSim_BallReplacement* ball_replacement = replacement->mutable_ball();
+    // ball_replacement->set_x(destination.x());
+    // ball_replacement->set_y(destination.y());
+    // ball_replacement->set_vx(velocity.x());
+    // ball_replacement->set_vy(velocity.y());
+    packet.mutable_replacement()->mutable_ball()->set_x(destination.x());
+    packet.mutable_replacement()->mutable_ball()->set_y(destination.y());
+    packet.mutable_replacement()->mutable_ball()->set_vx(velocity.x());
+    packet.mutable_replacement()->mutable_ball()->set_vy(velocity.y());
     return (packet);
 }
 
