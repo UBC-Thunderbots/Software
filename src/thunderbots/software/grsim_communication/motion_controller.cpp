@@ -29,9 +29,10 @@ MotionController::Velocity MotionController::bangBangVelocityController(
 
     if (delta_time < 0)
     {
-        throw std::invalid_argument("GrSim Motion controller received a negative delta time");
+        throw std::invalid_argument(
+            "GrSim Motion controller received a negative delta time");
     }
-    else if(delta_time == 0)
+    else if (delta_time == 0)
     {
         robot_velocities.linear_velocity  = robot.velocity();
         robot_velocities.angular_velocity = robot.angularVelocity();
