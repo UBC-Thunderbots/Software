@@ -58,12 +58,6 @@ namespace Util
                 // cases, it's more of a weight then a cutoff.
                 extern Parameter<double> ideal_min_shoot_angle_degrees;
 
-                // The minimum open angle formed by the two enemy goal posts and the
-                // pass reception position that we think will likely result in a good
-                // shooting opportunity. Note that we may take shots below this in some
-                // cases, it's more of a weight then a cutoff.
-
-
                 // The minimum angle that we have to rotate after receiving a pass to
                 // shoot that we think would likely result in a goal. Note that we may
                 // try to take shots that require us to rotate more then this, it's

@@ -25,7 +25,7 @@ double AI::Passing::ratePassShootScore(Field field, std::vector<Robot> robots_on
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
     Angle open_angle_to_goal = angleSweepCircles(pass.receiverPoint(),
-            field.enemyGoalpostPos(), field.enemyGoalpostNeg(), obstacles,
+            field.enemyGoalpostNeg(), field.enemyGoalpostPos(), obstacles,
             ROBOT_MAX_RADIUS_METERS).second;
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
@@ -53,16 +53,19 @@ double AI::Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass) 
     // point, based on an exponential function of the distance of each robot from the
     // receiver point
     auto enemy_robots = enemy_team.getAllRobots();
-    double enemy_reciever_proximity_risk = 1;
+    double enemy_receiver_proximity_risk = 1;
     for (const Robot& enemy : enemy_team.getAllRobots()){
         double dist = (pass.receiverPoint() - enemy.position()).len();
-        enemy_reciever_proximity_risk *= (1 - enemy_proximity_importance*std::exp(-dist*dist));
+        enemy_receiver_proximity_risk *= enemy_proximity_importance*std::exp(-dist*dist);
+    }
+    if (enemy_robots.empty()) {
+        enemy_receiver_proximity_risk = 0;
     }
 
     double intercept_risk = calculateInterceptRisk(enemy_team, pass);
 
     // We want to rate a pass more highly if it is lower risk, so subtract from 1
-    return 1 - (enemy_reciever_proximity_risk * intercept_risk);
+    return 1 - std::max(intercept_risk, enemy_receiver_proximity_risk);
 }
 
 double AI::Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass) {

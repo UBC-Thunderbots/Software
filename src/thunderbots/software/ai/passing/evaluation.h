@@ -15,6 +15,7 @@
 
 namespace AI::Passing
 {
+    // TODO: log-sum-exp function with bounds??
     /**
      * Rate pass based on the probability of scoring once we receive the pass
      *
