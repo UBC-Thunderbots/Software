@@ -6,17 +6,17 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-std::pair<Point, bool> Evaluation::indirect_chip_and_chase_target(const World& world)
+std::optional<Point> Evaluation::indirect_chip_and_chase_target(const World& world)
 {
-    // Creates a vector of all non-goalie enemy robots
-    Robot enemy_goalie = world.enemyTeam().goalie().value();
+    std::optional<Robot> enemy_goalie_opt = world.enemyTeam().goalie();
+
     std::vector<Point> non_goalie_enemy_positions;
     std::vector<Point> all_enemy_positions;
 
     for (Robot i : world.enemyTeam().getAllRobots())
     {
         all_enemy_positions.push_back(i.position());
-        if (i != enemy_goalie)
+        if (std::optional<Robot>(i) != enemy_goalie_opt)
         {
             non_goalie_enemy_positions.push_back(i.position());
         }
@@ -30,36 +30,47 @@ std::pair<Point, bool> Evaluation::indirect_chip_and_chase_target(const World& w
 
     target_triangles = remove_outofbounds_triangles(world, target_triangles);
 
-    if (!target_triangles.empty())
+    Point ball_position = world.ball().position();
+
+    return indirect_chip_and_chase_target(target_triangles, ball_position);
+}
+
+
+std::optional<Point> Evaluation::indirect_chip_and_chase_target(
+    const std::vector<Triangle>& triangles, Point ball_position)
+{
+    if (!triangles.empty())
     {
         std::pair<Triangle, bool> largest_triangle = get_largest_triangle(
-            target_triangles,
+            triangles,
             Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_area.value(),
             Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_edge_len
                 .value());
-        Triangle t   = largest_triangle.first;
-        bool valid   = largest_triangle.second;
+        Triangle t = largest_triangle.first;
+
         Point target = get_triangle_center_and_area(t).first;
         target       = target.norm(
-            (target - world.ball().position()).len() *
+            (target - ball_position).len() *
             Util::DynamicParameters::Indirect_Chip_Evaluation::chip_cherry_power_downscale
                 .value());
 
         // Target should never be further away than maximum chip power
-        if ((target - world.ball().position()).len() >
+        if ((target - ball_position).len() >
             Util::DynamicParameters::Indirect_Chip_Evaluation::max_chip_power.value())
+        {
             target =
-                world.ball().position() +
-                (target - world.ball().position())
+                ball_position +
+                (target - ball_position)
                     .norm(
                         Util::DynamicParameters::Indirect_Chip_Evaluation::max_chip_power
                             .value());
+        }
 
-        return std::make_pair(target, valid);
+        return std::optional(target);
     }
     else
     {
-        return std::make_pair(world.field().enemyGoal(), false);
+        return std::nullopt;
     }
 }
 

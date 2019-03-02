@@ -17,14 +17,29 @@ namespace Evaluation
 
     /**
      * Returns the target point that the chipper will shoot at and the chaser will meet
-     * ball at. The target is where ball will land according to chipping calibration.
+     * ball at. Given the enemy team robot's positions, filters and creates a vector of
+     * triangles to be used as a parameter. The target is where ball will land according
+     * to chipping calibration.
      *
      * @param World Object
      *
-     * @return Target point to chip and chase at
-     * @return valid Target is within reach
+     * @return Point to chip and chase at; If empty, point is not valid
      */
-    std::pair<Point, bool> indirect_chip_and_chase_target(const World& world);
+    std::optional<Point> indirect_chip_and_chase_target(const World& world);
+
+    /**
+     * Returns the target point that the chipper will shoot at and the chaser will meet
+     * ball at. Given the filtered vector of triangles, determines if the triangles are
+     * empty and if the largest triangle is within reach. The target is where ball will
+     * land according to chipping calibration.
+     *
+     * @param triangles A vector of triangles that is already filtered
+     * @param ball_position Position of the ball
+     *
+     * @return Point to chip and chase at; If empty, point is not valid
+     */
+    std::optional<Point> indirect_chip_and_chase_target(
+        const std::vector<Triangle>& triangles, Point ball_position);
 
     /**
      * Creates a vector of triangles that picks all permutations of points from the
