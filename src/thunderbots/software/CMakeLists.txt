@@ -224,6 +224,29 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
 
+file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/direct_velocity_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/kick_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/chip_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/timestamp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
+        )
+add_executable (xbox_controller_mapping
+        ${XBOX_CONTROLLER_MAPPING_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
+target_link_libraries(xbox_controller_mapping
+        ${catkin_LIBRARIES}
+        )
+
+
 #############
 ## Testing ##
 #############

@@ -83,5 +83,15 @@ namespace Util
 
             }  // namespace Passing
         }      // namespace AI
-    }          // namespace DynamicParameters
+
+        namespace XBoxControllerDemo
+        {
+            extern Parameter<int32_t> robot_id;
+            extern Parameter<double> kick_speed_meters_per_second;
+            extern Parameter<double> chip_distance_meters;
+            extern Parameter<double> dribbler_rpm;
+            extern Parameter<double> linear_sensitivity;
+            extern Parameter<double> angular_sensitivity;
+        }  // namespace XBoxControllerDemo
+    }      // namespace DynamicParameters
 }  // namespace Util

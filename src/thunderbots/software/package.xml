@@ -62,6 +62,8 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>thunderbots_msgs</exec_depend>
+  <!-- The node we use to interact with the XBox Controller -->
+  <exec_depend>joy</exec_depend>
 
   <depend>dynamic_reconfigure</depend>
   <test_depend>rostest</test_depend>
