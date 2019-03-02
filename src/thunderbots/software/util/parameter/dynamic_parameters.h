@@ -43,7 +43,7 @@ namespace Util
             extern Parameter<double> min_chip_tri_edge_angle;
             extern Parameter<double> chip_cherry_power_downscale;
         }  // namespace Indirect_Chip_Evaluation
-        
+
         namespace AI
         {
             namespace Passing
