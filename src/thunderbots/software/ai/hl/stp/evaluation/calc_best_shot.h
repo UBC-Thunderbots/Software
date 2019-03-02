@@ -1,10 +1,10 @@
 #ifndef PROJECT_CALC_BEST_SHOT_H
 #define PROJECT_CALC_BEST_SHOT_H
 
-#include "geom\point.h"
-#include "ai\world\field.h"
-#include "ai\world\world.h"
-#include "ai\world\robot.h"
+#include "geom/point.h"
+#include "ai/world/field.h"
+#include "ai/world/world.h"
+#include "ai/world/robot.h"
 
 namespace Evaluation
 {
@@ -56,8 +56,6 @@ namespace Evaluation
 
     std::vector<std::pair<Point, Angle>> calc_best_shot_all(
             World world, Robot robot, double radius = 1.0);
-
-
 
 }
 #endif
