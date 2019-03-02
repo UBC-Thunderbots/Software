@@ -208,8 +208,8 @@ double PassGenerator::ratePass(Pass pass)
 
     double enemy_pass_rating = 1 - ratePassEnemyRisk(world.enemyTeam(), pass);
 
-    // Get all the robots except for the passer
-    // TODO: get all the robots expect for the passer and then call ratePassShootScore
+    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+
 
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
@@ -218,7 +218,7 @@ double PassGenerator::ratePass(Pass pass)
         in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
     }
 
-    return static_pass_quality * friendly_pass_rating * enemy_pass_rating * in_region_quality;
+    return static_pass_quality * friendly_pass_rating * enemy_pass_rating * shoot_pass_rating * in_region_quality;
 }
 
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen)
