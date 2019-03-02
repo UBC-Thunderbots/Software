@@ -1,79 +1,74 @@
-#include "timestamp.h"
+#include "time.h"
 
 #include <cmath>
 #include <stdexcept>
 
 #include "shared/constants.h"
 
-Timestamp::Timestamp() : timestamp_in_seconds(0) {}
+Time::Time() : time_in_seconds(0) {}
 
-Timestamp::Timestamp(double timestamp_seconds)
+Time::Time(double time_seconds)
 {
-    if (timestamp_seconds < 0.0)
-    {
-        throw std::invalid_argument(
-            "Error: Timestamps cannot be created from negative values");
-    }
-
-    timestamp_in_seconds = timestamp_seconds;
+    this->time_in_seconds = time_seconds;
 }
 
-const Timestamp Timestamp::fromSeconds(double seconds)
+const Time Time::fromSeconds(double seconds)
 {
-    return Timestamp(seconds);
+    return Time(seconds);
 }
 
-const Timestamp Timestamp::fromMilliseconds(double milliseconds)
+const Time Time::fromMilliseconds(double milliseconds)
 {
-    return Timestamp(milliseconds * SECONDS_PER_MILLISECOND);
+    return Time(milliseconds * SECONDS_PER_MILLISECOND);
 }
 
-double Timestamp::getSeconds() const
+double Time::getSeconds() const
 {
-    return timestamp_in_seconds;
+    return time_in_seconds;
 }
 
-double Timestamp::getMilliseconds() const
+double Time::getMilliseconds() const
 {
-    return timestamp_in_seconds * MILLISECONDS_PER_SECOND;
+    return time_in_seconds * MILLISECONDS_PER_SECOND;
 }
 
-bool Timestamp::operator==(const Timestamp &other) const
+bool Time::operator==(const Time &other) const
 {
     return std::fabs(other.getSeconds() - getSeconds()) < EPSILON;
 }
 
-bool Timestamp::operator!=(const Timestamp &other) const
+bool Time::operator!=(const Time &other) const
 {
     return !(*this == other);
 }
 
-bool Timestamp::operator<(const Timestamp &other) const
+bool Time::operator<(const Time &other) const
 {
     return (*this != other) && (getSeconds() < other.getSeconds());
 }
 
-bool Timestamp::operator>=(const Timestamp &other) const
+bool Time::operator>=(const Time &other) const
 {
     return !(*this < other);
 }
 
-bool Timestamp::operator>(const Timestamp &other) const
+bool Time::operator>(const Time &other) const
 {
     return (*this != other) && (getSeconds() > other.getSeconds());
 }
 
-bool Timestamp::operator<=(const Timestamp &other) const
+bool Time::operator<=(const Time &other) const
 {
     return !(*this > other);
 }
 
-Timestamp Timestamp::operator+(const Duration &duration) const
+Time Time::operator+(const Time &time) const
 {
-    return Timestamp::fromSeconds(getSeconds() + duration.getSeconds());
+    return Time::fromSeconds(getSeconds() + time.getSeconds());
 }
 
-Timestamp Timestamp::operator-(const Duration &duration) const
+Time Time::operator-(const Time &time) const
 {
-    return Timestamp::fromSeconds(getSeconds() - duration.getSeconds());
+    return Time::fromSeconds(getSeconds() - time.getSeconds());
 }
+

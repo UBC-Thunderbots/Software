@@ -443,13 +443,17 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(mrf_primitive_visitor_test ${catkin_LIBRARIES}
             ${G3LOG})
 
-    catkin_add_gtest(time
+    catkin_add_gtest(time_test
             test/util/time/main.cpp
             test/util/time/timestamp.cpp
+            test/util/time/time.cpp
+            test/util/time/duration.cpp
+            util/time/time.cpp
+            util/time/duration.cpp
             util/time/timestamp.cpp
             util/time/time.cpp
             )
-    target_link_libraries(timestamp_test ${catkin_LIBRARIES})
+    target_link_libraries(time_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(ai_evaluation_test
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
