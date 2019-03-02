@@ -31,13 +31,13 @@ add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 
 # Run code generator for dynamic reconfigure
-#add_custom_command(
-    #COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/generate_parameters.py
-    #DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/generate_parameters.py
-    #WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/
-    #OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.h
-    #COMMENT "Generating code for DynamicParameters"
-#)
+add_custom_command(
+    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/generate_parameters.py
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/generate_parameters.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/
+    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.h
+    COMMENT "Generating code for DynamicParameters"
+)
 
 
 #############################################

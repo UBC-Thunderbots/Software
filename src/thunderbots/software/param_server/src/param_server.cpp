@@ -1,5 +1,5 @@
-#include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
+#include <ros/ros.h>
 #include <util/parameter/dynamic_parameter_utils.h>
 #include <util/parameter/dynamic_parameters.h>
 #include <util/parameter/parameter.h>
@@ -24,6 +24,6 @@ int main(int argc, char** argv)
     ros::Subscriber param_update_subscription_2 =
         Util::DynamicParameters::initParamUpdateSubscription(nh_a);
 
-   ros::spin();
+    ros::spin();
     return 0;
 }
