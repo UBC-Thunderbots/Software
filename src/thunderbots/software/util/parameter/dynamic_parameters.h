@@ -52,6 +52,24 @@ namespace Util
                 // TODO: Do the rest of the stuff for this dynamic param
                 extern Parameter<double> enemy_proximity_importance;
 
+                // The minimum open angle formed by the two enemy goal posts and the
+                // pass reception position that we think will likely result in a good
+                // shooting opportunity. Note that we may take shots below this in some
+                // cases, it's more of a weight then a cutoff.
+                extern Parameter<double> ideal_min_shoot_angle_degrees;
+
+                // The minimum open angle formed by the two enemy goal posts and the
+                // pass reception position that we think will likely result in a good
+                // shooting opportunity. Note that we may take shots below this in some
+                // cases, it's more of a weight then a cutoff.
+
+
+                // The minimum angle that we have to rotate after receiving a pass to
+                // shoot that we think would likely result in a goal. Note that we may
+                // try to take shots that require us to rotate more then this, it's
+                // more of a weight then a cutoff
+                extern Parameter<double> ideal_min_rotation_to_shoot_degrees;
+
                 // The number of passes to try to optimize at any given time
                 extern Parameter<int32_t> num_passes_to_optimize;
 

@@ -13,6 +13,39 @@
 
 using namespace AI::Passing;
 
+double AI::Passing::ratePassShootScore(Field field, std::vector<Robot> robots_on_field, AI::Passing::Pass pass) {
+    double ideal_shoot_angle_degrees = Util::DynamicParameters::AI::Passing::ideal_min_shoot_angle_degrees.value();
+    double ideal_min_rotation_to_shoot_degrees = Util::DynamicParameters::AI::Passing::ideal_min_rotation_to_shoot_degrees.value();
+
+    std::vector<Point> obstacles;
+    for (const Robot& robot : robots_on_field){
+        obstacles.emplace_back(robot.position());
+    }
+
+    // Figure out the range of angles for which we have an open shot to the goal after
+    // receiving the pass
+    Angle open_angle_to_goal = angleSweepCircles(pass.receiverPoint(),
+            field.enemyGoalpostPos(), field.enemyGoalpostNeg(), obstacles,
+            ROBOT_MAX_RADIUS_METERS).second;
+
+    // Create the shoot score by creating a sigmoid that goes to a large value as
+    // we get to the ideal shoot angle.
+    double shot_openness_score = sigmoid(open_angle_to_goal.toDegrees(), 0.5 * ideal_shoot_angle_degrees, ideal_shoot_angle_degrees);
+
+    // Prefer angles where the robot does not have to turn much after receiving the
+    // pass to take the shot
+    Angle pass_orientation = (pass.passerPoint() - pass.receiverPoint()).orientation();
+    Angle post0_diff = pass_orientation.minDiff((field.enemyGoalpostNeg() - pass.receiverPoint()).orientation());
+    Angle post1_diff = pass_orientation.minDiff((field.enemyGoalpostPos() - pass.receiverPoint()).orientation());
+    Angle min_rotation_to_shot_after_pass = std::min(post0_diff, post1_diff);
+    double required_rotation_for_shot_score = sigmoid(
+            min_rotation_to_shot_after_pass.toDegrees(),
+            0.5 * ideal_min_rotation_to_shoot_degrees,
+            ideal_min_rotation_to_shoot_degrees);
+
+    return shot_openness_score * required_rotation_for_shot_score;
+}
+
 double AI::Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass) {
     double enemy_proximity_importance = Util::DynamicParameters::AI::Passing::enemy_proximity_importance.value();
 
@@ -28,7 +61,8 @@ double AI::Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass) 
 
     double intercept_risk = calculateInterceptRisk(enemy_team, pass);
 
-    return enemy_reciever_proximity_risk * intercept_risk;
+    // We want to rate a pass more highly if it is lower risk, so subtract from 1
+    return 1 - (enemy_reciever_proximity_risk * intercept_risk);
 }
 
 double AI::Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass) {
@@ -145,7 +179,7 @@ Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot, const Ang
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = robot.orientation().diff(desired_orientation).toRadians();
+    double dist = robot.orientation().minDiff(desired_orientation).toRadians();
     double max_accel = ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED;
     double max_vel = ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND;
 

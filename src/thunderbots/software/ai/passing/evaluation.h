@@ -15,6 +15,19 @@
 
 namespace AI::Passing
 {
+    /**
+     * Rate pass based on the probability of scoring once we receive the pass
+     *
+     * @param field The field we are playing on
+     * @param robots_on_field All the robots currently on the field
+     * @param pass The pass to rate
+     *
+     * @return A value in [0,1], with 0 indicating that it's impossible to score off of
+     *         the pass, and 1 indicating that it is guaranteed to be able to score off of
+     *         the pass
+     */
+    double ratePassShootScore(Field field, std::vector<Robot> robots_on_field, AI::Passing::Pass pass);
+
     // TODO: better name for this function?
     /**
      * Calculates the risk of an enemy robot interfering with a given pass
@@ -146,7 +159,11 @@ namespace AI::Passing
      * A sigmoid function with a given offset from 0 and rate of change
      *
      * By default this increases from -v to positive v, ie. y = 1 / (1+e^(-x))
-     * To flip the sigmoid around (ie. increasing from +v to -v), use a negative sig_width
+     * To flip the sigmoid around (ie. increasing from +v to -v), subtract it from 1
+     *
+     * When using this function, it is strongly encouraged that you look at it's
+     * implementation and go plot it, play around with the numbers a bit to really
+     * understand what they're doing.
      *
      * @param v The value to evaluate over the sigmoid
      * @param offset The offset of the center of the  sigmoid from 0
