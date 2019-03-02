@@ -20,14 +20,15 @@ namespace AI::Passing
      * Rate pass based on the probability of scoring once we receive the pass
      *
      * @param field The field we are playing on
-     * @param robots_on_field All the robots currently on the field
+     * @param enemy_team The enemy team
      * @param pass The pass to rate
      *
      * @return A value in [0,1], with 0 indicating that it's impossible to score off of
      *         the pass, and 1 indicating that it is guaranteed to be able to score off of
      *         the pass
      */
-    double ratePassShootScore(Field field, std::vector<Robot> robots_on_field, AI::Passing::Pass pass);
+    double ratePassShootScore(Field field, Team enemy_team,
+                              AI::Passing::Pass pass);
 
     // TODO: better name for this function?
     /**

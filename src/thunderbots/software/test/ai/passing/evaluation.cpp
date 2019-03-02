@@ -14,11 +14,13 @@ using namespace AI::Passing;
 TEST(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goal){
     // No robots on the field, we receive the pass and are directly facing the goal
     // and are right in front of it
-    std::vector<Robot> robots_on_field = {};
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots(
+            {});
     Field field = ::Test::TestUtil::createSSLDivBField();
     Pass pass({4,0}, {3.5,0}, 1, Timestamp::fromSeconds(1));
 
-    double pass_shoot_score = ratePassShootScore(field, robots_on_field, pass);
+    double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
     EXPECT_LE(0.99, pass_shoot_score);
     EXPECT_GE(1, pass_shoot_score);
 }
@@ -26,39 +28,47 @@ TEST(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goa
 TEST(PassingEvaluationTest, ratePassShootScore_no_robots_and_facing_directly_away_from_goal){
     // No robots on the field, we receive the pass and are facing directly away from the
     // goal
-    std::vector<Robot> robots_on_field = {};
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots(
+            {});
     Field field = ::Test::TestUtil::createSSLDivBField();
     Pass pass({-1,0}, {0,0}, 1, Timestamp::fromSeconds(1));
 
-    double pass_shoot_score = ratePassShootScore(field, robots_on_field, pass);
+    double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
     EXPECT_LE(0, pass_shoot_score);
     EXPECT_GE(0.5, pass_shoot_score);
 }
 
 TEST(PassingEvaluationTest, ratePassShootScore_some_robots_far_away_and_facing_directly_away_from_goal){
     // Robots on field, but none that are in the way of us shooting after the pass
-    std::vector<Robot> robots_on_field = {
-            Robot(0, {0,10}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-            Robot(0, {1,-10}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-    };
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots(
+            {
+                    Robot(0, {0,10}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                    Robot(1, {1,-10}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+            }
+            );
     Field field = ::Test::TestUtil::createSSLDivBField();
     Pass pass({3.5,0}, {3,0}, 1, Timestamp::fromSeconds(1));
 
-    double pass_shoot_score = ratePassShootScore(field, robots_on_field, pass);
+    double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
     EXPECT_LE(0.9, pass_shoot_score);
     EXPECT_GE(1, pass_shoot_score);
 }
 
 TEST(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal){
     // Test rating a pass that results in no open shot to goal
-    std::vector<Robot> robots_on_field = {
-            // Robot directly in front of the pass position
-            Robot(0, {0.2,0}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-    };
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots(
+            {
+                    // Robot directly in front of the pass position
+                    Robot(0, {0.2,0}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+            }
+    );
     Field field = ::Test::TestUtil::createSSLDivBField();
     Pass pass({1,1}, {0,0}, 1, Timestamp::fromSeconds(1));
 
-    double pass_shoot_score = ratePassShootScore(field, robots_on_field, pass);
+    double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
     EXPECT_LE(0, pass_shoot_score);
     EXPECT_GE(0.05, pass_shoot_score);
 }
@@ -66,25 +76,34 @@ TEST(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal){
 TEST(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal){
     // As we decrease the open angle to the goal, the shot score should also decrease
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Pass pass({1,1}, {0,0}, 1, Timestamp::fromSeconds(1));
+    Pass pass({3.5,1}, {3,0}, 1, Timestamp::fromSeconds(1));
+    Team enemy_team(Duration::fromSeconds(10));
 
+    enemy_team.updateRobots(
+            {
+                    Robot(0, {3.5,0.1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                    Robot(1, {3.5,0.1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+            }
+    );
     std::vector<Robot> robots_on_field = {
-            Robot(0, {0.5,0.1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-            Robot(0, {0.5,0.1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     };
-    double pass_shoot_score0 = ratePassShootScore(field, robots_on_field, pass);
-    robots_on_field = {
-            Robot(0, {0.5,0.5}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-            Robot(0, {0.5,0.5}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-    };
-    double pass_shoot_score1 = ratePassShootScore(field, robots_on_field, pass);
-    robots_on_field = {
-            Robot(0, {0.5,1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-            Robot(0, {0.5,1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-    };
-    double pass_shoot_score2 = ratePassShootScore(field, robots_on_field, pass);
-    EXPECT_LE(pass_shoot_score0, pass_shoot_score1);
-    EXPECT_LE(pass_shoot_score1, pass_shoot_score2);
+    double pass_shoot_score0 = ratePassShootScore(field, enemy_team, pass);
+    enemy_team.updateRobots(
+            {
+                    Robot(0, {3.5,0.2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                    Robot(1, {3.5,0.2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+            }
+    );
+    double pass_shoot_score1 = ratePassShootScore(field, enemy_team, pass);
+    enemy_team.updateRobots(
+            {
+                    Robot(0, {3.5,0.3}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                    Robot(1, {3.5,0.3}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+            }
+    );
+    double pass_shoot_score2 = ratePassShootScore(field, enemy_team, pass);
+    EXPECT_LT(pass_shoot_score0, pass_shoot_score1);
+    EXPECT_LT(pass_shoot_score1, pass_shoot_score2);
 }
 
 TEST(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots){

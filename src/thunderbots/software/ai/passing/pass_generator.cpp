@@ -206,7 +206,10 @@ double PassGenerator::ratePass(Pass pass)
 
     double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
 
-    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
+    double enemy_pass_rating = 1 - ratePassEnemyRisk(world.enemyTeam(), pass);
+
+    // Get all the robots except for the passer
+    // TODO: get all the robots expect for the passer and then call ratePassShootScore
 
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;

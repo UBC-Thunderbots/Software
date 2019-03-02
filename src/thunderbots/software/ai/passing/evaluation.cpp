@@ -13,12 +13,13 @@
 
 using namespace AI::Passing;
 
-double AI::Passing::ratePassShootScore(Field field, std::vector<Robot> robots_on_field, AI::Passing::Pass pass) {
+double AI::Passing::ratePassShootScore(Field field, Team enemy_team,
+                                       AI::Passing::Pass pass) {
     double ideal_shoot_angle_degrees = Util::DynamicParameters::AI::Passing::ideal_min_shoot_angle_degrees.value();
     double ideal_min_rotation_to_shoot_degrees = Util::DynamicParameters::AI::Passing::ideal_min_rotation_to_shoot_degrees.value();
 
     std::vector<Point> obstacles;
-    for (const Robot& robot : robots_on_field){
+    for (const Robot& robot : enemy_team.getAllRobots()){
         obstacles.emplace_back(robot.position());
     }
 
