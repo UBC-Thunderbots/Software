@@ -5,6 +5,8 @@
 
 #include "shared/constants.h"
 
+Timestamp::Timestamp() : Timestamp(0) {}
+
 Timestamp::Timestamp(double timestamp_seconds) : Time(timestamp_seconds)
 {
     if (timestamp_seconds < 0.0)

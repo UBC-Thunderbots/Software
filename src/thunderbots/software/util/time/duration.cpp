@@ -5,6 +5,8 @@
 #include "duration.h"
 #include "shared/constants.h"
 
+Duration::Duration() : Duration(0) {}
+
 Duration::Duration(double timestamp_seconds) : Time(timestamp_seconds) {}
 
 const Duration Duration::fromSeconds(double seconds)

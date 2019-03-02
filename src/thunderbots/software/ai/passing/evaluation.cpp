@@ -37,10 +37,10 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     // velocity until the ball is kicked
 
     // We force any negative duration to 0 here
-    double time_until_pass = std::max(0.0, (pass.startTime() - enemy_robot.lastUpdateTimestamp()).getSeconds());
+    Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
 
     // Estimate where the enemy will be when we start the pass
-    enemy_robot.updateStateToPredictedState(Timestamp::fromSeconds(time_until_pass));
+    enemy_robot.updateStateToPredictedState(time_until_pass);
 
     // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
     // the the receiver point for the pass, then it is guaranteed that it will not be
@@ -48,7 +48,7 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
 
     Point closest_point_on_pass_to_robot = closestPointOnSeg(enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(enemy_robot, closest_point_on_pass_to_robot);
-    Duration ball_time_to_closest_pass_point = Timestamp::fromSeconds((closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
+    Duration ball_time_to_closest_pass_point = Duration::fromSeconds((closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
 
     // Figure out how long the enemy robot will take to reach the receive point for the
     // pass.
@@ -87,7 +87,7 @@ double AI::Passing::ratePassFriendlyCapability(Team friendly_team, AI::Passing::
     }
 
     // Figure out what time the robot would have to receive the ball at
-    Timestamp ball_travel_time = Timestamp::fromSeconds((pass.receiverPoint() - pass.passerPoint()).len() / pass.speed());
+    Duration ball_travel_time = Duration::fromSeconds((pass.receiverPoint() - pass.passerPoint()).len() / pass.speed());
     Timestamp receive_time = pass.startTime() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
@@ -142,7 +142,7 @@ Duration AI::Passing::getTimeToOrientationForRobot(Robot robot, Angle desired_or
     // Note that the acceleration time is the same as a de-acceleration time
     double travel_time = 2*acceleration_time + time_at_max_vel;
 
-    return Timestamp::fromSeconds(travel_time);
+    return Duration::fromSeconds(travel_time);
 }
 
 Duration AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
@@ -179,7 +179,7 @@ Duration AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
     // Note that the acceleration time is the same as a de-acceleration time
     double travel_time = 2*acceleration_time + time_at_max_vel;
 
-    return Timestamp::fromSeconds(travel_time);
+    return Duration::fromSeconds(travel_time);
 }
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)

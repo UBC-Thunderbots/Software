@@ -4,6 +4,11 @@
 
 #include <stdexcept>
 
+TEST(DurationTest, default_constructor){
+    Duration d;
+    EXPECT_DOUBLE_EQ(d.getSeconds(), 0);
+}
+
 TEST(DurationTest, create_duration_from_positive_seconds)
 {
     Duration duration = Duration::fromSeconds(1.0);
@@ -42,77 +47,76 @@ TEST(DurationTest, create_millisecond_duration_in_seconds)
 
 TEST(DurationTest, test_equality_operator)
 {
-    Duration t1 = Duration::fromSeconds(6.2);
-    Duration t2 = Duration::fromMilliseconds(6200);
-    EXPECT_TRUE(t1 == t2);
+    Duration d1 = Duration::fromSeconds(6.2);
+    Duration d2 = Duration::fromMilliseconds(6200);
+    EXPECT_TRUE(d1 == d2);
 }
 
 TEST(DurationTest, test_inequality_operator)
 {
-    Duration t1 = Duration::fromSeconds(0);
-    Duration t2 = Duration::fromMilliseconds(6.2);
-    EXPECT_TRUE(t1 != t2);
-    EXPECT_FALSE(t2 != t2);
+    Duration d1 = Duration::fromSeconds(0);
+    Duration d2 = Duration::fromMilliseconds(6.2);
+    EXPECT_TRUE(d1 != d2);
+    EXPECT_FALSE(d2 != d2);
 }
 
 TEST(DurationTest, test_less_than_operator)
 {
-    Duration t1 = Duration::fromSeconds(6.15);
-    Duration t2 = Duration::fromSeconds(6.2);
-    EXPECT_TRUE(t1 < t2);
-    EXPECT_FALSE(t2 < t1);
+    Duration d1 = Duration::fromSeconds(6.15);
+    Duration d2 = Duration::fromSeconds(6.2);
+    EXPECT_TRUE(d1 < d2);
+    EXPECT_FALSE(d2 < d1);
 }
 
 TEST(DurationTest, test_less_than_or_equal_to_operator)
 {
-    Duration t1 = Duration::fromSeconds(6.2);
-    Duration t2 = Duration::fromSeconds(6.2);
-    Duration t3 = Duration::fromSeconds(0.88);
-    EXPECT_TRUE(t3 <= t2);
-    EXPECT_TRUE(t2 <= t1);
-    EXPECT_FALSE(t1 <= t3);
+    Duration d1 = Duration::fromSeconds(6.2);
+    Duration d2 = Duration::fromSeconds(6.2);
+    Duration d3 = Duration::fromSeconds(0.88);
+    EXPECT_TRUE(d3 <= d2);
+    EXPECT_TRUE(d2 <= d1);
+    EXPECT_FALSE(d1 <= d3);
 }
 
 TEST(DurationTest, test_greater_than_operator)
 {
-    Duration t1 = Duration::fromSeconds(0.4);
-    Duration t2 = Duration::fromSeconds(3.01);
-    EXPECT_TRUE(t2 > t1);
-    EXPECT_FALSE(t1 > t2);
+    Duration d1 = Duration::fromSeconds(0.4);
+    Duration d2 = Duration::fromSeconds(3.01);
+    EXPECT_TRUE(d2 > d1);
+    EXPECT_FALSE(d1 > d2);
 }
 
 TEST(DurationTest, test_greater_than_or_equal_to_operator)
 {
-    Duration t1 = Duration::fromSeconds(0.4);
-    Duration t2 = Duration::fromSeconds(3.01);
-    EXPECT_TRUE(t2 >= t1);
-    EXPECT_TRUE(t2 >= t2);
-    EXPECT_FALSE(t1 >= t2);
+    Duration d1 = Duration::fromSeconds(0.4);
+    Duration d2 = Duration::fromSeconds(3.01);
+    EXPECT_TRUE(d2 >= d1);
+    EXPECT_TRUE(d2 >= d2);
+    EXPECT_FALSE(d1 >= d2);
 }
-
 TEST(DurationTest, test_addition_operator)
 {
-    Duration t1              = Duration::fromSeconds(0.12);
-    Duration t2 = Duration::fromMilliseconds(350);
-    Duration result          = t1 + t2;
+    Duration d1              = Duration::fromSeconds(0.12);
+    Duration d2 = Duration::fromMilliseconds(350);
+    Duration result          = d1 + d2;
     Duration expected_result = Duration::fromMilliseconds(470);
     EXPECT_EQ(result, expected_result);
 }
 
 TEST(DurationTest, test_subtraction_operator_with_positive_result)
 {
-    Duration t1              = Duration::fromMilliseconds(1234);
-    Duration t2 = Duration::fromMilliseconds(600);
-    Duration result          = t1 - t2;
+    Duration d1              = Duration::fromMilliseconds(1234);
+    Duration d2 = Duration::fromMilliseconds(600);
+    Duration result          = d1 - d2;
     Duration expected_result = Duration::fromMilliseconds(634);
     EXPECT_EQ(result, expected_result);
 }
 
 TEST(DurationTest, test_subtraction_operator_with_negative_result)
 {
-    Duration t1              = Duration::fromMilliseconds(1234);
-    Duration t2 = Duration::fromMilliseconds(1235);
-    Duration result          = t1 - t2;
+    Duration d1              = Duration::fromMilliseconds(1234);
+    Duration d2 = Duration::fromMilliseconds(1235);
+    Duration result          = d1 - d2;
     Duration expected_result = Duration::fromMilliseconds(-1);
     EXPECT_EQ(result, expected_result);
 }

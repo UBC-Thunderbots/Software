@@ -40,7 +40,7 @@ Timestamp Pass::estimateReceiveTime() {
 }
 
 Duration Pass::estimatePassDuration() {
-    return Timestamp::fromSeconds((receiver_point - passer_point).len()/pass_speed_m_per_s);
+    return Duration::fromSeconds((receiver_point - passer_point).len()/pass_speed_m_per_s);
 }
 
 namespace AI::Passing

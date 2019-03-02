@@ -289,6 +289,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/field.cpp
             ai/world/team.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             geom/point.h
             geom/angle.h)
@@ -312,6 +314,8 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/refbox_constants.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(world_test ${catkin_LIBRARIES})
@@ -326,6 +330,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/game_state.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             util/parameter/dynamic_parameters.cpp
             )
@@ -362,6 +368,8 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/ros_messages.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(grsim_communication_test ${catkin_LIBRARIES}
@@ -426,6 +434,7 @@ if (CATKIN_ENABLE_TESTING)
             test/util/time/duration.cpp
             util/time/time.cpp
             util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             util/time/time.cpp
             )
@@ -448,6 +457,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/evaluation/team.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
     )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
@@ -464,6 +475,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/action/move_action.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(action_test
@@ -493,6 +506,8 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/parameter/dynamic_parameters.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(tactic_test
@@ -558,6 +573,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(passing_test ${catkin_LIBRARIES})
@@ -579,6 +596,8 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             test/util/logger_test.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(logger_test ${catkin_LIBRARIES}
@@ -587,6 +606,8 @@ if (CATKIN_ENABLE_TESTING)
     # The test node that verifies the rostest utils are working correctly
     add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
             test/test_util/rostest_util_test.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})

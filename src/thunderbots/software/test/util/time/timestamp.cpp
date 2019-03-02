@@ -4,6 +4,11 @@
 
 #include <stdexcept>
 
+TEST(TimestampTest, default_constructor){
+    Timestamp t;
+    EXPECT_DOUBLE_EQ(t.getSeconds(), 0);
+}
+
 TEST(TimestampTest, create_timestamp_from_positive_seconds)
 {
     Timestamp timestamp = Timestamp::fromSeconds(1.0);
