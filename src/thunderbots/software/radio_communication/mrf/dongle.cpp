@@ -45,7 +45,9 @@ namespace
 
 }  // namespace
 
-MRFDongle::MRFDongle(std::function<void(int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)> robot_msg_handler)
+MRFDongle::MRFDongle(std::function<void(int robot, const void *data, std::size_t len,
+                                        uint8_t lqi, uint8_t rssi)>
+                         robot_msg_handler)
     : context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -295,10 +297,9 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
     if (transfer.size() > 2)
     {
         unsigned int robot = transfer.data()[0];
-        robot_msg_handler(robot, 
-            transfer.data() + 1, transfer.size() - 3,
-            transfer.data()[transfer.size() - 2],
-            transfer.data()[transfer.size() - 1]);
+        robot_msg_handler(robot, transfer.data() + 1, transfer.size() - 3,
+                          transfer.data()[transfer.size() - 2],
+                          transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
 }

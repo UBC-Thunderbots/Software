@@ -2,85 +2,90 @@
 
 #include <chrono>
 #include <functional>
-#include "util/logger/init.h"
+
 #include "mrf/constants.h"
 #include "util/codec.h"
+#include "util/logger/init.h"
 namespace ph = std::placeholders;
 
 namespace
 {
-/**
- * \brief The number of attempts to request the build IDs before giving up.
- */
-const unsigned int REQUEST_BUILD_IDS_COUNT = 7;
+    /**
+     * \brief The number of attempts to request the build IDs before giving up.
+     */
+    const unsigned int REQUEST_BUILD_IDS_COUNT = 7;
 
-/**
- * \brief The number of seconds to wait between consecutive requests for
- * the build IDs.
- */
-const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
+    /**
+     * \brief The number of seconds to wait between consecutive requests for
+     * the build IDs.
+     */
+    const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
 
-struct RSSITableEntry final
-{
-    int rssi;
-    int db;
-};
-const struct RSSITableEntry RSSI_TABLE[] = {
-    {255, -35}, {254, -36}, {253, -37}, {250, -38}, {245, -39}, {239, -40},
-    {233, -41}, {228, -42}, {225, -43}, {221, -44}, {216, -45}, {212, -46},
-    {207, -47}, {203, -48}, {198, -49}, {193, -50}, {188, -51}, {183, -52},
-    {176, -53}, {170, -54}, {165, -55}, {159, -56}, {153, -57}, {148, -58},
-    {143, -59}, {138, -60}, {133, -61}, {129, -62}, {125, -63}, {121, -64},
-    {117, -65}, {111, -66}, {107, -67}, {100, -68}, {95, -69},  {89, -70},
-    {83, -71},  {78, -72},  {73, -73},  {68, -74},  {63, -75},  {58, -76},
-    {53, -77},  {48, -78},  {43, -79},  {37, -80},  {32, -81},  {27, -82},
-    {23, -83},  {18, -84},  {13, -85},  {9, -86},   {5, -87},   {2, -88},
-    {1, -89},   {0, -90},
-};
+    struct RSSITableEntry final
+    {
+        int rssi;
+        int db;
+    };
+    const struct RSSITableEntry RSSI_TABLE[] = {
+        {255, -35}, {254, -36}, {253, -37}, {250, -38}, {245, -39}, {239, -40},
+        {233, -41}, {228, -42}, {225, -43}, {221, -44}, {216, -45}, {212, -46},
+        {207, -47}, {203, -48}, {198, -49}, {193, -50}, {188, -51}, {183, -52},
+        {176, -53}, {170, -54}, {165, -55}, {159, -56}, {153, -57}, {148, -58},
+        {143, -59}, {138, -60}, {133, -61}, {129, -62}, {125, -63}, {121, -64},
+        {117, -65}, {111, -66}, {107, -67}, {100, -68}, {95, -69},  {89, -70},
+        {83, -71},  {78, -72},  {73, -73},  {68, -74},  {63, -75},  {58, -76},
+        {53, -77},  {48, -78},  {43, -79},  {37, -80},  {32, -81},  {27, -82},
+        {23, -83},  {18, -84},  {13, -85},  {9, -86},   {5, -87},   {2, -88},
+        {1, -89},   {0, -90},
+    };
 
-const char *const SD_MESSAGES[] = {
-    nullptr,
-    u8"Bot %1 SD card uninitialized",
-    nullptr,
-    u8"Bot %1 SD card incompatible",
-    u8"Bot %1 SD card sent illegal response",
-    u8"Bot %1 SD layer logical error",
-    u8"Bot %1 SD card CRC error",
-    u8"Bot %1 SD card claimed illegal command",
-    u8"Bot %1 SD card in unexpected state",
-    u8"Bot %1 SD card internal error",
-    u8"Bot %1 SD card command response timeout",
-    u8"Bot %1 SD card parameter out of range",
-    u8"Bot %1 SD card address misaligned",
-    u8"Bot %1 SD card block length error",
-    u8"Bot %1 SD card erase sequence error",
-    u8"Bot %1 SD card erase parameter error",
-    u8"Bot %1 SD card write protect violation",
-    u8"Bot %1 SD card locked",
-    u8"Bot %1 SD card lock or unlock failed",
-    u8"Bot %1 SD card command CRC error",
-    u8"Bot %1 SD card ECC error",
-    u8"Bot %1 SD card CC error",
-    u8"Bot %1 SD card generic error",
-    u8"Bot %1 SD card CSD write error",
-    u8"Bot %1 SD card partial erase due to write protection",
-    u8"Bot %1 SD card ECC disabled",
-    u8"Bot %1 SD card erase sequence cancelled",
-    u8"Bot %1 SD card authentication sequence error",
-    u8"Bot %1 SD card initialization timeout",
-    u8"Bot %1 SD card data timeout",
-    u8"Bot %1 SD card data CRC error",
-    u8"Bot %1 SD card missing data start bit",
-    u8"Bot %1 SD card FIFO overrun or underrun",
-};
+    const char *const SD_MESSAGES[] = {
+        nullptr,
+        u8"Bot %1 SD card uninitialized",
+        nullptr,
+        u8"Bot %1 SD card incompatible",
+        u8"Bot %1 SD card sent illegal response",
+        u8"Bot %1 SD layer logical error",
+        u8"Bot %1 SD card CRC error",
+        u8"Bot %1 SD card claimed illegal command",
+        u8"Bot %1 SD card in unexpected state",
+        u8"Bot %1 SD card internal error",
+        u8"Bot %1 SD card command response timeout",
+        u8"Bot %1 SD card parameter out of range",
+        u8"Bot %1 SD card address misaligned",
+        u8"Bot %1 SD card block length error",
+        u8"Bot %1 SD card erase sequence error",
+        u8"Bot %1 SD card erase parameter error",
+        u8"Bot %1 SD card write protect violation",
+        u8"Bot %1 SD card locked",
+        u8"Bot %1 SD card lock or unlock failed",
+        u8"Bot %1 SD card command CRC error",
+        u8"Bot %1 SD card ECC error",
+        u8"Bot %1 SD card CC error",
+        u8"Bot %1 SD card generic error",
+        u8"Bot %1 SD card CSD write error",
+        u8"Bot %1 SD card partial erase due to write protection",
+        u8"Bot %1 SD card ECC disabled",
+        u8"Bot %1 SD card erase sequence cancelled",
+        u8"Bot %1 SD card authentication sequence error",
+        u8"Bot %1 SD card initialization timeout",
+        u8"Bot %1 SD card data timeout",
+        u8"Bot %1 SD card data CRC error",
+        u8"Bot %1 SD card missing data start bit",
+        u8"Bot %1 SD card FIFO overrun or underrun",
+    };
 
-const char *const LOGGER_MESSAGES[] = {
-    nullptr, u8"Bot %1 logger uninitialized", nullptr, u8"Bot %1 SD card full",
-};
-}
+    const char *const LOGGER_MESSAGES[] = {
+        nullptr,
+        u8"Bot %1 logger uninitialized",
+        nullptr,
+        u8"Bot %1 SD card full",
+    };
+}  // namespace
 
-MRFBackend::MRFBackend(ros::NodeHandle& node_handle)
-    : dongle(MRFDongle(std::bind(&MRFBackend::handle_message, this, ph::_1, ph::_2, ph::_3, ph::_4, ph::_5))),
+MRFBackend::MRFBackend(ros::NodeHandle &node_handle)
+    : dongle(MRFDongle(std::bind(&MRFBackend::handle_message, this, ph::_1, ph::_2,
+                                 ph::_3, ph::_4, ph::_5))),
       ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(1)))
 {
     robot_status_publisher = node_handle.advertise<thunderbots_msgs::RobotStatus>(
@@ -89,7 +94,7 @@ MRFBackend::MRFBackend(ros::NodeHandle& node_handle)
 
 MRFBackend::~MRFBackend() {}
 
-void MRFBackend::sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives)
+void MRFBackend::sendPrimitives(const std::vector<std::unique_ptr<Primitive>> &primitives)
 {
     dongle.send_drive_packet(primitives);
 }
@@ -128,8 +133,9 @@ void MRFBackend::update_dongle_events()
     dongle.handle_libusb_events();
 }
 
-thunderbots_msgs::RobotStatus MRFBackend::handle_message(
-    int index, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)
+thunderbots_msgs::RobotStatus MRFBackend::handle_message(int index, const void *data,
+                                                         std::size_t len, uint8_t lqi,
+                                                         uint8_t rssi)
 {
     thunderbots_msgs::RobotStatus robot_status;
 
@@ -137,13 +143,13 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
 
     {
         bool found = false;
-        for (std::size_t i = 0;
-             !found && i < sizeof(RSSI_TABLE) / sizeof(*RSSI_TABLE); ++i)
+        for (std::size_t i = 0; !found && i < sizeof(RSSI_TABLE) / sizeof(*RSSI_TABLE);
+             ++i)
         {
             if (RSSI_TABLE[i].rssi < rssi)
             {
                 robot_status.received_signal_strength_db = RSSI_TABLE[i].db;
-                found                    = true;
+                found                                    = true;
             }
         }
         if (!found)
@@ -166,33 +172,29 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                     robot_status.alive = true;
 
                     robot_status.battery_voltage =
-                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
-                        1000.0;
+                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 1000.0;
                     bptr += 2;
                     len -= 2;
 
                     robot_status.capacitor_voltage =
-                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
-                        100.0;
+                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
                     // TODO: let visualizer know about low cap voltages?
                     // low_capacitor_message.active(capacitor_voltage < 5.0);
                     bptr += 2;
                     len -= 2;
 
                     robot_status.break_beam_reading =
-                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
-                        1000.0;
+                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 1000.0;
                     bptr += 2;
                     len -= 2;
 
                     robot_status.board_temperature =
-                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
-                        100.0;
+                        (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
                     bptr += 2;
                     len -= 2;
 
-                    robot_status.ball_in_beam               = !!(*bptr & 0x80);
-                    robot_status.capacitor_charged          = !!(*bptr & 0x40);
+                    robot_status.ball_in_beam      = !!(*bptr & 0x80);
+                    robot_status.capacitor_charged = !!(*bptr & 0x40);
                     // unsigned int logger_status = *bptr & 0x3F;
                     // for (std::size_t i = 0; i < logger_messages.size(); ++i)
                     // {
@@ -214,9 +216,10 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                     ++bptr;
                     --len;
 
-                    robot_status.dribbler_speed = static_cast<int16_t>(static_cast<uint16_t>(
-                                         bptr[0] | (bptr[1] << 8))) *
-                                     25 * 60 / 6;
+                    robot_status.dribbler_speed =
+                        static_cast<int16_t>(
+                            static_cast<uint16_t>(bptr[0] | (bptr[1] << 8))) *
+                        25 * 60 / 6;
                     bptr += 2;
                     len -= 2;
 
@@ -235,8 +238,8 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                 if (len >= MRF::ERROR_BYTES)
                                 {
                                     has_error_extension = true;
-                                    for (unsigned int i = 0;
-                                         i != MRF::ERROR_LT_COUNT; ++i)
+                                    for (unsigned int i = 0; i != MRF::ERROR_LT_COUNT;
+                                         ++i)
                                     {
                                         unsigned int byte = i / CHAR_BIT;
                                         unsigned int bit  = i % CHAR_BIT;
@@ -245,15 +248,13 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                         // error_lt_messages[i]->active(
                                         //     bptr[byte] & (1 << bit));
                                     }
-                                    for (unsigned int i = 0;
-                                         i != MRF::ERROR_ET_COUNT; ++i)
+                                    for (unsigned int i = 0; i != MRF::ERROR_ET_COUNT;
+                                         ++i)
                                     {
                                         unsigned int byte =
-                                            (i + MRF::ERROR_LT_COUNT) /
-                                            CHAR_BIT;
+                                            (i + MRF::ERROR_LT_COUNT) / CHAR_BIT;
                                         unsigned int bit =
-                                            (i + MRF::ERROR_LT_COUNT) %
-                                            CHAR_BIT;
+                                            (i + MRF::ERROR_LT_COUNT) % CHAR_BIT;
                                         // TODO: Handle these messages
                                         if (bptr[byte] & (1 << bit))
                                         {
@@ -266,8 +267,9 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                 else
                                 {
                                     LOG(WARNING) << "Received general robot status "
-                                        "update with truncated error bits "
-                                        "extension of length " << len << std::endl;
+                                                    "update with truncated error bits "
+                                                    "extension of length "
+                                                 << len << std::endl;
                                 }
                                 break;
 
@@ -278,7 +280,7 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                 {
                                     robot_status.build_ids_valid = true;
                                     robot_status.fw_build_id     = decode_u32_le(bptr);
-                                    robot_status.fpga_build_id   = decode_u32_le(bptr + 4);
+                                    robot_status.fpga_build_id = decode_u32_le(bptr + 4);
                                     // TODO: check this
                                     // check_build_id_mismatch();
                                     bptr += 8;
@@ -286,10 +288,10 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                 }
                                 else
                                 {
-                                    LOG(WARNING) <<
-                                        "Received general robot status "
-                                        "update with truncated build IDs "
-                                        "extension of length " << len << std::endl;
+                                    LOG(WARNING) << "Received general robot status "
+                                                    "update with truncated build IDs "
+                                                    "extension of length "
+                                                 << len << std::endl;
                                 }
                                 break;
 
@@ -307,18 +309,18 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                 }
                                 else
                                 {
-                                    LOG(WARNING) << 
-                                        "Received general robot status "
-                                        "update with truncated LPS data "
-                                        "extension of length " << len << std::endl;
+                                    LOG(WARNING) << "Received general robot status "
+                                                    "update with truncated LPS data "
+                                                    "extension of length "
+                                                 << len << std::endl;
                                 }
                                 break;
 
                             default:
-                                LOG(WARNING) << 
-                                    "Received general status packet from "
-                                    "robot with unknown extension code " << 
-                                    static_cast<unsigned int>(*bptr) << std::endl;
+                                LOG(WARNING)
+                                    << "Received general status packet from "
+                                       "robot with unknown extension code "
+                                    << static_cast<unsigned int>(*bptr) << std::endl;
                                 len = 0;
                                 break;
                         }
@@ -337,9 +339,9 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                 }
                 else
                 {
-                    LOG(WARNING) << 
-                        "Received general robot status update with wrong "
-                        "byte count " << len << std::endl;
+                    LOG(WARNING) << "Received general robot status update with wrong "
+                                    "byte count "
+                                 << len << std::endl;
                 }
 
                 // TODO: see what this does
@@ -380,7 +382,8 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                 break;
 
             default:
-                LOG(WARNING) << "Received packet from robot with unknown message type " << static_cast<unsigned int>(*bptr) << std::endl;
+                LOG(WARNING) << "Received packet from robot with unknown message type "
+                             << static_cast<unsigned int>(*bptr) << std::endl;
                 break;
         }
     }

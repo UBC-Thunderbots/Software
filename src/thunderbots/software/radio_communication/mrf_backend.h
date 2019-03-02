@@ -1,8 +1,9 @@
 #pragma once
 
+#include <ros/ros.h>
+
 #include <limits>
 
-#include <ros/ros.h>
 #include "ai/world/ball.h"
 #include "ai/world/team.h"
 #include "mrf/dongle.h"
@@ -14,6 +15,8 @@ class MRFBackend
     /**
      * Creates a new MRFBackend.
      * Automatically connects to the dongle upon initialization.
+     * 
+     * @param node_handle the ROS NodeHandle of the radio_communication node
      */
     explicit MRFBackend(ros::NodeHandle& node_handle);
 
@@ -51,8 +54,18 @@ class MRFBackend
      */
     void send_vision_packet();
 
-    thunderbots_msgs::RobotStatus handle_message(
-        int index, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi);
+    /**
+     * Parses a robot status message from the dongle, and publishes it to the ROS topic.
+     * 
+     * @param index robot number
+     * @param data the message data
+     * @param len the length of the message
+     * @param lqi link quality
+     * @param rssi received signal strength indicator
+     */
+    thunderbots_msgs::RobotStatus handle_message(int index, const void* data,
+                                                 std::size_t len, uint8_t lqi,
+                                                 uint8_t rssi);
 
    private:
     MRFDongle dongle;

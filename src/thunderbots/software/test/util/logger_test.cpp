@@ -112,7 +112,7 @@ TEST_F(LoggerTest, test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_roso
 }
 
 TEST_F(LoggerTest,
-       test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_the_ROBOT_MESSAGE_TOPIC)
+       test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_the_robot_message_topic)
 {
     std::string msg_data = "ROBOT_STATUS log test message";
 

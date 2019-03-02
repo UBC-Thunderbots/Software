@@ -1,45 +1,46 @@
 #include "util/codec.h"
+
 #include <cfloat>
 #include <cmath>
 
 namespace
 {
-/**
- * Packs a sign bit, a biased exponent, and a significand into a 32-bit integer
- * in IEEE754 single-precision format.
- *
- * \param[in] sign the sign bit, \c true for negative or \c false for positive.
- *
- * \param[in] exponent the biased exponent, between 0 and 0xFF.
- *
- * \param[in] significand the significand.
- *
- * \return the packed 32-bit integer.
- */
-uint32_t pack_ses32(bool sign, uint8_t exponent, uint32_t significand)
-{
-    return (sign ? UINT32_C(0x80000000) : 0) |
-           (static_cast<uint32_t>(exponent) << 23) | significand;
-}
+    /**
+     * Packs a sign bit, a biased exponent, and a significand into a 32-bit integer
+     * in IEEE754 single-precision format.
+     *
+     * \param[in] sign the sign bit, \c true for negative or \c false for positive.
+     *
+     * \param[in] exponent the biased exponent, between 0 and 0xFF.
+     *
+     * \param[in] significand the significand.
+     *
+     * \return the packed 32-bit integer.
+     */
+    uint32_t pack_ses32(bool sign, uint8_t exponent, uint32_t significand)
+    {
+        return (sign ? UINT32_C(0x80000000) : 0) |
+               (static_cast<uint32_t>(exponent) << 23) | significand;
+    }
 
-/**
- * Packs a sign bit, a biased exponent, and a significand into a 64-bit integer
- * in IEEE754 double-precision format.
- *
- * \param[in] sign the sign bit, \c true for negative or \c false for positive.
- *
- * \param[in] exponent the biased exponent, between 0 and 0x7FF.
- *
- * \param[in] significand the significand.
- *
- * \return the packed 64-bit integer.
- */
-uint64_t pack_ses64(bool sign, uint16_t exponent, uint64_t significand)
-{
-    return (sign ? UINT64_C(0x8000000000000000) : 0) |
-           (static_cast<uint64_t>(exponent) << 52) | significand;
-}
-}
+    /**
+     * Packs a sign bit, a biased exponent, and a significand into a 64-bit integer
+     * in IEEE754 double-precision format.
+     *
+     * \param[in] sign the sign bit, \c true for negative or \c false for positive.
+     *
+     * \param[in] exponent the biased exponent, between 0 and 0x7FF.
+     *
+     * \param[in] significand the significand.
+     *
+     * \return the packed 64-bit integer.
+     */
+    uint64_t pack_ses64(bool sign, uint16_t exponent, uint64_t significand)
+    {
+        return (sign ? UINT64_C(0x8000000000000000) : 0) |
+               (static_cast<uint64_t>(exponent) << 52) | significand;
+    }
+}  // namespace
 
 uint32_t encode_float_to_u32(float x)
 {
@@ -128,9 +129,8 @@ uint32_t encode_float_to_u32(float x)
 float decode_u32_to_float(uint32_t x)
 {
     // Extract the sign bit, biased exponent, and significand.
-    bool sign = !!(x & UINT32_C(0x80000000));
-    int8_t exponent =
-        static_cast<int8_t>(static_cast<uint8_t>((x >> 23U) & 0xFFU));
+    bool sign            = !!(x & UINT32_C(0x80000000));
+    int8_t exponent      = static_cast<int8_t>(static_cast<uint8_t>((x >> 23U) & 0xFFU));
     uint32_t significand = x & UINT32_C(0x007FFFFF);
 
     // Break down the possible exponents by class.
@@ -305,8 +305,7 @@ double decode_u64_to_double(uint64_t x)
 
         // Shift the significand down into the fraction part and re-add the
         // implicit leading 1 bit.
-        double value =
-            1.0 + static_cast<double>(significand) / (UINT64_C(1) << 52);
+        double value = 1.0 + static_cast<double>(significand) / (UINT64_C(1) << 52);
 
         // Apply the exponent.
         while (exponent > 0)
