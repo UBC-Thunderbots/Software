@@ -3,40 +3,39 @@ xbox_controller_demo:
     min: 0
     max: 16
     default: 0
-    type: "int32_t"
+    type: "int_t"
     description: "The ID of the robot being controller by the XBox Controller"
   kick_speed_meters_per_second:
     min: 0.0
     max: 6.5
     default: 4.0
-    type: "double"
+    type: "double_t"
     description: "The robot's kick speed in meters per second"
   chip_distance_meters:
     min: 0.0
     max: 5.0
     default: 1.0
-    type: "double"
+    type: "double_t"
     description: "How far in meters the robot will chip"
   chip_distance_meters:
     min: 0
     max: 10000
     default: 1000
-    type: "int"
+    type: "int_t"
     description: "The RPM of the robot's dribbler when turned on"
-asodasd
   linear_sensitivity:
     min: 0.0
     max: 1.0
     default: 1.0
-    type: "double"
+    type: "double_t"
     description: "The amount to scale the x and y output values by to make the robot more or less sensitive to control linearly"
   angular_sensitivity:
     min: 0.0
     max: 1.0
     default: 1.0
-    type: "double"
+    type: "double_t"
     description: "The amount to scale the theta output values to make the robot more or less sensitive to control rotationaly"
   test:
     default: "nigerian prince"
-    type: "string"
+    type: "str_t"
     description: "The amount to scale the theta output values to make the robot more or less sensitive to control rotationaly"

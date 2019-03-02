@@ -44,7 +44,7 @@ def load_configuration(path_to_yaml):
                     msg = "{} could not be parsed correctly, please check format".format(
                         filename)
                     sys.exit(msg)
-
+    print param_info
     return param_info
 
 #######################################################################
@@ -65,10 +65,10 @@ gen = ParameterGenerator()
 PARAMS_CONFIG_NAMESPACE = "param_server"
 NODE_NAME = "ps"
 EXT = '.cfg'
-RANGE_TYPES = ["int32_t", "double"]
+RANGE_TYPES = ["int_t", "double_t"]
 
 # generator strs
-NEW_NAMESPACE_FS = '{namespace} = gen.add_group({namespace})\n'
+NEW_NAMESPACE_FS = '{namespace} = gen.add_group(\"{namespace}\")\n'
 SUB_NAMESPACE_FS = '{sub_namespace} = {namespace}.add_group(\"{sub_namespace}\")\n'
 PARAMETER_FS = '{namespace}.add(\"{name}\", {type}, 0, \"{description}\", {quote}{default}{quote}, {min}, {max})\n'
 
@@ -85,13 +85,17 @@ def generate_cfg(param_info, output_path):
     """
     # fist key resolves to filename
     for key, value in param_info.iteritems():
-        with open(output_path+key+EXT, 'w') as fpe:
+        with open(output_path+key+EXT, 'w+') as fpe:
 
             # write boilder plate
             fpe.write(BOILER_PLATE)
 
             # generate cfg
             __cfg_gen(param_info, fpe)
+
+            # make file read/write/executable
+            os.chmod(output_path+key+EXT, 0o0754)
+            print'===== done ====='
 
 
 def __cfg_gen(param_info, file_pointer, group_name=None):
@@ -147,7 +151,7 @@ def __cfg_gen(param_info, file_pointer, group_name=None):
                 name=param_name,
                 description=param_description,
                 default=param_default,
-                quote="\"" if param_type == "string" else "",
+                quote="\"" if param_type == "str_t" else "",
                 type=param_type,
                 min=param_min,
                 max=param_min
