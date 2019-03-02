@@ -19,6 +19,11 @@ class Timestamp : public Time
    public:
 
     /**
+     * The default constructor for a Timestamp. Creates a Timestamp at time 0
+     */
+    Timestamp();
+
+    /**
      * Creates a new Timestamp value from a value in seconds.
      * @param seconds A value >= 0.0, in seconds, from which to create the Timestamp
      * @throws std::invalid_argument if the given value is < 0.0

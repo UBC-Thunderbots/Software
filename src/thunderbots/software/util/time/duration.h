@@ -9,6 +9,12 @@
 class Duration : public Time
 {
 public:
+
+    /**
+     * The default constructor for a Duration. Creates a Duration of length 0
+     */
+    Duration();
+
     /**
      * Creates a new Duration value from a value in seconds.
      * @param seconds A value in seconds, from which to create the Duration

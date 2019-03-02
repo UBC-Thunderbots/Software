@@ -45,21 +45,22 @@ void Robot::updateState(const Robot &new_robot_data)
 
 void Robot::updateStateToPredictedState(const Timestamp &timestamp)
 {
-    if (timestamp < last_update_timestamp)
-    {
-        throw std::invalid_argument(
-            "Error: Predicted state is updating times from the past");
-    }
+    updateStateToPredictedState(timestamp - last_update_timestamp);
+}
 
-    Duration duration_in_future = timestamp - last_update_timestamp;
+void Robot::updateStateToPredictedState(const Duration &duration_in_future) {
+    if (duration_in_future.getSeconds() < 0) {
+        throw std::invalid_argument(
+                "Error: Predicted state is updating times from the past");
+    }
     Point new_position          = estimatePositionAtFutureTime(duration_in_future);
     Vector new_velocity         = estimateVelocityAtFutureTime(duration_in_future);
     Angle new_orientation       = estimateOrientationAtFutureTime(duration_in_future);
     AngularVelocity new_angular_velocity =
-        estimateAngularVelocityAtFutureTime(duration_in_future);
+            estimateAngularVelocityAtFutureTime(duration_in_future);
 
     updateState(new_position, new_velocity, new_orientation, new_angular_velocity,
-                timestamp);
+                last_update_timestamp + duration_in_future);
 }
 
 Timestamp Robot::lastUpdateTimestamp() const

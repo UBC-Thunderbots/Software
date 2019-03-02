@@ -12,12 +12,12 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
-typedef struct
+ struct SSLBallDetection
 {
     Point position;
     double confidence;
     Timestamp timestamp;
-} SSLBallDetection;
+};
 
 /**
  * Given ball data from SSL Vision, filters for and returns the position/velocity of the
