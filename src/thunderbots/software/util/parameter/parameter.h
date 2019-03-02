@@ -31,7 +31,7 @@
 namespace
 {
     // the namespaces related to the param_server
-    const std::string NamespaceForParameters = "/parameters";
+    const std::string NamespaceForParameters = "/a";
 }  // namespace
 
 template <class T>

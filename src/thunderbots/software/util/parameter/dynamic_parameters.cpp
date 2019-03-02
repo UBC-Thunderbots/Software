@@ -1,32 +1,7 @@
 #include "util/parameter/dynamic_parameters.h"
 
-#include "shared/constants.h"
-
 namespace Util::DynamicParameters
 {
-    ros::Subscriber initParamUpdateSubscription(ros::NodeHandle& node_handle)
-    {
-        // return the subscriber that updates the parameters on change
-        return node_handle.subscribe("/parameters/parameter_updates", 1,
-                                     Util::DynamicParameters::parameterUpdateCallback);
-    }
-
-    void parameterUpdateCallback(const dynamic_reconfigure::Config::ConstPtr& updates)
-    {
-        Parameter<bool>::updateAllParametersFromConfigMsg(updates);
-        Parameter<int32_t>::updateAllParametersFromConfigMsg(updates);
-        Parameter<double>::updateAllParametersFromConfigMsg(updates);
-        Parameter<std::string>::updateAllParametersFromConfigMsg(updates);
-    }
-
-    void updateAllParametersFromROSParameterServer()
-    {
-        Parameter<bool>::updateAllParametersFromROSParameterServer();
-        Parameter<int32_t>::updateAllParametersFromROSParameterServer();
-        Parameter<double>::updateAllParametersFromROSParameterServer();
-        Parameter<std::string>::updateAllParametersFromROSParameterServer();
-    }
-
     Parameter<int32_t> robot_expiry_buffer_milliseconds(
         "robot_expiry_buffer_milliseconds", 1000);
 
@@ -70,7 +45,7 @@ namespace Util::DynamicParameters
     {
         Parameter<int32_t> robot_id("xbox_demo_robot_ID", 0);
         Parameter<double> kick_speed_meters_per_second(
-            "xbox_demo_kick_speed_meters_per_second", BALL_MAX_SPEED_METERS_PER_SECOND);
+            "xbox_demo_kick_speed_meters_per_second", 0);
         Parameter<double> chip_distance_meters("xbox_demo_chip_distance_meters", 1.0);
         Parameter<double> dribbler_rpm("xbox_demo_dribbler_rpm", 1000.0);
         Parameter<double> linear_sensitivity("xbox_demo_linear_sensitivity", 1.0);
