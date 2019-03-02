@@ -533,10 +533,19 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     //         words[1] |= 2 << 14;
     //         break;
     // }
-    // charged by default
+
     // Once we stop sending radio packets to the robots, they have a failsafe to discharge
     // after 1 second. For now we rely on that to discharge the robots.
-    words[1] |= 2 << 14;
+    switch (estop_state)
+    {
+        case EStopState::BROKEN:
+        case EStopState::STOP:
+            words[1] |= 1 << 14;
+            break;
+        case EStopState::RUN:
+            words[1] |= 2 << 14;
+            break;
+    }
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?
