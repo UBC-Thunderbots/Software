@@ -174,19 +174,14 @@ TEST_F(MotionControllerTest, negative_time_test)
     Angle destination_angle  = Angle::ofDegrees(210);
     double destination_speed = 0;
 
+    EXPECT_THROW(
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
             robot, destination, destination_speed, destination_angle, delta_time,
             ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
             ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
-
-    Vector expected_velocity = Vector(-1, 2);
-
-    AngularVelocity expected_angular_speed = Angle::ofRadians(3.9);
-
-    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
-    EXPECT_EQ(expected_angular_speed, robot_velocities.angular_velocity);
+    , std::invalid_argument);
 }
 
 TEST_F(MotionControllerTest, zero_time_test)
