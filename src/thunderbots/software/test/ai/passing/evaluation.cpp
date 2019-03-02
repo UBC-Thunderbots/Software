@@ -25,7 +25,7 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_for_team_several_robots_first
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
         Robot(0, {5,5}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-        Robot(0, {30,50}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(1, {30,50}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
     });
     Pass pass({0,0}, {10,10}, 3, Timestamp::fromSeconds(1));
 
@@ -40,7 +40,7 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_for_team_several_robots_last_
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
                                     Robot(0, {30,50}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                                    Robot(0, {5,5}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                                    Robot(1, {5,5}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
                             });
     Pass pass({0,0}, {10,10}, 3, Timestamp::fromSeconds(1));
 
@@ -101,8 +101,8 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away){
     Pass pass({1,1}, {4,4}, 2, Timestamp::fromSeconds(0));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
-    EXPECT_LE(0.5, intercept_risk);
-    EXPECT_GE(1, intercept_risk);
+    EXPECT_LE(0, intercept_risk);
+    EXPECT_GE(0.1, intercept_risk);
 }
 
 TEST(PassingEvaluationTest, calculateInterceptRisk_just_barely_intercept_starting_from_stop){
@@ -127,8 +127,8 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_just_barely_intercept_startin
     Pass pass({0,0}, {0,2}, 0.5, Timestamp::fromSeconds(0));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
-    EXPECT_LE(0, intercept_risk);
-    EXPECT_GE(0.1, intercept_risk);
+    EXPECT_LE(0.9, intercept_risk);
+    EXPECT_GE(1, intercept_risk);
 }
 
 TEST(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team){

@@ -24,7 +24,7 @@ double AI::Passing::calculateInterceptRisk(Team enemy_team, AI::Passing::Pass pa
         return 0;
     }
     std::vector<double> enemy_intercept_risks;
-    std::transform(enemy_robots.begin(), enemy_robots.end(), enemy_intercept_risks.begin(),
+    std::transform(enemy_robots.begin(), enemy_robots.end(), std::back_inserter(enemy_intercept_risks),
                                            [&](Robot robot){
                                                return calculateInterceptRisk(robot, pass);
                                            });
@@ -32,9 +32,13 @@ double AI::Passing::calculateInterceptRisk(Team enemy_team, AI::Passing::Pass pa
 }
 
 double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass pass) {
-    // We estimate the intercept risk by the distance that the enemy robot is
-    // from the pass trajectory. We assume the enemy continues moving at it's current
-    // velocity until the ball is kicked
+    // We estimate the intercept by the risk that the robot will get to the closest
+    // point on the pass before the ball, and by the risk that the robot will get to
+    // the reception point before the ball. We take the greater of these two risks.
+    // We assume that the enemy continues moving at it's current velocity until the
+    // pass starts
+
+    // TODO: Some of the variable names here are real long and a bit ugly
 
     // We force any negative duration to 0 here
     Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
@@ -62,12 +66,14 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     double max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point, robot_ball_time_diff_at_pass_receive_point);
     double max_time_diff_smooth = max_time_diff_unsmooth + std::log(std::exp(robot_ball_time_diff_at_closest_pass_point - max_time_diff_unsmooth) + std::exp(robot_ball_time_diff_at_pass_receive_point - max_time_diff_unsmooth));
 
+    // TODO: This `1` here should be a dynamic parameter
+
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
     // the pass does. As such, we construct a sigmoid centered at the time the pass
     // will complete, and use the time the robot will get to the receive point as
     // the "x" value along our sigmoid
-    return sigmoid(max_time_diff_smooth, -0.5, 1);
+    return 1 - sigmoid(max_time_diff_smooth, 0, 1);
 }
 
 double AI::Passing::ratePassFriendlyCapability(Team friendly_team, AI::Passing::Pass pass) {
