@@ -454,6 +454,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
+            ai/hl/stp/evaluation/indirect_chip.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
             ai/world/game_state.cpp
@@ -465,76 +466,12 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/evaluation/main.cpp
             test/ai/evaluation/robot.cpp
             test/ai/evaluation/team.cpp
-            test/test_util/test_util.cpp
-            util/parameter/dynamic_parameters.cpp
-            util/timestamp.cpp
-            )
-            
-    target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
-    
-    catkin_add_gtest(deflect_off_enemy_target_test
-            test/ai/evaluation/deflect_off_enemy_target.cpp
-            ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
-            geom/util.cpp
-            util/timestamp.cpp
-            ai/world/ball.cpp
-            ai/world/field.cpp
-            ai/world/game_state.cpp
-            ai/world/robot.cpp
-            ai/world/team.cpp
-            ai/world/world.cpp
-            test/test_util/test_util.cpp
-            )
-
-    target_link_libraries(deflect_off_enemy_target_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(evaluation_robot_orientation_within_angle_threshold_of_target_test
-            test/ai/evaluation/robot.cpp
-            ai/hl/stp/evaluation/robot.cpp
-            util/parameter/dynamic_parameters.cpp
-            geom/point.h
-            geom/angle.h
-            )
-
-    target_link_libraries(evaluation_robot_orientation_within_angle_threshold_of_target_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(indirect_chip_and_chase_target_evaluation_test
             test/ai/evaluation/indirect_chip.cpp
-            ai/hl/stp/evaluation/indirect_chip.cpp
-            ai/world/world.cpp
-            ai/world/ball.cpp
-            util/timestamp.cpp
-            util/parameter/dynamic_parameters.cpp            
-            ai/world/field.cpp
-            ai/world/game_state.cpp
-            ai/world/robot.cpp
-            ai/world/team.cpp
-            geom/angle.h
-            geom/point.h
-            geom/util.cpp
             test/test_util/test_util.cpp
-            )
-
-    target_link_libraries(indirect_chip_and_chase_target_evaluation_test ${catkin_LIBRARIES})
-    
-    catkin_add_gtest(evaluation_nearest_friendly_robot_test
-            test/ai/evaluation/team.cpp
-            ai/hl/stp/evaluation/team.cpp
-            ai/world/team.cpp
-            ai/world/robot.cpp
-            ai/world/ball.cpp
-            ai/world/world.cpp
             util/parameter/dynamic_parameters.cpp
-            ai/world/field.cpp
-            ai/world/game_state.cpp
             util/timestamp.cpp
-            geom/point.h
-            geom/angle.h
-            geom/util.cpp
-            test/test_util/test_util.cpp
-            )
-            
-    target_link_libraries(evaluation_nearest_friendly_robot_test ${catkin_LIBRARIES})
+    )
+    target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
@@ -550,7 +487,6 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/init.h
             util/timestamp.cpp
             )
-
     target_link_libraries(action_test
             ${catkin_LIBRARIES}
             ${G3LOG}
