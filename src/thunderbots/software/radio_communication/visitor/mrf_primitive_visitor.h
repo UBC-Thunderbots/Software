@@ -14,11 +14,17 @@ typedef struct RadioPrimitive_t
     FirmwarePrimitiveType prim_type;
 
     // The parameter array to be encoded into the radio packet
-    std::vector<double> param_array;
+    std::array<double, 4> param_array;
 
     // Extra bits used for flags and/or additional information
     uint8_t extra_bits;
 } RadioPrimitive;
+
+inline bool operator==(const RadioPrimitive &lhs, const RadioPrimitive &rhs)
+{
+    return lhs.prim_type == rhs.prim_type && lhs.param_array == rhs.param_array &&
+           lhs.extra_bits == rhs.extra_bits;
+}
 
 /**
  * This class implements a Visitor that serializes the Primitive classes into packets
@@ -37,35 +43,41 @@ class MRFPrimitiveVisitor : public PrimitiveVisitor
      *
      * @param catch_primitive The CatchPrimitive to serialize
      */
-    void visit(const CatchPrimitive &catch_primtiive) override;
+    void visit(const CatchPrimitive &catch_primitive) override;
 
     /**
      * Serializes the given ChipPrimitive into a radio packet
      *
-     * @param chip_primitive The ChipPrimitive to simulate
-     */
-    void visit(const ChipPrimitive &chip_primtiive) override;
+     * @param chip_primitive The ChipPrimitive to simulate */
+    void visit(const ChipPrimitive &chip_primitive) override;
 
     /**
      * Serializes the given DirectVelocityPrimitive into a radio packet
      *
      * @param direct_velocity_primitive The DirectVelocityPrimitive to simulate
      */
-    void visit(const DirectVelocityPrimitive &direct_velocity_primtiive) override;
+    void visit(const DirectVelocityPrimitive &direct_velocity_primitive) override;
 
     /**
      * Visits a DirectWheelsPrimitive to perform an operation.
      *
      * @param direct_wheels_primitive The DirectWheelsPrimitive to visit
      */
-    void visit(const DirectWheelsPrimitive &direct_wheels_primtiive) override;
+    void visit(const DirectWheelsPrimitive &direct_wheels_primitive) override;
+
+    /**
+     * Visits a DribblePrimitive to perform an operation.
+     *
+     * @param dribble_primitive The DribblePrimitive to visit
+     */
+    void visit(const DribblePrimitive &dribble_primitive) override;
 
     /**
      * Serializes the given KickPrimitive into a radio packet
      *
      * @param kick_primitive The KickPrimitive to simulate
      */
-    void visit(const KickPrimitive &kick_primtiive) override;
+    void visit(const KickPrimitive &kick_primitive) override;
 
     /**
      * Serializes the given MovePrimitive into a radio packet
@@ -104,9 +116,8 @@ class MRFPrimitiveVisitor : public PrimitiveVisitor
      * @return The most recent serialized packet created by this
      * MRFPrimitiveVisitor
      */
-    std::optional<RadioPrimitive> getSerializedRadioPacket();
+    RadioPrimitive getSerializedRadioPacket();
 
    private:
-    std::optional<RadioPrimitive> prim;
-    RadioPrimitive r_prim;
+    std::optional<RadioPrimitive> radio_prim;
 };

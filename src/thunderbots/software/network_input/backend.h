@@ -1,8 +1,11 @@
 #pragma once
 
 #include <optional>
+#include <queue>
 
+#include "ai/world/ball.h"
 #include "ai/world/field.h"
+#include "ai/world/team.h"
 #include "network_input/filter/ball_filter.h"
 #include "network_input/filter/robot_filter.h"
 #include "network_input/filter/robot_team_filter.h"
@@ -24,61 +27,75 @@ class Backend
     explicit Backend();
 
     /**
-     * Given a new protobuf packet, updates the Ball filter and returns a Ball message
-     * containing the most up to date filtered Ball data
+     * Filters the ball data contained in the list of DetectionFrames and returns the most
+     * up to date state of the ball
      *
-     * @param packet The SSL Vision packet containing new data
+     * @param detections A list of new DetectionFrames containing ball data
      *
-     * @return a Ball message containing the most up to date filtered Ball data. If the
-     * packet does not contain any new Ball information, returns std::nullopt
+     * @return The most up to date state of the ball given the new DetectionFrame
+     * information
      */
-    std::optional<thunderbots_msgs::Ball> getFilteredBallMsg(
-        const SSL_WrapperPacket &packet);
+    Ball getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections);
 
     /**
-     * Given a new protobuf packet, returns a Field message containing the most up to date
-     * Field geometry
+     * Returns a new Field object containing the most up to date state of the field given
+     * the new GeometryData information
      *
-     * @param packet The SSL Vision packet containing new data
+     * @param geometry_packet The SSL_GeometryData packet containing new field data
      *
-     * @return a Field message containing the most up to date Field geometry. If the
-     * packet does not contain any new Field geometry, returns std::nullopt
+     * @return a Field object containing the most up to date state of the field given the
+     * new GeometryData information
      */
-    std::optional<thunderbots_msgs::Field> getFieldMsg(const SSL_WrapperPacket &packet);
+    Field getFieldData(const SSL_GeometryData &geometry_packet);
 
     /**
-     * Given a new protobuf packet, updates the friendly team filter and returns a Team
-     * message containing the most up to date filtered friendly team data
+     * Filters the robot data for the friendly team contained in the list of
+     * DetectionFrames and returns the most up to date state of the friendly team
      *
-     * @param packet The SSL Vision packet containing new data
+     * @param detections A list of new DetectionFrames containing friendly team robot data
      *
-     * @return a Team message containing the most up to date filtered friendly team data.
-     * If the packet does not contain any new Team or Robot data, returns std::nullopt
+     * @return The most up to date state of the friendly team given the new DetectionFrame
+     * information
      */
-    std::optional<thunderbots_msgs::Team> getFilteredFriendlyTeamMsg(
-        const SSL_WrapperPacket &packet);
+    Team getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detections);
 
     /**
-     * Given a new protobuf packet, updates the enemy team filter and returns a Team
-     * message containing the most up to date filtered enemy team data
+     * Filters the robot data for the enemy team contained in the list of DetectionFrames
+     * and returns the most up to date state of the enemy team
      *
-     * @param packet The SSL Vision packet containing new data
+     * @param detections A list of new DetectionFrames containing enemy team robot data
      *
-     * @return a Team message containing the most up to date filtered enemy team data.
-     * If the packet does not contain any new Team or Robot data, returns std::nullopt
+     * @return The most up to date state of the enemy team given the new DetectionFrame
+     * information
      */
-    std::optional<thunderbots_msgs::Team> getFilteredEnemyTeamMsg(
-        const SSL_WrapperPacket &packet);
+    Team getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections);
 
-    std::optional<thunderbots_msgs::RefboxData> getRefboxDataMsg(const Referee &packet);
-
+    thunderbots_msgs::RefboxData getRefboxDataMsg(const Referee &packet);
 
     virtual ~Backend() = default;
 
    private:
+    /**
+     * Creates a Field object given geometry data from a protobuf packet
+     *
+     * @param packet_geometry The SSL_GeometryFieldSize data from a protobuf packet
+     * containing field geometry
+     * @return A Field object representing the field specified with the provided geometry
+     */
+    Field createFieldFromPacketGeometry(
+        const SSL_GeometryFieldSize &packet_geometry) const;
+
     BallFilter ball_filter;
     RobotTeamFilter friendly_team_filter;
     RobotTeamFilter enemy_team_filter;
+
+    // Objects used to aggregate and store state. We use these to aggregate the state
+    // so that we always publish "complete" data, not just data from a single frame/
+    // part of the field
+    Field field_state;
+    Team friendly_team_state;
+    Team enemy_team_state;
+    Ball ball_state;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.

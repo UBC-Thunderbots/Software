@@ -49,3 +49,13 @@ void StopPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool StopPrimitive::operator==(const StopPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->coast == other.coast;
+}
+
+bool StopPrimitive::operator!=(const StopPrimitive &other) const
+{
+    return !((*this) == other);
+}

@@ -158,6 +158,16 @@ double Field::boundaryWidth() const
     return boundary_width_;
 }
 
+bool Field::pointInFriendlyDefenseArea(const Point p) const
+{
+    return friendlyDefenseArea().containsPoint(p);
+}
+
+bool Field::pointInEnemyDefenseArea(const Point p) const
+{
+    return enemyDefenseArea().containsPoint(p);
+}
+
 bool Field::operator==(const Field &other) const
 {
     return this->field_width_ == other.field_width_ &&

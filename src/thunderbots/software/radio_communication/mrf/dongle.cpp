@@ -7,7 +7,6 @@
 
 #include <algorithm>
 #include <bitset>
-#include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -19,6 +18,7 @@
 
 #include "constants.h"
 #include "radio_communication/visitor/mrf_primitive_visitor.h"
+#include "util/logger/init.h"
 
 namespace
 {
@@ -29,6 +29,8 @@ namespace
         uint16_t pan;
     };
 
+    // Different configs for the dongle, to allow for communication over
+    // different PANs and/or channels
     const RadioConfig DEFAULT_CONFIGS[4] = {
         {25U, 250, 0x1846U},
         {25U, 250, 0x1847U},
@@ -36,7 +38,10 @@ namespace
         {25U, 250, 0x1849U},
     };
 
-    const unsigned int ANNUNCIATOR_BEEP_LENGTH = 750;
+    const unsigned int ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS = 750;  // milliseconds
+
+    // The dongle's MAC address
+    static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
 
 }  // namespace
 
@@ -173,7 +178,6 @@ MRFDongle::MRFDongle()
         device.control_no_data(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
                                MRF::CONTROL_REQUEST_SET_PAN_ID, pan_,
                                static_cast<uint16_t>(radio_interface), 0);
-        static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
         device.control_out(LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_INTERFACE,
                            MRF::CONTROL_REQUEST_SET_MAC_ADDRESS, 0,
                            static_cast<uint16_t>(radio_interface), &MAC, sizeof(MAC), 0);
@@ -204,6 +208,7 @@ MRFDongle::MRFDongle()
     // Submit the message delivery report transfers.
     for (auto &i : mdr_transfers)
     {
+        // Attempt to receive at most 8 bytes from endpoint 1
         i.reset(new USB::BulkInTransfer(device, 1, 8, false, 0));
         i->signal_done.connect(sigc::mem_fun(this, &MRFDongle::handle_mdrs));
         i->submit();
@@ -212,6 +217,7 @@ MRFDongle::MRFDongle()
     // Submit the received message transfers.
     for (auto &i : message_transfers)
     {
+        // Attempt to receive at most 105 bytes from endpoint 2
         i.reset(new USB::BulkInTransfer(device, 2, 105, false, 0));
         i->signal_done.connect(sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_message),
                                           sigc::ref(*i.get())));
@@ -377,7 +383,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
     if (camera_transfers.size() >= 8)
     {
-        std::cout << "Camera transfer queue is full, ignoring camera packet" << std::endl;
+        LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
+                     << std::endl;
         return;
     }
 
@@ -398,22 +405,22 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
     (*i).first->submit();
 
-    std::cout << "Submitted camera transfer in kposition:" << camera_transfers.size()
-              << std::endl;
+    LOG(DEBUG) << "Submitted camera transfer in position:" << camera_transfers.size()
+               << std::endl;
 };
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
 {
-    std::size_t num_prims = prims.size();
-    if (num_prims > MAX_ROBOTS)
-    {
-        throw std::invalid_argument("Too many primitives in vector.");
-    }
-
     // More than 1 prim.
-    if (num_prims)
+    if (!prims.empty())
     {
-        if (num_prims == MAX_ROBOTS)
+        std::size_t num_prims = prims.size();
+        if (num_prims > MAX_ROBOTS_OVER_RADIO)
+        {
+            throw std::invalid_argument("Too many primitives in vector.");
+        }
+
+        if (num_prims == MAX_ROBOTS_OVER_RADIO)
         {
             // All robots are present. Build a full-size packet with all the
             // robots’ data in index order.
@@ -423,7 +430,7 @@ void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> 
             }
             drive_packet_length = 64;
         }
-        else if (num_prims < MAX_ROBOTS)
+        else if (num_prims < MAX_ROBOTS_OVER_RADIO)
         {
             // Only some robots are present. Build a reduced-size packet
             // with robot indices prefixed.
@@ -463,17 +470,12 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
     // Visit the primitive.
     prim->accept(visitor);
-    std::optional<RadioPrimitive> r_prim = visitor.getSerializedRadioPacket();
-    if (!r_prim.has_value())
-    {
-        throw std::invalid_argument(
-            "MRF Primitive Visitor was not called on a primitive");
-    }
+    RadioPrimitive r_prim = visitor.getSerializedRadioPacket();
 
     // Encode the parameter words.
-    for (std::size_t i = 0; i < r_prim->param_array.size(); ++i)
+    for (std::size_t i = 0; i < r_prim.param_array.size(); ++i)
     {
-        double value = r_prim->param_array[i];
+        double value = r_prim.param_array[i];
         switch (std::fpclassify(value))
         {
             case FP_NAN:
@@ -510,7 +512,7 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
     // Encode the movement primitive number.
     words[0] = static_cast<uint16_t>(words[0] |
-                                     static_cast<unsigned int>(r_prim->prim_type) << 12);
+                                     static_cast<unsigned int>(r_prim.prim_type) << 12);
 
     // Encode the charger state. TODO add this (#223)
     // switch (charger_state)
@@ -524,13 +526,19 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     //         words[1] |= 2 << 14;
     //         break;
     // }
-    words[1] |= 2 << 14;  // Charged for now
+    // charged by default
+    // Once we stop sending radio packets to the robots, they have a failsafe to discharge
+    // after 1 second. For now we rely on that to discharge the robots.
+    words[1] |= 2 << 14;
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?
-    uint8_t extra = r_prim->extra_bits;
+    uint8_t extra = r_prim.extra_bits;
     bool slow     = false;
-    assert(extra <= 127);
+    if (extra > 127)
+    {
+        throw std::invalid_argument("extra greater than 127");
+    }
     uint8_t extra_encoded = static_cast<uint8_t>(extra | (slow ? 0x80 : 0x00));
 
     words[2] = static_cast<uint16_t>(words[2] |
@@ -549,7 +557,6 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
 
 void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 {
-    // std::cout << "Drive Transfer done" << std::endl;
     op.result();
     drive_transfer.reset();
 }
@@ -567,8 +574,8 @@ void MRFDongle::handle_camera_transfer_done(
     uint64_t stamp = static_cast<uint64_t>(micros.count());
 
     std::lock_guard<std::mutex> lock(cam_mtx);
-    std::cout << "Camera transfer done, took: " << stamp - (*iter).second
-              << " microseconds" << std::endl;
+    LOG(DEBUG) << "Camera transfer done, took: " << stamp - (*iter).second
+               << " microseconds" << std::endl;
     (*iter).first->result();
     camera_transfers.erase(iter);
 }
@@ -576,8 +583,16 @@ void MRFDongle::handle_camera_transfer_done(
 void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const void *data,
                                 std::size_t len)
 {
-    assert(robot < 8);
-    assert((1 <= tries) && (tries <= 256));
+    if (robot >= MAX_ROBOTS_OVER_RADIO)
+    {
+        throw std::out_of_range("Robot ID must be below 8");
+    }
+
+    if ((tries < 1) || (tries > 256))
+    {
+        throw std::out_of_range("Number of tries must be between 1 and 256 (inclusive)");
+    }
+
     uint8_t buffer[len + 2];
     buffer[0] = static_cast<uint8_t>(robot);
     buffer[1] = static_cast<uint8_t>(tries & 0xFF);

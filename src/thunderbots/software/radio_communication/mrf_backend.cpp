@@ -1,6 +1,7 @@
 #include "mrf_backend.h"
 
 #include <chrono>
+#include "thunderbots_msgs/RobotStatus.h"
 
 namespace
 {
@@ -72,6 +73,7 @@ const char *const SD_MESSAGES[] = {
 const char *const LOGGER_MESSAGES[] = {
     nullptr, u8"Bot %1 logger uninitialized", nullptr, u8"Bot %1 SD card full",
 };
+}
 
 MRFBackend::MRFBackend()
     : dongle(MRFDongle()),
@@ -86,9 +88,9 @@ void MRFBackend::sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& p
     dongle.send_drive_packet(primitives);
 }
 
-void MRFBackend::update_detbots(std::vector<std::tuple<uint8_t, Point, Angle>> ft)
+void MRFBackend::update_robots(std::vector<std::tuple<uint8_t, Point, Angle>> robots)
 {
-    detbots = ft;
+    this->robots = robots;
 }
 
 void MRFBackend::update_ball(Ball b)
@@ -98,21 +100,21 @@ void MRFBackend::update_ball(Ball b)
 
 void MRFBackend::send_vision_packet()
 {
-    /* TODO: Change handling of timestamp depending on age of team vs ball */
     uint64_t timestamp = static_cast<uint64_t>(ball.lastUpdateTimestamp().getSeconds());
-    std::cout << "Calling dongle.send_camera_packet with: ";
-    for (std::size_t i = 0; i < detbots.size(); ++i)
-    {
-        std::cout << "bot number = " << unsigned(std::get<0>(detbots[i])) << ", ";
-        std::cout << "x = " << (std::get<1>(detbots[i])).x() << ", ";
-        std::cout << "y = " << (std::get<1>(detbots[i])).y() << ", ";
-        std::cout << "time capture = " << timestamp << ", ";
-        std::cout << "theta = " << (std::get<2>(detbots[i])).toDegrees() << std::endl;
-    }
-    std::cout << "ball x = " << ball.position().x() << ", ";
-    std::cout << "ball y = " << ball.position().y() << std::endl;
 
-    dongle.send_camera_packet(detbots, ball.position() * 1000, timestamp);
+    LOG(DEBUG) << "Calling dongle.send_camera_packet with: ";
+    for (std::size_t i = 0; i < robots.size(); ++i)
+    {
+        LOG(DEBUG) << "bot number = " << unsigned(std::get<0>(robots[i])) << ", ";
+        LOG(DEBUG) << "x = " << (std::get<1>(robots[i])).x() << ", ";
+        LOG(DEBUG) << "y = " << (std::get<1>(robots[i])).y() << ", ";
+        LOG(DEBUG) << "time capture = " << timestamp << ", ";
+        LOG(DEBUG) << "theta = " << (std::get<2>(robots[i])).toDegrees() << std::endl;
+    }
+    LOG(DEBUG) << "ball x = " << ball.position().x() * MILLIMETERS_PER_METER << ", ";
+    LOG(DEBUG) << "ball y = " << ball.position().y() * MILLIMETERS_PER_METER << std::endl;
+
+    dongle.send_camera_packet(robots, ball.position() * MILLIMETERS_PER_METER, timestamp);
 }
 
 void MRFBackend::update_dongle_events()
@@ -120,130 +122,12 @@ void MRFBackend::update_dongle_events()
     dongle.handle_libusb_events();
 }
 
-void MRFBackend::handle_message(
+thunderbots_msgs::RobotStatus MRFBackend::handle_message(
     int index, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)
 {
-    int link_quality = lqi / 255.0;
-    int received_signal_strength_db;
-    bool alive;
+    thunderbots_msgs::RobotStatus robot_status;
 
-    /**
-     * \brief The rough maximum full-scale deflection of the laser
-     * sensor.
-     */
-    const double break_beam_scale;
-
-    /**
-     * \brief The maximum possible kick speed, in m/s.
-     */
-    const double kick_speed_max;
-
-    /**
-     * \brief The kick resolution for HScale.
-     */
-
-    const double kick_speed_resolution;
-
-    /**
-     * \brief The maximum possible chip distance, in m.
-     */
-    const double chip_distance_max;
-
-    /**
-     * \brief The chip resolution for HScale.
-     */
-
-    const double chip_distance_resolution;
-
-    /**
-     * \brief The maximum power level understood by the \ref
-     * direct_dribbler function.
-     */
-    const unsigned int direct_dribbler_max;
-
-    /**
-     * \brief Whether or not the robot is currently responding to radio
-     * communication.
-     */
-    Property<bool> alive;
-
-    /**
-     * \brief Whether the robot is in direct mode.
-     */
-    Property<bool> direct_control;
-
-    /**
-     * \brief Whether or not the ball is interrupting the robot’s laser
-     * beam.
-     */
-    Property<bool> ball_in_beam;
-
-    /**
-     * \brief Whether or not the robot’s capacitor is charged enough to
-     * kick the ball.
-     */
-    Property<bool> capacitor_charged;
-
-    /**
-     * \brief The voltage on the robot’s battery, in volts.
-     */
-    Property<double> battery_voltage;
-
-    /**
-     * \brief The voltage on the robot’s kicking capacitor, in volts.
-     */
-    Property<double> capacitor_voltage;
-
-    /**
-     * \brief The reading of the robot’s laser sensor.
-     */
-    Property<double> break_beam_reading;
-
-    /**
-     * \brief The temperature of the robot’s dribbler motor, in degrees
-     * Celsius.
-     */
-    Property<double> dribbler_temperature;
-
-    /**
-     * \brief The speed of the robot’s dribbler motor, in revolutions
-     * per minute.
-     */
-    Property<int> dribbler_speed;
-
-    /**
-     * \brief The temperature of the robot’s mainboard, in degrees
-     * Celsius.
-     */
-    Property<double> board_temperature;
-
-    /**
-     * \brief The link quality of the last received packet, from 0 to
-     * 1.
-     */
-    double link_quality;
-
-    /**
-     * \brief The received signal strength of the last received packet,
-     * in decibels.
-     */
-    Property<int> received_signal_strength;
-
-    /**
-     * \brief Whether or not the build ID information is valid.
-     */
-    Property<bool> build_ids_valid;
-
-    /**
-     * \brief The microcontroller firmware build ID.
-     */
-    Property<uint32_t> fw_build_id;
-
-    /**
-     * \brief The FPGA bitstream build ID.
-     */
-    Property<uint32_t> fpga_build_id;
-
+    robot_status.link_quality = lqi / 255.0;
 
     {
         bool found = false;
@@ -252,13 +136,13 @@ void MRFBackend::handle_message(
         {
             if (RSSI_TABLE[i].rssi < rssi)
             {
-                received_signal_strength_db = RSSI_TABLE[i].db;
+                robot_status.received_signal_strength_db = RSSI_TABLE[i].db;
                 found                    = true;
             }
         }
         if (!found)
         {
-            received_signal_strength_db = -90;
+            robot_status.received_signal_strength_db = -90;
         }
     }
 
@@ -275,13 +159,13 @@ void MRFBackend::handle_message(
                 {
                     alive = true;
 
-                    battery_voltage =
+                    robot_status.battery_voltage =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
                         1000.0;
                     bptr += 2;
                     len -= 2;
 
-                    capacitor_voltage =
+                    robot_status.capacitor_voltage =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
                         100.0;
                     // TODO: let visualizer know about low cap voltages?
@@ -289,48 +173,48 @@ void MRFBackend::handle_message(
                     bptr += 2;
                     len -= 2;
 
-                    break_beam_reading =
+                    robot_status.break_beam_reading =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
                         1000.0;
                     bptr += 2;
                     len -= 2;
 
-                    board_temperature =
+                    robot_status.board_temperature =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
                         100.0;
                     bptr += 2;
                     len -= 2;
 
-                    ball_in_beam               = !!(*bptr & 0x80);
-                    capacitor_charged          = !!(*bptr & 0x40);
-                    unsigned int logger_status = *bptr & 0x3F;
-                    for (std::size_t i = 0; i < logger_messages.size(); ++i)
-                    {
-                        if (logger_messages[i])
-                        {
-                            logger_messages[i]->active(logger_status == i);
-                        }
-                    }
+                    robot_status.ball_in_beam               = !!(*bptr & 0x80);
+                    robot_status.capacitor_charged          = !!(*bptr & 0x40);
+                    // unsigned int logger_status = *bptr & 0x3F;
+                    // for (std::size_t i = 0; i < logger_messages.size(); ++i)
+                    // {
+                    //     if (logger_messages[i])
+                    //     {
+                    //         logger_messages[i]->active(logger_status == i);
+                    //     }
+                    // }
                     ++bptr;
                     --len;
 
-                    for (std::size_t i = 0; i < sd_messages.size(); ++i)
-                    {
-                        if (sd_messages[i])
-                        {
-                            sd_messages[i]->active(*bptr == i);
-                        }
-                    }
+                    // for (std::size_t i = 0; i < sd_messages.size(); ++i)
+                    // {
+                    //     if (sd_messages[i])
+                    //     {
+                    //         sd_messages[i]->active(*bptr == i);
+                    //     }
+                    // }
                     ++bptr;
                     --len;
 
-                    dribbler_speed = static_cast<int16_t>(static_cast<uint16_t>(
+                    robot_status.dribbler_speed = static_cast<int16_t>(static_cast<uint16_t>(
                                          bptr[0] | (bptr[1] << 8))) *
                                      25 * 60 / 6;
                     bptr += 2;
                     len -= 2;
 
-                    dribbler_temperature = *bptr++;
+                    robot_status.dribbler_temperature = *bptr++;
                     --len;
 
                     bool has_error_extension = false;
@@ -350,8 +234,10 @@ void MRFBackend::handle_message(
                                     {
                                         unsigned int byte = i / CHAR_BIT;
                                         unsigned int bit  = i % CHAR_BIT;
-                                        error_lt_messages[i]->active(
-                                            bptr[byte] & (1 << bit));
+
+                                        // TODO: Handle these messages
+                                        // error_lt_messages[i]->active(
+                                        //     bptr[byte] & (1 << bit));
                                     }
                                     for (unsigned int i = 0;
                                          i != MRF::ERROR_ET_COUNT; ++i)
@@ -362,9 +248,10 @@ void MRFBackend::handle_message(
                                         unsigned int bit =
                                             (i + MRF::ERROR_LT_COUNT) %
                                             CHAR_BIT;
+                                        // TODO: Handle these messages
                                         if (bptr[byte] & (1 << bit))
                                         {
-                                            error_et_messages[i]->fire();
+                                            // error_et_messages[i]->fire();
                                         }
                                     }
                                     bptr += MRF::ERROR_BYTES;
@@ -383,9 +270,9 @@ void MRFBackend::handle_message(
                                 --len;
                                 if (len >= 8)
                                 {
-                                    build_ids_valid = true;
-                                    fw_build_id     = decode_u32_le(bptr);
-                                    fpga_build_id   = decode_u32_le(bptr + 4);
+                                    robot_status.build_ids_valid = true;
+                                    robot_status.fw_build_id     = decode_u32_le(bptr);
+                                    robot_status.fpga_build_id   = decode_u32_le(bptr + 4);
                                     check_build_id_mismatch();
                                     bptr += 8;
                                     len -= 8;
@@ -404,11 +291,11 @@ void MRFBackend::handle_message(
                                 --len;
                                 if (len >= 4)
                                 {
-                                    for (unsigned int i = 0; i < 4; ++i)
-                                    {
-                                        lps_values[i] =
-                                            static_cast<int8_t>(*bptr++) / 10.0;
-                                    }
+                                    // for (unsigned int i = 0; i < 4; ++i)
+                                    // {
+                                    //     lps_values[i] =
+                                    //         static_cast<int8_t>(*bptr++) / 10.0;
+                                    // }
                                     len -= 4;
                                 }
                                 else
@@ -434,10 +321,11 @@ void MRFBackend::handle_message(
                     {
                         // Error reporting extension is absent → no errors are
                         // asserted.
-                        for (auto &i : error_lt_messages)
-                        {
-                            i->active(false);
-                        }
+                        // TODO: figure this out
+                        // for (auto &i : error_lt_messages)
+                        // {
+                        //     i->active(false);
+                        // }
                     }
                 }
                 else
@@ -447,24 +335,25 @@ void MRFBackend::handle_message(
                         "byte count " << len << std::endl;
                 }
 
-                if (!build_ids_valid &&
-                    request_build_ids_timer.elapsed() >
-                        REQUEST_BUILD_IDS_INTERVAL)
-                {
-                    request_build_ids_timer.stop();
-                    request_build_ids_timer.reset();
-                    request_build_ids_timer.start();
-                    if (request_build_ids_counter)
-                    {
-                        --request_build_ids_counter;
-                        static const uint8_t REQUEST = 0x0D;
-                        dongle_.send_unreliable(index, 20, &REQUEST, 1);
-                    }
-                    else
-                    {
-                        build_id_fetch_error_message.active(true);
-                    }
-                }
+                // TODO: see what this does
+                // if (!robot_status.build_ids_valid &&
+                //     request_build_ids_timer.elapsed() >
+                //         REQUEST_BUILD_IDS_INTERVAL)
+                // {
+                //     request_build_ids_timer.stop();
+                //     request_build_ids_timer.reset();
+                //     request_build_ids_timer.start();
+                //     if (request_build_ids_counter)
+                //     {
+                //         --request_build_ids_counter;
+                //         static const uint8_t REQUEST = 0x0D;
+                //         dongle_.send_unreliable(index, 20, &REQUEST, 1);
+                //     }
+                //     else
+                //     {
+                //         build_id_fetch_error_message.active(true);
+                //     }
+                // }
                 break;
 
             case 0x01:
@@ -475,12 +364,12 @@ void MRFBackend::handle_message(
 
             case 0x04:
                 // Robot has ball
-                ball_in_beam = true;
+                robot_status.ball_in_beam = true;
                 break;
 
             case 0x05:
                 // Robot does not have ball
-                ball_in_beam = false;
+                robot_status.ball_in_beam = false;
                 break;
 
             default:
@@ -488,4 +377,5 @@ void MRFBackend::handle_message(
                 break;
         }
     }
+    return robot_status;
 }
