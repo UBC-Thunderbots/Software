@@ -13,7 +13,7 @@
 
 using namespace AI::Passing;
 
-double AI::Passing::ratePassEnemyRisk(Team enemy_team, AI::Passing::Pass pass) {
+double AI::Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass) {
     double enemy_proximity_importance = Util::DynamicParameters::AI::Passing::enemy_proximity_importance.value();
 
     // Calculate a risk score based on the distance of the enemy robots from the receive
@@ -31,7 +31,7 @@ double AI::Passing::ratePassEnemyRisk(Team enemy_team, AI::Passing::Pass pass) {
     return enemy_reciever_proximity_risk * intercept_risk;
 }
 
-double AI::Passing::calculateInterceptRisk(Team enemy_team, AI::Passing::Pass pass) {
+double AI::Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass) {
     // Return the highest risk for all the enemy robots, if there are any
     auto enemy_robots = enemy_team.getAllRobots();
     if (enemy_robots.empty()){
@@ -45,7 +45,7 @@ double AI::Passing::calculateInterceptRisk(Team enemy_team, AI::Passing::Pass pa
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass pass) {
+double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass) {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
     // the reception point before the ball. We take the greater of these two risks.
@@ -93,7 +93,7 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     return 1 - sigmoid(max_time_diff_smooth, 0, 1);
 }
 
-double AI::Passing::ratePassFriendlyCapability(Team friendly_team, AI::Passing::Pass pass) {
+double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass) {
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty()){
         return 0;
@@ -131,7 +131,7 @@ double AI::Passing::ratePassFriendlyCapability(Team friendly_team, AI::Passing::
     return sigmoid(receive_time.getSeconds(), latest_time_to_reciever_state.getSeconds() + 0.5, 1);
 }
 
-Duration AI::Passing::getTimeToOrientationForRobot(Robot robot, Angle desired_orientation) {
+Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot, const Angle& desired_orientation) {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
     // we integrate (1) to get:
@@ -168,7 +168,7 @@ Duration AI::Passing::getTimeToOrientationForRobot(Robot robot, Angle desired_or
     return Duration::fromSeconds(travel_time);
 }
 
-Duration AI::Passing::getTimeToPositionForRobot(Robot robot, Point dest) {
+Duration AI::Passing::getTimeToPositionForRobot(const Robot& robot, const Point& dest) {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
     // we integrate (1) to get:

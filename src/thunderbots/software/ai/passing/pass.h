@@ -38,28 +38,28 @@ namespace AI::Passing
          *
          * @return The value of the receiver point
          */
-        Point receiverPoint();
+        Point receiverPoint() const;
 
         /**
          * Gets the value of the passer point
          *
          * @return The value of the passer point
          */
-        Point passerPoint();
+        Point passerPoint() const;
 
         /**
          * Gets the value of the pass speed
          *
          * @return The value of the pass speed, in meters/second
          */
-        double speed();
+        double speed() const;
 
         /**
          * Gets the value of the pass start time
          *
          * @return The value of the pass start time
          */
-        Timestamp startTime();
+        Timestamp startTime() const;
 
         /**
          * Estimate the time when the pass should be received
@@ -68,7 +68,7 @@ namespace AI::Passing
          *
          * @return An estimate of the time when the pass should be received
          */
-        Timestamp estimateReceiveTime();
+        Timestamp estimateReceiveTime() const;
 
         /**
          * Estimate how long the pass will take, from kicking to receiving
@@ -77,7 +77,7 @@ namespace AI::Passing
          *
          * @return An estimate of how long the pass will take, from kicking to receiving
          */
-        Duration estimatePassDuration();
+        Duration estimatePassDuration() const;
 
         /**
          * Implement the "<<" operator for printing

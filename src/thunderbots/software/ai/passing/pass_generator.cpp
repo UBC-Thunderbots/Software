@@ -204,6 +204,7 @@ double PassGenerator::ratePass(Pass pass)
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
 
+    double enemy_risk = ratePassEnemyRisk(world.enemyTeam(), pass);
     // TODO (Issue #383): Implement this properly
 
     // Strongly weight positions in our target region, if we have one

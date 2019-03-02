@@ -26,7 +26,7 @@ namespace AI::Passing
      *         to run without interference, and 0 indicating that the pass will certainly
      *         be interfered with (and so is very poor)
      */
-    double ratePassEnemyRisk(Team enemy_team, Pass pass);
+    double ratePassEnemyRisk(const Team& enemy_team, const Pass& pass);
 
     /**
      * Calculates the likelihood that the given pass will be intercepted
@@ -38,7 +38,7 @@ namespace AI::Passing
      *         guaranteed to be intercepted, and 0 indicating it's impossible for the
      *         pass to be intercepted
      */
-    double calculateInterceptRisk(Team enemy_team, Pass pass);
+    double calculateInterceptRisk(const Team& enemy_team, const Pass& pass);
 
     /**
      * Calculates the likelihood that the given pass will be intercepted by a given robot
@@ -50,7 +50,7 @@ namespace AI::Passing
      *         be intercepted, and 0 indicating it's impossible for the pass to be
      *         intercepted
      */
-    double calculateInterceptRisk(Robot enemy_robot, Pass pass);
+    double calculateInterceptRisk(Robot enemy_robot, const Pass& pass);
 
 
     // TODO: better name for this function?
@@ -67,7 +67,7 @@ namespace AI::Passing
      *         friendly team to recive the given pass, with 1 being very likely, 0
      *         being impossible
      */
-    double ratePassFriendlyCapability(Team friendly_team, Pass pass);
+    double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass);
 
     /**
      * Calculate how long it would take the given robot to turn to the given orientation
@@ -77,7 +77,7 @@ namespace AI::Passing
      *
      * @return The time required for the given robot to rotate to the given orientation
      */
-    Duration getTimeToOrientationForRobot(Robot robot, Angle desired_orientation);
+    Duration getTimeToOrientationForRobot(const Robot& robot, const Angle& desired_orientation);
 
     /**
      * Calculate minimum time it would take for the given robot to reach the given point
@@ -91,7 +91,7 @@ namespace AI::Passing
      * point
      */
      // TODO: `Timestamp` should really be `duration` here
-    Duration getTimeToPositionForRobot(Robot robot, Point dest);
+    Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest);
 
     /**
      * Calculates the static position quality for a given position on a given field
