@@ -14,7 +14,21 @@
 using namespace AI::Passing;
 
 double AI::Passing::ratePassEnemyRisk(Team enemy_team, AI::Passing::Pass pass) {
-    // TODO: The old code adds risk based on the distance of enemies to the receive point, wait for James response on why this was before deciding whether or not to add it
+    double enemy_proximity_importance = Util::DynamicParameters::AI::Passing::enemy_proximity_importance.value();
+
+    // Calculate a risk score based on the distance of the enemy robots from the receive
+    // point, based on an exponential function of the distance of each robot from the
+    // receiver point
+    auto enemy_robots = enemy_team.getAllRobots();
+    double enemy_reciever_proximity_risk = 1;
+    for (const Robot& enemy : enemy_team.getAllRobots()){
+        double dist = (pass.receiverPoint() - enemy.position()).len();
+        enemy_reciever_proximity_risk *= (1 - enemy_proximity_importance*std::exp(-dist*dist));
+    }
+
+    double intercept_risk = calculateInterceptRisk(enemy_team, pass);
+
+    return enemy_reciever_proximity_risk * intercept_risk;
 }
 
 double AI::Passing::calculateInterceptRisk(Team enemy_team, AI::Passing::Pass pass) {
@@ -50,12 +64,14 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     // the the receiver point for the pass, then it is guaranteed that it will not be
     // able to intercept the pass anywhere.
 
+    // Figure out how long the enemy robot and ball will take to reach the closest
+    // point on the pass to the enemy's current position
     Point closest_point_on_pass_to_robot = closestPointOnSeg(enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
     Duration enemy_robot_time_to_closest_pass_point = getTimeToPositionForRobot(enemy_robot, closest_point_on_pass_to_robot);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds((closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
 
-    // Figure out how long the enemy robot will take to reach the receive point for the
-    // pass.
+    // Figure out how long the enemy robot and ball will take to reach the receive point
+    // for the pass.
     Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(enemy_robot, pass.receiverPoint());
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
@@ -66,13 +82,14 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     double max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point, robot_ball_time_diff_at_pass_receive_point);
     double max_time_diff_smooth = max_time_diff_unsmooth + std::log(std::exp(robot_ball_time_diff_at_closest_pass_point - max_time_diff_unsmooth) + std::exp(robot_ball_time_diff_at_pass_receive_point - max_time_diff_unsmooth));
 
-    // TODO: This `1` here should be a dynamic parameter
+    // TODO: Sigmoid width here should be a dynamic parameter
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
-    // the pass does. As such, we construct a sigmoid centered at the time the pass
-    // will complete, and use the time the robot will get to the receive point as
-    // the "x" value along our sigmoid
+    // the pass does. As such, we place the time difference between the robot and ball
+    // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
+    // negative values. We then subtract this from 1 to essentially invert it, getting
+    // a sigmoid that goes to 1 at negative values, and 0 at positive values.
     return 1 - sigmoid(max_time_diff_smooth, 0, 1);
 }
 

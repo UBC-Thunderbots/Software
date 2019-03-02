@@ -11,6 +11,46 @@
 
 using namespace AI::Passing;
 
+TEST(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots){
+    Team enemy_team(Duration::fromSeconds(10));
+    Pass pass({0,0}, {10,10}, 3, Timestamp::fromSeconds(1));
+
+    double intercept_risk = ratePassEnemyRisk(enemy_team, pass);
+    EXPECT_EQ(0, intercept_risk);
+}
+
+TEST(PassingEvaluationTest, ratePassEnemyRisk_enemy_near_receiver_worse_then_enemy_near_middle_of_pass){
+    // Test that an enemy robot near the receive point of a pass is worse then an enemy
+    // robot near the middle of the pass
+    Team enemy_team(Duration::fromSeconds(10));
+    Pass pass({0,0}, {10,0}, 3, Timestamp::fromSeconds(1));
+
+    enemy_team.updateRobots({
+                                    Robot(0, {10,1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0))
+                            });
+    double robot_near_receive_point_risk = ratePassEnemyRisk(enemy_team, pass);
+
+    enemy_team.updateRobots({
+                                    Robot(0, {5,1}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0))
+                            });
+    double robot_near_pass_center_risk = ratePassEnemyRisk(enemy_team, pass);
+
+    EXPECT_GE(robot_near_receive_point_risk, robot_near_pass_center_risk);
+}
+
+TEST(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near){
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                    Robot(0, {20,20}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                                    Robot(1, {-30,50}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                            });
+    Pass pass({0,0}, {10,10}, 3, Timestamp::fromSeconds(1));
+
+    double intercept_risk = ratePassEnemyRisk(enemy_team, pass);
+    EXPECT_LE(0, intercept_risk);
+    EXPECT_GE(0.05, intercept_risk);
+}
+
 TEST(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots){
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0,0}, {10,10}, 3, Timestamp::fromSeconds(1));
@@ -195,8 +235,6 @@ TEST(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_in
     EXPECT_GE(0.1, ratePassFriendlyCapability(team, pass));
     EXPECT_LE(0, ratePassFriendlyCapability(team, pass));
 }
-
-// TODO: Test case where a robot is facing away from a pass and there is no way it can turn in time
 
 TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle){
     Angle target_angle = Angle::half();

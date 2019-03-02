@@ -44,6 +44,7 @@ namespace Util::DynamicParameters
                 "static_field_position_quality_y_offset", 0.3);
             Parameter<double> static_field_position_quality_friendly_goal_distance_weight(
                 "static_field_position_quality_friendly_goal_distance_weight", 0.3);
+            Parameter<double> enemy_proximity_importance("enemy_proximity_importance", 0.5);
             Parameter<int32_t> num_passes_to_optimize("num_passes_to_optimize", 50);
             Parameter<int32_t> num_passes_to_keep_after_pruning(
                 "num_passes_to_keep_after_pruning", 10);

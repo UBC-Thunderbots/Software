@@ -47,6 +47,11 @@ namespace Util
                 extern Parameter<double>
                     static_field_position_quality_friendly_goal_distance_weight;
 
+                // This controls how heavily we weight a robot being near the pass
+                // receiver when calculating enemy risk to a pass
+                // TODO: Do the rest of the stuff for this dynamic param
+                extern Parameter<double> enemy_proximity_importance;
+
                 // The number of passes to try to optimize at any given time
                 extern Parameter<int32_t> num_passes_to_optimize;
 
