@@ -9,10 +9,6 @@ namespace Evaluation
                                            const std::vector<Point>& obstacles,
                                            const Point& p, const double radius)
     {
-        // whether that the goal is always on positive x- axis at (f.length()/2,0)?
-        // player and robot are all robot type?
-        // what is mutable reference? guss it is just not const reference
-
         // Calculate the location of goalpost then use angleSweepCircle function to get
         // the pair
         const Point p1 = Point(f.length() / 2.0, -f.goalWidth() / 2.0);
@@ -32,19 +28,20 @@ namespace Evaluation
 
     std::pair<Point, Angle> calc_best_shot(
         const World& world, const Robot& robot,
-        double radius)  // why not using refernce as world
+        double radius)
     {
         std::vector<Point> obstacles;
         const Team& enemy    = world.enemyTeam();
         const Team& friendly = world.friendlyTeam();
         obstacles.reserve(enemy.numRobots() + friendly.numRobots());
+        //create a vector of points for all the robots except the shooting one
         for (const Robot& i : enemy.getAllRobots())
         {
-            obstacles.emplace_back(i.position());  // push back and emplace back
+            obstacles.emplace_back(i.position());
         }
         for (const Robot& fpl : friendly.getAllRobots())
         {
-            if (fpl == robot)  // does this still works for const reference
+            if (fpl == robot)
             {
                 continue;
             }
