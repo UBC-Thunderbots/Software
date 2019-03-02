@@ -37,10 +37,10 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     // velocity until the ball is kicked
 
     // We force any negative duration to 0 here
-    Duration time_until_pass = std::max(Duration::fromSeconds(0), pass.startTime() - enemy_robot.lastUpdateTimestamp());
+    double time_until_pass = std::max(0.0, (pass.startTime() - enemy_robot.lastUpdateTimestamp()).getSeconds());
 
     // Estimate where the enemy will be when we start the pass
-    enemy_robot.updateStateToPredictedState(time_until_pass);
+    enemy_robot.updateStateToPredictedState(Timestamp::fromSeconds(time_until_pass));
 
     // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
     // the the receiver point for the pass, then it is guaranteed that it will not be
@@ -55,12 +55,12 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, AI::Passing::Pass 
     Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(enemy_robot, pass.receiverPoint());
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration robot_ball_time_diff_at_closest_pass_point = enemy_robot_time_to_closest_pass_point - ball_time_to_closest_pass_point;
-    Duration robot_ball_time_diff_at_pass_receive_point = enemy_robot_time_to_pass_receive_position - ball_time_to_pass_receive_position;
+    double robot_ball_time_diff_at_closest_pass_point = (enemy_robot_time_to_closest_pass_point - ball_time_to_closest_pass_point).getSeconds();
+    double robot_ball_time_diff_at_pass_receive_point = (enemy_robot_time_to_pass_receive_position - ball_time_to_pass_receive_position).getSeconds();
 
     // We take a smooth "max" of these two values using a log-sum-exp function
-    Duration max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point, robot_ball_time_diff_at_pass_receive_point);
-    double max_time_diff_smooth = max_time_diff_unsmooth.getSeconds() + std::log(std::exp((robot_ball_time_diff_at_closest_pass_point - max_time_diff_unsmooth).getSeconds()) + std::exp((robot_ball_time_diff_at_pass_receive_point - max_time_diff_unsmooth).getSeconds()));
+    double max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point, robot_ball_time_diff_at_pass_receive_point);
+    double max_time_diff_smooth = max_time_diff_unsmooth + std::log(std::exp(robot_ball_time_diff_at_closest_pass_point - max_time_diff_unsmooth) + std::exp(robot_ball_time_diff_at_pass_receive_point - max_time_diff_unsmooth));
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
