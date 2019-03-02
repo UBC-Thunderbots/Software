@@ -88,7 +88,7 @@ TEST(TimestampTest, test_greater_than_or_equal_to_operator)
     EXPECT_FALSE(t1 >= t2);
 }
 
-TEST(TimestampTest, test_addition_operator)
+TEST(TimestampTest, test_addition_operator_with_duration)
 {
     Timestamp t1              = Timestamp::fromSeconds(0.12);
     Duration d1               = Duration::fromMilliseconds(350);
@@ -97,7 +97,7 @@ TEST(TimestampTest, test_addition_operator)
     EXPECT_EQ(result, expected_result);
 }
 
-TEST(TimestampTest, test_subtraction_operator_with_positive_result)
+TEST(TimestampTest, test_subtraction_operator_with_duration_with_positive_result)
 {
     Timestamp t1              = Timestamp::fromMilliseconds(1234);
     Duration d1               = Duration::fromMilliseconds(600);
@@ -106,9 +106,19 @@ TEST(TimestampTest, test_subtraction_operator_with_positive_result)
     EXPECT_EQ(result, expected_result);
 }
 
-TEST(TimestampTest, test_subtraction_operator_with_negative_result)
+TEST(TimestampTest, test_subtraction_operator_with_duration_with_negative_result)
 {
     Timestamp t1 = Timestamp::fromMilliseconds(1234);
     Duration d1  = Duration::fromMilliseconds(1235);
     EXPECT_THROW(t1 - d1, std::invalid_argument);
 }
+
+TEST(TimestampTest, test_subtraction_operator_with_timestamp_with_negative_result)
+{
+    Timestamp t1              = Timestamp::fromMilliseconds(1234);
+    Timestamp t2              = Timestamp::fromMilliseconds(600);
+    Duration result          = t1 - t2;
+    Duration expected_result = Duration::fromMilliseconds(634);
+    EXPECT_EQ(result, expected_result);
+}
+
