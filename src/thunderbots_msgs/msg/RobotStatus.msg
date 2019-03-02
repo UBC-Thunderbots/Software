@@ -19,7 +19,7 @@ float64 chip_distance_resolution
 
 
 # The maximum power level understood by the direct_dribbler function.
-const unsigned int direct_dribbler_max
+uint32 direct_dribbler_max
 
 
 # Whether or not the robot is currently responding to radio communication.
@@ -63,11 +63,11 @@ float64 board_temperature
 
 
 # The link quality of the last received packet, from 0 to 1.
-double link_quality
+float64 link_quality
 
 
 # The received signal strength of the last received packet, in decibels.
-int32 received_signal_strength
+int32 received_signal_strength_db
 
 
 # Whether or not the build ID information is valid.

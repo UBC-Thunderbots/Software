@@ -43,7 +43,7 @@ class MRFDongle final
     /**
      * Constructs a new MRFDongle.
      */
-    explicit MRFDongle();
+    explicit MRFDongle(std::function<void(int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)> robot_msg_handler);
 
     /**
      * Destroys an MRFDongle.
@@ -165,7 +165,7 @@ class MRFDongle final
     std::list<std::unique_ptr<USB::BulkOutTransfer>> unreliable_messages;
     std::queue<uint8_t> free_message_ids;
     sigc::signal<void, uint8_t, uint8_t> signal_message_delivery_report;
-    void (*robot_msg_handler)(int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi);
+    std::function<void(int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)> robot_msg_handler;
 
     uint8_t alloc_message_id();
     void free_message_id(uint8_t id);

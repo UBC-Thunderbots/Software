@@ -1,7 +1,11 @@
 #include "mrf_backend.h"
 
 #include <chrono>
-#include "thunderbots_msgs/RobotStatus.h"
+#include <functional>
+#include "util/logger/init.h"
+#include "mrf/constants.h"
+#include "util/codec.h"
+namespace ph = std::placeholders;
 
 namespace
 {
@@ -75,10 +79,12 @@ const char *const LOGGER_MESSAGES[] = {
 };
 }
 
-MRFBackend::MRFBackend()
-    : dongle(MRFDongle()),
+MRFBackend::MRFBackend(ros::NodeHandle& node_handle)
+    : dongle(MRFDongle(std::bind(&MRFBackend::handle_message, this, ph::_1, ph::_2, ph::_3, ph::_4, ph::_5))),
       ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(1)))
 {
+    robot_status_publisher = node_handle.advertise<thunderbots_msgs::RobotStatus>(
+        Util::Constants::ROBOT_STATUS_TOPIC, 1);
 }
 
 MRFBackend::~MRFBackend() {}
@@ -157,7 +163,7 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                 --len;
                 if (len >= 13)
                 {
-                    alive = true;
+                    robot_status.alive = true;
 
                     robot_status.battery_voltage =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) /
@@ -273,7 +279,8 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                                     robot_status.build_ids_valid = true;
                                     robot_status.fw_build_id     = decode_u32_le(bptr);
                                     robot_status.fpga_build_id   = decode_u32_le(bptr + 4);
-                                    check_build_id_mismatch();
+                                    // TODO: check this
+                                    // check_build_id_mismatch();
                                     bptr += 8;
                                     len -= 8;
                                 }
@@ -377,5 +384,6 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(
                 break;
         }
     }
+    robot_status_publisher.publish(robot_status);
     return robot_status;
 }

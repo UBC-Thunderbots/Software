@@ -45,7 +45,7 @@ namespace
 
 }  // namespace
 
-MRFDongle::MRFDongle()
+MRFDongle::MRFDongle(std::function<void(int robot, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi)> robot_msg_handler)
     : context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -53,7 +53,8 @@ MRFDongle::MRFDongle()
       normal_altsetting(-1),
       status_transfer(device, 3, 1, true, 0),
       pending_beep_length(0),
-      estop_state(EStopState::STOP)
+      estop_state(EStopState::STOP),
+      robot_msg_handler(robot_msg_handler)
 {
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
@@ -288,7 +289,6 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
     mdr_transfer.submit();
 }
 
-// TODO see #222
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
     transfer.result();

@@ -2,9 +2,11 @@
 
 #include <limits>
 
+#include <ros/ros.h>
 #include "ai/world/ball.h"
 #include "ai/world/team.h"
 #include "mrf/dongle.h"
+#include "thunderbots_msgs/RobotStatus.h"
 
 class MRFBackend
 {
@@ -13,7 +15,7 @@ class MRFBackend
      * Creates a new MRFBackend.
      * Automatically connects to the dongle upon initialization.
      */
-    explicit MRFBackend();
+    explicit MRFBackend(ros::NodeHandle& node_handle);
 
     ~MRFBackend();
 
@@ -49,8 +51,13 @@ class MRFBackend
      */
     void send_vision_packet();
 
+    thunderbots_msgs::RobotStatus handle_message(
+        int index, const void *data, std::size_t len, uint8_t lqi, uint8_t rssi);
+
    private:
     MRFDongle dongle;
+
+    ros::Publisher robot_status_publisher;
     std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     Ball ball;
 };
