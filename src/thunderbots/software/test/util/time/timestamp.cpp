@@ -1,4 +1,4 @@
-#include "util/timestamp.h"
+#include "util/time/timestamp.h"
 
 #include <gtest/gtest.h>
 
@@ -111,10 +111,4 @@ TEST(TimestampTest, test_subtraction_operator_with_negative_result)
     Timestamp t1 = Timestamp::fromMilliseconds(1234);
     Duration d1  = Duration::fromMilliseconds(1235);
     EXPECT_THROW(t1 - d1, std::invalid_argument);
-}
-
-int main(int argc, char **argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
