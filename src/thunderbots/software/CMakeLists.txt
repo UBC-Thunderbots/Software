@@ -1,8 +1,6 @@
 # This project name must match the name of the package defined in package.xml
 project(thunderbots)
 
-cmake_minimum_required(VERSION 3.10)
-
 # Build in "Release" (with lots of compiler optimizations) by default
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
@@ -226,6 +224,29 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
 
+file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/direct_velocity_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/kick_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/chip_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/timestamp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
+        )
+add_executable (xbox_controller_mapping
+        ${XBOX_CONTROLLER_MAPPING_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
+target_link_libraries(xbox_controller_mapping
+        ${catkin_LIBRARIES}
+        )
+
+
 #############
 ## Testing ##
 #############
@@ -289,9 +310,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/field.cpp
             ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/game_state.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
+            util/parameter/dynamic_parameters.cpp
             geom/point.h
             geom/angle.h)
 
@@ -361,8 +385,8 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
             test/ai/grsim_communication/grsim_backend.cpp
-            test/ai/grsim_communication/grsim_command_primitive_visitor_catch.cpp
-            test/ai/grsim_communication/grsim_command_primitive_visitor_movespin.cpp
+            test/ai/grsim_communication/catch_primitive.cpp
+            test/ai/grsim_communication/movespin_primitive.cpp
             test/ai/grsim_communication/main.cpp
             test/ai/grsim_communication/motion_controller.cpp
             test/test_util/test_util.cpp
@@ -583,6 +607,47 @@ if (CATKIN_ENABLE_TESTING)
             test/util/gradient_descent_optimizer.cpp
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(navigator_test
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/robot.cpp
+            ai/world/game_state.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/intent/catch_intent.cpp
+            ai/intent/chip_intent.cpp
+            ai/intent/direct_velocity_intent.cpp
+            ai/intent/direct_wheels_intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/movespin_intent.cpp
+            ai/intent/pivot_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            test/ai/navigator/main.cpp
+            test/test_util/test_util.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/timestamp.cpp
+            )
+    target_link_libraries(navigator_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
 endif()
 

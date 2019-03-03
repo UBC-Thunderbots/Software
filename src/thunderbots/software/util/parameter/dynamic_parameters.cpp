@@ -1,5 +1,7 @@
 #include "util/parameter/dynamic_parameters.h"
 
+#include "shared/constants.h"
+
 namespace Util::DynamicParameters
 {
     void updateAllParametersFromROSParameterServer()
@@ -61,5 +63,15 @@ namespace Util::DynamicParameters
         }  // namespace Passing
     }      // namespace AI
 
+    namespace XBoxControllerDemo
+    {
+        Parameter<int32_t> robot_id("xbox_demo_robot_ID", 0);
+        Parameter<double> kick_speed_meters_per_second(
+            "xbox_demo_kick_speed_meters_per_second", BALL_MAX_SPEED_METERS_PER_SECOND);
+        Parameter<double> chip_distance_meters("xbox_demo_chip_distance_meters", 1.0);
+        Parameter<double> dribbler_rpm("xbox_demo_dribbler_rpm", 1000.0);
+        Parameter<double> linear_sensitivity("xbox_demo_linear_sensitivity", 1.0);
+        Parameter<double> angular_sensitivity("xbox_demo_angular_sensitivity", 1.0);
+    }  // namespace XBoxControllerDemo
 
 }  // namespace Util::DynamicParameters

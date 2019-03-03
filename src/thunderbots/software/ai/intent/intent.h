@@ -2,6 +2,14 @@
 
 #include <string>
 
+// We forward-declare the IntentVisitor interface (pure virtual class) because we need
+// to know about the existence of this class in order to accept visitors with the
+// accept() function. We cannot use an #include statement because this creates a cyclic
+// dependency
+//
+// This class can be found in ai/intent/visitor/intent_visitor.h
+class IntentVisitor;
+
 /**
  * An intent is a simple "thing" a robot or player may want to do. It specifies WHAT a
  * robot should do, not necessarily exactly how it will do it. Examples are shooting at
@@ -64,6 +72,13 @@ class Intent
      * @return true if the Intents are not equal and false otherwise
      */
     bool operator!=(const Intent& other) const;
+
+    /**
+     * Accepts an Intent Visitor and calls the visit function
+     *
+     * @param visitor An Intent Visitor
+     */
+    virtual void accept(IntentVisitor& visitor) const = 0;
 
     virtual ~Intent() = default;
 

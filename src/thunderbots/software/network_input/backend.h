@@ -70,7 +70,7 @@ class Backend
      */
     Team getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections);
 
-    std::optional<thunderbots_msgs::RefboxData> getRefboxDataMsg(const Referee &packet);
+    thunderbots_msgs::RefboxData getRefboxDataMsg(const Referee &packet);
 
     virtual ~Backend() = default;
 

@@ -29,4 +29,3 @@ TEST(PassTest, test_stream_operator)
     EXPECT_EQ("Receiver: (3, 4), Passer: (1, 2) Speed (m/s): 99.97 Start Time (s): 10",
               out.str());
 }
-
