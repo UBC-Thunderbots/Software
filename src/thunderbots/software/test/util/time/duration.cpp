@@ -4,7 +4,8 @@
 
 #include <stdexcept>
 
-TEST(DurationTest, default_constructor){
+TEST(DurationTest, default_constructor)
+{
     Duration d;
     EXPECT_DOUBLE_EQ(d.getSeconds(), 0);
 }
@@ -97,7 +98,7 @@ TEST(DurationTest, test_greater_than_or_equal_to_operator)
 TEST(DurationTest, test_addition_operator)
 {
     Duration d1              = Duration::fromSeconds(0.12);
-    Duration d2 = Duration::fromMilliseconds(350);
+    Duration d2              = Duration::fromMilliseconds(350);
     Duration result          = d1 + d2;
     Duration expected_result = Duration::fromMilliseconds(470);
     EXPECT_EQ(result, expected_result);
@@ -106,7 +107,7 @@ TEST(DurationTest, test_addition_operator)
 TEST(DurationTest, test_subtraction_operator_with_positive_result)
 {
     Duration d1              = Duration::fromMilliseconds(1234);
-    Duration d2 = Duration::fromMilliseconds(600);
+    Duration d2              = Duration::fromMilliseconds(600);
     Duration result          = d1 - d2;
     Duration expected_result = Duration::fromMilliseconds(634);
     EXPECT_EQ(result, expected_result);
@@ -115,7 +116,7 @@ TEST(DurationTest, test_subtraction_operator_with_positive_result)
 TEST(DurationTest, test_subtraction_operator_with_negative_result)
 {
     Duration d1              = Duration::fromMilliseconds(1234);
-    Duration d2 = Duration::fromMilliseconds(1235);
+    Duration d2              = Duration::fromMilliseconds(1235);
     Duration result          = d1 - d2;
     Duration expected_result = Duration::fromMilliseconds(-1);
     EXPECT_EQ(result, expected_result);

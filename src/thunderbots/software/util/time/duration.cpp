@@ -3,6 +3,7 @@
  */
 
 #include "duration.h"
+
 #include "shared/constants.h"
 
 Duration::Duration() : Duration(0) {}
@@ -28,4 +29,3 @@ Duration Duration::operator-(const Duration &duration) const
 {
     return Duration::fromSeconds(getSeconds() - duration.getSeconds());
 }
-

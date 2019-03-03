@@ -15,8 +15,8 @@ TEST(PassTest, test_getters)
     EXPECT_EQ(Point(1, 2), p.passerPoint());
     EXPECT_EQ(Point(3, 4), p.receiverPoint());
     EXPECT_EQ(3.443, p.speed());
-    EXPECT_DOUBLE_EQ(std::sqrt(8)/3.443 + 10, p.estimateReceiveTime().getSeconds());
-    EXPECT_DOUBLE_EQ(std::sqrt(8)/3.443, p.estimatePassDuration().getSeconds());
+    EXPECT_DOUBLE_EQ(std::sqrt(8) / 3.443 + 10, p.estimateReceiveTime().getSeconds());
+    EXPECT_DOUBLE_EQ(std::sqrt(8) / 3.443, p.estimatePassDuration().getSeconds());
     EXPECT_EQ(Timestamp::fromSeconds(10), p.startTime());
 }
 

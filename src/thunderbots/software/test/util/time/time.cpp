@@ -93,7 +93,7 @@ TEST(TimeTest, test_greater_than_or_equal_to_operator)
 TEST(TimeTest, test_addition_operator)
 {
     Time t1              = Time::fromSeconds(0.12);
-    Time t2 = Time::fromMilliseconds(350);
+    Time t2              = Time::fromMilliseconds(350);
     Time result          = t1 + t2;
     Time expected_result = Time::fromMilliseconds(470);
     EXPECT_EQ(result, expected_result);
@@ -102,7 +102,7 @@ TEST(TimeTest, test_addition_operator)
 TEST(TimeTest, test_subtraction_operator_with_positive_result)
 {
     Time t1              = Time::fromMilliseconds(1234);
-    Time t2 = Time::fromMilliseconds(600);
+    Time t2              = Time::fromMilliseconds(600);
     Time result          = t1 - t2;
     Time expected_result = Time::fromMilliseconds(634);
     EXPECT_EQ(result, expected_result);
@@ -111,7 +111,7 @@ TEST(TimeTest, test_subtraction_operator_with_positive_result)
 TEST(TimeTest, test_subtraction_operator_with_negative_result)
 {
     Time t1              = Time::fromMilliseconds(1234);
-    Time t2 = Time::fromMilliseconds(1235);
+    Time t2              = Time::fromMilliseconds(1235);
     Time result          = t1 - t2;
     Time expected_result = Time::fromMilliseconds(-1);
     EXPECT_EQ(result, expected_result);

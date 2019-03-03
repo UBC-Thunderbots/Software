@@ -12,7 +12,7 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
- struct SSLBallDetection
+struct SSLBallDetection
 {
     Point position;
     double confidence;

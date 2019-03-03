@@ -46,9 +46,12 @@ namespace Util::DynamicParameters
                 "static_field_position_quality_y_offset", 0.3);
             Parameter<double> static_field_position_quality_friendly_goal_distance_weight(
                 "static_field_position_quality_friendly_goal_distance_weight", 0.3);
-            Parameter<double> enemy_proximity_importance("enemy_proximity_importance", 0.5);
-            Parameter<double> ideal_min_shoot_angle_degrees("ideal_min_shoot_angle_degrees", 40.0);
-            Parameter<double> ideal_min_rotation_to_shoot_degrees("ideal_min_rotation_to_shoot_degrees", 5.0);
+            Parameter<double> enemy_proximity_importance("enemy_proximity_importance",
+                                                         0.5);
+            Parameter<double> ideal_min_shoot_angle_degrees(
+                "ideal_min_shoot_angle_degrees", 40.0);
+            Parameter<double> ideal_min_rotation_to_shoot_degrees(
+                "ideal_min_rotation_to_shoot_degrees", 5.0);
             Parameter<int32_t> num_passes_to_optimize("num_passes_to_optimize", 50);
             Parameter<int32_t> num_passes_to_keep_after_pruning(
                 "num_passes_to_keep_after_pruning", 10);

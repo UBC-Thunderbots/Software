@@ -35,12 +35,15 @@ Timestamp Pass::startTime() const
     return pass_start_time;
 }
 
-Timestamp Pass::estimateReceiveTime() const {
+Timestamp Pass::estimateReceiveTime() const
+{
     return pass_start_time + estimatePassDuration();
 }
 
-Duration Pass::estimatePassDuration() const {
-    return Duration::fromSeconds((receiver_point - passer_point).len()/pass_speed_m_per_s);
+Duration Pass::estimatePassDuration() const
+{
+    return Duration::fromSeconds((receiver_point - passer_point).len() /
+                                 pass_speed_m_per_s);
 }
 
 namespace AI::Passing

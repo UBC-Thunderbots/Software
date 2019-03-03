@@ -27,8 +27,7 @@ namespace AI::Passing
      *         the pass, and 1 indicating that it is guaranteed to be able to score off of
      *         the pass
      */
-    double ratePassShootScore(Field field, Team enemy_team,
-                              AI::Passing::Pass pass);
+    double ratePassShootScore(Field field, Team enemy_team, AI::Passing::Pass pass);
 
     // TODO: better name for this function?
     /**
@@ -92,7 +91,8 @@ namespace AI::Passing
      *
      * @return The time required for the given robot to rotate to the given orientation
      */
-    Duration getTimeToOrientationForRobot(const Robot& robot, const Angle& desired_orientation);
+    Duration getTimeToOrientationForRobot(const Robot& robot,
+                                          const Angle& desired_orientation);
 
     /**
      * Calculate minimum time it would take for the given robot to reach the given point
@@ -105,7 +105,7 @@ namespace AI::Passing
      * @return The minimum theoretical time it would take the robot to reach the dest
      * point
      */
-     // TODO: `Timestamp` should really be `duration` here
+    // TODO: `Timestamp` should really be `duration` here
     Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest);
 
     /**
