@@ -2,6 +2,9 @@
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 
+/**
+ * A test Play that should move the robots into a circle around the center of the field
+ */
 class MovePlay : public Play
 {
    public:
@@ -22,8 +25,8 @@ class MovePlay : public Play
         return true;
     }
 
-    std::vector<std::shared_ptr<Tactic>> getNextTactics(
-        tactic_coroutine::push_type &yield, const World &world) override
+    std::vector<std::shared_ptr<Tactic>> getNextTactics(TacticCoroutine::push_type &yield,
+                                                        const World &world) override
     {
         auto move_tactic_1 = std::make_shared<MoveTactic>();
         auto move_tactic_2 = std::make_shared<MoveTactic>();
@@ -53,4 +56,5 @@ class MovePlay : public Play
     }
 };
 
+// Register this play in the PlayFactory
 static TPlayFactory<MovePlay> factory;

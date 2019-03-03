@@ -11,7 +11,7 @@
 // and easier to work with.
 // This coroutine returns a list of shared_ptrs to Tactic objects
 typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
-    tactic_coroutine;
+    TacticCoroutine;
 
 /**
  * In the STP framework, a Play is a collection of tactics that represent some
@@ -60,19 +60,13 @@ class Play
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority.
-     *
-     * The Tactic at the beginning of the vector has the highest priority, and the Tactic
-     * at the end has the lowest priority. The priority determines what Tactics will not
-     * be assigned if there are not enough robots on the field to assign them all. For
-     * example, if a Play returned 6 Tactics but there were only 4 robots on the field
-     * at the time, only the first 4 Tactics in the vector would be assigned to robots
-     * and run.
+     * order of priority. The Tactic at the beginning of the vector has the highest
+     * priority, and the Tactic at the end has the lowest priority.
      *
      * shared_ptrs are used so that the Play can own the objects (and have control over
      * updating the Tactic parameters, etc), but callers of this function can still
      * access their updated state. Using unique_ptrs wouldn't allow the Play to maintain
-     * the Tactic's state because the objects would have to be contructed and moved every
+     * the Tactic's state because the objects would have to be constructed and moved every
      * time the function is called.
      *
      * @param world The current state of the world
@@ -121,7 +115,7 @@ class Play
      * order of priority
      */
     std::vector<std::shared_ptr<Tactic>> getNextTacticsWrapper(
-        tactic_coroutine::push_type& yield);
+        TacticCoroutine::push_type& yield);
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -134,10 +128,10 @@ class Play
      * order of priority
      */
     virtual std::vector<std::shared_ptr<Tactic>> getNextTactics(
-        tactic_coroutine::push_type& yield, const World& world) = 0;
+        TacticCoroutine::push_type& yield, const World& world) = 0;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
-    tactic_coroutine::pull_type tactic_sequence;
+    TacticCoroutine::pull_type tactic_sequence;
     // The Play's knowledge of the most up-to-date World
     World world;
 };

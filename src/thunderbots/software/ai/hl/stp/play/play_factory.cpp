@@ -2,13 +2,13 @@
 
 #include <exception>
 
-PlayRegistry_t& PlayFactory::getMutableRegistry()
+PlayRegistry& PlayFactory::getMutableRegistry()
 {
-    static PlayRegistry_t instance;
+    static PlayRegistry instance;
     return instance;
 }
 
-const PlayRegistry_t& PlayFactory::getRegistry()
+const PlayRegistry& PlayFactory::getRegistry()
 {
     return PlayFactory::getMutableRegistry();
 }

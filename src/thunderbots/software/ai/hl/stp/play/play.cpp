@@ -30,15 +30,14 @@ std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World
 }
 
 std::vector<std::shared_ptr<Tactic>> Play::getNextTacticsWrapper(
-    tactic_coroutine::push_type &yield)
+    TacticCoroutine::push_type &yield)
 {
     // Yield an empty vector the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
     yield({});
 
     // Anytime after the first function call, the getNextTactics function will be
-    // used to perform the real logic
-    //
+    // used to perform the real logic.
     // The getNextTactics function is given the World as a parameter rather than using
     // the member variable since it's more explicit and obvious where the World
     // comes from when implementing Plays

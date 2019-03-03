@@ -7,7 +7,7 @@
 
 // A quality of life typedef to make things shorter and more readable
 typedef std::unordered_map<std::string, std::function<std::unique_ptr<Play>()>>
-    PlayRegistry_t;
+    PlayRegistry;
 
 /**
  * The PlayFactory is an Abstract class that provides an interface for Play Factories
@@ -36,7 +36,7 @@ class PlayFactory
      *
      * @return a const reference to the Play registry
      */
-    static const PlayRegistry_t& getRegistry();
+    static const PlayRegistry& getRegistry();
 
     /**
      * Returns a list of names of all the existing Plays
@@ -70,7 +70,7 @@ class PlayFactory
      *
      * @return a mutable reference to the Play registry
      */
-    static PlayRegistry_t& getMutableRegistry();
+    static PlayRegistry& getMutableRegistry();
 };
 
 /**
