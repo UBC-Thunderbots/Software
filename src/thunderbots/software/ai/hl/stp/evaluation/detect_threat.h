@@ -3,8 +3,7 @@
  * team on the playing field
  */
 
-#ifndef THUNDERBOTS_ALL_DETECT_THREAT_H
-#define THUNDERBOTS_ALL_DETECT_THREAT_H
+#pragma once
 
 #include <optional>
 
@@ -36,5 +35,3 @@ namespace Evaluation
     std::optional<Point> calcBallVelIntersectEnemyNet(Ball ball, Field field);
 };  // namespace Evaluation
 
-
-#endif  // THUNDERBOTS_ALL_DETECT_THREAT_H
