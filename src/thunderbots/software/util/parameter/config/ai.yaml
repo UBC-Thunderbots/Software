@@ -1,75 +1,82 @@
-passing:
-  static_field_position_quality_x_offset:
-    min: 0
-    max: 1
-    default: 0.3
-    type: "double_t"
-    description: ""
-  static_field_position_quality_y_offset:
-    min: 0
-    max: 1
-    default: 0.3
-    type: "double_t"
-    description: ""
-  static_field_position_quality_friendly_goal_distance_weight:
-    min: 0
-    max: 1
-    default: 0.3
-    type: "double_t"
-    description: ""
-  num_passes_to_optimize:
-    min: 0
-    max: 1000
-    default: 50
-    type: "int_t"
-    description: ""
-  num_passes_to_keep_after_pruning:
-    min: 0
-    max: 1000
-    default: 10
-    type: "int_t"
-    description: ""
-  number_of_gradient_descent_steps_per_iter:
-    min: 0
-    max: 1000
-    default: 20
-    type: "int_t"
-    description: ""
-  pass_equality_max_position_difference_meters:
-    min: 0
-    max: 4
-    default: 0.1
-    type: "double_t"
-    description: ""
-  pass_equality_max_start_time_difference_seconds:
-    min: 0
-    max: 3
-    default: 0.5
-    type: "double_t"
-    description: ""
-  pass_equality_max_start_time_difference_seconds:
-    min: 0
-    max: 4
-    default: 0.3
-    type: "double_t"
-    description: ""
-
-navigator:
-  deault_avoid_dist:
+AI:
+  Passing:
+    static_field_position_quality_x_offset:
+      min: 0
+      max: 1
+      default: 0.3
+      type: "double"
+      description: ""
+    static_field_position_quality_y_offset:
+      min: 0
+      max: 1
+      default: 0.3
+      type: "double"
+      description: ""
+    static_field_position_quality_friendly_goal_distance_weight:
+      min: 0
+      max: 1
+      default: 0.3
+      type: "double"
+      description: ""
+    num_passes_to_optimize:
+      min: 0
+      max: 1000
+      default: 50
+      type: "int"
+      description: ""
+    num_passes_to_keep_after_pruning:
+      min: 0
+      max: 1000
+      default: 10
+      type: "int"
+      description: ""
+    number_of_gradient_descent_steps_per_iter:
+      min: 0
+      max: 1000
+      default: 20
+      type: "int"
+      description: ""
+    pass_equality_max_position_difference_meters:
+      min: 0
+      max: 4
+      default: 0.1
+      type: "double"
+      description: ""
+    pass_equality_max_start_time_difference_seconds:
+      min: 0
+      max: 3
+      default: 0.5
+      type: "double"
+      description: ""
+    pass_equality_max_speed_difference_meters_per_second:
+      min: 0
+      max: 4
+      default: 0.3
+      type: "double"
+      description: ""
+Navigator:
+  robot_expiry_buffer_milliseconds:
     min: 0
     max: 100
     default: 50
-    type: "double_t"
+    type: "int"
+    description: "asdasd"
+  default_avoid_dist:
+    min: 0
+    max: 100
+    default: 50
+    type: "double"
     description: "asdfsadf"
   collision_avoid_velocity_scale:
     min: 0
     max: 1
     default: 0.5
-    type: "double_t"
+    type: "double"
     description: ""
   collision_avoid_velocity_scale2:
     min: 0
     max: 1
     default: 0.5
-    type: "double_t"
+    type: "double"
     description: ""
+

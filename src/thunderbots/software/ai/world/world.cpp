@@ -6,9 +6,9 @@ World::World()
     : World(Field(0, 0, 0, 0, 0, 0, 0),
             Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
             Team(Duration::fromMilliseconds(
-                Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                Util::DynamicParameters::Navigator::robot_expiry_buffer_milliseconds.value())),
             Team(Duration::fromMilliseconds(
-                Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())))
+                Util::DynamicParameters::Navigator::robot_expiry_buffer_milliseconds.value())))
 {
 }
 
