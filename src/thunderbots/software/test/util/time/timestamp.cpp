@@ -4,7 +4,8 @@
 
 #include <stdexcept>
 
-TEST(TimestampTest, default_constructor){
+TEST(TimestampTest, default_constructor)
+{
     Timestamp t;
     EXPECT_DOUBLE_EQ(t.getSeconds(), 0);
 }
@@ -120,10 +121,9 @@ TEST(TimestampTest, test_subtraction_operator_with_duration_with_negative_result
 
 TEST(TimestampTest, test_subtraction_operator_with_timestamp_with_negative_result)
 {
-    Timestamp t1              = Timestamp::fromMilliseconds(1234);
-    Timestamp t2              = Timestamp::fromMilliseconds(600);
+    Timestamp t1             = Timestamp::fromMilliseconds(1234);
+    Timestamp t2             = Timestamp::fromMilliseconds(600);
     Duration result          = t1 - t2;
     Duration expected_result = Duration::fromMilliseconds(634);
     EXPECT_EQ(result, expected_result);
 }
-

@@ -71,4 +71,3 @@ Time Time::operator-(const Time &time) const
 {
     return Time::fromSeconds(getSeconds() - time.getSeconds());
 }
-

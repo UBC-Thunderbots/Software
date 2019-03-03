@@ -1,7 +1,7 @@
 #pragma once
 
-#include "time.h"
 #include "duration.h"
+#include "time.h"
 
 /**
  * A simple Timestamp class built around doubles. This Timestamp is intended to represent
@@ -17,7 +17,6 @@
 class Timestamp : public Time
 {
    public:
-
     /**
      * The default constructor for a Timestamp. Creates a Timestamp at time 0
      */

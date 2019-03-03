@@ -8,8 +8,7 @@
  */
 class Duration : public Time
 {
-public:
-
+   public:
     /**
      * The default constructor for a Duration. Creates a Duration of length 0
      */
@@ -49,7 +48,7 @@ public:
      */
     Duration operator-(const Duration& duration) const;
 
-private:
+   private:
     /**
      * Constructs a Duration value from a value in seconds.
      * @param timestamp_seconds A value >= 0.0, in seconds, from which to create the

@@ -124,7 +124,7 @@ class Time
      */
     Time operator-(const Time& time) const;
 
-protected:
+   protected:
     /**
      * Constructs a Time value from a value in seconds.
      * @param Time_seconds A value in seconds, from which to create the
@@ -132,7 +132,7 @@ protected:
      */
     explicit Time(double Time_seconds);
 
-private:
+   private:
     // The stored internal value of the Time, in seconds
     double time_in_seconds;
 };
