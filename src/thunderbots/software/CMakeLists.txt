@@ -232,7 +232,7 @@ file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_D
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/primitive.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/timestamp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
         )
 add_executable (xbox_controller_mapping
@@ -304,20 +304,21 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(shared_util_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(ros_message_util_test
-            test/util/ros_messages.cpp
-            util/ros_messages.cpp
             ai/world/ball.cpp
-            ai/world/robot.cpp
             ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
-            ai/world/game_state.cpp
+            geom/angle.h
+            geom/point.h
+            test/util/ros_messages.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/ros_messages.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-            util/parameter/dynamic_parameters.cpp
-            geom/point.h
-            geom/angle.h)
+            )
 
     target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
 
@@ -642,7 +643,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/main.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
-            util/timestamp.cpp
+            util/time/timestamp.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}
