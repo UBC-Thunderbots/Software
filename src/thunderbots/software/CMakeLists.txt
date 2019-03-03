@@ -644,6 +644,8 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/timestamp.cpp
+            util/time/time.cpp
+            util/time/duration.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}
