@@ -10,7 +10,8 @@
 #include "ai/world/ball.h"
 #include "test/test_util/test_util.h"
 
-TEST(evaluation_detect_threat_test, ball_threat_ball_vel_to_friendly_net)
+// Test were the ball will intersect the friendly net
+TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)
 {
     Vector velocity(-1, 0.01);
     Point position(1, -0.2);
@@ -24,10 +25,11 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_to_friendly_net)
         Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
 
 
-    EXPECT_EQ(Point(-4.5, -0.145), *intersection);
+    EXPECT_EQ(Point(-4.5, -0.145), intersection.value());
 }
 
-TEST(evaluation_detect_threat_test, ball_threat_ball_vel_not_to_friendly_net)
+// Test where the ball will not intersect the friendly net
+TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_friendly_net)
 {
     Vector velocity(1, 0.01);
     Point position(1, -0.2);
@@ -44,7 +46,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_not_to_friendly_net)
     EXPECT_EQ(std::nullopt, intersection);
 }
 
-TEST(evaluation_detect_threat_test, ball_threat_ball_vel_to_enemy_net)
+TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
 {
     Vector velocity(1, 0.01);
     Point position(1, -0.2);
@@ -58,10 +60,10 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_vel_to_enemy_net)
         Evaluation::calcBallVelIntersectEnemyNet(ball, field);
 
 
-    EXPECT_EQ(Point(4.5, -0.165), *intersection);
+    EXPECT_EQ(Point(4.5, -0.165), intersection.value());
 }
 
-TEST(evaluation_detect_threat_test, ball_threat_ball_vel_not_to_enemy_net)
+TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_enemy_net)
 {
     Vector velocity(-1, 0.01);
     Point position(1, -0.2);

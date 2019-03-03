@@ -15,18 +15,25 @@ namespace Evaluation
 {
     std::optional<Point> calcBallVelIntersectFriendlyNet(Ball ball, Field field)
     {
-        return velocityLineIntersection(
-            ball.velocity(), ball.position(), field.friendlyGoalpostNeg(),
-            field.friendlyGoalpostPos(),
-            Rectangle(field.friendlyCornerPos(), field.enemyCornerNeg()));
+        Ray ballRay = Ray(ball.position(), ball.velocity());
+        Segment friendlyNetSegment =
+            Segment(field.friendlyGoalpostPos(), field.friendlyGoalpostNeg());
+
+        auto [intersection1, intersection2] =
+            raySegmentIntersection(ballRay, friendlyNetSegment);
+
+        return intersection1;
     }
 
     std::optional<Point> calcBallVelIntersectEnemyNet(Ball ball, Field field)
     {
-        return velocityLineIntersection(
-            ball.velocity(), ball.position(), field.enemyGoalpostNeg(),
-            field.enemyGoalpostPos(),
-            Rectangle(field.friendlyCornerPos(), field.enemyCornerNeg()));
+        Ray ballRay = Ray(ball.position(), ball.velocity());
+        Segment enemyNetSegment =
+            Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
+
+        auto [intersection1, intersection2] =
+            raySegmentIntersection(ballRay, enemyNetSegment);
+        return intersection1;
     }
 
 };  // namespace Evaluation

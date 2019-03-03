@@ -497,17 +497,19 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
         Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
 
-        // We do not know what the  tolorance of the function is, but we
-        // probabaly should check if segments overlap completely
+        // We do not know what the  tolerance of the function is, but we
+        // probably should check if segments overlap completely
 
         bool expected = std::rand() % 2;
 
         Point a2 = a1 + (i0 - a1).norm();
         Point b2 =
-            b1 + (i0 - b1) * (1 + std::rand() % 100 / 100.0 *
+            b1 + (i0 - b1) * (1 + (std::rand() % 100 / 100.0) *
                                       (expected ? 1 : -1));  // as a scaling factor for b2
 
-        bool found = intersects(Ray(a1, a2), Segment(b1, b2));
+        Vector ray_direction = (a2 - a1).norm();
+
+        bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -529,8 +531,8 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
         Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
 
-        // We do not know what the  tolorance of the function is, but we
-        // probabaly should check if segments overlap completely
+        // We do not know what the  tolerance of the function is, but we
+        // probably should check if segments overlap completely
 
         bool expected = false;
 
@@ -540,7 +542,9 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         // make sure it
         // is long enough
 
-        bool found = intersects(Ray(a1, a2), Segment(b1, b2));
+        Vector ray_direction = (a2 - a1).norm();
+
+        bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -762,172 +766,44 @@ TEST(GeomUtilTest, test_dist_point_seg)
     EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
 }
 
-TEST(GeomUtilTest, test_velocity_intersection_upper_bound)
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment intersect once
+TEST(GeomUtilTest, test_ray_segment_intersecting)
 {
-    Vector velociity(0, 1);
-    Point position(0, 0);
+    Ray ray         = Ray(Point(1, 1), Point(0.3, -0.2));
+    Segment segment = Segment(Point(-2, -2), Point(10, -2));
 
-    Point start(1, 1);
-    Point end(-1, 1);
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    Rectangle boundry(Point(2, 2), Point(-2, -2));
-
-    const std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(0, 1), *intersection);
+    EXPECT_DOUBLE_EQ(intersection1.value().x(), 5.5);
+    EXPECT_DOUBLE_EQ(intersection1.value().y(), -2);
+    EXPECT_EQ(intersection2, std::nullopt);
 }
 
-TEST(GeomUtilTest, test_velocity_intersection_lower_bound)
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment don't intersect
+TEST(GeomUtilTest, test_ray_segment_non_intersecting)
 {
-    Vector velociity(0, -1);
-    Point position(0, 0);
+    Ray ray         = Ray(Point(0, 0), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1.1), Point(10, 1.1));
 
-    Point start(1, -1);
-    Point end(-1, -1);
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    Rectangle boundry(Point(2, 2), Point(-2, -2));
-
-    const std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(0, -1), *intersection);
+    EXPECT_EQ(intersection1, std::nullopt);
+    EXPECT_EQ(intersection2, std::nullopt);
 }
 
-TEST(GeomUtilTest, test_velocity_intersection_right_bound)
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment are overlapping and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping)
 {
-    Vector velocity(1, 0);
-    Point position(0, 0);
+    Ray ray         = Ray(Point(1, 0), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
 
-    Point start(1, -1);
-    Point end(1, 1);
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
-    Rectangle boundry(Point(2, 2), Point(-2, -2));
-
-    const std::optional<Point> intersection =
-        velocityLineIntersection(velocity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(1, 0), *intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_intersection_left_bound)
-{
-    Vector velocity(-1, 0);
-    Point position(0, 0);
-
-    Point start(-1, -1);
-    Point end(-1, 1);
-
-    Rectangle boundry(Point(2, 2), Point(-2, -2));
-
-    const std::optional<Point> intersection =
-        velocityLineIntersection(velocity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(-1, 0), *intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_intersection_out_of_scope)
-{
-    Vector velociity(-1, 0);
-    Point position(0, 0);
-
-    Point start(-5, 5);
-    Point end(5, 5);
-
-    Rectangle boundry(Point(2, 2), Point(-2, -2));
-
-    std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(std::nullopt, intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_intersection_diagonal_line)
-{
-    Vector velociity(0, 5);
-    Point position(0, 0);
-
-    Point start(-4, 1.25);
-    Point end(1, 0);
-
-    Rectangle boundry(Point(3, 3), Point(-3, -3));
-
-    std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(0, 0.25), *intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_intersection_diagonal_line_diagonal_velocity)
-{
-    Vector velociity(1, 1);
-    Point position(0, 0);
-
-    Point start(-4, 1.25);
-    Point end(1, 0);
-
-    Rectangle boundry(Point(3, 3), Point(-3, -3));
-
-    std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(0.2, 0.2), *intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_intersection_element_not_in_boundry)
-{
-    Vector velociity(1, 1);
-    Point position(4, 4);
-
-    Point start(-4, 1.25);
-    Point end(1, 0);
-
-    Rectangle boundry(Point(3, 3), Point(-3, -3));
-
-    std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(std::nullopt, intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_intersection_limit_case)
-{
-    Vector velociity(-1, 0.00);
-    Point position(1, -0.2);
-
-    Point start(-4.5, 2);
-    Point end(-4.5, -2);
-
-    Rectangle boundry(Point(-4.5, -3), Point(4.5, 3));
-
-    std::optional<Point> intersection =
-        velocityLineIntersection(velociity, position, start, end, boundry);
-
-    EXPECT_EQ(Point(-4.5, -0.2), *intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_finite_intersection_intersect)
-{
-    Point a = Point(1, 1);
-    Point b = Point(-1, -1);
-    Point c = Point(1, 0);
-    Point d = Point(-1, 0);
-
-    std::optional<Point> intersection = finiteLengthLineIntersection(a, b, c, d);
-
-    EXPECT_EQ(Point(0, 0), *intersection);
-}
-
-TEST(GeomUtilTest, test_velocity_finite_intersection_not_intersecting)
-{
-    Point a = Point(1, 1);
-    Point b = Point(1, -1);
-    Point c = Point(0.1, 0);
-    Point d = Point(0.2, 0);
-
-    std::optional<Point> intersection = finiteLengthLineIntersection(a, b, c, d);
-
-    EXPECT_EQ(std::nullopt, intersection);
+    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
 int main(int argc, char **argv)

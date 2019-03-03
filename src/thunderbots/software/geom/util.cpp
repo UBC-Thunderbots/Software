@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <tuple>
 
 #include "geom/angle.h"
 #include "geom/rectangle.h"
@@ -168,14 +169,12 @@ bool contains(const Segment &out, const Vector &in)
 
 bool contains(const Ray &out, const Vector &in)
 {
-    if (collinear(in, out.getRayStart(), out.getDirection()))
+    Point point_in_ray_direction = out.getRayStart() + out.getDirection();
+    if (collinear(in, out.getRayStart(), point_in_ray_direction) &&
+        (in - out.getRayStart()).norm() == out.getDirection().norm())
     {
-        return sign(in.x() - out.getRayStart().x()) ==
-                   sign(out.getDirection().x() - out.getRayStart().x()) &&
-               sign(in.y() - out.getRayStart().y()) ==
-                   sign(out.getDirection().y() - out.getRayStart().y());
+        return true;
     }
-
     return false;
 }
 
@@ -204,13 +203,18 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Ray &first, const Segment &second)
 {
-    auto isect = lineIntersection(first.getRayStart(), first.getDirection(),
-                                  second.getSegStart(), second.getEnd());
+    auto isect =
+        lineIntersection(first.getRayStart(), first.getRayStart() + first.getDirection(),
+                         second.getSegStart(), second.getEnd());
+    // If the infinitely long vectors defined by ray and segment intersect, check that the
+    // intersection is within their definitions
     if (isect.has_value())
     {
         return contains(first, isect.value()) && contains(second, isect.value());
     }
-    return collinear(first.getRayStart(), first.getDirection(), second.getSegStart());
+    // If there is no intersection, the ray and segment may be parallel, check if they are
+    // overlapped
+    return contains(second, first.getRayStart());
 }
 bool intersects(const Segment &first, const Ray &second)
 {
@@ -565,7 +569,7 @@ Vector vectorRectIntersect(const Rectangle &r, const Vector &vecA, const Vector 
     std::vector<Vector> points = lineRectIntersect(r, vecA, (vecB - vecA) * 100 + vecA);
     for (Vector i : points)
     {
-        if (contains(Ray(vecA, vecB), i))
+        if (contains(Ray(vecA, (vecB - vecA)), i))
         {
             return i;
         }
@@ -752,58 +756,38 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
     return std::make_optional(intersection);
 }
 
-std::optional<Point> finiteLengthLineIntersection(const Vector &a, const Vector &b,
-                                                  const Vector &c, const Vector &d)
+std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
+    Ray &ray, Segment &segment)
 {
-    std::optional<Point> intersection = lineIntersection(a, b, c, d);
+    Point ray2 = ray.getRayStart() + ray.getDirection();
 
-    if (intersection != std::nullopt)
+    std::optional<Point> intersection = lineIntersection(
+        ray.getRayStart(), ray2, segment.getSegStart(), segment.getEnd());
+
+    // If there exists a single intersection, and it exists on the ray and within the
+    // segment
+    if (intersection.has_value() && contains(ray, intersection.value()) &&
+        contains(segment, intersection.value()))
     {
-        // We know the point returned by lineIntersection() exists along the trajectory of
-        // one of the lines, now we must check that it is within the specified line points
-        // If point C exists on line A-B, DIST(AC) + DIST(CB) = DIST(AB)
-        // Calculated for lines a-b and c-d
-        if ((fabs(dist(a, *intersection)) + fabs(dist(*intersection, b)) ==
-             fabs(dist(a, b))) &&
-            fabs(dist(c, *intersection)) + fabs(dist(*intersection, d)) ==
-                fabs(dist(c, d)))
-        {
-            return intersection;
-        }
+        return std::make_pair(intersection, std::nullopt);
     }
-
-    return std::nullopt;
-}
-
-std::optional<Point> velocityLineIntersection(const Vector element_velocity,
-                                              const Vector element_position,
-                                              const Point line_start,
-                                              const Point line_end,
-                                              const Rectangle boundry_area)
-{
-    // If the element is not within the boundries, return null
-    if (!boundry_area.containsPoint(element_position))
+    // The ray and segment are parallel, and collinear
+    else if (!intersection.has_value() &&
+             collinear(ray.getRayStart(), segment.getSegStart(), segment.getEnd()))
     {
-        return std::nullopt;
+        // Since we know the ray and segment are overlapping, return the ray start
+        // position, and the end of the segment that is in the direction of the ray
+        ray.getDirection().norm() == (segment.getEnd() - ray.getRayStart()).norm()
+            ? intersection = std::make_optional(segment.getEnd())
+            : intersection = std::make_optional(segment.getSegStart());
+
+        return std::make_pair(ray.getRayStart(), intersection.value());
     }
-
-    // Calculate the closest edge of the boundry based on element speed and position
-    const double proximity_to_x_boundry = std::max(
-        (-boundry_area.width() / 2 - element_position.x()) / element_velocity.x(),
-        (boundry_area.width() / 2 - element_position.x()) / element_velocity.x());
-    const double proximity_to_y_boundry = std::max(
-        (-boundry_area.height() / 2 - element_position.y()) / element_velocity.y(),
-        (boundry_area.height() / 2 - element_position.y()) / element_velocity.y());
-
-    // Grab the boundry edge that is intersected first
-    const double proximity_to_closest_edge =
-        std::min(proximity_to_x_boundry, proximity_to_y_boundry);
-
-    const Point boundry_edge_intersection =
-        proximity_to_closest_edge * element_velocity + element_position;
-
-    return finiteLengthLineIntersection(line_start, line_end, element_position,
-                                        boundry_edge_intersection);
+    // The ray and segment do not intersect at all
+    else
+    {
+        return std::make_pair(std::nullopt, std::nullopt);
+    }
 }
 
 Vector reflect(const Vector &v, const Vector &n)
