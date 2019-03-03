@@ -34,4 +34,3 @@ namespace Evaluation
      */
     std::optional<Point> calcBallVelIntersectEnemyNet(Ball ball, Field field);
 };  // namespace Evaluation
-
