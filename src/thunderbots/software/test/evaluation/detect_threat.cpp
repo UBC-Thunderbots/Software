@@ -46,6 +46,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_friendly_net)
     EXPECT_EQ(std::nullopt, intersection);
 }
 
+// Test where the ball will intersect the enemy net
 TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
 {
     Vector velocity(1, 0.01);
@@ -63,6 +64,7 @@ TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
     EXPECT_EQ(Point(4.5, -0.165), intersection.value());
 }
 
+// Test where the ball will not intersect the enemy net
 TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_enemy_net)
 {
     Vector velocity(-1, 0.01);
