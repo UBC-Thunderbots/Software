@@ -232,7 +232,7 @@ file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_D
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/primitive.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/timestamp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
         )
 add_executable (xbox_controller_mapping
