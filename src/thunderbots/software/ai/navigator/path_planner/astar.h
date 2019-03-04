@@ -6,6 +6,19 @@
 
 #include "ai/world/field.h"
 #include "path_planner.h"
+
+/**
+ * The AStar namespace contains everything that is necessary for an implementation
+ * of A* search using a grid graph and edge weights for obstacle avoidance.
+ *
+ * AStarPathPlanner is an implementation of the PathPlanner interface that returns
+ * a path from a start point to a destination point using the A* implementation
+ * detailed above.
+ *
+ * WARNING: Currently, the AStarPathPlanner will not return std::nullopt when a path
+ * is not found, due to the fact that we use edge weights for obstacle avoidance.
+ */
+
 namespace AStar
 {
     // edge cost type
@@ -84,7 +97,11 @@ namespace AStar
         explicit AStarPathPlanner(const Field &field, size_t grid_vertex_density);
         /**
          * Returns a path from start to dest if it is possible,
-         * otherwise return std::nullopt
+         * otherwise return std::nullopt.
+         *
+         * WARNING: This will currently never return nullopt, because we use edge
+         * weights for obstacle avoidance. Instead, it will return a path that
+         * has minimum intrusion on obstacle boundaries.
          *
          * @param violation_function a function that returns the violation distance for a
          * given point

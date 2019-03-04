@@ -1,6 +1,6 @@
-//
-// Created by jordan on 2/26/19.
-//
+/**
+ * This file contains tests for the AStarPathPlanner.
+ */
 
 #include "ai/navigator/path_planner/astar.h"
 

@@ -1,6 +1,3 @@
-//
-// Created by jordan on 2/26/19.
-//
 #include "astar.h"
 
 #include <boost/property_map/function_property_map.hpp>
