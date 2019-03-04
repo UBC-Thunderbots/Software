@@ -39,7 +39,7 @@ class AStarPathPlannerTest : public ::testing::Test
     World testWorld;
     Field testField;
     const ViolationFunction testViolationFunction;
-    static constexpr size_t GRID_VERTEX_DENSITY = 20;
+    static constexpr size_t GRID_VERTEX_DENSITY = 10;
 };
 
 TEST_F(AStarPathPlannerTest, test_construct_path_planner)
