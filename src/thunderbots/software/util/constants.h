@@ -20,6 +20,9 @@ namespace Util
         static const std::string AI_PRIMITIVES_TOPIC         = "backend/primitives";
         static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
+        // The topic published by the joy_node that contains information about any plugged
+        // in joysticks / controllers
+        static const std::string JOY_NODE_TOPIC = "joy";
 
         // TODO: Make this a tuneable parameter
         static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
@@ -27,6 +30,11 @@ namespace Util
         // Networking and vision
         static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
         static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
+
+        // GrSim networking and communication
+        // TODO: BETTER NAMES
+        static const std::string GRSIM_COMMAND_NETWORK_ADDRESS = "127.0.0.1";
+        static const short GRSIM_COMMAND_NETWORK_PORT          = 20011;
 
         // Refbox address
         static const std::string SSL_GAMECONTROLLER_MULTICAST_ADDRESS = "224.5.23.1";

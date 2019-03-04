@@ -21,6 +21,8 @@ class StopIntent : public Intent, public StopPrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Compares StopIntents for equality. StopIntents are considered equal if all
      * their member variables are equal.

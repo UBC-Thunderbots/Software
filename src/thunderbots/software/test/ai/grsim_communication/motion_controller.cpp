@@ -52,7 +52,10 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_vector          = Point(0, 0);
     Angle expected_angular_velocity = Angle::ofRadians(0);
@@ -72,7 +75,10 @@ TEST_F(MotionControllerTest, calc_correct_velocity_ones)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_vector =
         Point(1 - ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, 0);
@@ -94,7 +100,10 @@ TEST_F(MotionControllerTest, over_speed_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     double expected_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
@@ -115,7 +124,10 @@ TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     double expected_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
@@ -134,9 +146,16 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
     Angle destination_angle  = Angle::ofDegrees(210);
     double destination_speed = 0;
 
+    // We use a custom MAX_ANGULAR_SPEED value because if this value is too high, the
+    // controller will always try decelerate because it thinks it will overshoot its
+    // orientation target at the current velocity. Using a lower value lets us actually
+    // hit the maximum and test that case
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     double expected_speed = 0;
 
@@ -155,16 +174,14 @@ TEST_F(MotionControllerTest, negative_time_test)
     Angle destination_angle  = Angle::ofDegrees(210);
     double destination_speed = 0;
 
-    MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
-
-    Vector expected_velocity = Vector(-1, 2);
-
-    AngularVelocity expected_angular_speed = Angle::ofRadians(3.9);
-
-    EXPECT_EQ(expected_velocity, robot_velocities.linear_velocity);
-    EXPECT_EQ(expected_angular_speed, robot_velocities.angular_velocity);
+    EXPECT_THROW(
+        MotionController::Velocity robot_velocities =
+            MotionController::bangBangVelocityController(
+                robot, destination, destination_speed, destination_angle, delta_time,
+                ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        , std::invalid_argument);
 }
 
 TEST_F(MotionControllerTest, zero_time_test)
@@ -178,7 +195,10 @@ TEST_F(MotionControllerTest, zero_time_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(-1, 1.6);
 
@@ -201,7 +221,10 @@ TEST_F(MotionControllerTest, negative_x_velocity_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(
         initialSpeed - ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time, 0);
@@ -221,7 +244,10 @@ TEST_F(MotionControllerTest, negative_y_velocity_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(
         0, initialSpeed - ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time);
@@ -241,14 +267,17 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
     Robot robot = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
                         initial_ang_speed, current_time);
 
-
+    // We use a lower MAX_ANGULAR_SPEED threshold here so it's easier to check the final
+    // value (since it will just hit the maximum)
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     // expect -4 because of angular speed cap
-    AngularVelocity expected_velocity =
-        AngularVelocity::ofRadians(-ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND);
+    AngularVelocity expected_velocity = AngularVelocity::ofRadians(-4);
 
     EXPECT_EQ(expected_velocity, robot_velocities.angular_velocity);
 }
@@ -265,13 +294,17 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
     Robot robot = Robot(4, Point(0, 0), Vector(0, 0), Angle::ofRadians(0),
                         initial_ang_speed, current_time);
 
+    // We use a lower MAX_ANGULAR_SPEED threshold here so it's easier to check the final
+    // value (since it will just hit the maximum)
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
-    // expect -4 because of angular speed cap
-    AngularVelocity expected_velocity =
-        AngularVelocity::ofRadians(ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND);
+    // expect 4 because of angular speed cap
+    AngularVelocity expected_velocity = AngularVelocity::ofRadians(4.0);
 
     EXPECT_EQ(expected_velocity, robot_velocities.angular_velocity);
 }
@@ -288,7 +321,10 @@ TEST_F(MotionControllerTest, negative_y_positive_x_velocity_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       -sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -307,7 +343,10 @@ TEST_F(MotionControllerTest, positive_y_negative_x_velocity_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(-sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -326,7 +365,10 @@ TEST_F(MotionControllerTest, positive_y_positive_x_velocity_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -345,7 +387,10 @@ TEST_F(MotionControllerTest, negative_y_negative_x_velocity_test)
 
     MotionController::Velocity robot_velocities =
         MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     Vector expected_velocity = Vector(-sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       -sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -370,7 +415,10 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -410,7 +458,10 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_negative_y_position_tes
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -445,7 +496,10 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_positive_y_position_tes
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -483,7 +537,10 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_negative_y_position_tes
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -521,7 +578,10 @@ TEST_F(MotionControllerTest, asymetric_reach_des_test)
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -561,7 +621,10 @@ TEST_F(MotionControllerTest, positive_final_speed_position_test)
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -602,7 +665,10 @@ TEST_F(MotionControllerTest, negative_final_speed_position_test)
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -641,7 +707,10 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_orientation =
             robot.orientation() +
@@ -677,7 +746,10 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
         robot_velocities = MotionController::bangBangVelocityController(
-            robot, destination, destination_speed, destination_angle, delta_time);
+            robot, destination, destination_speed, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
         new_orientation =
             robot.orientation() +
@@ -711,8 +783,11 @@ TEST_F(MotionControllerTest,
     Angle destination_angle = Angle::ofRadians(0);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(robot, destination, 2,
-                                                     destination_angle, delta_time);
+        MotionController::bangBangVelocityController(
+            robot, destination, 2, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     // if the destination is on the +x side of the robot, the velocity should always have
     // x > 0
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
@@ -730,8 +805,11 @@ TEST_F(MotionControllerTest,
     Angle destination_angle = Angle::ofRadians(0);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(robot, destination, 2,
-                                                     destination_angle, delta_time);
+        MotionController::bangBangVelocityController(
+            robot, destination, 2, destination_angle, delta_time,
+            ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     // if the destination is on the +x side of the robot, the velocity should always have
     // x > 0
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());

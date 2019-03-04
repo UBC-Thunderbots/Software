@@ -15,20 +15,24 @@
 
 #include <algorithm>
 
-#include "shared/constants.h"
 #include "util/logger/init.h"
 
 MotionController::Velocity MotionController::bangBangVelocityController(
     const Robot robot, const Point dest, const double desired_final_speed,
-    const Angle desired_final_orientation, const double delta_time)
+    const Angle desired_final_orientation, const double delta_time,
+    const double max_speed_meters_per_second,
+    const double max_angular_speed_radians_per_second,
+    const double max_acceleration_meters_per_second_squared,
+    const double max_angular_acceleration_meters_per_second_squared)
 {
     MotionController::Velocity robot_velocities;
 
-    // if the change is time is somehow negative or zero, just return the current robot
-    // velocity
-    // TODO: Implement exception handling for negative time case
-    // See issue #123
-    if (delta_time <= 0)
+    if (delta_time < 0)
+    {
+        throw std::invalid_argument(
+            "GrSim Motion controller received a negative delta time");
+    }
+    else if (delta_time == 0)
     {
         robot_velocities.linear_velocity  = robot.velocity();
         robot_velocities.angular_velocity = robot.angularVelocity();
@@ -36,16 +40,21 @@ MotionController::Velocity MotionController::bangBangVelocityController(
     else
     {
         robot_velocities.linear_velocity = MotionController::determineLinearVelocity(
-            robot, dest, desired_final_speed, delta_time);
+            robot, dest, desired_final_speed, delta_time, max_speed_meters_per_second,
+            max_angular_speed_radians_per_second);
         robot_velocities.angular_velocity = MotionController::determineAngularVelocity(
-            robot, desired_final_orientation, delta_time);
+            robot, desired_final_orientation, delta_time,
+            max_angular_speed_radians_per_second,
+            max_angular_acceleration_meters_per_second_squared);
     }
 
     return robot_velocities;
 }
 
 AngularVelocity MotionController::determineAngularVelocity(
-    const Robot robot, const Angle desired_final_orientation, const double delta_time)
+    const Robot robot, const Angle desired_final_orientation, const double delta_time,
+    const double max_angular_speed_radians_per_second,
+    const double max_angular_acceleration_radians_per_second_squared)
 {
     // Calculate the angular difference between us and a goal
     Angle angle_difference = (desired_final_orientation - robot.orientation()).angleMod();
@@ -59,10 +68,10 @@ AngularVelocity MotionController::determineAngularVelocity(
         3;
     // Cap our angular velocity at the robot's physical limit
     new_robot_angular_velocity_magnitude = std::min<double>(
-        new_robot_angular_velocity_magnitude, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND);
+        new_robot_angular_velocity_magnitude, max_angular_speed_radians_per_second);
     // Figure out the maximum acceleration the robot is physically capable of
     double max_additional_angular_velocity =
-        ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED * delta_time;
+        max_angular_acceleration_radians_per_second_squared * delta_time;
 
     // Compute the final velocity by taking the minimum of the physical max additional
     // turn rate and our desired additional turn rate
@@ -76,13 +85,14 @@ AngularVelocity MotionController::determineAngularVelocity(
     return AngularVelocity::ofRadians(new_angular_velocity);
 }
 
-Vector MotionController::determineLinearVelocity(const Robot robot, const Point dest,
-                                                 const double desired_final_speed,
-                                                 const double delta_time)
+Vector MotionController::determineLinearVelocity(
+    const Robot robot, const Point dest, const double desired_final_speed,
+    const double delta_time, const double max_speed_meters_per_second,
+    const double max_acceleration_meters_per_second_squared)
 {
     // Figure out the maximum (physically possible) velocity we can add to the robot
     double max_magnitude_of_velocity_to_apply =
-        ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time;
+        max_acceleration_meters_per_second_squared * delta_time;
 
     // Calculate a unit vector from the robot to the destination
     Vector unit_vector_to_dest = (dest - robot.position()).norm();
@@ -127,9 +137,9 @@ Vector MotionController::determineLinearVelocity(const Robot robot, const Point 
     {
         new_robot_velocity_magnitude *= -1;
     }
-    new_robot_velocity_magnitude = std::clamp<double>(new_robot_velocity_magnitude,
-                                                      -ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                                      ROBOT_MAX_SPEED_METERS_PER_SECOND);
+    new_robot_velocity_magnitude =
+        std::clamp<double>(new_robot_velocity_magnitude, -max_speed_meters_per_second,
+                           max_speed_meters_per_second);
 
     Vector new_robot_velocity =
         new_robot_velocity_magnitude * (robot.velocity() + additional_velocity).norm();

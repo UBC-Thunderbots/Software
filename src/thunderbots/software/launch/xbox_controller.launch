@@ -1,0 +1,31 @@
+<launch>
+
+    <!-- Launch the Joystick receiver node -->
+    <node name="joy_node" pkg="joy" type="joy_node" output="screen">
+        <!-- See http://wiki.ros.org/joy section 3.2 for parameters -->
+
+        <!-- The name of the device the XBox controller shows up as on the system -->
+        <param name="dev" value="/dev/input/js0" />
+
+        <!-- Amount by which the joystick has to move before it is considered to be off-center -->
+        <!-- Empirically determined 0.5 to be a reasonable value -->
+        <param name="deadzone" value="0.5" />
+
+        <!-- Rate in Hz at which a joystick that has a non-changing state will resend the previously sent message -->
+        <param name="autorepeat_rate" value="10" />
+
+        <!-- Axis events that are received within coalesce_interval (seconds) of each other are sent out in a single ROS message -->
+        <param name="coalesce_interval" value="0.001" />
+    </node>
+
+    <!-- Launch the XBox controller mapper node -->
+    <node name="xbox_controller_mapping" pkg="thunderbots" type="xbox_controller_mapping" output="screen">
+    </node>
+
+    <!-- Launch the dynamic parameters node -->
+    <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
+
+    <!-- Launch the rqt_reconfigure gui -->
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
+
+</launch>

@@ -75,13 +75,24 @@ namespace MotionController
      * @param desired_final_speed The target final speed of the robot
      * @param desired_final_orientation The target final orientation of the robot
      * @param delta_time The change in time since the motion controller was run last
+     * @param max_speed_meters_per_second The maximum linear speed of the robot, in meters
+     * per second
+     * @param max_angular_speed_radians_per_second The maximum angular speed of the robot,
+     * in radians per second
+     * @param max_acceleration_meters_per_second_squared The maximum linear acceleration
+     * of the robot, in meters per second squared
+     * @param max_angular_acceleration_meters_per_second_squared The maximum angular
+     * acceleration of the robot, in radians per second squared
      * @return The linear velocity of the robot as a Vector(X,Y) and the angular velocity
      * of the robot as a AngularVelocity packaged in a vector
      */
-    Velocity bangBangVelocityController(const Robot robot, const Point dest,
-                                        const double desired_final_speed,
-                                        const Angle desired_final_orientation,
-                                        const double delta_time);
+    Velocity bangBangVelocityController(
+        const Robot robot, const Point dest, const double desired_final_speed,
+        const Angle desired_final_orientation, const double delta_time,
+        const double max_speed_meters_per_second,
+        const double max_angular_speed_radians_per_second,
+        const double max_acceleration_meters_per_second_squared,
+        const double max_angular_acceleration_meters_per_second_squared);
 
     /**
      * Calculate robot angular velocities based on current robot polar state and
@@ -92,9 +103,10 @@ namespace MotionController
      * @param delta_time The time that will be used to calculate the change in speed of
      * @return Angular velocity of the robot as a AngularVelocity packaged in a vector
      */
-    AngularVelocity determineAngularVelocity(const Robot robot,
-                                             const Angle desired_final_orientation,
-                                             const double delta_time);
+    AngularVelocity determineAngularVelocity(
+        const Robot robot, const Angle desired_final_orientation, const double delta_time,
+        const double max_angular_speed_radians_per_second,
+        const double max_angular_acceleration_radians_per_second_squared);
 
     /**
      * Calculate robot linear velocities based on current robot cartesian state and
@@ -105,8 +117,9 @@ namespace MotionController
      * @param delta_time The time that will be used to calculate the change in speed of
      * @return Linear velocity of the robot as a AngularVelocity packaged in a vector
      */
-    Vector determineLinearVelocity(const Robot robot, const Point dest,
-                                   const double desired_final_speed,
-                                   const double delta_time);
+    Vector determineLinearVelocity(
+        const Robot robot, const Point dest, const double desired_final_speed,
+        const double delta_time, const double max_speed_meters_per_second,
+        const double max_acceleration_meters_per_second_squared);
 
 }  // namespace MotionController
