@@ -129,10 +129,10 @@ AStar::AStarHeuristic::AStarHeuristic(
 
 AStar::edge_cost_t AStar::AStarHeuristic::operator()(AStar::GridVertex gp)
 {
-    // TODO: scale violation component based on grid density
     Point p = graph->gridPointToPoint(gp);
-    double p_violation =
-        VIOLATION_SCALE_FACTOR * graph->gridVertexDistance() * violation_function(p);
+    // the violation is already in metres, so the same unit
+    // as the heuristic and edge cost
+    double p_violation = VIOLATION_SCALE_FACTOR * violation_function(p);
     return dist(dest_point, p) + p_violation;
 }
 
@@ -154,23 +154,20 @@ std::optional<std::vector<Point>> AStar::AStarPathPlanner::findPath(
     // create a map that dynamically generates edge weights as we traverse the grid graph
     auto edge_weights = boost::make_function_property_map<GridGraph2D::edge_descriptor>(
         [this, violation_function](GridGraph2D::edge_descriptor edge) -> edge_cost_t {
-            // TODO: scale violation based on grid density
-            // TODO: memoizing this may improve performance eventually
             // cost of an edge is the distance between grid points
+            // plus the increase in violation between the start and end vertices
             double cost            = this->field_graph_ptr->gridVertexDistance();
             Point edge_start_point = this->field_graph_ptr->gridPointToPoint(edge.first);
             Point edge_dest_point  = this->field_graph_ptr->gridPointToPoint(edge.second);
             // increase the cost by the increase in violation between the start and end
             // points of the edge
-            double edge_start_violation = VIOLATION_SCALE_FACTOR *
-                                          field_graph_ptr->gridVertexDistance() *
-                                          violation_function(edge_start_point);
+            double edge_start_violation =
+                VIOLATION_SCALE_FACTOR * violation_function(edge_start_point);
 
-            double edge_dest_violation = VIOLATION_SCALE_FACTOR *
-                                         field_graph_ptr->gridVertexDistance() *
-                                         violation_function(edge_start_point);
+            double edge_dest_violation =
+                VIOLATION_SCALE_FACTOR * violation_function(edge_start_point);
 
-            cost = edge_dest_violation - edge_start_violation;
+            cost += (edge_dest_violation - edge_start_violation);
             return cost;
         });
 

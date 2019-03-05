@@ -12,7 +12,7 @@ RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
         robot.position() + robot.velocity() * collision_avoid_velocity_scale.value());
 }
 
-double RobotObstacle::getViolationDistance(const Point& point)
+double RobotObstacle::getViolationDistance(const Point& point) const
 {
     // Check if distance between p and center of boundary is less than the radius
     // if so then we have a violation.
@@ -20,7 +20,7 @@ double RobotObstacle::getViolationDistance(const Point& point)
     return std::max(0.0, boundary.getRadius() - dist1);
 }
 
-Point RobotObstacle::getNearestValidPoint(const Point& point)
+Point RobotObstacle::getNearestValidPoint(const Point& point) const
 {
     if (getViolationDistance(point) > 0.0)
     {
@@ -30,7 +30,7 @@ Point RobotObstacle::getNearestValidPoint(const Point& point)
     return point;
 }
 
-bool RobotObstacle::willCollide(const Robot& robot)
+bool RobotObstacle::willCollide(const Robot& robot) const
 {
     RobotObstacle other = RobotObstacle(robot, default_avoid_dist.value());
     return dist(velocity, other.velocity) < default_avoid_dist.value();

@@ -30,9 +30,9 @@ namespace AStar
 
     // the factor to multiply violation distance by in the cost and heuristic functions
     // that A* uses
-    // gigantic number empirically determined by running unit tests until obstacles were
+    // number empirically determined by running unit tests until obstacles were
     // actually avoided
-    static constexpr double VIOLATION_SCALE_FACTOR = 1000.0f;
+    static constexpr double VIOLATION_SCALE_FACTOR = 5.0f;
 
     class AStarGridGraph
     {

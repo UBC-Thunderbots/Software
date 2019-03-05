@@ -23,14 +23,32 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T> items)
 bool pathViolatesObstacles(const std::vector<Point>& path,
                            const std::vector<RobotObstacle>& obstacles)
 {
-    // TODO: finish this function
+    // a path violates obstacles if the total violation increases from
+    // the first point to the last point
+    double initial_violation = 0.0f;
+    for (const auto& obstacle : obstacles)
+    {
+        initial_violation += obstacle.getViolationDistance(path[0]);
+    }
+
+    double total_violation = 0.0f;
+    for (const auto& point : path)
+    {
+        for (const auto& obstacle : obstacles)
+        {
+            total_violation += obstacle.getViolationDistance(point);
+        }
+    }
+    std::cout << "Initial violation: " << initial_violation << std::endl;
+    std::cout << "Final violation: " << total_violation << std::endl;
+    return initial_violation < total_violation;
 }
 
 class AStarPathPlannerTest : public ::testing::Test
 {
    protected:
     AStarPathPlannerTest()
-        : testField(1.0f, 1.0f, 0.1f, 0.1f, 0.1f, 0.0f, 0.1f),
+        : testField(3.0f, 3.0f, 0.1f, 0.1f, 0.1f, 0.0f, 0.1f),
           testViolationFunction([](const Point& p) { return 0; })
     {
         testWorld.updateFieldGeometry(testField);
@@ -77,12 +95,13 @@ TEST_F(AStarPathPlannerTest, test_find_path_vertical_with_obstacles)
     Point start{0.0f, 0.0f}, end{0.0f, 1.0f};
     Robot obstacle_robot(0, Point(0.0f, 0.2f), Vector(), Angle(), AngularVelocity(),
                          Timestamp());
-    RobotObstacle obstacle(obstacle_robot, 0.2f);
+    RobotObstacle obstacle(obstacle_robot, 0.1f);
     ViolationFunction violation_function = [&obstacle](const Point& p) {
         return obstacle.getViolationDistance(p);
     };
     std::vector<Point> path = *planner->findPath(violation_function, start, end);
     std::cout << path << std::endl;
+    EXPECT_FALSE(pathViolatesObstacles(path, {obstacle}));
 }
 
 int main(int argc, char** argv)

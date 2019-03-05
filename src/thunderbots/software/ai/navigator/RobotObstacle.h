@@ -24,7 +24,7 @@ class RobotObstacle
      * @return Violation distance, defined as distance from the nearest boundary
      *         to the given point; 0.0 if no violation occured.
      */
-    double getViolationDistance(const Point& point);
+    double getViolationDistance(const Point& point) const;
 
     /**
      * Returns the closest Point on the obstacle boundary to the given Point that
@@ -35,7 +35,7 @@ class RobotObstacle
      * @return A point on the boundary nearest to p if p violates the boundary, otherwise
      *         returns p
      */
-    Point getNearestValidPoint(const Point& point);
+    Point getNearestValidPoint(const Point& point) const;
 
     /**
      * TODO: This function may have to be rewritten depending on our needs later,
@@ -47,7 +47,7 @@ class RobotObstacle
      * @param robot Robot to check against.
      * @return true if collision possible, false otherwise.
      */
-    bool willCollide(const Robot& robot);
+    bool willCollide(const Robot& robot) const;
 
    private:
     /**
