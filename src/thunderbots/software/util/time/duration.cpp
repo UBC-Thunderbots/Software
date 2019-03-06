@@ -20,6 +20,36 @@ const Duration Duration::fromMilliseconds(double milliseconds)
     return Duration(milliseconds * SECONDS_PER_MILLISECOND);
 }
 
+bool Duration::operator==(const Duration &other) const
+{
+    return std::fabs(other.getSeconds() - getSeconds()) < EPSILON;
+}
+
+bool Duration::operator!=(const Duration &other) const
+{
+    return !(*this == other);
+}
+
+bool Duration::operator<(const Duration &other) const
+{
+    return (*this != other) && (getSeconds() < other.getSeconds());
+}
+
+bool Duration::operator>=(const Duration &other) const
+{
+    return !(*this < other);
+}
+
+bool Duration::operator>(const Duration &other) const
+{
+    return (*this != other) && (getSeconds() > other.getSeconds());
+}
+
+bool Duration::operator<=(const Duration &other) const
+{
+    return !(*this > other);
+}
+
 Duration Duration::operator+(const Duration &duration) const
 {
     return Duration::fromSeconds(getSeconds() + duration.getSeconds());

@@ -40,6 +40,63 @@ class Timestamp : public Time
     static const Timestamp fromMilliseconds(double milliseconds);
 
     /**
+     * Compares Timestamps for equality. Timestamps are considered equal if their values
+     * in seconds are within EPSILON from one another.
+     *
+     * @param other the Timestamp to compare with for equality
+     * @return true if the Timestamps are equal and false otherwise
+     */
+    bool operator==(const Timestamp& other) const;
+
+    /**
+     * Compares Timestamps for inequality
+     *
+     * @param other the Timestamp to compare with for inequality
+     * @return true if the Timestamps are not equal, and false otherwise
+     */
+    bool operator!=(const Timestamp& other) const;
+
+    /**
+     * Defines the "less than" operator. Returns true if this Timestamp is strictly less
+     * than (and not equal to) the other Timestamp
+     *
+     * @param other the Timestamp to compare with
+     * @return true if this Timestamp is strictly less than (and not equal to) the other
+     * Timestamp, and false otherwise
+     */
+    bool operator<(const Timestamp& other) const;
+
+    /**
+     * Defines the "less than or equal to" operator. Returns true if this Timestamp is
+     * less than or equal to the other Timestamp
+     *
+     * @param other the Timestamp to compare with
+     * @return true if this Timestamp is less than or equal to the other Timestamp, and
+     * false otherwise
+     */
+    bool operator<=(const Timestamp& other) const;
+
+    /**
+     * Defines the "greater than" operator. Returns true if this Timestamp is strictly
+     * greater than (and not equal to) the other Timestamp
+     *
+     * @param other the Timestamp to compare with
+     * @return true if this Timestamp is strictly greater than (and not equal to) the
+     * other Timestamp, and false otherwise
+     */
+    bool operator>(const Timestamp& other) const;
+
+    /**
+     * Defines the "greater than or equal to" operator. Returns true if this Timestamp
+     * is greater than or equal to the other Timestamp
+     *
+     * @param other the Timestamp to compare with
+     * @return true if this Timestamp is greater than or equal to the other Timestamp, and
+     * false otherwise
+     */
+    bool operator>=(const Timestamp& other) const;
+
+    /**
      * Defines the addition operator for Timestamps. Allows Durations to be added to
      * Timestamps
      *

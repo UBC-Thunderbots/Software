@@ -455,7 +455,6 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(time_test
             test/util/time/duration.cpp
             test/util/time/main.cpp
-            test/util/time/time.cpp
             test/util/time/timestamp.cpp
             util/time/duration.cpp
             util/time/time.cpp
