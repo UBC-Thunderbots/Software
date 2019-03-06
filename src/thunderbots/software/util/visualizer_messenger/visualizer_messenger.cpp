@@ -26,6 +26,7 @@ namespace Util
         boost::asio::io_service ioc{1};
 
         // The acceptor receives incoming connections
+        // TODO: make IP and port a configurable constant somewhere?
         auto const address = boost::asio::ip::address::from_string("127.0.0.1");
         auto const port    = static_cast<unsigned short>(std::atoi("9091"));
         tcp::acceptor acceptor{ioc, {address, port}};
@@ -46,7 +47,7 @@ namespace Util
             // Set the websocket to talk in binary
             websocket.binary(true);
 
-            std::cout << "GOT A CONNECTION" << std::endl;
+            LOG(INFO) << "Connection received." << std::endl;
 
             // Lock the current list of sockets
             ws_mutex.lock();
@@ -57,7 +58,7 @@ namespace Util
             // Unlock the current list of sockets
             ws_mutex.unlock();
 
-            std::cout << "ADDED THE CONNECTION" << std::endl;
+            LOG(INFO) << "Connection added." << std::endl;
 
             // TODO: this is disgusting. We should not tie up all the cpu
             // Yield so that other things can run
@@ -67,16 +68,6 @@ namespace Util
 
     void VisualizerMessenger::initializeWebsocket()
     {
-        // TODO: can we nuke this?
-        // if (this->publisher)
-        //{
-        //    LOG(WARNING) << "Re-initializing visualizer messenger singleton publisher";
-        //}
-
-        // this->publisher = node_handle.advertise<LayerMsg>(
-        //    Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, 8);
-
-        // Assign handler to a thread
         ws_thread = std::thread([this]() { return onConnection(); });
     }
 
@@ -87,7 +78,7 @@ namespace Util
 
     void VisualizerMessenger::publishAndClearLayers()
     {
-        std::cout << "PUBLISHING" << std::endl;
+        LOG(INFO) << "Starting shape data publishing." << std::endl;
 
         // Limit rate of the message publishing
         // Get the time right now
@@ -105,49 +96,31 @@ namespace Util
         // Lock the list of current websockets
         ws_mutex.lock();
 
+        std::vector<int32_t> payload;
+        for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
+        {
+            for (auto shape : layer_msg_pair.second)
+            {
+                payload.insert(payload.end(), shape.begin(), shape.end());
+            }
+        }
+
         // Send all the shapes to all the websocket connections we have
         for (websocket::stream<tcp::socket>& websocket : ws_connections)
         {
-            std::vector<int32_t> message_contents;
-            for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
-            {
-                for (auto shape : layer_msg_pair.second)
-                {
-                    message_contents.insert(message_contents.end(), shape.begin(),
-                                            shape.end());
-                }
-            }
             try
             {
-                websocket.write(boost::asio::buffer(message_contents));
+                websocket.write(boost::asio::buffer(payload));
             }
+            // TODO: non-generic exception type
             catch (std::exception const& e)
             {
-                std::cerr << "Error: " << e.what() << std::endl;
+                LOG(ERROR) << e.what() << std::endl;
             }
         }
 
         // UnLock the list of current websockets
         ws_mutex.unlock();
-
-        //// Check if publisher is initialized before publishing messages
-        // if (!this->publisher)
-        //{
-        //    LOG(WARNING)
-        //        << "Publishing requested when visualizer messenger publisher is not
-        //        initialized";
-        //}
-        // else
-        //{
-        //    // Send layer messages
-        //    for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
-        //    {
-        //        if (!layer_msg_pair.second.shapes.empty())
-        //        {
-        //            this->publisher.publish(layer_msg_pair.second);
-        //        }
-        //    }
-        //}
 
         // Clear shapes in layers of current frame/tick
         clearLayers();
@@ -189,6 +162,7 @@ namespace Util
     {
         std::vector<int32_t> raw = {
             2, int(x), int(y), int(w), int(h), draw_transform.rotation, 0xFF, 0xFF, 0xFF};
+
         addShapeToLayer(layer, raw);
         // ShapeMsg new_shape;
         // new_shape.type = "rect";
@@ -262,23 +236,6 @@ namespace Util
     //        addShapeToLayer(layer, new_shape);
     //    }
 
-    //    void VisualizerMessenger::buildLayers()
-    //    {
-    //        // TODO: #268 list these existing layer names elsewhere where it's more
-    //        obvious std::vector<std::string> layer_names = std::vector<std::string>(
-    //            {"field", "ball", "ball_vel", "friendly_robot", "friendly_robot_vel",
-    //             "enemy_robot", "enemy_robot_vel", "nav", "rule", "passing", "test",
-    //             "misc"});
-    //
-    //        for (std::string layer_name : layer_names)
-    //        {
-    //            LayerMsg new_layer_msg;
-    //            new_layer_msg.layer_name = layer_name;
-    //            this->layers_name_to_msg_map.insert(
-    //                std::pair<std::string, LayerMsg>(layer_name, new_layer_msg));
-    //        }
-    //    }
-
     //    void VisualizerMessenger::applyDrawStyleToMsg(ShapeMsg& shape_msg, DrawStyle&
     //    style)
     //    {
@@ -293,22 +250,5 @@ namespace Util
     //        shape_msg.transform_rotation = transform.rotation;
     //        shape_msg.transform_scale    = transform.scale;
     //    }
-
-    // TODO: this is a hack, fix up
-    void VisualizerMessenger::addShapeToLayer(const std::string& layer,
-                                              std::vector<int32_t>& shape)
-    {
-        if (this->layers_name_to_msg_map.find(layer) !=
-            this->layers_name_to_msg_map.end())
-        {
-            this->layers_name_to_msg_map[layer].emplace_back(shape);
-        }
-        else
-        {
-            LOG(WARNING) << "Referenced layer (" << layer << ") is undefined\n";
-            this->layers_name_to_msg_map[layer] = {};
-            this->layers_name_to_msg_map[layer].emplace_back(shape);
-        }
-    }
 
 }  // namespace Util

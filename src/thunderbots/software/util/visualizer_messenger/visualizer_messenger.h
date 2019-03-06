@@ -244,8 +244,7 @@ namespace Util
         LayerMsgMap layers_name_to_msg_map;
 
         // Period in nanoseconds
-        const double DESIRED_PERIOD_MS =
-            1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
+        const double DESIRED_PERIOD_MS = 1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
 
         // Time point
         time_point time_last_published;
@@ -257,8 +256,7 @@ namespace Util
         std::mutex ws_mutex;
 
         // All the current websocket connections we have
-        using websocket_connection_vector =
-            std::vector<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>;
+        using websocket_connection_vector = std::vector<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>;
         websocket_connection_vector ws_connections;
     };
 
