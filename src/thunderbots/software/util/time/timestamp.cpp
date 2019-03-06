@@ -28,7 +28,6 @@ const Timestamp Timestamp::fromMilliseconds(double milliseconds)
 
 Timestamp Timestamp::operator+(const Duration &duration) const
 {
-    // TODO
     return Timestamp::fromSeconds(getSeconds() + duration.getSeconds());
 }
 

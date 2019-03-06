@@ -8,7 +8,7 @@
 
 Duration::Duration() : Duration(0) {}
 
-Duration::Duration(double timestamp_seconds) : Time(timestamp_seconds) {}
+Duration::Duration(double duration_seconds) : Time(duration_seconds) {}
 
 const Duration Duration::fromSeconds(double seconds)
 {

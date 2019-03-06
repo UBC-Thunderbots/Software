@@ -28,6 +28,12 @@ TEST(TimeTest, create_time_from_negative_milliseconds)
     EXPECT_DOUBLE_EQ(time.getMilliseconds(), -125);
 }
 
+TEST(TimeTest, create_time_from_positive_milliseconds)
+{
+    Time time = Time::fromMilliseconds(125);
+    EXPECT_DOUBLE_EQ(time.getMilliseconds(), 125);
+}
+
 TEST(TimeTest, get_seconds_time_in_milliseconds)
 {
     Time time = Time::fromSeconds(5);

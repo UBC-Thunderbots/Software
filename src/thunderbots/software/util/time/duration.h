@@ -51,8 +51,8 @@ class Duration : public Time
    private:
     /**
      * Constructs a Duration value from a value in seconds.
-     * @param timestamp_seconds A value >= 0.0, in seconds, from which to create the
-     * timestamp
+     * @param duration_seconds A value >= 0.0, in seconds, from which to create the
+     *                         Duration
      */
-    explicit Duration(double timestamp_seconds);
+    explicit Duration(double duration_seconds);
 };
