@@ -9,9 +9,6 @@
 # Divide by 1,000,000 to get a time_t.
 uint64 packet_timestamp
 
-# The "coarse" stage of the game.
-RefboxStage stage
-
 # The number of microseconds left in the stage.
 # Becomes negative when a stage runs over its specified time.
 int32 stage_time_left
@@ -33,7 +30,7 @@ RefboxTeamInfo us
 RefboxTeamInfo them
 
 # The point for ball placement. See Robocup SSL Rules
-Vector2f ball_placement_point
+Point2D ball_placement_point
 
 # Information about the direction of play.
 # True, if the blue team will have it's goal on the positive x-axis of the ssl-vision coordinate system

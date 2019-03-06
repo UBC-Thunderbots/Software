@@ -5,9 +5,10 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "grsim_communication/motion_controller/motion_controller.h"
-#include "grsim_communication/visitor/grsim_command_primitive_visitor.h"
+#include "grsim_command_primitive_visitor.h"
+#include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
+#include "shared/constants.h"
 #include "util/logger/init.h"
 
 using namespace boost::asio;
@@ -25,8 +26,14 @@ GrSimBackend::~GrSimBackend()
 }
 
 void GrSimBackend::sendPrimitives(
-    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team)
+    const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team,
+    const Ball& ball)
 {
+    // TODO: Can't replace this timestamp as part of issue #228 because the Timestamp
+    // class doesn't support absolute "wall time". This function will need to be
+    // changed to make use of the timestamps stored with the robots
+    // https://github.com/UBC-Thunderbots/Software/issues/279
+    //
     // initial timestamp for bang-bang set as current time
     static auto bangbang_timestamp = std::chrono::steady_clock::now();
 
@@ -40,7 +47,7 @@ void GrSimBackend::sendPrimitives(
             Robot robot = *friendly_team.getRobotById(prim->getRobotId());
 
             GrsimCommandPrimitiveVisitor grsim_command_primitive_visitor =
-                GrsimCommandPrimitiveVisitor(robot);
+                GrsimCommandPrimitiveVisitor(robot, ball);
             prim->accept(grsim_command_primitive_visitor);
 
             MotionController::MotionControllerCommand motion_controller_command =
@@ -50,7 +57,10 @@ void GrSimBackend::sendPrimitives(
                 MotionController::bangBangVelocityController(
                     robot, motion_controller_command.global_destination,
                     motion_controller_command.final_speed_at_destination,
-                    motion_controller_command.final_orientation, delta_time.count());
+                    motion_controller_command.final_orientation, delta_time.count(),
+                    ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+                    ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(

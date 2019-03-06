@@ -76,6 +76,23 @@ class ChipPrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares ChipPrimitives for equality. ChipPrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the ChipPrimitive to compare with for equality
+     * @return true if the ChipPrimitives are equal and false otherwise
+     */
+    bool operator==(const ChipPrimitive &other) const;
+
+    /**
+     * Compares ChipPrimitives for inequality.
+     *
+     * @param other the ChipPrimitive to compare with for inequality
+     * @return true if the ChipPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const ChipPrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point chip_origin;

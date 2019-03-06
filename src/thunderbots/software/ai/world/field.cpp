@@ -1,5 +1,7 @@
 #include "field.h"
 
+#include "geom/rectangle.h"
+
 Field::Field(double field_length, double field_width, double defense_length,
              double defense_width, double goal_width, double boundary_width,
              double center_circle_radius)
@@ -73,16 +75,17 @@ double Field::defenseAreaLength() const
     return defense_length_;
 }
 
-Rect Field::friendlyDefenseArea() const
+Rectangle Field::friendlyDefenseArea() const
 {
-    return Rect(Point(-field_length_ * 0.5, defense_width_ / 2.0),
-                Point(-field_length_ * 0.5 + defense_length_, -defense_width_ / 2.0));
+    return Rectangle(
+        Point(-field_length_ * 0.5, defense_width_ / 2.0),
+        Point(-field_length_ * 0.5 + defense_length_, -defense_width_ / 2.0));
 }
 
-Rect Field::enemyDefenseArea() const
+Rectangle Field::enemyDefenseArea() const
 {
-    return Rect(Point(field_length_ * 0.5, defense_width_ / 2.0),
-                Point(field_length_ * 0.5 - defense_length_, -defense_width_ / 2.0));
+    return Rectangle(Point(field_length_ * 0.5, defense_width_ / 2.0),
+                     Point(field_length_ * 0.5 - defense_length_, -defense_width_ / 2.0));
 }
 
 double Field::centreCircleRadius() const
@@ -153,6 +156,16 @@ Point Field::enemyGoalpostNeg() const
 double Field::boundaryWidth() const
 {
     return boundary_width_;
+}
+
+bool Field::pointInFriendlyDefenseArea(const Point p) const
+{
+    return friendlyDefenseArea().containsPoint(p);
+}
+
+bool Field::pointInEnemyDefenseArea(const Point p) const
+{
+    return enemyDefenseArea().containsPoint(p);
 }
 
 bool Field::operator==(const Field &other) const
