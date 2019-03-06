@@ -81,5 +81,26 @@ namespace Util
             extern Parameter<double> linear_sensitivity;
             extern Parameter<double> angular_sensitivity;
         }  // namespace XBoxControllerDemo
-    }      // namespace DynamicParameters
+
+        namespace NetworkInput
+        {
+            namespace Filter
+            {
+                namespace PartileFilter
+                {
+                    extern Parameter<int32_t> PARTICLE_FILTER_NUM_CONDENSATIONS;
+                    extern Parameter<double> TOP_PERCENTAGE_OF_PARTICLES;
+                    extern Parameter<double> MAX_DETECTION_WEIGHT;
+                    extern Parameter<double> DETECTION_WEIGHT_DECAY;
+                    extern Parameter<double> PREVIOUS_BALL_WEIGHT;
+                    extern Parameter<double> PREDICTION_WEIGHT;
+                    extern Parameter<double> BALL_DIST_THRESHOLD;
+                    extern Parameter<double> BALL_CONFIDENCE_THRESHOLD;
+                    extern Parameter<double> BALL_VALID_DIST_THRESHOLD;
+                    extern Parameter<double> BALL_CONFIDENCE_DELTA;
+                    extern Parameter<double> BALL_MAX_VARIANCE;
+                }  // namespace PartileFilter
+            }      // namespace Filter
+        }          // namespace NetworkInput
+    }              // namespace DynamicParameters
 }  // namespace Util

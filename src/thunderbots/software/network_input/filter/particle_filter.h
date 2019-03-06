@@ -4,6 +4,7 @@
 #include <random>
 
 #include "geom/point.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "util/parameter/parameter.h"
 /**
  * Finds and filters the "real" ball from the received data
@@ -13,17 +14,37 @@ const double MAX_BALL_CONFIDENCE                 = 100.0;
 const double MAX_PARTICLE_STANDARD_DEV           = 0.05;
 const double MIN_PARTICLE_STANDARD_DEV           = 0.001;
 
-const int PARTICLE_FILTER_NUM_CONDENSATIONS = 0.25;
-const double TOP_PERCENTAGE_OF_PARTICLES    = 1.0;
-const double MAX_DETECTION_WEIGHT           = 500.0;
-const double DETECTION_WEIGHT_DECAY         = 2.0;
-const double PREVIOUS_BALL_WEIGHT           = 1.5;
-const double PREDICTION_WEIGHT              = 2.3;
-const double BALL_DIST_THRESHOLD            = 0.5;
-const double BALL_CONFIDENCE_THRESHOLD      = 70.0;
-const double BALL_VALID_DIST_THRESHOLD      = 0.2;
-const double BALL_CONFIDENCE_DELTA          = 6.0;
-const double BALL_MAX_VARIANCE              = 5.0;
+int PARTICLE_FILTER_NUM_CONDENSATIONS =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::
+        PARTICLE_FILTER_NUM_CONDENSATIONS.value();
+double TOP_PERCENTAGE_OF_PARTICLES =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::
+        TOP_PERCENTAGE_OF_PARTICLES.value();
+double MAX_DETECTION_WEIGHT =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::MAX_DETECTION_WEIGHT
+        .value();
+double DETECTION_WEIGHT_DECAY =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::DETECTION_WEIGHT_DECAY
+        .value();
+double PREVIOUS_BALL_WEIGHT =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::PREVIOUS_BALL_WEIGHT
+        .value();
+double PREDICTION_WEIGHT =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::PREDICTION_WEIGHT
+        .value();
+double BALL_DIST_THRESHOLD =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::BALL_DIST_THRESHOLD
+        .value();
+double BALL_CONFIDENCE_THRESHOLD = Util::DynamicParameters::NetworkInput::Filter::
+                                       PartileFilter::BALL_CONFIDENCE_THRESHOLD.value();
+double BALL_VALID_DIST_THRESHOLD = Util::DynamicParameters::NetworkInput::Filter::
+                                       PartileFilter::BALL_VALID_DIST_THRESHOLD.value();
+double BALL_CONFIDENCE_DELTA =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::BALL_CONFIDENCE_DELTA
+        .value();
+double BALL_MAX_VARIANCE =
+    Util::DynamicParameters::NetworkInput::Filter::PartileFilter::BALL_MAX_VARIANCE
+        .value();
 
 // This is used as a placeholder point for when we don't have real data
 const Point TMP_POINT = Point(-99.99, -99.99);

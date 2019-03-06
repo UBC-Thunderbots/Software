@@ -71,4 +71,29 @@ namespace Util::DynamicParameters
         Parameter<double> angular_sensitivity("xbox_demo_angular_sensitivity", 1.0);
     }  // namespace XBoxControllerDemo
 
+    namespace NetworkInput
+    {
+        namespace Filter
+        {
+            namespace PartileFilter
+            {
+                Parameter<int32_t> PARTICLE_FILTER_NUM_CONDENSATIONS(
+                    "PARTICLE_FILTER_NUM_CONDENSATIONS", 5);
+                Parameter<double> TOP_PERCENTAGE_OF_PARTICLES(
+                    "TOP_PERCENTAGE_OF_PARTICLES", 1);
+                Parameter<double> MAX_DETECTION_WEIGHT("MAX_DETECTION_WEIGHT", 100);
+                Parameter<double> DETECTION_WEIGHT_DECAY("DETECTION_WEIGHT_DECAY", 200);
+                Parameter<double> PREVIOUS_BALL_WEIGHT("PREVIOUS_BALL_WEIGHT", 1);
+                Parameter<double> PREDICTION_WEIGHT("PREDICTION_WEIGHT", 15);
+                Parameter<double> BALL_DIST_THRESHOLD("BALL_DIST_THRESHOLD", 0.5);
+                Parameter<double> BALL_CONFIDENCE_THRESHOLD("BALL_CONFIDENCE_THRESHOLD",
+                                                            60);
+                Parameter<double> BALL_VALID_DIST_THRESHOLD("BALL_VALID_DIST_THRESHOLD",
+                                                            0.1);
+                Parameter<double> BALL_CONFIDENCE_DELTA("BALL_CONFIDENCE_DELTA", 5);
+                Parameter<double> BALL_MAX_VARIANCE("BALL_MAX_VARIANCE", 1);
+
+            }  // namespace PartileFilter
+        }      // namespace Filter
+    }          // namespace NetworkInput
 }  // namespace Util::DynamicParameters
