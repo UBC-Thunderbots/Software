@@ -141,6 +141,8 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
             .getSeconds();
 
     // We take a smooth "max" of these two values using a log-sum-exp function
+    // https://en.wikipedia.org/wiki/LogSumExp (NOTE: we use the more computationally
+    // stable version mentioned towards the bottom of the wiki page)
     double max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point,
                                              robot_ball_time_diff_at_pass_receive_point);
     double max_time_diff_smooth =
