@@ -24,7 +24,10 @@ namespace MotionController
               final_speed_at_destination(0.0),
               kick_speed_meters_per_second(0.0),
               chip_instead_of_kick(false),
-              dribbler_on(false)
+              dribbler_on(false),
+              velocity_request(false),
+              requested_linear_velocity(Vector(0, 0)),
+              requested_angular_velocity(AngularVelocity())
         {
         }
 
@@ -37,7 +40,35 @@ namespace MotionController
               final_speed_at_destination(final_speed_at_destination),
               kick_speed_meters_per_second(kick_or_chip_power),
               chip_instead_of_kick(chip_instead_of_kick),
-              dribbler_on(dribbler_on)
+              dribbler_on(dribbler_on),
+              velocity_request(false),
+              requested_linear_velocity(Vector(0, 0)),
+              requested_angular_velocity(AngularVelocity())
+        {
+        }
+
+        /**
+         * Creates a motion controller command which will output the velocity that is
+         * directly passed to it instead of a position.
+         *
+         * @param final_orientation
+         * @param kick_or_chip_power
+         * @param chip_instead_of_kick
+         * @param dribbler_on
+         * @param requested_velocty The desired output velocity.
+         */
+        MotionControllerCommand(Angle final_orientation, double kick_or_chip_power,
+                                bool chip_instead_of_kick, bool dribbler_on,
+                                Vector requested_linear_velocity,
+                                AngularVelocity requested_angular_velocity)
+            : global_destination(Vector(0, 0)),
+              final_orientation(final_orientation),
+              final_speed_at_destination(0.0),
+              kick_speed_meters_per_second(kick_or_chip_power),
+              chip_instead_of_kick(chip_instead_of_kick),
+              dribbler_on(dribbler_on),
+              velocity_request(true),
+              requested_linear_velocity(requested_linear_velocity)
         {
         }
 
@@ -59,6 +90,14 @@ namespace MotionController
         // Whether or not the robot's dribbler should be on. Dribbler speed cannot be
         // controlled in grSim
         bool dribbler_on;
+        // Whether the caller is directly requesting a velocity instead of position
+        bool velocity_request;
+        // Outputted linear velocity when the caller wants to directly request velocity
+        // instead of a position.
+        Vector requested_linear_velocity;
+        // Outputted angular velocity when the caller wants to directly request velocity
+        // instead of a position.
+        AngularVelocity requested_angular_velocity;
     };
 
     // tolerance distance measurement in meters
@@ -89,10 +128,14 @@ namespace MotionController
     Velocity bangBangVelocityController(
         const Robot robot, const Point dest, const double desired_final_speed,
         const Angle desired_final_orientation, const double delta_time,
+
         const double max_speed_meters_per_second,
         const double max_angular_speed_radians_per_second,
         const double max_acceleration_meters_per_second_squared,
-        const double max_angular_acceleration_meters_per_second_squared);
+        const double max_angular_acceleration_meters_per_second_squared,
+        const bool velocity_request                      = false,
+        const Vector requested_linear_velocty            = Vector(0, 0),
+        const AngularVelocity requested_angular_velocity = AngularVelocity());
 
     /**
      * Calculate robot angular velocities based on current robot polar state and

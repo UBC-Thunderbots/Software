@@ -23,7 +23,9 @@ MotionController::Velocity MotionController::bangBangVelocityController(
     const double max_speed_meters_per_second,
     const double max_angular_speed_radians_per_second,
     const double max_acceleration_meters_per_second_squared,
-    const double max_angular_acceleration_meters_per_second_squared)
+    const double max_angular_acceleration_meters_per_second_squared,
+    const bool velocity_request, const Vector requested_linear_velocty,
+    const AngularVelocity requested_angular_velocity)
 {
     MotionController::Velocity robot_velocities;
 
@@ -31,6 +33,11 @@ MotionController::Velocity MotionController::bangBangVelocityController(
     {
         throw std::invalid_argument(
             "GrSim Motion controller received a negative delta time");
+    }
+    else if (velocity_request)
+    {
+        robot_velocities.linear_velocity  = requested_linear_velocty;
+        robot_velocities.angular_velocity = requested_angular_velocity;
     }
     else if (delta_time == 0)
     {

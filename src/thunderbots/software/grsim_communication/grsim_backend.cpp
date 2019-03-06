@@ -60,7 +60,10 @@ void GrSimBackend::sendPrimitives(
                     motion_controller_command.final_orientation, delta_time.count(),
                     ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
                     ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
+                    motion_controller_command.velocity_request,
+                    motion_controller_command.requested_linear_velocity,
+                    motion_controller_command.requested_angular_velocity);
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
