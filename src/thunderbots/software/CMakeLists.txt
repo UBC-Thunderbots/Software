@@ -224,6 +224,29 @@ target_link_libraries(parameters  ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         )
 
+file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/direct_velocity_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/kick_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/chip_primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/primitive.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/dynamic_parameters.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/timestamp.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
+        )
+add_executable (xbox_controller_mapping
+        ${XBOX_CONTROLLER_MAPPING_SRC}
+        ${SHARED_UTIL_SRC}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
+target_link_libraries(xbox_controller_mapping
+        ${catkin_LIBRARIES}
+        )
+
+
 #############
 ## Testing ##
 #############
@@ -493,6 +516,38 @@ if (CATKIN_ENABLE_TESTING)
             util/timestamp.cpp
             )
     target_link_libraries(tactic_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
+
+    catkin_add_gtest(play_test
+            ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/play/play.cpp
+            ai/hl/stp/play/play_factory.cpp
+            ai/hl/stp/play/move_play.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            test/ai/hl/stp/play/main.cpp
+            test/ai/hl/stp/play/move_play.cpp
+            test/ai/hl/stp/play/play_factory.cpp
+            test/test_util/test_util.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/parameter/dynamic_parameters.cpp
+            util/timestamp.cpp
+            )
+    target_link_libraries(play_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES})
