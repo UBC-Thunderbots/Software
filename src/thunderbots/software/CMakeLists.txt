@@ -541,11 +541,11 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(play_test
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
-            ai/hl/stp/tactic/move_tactic.cpp
-            ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/play/move_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
-            ai/hl/stp/play/move_play.cpp
+            ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/primitive/move_primitive.cpp
@@ -563,7 +563,9 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/parameter/dynamic_parameters.cpp
-            util/timestamp.cpp
+            util/time/timestamp.cpp
+            util/time/time.cpp
+            util/time/duration.cpp
             )
     target_link_libraries(play_test
             ${catkin_LIBRARIES}
