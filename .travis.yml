@@ -41,18 +41,6 @@ install:
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
 
-after_success: 
-    # If Code Coverage ran, then upload the report. 
-    # Find and upload any code coverage reports that were generated.
-    # We do this from here because CodeCov's Travis-CI integration requires it 
-    # to be run directly within Travis (will not work from within the docker 
-    # container)
-    - bash <(curl -s https://codecov.io/bash)
-    # TODO: delete these
-    - find . -iname "*.gcov"
-    - find . -iname "*.gcda"
-    - find . -iname "*.gcno"
-
 env:
   # Global Variables that are set at the start of every CI run
   global:
