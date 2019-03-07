@@ -1,11 +1,11 @@
 #include "ai/ai.h"
 
-#include "ai/hl/stp/stp_hl.h"
+#include "ai/hl/stp/stp.h"
 #include "ai/navigator/placeholder_navigator/placeholder_navigator.h"
 
 AI::AI()
     : navigator(std::make_unique<PlaceholderNavigator>()),
-      high_level(std::make_unique<STP_HL>())
+      high_level(std::make_unique<STP>())
 {
 }
 
