@@ -6,7 +6,7 @@
 
 MRFBackend::MRFBackend()
     : dongle(MRFDongle()),
-      ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(1)))
+      ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)))
 {
 }
 

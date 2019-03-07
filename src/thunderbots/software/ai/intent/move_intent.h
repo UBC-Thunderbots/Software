@@ -26,6 +26,8 @@ class MoveIntent : public Intent, public MovePrimitive
 
     std::string getIntentName(void) const override;
 
+    void accept(IntentVisitor& visitor) const override;
+
     /**
      * Compares MoveIntents for equality. MoveIntents are considered equal if all
      * their member variables are equal.

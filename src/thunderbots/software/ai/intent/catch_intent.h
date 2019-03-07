@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ai/intent/intent.h"
-#include "ai/primitive/grsim_command_primitive_visitor_catch.h"
+#include "ai/primitive/catch_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 
@@ -26,6 +26,8 @@ class CatchIntent : public Intent, public CatchPrimitive
                          double ball_intercept_margin, unsigned int priority);
 
     std::string getIntentName(void) const override;
+
+    void accept(IntentVisitor& visitor) const override;
 
     /**
      * Compares CatchIntents for equality. CatchIntents are considered equal if all

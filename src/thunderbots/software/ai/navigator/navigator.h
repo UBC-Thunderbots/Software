@@ -29,7 +29,7 @@ class Navigator
      */
     virtual std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
-        const std::vector<std::unique_ptr<Intent>> &assignedIntents) const = 0;
+        const std::vector<std::unique_ptr<Intent>> &assignedIntents) = 0;
 
     virtual ~Navigator() = default;
 };
