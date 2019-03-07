@@ -4,6 +4,7 @@
 #include "ai/navigator/navigator.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
+#include "util/time/timestamp.h"
 
 /**
  * This class wraps all our AI logic and decision making to help separate our

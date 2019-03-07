@@ -14,7 +14,7 @@
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/ros_messages.h"
-#include "util/timestamp.h"
+#include "util/time/timestamp.h"
 
 int main(int argc, char** argv)
 {
