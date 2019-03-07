@@ -19,13 +19,13 @@ describe('paramsActions', () => {
             const expectedActions = [
                 {
                     payload: {
-                        settings: { color: 'blue' },
+                        params: { color: 'blue' },
                     },
-                    type: 'param_HYDRATE_PARAM',
+                    type: 'param_HYDRATE_PARAMS',
                 },
             ];
 
-            store.dispatch(paramsActions.hydrateROSParam({ color: 'blue' }));
+            store.dispatch(paramsActions.hydrateROSParams({ color: 'blue' }));
             expect(store.getActions()).toEqual(expectedActions);
         });
     });
@@ -38,13 +38,12 @@ describe('paramsActions', () => {
                         key: 'dog',
                         value: 'bark',
                     },
-                    type: 'param_SET_PARAM',
+                    type: 'param_UPDATE_PARAMS',
                 },
             ];
 
-            store.dispatch(paramsActions.setROSParam('dog', 'bark'));
+            store.dispatch(paramsActions.updateROSParams('dog', 'bark'));
             expect(store.getActions()).toEqual(expectedActions);
         });
     });
-    // How would I test getROSParam?
 });

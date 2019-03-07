@@ -7,29 +7,32 @@ import * as params from '../../actions/params';
 import paramsReducer from '../params';
 
 describe('settings reducer', () => {
-    describe('when we receive action param_HYDRATE_PARAM', () => {
+    describe('when we receive action param_HYDRATE_PARAMS', () => {
         it('should hydrate ROS params to state', () => {
-            const mockAction = params.hydrateROSParam({ color: 'blue' });
+            const mockAction = params.hydrateROSParams({ color: 'blue' });
 
             const state = paramsReducer(undefined, mockAction);
 
             expect(state['color']).toEqual('blue');
         });
     });
-    describe('when we receive action param_SET_PARAM', () => {
+    describe('when we receive action param_UPDATE_PARAMS', () => {
         it('should push ROS params to the state', () => {
-            const mockAction = params.setROSParam('testKey', 'testValue');
+            const mockAction = params.updateROSParams('testKey', 'testValue');
 
             const state = paramsReducer(undefined, mockAction);
 
             expect(state['testKey']).toEqual('testValue');
         });
     });
-    describe('when we receive action param_GET_PARAM', () => {
-        it('should retrieve a ROS param and return same state', () => {
-            const mockAction = params.getROSParam('retrieveKey');
+    describe('when we receive any other action', () => {
+        it('should return the same state', () => {
+            const mockAction = {
+                payload: null,
+                type: 'test_ACTION',
+            };
 
-            const state = paramsReducer(undefined, mockAction);
+            const state = paramsReducer(undefined, mockAction as any);
 
             expect(state).toEqual({ testKey: 'testValue' });
         });
