@@ -12,29 +12,28 @@ export default function* init() {
     yield takeEvery(getType(params.updateROSParams), updateROSParams);
 }
 
-let settingsStored = {};
+let rosParamsStored = {};
 
 /**
  * Hydrate ROS params upon starting
  */
 function* startROSParams() {
-    // Retrieve settings from local storage
-    const settingsStoredBuffer = localStorage.getItem('settings');
-    if (settingsStoredBuffer !== null) {
-        settingsStored = JSON.parse(settingsStoredBuffer);
-        // Put hydrateSettings action from item
-        yield put(settings.hydrateSettings(settingsStored));
+    // Retrieve settings from ROS param server
+    const rosParamsStoredString = localStorage.getItem('rosparams');
+    if (rosParamsStoredString !== null) {
+        rosParamsStored = JSON.parse(rosParamsStoredString);
+        // Put hydrateROSParams action from item
+        yield put(params.hydrateROSParams(rosParamsStored));
     }
 }
 
 /**
  * Update settings by putting into local storage
  */
-export function* updateROSParams(action: ReturnType<typeof settings.updateSettings>) {
-    // Use localStorage.setItem
-    settingsStored = {
-        ...settingsStored,
+export function* updateROSParams(action: ReturnType<typeof params.updateROSParams>) {
+    rosParamsStored = {
+        ...rosParamsStored,
         [action.payload.key]: action.payload.value,
     };
-    yield call(localStorage.setItem, 'settings', JSON.stringify(settingsStored));
+    yield call(localStorage.setItem, 'rosparams', JSON.stringify(rosParamsStored));
 }
