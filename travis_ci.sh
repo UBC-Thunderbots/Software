@@ -59,6 +59,11 @@ if [ "$RUN_TESTS" == "true" ] || \
     # Report the results of the tests
     # (which tests failed and why)
     travis_run catkin_test_results --verbose
+
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Upload coverage reports
+        bash <(curl -s https://codecov.io/bash)
+    fi
 fi
 
 # We need to run tests in order to get coverage

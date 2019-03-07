@@ -6,8 +6,7 @@
 #       significantly speed up CI times.                                #
 #########################################################################
 # Note: Setting `sudo` to `required` will add 20-50s to CI image boot time
-sudo: false
-dist: trusty
+sudo: false dist: trusty
 services:
   - docker
 language: generic
@@ -25,9 +24,11 @@ install:
     - RUN_TESTS=${RUN_TESTS:-"false"}
     - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
+    # Grab environment variables Codecov needs to run in the docker
+    - CODECOV_ENV=`bash <(curl -s https://codecov.io/env)`
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
-    - docker run 
+    - docker run $CODECOV_ENV
       --env RUN_BUILD
       --env RUN_TESTS
       --env RUN_COVERAGE
@@ -46,6 +47,10 @@ after_success:
     # to be run directly within Travis (will not work from within the docker 
     # container)
     - bash <(curl -s https://codecov.io/bash)
+    # TODO: delete these
+    - find . -iname "*.gcov"
+    - find . -iname "*.gcda"
+    - find . -iname "*.gcno"
 
 env:
   # Global Variables that are set at the start of every CI run
