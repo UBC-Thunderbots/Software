@@ -38,8 +38,8 @@ class MoveTestPlay : public Play
                                                         const World &world) override
     {
         auto move_test_tactic_friendly_goal = std::make_shared<MoveTestTactic>();
-        auto move_test_tactic_enemy_goal = std::make_shared<MoveTestTactic>();
-        auto move_test_tactic_center_field = std::make_shared<MoveTestTactic>();
+        auto move_test_tactic_enemy_goal    = std::make_shared<MoveTestTactic>();
+        auto move_test_tactic_center_field  = std::make_shared<MoveTestTactic>();
 
         do
         {
@@ -47,7 +47,8 @@ class MoveTestPlay : public Play
             move_test_tactic_enemy_goal->updateParams(world.field().enemyGoal());
             move_test_tactic_center_field->updateParams(Point(0, 0));
 
-            yield({move_test_tactic_center_field, move_test_tactic_friendly_goal, move_test_tactic_enemy_goal});
+            yield({move_test_tactic_center_field, move_test_tactic_friendly_goal,
+                   move_test_tactic_enemy_goal});
         } while (!move_test_tactic_center_field->done());
     }
 };

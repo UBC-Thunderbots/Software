@@ -1,14 +1,15 @@
 #include "test/ai/hl/stp/test_tactics/move_test_tactic.h"
-#include "ai/intent/move_intent.h"
 
 #include <algorithm>
+
+#include "ai/intent/move_intent.h"
 
 MoveTestTactic::MoveTestTactic() : Tactic() {}
 
 void MoveTestTactic::updateParams(Point destination)
 {
     // Update the parameters stored by this Tactic
-    this->destination       = destination;
+    this->destination = destination;
 }
 
 double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -25,6 +26,7 @@ std::unique_ptr<Intent> MoveTestTactic::calculateNextIntent(
 {
     do
     {
-        yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination, Angle::zero(), 0.0, 0));
+        yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
+                                           Angle::zero(), 0.0, 0));
     } while ((this->robot->position() - this->destination).len() > 0.01);
 }

@@ -1,7 +1,7 @@
 #include "ai/hl/stp/play/play.h"
 #include "ai/hl/stp/play/play_factory.h"
-#include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
 #include "geom/util.h"
+#include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
 
 /**
  * A test Play that stops 3 robots.
@@ -31,7 +31,9 @@ class StopTestPlay : public Play
 
     bool invariantHolds(const World &world) override
     {
-        return contains(Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos()), world.ball().position());
+        return contains(
+            Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos()),
+            world.ball().position());
     }
 
     std::vector<std::shared_ptr<Tactic>> getNextTactics(TacticCoroutine::push_type &yield,

@@ -1,9 +1,10 @@
 #pragma once
 
+#include <random>
+
 #include "ai/hl/hl.h"
 #include "ai/hl/stp/play/play.h"
 #include "ai/intent/intent.h"
-#include <random>
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that
@@ -19,7 +20,8 @@ class STP : public HL
      * @param random_seed The random seed used for STP's internal random number generator.
      * Defaults to the number of nanoseconds since the Linux epoch
      */
-    explicit STP(long random_seed=std::chrono::system_clock::now().time_since_epoch().count());
+    explicit STP(
+        long random_seed = std::chrono::system_clock::now().time_since_epoch().count());
 
     std::vector<std::unique_ptr<Intent>> getIntentAssignment(const World& world) override;
 
@@ -63,7 +65,7 @@ class STP : public HL
      */
     std::optional<std::string> getCurrentPlayName() const;
 
-private:
+   private:
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
     // The random number generator

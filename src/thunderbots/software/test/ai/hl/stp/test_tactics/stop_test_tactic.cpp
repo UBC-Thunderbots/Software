@@ -1,13 +1,12 @@
 #include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
-#include "ai/intent/stop_intent.h"
 
 #include <algorithm>
 
+#include "ai/intent/stop_intent.h"
+
 StopTestTactic::StopTestTactic() : Tactic() {}
 
-void StopTestTactic::updateParams()
-{
-}
+void StopTestTactic::updateParams() {}
 
 double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
@@ -16,11 +15,10 @@ double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world
 }
 
 std::unique_ptr<Intent> StopTestTactic::calculateNextIntent(
-        intent_coroutine::push_type &yield)
+    intent_coroutine::push_type &yield)
 {
     do
     {
         yield(std::make_unique<StopIntent>(this->robot->id(), false, 0));
     } while (this->robot->velocity().len() > 0.05);
 }
-

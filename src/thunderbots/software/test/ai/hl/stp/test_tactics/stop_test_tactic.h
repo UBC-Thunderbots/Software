@@ -9,7 +9,7 @@
  */
 class StopTestTactic : public Tactic
 {
-public:
+   public:
     /**
      * Creates a new StopTestTactic
      */
@@ -31,8 +31,7 @@ public:
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-private:
+   private:
     std::unique_ptr<Intent> calculateNextIntent(
-            intent_coroutine::push_type& yield) override;
+        intent_coroutine::push_type& yield) override;
 };
-
