@@ -45,7 +45,7 @@ fi
 if [ "$RUN_TESTS" == "true" ] || \
     [ "$RUN_COVERAGE" == "true" ]; then
     
-    if [ "$RUN_COVERAGE" == "true" ];
+    if [ "$RUN_COVERAGE" == "true" ]; then
         # Run tests for AI with coverage
         travis_run catkin_make run_tests -DENABLE_COVERAGE=ON
     else
