@@ -5,7 +5,6 @@
 #       does eventually add support, this should be changed, as it will #
 #       significantly speed up CI times.                                #
 #########################################################################
-
 # Note: Setting `sudo` to `required` will add 20-50s to CI image boot time
 sudo: false
 dist: trusty
@@ -41,10 +40,12 @@ install:
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
 
 after_success: 
-    # If Code Coverage ran, then upload the report. We do this from here because
-    # CodeCov's Travis-CI integration requires it to be run directly within
-    # Travis (will not work from within the docker container)
-    - ./codecov.sh
+    # If Code Coverage ran, then upload the report. 
+    # Find and upload any code coverage reports that were generated.
+    # We do this from here because CodeCov's Travis-CI integration requires it 
+    # to be run directly within Travis (will not work from within the docker 
+    # container)
+    - bash <(curl -s https://codecov.io/bash)
 
 env:
   # Global Variables that are set at the start of every CI run

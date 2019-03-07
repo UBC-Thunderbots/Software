@@ -14,11 +14,28 @@ find_package(PkgConfig REQUIRED)
 include(FindPkgConfig)
 
 ####################
+## Custom Options ##
+####################
+option(ENABLE_COVERAGE "Enable code profiling and coverage report analysis" OFF)
+
+####################
 ## Compiler Flags ##
 ####################
-
 ### Set cmake standard to c++ 17 ###
 set(CMAKE_CXX_STANDARD 17)
+
+### Flags to add for debug/release/coverage ###
+if(${ENABLE_COVERAGE})
+    message(STATUS "Building in Debug with profiling enabled")
+    # Add the required flags to build with profiling enabled
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-generate -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
+elseif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    # Build in release by default if nothing was specified on the command line
+    message(STATUS "Building in Release")
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
+endif()
 
 ### Set compiler flags for all code ###
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
