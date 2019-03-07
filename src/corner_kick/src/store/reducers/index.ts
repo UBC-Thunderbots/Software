@@ -5,6 +5,7 @@
 import { combineReducers } from 'redux';
 
 import consoleReducer from './console';
+import paramsReducer from './params';
 import rosReducer from './ros';
 
 /**
@@ -13,5 +14,6 @@ import rosReducer from './ros';
  */
 export default combineReducers({
     console: consoleReducer,
+    params: paramsReducer,
     ros: rosReducer,
 });

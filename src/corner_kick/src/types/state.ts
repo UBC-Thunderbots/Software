@@ -25,3 +25,10 @@ export interface IROSState {
 export interface IMessagesState {
     rosout: IRosoutMessage[];
 }
+
+/**
+ * The state object for ROS params
+ */
+export interface IROSSettings {
+    [key: string]: string;
+}

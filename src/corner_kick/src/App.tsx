@@ -18,7 +18,9 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
-            <Portal portalLocation={PortalLocation.SIDEBAR}>This is the sidebar</Portal>
+            <Portal portalLocation={PortalLocation.SIDEBAR}>
+                <button>Start AI logic</button>
+            </Portal>
             <Portal portalLocation={PortalLocation.MAIN}>This is main</Portal>
             <Portal portalLocation={PortalLocation.CONSOLE}>This is the console</Portal>
         </Theme>
