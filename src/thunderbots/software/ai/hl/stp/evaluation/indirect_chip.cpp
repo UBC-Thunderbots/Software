@@ -55,8 +55,7 @@ std::optional<Point> Evaluation::indirect_chip_and_chase_target(
                 .value());
 
         // Target should never be further away than maximum chip power
-        if ((target - ball_position).len() >
-            Util::DynamicParameters::Indirect_Chip_Evaluation::max_chip_power.value())
+        if ((target - ball_position).len() > Util::DynamicParameters::Indirect_Chip_Evaluation::max_chip_power.value())
         {
             target =
                 ball_position +

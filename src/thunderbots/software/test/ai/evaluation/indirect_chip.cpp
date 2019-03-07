@@ -31,45 +31,25 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_within_reach_
 TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_not_within_reach_test)
 {
     std::vector<Triangle> triangles;
-    Triangle t = {Point(5.2, 5.6), Point(5.8, 6), Point(6, 5.6)};
+    Triangle t = {Point(8, 5.9), Point(8.5, 6), Point(8.9, 5.9)};
     triangles.emplace_back(t);
 
     Point ball_position = Point(0, 0);
 
-    Point target = Point(17 / 3, 17.2 / 3);
+    Point target = Point(25.4 / 3, 17.8 / 3);
+    target       = target.norm((target - ball_position).len() * 0.85);
     target       = ball_position + (target - ball_position).norm(8.0);
 
-    EXPECT_EQ(target,
+    EXPECT_EQ(std::optional(target),
               Evaluation::indirect_chip_and_chase_target(triangles, ball_position));
 }
 
 
-TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_and_target_within_reach_test)
+TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_test)
 {
     std::vector<Triangle> triangles;
-    Triangle t = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
-    triangles.emplace_back(t);
 
     Point ball_position = Point(0, 0);
-
-    Robot enemy_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
-
-    EXPECT_EQ(std::nullopt,
-              Evaluation::indirect_chip_and_chase_target(triangles, ball_position));
-}
-
-
-TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_and_target_not_within_reach_test)
-{
-    std::vector<Triangle> triangles;
-    Triangle t = {Point(5.2, 5.6), Point(5.8, 6), Point(6, 5.6)};
-    triangles.emplace_back(t);
-
-    Point ball_position = Point(0, 0);
-
-    Robot enemy_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromMilliseconds(0));
 
     EXPECT_EQ(std::nullopt,
               Evaluation::indirect_chip_and_chase_target(triangles, ball_position));
