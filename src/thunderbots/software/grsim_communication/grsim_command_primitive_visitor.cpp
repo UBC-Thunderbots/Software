@@ -79,25 +79,31 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    // Determine if robot is at least 1 robot radius from the given location
-    if ((chip_primitive.getChipOrigin() - robot.position()).len() >= 1)
+    Point chip_origin    = chip_primitive.getChipOrigin();
+    Angle chip_direction = chip_primitive.getChipDirection();
+
+    double final_speed_at_destination = 0.0;
+    Point perp_line_to_shot = chip_origin + Point::createFromAngle(chip_direction).perp();
+    double dest_behind_x    = -cos(chip_direction.toDegrees());
+    double dest_behind_y    = -sin(chip_direction.toDegrees());
+    Point dest_behind       = chip_origin + Vector(dest_behind_x, dest_behind_y);
+
+    // If current distance between robot and line perpendicular to shot is
+    // less than distance between destination behind shot and line perpendicular to shot
+    // while robot is in same direction as shot, can go for the shot
+    if (!(offsetToLine(chip_origin, dest_behind, robot.position()) <=
+              ROBOT_MAX_RADIUS_METERS &&
+          offsetToLine(chip_origin, perp_line_to_shot, robot.position()) <=
+              offsetToLine(chip_origin, perp_line_to_shot, dest_behind)))
     {
-        // Move in a straight line directly behind the robot
-        Point destBehind;
-        destBehind = chip_primitive.getChipOrigin();
-        destBehind.set(destBehind.x() - 0.5, destBehind.y() - 0.5);
-
         motion_controller_command = MotionController::MotionControllerCommand(
-            destBehind, chip_primitive.getChipDirection(), 0.0,
-            chip_primitive.getChipDistance(), true, false);
-
-        // Move forward to chip
-        Point destForward;
-        destForward = chip_primitive.getChipOrigin();
-        destForward.set(destForward.x() + 0.5, destForward.y() + 0.5);
-
+            dest_behind, chip_direction, 0.0, chip_primitive.getChipDistance(), true,
+            false);
+    }
+    else
+    {
         motion_controller_command = MotionController::MotionControllerCommand(
-            destForward, chip_primitive.getChipDirection(), 0.0,
+            chip_origin, chip_direction, final_speed_at_destination,
             chip_primitive.getChipDistance(), true, false);
     }
 }
@@ -150,19 +156,18 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     Angle kick_direction = kick_primitive.getKickDirection();
 
     double final_speed_at_destination = 0.0;
-    Point perp_line_to_shot           = Point::createFromAngle(kick_direction.quarter());
-    Point normal_line_to_shot         = Point::createFromAngle(kick_direction.half());
-    double dest_behind_x              = -cos(kick_direction.toDegrees());
-    double dest_behind_y              = -sin(kick_direction.toDegrees());
-    Point dest_behind = kick_origin + Vector(dest_behind_x, dest_behind_y);
+    Point perp_line_to_shot = kick_origin + Point::createFromAngle(kick_direction).perp();
+    double dest_behind_x    = -cos(kick_direction.toDegrees());
+    double dest_behind_y    = -sin(kick_direction.toDegrees());
+    Point dest_behind       = kick_origin + Vector(dest_behind_x, dest_behind_y);
 
-    // If current distance between robot and line perpendicular to direction of shot is
-    // less than that of between destination behind shot and the same perpendicular line
+    // If current distance between robot and line perpendicular to shot is
+    // less than distance between destination behind shot and line perpendicular to shot
     // while robot is in same direction as shot, can go for the shot
-    if (!(abs(offsetToLine(kick_origin, perp_line_to_shot, robot.position())) <=
-              abs(offsetToLine(kick_origin, perp_line_to_shot,
-                               Point(dest_behind_x, dest_behind_y))) &&
-          offsetToLine(kick_origin, dest_behind, robot.position()) <= 0))
+    if (!(offsetToLine(kick_origin, dest_behind, robot.position()) <=
+              ROBOT_MAX_RADIUS_METERS &&
+          offsetToLine(kick_origin, perp_line_to_shot, robot.position()) <=
+              offsetToLine(kick_origin, perp_line_to_shot, dest_behind)))
     {
         motion_controller_command = MotionController::MotionControllerCommand(
             dest_behind, kick_direction, 0.0, kick_primitive.getKickSpeed(), false,
