@@ -589,6 +589,39 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES})
 
+    catkin_add_gtest(stp_test
+            ai/hl/stp/stp.cpp
+            ai/hl/stp/tactic/tactic.cpp
+            test/ai/hl/stp/test_tactics/move_test_tactic.cpp
+            test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
+            ai/hl/stp/play/play.cpp
+            ai/hl/stp/play/play_factory.cpp
+            test/ai/hl/stp/test_plays/move_test_play.cpp
+            test/ai/hl/stp/test_plays/stop_test_play.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            test/ai/hl/stp/main.cpp
+            test/ai/hl/stp/stp.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/timestamp.cpp
+            geom/util.cpp
+            test/test_util/test_util.cpp
+            )
+    target_link_libraries(stp_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
+
     catkin_add_gtest(intent_test
             ai/intent/catch_intent.cpp
             ai/intent/chip_intent.cpp
