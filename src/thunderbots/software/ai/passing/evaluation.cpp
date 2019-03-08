@@ -2,8 +2,6 @@
  * Implementation of evaluation functions for passing
  */
 
-// TODO: If this file gets too big we should break it up
-
 #include "ai/passing/evaluation.h"
 
 #include <numeric>
@@ -106,8 +104,6 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // We assume that the enemy continues moving at it's current velocity until the
     // pass starts
 
-    // TODO: Some of the variable names here are real long and a bit ugly
-
     // We force any negative duration to 0 here
     Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
 
@@ -123,14 +119,19 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     Point closest_point_on_pass_to_robot = closestPointOnSeg(
         enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
     Duration enemy_robot_time_to_closest_pass_point =
-        getTimeToPositionForRobot(enemy_robot, closest_point_on_pass_to_robot);
+            getTimeToPositionForRobot(enemy_robot,
+                                      closest_point_on_pass_to_robot,
+                                      ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                      ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
     Duration enemy_robot_time_to_pass_receive_position =
-        getTimeToPositionForRobot(enemy_robot, pass.receiverPoint());
+            getTimeToPositionForRobot(enemy_robot, pass.receiverPoint(),
+                                      ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                      ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
     double robot_ball_time_diff_at_closest_pass_point =
@@ -151,8 +152,6 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
                           max_time_diff_unsmooth) +
                  std::exp(robot_ball_time_diff_at_pass_receive_point -
                           max_time_diff_unsmooth));
-
-    // TODO: Sigmoid width here should be a dynamic parameter
 
     // Whether or not the enemy will be able to intercept the pass can be determined
     // by whether or not they will be able to reach the pass receive position before
@@ -192,15 +191,18 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
 
     // Figure out how long it would take our robot to get there
     Duration min_robot_travel_time =
-        getTimeToPositionForRobot(best_receiver, pass.receiverPoint());
+            getTimeToPositionForRobot(best_receiver, pass.receiverPoint(),
+                                      ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                      ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_point =
         best_receiver.lastUpdateTimestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
-    // TODO: should we flip passer and receiver point here??
     Angle receive_angle = (best_receiver.position() - pass.passerPoint()).orientation();
     Duration time_to_receive_angle =
-        getTimeToOrientationForRobot(best_receiver, receive_angle);
+            getTimeToOrientationForRobot(best_receiver, receive_angle,
+                                         ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+                                         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.lastUpdateTimestamp() + time_to_receive_angle;
 
@@ -214,8 +216,10 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
                    latest_time_to_reciever_state.getSeconds() + 0.5, 1);
 }
 
-Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot,
-                                                   const Angle& desired_orientation)
+Duration AI::Passing::getTimeToOrientationForRobot(const Robot &robot,
+                                                   const Angle &desired_orientation,
+                                                   const double &max_velocity,
+                                                   const double &max_acceleration)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -231,30 +235,30 @@ Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot,
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
     double dist      = robot.orientation().minDiff(desired_orientation).toRadians();
-    double max_accel = ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED;
-    double max_vel   = ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND;
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
-    double dist_to_max_possible_vel = std::pow(max_vel / max_accel, 2) * max_accel / 2;
+    double dist_to_max_possible_vel = std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
 
     // Calculate how long we'll accelerate for using (3), taking into account that we
     // might not actually reach the max velocity if it will take too much distance
     double acceleration_time =
-        std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_accel);
+        std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_acceleration);
 
     // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_vel = std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_vel;
+    double time_at_max_velocity = std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
 
     // The time taken to get to the target angle is:
     // time to accelerate + time at the max velocity + time to de-accelerate
     // Note that the acceleration time is the same as a de-acceleration time
-    double travel_time = 2 * acceleration_time + time_at_max_vel;
+    double travel_time = 2 * acceleration_time + time_at_max_velocity;
 
     return Duration::fromSeconds(travel_time);
 }
 
-Duration AI::Passing::getTimeToPositionForRobot(const Robot& robot, const Point& dest)
+Duration AI::Passing::getTimeToPositionForRobot(const Robot &robot, const Point &dest,
+                                                const double &max_velocity,
+                                                const double &max_acceleration)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -270,25 +274,23 @@ Duration AI::Passing::getTimeToPositionForRobot(const Robot& robot, const Point&
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
     double dist      = (robot.position() - dest).len();
-    double max_accel = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    double max_vel   = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
-    double dist_to_max_possible_vel = std::pow(max_vel / max_accel, 2) * max_accel / 2;
+    double dist_to_max_possible_vel = std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
 
     // Calculate how long we'll accelerate for using (3), taking into account that we
     // might not actually reach the max velocity if it will take too much distance
     double acceleration_time =
-        std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_accel);
+        std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_acceleration);
 
     // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_vel = std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_vel;
+    double time_at_max_velocity = std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
 
     // The time taken to get to the receiver point is:
     // time to accelerate + time at the max velocity + time to de-accelerate
     // Note that the acceleration time is the same as a de-acceleration time
-    double travel_time = 2 * acceleration_time + time_at_max_vel;
+    double travel_time = 2 * acceleration_time + time_at_max_velocity;
 
     return Duration::fromSeconds(travel_time);
 }

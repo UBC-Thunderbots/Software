@@ -11,8 +11,6 @@
 
 using namespace AI::Passing;
 
-// TODO: performance tests? That's gonna be tricky........
-
 class PassGeneratorTest : public testing::Test
 {
    protected:

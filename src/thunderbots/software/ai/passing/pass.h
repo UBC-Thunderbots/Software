@@ -13,7 +13,6 @@
 
 namespace AI::Passing
 {
-    // TODO: simple test for getters
     /**
      * This class represents a Pass, with a given start position, end position,
      * speed, and start time

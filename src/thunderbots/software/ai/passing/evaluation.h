@@ -15,7 +15,6 @@
 
 namespace AI::Passing
 {
-    // TODO: log-sum-exp function with bounds??
     /**
      * Rate pass based on the probability of scoring once we receive the pass
      *
@@ -29,7 +28,6 @@ namespace AI::Passing
      */
     double ratePassShootScore(Field field, Team enemy_team, AI::Passing::Pass pass);
 
-    // TODO: better name for this function?
     /**
      * Calculates the risk of an enemy robot interfering with a given pass
      *
@@ -67,7 +65,6 @@ namespace AI::Passing
     double calculateInterceptRisk(Robot enemy_robot, const Pass& pass);
 
 
-    // TODO: better name for this function?
     /**
      * Calculate the probability of a friendly robot receiving the given pass
      *
@@ -78,7 +75,7 @@ namespace AI::Passing
      * @param pass The pass we want a robot to receive
      *
      * @return A value in [0,1] indicating how likely it would be for a robot on the
-     *         friendly team to recive the given pass, with 1 being very likely, 0
+     *         friendly team to recieve the given pass, with 1 being very likely, 0
      *         being impossible
      */
     double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass);
@@ -88,11 +85,16 @@ namespace AI::Passing
      *
      * @param robot The robot to calculate the rotation time for
      * @param desired_orientation The orientation which we want the robot to be at
+     * @param max_velocity The maximum angular velocity that robot can turn at (rad/s)
+     * @param max_acceleration The maximum angular rate at which the robot can
+     *                             accelerate (rad/s^2)
      *
      * @return The time required for the given robot to rotate to the given orientation
      */
-    Duration getTimeToOrientationForRobot(const Robot& robot,
-                                          const Angle& desired_orientation);
+    Duration getTimeToOrientationForRobot(const Robot &robot,
+                                          const Angle &desired_orientation,
+                                          const double &max_velocity,
+                                          const double &max_acceleration);
 
     /**
      * Calculate minimum time it would take for the given robot to reach the given point
@@ -101,12 +103,15 @@ namespace AI::Passing
      *
      * @param robot The robot to calculate the time for
      * @param dest The destination that the robot is going to
+     * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
+     * @param max_acceleration The maximum acceleration of the robot (m/s^2)
      *
      * @return The minimum theoretical time it would take the robot to reach the dest
      * point
      */
-    // TODO: `Timestamp` should really be `duration` here
-    Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest);
+    Duration getTimeToPositionForRobot(const Robot &robot, const Point &dest,
+                                       const double &max_velocity,
+                                       const double &max_acceleration);
 
     /**
      * Calculates the static position quality for a given position on a given field
