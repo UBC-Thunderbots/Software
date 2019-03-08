@@ -15,6 +15,8 @@ class StopTestTactic : public Tactic
      */
     explicit StopTestTactic();
 
+    std::string getName() const override;
+
     /**
      * Updates the parameters for this StopTestTactic.
      */

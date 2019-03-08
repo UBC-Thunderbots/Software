@@ -15,6 +15,8 @@ class MoveTestTactic : public Tactic
      */
     explicit MoveTestTactic();
 
+    std::string getName() const override;
+
     /**
      * Updates the parameters for this MoveTestTactic.
      *

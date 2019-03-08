@@ -6,6 +6,10 @@
 
 StopTestTactic::StopTestTactic() : Tactic() {}
 
+std::string StopTestTactic::getName() const {
+    return "Stop Test Tactic";
+}
+
 void StopTestTactic::updateParams() {}
 
 double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world)
