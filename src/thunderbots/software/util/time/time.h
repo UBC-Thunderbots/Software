@@ -2,6 +2,8 @@
 
 /**
  * A simple Time class that represents some amount of Time
+ *
+ * This class should not be used directly, rather, you should use one of it's subclasses
  */
 class Time
 {
@@ -22,115 +24,38 @@ class Time
     Time();
 
     /**
-     * Creates a new Time value from a value in seconds.
-     * @param seconds A value in seconds, from which to create the Time
-     * @return A Time created from the given value
-     */
-    static const Time fromSeconds(double seconds);
-
-    /**
-     * Creates a new Time value from a value in milliseconds
-     * @param milliseconds A value in milliseconds, from which to create the
-     * Time
-     * @return A Time created from the given value
-     */
-    static const Time fromMilliseconds(double milliseconds);
-
-    /**
      * Returns the value of the Time in seconds
+     *
      * @return the value of the Time in seconds
      */
     double getSeconds() const;
 
     /**
      * Returns the value of the Time in milliseconds
+     *
      * @return the value of the Time in milliseconds
      */
     double getMilliseconds() const;
 
     /**
-     * Compares Times for equality. Times are considered equal if their values
-     * in seconds are within EPSILON from one another.
+     * Destructor
      *
-     * @param other the Time to compare with for equality
-     * @return true if the Times are equal and false otherwise
-     */
-    bool operator==(const Time& other) const;
-
-    /**
-     * Compares Times for inequality
+     * We declare this virtual because no one should use this class directly, but instead
+     * should use one of it's subclasses.
      *
-     * @param other the Time to compare with for inequality
-     * @return true if the Times are not equal, and false otherwise
+     * Note however that we give it an implementation, so subclasses will by default not
+     * be abstract.
      */
-    bool operator!=(const Time& other) const;
-
-    /**
-     * Defines the "less than" operator. Returns true if this Time is strictly less
-     * than (and not equal to) the other Time
-     *
-     * @param other the Time to compare with
-     * @return true if this Time is strictly less than (and not equal to) the other
-     * Time, and false otherwise
-     */
-    bool operator<(const Time& other) const;
-
-    /**
-     * Defines the "less than or equal to" operator. Returns true if this Time is
-     * less than or equal to the other Time
-     *
-     * @param other the Time to compare with
-     * @return true if this Time is less than or equal to the other Time, and
-     * false otherwise
-     */
-    bool operator<=(const Time& other) const;
-
-    /**
-     * Defines the "greater than" operator. Returns true if this Time is strictly
-     * greater than (and not equal to) the other Time
-     *
-     * @param other the Time to compare with
-     * @return true if this Time is strictly greater than (and not equal to) the
-     * other Time, and false otherwise
-     */
-    bool operator>(const Time& other) const;
-
-    /**
-     * Defines the "greater than or equal to" operator. Returns true if this Time
-     * is greater than or equal to the other Time
-     *
-     * @param other the Time to compare with
-     * @return true if this Time is greater than or equal to the other Time, and
-     * false otherwise
-     */
-    bool operator>=(const Time& other) const;
-
-    /**
-     * Defines the addition operator for Times. Allows Times to be added to
-     * Times
-     *
-     * @param time the time to add to this Time
-     * @return A new Time with the given Time added to this Time
-     */
-    Time operator+(const Time& time) const;
-
-    /**
-     * Defines the subtraction operator for Times. Allows Times to be subtracted
-     * from Times
-     *
-     * @param time the Time to subtract from this Time
-     * @return A new Time with the given Time subtracted from this current
-     * Time
-     */
-    Time operator-(const Time& time) const;
+    virtual ~Time() = 0;
 
    protected:
     /**
      * Constructs a Time value from a value in seconds.
-     * @param Time_seconds A value in seconds, from which to create the
+     *
+     * @param time_seconds A value in seconds, from which to create the
      * Time
      */
-    explicit Time(double Time_seconds);
+    explicit Time(double time_seconds);
 
    private:
     // The stored internal value of the Time, in seconds

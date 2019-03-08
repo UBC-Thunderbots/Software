@@ -28,8 +28,37 @@ const Timestamp Timestamp::fromMilliseconds(double milliseconds)
 
 Timestamp Timestamp::operator+(const Duration &duration) const
 {
-    // TODO
     return Timestamp::fromSeconds(getSeconds() + duration.getSeconds());
+}
+
+bool Timestamp::operator==(const Timestamp &other) const
+{
+    return std::fabs(other.getSeconds() - getSeconds()) < EPSILON;
+}
+
+bool Timestamp::operator!=(const Timestamp &other) const
+{
+    return !(*this == other);
+}
+
+bool Timestamp::operator<(const Timestamp &other) const
+{
+    return (*this != other) && (getSeconds() < other.getSeconds());
+}
+
+bool Timestamp::operator>=(const Timestamp &other) const
+{
+    return !(*this < other);
+}
+
+bool Timestamp::operator>(const Timestamp &other) const
+{
+    return (*this != other) && (getSeconds() > other.getSeconds());
+}
+
+bool Timestamp::operator<=(const Timestamp &other) const
+{
+    return !(*this > other);
 }
 
 Timestamp Timestamp::operator-(const Duration &duration) const

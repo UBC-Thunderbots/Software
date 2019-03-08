@@ -34,10 +34,22 @@ TEST(DurationTest, create_duration_from_negative_milliseconds)
     EXPECT_DOUBLE_EQ(duration.getMilliseconds(), -125);
 }
 
+TEST(DurationTest, create_duration_from_positive_milliseconds)
+{
+    Duration duration = Duration::fromMilliseconds(125);
+    EXPECT_DOUBLE_EQ(duration.getMilliseconds(), 125);
+}
+
 TEST(DurationTest, get_seconds_duration_in_milliseconds)
 {
     Duration duration = Duration::fromSeconds(5);
     EXPECT_DOUBLE_EQ(duration.getMilliseconds(), 5000);
+}
+
+TEST(DurationTest, get_seconds_duration_in_seconds)
+{
+    Duration duration = Duration::fromSeconds(5);
+    EXPECT_DOUBLE_EQ(duration.getSeconds(), 5);
 }
 
 TEST(DurationTest, create_millisecond_duration_in_seconds)

@@ -30,6 +30,63 @@ class Duration : public Time
     static const Duration fromMilliseconds(double milliseconds);
 
     /**
+     * Compares Durations for equality. Durations are considered equal if their values
+     * in seconds are within EPSILON from one another.
+     *
+     * @param other the Duration to compare with for equality
+     * @return true if the Durations are equal and false otherwise
+     */
+    bool operator==(const Duration& other) const;
+
+    /**
+     * Compares Durations for inequality
+     *
+     * @param other the Duration to compare with for inequality
+     * @return true if the Durations are not equal, and false otherwise
+     */
+    bool operator!=(const Duration& other) const;
+
+    /**
+     * Defines the "less than" operator. Returns true if this Duration is strictly less
+     * than (and not equal to) the other Duration
+     *
+     * @param other the Duration to compare with
+     * @return true if this Duration is strictly less than (and not equal to) the other
+     * Duration, and false otherwise
+     */
+    bool operator<(const Duration& other) const;
+
+    /**
+     * Defines the "less than or equal to" operator. Returns true if this Duration is
+     * less than or equal to the other Duration
+     *
+     * @param other the Duration to compare with
+     * @return true if this Duration is less than or equal to the other Duration, and
+     * false otherwise
+     */
+    bool operator<=(const Duration& other) const;
+
+    /**
+     * Defines the "greater than" operator. Returns true if this Duration is strictly
+     * greater than (and not equal to) the other Duration
+     *
+     * @param other the Duration to compare with
+     * @return true if this Duration is strictly greater than (and not equal to) the
+     * other Duration, and false otherwise
+     */
+    bool operator>(const Duration& other) const;
+
+    /**
+     * Defines the "greater than or equal to" operator. Returns true if this Duration
+     * is greater than or equal to the other Duration
+     *
+     * @param other the Duration to compare with
+     * @return true if this Duration is greater than or equal to the other Duration, and
+     * false otherwise
+     */
+    bool operator>=(const Duration& other) const;
+
+    /**
      * Defines the addition operator for Durations. Allows Durations to be added to
      * Durations
      *
@@ -51,8 +108,8 @@ class Duration : public Time
    private:
     /**
      * Constructs a Duration value from a value in seconds.
-     * @param timestamp_seconds A value >= 0.0, in seconds, from which to create the
-     * timestamp
+     * @param duration_seconds A value >= 0.0, in seconds, from which to create the
+     *                         Duration
      */
-    explicit Duration(double timestamp_seconds);
+    explicit Duration(double duration_seconds);
 };

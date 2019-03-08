@@ -14,11 +14,28 @@ find_package(PkgConfig REQUIRED)
 include(FindPkgConfig)
 
 ####################
+## Custom Options ##
+####################
+option(ENABLE_COVERAGE "Enable code profiling and coverage report analysis" OFF)
+
+####################
 ## Compiler Flags ##
 ####################
-
 ### Set cmake standard to c++ 17 ###
 set(CMAKE_CXX_STANDARD 17)
+
+### Flags to add for debug/release/coverage ###
+if(${ENABLE_COVERAGE})
+    message(STATUS "Building in Debug with profiling enabled")
+    # Add the required flags to build with profiling enabled
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Debug")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-generate -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fprofile-arcs")
+elseif(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    # Build in release by default if nothing was specified on the command line
+    message(STATUS "Building in Release")
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
+endif()
 
 ### Set compiler flags for all code ###
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
@@ -453,15 +470,12 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG})
 
     catkin_add_gtest(time_test
+            test/util/time/duration.cpp
             test/util/time/main.cpp
             test/util/time/timestamp.cpp
-            test/util/time/time.cpp
-            test/util/time/duration.cpp
-            util/time/time.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-            util/time/time.cpp
             )
     target_link_libraries(time_test ${catkin_LIBRARIES})
 
@@ -527,6 +541,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
+            test/ai/hl/stp/tactic/tactic.cpp
             test/test_util/test_util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
@@ -543,11 +558,11 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(play_test
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
-            ai/hl/stp/tactic/move_tactic.cpp
-            ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/play/move_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
-            ai/hl/stp/play/move_play.cpp
+            ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/primitive/move_primitive.cpp
@@ -565,7 +580,9 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/parameter/dynamic_parameters.cpp
-            util/timestamp.cpp
+            util/time/timestamp.cpp
+            util/time/time.cpp
+            util/time/duration.cpp
             )
     target_link_libraries(play_test
             ${catkin_LIBRARIES}
@@ -642,12 +659,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(navigator_test
-            ai/world/ball.cpp
-            ai/world/field.cpp
-            ai/world/robot.cpp
-            ai/world/game_state.cpp
-            ai/world/team.cpp
-            ai/world/world.cpp
             ai/intent/catch_intent.cpp
             ai/intent/chip_intent.cpp
             ai/intent/direct_velocity_intent.cpp
@@ -659,6 +670,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/movespin_intent.cpp
             ai/intent/pivot_intent.cpp
             ai/intent/stop_intent.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -670,14 +682,19 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/pivot_primitive.cpp
             ai/primitive/primitive.cpp
             ai/primitive/stop_primitive.cpp
-            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
-            test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
             test/ai/navigator/main.cpp
+            test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
-            util/time/timestamp.cpp
-            util/time/time.cpp
             util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}
