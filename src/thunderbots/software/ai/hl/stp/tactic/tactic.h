@@ -88,6 +88,13 @@ class Tactic
      */
     std::unique_ptr<Intent> getNextIntent();
 
+    /**
+     * Returns the name of the Tactic
+     *
+     * @return the name of the Tactic
+     */
+    virtual std::string getName() const = 0;
+
     virtual ~Tactic() = default;
 
    protected:
