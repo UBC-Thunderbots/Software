@@ -16,29 +16,34 @@ namespace Evaluation
     using Triangle = Poly<3>;
 
     /**
-     * Returns the target point that the chipper will shoot at and the chaser will meet
-     * ball at. Given the enemy team robot's positions, filters and creates a vector of
-     * triangles to be used as a parameter. The target is where ball will land according
-     * to chipping calibration.
+     * Returns the target point that the chipper and chaser will chip and chase at.
      *
-     * @param World Object
+     * Given the enemy team robot's positions, filters and creates a vector of
+     * triangles to be used as a parameter. The target point is where ball will land
+     * according to chipping calibration, as well as where the chaser will meet the ball
+     * at.
      *
-     * @return Point to chip and chase at; If empty, point is not valid
+     * @param world The world in which we want to find the target point
+     *
+     * @return Point to chip and chase at; If null, the target triangles were empty
      */
-    std::optional<Point> indirect_chip_and_chase_target(const World& world);
+    std::optional<Point> indirectChipAndChaseTarget(const World& world);
 
     /**
-     * Returns the target point that the chipper will shoot at and the chaser will meet
-     * ball at. Given the filtered vector of triangles, determines if the triangles are
-     * empty and if the largest triangle is within reach. The target is where ball will
-     * land according to chipping calibration.
+     * Returns the target point that the chipper and chaser will chip and chase at.
+     *
+     * Given the vector of triangles without enemy robots, determines if the triangles are
+     * empty and if the largest triangle is within reach. If not within reach, scale the
+     * target point with the maximum chip power. The target point is
+     * where ball will land according to chipping calibration, as well as where the chaser
+     * will meet the ball at.
      *
      * @param triangles A vector of triangles that is already filtered
      * @param ball_position Position of the ball
      *
-     * @return Point to chip and chase at; If empty, point is not valid
+     * @return Point to chip and chase at; If null, the target triangles were empty
      */
-    std::optional<Point> indirect_chip_and_chase_target(
+    std::optional<Point> indirectChipAndChaseTarget(
         const std::vector<Triangle>& triangles, Point ball_position);
 
     /**
@@ -46,7 +51,7 @@ namespace Evaluation
      * list of all non-goalie enemy players as well as the four points returned by
      * get_chip_area_target_corners.
      *
-     * @param World Object
+     * @param world The world in which we want to find the target point
      * @param enemy_players
      *
      * @return Vector of triangles
@@ -80,7 +85,7 @@ namespace Evaluation
      * Remove all Triangles in a given list whose centers do not fall
      * within the rectangle returned by get_chip_target_area.
      *
-     * @param World Object
+     * @param world The world in which we want to find the target point
      * @param triangles
      *
      * @return Valid triangles
@@ -94,12 +99,12 @@ namespace Evaluation
      * All points are 'inset' distance away from each edge of the field to allow a
      * buffer for catching and prevent ball from leaving the field.
      *
-     * @param World Object
+     * @param world The world in which we want to find the target point
      * @param inset Distance away from each edge of field
      *
      * @return Four points for rectangle
      */
-    std::vector<Point> get_chip_target_area_corners(const World& world, double inset);
+    std::vector<Point> findBestChipTargetArea(const World &world, double inset);
 
     /**
      * Given a vector of triangles, returns the largest triangles with area greater
@@ -113,9 +118,9 @@ namespace Evaluation
      * @return Largest triangle
      * @return valid Largest triangle is found
      */
-    std::pair<Triangle, bool> get_largest_triangle(std::vector<Triangle> allTriangles,
-                                                   double min_area       = 0,
-                                                   double min_edge_len   = 0,
-                                                   double min_edge_angle = 0);
+    std::optional<Triangle> getLargestValidTriangle(std::vector<Triangle> allTriangles,
+                                                    double min_area = 0,
+                                                    double min_edge_len = 0,
+                                                    double min_edge_angle = 0);
 
 };  // namespace Evaluation

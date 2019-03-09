@@ -24,7 +24,7 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_within_reach_
     target       = target.norm((target - ball_position).len() * 0.85);
 
     EXPECT_EQ(target,
-              Evaluation::indirect_chip_and_chase_target(triangles, ball_position));
+              Evaluation::indirectChipAndChaseTarget(triangles, ball_position));
 }
 
 
@@ -41,7 +41,7 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_not_within_re
     target       = ball_position + (target - ball_position).norm(8.0);
 
     EXPECT_EQ(std::optional(target),
-              Evaluation::indirect_chip_and_chase_target(triangles, ball_position));
+              Evaluation::indirectChipAndChaseTarget(triangles, ball_position));
 }
 
 
@@ -52,7 +52,7 @@ TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_test)
     Point ball_position = Point(0, 0);
 
     EXPECT_EQ(std::nullopt,
-              Evaluation::indirect_chip_and_chase_target(triangles, ball_position));
+              Evaluation::indirectChipAndChaseTarget(triangles, ball_position));
 }
 
 
@@ -157,7 +157,7 @@ TEST(GetChipTargetAreaCornersTest, get_chip_target_area_corners_test)
     corners.push_back(Point(fieldX, negFieldY));
     corners.push_back(Point(fieldX, posFieldY));
 
-    EXPECT_EQ(corners, Evaluation::get_chip_target_area_corners(test_world, inset));
+    EXPECT_EQ(corners, Evaluation::findBestChipTargetArea(test_world, inset));
 }
 
 
@@ -174,5 +174,5 @@ TEST(GetLargestTriangleTest, get_largest_triangle_test)
     bool valid       = true;
 
     std::pair<Triangle, bool> test_pair = std::make_pair(largest, valid);
-    EXPECT_EQ(test_pair, Evaluation::get_largest_triangle(allTriangles, 0, 0, 0));
+    EXPECT_EQ(test_pair, Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
 }

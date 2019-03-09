@@ -6,7 +6,7 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-std::optional<Point> Evaluation::indirect_chip_and_chase_target(const World& world)
+std::optional<Point> Evaluation::indirectChipAndChaseTarget(const World& world)
 {
     std::optional<Robot> enemy_goalie_opt = world.enemyTeam().goalie();
 
@@ -32,24 +32,28 @@ std::optional<Point> Evaluation::indirect_chip_and_chase_target(const World& wor
 
     Point ball_position = world.ball().position();
 
-    return indirect_chip_and_chase_target(target_triangles, ball_position);
+    return indirectChipAndChaseTarget(target_triangles, ball_position);
 }
 
-
-std::optional<Point> Evaluation::indirect_chip_and_chase_target(
+std::optional<Point> Evaluation::indirectChipAndChaseTarget(
     const std::vector<Triangle>& triangles, Point ball_position)
 {
     if (!triangles.empty())
     {
-        std::pair<Triangle, bool> largest_triangle = get_largest_triangle(
-            triangles,
-            Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_area.value(),
-            Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_edge_len
-                .value());
-        Triangle t = largest_triangle.first;
+        // Get the largest triangle within the vector of triangles that has area greater
+        // than minimum area of chip target triangle, and all edge lengths greater than
+        // minimum edge length of chip target triangle
+        std::optional<Triangle> largest_triangle = getLargestValidTriangle(
+                triangles,
+                Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_area.value(),
+                Util::DynamicParameters::Indirect_Chip_Evaluation::min_chip_tri_edge_len
+                        .value());
+        Triangle t = largest_triangle.value();
 
         Point target = get_triangle_center_and_area(t).first;
-        target       = target.norm(
+        // Adjust the target point to have a length of distance between itself and the
+        // ball's position, then scaling it by a certain percentage
+        target = target.norm(
             (target - ball_position).len() *
             Util::DynamicParameters::Indirect_Chip_Evaluation::chip_cherry_power_downscale
                 .value());
@@ -91,6 +95,11 @@ std::vector<Triangle> Evaluation::get_all_triangles(const World& world,
         {
             for (unsigned int k = j + 1; k < allPts.size(); k++)
             {
+                // Set up 3 different points from the vector of non-goalie enemy players'
+                // positions and the four points for the rectangular region to chip and
+                // chase at. With the 3 points, create a possible triangle and place in
+                // vector of all triangles. Eventually all permutations of points will be
+                // picked
                 Point p1   = allPts[i];
                 Point p2   = allPts[j];
                 Point p3   = allPts[k];
@@ -107,12 +116,12 @@ std::vector<Triangle> Evaluation::filter_open_triangles(std::vector<Triangle> tr
                                                         std::vector<Point> enemy_players)
 {
     std::vector<Triangle> filtered_triangles;
-    bool containsEnemy = false;
 
+    // For every triangle, the 3 points are adjusted so that the robots making up the
+    // vertices won't be counted within the triangle, i.e. make every triangle slightly
+    // smaller
     for (unsigned int i = 0; i < triangles.size(); i++)
     {
-        // Create a slightly smaller triangle so the robots making up the vertices
-        // are not counted in the triangle
         Point p1 = triangles[i][0] +
                    ((get_triangle_center_and_area(triangles[i]).first) - triangles[i][0])
                        .norm(2.5 * ROBOT_MAX_RADIUS_METERS);
@@ -123,7 +132,7 @@ std::vector<Triangle> Evaluation::filter_open_triangles(std::vector<Triangle> tr
                    ((get_triangle_center_and_area(triangles[i]).first) - triangles[i][2])
                        .norm(2.5 * ROBOT_MAX_RADIUS_METERS);
         Triangle t    = triangle(p1, p2, p3);
-        containsEnemy = false;
+        bool containsEnemy = false;
 
         for (unsigned int k = 0; k < enemy_players.size(); k++)
         {
@@ -163,9 +172,9 @@ std::vector<Triangle> Evaluation::remove_outofbounds_triangles(
     const World& world, std::vector<Triangle> triangles)
 {
     std::vector<Triangle> valid_triangles;
-    std::vector<Point> chip_area_corners = get_chip_target_area_corners(
-        world, Util::DynamicParameters::Indirect_Chip_Evaluation::chip_target_area_inset
-                   .value());
+    std::vector<Point> chip_area_corners = findBestChipTargetArea(
+            world, Util::DynamicParameters::Indirect_Chip_Evaluation::chip_target_area_inset
+                    .value());
     Point center;
 
     double smallest_x = chip_area_corners[0].x();
@@ -200,8 +209,8 @@ std::vector<Triangle> Evaluation::remove_outofbounds_triangles(
     return valid_triangles;
 }
 
-std::vector<Point> Evaluation::get_chip_target_area_corners(const World& world,
-                                                            double inset)
+std::vector<Point> Evaluation::findBestChipTargetArea(const World &world,
+                                                      double inset)
 {
     std::vector<Point> corners;
 
@@ -210,26 +219,21 @@ std::vector<Point> Evaluation::get_chip_target_area_corners(const World& world,
     double negFieldY = world.field().enemyCornerNeg().y() + inset;
     double posFieldY = world.field().enemyCornerPos().y() - inset;
 
-    Point p1 = Point(ballX, negFieldY);
-    Point p2 = Point(ballX, posFieldY);
-    Point p3 = Point(fieldX, negFieldY);
-    Point p4 = Point(fieldX, posFieldY);
+    corners ={ Point(ballX, negFieldY);
+    Point(ballX, posFieldY);
+    Point(fieldX, negFieldY);
+    Point(fieldX, posFieldY);
+};
 
-    corners.push_back(p1);
-    corners.push_back(p2);
-    corners.push_back(p3);
-    corners.push_back(p4);
-
-    return corners;
+return corners;
 }
 
-std::pair<Triangle, bool> Evaluation::get_largest_triangle(
-    std::vector<Triangle> allTriangles, double min_area, double min_edge_len,
-    double min_edge_angle)
+std::optional<Triangle> Evaluation::getLargestValidTriangle(
+        std::vector<Triangle> allTriangles, double min_area, double min_edge_len,
+        double min_edge_angle)
 {
     Triangle largest    = allTriangles[0];
     double largest_area = get_triangle_center_and_area(largest).second;
-    bool valid          = false;
 
     for (unsigned int i = 0; i < allTriangles.size(); i++)
     {
@@ -250,9 +254,8 @@ std::pair<Triangle, bool> Evaluation::get_largest_triangle(
         {
             largest      = t;
             largest_area = area;
-            valid        = true;
         }
     }
 
-    return std::make_pair(largest, valid);
+    return std::optional(largest);
 }
