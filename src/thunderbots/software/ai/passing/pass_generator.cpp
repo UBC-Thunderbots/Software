@@ -218,16 +218,20 @@ double PassGenerator::ratePass(Pass pass)
     }
 
     double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-           shoot_pass_rating * in_region_quality;
+                          shoot_pass_rating * in_region_quality;
 
     // Strict requirement that the pass occurs at a minimum time in the future
-    double min_pass_time_offset = Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
-    pass_quality *= sigmoid(pass.startTime().getSeconds(),
-            min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+    double min_pass_time_offset =
+        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    pass_quality *= sigmoid(
+        pass.startTime().getSeconds(),
+        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
 
     // Place strict limits on the ball speed
-    double min_pass_speed = Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
-    double max_pass_speed = Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+    double min_pass_speed =
+        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+    double max_pass_speed =
+        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
     pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.001);
     pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.001);
 

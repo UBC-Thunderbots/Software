@@ -20,8 +20,8 @@ class PassGeneratorTest : public testing::Test
         world = ::Test::TestUtil::createBlankTestingWorld();
         Team friendly_team(Duration::fromSeconds(10));
         friendly_team.updateRobots(
-                {Robot(0, {0,0}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0))}
-                );
+            {Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(0))});
         world.updateFriendlyTeamState(friendly_team);
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
         pass_generator = std::make_shared<PassGenerator>(0.0);
@@ -33,7 +33,7 @@ class PassGeneratorTest : public testing::Test
 };
 
 // TODO (Issue #323): Re-enable this test when we're properly generating passes
-//TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
+// TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
 //{
 //    // Test that given enough time and a static world with no robots, we converge to a
 //    // pass near the enemy team goal
