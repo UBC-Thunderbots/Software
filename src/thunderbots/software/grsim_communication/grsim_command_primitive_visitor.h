@@ -2,6 +2,8 @@
 
 #include <ai/world/ball.h>
 
+#include <variant>
+
 #include "ai/primitive/visitor/primitive_visitor.h"
 #include "ai/world/robot.h"
 #include "motion_controller.h"
@@ -115,7 +117,8 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * @return The most recent MotionControllerCommand created by this
      * GrSimCommandPrimitiveVisitor
      */
-    MotionController::MotionControllerCommand getMotionControllerCommand();
+    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
+    getMotionControllerCommand();
 
    private:
     static constexpr double STANDARD_INTERCEPT_MARGIN = 1.0;
@@ -123,7 +126,8 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
     // The robot that the Primitive calculations will be performed for
     Robot robot;
     // The MotionControllerCommand created by the 'visit' functions that is to be sent
-    // to the MotionController
-    MotionController::MotionControllerCommand motion_controller_command;
+    // to the MotionController. THis can be either a position or velocity command.
+    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
+        motion_controller_command;
     Ball ball;
 };

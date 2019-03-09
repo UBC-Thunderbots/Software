@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <variant>
+
 #include "ai/world/robot.h"
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -16,34 +18,27 @@ namespace MotionController
         AngularVelocity angular_velocity;
     };
 
-    struct MotionControllerCommand
+    struct PositionCommand
     {
-        MotionControllerCommand()
+        PositionCommand()
             : global_destination(Vector(0, 0)),
               final_orientation(Angle::zero()),
               final_speed_at_destination(0.0),
               kick_speed_meters_per_second(0.0),
               chip_instead_of_kick(false),
-              dribbler_on(false),
-              velocity_request(false),
-              requested_linear_velocity(Vector(0, 0)),
-              requested_angular_velocity(AngularVelocity())
+              dribbler_on(false)
         {
         }
 
-        MotionControllerCommand(Vector global_destination, Angle final_orientation,
-                                double final_speed_at_destination,
-                                double kick_or_chip_power, bool chip_instead_of_kick,
-                                bool dribbler_on)
+        PositionCommand(Vector global_destination, Angle final_orientation,
+                        double final_speed_at_destination, double kick_or_chip_power,
+                        bool chip_instead_of_kick, bool dribbler_on)
             : global_destination(global_destination),
               final_orientation(final_orientation),
               final_speed_at_destination(final_speed_at_destination),
               kick_speed_meters_per_second(kick_or_chip_power),
               chip_instead_of_kick(chip_instead_of_kick),
-              dribbler_on(dribbler_on),
-              velocity_request(false),
-              requested_linear_velocity(Vector(0, 0)),
-              requested_angular_velocity(AngularVelocity())
+              dribbler_on(dribbler_on)
         {
         }
 
@@ -57,18 +52,16 @@ namespace MotionController
          * @param dribbler_on
          * @param requested_velocty The desired output velocity.
          */
-        MotionControllerCommand(Angle final_orientation, double kick_or_chip_power,
-                                bool chip_instead_of_kick, bool dribbler_on,
-                                Vector requested_linear_velocity,
-                                AngularVelocity requested_angular_velocity)
+        PositionCommand(Angle final_orientation, double kick_or_chip_power,
+                        bool chip_instead_of_kick, bool dribbler_on,
+                        Vector requested_linear_velocity,
+                        AngularVelocity requested_angular_velocity)
             : global_destination(Vector(0, 0)),
               final_orientation(final_orientation),
               final_speed_at_destination(0.0),
               kick_speed_meters_per_second(kick_or_chip_power),
               chip_instead_of_kick(chip_instead_of_kick),
-              dribbler_on(dribbler_on),
-              velocity_request(true),
-              requested_linear_velocity(requested_linear_velocity)
+              dribbler_on(dribbler_on)
         {
         }
 
@@ -90,15 +83,40 @@ namespace MotionController
         // Whether or not the robot's dribbler should be on. Dribbler speed cannot be
         // controlled in grSim
         bool dribbler_on;
+    };
+
+    struct VelocityCommand
+    {
+        VelocityCommand(double kick_or_chip_power, bool chip_instead_of_kick,
+                        bool dribbler_on, Vector linear_velocty,
+                        AngularVelocity angular_velocity)
+            : kick_speed_meters_per_second(kick_or_chip_power),
+              chip_instead_of_kick(chip_instead_of_kick),
+              dribbler_on(dribbler_on),
+              linear_velocity(linear_velocty),
+              angular_velocity(angular_velocity)
+        {
+        }
+
+
+        // How fast to kick the ball when the robot makes contact with it. A value of
+        // 0 means the robot will not kick/chip the ball. Whether or not the robot kicks
+        // or chips the ball is controlled by the 'chip_instead_of_kick' parameter below
+        double kick_speed_meters_per_second;
+        // Whether or not the robot should chip the ball instead of kick it when it makes
+        // contact with the ball. If this value is false, the robot will kick the ball.
+        // If it is true, the robot will kick the ball.
+        bool chip_instead_of_kick;
+        // Whether or not the robot's dribbler should be on. Dribbler speed cannot be
+        // controlled in grSim
+        bool dribbler_on;
         // Whether the caller is directly requesting a velocity instead of position
-        bool velocity_request;
-        // Outputted linear velocity when the caller wants to directly request velocity
-        // instead of a position.
-        Vector requested_linear_velocity;
+        Vector linear_velocity;
         // Outputted angular velocity when the caller wants to directly request velocity
         // instead of a position.
-        AngularVelocity requested_angular_velocity;
+        AngularVelocity angular_velocity;
     };
+
 
     // tolerance distance measurement in meters
     const double VELOCITY_STOP_TOLERANCE       = 0.02;
@@ -126,16 +144,13 @@ namespace MotionController
      * of the robot as a AngularVelocity packaged in a vector
      */
     Velocity bangBangVelocityController(
-        const Robot robot, const Point dest, const double desired_final_speed,
-        const Angle desired_final_orientation, const double delta_time,
-
-        const double max_speed_meters_per_second,
-        const double max_angular_speed_radians_per_second,
-        const double max_acceleration_meters_per_second_squared,
-        const double max_angular_acceleration_meters_per_second_squared,
-        const bool velocity_request                      = false,
-        const Vector requested_linear_velocty            = Vector(0, 0),
-        const AngularVelocity requested_angular_velocity = AngularVelocity());
+        Robot robot,
+        std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
+            motion_command,
+        double delta_time, double max_speed_meters_per_second,
+        double max_angular_speed_radians_per_second,
+        double max_acceleration_meters_per_second_squared,
+        double max_angular_acceleration_meters_per_second_squared);
 
     /**
      * Calculate robot angular velocities based on current robot polar state and
@@ -146,7 +161,7 @@ namespace MotionController
      * @param delta_time The time that will be used to calculate the change in speed of
      * @return Angular velocity of the robot as a AngularVelocity packaged in a vector
      */
-    AngularVelocity determineAngularVelocity(
+    AngularVelocity determineAngularVelocityFromPosition(
         const Robot robot, const Angle desired_final_orientation, const double delta_time,
         const double max_angular_speed_radians_per_second,
         const double max_angular_acceleration_radians_per_second_squared);
@@ -160,9 +175,18 @@ namespace MotionController
      * @param delta_time The time that will be used to calculate the change in speed of
      * @return Linear velocity of the robot as a AngularVelocity packaged in a vector
      */
-    Vector determineLinearVelocity(
+    Vector determineLinearVelocityFromPosition(
         const Robot robot, const Point dest, const double desired_final_speed,
         const double delta_time, const double max_speed_meters_per_second,
         const double max_acceleration_meters_per_second_squared);
+
+    Vector determineLinearVelocityFromVelocity(
+        const Robot robot, const Vector linear_velocity,
+        const double max_acceleration_meters_per_second_squared, const double delta_time);
+
+    AngularVelocity determineAngularVelocityFromVelocity(
+        const Robot robot, AngularVelocity angular_velocity,
+        const double max_angular_acceleration_meters_per_second_squared,
+        const double delta_time);
 
 }  // namespace MotionController

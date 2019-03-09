@@ -50,28 +50,28 @@ void GrSimBackend::sendPrimitives(
                 GrsimCommandPrimitiveVisitor(robot, ball);
             prim->accept(grsim_command_primitive_visitor);
 
-            MotionController::MotionControllerCommand motion_controller_command =
-                grsim_command_primitive_visitor.getMotionControllerCommand();
+            std::variant<MotionController::PositionCommand,
+                         MotionController::VelocityCommand>
+                motion_controller_command =
+                    grsim_command_primitive_visitor.getMotionControllerCommand();
 
             MotionController::Velocity robot_velocities =
                 MotionController::bangBangVelocityController(
-                    robot, motion_controller_command.global_destination,
-                    motion_controller_command.final_speed_at_destination,
-                    motion_controller_command.final_orientation, delta_time.count(),
+                    robot, motion_controller_command, delta_time.count(),
                     ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
                     ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED,
-                    motion_controller_command.velocity_request,
-                    motion_controller_command.requested_linear_velocity,
-                    motion_controller_command.requested_angular_velocity);
+                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
                 prim->getRobotId(), YELLOW, robot_velocities.linear_velocity,
                 robot_velocities.angular_velocity,
-                motion_controller_command.kick_speed_meters_per_second,
-                motion_controller_command.chip_instead_of_kick,
-                motion_controller_command.dribbler_on);
+                std::get<MotionController::PositionCommand>(motion_controller_command)
+                    .kick_speed_meters_per_second,
+                std::get<MotionController::PositionCommand>(motion_controller_command)
+                    .chip_instead_of_kick,
+                std::get<MotionController::PositionCommand>(motion_controller_command)
+                    .dribbler_on);
 
             sendGrSimPacket(grsim_packet);
         }

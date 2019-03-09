@@ -17,15 +17,22 @@
 
 #include "util/logger/init.h"
 
+template <class... Ts>
+struct overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overload(Ts...)->overload<Ts...>;
+
 MotionController::Velocity MotionController::bangBangVelocityController(
-    const Robot robot, const Point dest, const double desired_final_speed,
-    const Angle desired_final_orientation, const double delta_time,
-    const double max_speed_meters_per_second,
+    const Robot robot,
+    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
+        motion_command,
+    const double delta_time, const double max_speed_meters_per_second,
     const double max_angular_speed_radians_per_second,
     const double max_acceleration_meters_per_second_squared,
-    const double max_angular_acceleration_meters_per_second_squared,
-    const bool velocity_request, const Vector requested_linear_velocty,
-    const AngularVelocity requested_angular_velocity)
+    const double max_angular_acceleration_meters_per_second_squared)
 {
     MotionController::Velocity robot_velocities;
 
@@ -34,11 +41,6 @@ MotionController::Velocity MotionController::bangBangVelocityController(
         throw std::invalid_argument(
             "GrSim Motion controller received a negative delta time");
     }
-    else if (velocity_request)
-    {
-        robot_velocities.linear_velocity  = requested_linear_velocty;
-        robot_velocities.angular_velocity = requested_angular_velocity;
-    }
     else if (delta_time == 0)
     {
         robot_velocities.linear_velocity  = robot.velocity();
@@ -46,19 +48,60 @@ MotionController::Velocity MotionController::bangBangVelocityController(
     }
     else
     {
-        robot_velocities.linear_velocity = MotionController::determineLinearVelocity(
-            robot, dest, desired_final_speed, delta_time, max_speed_meters_per_second,
-            max_angular_speed_radians_per_second);
-        robot_velocities.angular_velocity = MotionController::determineAngularVelocity(
-            robot, desired_final_orientation, delta_time,
-            max_angular_speed_radians_per_second,
-            max_angular_acceleration_meters_per_second_squared);
+        robot_velocities = std::visit(
+            [robot, motion_command, delta_time, max_speed_meters_per_second,
+             max_angular_speed_radians_per_second,
+             max_acceleration_meters_per_second_squared,
+             max_angular_acceleration_meters_per_second_squared](auto&& arg) {
+                using T = std::decay_t<decltype(arg)>;
+
+                MotionController::Velocity robot_velocities;
+
+                if constexpr (std::is_same_v<T, MotionController::PositionCommand>)
+                {
+                    MotionController::PositionCommand command =
+                        std::get<MotionController::PositionCommand>(motion_command);
+                    robot_velocities.linear_velocity =
+                        MotionController::determineLinearVelocityFromPosition(
+                            robot, command.global_destination,
+                            command.final_speed_at_destination, delta_time,
+                            max_speed_meters_per_second,
+                            max_angular_speed_radians_per_second);
+                    robot_velocities.angular_velocity =
+                        MotionController::determineAngularVelocityFromPosition(
+                            robot, command.final_orientation, delta_time,
+                            max_angular_speed_radians_per_second,
+                            max_angular_acceleration_meters_per_second_squared);
+                }
+                else  // Velocity Command
+                {
+                    MotionController::VelocityCommand command =
+                        std::get<MotionController::VelocityCommand>(motion_command);
+
+                    if (command.linear_velocity.len() > max_speed_meters_per_second)
+                    {
+                        throw std::invalid_argument(
+                            "Desired speed is above the allowed max speed");
+                    }
+                    robot_velocities.linear_velocity =
+                        MotionController::determineLinearVelocityFromVelocity(
+                            robot, command.linear_velocity,
+                            max_acceleration_meters_per_second_squared, delta_time);
+                    robot_velocities.angular_velocity =
+                        MotionController::determineAngularVelocityFromVelocity(
+                            robot, command.angular_velocity,
+                            max_angular_acceleration_meters_per_second_squared,
+                            delta_time);
+                }
+                return robot_velocities;
+            },
+            motion_command);
     }
 
     return robot_velocities;
 }
 
-AngularVelocity MotionController::determineAngularVelocity(
+AngularVelocity MotionController::determineAngularVelocityFromPosition(
     const Robot robot, const Angle desired_final_orientation, const double delta_time,
     const double max_angular_speed_radians_per_second,
     const double max_angular_acceleration_radians_per_second_squared)
@@ -92,7 +135,7 @@ AngularVelocity MotionController::determineAngularVelocity(
     return AngularVelocity::ofRadians(new_angular_velocity);
 }
 
-Vector MotionController::determineLinearVelocity(
+Vector MotionController::determineLinearVelocityFromPosition(
     const Robot robot, const Point dest, const double desired_final_speed,
     const double delta_time, const double max_speed_meters_per_second,
     const double max_acceleration_meters_per_second_squared)
@@ -156,4 +199,63 @@ Vector MotionController::determineLinearVelocity(
         new_robot_velocity.rotate(-robot.orientation());
 
     return new_robot_velocity_in_robot_coordinates;
+}
+
+Vector MotionController::determineLinearVelocityFromVelocity(
+    const Robot robot, const Vector linear_velocity,
+    const double max_acceleration_meters_per_second_squared, const double delta_time)
+{
+    double velocity_to_add = max_acceleration_meters_per_second_squared * delta_time;
+    double new_velocity_x, new_velocity_y;
+
+    if (robot.velocity().x() < linear_velocity.x())
+    {
+        new_velocity_x = robot.velocity().x() + velocity_to_add;
+    }
+    else
+    {
+        new_velocity_x = robot.velocity().x() - velocity_to_add;
+    }
+
+    if (robot.velocity().y() < linear_velocity.y())
+    {
+        new_velocity_y = robot.velocity().y() + velocity_to_add;
+    }
+    else
+    {
+        new_velocity_y = robot.velocity().y() - velocity_to_add;
+    }
+
+    new_velocity_x = std::clamp<double>(new_velocity_x, -abs(linear_velocity.x()),
+                                        abs(linear_velocity.x()));
+    new_velocity_y = std::clamp<double>(new_velocity_y, -abs(linear_velocity.y()),
+                                        abs(linear_velocity.y()));
+    return Vector(new_velocity_x, new_velocity_y);
+}
+
+AngularVelocity MotionController::determineAngularVelocityFromVelocity(
+    const Robot robot, AngularVelocity angular_velocity,
+    const double max_angular_acceleration_meters_per_second_squared,
+    const double delta_time)
+{
+    double velocity_to_add =
+        max_angular_acceleration_meters_per_second_squared * delta_time;
+    double new_angular_velocity;
+
+    if (robot.angularVelocity() < angular_velocity)
+    {
+        new_angular_velocity = robot.angularVelocity().toRadians() + velocity_to_add;
+    }
+    else
+    {
+        new_angular_velocity = robot.angularVelocity().toRadians() - velocity_to_add;
+    }
+
+    new_angular_velocity =
+        std::clamp(new_angular_velocity, -abs(angular_velocity.toRadians()),
+                   abs(angular_velocity.toRadians()));
+    new_angular_velocity = std::clamp(new_angular_velocity,
+                                      -max_angular_acceleration_meters_per_second_squared,
+                                      max_angular_acceleration_meters_per_second_squared);
+    return AngularVelocity::ofRadians(new_angular_velocity);
 }
