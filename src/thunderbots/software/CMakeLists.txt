@@ -613,7 +613,9 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
             util/parameter/dynamic_parameters.cpp
-            util/timestamp.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             geom/util.cpp
             test/test_util/test_util.cpp
             )
@@ -683,6 +685,7 @@ if (CATKIN_ENABLE_TESTING)
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
+            util/time/duration.cpp
             )
     target_link_libraries(passing_test ${catkin_LIBRARIES})
 

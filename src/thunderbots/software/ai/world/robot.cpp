@@ -55,9 +55,9 @@ void Robot::updateStateToPredictedState(const Duration &duration_in_future)
         throw std::invalid_argument(
             "Error: Predicted state is updating times from the past");
     }
-    Point new_position          = estimatePositionAtFutureTime(duration_in_future);
-    Vector new_velocity         = estimateVelocityAtFutureTime(duration_in_future);
-    Angle new_orientation       = estimateOrientationAtFutureTime(duration_in_future);
+    Point new_position    = estimatePositionAtFutureTime(duration_in_future);
+    Vector new_velocity   = estimateVelocityAtFutureTime(duration_in_future);
+    Angle new_orientation = estimateOrientationAtFutureTime(duration_in_future);
     AngularVelocity new_angular_velocity =
         estimateAngularVelocityAtFutureTime(duration_in_future);
 

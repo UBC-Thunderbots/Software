@@ -12,12 +12,9 @@
 #include "ai/intent/move_intent.h"
 #include "util/logger/init.h"
 
-STP::STP(long random_seed)
-    : random_number_generator(random_seed), uniform_distribution(1, 6)
-{
-}
+STP::STP(long random_seed) : random_number_generator(random_seed) {}
 
-std::vector<std::unique_ptr<Intent>> STP::getIntentAssignment(const World& world)
+std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     // Assign a new play if we don't currently have a play assigned, the current play's
     // invariant no longer holds, or the current play is done
@@ -25,7 +22,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentAssignment(const World& world
     {
         try
         {
-            current_play = std::move(calculateNewPlay(world));
+            current_play = calculateNewPlay(world);
         }
         catch (const std::runtime_error& e)
         {
@@ -42,11 +39,17 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentAssignment(const World& world
     std::vector<std::unique_ptr<Intent>> intents;
     if (tactics)
     {
-        // Assign robots to the tactics
-        auto assigned_tactics = assignRobotsToTactics(world, *tactics);
-        // Get the Intent each tactic wants to run
-        for (const auto& tactic : assigned_tactics)
+        // Get the optimal assignment of robots to tactics
+        auto tactic_robot_assignments = calculateTacticRobotAssignment(world, *tactics);
+
+        for (const auto& tactic_robot_pair : tactic_robot_assignments)
         {
+            // Assign the robot to the tactic
+            auto robot  = tactic_robot_pair.first;
+            auto tactic = tactic_robot_pair.second;
+            tactic->updateRobot(robot);
+
+            // Get the Intent the tactic wants to run
             auto intent = tactic->getNextIntent();
             if (intent)
             {
@@ -58,8 +61,9 @@ std::vector<std::unique_ptr<Intent>> STP::getIntentAssignment(const World& world
     return intents;
 }
 
-std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
-    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
+std::vector<std::pair<Robot, std::shared_ptr<Tactic>>>
+STP::calculateTacticRobotAssignment(const World& world,
+                                    std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     return {};
 }
@@ -67,9 +71,9 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 {
     std::vector<std::unique_ptr<Play>> applicable_plays;
-    for (const auto& play_name : PlayFactory::getRegisteredPlayNames())
+    for (const auto& play_constructor : PlayFactory::getRegisteredPlayConstructors())
     {
-        auto play = PlayFactory::createPlay(play_name);
+        auto play = play_constructor();
         if (play->isApplicable(world))
         {
             applicable_plays.emplace_back(std::move(play));
@@ -84,7 +88,7 @@ std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
 
     // Create a uniform distribution over the indices of the applicable_plays
     // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution
-    uniform_distribution = std::uniform_int_distribution<std::mt19937::result_type>(
+    auto uniform_distribution = std::uniform_int_distribution<std::mt19937::result_type>(
         0, applicable_plays.size() - 1);
     auto play_index = uniform_distribution(random_number_generator);
 

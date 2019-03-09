@@ -102,12 +102,13 @@ TEST_F(STPTest, test_current_play_initially_unassigned)
     EXPECT_EQ(stp.getCurrentPlayName(), std::nullopt);
 }
 
+// Test that we can successfully assign Plays when there is currently no Play assigned
 TEST_F(STPTest, test_play_assignment_transition_from_unassigned_to_assigned)
 {
     // Only the StopTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
-    stp.getIntentAssignment(world);
+    stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), "Stop Test Play");
 }
 
@@ -118,14 +119,14 @@ TEST_F(
     // Only the StopTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
-    stp.getIntentAssignment(world);
+    stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), "Stop Test Play");
 
     // The StopTestPlays invariant should no longer hold, and the MoveTestPlay should now
     // be applicable
     world = ::Test::TestUtil::setBallPosition(
         world, world.field().enemyCornerNeg() + Vector(1, 0), Timestamp::fromSeconds(0));
-    stp.getIntentAssignment(world);
+    stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), "Move Test Play");
 }
 
@@ -134,7 +135,7 @@ TEST_F(STPTest, test_play_assignment_from_one_play_to_another_when_current_play_
     // Only the MoveTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(1, -1), Timestamp::fromSeconds(0));
-    stp.getIntentAssignment(world);
+    stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), "Move Test Play");
 
     // TODO: Finish this test. Requires tactic assignment to be completed
@@ -149,13 +150,13 @@ TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
     // Only the StopTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
-    stp.getIntentAssignment(world);
+    stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), "Stop Test Play");
 
     // Put the ball where both its x and y coordinates are negative. Neither test Play
     // is applicable in this case
     world = ::Test::TestUtil::setBallPosition(world, Point(-1, -1),
                                               Timestamp::fromSeconds(0));
-    stp.getIntentAssignment(world);
+    stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), "Stop Test Play");
 }
