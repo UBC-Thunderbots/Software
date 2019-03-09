@@ -1,7 +1,6 @@
 #include "ai/hl/stp/stp.h"
 
 #include <ai/hl/stp/play/play_factory.h>
-#include <munkres/munkres.h>
 
 #include <chrono>
 #include <exception>
