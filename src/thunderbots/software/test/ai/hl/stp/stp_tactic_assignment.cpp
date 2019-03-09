@@ -48,9 +48,9 @@ TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_equ
             move_tactic_2
     };
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 2);
+    EXPECT_EQ(assigned_tactics.size(), 2);
 }
 
 TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_more_tactics_than_robots) {
@@ -72,9 +72,9 @@ TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_mor
             move_tactic_2
     };
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 1);
+    EXPECT_EQ(assigned_tactics.size(), 1);
 }
 
 TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_more_robots_than_tactics) {
@@ -95,9 +95,9 @@ TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_mor
             move_tactic_1
     };
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 1);
+    EXPECT_EQ(assigned_tactics.size(), 1);
 }
 
 TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots) {
@@ -113,9 +113,9 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
             move_tactic_1
     };
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 0);
+    EXPECT_EQ(assigned_tactics.size(), 0);
 }
 
 TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_tactics) {
@@ -130,9 +130,9 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_tactic
 
     std::vector<std::shared_ptr<Tactic>> tactics;
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 0);
+    EXPECT_EQ(assigned_tactics.size(), 0);
 }
 
 
@@ -160,12 +160,12 @@ TEST_F(STPTacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_t
     // way around to move_tactic_2. What we expect is that robot_0 will be assigned to
     // move_tactic_2 and "slide over" to make room for robot_1
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     // move_tactic_1 should be the only Tactic returned. stop_tactic_1 is a lower priority
     // than move_tactic_1 so it should be dropped since there's only 1 robot
-    EXPECT_EQ(tactic_robot_assignment.size(), 1);
-    EXPECT_EQ(tactic_robot_assignment.at(0).first->getName(), "Move Test Tactic");
+    EXPECT_EQ(assigned_tactics.size(), 1);
+    EXPECT_EQ(assigned_tactics.at(0)->getName(), "Move Test Tactic");
 }
 
 
@@ -185,10 +185,10 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot) {
             move_tactic_1
     };
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 1);
-    EXPECT_EQ(tactic_robot_assignment.at(0).second, robot_0);
+    EXPECT_EQ(assigned_tactics.size(), 1);
+    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_0);
 }
 
 // Test the case where it is "obvious" which robots should be assigned to each tactic
@@ -219,11 +219,11 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     // Each robot is close to separate tactic destinations. They should each be trivially
     // assigned to the tactic with the destination closest to their position
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 2);
-    EXPECT_EQ(tactic_robot_assignment.at(0).second, robot_0);
-    EXPECT_EQ(tactic_robot_assignment.at(1).second, robot_1);
+    EXPECT_EQ(assigned_tactics.size(), 2);
+    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_0);
+    EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_1);
 }
 
 // Test a more complex case where each robot is closest to the same tactic destination.
@@ -262,11 +262,11 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     // way around to move_tactic_2. What we expect is that robot_0 will be assigned to
     // move_tactic_2 and "slide over" to make room for robot_1
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 2);
-    EXPECT_EQ(tactic_robot_assignment.at(0).second, robot_1);
-    EXPECT_EQ(tactic_robot_assignment.at(1).second, robot_0);
+    EXPECT_EQ(assigned_tactics.size(), 2);
+    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_1);
+    EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_0);
 }
 
 TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics) {
@@ -295,11 +295,11 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics) {
     // robot_2 should not be assigned since both robot_0 and robot_1 are more optimal
     // to assign to the tactics. robot_2 is too far away
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 2);
-    EXPECT_EQ(tactic_robot_assignment.at(0).second, robot_0);
-    EXPECT_EQ(tactic_robot_assignment.at(1).second, robot_1);
+    EXPECT_EQ(assigned_tactics.size(), 2);
+    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_0);
+    EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_1);
 }
 
 TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_the_same_cost) {
@@ -329,12 +329,12 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_th
     };
 
     // If all costs are equal, the robots and tactics are simply paired in order
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 3);
-    EXPECT_EQ(tactic_robot_assignment.at(0).second, robot_0);
-    EXPECT_EQ(tactic_robot_assignment.at(1).second, robot_1);
-    EXPECT_EQ(tactic_robot_assignment.at(2).second, robot_2);
+    EXPECT_EQ(assigned_tactics.size(), 3);
+    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_0);
+    EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_1);
+    EXPECT_EQ(assigned_tactics.at(2)->getAssignedRobot(), robot_2);
 }
 
 TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_with_2_of_the_same_cost) {
@@ -366,10 +366,10 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_with_2_of_t
             stop_tactic_2
     };
 
-    auto tactic_robot_assignment = stp.calculateTacticRobotAssignment(world, tactics);
+    auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
-    EXPECT_EQ(tactic_robot_assignment.size(), 3);
-    EXPECT_EQ(tactic_robot_assignment.at(0).second, robot_2);
-    EXPECT_EQ(tactic_robot_assignment.at(1).second, robot_0);
-    EXPECT_EQ(tactic_robot_assignment.at(2).second, robot_1);
+    EXPECT_EQ(assigned_tactics.size(), 3);
+    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_2);
+    EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_0);
+    EXPECT_EQ(assigned_tactics.at(2)->getAssignedRobot(), robot_1);
 }
