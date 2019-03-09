@@ -375,6 +375,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/util.cpp
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp

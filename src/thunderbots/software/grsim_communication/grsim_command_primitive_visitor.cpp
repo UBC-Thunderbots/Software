@@ -156,18 +156,16 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     Angle kick_direction = kick_primitive.getKickDirection();
 
     double final_speed_at_destination = 0.0;
-    Point perp_line_to_shot = kick_origin + Point::createFromAngle(kick_direction).perp();
-    double dest_behind_x    = -cos(kick_direction.toDegrees());
-    double dest_behind_y    = -sin(kick_direction.toDegrees());
-    Point dest_behind       = kick_origin + Vector(dest_behind_x, dest_behind_y);
+    // double dest_behind_x    = -cos(kick_direction.toDegrees());
+    // double dest_behind_y    = -sin(kick_direction.toDegrees());
+    double dest_behind_x = -Point::createFromAngle(kick_direction).x();
+    double dest_behind_y = -Point::createFromAngle(kick_direction).y();
 
+    Point dest_behind       = kick_origin + Vector(dest_behind_x, dest_behind_y);
     // If current distance between robot and line perpendicular to shot is
     // less than distance between destination behind shot and line perpendicular to shot
     // while robot is in same direction as shot, can go for the shot
-    if (!(offsetToLine(kick_origin, dest_behind, robot.position()) <=
-              ROBOT_MAX_RADIUS_METERS &&
-          offsetToLine(kick_origin, perp_line_to_shot, robot.position()) <=
-              offsetToLine(kick_origin, perp_line_to_shot, dest_behind)))
+    if (!(offsetToLine(kick_origin, dest_behind, robot.position()) <= ROBOT_MAX_RADIUS_METERS))
     {
         motion_controller_command = MotionController::MotionControllerCommand(
             dest_behind, kick_direction, 0.0, kick_primitive.getKickSpeed(), false,
