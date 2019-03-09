@@ -1,11 +1,11 @@
 #include "ai/hl/stp/stp.h"
 
 #include <ai/hl/stp/play/play_factory.h>
+#include <munkres/munkres.h>
 
 #include <chrono>
 #include <exception>
 #include <random>
-#include <munkres/munkres.h>
 
 #include "ai/hl/stp/play/play.h"
 #include "ai/hl/stp/tactic/tactic.h"
@@ -39,7 +39,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     std::vector<std::unique_ptr<Intent>> intents;
     if (tactics)
     {
-        // Get the optimal assignment of robots to tactics
+        // Assign robots to tactics
         auto assigned_tactics = assignRobotsToTactics(world, *tactics);
 
         for (const auto& tactic : assigned_tactics)
@@ -59,6 +59,14 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
 {
+    // This functions optimizes the assignment of robots to tactics by minimizing
+    // the total cost of assignment using the Hungarian algorithm
+    // (also known as the Munkres algorithm)
+    // https://en.wikipedia.org/wiki/Hungarian_algorithm
+    //
+    // https://github.com/saebyn/munkres-cpp is the implementation of the Hungarian
+    // algorithm that we use here
+
     if (world.friendlyTeam().numRobots() < tactics.size())
     {
         // We do not have enough robots to assign all the tactics to. We "drop"
@@ -82,7 +90,7 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     }
 
     // The rows of the matrix are the "workers" (the robots) and the columns are the
-    // "jobs" (the Tactics)
+    // "jobs" (the Tactics).
     Matrix<double> matrix(num_rows, num_cols);
 
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
