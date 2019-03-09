@@ -83,7 +83,8 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     size_t num_cols = tactics.size();
 
     // The Matrix constructor will assert if the rows and columns of the matrix are
-    // not >= 1, so we perform that check first and return an empty vector of tactics
+    // not >= 1, so we perform that check first and return an empty vector of tactics.
+    // This represents the cases where there are either no tactics or no robots
     if (num_rows == 0 || num_cols == 0)
     {
         return {};
