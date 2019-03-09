@@ -23,8 +23,8 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_within_reach_
     Point target = Point(0, (-1 + sqrt(0.75) - 1) / 3);
     target       = target.norm((target - ball_position).len() * 0.85);
 
-    EXPECT_EQ(target,
-              Evaluation::indirectChipAndChaseTarget(triangles, ball_position));
+    EXPECT_EQ(target, Evaluation::findTargetPointForIndirectChipAndChase(triangles,
+                                                                         ball_position));
 }
 
 
@@ -40,8 +40,8 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_not_within_re
     target       = target.norm((target - ball_position).len() * 0.85);
     target       = ball_position + (target - ball_position).norm(8.0);
 
-    EXPECT_EQ(std::optional(target),
-              Evaluation::indirectChipAndChaseTarget(triangles, ball_position));
+    EXPECT_EQ(std::optional(target), Evaluation::findTargetPointForIndirectChipAndChase(
+                                         triangles, ball_position));
 }
 
 
@@ -51,8 +51,8 @@ TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_test)
 
     Point ball_position = Point(0, 0);
 
-    EXPECT_EQ(std::nullopt,
-              Evaluation::indirectChipAndChaseTarget(triangles, ball_position));
+    EXPECT_EQ(std::nullopt, Evaluation::findTargetPointForIndirectChipAndChase(
+                                triangles, ball_position));
 }
 
 
@@ -76,7 +76,7 @@ TEST(GetAllTrianglesTest, get_all_triangles_test)
         {Point(6 - 1.5, -3), Point(0, 3), Point(0, -3)},
         {Point(6 - 1.5, 3), Point(0, 3), Point(0, -3)}};
 
-    EXPECT_EQ(all_triangles, Evaluation::get_all_triangles(test_world, enemy_players));
+    EXPECT_EQ(all_triangles, Evaluation::getAllTrianglesBetweenEnemyPlayers(test_world, enemy_players));
 }
 
 
@@ -98,7 +98,7 @@ TEST(FilterOpenTrianglesTest, filter_open_triangles_test)
     filtered_triangles.pop_back();
 
     EXPECT_EQ(filtered_triangles,
-              Evaluation::filter_open_triangles(triangles, enemy_players));
+              Evaluation::findOpenTriangles(triangles, enemy_players));
 }
 
 
@@ -123,7 +123,7 @@ TEST(RemoveOutofboundsTrianglesTest, remove_outofbounds_triangles_test)
 }
 
 
-TEST(GetTriangleCenterAndAreaTest, get_triangle_center_and_area_test)
+TEST(GetTriangleCenterAndAreaTest, get_triangle_center_test)
 {
     Triangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
     Point p1          = triangle[0];
@@ -131,10 +131,21 @@ TEST(GetTriangleCenterAndAreaTest, get_triangle_center_and_area_test)
     Point p3          = triangle[2];
 
     Point center = Point(0, (-1 + sqrt(0.75) - 1) / 3);
+
+    EXPECT_EQ(center, Evaluation::getTriangleCenter(triangle));
+}
+
+
+TEST(GetTriangleCenterAndAreaTest, get_triangle_area_test)
+{
+    Triangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    Point p1          = triangle[0];
+    Point p2          = triangle[1];
+    Point p3          = triangle[2];
+
     double area  = abs(0.5 * (2 * (1 + sqrt(0.75))));
 
-    std::pair<Point, double> test_pair = std::make_pair(center, area);
-    EXPECT_EQ(test_pair, Evaluation::get_triangle_center_and_area(triangle));
+    EXPECT_EQ(area, Evaluation::getTriangleArea(triangle));
 }
 
 
@@ -171,8 +182,6 @@ TEST(GetLargestTriangleTest, get_largest_triangle_test)
     allTriangles.emplace_back(t2);
 
     Triangle largest = t2;
-    bool valid       = true;
 
-    std::pair<Triangle, bool> test_pair = std::make_pair(largest, valid);
-    EXPECT_EQ(test_pair, Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
+    EXPECT_EQ(std::optional(largest), Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
 }

@@ -18,7 +18,7 @@ namespace Evaluation
     /**
      * Returns the target point that the chipper and chaser will chip and chase at.
      *
-     * Given the enemy team robot's positions, filters and creates a vector of
+     * Given the enemy robots' positions, filters and creates a vector of
      * triangles to be used as a parameter. The target point is where ball will land
      * according to chipping calibration, as well as where the chaser will meet the ball
      * at.
@@ -27,59 +27,71 @@ namespace Evaluation
      *
      * @return Point to chip and chase at; If null, the target triangles were empty
      */
-    std::optional<Point> indirectChipAndChaseTarget(const World& world);
+    std::optional<Point> findTargetPointForIndirectChipAndChase(const World& world);
 
     /**
      * Returns the target point that the chipper and chaser will chip and chase at.
      *
      * Given the vector of triangles without enemy robots, determines if the triangles are
      * empty and if the largest triangle is within reach. If not within reach, scale the
-     * target point with the maximum chip power. The target point is
-     * where ball will land according to chipping calibration, as well as where the chaser
-     * will meet the ball at.
+     * target point with the maximum chip power. The target point is where ball will land
+     * according to chipping calibration, as well as where the chaser will meet the ball at.
      *
      * @param triangles A vector of triangles that is already filtered
      * @param ball_position Position of the ball
      *
      * @return Point to chip and chase at; If null, the target triangles were empty
      */
-    std::optional<Point> indirectChipAndChaseTarget(
+    std::optional<Point> findTargetPointForIndirectChipAndChase(
         const std::vector<Triangle>& triangles, Point ball_position);
 
     /**
+     * Returns a vector of all possible triangles between enemy players and rectangular chip area.
+     *
      * Creates a vector of triangles that picks all permutations of points from the
      * list of all non-goalie enemy players as well as the four points returned by
      * get_chip_area_target_corners.
      *
      * @param world The world in which we want to find the target point
-     * @param enemy_players
+     * @param enemy_players Vector of enemy robots' positions
      *
      * @return Vector of triangles
      */
-    std::vector<Triangle> get_all_triangles(const World& world,
-                                            std::vector<Point> enemy_players);
+    std::vector<Triangle> getAllTrianglesBetweenEnemyPlayers(const World &world,
+                                                             std::vector<Point> enemy_players);
 
     /**
-     * Given a vector of triangles, returns a new vector that only contains triangles
-     * without enemy robots.
+     * Returns a vector of triangles that only contains triangles without enemy robots.
      *
-     * @param triangles
-     * @param enemy_players
+     * Given a vector of triangles, shrink each triangle slightly (to avoid counting the robot's
+     * width within the triangle), filters out the triangles that consist of enemy robots and
+     * returns a new vector that only contains triangles without enemy robots.
+     *
+     * @param triangles Vector of triangles
+     * @param enemy_players Vector of enemy robots' positions
      *
      * @return Vector of triangles with no enemy robots
      */
-    std::vector<Triangle> filter_open_triangles(std::vector<Triangle> triangles,
-                                                std::vector<Point> enemy_players);
+    std::vector<Triangle> findOpenTriangles(std::vector<Triangle> triangles,
+                                            std::vector<Point> enemy_players);
 
     /**
-     * Returns the center point and area of the given triangle.
+     * Returns the center point the given triangle.
      *
      * @param triangle
      *
      * @return Centre point of triangle
+     */
+    Point getTriangleCenter(Triangle triangle);
+
+    /**
+     * Returns the area of the given triangle.
+     *
+     * @param triangle
+     *
      * @return Area of triangle
      */
-    std::pair<Point, double> get_triangle_center_and_area(Triangle triangle);
+    double getTriangleArea(Triangle triangle);
 
     /**
      * Remove all Triangles in a given list whose centers do not fall
@@ -100,27 +112,33 @@ namespace Evaluation
      * buffer for catching and prevent ball from leaving the field.
      *
      * @param world The world in which we want to find the target point
-     * @param inset Distance away from each edge of field
+     * @param inset Distance away from each edge of field in meters
      *
      * @return Four points for rectangle
      */
-    std::vector<Point> findBestChipTargetArea(const World &world, double inset);
+    std::vector<Point> findBestChipTargetArea(const World& world, double inset);
 
     /**
-     * Given a vector of triangles, returns the largest triangles with area greater
-     * than min_area and all edge lengths greater than min_edge_len.
+     * Returns the largest triangle that meets the area and edge length thresholds.
+     *
+     * Given a vector of triangles, returns the largest triangle with area greater
+     * than minimum area a chip target triangle must have to be considered
+     * valid, and all edge lengths greater than minimum edge length
+     * for the triangle to be considered valid.
      *
      * @param allTriangles Vector of triangles
-     * @param min_area = 0
-     * @param min_edge_len = 0
-     * @param min_edge_angle = 0
+     * @param min_area Minimum area a chip target triangle must have to be considered
+     * valid
+     * @param min_edge_len Minimum length each edge of the chip target triangle must have
+     * for the triangle to be considered valid
+     * @param min_edge_angle Minimum angle in degrees that any two edges of a chip
+     * triangle triangle must have for that triangle to be considered valid
      *
      * @return Largest triangle
-     * @return valid Largest triangle is found
      */
     std::optional<Triangle> getLargestValidTriangle(std::vector<Triangle> allTriangles,
-                                                    double min_area = 0,
-                                                    double min_edge_len = 0,
+                                                    double min_area       = 0,
+                                                    double min_edge_len   = 0,
                                                     double min_edge_angle = 0);
 
 };  // namespace Evaluation
