@@ -6,8 +6,8 @@
 namespace Evaluation
 {
     std::pair<Point, Angle> calcBestShot(const Field& f,
-                                           const std::vector<Point>& obstacles,
-                                           const Point& p, const double radius)
+                                         const std::vector<Point>& obstacles,
+                                         const Point& p, const double radius)
     {
         // Calculate the location of goalpost then use angleSweepCircle function to get
         // the pair
@@ -27,7 +27,7 @@ namespace Evaluation
     }
 
     std::pair<Point, Angle> calcBestShot(const World& world, const Robot& robot,
-                                           double radius)
+                                         double radius)
     {
         std::vector<Point> obstacles;
         const Team& enemy    = world.enemyTeam();
@@ -59,8 +59,8 @@ namespace Evaluation
     }
 
     std::vector<std::pair<Point, Angle>> calcBestShotAll(const World& world,
-                                                            const Robot& robot,
-                                                            double radius)
+                                                         const Robot& robot,
+                                                         double radius)
     {
         std::vector<Point> obstacles;
         const Team& enemy    = world.enemyTeam();

@@ -27,8 +27,8 @@ namespace Evaluation
      * where the score will be 0 if the point is invalid.
      */
     std::pair<Point, Angle> calcBestShot(const Field& f,
-                                           const std::vector<Point>& obstacles,
-                                           const Point& p, double radius = 1.0);
+                                         const std::vector<Point>& obstacles,
+                                         const Point& p, double radius = 1.0);
 
     /**
      * Finds the length of the all continuous interval (angle-wise) of the
@@ -70,7 +70,7 @@ namespace Evaluation
      * where the score will be 0 if the point is invalid.
      */
     std::pair<Point, Angle> calcBestShot(const World& world, const Robot& robot,
-                                           double radius = 1.0);
+                                         double radius = 1.0);
 
 
     /**
@@ -90,8 +90,8 @@ namespace Evaluation
      */
 
     std::vector<std::pair<Point, Angle>> calcBestShotAll(const World& world,
-                                                            const Robot& robot,
-                                                            double radius = 1.0);
+                                                         const Robot& robot,
+                                                         double radius = 1.0);
 
 }  // namespace Evaluation
 #endif
