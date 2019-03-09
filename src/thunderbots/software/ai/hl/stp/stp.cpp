@@ -61,9 +61,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return intents;
 }
 
-std::vector<std::pair<Robot, std::shared_ptr<Tactic>>>
-STP::calculateTacticRobotAssignment(const World& world,
-                                    std::vector<std::shared_ptr<Tactic>> tactics) const
+std::vector<std::shared_ptr<Tactic>> STP::calculateTacticRobotAssignment(
+    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
 {
     return {};
 }

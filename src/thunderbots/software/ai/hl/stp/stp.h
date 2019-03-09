@@ -38,10 +38,10 @@ class STP : public HL
      * @param world The state of the world, which contains the friendly Robots that will
      * be mapped to a Tactic
      * @param tactics The list of tactics that should be run (and paired with a Robot)
-     * @return A list of pairs, where each pair contains a Robot and the Tactic that the
-     * Robot will run
+     * @return A list of tactics, where each tactic has a robot assigned to it. Only
+     * tactics with a robot assigned are returned
      */
-    std::vector<std::pair<Robot, std::shared_ptr<Tactic>>> calculateTacticRobotAssignment(
+    std::vector<std::shared_ptr<Tactic>> calculateTacticRobotAssignment(
         const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const;
 
     /**
