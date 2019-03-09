@@ -21,6 +21,10 @@
     min: 0
     max: 10000
     default: 1000
+    options:
+        - 1000
+        - 100
+        - 120
     type: "int"
     description: "The RPM of the robot's dribbler when turned on"
   linear_sensitivity:

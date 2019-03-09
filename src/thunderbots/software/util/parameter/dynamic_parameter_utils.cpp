@@ -1,12 +1,15 @@
 #include "util/parameter/dynamic_parameter_utils.h"
 
+#include "util/parameter/dynamic_parameters.h"
+
 namespace Util::DynamicParameters
 {
-    ros::Subscriber initParamUpdateSubscription(ros::NodeHandle& node_handle)
-    {
-        // return the subscriber that updates the parameters on change
-        return node_handle.subscribe(node_handle.getNamespace() + "/parameter_updates", 1,
-                                     Util::DynamicParameters::parameterUpdateCallback);
+
+    void init(){
+
+    }
+    void initReconfigureServers(){
+
     }
 
     void parameterUpdateCallback(const dynamic_reconfigure::Config::ConstPtr& updates)

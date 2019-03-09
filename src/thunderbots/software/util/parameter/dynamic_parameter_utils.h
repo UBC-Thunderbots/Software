@@ -5,10 +5,9 @@
 
 namespace Util::DynamicParameters
 {
-    /**
-     * Initializes the subscriber to the parameter update callback
-     */
-    ros::Subscriber initParamUpdateSubscription(ros::NodeHandle& node_handle);
+    void init();
+    void initReconfigureServers();
+    extern std::vector<std::string> cfg_strs;
 
     /**
      * This callback is attatched to the /parameter/parameter_updates topic

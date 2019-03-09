@@ -472,7 +472,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/evaluation/robot.cpp
             test/ai/evaluation/team.cpp
             test/test_util/test_util.cpp
-            util/parameter/dynamic_parameters.cpp
+            util/parameter/dynamic_parameter_utils.cpp
             util/timestamp.cpp
     )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
