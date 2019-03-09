@@ -17,14 +17,6 @@
 
 #include "util/logger/init.h"
 
-template <class... Ts>
-struct overload : Ts...
-{
-    using Ts::operator()...;
-};
-template <class... Ts>
-overload(Ts...)->overload<Ts...>;
-
 MotionController::Velocity MotionController::bangBangVelocityController(
     const Robot robot,
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
