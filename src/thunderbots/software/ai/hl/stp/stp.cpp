@@ -5,6 +5,7 @@
 #include <chrono>
 #include <exception>
 #include <random>
+#include <munkres/munkres.h>
 
 #include "ai/hl/stp/play/play.h"
 #include "ai/hl/stp/tactic/tactic.h"
@@ -39,7 +40,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     if (tactics)
     {
         // Get the optimal assignment of robots to tactics
-        auto assigned_tactics = calculateTacticRobotAssignment(world, *tactics);
+        auto assigned_tactics = assignRobotsToTactics(world, *tactics);
 
         for (const auto& tactic : assigned_tactics)
         {
@@ -55,10 +56,64 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     return intents;
 }
 
-std::vector<std::shared_ptr<Tactic>> STP::calculateTacticRobotAssignment(
-    const World& world, std::vector<std::shared_ptr<Tactic>> tactics) const
+std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
+        const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const
 {
-    return {};
+    if(world.friendlyTeam().numRobots() < tactics.size()) {
+        // We do not have enough robots to assign all the tactics to. We "drop"
+        // (aka don't assign) the tactics at the end of the vector since they are
+        // considered lower priority
+        tactics.resize(world.friendlyTeam().numRobots());
+    }
+
+    auto friendly_team = world.friendlyTeam();
+    auto friendly_team_robots = friendly_team.getAllRobots();
+    auto friendly_team_size = friendly_team.numRobots();
+
+    size_t num_rows = world.friendlyTeam().numRobots();
+    size_t num_cols = tactics.size();
+
+    // The Matrix constructor will assert if the rows and columns of the matrix are
+    // not >= 1, so we perform that check first and return an empty vector of tactics
+    if(num_rows == 0 || num_cols == 0) {
+        return {};
+    }
+
+    // The rows of the matrix are the "workers" (the robots) and the columns are the
+    // "jobs" (the Tactics)
+    Matrix<double> matrix(num_rows, num_cols);
+
+    // Initialize the matrix with the cost of assigning each Robot to each Tactic
+    for(int row = 0; row < num_rows; row++) {
+        for(int col = 0; col < num_cols; col++) {
+            matrix(row, col) = tactics.at(col)->calculateRobotCost(friendly_team_robots.at(row), world);
+        }
+    }
+
+    // Apply the Munkres/Hungarian algorithm to the matrix.
+    Munkres<double> m;
+    m.solve(matrix);
+
+    // The Munkres matrix gets solved such that there will be exactly one 0 in every row
+    // and exactly one 0 in every column. All other values will be -1. The 0's indicate the
+    // "workers" and "jobs" (robots and tactics for us) that are most optimally paired
+    // together
+    //
+    // Example matrices:
+    //        -1, 0,-1,         and            0,-1,
+    //         0,-1,-1,                       -1, 0,
+    //        -1,-1, 0,
+    for(int row = 0; row < num_rows; row++) {
+        for(int col = 0; col < num_cols; col++) {
+            auto val = matrix(row, col);
+            if(val == 0) {
+                tactics.at(col)->updateRobot(friendly_team_robots.at(row));
+                break;
+            }
+        }
+    }
+
+    return tactics;
 }
 
 std::unique_ptr<Play> STP::calculateNewPlay(const World& world)
