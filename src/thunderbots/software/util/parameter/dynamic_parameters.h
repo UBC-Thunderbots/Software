@@ -49,7 +49,6 @@ namespace Util
 
                 // This controls how heavily we weight a robot being near the pass
                 // receiver when calculating enemy risk to a pass
-                // TODO: Do the rest of the stuff for this dynamic param
                 extern Parameter<double> enemy_proximity_importance;
 
                 // The minimum open angle formed by the two enemy goal posts and the
