@@ -620,6 +620,34 @@ Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector 
     return segB;
 }
 
+Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vector &lineB)
+{
+    // find point C, the projection onto the line
+    double len_line = (lineB - lineA).dot(centre - lineA) / (lineB - lineA).len();
+    Vector C      = lineA + len_line * (lineB - lineA).norm();
+    return C;
+
+    // check if C is in the line range
+    double AC     = (lineA - C).lensq();
+    double BC     = (lineB - C).lensq();
+    double AB     = (lineA - lineB).lensq();
+    bool in_range = AC <= AB && BC <= AB;
+
+    // if so return C
+    if (in_range){
+    }
+        
+    double lenA = (centre - lineA).len();
+    double lenB = (centre - lineB).len();
+
+    // otherwise return closest end of line-seg
+    if (lenA < lenB)
+    {
+        return lineA;
+    }
+    return lineB;
+}
+
 namespace
 {
     std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
@@ -810,7 +838,7 @@ double offsetToLine(Vector x0, Vector x1, Vector p)
     // get normal to line
     n = (x1 - x0).perp().norm();
 
-    return n.dot(p - x0);
+    return abs(n.dot(p - x0));
 }
 
 double offsetAlongLine(Vector x0, Vector x1, Vector p)
