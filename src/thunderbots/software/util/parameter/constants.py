@@ -76,6 +76,7 @@ NODE_HEADER = """{}#include <dynamic_reconfigure/server.h>
 INCLUDE_STATEMENT = "#include <thunderbots/{}Config.h>\n"
 INIT_NODE = "ros::init(argc, argv, \"dynamic_parameters\");\n"
 MAIN_FUNC = "int main(int argc, char** argv){{\n{}\n}};"
+SPIN_NODE = "ros::spin();"
 
 NEW_SERVER = """ros::NodeHandle nh_{name}(\"/{name}\");
 dynamic_reconfigure::Server<param_server::{name}Config> {name}(nh_{name});\n"""

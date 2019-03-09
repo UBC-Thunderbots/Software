@@ -255,12 +255,17 @@ def generate_server_node(param_info, output_path):
         # init node
         main_contents = constants.INIT_NODE
 
-        # main contents
+        # main servers
         for key in param_info.iterkeys():
             main_contents += constants.NEW_SERVER.format(name=key)
 
+        # spin node
+        main_contents += constants.SPIN_NODE
+
         # write the main function
         reconfigure_server_node.write(constants.MAIN_FUNC.format(main_contents))
+
+    print '===== created server node header ====='
 
 
 
@@ -268,8 +273,17 @@ def generate_server_node(param_info, output_path):
 #                                MAIN                                 #
 #######################################################################
 if __name__ == '__main__':
+    # get config
     config = load_configuration(constants.PATH_TO_YAML)
     __import__('pprint').pprint(config)
+
+    # create folders
+    if not os.path.exists(constants.PATH_TO_AUTOGEN_CPP):
+        os.mkdir(constants.PATH_TO_AUTOGEN_CPP)
+    if not os.path.exists(constants.PATH_TO_AUTOGEN_CFG):
+        os.mkdir(constants.PATH_TO_AUTOGEN_CFG)
+
+    # generate
     generate_cfg(config, constants.PATH_TO_AUTOGEN_CFG)
     generate_header_cpp(config, constants.PATH_TO_AUTOGEN_CPP)
     generate_server_node(config, constants.PATH_TO_AUTOGEN_CPP)
