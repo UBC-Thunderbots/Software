@@ -43,7 +43,7 @@ class STP : public HL
      * tactics with a robot assigned are returned
      */
     std::vector<std::shared_ptr<Tactic>> assignRobotsToTactics(
-            const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const;
+        const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const;
 
     /**
      * Given the state of the world, returns a unique_ptr to the Play that should be run

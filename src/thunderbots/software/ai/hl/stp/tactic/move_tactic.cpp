@@ -4,7 +4,8 @@
 
 MoveTactic::MoveTactic() : Tactic() {}
 
-std::string MoveTactic::getName() const {
+std::string MoveTactic::getName() const
+{
     return "Move Tactic";
 }
 

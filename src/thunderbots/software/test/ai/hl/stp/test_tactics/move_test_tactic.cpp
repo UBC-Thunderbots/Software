@@ -6,7 +6,8 @@
 
 MoveTestTactic::MoveTestTactic() : Tactic() {}
 
-std::string MoveTestTactic::getName() const {
+std::string MoveTestTactic::getName() const
+{
     return "Move Test Tactic";
 }
 

@@ -6,7 +6,8 @@
 
 StopTestTactic::StopTestTactic() : Tactic() {}
 
-std::string StopTestTactic::getName() const {
+std::string StopTestTactic::getName() const
+{
     return "Stop Test Tactic";
 }
 

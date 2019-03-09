@@ -1,10 +1,10 @@
-#include "ai/hl/stp/stp.h"
-
 #include <gtest/gtest.h>
-
-#include <algorithm>
 #include <test/ai/hl/stp/test_tactics/move_test_tactic.h>
 #include <test/ai/hl/stp/test_tactics/stop_test_tactic.h>
+
+#include <algorithm>
+
+#include "ai/hl/stp/stp.h"
 #include "test/test_util/test_util.h"
 
 /**
@@ -15,7 +15,7 @@
 
 class STPTacticAssignmentTest : public ::testing::Test
 {
-protected:
+   protected:
     void SetUp() override
     {
         // Give an explicit seed to STP so that our tests are deterministic
@@ -27,14 +27,15 @@ protected:
     World world;
 };
 
-TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_equal_number_of_robots_and_tactics) {
+TEST_F(STPTacticAssignmentTest,
+       test_correct_number_of_tactics_returned_when_equal_number_of_robots_and_tactics)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                   robot_0,
-                                   robot_1
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
@@ -43,22 +44,20 @@ TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_equ
     move_tactic_1->updateParams(Point(-1, 0));
     move_tactic_2->updateParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1,
-            move_tactic_2
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 2);
 }
 
-TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_more_tactics_than_robots) {
+TEST_F(STPTacticAssignmentTest,
+       test_correct_number_of_tactics_returned_when_more_tactics_than_robots)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
@@ -67,40 +66,37 @@ TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_mor
     move_tactic_1->updateParams(Point(-1, 0));
     move_tactic_2->updateParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1,
-            move_tactic_2
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 1);
 }
 
-TEST_F(STPTacticAssignmentTest, test_correct_number_of_tactics_returned_when_more_robots_than_tactics) {
+TEST_F(STPTacticAssignmentTest,
+       test_correct_number_of_tactics_returned_when_more_robots_than_tactics)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0,
-                                       robot_1
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
     move_tactic_1->updateParams(Point(-1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 1);
 }
 
-TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots) {
+TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots)
+{
     Team friendly_team(Duration::fromSeconds(0));
     friendly_team.updateRobots({});
     world.updateFriendlyTeamState(friendly_team);
@@ -109,23 +105,21 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
 
     move_tactic_1->updateParams(Point(-1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 0);
 }
 
-TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_tactics) {
+TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_tactics)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-        robot_0,
-        robot_1
-    });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
     std::vector<std::shared_ptr<Tactic>> tactics;
@@ -136,12 +130,13 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_tactic
 }
 
 
-TEST_F(STPTacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_than_robots) {
+TEST_F(STPTacticAssignmentTest,
+       test_correct_tactics_removed_when_more_tactics_than_robots)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
@@ -150,10 +145,7 @@ TEST_F(STPTacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_t
     move_tactic_1->updateParams(Point(-1, 0));
     stop_tactic_1->updateParams();
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1,
-            stop_tactic_1
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, stop_tactic_1};
 
     // Both robots are now closest to move_tactic_1's destination. We do NOT want
     // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
@@ -169,21 +161,19 @@ TEST_F(STPTacticAssignmentTest, test_correct_tactics_removed_when_more_tactics_t
 }
 
 
-TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot) {
+TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
     move_tactic_1->updateParams(Point(2, -3.2));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
@@ -195,14 +185,14 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot) {
 // Each robot is already close to one of the tactic's destinations, so it is trivial to
 // see the optimal assignment is for each robot to be assigned to the tactic whose
 // destination it's closest to
-TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap) {
+TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0,
-                                       robot_1
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
@@ -211,10 +201,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     move_tactic_1->updateParams(Point(-1, 0));
     move_tactic_2->updateParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1,
-            move_tactic_2
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
     // Each robot is close to separate tactic destinations. They should each be trivially
     // assigned to the tactic with the destination closest to their position
@@ -236,14 +223,14 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
 //
 //
 //                     dest1             dest2
-TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap) {
+TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overlap)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(-3, 1.5), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0,
-                                       robot_1
-                               });
+    Robot robot_0(0, Point(-1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(-3, 1.5), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
@@ -252,10 +239,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     move_tactic_1->updateParams(Point(-1, 0));
     move_tactic_2->updateParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1,
-            move_tactic_2
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
     // Both robots are now closest to move_tactic_1's destination. We do NOT want
     // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
@@ -269,16 +253,16 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_0);
 }
 
-TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics) {
+TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0,
-                                       robot_1,
-                                       robot_2
-                               });
+    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
@@ -287,10 +271,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics) {
     move_tactic_1->updateParams(Point(-1, 0));
     move_tactic_2->updateParams(Point(1, 0));
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            move_tactic_1,
-            move_tactic_2
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
     // robot_2 should not be assigned since both robot_0 and robot_1 are more optimal
     // to assign to the tactics. robot_2 is too far away
@@ -302,16 +283,17 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics) {
     EXPECT_EQ(assigned_tactics.at(1)->getAssignedRobot(), robot_1);
 }
 
-TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_the_same_cost) {
+TEST_F(STPTacticAssignmentTest,
+       test_assigning_3_robots_to_3_tactics_all_with_the_same_cost)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0,
-                                       robot_1,
-                                       robot_2
-                               });
+    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_2(2, Point(0, 5.0), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
     auto stop_tactic_1 = std::make_shared<StopTestTactic>();
@@ -322,11 +304,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_th
     stop_tactic_2->updateParams();
     stop_tactic_3->updateParams();
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            stop_tactic_1,
-            stop_tactic_2,
-            stop_tactic_3
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {stop_tactic_1, stop_tactic_2,
+                                                    stop_tactic_3};
 
     // If all costs are equal, the robots and tactics are simply paired in order
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
@@ -337,16 +316,17 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_all_with_th
     EXPECT_EQ(assigned_tactics.at(2)->getAssignedRobot(), robot_2);
 }
 
-TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_with_2_of_the_same_cost) {
+TEST_F(STPTacticAssignmentTest,
+       test_assigning_3_robots_to_3_tactics_with_2_of_the_same_cost)
+{
     Team friendly_team(Duration::fromSeconds(0));
-    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot robot_2(2, Point(0, 4.0), Point(), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-                                       robot_0,
-                                       robot_1,
-                                       robot_2
-                               });
+    Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_1(1, Point(2, 0.81), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    Robot robot_2(2, Point(0, 4.0), Point(), Angle::zero(), AngularVelocity::zero(),
+                  Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({robot_0, robot_1, robot_2});
     world.updateFriendlyTeamState(friendly_team);
 
     auto stop_tactic_1 = std::make_shared<StopTestTactic>();
@@ -360,11 +340,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_3_tactics_with_2_of_t
     move_tactic_1->updateParams(Point(0, 0));
     stop_tactic_2->updateParams();
 
-    std::vector<std::shared_ptr<Tactic>> tactics = {
-            stop_tactic_1,
-            move_tactic_1,
-            stop_tactic_2
-    };
+    std::vector<std::shared_ptr<Tactic>> tactics = {stop_tactic_1, move_tactic_1,
+                                                    stop_tactic_2};
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
