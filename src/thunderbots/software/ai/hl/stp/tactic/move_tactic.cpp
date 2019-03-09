@@ -4,6 +4,11 @@
 
 MoveTactic::MoveTactic() : Tactic() {}
 
+std::string MoveTactic::getName() const
+{
+    return "Move Tactic";
+}
+
 void MoveTactic::updateParams(Point destination, Angle final_orientation,
                               double final_speed)
 {
