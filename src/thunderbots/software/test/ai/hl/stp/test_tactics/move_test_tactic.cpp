@@ -6,6 +6,11 @@
 
 MoveTestTactic::MoveTestTactic() : Tactic() {}
 
+std::string MoveTestTactic::getName() const
+{
+    return "Move Test Tactic";
+}
+
 void MoveTestTactic::updateParams(Point destination)
 {
     // Update the parameters stored by this Tactic
