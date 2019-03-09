@@ -206,7 +206,7 @@ double PassGenerator::ratePass(Pass pass)
 
     double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
 
-    double enemy_pass_rating = 1 - ratePassEnemyRisk(world.enemyTeam(), pass);
+    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
     double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
 

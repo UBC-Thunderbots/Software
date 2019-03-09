@@ -331,6 +331,19 @@ TEST(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
     EXPECT_EQ(0, ratePassFriendlyCapability(team, pass));
 }
 
+TEST(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
+{
+    Team team(Duration::fromSeconds(10));
+    team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
+                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0)),
+                       Robot(1, {100, -100}, {0, 0}, Angle::ofDegrees(0),
+                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+    Pass pass({0, 0}, {1, 1}, 0, Timestamp::fromSeconds(10));
+
+    // If there are no robots on the team, then there is no way we can receive a pass
+    EXPECT_EQ(0, ratePassFriendlyCapability(team, pass));
+}
+
 TEST(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one_far_away)
 {
     // Test getting friendly capability for a team with two robots, one near the pass

@@ -169,6 +169,11 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
         return 0;
     }
 
+    // Special case where pass speed is 0
+    if (pass.speed() == 0){
+        return 0;
+    }
+
     // Get the robot that is closest to where the pass would be received
     Robot best_receiver = friendly_team.getAllRobots()[0];
     for (Robot& robot : friendly_team.getAllRobots())
