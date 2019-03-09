@@ -52,6 +52,9 @@ namespace Util::DynamicParameters
                 "ideal_min_shoot_angle_degrees", 40.0);
             Parameter<double> ideal_min_rotation_to_shoot_degrees(
                 "ideal_min_rotation_to_shoot_degrees", 5.0);
+            Parameter<double> min_time_offset_for_pass_seconds("min_time_offset_for_pass_seconds", 0.3);
+            Parameter<double> min_pass_speed_m_per_s("min_pass_speed_m_per_s", 2.0);
+            Parameter<double> max_pass_speed_m_per_s("max_pass_speed_m_per_s", 4.0);
             Parameter<int32_t> num_passes_to_optimize("num_passes_to_optimize", 50);
             Parameter<int32_t> num_passes_to_keep_after_pruning(
                 "num_passes_to_keep_after_pruning", 10);
