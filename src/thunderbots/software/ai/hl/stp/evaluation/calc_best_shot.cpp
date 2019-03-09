@@ -5,7 +5,7 @@
 
 namespace Evaluation
 {
-    std::pair<Point, Angle> calc_best_shot(const Field& f,
+    std::pair<Point, Angle> calcBestShot(const Field& f,
                                            const std::vector<Point>& obstacles,
                                            const Point& p, const double radius)
     {
@@ -16,7 +16,7 @@ namespace Evaluation
         return angleSweepCircles(p, p1, p2, obstacles, radius * ROBOT_MAX_RADIUS_METERS);
     }
 
-    std::vector<std::pair<Point, Angle>> calc_best_shot_all(
+    std::vector<std::pair<Point, Angle>> calcBestShotAll(
         const Field& f, const std::vector<Point>& obstacles, const Point& p,
         const double radius)
     {
@@ -26,15 +26,14 @@ namespace Evaluation
                                     radius * ROBOT_MAX_RADIUS_METERS);
     }
 
-    std::pair<Point, Angle> calc_best_shot(
-        const World& world, const Robot& robot,
-        double radius)
+    std::pair<Point, Angle> calcBestShot(const World& world, const Robot& robot,
+                                           double radius)
     {
         std::vector<Point> obstacles;
         const Team& enemy    = world.enemyTeam();
         const Team& friendly = world.friendlyTeam();
         obstacles.reserve(enemy.numRobots() + friendly.numRobots());
-        //create a vector of points for all the robots except the shooting one
+        // create a vector of points for all the robots except the shooting one
         for (const Robot& i : enemy.getAllRobots())
         {
             obstacles.emplace_back(i.position());
@@ -48,7 +47,7 @@ namespace Evaluation
             obstacles.emplace_back(fpl.position());
         }
         std::pair<Point, Angle> best_shot =
-            calc_best_shot(world.field(), obstacles, robot.position(), radius);
+            calcBestShot(world.field(), obstacles, robot.position(), radius);
         // if there is no good shot at least make the
         // target within the goal area
         if (best_shot.second <= Angle::zero())
@@ -59,7 +58,7 @@ namespace Evaluation
         return best_shot;
     }
 
-    std::vector<std::pair<Point, Angle>> calc_best_shot_all(const World& world,
+    std::vector<std::pair<Point, Angle>> calcBestShotAll(const World& world,
                                                             const Robot& robot,
                                                             double radius)
     {
@@ -79,7 +78,7 @@ namespace Evaluation
             }
             obstacles.push_back(fpl.position());
         }
-        return calc_best_shot_all(world.field(), obstacles, robot.position(), radius);
+        return calcBestShotAll(world.field(), obstacles, robot.position(), radius);
     }
 
 }  // namespace Evaluation

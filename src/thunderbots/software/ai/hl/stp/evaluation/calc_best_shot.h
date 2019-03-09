@@ -26,7 +26,7 @@ namespace Evaluation
      * @return the point and the score (angle),
      * where the score will be 0 if the point is invalid.
      */
-    std::pair<Point, Angle> calc_best_shot(const Field& f,
+    std::pair<Point, Angle> calcBestShot(const Field& f,
                                            const std::vector<Point>& obstacles,
                                            const Point& p, double radius = 1.0);
 
@@ -50,7 +50,7 @@ namespace Evaluation
      */
 
 
-    std::vector<std::pair<Point, Angle>> calc_best_shot_all(
+    std::vector<std::pair<Point, Angle>> calcBestShotAll(
         const Field& f, const std::vector<Point>& obstacles, const Point& p,
         double radius = 1.0);
 
@@ -69,7 +69,7 @@ namespace Evaluation
      * @return the point as and the score (angle),
      * where the score will be 0 if the point is invalid.
      */
-    std::pair<Point, Angle> calc_best_shot(const World& world, const Robot& robot,
+    std::pair<Point, Angle> calcBestShot(const World& world, const Robot& robot,
                                            double radius = 1.0);
 
 
@@ -89,7 +89,7 @@ namespace Evaluation
      * where the score will be 0 if the point is invalid.
      */
 
-    std::vector<std::pair<Point, Angle>> calc_best_shot_all(const World& world,
+    std::vector<std::pair<Point, Angle>> calcBestShotAll(const World& world,
                                                             const Robot& robot,
                                                             double radius = 1.0);
 

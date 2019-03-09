@@ -451,6 +451,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(timestamp_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(ai_evaluation_test
+            ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
@@ -461,6 +462,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
+            test/ai/evaluation/calc_best_shot.cpp
             test/ai/evaluation/deflect_off_enemy_target.cpp
             test/ai/evaluation/main.cpp
             test/ai/evaluation/robot.cpp
