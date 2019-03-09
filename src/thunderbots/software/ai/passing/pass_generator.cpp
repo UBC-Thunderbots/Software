@@ -15,6 +15,7 @@ PassGenerator::PassGenerator(double min_reasonable_pass_quality)
       optimizer(optimizer_param_weights),
       best_known_pass(std::nullopt),
       target_region(std::nullopt),
+      random_num_gen(random_device()),
       in_destructor(false)
 {
     // Generate the initial set of passes
@@ -223,6 +224,7 @@ double PassGenerator::ratePass(Pass pass)
     // Strict requirement that the pass occurs at a minimum time in the future
     double min_pass_time_offset =
         Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
     pass_quality *= sigmoid(
         pass.startTime().getSeconds(),
         min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
@@ -238,13 +240,43 @@ double PassGenerator::ratePass(Pass pass)
     return pass_quality;
 }
 
-std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen)
+std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
 {
-    Pass p(Point(0, 0), Point(0, 0), 0, Timestamp::fromSeconds(0));
+    // Take ownership of world for the duration of this function
+    std::lock_guard<std::mutex> world_lock(world_mutex);
 
-    // TODO (Issue #382): Implement this properly
+    std::uniform_real_distribution x_distribution(-world.field().width()/2, world.field().width()/2);
+    std::uniform_real_distribution y_distribution(-world.field().length()/2, world.field().length()/2);
+    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
+    Timestamp curr_time = world.ball().lastUpdateTimestamp();
+    Duration min_start_time_offset = Duration::fromSeconds(
+            Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value()
+    );
+    Duration max_start_time_offset = Duration::fromSeconds(
+            Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value()
+    );
+    std::uniform_real_distribution start_time_distribution(
+            curr_time + min_start_time_offset, curr_time + max_start_time_offset
+    );
+    std::uniform_real_distribution speed_distribution(
+            Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value(),
+            Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value()
+    );
 
-    return std::vector<Pass>(num_paths_to_gen, p);
+    std::vector<Pass> passes(num_passes_to_gen);
+    for (int i = 0; i < num_passes_to_gen; i++){
+        Point receiver_point(
+                x_distribution(random_num_gen),
+                y_distribution(random_num_gen)
+        );
+        Timestamp start_time = Timestamp::fromSeconds(start_time_distribution(random_num_gen));
+        double pass_speed = speed_distribution(random_num_gen);
+
+        Pass p(passer_point, receiver_point, pass_speed, start_time);
+        passes.emplace_back(p);
+    }
+
+    return passes;
 }
 
 bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)

@@ -2,6 +2,7 @@
 
 #include <mutex>
 #include <thread>
+#include <random>
 
 #include "ai/passing/pass.h"
 #include "ai/world/world.h"
@@ -247,6 +248,10 @@ namespace AI::Passing
 
         // The optimizer we're using to find passes
         Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+
+        // A random number generator for use across the class
+        std::random_device random_device;
+        std::mt19937 random_num_gen;
     };
 
 

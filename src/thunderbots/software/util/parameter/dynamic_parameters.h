@@ -63,10 +63,11 @@ namespace Util
                 // more of a weight then a cutoff
                 extern Parameter<double> ideal_min_rotation_to_shoot_degrees;
 
-                // Minimum time into the future at which the pass should occur. This is
-                // to ensure we have enough time to setup a robot to actually perform
+                // Minimum/maximum time into the future at which the pass should occur.
+                // This is to ensure we have enough time to setup a robot to actually perform
                 // the pass. This is in seconds
                 extern Parameter<double> min_time_offset_for_pass_seconds;
+                extern Parameter<double> max_time_offset_for_pass_seconds;
 
                 // The minimum/maximum pass speed (in m/s)
                 extern Parameter<double> min_pass_speed_m_per_s;
