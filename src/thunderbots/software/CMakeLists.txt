@@ -612,6 +612,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
+            test/ai/hl/stp/stp_tactic_assignment.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/timestamp.cpp
             util/time/duration.cpp

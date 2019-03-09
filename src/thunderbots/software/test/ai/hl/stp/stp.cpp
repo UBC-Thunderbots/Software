@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <test/ai/hl/stp/test_tactics/move_test_tactic.h>
 
 #include "ai/hl/stp/play/play_factory.h"
 #include "test/test_util/test_util.h"
