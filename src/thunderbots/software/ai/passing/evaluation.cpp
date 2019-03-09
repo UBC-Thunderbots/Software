@@ -119,19 +119,17 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     Point closest_point_on_pass_to_robot = closestPointOnSeg(
         enemy_robot.position(), pass.passerPoint(), pass.receiverPoint());
     Duration enemy_robot_time_to_closest_pass_point =
-            getTimeToPositionForRobot(enemy_robot,
-                                      closest_point_on_pass_to_robot,
-                                      ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                      ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+        getTimeToPositionForRobot(enemy_robot, closest_point_on_pass_to_robot,
+                                  ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                  ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.
-    Duration enemy_robot_time_to_pass_receive_position =
-            getTimeToPositionForRobot(enemy_robot, pass.receiverPoint(),
-                                      ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                      ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(
+        enemy_robot, pass.receiverPoint(), ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
     double robot_ball_time_diff_at_closest_pass_point =
@@ -190,19 +188,17 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
     Timestamp receive_time = pass.startTime() + ball_travel_time;
 
     // Figure out how long it would take our robot to get there
-    Duration min_robot_travel_time =
-            getTimeToPositionForRobot(best_receiver, pass.receiverPoint(),
-                                      ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                      ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    Duration min_robot_travel_time = getTimeToPositionForRobot(
+        best_receiver, pass.receiverPoint(), ROBOT_MAX_SPEED_METERS_PER_SECOND,
+        ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_point =
         best_receiver.lastUpdateTimestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
     Angle receive_angle = (best_receiver.position() - pass.passerPoint()).orientation();
-    Duration time_to_receive_angle =
-            getTimeToOrientationForRobot(best_receiver, receive_angle,
-                                         ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-                                         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+    Duration time_to_receive_angle = getTimeToOrientationForRobot(
+        best_receiver, receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+        ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
     Timestamp earliest_time_to_receive_angle =
         best_receiver.lastUpdateTimestamp() + time_to_receive_angle;
 
@@ -216,10 +212,10 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
                    latest_time_to_reciever_state.getSeconds() + 0.5, 1);
 }
 
-Duration AI::Passing::getTimeToOrientationForRobot(const Robot &robot,
-                                                   const Angle &desired_orientation,
-                                                   const double &max_velocity,
-                                                   const double &max_acceleration)
+Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot,
+                                                   const Angle& desired_orientation,
+                                                   const double& max_velocity,
+                                                   const double& max_acceleration)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -234,11 +230,12 @@ Duration AI::Passing::getTimeToOrientationForRobot(const Robot &robot,
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist      = robot.orientation().minDiff(desired_orientation).toRadians();
+    double dist = robot.orientation().minDiff(desired_orientation).toRadians();
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
-    double dist_to_max_possible_vel = std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
+    double dist_to_max_possible_vel =
+        std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
 
     // Calculate how long we'll accelerate for using (3), taking into account that we
     // might not actually reach the max velocity if it will take too much distance
@@ -246,7 +243,8 @@ Duration AI::Passing::getTimeToOrientationForRobot(const Robot &robot,
         std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_acceleration);
 
     // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_velocity = std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
+    double time_at_max_velocity =
+        std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
 
     // The time taken to get to the target angle is:
     // time to accelerate + time at the max velocity + time to de-accelerate
@@ -256,9 +254,9 @@ Duration AI::Passing::getTimeToOrientationForRobot(const Robot &robot,
     return Duration::fromSeconds(travel_time);
 }
 
-Duration AI::Passing::getTimeToPositionForRobot(const Robot &robot, const Point &dest,
-                                                const double &max_velocity,
-                                                const double &max_acceleration)
+Duration AI::Passing::getTimeToPositionForRobot(const Robot& robot, const Point& dest,
+                                                const double& max_velocity,
+                                                const double& max_acceleration)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -273,11 +271,12 @@ Duration AI::Passing::getTimeToPositionForRobot(const Robot &robot, const Point 
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist      = (robot.position() - dest).len();
+    double dist = (robot.position() - dest).len();
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)
-    double dist_to_max_possible_vel = std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
+    double dist_to_max_possible_vel =
+        std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
 
     // Calculate how long we'll accelerate for using (3), taking into account that we
     // might not actually reach the max velocity if it will take too much distance
@@ -285,7 +284,8 @@ Duration AI::Passing::getTimeToPositionForRobot(const Robot &robot, const Point 
         std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_acceleration);
 
     // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_velocity = std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
+    double time_at_max_velocity =
+        std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
 
     // The time taken to get to the receiver point is:
     // time to accelerate + time at the max velocity + time to de-accelerate
