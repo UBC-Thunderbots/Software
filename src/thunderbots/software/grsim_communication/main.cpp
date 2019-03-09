@@ -55,7 +55,6 @@ int main(int argc, char** argv)
     // Initialize the logger
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
-    grsim_backend.setBallState(Point(3, -2), Vector(0, 0));
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown
     // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
