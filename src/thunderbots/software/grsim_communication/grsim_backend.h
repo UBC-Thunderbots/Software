@@ -70,6 +70,24 @@ class GrSimBackend
                                                     AngularVelocity angular_velocity,
                                                     double kick_speed_meters_per_second,
                                                     bool chip, bool dribbler_on) const;
+    /**
+     * Sends a ball replacement grSim_packet to grSim using sendGrSimPacket
+     *
+     * @param position the new position of the ball
+     * @param velocity the new velocity of the ball
+     */
+
+    void setBallState(Point destination, Vector velocity);
+
+    /**
+     * Takes a position and velocity vector for the ball
+     * and use these to construct a grSim_packet with a replacement command.
+     *
+     * @param position the new position of the ball
+     * @param velocity the new velocity of the ball
+     */
+
+    grSim_Packet createGrSimReplacementWithBallState(Point destination, Vector velocity);
 
    private:
     /**

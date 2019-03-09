@@ -1,31 +1,28 @@
 #pragma once
 
-#include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/tactic/tactic.h"
 
 /**
- * The MoveTactic will move the assigned robot to the given destination and arrive
- * with the specified final orientation and speed
+ * A test Tactic used for unit tests
+ *
+ * Moves the assigned robot to the given destination
  */
-class MoveTactic : public Tactic
+class MoveTestTactic : public Tactic
 {
    public:
     /**
-     * Creates a new MoveTactic
+     * Creates a new MoveTestTactic
      */
-    explicit MoveTactic();
+    explicit MoveTestTactic();
 
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this MoveTactic.
+     * Updates the parameters for this MoveTestTactic.
      *
      * @param destination The destination to move to (in global coordinates)
-     * @param final_orientation The final orientation the robot should have at
-     * the destination
-     * @param final_speed The final speed the robot should have at the destination
      */
-    void updateParams(Point destination, Angle final_orientation, double final_speed);
+    void updateParams(Point destination);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -45,8 +42,4 @@ class MoveTactic : public Tactic
     // Tactic parameters
     // The point the robot is trying to move to
     Point destination;
-    // The orientation the robot should have when it arrives at its destination
-    Angle final_orientation;
-    // The speed the robot should have when it arrives at its destination
-    double final_speed;
 };
