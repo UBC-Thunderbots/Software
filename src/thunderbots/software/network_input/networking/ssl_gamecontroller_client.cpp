@@ -2,9 +2,10 @@
 
 #include "util/logger/init.h"
 
-SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
-                                                 const unsigned short port)
-    : socket_(io_service)
+SSLGameControllerClient::SSLGameControllerClient(
+    boost::asio::io_service& io_service, std::string ip_address, unsigned short port,
+    std::function<void(Referee)> handle_function)
+    : socket_(io_service), handle_function(handle_function)
 {
     boost::asio::ip::udp::endpoint listen_endpoint(
         boost::asio::ip::address::from_string(ip_address), port);
@@ -15,7 +16,13 @@ SSLGameControllerClient::SSLGameControllerClient(const std::string ip_address,
     }
     catch (const boost::exception& ex)
     {
-        LOG(INFO) << "SSL Game Controller client could not bind to socket!";
+        LOG(WARNING) << "There was an issue binding the socket to the endpoint when"
+                        "trying to connect to the SSL GameController multicast address."
+                        "This may be due to another instance of the the SSLGameController"
+                        "running and using the port already"
+                     << std::endl;
+        // Throw this exception up to top-level, as we have no valid
+        // recovery action here
         throw;
     }
 
@@ -36,13 +43,10 @@ void SSLGameControllerClient::handleDataReception(const boost::system::error_cod
 {
     if (!error)
     {
-        // We create a new pointer here rather than reset or clear the existing pointer
-        // because the unique_ptr is returned with std::move in the getVisionPacket()
-        // function, meaning we can no longer access that memory. Hence we create a new
-        // pointer to work with
-        packet_data = std::make_unique<Referee>();
-        packet_data->ParseFromArray(raw_received_data_,
-                                    static_cast<int>(num_bytes_received));
+        auto packet_data = Referee();
+        packet_data.ParseFromArray(raw_received_data_.data(),
+                                   static_cast<int>(num_bytes_received));
+        handle_function(packet_data);
 
         // Once we've handled the data, start listening again
         socket_.async_receive_from(
@@ -60,14 +64,8 @@ void SSLGameControllerClient::handleDataReception(const boost::system::error_cod
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
 
-        LOG(WARNING) << "Error while receiving data from SSL Game Controller: " << error;
+        LOG(WARNING)
+            << "An unknown network error occurred when attempting to receive SSL GameController data. The boost system error code is "
+            << error << std::endl;
     }
-}
-
-const std::unique_ptr<Referee> SSLGameControllerClient::getGameControllerPacket()
-{
-    // Polling the service causes the handleDataReception function to run, storing
-    // data in the packet_data variable, which we can then return
-    io_service.poll();
-    return std::move(packet_data);
 }

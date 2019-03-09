@@ -28,8 +28,7 @@ class HL
      * @return A vector of unique pointers to the Intents our friendly robots should be
      * running
      */
-    virtual std::vector<std::unique_ptr<Intent>> getIntentAssignment(
-        const World &world) = 0;
+    virtual std::vector<std::unique_ptr<Intent>> getIntents(const World &world) = 0;
 
     virtual ~HL() = default;
 };

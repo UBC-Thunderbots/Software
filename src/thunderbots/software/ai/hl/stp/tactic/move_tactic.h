@@ -3,37 +3,50 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/tactic/tactic.h"
 
+/**
+ * The MoveTactic will move the assigned robot to the given destination and arrive
+ * with the specified final orientation and speed
+ */
 class MoveTactic : public Tactic
 {
    public:
-    explicit MoveTactic(const Robot& robot);
+    /**
+     * Creates a new MoveTactic
+     */
+    explicit MoveTactic();
+
+    std::string getName() const override;
 
     /**
-     * Returns the next Intent this MoveTactic wants to run, given the parameters.
-     * Moves the robot in a straight line to the given destination.
+     * Updates the parameters for this MoveTactic.
      *
-     * @param robot The robot to move
      * @param destination The destination to move to (in global coordinates)
      * @param final_orientation The final orientation the robot should have at
      * the destination
      * @param final_speed The final speed the robot should have at the destination
-     *
-     * @return A unique pointer to the Intent the MoveAction wants to run. If the
-     * MoveAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
-                                                        Point destination,
-                                                        Angle final_orientation,
-                                                        double final_speed);
+    void updateParams(Point destination, Angle final_orientation, double final_speed);
 
-    double calculateRobotCost(const Robot& robot, const Field& field) override;
+    /**
+     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
+     * closer to the destination
+     *
+     * @param robot The robot to evaluate the cost for
+     * @param world The state of the world with which to perform the evaluation
+     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
+     * to this tactic. Lower cost values indicate a more preferred robot.
+     */
+    double calculateRobotCost(const Robot& robot, const World& world) override;
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type& yield) override;
 
     // Tactic parameters
+    // The point the robot is trying to move to
     Point destination;
+    // The orientation the robot should have when it arrives at its destination
     Angle final_orientation;
+    // The speed the robot should have when it arrives at its destination
     double final_speed;
 };

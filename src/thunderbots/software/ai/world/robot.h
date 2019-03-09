@@ -2,7 +2,7 @@
 
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "util/timestamp.h"
+#include "util/time/timestamp.h"
 
 /**
  * Defines an SSL robot
@@ -55,11 +55,21 @@ class Robot
      * Updates the robot's state to be its predicted state at the given timestamp.
      * The timestamp must be >= the robot's last update timestamp
      *
-     * @throws std::invalid_argument if the robot is updated with a time from the past
      * @param timestamp The timestamp at which to update the robot's state to. Must
      * be >= the robot's last update timestamp
+     * @throws std::invalid_argument if the robot is updated with a time from the past
      */
     void updateStateToPredictedState(const Timestamp &timestamp);
+
+    /**
+     * Updates the robot's state to be its predicted state at the given duration from the
+     * last time it was updated.
+     *
+     * @param duration_in_future A duration >= 0.0 that indicates how long in the future
+     * (from the last time this robot was updated) to update the robot state by
+     * @throws std::invalid_argument if the duration given is negative
+     */
+    void updateStateToPredictedState(const Duration &duration_in_future);
 
     /**
      * Returns the timestamp for when this robot's data was last updated

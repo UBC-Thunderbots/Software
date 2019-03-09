@@ -15,24 +15,35 @@ Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
 {
 }
 
-Point Pass::receiverPoint()
+Point Pass::receiverPoint() const
 {
     return receiver_point;
 }
 
-Point Pass::passerPoint()
+Point Pass::passerPoint() const
 {
     return passer_point;
 }
 
-double Pass::speed()
+double Pass::speed() const
 {
     return pass_speed_m_per_s;
 }
 
-Timestamp Pass::startTime()
+Timestamp Pass::startTime() const
 {
     return pass_start_time;
+}
+
+Timestamp Pass::estimateReceiveTime() const
+{
+    return pass_start_time + estimatePassDuration();
+}
+
+Duration Pass::estimatePassDuration() const
+{
+    return Duration::fromSeconds((receiver_point - passer_point).len() /
+                                 pass_speed_m_per_s);
 }
 
 namespace AI::Passing
