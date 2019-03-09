@@ -39,15 +39,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     if (tactics)
     {
         // Get the optimal assignment of robots to tactics
-        auto tactic_robot_assignments = calculateTacticRobotAssignment(world, *tactics);
+        auto assigned_tactics = calculateTacticRobotAssignment(world, *tactics);
 
-        for (const auto& tactic_robot_pair : tactic_robot_assignments)
+        for (const auto& tactic : assigned_tactics)
         {
-            // Assign the robot to the tactic
-            auto robot  = tactic_robot_pair.first;
-            auto tactic = tactic_robot_pair.second;
-            tactic->updateRobot(robot);
-
             // Get the Intent the tactic wants to run
             auto intent = tactic->getNextIntent();
             if (intent)
