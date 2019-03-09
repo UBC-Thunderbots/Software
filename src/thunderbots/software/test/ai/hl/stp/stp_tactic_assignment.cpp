@@ -8,7 +8,7 @@
 #include "test/test_util/test_util.h"
 
 /**
- * This file contains unit tests for the assignRobotsToTactics function
+ * This file contains unit tests for the calculateTacticRobotAssignment function
  * of the STP module. It is in a separate file because there are so many tests, and it
  * is cleaner to keep separate from the rest of the STP tests
  */
