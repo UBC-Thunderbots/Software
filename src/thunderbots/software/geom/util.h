@@ -44,7 +44,7 @@ double proj_len(const Vector &first, const Vector &second);
 double proj_len(const Segment &first, const Vector &second);
 
 /*
- * The family of `contains` functions determins whether
+ * The family of `contains` functions determines whether
  * the second parameter is contained, even if partially,
  * inside the first parameter.
  */
