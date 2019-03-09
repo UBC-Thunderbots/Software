@@ -20,7 +20,7 @@ class STP : public HL
      * @param random_seed The random seed used for STP's internal random number generator.
      * The default value is 0
      */
-    explicit STP(long random_seedi = 0);
+    explicit STP(long random_seed = 0);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
