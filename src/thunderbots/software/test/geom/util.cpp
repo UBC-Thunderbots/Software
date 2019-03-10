@@ -692,6 +692,18 @@ TEST(GeomUtilTest, test_intersection)
     EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).len() < 0.0001);
 }
 
+// Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point along the ray (Should be ray.getRayStart() + ray.GetDirection())
+TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction) {
+    Segment segment = Segment( Point(-1,1), Point(1,1));
+
+    Ray position_and_direction = Ray( Point(-2,0), Vector(0,1));
+    Ray just_direction = Ray( Point(0,0), Vector(0,1));
+
+    EXPECT_EQ(intersects(position_and_direction, segment), false);
+    EXPECT_EQ(intersects(just_direction, segment), true);
+
+}
+
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
 {
     Segment seg1(Point(0, 0), Point(2, 2));
