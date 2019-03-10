@@ -56,9 +56,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
 # Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 
-# Get cfg generating macro
-include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_cfgs_from_yaml.cmake")
-
 # Create a list of files from the shared folder
 file(GLOB SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
@@ -90,6 +87,8 @@ find_package(catkin REQUIRED COMPONENTS
         dynamic_reconfigure
         )
 
+# Get macro for generating dynamic reconfigure files for multiple languages
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_cfgs_from_yaml.cmake")
 generate_cfgs_from_yaml()
 
 # Specify the configuration file for dynamic_reconfigure pkg

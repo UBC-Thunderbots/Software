@@ -18,14 +18,14 @@ import constants
 def load_configuration(path_to_yaml):
     """Loads the yaml files in the current directory and
     makes a dictionary containg the parameter name and its
-    attributes with the proper heirarchy
+    attributes with the proper hierarchy
 
     NOTE: No exception handling in place so that when an error happens
     it raises to the main thread when catkin_make runs
 
     :param path_to_yaml: The path to where the YAML files are stored
     :type path_to_yaml: str
-    :returns: Dictionary containg the parameters with proper heirarchy
+    :returns: Dictionary containing the parameters with proper hierarchy
     :rtype: dict
 
     """
@@ -38,7 +38,7 @@ def load_configuration(path_to_yaml):
                 try:
                     param_info[filename.split(".")[0]] = yaml.load(param_yaml)
                 except yaml.YAMLError as ymle:
-                    print constants.AUTOGEN_FAILURE_MSG
+                    print(constants.AUTOGEN_FAILURE_MSG)
                     sys.exit(
                         "{} could not be loaded correctly, please check format".format(filename))
     return param_info
@@ -58,11 +58,11 @@ def generate_cfg(param_info, output_path):
     :type output_path: str
 
     """
-    # fist key resolves to filename
-    for key, value in param_info.iteritems():
+    # first key resolves to filename
+    for key, value in param_info.items():
         with open(output_path+key+constants.EXT, 'w+') as fpe:
 
-            # write boilder plate
+            # write boiler plate
             fpe.write(constants.CFG_HEADER)
 
             # generate cfg
@@ -73,7 +73,7 @@ def generate_cfg(param_info, output_path):
 
             # make file read/write/executable
             os.chmod(output_path+key+constants.EXT, 0o0754)
-            print '=== generated {} ==='.format(key)
+            print('=== generated {} params cfg==='.format(key))
 
 
 def __cfg_gen(param_info, file_pointer, group_name=None):
@@ -111,7 +111,7 @@ def __cfg_gen(param_info, file_pointer, group_name=None):
                     ))
 
             except KeyError as kerr:
-                print constants.AUTOGEN_FAILURE_MSG
+                print(constants.AUTOGEN_FAILURE_MSG)
                 sys.exit('Required key missing from config: {}, please check parameter {}'.format(
                     kerr, key))
 
@@ -135,7 +135,7 @@ def __cfg_gen(param_info, file_pointer, group_name=None):
 #######################################################################
 
 
-def generate_header_cpp(param_info, output_path):
+def generate_header_and_cpp(param_info, output_path):
     """Takes the input dictionary from the parsed yaml
     and generates the respective cfg files needed
 
@@ -154,13 +154,13 @@ def generate_header_cpp(param_info, output_path):
     dynamic_parameters_cpp.write(constants.CPP_HEADER)
 
     # generate cfg str used for topic subsription
-    cfg_strs = ",".join("\"{}\"".format(key) for key in param_info.iterkeys())
+    cfg_strs = ",".join("\"{}\"".format(key) for key in param_info.keys())
     dynamic_parameters_cpp.write(constants.CFG_STR_VECTOR.format(cfg_strs))
 
     # iterate through param_info starting from namespaces
     # the first key is the file name, so that is skipped
-    for key, value in param_info.iteritems():
-        __header_cpp_gen(value, key, dynamic_parameters_h, dynamic_parameters_cpp)
+    for key, value in param_info.items():
+        __header_and_cpp_gen(value, key, dynamic_parameters_h, dynamic_parameters_cpp)
 
     # append the footer
     dynamic_parameters_h.write(constants.FOOTER)
@@ -170,10 +170,10 @@ def generate_header_cpp(param_info, output_path):
     dynamic_parameters_h.close()
     dynamic_parameters_cpp.close()
 
-    print '===== created header ====='
+    print('===== created dynamic_parameters header and cpp =====')
 
 
-def __header_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_pointer):
+def __header_and_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_pointer):
     """Takes the information about the parameters and namespaces
     and recursively generates the header file, returns a string to be written
     to the file
@@ -227,7 +227,7 @@ def __header_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_pointer
             header_file_pointer.write(constants.NAMESPACE_OPEN.format(name=key))
             cpp_file_pointer.write(constants.NAMESPACE_OPEN.format(name=key))
 
-            __header_cpp_gen(
+            __header_and_cpp_gen(
                 param_info[key], cfg_name, header_file_pointer, cpp_file_pointer)
 
             # end the namespace
@@ -251,14 +251,14 @@ def generate_server_node(param_info, output_path):
         reconfigure_server_node.write(constants.NODE_HEADER)
         
         # include statements
-        for key in param_info.iterkeys():
+        for key in param_info.keys():
             reconfigure_server_node.write(constants.INCLUDE_STATEMENT.format(key))
 
         # init node
         main_contents = constants.INIT_NODE
 
         # main servers
-        for key in param_info.iterkeys():
+        for key in param_info.keys():
             main_contents += constants.NEW_SERVER.format(name=key)
 
         # spin node
@@ -267,7 +267,7 @@ def generate_server_node(param_info, output_path):
         # write the main function
         reconfigure_server_node.write(constants.MAIN_FUNC.format(main_contents))
 
-    print '===== created server node header ====='
+    print('===== created server node header =====')
 
 
 
@@ -277,7 +277,6 @@ def generate_server_node(param_info, output_path):
 if __name__ == '__main__':
     # get config
     config = load_configuration(constants.PATH_TO_YAML)
-    __import__('pprint').pprint(config)
 
     # create folders
     if not os.path.exists(constants.PATH_TO_AUTOGEN_CPP):
@@ -287,5 +286,5 @@ if __name__ == '__main__':
 
     # generate files
     generate_cfg(config, constants.PATH_TO_AUTOGEN_CFG)
-    generate_header_cpp(config, constants.PATH_TO_AUTOGEN_CPP)
+    generate_header_and_cpp(config, constants.PATH_TO_AUTOGEN_CPP)
     generate_server_node(config, constants.PATH_TO_AUTOGEN_CPP)
