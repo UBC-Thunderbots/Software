@@ -42,7 +42,7 @@ const Wrapper = styled('div')<{ level: number }>`
                     font-weight: 900;
                 `;
             default:
-                return '';
+                return `color: ${props.theme.colors.fg};`;
         }
     }}
 
