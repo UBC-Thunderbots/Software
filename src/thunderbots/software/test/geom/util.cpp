@@ -818,6 +818,19 @@ TEST(GeomUtilTest, test_ray_segment_overlapping)
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment are overlapping on a single point and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping_single_point)
+{
+    Ray ray         = Ray(Point(1, 5), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getEnd());
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

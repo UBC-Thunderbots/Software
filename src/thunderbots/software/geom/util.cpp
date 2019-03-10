@@ -777,7 +777,7 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     {
         // Since we know the ray and segment are overlapping, return the ray start
         // position, and the end of the segment that is in the direction of the ray
-        ray.getDirection().norm() == (segment.getEnd() - ray.getRayStart()).norm()
+        ray.getDirection().norm() == (segment.getEnd() - segment.getSegStart()).norm()
             ? intersection = std::make_optional(segment.getEnd())
             : intersection = std::make_optional(segment.getSegStart());
 
