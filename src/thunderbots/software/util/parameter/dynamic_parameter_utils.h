@@ -5,8 +5,7 @@
 
 namespace Util::DynamicParameters
 {
-    void init();
-    void initReconfigureServers();
+    std::vector<ros::Subscriber> initUpdateSubscriptions(ros::NodeHandle);
     extern std::vector<std::string> cfg_strs;
 
     /**
