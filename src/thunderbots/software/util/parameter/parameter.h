@@ -59,7 +59,7 @@ class Parameter
      */
     const std::string getROSParameterPath() const
     {
-        return NamespaceForParameters + "/" + name();
+        return name();
     }
 
     /**

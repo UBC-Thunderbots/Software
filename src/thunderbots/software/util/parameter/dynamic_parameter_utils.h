@@ -5,8 +5,18 @@
 
 namespace Util::DynamicParameters
 {
-    std::vector<ros::Subscriber> initUpdateSubscriptions(ros::NodeHandle);
+    /*
+     * cfg_sts contains the names of all the cfg files which 
+     * is the namespace on which the parameter update topic will 
+     * be aviable to subscribe to 
+     */
     extern std::vector<std::string> cfg_strs;
+
+    /**
+     * This creates the subscriber to each seperate reconfigure server
+     * to the parameter updates
+     */
+    std::vector<ros::Subscriber> initUpdateSubscriptions(ros::NodeHandle);
 
     /**
      * This callback is attatched to the /parameter/parameter_updates topic

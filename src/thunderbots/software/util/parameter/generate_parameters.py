@@ -100,7 +100,7 @@ def __cfg_gen(param_info, file_pointer, group_name=None):
                 # write parameter to file
                 file_pointer.write(
                     constants.CFG_PARAMETER.format(
-                        namespace=group_name,
+                        namespace=group_name if group_name is not None else "gen",
                         name=key,
                         type=constants.CFG_TYPE_MAP[parameter["type"]],
                         description=parameter["description"],
@@ -159,8 +159,8 @@ def generate_header_cpp(param_info, output_path):
 
     # iterate through param_info starting from namespaces
     # the first key is the file name, so that is skipped
-    for value in param_info.itervalues():
-        __header_cpp_gen(value, dynamic_parameters_h, dynamic_parameters_cpp)
+    for key, value in param_info.iteritems():
+        __header_cpp_gen(value, key, dynamic_parameters_h, dynamic_parameters_cpp)
 
     # append the footer
     dynamic_parameters_h.write(constants.FOOTER)
@@ -173,7 +173,7 @@ def generate_header_cpp(param_info, output_path):
     print '===== created header ====='
 
 
-def __header_cpp_gen(param_info, header_file_pointer, cpp_file_pointer):
+def __header_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_pointer):
     """Takes the information about the parameters and namespaces
     and recursively generates the header file, returns a string to be written
     to the file
@@ -183,9 +183,11 @@ def __header_cpp_gen(param_info, header_file_pointer, cpp_file_pointer):
 
     :param param_info: Contains namespace and parameter information
         organized by filename, followed by namespaces until the parameter
+    :param cfg_name: The name of the configuration file this parameter is in
     :param header_file_pointer: The file pointer to the dynamic_parameters.h file
     :param cpp_file_pointer: The file pointer to the dynamic_parameters.cpp file
     :type param_info: dict
+    :type cfg_name: str
     :type header_file_pointer: file
     :type cpp_file_pointer: file
 
@@ -212,7 +214,7 @@ def __header_cpp_gen(param_info, header_file_pointer, cpp_file_pointer):
             cpp_file_pointer.write(
                 constants.CPP_PARAMETER_INSTNACE.format(
                     name=key,
-                    path=key,
+                    path="/{}/{}".format(cfg_name, key),
                     default=parameter["default"],
                     type=constants.CPP_TYPE_MAP[parameter["type"]],
                     quote="\"" if parameter["type"] in constants.QUOTE_TYPES else ""
@@ -226,7 +228,7 @@ def __header_cpp_gen(param_info, header_file_pointer, cpp_file_pointer):
             cpp_file_pointer.write(constants.NAMESPACE_OPEN.format(name=key))
 
             __header_cpp_gen(
-                param_info[key], header_file_pointer, cpp_file_pointer)
+                param_info[key], cfg_name, header_file_pointer, cpp_file_pointer)
 
             # end the namespace
             header_file_pointer.write(constants.NAMESPACE_CLOSE)
@@ -283,7 +285,7 @@ if __name__ == '__main__':
     if not os.path.exists(constants.PATH_TO_AUTOGEN_CFG):
         os.mkdir(constants.PATH_TO_AUTOGEN_CFG)
 
-    # generate
+    # generate files
     generate_cfg(config, constants.PATH_TO_AUTOGEN_CFG)
     generate_header_cpp(config, constants.PATH_TO_AUTOGEN_CPP)
     generate_server_node(config, constants.PATH_TO_AUTOGEN_CPP)

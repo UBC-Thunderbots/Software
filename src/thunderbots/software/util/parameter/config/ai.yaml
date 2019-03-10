@@ -55,12 +55,6 @@ AI:
       type: "double"
       description: ""
 Navigator:
-  robot_expiry_buffer_milliseconds:
-    min: 0
-    max: 100
-    default: 50
-    type: "int"
-    description: "asdasd"
   default_avoid_dist:
     min: 0
     max: 100
@@ -79,4 +73,9 @@ Navigator:
     default: 0.5
     type: "double"
     description: ""
-
+robot_expiry_buffer_milliseconds:
+  min: 0
+  max: 100
+  default: 50
+  type: "int"
+  description: "asdasd"
