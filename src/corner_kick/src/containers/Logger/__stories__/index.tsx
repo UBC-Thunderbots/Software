@@ -1,5 +1,5 @@
 /*
- * This file creates an story for Logger
+ * This file creates an story for the Logger
  */
 
 import { storiesOf } from '@storybook/react';

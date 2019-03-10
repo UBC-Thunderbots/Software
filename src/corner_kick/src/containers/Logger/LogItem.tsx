@@ -9,7 +9,7 @@ import styled from 'SRC/utils/styled-components';
 
 /**
  * Specifies most of the styling for the LogItem
- * It also includes level depend styling.
+ * It also includes level dependent styling.
  */
 const Wrapper = styled('div')<{ level: number }>`
     width: 100%;
