@@ -776,12 +776,16 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
              collinear(ray.getRayStart(), segment.getSegStart(), segment.getEnd()))
     {
         // Check if ray passes through both segment start and end
-        if( ray.getDirection().norm() == (segment.getSegStart() - ray.getRayStart()).norm() && ray.getDirection().norm() == (segment.getEnd() - ray.getRayStart()).norm() ) {
-            return std::make_pair( segment.getSegStart(), segment.getEnd());
+        if (ray.getDirection().norm() ==
+                (segment.getSegStart() - ray.getRayStart()).norm() &&
+            ray.getDirection().norm() == (segment.getEnd() - ray.getRayStart()).norm())
+        {
+            return std::make_pair(segment.getSegStart(), segment.getEnd());
         }
 
-        // Since we know the ray and segment are overlapping (with ray origin within the segment), return the ray start
-        // position, and the end of the segment that is in the direction of the ray
+        // Since we know the ray and segment are overlapping (with ray origin within the
+        // segment), return the ray start position, and the end of the segment that is in
+        // the direction of the ray
         ray.getDirection().norm() == (segment.getEnd() - segment.getSegStart()).norm()
             ? intersection = std::make_optional(segment.getEnd())
             : intersection = std::make_optional(segment.getSegStart());
