@@ -80,7 +80,7 @@ export const LogItem = ({ item, style }: { item: IRosoutMessage; style: {} }) =>
     // Message to be displayed when user hover over a log item.
     const hoverText =
         `name: ${item.name}\n` +
-        `level: ${item.level}\n` +
+        `level: ${RosoutLevel[item.level]}\n` +
         `msg: ${item.msg}\n` +
         `file: ${item.file}\n` +
         `line: ${item.line}`;
