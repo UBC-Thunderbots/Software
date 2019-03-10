@@ -45,6 +45,14 @@ class PlayFactory
      */
     static std::vector<std::string> getRegisteredPlayNames();
 
+    /**
+     * Returns a list of constructor functions for all the existing Plays
+     *
+     * @return a list of constructor functions for all the existing Plays
+     */
+    static std::vector<std::function<std::unique_ptr<Play>()>>
+    getRegisteredPlayConstructors();
+
    protected:
     /**
      * Adds a Play to the Play Registry

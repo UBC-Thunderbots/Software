@@ -5,7 +5,6 @@
 #       does eventually add support, this should be changed, as it will #
 #       significantly speed up CI times.                                #
 #########################################################################
-
 # Note: Setting `sudo` to `required` will add 20-50s to CI image boot time
 sudo: false
 dist: trusty
@@ -26,9 +25,11 @@ install:
     - RUN_TESTS=${RUN_TESTS:-"false"}
     - RUN_COVERAGE=${RUN_COVERAGE:-"false"}
     - RUN_FORMATTING_CHECKS=${RUN_FORMATTING_CHECKS:-"false"}
+    # Grab environment variables Codecov needs to run in the docker
+    - CODECOV_ENV=`bash <(curl -s https://codecov.io/env)`
     # Run the CI script inside the docker container
     # (set tests/checks to false by default)
-    - docker run 
+    - docker run $CODECOV_ENV
       --env RUN_BUILD
       --env RUN_TESTS
       --env RUN_COVERAGE
@@ -39,12 +40,6 @@ install:
       --volume $(pwd):/root/$REPOSITORY_NAME
       $DOCKER_IMAGE
       /bin/bash -c "/root/$REPOSITORY_NAME/travis_ci.sh"
-
-after_success: 
-    # If Code Coverage ran, then upload the report. We do this from here because
-    # CodeCov's Travis-CI integration requires it to be run directly within
-    # Travis (will not work from within the docker container)
-    - ./codecov.sh
 
 env:
   # Global Variables that are set at the start of every CI run
