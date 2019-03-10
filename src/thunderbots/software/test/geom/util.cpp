@@ -809,7 +809,7 @@ TEST(GeomUtilTest, test_ray_segment_non_intersecting)
 // segment are overlapping and parallel
 TEST(GeomUtilTest, test_ray_segment_overlapping)
 {
-    Ray ray         = Ray(Point(1, 0), Point(0.0, 1));
+    Ray ray         = Ray(Point(1, 1.1), Point(0.0, 1));
     Segment segment = Segment(Point(1, 1), Point(1, 5));
 
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
@@ -819,8 +819,8 @@ TEST(GeomUtilTest, test_ray_segment_overlapping)
 }
 
 // Test to see if raySegmentIntersection() returns the correct parameters when the ray and
-// segment are overlapping on a single point and parallel
-TEST(GeomUtilTest, test_ray_segment_overlapping_single_point)
+// segment are overlapping at segment end and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_end)
 {
     Ray ray         = Ray(Point(1, 5), Point(0.0, 1));
     Segment segment = Segment(Point(1, 1), Point(1, 5));
@@ -828,6 +828,30 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_single_point)
     auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
 
     EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getEnd());
+}
+
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment are overlapping at segment start and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_start)
+{
+    Ray ray         = Ray(Point(1, 1), Point(0.0, -1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getSegStart());
+}
+
+// Test to see if the segment start and end are returned if the ray passes through both
+TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end) {
+    Ray ray         = Ray(Point(1, 0), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), segment.getSegStart());
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
