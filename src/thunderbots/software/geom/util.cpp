@@ -928,6 +928,13 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
+std::pair<Vector, Vector> getCircleTangentVectors( const Point reference, const Circle circle, double buffer) {
+
+    auto [tangent_point1, tangent_point2] getCircleTangentPoints(reference, circle, buffer);
+
+    return std::make_pair((tangent_point1 - reference).norm(), (tangent_point2 - reference).norm());
+};
+
 bool pointIsRightOfLine(const Segment &line, const Point &point)
 {
     return (line.getEnd().x() - line.getSegStart().x()) *
@@ -962,3 +969,24 @@ double getPointsVariance(const std::vector<Point> &points)
     sum /= static_cast<double>(points.size());
     return sqrt(sum);
 }
+
+Segment calculateIntersectingSegmentOfRaySegmentIntersection( Ray ray1, Ray ray2, Segment segment) {
+
+    //auto [intersect11, intersect12] = raySegment
+}
+
+std::pair<Angle, Point> calculateMostOpenDirectionToSegment( Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius) {
+    // IDEA:
+    // Project all objects onto the line segment and keep track of open points
+
+    // How to get blocked segment:
+    // Get tangent vectors from obstacle circle to origin
+    //  flip vector direction and form a ray. If both rays of an obstacle pass through the segment then, block it off
+    //  if one ray intersects, then check block off from the intersecting ray to the segment extreme in the same direction
+    for( Point obstacle : obstacles) {
+        auto
+    }
+    // Combine overlapping obstacle line segments to reduce complexity
+    // iterate over combined line segments to find the largest open segments, and then back-calculate the coresponding angle from the origin
+
+};

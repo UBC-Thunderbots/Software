@@ -455,6 +455,16 @@ bool pointInFrontVector(Point offset, Point dir, Point p);
 std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle &circle,
                                                double buffer = 0.0);
 
+/**
+ * Returns the tangent vectors of a Circle and Point (Vectors are directed towards Circle)
+ *
+ * @param reference: The point which the tangent vectors will intersect
+ * @param circle: The circle to calculate the tangent vectors of
+ * @param buffer:
+ * @return the mean point of points
+ */
+std::pair<Vector, Vector> getCircleTangentVectors(const Point reference, const Circle circle, double buffer =0.0);
+
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
 /**
@@ -472,3 +482,7 @@ Point getPointsMean(const std::vector<Point> &points);
  * @return the variance of the list of points
  */
 double getPointsVariance(const std::vector<Point> &points);
+
+Segment calculateIntersectingSegmentOfRaySegmentIntersection( Ray ray1, Ray ray2, Segment segment);
+
+std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius);
