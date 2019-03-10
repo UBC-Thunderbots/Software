@@ -17,4 +17,4 @@
  * of the path
  */
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
-                                                  const Point &p3, double final_speed);
+                                               const Point &p3, double final_speed);
