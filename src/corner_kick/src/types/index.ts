@@ -6,4 +6,4 @@ export { Color } from './primitives';
 export { IThemeProvider } from './theme';
 export { IRosoutMessage } from './standardROSMessages';
 export { IRootState, IROSState, IMessagesState } from './state';
-export { ILayer, ILayerMessage, IShape } from './visualizer';
+export { ILayer, IShape } from './canvas';

@@ -18,6 +18,7 @@
         "@babel/core": "7.2.2",
         "@storybook/addon-knobs": "4.1.11",
         "@storybook/react": "4.1.11",
+        "@types/chance": "1.0.1",
         "@types/jest": "23.3.12",
         "@types/lodash": "4.14.119",
         "@types/react": "16.7.17",
@@ -52,6 +53,7 @@
         "webpack-dev-server": "3.1.10"
     },
     "dependencies": {
+        "chance": "1.0.18",
         "lodash": "4.17.11",
         "react": "16.6.3",
         "react-custom-scrollbars": "4.2.1",
