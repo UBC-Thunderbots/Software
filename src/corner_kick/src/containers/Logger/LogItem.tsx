@@ -77,7 +77,7 @@ export const LogItem = ({ item, style }: { item: IRosoutMessage; style: {} }) =>
     // We shorten the path to only include the filename
     const shortFilename = item.file.match(/[^/]*$/)![0];
 
-    // Message to be displayed when user hover over a log item.
+    // Message to be displayed when the user hovers over a log item.
     const hoverText =
         `name: ${item.name}\n` +
         `level: ${RosoutLevel[item.level]}\n` +

@@ -1,5 +1,5 @@
 /***
- * This file specifies a Logger outputing /rosout info.
+ * This file specifies a Logger outputting info from /rosout.
  */
 
 import * as React from 'react';
