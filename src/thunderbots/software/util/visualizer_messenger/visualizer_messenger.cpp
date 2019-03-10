@@ -71,15 +71,8 @@ namespace Util
         ws_thread = std::thread([this]() { return onConnection(); });
     }
 
-    const LayerMsgMap& VisualizerMessenger::getLayerMap() const
-    {
-        return this->layers_name_to_msg_map;
-    }
-
     void VisualizerMessenger::publishAndClearLayers()
     {
-        LOG(INFO) << "Starting shape data publishing." << std::endl;
-
         // Limit rate of the message publishing
         // Get the time right now
         const time_point now     = std::chrono::system_clock::now();
@@ -96,13 +89,19 @@ namespace Util
         // Lock the list of current websockets
         ws_mutex.lock();
 
+        // Unpack all the shape data and make a payload
         std::vector<int32_t> payload;
-        for (const std::pair<std::string, LayerMsg>& layer_msg_pair : getLayerMap())
+        for (const Shape& shape : this->shapes)
         {
-            for (auto shape : layer_msg_pair.second)
-            {
-                payload.insert(payload.end(), shape.begin(), shape.end());
-            }
+            payload.insert(payload.end(), shape.layer);
+            payload.insert(payload.end(), shape.status);
+            payload.insert(payload.end(), shape.texture);
+            payload.insert(payload.end(), shape.x);
+            payload.insert(payload.end(), shape.y);
+            payload.insert(payload.end(), shape.width);
+            payload.insert(payload.end(), shape.height);
+            payload.insert(payload.end(), shape.rotation);
+            payload.insert(payload.end(), shape.tint);
         }
 
         // Send all the shapes to all the websocket connections we have
@@ -115,7 +114,7 @@ namespace Util
             // TODO: non-generic exception type
             catch (std::exception const& e)
             {
-                LOG(ERROR) << e.what() << std::endl;
+                LOG(WARNING) << e.what() << std::endl;
             }
         }
 
@@ -123,132 +122,79 @@ namespace Util
         ws_mutex.unlock();
 
         // Clear shapes in layers of current frame/tick
-        clearLayers();
+        this->shapes.clear();
 
         // Update last published time
         time_last_published = now;
+
+        LOG(INFO) << "Published shapes" << std::endl;
     }
 
-    void VisualizerMessenger::clearLayers()
+    void VisualizerMessenger::drawEllipse(uint8_t layer, uint16_t cx, uint16_t cy,
+                                          int16_t r1, int16_t r2, int16_t rotation, ShapeStyle style)
     {
-        // Clears all shape vector in all the layers
-        for (auto& layer : this->layers_name_to_msg_map)
-        {
-            layer.second.clear();
-        }
+        const uint8_t texture = style.texture;
+        const uint32_t tint   = style.tint;
+
+        Shape new_shape;
+        new_shape.layer    = layer;
+        new_shape.texture  = texture;
+
+        // Since x and y of the shape definition is top left, we need to shift to respect
+        // the center of the ellipse
+        new_shape.x        = cx - r1;
+        new_shape.y        = cy - r2;
+
+        new_shape.width    = r1 * 2;
+        new_shape.height   = r2 * 2;
+
+        new_shape.rotation = rotation;
+        new_shape.tint     = tint;
+
+        this->shapes.emplace_back(new_shape);
     }
 
-    //    void VisualizerMessenger::drawEllipse(const std::string& layer, double cx,
-    //    double cy,
-    //                                          double r1, double r2, DrawStyle
-    //                                          draw_style, DrawTransform draw_transform)
-    //    {
-    //        ShapeMsg new_shape;
-    //        new_shape.type = "ellipse";
-    //        new_shape.data.clear();
-    //        new_shape.data.push_back(cx);
-    //        new_shape.data.push_back(cy);
-    //        new_shape.data.push_back(r1);
-    //        new_shape.data.push_back(r2);
-    //
-    //        applyDrawStyleToMsg(new_shape, draw_style);
-    //        applyDrawTransformToMsg(new_shape, draw_transform);
-    //        addShapeToLayer(layer, new_shape);
-    //    }
-
-    void VisualizerMessenger::drawRect(const std::string& layer, double x, double y,
-                                       double w, double h, DrawStyle draw_style,
-                                       DrawTransform draw_transform)
+    void VisualizerMessenger::drawRect(uint8_t layer, int16_t x, int16_t y, int16_t w,
+                                       int16_t h, int16_t rotation, ShapeStyle style)
     {
-        std::vector<int32_t> raw = {
-            2, int(x), int(y), int(w), int(h), draw_transform.rotation, 0xFF, 0xFF, 0xFF};
+        const uint8_t texture = style.texture;
+        const uint32_t tint = style.tint;
 
-        addShapeToLayer(layer, raw);
-        // ShapeMsg new_shape;
-        // new_shape.type = "rect";
-        // new_shape.data.clear();
-        // new_shape.data.push_back(x);
-        // new_shape.data.push_back(y);
-        // new_shape.data.push_back(w);
-        // new_shape.data.push_back(h);
+        Shape new_shape;
+        new_shape.layer = layer;
+        new_shape.texture = texture;
+        new_shape.x = x;
+        new_shape.y = y;
+        new_shape.width = w;
+        new_shape.height = h;
+        new_shape.rotation = rotation;
+        new_shape.tint = tint;
 
-        // applyDrawStyleToMsg(new_shape, draw_style);
-        // applyDrawTransformToMsg(new_shape, draw_transform);
-        // addShapeToLayer(layer, new_shape);
+        this->shapes.emplace_back(new_shape);
     }
 
-    //    void VisualizerMessenger::drawPoly(const std::string& layer,
-    //                                       std::vector<Point>& vertices,
-    //                                       DrawStyle draw_style, DrawTransform
-    //                                       draw_transform)
-    //    {
-    //        ShapeMsg new_shape;
-    //        new_shape.type = "poly";
-    //        new_shape.data.clear();
-    //
-    //        for (auto vertexIter = vertices.begin(); vertexIter != vertices.end();
-    //             vertexIter++)
-    //        {
-    //            new_shape.data.push_back((*vertexIter).x);
-    //            new_shape.data.push_back((*vertexIter).y);
-    //        }
-    //
-    //        applyDrawStyleToMsg(new_shape, draw_style);
-    //        applyDrawTransformToMsg(new_shape, draw_transform);
-    //        addShapeToLayer(layer, new_shape);
-    //    }
+    void VisualizerMessenger::drawLine(uint8_t layer, int16_t x1, int16_t y1, int16_t x2,
+                                       int16_t y2, uint8_t width, ShapeStyle style)
+    {
+        const uint8_t texture = style.texture;
+        const uint32_t tint   = style.tint;
 
-    //    void VisualizerMessenger::drawArc(const std::string& layer, double cx, double
-    //    cy,
-    //                                      double radius, double theta_start, double
-    //                                      theta_end, DrawStyle draw_style, DrawTransform
-    //                                      draw_transform)
-    //    {
-    //        ShapeMsg new_shape;
-    //        new_shape.type = "arc";
-    //        new_shape.data.clear();
-    //        new_shape.data.push_back(cx);
-    //        new_shape.data.push_back(cy);
-    //        new_shape.data.push_back(radius);
-    //        new_shape.data.push_back(theta_start);
-    //        new_shape.data.push_back(theta_end);
-    //
-    //        applyDrawStyleToMsg(new_shape, draw_style);
-    //        applyDrawTransformToMsg(new_shape, draw_transform);
-    //        addShapeToLayer(layer, new_shape);
-    //    }
+        const int16_t dx     = x2 - x1;
+        const int16_t dy     = y2 - y1;
+        const int16_t length = (int16_t)sqrt(dx * dx + dy * dy);
+        const int16_t angle  = (int16_t)atan2(dy, dx);
 
-    //    void VisualizerMessenger::drawLine(const std::string& layer, double x1, double
-    //    y1,
-    //                                       double x2, double y2, DrawStyle draw_style,
-    //                                       DrawTransform draw_transform)
-    //    {
-    //        ShapeMsg new_shape;
-    //        new_shape.type = "line";
-    //        new_shape.data.clear();
-    //        new_shape.data.push_back(x1);
-    //        new_shape.data.push_back(y1);
-    //        new_shape.data.push_back(x2);
-    //        new_shape.data.push_back(y2);
-    //
-    //        applyDrawStyleToMsg(new_shape, draw_style);
-    //        applyDrawTransformToMsg(new_shape, draw_transform);
-    //        addShapeToLayer(layer, new_shape);
-    //    }
+        Shape new_shape;
+        new_shape.layer    = layer;
+        new_shape.texture  = texture;
+        new_shape.x        = x1;
+        new_shape.y        = y1;
+        new_shape.width    = width;
+        new_shape.height   = length;
+        new_shape.rotation = angle;
+        new_shape.tint     = tint;
 
-    //    void VisualizerMessenger::applyDrawStyleToMsg(ShapeMsg& shape_msg, DrawStyle&
-    //    style)
-    //    {
-    //        shape_msg.fill          = style.fill;
-    //        shape_msg.stroke        = style.stroke;
-    //        shape_msg.stroke_weight = style.stroke_weight;
-    //    }
-    //
-    //    void VisualizerMessenger::applyDrawTransformToMsg(ShapeMsg& shape_msg,
-    //                                                      DrawTransform& transform)
-    //    {
-    //        shape_msg.transform_rotation = transform.rotation;
-    //        shape_msg.transform_scale    = transform.scale;
-    //    }
+        this->shapes.emplace_back(new_shape);
+    }
 
 }  // namespace Util

@@ -18,8 +18,6 @@ add_message_files(
     FILES
     Ball.msg
     Circle2D.msg
-    DrawShape.msg
-    DrawLayer.msg
     Field.msg
     Point2D.msg
     Primitive.msg

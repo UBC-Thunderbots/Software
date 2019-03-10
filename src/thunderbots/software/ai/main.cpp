@@ -40,6 +40,19 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     primitive_publisher.publish(primitive_array_message);
 
     // On every tick, send the layer messages
+    Util::VisualizerMessenger::ShapeStyle style;
+    style.texture     = 0;
+    style.tint        = 0;
+    const int16_t x_i = -500;
+    const int16_t y_i = -500;
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            Util::VisualizerMessenger::getInstance()->drawRect(
+                0, x_i + i * 100, y_i + j * 100, 50, 50, 0, style);
+        }
+    }
     Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
 }
 
@@ -61,7 +74,7 @@ int main(int argc, char **argv)
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Initialize the draw visualizer messenger
-    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
+    Util::VisualizerMessenger::getInstance()->initializeWebsocket();
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown

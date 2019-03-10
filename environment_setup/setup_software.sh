@@ -14,6 +14,41 @@
 # unit tests
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
+# Here we handle arguments provided to the script. Because this script allows
+# the installation of different versions of ROS, we use a parameter to let the
+# user decide which one to install.
+function show_help()
+{
+    echo "Thunderbots software setup script. Installs the programs"
+    echo "and dependencies required to build and run our code"
+    echo ""
+}
+
+# This script only accepts 1 argument
+if [ "$#" -ne 0 ]; then
+    echo "Error: Illegal number of arguments provided. Expected 0 arguments"
+    show_help
+    exit 1
+fi
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+        -h | --help)
+            show_help
+            exit
+            ;;
+        *)
+            echo "ERROR: unknown parameter \"$PARAM\""
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+    shift
+done
+
 
 # Save the parent dir of this so we can always run commands relative to the
 # location of this script, no matter where it is called from. This
@@ -158,6 +193,10 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
                          --slave /usr/bin/g++ g++ /usr/bin/g++-7 
 sudo update-alternatives --config gcc
 
+echo "================================================================"
+echo "Installing g3log"
+echo "================================================================"
+
 # Clone, build, and install g3log. Adapted from instructions at:
 # https://github.com/KjellKod/g3log
 g3log_path="/tmp/g3log"
@@ -173,6 +212,25 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 sudo make install
+cd $CURR_DIR
+
+echo "================================================================"
+echo "Installing beast"
+echo "================================================================"
+
+beast_path="/tmp/beast"
+if [ -d $beast_path ]; then
+    echo "Removing old beast..."
+    sudo rm -r $beast_path 
+fi
+mkdir $beast_path
+cd $beast_path
+
+wget https://github.com/boostorg/beast/archive/v124.zip
+unzip v124.zip
+cd beast-124
+# Note that we use `\cp` here instead of `cp` to force overwrite without prompt
+sudo \cp -r include/boost /usr/include
 cd $CURR_DIR
 
 # Done
