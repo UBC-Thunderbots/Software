@@ -226,6 +226,12 @@ std::vector<Point> Evaluation::findBestChipTargetArea(const World &world, double
     std::vector<Point> corners = {Point(ballX, negFieldY), Point(ballX, posFieldY),
                                   Point(fieldX, negFieldY), Point(fieldX, posFieldY)};
 
+    Rectangle r = Rectangle(Point(ballX, negFieldY), Point(ballX, posFieldY));
+    Point p1 = r[0];
+    Point p2 = r[1];
+    Point p3 = r[2];
+    Point p4 = r[3];
+
     return corners;
 }
 
