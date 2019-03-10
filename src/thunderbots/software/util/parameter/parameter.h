@@ -28,12 +28,6 @@
  * In our codebase, we support bool, int32_t, double, and strings
  * */
 
-namespace
-{
-    // the namespaces related to the param_server
-    const std::string NamespaceForParameters = "/a";
-}  // namespace
-
 template <class T>
 class Parameter
 {

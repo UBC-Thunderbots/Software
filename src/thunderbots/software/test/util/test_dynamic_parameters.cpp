@@ -108,7 +108,7 @@ TYPED_TEST(RegistryTest, update_parameter_test)
 
     // set ros param
     std::string unique_param_name = RegistryTest<TypeParam>::get_unique_param_name();
-    nh_.setParam("/"+unique_param_name, unique_value);
+    nh_.setParam("/" + unique_param_name, unique_value);
 
     // create parameter
     Parameter<TypeParam> test_param =

@@ -6,9 +6,9 @@
 namespace Util::DynamicParameters
 {
     /*
-     * cfg_sts contains the names of all the cfg files which 
-     * is the namespace on which the parameter update topic will 
-     * be aviable to subscribe to 
+     * cfg_strs contain the names of all the cfg files which corresponds
+     * to the namespace the /parameter_updates topic will be published on 
+     * to subscribe to 
      */
     extern std::vector<std::string> cfg_strs;
 
