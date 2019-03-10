@@ -10,7 +10,7 @@
 #include "ai/world/ball.h"
 #include "test/test_util/test_util.h"
 
-// Test were the ball will intersect the friendly net
+// Test where the ball will intersect the friendly net
 TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)
 {
     Vector velocity(-1, 0.01);
