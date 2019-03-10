@@ -27,11 +27,12 @@ MotionController::Velocity MotionController::bangBangVelocityController(
 {
     MotionController::Velocity robot_velocities;
 
-    // if the change is time is somehow negative or zero, just return the current robot
-    // velocity
-    // TODO: Implement exception handling for negative time case
-    // See issue #123
-    if (delta_time <= 0)
+    if (delta_time < 0)
+    {
+        throw std::invalid_argument(
+            "GrSim Motion controller received a negative delta time");
+    }
+    else if (delta_time == 0)
     {
         robot_velocities.linear_velocity  = robot.velocity();
         robot_velocities.angular_velocity = robot.angularVelocity();

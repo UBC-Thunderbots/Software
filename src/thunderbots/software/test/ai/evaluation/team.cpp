@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-// using namespace Evaluation;
-
 class TeamEvaluationTest : public ::testing::Test
 {
    protected:

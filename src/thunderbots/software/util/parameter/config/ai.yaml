@@ -18,6 +18,42 @@ AI:
       default: 0.3
       type: "double"
       description: ""
+    enemy_proximity_importance:
+      min: 0
+      max: 10
+      default: 0.5
+      type: "double"
+      description: ""
+    ideal_min_shoot_angle_degrees:
+      min: -360
+      max: 360
+      default: 40
+      type: "double"
+      description: ""
+    ideal_min_rotation_to_shoot_degrees:
+      min: -360
+      max: 360
+      default: 5
+      type: "double"
+      description: ""
+    min_pass_speed_m_per_s:
+      min: 0
+      max: 5
+      default: 2.0
+      type: "double"
+      description: ""
+    max_pass_speed_m_per_s:
+      min: 0
+      max: 5
+      default: 4.0
+      type: "double"
+      description: ""
+    min_time_offset_for_pass_seconds:
+      min: 0
+      max: 5
+      default: 0.3
+      type: "double"
+      description: ""
     num_passes_to_optimize:
       min: 0
       max: 1000
