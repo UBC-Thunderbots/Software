@@ -48,5 +48,9 @@ namespace Util
         // How many milliseconds a robot must not be seen in vision before it is
         // considered as "gone" and no longer reported.
         static const unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 200;
+
+        // Visualizer websocket IP and port
+        static const std::string VISUALIZER_WEBSOCKET_ADDRESS = "127.0.0.1";
+        static const unsigned int VISUALIZER_WEBSOCKET_PORT = 9091;
     }  // namespace Constants
 }  // namespace Util

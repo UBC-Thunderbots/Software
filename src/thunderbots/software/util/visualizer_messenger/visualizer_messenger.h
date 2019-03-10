@@ -100,15 +100,17 @@ namespace Util
 
         // Drawing methods
         /**
-        * Request a message to draw a ellipse shape. The origin is the center of the
-        * circle.
-        *
-        * @param layer: The layer name this shape is being drawn to
-        * @param cx: Ellipse's center X
-        * @param cy: Ellipse's center Y
-        * @param r1: Ellipse's horizontal radius
-        * @param r2: Ellipse's vertical radius
-        */
+         * Request a message to draw a ellipse shape. The origin is the center of the
+         * circle.
+         *
+         * @param layer: The layer number this shape is being drawn to
+         * @param cx: Ellipse's center X             [mm]
+         * @param cy: Ellipse's center Y             [mm]
+         * @param r1: Ellipse's horizontal radius    [mm]
+         * @param r2: Ellipse's vertical radius      [mm]
+         * @param rotation: Shape's ratation         [deg]
+         * @param style: Shape style struct
+         */
         void drawEllipse(uint8_t layer, uint16_t cx, uint16_t cy, int16_t r1, int16_t r2,
                          int16_t rotation, ShapeStyle style = ShapeStyle());
 
@@ -116,24 +118,29 @@ namespace Util
          * Request a message to draw a rectangle shape. The rectangle has origin on the
          * upper left corner, this is also the point specified in the parameter.
          *
-         * @param layer: The layer name this shape is being drawn to
-         * @param x: Rectangle's starting point X
-         * @param y: Rectangle's starting point Y
-         * @param w: Rectangle width
-         * @param h: Rectangle height
+         * @param layer: The layer number this shape is being drawn to
+         * @param x: Rectangle's starting point X   [mm]
+         * @param y: Rectangle's starting point Y   [mm]
+         * @param w: Rectangle width                [mm]
+         * @param h: Rectangle height               [mm]
+         * @param rotation: Shape's ratation        [deg]
+         * @param style: Shape style struct
          */
         void drawRect(uint8_t layer, int16_t x, int16_t y, int16_t w, int16_t h, int16_t rotation,
                       ShapeStyle style = ShapeStyle());
 
         /**
-        * Request a message to draw a line. The origin is the first point
-        *
-        * @param layer: The layer name this shape is being drawn to
-        * @param x1: Starting point X
-        * @param y1: Starting point Y
-        * @param x2: Ending point X
-        * @param y2: Ending point Y
-        */
+         * Request a message to draw a line. The origin is the first point
+         *
+         * @param layer: The layer number this shape is being drawn to
+         * @param x1: Starting point X               [mm]
+         * @param y1: Starting point Y               [mm]
+         * @param x2: Ending point X                 [mm]
+         * @param y2: Ending point Y                 [mm]
+         * @param rotation: Shape's ratation        [deg]
+         * @param rotation: Shape's ratation [deg]
+         * @param style: Shape style struct
+         */
         void drawLine(uint8_t layer, int16_t x1, int16_t y1, int16_t x2, int16_t y2,
                       uint8_t width, ShapeStyle style = ShapeStyle());
 
@@ -143,20 +150,11 @@ namespace Util
          */
         explicit VisualizerMessenger()
             : time_last_published(),
-              ws_thread(),
-              ws_mutex(),
-              ws_connections()
+              websocket_thread(),
+              websocket_mutex(),
+              websocket_connections()
         {
         }
-
-        /**
-         * Helper function for the shape draw methods that copies the attributes in
-         * ShapeStyle struct into the actual shape message
-         *
-         * @param shape_msg: Reference to the shape message
-         * @param style: The ShapeStyle to be extracted
-         */
-        void applyShapeStyle(Shape& shape, ShapeStyle& style);
 
         /**
          * Handles any connections
@@ -170,14 +168,14 @@ namespace Util
         time_point time_last_published;
 
         // Thread on which we watch for websocket connections
-        std::thread ws_thread;
+        std::thread websocket_thread;
 
         // Mutex on the list of current websocket connections
-        std::mutex ws_mutex;
+        std::mutex websocket_mutex;
 
         // All the current websocket connections we have
         using websocket_connection_vector = std::vector<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>;
-        websocket_connection_vector ws_connections;
+        websocket_connection_vector websocket_connections;
 
         // List of shapes for this frame
         using ShapeVector = std::vector<Shape>;

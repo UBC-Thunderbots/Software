@@ -20,15 +20,14 @@ namespace Util
         return vm;
     }
 
-    void VisualizerMessenger::onConnection()
+    void VisualizerMessenger::receiveWebsocketConnections()
     {
         // The io_context is required for all I/O
         boost::asio::io_service ioc{1};
 
         // The acceptor receives incoming connections
-        // TODO: make IP and port a configurable constant somewhere?
-        auto const address = boost::asio::ip::address::from_string("127.0.0.1");
-        auto const port    = static_cast<unsigned short>(std::atoi("9091"));
+        auto const address = boost::asio::ip::address::from_string(VISUALIZER_WEBSOCKET_ADDRESS);
+        auto const port    = static_cast<unsigned short>(VISUALIZER_WEBSOCKET_PORT);
         tcp::acceptor acceptor{ioc, {address, port}};
         for (;;)
         {
@@ -47,32 +46,31 @@ namespace Util
             // Set the websocket to talk in binary
             websocket.binary(true);
 
-            LOG(INFO) << "Connection received." << std::endl;
+            LOG(INFO) << "Visualizer websocket connection received." << std::endl;
 
             // Lock the current list of sockets
-            ws_mutex.lock();
+            websocket_mutex.lock();
 
             // Save this new websocket connection
-            ws_connections.emplace_back(std::move(websocket));
+            websocket_connections.emplace_back(std::move(websocket));
 
             // Unlock the current list of sockets
-            ws_mutex.unlock();
+            websocket_mutex.unlock();
 
-            LOG(INFO) << "Connection added." << std::endl;
-
-            // TODO: this is disgusting. We should not tie up all the cpu
-            // Yield so that other things can run
-            std::this_thread::yield();
+            LOG(INFO) << "Visualizer websocket connection added." << std::endl;
         }
     }
 
     void VisualizerMessenger::initializeWebsocket()
     {
-        ws_thread = std::thread([this]() { return onConnection(); });
+        websocket_thread = std::thread([this]() { return receiveWebsocketConnections(); });
     }
 
     void VisualizerMessenger::publishAndClearLayers()
     {
+        // Take ownership of list of websockets for the duration of this function
+        std::lock_guard<std::mutex> websocket_list_lock(websocket_mutex);
+
         // Limit rate of the message publishing
         // Get the time right now
         const time_point now     = std::chrono::system_clock::now();
@@ -85,9 +83,6 @@ namespace Util
         // long enough
         if (elapsed_ms < DESIRED_PERIOD_MS)
             return;
-
-        // Lock the list of current websockets
-        ws_mutex.lock();
 
         // Unpack all the shape data and make a payload
         std::vector<int32_t> payload;
@@ -105,7 +100,7 @@ namespace Util
         }
 
         // Send all the shapes to all the websocket connections we have
-        for (websocket::stream<tcp::socket>& websocket : ws_connections)
+        for (websocket::stream<tcp::socket>& websocket : websocket_connections)
         {
             try
             {
@@ -118,16 +113,13 @@ namespace Util
             }
         }
 
-        // UnLock the list of current websockets
-        ws_mutex.unlock();
-
         // Clear shapes in layers of current frame/tick
         this->shapes.clear();
 
         // Update last published time
         time_last_published = now;
 
-        LOG(INFO) << "Published shapes" << std::endl;
+        LOG(DEBUG) << "Published shapes" << std::endl;
     }
 
     void VisualizerMessenger::drawEllipse(uint8_t layer, uint16_t cx, uint16_t cy,
