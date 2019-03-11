@@ -704,12 +704,15 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(evaluation_detect_threat_test
-            test/evaluation/detect_threat.cpp
+            test/ai/evaluation/detect_threat.cpp
             ai/hl/stp/evaluation/detect_threat.cpp
             test/test_util/test_util.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             util/time/timestamp.cpp
+            util/time/duration.cpp
             geom/util.cpp
             ai/world/team.cpp
             ai/world/world.cpp
