@@ -709,7 +709,7 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
-            util/timestamp.cpp
+            util/time/timestamp.cpp
             geom/util.cpp
             ai/world/team.cpp
             ai/world/world.cpp
