@@ -15,6 +15,8 @@ class MoveTactic : public Tactic
      */
     explicit MoveTactic();
 
+    std::string getName() const override;
+
     /**
      * Updates the parameters for this MoveTactic.
      *
