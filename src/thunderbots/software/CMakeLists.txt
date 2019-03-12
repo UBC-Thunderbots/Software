@@ -566,7 +566,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(play_test
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
-            ai/hl/stp/play/move_play.cpp
+            ai/hl/stp/play/example_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
             ai/hl/stp/tactic/move_tactic.cpp
