@@ -17,7 +17,7 @@ namespace Evaluation
 
         // The triangle formed by the enemy goalposts and the ball. Any robots in
         // this triangle could block a chip/shot
-        Triangle chip_target_area =
+        LegacyTriangle chip_target_area =
             triangle(world.ball().position(), enemy_goal_positive, enemy_goal_negative);
 
         Robot enemyClosestToEdge = world.enemyTeam().getRobotById(0).value();
