@@ -56,17 +56,6 @@ namespace Util
 
         typedef struct Shape
         {
-            // Shape()
-            //       texture(0),
-            //       flags(0),
-            //       x(0),
-            //       y(0),
-            //       width(1000),
-            //       height(1000),
-            //       rotation(0),
-            //       tint(0xFFFFFFFF)
-            // {
-            // }
             uint8_t texture;
             uint8_t flags;
             int16_t x;
@@ -110,7 +99,7 @@ namespace Util
          * @param cy: Ellipse's center Y             [mm]
          * @param r1: Ellipse's horizontal radius    [mm]
          * @param r2: Ellipse's vertical radius      [mm]
-         * @param rotation: Shape's ratation         [deg]
+         * @param rotation: Shape's rotation         [deg]
          * @param style: Shape style struct
          */
         void drawEllipse(uint8_t layer, uint16_t cx, uint16_t cy, int16_t r1, int16_t r2,
@@ -125,7 +114,7 @@ namespace Util
          * @param y: Rectangle's starting point Y   [mm]
          * @param w: Rectangle width                [mm]
          * @param h: Rectangle height               [mm]
-         * @param rotation: Shape's ratation        [deg]
+         * @param rotation: Shape's rotation        [deg]
          * @param style: Shape style struct
          */
         void drawRect(uint8_t layer, int16_t x, int16_t y, int16_t w, int16_t h,
@@ -135,12 +124,11 @@ namespace Util
          * Request a message to draw a line. The origin is the first point
          *
          * @param layer: The layer number this shape is being drawn to
-         * @param x1: Starting point X               [mm]
-         * @param y1: Starting point Y               [mm]
-         * @param x2: Ending point X                 [mm]
-         * @param y2: Ending point Y                 [mm]
-         * @param rotation: Shape's ratation        [deg]
-         * @param rotation: Shape's ratation [deg]
+         * @param x1: Starting point X              [mm]
+         * @param y1: Starting point Y              [mm]
+         * @param x2: Ending point X                [mm]
+         * @param y2: Ending point Y                [mm]
+         * @param rotation: Shape's rotation        [deg]
          * @param style: Shape style struct
          */
         void drawLine(uint8_t layer, int16_t x1, int16_t y1, int16_t x2, int16_t y2,
@@ -166,7 +154,9 @@ namespace Util
 
         /**
          * Sends a layer of shape data through websocket
-         * @param data: A list of data
+         * @param layer: The layer number to be "published" on websocket
+         * @param shapes: A const reference of the vector of shapes that belong to the
+         * layer
          */
         void publishPayload(uint8_t layer, const ShapeVector& shapes);
 
@@ -177,8 +167,8 @@ namespace Util
 
         /**
          * Add shape to layer
-         * @param layer
-         * @param shape
+         * @param layer: The layer which the shape is to be added to
+         * @param shape: The shape
          */
         void addShapeToLayer(uint8_t layer, Shape& shape);
 
