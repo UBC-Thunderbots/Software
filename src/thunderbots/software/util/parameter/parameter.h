@@ -36,14 +36,16 @@ class Parameter
      * Constructs a new Parameter
      *
      * @param parameter_name The name of the parameter used by dynamic_reconfigure
-     * @param parameter_namespace The namespace of the parameter used by dynamic_reconfigure
+     * @param parameter_namespace The namespace of the parameter used by
+     * dynamic_reconfigure
      * @param default_value The default value for this parameter
      */
-    explicit Parameter<T>(const std::string& parameter_name, const std::string& parameter_namespace, T default_value)
+    explicit Parameter<T>(const std::string& parameter_name,
+                          const std::string& parameter_namespace, T default_value)
     {
-        this->name_  = parameter_name;
-        this->namespace_  = parameter_namespace;
-        this->value_ = default_value;
+        this->name_      = parameter_name;
+        this->namespace_ = parameter_namespace;
+        this->value_     = default_value;
 
         Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
     }
@@ -55,7 +57,7 @@ class Parameter
      */
     const std::string getROSParameterPath() const
     {
-        return "/"+this->namespace_+"/"+name();
+        return "/" + this->namespace_ + "/" + name();
     }
 
     /**

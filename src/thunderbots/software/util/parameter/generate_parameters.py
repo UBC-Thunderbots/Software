@@ -73,7 +73,7 @@ def generate_cfg(param_info: dict, output_path: str):
 
             # make file read/write/executable
             os.chmod(output_path+key+constants.EXT, 0o0754)
-            print('=== generated {} params cfg==='.format(key))
+            print('===== generated {} params cfg'.format(key))
 
 
 def __cfg_gen(param_info: dict, file_pointer, group_name=None):
@@ -173,7 +173,7 @@ def generate_header_and_cpp(param_info: dict, output_path: str):
     dynamic_parameters_h.close()
     dynamic_parameters_cpp.close()
 
-    print('===== created dynamic_parameters header and cpp =====')
+    print('===== created dynamic_parameters header and cpp')
 
 
 def __header_and_cpp_gen(param_info: dict, cfg_name: str, header_file_pointer, cpp_file_pointer):
@@ -275,7 +275,7 @@ def generate_server_node(param_info: dict, output_path: str):
         reconfigure_server_node.write(
             constants.MAIN_FUNC.format(main_contents))
 
-    print('===== created server node header =====')
+    print('===== created server node header')
 
 
 #######################################################################
