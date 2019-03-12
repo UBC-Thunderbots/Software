@@ -1,25 +1,18 @@
 /*
  * This file specifies the saga for Params
  */
-/*
-import { channel } from 'redux-saga';
-import { call, put, spawn, takeEvery, takeLatest } from 'redux-saga/effects';
-import { getType } from 'typesafe-actions';
-*/
 
 import { channel } from 'redux-saga';
 import { put, spawn, take, takeLatest } from 'redux-saga/effects';
 import ROSLIB from 'roslib';
 import { getType } from 'typesafe-actions';
 
-import { TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE } from '../../constants';
-import { IRosoutMessage } from '../../types';
-
 import { actions } from '../actions';
-import ros from '../reducers/ros';
 
-let rosbridge: ROSLIB.Ros | null = null;
-let rosParam: ROSLIB.Param | null = null;
+let ros: ROSLIB.Ros | null = null;
+let rosService: ROSLIB.Service | null = null;
+let rosServiceRequest: ROSLIB.ServiceRequest | null = null;
+
 const paramChannel = channel();
 
 let rosParamsStored = {};
@@ -38,49 +31,52 @@ export default function* init() {
 function* listenToParamChannel() {
     while (true) {
         const action = yield take(paramChannel);
-        if (getType(action.type) === 'param_UPDATE_PARAMS') {
+        if (getType(action.type) === 'params_UPDATE_PARAMS') {
             // update the stored state
             rosParamsStored = {
                 ...rosParamsStored,
                 [action.payload.key]: action.payload.value,
             };
-            rosParam = new ROSLIB.Param({ ros: rosbridge, name: action.payload.key });
-            rosParam.set(action.payload.value);
+            // Create a new service to set parameters
+            rosService = new ROSLIB.Service({
+                name: '/params/set_parameters', // 'params' for current implementation
+                ros: ros,
+                serviceType: 'dynamic_reconfigure/Reconfigure',
+            });
+
+            // Create a new service request to specify parameters
+            rosServiceRequest = new ROSLIB.ServiceRequest({
+                config: {
+                    doubles: [
+                        { name: 'static_field_position_quality_x_offset', value: 10.0 },
+                        { name: 'static_field_position_quality_y_offset', value: 0.1 },
+                    ],
+                },
+            });
+
+            rosService.callService(rosServiceRequest, (result) => {
+                console.log(JSON.stringify(result, null, 1));
+            });
         }
         yield put(action);
     }
 }
 
 /**
- * Hydrate ROS param server state
+ * Read from ROS params hydrate state
  */
 function startROSParams() {
     // Get params from ROS param server
-    rosbridge = new ROSLIB.Ros({});
-    rosParam = new ROSLIB.Param({ ros: rosbridge, name: 'testParam' });
-    rosParam.getParams(function(params) {
-        // add each param to object
+    ros = new ROSLIB.Ros({});
+    // Name will be interchangable, params for now
+    rosParam = new ROSLIB.Param({ ros: ros, name: 'params' });
+    rosParam.getParams((params) => {
+        // add each param to object after parsing
+        // for key and value
         rosParamsStored = {
             ...rosParamsStored,
-            [params.key]: params.value, // check these properties
+            rosparams: params.value,
         };
     });
     actions.params.hydrateROSParams({ rosparams: rosParamsStored });
 }
-/*
-function* startROSParams() {
-    const rosParamsStoredString = localStorage.getItem('rosparams');
-    if (rosParamsStoredString !== null) {
-        rosParamsStored = JSON.parse(rosParamsStoredString);
-        yield put(params.hydrateROSParams(rosParamsStored));
-    }
-}
-
-export function* updateROSParams(action: ReturnType<typeof params.updateROSParams>) {
-    rosParamsStored = {
-        ...rosParamsStored,
-        [action.payload.key]: action.payload.value,
-    };
-    yield call(localStorage.setItem, 'rosparams', JSON.stringify(rosParamsStored));
-}
-*/

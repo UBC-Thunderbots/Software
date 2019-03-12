@@ -21,7 +21,7 @@ describe('paramsActions', () => {
                     payload: {
                         params: { color: 'blue' },
                     },
-                    type: 'param_HYDRATE_PARAMS',
+                    type: 'params_HYDRATE_PARAMS',
                 },
             ];
 
@@ -38,7 +38,7 @@ describe('paramsActions', () => {
                         key: 'dog',
                         value: 'bark',
                     },
-                    type: 'param_UPDATE_PARAMS',
+                    type: 'params_UPDATE_PARAMS',
                 },
             ];
 
