@@ -43,11 +43,12 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         // done) to make sure that the done() function will always return true at the same
         // time a nullptr is returned (which also indicates the Tactic is done)
         done_ = !static_cast<bool>(next_intent);
-        if(done_) {
+        if (done_)
+        {
             // If the tactic is done is supposed to loop forever, we re-create the
             // intent_sequence which "restarts" the coroutine
             intent_sequence = intent_coroutine::pull_type(
-                    boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
+                boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
         }
         return next_intent;
     }

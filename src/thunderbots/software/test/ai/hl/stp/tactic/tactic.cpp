@@ -110,7 +110,8 @@ TEST(TacticTest, test_tactic_reports_done_at_same_time_nullptr_returned)
     EXPECT_TRUE(tactic.done());
 }
 
-TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely) {
+TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
+{
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
@@ -123,7 +124,8 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely) {
     // Since the Tactic should be done, we expect the returned intent_ptr to alternate
     // between some valid Intent, and nullptr as the Tactic finishes and restarts
     std::unique_ptr<Intent> intent_ptr;
-    for(int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++)
+    {
         intent_ptr = tactic.getNextIntent();
         EXPECT_TRUE(intent_ptr);
         EXPECT_FALSE(tactic.done());

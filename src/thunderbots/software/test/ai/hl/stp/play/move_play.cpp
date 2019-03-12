@@ -25,7 +25,7 @@ TEST(ExamplePlayTest, test_example_play_returns_correct_tactics)
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     auto example_play = PlayFactory::createPlay("Example Play");
-    auto tactics   = example_play->getTactics(world);
+    auto tactics      = example_play->getTactics(world);
 
     // Make sure something was returned
     EXPECT_TRUE(tactics);
