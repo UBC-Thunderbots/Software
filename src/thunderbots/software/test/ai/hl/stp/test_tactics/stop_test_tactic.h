@@ -12,8 +12,11 @@ class StopTestTactic : public Tactic
    public:
     /**
      * Creates a new StopTestTactic
+     *
+     * @param loop_forever Whether or not this Tactic should never complete. If true, the
+     * tactic will be restarted every time it completes
      */
-    explicit StopTestTactic();
+    explicit StopTestTactic(bool loop_forever = false);
 
     std::string getName() const override;
 
