@@ -746,6 +746,15 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             )
 
+    catkin_add_gtest(polygon_test
+            test/geom/polygon.cpp
+            geom/polygon.cpp
+            geom/util.cpp)
+
+    target_link_libraries(polygon_test
+            ${catkin_LIBRARIES}
+            ${G3LOG})
+
 endif()
 
 ##### ROSTests / Integration Tests #####
