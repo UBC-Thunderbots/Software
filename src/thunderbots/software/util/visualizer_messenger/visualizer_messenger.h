@@ -33,7 +33,9 @@ namespace ros
 
 namespace Util
 {
-    using time_point  = std::chrono::time_point<std::chrono::system_clock>;
+    using time_point = std::chrono::time_point<std::chrono::system_clock>;
+    using websocket_connection_vector =
+        std::vector<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>;
 
     class VisualizerMessenger
     {
@@ -54,21 +56,19 @@ namespace Util
 
         typedef struct Shape
         {
-            Shape()
-                : layer(0),
-                  status(0),
-                  texture(0),
-                  x(0),
-                  y(0),
-                  width(1000),
-                  height(1000),
-                  rotation(0),
-                  tint(0xFFFFFFFF)
-            {
-            }
-            uint8_t layer;
-            uint8_t status;
+            // Shape()
+            //       texture(0),
+            //       flags(0),
+            //       x(0),
+            //       y(0),
+            //       width(1000),
+            //       height(1000),
+            //       rotation(0),
+            //       tint(0xFFFFFFFF)
+            // {
+            // }
             uint8_t texture;
+            uint8_t flags;
             int16_t x;
             int16_t y;
             int16_t width;
@@ -76,6 +76,8 @@ namespace Util
             int16_t rotation;
             uint32_t tint;
         } Shape;
+        using ShapeVector = std::vector<Shape>;
+        using LayerMap    = std::map<uint8_t, ShapeVector>;
 
        public:
         /**
@@ -126,8 +128,8 @@ namespace Util
          * @param rotation: Shape's ratation        [deg]
          * @param style: Shape style struct
          */
-        void drawRect(uint8_t layer, int16_t x, int16_t y, int16_t w, int16_t h, int16_t rotation,
-                      ShapeStyle style = ShapeStyle());
+        void drawRect(uint8_t layer, int16_t x, int16_t y, int16_t w, int16_t h,
+                      int16_t rotation, ShapeStyle style = ShapeStyle());
 
         /**
          * Request a message to draw a line. The origin is the first point
@@ -149,7 +151,8 @@ namespace Util
          * Constructor; initializes an empty layers map then populates it
          */
         explicit VisualizerMessenger()
-            : time_last_published(),
+            : layer_shapes_map(),
+              time_last_published(),
               websocket_thread(),
               websocket_mutex(),
               websocket_connections()
@@ -159,10 +162,29 @@ namespace Util
         /**
          * Handles any connections
          */
-        void onConnection();
+        void receiveWebsocketConnections();
+
+        /**
+         * Sends a layer of shape data through websocket
+         * @param data: A list of data
+         */
+        void publishPayload(uint8_t layer, const ShapeVector& shapes);
+
+        /**
+         * Clears the shapes array in the layer to shape map for this frame
+         */
+        void clearShapes();
+
+        /**
+         * Add shape to layer
+         * @param layer
+         * @param shape
+         */
+        void addShapeToLayer(uint8_t layer, Shape& shape);
 
         // Period in nanoseconds
-        const double DESIRED_PERIOD_MS = 1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
+        const double DESIRED_PERIOD_MS =
+            1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;
 
         // Time point
         time_point time_last_published;
@@ -174,12 +196,10 @@ namespace Util
         std::mutex websocket_mutex;
 
         // All the current websocket connections we have
-        using websocket_connection_vector = std::vector<boost::beast::websocket::stream<boost::asio::ip::tcp::socket>>;
         websocket_connection_vector websocket_connections;
 
-        // List of shapes for this frame
-        using ShapeVector = std::vector<Shape>;
-        ShapeVector shapes;
+        // A map that contains the layers and shapes of this frame
+        LayerMap layer_shapes_map;
     };
 
 }  // namespace Util

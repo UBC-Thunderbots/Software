@@ -16,9 +16,9 @@ namespace Util
         static const std::string NETWORK_INPUT_ENEMY_TEAM_TOPIC = "backend/enemy_team";
         static const std::string NETWORK_INPUT_GAMECONTROLLER_TOPIC =
             "backend/gamecontroller";
-        static const std::string NETWORK_INPUT_WORLD_TOPIC   = "backend/world";
-        static const std::string AI_PRIMITIVES_TOPIC         = "backend/primitives";
-        static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
+        static const std::string NETWORK_INPUT_WORLD_TOPIC = "backend/world";
+        static const std::string AI_PRIMITIVES_TOPIC       = "backend/primitives";
+        static const std::string ROBOT_STATUS_TOPIC        = "log/robot_status";
         // The topic published by the joy_node that contains information about any plugged
         // in joysticks / controllers
         static const std::string JOY_NODE_TOPIC = "joy";
@@ -51,6 +51,6 @@ namespace Util
 
         // Visualizer websocket IP and port
         static const std::string VISUALIZER_WEBSOCKET_ADDRESS = "127.0.0.1";
-        static const unsigned int VISUALIZER_WEBSOCKET_PORT = 9091;
+        static const unsigned int VISUALIZER_WEBSOCKET_PORT   = 9091;
     }  // namespace Constants
 }  // namespace Util

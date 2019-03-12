@@ -26,8 +26,10 @@ namespace Util
         boost::asio::io_service ioc{1};
 
         // The acceptor receives incoming connections
-        auto const address = boost::asio::ip::address::from_string(VISUALIZER_WEBSOCKET_ADDRESS);
-        auto const port    = static_cast<unsigned short>(VISUALIZER_WEBSOCKET_PORT);
+        auto const address = boost::asio::ip::address::from_string(
+            Util::Constants::VISUALIZER_WEBSOCKET_ADDRESS);
+        auto const port =
+            static_cast<unsigned short>(Util::Constants::VISUALIZER_WEBSOCKET_PORT);
         tcp::acceptor acceptor{ioc, {address, port}};
         for (;;)
         {
@@ -63,7 +65,8 @@ namespace Util
 
     void VisualizerMessenger::initializeWebsocket()
     {
-        websocket_thread = std::thread([this]() { return receiveWebsocketConnections(); });
+        websocket_thread =
+            std::thread([this]() { return receiveWebsocketConnections(); });
     }
 
     void VisualizerMessenger::publishAndClearLayers()
@@ -84,13 +87,47 @@ namespace Util
         if (elapsed_ms < DESIRED_PERIOD_MS)
             return;
 
-        // Unpack all the shape data and make a payload
-        std::vector<int32_t> payload;
-        for (const Shape& shape : this->shapes)
+        // Send a payload per layer of messages
+        for (const std::pair<uint8_t, ShapeVector>& layer_pair : this->layer_shapes_map)
         {
-            payload.insert(payload.end(), shape.layer);
-            payload.insert(payload.end(), shape.status);
+            // First is the layer number
+            const uint8_t layer_number = layer_pair.first;
+
+            // Second is the vector that contains the shapes
+            const ShapeVector& shapes = layer_pair.second;
+
+            // Only send the non-empty layers
+            if (!layer_pair.second.empty())
+            {
+                this->publishPayload(layer_number, shapes);
+            }
+        }
+
+        // Clear shapes in layers of current frame/tick
+        this->clearShapes();
+
+        // Update last published time
+        time_last_published = now;
+
+        LOG(DEBUG) << "Published shapes" << std::endl;
+    }
+
+    void VisualizerMessenger::publishPayload(uint8_t layer, const ShapeVector& shapes)
+    {
+        // Payload is a list of int32s
+        std::vector<int32_t> payload;
+
+        // Add layer number and layer flags that prepend shape data
+        payload.insert(payload.end(), layer);
+
+        const uint8_t layer_flags = 0x00;
+        payload.insert(payload.end(), layer_flags);
+
+        // Unpack all the shape data and make a payload
+        for (const Shape& shape : shapes)
+        {
             payload.insert(payload.end(), shape.texture);
+            payload.insert(payload.end(), shape.flags);
             payload.insert(payload.end(), shape.x);
             payload.insert(payload.end(), shape.y);
             payload.insert(payload.end(), shape.width);
@@ -112,57 +149,56 @@ namespace Util
                 LOG(WARNING) << e.what() << std::endl;
             }
         }
+    }
 
-        // Clear shapes in layers of current frame/tick
-        this->shapes.clear();
-
-        // Update last published time
-        time_last_published = now;
-
-        LOG(DEBUG) << "Published shapes" << std::endl;
+    void VisualizerMessenger::clearShapes()
+    {
+        for (auto& layer : this->layer_shapes_map)
+        {
+            layer.second.clear();
+        }
     }
 
     void VisualizerMessenger::drawEllipse(uint8_t layer, uint16_t cx, uint16_t cy,
-                                          int16_t r1, int16_t r2, int16_t rotation, ShapeStyle style)
+                                          int16_t r1, int16_t r2, int16_t rotation,
+                                          ShapeStyle style)
     {
         const uint8_t texture = style.texture;
         const uint32_t tint   = style.tint;
 
         Shape new_shape;
-        new_shape.layer    = layer;
-        new_shape.texture  = texture;
+        new_shape.texture = texture;
 
         // Since x and y of the shape definition is top left, we need to shift to respect
         // the center of the ellipse
-        new_shape.x        = cx - r1;
-        new_shape.y        = cy - r2;
+        new_shape.x = cx - r1;
+        new_shape.y = cy - r2;
 
-        new_shape.width    = r1 * 2;
-        new_shape.height   = r2 * 2;
+        new_shape.width  = r1 * 2;
+        new_shape.height = r2 * 2;
 
         new_shape.rotation = rotation;
         new_shape.tint     = tint;
 
-        this->shapes.emplace_back(new_shape);
+        this->addShapeToLayer(layer, new_shape);
     }
 
     void VisualizerMessenger::drawRect(uint8_t layer, int16_t x, int16_t y, int16_t w,
                                        int16_t h, int16_t rotation, ShapeStyle style)
     {
         const uint8_t texture = style.texture;
-        const uint32_t tint = style.tint;
+        const uint32_t tint   = style.tint;
 
         Shape new_shape;
-        new_shape.layer = layer;
-        new_shape.texture = texture;
-        new_shape.x = x;
-        new_shape.y = y;
-        new_shape.width = w;
-        new_shape.height = h;
+        new_shape.texture  = texture;
+        new_shape.x        = x;
+        new_shape.y        = y;
+        new_shape.width    = w;
+        new_shape.height   = h;
         new_shape.rotation = rotation;
-        new_shape.tint = tint;
+        new_shape.tint     = tint;
 
-        this->shapes.emplace_back(new_shape);
+        this->addShapeToLayer(layer, new_shape);
     }
 
     void VisualizerMessenger::drawLine(uint8_t layer, int16_t x1, int16_t y1, int16_t x2,
@@ -177,7 +213,6 @@ namespace Util
         const int16_t angle  = (int16_t)atan2(dy, dx);
 
         Shape new_shape;
-        new_shape.layer    = layer;
         new_shape.texture  = texture;
         new_shape.x        = x1;
         new_shape.y        = y1;
@@ -186,7 +221,20 @@ namespace Util
         new_shape.rotation = angle;
         new_shape.tint     = tint;
 
-        this->shapes.emplace_back(new_shape);
+        this->addShapeToLayer(layer, new_shape);
+    }
+
+    void VisualizerMessenger::addShapeToLayer(uint8_t layer, Shape& shape)
+    {
+        if (this->layer_shapes_map.find(layer) != this->layer_shapes_map.end())
+        {
+            this->layer_shapes_map[layer].emplace_back(shape);
+        }
+        else
+        {
+            LOG(WARNING) << "Referenced layer (" << layer << ") is undefined."
+                         << std::endl;
+        }
     }
 
 }  // namespace Util
