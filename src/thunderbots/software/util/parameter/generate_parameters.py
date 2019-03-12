@@ -15,7 +15,7 @@ import constants
 #                              Load Yaml                              #
 #######################################################################
 
-def load_configuration(path_to_yaml):
+def load_configuration(path_to_yaml: str):
     """Loads the yaml files in the current directory and
     makes a dictionary containg the parameter name and its
     attributes with the proper hierarchy
@@ -48,7 +48,7 @@ def load_configuration(path_to_yaml):
 #######################################################################
 
 
-def generate_cfg(param_info, output_path):
+def generate_cfg(param_info: dict, output_path: str):
     """Takes the input dictionary from the parsed yaml
     and generates the respective cfg files needed
 
@@ -76,7 +76,7 @@ def generate_cfg(param_info, output_path):
             print('=== generated {} params cfg==='.format(key))
 
 
-def __cfg_gen(param_info, file_pointer, group_name=None):
+def __cfg_gen(param_info: dict, file_pointer, group_name=None):
     """Takes the information about parameters and namespaces,
     and recursively generates the configuration
 
@@ -135,7 +135,7 @@ def __cfg_gen(param_info, file_pointer, group_name=None):
 #######################################################################
 
 
-def generate_header_and_cpp(param_info, output_path):
+def generate_header_and_cpp(param_info: dict, output_path: str):
     """Takes the input dictionary from the parsed yaml
     and generates the respective cfg files needed
 
@@ -146,8 +146,10 @@ def generate_header_and_cpp(param_info, output_path):
 
     """
     # open files
-    dynamic_parameters_h = open(output_path+constants.DYNAMIC_PARMETERS_HEADER, 'w')
-    dynamic_parameters_cpp = open(output_path+constants.DYNAMIC_PARMETERS_CPP, 'w')
+    dynamic_parameters_h = open(
+        output_path+constants.DYNAMIC_PARMETERS_HEADER, 'w')
+    dynamic_parameters_cpp = open(
+        output_path+constants.DYNAMIC_PARMETERS_CPP, 'w')
 
     # write the header to .h .cpp file
     dynamic_parameters_h.write(constants.H_HEADER)
@@ -160,7 +162,8 @@ def generate_header_and_cpp(param_info, output_path):
     # iterate through param_info starting from namespaces
     # the first key is the file name, so that is skipped
     for key, value in param_info.items():
-        __header_and_cpp_gen(value, key, dynamic_parameters_h, dynamic_parameters_cpp)
+        __header_and_cpp_gen(
+            value, key, dynamic_parameters_h, dynamic_parameters_cpp)
 
     # append the footer
     dynamic_parameters_h.write(constants.FOOTER)
@@ -173,7 +176,7 @@ def generate_header_and_cpp(param_info, output_path):
     print('===== created dynamic_parameters header and cpp =====')
 
 
-def __header_and_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_pointer):
+def __header_and_cpp_gen(param_info: dict, cfg_name: str, header_file_pointer, cpp_file_pointer):
     """Takes the information about the parameters and namespaces
     and recursively generates the header file, returns a string to be written
     to the file
@@ -206,7 +209,8 @@ def __header_and_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_poi
             header_file_pointer.write(
                 constants.H_PARAMETER_DECL.format(
                     name=key,
-                    type=constants.CPP_TYPE_MAP[parameter["type"]]
+                    type=constants.CPP_TYPE_MAP[parameter["type"]],
+                    comment=parameter["description"]
                 )
             )
 
@@ -224,7 +228,8 @@ def __header_and_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_poi
         # else setup the namespaces
         else:
             # start the namespace
-            header_file_pointer.write(constants.NAMESPACE_OPEN.format(name=key))
+            header_file_pointer.write(
+                constants.NAMESPACE_OPEN.format(name=key))
             cpp_file_pointer.write(constants.NAMESPACE_OPEN.format(name=key))
 
             __header_and_cpp_gen(
@@ -235,7 +240,7 @@ def __header_and_cpp_gen(param_info, cfg_name, header_file_pointer, cpp_file_poi
             cpp_file_pointer.write(constants.NAMESPACE_CLOSE)
 
 
-def generate_server_node(param_info, output_path):
+def generate_server_node(param_info: dict, output_path: str):
     """This function must be called after the cfg, h and cpp files
     have been generated. Those generated cfg files will be setup
     as an indidual server containing the parameters to change
@@ -247,12 +252,13 @@ def generate_server_node(param_info, output_path):
 
     """
     # reconfigure server node file
-    with open(output_path+"reconfigure_server_host.cc", 'w+') as reconfigure_server_node:
+    with open(output_path+"reconfigure_servers.cpp", 'w+') as reconfigure_server_node:
         reconfigure_server_node.write(constants.NODE_HEADER)
-        
+
         # include statements
         for key in param_info.keys():
-            reconfigure_server_node.write(constants.INCLUDE_STATEMENT.format(key))
+            reconfigure_server_node.write(
+                constants.INCLUDE_STATEMENT.format(key))
 
         # init node
         main_contents = constants.INIT_NODE
@@ -265,10 +271,10 @@ def generate_server_node(param_info, output_path):
         main_contents += constants.SPIN_NODE
 
         # write the main function
-        reconfigure_server_node.write(constants.MAIN_FUNC.format(main_contents))
+        reconfigure_server_node.write(
+            constants.MAIN_FUNC.format(main_contents))
 
     print('===== created server node header =====')
-
 
 
 #######################################################################
@@ -287,4 +293,4 @@ if __name__ == '__main__':
     # generate files
     generate_cfg(config, constants.PATH_TO_AUTOGEN_CFG)
     generate_header_and_cpp(config, constants.PATH_TO_AUTOGEN_CPP)
-    generate_server_node(config, constants.PATH_TO_AUTOGEN_CPP)
+    generate_server_node(config, constants.PATH_TO_AUTOGEN_NODE)
