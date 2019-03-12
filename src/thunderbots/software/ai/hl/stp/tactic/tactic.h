@@ -34,8 +34,11 @@ class Tactic
    public:
     /**
      * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
+     *
+     * @param loop_forever Whether or not this Tactic should never complete. If true, the
+     * tactic will be restarted every time it completes
      */
-    explicit Tactic();
+    explicit Tactic(bool loop_forever);
 
     /**
      * Returns true if the Tactic is done and false otherwise. The tactic is considered
@@ -144,4 +147,6 @@ class Tactic
     intent_coroutine::pull_type intent_sequence;
     // Whether or not this Tactic is done
     bool done_;
+    // TODO: comment
+    bool loop_forever;
 };

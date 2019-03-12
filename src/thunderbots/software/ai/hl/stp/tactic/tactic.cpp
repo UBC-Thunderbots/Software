@@ -2,9 +2,10 @@
 
 #include "util/logger/init.h"
 
-Tactic::Tactic()
+Tactic::Tactic(bool loop_forever)
     : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
-      done_(false)
+      done_(false),
+      loop_forever(loop_forever)
 {
 }
 
@@ -42,7 +43,20 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         // done) to make sure that the done() function will always return true at the same
         // time a nullptr is returned (which also indicates the Tactic is done)
         done_ = !static_cast<bool>(next_intent);
+        if(done_) {
+            // If the tactic is done is supposed to loop forever, we re-create the
+            // intent_sequence which "restarts" the coroutine
+            intent_sequence = intent_coroutine::pull_type(
+                    boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
+        }
         return next_intent;
+    }
+    else if (loop_forever)
+    {
+        // When the coroutine finishes, if the Tactic is supposed to loop forever
+        // we re-create the intent_sequence which "restarts" the coroutine
+        intent_sequence = intent_coroutine::pull_type(
+            boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
     }
     // If the coroutine "iterator" is done, the calculateNextIntent function has completed
     // and has no more work to do. Therefore, the Tactic is done so we set done_ to true
