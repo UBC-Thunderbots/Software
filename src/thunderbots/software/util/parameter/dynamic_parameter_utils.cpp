@@ -18,6 +18,7 @@ namespace Util::DynamicParameters
 
     void parameterUpdateCallback(const dynamic_reconfigure::Config::ConstPtr& updates)
     {
+        std::cerr<<updates<<std::endl;
         Parameter<bool>::updateAllParametersFromConfigMsg(updates);
         Parameter<int32_t>::updateAllParametersFromConfigMsg(updates);
         Parameter<double>::updateAllParametersFromConfigMsg(updates);

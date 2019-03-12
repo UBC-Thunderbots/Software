@@ -9,9 +9,6 @@
 /install
 /logs
 
-# Dynamic Parameters   
-/src/thunderbots/software/util/parameter/dynamic_parameters.*
-
 # Pycache
 *.pyc
 

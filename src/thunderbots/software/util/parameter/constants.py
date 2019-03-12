@@ -21,7 +21,7 @@ DYNAMIC_PARMETERS_CPP = 'dynamic_parameters.cpp'
 ################
 
 H_PARAMETER_DECL = '// {comment}\nextern Parameter<{type}> {name}; \n\n'
-CPP_PARAMETER_INSTNACE = 'Parameter<{type}> {name}(\"{path}\", {quote}{default}{quote});\n\n'
+CPP_PARAMETER_INSTNACE = 'Parameter<{type}> {name}(\"{name}\", \"{namespace}\", {quote}{default}{quote});\n\n'
 
 NAMESPACE_OPEN = 'namespace {name} {{ \n'
 NAMESPACE_CLOSE = '}\n'

@@ -218,7 +218,8 @@ def __header_and_cpp_gen(param_info: dict, cfg_name: str, header_file_pointer, c
             cpp_file_pointer.write(
                 constants.CPP_PARAMETER_INSTNACE.format(
                     name=key,
-                    path="/{}/{}".format(cfg_name, key),
+                    path=key,
+                    namespace=cfg_name,
                     default=parameter["default"],
                     type=constants.CPP_TYPE_MAP[parameter["type"]],
                     quote="\"" if parameter["type"] in constants.QUOTE_TYPES else ""

@@ -10,7 +10,7 @@ namespace Util::DynamicParameters
      * to the namespace the /parameter_updates topic will be published on
      * to subscribe to
      */
-    static const std::vector<std::string> cfg_strs;
+    extern const std::vector<std::string> cfg_strs;
 
     /**
      * This creates the subscriber to each seperate reconfigure server
