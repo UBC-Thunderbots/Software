@@ -161,7 +161,8 @@ namespace AI::Passing
         /**
          * Calculate the quality of a given pass
          * @param pass The pass to rate
-         * @return A value in [0,1] representing the quality of the pass
+         * @return A value in [0,1] representing the quality of the pass with 1 being the
+         *         best pass and 0 being the worst pass
          */
         double ratePass(Pass pass);
 

@@ -202,42 +202,7 @@ double PassGenerator::ratePass(Pass pass)
     std::lock_guard<std::mutex> world_lock(world_mutex);
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
-    double static_pass_quality =
-        getStaticPositionQuality(world.field(), pass.receiverPoint());
-
-    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
-
-    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
-
-    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
-
-    // Rate all passes outside our target region as 0 if we have one
-    double in_region_quality = 1;
-    if (target_region)
-    {
-        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
-    }
-
-    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-                          shoot_pass_rating * in_region_quality;
-
-    // Strict requirement that the pass occurs at a minimum time in the future
-    double min_pass_time_offset =
-        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
-    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
-    pass_quality *= sigmoid(
-        pass.startTime().getSeconds(),
-        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
-
-    // Place strict limits on the ball speed
-    double min_pass_speed =
-        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
-    double max_pass_speed =
-        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
-    pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.001);
-    pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.001);
-
-    return pass_quality;
+    return ::ratePass(world, pass, target_region);
 }
 
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
@@ -248,13 +213,9 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     std::uniform_real_distribution x_distribution(-world.field().width()/2, world.field().width()/2);
     std::uniform_real_distribution y_distribution(-world.field().length()/2, world.field().length()/2);
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
-    Timestamp curr_time = world.ball().lastUpdateTimestamp();
-    Duration min_start_time_offset = Duration::fromSeconds(
-            Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value()
-    );
-    Duration max_start_time_offset = Duration::fromSeconds(
-            Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value()
-    );
+    double curr_time = world.ball().lastUpdateTimestamp().getSeconds();
+    double min_start_time_offset = Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    double max_start_time_offset = Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
     std::uniform_real_distribution start_time_distribution(
             curr_time + min_start_time_offset, curr_time + max_start_time_offset
     );
@@ -263,7 +224,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
             Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value()
     );
 
-    std::vector<Pass> passes(num_passes_to_gen);
+    std::vector<Pass> passes;
     for (int i = 0; i < num_passes_to_gen; i++){
         Point receiver_point(
                 x_distribution(random_num_gen),

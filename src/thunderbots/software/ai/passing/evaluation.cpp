@@ -12,8 +12,48 @@
 
 using namespace AI::Passing;
 
-double AI::Passing::ratePassShootScore(Field field, Team enemy_team,
-                                       AI::Passing::Pass pass)
+double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, const std::optional<Rectangle> &target_region)
+{
+    double static_pass_quality =
+            getStaticPositionQuality(world.field(), pass.receiverPoint());
+
+    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
+
+    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
+
+    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+
+    // Rate all passes outside our target region as 0 if we have one
+    double in_region_quality = 1;
+    if (target_region)
+    {
+        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
+    }
+
+    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+                          shoot_pass_rating * in_region_quality;
+
+    // Strict requirement that the pass occurs at a minimum time in the future
+    double min_pass_time_offset =
+            Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
+    pass_quality *= sigmoid(
+            pass.startTime().getSeconds(),
+            min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+
+    // Place strict limits on the ball speed
+    double min_pass_speed =
+            Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+    double max_pass_speed =
+            Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+    pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.001);
+    pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.001);
+
+    return pass_quality;
+}
+
+double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
+                                       const AI::Passing::Pass& pass)
 {
     double ideal_shoot_angle_degrees =
         Util::DynamicParameters::AI::Passing::ideal_min_shoot_angle_degrees.value();
