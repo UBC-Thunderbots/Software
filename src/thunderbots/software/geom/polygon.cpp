@@ -4,35 +4,34 @@
 
 #include "geom/util.h"
 
-// CMake defines NDEBUG for Release build configurations
-#ifndef NDEBUG
-#define VALIDATE_POLYGON
-#endif
 
-Polygon::Polygon(const std::vector<Segment>& _segments) : segments(_segments)
+Polygon::Polygon(const std::vector<Point>& _points)
+    : segments(_points.size()), points(_points)
 {
-#ifdef VALIDATE_POLYGON
-    if (!isValid())
+    for (auto i = 0; i < _points.size(); i++)
     {
-        throw std::invalid_argument("input segments do not form a polygon!");
+        // add a segment between consecutive points, but wrap index
+        // to draw a segment from the last point to first point.
+        segments[i] = Segment{_points[i], _points[(i + 1) % _points.size()]};
     }
-#endif
 }
 
-Polygon::Polygon(const std::initializer_list<Segment>& _segments) : segments(_segments)
+Polygon::Polygon(const std::initializer_list<Point>& _points)
+    : segments(_points.size()), points(_points)
 {
-#ifdef VALIDATE_POLYGON
-    if (!isValid())
+    for (auto i = 0; i < _points.size(); i++)
     {
-        throw std::invalid_argument("input segments do not form a polygon!");
+        // add a segment between consecutive points, but wrap index
+        // to draw a segment from the last point to first point.
+        segments[i] =
+            Segment{*(points.begin() + i), *(points.begin() + ((i + 1) % points.size()))};
     }
-#endif
 }
 
 bool Polygon::containsPoint(const Point& point)
 {
     // cast a ray from the point in the +x direction
-    Ray ray(point, Vector(1, 0));
+    Ray ray(point, point + Point(1, 0));
     unsigned int num_intersections = 0;
     for (const Segment& seg : segments)
     {
@@ -43,9 +42,10 @@ bool Polygon::containsPoint(const Point& point)
             num_intersections++;
         }
     }
+
     // if the ray intersects the polygon an odd number of times,
     // it is inside the polygon, otherwise it is outside the polygon
-    return num_intersections % 2 == 0;
+    return num_intersections % 2 != 0;
 }
 
 bool Polygon::intersects(const Segment& segment)
@@ -68,22 +68,12 @@ bool Polygon::intersects(const Ray& ray)
     return false;
 }
 
-bool Polygon::isValid()
+const std::vector<Segment>& Polygon::getSegments()
 {
-    // to have a valid polygon, each vertex should appear once in the
-    // first part of a segment, and once in the 2nd part of a segment
-    std::unordered_set<Point> first_point_set;
-    for (const auto& seg : segments)
-    {
-        first_point_set.insert(seg.getSegStart());
-    }
-    for (const auto& seg : segments)
-    {
-        if (first_point_set.find(seg.getEnd()) == first_point_set.end())
-        {
-            // 2nd point does not occur in set of first points,
-            return false;
-        }
-    }
-    return true;
+    return segments;
+}
+
+const std::vector<Point>& Polygon::getPoints()
+{
+    return points;
 }
