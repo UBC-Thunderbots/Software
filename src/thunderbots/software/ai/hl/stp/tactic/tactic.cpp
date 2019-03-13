@@ -38,8 +38,10 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
     {
         // If the tactic is done and is supposed to loop forever, we re-create the
         // intent_sequence which "restarts" the coroutine. We then run the coroutine
-        // again, and take the new result so that we don't return a nullptr while
-        // restarting the Tactic
+        // again, and return the result from the restarted coroutine rather than the
+        // old one. This way, any callers of this function won't accidentally get a
+        // nullptr returned for a single call (which could come from the "old" coroutine)
+        // when this Tactic restarts
         intent_sequence = intent_coroutine::pull_type(
             boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
         next_intent = getNextIntentHelper();
