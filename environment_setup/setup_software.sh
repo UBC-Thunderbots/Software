@@ -191,6 +191,9 @@ make
 sudo make install
 cd $CURR_DIR
 
+# yaml for cfg generation (Dynamic Parameters)
+pip3 install pyyaml
+
 # Done
 echo "================================================================"
 echo "Done Software Setup"
