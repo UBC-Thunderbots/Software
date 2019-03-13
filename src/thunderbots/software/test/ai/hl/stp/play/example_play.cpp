@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/play/example_play.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "test/test_util/test_util.h"
 
@@ -8,24 +8,24 @@ TEST(ExamplePlayTest, test_example_play_always_applicable)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    auto example_play = PlayFactory::createPlay("Example Play");
-    EXPECT_TRUE(example_play->isApplicable(world));
+    ExamplePlay example_play;
+    EXPECT_TRUE(example_play.isApplicable(world));
 }
 
 TEST(ExamplePlayTest, test_example_play_invariant_always_holds)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    auto example_play = PlayFactory::createPlay("Example Play");
-    EXPECT_TRUE(example_play->invariantHolds(world));
+    ExamplePlay example_play;
+    EXPECT_TRUE(example_play.invariantHolds(world));
 }
 
 TEST(ExamplePlayTest, test_example_play_returns_correct_tactics)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    auto example_play = PlayFactory::createPlay("Example Play");
-    auto tactics      = example_play->getTactics(world);
+    ExamplePlay example_play;
+    auto tactics      = example_play.getTactics(world);
 
     // Make sure something was returned
     EXPECT_TRUE(tactics);

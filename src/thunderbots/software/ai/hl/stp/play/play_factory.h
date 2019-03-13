@@ -109,7 +109,6 @@ class TPlayFactory : public PlayFactory
         auto play_creator = []() -> std::unique_ptr<Play> {
             return std::make_unique<T>();
         };
-        std::string name = play_creator()->name();
-        PlayFactory::registerPlay(name, play_creator);
+        PlayFactory::registerPlay(T::name, play_creator);
     }
 };

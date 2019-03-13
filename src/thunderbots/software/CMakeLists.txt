@@ -588,7 +588,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             test/ai/hl/stp/play/main.cpp
-            test/ai/hl/stp/play/move_play.cpp
+            test/ai/hl/stp/play/example_play.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/test_util/test_util.cpp
             util/logger/custom_g3log_sinks.h
