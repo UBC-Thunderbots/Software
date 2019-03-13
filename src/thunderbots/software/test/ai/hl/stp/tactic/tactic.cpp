@@ -128,6 +128,6 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
     {
         intent_ptr = tactic.getNextIntent();
         EXPECT_TRUE(intent_ptr);
-        //        EXPECT_FALSE(tactic.done());
+        EXPECT_FALSE(tactic.done());
     }
 }
