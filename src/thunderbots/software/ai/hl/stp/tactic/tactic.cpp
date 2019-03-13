@@ -33,37 +33,19 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         return std::unique_ptr<Intent>{};
     }
 
-    if (intent_sequence)
+    auto next_intent = getNextIntentHelper();
+    if (done_ && loop_forever)
     {
-        // Calculate and return the next Intent
-        intent_sequence();
-        auto next_intent = intent_sequence.get();
-        // The tactic is considered done once a nullptr is returned
-        // We set the done_ variable here in addition to below (once the coroutine is
-        // done) to make sure that the done() function will always return true at the same
-        // time a nullptr is returned (which also indicates the Tactic is done)
-        done_ = !static_cast<bool>(next_intent);
-        if (done_)
-        {
-            // If the tactic is done is supposed to loop forever, we re-create the
-            // intent_sequence which "restarts" the coroutine
-            intent_sequence = intent_coroutine::pull_type(
-                boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
-        }
-        return next_intent;
-    }
-    else if (loop_forever)
-    {
-        // When the coroutine finishes, if the Tactic is supposed to loop forever
-        // we re-create the intent_sequence which "restarts" the coroutine
+        // If the tactic is done and is supposed to loop forever, we re-create the
+        // intent_sequence which "restarts" the coroutine. We then run the coroutine
+        // again, and take the new result so that we don't return a nullptr while
+        // restarting the Tactic
         intent_sequence = intent_coroutine::pull_type(
             boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
+        next_intent = getNextIntentHelper();
     }
-    // If the coroutine "iterator" is done, the calculateNextIntent function has completed
-    // and has no more work to do. Therefore, the Tactic is done so we set done_ to true
-    // and return a nullptr
-    done_ = true;
-    return std::unique_ptr<Intent>{};
+
+    return next_intent;
 }
 
 std::unique_ptr<Intent> Tactic::calculateNextIntentWrapper(
@@ -76,4 +58,26 @@ std::unique_ptr<Intent> Tactic::calculateNextIntentWrapper(
     // Anytime after the first function call, the calculateNextIntent function will be
     // used to perform the real logic
     return calculateNextIntent(yield);
+}
+
+std::unique_ptr<Intent> Tactic::getNextIntentHelper()
+{
+    std::unique_ptr<Intent> next_intent;
+    // Check if the coroutine "iterator" has any more work to do. Only run the coroutine
+    // if there is work to be done otherwise the coroutine library will fail on an assert.
+    if (intent_sequence)
+    {
+        // Run the coroutine
+        intent_sequence();
+        // Get the result of running the coroutine, which is the next Intent the Tactic
+        // wants to run
+        next_intent = intent_sequence.get();
+    }
+
+    // The Tactic is considered done once the next_intent becomes a nullptr. This could
+    // either be because it was returned by the calculateNextIntent function, or because
+    // the intent_sequence coroutine is done and has no more work to do.
+    done_ = !static_cast<bool>(next_intent);
+
+    return next_intent;
 }

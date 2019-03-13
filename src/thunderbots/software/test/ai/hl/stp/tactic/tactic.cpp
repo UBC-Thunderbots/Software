@@ -121,17 +121,13 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
     tactic.updateRobot(robot);
     tactic.updateParams(Point(), Angle::zero(), 0.0);
 
-    // Since the Tactic should be done, we expect the returned intent_ptr to alternate
-    // between some valid Intent, and nullptr as the Tactic finishes and restarts
+    // Even though the Tactic should be done, we expect the it to continue returning valid
+    // Intents because it will be constantly restarting
     std::unique_ptr<Intent> intent_ptr;
     for (int i = 0; i < 5; i++)
     {
         intent_ptr = tactic.getNextIntent();
         EXPECT_TRUE(intent_ptr);
-        EXPECT_FALSE(tactic.done());
-
-        intent_ptr = tactic.getNextIntent();
-        EXPECT_FALSE(intent_ptr);
-        EXPECT_TRUE(tactic.done());
+        //        EXPECT_FALSE(tactic.done());
     }
 }
