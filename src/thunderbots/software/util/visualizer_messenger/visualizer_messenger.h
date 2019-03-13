@@ -172,6 +172,17 @@ namespace Util
          */
         void addShapeToLayer(uint8_t layer, Shape& shape);
 
+        /**
+         * Pack two 8-bit data to a single 16-bit data
+         * @param in1: first data
+         * @param in2: second data
+         * @return 16 bit concatenated data <first><second>
+         */
+        inline uint16_t pack16BitData(uint8_t in1, uint8_t in2)
+        {
+            return ((static_cast<uint16_t>(in1)) << 8) | (in2 & 0x00FF);
+        }
+
         // Period in nanoseconds
         const double DESIRED_PERIOD_MS =
             1.0e3 / Util::Constants::DESIRED_VISUALIZER_MESSAGE_FREQ;

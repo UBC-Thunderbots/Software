@@ -115,25 +115,28 @@ namespace Util
     void VisualizerMessenger::publishPayload(uint8_t layer, const ShapeVector& shapes)
     {
         // Payload is a list of int32s
-        std::vector<int32_t> payload;
+        std::vector<int16_t> payload;
 
         // Add layer number and layer flags that prepend shape data
-        payload.insert(payload.end(), layer);
-
         const uint8_t layer_flags = 0x00;
-        payload.insert(payload.end(), layer_flags);
+        payload.insert(payload.end(), pack16BitData(layer, layer_flags));
 
         // Unpack all the shape data and make a payload
         for (const Shape& shape : shapes)
         {
-            payload.insert(payload.end(), shape.texture);
-            payload.insert(payload.end(), shape.flags);
+            // Packing texture (8 bit) and flag (8 bit) data into a single 16 bit int
+            payload.insert(payload.end(), pack16BitData(shape.texture, shape.flags));
+
+            // These are all 16 bits
             payload.insert(payload.end(), shape.x);
             payload.insert(payload.end(), shape.y);
             payload.insert(payload.end(), shape.width);
             payload.insert(payload.end(), shape.height);
             payload.insert(payload.end(), shape.rotation);
-            payload.insert(payload.end(), shape.tint);
+
+            // Split the 32 bit data into two parts
+            payload.insert(payload.end(), static_cast<uint16_t>(shape.tint >> 16));
+            payload.insert(payload.end(), static_cast<uint16_t>(shape.tint & 0xFF));
         }
 
         // Send all the shapes to all the websocket connections we have
@@ -209,8 +212,8 @@ namespace Util
 
         const int16_t dx     = x2 - x1;
         const int16_t dy     = y2 - y1;
-        const int16_t length = (int16_t)sqrt(dx * dx + dy * dy);
-        const int16_t angle  = (int16_t)atan2(dy, dx);
+        const int16_t length = static_cast<int16_t>(sqrt(dx * dx + dy * dy));
+        const int16_t angle  = static_cast<int16_t>(atan2(dy, dx));
 
         Shape new_shape;
         new_shape.texture  = texture;
