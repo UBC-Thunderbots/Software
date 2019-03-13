@@ -1,5 +1,5 @@
 /**
- * main function for all Action tests
+ * main function for all Play tests
  */
 
 #include <gtest/gtest.h>
