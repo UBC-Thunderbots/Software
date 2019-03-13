@@ -121,7 +121,7 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
     tactic.updateRobot(robot);
     tactic.updateParams(Point(), Angle::zero(), 0.0);
 
-    // Even though the Tactic should be done, we expect the it to continue returning valid
+    // Even though the Tactic should be done, we expect it to continue returning valid
     // Intents because it will be constantly restarting
     std::unique_ptr<Intent> intent_ptr;
     for (int i = 0; i < 5; i++)
