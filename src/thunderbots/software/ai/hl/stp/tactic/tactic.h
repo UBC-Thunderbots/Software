@@ -147,6 +147,6 @@ class Tactic
     intent_coroutine::pull_type intent_sequence;
     // Whether or not this Tactic is done
     bool done_;
-    // TODO: comment
+    // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
 };
