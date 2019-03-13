@@ -13,7 +13,7 @@ TEST(PlayFactoryTest, test_create_play_with_invalid_name)
 
 TEST(PlayFactoryTest, test_create_play_with_valid_name)
 {
-    auto play_ptr = PlayFactory::createPlay("Move Play");
+    auto play_ptr = PlayFactory::createPlay("Example Play");
 
     EXPECT_TRUE(play_ptr);
 }

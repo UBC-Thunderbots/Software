@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-MoveTactic::MoveTactic() : Tactic() {}
+MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
 
 std::string MoveTactic::getName() const
 {
