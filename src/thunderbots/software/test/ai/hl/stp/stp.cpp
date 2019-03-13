@@ -144,7 +144,7 @@ TEST_F(STPTest, test_play_assignment_from_one_play_to_another_when_current_play_
     // Now only the StopTestPlay should be applicable, and the MoveTestPlay's invariant
     // no longer holds, so we expect the current play to become the StopTestPlay
     world =
-            ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
+        ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), StopTestPlay::name);
 }

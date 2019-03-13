@@ -1,4 +1,5 @@
 #include "test/ai/hl/stp/test_plays/stop_test_play.h"
+
 #include "ai/hl/stp/play/play_factory.h"
 #include "geom/util.h"
 #include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
@@ -22,8 +23,8 @@ bool StopTestPlay::invariantHolds(const World &world) const
         world.ball().position());
 }
 
-std::vector<std::shared_ptr<Tactic>> StopTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                                    const World &world)
+std::vector<std::shared_ptr<Tactic>> StopTestPlay::getNextTactics(
+    TacticCoroutine::push_type &yield, const World &world)
 {
     auto stop_test_tactic_1 = std::make_shared<StopTestTactic>();
     auto stop_test_tactic_2 = std::make_shared<StopTestTactic>();

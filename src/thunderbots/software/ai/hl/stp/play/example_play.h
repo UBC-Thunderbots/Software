@@ -7,7 +7,7 @@
  */
 class ExamplePlay : public Play
 {
-public:
+   public:
     static const std::string name;
 
     ExamplePlay() = default;

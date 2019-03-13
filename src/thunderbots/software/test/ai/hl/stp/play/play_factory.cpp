@@ -1,11 +1,11 @@
 #include "ai/hl/stp/play/play_factory.h"
-#include "test/ai/hl/stp/test_plays/move_test_play.h"
-#include "test/ai/hl/stp/test_plays/stop_test_play.h"
 
 #include <gtest/gtest.h>
 
 #include <exception>
 
+#include "test/ai/hl/stp/test_plays/move_test_play.h"
+#include "test/ai/hl/stp/test_plays/stop_test_play.h"
 #include "test/test_util/test_util.h"
 
 TEST(PlayFactoryTest, test_create_play_with_invalid_name)
@@ -26,8 +26,12 @@ TEST(PlayFactoryTest, test_get_registered_play_names)
     // Make sure we get the right number of names
     EXPECT_EQ(registered_names.size(), 2);
     // Make sure we get the names we are expecting
-    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), MoveTestPlay::name), 1);
-    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), StopTestPlay::name), 1);
+    EXPECT_EQ(
+        std::count(registered_names.begin(), registered_names.end(), MoveTestPlay::name),
+        1);
+    EXPECT_EQ(
+        std::count(registered_names.begin(), registered_names.end(), StopTestPlay::name),
+        1);
 }
 
 TEST(PlayFactoryTest, test_get_registered_play_constructors)

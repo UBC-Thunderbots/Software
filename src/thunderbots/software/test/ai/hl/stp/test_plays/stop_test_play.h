@@ -15,7 +15,7 @@
  */
 class StopTestPlay : public Play
 {
-public:
+   public:
     static const std::string name;
 
     StopTestPlay() = default;
@@ -29,4 +29,3 @@ public:
     std::vector<std::shared_ptr<Tactic>> getNextTactics(TacticCoroutine::push_type &yield,
                                                         const World &world) override;
 };
-

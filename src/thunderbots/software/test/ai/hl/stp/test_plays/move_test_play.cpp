@@ -1,4 +1,5 @@
 #include "test/ai/hl/stp/test_plays/move_test_play.h"
+
 #include "ai/hl/stp/play/play_factory.h"
 #include "test/ai/hl/stp/test_tactics/move_test_tactic.h"
 
@@ -19,8 +20,8 @@ bool MoveTestPlay::invariantHolds(const World &world) const
     return world.ball().position().x() >= 0;
 }
 
-std::vector<std::shared_ptr<Tactic>> MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield,
-                                                    const World &world)
+std::vector<std::shared_ptr<Tactic>> MoveTestPlay::getNextTactics(
+    TacticCoroutine::push_type &yield, const World &world)
 {
     auto move_test_tactic_friendly_goal = std::make_shared<MoveTestTactic>();
     auto move_test_tactic_enemy_goal    = std::make_shared<MoveTestTactic>();

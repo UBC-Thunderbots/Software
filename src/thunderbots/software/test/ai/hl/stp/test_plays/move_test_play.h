@@ -16,7 +16,7 @@
  */
 class MoveTestPlay : public Play
 {
-public:
+   public:
     static const std::string name;
 
     MoveTestPlay() = default;

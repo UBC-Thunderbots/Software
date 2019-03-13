@@ -11,7 +11,7 @@
 TEST(TacticTest, test_get_assigned_robot_with_no_robot_and_no_params)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    auto robot        = tactic.getAssignedRobot();
+    auto robot            = tactic.getAssignedRobot();
 
     EXPECT_EQ(robot, std::nullopt);
 }
@@ -28,7 +28,7 @@ TEST(TacticTest, test_get_assigned_robot_with_no_robot)
 TEST(TacticTest, test_get_assigned_robot_with_a_robot_assigned)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    auto robot        = Robot(1, Point(1, 0), Vector(), Angle::threeQuarter(),
+    auto robot            = Robot(1, Point(1, 0), Vector(), Angle::threeQuarter(),
                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     tactic.updateRobot(robot);
 
