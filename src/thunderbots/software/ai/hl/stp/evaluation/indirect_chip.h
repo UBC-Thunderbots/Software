@@ -35,9 +35,11 @@ namespace Evaluation
      * Given the vector of triangles without enemy robots, determines if the triangles are
      * empty and if the largest triangle is within reach. If not within reach, scale the
      * target point with the maximum chip power. The target point is where ball will land
-     * according to chipping calibration, as well as where the chaser will meet the ball at.
+     * according to chipping calibration, as well as where the chaser will meet the ball
+     * at.
      *
-     * @param triangles A vector of triangles that is already filtered
+     * @param triangles A vector of triangles with no enemy robots and are within best
+     * chip target area
      * @param ball_position Position of the ball
      *
      * @return Point to chip and chase at; If null, the target triangles were empty
@@ -46,7 +48,8 @@ namespace Evaluation
         const std::vector<Triangle>& triangles, Point ball_position);
 
     /**
-     * Returns a vector of all possible triangles between enemy players and rectangular chip area.
+     * Returns a vector of all possible triangles between enemy players and rectangular
+     * chip area.
      *
      * Creates a vector of triangles that picks all permutations of points from the
      * list of all non-goalie enemy players as well as the four points returned by
@@ -57,15 +60,15 @@ namespace Evaluation
      *
      * @return Vector of triangles
      */
-    std::vector<Triangle> getAllTrianglesBetweenEnemyPlayers(const World &world,
-                                                             std::vector<Point> enemy_players);
+    std::vector<Triangle> getAllTrianglesBetweenEnemyPlayers(
+        const World& world, std::vector<Point> enemy_players);
 
     /**
      * Returns a vector of triangles that only contains triangles without enemy robots.
      *
-     * Given a vector of triangles, shrink each triangle slightly (to avoid counting the robot's
-     * width within the triangle), filters out the triangles that consist of enemy robots and
-     * returns a new vector that only contains triangles without enemy robots.
+     * Given a vector of triangles, shrink each triangle slightly (to avoid counting the
+     * robot's width within the triangle), filters out the triangles that consist of enemy
+     * robots and returns a new vector that only contains triangles without enemy robots.
      *
      * @param triangles Vector of triangles
      * @param enemy_players Vector of enemy robots' positions

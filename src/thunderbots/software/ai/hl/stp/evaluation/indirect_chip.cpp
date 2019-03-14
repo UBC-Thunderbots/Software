@@ -97,12 +97,13 @@ std::vector<Triangle> Evaluation::getAllTrianglesBetweenEnemyPlayers(const World
             {
                 // Set up 3 different points from the vector of non-goalie enemy players'
                 // positions and the four points for the rectangular region to chip and
-                // chase at. With the 3 points, create a possible triangle and place in
-                // vector of all triangles. Eventually all permutations of points will be
-                // picked
+                // chase at
                 Point p1   = allPts[i];
                 Point p2   = allPts[j];
                 Point p3   = allPts[k];
+                // With the 3 points, create a possible triangle and place in
+                // vector of all triangles. Eventually all permutations of points will be
+                // picked
                 Triangle t = triangle(p1, p2, p3);
                 triangles.push_back(t);
             }
