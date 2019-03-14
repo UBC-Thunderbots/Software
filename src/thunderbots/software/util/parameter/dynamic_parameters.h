@@ -28,7 +28,12 @@ namespace Util
 
         namespace Navigator
         {
+            // Default avoid distance around robots.
             extern Parameter<double> default_avoid_dist;
+
+            // Scaling factor for collision avoidance.
+            // TODO this is arbitrary for now; could be determined as part of
+            // #23: https://github.com/UBC-Thunderbots/Software/issues/23
             extern Parameter<double> collision_avoid_velocity_scale;
         }  // namespace Navigator
 
@@ -36,13 +41,30 @@ namespace Util
         {
             namespace Indirect_Chip
             {
+                // Adjusts how far between ball and target the robot will chip
                 extern Parameter<double> chip_target_fraction;
+
+                // Maximum fraction of distance between chipper and target the first
+                // bounce should be, so ball is rolling when it reaches the target
                 extern Parameter<double> chip_power_bounce_threshold;
+
+                // Maximum power the robot can chip the ball at without malfunctions
                 extern Parameter<double> max_chip_power;
+
+                // Closest distance to edge of field that the robot could chip and chase
+                // to
                 extern Parameter<double> chip_target_area_inset;
+
+                // Minimum area of chip target triangle
                 extern Parameter<double> min_chip_tri_area;
+
+                // Minimum edge length of chip target triangle
                 extern Parameter<double> min_chip_tri_edge_len;
+
+                // Minimum angle in degrees between chip triangle edges
                 extern Parameter<double> min_chip_tri_edge_angle;
+
+                // Percentage of distance to center of triangle to return as target
                 extern Parameter<double> chip_cherry_power_downscale;
             }  // namespace Indirect_Chip
 

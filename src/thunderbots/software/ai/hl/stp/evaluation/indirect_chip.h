@@ -132,10 +132,10 @@ namespace Evaluation
      * @param allTriangles Vector of triangles
      * @param min_area Minimum area a chip target triangle must have to be considered
      * valid
-     * @param min_edge_len Minimum length each edge of the chip target triangle must have
-     * for the triangle to be considered valid
+     * @param min_edge_len Minimum length in meters that each edge of the chip target
+     * triangle must have for the triangle to be considered valid
      * @param min_edge_angle Minimum angle in degrees that any two edges of a chip
-     * triangle triangle must have for that triangle to be considered valid
+     * target triangle must have for that triangle to be considered valid
      *
      * @return Largest triangle
      */
