@@ -32,3 +32,4 @@ file(GLOB_RECURSE SHARED_UTIL_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 list(REMOVE_ITEM SHARED_UTIL_SRC ${SHARED_UTIL_TEST})
 
 add_subdirectory(software)
+add_subdirectory(firmware)
