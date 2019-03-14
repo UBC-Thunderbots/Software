@@ -60,6 +60,31 @@ namespace Util
                 extern Parameter<double>
                     static_field_position_quality_friendly_goal_distance_weight;
 
+                // This controls how heavily we weight a robot being near the pass
+                // receiver when calculating enemy risk to a pass
+                extern Parameter<double> enemy_proximity_importance;
+
+                // The minimum open angle formed by the two enemy goal posts and the
+                // pass reception position that we think will likely result in a good
+                // shooting opportunity. Note that we may take shots below this in some
+                // cases, it's more of a weight then a cutoff.
+                extern Parameter<double> ideal_min_shoot_angle_degrees;
+
+                // The minimum angle that we have to rotate after receiving a pass to
+                // shoot that we think would likely result in a goal. Note that we may
+                // try to take shots that require us to rotate more then this, it's
+                // more of a weight then a cutoff
+                extern Parameter<double> ideal_min_rotation_to_shoot_degrees;
+
+                // Minimum time into the future at which the pass should occur. This is
+                // to ensure we have enough time to setup a robot to actually perform
+                // the pass. This is in seconds
+                extern Parameter<double> min_time_offset_for_pass_seconds;
+
+                // The minimum/maximum pass speed (in m/s)
+                extern Parameter<double> min_pass_speed_m_per_s;
+                extern Parameter<double> max_pass_speed_m_per_s;
+
                 // The number of passes to try to optimize at any given time
                 extern Parameter<int32_t> num_passes_to_optimize;
 

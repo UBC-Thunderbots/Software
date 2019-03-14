@@ -1,15 +1,7 @@
 #pragma once
 
-// The forward declaration is required for the typedef to appear before the class
-class Timestamp;
-
-/**
- * This Timestamp class can also represent a duration in time, so we create a typedef
- * for Durations to make that distinction explicit
- * This typedef appears before the Timestamp class so that the class can return Duration
- * values
- */
-typedef Timestamp Duration;
+#include "duration.h"
+#include "time.h"
 
 /**
  * A simple Timestamp class built around doubles. This Timestamp is intended to represent
@@ -22,19 +14,9 @@ typedef Timestamp Duration;
  * the system in order to calculate time differences (durations), velocities, and other
  * time-dependent values.
  */
-class Timestamp
+class Timestamp : public Time
 {
    public:
-    // Due to internal representation of doubles being slightly less accurate/consistent
-    // with some numbers and operations, we consider timestamps that are very close
-    // together to be equal (since they likely are, just possibly slightly misrepresented
-    // by the system/compiler). We use this EPSILON as a threshold for comparison. 1e-15
-    // was chosen as a value because doubles have about 16 consistent significant figures.
-    // Comparing numbers with 15 significant figures gives us a
-    // small buffer while remaining as accurate as possible.
-    // http://www.cplusplus.com/forum/beginner/95128/
-    static constexpr double EPSILON = 1e-15;
-
     /**
      * The default constructor for a Timestamp. Creates a Timestamp at time 0
      */
@@ -58,23 +40,11 @@ class Timestamp
     static const Timestamp fromMilliseconds(double milliseconds);
 
     /**
-     * Returns the value of the Timestamp in seconds
-     * @return the value of the Timestamp in seconds
-     */
-    double getSeconds() const;
-
-    /**
-     * Returns the value of the Timestamp in milliseconds
-     * @return the value of the Timestamp in milliseconds
-     */
-    double getMilliseconds() const;
-
-    /**
      * Compares Timestamps for equality. Timestamps are considered equal if their values
      * in seconds are within EPSILON from one another.
      *
      * @param other the Timestamp to compare with for equality
-     * @return true if the timestamps are equal and false otherwise
+     * @return true if the Timestamps are equal and false otherwise
      */
     bool operator==(const Timestamp& other) const;
 
@@ -82,46 +52,46 @@ class Timestamp
      * Compares Timestamps for inequality
      *
      * @param other the Timestamp to compare with for inequality
-     * @return true if the timestamps are not equal, and false otherwise
+     * @return true if the Timestamps are not equal, and false otherwise
      */
     bool operator!=(const Timestamp& other) const;
 
     /**
      * Defines the "less than" operator. Returns true if this Timestamp is strictly less
-     * than (and not equal to) the other timestamp
+     * than (and not equal to) the other Timestamp
      *
      * @param other the Timestamp to compare with
      * @return true if this Timestamp is strictly less than (and not equal to) the other
-     * timestamp, and false otherwise
+     * Timestamp, and false otherwise
      */
     bool operator<(const Timestamp& other) const;
 
     /**
      * Defines the "less than or equal to" operator. Returns true if this Timestamp is
-     * less than or equal to the other timestamp
+     * less than or equal to the other Timestamp
      *
      * @param other the Timestamp to compare with
-     * @return true if this Timestamp is less than or equal to the other timestamp, and
+     * @return true if this Timestamp is less than or equal to the other Timestamp, and
      * false otherwise
      */
     bool operator<=(const Timestamp& other) const;
 
     /**
      * Defines the "greater than" operator. Returns true if this Timestamp is strictly
-     * greater than (and not equal to) the other timestamp
+     * greater than (and not equal to) the other Timestamp
      *
      * @param other the Timestamp to compare with
      * @return true if this Timestamp is strictly greater than (and not equal to) the
-     * other timestamp, and false otherwise
+     * other Timestamp, and false otherwise
      */
     bool operator>(const Timestamp& other) const;
 
     /**
      * Defines the "greater than or equal to" operator. Returns true if this Timestamp
-     * is greater than or equal to the other timestamp
+     * is greater than or equal to the other Timestamp
      *
      * @param other the Timestamp to compare with
-     * @return true if this Timestamp is greater than or equal to the other timestamp, and
+     * @return true if this Timestamp is greater than or equal to the other Timestamp, and
      * false otherwise
      */
     bool operator>=(const Timestamp& other) const;
@@ -140,10 +110,18 @@ class Timestamp
      * from Timestamps
      *
      * @param duration the Duration to subtract from this Timestamp
-     * @return A new Timestamp with the given Duration subtracted from this current
-     * Timestamp
+     * @return A new Timestamp with the given Duration subtracted from to this Timestamp
      */
     Timestamp operator-(const Duration& duration) const;
+
+    /**
+     * Defines the subtraction operator for Timestamps. Allows Timestamps to be subtracted
+     * from Timestamps
+     *
+     * @param timestamp The Timestamp to subtract from this Timestamp
+     * @return A Duration that is the difference in time between the two timestamps
+     */
+    Duration operator-(const Timestamp& timestamp) const;
 
    private:
     /**
@@ -153,7 +131,4 @@ class Timestamp
      * @throws std::invalid_argument if the provided value is < 0.0
      */
     explicit Timestamp(double timestamp_seconds);
-
-    // The stored internal value of the timestamp, in seconds
-    double timestamp_in_seconds;
 };

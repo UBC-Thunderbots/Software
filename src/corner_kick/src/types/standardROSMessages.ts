@@ -3,6 +3,17 @@
  */
 
 /**
+ * ROSOUT level numbers
+ */
+export enum RosoutLevel {
+    DEBUG = 1,
+    INFO = 2,
+    WARN = 4,
+    ERROR = 8,
+    FATAL = 16,
+}
+
+/**
  * ROSOUT message type
  */
 export interface IRosoutMessage {
@@ -11,6 +22,6 @@ export interface IRosoutMessage {
     name: string;
     file: string;
     function: string;
-    line: number;
+    line: RosoutLevel;
     topics: string[];
 }
