@@ -4,39 +4,26 @@
 std::optional<Robot> Evaluation::nearest_friendly(const Team friendly_team,
                                                   const Point ref_point)
 {
-    if (friendly_team.getAllRobots().empty())
-    {
-        return std::nullopt;
-    }
-
-    unsigned nearestRobotId = friendly_team.getAllRobots()[0].id();
-    double minDist = (ref_point - friendly_team.getAllRobots()[0].position()).len();
-
-    for (const Robot &curRobot : friendly_team.getAllRobots())
-    {
-        double curDistance = (ref_point - curRobot.position()).len();
-        if (curDistance < minDist)
-        {
-            nearestRobotId = curRobot.id();
-            minDist        = curDistance;
-        }
-    }
-
-    return friendly_team.getRobotById(nearestRobotId).value();
+    return nearest_robot(friendly_team, ref_point);
 }
 
 std::optional<Robot> Evaluation::nearest_enemy(const Team enemy_team,
                                                const Point ref_point)
 {
-    if (enemy_team.getAllRobots().empty())
+    return nearest_robot(enemy_team, ref_point);
+}
+
+std::optional<Robot> Evaluation::nearest_robot(const Team team, const Point ref_point)
+{
+    if (team.getAllRobots().empty())
     {
         return std::nullopt;
     }
 
-    unsigned nearestRobotId = enemy_team.getAllRobots()[0].id();
-    double minDist          = (ref_point - enemy_team.getAllRobots()[0].position()).len();
+    unsigned nearestRobotId = team.getAllRobots()[0].id();
+    double minDist          = (ref_point - team.getAllRobots()[0].position()).len();
 
-    for (const Robot &curRobot : enemy_team.getAllRobots())
+    for (const Robot &curRobot : team.getAllRobots())
     {
         double curDistance = (ref_point - curRobot.position()).len();
         if (curDistance < minDist)
@@ -46,5 +33,5 @@ std::optional<Robot> Evaluation::nearest_enemy(const Team enemy_team,
         }
     }
 
-    return enemy_team.getRobotById(nearestRobotId).value();
+    return team.getRobotById(nearestRobotId).value();
 }
