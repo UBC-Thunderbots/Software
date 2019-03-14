@@ -8,6 +8,9 @@
 #include "ai/world/robot.h"
 #include "motion_controller.h"
 
+using MotionControllerCommand =
+    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;
+
 /**
  * This class implements a Visitor that simulates the motion of our Primitives in grSim
  * by calculating and returning commands that are sent to our simulated MotionController
@@ -117,8 +120,7 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
      * @return The most recent MotionControllerCommand created by this
      * GrSimCommandPrimitiveVisitor
      */
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-    getMotionControllerCommand();
+    MotionControllerCommand getMotionControllerCommand();
 
    private:
     static constexpr double STANDARD_INTERCEPT_MARGIN = 1.0;
@@ -127,7 +129,6 @@ class GrsimCommandPrimitiveVisitor : public PrimitiveVisitor
     Robot robot;
     // The MotionControllerCommand created by the 'visit' functions that is to be sent
     // to the MotionController. THis can be either a position or velocity command.
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_controller_command;
+    MotionControllerCommand motion_controller_command;
     Ball ball;
 };

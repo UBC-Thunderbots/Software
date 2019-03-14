@@ -163,8 +163,7 @@ void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
         robot.position(), robot.orientation(), 0, 0.0, false, false);
 }
 
-std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-GrsimCommandPrimitiveVisitor::getMotionControllerCommand()
+MotionControllerCommand GrsimCommandPrimitiveVisitor::getMotionControllerCommand()
 {
     return motion_controller_command;
 }

@@ -17,14 +17,20 @@
 
 #include "util/logger/init.h"
 
+template <class... Ts>
+struct overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overload(Ts...)->overload<Ts...>;
+
+using MotionControllerCommand =
+    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;
+
+
 MotionController::Velocity MotionController::bangBangVelocityController(
-    const Robot robot,
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command,
-    const double delta_time, const double max_speed_meters_per_second,
-    const double max_angular_speed_radians_per_second,
-    const double max_acceleration_meters_per_second_squared,
-    const double max_angular_acceleration_meters_per_second_squared)
+    Robot robot, const double delta_time, MotionControllerCommand motion_command)
 {
     MotionController::Velocity robot_velocities;
 
@@ -40,37 +46,26 @@ MotionController::Velocity MotionController::bangBangVelocityController(
     }
     else
     {
-        robot_velocities = std::visit(
-            [robot, motion_command, delta_time, max_speed_meters_per_second,
-             max_angular_speed_radians_per_second,
-             max_acceleration_meters_per_second_squared,
-             max_angular_acceleration_meters_per_second_squared](auto&& arg) {
-                using T = std::decay_t<decltype(arg)>;
-
-                MotionController::Velocity robot_velocities;
-
-                if constexpr (std::is_same_v<T, MotionController::PositionCommand>)
-                {
-                    MotionController::PositionCommand command =
-                        std::get<MotionController::PositionCommand>(motion_command);
+        std::visit(
+            overload{
+                [&robot_velocities, robot, delta_time,
+                 this](MotionController::PositionCommand& command) {
                     robot_velocities.linear_velocity =
                         MotionController::determineLinearVelocityFromPosition(
                             robot, command.global_destination,
                             command.final_speed_at_destination, delta_time,
-                            max_speed_meters_per_second,
-                            max_angular_speed_radians_per_second);
+                            this->max_speed_meters_per_second,
+                            this->max_angular_speed_radians_per_second);
                     robot_velocities.angular_velocity =
                         MotionController::determineAngularVelocityFromPosition(
                             robot, command.final_orientation, delta_time,
-                            max_angular_speed_radians_per_second,
-                            max_angular_acceleration_meters_per_second_squared);
-                }
-                else  // Velocity Command
-                {
-                    MotionController::VelocityCommand command =
-                        std::get<MotionController::VelocityCommand>(motion_command);
+                            this->max_angular_speed_radians_per_second,
+                            this->max_angular_acceleration_meters_per_second_squared);
+                },
 
-                    if (command.linear_velocity.len() > max_speed_meters_per_second)
+                [&robot_velocities, robot, delta_time,
+                 this](MotionController::VelocityCommand& command) {
+                    if (command.linear_velocity.len() > this->max_speed_meters_per_second)
                     {
                         throw std::invalid_argument(
                             "Desired speed is above the allowed max speed");
@@ -78,15 +73,13 @@ MotionController::Velocity MotionController::bangBangVelocityController(
                     robot_velocities.linear_velocity =
                         MotionController::determineLinearVelocityFromVelocity(
                             robot, command.linear_velocity,
-                            max_acceleration_meters_per_second_squared, delta_time);
+                            this->max_acceleration_meters_per_second_squared, delta_time);
                     robot_velocities.angular_velocity =
                         MotionController::determineAngularVelocityFromVelocity(
                             robot, command.angular_velocity,
-                            max_angular_acceleration_meters_per_second_squared,
+                            this->max_angular_acceleration_meters_per_second_squared,
                             delta_time);
-                }
-                return robot_velocities;
-            },
+                }},
             motion_command);
     }
 

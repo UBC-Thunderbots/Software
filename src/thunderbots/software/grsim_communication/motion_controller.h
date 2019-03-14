@@ -10,14 +10,33 @@
 #include "geom/angle.h"
 #include "geom/point.h"
 
-namespace MotionController
+class MotionController
 {
+   public:
+    MotionController(const double max_speed_meters_per_second,
+                     const double max_angular_speed_radians_per_second,
+                     const double max_acceleration_meters_per_second_squared,
+                     const double max_angular_acceleration_meters_per_second_squared)
+        : max_speed_meters_per_second(max_speed_meters_per_second),
+          max_angular_speed_radians_per_second(max_angular_speed_radians_per_second),
+          max_acceleration_meters_per_second_squared(
+              max_acceleration_meters_per_second_squared),
+          max_angular_acceleration_meters_per_second_squared(
+              max_angular_acceleration_meters_per_second_squared)
+
+    {
+    }
+
     struct Velocity
     {
         Vector linear_velocity;
         AngularVelocity angular_velocity;
     };
 
+    /**
+     * Structure for a MotionControllerCommand which determines a velocity based on final
+     * position.
+     */
     struct PositionCommand
     {
         PositionCommand()
@@ -42,16 +61,6 @@ namespace MotionController
         {
         }
 
-        /**
-         * Creates a motion controller command which will output the velocity that is
-         * directly passed to it instead of a position.
-         *
-         * @param final_orientation
-         * @param kick_or_chip_power
-         * @param chip_instead_of_kick
-         * @param dribbler_on
-         * @param requested_velocty The desired output velocity.
-         */
         PositionCommand(Angle final_orientation, double kick_or_chip_power,
                         bool chip_instead_of_kick, bool dribbler_on,
                         Vector requested_linear_velocity,
@@ -85,15 +94,19 @@ namespace MotionController
         bool dribbler_on;
     };
 
+    /**
+     * Structure for a MotionControllerCommand which determines velocity directly through
+     * the provided velocities
+     */
     struct VelocityCommand
     {
         VelocityCommand(double kick_or_chip_power, bool chip_instead_of_kick,
-                        bool dribbler_on, Vector linear_velocty,
+                        bool dribbler_on, Vector linear_velocity,
                         AngularVelocity angular_velocity)
             : kick_speed_meters_per_second(kick_or_chip_power),
               chip_instead_of_kick(chip_instead_of_kick),
               dribbler_on(dribbler_on),
-              linear_velocity(linear_velocty),
+              linear_velocity(linear_velocity),
               angular_velocity(angular_velocity)
         {
         }
@@ -117,40 +130,32 @@ namespace MotionController
         AngularVelocity angular_velocity;
     };
 
-
     // tolerance distance measurement in meters
     const double VELOCITY_STOP_TOLERANCE       = 0.02;
     const double POSITION_STOP_TOLERANCE       = 0.01;
     const Angle DESTINATION_VELOCITY_TOLERENCE = Angle::ofDegrees(1);
 
+    // Constants used to determine output velocity of the controller
+    const double max_speed_meters_per_second;
+    const double max_angular_speed_radians_per_second;
+    const double max_acceleration_meters_per_second_squared;
+    const double max_angular_acceleration_meters_per_second_squared;
+
     /**
      * Calculate new robot velocities based on current robot state and destination
-     * criteria using Bang-bang motion controller
+     * criteria or with the provided velocities using Bang-bang motion controller
      *
      * @param robot The robot whose motion is to be controlled
-     * @param dest The destination of the robot
-     * @param desired_final_speed The target final speed of the robot
-     * @param desired_final_orientation The target final orientation of the robot
      * @param delta_time The change in time since the motion controller was run last
-     * @param max_speed_meters_per_second The maximum linear speed of the robot, in meters
-     * per second
-     * @param max_angular_speed_radians_per_second The maximum angular speed of the robot,
-     * in radians per second
-     * @param max_acceleration_meters_per_second_squared The maximum linear acceleration
-     * of the robot, in meters per second squared
-     * @param max_angular_acceleration_meters_per_second_squared The maximum angular
-     * acceleration of the robot, in radians per second squared
+     * @param motion_command A variant which contains either a Velocity or Position
+     * command
      * @return The linear velocity of the robot as a Vector(X,Y) and the angular velocity
      * of the robot as a AngularVelocity packaged in a vector
      */
     Velocity bangBangVelocityController(
-        Robot robot,
+        Robot robot, const double delta_time,
         std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-            motion_command,
-        double delta_time, double max_speed_meters_per_second,
-        double max_angular_speed_radians_per_second,
-        double max_acceleration_meters_per_second_squared,
-        double max_angular_acceleration_meters_per_second_squared);
+            motion_command);
 
     /**
      * Calculate robot angular velocities based on current robot polar state and
@@ -180,13 +185,29 @@ namespace MotionController
         const double delta_time, const double max_speed_meters_per_second,
         const double max_acceleration_meters_per_second_squared);
 
+    /**
+     *
+     * @param robot The robot whose motion is to be controlled
+     * @param linear_velocity The target linear velocity
+     * @param max_acceleration_meters_per_second_squared
+     * @param delta_time The time that will be used to calculate the change in speed
+     * @return Linear velocity of the robot as a vector.
+     */
     Vector determineLinearVelocityFromVelocity(
         const Robot robot, const Vector linear_velocity,
         const double max_acceleration_meters_per_second_squared, const double delta_time);
 
+    /**
+     *
+     * @param robot The robot whose motion is to be controlled
+     * @param angular_velocity The target angular velocity
+     * @param max_angular_acceleration_meters_per_second_squared
+     * @param delta_time
+     * @return
+     */
     AngularVelocity determineAngularVelocityFromVelocity(
         const Robot robot, AngularVelocity angular_velocity,
         const double max_angular_acceleration_meters_per_second_squared,
         const double delta_time);
 
-}  // namespace MotionController
+};  // class MotionController

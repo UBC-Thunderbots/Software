@@ -45,6 +45,11 @@ void GrSimBackend::sendPrimitives(
     std::chrono::duration<double> delta_time =
         std::chrono::steady_clock::now() - bangbang_timestamp;
 
+    MotionController motionController(ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                      ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+                                      ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                                      ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+
     for (auto& prim : primitives)
     {
         if (friendly_team.getRobotById(prim->getRobotId()))
@@ -61,22 +66,33 @@ void GrSimBackend::sendPrimitives(
                     grsim_command_primitive_visitor.getMotionControllerCommand();
 
             MotionController::Velocity robot_velocities =
-                MotionController::bangBangVelocityController(
-                    robot, motion_controller_command, delta_time.count(),
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-                    ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+                motionController.bangBangVelocityController(robot, delta_time.count(),
+                                                            motion_controller_command);
+
+            double kick_speed_meters_per_second;
+            bool chip_instead_of_kick;
+            bool dribbler_on;
+
+            if (auto val = std::get_if<MotionController::PositionCommand>(
+                    &motion_controller_command))
+            {
+                kick_speed_meters_per_second = val->kick_speed_meters_per_second;
+                chip_instead_of_kick         = val->chip_instead_of_kick;
+                dribbler_on                  = val->dribbler_on;
+            }
+            else if (auto val = std::get_if<MotionController::VelocityCommand>(
+                         &motion_controller_command))
+            {
+                kick_speed_meters_per_second = val->kick_speed_meters_per_second;
+                chip_instead_of_kick         = val->chip_instead_of_kick;
+                dribbler_on                  = val->dribbler_on;
+            }
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
                 prim->getRobotId(), YELLOW, robot_velocities.linear_velocity,
-                robot_velocities.angular_velocity,
-                std::get<MotionController::PositionCommand>(motion_controller_command)
-                    .kick_speed_meters_per_second,
-                std::get<MotionController::PositionCommand>(motion_controller_command)
-                    .chip_instead_of_kick,
-                std::get<MotionController::PositionCommand>(motion_controller_command)
-                    .dribbler_on);
+                robot_velocities.angular_velocity, kick_speed_meters_per_second,
+                chip_instead_of_kick, dribbler_on);
 
             sendGrSimPacket(grsim_packet);
         }

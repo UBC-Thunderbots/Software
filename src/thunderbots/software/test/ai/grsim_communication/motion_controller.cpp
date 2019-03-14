@@ -10,6 +10,9 @@
 
 
 using namespace std::chrono;
+using MotionControllerCommand =
+    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;
+;
 
 // GrSim motion controller test file.
 // Functional unit tests for the controller are located here.
@@ -33,6 +36,10 @@ class MotionControllerTest : public ::testing::Test
     }
 
     Timestamp current_time;
+    MotionController motionController =
+        MotionController(ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
+                         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
 
     double calculateVelocityTolerance(double velocity)
     {
@@ -52,16 +59,11 @@ TEST_F(MotionControllerTest, calc_correct_velocity_zeros)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_vector          = Point(0, 0);
     Angle expected_angular_velocity = Angle::ofRadians(0);
@@ -81,16 +83,11 @@ TEST_F(MotionControllerTest, calc_correct_velocity_ones)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_vector =
         Point(1 - ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, 0);
@@ -110,18 +107,14 @@ TEST_F(MotionControllerTest, over_speed_test)
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 1.75;
 
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     double expected_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
@@ -142,16 +135,11 @@ TEST_F(MotionControllerTest, no_overspeed_acceleration_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     double expected_speed = ROBOT_MAX_SPEED_METERS_PER_SECOND;
 
@@ -176,15 +164,11 @@ TEST_F(MotionControllerTest, no_overspeed_ang_acceleration_test)
     // hit the maximum and test that case
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     double expected_speed = 0;
 
@@ -205,18 +189,13 @@ TEST_F(MotionControllerTest, negative_time_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
-    EXPECT_THROW(
-        MotionController::Velocity robot_velocities =
-            MotionController::bangBangVelocityController(
-                robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-                ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
-        , std::invalid_argument);
+    EXPECT_THROW(MotionController::Velocity robot_velocities =
+                     motionController.bangBangVelocityController(robot, delta_time,
+                                                                 motion_command);
+                 , std::invalid_argument);
 }
 
 TEST_F(MotionControllerTest, zero_time_test)
@@ -230,16 +209,11 @@ TEST_F(MotionControllerTest, zero_time_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(-1, 1.6);
 
@@ -262,16 +236,11 @@ TEST_F(MotionControllerTest, negative_x_velocity_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(
         initialSpeed - ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time, 0);
@@ -291,16 +260,11 @@ TEST_F(MotionControllerTest, negative_y_velocity_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(
         0, initialSpeed - ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time);
@@ -324,15 +288,11 @@ TEST_F(MotionControllerTest, negative_desired_orientation_test)
     // value (since it will just hit the maximum)
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     // expect -4 because of angular speed cap
     AngularVelocity expected_velocity = AngularVelocity::ofRadians(-4);
@@ -356,15 +316,11 @@ TEST_F(MotionControllerTest, positive_desired_orientation_test)
     // value (since it will just hit the maximum)
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND, 4.0,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     // expect 4 because of angular speed cap
     AngularVelocity expected_velocity = AngularVelocity::ofRadians(4.0);
@@ -384,16 +340,11 @@ TEST_F(MotionControllerTest, negative_y_positive_x_velocity_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       -sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -412,16 +363,11 @@ TEST_F(MotionControllerTest, positive_y_negative_x_velocity_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(-sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -440,16 +386,11 @@ TEST_F(MotionControllerTest, positive_y_positive_x_velocity_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -468,16 +409,11 @@ TEST_F(MotionControllerTest, negative_y_negative_x_velocity_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Vector expected_velocity = Vector(-sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND),
                                       -sqrt(ROBOT_MAX_SPEED_METERS_PER_SECOND));
@@ -494,6 +430,7 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
     Angle destination_angle  = Angle::ofDegrees(0);
     double destination_speed = 0;
 
+
     int iteration_count;
     MotionController::Velocity robot_velocities;
     double new_x_position;
@@ -501,17 +438,13 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_positive_y_position_tes
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -548,19 +481,16 @@ TEST_F(MotionControllerTest, zero_final_speed_positive_x_negative_y_position_tes
     double new_y_position;
     Vector expected_velocity = Vector(0, 0);
 
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -592,19 +522,16 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_positive_y_position_tes
     double new_x_position;
     double new_y_position;
 
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -639,19 +566,17 @@ TEST_F(MotionControllerTest, zero_final_speed_negative_x_negative_y_position_tes
     double new_x_position;
     double new_y_position;
 
+
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -686,19 +611,16 @@ TEST_F(MotionControllerTest, asymetric_reach_des_test)
     double new_x_position;
     double new_y_position;
 
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -737,17 +659,13 @@ TEST_F(MotionControllerTest, positive_final_speed_position_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -787,17 +705,14 @@ TEST_F(MotionControllerTest, negative_final_speed_position_test)
 
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        MotionController::Velocity robot_velocities =
+            motionController.bangBangVelocityController(robot, delta_time,
+                                                        motion_command);
 
         new_x_position = robot.position().x() + robot.velocity().x() * delta_time;
         new_y_position = robot.position().y() + robot.velocity().y() * delta_time;
@@ -833,19 +748,18 @@ TEST_F(MotionControllerTest, positive_rotation_position_test)
     Angle new_orientation;
     AngularVelocity final_angular_speed = AngularVelocity::ofRadians(0);
 
+
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        MotionController::Velocity robot_velocities =
+            motionController.bangBangVelocityController(robot, delta_time,
+                                                        motion_command);
 
         new_orientation =
             robot.orientation() +
@@ -878,19 +792,16 @@ TEST_F(MotionControllerTest, negative_rotation_position_test)
     Angle new_orientation;
     AngularVelocity final_angular_speed = AngularVelocity::ofRadians(0);
 
+
     MotionController::PositionCommand position_command(
         destination, destination_angle, destination_speed, 0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     for (iteration_count = 0; iteration_count < TOTAL_STEPS; iteration_count++)
     {
-        robot_velocities = MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        robot_velocities = motionController.bangBangVelocityController(robot, delta_time,
+                                                                       motion_command);
 
         new_orientation =
             robot.orientation() +
@@ -925,16 +836,11 @@ TEST_F(MotionControllerTest,
 
     MotionController::PositionCommand position_command(destination, destination_angle, 2,
                                                        0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
     // if the destination is on the +x side of the robot, the velocity should always have
     // x > 0
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
@@ -953,16 +859,11 @@ TEST_F(MotionControllerTest,
 
     MotionController::PositionCommand position_command(destination, destination_angle, 2,
                                                        0, false, false);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
     // if the destination is on the +x side of the robot, the velocity should always have
     // x > 0
     EXPECT_GT(robot_velocities.linear_velocity.x(), initial_velocity.x());
@@ -978,16 +879,11 @@ TEST_F(MotionControllerTest, zero_velocity_command)
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     double expected_speed = 0;
 
@@ -1007,16 +903,11 @@ TEST_F(MotionControllerTest, positive_velocity_command_robot_stationary)
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
@@ -1035,16 +926,11 @@ TEST_F(MotionControllerTest, negative_velocity_command_robot_stationary)
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
@@ -1063,16 +949,11 @@ TEST_F(MotionControllerTest, positive_angular_velocity_command_robot_stationary)
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     EXPECT_DOUBLE_EQ(linear_velocity.x(), robot_velocities.linear_velocity.x());
     EXPECT_DOUBLE_EQ(linear_velocity.y(), robot_velocities.linear_velocity.y());
@@ -1089,16 +970,11 @@ TEST_F(MotionControllerTest, negative_angular_velocity_command_robot_stationary)
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     EXPECT_DOUBLE_EQ(linear_velocity.x(), robot_velocities.linear_velocity.x());
     EXPECT_DOUBLE_EQ(linear_velocity.y(), robot_velocities.linear_velocity.y());
@@ -1115,16 +991,11 @@ TEST_F(MotionControllerTest, velocity_command_robot_stationary_greater_than_velo
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     double expected_speed = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time;
 
@@ -1146,16 +1017,11 @@ TEST_F(MotionControllerTest,
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
@@ -1175,16 +1041,11 @@ TEST_F(MotionControllerTest,
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
     MotionController::Velocity robot_velocities =
-        MotionController::bangBangVelocityController(
-            robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-            ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-            ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
@@ -1203,16 +1064,11 @@ TEST_F(MotionControllerTest, velocity_command_velocity_above_max_speed)
 
     MotionController::VelocityCommand velocity_command(0, false, false, linear_velocity,
                                                        angular_velocity);
-    std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>
-        motion_command;
+    MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
-    EXPECT_THROW(
-        MotionController::Velocity robot_velocities =
-            MotionController::bangBangVelocityController(
-                robot, motion_command, delta_time, ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-                ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-                ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED),
-        std::invalid_argument);
+    EXPECT_THROW(MotionController::Velocity robot_velocities =
+                     motionController.bangBangVelocityController(robot, delta_time,
+                                                                 motion_command),
+                 std::invalid_argument);
 }
