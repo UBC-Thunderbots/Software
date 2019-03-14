@@ -23,8 +23,9 @@ TEST(PlayFactoryTest, test_create_play_with_valid_name)
 TEST(PlayFactoryTest, test_get_registered_play_names)
 {
     auto registered_names = PlayFactory::getRegisteredPlayNames();
-    // Make sure we get the right number of names
-    EXPECT_EQ(registered_names.size(), 2);
+    // Make sure we get the right number of names. There should be at least as many
+    // as the number of TestPlays, since the number of "real" Plays can change a lot
+    EXPECT_GE(registered_names.size(), 2);
     // Make sure we get the names we are expecting
     EXPECT_EQ(
         std::count(registered_names.begin(), registered_names.end(), MoveTestPlay::name),
@@ -37,6 +38,7 @@ TEST(PlayFactoryTest, test_get_registered_play_names)
 TEST(PlayFactoryTest, test_get_registered_play_constructors)
 {
     auto registered_constructors = PlayFactory::getRegisteredPlayConstructors();
-    // Make sure we get the right number of constructors
-    EXPECT_EQ(registered_constructors.size(), 2);
+    // Make sure we get the right number of constructor. There should be at least as many
+    // as the number of TestPlays, since the number of "real" Plays can change a lot
+    EXPECT_GE(registered_constructors.size(), 2);
 }
