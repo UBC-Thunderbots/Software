@@ -109,3 +109,25 @@ TEST(TacticTest, test_tactic_reports_done_at_same_time_nullptr_returned)
     EXPECT_FALSE(intent_ptr);
     EXPECT_TRUE(tactic.done());
 }
+
+TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+
+    // Create a MoveTactic that wants to move the Robot to where it already is.
+    // Therefore we expect the tactic to be done
+    MoveTactic tactic = MoveTactic(true);
+    tactic.updateRobot(robot);
+    tactic.updateParams(Point(), Angle::zero(), 0.0);
+
+    // Even though the Tactic should be done, we expect it to continue returning valid
+    // Intents because it will be constantly restarting
+    std::unique_ptr<Intent> intent_ptr;
+    for (int i = 0; i < 5; i++)
+    {
+        intent_ptr = tactic.getNextIntent();
+        EXPECT_TRUE(intent_ptr);
+        EXPECT_FALSE(tactic.done());
+    }
+}
