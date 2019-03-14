@@ -164,7 +164,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 {
     if (current_play)
     {
-        return std::make_optional(current_play->name());
+        return std::make_optional(current_play->getName());
     }
 
     return std::nullopt;
