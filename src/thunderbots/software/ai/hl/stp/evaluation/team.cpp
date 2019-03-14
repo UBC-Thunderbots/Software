@@ -24,3 +24,27 @@ std::optional<Robot> Evaluation::nearest_friendly(const Team friendly_team,
 
     return friendly_team.getRobotById(nearestRobotId).value();
 }
+
+std::optional<Robot> Evaluation::nearest_enemy(const Team enemy_team,
+                                               const Point ref_point)
+{
+    if (enemy_team.getAllRobots().empty())
+    {
+        return std::nullopt;
+    }
+
+    unsigned nearestRobotId = enemy_team.getAllRobots()[0].id();
+    double minDist          = (ref_point - enemy_team.getAllRobots()[0].position()).len();
+
+    for (const Robot &curRobot : enemy_team.getAllRobots())
+    {
+        double curDistance = (ref_point - curRobot.position()).len();
+        if (curDistance < minDist)
+        {
+            nearestRobotId = curRobot.id();
+            minDist        = curDistance;
+        }
+    }
+
+    return enemy_team.getRobotById(nearestRobotId).value();
+}

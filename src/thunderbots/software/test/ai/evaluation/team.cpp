@@ -14,7 +14,7 @@ class TeamEvaluationTest : public ::testing::Test
     Timestamp current_time;
 };
 
-TEST_F(TeamEvaluationTest, one_robot)
+TEST_F(TeamEvaluationTest, nearest_friendy_one_robot)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -27,7 +27,7 @@ TEST_F(TeamEvaluationTest, one_robot)
     EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(TeamEvaluationTest, multiple_robots)
+TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -46,7 +46,7 @@ TEST_F(TeamEvaluationTest, multiple_robots)
     EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(TeamEvaluationTest, multiple_robots_closest_is_moving)
+TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots_closest_is_moving)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -65,7 +65,7 @@ TEST_F(TeamEvaluationTest, multiple_robots_closest_is_moving)
     EXPECT_EQ(robot_1, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(TeamEvaluationTest, multiple_robots_all_moving)
+TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots_all_moving)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -84,7 +84,7 @@ TEST_F(TeamEvaluationTest, multiple_robots_all_moving)
     EXPECT_EQ(robot_2, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(TeamEvaluationTest, one_robot_on_ball)
+TEST_F(TeamEvaluationTest, nearest_friendy_one_robot_on_ball)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -103,9 +103,94 @@ TEST_F(TeamEvaluationTest, one_robot_on_ball)
     EXPECT_EQ(robot_0, Evaluation::nearest_friendly(team, Point(0, 0)));
 }
 
-TEST_F(TeamEvaluationTest, zero_robots)
+TEST_F(TeamEvaluationTest, nearest_friendly_zero_robots)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
     EXPECT_EQ(std::nullopt, Evaluation::nearest_friendly(team, Point(0, 0)));
+}
+
+
+
+TEST_F(TeamEvaluationTest, nearest_enemy_multiple_robots)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    Robot robot_0 = Robot(0, Point(3, -1), Vector(), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(1, 0), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(4, 6), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+
+    team.updateRobots({robot_0, robot_1, robot_2});
+
+    EXPECT_EQ(robot_1, Evaluation::nearest_enemy(team, Point(0, 0)));
+}
+
+TEST_F(TeamEvaluationTest, nearest_enemy_multiple_robots_closest_is_moving)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    Robot robot_0 = Robot(0, Point(3, -1), Vector(), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(1, 0), Vector(3, 3), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(4, 6), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+
+    team.updateRobots({robot_0, robot_1, robot_2});
+
+    EXPECT_EQ(robot_1, Evaluation::nearest_enemy(team, Point(0, 0)));
+}
+
+TEST_F(TeamEvaluationTest, nearest_enemy_multiple_robots_all_moving)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    Robot robot_0 = Robot(0, Point(3, -1), Vector(3, 3), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(4, 6), Vector(3, 3), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(0, 1), Vector(3, 3), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+
+    team.updateRobots({robot_0, robot_1, robot_2});
+
+    EXPECT_EQ(robot_2, Evaluation::nearest_enemy(team, Point(0, 0)));
+}
+
+TEST_F(TeamEvaluationTest, nearest_enemy_one_robot_on_ball)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    Robot robot_0 = Robot(0, Point(0, 0), Vector(), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(1, 0), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(4, 6), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+
+    team.updateRobots({robot_0, robot_1, robot_2});
+
+    EXPECT_EQ(robot_0, Evaluation::nearest_enemy(team, Point(0, 0)));
+}
+
+TEST_F(TeamEvaluationTest, nearest_enemy_zero_robots)
+{
+    Team team = Team(Duration::fromMilliseconds(1000));
+
+    EXPECT_EQ(std::nullopt, Evaluation::nearest_enemy(team, Point(0, 0)));
 }
