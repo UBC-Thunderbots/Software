@@ -14,7 +14,7 @@ Ball BallFilter::getFilteredData(const Ball& current_ball_state,
 
     // The direction of the velocity
     Vector ball_velocity = filtered_detection.position - current_ball_state.position();
-    // Set the magnitude based on the time diff
+    // Set the magnitude based on the time minDiff
     ball_velocity = ball_velocity.norm(ball_velocity.len() / time_diff.getSeconds());
 
     return Ball{filtered_detection.position, ball_velocity, filtered_detection.timestamp};

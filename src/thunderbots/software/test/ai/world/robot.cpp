@@ -88,12 +88,35 @@ TEST_F(RobotTest, update_state_to_predicted_state_with_future_timestamp)
     EXPECT_EQ(one_second_future, robot.lastUpdateTimestamp());
 }
 
+TEST_F(RobotTest, update_state_to_predicted_state_with_positive_duration)
+{
+    Robot robot = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                        AngularVelocity::ofRadians(2), current_time);
+
+    robot.updateStateToPredictedState(Duration::fromSeconds(1));
+
+    EXPECT_EQ(Point(4.5, -1), robot.position());
+    EXPECT_EQ(Point(3.5, 1), robot.velocity());
+    EXPECT_EQ(Angle::ofRadians(-0.3) + Angle::ofRadians(2), robot.orientation());
+    EXPECT_EQ(AngularVelocity::ofRadians(2), robot.angularVelocity());
+    EXPECT_EQ(one_second_future, robot.lastUpdateTimestamp());
+}
+
 TEST_F(RobotTest, update_state_to_predicted_state_with_past_timestamp)
 {
     Robot robot = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
                         AngularVelocity::ofRadians(2), current_time);
 
     ASSERT_THROW(robot.updateStateToPredictedState(one_second_past),
+                 std::invalid_argument);
+}
+
+TEST_F(RobotTest, update_state_to_predicted_state_with_negative_duration)
+{
+    Robot robot = Robot(1, Point(1, -2), Vector(3.5, 1), Angle::ofRadians(-0.3),
+                        AngularVelocity::ofRadians(2), current_time);
+
+    ASSERT_THROW(robot.updateStateToPredictedState(Duration::fromSeconds(-1)),
                  std::invalid_argument);
 }
 

@@ -11,6 +11,7 @@
 #include "ai/primitive/kick_primitive.h"
 #include "shared/constants.h"
 #include "util/constants.h"
+#include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 
@@ -206,6 +207,10 @@ int main(int argc, char **argv)
     // Create subscribers
     ros::Subscriber joy_node_subscriber =
         node_handle.subscribe(Util::Constants::JOY_NODE_TOPIC, 1, joystickUpdateCallback);
+
+    // Initialize Dynamic Parameters
+    auto update_subscribers =
+        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown
