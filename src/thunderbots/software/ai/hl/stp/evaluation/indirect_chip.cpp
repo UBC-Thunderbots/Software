@@ -217,7 +217,7 @@ std::vector<Triangle> Evaluation::remove_outofbounds_triangles(
     return valid_triangles;
 }
 
-std::vector<Point> Evaluation::findBestChipTargetArea(const World &world, double inset)
+Rectangle Evaluation::findBestChipTargetArea(const World &world, double inset)
 {
     double ballX     = world.ball().position().x();
     double fieldX    = world.field().enemyGoal().x() - inset;
@@ -227,17 +227,17 @@ std::vector<Point> Evaluation::findBestChipTargetArea(const World &world, double
     std::vector<Point> corners = {Point(ballX, negFieldY), Point(ballX, posFieldY),
                                   Point(fieldX, negFieldY), Point(fieldX, posFieldY)};
 
-    Rectangle r = Rectangle(Point(ballX, negFieldY), Point(ballX, posFieldY));
-    Point p1 = r[0];
-    Point p2 = r[1];
-    Point p3 = r[2];
-    Point p4 = r[3];
+    Rectangle target_rectangle = Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
+    Point p1 = r[0]; // south-west corner
+    Point p2 = r[1]; // north-west corner
+    Point p3 = r[2]; // north-east corner
+    Point p4 = r[3]; // south-east corner
 
-    return corners;
+    return target_rectangle;
 }
 
 std::optional<Triangle> Evaluation::getLargestValidTriangle(
-    std::vector<Triangle> allTriangles, double min_area, double min_edge_len,
+    std::vector<TrianSgle> allTriangles, double min_area, double min_edge_len,
     double min_edge_angle)
 {
     Triangle largest    = allTriangles[0];

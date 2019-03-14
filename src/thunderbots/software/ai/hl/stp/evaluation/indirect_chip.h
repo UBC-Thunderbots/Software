@@ -1,7 +1,7 @@
 #include "ai/world/world.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "util/parameter/dynamic_parameter_utils.h"
 
 /**
  * The indirect chip and chase target evaluation function returns a target point for the
@@ -10,9 +10,9 @@
  */
 namespace Evaluation
 {
-    typedef Point Vector2;
+    typedef Point Vector;
     template <size_t N>
-    using Poly     = std::array<Vector2, N>;
+    using Poly     = std::array<Vector, N>;
     using Triangle = Poly<3>;
 
     /**
