@@ -4,7 +4,7 @@
 
 #include "ai/intent/stop_intent.h"
 
-StopTestTactic::StopTestTactic() : Tactic() {}
+StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
 
 std::string StopTestTactic::getName() const
 {
