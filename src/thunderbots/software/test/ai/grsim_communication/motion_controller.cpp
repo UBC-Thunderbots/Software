@@ -1067,8 +1067,15 @@ TEST_F(MotionControllerTest, velocity_command_velocity_above_max_speed)
     MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::VelocityCommand>(velocity_command);
 
-    EXPECT_THROW(MotionController::Velocity robot_velocities =
-                     motionController.bangBangVelocityController(robot, delta_time,
-                                                                 motion_command),
-                 std::invalid_argument);
+    MotionController::Velocity robot_velocities =
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
+
+    Angle expected_angular_velocity = Angle::ofRadians(0);
+    Vector expected_linear_velocity = Vector(1.41, 1.41);
+
+    EXPECT_NEAR(expected_linear_velocity.x(), robot_velocities.linear_velocity.x(),
+                calculateVelocityTolerance(expected_linear_velocity.len()));
+    EXPECT_NEAR(expected_linear_velocity.y(), robot_velocities.linear_velocity.y(),
+                calculateVelocityTolerance(expected_linear_velocity.len()));
+    EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }

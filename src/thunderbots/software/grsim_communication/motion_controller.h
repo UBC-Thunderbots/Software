@@ -195,7 +195,8 @@ class MotionController
      */
     Vector determineLinearVelocityFromVelocity(
         const Robot robot, const Vector linear_velocity,
-        const double max_acceleration_meters_per_second_squared, const double delta_time);
+        const double max_acceleration_meters_per_second_squared, const double delta_time,
+        const double max_speed_meters_per_second);
 
     /**
      *

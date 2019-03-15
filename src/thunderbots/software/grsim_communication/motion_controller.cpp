@@ -17,6 +17,10 @@
 
 #include "util/logger/init.h"
 
+// Creates a struct which inherits all lambda function given to it and uses their
+// Ts::operator(). This can be passed to std::visit to easily write multiple different
+// lambdas for each type of motion controller commands below. See
+// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
 template <class... Ts>
 struct overload : Ts...
 {
@@ -65,15 +69,11 @@ MotionController::Velocity MotionController::bangBangVelocityController(
 
                 [&robot_velocities, robot, delta_time,
                  this](MotionController::VelocityCommand& command) {
-                    if (command.linear_velocity.len() > this->max_speed_meters_per_second)
-                    {
-                        throw std::invalid_argument(
-                            "Desired speed is above the allowed max speed");
-                    }
                     robot_velocities.linear_velocity =
                         MotionController::determineLinearVelocityFromVelocity(
                             robot, command.linear_velocity,
-                            this->max_acceleration_meters_per_second_squared, delta_time);
+                            this->max_acceleration_meters_per_second_squared, delta_time,
+                            max_speed_meters_per_second);
                     robot_velocities.angular_velocity =
                         MotionController::determineAngularVelocityFromVelocity(
                             robot, command.angular_velocity,
@@ -193,7 +193,8 @@ Vector MotionController::determineLinearVelocityFromPosition(
 
 Vector MotionController::determineLinearVelocityFromVelocity(
     const Robot robot, const Vector linear_velocity,
-    const double max_acceleration_meters_per_second_squared, const double delta_time)
+    const double max_acceleration_meters_per_second_squared, const double delta_time,
+    const double max_speed_meters_per_second)
 {
     double velocity_to_add = max_acceleration_meters_per_second_squared * delta_time;
     double new_velocity_x, new_velocity_y;
@@ -216,11 +217,15 @@ Vector MotionController::determineLinearVelocityFromVelocity(
         new_velocity_y = robot.velocity().y() - velocity_to_add;
     }
 
-    new_velocity_x = std::clamp<double>(new_velocity_x, -abs(linear_velocity.x()),
-                                        abs(linear_velocity.x()));
-    new_velocity_y = std::clamp<double>(new_velocity_y, -abs(linear_velocity.y()),
-                                        abs(linear_velocity.y()));
-    return Vector(new_velocity_x, new_velocity_y);
+    Vector new_velocity_norm      = Vector(new_velocity_x, new_velocity_y).norm();
+    double new_velocity_magnitude = Vector(new_velocity_x, new_velocity_y).len();
+
+    new_velocity_magnitude = std::clamp<double>(
+        new_velocity_magnitude, -linear_velocity.len(), linear_velocity.len());
+    new_velocity_magnitude =
+        std::clamp<double>(new_velocity_magnitude, -max_speed_meters_per_second,
+                           max_speed_meters_per_second);
+    return new_velocity_norm * new_velocity_magnitude;
 }
 
 AngularVelocity MotionController::determineAngularVelocityFromVelocity(
