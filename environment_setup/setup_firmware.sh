@@ -60,3 +60,7 @@ sudo mv ./* $TBOTS_TOOLCHAIN
 # remove the temporary setup folder
 sudo rm -r $TEMP_FOLDER
 
+# Install dfu-util, the tool used to load the firmware onto devices
+sudo apt-get update
+sudo apt-get install dfu-util -y
+
