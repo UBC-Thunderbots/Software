@@ -28,7 +28,7 @@ Polygon::Polygon(const std::initializer_list<Point>& _points)
     }
 }
 
-bool Polygon::containsPoint(const Point& point)
+bool Polygon::containsPoint(const Point& point) const
 {
     // cast a ray from the point in the +x direction
     Ray ray(point, point + Point(1, 0));
@@ -48,7 +48,7 @@ bool Polygon::containsPoint(const Point& point)
     return num_intersections % 2 != 0;
 }
 
-bool Polygon::intersects(const Segment& segment)
+bool Polygon::intersects(const Segment& segment) const
 {
     for (const auto& seg : segments)
     {
@@ -58,7 +58,7 @@ bool Polygon::intersects(const Segment& segment)
     return false;
 }
 
-bool Polygon::intersects(const Ray& ray)
+bool Polygon::intersects(const Ray& ray) const
 {
     for (const auto& seg : segments)
     {
@@ -68,12 +68,12 @@ bool Polygon::intersects(const Ray& ray)
     return false;
 }
 
-const std::vector<Segment>& Polygon::getSegments()
+const std::vector<Segment>& Polygon::getSegments() const
 {
     return segments;
 }
 
-const std::vector<Point>& Polygon::getPoints()
+const std::vector<Point>& Polygon::getPoints() const
 {
     return points;
 }

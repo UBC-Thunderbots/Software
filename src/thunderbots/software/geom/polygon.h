@@ -30,7 +30,7 @@ class Polygon
      * @param point a Point
      * @return if the point is contained within the polygon.
      */
-    bool containsPoint(const Point& point);
+    bool containsPoint(const Point& point) const;
 
     /**
      * Returns true if the segment intersects the polygon, and false otherwise.
@@ -38,26 +38,26 @@ class Polygon
      * @param segment a line segment
      * @return true if the segment intersects the polygon, false otherwise
      */
-    bool intersects(const Segment& segment);
+    bool intersects(const Segment& segment) const;
 
     /**
      * Returns true if the ray intersects the polygon, false otherwise
      * @param ray a ray
      * @return true if the ray intersects the polygon, false otherwise
      */
-    bool intersects(const Ray& ray);
+    bool intersects(const Ray& ray) const;
 
     /**
      * Returns a vector of the line segments that form this polygon.
      * @return a vector of the line segments that form this polygon.
      */
-    const std::vector<Segment>& getSegments();
+    const std::vector<Segment>& getSegments() const;
 
     /**
      * Returns the points that form the polygon.
      * @return the points that form the polygon.
      */
-    const std::vector<Point>& getPoints();
+    const std::vector<Point>& getPoints() const;
 
    private:
     // the line segments that form the polygon

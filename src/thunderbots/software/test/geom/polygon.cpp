@@ -50,7 +50,7 @@ TEST(PolygonTest, test_construct_from_initializer_list)
 }
 
 
-TEST(PolygonTest, test_triangle_contains_point)
+TEST(PolygonTest, test_polygon_triangle_contains_point)
 {
     Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 1.0f};
     Point point{0.9f, 0.9f};
@@ -58,12 +58,62 @@ TEST(PolygonTest, test_triangle_contains_point)
     EXPECT_TRUE(triangle.containsPoint(point));
 }
 
-TEST(PolygonTest, test_triangle_not_contains_point)
+TEST(PolygonTest, test_polygon_triangle_not_contains_point)
 {
     Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 1.0f};
     Point point{2.0f, 2.0f};
     Polygon triangle{p1, p2, p3};
     EXPECT_FALSE(triangle.containsPoint(point));
+}
+
+TEST(PolygonTest, test_polygon_triangle_intersects_line_segment)
+{
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point point{2.0f, 2.0f};
+    Polygon triangle{p1, p2, p3};
+
+    Segment seg{Point(1.0f, 1.0f), Point(0.2f, 0.2f)};
+    EXPECT_TRUE(triangle.intersects(seg));
+}
+
+TEST(PolygonTest, test_polygon_triangle_not_intersects_line_segment)
+{
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point point{2.0f, 2.0f};
+    Polygon triangle{p1, p2, p3};
+
+    Segment seg{Point(1.0f, 1.0f), Point(2.0f, 2.0f)};
+    EXPECT_FALSE(triangle.intersects(seg));
+}
+
+TEST(PolygonTest, test_polygon_triangle_intersects_ray)
+{
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point point{2.0f, 2.0f};
+    Polygon triangle{p1, p2, p3};
+
+    Ray ray{Point(5000.0f, 5000.0f), Point(4999.0f, 4999.0f)};
+    EXPECT_TRUE(triangle.intersects(ray));
+}
+
+TEST(PolygonTest, test_polygon_triangle_not_intersects_ray)
+{
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point point{2.0f, 2.0f};
+    Polygon triangle{p1, p2, p3};
+
+    Ray ray{Point(5000.0f, 5000.0f), Point(5001.0f, 5001.0f)};
+    EXPECT_FALSE(triangle.intersects(ray));
+}
+
+TEST(PolygonTest, test_polygon_triangle_intersects_ray2)
+{
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point point{2.0f, 2.0f};
+    Polygon triangle{p1, p2, p3};
+
+    Ray ray{Point(-1.0f, -1.0f), Point(-2.0f, -2.0f)};
+    EXPECT_FALSE(triangle.intersects(ray));
 }
 
 int main(int argc, char** argv)
