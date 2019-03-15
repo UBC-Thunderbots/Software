@@ -14,41 +14,6 @@
 # unit tests
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-# Here we handle arguments provided to the script. Because this script allows
-# the installation of different versions of ROS, we use a parameter to let the
-# user decide which one to install.
-function show_help()
-{
-    echo "Thunderbots software setup script. Installs the programs"
-    echo "and dependencies required to build and run our code"
-    echo ""
-}
-
-# This script only accepts 1 argument
-if [ "$#" -ne 0 ]; then
-    echo "Error: Illegal number of arguments provided. Expected 0 arguments"
-    show_help
-    exit 1
-fi
-
-while [ "$1" != "" ]; do
-    PARAM=`echo $1 | awk -F= '{print $1}'`
-    VALUE=`echo $1 | awk -F= '{print $2}'`
-    case $PARAM in
-        -h | --help)
-            show_help
-            exit
-            ;;
-        *)
-            echo "ERROR: unknown parameter \"$PARAM\""
-            echo ""
-            show_help
-            exit 1
-            ;;
-    esac
-    shift
-done
-
 
 # Save the parent dir of this so we can always run commands relative to the
 # location of this script, no matter where it is called from. This
@@ -209,6 +174,25 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 sudo make install
 cd $CURR_DIR
+
+# Clone, build, and install munkres-cpp (Our Hungarian library algorithm)
+hungarian_path="/tmp/hungarian-cpp"
+if [ -d $hungarian_path ]; then
+    echo "Removing old hungarian-cpp library..."
+    sudo rm -r $hungarian_path
+fi
+
+git clone https://github.com/saebyn/munkres-cpp.git $hungarian_path
+cd $hungarian_path
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+sudo make install
+cd $CURR_DIR
+
+# yaml for cfg generation (Dynamic Parameters)
+sudo apt-get install python3-yaml -y
 
 # Done
 echo "================================================================"

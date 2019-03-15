@@ -497,17 +497,19 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
         Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
 
-        // We do not know what the  tolorance of the function is, but we
-        // probabaly should check if segments overlap completely
+        // We do not know what the  tolerance of the function is, but we
+        // probably should check if segments overlap completely
 
         bool expected = std::rand() % 2;
 
         Point a2 = a1 + (i0 - a1).norm();
         Point b2 =
-            b1 + (i0 - b1) * (1 + std::rand() % 100 / 100.0 *
+            b1 + (i0 - b1) * (1 + (std::rand() % 100 / 100.0) *
                                       (expected ? 1 : -1));  // as a scaling factor for b2
 
-        bool found = intersects(Ray(a1, a2), Segment(b1, b2));
+        Vector ray_direction = (a2 - a1).norm();
+
+        bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -529,8 +531,8 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         Point b1(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
         Point i0(std::rand() % 200 / 100.0, std::rand() % 200 / 100.0);
 
-        // We do not know what the  tolorance of the function is, but we
-        // probabaly should check if segments overlap completely
+        // We do not know what the  tolerance of the function is, but we
+        // probably should check if segments overlap completely
 
         bool expected = false;
 
@@ -540,7 +542,9 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
         // make sure it
         // is long enough
 
-        bool found = intersects(Ray(a1, a2), Segment(b1, b2));
+        Vector ray_direction = (a2 - a1).norm();
+
+        bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
 
         // uncomment to print out some messages
         dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
@@ -688,6 +692,19 @@ TEST(GeomUtilTest, test_intersection)
     EXPECT_TRUE((intersection(a1, a2, b1, b2) - Point(0.30435, 0.52174)).len() < 0.0001);
 }
 
+// Test to ensure that intersects(Ray, Segment) does not use ray.getDirection() as a point
+// along the ray (Should be ray.getRayStart() + ray.GetDirection())
+TEST(GeomUtilTest, test_ray_intersect_position_and_direction_intersect_not_just_direction)
+{
+    Segment segment = Segment(Point(-1, 1), Point(1, 1));
+
+    Ray position_and_direction = Ray(Point(-2, 0), Vector(0, 1));
+    Ray just_direction         = Ray(Point(0, 0), Vector(0, 1));
+
+    EXPECT_EQ(intersects(position_and_direction, segment), false);
+    EXPECT_EQ(intersects(just_direction, segment), true);
+}
+
 TEST(GeomUtilTest, test_line_intersection_segments_collinear_overlap)
 {
     Segment seg1(Point(0, 0), Point(2, 2));
@@ -760,6 +777,84 @@ TEST(GeomUtilTest, test_dist_point_seg)
     Point c2(6.5369, 7.2131);
 
     EXPECT_NEAR(4.0, dist(c2, Segment(a2, b2)), 1e-5);
+}
+
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment intersect once
+TEST(GeomUtilTest, test_ray_segment_intersecting)
+{
+    Ray ray         = Ray(Point(1, 1), Point(0.3, -0.2));
+    Segment segment = Segment(Point(-2, -2), Point(10, -2));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_DOUBLE_EQ(intersection1.value().x(), 5.5);
+    EXPECT_DOUBLE_EQ(intersection1.value().y(), -2);
+    EXPECT_EQ(intersection2, std::nullopt);
+}
+
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment don't intersect
+TEST(GeomUtilTest, test_ray_segment_non_intersecting)
+{
+    Ray ray         = Ray(Point(0, 0), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1.1), Point(10, 1.1));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1, std::nullopt);
+    EXPECT_EQ(intersection2, std::nullopt);
+}
+
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment are overlapping and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping)
+{
+    Ray ray         = Ray(Point(1, 1.1), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getEnd());
+}
+
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment are overlapping at segment end and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_end)
+{
+    Ray ray         = Ray(Point(1, 5), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getEnd());
+}
+
+// Test to see if raySegmentIntersection() returns the correct parameters when the ray and
+// segment are overlapping at segment start and parallel
+TEST(GeomUtilTest, test_ray_segment_overlapping_single_point_at_seg_start)
+{
+    Ray ray         = Ray(Point(1, 1), Point(0.0, -1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), ray.getRayStart());
+    EXPECT_EQ(intersection2.value(), segment.getSegStart());
+}
+
+// Test to see if the segment start and end are returned if the ray passes through both
+TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end)
+{
+    Ray ray         = Ray(Point(1, 0), Point(0.0, 1));
+    Segment segment = Segment(Point(1, 1), Point(1, 5));
+
+    auto [intersection1, intersection2] = raySegmentIntersection(ray, segment);
+
+    EXPECT_EQ(intersection1.value(), segment.getSegStart());
+    EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
 int main(int argc, char **argv)

@@ -521,19 +521,20 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     words[0] = static_cast<uint16_t>(words[0] |
                                      static_cast<unsigned int>(r_prim.prim_type) << 12);
 
-    // Encode the charger state. TODO add this (#223)
-    // switch (charger_state)
-    // {
-    //     case ChargerState::DISCHARGE:
-    //         words[1] |= 1 << 14;
-    //         break;
-    //     case ChargerState::FLOAT:
-    //         break;
-    //     case ChargerState::CHARGE:
-    //         words[1] |= 2 << 14;
-    //         break;
-    // }
-    words[1] |= 1 << 14;  // discharged for now
+    // Encode charge state
+    // Robots are always charged if the estop is in RUN state; otherwise discharge them.
+    switch (estop_state)
+    {
+        case EStopState::BROKEN:
+        case EStopState::STOP:
+            // Discharge`
+            words[1] |= 1 << 14;
+            break;
+        case EStopState::RUN:
+            // Charge
+            words[1] |= 2 << 14;
+            break;
+    }
 
     // Encode extra data plus the slow flag.
     // TODO: do we actually use the slow flag?

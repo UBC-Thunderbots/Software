@@ -1,4 +1,5 @@
 #pragma once
+#include <math.h>
 
 // This file contains all constants that are shared between our software (AI)
 // and firmware code. Since this needs to be compiled by both C and C++, everything
@@ -18,12 +19,17 @@ const unsigned MAX_ROBOTS_OVER_RADIO = 8;
 // The maximum speed achievable by our robots, in metres per second.
 const double ROBOT_MAX_SPEED_METERS_PER_SECOND = 2.0;
 // The maximum angular speed achievable by our robots, in rad/sec
-const double ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND = 4.0;
+const double ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND = 4 * M_PI;
 // The maximum acceleration achievable by our robots, in metres per seconds squared.
 const double ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0;
 // The maximum angular acceleration achievable by our robots, in radians per second
 // squared
 const double ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED = 10.0;
+
+// The maximum speed attainable by enemy robots
+const double ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND = 3.0;
+// The maximum acceleration achievable by enemy robots, in metres per seconds squared.
+const double ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 4.0;
 
 /* Unit Conversion */
 const double MILLIMETERS_PER_METER = 1000.0;
