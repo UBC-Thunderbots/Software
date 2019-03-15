@@ -4,7 +4,7 @@
 
 #include "ai/intent/move_intent.h"
 
-MoveTestTactic::MoveTestTactic() : Tactic() {}
+MoveTestTactic::MoveTestTactic(bool loop_forever) : Tactic(loop_forever) {}
 
 std::string MoveTestTactic::getName() const
 {

@@ -191,6 +191,9 @@ make
 sudo make install
 cd $CURR_DIR
 
+# yaml for cfg generation (Dynamic Parameters)
+sudo apt-get install python3-yaml -y
+
 # Done
 echo "================================================================"
 echo "Done Software Setup"
