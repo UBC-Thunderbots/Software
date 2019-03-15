@@ -1,18 +1,5 @@
 #include "ai/hl/stp/evaluation/team.h"
 
-
-std::optional<Robot> Evaluation::nearest_friendly(const Team friendly_team,
-                                                  const Point ref_point)
-{
-    return nearest_robot(friendly_team, ref_point);
-}
-
-std::optional<Robot> Evaluation::nearest_enemy(const Team enemy_team,
-                                               const Point ref_point)
-{
-    return nearest_robot(enemy_team, ref_point);
-}
-
 std::optional<Robot> Evaluation::nearest_robot(const Team team, const Point ref_point)
 {
     if (team.getAllRobots().empty())
