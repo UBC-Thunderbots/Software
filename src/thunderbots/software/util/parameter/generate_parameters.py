@@ -220,7 +220,7 @@ def __header_and_cpp_gen(param_info: dict, cfg_name: str, header_file_pointer, c
                     name=key,
                     path=key,
                     namespace=cfg_name,
-                    default=parameter["default"],
+                    default=str(parameter["default"]).lower(),
                     type=constants.CPP_TYPE_MAP[parameter["type"]],
                     quote="\"" if parameter["type"] in constants.QUOTE_TYPES else ""
                 )
