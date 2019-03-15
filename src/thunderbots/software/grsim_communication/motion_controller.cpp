@@ -79,6 +79,11 @@ MotionController::Velocity MotionController::bangBangVelocityController(
                             robot, command.angular_velocity,
                             this->max_angular_acceleration_meters_per_second_squared,
                             delta_time);
+                },
+
+                [](auto arg) {
+                    throw std::invalid_argument(
+                        "Unrecognized type passed via std::variant");
                 }},
             motion_command);
     }
