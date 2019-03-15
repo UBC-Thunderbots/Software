@@ -5,7 +5,7 @@ AI:
     description: >-
         Selecting will allow HL and Navigator to run, unselecting will
         stop new decisions from being made, but the robots will finish
-        the last commands they were given. DO NOT USE inplace of the e-stop.
+        the last commands they were given. DO NOT USE in place of the e-stop.
   override_ai_play:
     type: "bool"
     default: false
@@ -14,7 +14,7 @@ AI:
         specified by current_play parameter
   current_ai_play:
     type: "string"
-    default: "spin"
+    default: "Example Play"
     description: >- 
         Specifies the ai play that should be in use
   refbox:
@@ -26,7 +26,7 @@ AI:
           specified by current_play parameter
     current_refbox_play:
       type: "string"
-      default: "spin"
+      default: "Halt"
       description: >- 
           Specifies the refbox play that should be in use
     override_refbox_defending_side:
