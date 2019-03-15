@@ -45,6 +45,8 @@ bool Polygon::containsPoint(const Point& point) const
 
     // if the ray intersects the polygon an odd number of times,
     // it is inside the polygon, otherwise it is outside the polygon
+    // see
+    // https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
     return num_intersections % 2 != 0;
 }
 
