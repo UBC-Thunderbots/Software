@@ -1,3 +1,10 @@
+# Compiled firmware files
+*.map
+*.bin
+*.elf
+*.dfu
+*.dfuse
+
 # Compiled proto files
 *.pb.cc
 *.pb.h
