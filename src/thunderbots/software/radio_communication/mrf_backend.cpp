@@ -39,48 +39,6 @@ namespace
         {1, -89},   {0, -90},
     };
 
-    const char *const SD_MESSAGES[] = {
-        nullptr,
-        u8"Bot %1 SD card uninitialized",
-        nullptr,
-        u8"Bot %1 SD card incompatible",
-        u8"Bot %1 SD card sent illegal response",
-        u8"Bot %1 SD layer logical error",
-        u8"Bot %1 SD card CRC error",
-        u8"Bot %1 SD card claimed illegal command",
-        u8"Bot %1 SD card in unexpected state",
-        u8"Bot %1 SD card internal error",
-        u8"Bot %1 SD card command response timeout",
-        u8"Bot %1 SD card parameter out of range",
-        u8"Bot %1 SD card address misaligned",
-        u8"Bot %1 SD card block length error",
-        u8"Bot %1 SD card erase sequence error",
-        u8"Bot %1 SD card erase parameter error",
-        u8"Bot %1 SD card write protect violation",
-        u8"Bot %1 SD card locked",
-        u8"Bot %1 SD card lock or unlock failed",
-        u8"Bot %1 SD card command CRC error",
-        u8"Bot %1 SD card ECC error",
-        u8"Bot %1 SD card CC error",
-        u8"Bot %1 SD card generic error",
-        u8"Bot %1 SD card CSD write error",
-        u8"Bot %1 SD card partial erase due to write protection",
-        u8"Bot %1 SD card ECC disabled",
-        u8"Bot %1 SD card erase sequence cancelled",
-        u8"Bot %1 SD card authentication sequence error",
-        u8"Bot %1 SD card initialization timeout",
-        u8"Bot %1 SD card data timeout",
-        u8"Bot %1 SD card data CRC error",
-        u8"Bot %1 SD card missing data start bit",
-        u8"Bot %1 SD card FIFO overrun or underrun",
-    };
-
-    const char *const LOGGER_MESSAGES[] = {
-        nullptr,
-        u8"Bot %1 logger uninitialized",
-        nullptr,
-        u8"Bot %1 SD card full",
-    };
 }  // namespace
 
 MRFBackend::MRFBackend(ros::NodeHandle &node_handle)
@@ -169,6 +127,7 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(int index, const void *
                 --len;
                 if (len >= 13)
                 {
+                    robot_status.robot = index;
                     robot_status.alive = true;
 
                     robot_status.battery_voltage =
@@ -206,9 +165,9 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(int index, const void *
                     ++bptr;
                     --len;
 
-                    // for (std::size_t i = 0; i < sd_messages.size(); ++i)
+                    // for (std::size_t i = 0; i < SD_MESSAGES.size(); ++i)
                     // {
-                    //     if (sd_messages[i])
+                    //     if (SD_MESSAGES[i])
                     //     {
                     //         sd_messages[i]->active(*bptr == i);
                     //     }
@@ -238,17 +197,18 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(int index, const void *
                                 if (len >= MRF::ERROR_BYTES)
                                 {
                                     has_error_extension = true;
-                                    for (unsigned int i = 0; i != MRF::ERROR_LT_COUNT;
+                                    for (unsigned int i = 0; i < MRF::ERROR_LT_COUNT;
                                          ++i)
                                     {
                                         unsigned int byte = i / CHAR_BIT;
                                         unsigned int bit  = i % CHAR_BIT;
 
-                                        // TODO: Handle these messages
-                                        // error_lt_messages[i]->active(
-                                        //     bptr[byte] & (1 << bit));
+                                        if (bptr[byte] & (1 << bit) && MRF::ERROR_LT_MESSAGES[i])
+                                        {
+                                            robot_status.messages.push_back(MRF::ERROR_LT_MESSAGES[i]);
+                                        }
                                     }
-                                    for (unsigned int i = 0; i != MRF::ERROR_ET_COUNT;
+                                    for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT;
                                          ++i)
                                     {
                                         unsigned int byte =
@@ -256,9 +216,9 @@ thunderbots_msgs::RobotStatus MRFBackend::handle_message(int index, const void *
                                         unsigned int bit =
                                             (i + MRF::ERROR_LT_COUNT) % CHAR_BIT;
                                         // TODO: Handle these messages
-                                        if (bptr[byte] & (1 << bit))
+                                        if (bptr[byte] & (1 << bit) && MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            // error_et_messages[i]->fire();
+                                            robot_status.messages.push_back(MRF::ERROR_ET_MESSAGES[i]);
                                         }
                                     }
                                     bptr += MRF::ERROR_BYTES;

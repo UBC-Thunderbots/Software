@@ -2,8 +2,8 @@
 #define MRF_CONSTANTS_H
 
 #include <stdint.h>
-
 #include <climits>
+#include <array>
 
 namespace MRF
 {
@@ -95,12 +95,90 @@ namespace MRF
     /**
      * The message patterns for the level-triggered error messages.
      */
-    extern const char* const ERROR_LT_MESSAGES[];
+    const std::array<const char*, ERROR_LT_COUNT> ERROR_LT_MESSAGES = {
+        "charge timeout",
+        "wheel 0 motor hot",
+        "wheel 1 motor hot",
+        "wheel 2 motor hot",
+        "wheel 3 motor hot",
+        "dribbler motor hot",
+        "wheel 0 encoder not commutating",
+        "wheel 1 encoder not commutating",
+        "wheel 2 encoder not commutating",
+        "wheel 3 encoder not commutating",
+        "wheel 0 Hall sensor stuck low",
+        "wheel 1 Hall sensor stuck low",
+        "wheel 2 Hall sensor stuck low",
+        "wheel 3 Hall sensor stuck low",
+        "dribbler Hall sensor stuck low",
+        "wheel 0 Hall sensor stuck high",
+        "wheel 1 Hall sensor stuck high",
+        "wheel 2 Hall sensor stuck high",
+        "wheel 3 Hall sensor stuck high",
+        "dribbler Hall sensor stuck high",
+    };
 
     /**
      * The message patterns for the edge-triggered error messages.
      */
-    extern const char* const ERROR_ET_MESSAGES[];
+    const std::array<const char*, ERROR_ET_COUNT> ERROR_ET_MESSAGES = {
+        "ICB CRC error",
+        "receive frame check sequence failure",
+        "crashed (core dumped)",
+        "crashed (no core dump)",
+    };
+
+    /**
+     * The total number of SD card-related messages.
+     */
+    constexpr unsigned int SD_MESSAGE_COUNT = 33;
+
+    /**
+     * The SD card messages.
+     */
+    const std::array<const char*, SD_MESSAGE_COUNT> SD_MESSAGES = {
+        nullptr,
+        "SD card uninitialized",
+        nullptr,
+        "SD card incompatible",
+        "SD card sent illegal response",
+        "SD layer logical error",
+        "SD card CRC error",
+        "SD card claimed illegal command",
+        "SD card in unexpected state",
+        "SD card internal error",
+        "SD card command response timeout",
+        "SD card parameter out of range",
+        "SD card address misaligned",
+        "SD card block length error",
+        "SD card erase sequence error",
+        "SD card erase parameter error",
+        "SD card write protect violation",
+        "SD card locked",
+        "SD card lock or unlock failed",
+        "SD card command CRC error",
+        "SD card ECC error",
+        "SD card CC error",
+        "SD card generic error",
+        "SD card CSD write error",
+        "SD card partial erase due to write protection",
+        "SD card ECC disabled",
+        "SD card erase sequence cancelled",
+        "SD card authentication sequence error",
+        "SD card initialization timeout",
+        "SD card data timeout",
+        "SD card data CRC error",
+        "SD card missing data start bit",
+        "SD card FIFO overrun or underrun",
+    };
+
+    constexpr unsigned int LOGGER_MESSAGE_COUNT = 4;
+    const std::array<const char*, LOGGER_MESSAGE_COUNT> LOGGER_MESSAGES = {
+        nullptr,
+        "Logger uninitialized",
+        nullptr,
+        "SD card full",
+    };
 }  // namespace MRF
 
 #endif

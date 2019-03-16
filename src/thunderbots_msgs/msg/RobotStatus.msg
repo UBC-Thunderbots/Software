@@ -1,3 +1,11 @@
+# This message contains various robot parameters (e.g. voltages, link quality, etc.)
+
+# The robot number.
+int32 robot
+
+# Messages related to the robot that are to be displayed in the visualizer
+# (usually errors that need attention)
+string[] messages
 
 # The rough maximum full-scale deflection of the laser sensor.
 float64 break_beam_scale
