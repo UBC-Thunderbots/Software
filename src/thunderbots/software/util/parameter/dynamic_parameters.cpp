@@ -9,7 +9,49 @@
 
 # include "util/parameter/dynamic_parameters.h"
 namespace Util::DynamicParameters{
-std::vector<std::string> cfg_strs{"ai","xbox_controller"};
+std::vector<std::string> cfg_strs{"ai_control","evaluation","ai","vision_and_filters","xbox_controller"};
+namespace AI { 
+Parameter<bool> run_ai("run_ai", "ai_control", false);
+
+Parameter<bool> override_ai_play("override_ai_play", "ai_control", false);
+
+Parameter<std::string> current_ai_play("current_ai_play", "ai_control", "Example Play");
+
+namespace refbox { 
+Parameter<bool> override_refbox_play("override_refbox_play", "ai_control", false);
+
+Parameter<std::string> current_refbox_play("current_refbox_play", "ai_control", "Halt");
+
+Parameter<bool> override_refbox_defending_side("override_refbox_defending_side", "ai_control", false);
+
+Parameter<bool> defending_positive_side("defending_positive_side", "ai_control", false);
+
+Parameter<bool> override_refbox_friendly_team_color("override_refbox_friendly_team_color", "ai_control", false);
+
+Parameter<bool> friendly_color_yellow("friendly_color_yellow", "ai_control", false);
+
+}
+}
+namespace Evaluation { 
+namespace Indirect_Chip { 
+Parameter<double> chip_target_fraction("chip_target_fraction", "evaluation", 5.0/10.0);
+
+Parameter<double> chip_power_bounce_threshold("chip_power_bounce_threshold", "evaluation", 7.5/10.0);
+
+Parameter<double> max_chip_power("max_chip_power", "evaluation", 8.0);
+
+Parameter<double> chip_target_area_inset("chip_target_area_inset", "evaluation", 0.3);
+
+Parameter<double> min_chip_tri_area("min_chip_tri_area", "evaluation", 0.5);
+
+Parameter<double> min_chip_tri_edge_len("min_chip_tri_edge_len", "evaluation", 0.8);
+
+Parameter<double> min_chip_tri_edge_angle("min_chip_tri_edge_angle", "evaluation", 20);
+
+Parameter<double> chip_cherry_power_downscale("chip_cherry_power_downscale", "evaluation", 0.85);
+
+}
+}
 namespace AI { 
 namespace Passing { 
 Parameter<double> static_field_position_quality_x_offset("static_field_position_quality_x_offset", "ai", 0.3);
@@ -49,11 +91,19 @@ Parameter<double> default_avoid_dist("default_avoid_dist", "ai", 50);
 
 Parameter<double> collision_avoid_velocity_scale("collision_avoid_velocity_scale", "ai", 0.5);
 
-Parameter<double> collision_avoid_velocity_scale2("collision_avoid_velocity_scale2", "ai", 0.5);
-
 }
 Parameter<int32_t> robot_expiry_buffer_milliseconds("robot_expiry_buffer_milliseconds", "ai", 50);
 
+namespace cameras { 
+Parameter<bool> ignore_camera_0("ignore_camera_0", "vision_and_filters", false);
+
+Parameter<bool> ignore_camera_1("ignore_camera_1", "vision_and_filters", false);
+
+Parameter<bool> ignore_camera_2("ignore_camera_2", "vision_and_filters", false);
+
+Parameter<bool> ignore_camera_3("ignore_camera_3", "vision_and_filters", false);
+
+}
 namespace XBoxControllerDemo { 
 Parameter<int32_t> robot_id("robot_id", "xbox_controller", 0);
 

@@ -1,7 +1,8 @@
 #include "ai/world/world.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "util/parameter/dynamic_parameter_utils.h"
+#include "geom/util.h"
+#include "util/parameter/dynamic_parameters.h"
 
 /**
  * The indirect chip and chase target evaluation function returns a target point for the
@@ -10,11 +11,6 @@
  */
 namespace Evaluation
 {
-    typedef Point Vector;
-    template <size_t N>
-    using Poly     = std::array<Vector, N>;
-    using Triangle = Poly<3>;
-
     /**
      * Returns the target point that the chipper and chaser will chip and chase at.
      *
@@ -47,7 +43,7 @@ namespace Evaluation
      * chip and chase to
      */
     std::optional<Point> findTargetPointForIndirectChipAndChase(
-        const std::vector<Triangle>& triangles, Point ball_position);
+        const std::vector<LegacyTriangle>& triangles, Point ball_position);
 
     /**
      * Returns a vector of all possible triangles between enemy players and rectangular
@@ -62,7 +58,7 @@ namespace Evaluation
      *
      * @return Vector of triangles
      */
-    std::vector<Triangle> getAllTrianglesBetweenEnemyPlayers(
+    std::vector<LegacyTriangle> getAllTrianglesBetweenEnemyPlayers(
         const World& world, std::vector<Point> enemy_players);
 
     /**
@@ -77,7 +73,7 @@ namespace Evaluation
      *
      * @return Vector of triangles with no enemy robots
      */
-    std::vector<Triangle> findOpenTriangles(std::vector<Triangle> triangles,
+    std::vector<LegacyTriangle> findOpenTriangles(std::vector<LegacyTriangle> triangles,
                                             std::vector<Point> enemy_players);
 
     /**
@@ -87,7 +83,7 @@ namespace Evaluation
      *
      * @return Centre point of triangle
      */
-    Point getTriangleCenter(Triangle triangle);
+    Point getTriangleCenter(LegacyTriangle triangle);
 
     /**
      * Returns the area of the given triangle.
@@ -96,7 +92,7 @@ namespace Evaluation
      *
      * @return Area of triangle in meters squared
      */
-    double getTriangleArea(Triangle triangle);
+    double getTriangleArea(LegacyTriangle triangle);
 
     /**
      * Remove all Triangles in a given list whose centers do not fall
@@ -107,8 +103,8 @@ namespace Evaluation
      *
      * @return Valid triangles
      */
-    std::vector<Triangle> removeOutOfBoundsTriangles(const World& world,
-                                                     std::vector<Triangle> triangles);
+    std::vector<LegacyTriangle> removeOutOfBoundsTriangles(const World& world,
+                                                     std::vector<LegacyTriangle> triangles);
 
     /**
      * Returns four Points representing a rectangular region to chip and
@@ -141,7 +137,7 @@ namespace Evaluation
      *
      * @return Largest triangle
      */
-    std::optional<Triangle> getLargestValidTriangle(std::vector<Triangle> allTriangles,
+    std::optional<LegacyTriangle> getLargestValidTriangle(std::vector<LegacyTriangle> allTriangles,
                                                     double min_area       = 0,
                                                     double min_edge_len   = 0,
                                                     double min_edge_angle = 0);

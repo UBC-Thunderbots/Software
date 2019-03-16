@@ -11,6 +11,65 @@
 #include "util/parameter/parameter.h"
 namespace Util::DynamicParameters{
 namespace AI { 
+// Selecting will allow HL and Navigator to run, unselecting will stop new decisions from being made, but the robots will finish the last commands they were given. DO NOT USE in place of the e-stop.
+extern Parameter<bool> run_ai; 
+
+// Overrides the current play with the play specified by current_play parameter
+extern Parameter<bool> override_ai_play; 
+
+// Specifies the ai play that should be in use
+extern Parameter<std::string> current_ai_play; 
+
+namespace refbox { 
+// Overrides the current refbox play with the play specified by current_play parameter
+extern Parameter<bool> override_refbox_play; 
+
+// Specifies the refbox play that should be in use
+extern Parameter<std::string> current_refbox_play; 
+
+// Overrides the defending side provided by refbox,  with defending_positive_side parameter
+extern Parameter<bool> override_refbox_defending_side; 
+
+// Positive if selected, Negative if unselected
+extern Parameter<bool> defending_positive_side; 
+
+// Overrides the team color provided by refbox,  with friendly_color_yellow parameter
+extern Parameter<bool> override_refbox_friendly_team_color; 
+
+// Yellow if selected, Blue if unselected
+extern Parameter<bool> friendly_color_yellow; 
+
+}
+}
+namespace Evaluation { 
+namespace Indirect_Chip { 
+// Adjusts how far between ball and target the robot will chip
+extern Parameter<double> chip_target_fraction; 
+
+// Maximum fraction of distance between chipper and target the first bounce should be, so ball is rolling when it reaches the target
+extern Parameter<double> chip_power_bounce_threshold; 
+
+// Maximum power the robot can chip the ball at without malfunctions
+extern Parameter<double> max_chip_power; 
+
+// Closest distance to edge of field that the robot could chip and chase to
+extern Parameter<double> chip_target_area_inset; 
+
+// Minimum area of chip target triangle
+extern Parameter<double> min_chip_tri_area; 
+
+// Minimum edge length of chip target triangle
+extern Parameter<double> min_chip_tri_edge_len; 
+
+// Minimum angle in degrees between chip triangle edges
+extern Parameter<double> min_chip_tri_edge_angle; 
+
+// Percentage of distance to center of triangle to return as target
+extern Parameter<double> chip_cherry_power_downscale; 
+
+}
+}
+namespace AI { 
 namespace Passing { 
 // The offset from the sides of the field to place the rectangular sigmoid we use to determine what areas to pass to
 extern Parameter<double> static_field_position_quality_x_offset; 
@@ -51,28 +110,39 @@ extern Parameter<int32_t> number_of_gradient_descent_steps_per_iter;
 // The maximum allowed difference between the reciever and passer  point of two passes for which they are considered equal
 extern Parameter<double> pass_equality_max_position_difference_meters; 
 
-// 
+// TODO: Add description as part of #149
 extern Parameter<double> pass_equality_max_start_time_difference_seconds; 
 
-// 
+// TODO: Add description as part of #149
 extern Parameter<double> pass_equality_max_speed_difference_meters_per_second; 
 
 }
 }
 namespace Navigator { 
-// asdfsadf
+// TODO: Add description as part of #149
 extern Parameter<double> default_avoid_dist; 
 
-// 
+// TODO: Add description as part of #149
 extern Parameter<double> collision_avoid_velocity_scale; 
 
-// 
-extern Parameter<double> collision_avoid_velocity_scale2; 
-
 }
-// asdasd
+// TODO: Add description as part of #149
 extern Parameter<int32_t> robot_expiry_buffer_milliseconds; 
 
+namespace cameras { 
+// Ignores camera 0
+extern Parameter<bool> ignore_camera_0; 
+
+// Ignores camera 1
+extern Parameter<bool> ignore_camera_1; 
+
+// Ignores camera 2
+extern Parameter<bool> ignore_camera_2; 
+
+// Ignores camera 3
+extern Parameter<bool> ignore_camera_3; 
+
+}
 namespace XBoxControllerDemo { 
 // The ID of the robot being controller by the XBox Controller
 extern Parameter<int32_t> robot_id; 
