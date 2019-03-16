@@ -114,10 +114,13 @@ void PassGenerator::optimizePasses()
     // that we're optimizing
     const auto objective_function =
         [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
-            try {
+            try
+            {
                 Pass pass = convertArrayToPass(pass_array);
                 return ratePass(pass);
-            } catch (std::invalid_argument& e){
+            }
+            catch (std::invalid_argument& e)
+            {
                 // If the pass was invalid, just rate it as poorly as possible
                 return 0.0;
             }
@@ -133,9 +136,12 @@ void PassGenerator::optimizePasses()
         auto pass_array =
             optimizer.maximize(objective_function, convertPassToArray(pass),
                                number_of_gradient_descent_steps_per_iter.value());
-        try{
+        try
+        {
             updated_passes.emplace_back(convertArrayToPass(pass_array));
-        } catch (std::invalid_argument& e) {
+        }
+        catch (std::invalid_argument& e)
+        {
             // Sometimes the gradient descent algorithm could return an invalid pass, if
             // so, we can just ignore it and carry on
         }
@@ -222,27 +228,29 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     // Take ownership of world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
 
-    std::uniform_real_distribution x_distribution(-world.field().width()/2, world.field().width()/2);
-    std::uniform_real_distribution y_distribution(-world.field().length()/2, world.field().length()/2);
+    std::uniform_real_distribution x_distribution(-world.field().width() / 2,
+                                                  world.field().width() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().length() / 2,
+                                                  world.field().length() / 2);
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
     double curr_time = world.ball().lastUpdateTimestamp().getSeconds();
-    double min_start_time_offset = Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
-    double max_start_time_offset = Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+    double min_start_time_offset =
+        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    double max_start_time_offset =
+        Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
     std::uniform_real_distribution start_time_distribution(
-            curr_time + min_start_time_offset, curr_time + max_start_time_offset
-    );
+        curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-            Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value(),
-            Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value()
-    );
+        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value(),
+        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value());
 
     std::vector<Pass> passes;
-    for (int i = 0; i < num_passes_to_gen; i++){
-        Point receiver_point(
-                x_distribution(random_num_gen),
-                y_distribution(random_num_gen)
-        );
-        Timestamp start_time = Timestamp::fromSeconds(start_time_distribution(random_num_gen));
+    for (int i = 0; i < num_passes_to_gen; i++)
+    {
+        Point receiver_point(x_distribution(random_num_gen),
+                             y_distribution(random_num_gen));
+        Timestamp start_time =
+            Timestamp::fromSeconds(start_time_distribution(random_num_gen));
         double pass_speed = speed_distribution(random_num_gen);
 
         Pass p(passer_point, receiver_point, pass_speed, start_time);

@@ -32,7 +32,7 @@ class PassGeneratorTest : public testing::Test
     std::shared_ptr<PassGenerator> pass_generator;
 };
 
- TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
+TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
 {
     // Test that given enough time and a static world with no robots, we converge to a
     // pass near the enemy team goal

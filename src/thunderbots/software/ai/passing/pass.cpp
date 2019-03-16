@@ -15,8 +15,7 @@ Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
 {
     if (pass_speed_m_per_s < 0.0)
     {
-        throw std::invalid_argument(
-                "Passes cannot have a negative pass speed");
+        throw std::invalid_argument("Passes cannot have a negative pass speed");
     }
 }
 

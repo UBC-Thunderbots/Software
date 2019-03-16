@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mutex>
-#include <thread>
 #include <random>
+#include <thread>
 
 #include "ai/passing/pass.h"
 #include "ai/world/world.h"

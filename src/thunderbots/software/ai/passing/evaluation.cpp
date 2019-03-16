@@ -12,10 +12,11 @@
 
 using namespace AI::Passing;
 
-double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, const std::optional<Rectangle> &target_region)
+double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
+                             const std::optional<Rectangle>& target_region)
 {
     double static_pass_quality =
-            getStaticPositionQuality(world.field(), pass.receiverPoint());
+        getStaticPositionQuality(world.field(), pass.receiverPoint());
 
     double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
 
@@ -35,17 +36,17 @@ double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, 
 
     // Strict requirement that the pass occurs at a minimum time in the future
     double min_pass_time_offset =
-            Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
     pass_quality *= sigmoid(
-            pass.startTime().getSeconds(),
-            min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+        pass.startTime().getSeconds(),
+        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
 
     // Place strict limits on the ball speed
     double min_pass_speed =
-            Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
     double max_pass_speed =
-            Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
     pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.001);
     pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.001);
 
