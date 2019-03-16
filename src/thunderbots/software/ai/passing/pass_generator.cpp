@@ -114,21 +114,33 @@ void PassGenerator::optimizePasses()
     // that we're optimizing
     const auto objective_function =
         [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
-            Pass pass = convertArrayToPass(pass_array);
-            return ratePass(pass);
+            try {
+                Pass pass = convertArrayToPass(pass_array);
+                return ratePass(pass);
+            } catch (std::invalid_argument& e){
+                // If the pass was invalid, just rate it as poorly as possible
+                return 0.0;
+            }
         };
 
     // Run gradient descent to optimize the passes to for the requested number
     // of iterations
     // NOTE: Parallelizing this `for` loop would probably be safe and potentially more
     //       performant
+    std::vector<Pass> updated_passes;
     for (Pass& pass : passes_to_optimize)
     {
         auto pass_array =
             optimizer.maximize(objective_function, convertPassToArray(pass),
                                number_of_gradient_descent_steps_per_iter.value());
-        pass = convertArrayToPass(pass_array);
+        try{
+            updated_passes.emplace_back(convertArrayToPass(pass_array));
+        } catch (std::invalid_argument& e) {
+            // Sometimes the gradient descent algorithm could return an invalid pass, if
+            // so, we can just ignore it and carry on
+        }
     }
+    passes_to_optimize = updated_passes;
 }
 
 void PassGenerator::pruneAndReplacePasses()

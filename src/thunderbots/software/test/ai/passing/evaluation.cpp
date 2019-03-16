@@ -24,6 +24,28 @@ protected:
    double avg_desired_pass_speed;
 };
 
+// TODO: YOU ARE HERE - need to implement functionality and add tests such that we should prefer passes that occur at a time closer in the future in `ratePass`
+
+TEST_F(PassingEvaluationTest, ratePass_prefer_sooner_passes){
+    // We should rate a pass that is going to happen at a given time higher then the same
+    // pass but later in the future
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {3, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(1, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass_soon({3,0}, {2,0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
+    Pass pass_later({3,0}, {2,0}, avg_desired_pass_speed, Timestamp::fromSeconds(3));
+
+    EXPECT_GE(ratePass(world, pass_soon, std::nullopt), ratePass(world, pass_later, std::nullopt));
+}
+
 TEST_F(PassingEvaluationTest, ratePass_no_target_region){
     // This should be a really good pass, and since there is no target region it should
     // be highly scored

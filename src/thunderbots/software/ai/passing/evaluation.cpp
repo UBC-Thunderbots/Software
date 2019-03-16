@@ -23,6 +23,9 @@ double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, 
 
     double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
 
+    double pass_time_weight =
+    double time_pass_rating = sigmoid
+
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
     if (target_region)
@@ -40,6 +43,9 @@ double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, 
     pass_quality *= sigmoid(
             pass.startTime().getSeconds(),
             min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+
+    // Prefer passes closer to the current time
+    // TODO
 
     // Place strict limits on the ball speed
     double min_pass_speed =
