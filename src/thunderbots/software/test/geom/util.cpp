@@ -871,8 +871,17 @@ TEST(GeomUtilTest, test_segment_intersect_with_existing_segment) {
 }
 
 TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting) {
+    Ray ray1 = Ray( Point(-4,0), Vector(0,-1));
+    Ray ray2 = Ray( Point(4,0), Vector(0,-1) );
 
+    Segment segment = Segment( Point(-1, 4), Point(1,4));
+
+    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ( false, intersecting_segment.has_value());
 }
+
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect) {}
 
 int main(int argc, char **argv)
 {

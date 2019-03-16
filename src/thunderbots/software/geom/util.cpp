@@ -1033,6 +1033,7 @@ std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segme
     else if( (intersect11.has_value() && !intersect12.has_value() ) && ( intersect21.has_value() && !intersect22.has_value() ))  {
         return std::make_optional( Segment( intersect11.value(), intersect21.value()) );
     }
+    // If only one ray intersects the segment (Can either return segment from intersect to end, or nothing
 }
 
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment( Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius) {
