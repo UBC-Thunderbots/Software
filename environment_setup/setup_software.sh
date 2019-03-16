@@ -191,6 +191,7 @@ mkdir $beast_path
 cd $beast_path
 
 wget https://github.com/boostorg/beast/archive/v124.zip
+sudo apt-get install unzip
 unzip v124.zip
 cd beast-124
 # Note that we use `\cp` here instead of `cp` to force overwrite without prompt
