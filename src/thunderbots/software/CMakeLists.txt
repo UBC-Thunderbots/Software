@@ -503,10 +503,10 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
-            test/ai/evaluation/deflect_off_enemy_target.cpp
-            test/ai/evaluation/main.cpp
-            test/ai/evaluation/robot.cpp
-            test/ai/evaluation/team.cpp
+            test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
+            test/ai/hl/stp/evaluation/main.cpp
+            test/ai/hl/stp/evaluation/robot.cpp
+            test/ai/hl/stp/evaluation/team.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameter_utils.cpp
             util/parameter/dynamic_parameters.cpp
@@ -718,7 +718,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(evaluation_detect_threat_test
-            test/ai/evaluation/detect_threat.cpp
+            test/ai/hl/stp/evaluation/detect_threat.cpp
             ai/hl/stp/evaluation/detect_threat.cpp
             test/test_util/test_util.cpp
             ai/world/ball.cpp
