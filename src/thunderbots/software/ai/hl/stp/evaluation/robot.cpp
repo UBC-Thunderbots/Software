@@ -11,6 +11,6 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     // orientation and target orientation. The difference in angle will be in the range of
     // [0, pi]. Return true if the difference is smaller than threshold, false otherwise
     Angle target_orientation = (target - position).orientation();
-    Angle diff_orientation   = orientation.diff(target_orientation);
+    Angle diff_orientation   = orientation.minDiff(target_orientation);
     return diff_orientation < threshold;
 }

@@ -25,6 +25,19 @@ std::vector<std::string> PlayFactory::getRegisteredPlayNames()
     return names;
 }
 
+std::vector<std::function<std::unique_ptr<Play>()>>
+PlayFactory::getRegisteredPlayConstructors()
+{
+    std::vector<std::function<std::unique_ptr<Play>()>> constructors;
+
+    for (auto it = PlayFactory::getRegistry().begin();
+         it != PlayFactory::getRegistry().end(); it++)
+    {
+        constructors.emplace_back(it->second);
+    }
+    return constructors;
+}
+
 void PlayFactory::registerPlay(std::string play_name,
                                std::function<std::unique_ptr<Play>()> play_creator)
 {
