@@ -73,7 +73,16 @@ AI:
       description: >-
         Minimum time into the future at which the pass should occur. This is
         to ensure we have enough time to setup a robot to actually perform
-        the pass. This is in seconds
+        the pass. This is in seconds.
+    max_time_offset_for_pass_seconds:
+      min: 0
+      max: 5
+      default: 4.0
+      type: "double"
+      description: >-
+        Maximum time into the future at which the pass should occur. This gives the
+        upper bound on the pass start time, relative to the current time. This is in
+        seconds.
     num_passes_to_optimize:
       min: 0
       max: 1000

@@ -23,9 +23,6 @@ double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, 
 
     double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
 
-    double pass_time_weight =
-    double time_pass_rating = sigmoid
-
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
     if (target_region)
