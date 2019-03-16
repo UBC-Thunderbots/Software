@@ -2,7 +2,12 @@
 
 #include <algorithm>
 
-MoveTactic::MoveTactic() : Tactic() {}
+MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
+
+std::string MoveTactic::getName() const
+{
+    return "Move Tactic";
+}
 
 void MoveTactic::updateParams(Point destination, Angle final_orientation,
                               double final_speed)

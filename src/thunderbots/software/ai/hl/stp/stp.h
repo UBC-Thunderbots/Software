@@ -25,8 +25,9 @@ class STP : public HL
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
     /**
-     * Given a list of tactics and the current World, returns the optimal assignment of
-     * friendly robots to the tactics.
+     * Given a list of tactics and the current World, returns a new list of tactics
+     * with robots assigned to them. Only tactics with a robot assigned are returned,
+     * and the tactics are returned in the same order that they were given.
      *
      * The order of the given tactics determines their priority, with the tactics as the
      * beginning of the vector being a higher priority than those at the end. The priority
@@ -41,7 +42,7 @@ class STP : public HL
      * @return A list of tactics, where each tactic has a robot assigned to it. Only
      * tactics with a robot assigned are returned
      */
-    std::vector<std::shared_ptr<Tactic>> calculateTacticRobotAssignment(
+    std::vector<std::shared_ptr<Tactic>> assignRobotsToTactics(
         const World &world, std::vector<std::shared_ptr<Tactic>> tactics) const;
 
     /**

@@ -9,6 +9,9 @@
 /install
 /logs
 
+# Pycache
+*.pyc
+
 # CLion
 *.idea*
 cmake-build-debug
