@@ -1,0 +1,92 @@
+/**
+ * This file contains the unit tests for evaluation functions
+ * in detect_threat.cpp
+ */
+
+#include "ai/hl/stp/evaluation/detect_threat.h"
+
+#include <gtest/gtest.h>
+
+#include "ai/world/ball.h"
+#include "software/util/time/timestamp.h"
+#include "test/test_util/test_util.h"
+
+// Test where the ball will intersect the friendly net
+TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)
+{
+    Vector velocity(-1, 0.01);
+    Point position(1, -0.2);
+    Timestamp timestamp = Timestamp::fromSeconds(20);
+
+    Ball ball(position, velocity, timestamp);
+
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    std::optional<Point> intersection =
+        Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
+
+
+    EXPECT_EQ(Point(-4.5, -0.145), intersection.value());
+}
+
+// Test where the ball will not intersect the friendly net
+TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_friendly_net)
+{
+    Vector velocity(1, 0.01);
+    Point position(1, -0.2);
+    Timestamp timestamp = Timestamp::fromSeconds(20);
+
+    Ball ball(position, velocity, timestamp);
+
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    std::optional<Point> intersection =
+        Evaluation::calcBallVelIntersectFriendlyNet(ball, field);
+
+
+    EXPECT_EQ(std::nullopt, intersection);
+}
+
+// Test where the ball will intersect the enemy net
+TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_enemy_net)
+{
+    Vector velocity(1, 0.01);
+    Point position(1, -0.2);
+    Timestamp timestamp = Timestamp::fromSeconds(20);
+
+    Ball ball(position, velocity, timestamp);
+
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    std::optional<Point> intersection =
+        Evaluation::calcBallVelIntersectEnemyNet(ball, field);
+
+
+    EXPECT_EQ(Point(4.5, -0.165), intersection.value());
+}
+
+// Test where the ball will not intersect the enemy net
+TEST(evaluation_detect_threat_test, ball_threat_ball_not_intersect_enemy_net)
+{
+    Vector velocity(-1, 0.01);
+    Point position(1, -0.2);
+    Timestamp timestamp = Timestamp::fromSeconds(20);
+
+    Ball ball(position, velocity, timestamp);
+
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    std::optional<Point> intersection =
+        Evaluation::calcBallVelIntersectEnemyNet(ball, field);
+
+
+    EXPECT_EQ(std::nullopt, intersection);
+}
+
+
+int main(int argc, char **argv)
+{
+    std::cout << argv[0] << std::endl;
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
