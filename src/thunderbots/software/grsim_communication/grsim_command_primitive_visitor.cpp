@@ -155,7 +155,7 @@ void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primiti
 {
     // TODO: https://github.com/UBC-Thunderbots/Software/issues/107
 
-    float kickPower = dribble_primitive.isSmallKickAllowed() ? 5.0f : 0.0f;
+    float kickPower = dribble_primitive.isSmallKickAllowed() ? 0.5f : 0.0f;
 
     motion_controller_command = MotionController::MotionControllerCommand(
             dribble_primitive.getDestination(), dribble_primitive.getFinalAngle(),

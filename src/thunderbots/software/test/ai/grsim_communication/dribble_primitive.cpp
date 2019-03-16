@@ -28,7 +28,7 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_allowed)
 
     EXPECT_EQ(motion_controller_command.global_destination, Point(-0.2, 1));
     EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(75));
-    EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 5.0);
+    EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 0.5);
     EXPECT_TRUE(motion_controller_command.dribbler_on);
     EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);
 }
@@ -54,5 +54,5 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_not_allowed)
     EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(75));
     EXPECT_EQ(motion_controller_command.kick_speed_meters_per_second, 0.0);
     EXPECT_TRUE(motion_controller_command.dribbler_on);
-EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);
+    EXPECT_FALSE(motion_controller_command.chip_instead_of_kick);
 }
