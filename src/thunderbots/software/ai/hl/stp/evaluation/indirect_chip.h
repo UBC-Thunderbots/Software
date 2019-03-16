@@ -1,6 +1,7 @@
 #include "ai/world/world.h"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "geom/rectangle.h"
 #include "geom/util.h"
 #include "util/parameter/dynamic_parameters.h"
 
@@ -22,7 +23,7 @@ namespace Evaluation
      * @param world The world in which we want to find the target point
      *
      * @return Point to chip and chase at; If std::nullopt, could not find a good point to
-     * chip and chase to
+     * chip and chase at
      */
     std::optional<Point> findTargetPointForIndirectChipAndChase(const World& world);
 
@@ -40,7 +41,7 @@ namespace Evaluation
      * @param ball_position Position of the ball
      *
      * @return Point to chip and chase at; If std::nullopt, could not find a good point to
-     * chip and chase to
+     * chip and chase at
      */
     std::optional<Point> findTargetPointForIndirectChipAndChase(
         const std::vector<LegacyTriangle>& triangles, Point ball_position);
@@ -56,7 +57,7 @@ namespace Evaluation
      * @param world The world in which we want to find the target point
      * @param enemy_players Vector of enemy robots' positions
      *
-     * @return Vector of triangles
+     * @return Vector of all possible triangles between enemy players and chip area
      */
     std::vector<LegacyTriangle> getAllTrianglesBetweenEnemyPlayers(
         const World& world, std::vector<Point> enemy_players);
@@ -74,7 +75,7 @@ namespace Evaluation
      * @return Vector of triangles with no enemy robots
      */
     std::vector<LegacyTriangle> findOpenTriangles(std::vector<LegacyTriangle> triangles,
-                                            std::vector<Point> enemy_players);
+                                                  std::vector<Point> enemy_players);
 
     /**
      * Returns the center point the given triangle.
@@ -96,36 +97,40 @@ namespace Evaluation
 
     /**
      * Remove all Triangles in a given list whose centers do not fall
-     * within the rectangle returned by get_chip_target_area.
+     * within the best, rectangular chip target area.
      *
-     * @param world The world in which we want to find the target point
-     * @param triangles
+     * Given a vector of triangles and rectangular target area, compares center point of
+     * each triangle and positions of each side of rectangle. If center point of triangle
+     * falls within rectangle, it is placed in a vector of valid triangles.
      *
-     * @return Valid triangles
+     * @param rectangle Chip target area
+     * @param triangles Vector of triangles
+     *
+     * @return Valid triangles that are within the chip target area
      */
-    std::vector<LegacyTriangle> removeOutOfBoundsTriangles(const World& world,
-                                                     std::vector<LegacyTriangle> triangles);
+    std::vector<LegacyTriangle> removeTrianglesOutsideRectangle(
+        Rectangle rectangle, std::vector<LegacyTriangle> triangles);
 
     /**
-     * Returns four Points representing a rectangular region to chip and
-     * chase. This rectangle is from ball's position to enemy's end of field.
-     * All points are 'inset' distance away from each edge of the field to allow a
-     * buffer for catching and prevent ball from leaving the field.
+     * Returns a Rectangle of best target area to chip and chase at.
+     *
+     * This rectangle is from ball's position to enemy's end of field. All points are
+     * 'inset' distance away from each edge of the field to allow a buffer for catching
+     * and prevent ball from leaving the field.
      *
      * @param world The world in which we want to find the target point
      * @param inset Distance away from each edge of field in meters
      *
-     * @return Four points for rectangle
+     * @return Rectangle of best target area
      */
     Rectangle findBestChipTargetArea(const World& world, double inset);
 
     /**
      * Returns the largest triangle that meets the area and edge length thresholds.
      *
-     * Given a vector of triangles, returns the largest triangle with area greater
-     * than minimum area a chip target triangle must have to be considered
-     * valid, and all edge lengths greater than minimum edge length
-     * for the triangle to be considered valid.
+     * Given a vector of triangles, returns the largest triangle with area greater than
+     * minimum area a chip target triangle must have to be considered valid, and all edge
+     * lengths greater than minimum edge length for the triangle to be considered valid.
      *
      * @param allTriangles Vector of triangles
      * @param min_area Minimum area that a chip target triangle must have to be considered
@@ -137,9 +142,7 @@ namespace Evaluation
      *
      * @return Largest triangle
      */
-    std::optional<LegacyTriangle> getLargestValidTriangle(std::vector<LegacyTriangle> allTriangles,
-                                                    double min_area       = 0,
-                                                    double min_edge_len   = 0,
-                                                    double min_edge_angle = 0);
-
+    std::optional<LegacyTriangle> getLargestValidTriangle(
+        std::vector<LegacyTriangle> allTriangles, double min_area = 0,
+        double min_edge_len = 0, double min_edge_angle = 0);
 };  // namespace Evaluation

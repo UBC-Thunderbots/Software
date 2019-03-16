@@ -3,6 +3,7 @@
 #include "ai/world/world.h"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "geom/rectangle.h"
 #include "geom/util.h"
 #include "shared/constants.h"
 
@@ -16,20 +17,25 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
 
     for (Robot i : world.enemyTeam().getAllRobots())
     {
-        all_enemy_positions.push_back(i.position());
+        all_enemy_positions.emplace_back(i.position());
         if (std::optional<Robot>(i) != enemy_goalie_opt)
         {
-            non_goalie_enemy_positions.push_back(i.position());
+            non_goalie_enemy_positions.emplace_back(i.position());
         }
     }
 
     std::vector<LegacyTriangle> allTriangles =
-            getAllTrianglesBetweenEnemyPlayers(world, non_goalie_enemy_positions);
+        getAllTrianglesBetweenEnemyPlayers(world, non_goalie_enemy_positions);
 
     std::vector<LegacyTriangle> target_triangles =
         findOpenTriangles(allTriangles, all_enemy_positions);
 
-    target_triangles = removeOutOfBoundsTriangles(world, target_triangles);
+    Rectangle target_area_rectangle = findBestChipTargetArea(
+        world, Util::DynamicParameters::Evaluation::Indirect_Chip::chip_target_area_inset
+                   .value());
+
+    target_triangles =
+        removeTrianglesOutsideRectangle(target_area_rectangle, target_triangles);
 
     Point ball_position = world.ball().position();
 
@@ -78,16 +84,16 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
     }
 }
 
-std::vector<LegacyTriangle> Evaluation::getAllTrianglesBetweenEnemyPlayers(const World &world,
-                                                                     std::vector<Point> enemy_players)
+std::vector<LegacyTriangle> Evaluation::getAllTrianglesBetweenEnemyPlayers(
+    const World &world, std::vector<Point> enemy_players)
 {
-    std::vector<LegacyTriangle> triangles;
+    std::vector<LegacyTriangle> all_triangles;
     std::vector<Point> allPts = enemy_players;
 
-    allPts.push_back(world.field().enemyCornerNeg());
-    allPts.push_back(world.field().enemyCornerPos());
-    allPts.push_back(Point(0, world.field().enemyCornerPos().y()));
-    allPts.push_back(Point(0, world.field().enemyCornerNeg().y()));
+    allPts.emplace_back(world.field().enemyCornerNeg());
+    allPts.emplace_back(world.field().enemyCornerPos());
+    allPts.emplace_back(Point(0, world.field().enemyCornerPos().y()));
+    allPts.emplace_back(Point(0, world.field().enemyCornerNeg().y()));
 
     for (unsigned int i = 0; i < allPts.size() - 2; i++)
     {
@@ -98,43 +104,45 @@ std::vector<LegacyTriangle> Evaluation::getAllTrianglesBetweenEnemyPlayers(const
                 // Set up 3 different points from the vector of non-goalie enemy players'
                 // positions and the four points for the rectangular region to chip and
                 // chase at
-                Point p1   = allPts[i];
-                Point p2   = allPts[j];
-                Point p3   = allPts[k];
+                Point p1 = allPts[i];
+                Point p2 = allPts[j];
+                Point p3 = allPts[k];
                 // With the 3 points, create a possible triangle and place in
                 // vector of all triangles. Eventually all permutations of points will be
                 // picked
                 LegacyTriangle t = triangle(p1, p2, p3);
-                triangles.push_back(t);
+                all_triangles.emplace_back(t);
             }
         }
     }
 
-    return triangles;
+    return all_triangles;
 }
 
-std::vector<LegacyTriangle> Evaluation::findOpenTriangles(std::vector<LegacyTriangle> triangles,
-                                                    std::vector<Point> enemy_players)
+std::vector<LegacyTriangle> Evaluation::findOpenTriangles(
+    std::vector<LegacyTriangle> triangles, std::vector<Point> enemy_players)
 {
     std::vector<LegacyTriangle> filtered_triangles;
 
     // For every triangle, the 3 points are adjusted so that the robots making up the
     // vertices won't be counted within the triangle, i.e. make every triangle slightly
     // smaller
-    for (unsigned int i = 0; i < triangles.size(); i++)
+    for (LegacyTriangle t : triangles)
     {
-        Point p1 = triangles[i][0] + ((getTriangleCenter(triangles[i])) - triangles[i][0])
-                                         .norm(2.5 * ROBOT_MAX_RADIUS_METERS);
-        Point p2 = triangles[i][1] + ((getTriangleCenter(triangles[i])) - triangles[i][1])
-                                         .norm(2.5 * ROBOT_MAX_RADIUS_METERS);
-        Point p3 = triangles[i][2] + ((getTriangleCenter(triangles[i])) - triangles[i][2])
-                                         .norm(2.5 * ROBOT_MAX_RADIUS_METERS);
-        LegacyTriangle t         = triangle(p1, p2, p3);
-        bool containsEnemy = false;
+        // Takes vector of triangles from input and adjust every single triangle within it
+        Point p1 =
+            t[0] + ((getTriangleCenter(t)) - t[0]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p2 =
+            t[1] + ((getTriangleCenter(t)) - t[1]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
+        Point p3 =
+            t[2] + ((getTriangleCenter(t)) - t[2]).norm(2.5 * ROBOT_MAX_RADIUS_METERS);
 
-        for (unsigned int k = 0; k < enemy_players.size(); k++)
+        LegacyTriangle adjusted_triangle = triangle(p1, p2, p3);
+        bool containsEnemy               = false;
+
+        for (Point enemy_robot : enemy_players)
         {
-            if (contains(t, enemy_players[k]))
+            if (contains(adjusted_triangle, enemy_robot))
             {
                 containsEnemy = true;
                 break;
@@ -143,7 +151,7 @@ std::vector<LegacyTriangle> Evaluation::findOpenTriangles(std::vector<LegacyTria
 
         if (!containsEnemy)
         {
-            filtered_triangles.push_back(triangles[i]);
+            filtered_triangles.emplace_back(adjusted_triangle);
         }
     }
 
@@ -176,23 +184,22 @@ double Evaluation::getTriangleArea(LegacyTriangle triangle)
     return area;
 }
 
-std::vector<LegacyTriangle> Evaluation::removeOutOfBoundsTriangles(
-    const World &world, std::vector<LegacyTriangle> triangles)
+std::vector<LegacyTriangle> Evaluation::removeTrianglesOutsideRectangle(
+    Rectangle rectangle, std::vector<LegacyTriangle> triangles)
 {
     std::vector<LegacyTriangle> valid_triangles;
-    std::vector<Point> chip_area_corners = findBestChipTargetArea(
-        world, Util::DynamicParameters::Evaluation::Indirect_Chip::chip_target_area_inset
-                   .value());
+    std::vector<Point> rectangle_corners = {rectangle[0], rectangle[1], rectangle[3],
+                                            rectangle[4]};
     Point center;
 
-    double smallest_x = chip_area_corners[0].x();
-    double smallest_y = chip_area_corners[0].y();
-    double largest_x  = chip_area_corners[0].x();
-    double largest_y  = chip_area_corners[0].y();
+    double smallest_x = rectangle_corners[0].x();
+    double smallest_y = rectangle_corners[0].y();
+    double largest_x  = rectangle_corners[0].x();
+    double largest_y  = rectangle_corners[0].y();
 
-    for (unsigned int i = 0; i < chip_area_corners.size(); i++)
+    for (unsigned int i = 0; i < rectangle_corners.size(); i++)
     {
-        Point p = chip_area_corners[i];
+        Point p = rectangle_corners[i];
         if (p.x() < smallest_x)
             smallest_x = p.x();
         if (p.x() > largest_x)
@@ -206,11 +213,11 @@ std::vector<LegacyTriangle> Evaluation::removeOutOfBoundsTriangles(
     for (unsigned int i = 0; i < triangles.size(); i++)
     {
         LegacyTriangle t = triangles[i];
-        center     = getTriangleCenter(triangles[i]);
+        center           = getTriangleCenter(triangles[i]);
         if (center.x() <= largest_x && center.x() >= smallest_x &&
             center.y() <= largest_y && center.y() >= smallest_y)
         {
-            valid_triangles.push_back(t);
+            valid_triangles.emplace_back(t);
         }
     }
 
@@ -224,14 +231,8 @@ Rectangle Evaluation::findBestChipTargetArea(const World &world, double inset)
     double negFieldY = world.field().enemyCornerNeg().y() + inset;
     double posFieldY = world.field().enemyCornerPos().y() - inset;
 
-    std::vector<Point> corners = {Point(ballX, negFieldY), Point(ballX, posFieldY),
-                                  Point(fieldX, negFieldY), Point(fieldX, posFieldY)};
-
-    Rectangle target_rectangle = Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
-    Point p1 = r[0]; // south-west corner
-    Point p2 = r[1]; // north-west corner
-    Point p3 = r[2]; // north-east corner
-    Point p4 = r[3]; // south-east corner
+    Rectangle target_rectangle =
+        Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
 
     return target_rectangle;
 }
@@ -240,16 +241,16 @@ std::optional<LegacyTriangle> Evaluation::getLargestValidTriangle(
     std::vector<LegacyTriangle> allTriangles, double min_area, double min_edge_len,
     double min_edge_angle)
 {
-    LegacyTriangle largest    = allTriangles[0];
-    double largest_area = getTriangleArea(largest);
+    LegacyTriangle largest = allTriangles[0];
+    double largest_area    = getTriangleArea(largest);
 
     for (unsigned int i = 0; i < allTriangles.size(); i++)
     {
-        LegacyTriangle t  = allTriangles[i];
-        double area = getTriangleArea(t);
-        double l1   = (t[1] - t[0]).len();
-        double l2   = (t[2] - t[0]).len();
-        double l3   = (t[2] - t[1]).len();
+        LegacyTriangle t = allTriangles[i];
+        double area      = getTriangleArea(t);
+        double l1        = (t[1] - t[0]).len();
+        double l2        = (t[2] - t[0]).len();
+        double l3        = (t[2] - t[1]).len();
 
         Angle a1 = vertexAngle(t[1], t[0], t[2]).angleMod().abs();
         Angle a2 = vertexAngle(t[0], t[1], t[2]).angleMod().abs();
