@@ -220,7 +220,8 @@ def __header_and_cpp_gen(param_info: dict, cfg_name: str, header_file_pointer, c
                     name=key,
                     path=key,
                     namespace=cfg_name,
-                    default=parameter["default"],
+                    # python parses "true" in the yaml as "True" and needs to be converted back to true for cpp
+                    default=str(parameter["default"]).lower() if parameter["type"] == "bool" else parameter["default"],
                     type=constants.CPP_TYPE_MAP[parameter["type"]],
                     quote="\"" if parameter["type"] in constants.QUOTE_TYPES else ""
                 )
