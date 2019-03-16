@@ -6,14 +6,12 @@
 namespace Evaluation
 {
     /**
-     * Finds the robot on the friendly team that is closest to some reference point.
+     * Given a team, finds the robot on that team that is closest to a reference point.
      *
-     * @param friendly_team
+     * @param team
      * @param ref_point The point where the distance to each robot will be measured.
-     *
      * @return Robot that is closest to the reference point.
      */
-    std::optional<Robot> nearest_friendly(const Team friendly_team,
-                                          const Point ref_point);
+    std::optional<Robot> nearest_robot(const Team team, const Point ref_point);
 
 };  // namespace Evaluation
