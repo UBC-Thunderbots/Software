@@ -50,7 +50,7 @@ class PassGeneratorTest : public testing::Test
     EXPECT_EQ(pass1->receiverPoint().y(), 0);
 
     // Run a bit more
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     std::optional<Pass> pass2 = pass_generator->getBestPassSoFar();
 
     // Check that we're moving towards the goal
@@ -59,6 +59,4 @@ class PassGeneratorTest : public testing::Test
 
     // Check that we're aren't moving at all in y
     EXPECT_EQ(pass2->receiverPoint().y(), 0);
-
-    // TODO (Issue #323): Check more things here when we're actually generating passes
 }
