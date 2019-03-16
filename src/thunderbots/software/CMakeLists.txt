@@ -556,6 +556,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
+            test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
@@ -579,7 +580,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
@@ -588,8 +591,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             test/ai/hl/stp/play/main.cpp
-            test/ai/hl/stp/play/move_play.cpp
+            test/ai/hl/stp/play/example_play.cpp
             test/ai/hl/stp/play/play_factory.cpp
+            test/ai/hl/stp/test_plays/move_test_play.cpp
+            test/ai/hl/stp/test_plays/stop_test_play.cpp
+            test/ai/hl/stp/test_tactics/move_test_tactic.cpp
+            test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             test/test_util/test_util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
@@ -597,6 +604,7 @@ if (CATKIN_ENABLE_TESTING)
             util/time/timestamp.cpp
             util/time/time.cpp
             util/time/duration.cpp
+            geom/util.cpp
             )
     target_link_libraries(play_test
             ${catkin_LIBRARIES}
@@ -752,6 +760,15 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             )
+
+    catkin_add_gtest(polygon_test
+            test/geom/polygon.cpp
+            geom/polygon.cpp
+            geom/util.cpp)
+
+    target_link_libraries(polygon_test
+            ${catkin_LIBRARIES}
+            ${G3LOG})
 
 endif()
 

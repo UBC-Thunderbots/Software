@@ -127,7 +127,7 @@ double lensq(const Line &line)
     return std::numeric_limits<double>::infinity();
 }
 
-bool contains(const Triangle &out, const Vector &in)
+bool contains(const LegacyTriangle &out, const Vector &in)
 {
     double angle = 0;
     for (int i = 0, j = 2; i < 3; j = i++)
@@ -184,14 +184,14 @@ bool contains(const Rectangle &out, const Vector &in)
     return out.containsPoint(in);
 }
 
-bool intersects(const Triangle &first, const Circle &second)
+bool intersects(const LegacyTriangle &first, const Circle &second)
 {
     return contains(first, second.getOrigin()) ||
            dist(getSide(first, 0), second.getOrigin()) < second.getRadius() ||
            dist(getSide(first, 1), second.getOrigin()) < second.getRadius() ||
            dist(getSide(first, 2), second.getOrigin()) < second.getRadius();
 }
-bool intersects(const Circle &first, const Triangle &second)
+bool intersects(const Circle &first, const LegacyTriangle &second)
 {
     return intersects(second, first);
 }
@@ -262,7 +262,7 @@ bool intersects(const Segment &first, const Segment &second)
 }
 
 template <size_t N>
-Vector getVertex(const Poly<N> &poly, unsigned int i)
+Vector getVertex(const LegacyPolygon<N> &poly, unsigned int i)
 {
     if (i > N)
         throw std::out_of_range("poly does not have that many sides!!!");
@@ -271,7 +271,7 @@ Vector getVertex(const Poly<N> &poly, unsigned int i)
 }
 
 template <size_t N>
-void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
+void setVertex(LegacyPolygon<N> &poly, unsigned int i, const Vector &v)
 {
     if (i > N)
         throw std::out_of_range("poly does not have that many sides!!!");
@@ -280,7 +280,7 @@ void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
 }
 
 template <size_t N>
-Segment getSide(const Poly<N> &poly, unsigned int i)
+Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
 {
     return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }

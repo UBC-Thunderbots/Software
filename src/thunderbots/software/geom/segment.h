@@ -70,4 +70,20 @@ class Segment final
     {
         return (end.y() - start.y()) / (end.x() - start.x());
     }
+
+    inline bool operator==(const Segment& other) const
+    {
+        return start == other.start && end == other.end;
+    }
+};
+
+template <>
+struct std::hash<Segment>
+{
+    std::size_t operator()(const Segment& seg) const
+    {
+        std::size_t const h1(std::hash<Point>()(seg.getSegStart()));
+        std::size_t const h2(std::hash<Point>()(seg.getEnd()));
+        return h1 ^ (h2 << 1);
+    }
 };
