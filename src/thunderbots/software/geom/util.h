@@ -496,6 +496,6 @@ Point getPointsMean(const std::vector<Point> &points);
  */
 double getPointsVariance(const std::vector<Point> &points);
 
-Segment calculateIntersectingSegmentOfRaySegmentIntersection( Ray ray1, Ray ray2, Segment segment);
+std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment);
 
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius);

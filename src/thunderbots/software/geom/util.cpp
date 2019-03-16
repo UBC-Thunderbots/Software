@@ -975,10 +975,10 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
 
 std::pair<Vector, Vector> getCircleTangentVectors( const Point reference, const Circle circle, double buffer) {
 
-    auto [tangent_point1, tangent_point2] getCircleTangentPoints(reference, circle, buffer);
+    auto [tangent_point1, tangent_point2] = getCircleTangentPoints(reference, circle, buffer);
 
     return std::make_pair((tangent_point1 - reference).norm(), (tangent_point2 - reference).norm());
-};
+}
 
 bool pointIsRightOfLine(const Segment &line, const Point &point)
 {
@@ -1015,9 +1015,20 @@ double getPointsVariance(const std::vector<Point> &points)
     return sqrt(sum);
 }
 
-Segment calculateIntersectingSegmentOfRaySegmentIntersection( Ray ray1, Ray ray2, Segment segment) {
+std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment) {
 
     //auto [intersect11, intersect12] = raySegment
+    auto [intersect11, intersect12] = raySegmentIntersection(ray1, segment);
+    auto [intersect21, intersect22] = raySegmentIntersection(ray2, segment);
+
+    // Check if there are any intersections at all
+    if( !intersect11.has_value() || !intersect21.has_value() ) {
+        return std::nullopt;
+    }
+    // Check if one of the rays is overlapping the segment
+    else if( (intersect11.has_value() && intersect12.has_value()) || (intersect21.has_value() && intersect22.has_value()) ) {
+        
+    }
 }
 
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment( Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius) {
@@ -1028,9 +1039,9 @@ std::pair<Angle, Point> calculateMostOpenDirectionToSegment( Point origin, Segme
     // Get tangent vectors from obstacle circle to origin
     //  flip vector direction and form a ray. If both rays of an obstacle pass through the segment then, block it off
     //  if one ray intersects, then check block off from the intersecting ray to the segment extreme in the same direction
-    for( Point obstacle : obstacles) {
-        auto
-    }
+//    for( Point obstacle : obstacles) {
+//        auto
+//    }
     // Combine overlapping obstacle line segments to reduce complexity
     // iterate over combined line segments to find the largest open segments, and then back-calculate the coresponding angle from the origin
 
