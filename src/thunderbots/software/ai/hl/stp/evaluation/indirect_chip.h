@@ -25,7 +25,8 @@ namespace Evaluation
      *
      * @param world The world in which we want to find the target point
      *
-     * @return Point to chip and chase at; If null, the target triangles were empty
+     * @return Point to chip and chase at; If std::nullopt, could not find a good point to
+     * chip and chase to
      */
     std::optional<Point> findTargetPointForIndirectChipAndChase(const World& world);
 
@@ -42,7 +43,8 @@ namespace Evaluation
      * chip target area
      * @param ball_position Position of the ball
      *
-     * @return Point to chip and chase at; If null, the target triangles were empty
+     * @return Point to chip and chase at; If std::nullopt, could not find a good point to
+     * chip and chase to
      */
     std::optional<Point> findTargetPointForIndirectChipAndChase(
         const std::vector<Triangle>& triangles, Point ball_position);
@@ -92,7 +94,7 @@ namespace Evaluation
      *
      * @param triangle
      *
-     * @return Area of triangle
+     * @return Area of triangle in meters squared
      */
     double getTriangleArea(Triangle triangle);
 
@@ -105,8 +107,8 @@ namespace Evaluation
      *
      * @return Valid triangles
      */
-    std::vector<Triangle> remove_outofbounds_triangles(const World& world,
-                                                       std::vector<Triangle> triangles);
+    std::vector<Triangle> removeOutOfBoundsTriangles(const World& world,
+                                                     std::vector<Triangle> triangles);
 
     /**
      * Returns four Points representing a rectangular region to chip and
@@ -119,7 +121,7 @@ namespace Evaluation
      *
      * @return Four points for rectangle
      */
-    std::vector<Point> findBestChipTargetArea(const World& world, double inset);
+    Rectangle findBestChipTargetArea(const World& world, double inset);
 
     /**
      * Returns the largest triangle that meets the area and edge length thresholds.
@@ -130,8 +132,8 @@ namespace Evaluation
      * for the triangle to be considered valid.
      *
      * @param allTriangles Vector of triangles
-     * @param min_area Minimum area a chip target triangle must have to be considered
-     * valid
+     * @param min_area Minimum area that a chip target triangle must have to be considered
+     * valid in meters squared
      * @param min_edge_len Minimum length in meters that each edge of the chip target
      * triangle must have for the triangle to be considered valid
      * @param min_edge_angle Minimum angle in degrees that any two edges of a chip

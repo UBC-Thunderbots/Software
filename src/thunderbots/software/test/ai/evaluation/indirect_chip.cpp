@@ -62,7 +62,7 @@ TEST(GetAllTrianglesTest, get_all_triangles_test)
     World test_world = TestUtil::createBlankTestingWorld();
 
     std::vector<Point> enemy_players;
-    enemy_players.push_back(Point(1, 2));
+    enemy_players.emplace_back(Point(1, 2));
 
     std::vector<Triangle> all_triangles = {
         {Point(1, 2), Point(6 - 1.5, -3), Point(6 - 1.5, 3)},
@@ -163,10 +163,10 @@ TEST(GetChipTargetAreaCornersTest, get_chip_target_area_corners_test)
     double negFieldY = -3 + inset;
     double posFieldY = 3 - inset;
 
-    corners.push_back(Point(ballX, negFieldY));
-    corners.push_back(Point(ballX, posFieldY));
-    corners.push_back(Point(fieldX, negFieldY));
-    corners.push_back(Point(fieldX, posFieldY));
+    corners.emplace_back(Point(ballX, negFieldY));
+    corners.emplace_back(Point(ballX, posFieldY));
+    corners.emplace_back(Point(fieldX, negFieldY));
+    corners.emplace_back(Point(fieldX, posFieldY));
 
     EXPECT_EQ(corners, Evaluation::findBestChipTargetArea(test_world, inset));
 }
@@ -184,4 +184,12 @@ TEST(GetLargestTriangleTest, get_largest_triangle_test)
     Triangle largest = t2;
 
     EXPECT_EQ(std::optional(largest), Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
+}
+
+
+TEST(GetLargestTriangleTest, get_largest_triangle_with_empty_vector_of_triangles_test)
+{
+    std::vector<Triangle> allTriangles;
+
+    EXPECT_EQ(std::nullopt, Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
 }

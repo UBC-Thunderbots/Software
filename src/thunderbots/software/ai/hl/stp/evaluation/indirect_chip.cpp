@@ -237,7 +237,7 @@ Rectangle Evaluation::findBestChipTargetArea(const World &world, double inset)
 }
 
 std::optional<Triangle> Evaluation::getLargestValidTriangle(
-    std::vector<TrianSgle> allTriangles, double min_area, double min_edge_len,
+    std::vector<Triangle> allTriangles, double min_area, double min_edge_len,
     double min_edge_angle)
 {
     Triangle largest    = allTriangles[0];
