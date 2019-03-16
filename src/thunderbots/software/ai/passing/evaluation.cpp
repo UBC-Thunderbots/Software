@@ -41,9 +41,6 @@ double AI::Passing::ratePass(const World &world, const AI::Passing::Pass &pass, 
             pass.startTime().getSeconds(),
             min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
 
-    // Prefer passes closer to the current time
-    // TODO
-
     // Place strict limits on the ball speed
     double min_pass_speed =
             Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
