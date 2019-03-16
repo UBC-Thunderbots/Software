@@ -18,6 +18,18 @@
 
 using namespace boost::asio;
 
+// Creates a struct which inherits all lambda function given to it and uses their
+// Ts::operator(). This can be passed to std::visit to easily write multiple different
+// lambdas for each type of motion controller commands below. See
+// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
+template <class... Ts>
+struct overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overload(Ts...)->overload<Ts...>;
+
 GrSimBackend::GrSimBackend(std::string network_address, unsigned short port)
     : network_address(network_address), port(port), socket(io_service)
 {
@@ -73,20 +85,23 @@ void GrSimBackend::sendPrimitives(
             bool chip_instead_of_kick;
             bool dribbler_on;
 
-            if (auto val = std::get_if<MotionController::PositionCommand>(
-                    &motion_controller_command))
-            {
-                kick_speed_meters_per_second = val->kick_speed_meters_per_second;
-                chip_instead_of_kick         = val->chip_instead_of_kick;
-                dribbler_on                  = val->dribbler_on;
-            }
-            else if (auto val = std::get_if<MotionController::VelocityCommand>(
-                         &motion_controller_command))
-            {
-                kick_speed_meters_per_second = val->kick_speed_meters_per_second;
-                chip_instead_of_kick         = val->chip_instead_of_kick;
-                dribbler_on                  = val->dribbler_on;
-            }
+            std::visit(
+                overload{[&kick_speed_meters_per_second, &chip_instead_of_kick,
+                          &dribbler_on](MotionController::PositionCommand& command) {
+                             kick_speed_meters_per_second =
+                                 command.kick_speed_meters_per_second;
+                             chip_instead_of_kick = command.chip_instead_of_kick;
+                             dribbler_on          = command.dribbler_on;
+                         },
+
+                         [&kick_speed_meters_per_second, &chip_instead_of_kick,
+                          &dribbler_on](MotionController::VelocityCommand& command) {
+                             kick_speed_meters_per_second =
+                                 command.kick_speed_meters_per_second;
+                             chip_instead_of_kick = command.chip_instead_of_kick;
+                             dribbler_on          = command.dribbler_on;
+                         }},
+                motion_controller_command);
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
