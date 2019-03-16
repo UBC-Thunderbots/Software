@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Initialize the draw visualizer messenger
-    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
+    Util::VisualizerMessenger::getInstance()->initializeWebsocket();
 
     // Initialize Dynamic Parameters
     auto update_subscribers =
