@@ -24,7 +24,9 @@ namespace {
         // Calculate the direction of the best shot, and the 'score' represented by the angle of deviation from the direction that would still result in a goal.
         const std::pair<Vector, Angle> best_shot_data = angleSweepCircles(shooter.position(), segment.getSegStart(), segment.getEnd(), obstacles, ROBOT_MAX_RADIUS_METERS);
 
-        Evaluation::ShotDirAndScore shot_dir_and_score = { .shot_direction = best_shot_data.first, .score = best_shot_data.second.toRadians() };
+        Evaluation::ShotDirAndScore shot_dir_and_score;
+        shot_dir_and_score.shot_direction = best_shot_data.first;
+        shot_dir_and_score.score = best_shot_data.second.toRadians();
 
         return shot_dir_and_score;
     }

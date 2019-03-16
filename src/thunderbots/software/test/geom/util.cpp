@@ -857,6 +857,23 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
+// Check the case where both rays intersect the segment only once (forming an intersection segment within the segment)
+TEST(GeomUtilTest, test_segment_intersect_with_existing_segment) {
+    Ray ray1 = Ray( Point(-1,0), Vector(0,1));
+    Ray ray2 = Ray( Point(1,0), Vector(0,1) );
+
+    Segment segment = Segment( Point(-5, 4), Point(5,4));
+
+    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ( Segment(Point(-1,4), Point(1,4)), intersecting_segment.value());
+
+}
+
+TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting) {
+
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

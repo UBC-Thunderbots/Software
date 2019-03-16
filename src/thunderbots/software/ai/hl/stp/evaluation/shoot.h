@@ -7,7 +7,7 @@
 
 namespace Evaluation {
 
-    typedef struct ShotDirAndScore {
+    struct ShotDirAndScore {
         double score;
         Vector shot_direction;
     };
