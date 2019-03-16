@@ -44,8 +44,8 @@ AI:
           shooting opportunity. Note that we may take shots below this in some
           cases, it's more of a weight then a cutoff.
     ideal_min_rotation_to_shoot_degrees:
-      min: -360
-      max: 360
+      min: -180
+      max: 180
       default: 5
       type: "double"
       description: >- 
