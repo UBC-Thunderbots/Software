@@ -19,7 +19,7 @@ const generalWebpackBuild = {
         rules: [
             {
                 test: /\.tsx?$/,
-                exclude: /node_modules/,
+                exclude: [/node_modules/, /__.*__/],
                 use: {
                     loader: 'ts-loader',
                 },
