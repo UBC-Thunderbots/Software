@@ -27,11 +27,15 @@ describe('parseLayer', () => {
             const fakeURL = LAYER_WEBSOCKET_ADDRESS;
             const mockServer = new Server(fakeURL);
 
+            // We create a fake websocket server and send a single layer message
+            // on connection
             mockServer.on('connection', (socket) => {
                 socket.binaryType = 'arraybuffer';
                 socket.send(arrayBuffer);
             });
 
+            // The callback calls done after running assertions. This
+            // is to notify jest that the test is complete
             const layerCallback = (layerData: ILayerMessage) => {
                 expect(layerData.layer).toEqual(layer);
                 expect(layerData.shapes.length).toEqual(shapeCount);
@@ -40,6 +44,8 @@ describe('parseLayer', () => {
                 done();
             };
 
+            // We create a layer receiver and tell it to connect to
+            // the server
             const layerReceiver = new LayerReceiver(layerCallback);
             layerReceiver.connect();
         });

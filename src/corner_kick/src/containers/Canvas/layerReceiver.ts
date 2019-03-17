@@ -3,9 +3,9 @@
  * processes new layer data.
  */
 
-import { BYTES_PER_SHAPE } from 'SRC/constants';
+import { BYTES_PER_SHAPE, LAYER_WEBSOCKET_ADDRESS } from 'SRC/constants';
 import { ILayerMessage, IShape } from 'SRC/types';
-import { MalformedShapeException } from 'SRC/utils/exceptions/malformedShapes';
+import { MalformedShapesException } from 'SRC/utils/exceptions';
 
 /**
  * Type of the callback called when new layer data is received
@@ -32,7 +32,7 @@ const parseLayer = (data: ArrayBuffer): ILayerMessage => {
     // We expect a certain multiple of bytes, based on shape size
     const incomingSpriteCount = (data.byteLength - 2) / BYTES_PER_SHAPE;
     if (incomingSpriteCount !== Math.round(incomingSpriteCount)) {
-        throw new MalformedShapeException(
+        throw new MalformedShapesException(
             'The message from the server contains malformed data',
         );
     } else {
@@ -81,8 +81,8 @@ export class LayerReceiver {
     /**
      * Connects to the websocket
      */
-    public connect = () => {
-        this.ws = new WebSocket('ws://localhost:9091');
+    public connect = (url: string = LAYER_WEBSOCKET_ADDRESS) => {
+        this.ws = new WebSocket(url);
         this.ws.binaryType = 'arraybuffer';
         this.ws.addEventListener('message', (event: MessageEvent) =>
             this.handleData(event.data),
