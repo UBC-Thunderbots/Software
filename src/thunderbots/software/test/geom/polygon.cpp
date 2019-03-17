@@ -92,7 +92,7 @@ TEST(PolygonTest, test_polygon_triangle_intersects_ray)
     Point point{2.0f, 2.0f};
     Polygon triangle{p1, p2, p3};
 
-    Ray ray{Point(5000.0f, 5000.0f), Point(4999.0f, 4999.0f)};
+    Ray ray{Point(5000.0f, 5000.0f), Vector(-1.0, -1.0)};
     EXPECT_TRUE(triangle.intersects(ray));
 }
 
@@ -102,7 +102,7 @@ TEST(PolygonTest, test_polygon_triangle_not_intersects_ray)
     Point point{2.0f, 2.0f};
     Polygon triangle{p1, p2, p3};
 
-    Ray ray{Point(5000.0f, 5000.0f), Point(5001.0f, 5001.0f)};
+    Ray ray{Point(5000.0f, 5000.0f), Vector(1.0f, 1.0f)};
     EXPECT_FALSE(triangle.intersects(ray));
 }
 
@@ -112,7 +112,7 @@ TEST(PolygonTest, test_polygon_triangle_intersects_ray2)
     Point point{2.0f, 2.0f};
     Polygon triangle{p1, p2, p3};
 
-    Ray ray{Point(-1.0f, -1.0f), Point(-2.0f, -2.0f)};
+    Ray ray{Point(-0.1f, -0.1f), Vector(-1.0f, -1.0f)};
     EXPECT_FALSE(triangle.intersects(ray));
 }
 
