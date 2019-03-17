@@ -20,10 +20,10 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_vector_of_points_test)
     double radius                = 0.15;
     EXPECT_EQ(
         std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112)) / 2 +
-                               Angle::atan(15.0 / 112))
+            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
+                               Angle::atan(0.15 / 1.12))
                                   .tan()),
-            (Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112))),
+            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
         Evaluation::calcBestShotOnEnemyGoal(f, obstacles, p, radius));
 }
 
@@ -36,15 +36,16 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_all_with_vector_of_points_te
     double radius                               = 0.15;
     std::vector<std::pair<Point, Angle>> result = {
         std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112)) / 2 +
-                               Angle::atan(15.0 / 112))
+            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
+                               Angle::atan(0.15 / 1.12))
                                   .tan()),
-            (Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112))),
+            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
         std::make_pair(
-            Point(4.5, 1.2 * ((Angle::atan(5.0 / 12) - 2 * Angle::atan(15.0 / 112)) / 2 +
-                              Angle::atan(15.0 / 112))
-                                 .tan()),
-            Angle::atan(5.0 / 12) - 2 * Angle::atan(15.0 / 112))};
+            Point(4.5,
+                  1.2 * ((Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)) / 2 +
+                         Angle::atan(0.15 / 1.12))
+                            .tan()),
+            (Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)))};
     EXPECT_EQ(result, Evaluation::calcBestShotOnEnemyGoalAll(f, obstacles, p, radius));
 }
 
@@ -67,10 +68,10 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_world_test)
 
     EXPECT_EQ(
         std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112)) / 2 +
-                               Angle::atan(15.0 / 112))
+            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
+                               Angle::atan(0.15 / 1.12))
                                   .tan()),
-            (Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112))),
+            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
         Evaluation::calcBestShotOnEnemyGoal(w, p, radius));
 }
 
@@ -112,14 +113,15 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_all_with_world_test)
 
     std::vector<std::pair<Point, Angle>> result = {
         std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112)) / 2 +
-                               Angle::atan(15.0 / 112))
+            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
+                               Angle::atan(0.15 / 1.12))
                                   .tan()),
-            (Angle::atan(5.0 / 12) - Angle::atan(15.0 / 112))),
+            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
         std::make_pair(
-            Point(4.5, 1.2 * ((Angle::atan(5.0 / 12) - 2 * Angle::atan(15.0 / 112)) / 2 +
-                              Angle::atan(15.0 / 112))
-                                 .tan()),
-            Angle::atan(5.0 / 12) - 2 * Angle::atan(15.0 / 112))};
+            Point(4.5,
+                  1.2 * ((Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)) / 2 +
+                         Angle::atan(0.15 / 1.12))
+                            .tan()),
+            (Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)))};
     EXPECT_EQ(result, Evaluation::calcBestShotOnEnemyGoalAll(w, p, radius));
 }
