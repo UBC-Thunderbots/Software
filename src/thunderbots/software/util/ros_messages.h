@@ -96,5 +96,11 @@ namespace Util
             const thunderbots_msgs::RefboxCommand& command);
 
         World createWorldFromROSMessage(const thunderbots_msgs::World& world_msg);
+
+        thunderbots_msgs::Ball transformBall(const thunderbots_msgs::Ball& old_ball);
+
+        std::vector<thunderbots_msgs::Robot> transformRobots(const std::vector<thunderbots_msgs::Robot>& robots);
+
+        thunderbots_msgs::Robot transformRobot(const thunderbots_msgs::Robot& old_robot);
     }  // namespace ROSMessages
 }  // namespace Util

@@ -1,7 +1,5 @@
 #include "util/ros_messages.h"
 
-#include "util/time/timestamp.h"
-
 namespace Util
 {
     namespace ROSMessages
@@ -179,6 +177,57 @@ namespace Util
 
             World world(field, ball, friendly_team, enemy_team);
             return world;
+        }
+
+        thunderbots_msgs::World transformWorld(const thunderbots_msgs::World& old_world_msg)
+        {
+            thunderbots_msgs::World new_world_msg;
+
+            new_world_msg.ball = transformBall(old_world_msg.ball);
+            new_world_msg.friendly_team.robots = transformRobots(old_world_msg.friendly_team.robots);
+            new_world_msg.enemy_team.robots = transformRobots(old_world_msg.enemy_team.robots);
+
+            return new_world_msg;
+        }
+
+        thunderbots_msgs::Ball transformBall(const thunderbots_msgs::Ball& old_ball)
+        {
+            thunderbots_msgs::Ball new_ball = old_ball;
+
+            new_ball.position.x = -old_ball.position.x;
+            new_ball.position.y = -old_ball.position.y;
+
+            new_ball.velocity.x = -old_ball.velocity.x;
+            new_ball.velocity.y = -old_ball.velocity.y;
+
+            return new_ball;
+        }
+
+        std::vector<thunderbots_msgs::Robot> transformRobots(const std::vector<thunderbots_msgs::Robot>& robots)
+        {
+            std::vector<thunderbots_msgs::Robot> new_robots;
+
+            for (auto old_robot : robots)
+            {
+                new_robots.emplace_back(transformRobot(old_robot));
+            }
+
+            return new_robots;
+        }
+
+        thunderbots_msgs::Robot transformRobot(const thunderbots_msgs::Robot& old_robot)
+        {
+            thunderbots_msgs::Robot new_robot = old_robot;
+
+            new_robot.position.x = -old_robot.position.x;
+            new_robot.position.y = -old_robot.position.y;
+
+            new_robot.velocity.x = -old_robot.velocity.x;
+            new_robot.velocity.y = -old_robot.velocity.y;
+
+            new_robot.orientation = old_robot.orientation + Angle::half().toRadians();
+
+            return new_robot;
         }
     }  // namespace ROSMessages
 }  // namespace Util
