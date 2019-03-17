@@ -47,7 +47,7 @@ describe('parseLayer', () => {
             // We create a layer receiver and tell it to connect to
             // the server
             const layerReceiver = new LayerReceiver(layerCallback);
-            layerReceiver.connect();
+            layerReceiver.connect(LAYER_WEBSOCKET_ADDRESS);
         });
     });
 });
