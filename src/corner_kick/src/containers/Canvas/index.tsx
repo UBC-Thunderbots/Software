@@ -6,24 +6,21 @@
 import * as React from 'react';
 
 import { ILayerMessage } from 'SRC/types';
-import { ShapeReceiver } from './shapeReceiver';
+import { LayerReceiver } from './layerReceiver';
 
 export class Canvas extends React.Component {
     public state = {
         messageCount: 0,
     };
 
-    private shapeReceiver: ShapeReceiver;
-    private active = true;
+    private shapeReceiver: LayerReceiver;
 
     /**
      * Initializes the shape receiver and starts requesting messages.
      */
     public componentDidMount() {
-        this.shapeReceiver = new ShapeReceiver(this.handleLayer);
+        this.shapeReceiver = new LayerReceiver(this.handleLayer);
         this.shapeReceiver.connect();
-
-        setTimeout(this.requestConnection, 16);
     }
 
     /**
@@ -42,20 +39,8 @@ export class Canvas extends React.Component {
      * Clean-up after ourselves to avoid memory leaks
      */
     public componentWillUnmount() {
-        this.active = false;
         this.shapeReceiver.close();
     }
-
-    /**
-     * Here, we request data from the ROS shape websocket.
-     */
-    private requestConnection = () => {
-        this.shapeReceiver.requestData();
-
-        if (this.active === true) {
-            setTimeout(this.requestConnection, 16);
-        }
-    };
 
     /**
      * Update message count and display message in the browser console when we receive a

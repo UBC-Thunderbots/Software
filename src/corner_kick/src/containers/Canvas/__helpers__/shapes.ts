@@ -4,7 +4,7 @@
 
 import * as Chance from 'chance';
 
-import { BYTES_PER_SHAPE } from 'SRC/constants/canvas';
+import { BYTES_PER_SHAPE } from 'SRC/constants';
 import { IShape } from 'SRC/types';
 
 const chance = new Chance();

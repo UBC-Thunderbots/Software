@@ -1,17 +1,22 @@
 /**
- * This file contains the logic to parse layer data
+ * This file defines the logic that connects to the ROS layer websocket and
+ * processes new layer data.
  */
 
-import { BYTES_PER_SHAPE } from 'SRC/constants/canvas';
-import { IShape } from 'SRC/types';
-import { ILayerMessage } from 'SRC/types/canvas';
+import { BYTES_PER_SHAPE } from 'SRC/constants';
+import { ILayerMessage, IShape } from 'SRC/types';
 import { MalformedShapeException } from 'SRC/utils/exceptions/malformedShapes';
+
+/**
+ * Type of the callback called when new layer data is received
+ */
+type ShapeReceiverCallback = (layer: ILayerMessage) => void;
 
 /**
  * Parses an ArrayBuffer into a LayerMessage.
  * @throws MalformedShapeException if the ArrayBuffer contains an illegal byte count
  */
-export const parseLayer = (data: ArrayBuffer): ILayerMessage => {
+const parseLayer = (data: ArrayBuffer): ILayerMessage => {
     const incomingDataView = new DataView(data);
 
     // Parse the layer number
@@ -24,6 +29,7 @@ export const parseLayer = (data: ArrayBuffer): ILayerMessage => {
         flagArray[i] = ((flags >> i) & 1) === 1;
     }
 
+    // We expect a certain multiple of bytes, based on shape size
     const incomingSpriteCount = (data.byteLength - 2) / BYTES_PER_SHAPE;
     if (incomingSpriteCount !== Math.round(incomingSpriteCount)) {
         throw new MalformedShapeException(
@@ -33,6 +39,8 @@ export const parseLayer = (data: ArrayBuffer): ILayerMessage => {
         // Parse each shape
         const shapes = new Array(incomingSpriteCount).fill(true).map(
             (_, index): IShape => {
+                // We start at 2 as the first two bytes of the message
+                // contain the layer number and flags
                 const startPos = 2 + index * BYTES_PER_SHAPE;
                 return {
                     texture: incomingDataView.getUint8(startPos),
@@ -56,3 +64,45 @@ export const parseLayer = (data: ArrayBuffer): ILayerMessage => {
         };
     }
 };
+
+/**
+ * Connects and manages the connection between the visualizer and
+ * the layer data websocket.
+ */
+export class LayerReceiver {
+    private ws: WebSocket;
+
+    private callback: ShapeReceiverCallback;
+
+    constructor(callback: ShapeReceiverCallback) {
+        this.callback = callback;
+    }
+
+    /**
+     * Connects to the websocket
+     */
+    public connect = () => {
+        this.ws = new WebSocket('ws://localhost:9091');
+        this.ws.binaryType = 'arraybuffer';
+        this.ws.addEventListener('message', (event: MessageEvent) =>
+            this.handleData(event.data),
+        );
+    };
+
+    /**
+     * Close the websocket connection. MUST be called
+     * to avoid memory leaks.
+     */
+    public close = () => {
+        this.ws.close();
+    };
+
+    /**
+     * Parse data from the websocket
+     */
+    private handleData = (data: ArrayBuffer) => {
+        const parsedLayer = parseLayer(data);
+
+        this.callback(parsedLayer);
+    };
+}

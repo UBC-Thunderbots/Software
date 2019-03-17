@@ -2,6 +2,8 @@
  * This file defines some constants for the canvas
  */
 
+export const SHAPE_WEBSOCKET_ADDRESS = 'ws://localhost:9091';
+
 /**
  * Number of bytes for each shape received from ROS.
  */
