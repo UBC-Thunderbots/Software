@@ -8,6 +8,7 @@ import { IRosoutMessage } from './standardROSMessages';
  * The application state
  */
 export interface IRootState {
+    console: IMessagesState;
     ros: IROSState;
 }
 

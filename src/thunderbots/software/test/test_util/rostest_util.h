@@ -7,7 +7,7 @@
 #include <string>
 #include <thread>
 
-#include "util/timestamp.h"
+#include "util/time/timestamp.h"
 
 namespace RosTestUtil
 {

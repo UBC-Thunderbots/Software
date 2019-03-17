@@ -1,0 +1,5 @@
+/**
+\defgroup REG Hardware registers
+
+These header files define the memory mapped registers in the STM32F4 chip.
+*/

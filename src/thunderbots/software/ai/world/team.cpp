@@ -61,7 +61,13 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     // has passed, then remove the robot from the team
     for (auto it = team_robots.begin(); it != team_robots.end();)
     {
-        if ((timestamp - it->second.lastUpdateTimestamp()) > robot_expiry_buffer_duration)
+        Duration time_diff = timestamp - it->second.lastUpdateTimestamp();
+        if (time_diff.getSeconds() < 0)
+        {
+            throw std::invalid_argument(
+                "Error: tried to remove a robot at a negative time");
+        }
+        if (time_diff > robot_expiry_buffer_duration)
         {
             it = team_robots.erase(it);
         }
