@@ -20,15 +20,14 @@ namespace Evaluation
      *
      * @param p-the point that the shot is being calculated from
      *
-     * @param radius-the multiplier to the radius of the robot,
-     * you can decrease the multiplier to make it easier to shoot.
+     * @param radius-the radius of all obstacles
      *
      * @return the point and the score (angle),
      * where the score will be 0 if the point is invalid.
      */
-    std::pair<Point, Angle> calcBestShot(const Field& f,
-                                         const std::vector<Point>& obstacles,
-                                         const Point& p, double radius = 1.0);
+    std::pair<Point, Angle> calcBestShotOnEnemyGoal(const Field &f,
+                                                    const std::vector<Point> &obstacles,
+                                                    const Point &p, double radius);
 
     /**
      * Finds the length of the all continuous interval (angle-wise) of the
@@ -42,17 +41,14 @@ namespace Evaluation
      *
      * @param p-the point that the shot is being calculated from
      *
-     * @param radius-the multiplier to the radius of the robot,
-     * you can decrease the multiplier to make it easier to shoot.
+     * @param radius-the radius of all obstacles
      *
      * @return a set of points and the corresponding score (angle),
      * where the score will be 0 if the point is invalid.
      */
-
-
-    std::vector<std::pair<Point, Angle>> calcBestShotAll(
-        const Field& f, const std::vector<Point>& obstacles, const Point& p,
-        double radius = 1.0);
+    std::vector<std::pair<Point, Angle>> calcBestShotOnEnemyGoalAll(
+        const Field &f, const std::vector<Point> &obstacles, const Point &p,
+        double radius);
 
     /**
      * Finds the length of the largest continuous interval (angle-wise) of the
@@ -61,16 +57,15 @@ namespace Evaluation
      *
      * @param world-world with field information
      *
-     * @param robot-robot that the shot is being calculated from
+     * @param point-robot that the shot is being calculated from
      *
-     * @param radius-the multiplier to the radius of the robot,
-     * you can decrease the radius to make it easier to shoot.
+     * @param radius-the radius of all obstacles
      *
      * @return the point as and the score (angle),
      * where the score will be 0 if the point is invalid.
      */
-    std::pair<Point, Angle> calcBestShot(const World& world, const Robot& robot,
-                                         double radius = 1.0);
+    std::pair<Point, Angle> calcBestShotOnEnemyGoal(const World &world,
+                                                    const Point &point, double radius);
 
 
     /**
@@ -80,18 +75,16 @@ namespace Evaluation
      *
      * @param world-world with field information
      *
-     * @param robot-robot that the shot is being calculated from
+     * @param point-robot that the shot is being calculated from
      *
-     * @param radius-the multiplier to the radius of the robot,
-     * you can decrease the radius to make it easier to shoot.
+     * @@param radius-the radius of all obstacles
      *
      * @return the point as and the score (angle),
      * where the score will be 0 if the point is invalid.
      */
-
-    std::vector<std::pair<Point, Angle>> calcBestShotAll(const World& world,
-                                                         const Robot& robot,
-                                                         double radius = 1.0);
+    std::vector<std::pair<Point, Angle>> calcBestShotOnEnemyGoalAll(const World &world,
+                                                                    const Point &point,
+                                                                    double radius);
 
 }  // namespace Evaluation
 #endif
