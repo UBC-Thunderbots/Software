@@ -496,6 +496,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
+            ai/hl/stp/evaluation/pass.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
             ai/world/game_state.cpp
@@ -506,6 +507,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp
             test/ai/hl/stp/evaluation/robot.cpp
+            test/ai/hl/stp/evaluation/pass.cpp
             test/ai/hl/stp/evaluation/team.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameter_utils.cpp

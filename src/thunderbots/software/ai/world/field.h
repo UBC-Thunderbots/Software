@@ -235,6 +235,17 @@ class Field
      */
     bool pointInEnemyDefenseArea(const Point p) const;
 
+    //TODO: Better name for this?
+    // TODO: implement and test this
+    /**
+     * Returns whether p is in bounds for the field
+     *
+     * @param p
+     *
+     * @return true if p is within bounds for the field, false otherwise
+     */
+    bool pointInBounds(const Point& p);
+
     /**
      * Compares two fields for equality
      *

@@ -104,7 +104,6 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // We assume that the enemy continues moving at it's current velocity until the
     // pass starts
 
-    // We force any negative duration to 0 here
     Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
 
     // Estimate where the enemy will be when we start the pass
