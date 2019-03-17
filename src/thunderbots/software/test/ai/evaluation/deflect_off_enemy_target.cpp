@@ -1,7 +1,3 @@
-//
-// Created by roark on 07/02/19.
-//
-
 #include "ai/hl/stp/evaluation/deflect_off_enemy_target.h"
 
 #include <gtest/gtest.h>

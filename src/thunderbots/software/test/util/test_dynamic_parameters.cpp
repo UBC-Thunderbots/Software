@@ -3,7 +3,7 @@
 
 #include <random>
 
-#include "util/parameter/dynamic_parameters.h"
+#include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/parameter.h"
 
 /* * Registry Test Fixutre:
@@ -73,7 +73,7 @@ class RegistryTest : public ::testing::Test
 // gtest getROSParameterPath
 TEST(RegistryTest, get_param_test)
 {
-    Parameter<bool> test_param = Parameter<bool>("test_param", false);
+    Parameter<bool> test_param = Parameter<bool>("test_param", "parameters", false);
     EXPECT_EQ(test_param.getROSParameterPath(), "/parameters/test_param");
 }
 
@@ -87,7 +87,7 @@ TYPED_TEST(RegistryTest, constructor_test)
     // each type gets its own registry, same name should not conflict
     auto unique_value = RegistryTest<TypeParam>::get_unique_value();
     Parameter<TypeParam> test_param =
-        Parameter<TypeParam>("test_all_type_params", unique_value);
+        Parameter<TypeParam>("test_all_type_params", "parameters", unique_value);
     try
     {
         ASSERT_EQ(test_param.getRegistry().count("test_all_type_params"), 1);
@@ -108,21 +108,21 @@ TYPED_TEST(RegistryTest, update_parameter_test)
 
     // set ros param
     std::string unique_param_name = RegistryTest<TypeParam>::get_unique_param_name();
-    nh_.setParam("/parameters/" + unique_param_name, unique_value);
+    nh_.setParam("/test/" + unique_param_name, unique_value);
 
     // create parameter
     Parameter<TypeParam> test_param =
-        Parameter<TypeParam>(unique_param_name, unique_value);
+        Parameter<TypeParam>(unique_param_name, "test", unique_value);
 
     // sanity check
     TypeParam stored_val;
-    nh_.getParam("/parameters/" + unique_param_name, stored_val);
+    nh_.getParam("/test/" + unique_param_name, stored_val);
     ASSERT_EQ(test_param.value(), stored_val);
 
     // change param (this would normally be through the reconf GUI)
     unique_value = RegistryTest<TypeParam>::get_unique_value();
-    nh_.setParam("/parameters/" + unique_param_name, unique_value);
-    nh_.getParam("/parameters/" + unique_param_name, stored_val);
+    nh_.setParam("/test/" + unique_param_name, unique_value);
+    nh_.getParam("/test/" + unique_param_name, stored_val);
     ASSERT_NE(test_param.value(), stored_val);
 
     // Calling updateAll...() will loop through the registry and update all

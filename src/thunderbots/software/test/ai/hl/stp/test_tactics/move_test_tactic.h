@@ -12,8 +12,11 @@ class MoveTestTactic : public Tactic
    public:
     /**
      * Creates a new MoveTestTactic
+     *
+     * @param loop_forever Whether or not this Tactic should never complete. If true, the
+     * tactic will be restarted every time it completes
      */
-    explicit MoveTestTactic();
+    explicit MoveTestTactic(bool loop_forever = false);
 
     std::string getName() const override;
 

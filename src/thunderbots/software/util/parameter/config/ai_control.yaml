@@ -1,0 +1,54 @@
+AI:
+  run_ai:
+    type: "bool"
+    default: false
+    description: >-
+        Selecting will allow HL and Navigator to run, unselecting will
+        stop new decisions from being made, but the robots will finish
+        the last commands they were given. DO NOT USE in place of the e-stop.
+  override_ai_play:
+    type: "bool"
+    default: false
+    description: >-
+        Overrides the current play with the play
+        specified by current_play parameter
+  current_ai_play:
+    type: "string"
+    default: "Example Play"
+    description: >- 
+        Specifies the ai play that should be in use
+  refbox:
+    override_refbox_play:
+      type: "bool"
+      default: false
+      description: >-
+          Overrides the current refbox play with the play
+          specified by current_play parameter
+    current_refbox_play:
+      type: "string"
+      default: "Halt"
+      description: >- 
+          Specifies the refbox play that should be in use
+    override_refbox_defending_side:
+      type: "bool"
+      default: false
+      description: >-
+          Overrides the defending side provided by refbox, 
+          with defending_positive_side parameter
+    defending_positive_side:
+      type: "bool"
+      default: false
+      description: >-
+          Positive if selected, Negative if unselected
+    override_refbox_friendly_team_color:
+      type: "bool"
+      default: false
+      description: >-
+          Overrides the team color provided by refbox, 
+          with friendly_color_yellow parameter
+    friendly_color_yellow:
+      type: "bool"
+      default: false
+      description: >-
+          Yellow if selected, Blue if unselected
+

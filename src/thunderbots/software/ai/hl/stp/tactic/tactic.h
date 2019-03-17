@@ -34,13 +34,15 @@ class Tactic
    public:
     /**
      * Creates a new Tactic. The Tactic will initially have no Robot assigned to it.
+     *
+     * @param loop_forever Whether or not this Tactic should never complete. If true, the
+     * tactic will be restarted every time it completes and will never report done
      */
-    explicit Tactic();
+    explicit Tactic(bool loop_forever);
 
     /**
-     * Returns true if the Tactic is done and false otherwise. The tactic is considered
-     * done when either its coroutine is done (the calculateNextIntent() function has no
-     * more work to do), or a nullptr has been returned
+     * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
+     * to loop forever, this function will always return false.
      *
      * @return true if the Tactic is done and false otherwise
      */
@@ -81,10 +83,10 @@ class Tactic
     /**
      * Runs the coroutine and get the next Intent to run from the calculateNextIntent
      * function. If the Tactic is not done, the next Intent is returned. If the Tactic
-     * is done, a null unique_ptr is returned.
+     * is done, a nullptr is returned.
      *
      * @return A unique pointer to the next Intent that should be run for the Tactic.
-     * If the Tactic is done, an empty/null unique pointer is returned.
+     * If the Tactic is done, a nullptr is returned.
      */
     std::unique_ptr<Intent> getNextIntent();
 
@@ -130,18 +132,30 @@ class Tactic
     /**
      * Calculates the next Intent for the Tactic. If the Tactic is done
      * (ie. it has achieved its objective and has no more Intents to return),
-     * an empty/null unique pointer is returned.
+     * a nullptr is returned.
      *
      * @param yield The coroutine push_type for the Tactic
      *
      * @return A unique pointer to the next Intent that should be run for the Tactic.
-     * If the Tactic is done, an empty/null unique pointer is returned.
+     * If the Tactic is done, a nullptr is returned.
      */
     virtual std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type &yield) = 0;
+
+    /**
+     * A helper function that runs the intent_sequence coroutine and returns the result
+     * of the coroutine. The done_ member variable is also updated to reflect whether
+     * or not the Tactic is done. If the Tactic is done, a nullptr is returned.
+     *
+     * @return the next Intent this Tactic wants to run. If the Tactic is done, a nullptr
+     * is returned
+     */
+    std::unique_ptr<Intent> getNextIntentHelper();
 
     // The coroutine that sequentially returns the Intents the Tactic wants to run
     intent_coroutine::pull_type intent_sequence;
     // Whether or not this Tactic is done
     bool done_;
+    // Whether or not this tactic should loop forever by restarting each time it is done
+    bool loop_forever;
 };
