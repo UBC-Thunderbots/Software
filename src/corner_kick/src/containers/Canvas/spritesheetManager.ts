@@ -1,11 +1,11 @@
 /**
  * This file is responsible for generating the spritesheet used in the
- * Canvas
+ * Canvas.
  */
 
 import * as PIXI from 'pixi.js';
 
-import { ISpritesheet } from 'SRC/types';
+import { ISpritesheet, ShapeType } from 'SRC/types';
 
 import * as draw from './utils/draw';
 
@@ -36,19 +36,19 @@ const generateSpritesheet = (spritesheet: ISpritesheet) => {
             draw.setStyle(frameCtx, shape);
             frameCtx.beginPath();
             switch (shape.type) {
-                case 'rect':
+                case ShapeType.RECT:
                     draw.drawRect(frameCtx, shape);
                     break;
-                case 'ellipse':
+                case ShapeType.ELLIPSE:
                     draw.drawEllipse(frameCtx, shape);
                     break;
-                case 'arc':
+                case ShapeType.ARC:
                     draw.drawArc(frameCtx, shape);
                     break;
-                case 'line':
+                case ShapeType.LINE:
                     draw.drawLine(frameCtx, shape);
                     break;
-                case 'poly':
+                case ShapeType.POLY:
                     draw.drawPoly(frameCtx, shape);
                     break;
             }
@@ -68,7 +68,8 @@ const generateSpritesheet = (spritesheet: ISpritesheet) => {
 };
 
 /**
- * Generates and manages the texture of a spritesheet
+ * Generates and manages the texture of a spritesheet. Supports rect, ellipse,
+ * line, arc, and poly shapes.
  */
 export class SpritesheetManager {
     private template: ISpritesheet;
