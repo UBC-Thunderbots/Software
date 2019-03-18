@@ -7,8 +7,9 @@ import { Server } from 'mock-socket';
 import { ILayerMessage } from 'SRC/types';
 
 import { LAYER_WEBSOCKET_ADDRESS } from 'SRC/constants';
-import { generateLayerBuffer, generateRandomShapes } from '../__helpers__/shapes';
+
 import { LayerReceiver } from '../layerReceiver';
+import { generateLayerBuffer, generateRandomShapes } from './__helpers__/shapes';
 
 describe('parseLayer', () => {
     describe('when we process layer data from the websocket', () => {
