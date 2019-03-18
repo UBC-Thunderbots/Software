@@ -7,7 +7,7 @@
 
 const ErrorOverlayPlugin = require('error-overlay-webpack-plugin');
 
-const webpackConfig = require('./webpack.base.config.js').web;
+const webpackConfig = require('./webpack.base.config.js');
 
 module.exports = {
     ...webpackConfig,
