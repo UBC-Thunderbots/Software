@@ -81,39 +81,6 @@ namespace AI::Passing
     double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass);
 
     /**
-     * Calculate how long it would take the given robot to turn to the given orientation
-     *
-     * @param robot The robot to calculate the rotation time for
-     * @param desired_orientation The orientation which we want the robot to be at
-     * @param max_velocity The maximum angular velocity that robot can turn at (rad/s)
-     * @param max_acceleration The maximum angular rate at which the robot can
-     *                             accelerate (rad/s^2)
-     *
-     * @return The time required for the given robot to rotate to the given orientation
-     */
-    Duration getTimeToOrientationForRobot(const Robot& robot,
-                                          const Angle& desired_orientation,
-                                          const double& max_velocity,
-                                          const double& max_acceleration);
-
-    /**
-     * Calculate minimum time it would take for the given robot to reach the given point
-     *
-     * This is only a rough calculation in order to be as performant as possible
-     *
-     * @param robot The robot to calculate the time for
-     * @param dest The destination that the robot is going to
-     * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
-     * @param max_acceleration The maximum acceleration of the robot (m/s^2)
-     *
-     * @return The minimum theoretical time it would take the robot to reach the dest
-     * point
-     */
-    Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                       const double& max_velocity,
-                                       const double& max_acceleration);
-
-    /**
      * Calculates the static position quality for a given position on a given field
      *
      * Static position quality prefers good passing points on the field from the

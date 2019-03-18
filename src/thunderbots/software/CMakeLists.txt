@@ -492,6 +492,14 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(time_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(shared_evaluation_test
+            ai/world/robot.cpp
+            ai/evaluation/pass.cpp
+            test/ai/evaluation/pass.cpp
+            test/ai/evaluation/main.cpp
+            )
+    target_link_libraries(shared_evaluation_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(ai_evaluation_test
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/robot.cpp
@@ -691,6 +699,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(passing_test
+            ai/evaluation/pass.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
@@ -708,9 +717,9 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
+            util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-            util/time/duration.cpp
             )
     target_link_libraries(passing_test ${catkin_LIBRARIES})
 
