@@ -1,3 +1,7 @@
+/**
+ * This file specifies the theme of Storybook
+ */
+
 import { create } from '@storybook/theming';
 
 import logo from '../src/assets/logo.svg';
@@ -5,7 +9,7 @@ import logo from '../src/assets/logo.svg';
 export default create({
     base: 'light',
 
-    brandTitle: 'Corner Kick',
-    brandUrl: 'http://localhost:6006',
     brandImage: logo,
+    brandTitle: 'Corner Kick',
+    brandUrl: 'https://github.com/UBC-Thunderbots/Software/tree/master/src/corner_kick',
 });
