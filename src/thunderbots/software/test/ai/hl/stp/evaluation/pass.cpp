@@ -28,6 +28,11 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_on_ball_path){
 
 }
 
+// Test where the robot is sitting just off to the side of the path the ball
+// is travelling along
+
+// Test where the ball is not moving
+
 // Test where we cannot get to the ball ever (even ignoring the field boundaries)
 
 // Test where we cannot get to the ball before it leaves the field, but if we ignore
