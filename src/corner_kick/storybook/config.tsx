@@ -4,6 +4,7 @@
  */
 
 import { withKnobs } from '@storybook/addon-knobs';
+import { withNotes } from '@storybook/addon-notes';
 import { addDecorator, configure } from '@storybook/react';
 import * as React from 'react';
 
@@ -21,7 +22,8 @@ function loadStories() {
 const StyleDecorator = (storyFn: () => JSX.Element) => <Theme>{storyFn()}</Theme>;
 addDecorator(StyleDecorator);
 
-// Add Storybook knobs
+// Add Storybook knobs and notes
+addDecorator(withNotes);
 addDecorator(withKnobs);
 
 // Init Storybook

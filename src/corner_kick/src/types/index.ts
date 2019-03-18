@@ -5,5 +5,16 @@
 export { Color } from './primitives';
 export { IThemeProvider } from './theme';
 export { IRosoutMessage, RosoutLevel } from './standardROSMessages';
+export {
+    ShapeType,
+    ISpritesheet,
+    IFrame,
+    IShape,
+    IRectShape,
+    IEllipseShape,
+    ILineShape,
+    IArcShape,
+    IPolyShape,
+} from './spritesheet';
 export { IRootState, IROSState, IMessagesState } from './state';
-export { ILayer, ILayerMessage, IShape } from './visualizer';
+export { ILayer, ILayerMessage } from './visualizer';
