@@ -12,6 +12,7 @@
 #include "ai/evaluation/pass.h"
 
 using namespace AI::Passing;
+using namespace AI::Evaluation;
 
 double AI::Passing::ratePassShootScore(Field field, Team enemy_team,
                                        AI::Passing::Pass pass)

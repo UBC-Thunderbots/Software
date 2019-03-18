@@ -497,6 +497,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/evaluation/pass.cpp
             test/ai/evaluation/pass.cpp
             test/ai/evaluation/main.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
             )
     target_link_libraries(shared_evaluation_test ${catkin_LIBRARIES})
 

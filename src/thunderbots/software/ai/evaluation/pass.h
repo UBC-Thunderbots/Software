@@ -4,6 +4,8 @@
 #include "geom/angle.h"
 #include "geom/point.h"
 
+namespace AI::Evaluation {
+
 /**
  * Calculate how long it would take the given robot to turn to the given orientation
  *
@@ -15,10 +17,10 @@
  *
  * @return The time required for the given robot to rotate to the given orientation
  */
-Duration getTimeToOrientationForRobot(const Robot& robot,
-                                      const Angle& desired_orientation,
-                                      const double& max_velocity,
-                                      const double& max_acceleration);
+    Duration getTimeToOrientationForRobot(const Robot& robot,
+                                          const Angle& desired_orientation,
+                                          const double& max_velocity,
+                                          const double& max_acceleration);
 
 /**
  * Calculate minimum time it would take for the given robot to reach the given point
@@ -33,6 +35,8 @@ Duration getTimeToOrientationForRobot(const Robot& robot,
  * @return The minimum theoretical time it would take the robot to reach the dest
  * point
  */
-Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                   const double& max_velocity,
-                                   const double& max_acceleration);
+    Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
+                                       const double& max_velocity,
+                                       const double& max_acceleration);
+
+}

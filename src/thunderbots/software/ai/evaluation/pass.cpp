@@ -1,6 +1,6 @@
 #include "ai/evaluation/pass.h"
 
-Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot,
+Duration AI::Evaluation::getTimeToOrientationForRobot(const Robot& robot,
                                                    const Angle& desired_orientation,
                                                    const double& max_velocity,
                                                    const double& max_acceleration)
@@ -42,7 +42,7 @@ Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot,
     return Duration::fromSeconds(travel_time);
 }
 
-Duration AI::Passing::getTimeToPositionForRobot(const Robot& robot, const Point& dest,
+Duration AI::Evaluation::getTimeToPositionForRobot(const Robot& robot, const Point& dest,
                                                 const double& max_velocity,
                                                 const double& max_acceleration)
 {
