@@ -1,3 +1,7 @@
+/**
+ * This file describes a fixture used in Storybook
+ */
+
 import { ISpritesheet, ShapeType } from 'SRC/types';
 
 /**

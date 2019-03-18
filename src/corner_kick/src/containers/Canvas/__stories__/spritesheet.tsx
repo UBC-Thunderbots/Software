@@ -1,5 +1,5 @@
 /*
- * This file creates a story for the LayersPanel
+ * This file creates a story for the SpritesheetManager
  */
 
 import { storiesOf } from '@storybook/react';
@@ -14,9 +14,6 @@ const stories = storiesOf('Spritesheet Generator', module);
 
 const spritesheetGenerator = new SpritesheetManager(exampleSpritesheet);
 
-/**
- * Story describing a LayerPanel with some layers defined
- */
 stories.add(
     'with an example spritesheet',
     () => (
