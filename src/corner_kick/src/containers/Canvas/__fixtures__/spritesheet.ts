@@ -15,7 +15,7 @@ import { ISpritesheet, ShapeType } from 'SRC/types';
  * 5. A line from top left to bottom right of the screen
  * 6. A filled arc from -90 degrees to 180 degrees
  */
-export const exampleSpritesheet: ISpritesheet = {
+export const exampleSpritesheetFormat: ISpritesheet = {
     dimensions: {
         h: 1024,
         w: 1536,

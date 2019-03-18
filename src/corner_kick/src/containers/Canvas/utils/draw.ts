@@ -1,5 +1,6 @@
-/**
- * This file specifies functions to draw various types of shapes
+/***
+ * This file specifies functions to draw various types of shapes. These functions
+ * are used for spritesheet generation.
  */
 
 import {
@@ -13,7 +14,7 @@ import {
 
 /**
  * Sets the correct draw style (fill and stroke). All sprites are white to ensure
- * correct tinting accuracy
+ * correct tinting accuracy. Actual tinting is specified when creating the sprite.
  * @param ctx an canvas rendering context
  * @param shape the shape description object
  */
