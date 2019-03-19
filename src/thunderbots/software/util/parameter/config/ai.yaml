@@ -104,7 +104,7 @@ AI:
     pass_equality_max_position_difference_meters:
       min: 0
       max: 4
-      default: 0.1
+      default: 0.05
       type: "double"
       description: >- 
         The maximum allowed difference between the reciever and passer 
@@ -112,7 +112,7 @@ AI:
     pass_equality_max_start_time_difference_seconds:
       min: 0
       max: 3
-      default: 0.5
+      default: 0.1
       type: "double"
       description: "TODO: Add description as part of #149"
     pass_equality_max_speed_difference_meters_per_second:

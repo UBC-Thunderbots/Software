@@ -151,7 +151,7 @@ void PassGenerator::optimizePasses()
 
 void PassGenerator::pruneAndReplacePasses()
 {
-    // Sort the passes by increasing quality
+    // Sort the passes by decreasing quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); });
 
@@ -159,6 +159,7 @@ void PassGenerator::pruneAndReplacePasses()
     // We start by assuming that the most similar passes will be right beside each other,
     // then iterate over the entire list, building a new list as we go by only adding
     // elements when they are dissimilar enough from the last element we added
+    // NOTE: This flips the passes so they are sorted by increasing quality
     passes_to_optimize = std::accumulate(
         passes_to_optimize.begin(), passes_to_optimize.end(), std::vector<Pass>(),
         [this](std::vector<Pass>& passes, Pass curr_pass) {
@@ -170,8 +171,6 @@ void PassGenerator::pruneAndReplacePasses()
             }
             return passes;
         });
-    // Reverse the list to sort by increasing quality
-    std::reverse(passes_to_optimize.begin(), passes_to_optimize.end());
 
     // Replace the least promising passes with newly generated passes
     if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value())
