@@ -22,8 +22,8 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_move_spin_primitive)
         new GrsimCommandPrimitiveVisitor(*test_robot, *test_ball);
     move_spin_primitive->accept(*grsimCommandPrimitiveVisitor);
 
-    auto motion_controller_command =
-        grsimCommandPrimitiveVisitor->getMotionControllerCommand();
+    auto motion_controller_command = std::get<MotionController::PositionCommand>(
+        grsimCommandPrimitiveVisitor->getMotionControllerCommand());
 
     EXPECT_EQ(motion_controller_command.global_destination, Point(3, -1));
     EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(45));

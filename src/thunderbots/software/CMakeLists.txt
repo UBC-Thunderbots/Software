@@ -720,6 +720,26 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(evaluation_detect_threat_test
+            test/ai/evaluation/detect_threat.cpp
+            ai/hl/stp/evaluation/detect_threat.cpp
+            test/test_util/test_util.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            geom/util.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/robot.cpp
+            ai/world/game_state.cpp
+            util/parameter/dynamic_parameters.cpp
+            )
+
+    target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
+  
     catkin_add_gtest(navigator_test
             ai/intent/catch_intent.cpp
             ai/intent/chip_intent.cpp
