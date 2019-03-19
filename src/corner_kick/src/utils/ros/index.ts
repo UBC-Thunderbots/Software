@@ -8,6 +8,12 @@ const ros: Ros = new Ros({});
 
 /**
  * Connect to ROS
+ *
+ * Promise is resolved if connection is successful
+ * Promise is rejected if timeout has elapsed
+ *
+ * @param {string} url - The WebSocket URL for Rosbridge
+ * @param {number} timeout - The set time before the promise is rejected
  */
 export const connect = (url = 'ws://localhost:9090', timeout = 100) => {
     return new Promise((resolve, reject) => {
@@ -30,6 +36,9 @@ export const stop = () => {
 
 /**
  * Subscribe to ROS Topic
+ * @param {string} name - The name of the topic
+ * @param {string} messageType - The message type of topic
+ * @callback - The callback upon subscribing
  */
 export const subscribeToROSTopic = (
     name: string,
@@ -46,6 +55,9 @@ export const subscribeToROSTopic = (
 
 /**
  * Unsubscribe from ROS Topic
+ * @param {string} name - The name of the topic
+ * @param {string} messageType - The message type of topic
+ * @callback - The callback upon unsubscribing
  */
 export const unsubscribeToROSTopic = (
     name: string,
@@ -62,6 +74,10 @@ export const unsubscribeToROSTopic = (
 
 /**
  * Update ROS Param server by sending request to service
+ * @param {string} name - The name of the service
+ * @param {string} serviceType - The service type of request
+ * @param {any} requestFormat - The service request to be created
+ * @param {number} timeout - The set time before the promise is rejected
  */
 export const sendRequestToService = (
     name: string,
