@@ -128,6 +128,12 @@ class Field
      */
     Rectangle enemyDefenseArea() const;
 
+    /**
+     * Gets the field bounds as a Rectangle
+     *
+     * @return the field bounds as a rectangle
+     */
+    Rectangle fieldBounds() const;
 
     /**
      * Gets the position of the centre of the friendly goal.

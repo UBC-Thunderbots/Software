@@ -168,6 +168,9 @@ bool Field::pointInEnemyDefenseArea(const Point p) const
     return enemyDefenseArea().containsPoint(p);
 }
 
+bool Field::pointInBounds(const Point &p) {
+}
+
 bool Field::operator==(const Field &other) const
 {
     return this->field_width_ == other.field_width_ &&

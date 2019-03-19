@@ -1,10 +1,7 @@
 #include "shared/constants.h"
 #include "util/gradient_descent.h"
+#include "ai/evaluation/pass.h"
 #include "pass.h"
-
-
-// TODO: delet this
-#include "ai/passing/evaluation.h"
 
 std::optional <std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field, Robot robot) {
     // This is the function that we want to minimize, finding the shortest duration in
@@ -16,7 +13,7 @@ std::optional <std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, F
         Point new_ball_pos = ball.estimatePositionAtFutureTime(Duration::fromSeconds(duration));
 
         // Figure out how long it will take the robot to get to the new ball position
-        Duration time_to_ball_pos = AI::Passing::getTimeToPositionForRobot(
+        Duration time_to_ball_pos = AI::Evaluation::getTimeToPositionForRobot(
                 robot, new_ball_pos,
                 ROBOT_MAX_SPEED_METERS_PER_SECOND,
                 ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
@@ -42,7 +39,7 @@ std::optional <std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, F
 
     // Check that we can get to the best position in time
     // TODO: handle timestamp differences between ball and robot here
-    Duration time_to_ball_pos = AI::Passing::getTimeToPositionForRobot(
+    Duration time_to_ball_pos = AI::Evaluation::getTimeToPositionForRobot(
             robot, best_ball_intercept_pos,
             ROBOT_MAX_SPEED_METERS_PER_SECOND,
             ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
