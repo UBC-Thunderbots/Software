@@ -504,6 +504,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
+            geom/rectangle.cpp
             test/ai/evaluation/deflect_off_enemy_target.cpp
             test/ai/evaluation/main.cpp
             test/ai/evaluation/robot.cpp

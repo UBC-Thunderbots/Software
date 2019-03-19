@@ -12,10 +12,11 @@
 #include "geom/util.h"
 #include "test/test_util/test_util.h"
 
-TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_within_reach_test)
+TEST(findTargetPointForIndirectChipAndChaseTest,
+     triangle_not_empty_and_target_within_reach_test)
 {
-    std::vector<Triangle> triangles;
-    Triangle t = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    std::vector<LegacyTriangle> triangles;
+    LegacyTriangle t = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
     triangles.emplace_back(t);
 
     Point ball_position = Point(0, 0);
@@ -28,10 +29,11 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_within_reach_
 }
 
 
-TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_not_within_reach_test)
+TEST(findTargetPointForIndirectChipAndChaseTest,
+     triangle_not_empty_and_target_not_within_reach_test)
 {
-    std::vector<Triangle> triangles;
-    Triangle t = {Point(8, 5.9), Point(8.5, 6), Point(8.9, 5.9)};
+    std::vector<LegacyTriangle> triangles;
+    LegacyTriangle t = {Point(8, 5.9), Point(8.5, 6), Point(8.9, 5.9)};
     triangles.emplace_back(t);
 
     Point ball_position = Point(0, 0);
@@ -45,9 +47,9 @@ TEST(IndirectChipAndChaseTargetTest, triangle_not_empty_and_target_not_within_re
 }
 
 
-TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_test)
+TEST(findTargetPointForIndirectChipAndChaseTest, triangle_is_empty_test)
 {
-    std::vector<Triangle> triangles;
+    std::vector<LegacyTriangle> triangles;
 
     Point ball_position = Point(0, 0);
 
@@ -56,7 +58,7 @@ TEST(IndirectChipAndChaseTargetTest, triangle_is_empty_test)
 }
 
 
-TEST(GetAllTrianglesTest, get_all_triangles_test)
+TEST(getAllTrianglesBetweenEnemyPlayersTest, get_all_triangles_test)
 {
     using namespace Test;
     World test_world = TestUtil::createBlankTestingWorld();
@@ -64,7 +66,7 @@ TEST(GetAllTrianglesTest, get_all_triangles_test)
     std::vector<Point> enemy_players;
     enemy_players.emplace_back(Point(1, 2));
 
-    std::vector<Triangle> all_triangles = {
+    std::vector<LegacyTriangle> all_triangles = {
         {Point(1, 2), Point(6 - 1.5, -3), Point(6 - 1.5, 3)},
         {Point(1, 2), Point(6 - 1.5, -3), Point(0, 3)},
         {Point(1, 2), Point(6 - 1.5, -3), Point(0, -3)},
@@ -76,16 +78,17 @@ TEST(GetAllTrianglesTest, get_all_triangles_test)
         {Point(6 - 1.5, -3), Point(0, 3), Point(0, -3)},
         {Point(6 - 1.5, 3), Point(0, 3), Point(0, -3)}};
 
-    EXPECT_EQ(all_triangles, Evaluation::getAllTrianglesBetweenEnemyPlayers(test_world, enemy_players));
+    EXPECT_EQ(all_triangles,
+              Evaluation::getAllTrianglesBetweenEnemyPlayers(test_world, enemy_players));
 }
 
 
-TEST(FilterOpenTrianglesTest, filter_open_triangles_test)
+TEST(findOpenTrianglesTest, find_open_triangles_test)
 {
-    std::vector<Triangle> triangles;
+    std::vector<LegacyTriangle> triangles;
 
-    Triangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
-    Triangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    LegacyTriangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
+    LegacyTriangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
     triangles.emplace_back(t1);
     triangles.emplace_back(t2);
 
@@ -94,7 +97,7 @@ TEST(FilterOpenTrianglesTest, filter_open_triangles_test)
     Point enemy_player1 = Point(-0.7, -0.7);
     enemy_players.emplace_back(enemy_player1);
 
-    std::vector<Triangle> filtered_triangles = triangles;
+    std::vector<LegacyTriangle> filtered_triangles = triangles;
     filtered_triangles.pop_back();
 
     EXPECT_EQ(filtered_triangles,
@@ -102,33 +105,32 @@ TEST(FilterOpenTrianglesTest, filter_open_triangles_test)
 }
 
 
-TEST(RemoveOutofboundsTrianglesTest, remove_outofbounds_triangles_test)
+TEST(removeTrianglesOutsideRectangleTest, remove_triangles_outside_rectangle_test)
 {
-    using namespace Test;
-    World test_world = TestUtil::createBlankTestingWorld();
+    Rectangle target_rectangle = Rectangle(Point(-2, -2), Point(2, 2));
 
-    Triangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
-    Triangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    LegacyTriangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
+    LegacyTriangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
 
-    std::vector<Triangle> triangles;
+    std::vector<LegacyTriangle> triangles;
     triangles.emplace_back(t1);
     triangles.emplace_back(t2);
 
-    std::vector<Triangle> valid_triangles;
+    std::vector<LegacyTriangle> valid_triangles;
     valid_triangles.emplace_back(t1);
     valid_triangles.emplace_back(t2);
 
     EXPECT_EQ(valid_triangles,
-              Evaluation::remove_outofbounds_triangles(test_world, triangles));
+              Evaluation::removeTrianglesOutsideRectangle(target_rectangle, triangles));
 }
 
 
-TEST(GetTriangleCenterAndAreaTest, get_triangle_center_test)
+TEST(GetTriangleCenterTest, get_triangle_center_test)
 {
-    Triangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
-    Point p1          = triangle[0];
-    Point p2          = triangle[1];
-    Point p3          = triangle[2];
+    LegacyTriangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    Point p1                = triangle[0];
+    Point p2                = triangle[1];
+    Point p3                = triangle[2];
 
     Point center = Point(0, (-1 + sqrt(0.75) - 1) / 3);
 
@@ -136,26 +138,24 @@ TEST(GetTriangleCenterAndAreaTest, get_triangle_center_test)
 }
 
 
-TEST(GetTriangleCenterAndAreaTest, get_triangle_area_test)
+TEST(GetTriangleAreaTest, get_triangle_area_test)
 {
-    Triangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
-    Point p1          = triangle[0];
-    Point p2          = triangle[1];
-    Point p3          = triangle[2];
+    LegacyTriangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    Point p1                = triangle[0];
+    Point p2                = triangle[1];
+    Point p3                = triangle[2];
 
-    double area  = abs(0.5 * (2 * (1 + sqrt(0.75))));
+    double area = abs(0.5 * (2 * (1 + sqrt(0.75))));
 
     EXPECT_EQ(area, Evaluation::getTriangleArea(triangle));
 }
 
 
-TEST(GetChipTargetAreaCornersTest, get_chip_target_area_corners_test)
+TEST(findBestChipTargetAreaTest, find_best_chip_target_area_test)
 {
     using namespace Test;
     World test_world = TestUtil::createBlankTestingWorld();
     double inset     = 0.3;
-
-    std::vector<Point> corners;
 
     double ballX  = 0;
     double fieldX = 6 - 1.5 - inset;
@@ -163,33 +163,33 @@ TEST(GetChipTargetAreaCornersTest, get_chip_target_area_corners_test)
     double negFieldY = -3 + inset;
     double posFieldY = 3 - inset;
 
-    corners.emplace_back(Point(ballX, negFieldY));
-    corners.emplace_back(Point(ballX, posFieldY));
-    corners.emplace_back(Point(fieldX, negFieldY));
-    corners.emplace_back(Point(fieldX, posFieldY));
+    Rectangle target_rectangle =
+        Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
 
-    EXPECT_EQ(corners, Evaluation::findBestChipTargetArea(test_world, inset));
+    EXPECT_EQ(target_rectangle, Evaluation::findBestChipTargetArea(test_world, inset));
 }
 
 
-TEST(GetLargestTriangleTest, get_largest_triangle_test)
+TEST(getLargestValidTriangleTest, get_largest_valid_triangle_test)
 {
-    std::vector<Triangle> allTriangles;
+    std::vector<LegacyTriangle> allTriangles;
 
-    Triangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
-    Triangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
+    LegacyTriangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
+    LegacyTriangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
     allTriangles.emplace_back(t1);
     allTriangles.emplace_back(t2);
 
-    Triangle largest = t2;
+    LegacyTriangle largest = t2;
 
-    EXPECT_EQ(std::optional(largest), Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
+    EXPECT_EQ(std::optional(largest),
+              Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
 }
 
 
-TEST(GetLargestTriangleTest, get_largest_triangle_with_empty_vector_of_triangles_test)
+TEST(getLargestValidTriangleTest,
+     get_largest_triangle_with_empty_vector_of_triangles_test)
 {
-    std::vector<Triangle> allTriangles;
+    std::vector<LegacyTriangle> allTriangles;
 
     EXPECT_EQ(std::nullopt, Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
 }
