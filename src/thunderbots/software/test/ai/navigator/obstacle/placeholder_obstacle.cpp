@@ -12,7 +12,7 @@
 #include "../shared/constants.h"
 #include "geom/point.h"
 
-//placeholder obstacle with robot radius factor = 1
+// placeholder obstacle with robot radius factor = 1
 TEST(NavigatorPlaceholderObstacleTest, default_placeholder_obstacle_polygon)
 {
     double ROOT_THREE_BY_TWO = 0.86602540378;
@@ -39,7 +39,7 @@ TEST(NavigatorPlaceholderObstacleTest, default_placeholder_obstacle_polygon)
     EXPECT_EQ(pg.getPoints()[5], pt5);
 }
 
-//placeholder obstacle with robot radius factor > 1
+// placeholder obstacle with robot radius factor > 1
 TEST(NavigatorPlaceholderObstacleTest, expanded_placeholder_obstacle_polygon)
 {
     double EXPANSION         = 1.4;
@@ -67,7 +67,7 @@ TEST(NavigatorPlaceholderObstacleTest, expanded_placeholder_obstacle_polygon)
     EXPECT_EQ(pg.getPoints()[5], pt5);
 }
 
-//placeholder obstacle with robot radius factor < 1
+// placeholder obstacle with robot radius factor < 1
 TEST(NavigatorPlaceholderObstacleTest, contracted_placeholder_obstacle_polygon)
 {
     double CONTRACTION       = .7;
