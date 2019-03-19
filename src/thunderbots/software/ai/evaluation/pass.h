@@ -1,3 +1,7 @@
+/**
+ * General evaluation functions for related to Passes and Passing, that are also used
+ * across multiple parts of AI
+ */
 #pragma once
 
 #include "ai/world/robot.h"

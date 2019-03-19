@@ -49,7 +49,7 @@ std::optional <std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, F
     }
 
     // Check that the best intercept position is actually on the field
-    if (!field.pointInBounds(best_ball_intercept_pos)){
+    if (!field.pointInPlayableArea(best_ball_intercept_pos)){
         return std::nullopt;
     }
 
