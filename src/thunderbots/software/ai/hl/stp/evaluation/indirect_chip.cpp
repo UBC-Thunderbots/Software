@@ -188,8 +188,8 @@ std::vector<LegacyTriangle> Evaluation::removeTrianglesOutsideRectangle(
     Rectangle rectangle, std::vector<LegacyTriangle> triangles)
 {
     std::vector<LegacyTriangle> valid_triangles;
-    std::vector<Point> rectangle_corners = {rectangle[0], rectangle[1], rectangle[3],
-                                            rectangle[4]};
+    std::vector<Point> rectangle_corners = {rectangle[0], rectangle[1], rectangle[2],
+                                            rectangle[3]};
     Point center;
 
     double smallest_x = rectangle_corners[0].x();

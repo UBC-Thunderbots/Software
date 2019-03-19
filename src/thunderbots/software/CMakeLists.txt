@@ -516,7 +516,7 @@ if (CATKIN_ENABLE_TESTING)
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-    )
+            )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(action_test

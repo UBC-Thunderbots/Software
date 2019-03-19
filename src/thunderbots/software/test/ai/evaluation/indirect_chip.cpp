@@ -86,21 +86,24 @@ TEST(getAllTrianglesBetweenEnemyPlayersTest, get_all_triangles_test)
 TEST(findOpenTrianglesTest, find_open_triangles_test)
 {
     std::vector<LegacyTriangle> triangles;
-
-    LegacyTriangle t1 = {Point(-0.5, -0.5), Point(0, 0.5), Point(0.5, -0.5)};
+    LegacyTriangle t1 = {Point(-1.8, -1.8), Point(0, 0.5), Point(0.5, -0.5)};
     LegacyTriangle t2 = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
     triangles.emplace_back(t1);
     triangles.emplace_back(t2);
 
     std::vector<Point> enemy_players;
-
-    Point enemy_player1 = Point(-0.7, -0.7);
+    Point enemy_player1 = Point(-1.5, -1.5);
     enemy_players.emplace_back(enemy_player1);
 
-    std::vector<LegacyTriangle> filtered_triangles = triangles;
-    filtered_triangles.pop_back();
+    LegacyTriangle adjusted_triangle = 
+    {(Point(-1, -1) + (Point(0,(-1+sqrt(0.75)-1)/3) - Point(-1, -1)).norm(2.5 * 0.09)),
+    (Point(0, sqrt(0.75)) + (Point(0,(-1+sqrt(0.75)-1)/3) - Point(0, sqrt(0.75))).norm(2.5 * 0.09)),
+    (Point(1, -1) + (Point(0, (-1 + sqrt(0.75) - 1) / 3) - Point(1, -1)).norm(2.5 * 0.09))};
 
-    EXPECT_EQ(filtered_triangles,
+    std::vector<LegacyTriangle> open_triangles;
+    open_triangles.emplace_back(adjusted_triangle);
+
+    EXPECT_EQ(open_triangles,
               Evaluation::findOpenTriangles(triangles, enemy_players));
 }
 
