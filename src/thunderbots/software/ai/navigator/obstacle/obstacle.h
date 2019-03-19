@@ -15,9 +15,9 @@ class Obstacle
      * velocityProjectionScaling
      * @param robot robot to create obstacle boundary polygon around
      * @param radiusScaling safety factor to vary the radius size of the buffer zone
-     * (1=default), must greater than 0
+     * (1=default), must be greater than 0
      * @param velocityProjectionScaling scales the projection buffer in the direction of
-     * the velocity (1=default)
+     * the velocity (1=default), must be greater than 0
      * @return a six-sided Polygon to represent the boundary around the obstacle
      */
     static Polygon getBoundaryPolygon(const Robot& robot, double robotRadiusScaling,

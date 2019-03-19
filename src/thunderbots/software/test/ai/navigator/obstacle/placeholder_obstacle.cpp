@@ -12,7 +12,8 @@
 #include "../shared/constants.h"
 #include "geom/point.h"
 
-TEST(NavPhObstTest, default_placeholder_obstacle_polygon)
+//placeholder obstacle with robot radius factor = 1
+TEST(NavigatorPlaceholderObstacleTest, default_placeholder_obstacle_polygon)
 {
     double ROOT_THREE_BY_TWO = 0.86602540378;
     Timestamp current_time   = Timestamp::fromSeconds(123);
@@ -38,7 +39,8 @@ TEST(NavPhObstTest, default_placeholder_obstacle_polygon)
     EXPECT_EQ(pg.getPoints()[5], pt5);
 }
 
-TEST(NavPhObstTest, expanded_placeholder_obstacle_polygon)
+//placeholder obstacle with robot radius factor > 1
+TEST(NavigatorPlaceholderObstacleTest, expanded_placeholder_obstacle_polygon)
 {
     double EXPANSION         = 1.4;
     double ROOT_THREE_BY_TWO = 0.86602540378;
@@ -65,7 +67,8 @@ TEST(NavPhObstTest, expanded_placeholder_obstacle_polygon)
     EXPECT_EQ(pg.getPoints()[5], pt5);
 }
 
-TEST(NavPhObstTest, contracted_placeholder_obstacle_polygon)
+//placeholder obstacle with robot radius factor < 1
+TEST(NavigatorPlaceholderObstacleTest, contracted_placeholder_obstacle_polygon)
 {
     double CONTRACTION       = .7;
     double ROOT_THREE_BY_TWO = 0.86602540378;
