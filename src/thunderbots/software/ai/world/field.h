@@ -129,11 +129,11 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
-     * Gets the field bounds as a Rectangle
+     * Gets the playable area of the field as a rectangle
      *
-     * @return the field bounds as a rectangle
+     * @return the playable area of the field as a rectangle
      */
-    Rectangle fieldBounds() const;
+    Rectangle playableArea() const;
 
     /**
      * Gets the position of the centre of the friendly goal.
@@ -241,16 +241,14 @@ class Field
      */
     bool pointInEnemyDefenseArea(const Point p) const;
 
-    //TODO: Better name for this?
-    // TODO: implement and test this
     /**
-     * Returns whether p is in bounds for the field
+     * Returns whether p is within the playable area of the field
      *
      * @param p
      *
-     * @return true if p is within bounds for the field, false otherwise
+     * @return true if p is within the playable area of the field, false otherwise
      */
-    bool pointInBounds(const Point& p);
+    bool pointInPlayableArea(const Point &p);
 
     /**
      * Compares two fields for equality
