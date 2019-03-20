@@ -47,3 +47,5 @@ const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 
 // Converts dribbler RPM to a smaller number firmware uses
 const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
+
+const double DRIBBLE_SMALL_KICK_POWER = 0.2;

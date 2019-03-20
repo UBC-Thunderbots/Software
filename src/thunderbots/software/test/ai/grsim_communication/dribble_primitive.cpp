@@ -11,20 +11,19 @@
 
 TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_allowed)
 {
-    DribblePrimitive* dribble_primitive =
-            new DribblePrimitive(0, Point(-0.2, 1), AngularVelocity::ofDegrees(75),
-                    5.0, 50.0, true);
+    DribblePrimitive dribble_primitive = DribblePrimitive(
+        0, Point(-0.2, 1), AngularVelocity::ofDegrees(75), 5.0, 50.0, true);
 
-    Robot* test_robot = new Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball* test_ball   = new Ball(Point(1, 0), Vector(-1, -1), Timestamp::fromSeconds(0));
+    Robot test_robot = Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(),
+                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball test_ball   = Ball(Point(1, 0), Vector(-1, -1), Timestamp::fromSeconds(0));
 
-    auto* grsimCommandPrimitiveVisitor =
-            new GrsimCommandPrimitiveVisitor(*test_robot, *test_ball);
-    dribble_primitive->accept(*grsimCommandPrimitiveVisitor);
+    auto grsimCommandPrimitiveVisitor =
+        GrsimCommandPrimitiveVisitor(test_robot, test_ball);
+    dribble_primitive.accept(grsimCommandPrimitiveVisitor);
 
     auto motion_controller_command =
-            grsimCommandPrimitiveVisitor->getMotionControllerCommand();
+        grsimCommandPrimitiveVisitor->getMotionControllerCommand();
 
     EXPECT_EQ(motion_controller_command.global_destination, Point(-0.2, 1));
     EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(75));
@@ -35,20 +34,19 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_allowed)
 
 TEST(GrsimCommandPrimitiveVisitorTest, visit_dribble_primitive_kick_not_allowed)
 {
-    DribblePrimitive* dribble_primitive =
-            new DribblePrimitive(0, Point(-0.2, 1), AngularVelocity::ofDegrees(75),
-                                 5.0, 50.0, false);
+    DribblePrimitive dribble_primitive = DribblePrimitive(
+        0, Point(-0.2, 1), AngularVelocity::ofDegrees(75), 5.0, 50.0, false);
 
-    Robot* test_robot = new Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(),
-                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Ball* test_ball   = new Ball(Point(1, 0), Vector(-1, -1), Timestamp::fromSeconds(0));
+    Robot test_robot = Robot(1, Point(0, 0), Vector(1, 2), Angle::zero(),
+                             AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball test_ball   = Ball(Point(1, 0), Vector(-1, -1), Timestamp::fromSeconds(0));
 
-    auto* grsimCommandPrimitiveVisitor =
-            new GrsimCommandPrimitiveVisitor(*test_robot, *test_ball);
-    dribble_primitive->accept(*grsimCommandPrimitiveVisitor);
+    auto grsimCommandPrimitiveVisitor =
+        GrsimCommandPrimitiveVisitor(test_robot, test_ball);
+    dribble_primitive.accept(grsimCommandPrimitiveVisitor);
 
     auto motion_controller_command =
-            grsimCommandPrimitiveVisitor->getMotionControllerCommand();
+        grsimCommandPrimitiveVisitor.getMotionControllerCommand();
 
     EXPECT_EQ(motion_controller_command.global_destination, Point(-0.2, 1));
     EXPECT_EQ(motion_controller_command.final_orientation, Angle::ofDegrees(75));
