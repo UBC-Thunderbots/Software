@@ -44,8 +44,8 @@ AI:
           shooting opportunity. Note that we may take shots below this in some
           cases, it's more of a weight then a cutoff.
     ideal_min_rotation_to_shoot_degrees:
-      min: -360
-      max: 360
+      min: -180
+      max: 180
       default: 5
       type: "double"
       description: >- 
@@ -73,7 +73,16 @@ AI:
       description: >-
         Minimum time into the future at which the pass should occur. This is
         to ensure we have enough time to setup a robot to actually perform
-        the pass. This is in seconds
+        the pass. This is in seconds.
+    max_time_offset_for_pass_seconds:
+      min: 0
+      max: 5
+      default: 4.0
+      type: "double"
+      description: >-
+        Maximum time into the future at which the pass should occur. This gives the
+        upper bound on the pass start time, relative to the current time. This is in
+        seconds.
     num_passes_to_optimize:
       min: 0
       max: 1000
@@ -95,7 +104,7 @@ AI:
     pass_equality_max_position_difference_meters:
       min: 0
       max: 4
-      default: 0.1
+      default: 0.05
       type: "double"
       description: >- 
         The maximum allowed difference between the reciever and passer 
@@ -103,37 +112,31 @@ AI:
     pass_equality_max_start_time_difference_seconds:
       min: 0
       max: 3
-      default: 0.5
+      default: 0.1
       type: "double"
-      description: ""
+      description: "TODO: Add description as part of #149"
     pass_equality_max_speed_difference_meters_per_second:
       min: 0
       max: 4
       default: 0.3
       type: "double"
-      description: ""
+      description: "TODO: Add description as part of #149"
 Navigator:
   default_avoid_dist:
     min: 0
     max: 100
     default: 50
     type: "double"
-    description: "asdfsadf"
+    description: "TODO: Add description as part of #149"
   collision_avoid_velocity_scale:
     min: 0
     max: 1
     default: 0.5
     type: "double"
-    description: ""
-  collision_avoid_velocity_scale2:
-    min: 0
-    max: 1
-    default: 0.5
-    type: "double"
-    description: ""
+    description: "TODO: Add description as part of #149"
 robot_expiry_buffer_milliseconds:
   min: 0
   max: 100
   default: 50
   type: "int"
-  description: "asdasd"
+  description: "TODO: Add description as part of #149"
