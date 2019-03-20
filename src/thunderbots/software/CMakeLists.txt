@@ -537,13 +537,17 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/movespin_action.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/movespin_intent.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/robot.cpp
             test/ai/hl/stp/action/main.cpp
             test/ai/hl/stp/action/move_action.cpp
+            test/ai/hl/stp/action/movespin_action.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/time/duration.cpp
