@@ -546,6 +546,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/primitive.cpp
             ai/world/robot.cpp
             test/ai/hl/stp/action/main.cpp
+            test/ai/hl/stp/test_actions/move_test_action.cpp
+            test/ai/hl/stp/action/action.cpp
             test/ai/hl/stp/action/move_action.cpp
             test/ai/hl/stp/action/movespin_action.cpp
             util/logger/custom_g3log_sinks.h
