@@ -340,6 +340,19 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 Point reflect(const Point &v, const Point &n);
 
 /**
+ * Calculates the intersection of a Ray and Segment
+ *
+ * @param ray: The point and direction
+ * @param segment: Line segment defined by 2 points
+ * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
+ * Returns {Point, std::nullopt} if a single intersection exists.
+ * Returns {Point, Point} if the ray and segment are overlapping, where the points define
+ * the line segment of overlap.
+ */
+std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
+    Ray &ray, Segment &segment);
+
+/**
  * Reflects a point across a line.
  *
  * @param a a point on the line.

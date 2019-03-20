@@ -29,8 +29,9 @@ TEST(GrsimCommandPrimitiveVisitorTest,
         GrsimCommandPrimitiveVisitor(robot, ball);
     primitive.accept(grsim_command_primitive_visitor);
 
-    MotionController::MotionControllerCommand motionCommand =
-        grsim_command_primitive_visitor.getMotionControllerCommand();
+    MotionController::PositionCommand motionCommand =
+        std::get<MotionController::PositionCommand>(
+            grsim_command_primitive_visitor.getMotionControllerCommand());
 
     EXPECT_NEAR(2.3, motionCommand.global_destination.x(), POSITION_TOLERANCE);
     EXPECT_NEAR(0, motionCommand.global_destination.y(), 0.1);
@@ -50,8 +51,9 @@ TEST(GrsimCommandPrimitiveVisitorTest,
         GrsimCommandPrimitiveVisitor(robot, ball);
     primitive.accept(grsim_command_primitive_visitor);
 
-    MotionController::MotionControllerCommand motionCommand =
-        grsim_command_primitive_visitor.getMotionControllerCommand();
+    MotionController::PositionCommand motionCommand =
+        std::get<MotionController::PositionCommand>(
+            grsim_command_primitive_visitor.getMotionControllerCommand());
 
     EXPECT_NEAR(2.3, motionCommand.global_destination.x(), POSITION_TOLERANCE);
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
@@ -71,8 +73,9 @@ TEST(GrsimCommandPrimitiveVisitorTest,
         GrsimCommandPrimitiveVisitor(robot, ball);
     primitive.accept(grsim_command_primitive_visitor);
 
-    MotionController::MotionControllerCommand motionCommand =
-        grsim_command_primitive_visitor.getMotionControllerCommand();
+    MotionController::PositionCommand motionCommand =
+        std::get<MotionController::PositionCommand>(
+            grsim_command_primitive_visitor.getMotionControllerCommand());
 
     EXPECT_NEAR(2.3, motionCommand.global_destination.x(), POSITION_TOLERANCE);
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
@@ -92,8 +95,9 @@ TEST(GrsimCommandPrimitiveVisitorTest,
         GrsimCommandPrimitiveVisitor(robot, ball);
     primitive.accept(grsim_command_primitive_visitor);
 
-    MotionController::MotionControllerCommand motionCommand =
-        grsim_command_primitive_visitor.getMotionControllerCommand();
+    MotionController::PositionCommand motionCommand =
+        std::get<MotionController::PositionCommand>(
+            grsim_command_primitive_visitor.getMotionControllerCommand());
 
     EXPECT_NEAR(2.3, motionCommand.global_destination.x(), POSITION_TOLERANCE);
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
@@ -112,8 +116,9 @@ TEST(GrsimCommandPrimitiveVisitorTest, visit_catch_primitive_robot_close_to_ball
         GrsimCommandPrimitiveVisitor(robot, ball);
     primitive.accept(grsim_command_primitive_visitor);
 
-    MotionController::MotionControllerCommand motionCommand =
-        grsim_command_primitive_visitor.getMotionControllerCommand();
+    MotionController::PositionCommand motionCommand =
+        std::get<MotionController::PositionCommand>(
+            grsim_command_primitive_visitor.getMotionControllerCommand());
 
     EXPECT_NEAR(0, motionCommand.global_destination.x(), POSITION_TOLERANCE);
     EXPECT_NEAR(0, motionCommand.global_destination.y(), POSITION_TOLERANCE);
