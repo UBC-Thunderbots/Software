@@ -15,12 +15,10 @@ class MoveAction : public Action
     /**
      * Creates a new MoveAction
      *
-     * @param robot The robot that will be performing the action
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
      */
-    explicit MoveAction(const Robot& robot,
-                        double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    explicit MoveAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     /**
      * Returns the next Intent this MoveAction wants to run, given the parameters.

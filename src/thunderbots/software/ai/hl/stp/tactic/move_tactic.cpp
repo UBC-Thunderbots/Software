@@ -30,7 +30,7 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
 std::unique_ptr<Intent> MoveTactic::calculateNextIntent(
     intent_coroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction(*robot);
+    MoveAction move_action = MoveAction();
     do
     {
         yield(move_action.updateStateAndGetNextIntent(*robot, destination,
