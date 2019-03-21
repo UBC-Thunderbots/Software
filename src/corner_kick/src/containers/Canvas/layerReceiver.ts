@@ -22,15 +22,8 @@ const parseLayer = (data: ArrayBuffer): ILayerMessage => {
     // Parse the layer number
     const layer = incomingDataView.getUint8(0);
 
-    // Parse the flags for the layer
-    const flags = incomingDataView.getUint8(1);
-    const flagArray: boolean[] = new Array(8);
-    for (let i = 0; i < 8; i++) {
-        flagArray[i] = ((flags >> i) & 1) === 1;
-    }
-
     // We expect a certain multiple of bytes, based on shape size
-    const incomingSpriteCount = (data.byteLength - 2) / BYTES_PER_SHAPE;
+    const incomingSpriteCount = (data.byteLength - 1) / BYTES_PER_SHAPE;
     if (incomingSpriteCount !== Math.round(incomingSpriteCount)) {
         throw new MalformedShapesException(
             'The message from the server contains malformed data',
@@ -39,27 +32,25 @@ const parseLayer = (data: ArrayBuffer): ILayerMessage => {
         // Parse each shape
         const shapes = new Array(incomingSpriteCount).fill(true).map(
             (_, index): IShape => {
-                // We start at 2 as the first two bytes of the message
-                // contain the layer number and flags
-                const startPos = 2 + index * BYTES_PER_SHAPE;
+                // We start at 1 as the first byte of the message
+                // contain the layer number
+                const startPos = 1 + index * BYTES_PER_SHAPE;
                 return {
                     texture: incomingDataView.getUint8(startPos),
-                    flags: incomingDataView.getUint8(startPos + 1),
-                    x: incomingDataView.getInt16(startPos + 2),
-                    y: incomingDataView.getInt16(startPos + 4),
-                    width: incomingDataView.getInt16(startPos + 6),
-                    height: incomingDataView.getInt16(startPos + 8),
-                    rotation: incomingDataView.getInt16(startPos + 10),
-                    opacity: incomingDataView.getUint8(startPos + 12),
-                    red: incomingDataView.getUint8(startPos + 13),
-                    green: incomingDataView.getUint8(startPos + 14),
-                    blue: incomingDataView.getUint8(startPos + 15),
+                    x: incomingDataView.getInt16(startPos + 1),
+                    y: incomingDataView.getInt16(startPos + 3),
+                    width: incomingDataView.getInt16(startPos + 5),
+                    height: incomingDataView.getInt16(startPos + 7),
+                    rotation: incomingDataView.getInt16(startPos + 9),
+                    opacity: incomingDataView.getUint8(startPos + 11),
+                    red: incomingDataView.getUint8(startPos + 12),
+                    green: incomingDataView.getUint8(startPos + 13),
+                    blue: incomingDataView.getUint8(startPos + 14),
                 };
             },
         );
         return {
             layer,
-            flags: flagArray,
             shapes,
         };
     }

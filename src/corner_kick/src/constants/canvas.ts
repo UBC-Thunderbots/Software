@@ -7,4 +7,4 @@ export const LAYER_WEBSOCKET_ADDRESS = 'ws://localhost:9091';
 /**
  * Number of bytes for each shape received from ROS.
  */
-export const BYTES_PER_SHAPE = 16;
+export const BYTES_PER_SHAPE = 15;

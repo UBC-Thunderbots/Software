@@ -12,11 +12,6 @@ export interface ILayerMessage {
     layer: number;
 
     /**
-     * Layer flags
-     */
-    flags: boolean[];
-
-    /**
      * Shape data
      */
     shapes: IShape[];
@@ -42,7 +37,6 @@ export interface ILayer {
  */
 export interface IShape {
     texture: number;
-    flags: number;
     x: number;
     y: number;
     width: number;
