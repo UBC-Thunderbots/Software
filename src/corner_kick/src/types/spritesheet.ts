@@ -44,13 +44,54 @@ export interface IFrame {
     /**
      * The shapes of this frame, drawn relative to the frame top-left corner
      */
-    shapes: Array<IRectShape | IEllipseShape | IArcShape | ILineShape | IPolyShape>;
+    shapes: IShape[];
 }
 
 /**
  * Describes a shape. Used to generate a spritesheet.
  */
 export interface IShape {
+    /**
+     * The type of shape
+     */
+    type: ShapeType;
+
+    /**
+     * The data associated with the shape
+     *
+     * **rect**:
+     * - `data[0]`: x in px
+     * - `data[1]`: y in px
+     * - `data[2]`: width in px
+     * - `data[3]`: height in px
+     *
+     * **ellipse**
+     * - `data[0]`: cx in px
+     * - `data[1]`: cy in px
+     * - `data[2]`: radiusX in px
+     * - `data[3]`: radiusY in px
+     *
+     * **arc**
+     * - `data[0]`: cx in px
+     * - `data[1]`: cy in px
+     * - `data[2]`: radius in px
+     * - `data[3]`: startAngle in rads
+     * - `data[4]`: endAngle in rads
+     *
+     * **line**
+     * - `data[0]`: x1 in px
+     * - `data[1]`: y1 in px
+     * - `data[2]`: x2 in px
+     * - `data[3]`: y2 in px
+     *
+     * **poly**
+     * - Contains pairs of x and y coordinates specified in px, describing
+     * the points of the polygon. The first and last point of the polygon
+     * will automatically be connected. Must have at least 3 coordinate sets in
+     * order for the shape to be valid and be drawn.
+     */
+    data: number[];
+
     /**
      * Should the shape be filled?
      */
@@ -65,90 +106,4 @@ export interface IShape {
      * The stroke weight of the shape
      */
     stroke_weight?: number;
-}
-
-/**
- * A rectangle shape object. All dimensions are relative to the parent frame's top-left
- * corner
- */
-export interface IRectShape extends IShape {
-    type: ShapeType.RECT;
-
-    /**
-     * The data object is specified as follow:
-     * - `data[0]`: x in px
-     * - `data[1]`: y in px
-     * - `data[2]`: width in px
-     * - `data[3]`: height in px
-     */
-    data: [number, number, number, number];
-}
-
-/**
- * An ellipse shape object. All dimensions are relative to the parent frame's top-left
- * corner
- */
-export interface IEllipseShape extends IShape {
-    type: ShapeType.ELLIPSE;
-
-    /**
-     * The data object is specified as follow:
-     * - `data[0]`: cx in px
-     * - `data[1]`: cy in px
-     * - `data[2]`: radiusX in px
-     * - `data[3]`: radiusY in px
-     */
-    data: [number, number, number, number];
-}
-
-/**
- * A line shape object. All dimensions are relative to the parent frame's top-left
- * corner
- */
-export interface ILineShape extends IShape {
-    type: ShapeType.LINE;
-
-    /**
-     * The data object is specified as follow:
-     * - `data[0]`: x1 in px
-     * - `data[1]`: y1 in px
-     * - `data[2]`: x2 in px
-     * - `data[3]`: y2 in px
-     */
-    data: [number, number, number, number];
-}
-
-/**
- * An arc shape object. All dimensions are relative to the parent frame's top-left
- * corner
- */
-export interface IArcShape extends IShape {
-    type: ShapeType.ARC;
-
-    /**
-     * The data object is specified as follow:
-     * - `data[0]`: cx in px
-     * - `data[1]`: cy in px
-     * - `data[2]`: radius in px
-     * - `data[3]`: startAngle in rads
-     * - `data[4]`: endAngle in rads
-     */
-    data: [number, number, number, number, number];
-}
-
-/**
- * A poly shape object. All dimensions are relative to the parent frame's top-left
- * corner
- */
-export interface IPolyShape extends IShape {
-    type: ShapeType.POLY;
-
-    /**
-     * The data object is specified as follow:
-     * - Contains pairs of x and y coordinates specified in px, describing
-     * the points of the polygon. The first and last point of the polygon
-     * will automatically be connected. Must have at least 3 coordinate sets in
-     * order for the shape to be valid and be drawn.
-     */
-    data: number[];
 }

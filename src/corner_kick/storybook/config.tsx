@@ -3,12 +3,12 @@
  * styling decorators
  */
 
-import { withKnobs } from '@storybook/addon-knobs';
-import { withNotes } from '@storybook/addon-notes';
-import { addDecorator, configure } from '@storybook/react';
+import { addDecorator, addParameters, configure } from '@storybook/react';
 import * as React from 'react';
 
 import { Theme } from 'SRC/style/Theme';
+
+import theme from './theme';
 
 // automatically import all files in the __stories__ directory
 const req = (require as any).context('../src', true, /__stories__\/.*.tsx$/);
@@ -22,9 +22,11 @@ function loadStories() {
 const StyleDecorator = (storyFn: () => JSX.Element) => <Theme>{storyFn()}</Theme>;
 addDecorator(StyleDecorator);
 
-// Add Storybook knobs and notes
-addDecorator(withNotes);
-addDecorator(withKnobs);
+addParameters({
+    options: {
+        theme,
+    },
+});
 
 // Init Storybook
 configure(loadStories, module);

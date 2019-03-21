@@ -7,12 +7,12 @@ import * as React from 'react';
 
 import { StorybookStage } from 'SRC/components/StorybookStage';
 
-import { exampleSpritesheetFormat } from '../__fixtures__/spritesheet';
+import { expectedSpritesheetFormat } from '../__fixtures__/spritesheet';
 import { SpritesheetManager } from '../spritesheetManager';
 
 const stories = storiesOf('Spritesheet Generator', module);
 
-const spritesheetGenerator = new SpritesheetManager(exampleSpritesheetFormat);
+const spritesheetGenerator = new SpritesheetManager(expectedSpritesheetFormat);
 
 stories.add(
     'with an example spritesheet',

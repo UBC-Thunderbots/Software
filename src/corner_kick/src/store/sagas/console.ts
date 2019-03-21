@@ -7,9 +7,9 @@ import { getType } from 'typesafe-actions';
 
 import { TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE } from 'SRC/constants';
 import { IRosoutMessage } from 'SRC/types';
+import * as ROS from 'SRC/utils/ros';
 
 import { actions } from '../actions';
-import { subscribeToROSTopic } from './ros';
 
 const consoleChannel = channel();
 
@@ -35,7 +35,11 @@ function* listenToConsoleChannel() {
  * We subscribe to topic rosout to start receiving messages
  */
 function startConsole() {
-    subscribeToROSTopic(TOPIC_ROSOUT, TOPIC_ROSOUT_TYPE, (message: IRosoutMessage) => {
-        consoleChannel.put(actions.console.newRosoutMessage(message));
-    });
+    ROS.subscribeToROSTopic(
+        TOPIC_ROSOUT,
+        TOPIC_ROSOUT_TYPE,
+        (message: IRosoutMessage) => {
+            consoleChannel.put(actions.console.newRosoutMessage(message));
+        },
+    );
 }

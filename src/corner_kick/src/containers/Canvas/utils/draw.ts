@@ -3,14 +3,7 @@
  * are used for spritesheet generation.
  */
 
-import {
-    IArcShape,
-    IEllipseShape,
-    ILineShape,
-    IPolyShape,
-    IRectShape,
-    IShape,
-} from 'SRC/types';
+import { IShape } from 'SRC/types';
 
 /**
  * Sets the correct draw style (fill and stroke). All sprites are white to ensure
@@ -29,7 +22,7 @@ export const setStyle = (ctx: CanvasRenderingContext2D, shape: IShape) => {
  * @param ctx an canvas rendering context
  * @param shape the shape description object
  */
-export const drawRect = (ctx: CanvasRenderingContext2D, shape: IRectShape) => {
+export const drawRect = (ctx: CanvasRenderingContext2D, shape: IShape) => {
     ctx.rect(shape.data[0], shape.data[1], shape.data[2], shape.data[3]);
 };
 
@@ -38,7 +31,7 @@ export const drawRect = (ctx: CanvasRenderingContext2D, shape: IRectShape) => {
  * @param ctx an canvas rendering context
  * @param shape the shape description object
  */
-export const drawEllipse = (ctx: CanvasRenderingContext2D, shape: IEllipseShape) => {
+export const drawEllipse = (ctx: CanvasRenderingContext2D, shape: IShape) => {
     ctx.arc(shape.data[0], shape.data[1], shape.data[2], 0, 2 * Math.PI, false);
 };
 
@@ -47,7 +40,7 @@ export const drawEllipse = (ctx: CanvasRenderingContext2D, shape: IEllipseShape)
  * @param ctx an canvas rendering context
  * @param shape the shape description object
  */
-export const drawArc = (ctx: CanvasRenderingContext2D, shape: IArcShape) => {
+export const drawArc = (ctx: CanvasRenderingContext2D, shape: IShape) => {
     ctx.arc(
         shape.data[0],
         shape.data[1],
@@ -63,7 +56,7 @@ export const drawArc = (ctx: CanvasRenderingContext2D, shape: IArcShape) => {
  * @param ctx an canvas rendering context
  * @param shape the shape description object
  */
-export const drawLine = (ctx: CanvasRenderingContext2D, shape: ILineShape) => {
+export const drawLine = (ctx: CanvasRenderingContext2D, shape: IShape) => {
     ctx.moveTo(shape.data[0], shape.data[1]);
     ctx.lineTo(shape.data[2], shape.data[3]);
 };
@@ -74,7 +67,7 @@ export const drawLine = (ctx: CanvasRenderingContext2D, shape: ILineShape) => {
  * @param ctx an canvas rendering context
  * @param shape the shape description object
  */
-export const drawPoly = (ctx: CanvasRenderingContext2D, shape: IPolyShape) => {
+export const drawPoly = (ctx: CanvasRenderingContext2D, shape: IShape) => {
     if (shape.data.length % 2 === 0 && shape.data.length >= 6) {
         ctx.moveTo(shape.data[0], shape.data[1]);
         for (let i = 2; i < shape.data.length; i += 2) {
