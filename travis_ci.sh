@@ -62,7 +62,10 @@ if [ "$RUN_TESTS" == "true" ] || \
 
     if [ "$RUN_COVERAGE" == "true" ]; then
         # Upload coverage reports
-        bash <(curl -s https://codecov.io/bash)
+        # Note that we only grab a certain number of lines from the head
+        # and tail (start and end) of the command to prevent this generating
+        # a massive log in CI
+        travis_run bash <(curl -s https://codecov.io/bash) | (head -n100 && tail -n100)
     fi
 fi
 
