@@ -1,8 +1,9 @@
 #include "ai/hl/stp/action/action.h"
 
-Action::Action(const Robot &robot)
-    : robot(robot),
-      intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))
+#include "util/logger/init.h"
+
+Action::Action()
+    : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))
 {
 }
 
@@ -13,6 +14,14 @@ bool Action::done() const
 
 std::unique_ptr<Intent> Action::getNextIntent()
 {
+    if (!robot)
+    {
+        LOG(WARNING)
+            << "Requesting the next Intent for an Action without a Robot assigned"
+            << std::endl;
+        return std::unique_ptr<Intent>{};
+    }
+
     // If the coroutine "iterator" is done, the calculateNextIntent function has completed
     // and therefore the Action is done, so we return a null pointer
     if (intent_sequence)
