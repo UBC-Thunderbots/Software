@@ -15,6 +15,7 @@ PassGenerator::PassGenerator(double min_reasonable_pass_quality)
       optimizer(optimizer_param_weights),
       best_known_pass(std::nullopt),
       target_region(std::nullopt),
+      random_num_gen(random_device()),
       in_destructor(false)
 {
     // Generate the initial set of passes
@@ -113,26 +114,44 @@ void PassGenerator::optimizePasses()
     // that we're optimizing
     const auto objective_function =
         [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
-            Pass pass = convertArrayToPass(pass_array);
-            return ratePass(pass);
+            try
+            {
+                Pass pass = convertArrayToPass(pass_array);
+                return ratePass(pass);
+            }
+            catch (std::invalid_argument& e)
+            {
+                // If the pass was invalid, just rate it as poorly as possible
+                return 0.0;
+            }
         };
 
     // Run gradient descent to optimize the passes to for the requested number
     // of iterations
     // NOTE: Parallelizing this `for` loop would probably be safe and potentially more
     //       performant
+    std::vector<Pass> updated_passes;
     for (Pass& pass : passes_to_optimize)
     {
         auto pass_array =
             optimizer.maximize(objective_function, convertPassToArray(pass),
                                number_of_gradient_descent_steps_per_iter.value());
-        pass = convertArrayToPass(pass_array);
+        try
+        {
+            updated_passes.emplace_back(convertArrayToPass(pass_array));
+        }
+        catch (std::invalid_argument& e)
+        {
+            // Sometimes the gradient descent algorithm could return an invalid pass, if
+            // so, we can just ignore it and carry on
+        }
     }
+    passes_to_optimize = updated_passes;
 }
 
 void PassGenerator::pruneAndReplacePasses()
 {
-    // Sort the passes by increasing quality
+    // Sort the passes by decreasing quality
     std::sort(passes_to_optimize.begin(), passes_to_optimize.end(),
               [this](Pass p1, Pass p2) { return comparePassQuality(p1, p2); });
 
@@ -140,6 +159,7 @@ void PassGenerator::pruneAndReplacePasses()
     // We start by assuming that the most similar passes will be right beside each other,
     // then iterate over the entire list, building a new list as we go by only adding
     // elements when they are dissimilar enough from the last element we added
+    // NOTE: This flips the passes so they are sorted by increasing quality
     passes_to_optimize = std::accumulate(
         passes_to_optimize.begin(), passes_to_optimize.end(), std::vector<Pass>(),
         [this](std::vector<Pass>& passes, Pass curr_pass) {
@@ -151,8 +171,6 @@ void PassGenerator::pruneAndReplacePasses()
             }
             return passes;
         });
-    // Reverse the list to sort by increasing quality
-    std::reverse(passes_to_optimize.begin(), passes_to_optimize.end());
 
     // Replace the least promising passes with newly generated passes
     if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value())
@@ -201,50 +219,44 @@ double PassGenerator::ratePass(Pass pass)
     std::lock_guard<std::mutex> world_lock(world_mutex);
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
-    double static_pass_quality =
-        getStaticPositionQuality(world.field(), pass.receiverPoint());
-
-    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
-
-    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
-
-    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
-
-    // Rate all passes outside our target region as 0 if we have one
-    double in_region_quality = 1;
-    if (target_region)
-    {
-        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
-    }
-
-    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-                          shoot_pass_rating * in_region_quality;
-
-    // Strict requirement that the pass occurs at a minimum time in the future
-    double min_pass_time_offset =
-        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
-    pass_quality *= sigmoid(
-        pass.startTime().getSeconds(),
-        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
-
-    // Place strict limits on the ball speed
-    double min_pass_speed =
-        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
-    double max_pass_speed =
-        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
-    pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.001);
-    pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.001);
-
-    return pass_quality;
+    return ::ratePass(world, pass, target_region);
 }
 
-std::vector<Pass> PassGenerator::generatePasses(unsigned long num_paths_to_gen)
+std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
 {
-    Pass p(Point(0, 0), Point(0, 0), 0, Timestamp::fromSeconds(0));
+    // Take ownership of world for the duration of this function
+    std::lock_guard<std::mutex> world_lock(world_mutex);
 
-    // TODO (Issue #382): Implement this properly
+    std::uniform_real_distribution x_distribution(-world.field().width() / 2,
+                                                  world.field().width() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().length() / 2,
+                                                  world.field().length() / 2);
+    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
+    double curr_time = world.ball().lastUpdateTimestamp().getSeconds();
+    double min_start_time_offset =
+        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    double max_start_time_offset =
+        Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+    std::uniform_real_distribution start_time_distribution(
+        curr_time + min_start_time_offset, curr_time + max_start_time_offset);
+    std::uniform_real_distribution speed_distribution(
+        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value(),
+        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value());
 
-    return std::vector<Pass>(num_paths_to_gen, p);
+    std::vector<Pass> passes;
+    for (int i = 0; i < num_passes_to_gen; i++)
+    {
+        Point receiver_point(x_distribution(random_num_gen),
+                             y_distribution(random_num_gen));
+        Timestamp start_time =
+            Timestamp::fromSeconds(start_time_distribution(random_num_gen));
+        double pass_speed = speed_distribution(random_num_gen);
+
+        Pass p(passer_point, receiver_point, pass_speed, start_time);
+        passes.emplace_back(p);
+    }
+
+    return passes;
 }
 
 bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
