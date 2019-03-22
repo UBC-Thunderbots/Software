@@ -84,8 +84,6 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    // Instead of having a set destination for the robot to adjust to behind the shot
-    // origin, use point that the robot is closest to the line in shot direction
     double point_behind_x = Point::createFromAngle(chip_direction).x();
     double point_behind_y = Point::createFromAngle(chip_direction).y();
     Point point_behind    = chip_origin + Vector(point_behind_x, point_behind_y);
@@ -93,20 +91,22 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), chip_origin, point_behind);
 
-    // If current robot position is in line with the shot (i.e. less than one robot radius
-    // within the line in the direction of the shot)
-    if (!(offsetToLine(chip_origin, point_behind, robot.position()) <=
-          2 * ROBOT_MAX_RADIUS_METERS))
+    // If current robot position is in line with the shot (i.e. less than two robot radius
+    // within the line in the direction of the shot), can go for the shot
+    if (offsetToLine(chip_origin, point_behind, robot.position()) <=
+        2 * ROBOT_MAX_RADIUS_METERS)
     {
-        motion_controller_command = MotionController::MotionControllerCommand(
-            closest_point_to_line, chip_direction, 0.0, chip_primitive.getChipDistance(),
-            true, false);
+        motion_controller_command = MotionController::PositionCommand(
+            chip_origin, chip_direction, final_speed_at_destination,
+            chip_primitive.getChipDistance(), true, false);
     }
     else
     {
-        motion_controller_command = MotionController::MotionControllerCommand(
-            chip_origin, chip_direction, final_speed_at_destination,
-            chip_primitive.getChipDistance(), true, false);
+        // If robot is not in line, move to the closest point on the line from the current
+        // position
+        motion_controller_command = MotionController::PositionCommand(
+            closest_point_to_line, chip_direction, 0.0, chip_primitive.getChipDistance(),
+            true, false);
     }
 }
 
@@ -159,8 +159,6 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    // Instead of having a set destination for the robot to adjust to behind the shot
-    // origin, use point that the robot is closest to the line in shot direction
     double point_behind_x = Point::createFromAngle(kick_direction).x();
     double point_behind_y = Point::createFromAngle(kick_direction).y();
     Point point_behind    = kick_origin + Vector(point_behind_x, point_behind_y);
@@ -168,20 +166,23 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), kick_origin, point_behind);
 
-    // If current robot position is in line with the shot (i.e. less than one robot radius
-    // within the line in the direction of the shot)
-    if (!(offsetToLine(kick_origin, point_behind, robot.position()) <=
-          2 * ROBOT_MAX_RADIUS_METERS))
+    // If current robot position is in line with the shot (i.e. less than two robot radius
+    // within the line in the direction of the shot), can go for the shot
+    if (offsetToLine(kick_origin, point_behind, robot.position()) <=
+        2 * ROBOT_MAX_RADIUS_METERS)
     {
-        motion_controller_command = MotionController::MotionControllerCommand(
-            closest_point_to_line, kick_direction, 0.0, kick_primitive.getKickSpeed(),
-            false, false);
+        motion_controller_command = MotionController::PositionCommand(
+            kick_origin, kick_direction, final_speed_at_destination,
+            kick_primitive.getKickSpeed(), false, false);
     }
     else
     {
-        motion_controller_command = MotionController::MotionControllerCommand(
-            kick_origin, kick_direction, final_speed_at_destination,
-            kick_primitive.getKickSpeed(), false, false);
+        // If robot is not in line, move to the closest point on the line from the current
+        // position
+        motion_controller_command = MotionController::PositionCommand(
+            closest_point_to_line, kick_direction, 0.0, kick_primitive.getKickSpeed(),
+            false, false);
+        ;
     }
 }
 
