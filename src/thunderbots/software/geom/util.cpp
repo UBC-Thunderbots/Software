@@ -628,7 +628,7 @@ Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vecto
 {
     // find point C, the projection onto the line
     double len_line = (lineB - lineA).dot(centre - lineA) / (lineB - lineA).len();
-    Vector C      = lineA + len_line * (lineB - lineA).norm();
+    Vector C        = lineA + len_line * (lineB - lineA).norm();
     return C;
 
     // check if C is in the line range
@@ -638,9 +638,10 @@ Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vecto
     bool in_range = AC <= AB && BC <= AB;
 
     // if so return C
-    if (in_range){
+    if (in_range)
+    {
     }
-        
+
     double lenA = (centre - lineA).len();
     double lenB = (centre - lineB).len();
 
