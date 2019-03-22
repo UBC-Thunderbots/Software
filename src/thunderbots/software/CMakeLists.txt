@@ -514,6 +514,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
+            ai/hl/stp/evaluation/indirect_chip.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
             ai/world/game_state.cpp
@@ -521,17 +522,19 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
+            geom/rectangle.cpp
             test/ai/evaluation/deflect_off_enemy_target.cpp
             test/ai/evaluation/main.cpp
             test/ai/evaluation/robot.cpp
             test/ai/evaluation/team.cpp
+            test/ai/evaluation/indirect_chip.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameter_utils.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-    )
+            )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(action_test
