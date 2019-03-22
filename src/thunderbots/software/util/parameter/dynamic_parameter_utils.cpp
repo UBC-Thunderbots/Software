@@ -31,4 +31,5 @@ namespace Util::DynamicParameters
         Parameter<double>::updateAllParametersFromROSParameterServer();
         Parameter<std::string>::updateAllParametersFromROSParameterServer();
     }
+
 }  // namespace Util::DynamicParameters
