@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <tuple>
 
 #include "geom/angle.h"
 #include "geom/rectangle.h"
@@ -127,7 +128,7 @@ double lensq(const Line &line)
     return std::numeric_limits<double>::infinity();
 }
 
-bool contains(const Triangle &out, const Vector &in)
+bool contains(const LegacyTriangle &out, const Vector &in)
 {
     double angle = 0;
     for (int i = 0, j = 2; i < 3; j = i++)
@@ -168,14 +169,12 @@ bool contains(const Segment &out, const Vector &in)
 
 bool contains(const Ray &out, const Vector &in)
 {
-    if (collinear(in, out.getRayStart(), out.getDirection()))
+    Point point_in_ray_direction = out.getRayStart() + out.getDirection();
+    if (collinear(in, out.getRayStart(), point_in_ray_direction) &&
+        (in - out.getRayStart()).norm() == out.getDirection().norm())
     {
-        return sign(in.x() - out.getRayStart().x()) ==
-                   sign(out.getDirection().x() - out.getRayStart().x()) &&
-               sign(in.y() - out.getRayStart().y()) ==
-                   sign(out.getDirection().y() - out.getRayStart().y());
+        return true;
     }
-
     return false;
 }
 
@@ -184,14 +183,14 @@ bool contains(const Rectangle &out, const Vector &in)
     return out.containsPoint(in);
 }
 
-bool intersects(const Triangle &first, const Circle &second)
+bool intersects(const LegacyTriangle &first, const Circle &second)
 {
     return contains(first, second.getOrigin()) ||
            dist(getSide(first, 0), second.getOrigin()) < second.getRadius() ||
            dist(getSide(first, 1), second.getOrigin()) < second.getRadius() ||
            dist(getSide(first, 2), second.getOrigin()) < second.getRadius();
 }
-bool intersects(const Circle &first, const Triangle &second)
+bool intersects(const Circle &first, const LegacyTriangle &second)
 {
     return intersects(second, first);
 }
@@ -204,13 +203,18 @@ bool intersects(const Circle &first, const Circle &second)
 
 bool intersects(const Ray &first, const Segment &second)
 {
-    auto isect = lineIntersection(first.getRayStart(), first.getDirection(),
-                                  second.getSegStart(), second.getEnd());
+    auto isect =
+        lineIntersection(first.getRayStart(), first.getRayStart() + first.getDirection(),
+                         second.getSegStart(), second.getEnd());
+    // If the infinitely long vectors defined by ray and segment intersect, check that the
+    // intersection is within their definitions
     if (isect.has_value())
     {
         return contains(first, isect.value()) && contains(second, isect.value());
     }
-    return collinear(first.getRayStart(), first.getDirection(), second.getSegStart());
+    // If there is no intersection, the ray and segment may be parallel, check if they are
+    // overlapped
+    return contains(second, first.getRayStart());
 }
 bool intersects(const Segment &first, const Ray &second)
 {
@@ -262,7 +266,7 @@ bool intersects(const Segment &first, const Segment &second)
 }
 
 template <size_t N>
-Vector getVertex(const Poly<N> &poly, unsigned int i)
+Vector getVertex(const LegacyPolygon<N> &poly, unsigned int i)
 {
     if (i > N)
         throw std::out_of_range("poly does not have that many sides!!!");
@@ -271,7 +275,7 @@ Vector getVertex(const Poly<N> &poly, unsigned int i)
 }
 
 template <size_t N>
-void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
+void setVertex(LegacyPolygon<N> &poly, unsigned int i, const Vector &v)
 {
     if (i > N)
         throw std::out_of_range("poly does not have that many sides!!!");
@@ -280,7 +284,7 @@ void setVertex(Poly<N> &poly, unsigned int i, const Vector &v)
 }
 
 template <size_t N>
-Segment getSide(const Poly<N> &poly, unsigned int i)
+Segment getSide(const LegacyPolygon<N> &poly, unsigned int i)
 {
     return Segment(getVertex(poly, i), getVertex(poly, (i + 1) % N));
 }
@@ -565,7 +569,7 @@ Vector vectorRectIntersect(const Rectangle &r, const Vector &vecA, const Vector 
     std::vector<Vector> points = lineRectIntersect(r, vecA, (vecB - vecA) * 100 + vecA);
     for (Vector i : points)
     {
-        if (contains(Ray(vecA, vecB), i))
+        if (contains(Ray(vecA, (vecB - vecA)), i))
         {
             return i;
         }
@@ -780,6 +784,47 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
     return std::make_optional(intersection);
 }
 
+std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
+    Ray &ray, Segment &segment)
+{
+    Point ray2 = ray.getRayStart() + ray.getDirection();
+
+    std::optional<Point> intersection = lineIntersection(
+        ray.getRayStart(), ray2, segment.getSegStart(), segment.getEnd());
+
+    // If there exists a single intersection, and it exists on the ray and within the
+    // segment
+    if (intersection.has_value() && contains(ray, intersection.value()) &&
+        contains(segment, intersection.value()))
+    {
+        return std::make_pair(intersection, std::nullopt);
+    }
+    // The ray and segment are parallel, and collinear
+    else if (!intersection.has_value() &&
+             collinear(ray.getRayStart(), segment.getSegStart(), segment.getEnd()))
+    {
+        // Check if ray passes through both segment start and end
+        if (ray.getDirection().norm() ==
+                (segment.getSegStart() - ray.getRayStart()).norm() &&
+            ray.getDirection().norm() == (segment.getEnd() - ray.getRayStart()).norm())
+        {
+            return std::make_pair(segment.getSegStart(), segment.getEnd());
+        }
+
+        // Since we know the ray and segment are overlapping (with ray origin within the
+        // segment), return the ray start position, and the end of the segment that is in
+        // the direction of the ray
+        ray.getDirection().norm() == (segment.getEnd() - segment.getSegStart()).norm()
+            ? intersection = std::make_optional(segment.getEnd())
+            : intersection = std::make_optional(segment.getSegStart());
+        return std::make_pair(ray.getRayStart(), intersection.value());
+    }
+    // The ray and segment do not intersect at all
+    else
+    {
+        return std::make_pair(std::nullopt, std::nullopt);
+    }
+}
 
 Vector reflect(const Vector &v, const Vector &n)
 {

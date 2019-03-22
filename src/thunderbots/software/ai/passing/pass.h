@@ -2,16 +2,17 @@
  * Declaration for the "Pass" Class
  */
 
+#pragma once
+
 #include <array>
 #include <cstdlib>
 #include <iostream>
 
 #include "geom/point.h"
-#include "util/timestamp.h"
+#include "util/time/timestamp.h"
 
 namespace AI::Passing
 {
-    // TODO: simple test for getters
     /**
      * This class represents a Pass, with a given start position, end position,
      * speed, and start time
@@ -36,28 +37,46 @@ namespace AI::Passing
          *
          * @return The value of the receiver point
          */
-        Point receiverPoint();
+        Point receiverPoint() const;
 
         /**
          * Gets the value of the passer point
          *
          * @return The value of the passer point
          */
-        Point passerPoint();
+        Point passerPoint() const;
 
         /**
          * Gets the value of the pass speed
          *
          * @return The value of the pass speed, in meters/second
          */
-        double speed();
+        double speed() const;
 
         /**
          * Gets the value of the pass start time
          *
          * @return The value of the pass start time
          */
-        Timestamp startTime();
+        Timestamp startTime() const;
+
+        /**
+         * Estimate the time when the pass should be received
+         *
+         * This estimate does not account for friction on the ball
+         *
+         * @return An estimate of the time when the pass should be received
+         */
+        Timestamp estimateReceiveTime() const;
+
+        /**
+         * Estimate how long the pass will take, from kicking to receiving
+         *
+         * This estimate does not account for friction on the ball
+         *
+         * @return An estimate of how long the pass will take, from kicking to receiving
+         */
+        Duration estimatePassDuration() const;
 
         /**
          * Implement the "<<" operator for printing

@@ -2,7 +2,12 @@
 
 #include <algorithm>
 
-MoveTactic::MoveTactic() : Tactic() {}
+MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
+
+std::string MoveTactic::getName() const
+{
+    return "Move Tactic";
+}
 
 void MoveTactic::updateParams(Point destination, Angle final_orientation,
                               double final_speed)
@@ -25,7 +30,7 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
 std::unique_ptr<Intent> MoveTactic::calculateNextIntent(
     intent_coroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction(*robot);
+    MoveAction move_action = MoveAction();
     do
     {
         yield(move_action.updateStateAndGetNextIntent(*robot, destination,

@@ -11,8 +11,6 @@
 
 using namespace AI::Passing;
 
-// TODO: performance tests? That's gonna be tricky........
-
 class PassGeneratorTest : public testing::Test
 {
    protected:
@@ -20,6 +18,11 @@ class PassGeneratorTest : public testing::Test
     virtual void SetUp()
     {
         world = ::Test::TestUtil::createBlankTestingWorld();
+        Team friendly_team(Duration::fromSeconds(10));
+        friendly_team.updateRobots(
+            {Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(0))});
+        world.updateFriendlyTeamState(friendly_team);
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
         pass_generator = std::make_shared<PassGenerator>(0.0);
         pass_generator->setWorld(world);
@@ -41,21 +44,8 @@ TEST_F(PassGeneratorTest, static_convergence_towards_target_region)
     // Make sure we got some pass
     ASSERT_TRUE(pass1);
 
-    // Check that the pass is across the half-line towards the enemy goal
-    EXPECT_GE(pass1->receiverPoint().x(), 0.1);
-    // Currently we just generate receiver points at (0,0), so y should be 0
-    EXPECT_EQ(pass1->receiverPoint().y(), 0);
-
-    // Run a bit more
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::optional<Pass> pass2 = pass_generator->getBestPassSoFar();
-
-    // Check that we're moving towards the goal
-    ASSERT_TRUE(pass2);
-    EXPECT_GE(pass2->receiverPoint().x(), pass1->receiverPoint().x());
-
-    // Check that we're aren't moving at all in y
-    EXPECT_EQ(pass2->receiverPoint().y(), 0);
-
-    // TODO (Issue #323): Check more things here when we're actually generating passes
+    // Check that the pass receiver point is approximately the one we expect
+    EXPECT_GE(pass1->receiverPoint().x(), 3.2);
+    EXPECT_LE(pass1->receiverPoint().x(), 4.5);
+    EXPECT_NEAR(pass1->receiverPoint().y(), 0, 0.01);
 }

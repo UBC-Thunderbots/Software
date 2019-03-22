@@ -23,7 +23,8 @@ export default (state: IMessagesState = defaultState, action: ConsoleAction) => 
         case getType(console.newRosoutMessage):
             return {
                 ...state,
-                rosout: [...state.rosout, action.payload.message],
+                // Append message at beginning of array
+                rosout: [action.payload.message, ...state.rosout],
             };
         default:
             return state;

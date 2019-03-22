@@ -11,9 +11,9 @@
 #include "geom/segment.h"
 
 template <size_t N>
-using Poly     = std::array<Vector, N>;
-using Triangle = Poly<3>;
-using Quad     = Poly<4>;
+using LegacyPolygon       = std::array<Vector, N>;
+using LegacyTriangle      = LegacyPolygon<3>;
+using LegacyQuadrilateral = LegacyPolygon<4>;
 
 constexpr double EPS = 1e-9;
 
@@ -24,11 +24,12 @@ constexpr int sign(double n)
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
 }
 
-inline Triangle triangle(const Point &a, const Point &b, const Point &c)
+inline LegacyTriangle triangle(const Point &a, const Point &b, const Point &c)
 {
     return {a, b, c};
 }
-inline Quad quad(const Point &a, const Point &b, const Point &c, const Point &d)
+inline LegacyQuadrilateral quad(const Point &a, const Point &b, const Point &c,
+                                const Point &d)
 {
     return {a, b, c, d};
 }
@@ -44,12 +45,12 @@ double proj_len(const Vector &first, const Vector &second);
 double proj_len(const Segment &first, const Vector &second);
 
 /*
- * The family of `contains` functions determins whether
+ * The family of `contains` functions determines whether
  * the second parameter is contained, even if partially,
  * inside the first parameter.
  */
 
-bool contains(const Triangle &out, const Vector &in);
+bool contains(const LegacyTriangle &out, const Vector &in);
 bool contains(const Circle &out, const Vector &in);
 bool contains(const Circle &out, const Segment &in);
 bool contains(const Ray &out, const Vector &in);
@@ -61,8 +62,8 @@ bool contains(const Rectangle &out, const Vector &in);
  * exists an intersection between one object and another.
  */
 
-bool intersects(const Triangle &first, const Circle &second);
-bool intersects(const Circle &first, const Triangle &second);
+bool intersects(const LegacyTriangle &first, const Circle &second);
+bool intersects(const Circle &first, const LegacyTriangle &second);
 bool intersects(const Circle &first, const Circle &second);
 bool intersects(const Segment &first, const Circle &second);
 bool intersects(const Circle &first, const Segment &second);
@@ -98,16 +99,16 @@ double lensq(const Segment &segment);
 double lensq(const Line &line);
 
 template <size_t N>
-Vector getVertex(const Poly<N> &poly, unsigned int i);
+Vector getVertex(const LegacyPolygon<N> &poly, unsigned int i);
 template <size_t N>
-void setVertex(Poly<N> &poly, unsigned int i, Vector &v);
+void setVertex(LegacyPolygon<N> &poly, unsigned int i, Vector &v);
 
 /**
  * Gets the side that is connected to the vertex with index provided
  * and also connected to the vertex with the next index.
  */
 template <size_t N>
-Segment getSide(const Poly<N> &poly, unsigned int i);
+Segment getSide(const LegacyPolygon<N> &poly, unsigned int i);
 
 /**
  * Checks if 3 points are collinear.
@@ -350,6 +351,19 @@ std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
  * @return the reflected ray.
  */
 Point reflect(const Point &v, const Point &n);
+
+/**
+ * Calculates the intersection of a Ray and Segment
+ *
+ * @param ray: The point and direction
+ * @param segment: Line segment defined by 2 points
+ * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
+ * Returns {Point, std::nullopt} if a single intersection exists.
+ * Returns {Point, Point} if the ray and segment are overlapping, where the points define
+ * the line segment of overlap.
+ */
+std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
+    Ray &ray, Segment &segment);
 
 /**
  * Reflects a point across a line.

@@ -14,16 +14,6 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # This variable is used to let us show nice folds in travis
 export TRAVIS_FOLD_COUNTER=1
 
-# Figure out what flags we should be passing to `cmake`
-CMAKE_FLAGS=""
-if [ "$RUN_COVERAGE" == "true" ]; then
-    # These flags slow the build a bit, slower but gives more detailed coverage 
-    # info that we will use later to produce a report
-    CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug \
-                -DCMAKE_CXX_FLAGS='-O0 -fprofile-arcs -ftest-coverage' \
-                -DCMAKE_CXX_OUTPUT_EXTENSION_REPLACE=1"
-fi
-
 # Display command in Travis console and fold output in dropdown section
 function travis_run() {
   local command=$@
@@ -48,14 +38,20 @@ if [ "$RUN_BUILD" == "true" ] || \
     travis_run ./environment_setup/setup_software.sh
 
     # Build the codebase
-    travis_run catkin_make ${CMAKE_FLAGS}
+    travis_run catkin_make
 fi
 
 # Note that we must run tests to get coverage
 if [ "$RUN_TESTS" == "true" ] || \
     [ "$RUN_COVERAGE" == "true" ]; then
-    # Run tests for AI
-    travis_run catkin_make run_tests ${CMAKE_FLAGS}
+    
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Run tests for AI with coverage
+        travis_run catkin_make run_tests -DENABLE_COVERAGE=ON
+    else
+        # Run tests for AI normally
+        travis_run catkin_make run_tests
+    fi
 
     # Run tests for Corner Kick
     travis_run ./src/corner_kick/scripts/start_test.sh
@@ -63,6 +59,14 @@ if [ "$RUN_TESTS" == "true" ] || \
     # Report the results of the tests
     # (which tests failed and why)
     travis_run catkin_test_results --verbose
+
+    if [ "$RUN_COVERAGE" == "true" ]; then
+        # Upload coverage reports
+        # Note that we only grab a certain number of lines from the head
+        # and tail (start and end) of the command to prevent this generating
+        # a massive log in CI
+        travis_run bash <(curl -s https://codecov.io/bash) | (head -n100 && tail -n100)
+    fi
 fi
 
 # We need to run tests in order to get coverage

@@ -43,7 +43,7 @@ class Play
      * @param world The current state of the world
      * @return true if this Play can be started, and false otherwise
      */
-    virtual bool isApplicable(const World& world) = 0;
+    virtual bool isApplicable(const World& world) const = 0;
 
     /**
      * Returns whether or not the invariant for this Play holds (is true). The invariant
@@ -56,7 +56,7 @@ class Play
      * @param world The current state of the world
      * @return true if this Play's invariant holds (is true), and false otherwise
      */
-    virtual bool invariantHolds(const World& world) = 0;
+    virtual bool invariantHolds(const World& world) const = 0;
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -89,7 +89,7 @@ class Play
      *
      * @return the name of this Play
      */
-    virtual std::string name() = 0;
+    virtual std::string getName() const = 0;
 
     virtual ~Play() = default;
 

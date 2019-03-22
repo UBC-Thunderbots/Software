@@ -5,13 +5,30 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
+#include "grsim_backend.h"
 #include "grsim_command_primitive_visitor.h"
+#include "grsim_communication/grsim_command_primitive_visitor.h"
+#include "grsim_communication/motion_controller.h"
 #include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
+#include "proto/grSim_Replacement.pb.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
 
+
 using namespace boost::asio;
+
+// Creates a struct which inherits all lambda function given to it and uses their
+// Ts::operator(). This can be passed to std::visit to easily write multiple different
+// lambdas for each type of motion controller commands below. See
+// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
+template <class... Ts>
+struct overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overload(Ts...)->overload<Ts...>;
 
 GrSimBackend::GrSimBackend(std::string network_address, unsigned short port)
     : network_address(network_address), port(port), socket(io_service)
@@ -40,6 +57,11 @@ void GrSimBackend::sendPrimitives(
     std::chrono::duration<double> delta_time =
         std::chrono::steady_clock::now() - bangbang_timestamp;
 
+    MotionController motionController(ROBOT_MAX_SPEED_METERS_PER_SECOND,
+                                      ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
+                                      ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                                      ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+
     for (auto& prim : primitives)
     {
         if (friendly_team.getRobotById(prim->getRobotId()))
@@ -50,25 +72,42 @@ void GrSimBackend::sendPrimitives(
                 GrsimCommandPrimitiveVisitor(robot, ball);
             prim->accept(grsim_command_primitive_visitor);
 
-            MotionController::MotionControllerCommand motion_controller_command =
-                grsim_command_primitive_visitor.getMotionControllerCommand();
+            std::variant<MotionController::PositionCommand,
+                         MotionController::VelocityCommand>
+                motion_controller_command =
+                    grsim_command_primitive_visitor.getMotionControllerCommand();
 
             MotionController::Velocity robot_velocities =
-                MotionController::bangBangVelocityController(
-                    robot, motion_controller_command.global_destination,
-                    motion_controller_command.final_speed_at_destination,
-                    motion_controller_command.final_orientation, delta_time.count(),
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
-                    ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-                    ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
+                motionController.bangBangVelocityController(robot, delta_time.count(),
+                                                            motion_controller_command);
+
+            double kick_speed_meters_per_second;
+            bool chip_instead_of_kick;
+            bool dribbler_on;
+
+            std::visit(
+                overload{[&kick_speed_meters_per_second, &chip_instead_of_kick,
+                          &dribbler_on](MotionController::PositionCommand& command) {
+                             kick_speed_meters_per_second =
+                                 command.kick_speed_meters_per_second;
+                             chip_instead_of_kick = command.chip_instead_of_kick;
+                             dribbler_on          = command.dribbler_on;
+                         },
+
+                         [&kick_speed_meters_per_second, &chip_instead_of_kick,
+                          &dribbler_on](MotionController::VelocityCommand& command) {
+                             kick_speed_meters_per_second =
+                                 command.kick_speed_meters_per_second;
+                             chip_instead_of_kick = command.chip_instead_of_kick;
+                             dribbler_on          = command.dribbler_on;
+                         }},
+                motion_controller_command);
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
                 prim->getRobotId(), YELLOW, robot_velocities.linear_velocity,
-                robot_velocities.angular_velocity,
-                motion_controller_command.kick_speed_meters_per_second,
-                motion_controller_command.chip_instead_of_kick,
-                motion_controller_command.dribbler_on);
+                robot_velocities.angular_velocity, kick_speed_meters_per_second,
+                chip_instead_of_kick, dribbler_on);
 
             sendGrSimPacket(grsim_packet);
         }
@@ -109,6 +148,28 @@ grSim_Packet GrSimBackend::createGrSimPacketWithRobotVelocity(
     robot_command->set_spinner(dribbler_on);
 
     return packet;
+}
+
+void GrSimBackend::setBallState(Point destination, Vector velocity)
+{
+    sendGrSimPacket(createGrSimReplacementWithBallState(destination, velocity));
+}
+
+grSim_Packet GrSimBackend::createGrSimReplacementWithBallState(Point destination,
+                                                               Vector velocity)
+{
+    grSim_Packet packet;
+    // grSim_Replacement* replacement          = packet.mutable_replacement();
+    // grSim_BallReplacement* ball_replacement = replacement->mutable_ball();
+    // ball_replacement->set_x(destination.x());
+    // ball_replacement->set_y(destination.y());
+    // ball_replacement->set_vx(velocity.x());
+    // ball_replacement->set_vy(velocity.y());
+    packet.mutable_replacement()->mutable_ball()->set_x(destination.x());
+    packet.mutable_replacement()->mutable_ball()->set_y(destination.y());
+    packet.mutable_replacement()->mutable_ball()->set_vx(velocity.x());
+    packet.mutable_replacement()->mutable_ball()->set_vy(velocity.y());
+    return (packet);
 }
 
 void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
