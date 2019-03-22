@@ -5,7 +5,7 @@
 #include "ai/intent/chip_intent.h"
 #include "ai/intent/move_intent.h"
 
-TEST(ChipActionTest, robot_behind_ball_chiping_towards_positive_x_positive_y)
+TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-0.5, 0), Vector(), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -25,7 +25,7 @@ TEST(ChipActionTest, robot_behind_ball_chiping_towards_positive_x_positive_y)
     EXPECT_EQ(5.0, chip_intent.getChipDistance());
 }
 
-TEST(ChipActionTest, robot_behind_ball_chiping_towards_negative_x_positive_y)
+TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-2, 1.5), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -45,7 +45,7 @@ TEST(ChipActionTest, robot_behind_ball_chiping_towards_negative_x_positive_y)
     EXPECT_EQ(5.0, chip_intent.getChipDistance());
 }
 
-TEST(ChipActionTest, robot_behind_ball_chiping_towards_negative_x_negative_y)
+TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -65,7 +65,7 @@ TEST(ChipActionTest, robot_behind_ball_chiping_towards_negative_x_negative_y)
     EXPECT_EQ(3.0, chip_intent.getChipDistance());
 }
 
-TEST(ChipActionTest, robot_behind_ball_chiping_towards_positive_x_negative_y)
+TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 {
     Robot robot       = Robot(0, Point(-0.25, 0.5), Vector(), Angle::threeQuarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -85,7 +85,7 @@ TEST(ChipActionTest, robot_behind_ball_chiping_towards_positive_x_negative_y)
     EXPECT_EQ(5.0, chip_intent.getChipDistance());
 }
 
-TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_positive_x_positive_y)
+TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-1, 0.0), Vector(), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -106,7 +106,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_positive_x_positive_y
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
 
-TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_negative_x_positive_y)
+TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-2, 5), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -127,7 +127,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_negative_x_positive_y
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
 
-TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_negative_x_negative_y)
+TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -148,7 +148,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_negative_x_negative_y
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
 
-TEST(ChipActionTest, robot_not_behind_ball_chiping_towards_positive_x_negative_y)
+TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
