@@ -9,12 +9,27 @@
 #include "ai/passing/pass.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
+#include "ai/world/world.h"
 #include "geom/circle.h"
 #include "geom/point.h"
 #include "geom/rectangle.h"
 
 namespace AI::Passing
 {
+    /**
+     * Calculate the quality of a given pass
+     *
+     * @param world The world in which to rate the pass
+     * @param pass The pass to rate
+     * @param target_region The area we want to pass to (if there is a specific area,
+     *                      set to `std::nullopt` otherwise
+     *
+     * @return A value in [0,1] representing the quality of the pass, with 1 being an
+     *         ideal pass, and 0 being the worst pass possible
+     */
+    double ratePass(const World& world, const AI::Passing::Pass& pass,
+                    const std::optional<Rectangle>& target_region);
+
     /**
      * Rate pass based on the probability of scoring once we receive the pass
      *
@@ -26,7 +41,8 @@ namespace AI::Passing
      *         the pass, and 1 indicating that it is guaranteed to be able to score off of
      *         the pass
      */
-    double ratePassShootScore(Field field, Team enemy_team, AI::Passing::Pass pass);
+    double ratePassShootScore(const Field& field, const Team& enemy_team,
+                              const AI::Passing::Pass& pass);
 
     /**
      * Calculates the risk of an enemy robot interfering with a given pass
@@ -79,39 +95,6 @@ namespace AI::Passing
      *         being impossible
      */
     double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass);
-
-    /**
-     * Calculate how long it would take the given robot to turn to the given orientation
-     *
-     * @param robot The robot to calculate the rotation time for
-     * @param desired_orientation The orientation which we want the robot to be at
-     * @param max_velocity The maximum angular velocity that robot can turn at (rad/s)
-     * @param max_acceleration The maximum angular rate at which the robot can
-     *                             accelerate (rad/s^2)
-     *
-     * @return The time required for the given robot to rotate to the given orientation
-     */
-    Duration getTimeToOrientationForRobot(const Robot& robot,
-                                          const Angle& desired_orientation,
-                                          const double& max_velocity,
-                                          const double& max_acceleration);
-
-    /**
-     * Calculate minimum time it would take for the given robot to reach the given point
-     *
-     * This is only a rough calculation in order to be as performant as possible
-     *
-     * @param robot The robot to calculate the time for
-     * @param dest The destination that the robot is going to
-     * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
-     * @param max_acceleration The maximum acceleration of the robot (m/s^2)
-     *
-     * @return The minimum theoretical time it would take the robot to reach the dest
-     * point
-     */
-    Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                       const double& max_velocity,
-                                       const double& max_acceleration);
 
     /**
      * Calculates the static position quality for a given position on a given field
