@@ -1,5 +1,5 @@
 /**
- * Declaration of evaluation functions related to passing
+ * Declaration for STP pass-related evaluation functions
  */
 
 #include <optional>

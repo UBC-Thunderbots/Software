@@ -1,3 +1,6 @@
+/**
+ * Implementation for STP pass-related evaluation functions
+ */
 #include "ai/evaluation/pass.h"
 
 #include "pass.h"
@@ -32,7 +35,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
 
         // Figure out when the robot will reach the new ball position relative to the
         // time that the ball will get there (ie. will we get there in time?)
-        // TODO: NAME THIS PROPERLY
         double ball_robot_time_diff = duration - time_to_ball_pos.getSeconds();
 
         // Figure out how soon we can get to the ball, but also accounting for the time
@@ -63,7 +65,6 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
         ball.estimatePositionAtFutureTime(best_ball_travel_duration);
 
     // Check that we can get to the best position in time
-    // TODO: handle timestamp differences between ball and robot here
     Duration time_to_ball_pos = AI::Evaluation::getTimeToPositionForRobot(
         robot, best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
