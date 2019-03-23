@@ -433,11 +433,11 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
-            test/ai/grsim_communication/grsim_backend.cpp
-            test/ai/grsim_communication/catch_primitive.cpp
-            test/ai/grsim_communication/movespin_primitive.cpp
-            test/ai/grsim_communication/main.cpp
-            test/ai/grsim_communication/motion_controller.cpp
+            test/grsim_communication/grsim_backend.cpp
+            test/grsim_communication/catch_primitive.cpp
+            test/grsim_communication/movespin_primitive.cpp
+            test/grsim_communication/main.cpp
+            test/grsim_communication/motion_controller.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
             util/ros_messages.cpp
@@ -510,24 +510,38 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(time_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(shared_evaluation_test
+            ai/world/robot.cpp
+            ai/evaluation/pass.cpp
+            test/ai/evaluation/pass.cpp
+            test/ai/evaluation/main.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            )
+    target_link_libraries(shared_evaluation_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(ai_evaluation_test
+            ai/evaluation/pass.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
+            ai/hl/stp/evaluation/indirect_chip.cpp
+            ai/hl/stp/evaluation/intercept.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
-            ai/hl/stp/evaluation/indirect_chip.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
             ai/world/game_state.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
-            geom/util.cpp
             geom/rectangle.cpp
-            test/ai/evaluation/deflect_off_enemy_target.cpp
-            test/ai/evaluation/main.cpp
-            test/ai/evaluation/robot.cpp
-            test/ai/evaluation/team.cpp
+            geom/util.cpp
             test/ai/evaluation/indirect_chip.cpp
+            test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
+            test/ai/hl/stp/evaluation/main.cpp
+            test/ai/hl/stp/evaluation/pass.cpp
+            test/ai/hl/stp/evaluation/robot.cpp
+            test/ai/hl/stp/evaluation/team.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameter_utils.cpp
             util/parameter/dynamic_parameters.cpp
@@ -726,6 +740,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(passing_test
+            ai/evaluation/pass.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
@@ -745,7 +760,6 @@ if (CATKIN_ENABLE_TESTING)
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-            util/time/duration.cpp
             )
     target_link_libraries(passing_test ${catkin_LIBRARIES})
 
@@ -755,7 +769,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(evaluation_detect_threat_test
-            test/ai/evaluation/detect_threat.cpp
+            test/ai/hl/stp/evaluation/detect_threat.cpp
             ai/hl/stp/evaluation/detect_threat.cpp
             test/test_util/test_util.cpp
             ai/world/ball.cpp
