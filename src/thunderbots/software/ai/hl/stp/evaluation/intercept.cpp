@@ -1,9 +1,9 @@
 /**
  * Implementation for STP intercept-related evaluation functions
  */
-#include "ai/evaluation/pass.h"
-
 #include "intercept.h"
+
+#include "ai/evaluation/pass.h"
 #include "shared/constants.h"
 #include "util/gradient_descent.h"
 
