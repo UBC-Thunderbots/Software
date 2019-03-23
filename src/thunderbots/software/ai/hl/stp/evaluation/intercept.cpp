@@ -1,9 +1,9 @@
 /**
- * Implementation for STP pass-related evaluation functions
+ * Implementation for STP intercept-related evaluation functions
  */
 #include "ai/evaluation/pass.h"
 
-#include "pass.h"
+#include "intercept.h"
 #include "shared/constants.h"
 #include "util/gradient_descent.h"
 
@@ -47,9 +47,13 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
     // the ball position as a function of it's travel time
     // We make the weight here an inverse of the ball speed, so that the gradient descent
     // takes smaller steps when the ball is moving faster
-    Util::GradientDescentOptimizer<1> optimizer({1 / ball.velocity().len()});
+    // We add a small amount to the ball velocity here to prevent division by 0, and also
+    // to prevent the weight from getting two small, which would make gradient descent
+    // take really large time steps
+    double descent_weight = 1 / (ball.velocity().len() + 0.01);
+    Util::GradientDescentOptimizer<1> optimizer({descent_weight}, 0.001);
     Duration best_ball_travel_duration = Duration::fromSeconds(
-        std::abs(optimizer.minimize(objective_function, {0}, 50).at(0)));
+        std::abs(optimizer.minimize(objective_function, {0}, 100).at(0)));
 
     // In the objective function above, if the robot timestamp > ball timestamp, we
     // add on the difference so we get a intercept time after the robot timestamp, so we
@@ -68,21 +72,17 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
     Duration time_to_ball_pos = AI::Evaluation::getTimeToPositionForRobot(
         robot, best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    if (time_to_ball_pos > best_ball_travel_duration)
+    // NOTE: We have an addtional check here for 0 ball velocity
+    if (ball.velocity().len() != 0 && time_to_ball_pos > best_ball_travel_duration)
     {
         return std::nullopt;
     }
 
     // Check that the best intercept position is actually on the field
-    if (!field.pointInPlayableArea(best_ball_intercept_pos))
+    if (!field.pointInFieldLines(best_ball_intercept_pos))
     {
         return std::nullopt;
     }
-
-    // The time from the robot timestamp that this intercept will occur
-    Duration duration_from_robot_timestamp =
-        best_ball_travel_duration +
-        (ball.lastUpdateTimestamp() - robot.lastUpdateTimestamp());
 
     return std::make_pair(best_ball_intercept_pos, time_to_ball_pos);
 }

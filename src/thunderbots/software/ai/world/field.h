@@ -129,11 +129,12 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
-     * Gets the playable area of the field as a rectangle
+     * Gets the area within the field lines as a rectangle. This is the set of locations
+     * where the ball is considered "in play".
      *
-     * @return the playable area of the field as a rectangle
+     * @return The area within the field lines as a rectangle
      */
-    Rectangle playableArea() const;
+    Rectangle fieldLines() const;
 
     /**
      * Gets the position of the centre of the friendly goal.
@@ -242,13 +243,13 @@ class Field
     bool pointInEnemyDefenseArea(const Point p) const;
 
     /**
-     * Returns whether p is within the playable area of the field
+     * Returns whether p is within the field lines of the this field.
      *
      * @param p
      *
-     * @return true if p is within the playable area of the field, false otherwise
+     * @return true if p is within the field lines of the field, false otherwise
      */
-    bool pointInPlayableArea(const Point &p);
+    bool pointInFieldLines(const Point &p);
 
     /**
      * Compares two fields for equality

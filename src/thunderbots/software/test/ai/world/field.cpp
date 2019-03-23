@@ -65,7 +65,7 @@ TEST_F(FieldTest, update_with_all_parameters)
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
-              field_to_update.playableArea());
+              field_to_update.fieldLines());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -99,7 +99,7 @@ TEST_F(FieldTest, update_with_new_field)
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
     EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
-              field_to_update.playableArea());
+              field_to_update.fieldLines());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -222,14 +222,14 @@ TEST_F(FieldTest, point_just_outside_friendly_defense_area)
     EXPECT_FALSE(field.pointInEnemyDefenseArea(p));
 }
 
-TEST_F(FieldTest, point_in_playable_area)
+TEST_F(FieldTest, point_in_field_lines)
 {
     Point p(4.4, 2.9);
-    EXPECT_TRUE(field.pointInPlayableArea(p));
+    EXPECT_TRUE(field.pointInFieldLines(p));
 }
 
-TEST_F(FieldTest, point_not_in_playable_area)
+TEST_F(FieldTest, point_not_in_field_lines)
 {
     Point p(4.6, 3.1);
-    EXPECT_FALSE(field.pointInPlayableArea(p));
+    EXPECT_FALSE(field.pointInFieldLines(p));
 }

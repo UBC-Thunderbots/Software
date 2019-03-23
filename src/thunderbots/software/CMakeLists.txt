@@ -525,7 +525,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/evaluation/pass.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
-            ai/hl/stp/evaluation/pass.cpp
+            ai/hl/stp/evaluation/intercept.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
             ai/world/ball.cpp

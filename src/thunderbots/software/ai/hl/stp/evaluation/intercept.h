@@ -1,5 +1,5 @@
 /**
- * Declaration for STP pass-related evaluation functions
+ * Declaration for STP intercept-related evaluation functions
  */
 
 #include <optional>
@@ -21,6 +21,5 @@
  *         relative to the timestamp of the robot. If no possible intercept could be found
  *         within the field bounds, returns std::nullopt
  */
-// TODO: better name for this function?
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field,
                                                                    Robot robot);

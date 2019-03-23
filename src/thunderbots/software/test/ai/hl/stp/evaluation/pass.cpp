@@ -3,13 +3,13 @@
  * in pass.cpp
  */
 
-#include "ai/hl/stp/evaluation/pass.h"
+#include "ai/hl/stp/evaluation/intercept.h"
 
 #include <gtest/gtest.h>
 
 #include "test/test_util/test_util.h"
 
-TEST(PassEvaluationTest, findBestInterceptForBall_robot_on_ball_path)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path)
 {
     // Test where the robot is just sitting on the path the ball is travelling along
     Field field = ::Test::TestUtil::createSSLDivBField();
@@ -35,7 +35,7 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_on_ball_path)
     EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path)
 {
     // Test where the robot is sitting just off to the side of the path the ball
     // is travelling along
@@ -60,7 +60,7 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path)
     EXPECT_GE(2, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory)
 {
     // Test where the robot is sitting just off to the side of the path the ball
     // is travelling along
@@ -83,7 +83,7 @@ TEST(PassEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory)
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_not_moving)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_not_moving)
 {
     // Test where the ball is not moving
     Field field = ::Test::TestUtil::createSSLDivBField();
@@ -106,7 +106,31 @@ TEST(PassEvaluationTest, findBestInterceptForBall_ball_not_moving)
     EXPECT_GE(5, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_ball)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_very_slowly)
+{
+    // Test where the ball is moving very slowly
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball({-2, -1}, {0.000001, 0.000001}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+    // We should be able to find an intercept
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
+    ASSERT_TRUE(best_intercept);
+
+    // Since the ball is not moving, the only way to intercept it is to move to where
+    // it is (at the origin)
+    // The expected time is the time it will take the robot to move to the destination.
+    // This is dependent on robot constants, but should be in [0,5] seconds
+    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    EXPECT_NEAR(-2, intercept_pos.x(), 0.02);
+    EXPECT_NEAR(-1, intercept_pos.y(), 0.02);
+    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_GE(5, robot_time_to_move_to_intercept.getSeconds());
+}
+
+
+TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_ball)
 {
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
@@ -128,7 +152,7 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_ball)
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot)
 {
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
@@ -150,7 +174,7 @@ TEST(PassEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot)
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timestamp)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timestamp)
 {
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
@@ -172,7 +196,7 @@ TEST(PassEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timest
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_moving_to_fast_to_intercept)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_moving_too_fast_to_intercept)
 {
     // Test where we cannot get to the ball before it leaves the field, but if we ignore
     // field boundaries we could eventually catch it
