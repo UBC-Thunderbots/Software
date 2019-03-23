@@ -2,15 +2,13 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/coroutine2/all.hpp>
-
 #include "ai/intent/move_intent.h"
 
 TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot, 0.05);
+    MoveAction action = MoveAction(0.05);
 
     auto intent_ptr =
         action.updateStateAndGetNextIntent(robot, Point(1, 0), Angle::quarter(), 1.0);
@@ -30,7 +28,7 @@ TEST(MoveActionTest, robot_at_destination)
 {
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot, 0.02);
+    MoveAction action = MoveAction(0.02);
 
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
@@ -47,7 +45,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot, 0.05);
+    MoveAction action = MoveAction(0.05);
 
     // Run the Action several times
     auto intent_ptr = std::unique_ptr<Intent>{};
@@ -60,27 +58,4 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
-}
-
-TEST(MoveActionTest, test_action_reports_done_at_same_time_nullptr_returned)
-{
-    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(robot, 0.05);
-
-    // The first time the Action runs it will always return an Intent to make sure we
-    // are doing the correct thing
-    auto intent_ptr =
-        action.updateStateAndGetNextIntent(robot, Point(), Angle::zero(), 0.0);
-    EXPECT_TRUE(intent_ptr);
-    EXPECT_FALSE(action.done());
-
-    // For subsequent calls, we expect the Action to be done (in this case)
-    // We make sure that when a nullptr is returned, the action also evaluates to "done"
-    // This is important since higher-level functionality relies on the Action::done()
-    // function but returning nullptr values out of sync with this done() function could
-    // cause problems
-    intent_ptr = action.updateStateAndGetNextIntent(robot, Point(), Angle::zero(), 0.0);
-    EXPECT_FALSE(intent_ptr);
-    EXPECT_TRUE(action.done());
 }

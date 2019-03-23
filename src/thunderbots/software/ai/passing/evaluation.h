@@ -9,12 +9,27 @@
 #include "ai/passing/pass.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
+#include "ai/world/world.h"
 #include "geom/circle.h"
 #include "geom/point.h"
 #include "geom/rectangle.h"
 
 namespace AI::Passing
 {
+    /**
+     * Calculate the quality of a given pass
+     *
+     * @param world The world in which to rate the pass
+     * @param pass The pass to rate
+     * @param target_region The area we want to pass to (if there is a specific area,
+     *                      set to `std::nullopt` otherwise
+     *
+     * @return A value in [0,1] representing the quality of the pass, with 1 being an
+     *         ideal pass, and 0 being the worst pass possible
+     */
+    double ratePass(const World& world, const AI::Passing::Pass& pass,
+                    const std::optional<Rectangle>& target_region);
+
     /**
      * Rate pass based on the probability of scoring once we receive the pass
      *
@@ -26,7 +41,8 @@ namespace AI::Passing
      *         the pass, and 1 indicating that it is guaranteed to be able to score off of
      *         the pass
      */
-    double ratePassShootScore(Field field, Team enemy_team, AI::Passing::Pass pass);
+    double ratePassShootScore(const Field& field, const Team& enemy_team,
+                              const AI::Passing::Pass& pass);
 
     /**
      * Calculates the risk of an enemy robot interfering with a given pass

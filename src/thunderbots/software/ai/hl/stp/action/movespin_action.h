@@ -4,7 +4,11 @@
 #include "geom/angle.h"
 #include "geom/point.h"
 
-class MoveAction : public Action
+/**
+ * The MoveSpinAction will move the given Robot to the specified destination while
+ * spinning with the desired angular velocity
+ */
+class MoveSpinAction : public Action
 {
    public:
     // We consider the robot close to a destination when it is within 2 cm.
@@ -13,30 +17,28 @@ class MoveAction : public Action
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.02;
 
     /**
-     * Creates a new MoveAction
+     * Creates a new MoveSpinAction
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
      */
-    explicit MoveAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    explicit MoveSpinAction(
+        double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD);
 
     /**
-     * Returns the next Intent this MoveAction wants to run, given the parameters.
-     * Moves the robot in a straight line to the given destination.
+     * Returns the next Intent this MoveSpinAction wants to run, given the parameters.
      *
      * @param robot The robot to move
      * @param destination The destination to move to (in global coordinates)
-     * @param final_orientation The final orientation the robot should have at
-     * the destination
-     * @param final_speed The final speed the robot should have at the destination
+     * @param angular_velocity The how fast the robot should spin, in radians per second.
+     * A positive value spins counterclockwise, and a negative value spins clockwise
      *
-     * @return A unique pointer to the Intent the MoveAction wants to run. If the
-     * MoveAction is done, returns an empty/null pointer
+     * @return A unique pointer to the Intent the MoveSpinAction wants to run. If the
+     * MoveSpinAction is done, returns an empty/null pointer
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
                                                         Point destination,
-                                                        Angle final_orientation,
-                                                        double final_speed);
+                                                        AngularVelocity angular_velocity);
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(
@@ -44,7 +46,6 @@ class MoveAction : public Action
 
     // Action parameters
     Point destination;
-    Angle final_orientation;
-    double final_speed;
+    AngularVelocity angular_velocity;
     double close_to_dest_threshold;
 };

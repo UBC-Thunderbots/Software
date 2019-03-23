@@ -325,6 +325,24 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(nav_ph_obstacle_test
+            test/ai/navigator/obstacle/placeholder_obstacle.cpp
+            ai/world/robot.cpp
+            ai/navigator/obstacle/placeholder_obstacle.cpp
+            ai/navigator/obstacle/placeholder_obstacle.h
+            ai/navigator/obstacle/obstacle.h
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            geom/polygon.h
+            geom/polygon.cpp
+            geom/point.h
+            geom/util.cpp
+            ../shared/constants.h
+            )
+
+    target_link_libraries(nav_ph_obstacle_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
             ../shared/util.c
@@ -506,6 +524,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(ai_evaluation_test
             ai/evaluation/pass.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
+            ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/pass.cpp
             ai/hl/stp/evaluation/robot.cpp
             ai/hl/stp/evaluation/team.cpp
@@ -515,7 +534,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/rectangle.cpp
             geom/util.cpp
+            test/ai/evaluation/indirect_chip.cpp
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp
             test/ai/hl/stp/evaluation/pass.cpp
@@ -527,19 +548,25 @@ if (CATKIN_ENABLE_TESTING)
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
-    )
+            )
     target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/movespin_action.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/movespin_intent.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/robot.cpp
             test/ai/hl/stp/action/main.cpp
+            test/ai/hl/stp/test_actions/move_test_action.cpp
+            test/ai/hl/stp/action/action.cpp
             test/ai/hl/stp/action/move_action.cpp
+            test/ai/hl/stp/action/movespin_action.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/time/duration.cpp
@@ -720,7 +747,6 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
-            util/time/duration.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp

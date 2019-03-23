@@ -3,6 +3,7 @@
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/World.h>
 
+#include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
 #include "grsim_communication/grsim_backend.h"
@@ -40,6 +41,10 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
 {
     thunderbots_msgs::World world_msg = *msg;
     world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+
+    std::vector<std::unique_ptr<Primitive>> primitives;
+    primitives.emplace_back(new ChipPrimitive(0, Point(0, 0), Angle::zero(), 1));
+    grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
 }
 
 int main(int argc, char** argv)
