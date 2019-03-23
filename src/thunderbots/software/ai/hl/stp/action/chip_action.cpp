@@ -4,9 +4,9 @@
 #include "ai/intent/move_intent.h"
 #include "geom/polygon.h"
 #include "geom/util.h"
+#include "shared/constants.h"
 
-ChipAction::ChipAction(double length_of_region_behind_ball)
-    : Action(), length_of_region_behind_ball(length_of_region_behind_ball)
+ChipAction::ChipAction() : Action()
 {
 }
 
@@ -34,68 +34,70 @@ std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
 std::unique_ptr<Intent> ChipAction::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
-    // TODO: replace with real constant
-    double DIST_TO_FRONT_OF_ROBOT = 0.05;
+    // How large the triangle is that defines the region where the robot is
+    // behind the ball and ready to chip.
+    // We want to keep the region small enough that we won't use the ChipIntent from too
+    // far away (since the ChipIntent doesn't avoid obstacles and we risk colliding
+    // with something), but large enough we can reasonably get in the region and chip the
+    // ball successfully.
+    // This value is 'X' in the ASCII art below
+    double size_of_region_behind_ball = 6 * ROBOT_MAX_RADIUS_METERS;
+
     // ASCII art showing the region behind the ball
+    // Diagram not to scale
     //
-    //              X
-    //       v-------------v
+    //                             X
+    //                      v-------------v
     //
-    //    >  \-------------/
-    //    |   \           /
-    //    |    \         /
-    //    |     \       /       <- Region considered "behind ball"
-    // 2X |      \     /
-    //    |       \   /
-    //    |        \ /
-    //    >         v
+    //                   >  B-------------C
+    //                   |   \           /
+    //                   |    \         /
+    //                   |     \       /       <- Region considered "behind ball"
+    //                 X |      \     /
+    //                   |       \   /
+    //                   |        \ /
+    //                   >         A       <
+    //                                     |
+    //                                     | DIST_TO_FRONT_OF_ROBOT / 2
+    //                                     |
+    //                             O       |
+    //             ball ->        O O      <
+    //                             O
     //
-    //
-    //
-    //              O
-    //             O O          <- Ball
-    //              O
-    //
-    //              |
-    //              V
-    //       direction of chip
+    //                             |
+    //                             V
+    //                     direction of chip
 
     do
     {
         // A vector in the direction opposite the chip (behind the ball)
         Vector behind_ball =
-            Vector::createFromAngle(this->chip_direction + Angle::half());
-        // We make the closest point of the region close enough to the ball so that the
-        // robot will still be inside it when it's taking the chip.
-        // This point is the "top" of the Isosceles triangle
-        Point behind_ball_close =
-            chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT * 0.5);
-        // These points form the "base" of the Isosceles triangle
-        Point behind_ball_far_1 =
-            chip_origin +
-            behind_ball.norm(DIST_TO_FRONT_OF_ROBOT * 0.5 +
-                             length_of_region_behind_ball) +
-            behind_ball.perp().norm(length_of_region_behind_ball / 2);
-        Point behind_ball_far_2 =
-            chip_origin +
-            behind_ball.norm(DIST_TO_FRONT_OF_ROBOT * 0.5 +
-                             length_of_region_behind_ball) -
-            behind_ball.perp().norm(length_of_region_behind_ball / 2);
-        // Forms an Isosceles triangle that represents the region behind the ball. This
-        // region is close enough to the ball that the robot will still be inside it
-        // even if the ball is in the robot's dribbler, since we don't want the robot
-        // to think it's no longer behind the ball right when it's going to take the chip
-        // The height of this triangle is equal to the specified length of the region
-        // behind the ball. The base of the triangle is also equal to this length.
+                Vector::createFromAngle(this->chip_direction + Angle::half());
+
+
+        // The points below make up the triangle that defines the region we treat as
+        // "behind the ball". They correspond to the vertices labeled 'A', 'B', and 'C'
+        // in the ASCII diagram
+
+        // We make the region close enough to the ball so that the robot will still be
+        // inside it when taking the chip.
+        Point behind_ball_vertex_A =
+                chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5);
+        Point behind_ball_vertex_B = behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
+                                     behind_ball.perp().norm(size_of_region_behind_ball / 2);
+        Point behind_ball_vertex_C = behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
+                                     behind_ball.perp().norm(size_of_region_behind_ball / 2);
+
         Polygon behind_ball_region =
-            Polygon({behind_ball_close, behind_ball_far_1, behind_ball_far_2});
+                Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
 
         bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-            chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT * 0.5 +
-                                           length_of_region_behind_ball / 2);
+                chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5 +
+                                               size_of_region_behind_ball / 2);
 
+        // If we're not in position to chip, move into position
         if (!robot_behind_ball)
         {
             yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball,

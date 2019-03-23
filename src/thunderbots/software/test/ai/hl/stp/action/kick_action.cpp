@@ -9,7 +9,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-0.5, 0), Vector(), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(1);
+    KickAction action = KickAction();
 
     auto intent_ptr =
         action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 5.0);
@@ -27,9 +27,9 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
 
 TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
 {
-    Robot robot       = Robot(0, Point(-2, 1.5), Vector(), Angle::quarter(),
+    Robot robot       = Robot(0, Point(-2.3, 2.1), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(1);
+    KickAction action = KickAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-2.5, 2.5),
                                                          Angle::ofDegrees(105), 5.0);
@@ -49,7 +49,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(0.5);
+    KickAction action = KickAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-0.1, -0.4),
                                                          Angle::ofDegrees(255), 3.0);
@@ -69,7 +69,7 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_negative_y)
 {
     Robot robot       = Robot(0, Point(-0.25, 0.5), Vector(), Angle::threeQuarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(2);
+    KickAction action = KickAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(0, 0),
                                                          Angle::ofDegrees(306), 5.0);
@@ -89,7 +89,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_positive_y
 {
     Robot robot       = Robot(0, Point(-1, 0.0), Vector(), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(0.3);
+    KickAction action = KickAction();
 
     auto intent_ptr =
         action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 5.0);
@@ -101,7 +101,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_positive_y
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the MoveIntent is moving roughly behind the ball
-    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.15, 0), 0.1));
+    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.28, 0), 0.1));
     EXPECT_EQ(Angle::zero(), move_intent.getFinalAngle());
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
@@ -110,7 +110,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_positive_y
 {
     Robot robot       = Robot(0, Point(-2, 5), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(0.3);
+    KickAction action = KickAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-2.5, 2.5),
                                                          Angle::ofDegrees(105), 5.0);
@@ -122,7 +122,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_positive_y
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the MoveIntent is moving roughly behind the ball
-    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-2.45, 2.35), 0.1));
+    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-2.45, 2.25), 0.1));
     EXPECT_EQ(Angle::ofDegrees(105), move_intent.getFinalAngle());
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
@@ -131,7 +131,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_negative_y
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(), Angle::quarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(0.3);
+    KickAction action = KickAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-1, -4),
                                                          Angle::ofDegrees(255), 3.0);
@@ -143,7 +143,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_negative_x_negative_y
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the MoveIntent is moving roughly behind the ball
-    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.92, -3.85), 0.1));
+    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.85, -3.75), 0.1));
     EXPECT_EQ(Angle::ofDegrees(255), move_intent.getFinalAngle());
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
@@ -152,7 +152,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
 {
     Robot robot       = Robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    KickAction action = KickAction(0.3);
+    KickAction action = KickAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(0, 0),
                                                          Angle::ofDegrees(306), 5.0);
@@ -164,7 +164,7 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the MoveIntent is moving roughly behind the ball
-    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.05, 0.1), 0.1));
+    EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.15, 0.25), 0.1));
     EXPECT_EQ(Angle::ofDegrees(306), move_intent.getFinalAngle());
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }

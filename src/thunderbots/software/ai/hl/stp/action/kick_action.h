@@ -3,10 +3,9 @@
 #include "ai/hl/stp/action/action.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "shared/constants.h"
 
 /**
- * The KickAction makes the robot take a kick at the given location in the given
+ * The KickAction makes the robot take a kick from the given location in the given
  * direction, with the given power
  */
 class KickAction : public Action
@@ -14,15 +13,8 @@ class KickAction : public Action
    public:
     /**
      * Creates a new KickAction
-     *
-     * @param length_of_region_behind_ball The distance behind the ball the robot must be
-     * before it can kick. The default value is 3 robot diameters. We want to keep the
-     * region small enough that we won't use the KickIntent from too far away (since we
-     * risk colliding with something since the KickIntent doesn't avoid obstacles), but
-     * large enough we can reasonable get in the region and kick the ball successfully.
      */
-    explicit KickAction(double length_of_region_behind_ball = 6 *
-                                                              ROBOT_MAX_RADIUS_METERS);
+    explicit KickAction();
 
     /**
      * Returns the next Intent this KickAction wants to run, given the parameters.
@@ -64,7 +56,4 @@ class KickAction : public Action
     Point kick_origin;
     Angle kick_direction;
     double kick_speed_meters_per_second;
-    // How far behind the ball the region stretches within which we treat things
-    // as being "behind the ball"
-    const double length_of_region_behind_ball;
 };

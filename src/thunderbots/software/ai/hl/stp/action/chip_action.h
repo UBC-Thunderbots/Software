@@ -3,10 +3,9 @@
 #include "ai/hl/stp/action/action.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "shared/constants.h"
 
 /**
- * The ChipAction makes the robot chip at the given location in the given
+ * The ChipAction makes the robot chip from the given location in the given
  * direction, with the given power
  */
 class ChipAction : public Action
@@ -14,15 +13,8 @@ class ChipAction : public Action
    public:
     /**
      * Creates a new ChipAction
-     *
-     * @param length_of_region_behind_ball The distance behind the ball the robot must be
-     * before it can chip. The default value is 3 robot diameters. We want to keep the
-     * region small enough that we won't use the ChipIntent from too far away (since we
-     * risk colliding with something since the ChipIntent doesn't avoid obstacles), but
-     * large enough we can reasonable get in the region and chip the ball successfully.
      */
-    explicit ChipAction(double length_of_region_behind_ball = 6 *
-                                                              ROBOT_MAX_RADIUS_METERS);
+    explicit ChipAction();
 
     /**
      * Returns the next Intent this ChipAction wants to run, given the parameters.
@@ -66,7 +58,4 @@ class ChipAction : public Action
     Point chip_origin;
     Angle chip_direction;
     double chip_distance_meters;
-    // How far behind the ball the region stretches within which we treat things
-    // as being "behind the ball"
-    const double length_of_region_behind_ball;
 };
