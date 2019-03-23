@@ -3,6 +3,7 @@
  * styling decorators
  */
 
+import { withTests } from '@storybook/addon-jest';
 import { addDecorator, addParameters, configure } from '@storybook/react';
 import * as React from 'react';
 
@@ -10,12 +11,13 @@ import { Theme } from 'SRC/style/Theme';
 
 import theme from './theme';
 
+import results from '../../.jest-test-results.json';
+
 // automatically import all files in the stories directory
 const req = (require as any).context('..', true, /.*\.story\.tsx?$/);
 
 // Load all stories from each file
 function loadStories() {
-    require('../main');
     req.keys().forEach(req);
 }
 
@@ -28,6 +30,10 @@ addParameters({
         theme,
     },
 });
+
+addDecorator(withTests({
+    results,
+}) as any);
 
 // Init Storybook
 configure(loadStories, module);

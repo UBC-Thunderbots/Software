@@ -2,6 +2,8 @@
  * This file specifies the addons for Storybook
  */
 
+import '@storybook/addon-jest/register';
+
 import '@storybook/addon-notes/register';
 
 import '@storybook/addon-actions/register';

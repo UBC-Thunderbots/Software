@@ -11,7 +11,7 @@ import { InjectPortals } from './InjectPortals';
 
 import CornerKickReadme from '../../README.md';
 
-const stories = storiesOf('App', module).addParameters({
+const stories = storiesOf('General', module).addParameters({
     notes: {
         markdown: CornerKickReadme,
     },

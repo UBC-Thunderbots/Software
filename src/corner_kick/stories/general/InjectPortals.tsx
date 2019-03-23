@@ -11,6 +11,8 @@ export class InjectPortals extends React.Component {
             width: 100vw;
             height: 100vh;
 
+            background: #0A0E14;
+
             display: grid;
             grid-template-columns: 56px 300px 1fr;
             grid-template-rows: 40px 1fr 300px 20px;`;

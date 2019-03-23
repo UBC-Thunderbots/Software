@@ -16,8 +16,6 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-
-    background: ${(props) => props.theme.colors.selected};
 `;
 
 /**

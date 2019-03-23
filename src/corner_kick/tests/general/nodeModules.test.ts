@@ -3,8 +3,8 @@ import * as path from 'path';
 
 const packageJSON = require(path.resolve(__dirname, '../../package.json'));
 
-describe('that all dependencies have a static version', () => {
-    describe('dependencies', () => {
+describe('check for fixed version', () => {
+    describe('for dependency', () => {
         // Static dependencies ensure reliability in the codebase accross
         // computers. However, yarn and npm does not peg dependency version
         // automatically. Hence this test makes sure that any new dependencies
@@ -18,7 +18,7 @@ describe('that all dependencies have a static version', () => {
         });
     });
 
-    describe('devDependencies', () => {
+    describe('for devDependencies', () => {
         // Static dependencies ensure reliability in the codebase accross
         // computers. However, yarn and npm does not peg dependency version
         // automatically. Hence this test makes sure that any new dependencies
