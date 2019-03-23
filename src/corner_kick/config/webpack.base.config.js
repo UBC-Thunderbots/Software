@@ -38,6 +38,10 @@ const generalWebpackBuild = {
                 use: ['style-loader', 'css-loader'],
             },
             {
+                test: /\.yaml$/,
+                use: 'js-yaml-loader',
+            },
+            {
                 test: /\.(png|jpg|gif|svg)$/,
                 use: [
                     {
@@ -56,6 +60,7 @@ const generalWebpackBuild = {
         // We set an alias to our src directory to reduce the need for relative paths.
         alias: {
             SRC: path.resolve(__dirname, '../src'),
+            THUNDERBOTS_ROOT: path.resolve(__dirname, '../../../'),
         },
     },
 };
