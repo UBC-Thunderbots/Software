@@ -25,17 +25,15 @@ class BlockShotPathTactic : public Tactic
      * Updates the parameters for this BlockShotPathTactic.
      *
      * @param enemy_robot The enemy robot to block from shooting on the friendly net
-     * @param field the Field we are playing on
      */
-    void updateParams(const Robot& enemy_robot, const Field& field);
+    void updateParams(const Robot& enemy_robot);
 
     /**
      * Updates the parameters for this BlockShotPathTactic.
      *
      * @param shot_origin The origin of the shot to block
-     * @param field the Field we are playing on
      */
-    void updateParams(const Point& shot_origin, const Field& field);
+    void updateParams(const Point& shot_origin);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

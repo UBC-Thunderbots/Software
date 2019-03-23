@@ -17,7 +17,7 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     tactic.updateRobot(friendly_robot);
     // Shoot from 2m in front of the goal
     Point shot_origin = field.friendlyGoal() + Point(2, 0);
-    tactic.updateParams(shot_origin, field);
+    tactic.updateParams(shot_origin);
     auto intent_ptr = tactic.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -47,7 +47,7 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
 
     BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
-    tactic.updateParams(enemy_robot, field);
+    tactic.updateParams(enemy_robot);
     auto intent_ptr = tactic.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -74,7 +74,7 @@ TEST(BlockShotPathTacticTest, test_calculate_robot_cost)
                         Timestamp::fromSeconds(0));
 
     BlockShotPathTactic tactic = BlockShotPathTactic(world.field());
-    tactic.updateParams(Point(), world.field());
+    tactic.updateParams(Point());
 
     // The robot is a little over 2 meters away from where we expect it to block, so the
     // cost should be relatively low
