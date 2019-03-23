@@ -16,6 +16,9 @@
 #include "geom/point.h"
 #include "util/logger/init.h"
 
+#define THRESH 0.05f
+#define WITHIN_THRESH(X) (X<=THRESH && X>=-THRESH)
+
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)
     : robot(robot), ball(ball)
@@ -150,10 +153,10 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
     // Compute final position
     Point final_robot_position(
-        pivot_primitive.getPivotPoint() +
-            pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().cos(),
-        pivot_primitive.getPivotPoint() +
-            pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().sin());
+        pivot_primitive.getPivotPoint().x() +
+            (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().cos()),
+        pivot_primitive.getPivotPoint().y() +
+            (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().sin()));
 
     Vector pivot_point_to_robot = pivot_primitive.getPivotPoint() - robot.position();
     Vector unit_pivot_point_to_robot = (pivot_primitive.getPivotPoint() - robot.position())/pivot_point_to_robot.len();
@@ -169,8 +172,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // based on how much of the general direction projects onto the two tangential 
     // direction vector, the direction is selected. The one with the lower mangnitude 
     // is selected, as it will be the shortest path to rotate
-    float weight_of_direction_1 = general_dir.dot(tangential_dir_1);
-    float weight_of_direction_2 = general_dir.dot(tangential_dir_2);
+    float weight_of_direction_1 = general_direction_to_destination.dot(tangential_dir_1);
+    float weight_of_direction_2 = general_direction_to_destination.dot(tangential_dir_2);
 
     // get tangential and radial directions
     Vector tangential_dir = (weight_of_direction_1 >= weight_of_direction_1) ? tangential_dir_1 : tangential_dir_2;
@@ -182,41 +185,36 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // gets the magnitude of a straight line from the current position and the final position 
     // this value is used to scale the speed
     double linear_displacement_to_final_position = (final_robot_position - robot.position()).len();
-    float disp_to_final_dest = compute_magnitude(end_goal_vect);
 
-    // TODO bring it to zero if its close enough (disp_to_final_dest)
+    // project current velocity onto tangential and radial vectors
+    float current_tangential_velocity = robot.velocity().dot(tangential_dir);
+    float current_radial_velocity = robot.velocity().dot(radial_dir);
 
-    // figure out all velocities in prioritized directions
-    float current_rot_vel = dot_product(tangential_dir, vel, 2);
-    float current_cor_vel = dot_product(radial_dir, vel, 2);
-
-    float mag_accel_orbital = compute_acceleration(
-        &rotation_profile, disp_to_final_dest, current_rot_vel, STOPPED, MAX_A, MAX_V);
-    float mag_accel_correction = compute_acceleration(
-        &correction_profile, correction, current_cor_vel, STOPPED, MAX_A, MAX_V);
-
-    PositionCommand(Angle final_orientation,
-                    double kick_or_chip_power,
-                    bool chip_instead_of_kick,
-                    bool dribbler_on,
-                    Vector requested_linear_velocity,
-                    AngularVelocity requested_angular_velocity)
+    //float magnitude_of_orbital_velocity = compute_acceleration(
+        //, current_rot_vel, STOPPED, MAX_A, MAX_V);
+    //float mag_accel_correction = compute_acceleration(
+        //&correction_profile, correction, current_cor_vel, STOPPED, MAX_A, MAX_V);
 
     // add the 3 directions together
     float accel[3] = {0};
 
-    accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
-    accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
+    //accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
+    //accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
 
-    if (WITHIN_THRESH(correction))
-    {
-        accel[0] += mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
-        accel[1] += mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
-    }
+    //if (WITHIN_THRESH(correction))
+    //{
+        //accel[0] += mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
+        //accel[1] += mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
+    //}
 
-    // destination
-    float angle =
-        min_angle_delta(current_bot_state.angle, atan2f(rel_dest[1], rel_dest[0]));
+    //// destination
+    //float angle =
+        //min_angle_delta(current_bot_state.angle, atan2f(rel_dest[1], rel_dest[0]));
+        //AngularVelocity angular_velocity;
+    //motion_controller_command = MotionController::VelocityCommand(
+        //-10, false, false, radial_dir, angular_velocity);
+    motion_controller_command = MotionController::PositionCommand(
+        final_robot_position, robot.orientation(), pivot_point_to_robot.len(), 0.0, false, false); 
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
