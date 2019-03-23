@@ -255,6 +255,74 @@ TEST(ROSMessageUtilTest, convert_team_with_no_goalie_to_ros_message)
     EXPECT_EQ(4.4, team_msg.robots.at(0).timestamp_seconds);
 }
 
+TEST(ROSMessageUtilTest, transform_ball)
+{
+    Ball ball = Ball(Point(-1.3, 0.2), Vector(-1.3, 5.4), Timestamp::fromSeconds(123.45));
+    thunderbots_msgs::Ball ball_msg = Util::ROSMessages::convertBallToROSMessage(ball);
+
+    thunderbots_msgs::Ball transformed_ball_msg = Util::ROSMessages::transformBallMessage(ball_msg);
+
+    EXPECT_EQ(1.3, transformed_ball_msg.position.x);
+    EXPECT_EQ(-0.2, transformed_ball_msg.position.y);
+    EXPECT_EQ(1.3, transformed_ball_msg.velocity.x);
+    EXPECT_EQ(-5.4, transformed_ball_msg.velocity.y);
+    EXPECT_EQ(Timestamp::fromSeconds(123.45).getSeconds(), transformed_ball_msg.timestamp_seconds);
+}
+
+TEST(ROSMessageUtilTest, transform_robot)
+{
+    Robot robot = Robot(1, Point(1, -5.01), Vector(-2, 3), Angle::quarter(),
+                        AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
+    thunderbots_msgs::Robot robot_msg = Util::ROSMessages::convertRobotToROSMessage(robot);
+
+    thunderbots_msgs::Robot transformed_robot_msg = Util::ROSMessages::transformRobotMessage(robot_msg);
+
+    EXPECT_EQ(1, transformed_robot_msg.id);
+    EXPECT_EQ(-1, transformed_robot_msg.position.x);
+    EXPECT_EQ(5.01, transformed_robot_msg.position.y);
+    EXPECT_EQ(2, transformed_robot_msg.velocity.x);
+    EXPECT_EQ(-3, transformed_robot_msg.velocity.y);
+    EXPECT_EQ(Angle::quarter().toRadians() + Angle::half().toRadians(), transformed_robot_msg.orientation);
+    EXPECT_EQ(AngularVelocity::ofRadians(1).toRadians(), transformed_robot_msg.angular_velocity);
+    EXPECT_EQ(Timestamp::fromSeconds(4.4).getSeconds(), transformed_robot_msg.timestamp_seconds);
+}
+
+TEST(ROSMessageUtilTest, transform_robots)
+{
+    Robot robot1 = Robot(1, Point(1, -5.01), Vector(-2, 3), Angle::quarter(),
+                        AngularVelocity::ofRadians(1), Timestamp::fromSeconds(4.4));
+    Robot robot2 = Robot(2, Point(10.4, -2.05), Vector(4, -6), Angle::half(),
+                        AngularVelocity::ofRadians(1), Timestamp::fromSeconds(5.6));
+
+    thunderbots_msgs::Robot robot1_msg = Util::ROSMessages::convertRobotToROSMessage(robot1);
+    thunderbots_msgs::Robot robot2_msg = Util::ROSMessages::convertRobotToROSMessage(robot2);
+
+    std::vector<thunderbots_msgs::Robot> robot_msgs = {robot1_msg, robot2_msg};
+
+    std::vector<thunderbots_msgs::Robot> transformed_robot_msgs = Util::ROSMessages::transformRobotMessages(robot_msgs);
+
+    thunderbots_msgs::Robot transformed_robot1_msg = transformed_robot_msgs.at(0);
+    thunderbots_msgs::Robot transformed_robot2_msg = transformed_robot_msgs.at(1);
+
+    EXPECT_EQ(1, transformed_robot1_msg.id);
+    EXPECT_EQ(-1, transformed_robot1_msg.position.x);
+    EXPECT_EQ(5.01, transformed_robot1_msg.position.y);
+    EXPECT_EQ(2, transformed_robot1_msg.velocity.x);
+    EXPECT_EQ(-3, transformed_robot1_msg.velocity.y);
+    EXPECT_EQ(Angle::quarter().toRadians() + Angle::half().toRadians(), transformed_robot1_msg.orientation);
+    EXPECT_EQ(AngularVelocity::ofRadians(1).toRadians(), transformed_robot1_msg.angular_velocity);
+    EXPECT_EQ(Timestamp::fromSeconds(4.4).getSeconds(), transformed_robot1_msg.timestamp_seconds);
+
+    EXPECT_EQ(2, transformed_robot2_msg.id);
+    EXPECT_EQ(-10.4, transformed_robot2_msg.position.x);
+    EXPECT_EQ(2.05, transformed_robot2_msg.position.y);
+    EXPECT_EQ(-4, transformed_robot2_msg.velocity.x);
+    EXPECT_EQ(6, transformed_robot2_msg.velocity.y);
+    EXPECT_EQ(Angle::half().toRadians() + Angle::half().toRadians(), transformed_robot2_msg.orientation);
+    EXPECT_EQ(AngularVelocity::ofRadians(1).toRadians(), transformed_robot1_msg.angular_velocity);
+    EXPECT_EQ(Timestamp::fromSeconds(5.6).getSeconds(), transformed_robot2_msg.timestamp_seconds);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

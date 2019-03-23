@@ -22,11 +22,6 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 {
 }
 
-void World::transformField(const Field &field)
-{
-
-}
-
 void World::updateFieldGeometry(const Field &new_field_data)
 {
     field_.updateDimensions(new_field_data);
