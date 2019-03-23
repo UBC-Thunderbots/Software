@@ -1,4 +1,5 @@
 #include "ai/hl/stp/tactic/block_shot_path_tactic.h"
+
 #include "geom/util.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
@@ -10,17 +11,19 @@ std::string BlockShotPathTactic::getName() const
     return "Block Shot Path Tactic";
 }
 
-void BlockShotPathTactic::updateParams(const Robot& enemy_robot, const Field& field) {
+void BlockShotPathTactic::updateParams(const Robot& enemy_robot, const Field& field)
+{
     updateParams(enemy_robot.position(), field);
 }
 
-void BlockShotPathTactic::updateParams(const Point& shot_origin, const Field& field) {
+void BlockShotPathTactic::updateParams(const Point& shot_origin, const Field& field)
+{
     // Update the parameters stored by this Tactic
     this->shot_origin = shot_origin;
-    this->field = field;
+    this->field       = field;
 }
 
-double BlockShotPathTactic::calculateRobotCost(const Robot &robot, const World &world)
+double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
     // Prefer robots closer to the block position
     // We normalize with the total field length so that robots that are within the field
@@ -30,18 +33,23 @@ double BlockShotPathTactic::calculateRobotCost(const Robot &robot, const World &
     return std::clamp<double>(cost, 0, 1);
 }
 
-Point BlockShotPathTactic::getBlockPosition() {
-    if(!this->field) {
-        LOG(WARNING) << "The Field for the " << getName() << " was not initialized" << std::endl;
+Point BlockShotPathTactic::getBlockPosition()
+{
+    if (!this->field)
+    {
+        LOG(WARNING) << "The Field for the " << getName() << " was not initialized"
+                     << std::endl;
         return this->robot->position();
     }
 
-    Point block_position = calcBlockCone(this->field->friendlyGoalpostPos(), this->field->friendlyGoalpostNeg(), this->shot_origin, ROBOT_MAX_RADIUS_METERS);
+    Point block_position = calcBlockCone(this->field->friendlyGoalpostPos(),
+                                         this->field->friendlyGoalpostNeg(),
+                                         this->shot_origin, ROBOT_MAX_RADIUS_METERS);
     return block_position;
 }
 
 std::unique_ptr<Intent> BlockShotPathTactic::calculateNextIntent(
-    intent_coroutine::push_type &yield)
+    intent_coroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction();
     do

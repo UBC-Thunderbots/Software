@@ -3,15 +3,15 @@
 #include <gtest/gtest.h>
 
 #include "ai/intent/move_intent.h"
-#include "test/test_util/test_util.h"
 #include "geom/util.h"
+#include "test/test_util/test_util.h"
 
 TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
+    Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     BlockShotPathTactic tactic = BlockShotPathTactic();
     tactic.updateRobot(friendly_robot);
@@ -27,7 +27,9 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
-    EXPECT_LE(dist(Segment(shot_origin, field.friendlyGoal()), move_intent.getDestination()), 0.1);
+    EXPECT_LE(
+        dist(Segment(shot_origin, field.friendlyGoal()), move_intent.getDestination()),
+        0.1);
     // Make sure the robot is facing the shot
     EXPECT_EQ(Angle::zero(), move_intent.getFinalAngle());
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
@@ -37,8 +39,8 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
 
-    Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(), AngularVelocity::zero(),
-                                 Timestamp::fromSeconds(0));
+    Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     BlockShotPathTactic tactic = BlockShotPathTactic();
     tactic.updateRobot(friendly_robot);
@@ -54,9 +56,12 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
-    EXPECT_LE(dist(Segment(shot_origin, field.friendlyGoal()), move_intent.getDestination()), 0.1);
+    EXPECT_LE(
+        dist(Segment(shot_origin, field.friendlyGoal()), move_intent.getDestination()),
+        0.1);
     // Make sure the robot is facing the shot
-    EXPECT_NEAR((shot_origin - field.friendlyGoal()).orientation().toRadians(), move_intent.getFinalAngle().toRadians(), 0.001);
+    EXPECT_NEAR((shot_origin - field.friendlyGoal()).orientation().toRadians(),
+                move_intent.getFinalAngle().toRadians(), 0.001);
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
 
