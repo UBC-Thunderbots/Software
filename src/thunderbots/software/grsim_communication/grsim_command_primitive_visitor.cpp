@@ -153,12 +153,9 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
-    float kickPower =
-        (float)(dribble_primitive.isSmallKickAllowed() ? DRIBBLE_SMALL_KICK_POWER : 0.0);
-
-    motion_controller_command = MotionController::MotionControllerCommand(
+    motion_controller_command = MotionController::PositionCommand(
         dribble_primitive.getDestination(), dribble_primitive.getFinalAngle(),
-        dribble_primitive.getFinalSpeed(), kickPower, false, true);
+        dribble_primitive.getFinalSpeed(), 0.0, false, true);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)

@@ -88,6 +88,11 @@ Rectangle Field::enemyDefenseArea() const
                      Point(field_length_ * 0.5 - defense_length_, -defense_width_ / 2.0));
 }
 
+Rectangle Field::fieldLines() const
+{
+    return Rectangle(friendlyCornerNeg(), enemyCornerPos());
+}
+
 double Field::centreCircleRadius() const
 {
     return center_circle_radius_;
@@ -166,6 +171,11 @@ bool Field::pointInFriendlyDefenseArea(const Point p) const
 bool Field::pointInEnemyDefenseArea(const Point p) const
 {
     return enemyDefenseArea().containsPoint(p);
+}
+
+bool Field::pointInFieldLines(const Point &p)
+{
+    return fieldLines().containsPoint(p);
 }
 
 bool Field::operator==(const Field &other) const
