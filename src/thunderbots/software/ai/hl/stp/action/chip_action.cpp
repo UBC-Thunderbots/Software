@@ -6,9 +6,7 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-ChipAction::ChipAction() : Action()
-{
-}
+ChipAction::ChipAction() : Action() {}
 
 std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
     const Robot& robot, Point chip_origin, Point chip_target, double chip_distance_meters)
@@ -72,7 +70,7 @@ std::unique_ptr<Intent> ChipAction::calculateNextIntent(
     {
         // A vector in the direction opposite the chip (behind the ball)
         Vector behind_ball =
-                Vector::createFromAngle(this->chip_direction + Angle::half());
+            Vector::createFromAngle(this->chip_direction + Angle::half());
 
 
         // The points below make up the triangle that defines the region we treat as
@@ -82,20 +80,22 @@ std::unique_ptr<Intent> ChipAction::calculateNextIntent(
         // We make the region close enough to the ball so that the robot will still be
         // inside it when taking the chip.
         Point behind_ball_vertex_A =
-                chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5);
-        Point behind_ball_vertex_B = behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
-                                     behind_ball.perp().norm(size_of_region_behind_ball / 2);
-        Point behind_ball_vertex_C = behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
-                                     behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5);
+        Point behind_ball_vertex_B =
+            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
+            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+        Point behind_ball_vertex_C =
+            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
+            behind_ball.perp().norm(size_of_region_behind_ball / 2);
 
         Polygon behind_ball_region =
-                Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
+            Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
 
         bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-                chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5 +
-                                               size_of_region_behind_ball / 2);
+            chip_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5 +
+                                           size_of_region_behind_ball / 2);
 
         // If we're not in position to chip, move into position
         if (!robot_behind_ball)

@@ -6,9 +6,7 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-KickAction::KickAction() : Action()
-{
-}
+KickAction::KickAction() : Action() {}
 
 std::unique_ptr<Intent> KickAction::updateStateAndGetNextIntent(
     const Robot& robot, Point kick_origin, Point kick_target,
@@ -42,7 +40,7 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
     // with something), but large enough we can reasonably get in the region and kick the
     // ball successfully.
     // This value is 'X' in the ASCII art below
-     double size_of_region_behind_ball = 6 * ROBOT_MAX_RADIUS_METERS;
+    double size_of_region_behind_ball = 6 * ROBOT_MAX_RADIUS_METERS;
 
     // ASCII art showing the region behind the ball
     // Diagram not to scale
@@ -84,10 +82,12 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
         // inside it when taking the kick.
         Point behind_ball_vertex_A =
             kick_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5);
-        Point behind_ball_vertex_B = behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
+        Point behind_ball_vertex_B =
+            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
             behind_ball.perp().norm(size_of_region_behind_ball / 2);
-        Point behind_ball_vertex_C = behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
-                                     behind_ball.perp().norm(size_of_region_behind_ball / 2);
+        Point behind_ball_vertex_C =
+            behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
+            behind_ball.perp().norm(size_of_region_behind_ball / 2);
 
         Polygon behind_ball_region =
             Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});

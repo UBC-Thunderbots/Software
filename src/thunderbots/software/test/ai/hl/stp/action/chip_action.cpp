@@ -8,11 +8,11 @@
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-0.5, 0), Vector(), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr =
-            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 5.0);
+        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 5.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -28,7 +28,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-2.3, 2.1), Vector(), Angle::quarter(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-2.5, 2.5),
@@ -48,7 +48,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_positive_y)
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(), Angle::quarter(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-0.1, -0.4),
@@ -68,7 +68,7 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_negative_x_negative_y)
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 {
     Robot robot       = Robot(0, Point(-0.25, 0.5), Vector(), Angle::threeQuarter(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(0, 0),
@@ -88,11 +88,11 @@ TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_negative_y)
 TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-1, 0.0), Vector(), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr =
-            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 5.0);
+        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 5.0);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -109,7 +109,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_positive_
 TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_y)
 {
     Robot robot       = Robot(0, Point(-2, 5), Vector(), Angle::quarter(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-2.5, 2.5),
@@ -130,7 +130,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_positive_
 TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0, 0), Vector(), Angle::quarter(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(-1, -4),
@@ -151,7 +151,7 @@ TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_negative_x_negative_
 TEST(ChipActionTest, robot_not_behind_ball_chipping_towards_positive_x_negative_y)
 {
     Robot robot       = Robot(0, Point(0.5, 1), Vector(), Angle::threeQuarter(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     ChipAction action = ChipAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, Point(0, 0),
