@@ -109,7 +109,7 @@ fi
 
 rosdep update
 # Install all required dependencies to build this repo
-rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro melodic -y
+rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro melodic -y --os=ubuntu:bionic
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing ROS dependencies failed"

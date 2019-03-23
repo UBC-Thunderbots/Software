@@ -64,6 +64,8 @@ TEST_F(FieldTest, update_with_all_parameters)
               field_to_update.friendlyDefenseArea());
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
+              field_to_update.fieldLines());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -96,6 +98,8 @@ TEST_F(FieldTest, update_with_new_field)
               field_to_update.friendlyDefenseArea());
     EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)),
               field_to_update.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.5, -3.0), Point(4.5, 3.0)),
+              field_to_update.fieldLines());
 
     EXPECT_EQ(Point(-3.5, 0.0), field_to_update.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field_to_update.penaltyEnemy());
@@ -182,38 +186,50 @@ TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
     EXPECT_NE(field_1, field_2);
 }
 
-TEST_F(FieldTest, ball_not_in_defense_area)
+TEST_F(FieldTest, point_not_in_defense_area)
 {
     // point around centre
     Point p(2, 3);
-    EXPECT_EQ(false, field.pointInFriendlyDefenseArea(p));
-    EXPECT_EQ(false, field.pointInEnemyDefenseArea(p));
+    EXPECT_FALSE(field.pointInFriendlyDefenseArea(p));
+    EXPECT_FALSE(field.pointInEnemyDefenseArea(p));
 }
 
-TEST_F(FieldTest, ball_in_friendly_defense_area)
+TEST_F(FieldTest, point_in_friendly_defense_area)
 {
     Point p(-4, 0.5);
-    EXPECT_EQ(true, field.pointInFriendlyDefenseArea(p));
-    EXPECT_EQ(false, field.pointInEnemyDefenseArea(p));
+    EXPECT_TRUE(field.pointInFriendlyDefenseArea(p));
+    EXPECT_FALSE(field.pointInEnemyDefenseArea(p));
 }
 
-TEST_F(FieldTest, ball_in_enemy_defense_area)
+TEST_F(FieldTest, point_in_enemy_defense_area)
 {
     Point p(4, -1.0);
-    EXPECT_EQ(false, field.pointInFriendlyDefenseArea(p));
-    EXPECT_EQ(true, field.pointInEnemyDefenseArea(p));
+    EXPECT_FALSE(field.pointInFriendlyDefenseArea(p));
+    EXPECT_TRUE(field.pointInEnemyDefenseArea(p));
 }
 
-TEST_F(FieldTest, ball_just_outside_enemy_defense_area)
+TEST_F(FieldTest, point_just_outside_enemy_defense_area)
 {
     Point p(4, -1.5);
-    EXPECT_EQ(false, field.pointInFriendlyDefenseArea(p));
-    EXPECT_EQ(false, field.pointInEnemyDefenseArea(p));
+    EXPECT_FALSE(field.pointInFriendlyDefenseArea(p));
+    EXPECT_FALSE(field.pointInEnemyDefenseArea(p));
 }
 
-TEST_F(FieldTest, ball_just_outside_friendly_defense_area)
+TEST_F(FieldTest, point_just_outside_friendly_defense_area)
 {
     Point p(-2, -.5);
-    EXPECT_EQ(false, field.pointInFriendlyDefenseArea(p));
-    EXPECT_EQ(false, field.pointInEnemyDefenseArea(p));
+    EXPECT_FALSE(field.pointInFriendlyDefenseArea(p));
+    EXPECT_FALSE(field.pointInEnemyDefenseArea(p));
+}
+
+TEST_F(FieldTest, point_in_field_lines)
+{
+    Point p(4.4, 2.9);
+    EXPECT_TRUE(field.pointInFieldLines(p));
+}
+
+TEST_F(FieldTest, point_not_in_field_lines)
+{
+    Point p(4.6, 3.1);
+    EXPECT_FALSE(field.pointInFieldLines(p));
 }
