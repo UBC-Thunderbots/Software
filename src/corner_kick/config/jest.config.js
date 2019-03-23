@@ -6,13 +6,13 @@
  */
 module.exports = {
     rootDir: '..',
-    roots: ['<rootDir>/src'],
+    roots: ['<rootDir>/tests'],
     // Assigning all tsx files to be interpreted by ts-jest
     transform: {
         '^.+\\.tsx?$': 'ts-jest',
     },
-    // Any files inside __tests__ is a test file
-    testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+    // Any files with extension (spec|test).ts(x) is a test file
+    testRegex: '(\\.|/)(test|spec)\\.tsx?$',
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     // SRC points to the src folder
     moduleNameMapper: {

@@ -5,9 +5,9 @@
 import { storiesOf } from '@storybook/react';
 import * as React from 'react';
 
-import { StorybookStage } from '..';
+import { StorybookStage } from 'SRC/components/StorybookStage';
 
-const stories = storiesOf('Storybook Stage', module);
+const stories = storiesOf('Components.Storybook Stage', module);
 
 stories.add('with fixed dimensions', () => (
     <StorybookStage width="300px" height="200px">

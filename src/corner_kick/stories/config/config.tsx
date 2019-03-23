@@ -10,11 +10,12 @@ import { Theme } from 'SRC/style/Theme';
 
 import theme from './theme';
 
-// automatically import all files in the __stories__ directory
-const req = (require as any).context('../src', true, /__stories__\/.*.tsx$/);
+// automatically import all files in the stories directory
+const req = (require as any).context('..', true, /.*\.story\.tsx?$/);
 
 // Load all stories from each file
 function loadStories() {
+    require('../main');
     req.keys().forEach(req);
 }
 

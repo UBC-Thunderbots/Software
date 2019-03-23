@@ -26,6 +26,8 @@ const Wrapper = styled.div`
 const Content = styled('div')<{ width?: string; height?: string }>`
     width: ${(props) => props.width};
     height: ${(props) => props.height};
+    max-width: 100%;
+    max-height: 100%;
     border: 1px solid ${(props) => props.theme.colors.border};
     background: ${(props) => props.theme.colors.bg};
 `;
