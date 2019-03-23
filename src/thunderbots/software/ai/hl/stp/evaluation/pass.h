@@ -23,6 +23,3 @@
  */
  // TODO: better name for this function?
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field, Robot robot);
-
-
-// TODO: move getTimeToOrientationForRobot and getTimeToOrientationForRobot here

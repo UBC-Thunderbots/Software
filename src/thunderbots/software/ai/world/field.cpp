@@ -176,6 +176,7 @@ bool Field::pointInEnemyDefenseArea(const Point p) const
 }
 
 bool Field::pointInPlayableArea(const Point &p) {
+    return playableArea().containsPoint(p);
 }
 
 bool Field::operator==(const Field &other) const
