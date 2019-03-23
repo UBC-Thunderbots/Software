@@ -884,7 +884,7 @@ double offsetToLine(Vector x0, Vector x1, Vector p)
     // get normal to line
     n = (x1 - x0).perp().norm();
 
-    return abs(n.dot(p - x0));
+    return fabs(n.dot(p - x0));
 }
 
 double offsetAlongLine(Vector x0, Vector x1, Vector p)
