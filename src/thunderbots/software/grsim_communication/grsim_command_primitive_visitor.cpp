@@ -84,9 +84,8 @@ void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    double point_behind_x = Point::createFromAngle(chip_direction).x();
-    double point_behind_y = Point::createFromAngle(chip_direction).y();
-    Point point_behind    = chip_origin + Vector(point_behind_x, point_behind_y);
+    Point point_behind = chip_origin + Vector(Point::createFromAngle(chip_direction).x(),
+                                              Point::createFromAngle(chip_direction).y());
 
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), chip_origin, point_behind);
@@ -159,9 +158,8 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
     double final_speed_at_destination = 0.0;
 
-    double point_behind_x = Point::createFromAngle(kick_direction).x();
-    double point_behind_y = Point::createFromAngle(kick_direction).y();
-    Point point_behind    = kick_origin + Vector(point_behind_x, point_behind_y);
+    Point point_behind = kick_origin + Vector(Point::createFromAngle(kick_direction).x(),
+                                              Point::createFromAngle(kick_direction).y());
 
     Point closest_point_to_line =
         closestPointOnLine(robot.position(), kick_origin, point_behind);
