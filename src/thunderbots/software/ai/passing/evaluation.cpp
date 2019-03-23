@@ -3,13 +3,14 @@
  */
 
 
+#include "ai/passing/evaluation.h"
+
 #include <numeric>
 
 #include "../shared/constants.h"
+#include "ai/evaluation/pass.h"
 #include "geom/util.h"
 #include "util/parameter/dynamic_parameters.h"
-#include "ai/passing/evaluation.h"
-#include "ai/evaluation/pass.h"
 
 using namespace AI::Passing;
 using namespace AI::Evaluation;

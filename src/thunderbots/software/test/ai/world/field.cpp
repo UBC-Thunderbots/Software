@@ -222,12 +222,14 @@ TEST_F(FieldTest, point_just_outside_friendly_defense_area)
     EXPECT_FALSE(field.pointInEnemyDefenseArea(p));
 }
 
-TEST_F(FieldTest, point_in_playable_area){
+TEST_F(FieldTest, point_in_playable_area)
+{
     Point p(4.4, 2.9);
     EXPECT_TRUE(field.pointInPlayableArea(p));
 }
 
-TEST_F(FieldTest, point_not_in_playable_area){
+TEST_F(FieldTest, point_not_in_playable_area)
+{
     Point p(4.6, 3.1);
     EXPECT_FALSE(field.pointInPlayableArea(p));
 }

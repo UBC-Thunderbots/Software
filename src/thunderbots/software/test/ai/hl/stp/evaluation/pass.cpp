@@ -3,16 +3,19 @@
  * in pass.cpp
  */
 
+#include "ai/hl/stp/evaluation/pass.h"
+
 #include <gtest/gtest.h>
 
-#include "ai/hl/stp/evaluation/pass.h"
 #include "test/test_util/test_util.h"
 
-TEST(PassEvaluationTest, findBestInterceptForBall_robot_on_ball_path){
+TEST(PassEvaluationTest, findBestInterceptForBall_robot_on_ball_path)
+{
     // Test where the robot is just sitting on the path the ball is travelling along
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({0,0}, {3,0}, Timestamp::fromSeconds(0));
-    Robot robot(0, {2,0}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -29,15 +32,17 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_on_ball_path){
     EXPECT_LE(1.75, intercept_pos.x());
     EXPECT_GE(2.25, intercept_pos.x());
     EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
-    EXPECT_LE(2/3, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path){
+TEST(PassEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path)
+{
     // Test where the robot is sitting just off to the side of the path the ball
     // is travelling along
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({0,0}, {1,0}, Timestamp::fromSeconds(0));
-    Robot robot(0, {2,0.2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, {1, 0}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 0.2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -55,12 +60,14 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_path){
     EXPECT_GE(2, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory){
+TEST(PassEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory)
+{
     // Test where the robot is sitting just off to the side of the path the ball
     // is travelling along
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({0.5,0.5}, {0.5,0.5}, Timestamp::fromSeconds(0));
-    Robot robot(0, {3,0}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball({0.5, 0.5}, {0.5, 0.5}, Timestamp::fromSeconds(0));
+    Robot robot(0, {3, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -76,11 +83,13 @@ TEST(PassEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory){
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_not_moving){
+TEST(PassEvaluationTest, findBestInterceptForBall_ball_not_moving)
+{
     // Test where the ball is not moving
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({-2,-1}, {0,0}, Timestamp::fromSeconds(0));
-    Robot robot(0, {2,2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball({-2, -1}, {0, 0}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -97,12 +106,14 @@ TEST(PassEvaluationTest, findBestInterceptForBall_ball_not_moving){
     EXPECT_GE(5, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_ball){
+TEST(PassEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_ball)
+{
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({0,0}, {0,0}, Timestamp::fromSeconds(0));
-    Robot robot(0, {2,2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(5));
+    Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(5));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -117,12 +128,14 @@ TEST(PassEvaluationTest, findBestInterceptForBall_robot_timestamp_ahead_of_ball)
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot){
+TEST(PassEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot)
+{
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({0,0}, {0,0}, Timestamp::fromSeconds(5));
-    Robot robot(0, {2,2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
+    Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -137,12 +150,14 @@ TEST(PassEvaluationTest, findBestInterceptForBall_ball_timestamp_ahead_of_robot)
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timestamp){
+TEST(PassEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timestamp)
+{
     // Test where the robot has a timestamp that is significantly greater then that
     // of the ball
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({0,0}, {0,0}, Timestamp::fromSeconds(5));
-    Robot robot(0, {2,2}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(7));
+    Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
+    Robot robot(0, {2, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(7));
 
     // We should be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
@@ -157,15 +172,16 @@ TEST(PassEvaluationTest, findBestInterceptForBall_non_zero_robot_and_ball_timest
     EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
-TEST(PassEvaluationTest, findBestInterceptForBall_ball_moving_to_fast_to_intercept){
+TEST(PassEvaluationTest, findBestInterceptForBall_ball_moving_to_fast_to_intercept)
+{
     // Test where we cannot get to the ball before it leaves the field, but if we ignore
     // field boundaries we could eventually catch it
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball({3,3}, {1,1}, Timestamp::fromSeconds(0));
-    Robot robot(0, {2,0}, {0,0}, Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Ball ball({3, 3}, {1, 1}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
 
     // We don't expect to be able to find an intercept
     auto best_intercept = findBestInterceptForBall(ball, field, robot);
     ASSERT_FALSE(best_intercept);
 }
-

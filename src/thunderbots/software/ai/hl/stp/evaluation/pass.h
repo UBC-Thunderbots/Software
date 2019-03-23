@@ -5,8 +5,8 @@
 #include <optional>
 
 #include "ai/world/ball.h"
-#include "ai/world/robot.h"
 #include "ai/world/field.h"
+#include "ai/world/robot.h"
 #include "geom/point.h"
 
 /**
@@ -21,5 +21,6 @@
  *         relative to the timestamp of the robot. If no possible intercept could be found
  *         within the field bounds, returns std::nullopt
  */
- // TODO: better name for this function?
-std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field, Robot robot);
+// TODO: better name for this function?
+std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field,
+                                                                   Robot robot);

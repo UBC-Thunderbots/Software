@@ -18,7 +18,7 @@
 
 template <size_t NUM_PARAMS>
 Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer()
-        : GradientDescentOptimizer(GradientDescentOptimizer<NUM_PARAMS>::ParamArray {1})
+    : GradientDescentOptimizer(GradientDescentOptimizer<NUM_PARAMS>::ParamArray{1})
 {
 }
 
