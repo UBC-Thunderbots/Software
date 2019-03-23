@@ -4,7 +4,10 @@
 #include "shared/constants.h"
 #include "util/logger/init.h"
 
-BlockShotPathTactic::BlockShotPathTactic(bool loop_forever) : Tactic(loop_forever) {}
+BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
+    : field(field), Tactic(loop_forever)
+{
+}
 
 std::string BlockShotPathTactic::getName() const
 {
@@ -35,15 +38,8 @@ double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& 
 
 Point BlockShotPathTactic::getBlockPosition()
 {
-    if (!this->field)
-    {
-        LOG(WARNING) << "The Field for the " << getName() << " was not initialized"
-                     << std::endl;
-        return this->robot->position();
-    }
-
-    Point block_position = calcBlockCone(this->field->friendlyGoalpostPos(),
-                                         this->field->friendlyGoalpostNeg(),
+    Point block_position = calcBlockCone(this->field.friendlyGoalpostPos(),
+                                         this->field.friendlyGoalpostNeg(),
                                          this->shot_origin, ROBOT_MAX_RADIUS_METERS);
     return block_position;
 }

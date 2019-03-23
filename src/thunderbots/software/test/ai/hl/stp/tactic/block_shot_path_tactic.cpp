@@ -13,7 +13,7 @@ TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
     Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    BlockShotPathTactic tactic = BlockShotPathTactic();
+    BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
     // Shoot from 2m in front of the goal
     Point shot_origin = field.friendlyGoal() + Point(2, 0);
@@ -42,11 +42,12 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     Robot friendly_robot = Robot(0, Point(1, 0.5), Vector(), Angle::zero(),
                                  AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
-    BlockShotPathTactic tactic = BlockShotPathTactic();
+    Robot enemy_robot = Robot(0, field.enemyCornerNeg(), Vector(), Angle::zero(),
+                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    BlockShotPathTactic tactic = BlockShotPathTactic(field);
     tactic.updateRobot(friendly_robot);
-    // Shoot from the enemy corner
-    Point shot_origin = field.enemyCornerNeg();
-    tactic.updateParams(shot_origin, field);
+    tactic.updateParams(enemy_robot, field);
     auto intent_ptr = tactic.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -56,11 +57,11 @@ TEST(BlockShotPathTacticTest, shot_starts_far_from_the_net)
     EXPECT_EQ(0, move_intent.getRobotId());
     // Check the robot is moving somewhere on the line segment between the shot origin
     // and the goal
-    EXPECT_LE(
-        dist(Segment(shot_origin, field.friendlyGoal()), move_intent.getDestination()),
-        0.1);
+    EXPECT_LE(dist(Segment(enemy_robot.position(), field.friendlyGoal()),
+                   move_intent.getDestination()),
+              0.1);
     // Make sure the robot is facing the shot
-    EXPECT_NEAR((shot_origin - field.friendlyGoal()).orientation().toRadians(),
+    EXPECT_NEAR((enemy_robot.position() - field.friendlyGoal()).orientation().toRadians(),
                 move_intent.getFinalAngle().toRadians(), 0.001);
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
@@ -72,7 +73,7 @@ TEST(BlockShotPathTacticTest, test_calculate_robot_cost)
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
 
-    BlockShotPathTactic tactic = BlockShotPathTactic();
+    BlockShotPathTactic tactic = BlockShotPathTactic(world.field());
     tactic.updateParams(Point(), world.field());
 
     // The robot is a little over 2 meters away from where we expect it to block, so the

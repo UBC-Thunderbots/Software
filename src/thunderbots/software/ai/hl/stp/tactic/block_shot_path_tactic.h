@@ -13,10 +13,11 @@ class BlockShotPathTactic : public Tactic
     /**
      * Creates a new BlockShotPathTactic
      *
+     * @param field the Field we are playing on
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit BlockShotPathTactic(bool loop_forever = false);
+    explicit BlockShotPathTactic(const Field& field, bool loop_forever = false);
 
     std::string getName() const override;
 
@@ -61,5 +62,5 @@ class BlockShotPathTactic : public Tactic
     // The point the shot to block will be starting from
     Point shot_origin;
     // The field we are playing on
-    std::optional<Field> field;
+    Field field;
 };
