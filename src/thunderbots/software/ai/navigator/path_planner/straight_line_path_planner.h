@@ -1,8 +1,9 @@
 #pragma once
 #include "ai/navigator/path_planner/path_planner.h"
 
-class StraightLinePathPlanner : public PathPlanner {
-public:
+class StraightLinePathPlanner : public PathPlanner
+{
+   public:
     /**
      * Returns a path that is a straight line between start and dest.
      * @param start start point
@@ -12,6 +13,6 @@ public:
      * @return a vector that is {start, dest}
      */
     std::optional<std::vector<Point>> findPath(
-            const Point &start, const Point &dest, const std::vector<Obstacle> &obstacles,
-            const ViolationFunction &violation_function) override;
+        const Point &start, const Point &dest, const std::vector<Obstacle> &obstacles,
+        const ViolationFunction &violation_function) override;
 };
