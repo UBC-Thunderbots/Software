@@ -57,7 +57,7 @@ void GrSimBackend::sendPrimitives(
     std::chrono::duration<double> delta_time =
         std::chrono::steady_clock::now() - bangbang_timestamp;
 
-    MotionController motionController(ROBOT_MAX_SPEED_METERS_PER_SECOND,
+    static MotionController motionController(ROBOT_MAX_SPEED_METERS_PER_SECOND,
                                       ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
                                       ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
                                       ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);

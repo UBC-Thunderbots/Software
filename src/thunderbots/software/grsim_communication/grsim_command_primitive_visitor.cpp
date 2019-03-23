@@ -190,31 +190,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     float current_tangential_velocity = robot.velocity().dot(tangential_dir);
     float current_radial_velocity = robot.velocity().dot(radial_dir);
 
-    //float magnitude_of_orbital_velocity = compute_acceleration(
-        //, current_rot_vel, STOPPED, MAX_A, MAX_V);
-    //float mag_accel_correction = compute_acceleration(
-        //&correction_profile, correction, current_cor_vel, STOPPED, MAX_A, MAX_V);
-
-    // add the 3 directions together
-    float accel[3] = {0};
-
-    //accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
-    //accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
-
-    //if (WITHIN_THRESH(correction))
-    //{
-        //accel[0] += mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
-        //accel[1] += mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
-    //}
-
-    //// destination
-    //float angle =
-        //min_angle_delta(current_bot_state.angle, atan2f(rel_dest[1], rel_dest[0]));
-        //AngularVelocity angular_velocity;
-    //motion_controller_command = MotionController::VelocityCommand(
-        //-10, false, false, radial_dir, angular_velocity);
-    motion_controller_command = MotionController::PositionCommand(
-        final_robot_position, robot.orientation(), pivot_point_to_robot.len(), 0.0, false, false); 
+    AngularVelocity test;
+    motion_controller_command = MotionController::VelocityCommand(0.0, 0.0, false, tangential_dir, test);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
