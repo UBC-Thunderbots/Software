@@ -8,11 +8,37 @@
 #include "ai/hl/stp/evaluation/intercept.h"
 #include "test/test_util/test_util.h"
 
-TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path)
+TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3_m_per_s)
 {
     // Test where the robot is just sitting on the path the ball is travelling along
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {3, 0}, Timestamp::fromSeconds(0));
+    Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+    // We should be able to find an intercept
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
+    ASSERT_TRUE(best_intercept);
+
+    // We expect that the best intercept is going to be somewhere between x=0 and x=2,
+    // The ball is travelling fast enough that we expect the best intercept to be
+    // somewhere between x=1.75 and x=2.25 (with some tolerance allowed because of how we
+    // do the optimisation here), with y = 0, and will occur sometime between 0 and
+    // 2/3 seconds in the future (the time for the ball to reach the robots initial
+    // position).
+    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    EXPECT_DOUBLE_EQ(0, intercept_pos.y());
+    EXPECT_LE(1.5, intercept_pos.x());
+    EXPECT_GE(2.25, intercept_pos.x());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_LE(2 / 3, robot_time_to_move_to_intercept.getSeconds());
+}
+
+TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_6_m_per_s)
+{
+    // This is the max speed the ball should ever be traveling at
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball({0, 0}, {6, 0}, Timestamp::fromSeconds(0));
     Robot robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                 Timestamp::fromSeconds(0));
 
@@ -57,6 +83,29 @@ TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_right_beside_ball_p
     EXPECT_GE(2.25, intercept_pos.x());
     EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
     EXPECT_GE(2, robot_time_to_move_to_intercept.getSeconds());
+}
+
+TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_chasing_ball)
+{
+    // Test where the ball starts ahead of the robot, but moving slowly so that
+    // the robot can catch up to it. Both the robot and the ball start at one
+    // end of the field moving towards the other end
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball({0, 3}, {0, -0.5}, Timestamp::fromSeconds(0));
+    Robot robot(0, {0, 4}, {0, -1}, Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+    // We should be able to find an intercept
+    auto best_intercept = findBestInterceptForBall(ball, field, robot);
+    ASSERT_TRUE(best_intercept);
+
+    // We expect the intercept will occur somewhere in x:[1,2], y:[1,2], t:[0, 3]
+    auto [intercept_pos, robot_time_to_move_to_intercept] = *best_intercept;
+    EXPECT_DOUBLE_EQ(0, intercept_pos.x());
+    EXPECT_GE(3, intercept_pos.y());
+    EXPECT_LE(1, intercept_pos.y());
+    EXPECT_LE(0, robot_time_to_move_to_intercept.getSeconds());
+    EXPECT_GE(3, robot_time_to_move_to_intercept.getSeconds());
 }
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_ball_on_diagonal_trajectory)
