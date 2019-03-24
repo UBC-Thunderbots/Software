@@ -21,7 +21,7 @@ class PathPlanner
      * and returns the distance that that point is violating a
      * boundary by, in metres.
      */
-    using ViolationFunction = std::function<double(const Point&)>;
+    using ViolationFunction = std::function<double(const Point &)>;
 
     /**
      * Returns a path from start to dest given obstacles and a
