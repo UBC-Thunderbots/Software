@@ -1041,7 +1041,7 @@ std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segme
     auto [intersect21, intersect22] = raySegmentIntersection(ray2, segment);
 
     // Check if there are any intersections at all
-    if( !intersect11.has_value() || !intersect21.has_value() ) {
+    if( !intersect11.has_value() && !intersect21.has_value() ) {
         return std::nullopt;
     }
     // Check if one of the rays is overlapping the segment
@@ -1052,10 +1052,43 @@ std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segme
     else if( (intersect11.has_value() && !intersect12.has_value() ) && ( intersect21.has_value() && !intersect22.has_value() ))  {
         return std::make_optional( Segment( intersect11.value(), intersect21.value()) );
     }
-    // If only one ray intersects the segment return the segment between the intersection and the segment extreme
-    else if( (intersect11.has_value() && !intersect21.has_value() || (!intersect11.has_value() && intersect21.has_value()))) {
-        
+    // If only one ray intersects the segment return the segment between the intersection and the segment extreme (part1)
+    else if( intersect11.has_value() && !intersect21.has_value() ) {
+
+        const Ray extremes1 = Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+        const Ray extremes2 = Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));;
+
+        std::optional<Point> extreme_intersect1 = intersects(extremes1, ray2);
+        std::optional<Point> extreme_intersect2 = intersects(extremes2, ray2);
+
+        if( extreme_intersect1.has_value()) {
+            return std::make_optional( Segment( intersect11.value(), segment.getEnd() ));
+        }
+        else if( extreme_intersect2.has_value()) {
+            return std::make_optional( Segment( intersect11.value(), segment.getSegStart()));
+        }
     }
+    // If only one ray intersects the segment return the segment between the intersection and the segment extreme (part2)
+    else if( intersect11.has_value() && !intersect21.has_value() ) {
+
+        const Ray extremes1 = Ray( segment.getEnd(), Vector(segment.getEnd()-segment.getSegStart()) );
+        const Ray extremes2 = Ray( segment.getSegStart(), Vector(segment.getSegStart()-segment.getEnd()) );;
+
+        std::optional<Point> extreme_intersect1 = intersects(extremes1, ray1);
+        std::optional<Point> extreme_intersect2 = intersects(extremes2, ray1);
+
+        if( extreme_intersect1.has_value()) {
+            return std::make_optional( Segment( intersect21.value(), segment.getEnd() ));
+        }
+        else if( extreme_intersect2.has_value()) {
+            return std::make_optional( Segment( intersect21.value(), segment.getSegStart()));
+        }
+    }
+    // All cases have been checked, return std::nullopt
+    else {
+        return std::nullopt;
+    }
+
 }
 
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment( Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius) {

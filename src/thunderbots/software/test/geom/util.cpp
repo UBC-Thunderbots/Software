@@ -921,7 +921,30 @@ std::optional<Point> intersection = intersects(ray1, ray2);
 EXPECT_EQ(intersection, std::nullopt);
 }
 
-TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect) {
+// Test that the segment between the intersecting ray and the segment extreme is returned when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme1) {
+
+    Ray ray_intersecting = Ray( Point(0,0), Vector(0,1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0,0), Vector(-14,1) );
+
+    Segment segment = Segment( Point(-1,2), Point(1,2));
+
+    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
+
+    EXPECT_EQ( intersecting_segment.value(), Segment( Point(0,2), Point(-1,2)));
+
+}
+// Test that the segment between the intersecting ray and the segment extreme is returned when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme2) {
+
+    Ray ray_intersecting = Ray( Point(0,0), Vector(0,1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0,0), Vector(20,2) );
+
+    Segment segment = Segment( Point(-1,2), Point(1,2));
+
+    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
+
+    EXPECT_EQ( intersecting_segment.value(), Segment( Point(0,2), Point(1,2)));
 
 }
 
