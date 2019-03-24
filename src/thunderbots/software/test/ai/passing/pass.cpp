@@ -8,6 +8,12 @@
 
 using namespace AI::Passing;
 
+TEST(PassTest, test_constructing_pass_with_negative_speed)
+{
+    EXPECT_THROW(Pass(Point(1, 2), Point(3, 4), -0.1, Timestamp::fromSeconds(10)),
+                 std::invalid_argument);
+}
+
 TEST(PassTest, test_getters)
 {
     Pass p(Point(1, 2), Point(3, 4), 3.443, Timestamp::fromSeconds(10));

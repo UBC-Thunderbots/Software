@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mutex>
+#include <random>
 #include <thread>
 
 #include "ai/passing/pass.h"
@@ -160,7 +161,8 @@ namespace AI::Passing
         /**
          * Calculate the quality of a given pass
          * @param pass The pass to rate
-         * @return A value in [0,1] representing the quality of the pass
+         * @return A value in [0,1] representing the quality of the pass with 1 being the
+         *         best pass and 0 being the worst pass
          */
         double ratePass(Pass pass);
 
@@ -247,6 +249,10 @@ namespace AI::Passing
 
         // The optimizer we're using to find passes
         Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+
+        // A random number generator for use across the class
+        std::random_device random_device;
+        std::mt19937 random_num_gen;
     };
 
 
