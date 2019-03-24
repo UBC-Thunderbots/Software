@@ -522,11 +522,8 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(shared_evaluation_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(ai_evaluation_test
-<<<<<<< HEAD
-            ai/hl/stp/evaluation/calc_best_shot.cpp
-=======
             ai/evaluation/pass.cpp
->>>>>>> 8c2794ed44d6fcf5085a635f71c6ca5450228dbf
+            ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/intercept.cpp
