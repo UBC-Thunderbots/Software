@@ -9,19 +9,18 @@ import { ILayerMessage } from 'SRC/types';
 import { LAYER_WEBSOCKET_ADDRESS } from 'SRC/constants';
 
 import { LayerReceiver } from '../layerReceiver';
-import { generateLayerBuffer, generateRandomShapes } from './__helpers__/shapes';
+import { generateLayerBuffer, generateRandomSprites } from './__helpers__/shapes';
 
 describe('parseLayer', () => {
     describe('when we process layer data from the websocket', () => {
         const layer = 2;
-        const flags = 1;
         const shapeCount = 100;
-        const shapes = generateRandomShapes(shapeCount);
+        const shapes = generateRandomSprites(shapeCount);
 
         let arrayBuffer: ArrayBuffer;
 
         beforeAll(() => {
-            arrayBuffer = generateLayerBuffer(layer, flags, shapes);
+            arrayBuffer = generateLayerBuffer(layer, shapes);
         });
 
         it('correctly processes the message', (done) => {
@@ -39,8 +38,8 @@ describe('parseLayer', () => {
             // is to notify jest that the test is complete
             const layerCallback = (layerData: ILayerMessage) => {
                 expect(layerData.layer).toEqual(layer);
-                expect(layerData.shapes.length).toEqual(shapeCount);
-                expect(layerData.shapes).toStrictEqual(shapes);
+                expect(layerData.sprites.length).toEqual(shapeCount);
+                expect(layerData.sprites).toStrictEqual(shapes);
                 layerReceiver.close();
                 done();
             };

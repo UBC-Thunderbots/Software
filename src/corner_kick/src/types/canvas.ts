@@ -12,9 +12,9 @@ export interface ILayerMessage {
     layer: number;
 
     /**
-     * Shape data
+     * Sprite data
      */
-    shapes: IShape[];
+    sprites: ISprite[];
 }
 
 /**
@@ -33,9 +33,9 @@ export interface ILayer {
 }
 
 /**
- * Represents a shape in the canvas
+ * Represents a sprite in the canvas
  */
-export interface IShape {
+export interface ISprite {
     texture: number;
     x: number;
     y: number;

@@ -4,7 +4,7 @@
  */
 
 import { BYTES_PER_SHAPE, LAYER_WEBSOCKET_ADDRESS } from 'SRC/constants';
-import { ILayerMessage, IShape } from 'SRC/types';
+import { ILayerMessage, ISprite } from 'SRC/types';
 import { MalformedShapesException } from 'SRC/utils/exceptions';
 
 /**
@@ -22,16 +22,16 @@ const parseLayer = (data: ArrayBuffer): ILayerMessage => {
     // Parse the layer number
     const layer = incomingDataView.getUint8(0);
 
-    // We expect a certain multiple of bytes, based on shape size
+    // We expect a certain multiple of bytes, based on sprite size
     const incomingSpriteCount = (data.byteLength - 1) / BYTES_PER_SHAPE;
     if (incomingSpriteCount !== Math.round(incomingSpriteCount)) {
         throw new MalformedShapesException(
             'The message from the server contains malformed data',
         );
     } else {
-        // Parse each shape
-        const shapes = new Array(incomingSpriteCount).fill(true).map(
-            (_, index): IShape => {
+        // Parse each sprites
+        const sprites = new Array(incomingSpriteCount).fill(true).map(
+            (_, index): ISprite => {
                 // We start at 1 as the first byte of the message
                 // contain the layer number
                 const startPos = 1 + index * BYTES_PER_SHAPE;
@@ -51,7 +51,7 @@ const parseLayer = (data: ArrayBuffer): ILayerMessage => {
         );
         return {
             layer,
-            shapes,
+            sprites,
         };
     }
 };

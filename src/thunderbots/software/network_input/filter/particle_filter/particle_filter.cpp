@@ -1,6 +1,7 @@
 #include "particle_filter.h"
 
 #include "geom/util.h"
+#include "util/parameter/dynamic_parameters.h"
 
 /* Notes on the weights and evaluation:
  * - PREDICTION_WEIGHT should always be greater than PREVIOUS_BALL_WEIGHT
@@ -25,7 +26,7 @@ ParticleFilter::ParticleFilter(double length, double width)
     width_  = width;
 
     // initialize vector with PARTICLE_FILTER_NUM_PARTICLES Particle() objects
-    particles = std::vector<Particle>(PARTICLE_FILTER_NUM_PARTICLES, Particle());
+    particles = std::vector<Particle>(num_particles, Particle());
 
     // Set the seed for the random number generator
     seed = static_cast<unsigned int>(time(NULL));
@@ -83,7 +84,15 @@ void ParticleFilter::update(Point ballPredictedPos)
     // percentage of particles to use
     // as basepoints for the next iteration. These particles should converge to
     // the ball's location.
-    for (int i = 0; i < PARTICLE_FILTER_NUM_CONDENSATIONS; i++)
+    int num_condensations =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::num_condensations
+            .value();
+
+    double top_percentage_of_particles =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::
+            top_percentage_of_particles.value();
+
+    for (int i = 0; i < num_condensations; i++)
     {
         // As we loop through each condensation, we want the particles that are
         // generated around the basepoints
@@ -92,19 +101,18 @@ void ParticleFilter::update(Point ballPredictedPos)
 
         // Make sure the denominator is never negative or 0
         double particle_standard_dev_decrement_denominator =
-            PARTICLE_FILTER_NUM_CONDENSATIONS < 1 ? 1
-                                                  : PARTICLE_FILTER_NUM_CONDENSATIONS - 1;
+            num_condensations < 1 ? 1 : num_condensations - 1;
         double particle_standard_dev_decrement =
-            (MAX_PARTICLE_STANDARD_DEV - MIN_PARTICLE_STANDARD_DEV) /
+            (max_particle_standard_dev - min_particle_standard_dev) /
             particle_standard_dev_decrement_denominator;
         double particle_standard_dev =
-            MAX_PARTICLE_STANDARD_DEV - i * particle_standard_dev_decrement;
+            max_particle_standard_dev - i * particle_standard_dev_decrement;
 
         generateParticles(basepoints, particle_standard_dev);
         updateParticleConfidences();
 
-        unsigned int numParticlesToKeep = static_cast<unsigned int>(
-            ceil(TOP_PERCENTAGE_OF_PARTICLES * PARTICLE_FILTER_NUM_PARTICLES));
+        unsigned int numParticlesToKeep =
+            static_cast<unsigned int>(ceil(top_percentage_of_particles * num_particles));
 
         // make sure we never try keep more particles than we have
         if (numParticlesToKeep > particles.size())
@@ -144,17 +152,28 @@ void ParticleFilter::update(Point ballPredictedPos)
     // but still use
     // the predicted position, so we are tolerant to the ball disappearing for a
     // few frames.
+    double ball_confidence_threshold =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::
+            ball_confidence_threshold.value();
+    double ball_confidence_delta = Util::DynamicParameters::NetworkInput::Filter::
+                                       ParticleFilter::ball_confidence_delta.value();
+    double ball_valid_dist_threshold =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::
+            ball_valid_dist_threshold.value();
+    double ball_max_variance =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::ball_max_variance
+            .value();
     if (detections.empty())
     {
-        if (ballConfidence < BALL_CONFIDENCE_THRESHOLD)
+        if (ballConfidence < ball_confidence_threshold)
         {
-            updateBallConfidence(-BALL_CONFIDENCE_DELTA);
+            updateBallConfidence(-ball_confidence_delta);
             ballPosition         = ballPosition;
             ballPositionVariance = ballPositionVariance;
         }
         else
         {
-            updateBallConfidence(-BALL_CONFIDENCE_DELTA);
+            updateBallConfidence(-ball_confidence_delta);
             ballPosition         = newBallPosition;
             ballPositionVariance = newBallPositionVariance;
         }
@@ -170,18 +189,19 @@ void ParticleFilter::update(Point ballPredictedPos)
     // in the ball, we use the ball's filtered position since if we don't, we
     // can get stuck in this "state"
     // if the ball reappears far away.
-    else if ((newBallPosition - ballPosition).len() > BALL_VALID_DIST_THRESHOLD ||
-             newBallPositionVariance > BALL_MAX_VARIANCE)
+
+    else if ((newBallPosition - ballPosition).len() > ball_valid_dist_threshold ||
+             newBallPositionVariance > ball_max_variance)
     {
-        if (ballConfidence < BALL_CONFIDENCE_THRESHOLD)
+        if (ballConfidence < ball_confidence_threshold)
         {
-            updateBallConfidence(-BALL_CONFIDENCE_DELTA);
+            updateBallConfidence(-ball_confidence_delta);
             ballPosition         = newBallPosition;
             ballPositionVariance = newBallPositionVariance;
         }
         else
         {
-            updateBallConfidence(-BALL_CONFIDENCE_DELTA);
+            updateBallConfidence(-ball_confidence_delta);
             ballPosition         = ballPredictedPosition;
             ballPositionVariance = newBallPositionVariance;
         }
@@ -193,7 +213,7 @@ void ParticleFilter::update(Point ballPredictedPos)
     {
         ballPosition         = newBallPosition;
         ballPositionVariance = newBallPositionVariance;
-        updateBallConfidence(BALL_CONFIDENCE_DELTA);
+        updateBallConfidence(ball_confidence_delta);
     }
 
     detections.clear();  // Clear the detections for the next tick
@@ -270,9 +290,9 @@ void ParticleFilter::generateParticles(const std::vector<Point> &basepoints,
 void ParticleFilter::updateBallConfidence(double val)
 {
     double newConfidence = ballConfidence + val;
-    if (newConfidence > MAX_BALL_CONFIDENCE)
+    if (newConfidence > max_ball_confidence)
     {
-        ballConfidence = MAX_BALL_CONFIDENCE;
+        ballConfidence = max_ball_confidence;
     }
     else if (newConfidence < 0.0)
     {
@@ -294,7 +314,18 @@ void ParticleFilter::updateParticleConfidences()
 
 double ParticleFilter::evaluateParticle(const Point &particle)
 {
-    double detectionScore = 0.0;
+    double detectionScore       = 0.0;
+    double max_detection_weight = Util::DynamicParameters::NetworkInput::Filter::
+                                      ParticleFilter::max_detection_weight.value();
+    double previous_ball_weight = Util::DynamicParameters::NetworkInput::Filter::
+                                      ParticleFilter::previous_ball_weight.value();
+    double ball_dist_threshold =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::ball_dist_threshold
+            .value();
+    double prediction_weight =
+        Util::DynamicParameters::NetworkInput::Filter::ParticleFilter::prediction_weight
+            .value();
+
     for (unsigned int i = 0; i < detections.size(); i++)
     {
         double detectionDist = (particle - detections[i]).len();
@@ -305,11 +336,13 @@ double ParticleFilter::evaluateParticle(const Point &particle)
         }
         else
         {
-            detectionScore += MAX_DETECTION_WEIGHT * exp(-detectionDist);
+            detectionScore += max_detection_weight * exp(-detectionDist);
         }
     }
 
     double previousBallScore = 0.0;
+
+
     if (ballPosition != TMP_POINT)
     {
         double ballDist = (particle - ballPosition).len();
@@ -321,7 +354,7 @@ double ParticleFilter::evaluateParticle(const Point &particle)
 
         // This weight will drop to 0 if ballDist is greater than
         // BALL_DIST_THRESHOLD
-        previousBallScore += PREVIOUS_BALL_WEIGHT * sqrt(-ballDist + BALL_DIST_THRESHOLD);
+        previousBallScore += previous_ball_weight * sqrt(-ballDist + ball_dist_threshold);
     }
 
     double predictionScore = 0.0;
@@ -342,7 +375,7 @@ double ParticleFilter::evaluateParticle(const Point &particle)
         // prediction, we still want reasonable bounces to gain weight from this
         // function.
         predictionScore +=
-            PREDICTION_WEIGHT * sqrt(-predictionDist + BALL_DIST_THRESHOLD * 3);
+            prediction_weight * sqrt(-predictionDist + ball_dist_threshold * 3);
     }
 
     return detectionScore + previousBallScore + predictionScore;
@@ -350,7 +383,11 @@ double ParticleFilter::evaluateParticle(const Point &particle)
 
 double ParticleFilter::getDetectionWeight(const double dist)
 {
-    double weight = MAX_DETECTION_WEIGHT - DETECTION_WEIGHT_DECAY * dist;
+    double detection_weight_decay = Util::DynamicParameters::NetworkInput::Filter::
+                                        ParticleFilter::detection_weight_decay.value();
+    double max_detection_weight = Util::DynamicParameters::NetworkInput::Filter::
+                                      ParticleFilter::max_detection_weight.value();
+    double weight = max_detection_weight - detection_weight_decay * dist;
     return weight < 0.0 ? 0.0 : weight;
 }
 
