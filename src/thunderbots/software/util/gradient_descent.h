@@ -49,8 +49,14 @@ namespace Util
         // Default step size for approximating the gradient of functions
         static constexpr double DEFAULT_GRADIENT_APPROX_STEP_SIZE = 0.00001;
 
-        // Delete the default constructor
-        GradientDescentOptimizer() = delete;
+        /**
+         * Creates a GradientDescentOptimizer
+         *
+         * This constructor chooses usually sane values for both
+         * "past_gradient_decay_rate" and "past_squared_gradient_decay_rate", and uses a
+         * value of 1 for each param weight
+         */
+        GradientDescentOptimizer();
 
         /**
          * Creates a GradientDescentOptimizer
@@ -58,7 +64,8 @@ namespace Util
          * This constructor chooses usually sane values for both
          * "past_gradient_decay_rate" and "past_squared_gradient_decay_rate"
          *
-         * @param param_weights The weight to multiply
+         * @param param_weights The weights to multiply each parameter by when calculating
+         *                      the gradient of the objective function.
          */
         explicit GradientDescentOptimizer(ParamArray param_weights);
 

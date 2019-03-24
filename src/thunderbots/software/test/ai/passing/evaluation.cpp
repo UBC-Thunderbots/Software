@@ -5,13 +5,139 @@
 #include "ai/passing/evaluation.h"
 
 #include <gtest/gtest.h>
+#include <util/parameter/dynamic_parameters.h>
 
 #include "../shared/constants.h"
 #include "test/test_util/test_util.h"
 
 using namespace AI::Passing;
 
-TEST(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goal)
+class PassingEvaluationTest : public testing::Test
+{
+   protected:
+    virtual void SetUp()
+    {
+        avg_desired_pass_speed =
+            (max_pass_speed_param - min_pass_speed_param) / 2 + min_pass_speed_param;
+    }
+
+    // We get these values here so we can make these tests robust to change
+    double min_pass_speed_param =
+        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+    double max_pass_speed_param =
+        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+    double avg_desired_pass_speed;
+};
+
+TEST_F(PassingEvaluationTest, ratePass_no_target_region)
+{
+    // This should be a really good pass, and since there is no target region it should
+    // be highly scored
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.5, pass_rating);
+    EXPECT_GE(1.0, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_with_target_region)
+{
+    // This should be a really good pass, but it's outside our target region, so it
+    // should be rate poorly
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
+
+    Rectangle target_region({1, 1}, {2, 2});
+    double pass_rating = ratePass(world, pass, target_region);
+    EXPECT_LE(0.0, pass_rating);
+    EXPECT_GE(0.1, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
+{
+    // We should very poorly rate a pass that has occurred in the past
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    // We update the the ball state because that's what is used as a reference for the
+    // current time by the evaluation function
+    // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
+    world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+
+    Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.0, pass_rating);
+    EXPECT_GE(0.01, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
+{
+    // We should very poorly rate a pass that has occurred in the past
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass({3, 0}, {2, 0}, min_pass_speed_param - 0.1, Timestamp::fromSeconds(1));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.0, pass_rating);
+    EXPECT_GE(0.01, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
+{
+    // We should very poorly rate a pass that has occurred in the past
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass({3, 0}, {2, 0}, max_pass_speed_param + 0.1, Timestamp::fromSeconds(1));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.0, pass_rating);
+    EXPECT_GE(0.01, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goal)
 {
     // No robots on the field, we receive the pass and are directly facing the goal
     // and are right in front of it
@@ -25,8 +151,8 @@ TEST(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goa
     EXPECT_GE(1, pass_shoot_score);
 }
 
-TEST(PassingEvaluationTest,
-     ratePassShootScore_no_robots_and_facing_directly_away_from_goal)
+TEST_F(PassingEvaluationTest,
+       ratePassShootScore_no_robots_and_facing_directly_away_from_goal)
 {
     // No robots on the field, we receive the pass and are facing directly away from the
     // goal
@@ -40,8 +166,8 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(0.5, pass_shoot_score);
 }
 
-TEST(PassingEvaluationTest,
-     ratePassShootScore_some_robots_far_away_and_facing_directly_away_from_goal)
+TEST_F(PassingEvaluationTest,
+       ratePassShootScore_some_robots_far_away_and_facing_directly_away_from_goal)
 {
     // Robots on field, but none that are in the way of us shooting after the pass
     Team enemy_team(Duration::fromSeconds(10));
@@ -59,7 +185,7 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(1, pass_shoot_score);
 }
 
-TEST(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
+TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
 {
     // Test rating a pass that results in no open shot to goal
     Team enemy_team(Duration::fromSeconds(10));
@@ -76,7 +202,7 @@ TEST(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
     EXPECT_GE(0.05, pass_shoot_score);
 }
 
-TEST(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
+TEST_F(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
 {
     // As we decrease the open angle to the goal, the shot score should also decrease
     Field field = ::Test::TestUtil::createSSLDivBField();
@@ -109,7 +235,7 @@ TEST(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
     EXPECT_LT(pass_shoot_score1, pass_shoot_score2);
 }
 
-TEST(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots)
+TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots)
 {
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
@@ -118,7 +244,7 @@ TEST(PassingEvaluationTest, ratePassEnemyRisk_no_enemy_robots)
     EXPECT_EQ(1, pass_rating);
 }
 
-TEST(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
+TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
 {
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
@@ -134,7 +260,7 @@ TEST(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
     EXPECT_GE(1, pass_rating);
 }
 
-TEST(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
+TEST_F(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
 {
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({Robot(0, {10, 10}, {0, 0}, Angle::zero(),
@@ -146,7 +272,7 @@ TEST(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
     EXPECT_GE(0.1, pass_rating);
 }
 
-TEST(PassingEvaluationTest, ratePassEnemyRisk_robot_near_center_of_pass)
+TEST_F(PassingEvaluationTest, ratePassEnemyRisk_robot_near_center_of_pass)
 {
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({Robot(0, {5.2, 6.2}, {0, 0}, Angle::zero(),
@@ -158,8 +284,8 @@ TEST(PassingEvaluationTest, ratePassEnemyRisk_robot_near_center_of_pass)
     EXPECT_GE(0.1, pass_rating);
 }
 
-TEST(PassingEvaluationTest,
-     ratePassEnemyRisk_robot_near_center_of_pass_and_by_receiver_point)
+TEST_F(PassingEvaluationTest,
+       ratePassEnemyRisk_robot_near_center_of_pass_and_by_receiver_point)
 {
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({Robot(0, {5.2, 6.2}, {0, 0}, Angle::zero(),
@@ -173,7 +299,7 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(0.1, pass_rating);
 }
 
-TEST(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
 {
     Team enemy_team(Duration::fromSeconds(10));
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
@@ -182,8 +308,8 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_for_team_no_robots)
     EXPECT_EQ(0, intercept_risk);
 }
 
-TEST(PassingEvaluationTest,
-     calculateInterceptRisk_for_team_several_robots_first_is_close_to_pass)
+TEST_F(PassingEvaluationTest,
+       calculateInterceptRisk_for_team_several_robots_first_is_close_to_pass)
 {
     // Test with an enemy team that has several robots, the first of which is close to
     // the pass trajectory
@@ -201,8 +327,8 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest,
-     calculateInterceptRisk_for_team_several_robots_last_is_close_to_pass)
+TEST_F(PassingEvaluationTest,
+       calculateInterceptRisk_for_team_several_robots_last_is_close_to_pass)
 {
     // Test with an enemy team that has several robots, the last of which is close to
     // the pass trajectory
@@ -220,7 +346,7 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_trajectory)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located directly
     // along the trajectory of the pass
@@ -233,7 +359,7 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_tra
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_trajectory)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located just off to the
     // side of the pass trajectory, but close enough that it will be able to move onto
@@ -247,7 +373,7 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_traje
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_trajectory)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located far enough away
     // from the pass trajectory that there is no way it will be able to intercept it
@@ -260,7 +386,7 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_traje
     EXPECT_GE(0.1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
 {
     // Test passing across the enemy end of the field, with an enemy robot over in the
     // friendly end of the field. The enemy robot should not be able to intercept the pass
@@ -273,7 +399,7 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
     EXPECT_GE(0.1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
 {
     // An enemy robot moving towards the pass from far away should not be able to
     // intercept it
@@ -286,8 +412,8 @@ TEST(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
     EXPECT_GE(0.1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest,
-     calculateInterceptRisk_just_barely_intercept_starting_from_stop)
+TEST_F(PassingEvaluationTest,
+       calculateInterceptRisk_just_barely_intercept_starting_from_stop)
 {
     // Test a pass that the enemy robot should just barely be able to intercept, starting
     // from a stop
@@ -303,8 +429,8 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest,
-     calculateInterceptRisk_just_barely_intercept_starting_with_initial_velocity)
+TEST_F(PassingEvaluationTest,
+       calculateInterceptRisk_just_barely_intercept_starting_with_initial_velocity)
 {
     // Test a pass that the enemy robot should just barely be able to intercept, with a
     // given initial velocity
@@ -321,7 +447,7 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(1, intercept_risk);
 }
 
-TEST(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
+TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
 {
     Team team(Duration::fromSeconds(10));
     team.updateRobots({});
@@ -331,7 +457,7 @@ TEST(PassingEvaluationTest, ratePassFriendlyCapability_no_robots_on_team)
     EXPECT_EQ(0, ratePassFriendlyCapability(team, pass));
 }
 
-TEST(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
+TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
 {
     Team team(Duration::fromSeconds(10));
     team.updateRobots({Robot(0, {15.5, -10}, {0, 0}, Angle::ofDegrees(0),
@@ -344,7 +470,7 @@ TEST(PassingEvaluationTest, ratePassFriendlyCapability_pass_speed_0)
     EXPECT_EQ(0, ratePassFriendlyCapability(team, pass));
 }
 
-TEST(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one_far_away)
+TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one_far_away)
 {
     // Test getting friendly capability for a team with two robots, one near the pass
     // reception point and the other far away
@@ -360,8 +486,8 @@ TEST(PassingEvaluationTest, ratePassFriendlyCapability_one_robot_near_pass_one_f
     EXPECT_GE(1, ratePassFriendlyCapability(team, pass));
 }
 
-TEST(PassingEvaluationTest,
-     ratePassFriendlyCapability_multiple_robots_all_too_far_from_reception_point)
+TEST_F(PassingEvaluationTest,
+       ratePassFriendlyCapability_multiple_robots_all_too_far_from_reception_point)
 {
     // Test case where there are lots of robots far away from the reception point and
     // there *is not* enough time for them to get to the reception point
@@ -376,8 +502,8 @@ TEST(PassingEvaluationTest,
     EXPECT_LE(0, ratePassFriendlyCapability(team, pass));
 }
 
-TEST(PassingEvaluationTest,
-     ratePassFriendlyCapability_multiple_robots_close_enough_to_reception_point)
+TEST_F(PassingEvaluationTest,
+       ratePassFriendlyCapability_multiple_robots_close_enough_to_reception_point)
 {
     // Test case where there are lots of robots far away from the reception point, but
     // when *there is* enough time for them to reach the receive point
@@ -392,7 +518,7 @@ TEST(PassingEvaluationTest,
     EXPECT_GE(1, ratePassFriendlyCapability(team, pass));
 }
 
-TEST(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_in_time)
+TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_in_time)
 {
     // Test case where this is one robot, but it is turned in the wrong direction and
     // will not be able to turn in time to receive the pass
@@ -405,83 +531,8 @@ TEST(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_in
     EXPECT_LE(0, ratePassFriendlyCapability(team, pass));
 }
 
-TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_at_desired_angle)
-{
-    Angle target_angle = Angle::half();
-    Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::ofDegrees(0),
-                Timestamp::fromSeconds(0));
 
-    EXPECT_EQ(Duration::fromSeconds(0),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10.0));
-}
-
-TEST(PassingEvaluationTest, getTimeToOrientationForRobot_robot_opposite_to_desired_angle)
-{
-    // Because we can't guarantee that the robot angular acceleration isn't going to
-    // increase to the point where we can't reach the the max angular speed within
-    // a half rotation, this is just a more loose test that checks if we got there
-    // within roughly the expected time. Any more strict test would have to
-    // basically re-write the function, which would be a bit pointless
-
-    Angle target_angle = Angle::zero();
-    Robot robot(0, {1, 1}, Vector(0, 0), Angle::half(), AngularVelocity::ofDegrees(0),
-                Timestamp::fromSeconds(0));
-
-    // Figure out a lower bound on the time required, based on us being able to constantly
-    // accelerate at the max acceleration
-    // s = ut + 1/2 * at^2, u = 0, s = pi/2
-    // t = sqrt(2*s/a)
-    double min_time_to_rotate = 0.56;
-
-    // For the upper bound, just choose a time that's much greater then we would expect
-    double max_time_to_rotate = 4.0;
-
-    Duration t = getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10);
-    EXPECT_LE(Duration::fromSeconds(min_time_to_rotate),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10));
-    EXPECT_GE(Duration::fromSeconds(max_time_to_rotate),
-              getTimeToOrientationForRobot(robot, target_angle, 4 * M_PI, 10));
-}
-
-TEST(PassingEvaluationTest, getTimeToPositionForRobot_already_at_dest)
-{
-    Point dest(1, 1);
-    Robot robot(0, dest, Vector(0, 0), Angle::ofDegrees(0), AngularVelocity::ofDegrees(0),
-                Timestamp::fromSeconds(0));
-
-    EXPECT_EQ(Duration::fromSeconds(0), getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
-}
-
-TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
-{
-    // Check that the robot reaches the dest in the at the expected time when
-    // it has enough time that it accelerates up to it's maximum velocity
-    // We set the distance here such that it the robot *should* always have time to
-    // get to the max velocity, unless our robots suddenly get *much* faster
-
-    Point dest(1, 1);
-    Point robot_location(40, 40);
-    Robot robot(0, robot_location, Vector(0, 0), Angle::ofDegrees(0),
-                AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
-
-    double distance_to_dest = (robot_location - dest).len();
-
-    double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
-                               ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    // x = v*t + 1/2*a*t^2, v = initial velocity = 0
-    double acceleration_distance = 0.5 *
-                                   ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED *
-                                   std::pow(acceleration_time, 2);
-    double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
-                             ROBOT_MAX_SPEED_METERS_PER_SECOND;
-
-    double travel_time = 2 * acceleration_time + time_at_max_vel;
-
-    EXPECT_EQ(Duration::fromSeconds(travel_time),
-              getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
-}
-
-TEST(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
+TEST_F(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
 {
     Field f = ::Test::TestUtil::createSSLDivBField();
 
@@ -492,7 +543,7 @@ TEST(PassingEvaluationTest, getStaticPositionQuality_on_field_quality)
     EXPECT_LE(getStaticPositionQuality(f, Point(0, 3.0)), 0.13);
 }
 
-TEST(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
+TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
 {
     Field f = ::Test::TestUtil::createSSLDivBField();
 
@@ -500,7 +551,7 @@ TEST(PassingEvaluationTest, getStaticPositionQuality_near_own_goal_quality)
     EXPECT_LE(getStaticPositionQuality(f, Point(-4.0, 0)), 0.14);
 }
 
-TEST(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
+TEST_F(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
 {
     Field f = ::Test::TestUtil::createSSLDivBField();
 
@@ -515,7 +566,7 @@ TEST(PassingEvaluationTest, getStaticPositionQuality_near_enemy_goal_quality)
     EXPECT_NEAR(getStaticPositionQuality(f, Point(4.4, -1.9)), 0.0, 0.1);
 }
 
-TEST(PassingEvaluationTest, rectangleSigmoid_value_in_rectangle_centered_rectangle)
+TEST_F(PassingEvaluationTest, rectangleSigmoid_value_in_rectangle_centered_rectangle)
 {
     Rectangle r1(Point(-1, -2), Point(1, 2));
 
@@ -523,7 +574,7 @@ TEST(PassingEvaluationTest, rectangleSigmoid_value_in_rectangle_centered_rectang
     EXPECT_GE(rectangleSigmoid(r1, {0, 0}, 0.1), 0.982);
 }
 
-TEST(PassingEvaluationTest, rectangleSigmoid_value_in_rectangle_offset_rectangle)
+TEST_F(PassingEvaluationTest, rectangleSigmoid_value_in_rectangle_offset_rectangle)
 {
     Rectangle r1(Point(-2, -1), Point(0, 3));
 
@@ -531,7 +582,7 @@ TEST(PassingEvaluationTest, rectangleSigmoid_value_in_rectangle_offset_rectangle
     EXPECT_GE(rectangleSigmoid(r1, {-1, 1}, 0.1), 0.9);
 }
 
-TEST(PassingEvaluationTest, rectangleSigmoid_values_outside_rectangle)
+TEST_F(PassingEvaluationTest, rectangleSigmoid_values_outside_rectangle)
 {
     Rectangle r1(Point(-1, -2), Point(1, 2));
 
@@ -550,21 +601,21 @@ TEST(PassingEvaluationTest, rectangleSigmoid_values_outside_rectangle)
     EXPECT_LE(rectangleSigmoid(r1, {1.1, 2.1}, 0.1), 0.1);
 }
 
-TEST(PassingEvaluationTest, circleSigmoid_value_in_circle_centered_circle)
+TEST_F(PassingEvaluationTest, circleSigmoid_value_in_circle_centered_circle)
 {
     Circle circle(Point(0, 0), 1);
 
     EXPECT_GE(circleSigmoid(circle, {0, 0}, 0.1), 0.982);
 }
 
-TEST(PassingEvaluationTest, circleSigmoid_value_in_circle_offset_circle)
+TEST_F(PassingEvaluationTest, circleSigmoid_value_in_circle_offset_circle)
 {
     Circle circle(Point(1, -1), 1);
 
     EXPECT_GE(circleSigmoid(circle, {1, -1}, 0.1), 0.982);
 }
 
-TEST(PassingEvaluationTest, circleSigmoid_value_on_circle_edge)
+TEST_F(PassingEvaluationTest, circleSigmoid_value_on_circle_edge)
 {
     Circle circle(Point(1, -1), 1);
 
@@ -573,7 +624,7 @@ TEST(PassingEvaluationTest, circleSigmoid_value_on_circle_edge)
                 0.5, 0.01);
 }
 
-TEST(PassingEvaluationTest, circleSigmoid_value_outside_circle_offset_circle)
+TEST_F(PassingEvaluationTest, circleSigmoid_value_outside_circle_offset_circle)
 {
     Circle circle(Point(1, -1), 1);
 
@@ -592,7 +643,7 @@ TEST(PassingEvaluationTest, circleSigmoid_value_outside_circle_offset_circle)
     EXPECT_LE(circleSigmoid(circle, {-2.2, 1.2}, 0.1), 0.018);
 }
 
-TEST(PassingEvaluationTest, sigmoid_sig_width_is_respected)
+TEST_F(PassingEvaluationTest, sigmoid_sig_width_is_respected)
 {
     // Test the value at sig_width/2 is 0.982
     EXPECT_NEAR(sigmoid(5, 0, 10), 0.982, 0.0001);
@@ -601,7 +652,7 @@ TEST(PassingEvaluationTest, sigmoid_sig_width_is_respected)
     EXPECT_NEAR(sigmoid(-5, 0, 10), 0.018, 0.001);
 }
 
-TEST(PassingEvaluationTest, sigmoid_offset)
+TEST_F(PassingEvaluationTest, sigmoid_offset)
 {
     // Test that the value at 0 is 0.5 if no offset
     EXPECT_DOUBLE_EQ(0.5, sigmoid(0, 0, 1));
@@ -611,7 +662,7 @@ TEST(PassingEvaluationTest, sigmoid_offset)
     EXPECT_DOUBLE_EQ(0.5, sigmoid(-2, -2, 1));
 }
 
-TEST(PassingEvaluationTest, sigmoid_negating_sig_width_flips_sigmoid)
+TEST_F(PassingEvaluationTest, sigmoid_negating_sig_width_flips_sigmoid)
 {
     // Test that negating sig_width inverts the sigmoid
     EXPECT_NEAR(sigmoid(-5, 0, -10), 0.982, 0.0001);

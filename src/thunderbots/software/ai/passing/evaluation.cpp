@@ -2,18 +2,62 @@
  * Implementation of evaluation functions for passing
  */
 
+
 #include "ai/passing/evaluation.h"
 
 #include <numeric>
 
 #include "../shared/constants.h"
+#include "ai/evaluation/pass.h"
 #include "geom/util.h"
 #include "util/parameter/dynamic_parameters.h"
 
 using namespace AI::Passing;
+using namespace AI::Evaluation;
 
-double AI::Passing::ratePassShootScore(Field field, Team enemy_team,
-                                       AI::Passing::Pass pass)
+double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
+                             const std::optional<Rectangle>& target_region)
+{
+    double static_pass_quality =
+        getStaticPositionQuality(world.field(), pass.receiverPoint());
+
+    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
+
+    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
+
+    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+
+    // Rate all passes outside our target region as 0 if we have one
+    double in_region_quality = 1;
+    if (target_region)
+    {
+        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
+    }
+
+    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+                          shoot_pass_rating * in_region_quality;
+
+    // Strict requirement that the pass occurs at a minimum time in the future
+    double min_pass_time_offset =
+        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
+    pass_quality *= sigmoid(
+        pass.startTime().getSeconds(),
+        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+
+    // Place strict limits on the ball speed
+    double min_pass_speed =
+        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+    double max_pass_speed =
+        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+    pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.001);
+    pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.001);
+
+    return pass_quality;
+}
+
+double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
+                                       const AI::Passing::Pass& pass)
 {
     double ideal_shoot_angle_degrees =
         Util::DynamicParameters::AI::Passing::ideal_min_shoot_angle_degrees.value();
@@ -104,7 +148,6 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // We assume that the enemy continues moving at it's current velocity until the
     // pass starts
 
-    // We force any negative duration to 0 here
     Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
 
     // Estimate where the enemy will be when we start the pass
@@ -217,90 +260,6 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
     return sigmoid(receive_time.getSeconds(),
                    latest_time_to_reciever_state.getSeconds() + 0.5, 1);
 }
-
-Duration AI::Passing::getTimeToOrientationForRobot(const Robot& robot,
-                                                   const Angle& desired_orientation,
-                                                   const double& max_velocity,
-                                                   const double& max_acceleration)
-{
-    // We assume a linear acceleration profile:
-    // (1) velocity = MAX_ACCELERATION*time
-    // we integrate (1) to get:
-    // (2) displacement = MAX_ACCELERATION/2 * time^2
-    // we rearrange to get:
-    // (3) time = sqrt(2 * displacement / MAX_ACCELERATION)
-    // we sub. (3) into (1) to get:
-    // (4) velocity = MAX_ACCELERATION*sqrt(2 * displacement / MAX_ACCELERATION)
-    // and rearrange to get:
-    // (5) displacement = (velocity / MAX_ACCELERATION)^2 * MAX_ACCELERATION/2
-    // We re-arrange (3) to get:
-    // (6) displacement = time^2 * MAX_ACCELERATION/2
-
-    double dist = robot.orientation().minDiff(desired_orientation).toRadians();
-
-    // Calculate the distance required to reach max possible velocity of the robot
-    // using (5)
-    double dist_to_max_possible_vel =
-        std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
-
-    // Calculate how long we'll accelerate for using (3), taking into account that we
-    // might not actually reach the max velocity if it will take too much distance
-    double acceleration_time =
-        std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_acceleration);
-
-    // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_velocity =
-        std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
-
-    // The time taken to get to the target angle is:
-    // time to accelerate + time at the max velocity + time to de-accelerate
-    // Note that the acceleration time is the same as a de-acceleration time
-    double travel_time = 2 * acceleration_time + time_at_max_velocity;
-
-    return Duration::fromSeconds(travel_time);
-}
-
-Duration AI::Passing::getTimeToPositionForRobot(const Robot& robot, const Point& dest,
-                                                const double& max_velocity,
-                                                const double& max_acceleration)
-{
-    // We assume a linear acceleration profile:
-    // (1) velocity = MAX_ACCELERATION*time
-    // we integrate (1) to get:
-    // (2) displacement = MAX_ACCELERATION/2 * time^2
-    // we rearrange to get:
-    // (3) time = sqrt(2 * displacement / MAX_ACCELERATION)
-    // we sub. (3) into (1) to get:
-    // (4) velocity = MAX_ACCELERATION*sqrt(2 * displacement / MAX_ACCELERATION)
-    // and rearrange to get:
-    // (5) displacement = (velocity / MAX_ACCELERATION)^2 * MAX_ACCELERATION/2
-    // We re-arrange (3) to get:
-    // (6) displacement = time^2 * MAX_ACCELERATION/2
-
-    double dist = (robot.position() - dest).len();
-
-    // Calculate the distance required to reach max possible velocity of the robot
-    // using (5)
-    double dist_to_max_possible_vel =
-        std::pow(max_velocity / max_acceleration, 2) * max_acceleration / 2;
-
-    // Calculate how long we'll accelerate for using (3), taking into account that we
-    // might not actually reach the max velocity if it will take too much distance
-    double acceleration_time =
-        std::sqrt(2 * std::min(dist / 2, dist_to_max_possible_vel) / max_acceleration);
-
-    // Calculate how long we'll be at the max possible velocity (if any time at all)
-    double time_at_max_velocity =
-        std::max(0.0, dist - 2 * dist_to_max_possible_vel) / max_velocity;
-
-    // The time taken to get to the receiver point is:
-    // time to accelerate + time at the max velocity + time to de-accelerate
-    // Note that the acceleration time is the same as a de-acceleration time
-    double travel_time = 2 * acceleration_time + time_at_max_velocity;
-
-    return Duration::fromSeconds(travel_time);
-}
-
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
 {
     // This constant is used to determine how steep the sigmoid slopes below are

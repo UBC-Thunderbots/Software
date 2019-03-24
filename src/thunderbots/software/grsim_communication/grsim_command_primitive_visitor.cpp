@@ -70,7 +70,7 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
                       finalDest.y() + interceptonMargin * ballDirY);
     }
 
-    motion_controller_command = MotionController::MotionControllerCommand(
+    motion_controller_command = MotionController::PositionCommand(
         finalDest, robotDirection, catch_primitive.getVelocity(), 0.0, false,
         catch_primitive.getDribblerSpeed() > 0);
 }
@@ -111,7 +111,7 @@ void GrsimCommandPrimitiveVisitor::visit(
         Angle::ofRadians(direct_velocity_primitive.getAngularVelocity())
             .mod(Angle::half());
 
-    motion_controller_command = MotionController::MotionControllerCommand(
+    motion_controller_command = MotionController::PositionCommand(
         final_destination, final_orientation, linear_velocity_in_robot_coordinates.len(),
         0.0, false, direct_velocity_primitive.getDribblerRpm() > 0);
 }
@@ -129,7 +129,7 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
-    motion_controller_command = MotionController::MotionControllerCommand(
+    motion_controller_command = MotionController::PositionCommand(
         move_primitive.getDestination(), move_primitive.getFinalAngle(),
         move_primitive.getFinalSpeed(), 0.0, false, false);
 }
@@ -142,7 +142,7 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
          ? targetAngle += Angle::ofDegrees(45)
          : targetAngle -= Angle::ofDegrees(45));
 
-    motion_controller_command = MotionController::MotionControllerCommand(
+    motion_controller_command = MotionController::PositionCommand(
         move_spin_primitive.getDestination(), targetAngle, 0.0, 0.0, false, false);
 }
 
@@ -159,12 +159,11 @@ void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primiti
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
 {
     // intentionally leaving out the option to coast until later
-    motion_controller_command = MotionController::MotionControllerCommand(
+    motion_controller_command = MotionController::PositionCommand(
         robot.position(), robot.orientation(), 0, 0.0, false, false);
 }
 
-MotionController::MotionControllerCommand
-GrsimCommandPrimitiveVisitor::getMotionControllerCommand()
+MotionControllerCommand GrsimCommandPrimitiveVisitor::getMotionControllerCommand()
 {
     return motion_controller_command;
 }
