@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "ai/navigator/obstacle/obstacle.h"
-#include "ai/navigator/path_planner/violation_function.h"
 #include "geom/point.h"
 
 /**
@@ -17,6 +16,13 @@
 class PathPlanner
 {
    public:
+    /**
+     * Typedef for a violation function, which consumes a Point
+     * and returns the distance that that point is violating a
+     * boundary by, in metres.
+     */
+    using ViolationFunction = std::function<double(const Point&)>;
+
     /**
      * Returns a path from start to dest given obstacles and a
      * violation, otherwise returns std::nullopt if a path is
