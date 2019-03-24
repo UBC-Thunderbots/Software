@@ -352,6 +352,19 @@ Point reflect(const Point &v, const Point &n);
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     Ray &ray, Segment &segment);
 
+
+/**
+ * Calculates the intersection of two Rays
+ *
+ * @param ray1: First Ray
+ * @param ray2: Second Ray
+ * @return Returns std::nullopt if no intersections exist, or if there are infinite intersections (overlapping)
+ * Returns Point if a single intersection exists.
+ * Returns Point if the ray and segment are overlapping, where the points define
+ * the line segment of overlap.
+ */
+std::optional<Point> intersects(Ray ray1, Ray ray2);
+
 /**
  * Reflects a point across a line.
  *

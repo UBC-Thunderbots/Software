@@ -798,6 +798,25 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     }
 }
 
+std::optional<Point> intersects(Ray ray1, Ray ray2) {
+
+    // Calculate if the intersecion exists along segments of infinite length
+    std::optional<Point> intersection = lineIntersection(ray1.getRayStart(), ray1.getRayStart() + ray1.getDirection(), ray2.getRayStart(), ray2.getRayStart() + ray2.getDirection());
+
+    // Return if no intersection exists
+    if( !intersection.has_value()) {
+        return std::nullopt;
+    }
+
+    // Check of the intersection exits along the direction of both rays
+    if( ((intersection.value() - ray1.getRayStart()).norm() == ray1.getDirection().norm()) && (intersection.value() - ray2.getRayStart()).norm() == ray2.getDirection().norm() ) {
+        return intersection.value();
+    }
+    else{
+        return std::nullopt;
+    }
+}
+
 Vector reflect(const Vector &v, const Vector &n)
 {
     if (n.len() < EPS)

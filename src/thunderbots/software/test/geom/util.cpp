@@ -870,6 +870,7 @@ TEST(GeomUtilTest, test_segment_intersect_with_existing_segment) {
 
 }
 
+// Test that no segment is returned if both rays do not intersect the segment, and the area between the rays do not enclose the segment
 TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting) {
     Ray ray1 = Ray( Point(-4,0), Vector(0,-1));
     Ray ray2 = Ray( Point(4,0), Vector(0,-1) );
@@ -881,7 +882,48 @@ TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting) {
     EXPECT_EQ( false, intersecting_segment.has_value());
 }
 
-TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect) {}
+// Test that a correct intersection point is returned for 2 rays that intersect once
+TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once) {
+
+    // Ray at origin pointing upwards
+    Ray ray1 = Ray( Point(0,0), Vector(0,1));
+    // Ray up and to the right that points right
+    Ray ray2 = Ray( Point(-1,1), Vector(1,0));
+
+    std::optional<Point> intersection = intersects(ray1, ray2);
+
+    EXPECT_EQ(intersection.value(), Point(0,1));
+
+}
+
+// Test that an intersection is not returned if the opposite direction of the rays intersect
+TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects) {
+
+    // Ray positioned at origin pointing down
+    Ray ray1 = Ray( Point(0,0), Vector(0,-1));
+
+    Ray ray2 = Ray( Point(-1,1), Vector(-1,0));
+
+    std::optional<Point> intersection = intersects(ray1, ray2);
+
+    EXPECT_EQ(intersection, std::nullopt);
+}
+
+// Test that an intersection is not returned if the Rays are overlapping
+TEST(GeomUtilTest, test_intersect_ray_ray_overlapping){
+
+// Ray positioned at origin pointing up
+Ray ray1 = Ray( Point(0,0), Vector(0,1));
+Ray ray2 = Ray( Point(0,1), Vector(0,1));
+
+std::optional<Point> intersection = intersects(ray1, ray2);
+
+EXPECT_EQ(intersection, std::nullopt);
+}
+
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect) {
+
+}
 
 int main(int argc, char **argv)
 {
