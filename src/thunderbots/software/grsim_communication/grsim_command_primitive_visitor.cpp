@@ -182,7 +182,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         (final_robot_position - robot.position()).len();
 
     // stop moving if you are within range of the final point
-    if (linear_displacement_to_final_position < 0.10 /*robot diameter*/)
+    if (linear_displacement_to_final_position <
+        2 * ROBOT_MAX_RADIUS_METERS /*robot diameter*/)
     {
         motion_controller_command = MotionController::PositionCommand(
             robot.position(), unit_pivot_point_to_robot.orientation(), 0.0, 0.0, false,
@@ -195,7 +196,7 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     // implemenatation does not provide a way to get the accelerations before applying
     // them.
     else if ((robot.position() - collinear_point_on_orbit).len() >
-             0.10 /*robot diameter*/)
+             2 * ROBOT_MAX_RADIUS_METERS /*robot diameter*/)
     {
         motion_controller_command = MotionController::PositionCommand(
             collinear_point_on_orbit, unit_pivot_point_to_robot.orientation(), 0.0, 0.0,
