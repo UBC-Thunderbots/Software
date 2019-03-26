@@ -11,7 +11,6 @@
 #include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
-#include "ai/primitive/pivot_primitive.h"
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
@@ -29,7 +28,11 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
 {
     std::vector<std::unique_ptr<Primitive>> primitives;
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
-    primitives.emplace_back(new PivotPrimitive(0, world.ball().position(), Angle::zero(), 1));
+    for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
+    {
+        primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
+    }
+
     grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
 }
 
