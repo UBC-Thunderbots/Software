@@ -1034,6 +1034,34 @@ double getPointsVariance(const std::vector<Point> &points)
     return sqrt(sum);
 }
 
+std::optional<Segment> segmentEnclosedBetweenRays( Segment segment, Ray ray1, Ray ray2) {
+    // Create a rays located at the extremes of the segment, that point in the direction outwards are parallel to the segment
+    const Ray extremes1 = Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+    const Ray extremes2 = Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));;
+
+    const std::optional<Point> extreme_intersect11 = intersects(extremes1, ray1);
+    const std::optional<Point> extreme_intersect12 = intersects(extremes2, ray1);
+    const std::optional<Point> extreme_intersect21 = intersects(extremes1, ray2);
+    const std::optional<Point> extreme_intersect22 = intersects(extremes2, ray2);
+
+    // Check for the cases that the rays intersect the same segment projection
+    if ((extreme_intersect11.has_value() == extreme_intersect21.has_value()) ||
+        (extreme_intersect21.has_value() == extreme_intersect22.has_value())) {
+        return std::nullopt;
+    } else {
+
+        // Since we know that both rays aren't passing through the same side of the segment at this point, then as long as they both only intersect 1 point the segment must be enclosed between them
+        if ( (extreme_intersect11.has_value() != extreme_intersect12.has_value()) && (extreme_intersect21.has_value() != extreme_intersect22.has_value()) ) {
+
+            return std::make_optional(segment);
+        }
+        // Covers the case where a single ray passes by both sides of the segment
+        else {
+            return std::nullopt;
+        }
+    }
+}
+
 std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment) {
 
     // Calculate intersections of each individual ray and the segment
@@ -1045,19 +1073,7 @@ std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segme
 
 
         // FIXME: This needs to be made into it's own function
-        // Now we want to check if the segment is enclosed between the space of the two rays
-        const Ray extremes1 = Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
-        const Ray extremes2 = Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));;
 
-        std::optional<Point> extreme_intersect11 = intersects(extremes1, ray1);
-        std::optional<Point> extreme_intersect12 = intersects(extremes2, ray1);
-        std::optional<Point> extreme_intersect21 = intersects(extremes1, ray2);
-        std::optional<Point> extreme_intersect22 = intersects(extremes2, ray2);
-
-        // If the rays directed out of the extremes of the segment intersect with the rays, then the segment parameter must be enclosed by the rays
-        if( ( !extreme_intersect11.has_value() != !extreme_intersect12.has_value() ) && (!extreme_intersect12.has_value() != !extreme_intersect22.has_value() ) )
-            return std::make_optional(segment);
-        }
         // If the segment parameter isn't enclosed between the rays, then there is no intersecting segment
         return std::nullopt;
     }

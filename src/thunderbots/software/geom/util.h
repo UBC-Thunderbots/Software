@@ -523,4 +523,15 @@ double getPointsVariance(const std::vector<Point> &points);
  */
 std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment);
 
+/**
+ * Function calculates whether the segment parameter is enclosed between the ray parameters. This means the entirety of the segment lays between the rays
+ *
+ * @param segment : segment parameter to calculate if its definition lies between the rays
+ * @param ray1 : Starting point and direction
+ * @param ray2 : Starting point an direction
+ * @return Segment: Returns the segment parameter if it is enclosed between ray1 and ray2
+ *         Returns std::nullopt of the ray is not completely enclosed between the rays, or not at all
+ */
+std::optional<Segment> segmentEnclosedBetweenRays( Segment segment, Ray ray1, Ray ray2);
+
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius);
