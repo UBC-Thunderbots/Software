@@ -156,18 +156,19 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
             (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().sin()));
 
     // Get unit vector from pivot point to robot
-    Vector unit_pivot_point_to_robot = (pivot_primitive.getPivotPoint() - robot.position()).norm();
+    Vector unit_pivot_point_to_robot =
+        (pivot_primitive.getPivotPoint() - robot.position()).norm();
 
     // find the general direction to travel, project those onto the two possible
     // directions and see which one is better
     Vector general_direction_to_destination = final_robot_position - robot.position();
 
-    // in the primitive, both tangential directions are dotted with a vector from the robot to 
-    // the final position to get the shortest way to rotate (CW/CCW). This direction is computed 
-    // once and does not change throughout the lifetime of the primitive. There is no equivalent
-    // setup function in the GrsimCommandPrimitiveVisitor class, so a hardcoded direction is chosen.
-    Vector tangential_dir(unit_pivot_point_to_robot.y(),
-                            -unit_pivot_point_to_robot.x());
+    // in the primitive, both tangential directions are dotted with a vector from the
+    // robot to the final position to get the shortest way to rotate (CW/CCW). This
+    // direction is computed once and does not change throughout the lifetime of the
+    // primitive. There is no equivalent setup function in the
+    // GrsimCommandPrimitiveVisitor class, so a hardcoded direction is chosen.
+    Vector tangential_dir(unit_pivot_point_to_robot.y(), -unit_pivot_point_to_robot.x());
 
     // compute point that is radius length away from pivot point and is collinear with the
     // robot and the pivot point
@@ -184,14 +185,17 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     if (linear_displacement_to_final_position < 0.10 /*robot diameter*/)
     {
         motion_controller_command = MotionController::PositionCommand(
-            robot.position(), unit_pivot_point_to_robot.orientation(), 0.0, 0.0, false, false);
+            robot.position(), unit_pivot_point_to_robot.orientation(), 0.0, 0.0, false,
+            false);
     }
     // apply correction to orbiting radius, if needed
-    // NOTE: The correction should be added to current velocity and sent together. The primitive will 
-    // only add corrections to get onto orbit to the tangential acceleration if it needs to.
-    // This workaround is in place as the motion controller implemenatation does not provide a way 
-    // to get the accelerations before applying them.
-    else if ((robot.position() - collinear_point_on_orbit).len() > 0.10 /*robot diameter*/)
+    // NOTE: The correction should be added to current velocity and sent together. The
+    // primitive will only add corrections to get onto orbit to the tangential
+    // acceleration if it needs to. This workaround is in place as the motion controller
+    // implemenatation does not provide a way to get the accelerations before applying
+    // them.
+    else if ((robot.position() - collinear_point_on_orbit).len() >
+             0.10 /*robot diameter*/)
     {
         motion_controller_command = MotionController::PositionCommand(
             collinear_point_on_orbit, unit_pivot_point_to_robot.orientation(), 0.0, 0.0,
