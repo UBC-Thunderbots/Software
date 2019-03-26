@@ -847,6 +847,16 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG})
 
+
+    catkin_add_gtest(straight_line_path_planner_test
+            test/ai/navigator/path_planner/straight_line_path_planner.cpp
+            ai/navigator/path_planner/straight_line_path_planner.cpp
+            )
+    target_link_libraries(straight_line_path_planner_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
