@@ -948,6 +948,18 @@ TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme2) {
 
 }
 
+TEST(GeomUtilTest, test_segment_intersect_segment_enclosed_by_rays) {
+
+    Ray ray1 = Ray( Point(0,0), Vector(-20,1));
+    Ray ray2 = Ray( Point(0,0), Vector(20,1));
+
+    Segment segment = Segment( Point(-2,2), Point(2,2));
+
+    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray1,ray2,segment);
+
+    EXPECT_EQ(intersecting_segment.value(), segment);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

@@ -510,6 +510,17 @@ Point getPointsMean(const std::vector<Point> &points);
  */
 double getPointsVariance(const std::vector<Point> &points);
 
+
+/**
+ * Function returns the segment defined by the segment between the intersections of two Rays on a segment
+ *
+ * @param ray1 (Starting point and direction)
+ * @param ray2 (Starting point and direction)
+ * @param segment (Segment to find segment of intersection upon)
+ * @return Segment, the segment defined by the space between two intersecting rays on the segment parameter
+ *         std::nullopt, if both rays don't intersect the segment, and the segment is not enclosed between the rays
+ *         Segment, if one ray intersects the segment, but one of the segment parameters extremes are enclosed within the two rays
+ */
 std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment);
 
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius);

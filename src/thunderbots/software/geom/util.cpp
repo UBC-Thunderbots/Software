@@ -1036,12 +1036,29 @@ double getPointsVariance(const std::vector<Point> &points)
 
 std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment) {
 
-    //auto [intersect11, intersect12] = raySegment
+    // Calculate intersections of each individual ray and the segment
     auto [intersect11, intersect12] = raySegmentIntersection(ray1, segment);
     auto [intersect21, intersect22] = raySegmentIntersection(ray2, segment);
 
-    // Check if there are any intersections at all
+    // Check if there are any real intersections
     if( !intersect11.has_value() && !intersect21.has_value() ) {
+
+
+        // FIXME: This needs to be made into it's own function
+        // Now we want to check if the segment is enclosed between the space of the two rays
+        const Ray extremes1 = Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+        const Ray extremes2 = Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));;
+
+        std::optional<Point> extreme_intersect11 = intersects(extremes1, ray1);
+        std::optional<Point> extreme_intersect12 = intersects(extremes2, ray1);
+        std::optional<Point> extreme_intersect21 = intersects(extremes1, ray2);
+        std::optional<Point> extreme_intersect22 = intersects(extremes2, ray2);
+
+        // If the rays directed out of the extremes of the segment intersect with the rays, then the segment parameter must be enclosed by the rays
+        if( ( !extreme_intersect11.has_value() != !extreme_intersect12.has_value() ) && (!extreme_intersect12.has_value() != !extreme_intersect22.has_value() ) )
+            return std::make_optional(segment);
+        }
+        // If the segment parameter isn't enclosed between the rays, then there is no intersecting segment
         return std::nullopt;
     }
     // Check if one of the rays is overlapping the segment
@@ -1088,6 +1105,10 @@ std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segme
     else {
         return std::nullopt;
     }
+
+}
+
+std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1, Segment segment2) {
 
 }
 
