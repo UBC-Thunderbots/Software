@@ -6,7 +6,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { UnknownPortalException } from 'SRC/utils/exceptions';
+import { UnknownPortalException } from 'SRC/utils/exceptions/unknownPortal';
 
 /**
  * The area where we wish to portal content to

@@ -10,8 +10,14 @@
 std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Field field,
                                                                    Robot robot)
 {
-    // This is the function that we want to minimize, finding the shortest duration in
-    // the future at which we can feasibly intercept the ball
+    static const double gradient_approx_step_size = 0.000001;
+
+    // We use this to take a smooth absolute value in our objective function
+    static const double smooth_abs_eps = 1000 * gradient_approx_step_size;
+
+    // This is the objective function that we want to minimize, finding the
+    // shortest duration in the future at which we can feasibly intercept the
+    // ball
     auto objective_function = [&](std::array<double, 1> x) {
         // We take the absolute value here because a negative time makes no sense
         double duration = std::abs(x.at(0));
@@ -37,23 +43,21 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
         // time that the ball will get there (ie. will we get there in time?)
         double ball_robot_time_diff = duration - time_to_ball_pos.getSeconds();
 
-        // Figure out how soon we can get to the ball, but also accounting for the time
-        // it will take the robot to make it to the destination. This ensures we're
-        // minimizing so that we get to the ball as soon as possible
-        return duration - ball_robot_time_diff;
+        // We want to get to the ball at the earliest opportunity possible, so
+        // aim for a time diff of zero. We use a smooth approximation of
+        // the maximum here
+        return std::sqrt(std::pow(ball_robot_time_diff, 2) + smooth_abs_eps);
     };
 
     // Figure out when/where to intercept the ball. We do this by optimizing over
     // the ball position as a function of it's travel time
     // We make the weight here an inverse of the ball speed, so that the gradient descent
     // takes smaller steps when the ball is moving faster
-    // We add a small amount to the ball velocity here to prevent division by 0, and also
-    // to prevent the weight from getting two small, which would make gradient descent
-    // take really large time steps
-    double descent_weight = 1 / (ball.velocity().len() + 0.01);
-    Util::GradientDescentOptimizer<1> optimizer({descent_weight}, 0.001);
+    double descent_weight = 1 / (std::exp(ball.velocity().len() * 0.5));
+    Util::GradientDescentOptimizer<1> optimizer({descent_weight},
+                                                gradient_approx_step_size);
     Duration best_ball_travel_duration = Duration::fromSeconds(
-        std::abs(optimizer.minimize(objective_function, {0}, 100).at(0)));
+        std::abs(optimizer.minimize(objective_function, {0}, 50).at(0)));
 
     // In the objective function above, if the robot timestamp > ball timestamp, we
     // add on the difference so we get a intercept time after the robot timestamp, so we
@@ -72,8 +76,11 @@ std::optional<std::pair<Point, Duration>> findBestInterceptForBall(Ball ball, Fi
     Duration time_to_ball_pos = AI::Evaluation::getTimeToPositionForRobot(
         robot, best_ball_intercept_pos, ROBOT_MAX_SPEED_METERS_PER_SECOND,
         ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
-    // NOTE: We have an addtional check here for 0 ball velocity
-    if (ball.velocity().len() != 0 && time_to_ball_pos > best_ball_travel_duration)
+    Duration ball_robot_time_diff = time_to_ball_pos - best_ball_travel_duration;
+    // NOTE: if ball velocity is 0 then ball travel duration is infinite, so this
+    // check isn't relevent in that case
+    if (ball.velocity().len() != 0 &&
+        std::abs(ball_robot_time_diff.getSeconds()) > descent_weight)
     {
         return std::nullopt;
     }

@@ -19,22 +19,18 @@ stories.add('with layers', () => (
             layers={[
                 {
                     name: 'Friendly Robots',
-                    shapes: [],
                     visible: true,
                 },
                 {
                     name: 'Enemy Robots',
-                    shapes: [],
                     visible: false,
                 },
                 {
                     name: 'Ball',
-                    shapes: [],
                     visible: true,
                 },
                 {
                     name: 'Field',
-                    shapes: [],
                     visible: true,
                 },
             ]}
