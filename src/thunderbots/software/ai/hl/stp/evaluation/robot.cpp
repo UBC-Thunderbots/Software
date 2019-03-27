@@ -1,5 +1,6 @@
-#include <shared/constants.h>
 #include "ai/hl/stp/evaluation/robot.h"
+
+#include <shared/constants.h>
 
 
 
@@ -21,11 +22,12 @@ bool Evaluation::robotHasPossession(const Ball ball, const Robot robot)
     // The actual vector to the ball from the center of the robot
     Vector robot_center_to_ball = ball.position() - robot.position();
 
-    // Calculate the ideal vector from the robot to the ball for the robot to have possession.
-    Angle orientation = robot.orientation();
+    // Calculate the ideal vector from the robot to the ball for the robot to have
+    // possession.
+    Angle orientation          = robot.orientation();
     double expected_position_x = orientation.cos() * DIST_TO_FRONT_OF_ROBOT_METERS;
     double expected_position_y = orientation.sin() * DIST_TO_FRONT_OF_ROBOT_METERS;
-    Vector expected_point = Vector(expected_position_x, expected_position_y);
+    Vector expected_point      = Vector(expected_position_x, expected_position_y);
 
-    return robot_center_to_ball.isClose(expected_point, DRIBBLER_LENGTH/2);
+    return robot_center_to_ball.isClose(expected_point, DRIBBLER_LENGTH / 2);
 };

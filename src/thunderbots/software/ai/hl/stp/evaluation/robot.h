@@ -3,6 +3,7 @@
 
 #include <ai/world/ball.h>
 #include <ai/world/robot.h>
+
 #include "geom/point.h"
 
 /**
@@ -26,14 +27,12 @@ namespace Evaluation
      * direction from position to target is smaller than threshold angle,
      * false otherwise
      */
-    bool robotOrientationWithinAngleThresholdOfTarget(Point position,
-                                                      Angle orientation,
-                                                      Point target,
-                                                      Angle threshold);
+    bool robotOrientationWithinAngleThresholdOfTarget(Point position, Angle orientation,
+                                                      Point target, Angle threshold);
 
     /**
-     * Determines if a robot has possession of the ball. A robot is considered to have possession if the ball is in a area
-     * close to the its dribbler.
+     * Determines if a robot has possession of the ball. A robot is considered to have
+     * possession if the ball is in a area close to the its dribbler.
      *
      * @param ball The ball the is wanted to be possessed
      * @param robot The Robot which wants to know if it has the ball.
