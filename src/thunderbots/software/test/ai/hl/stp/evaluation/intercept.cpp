@@ -3,9 +3,10 @@
  * in pass.cpp
  */
 
+#include "ai/hl/stp/evaluation/intercept.h"
+
 #include <gtest/gtest.h>
 
-#include "ai/hl/stp/evaluation/intercept.h"
 #include "test/test_util/test_util.h"
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3_m_per_s)
