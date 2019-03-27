@@ -1168,8 +1168,46 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
 }
 
 std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
-                                                        Segment segment2)
-{
+                                                        Segment segment2) {
+    // If the segments are not parallel, then return std::nullopt. (The segments are parallel of all points are collinear)
+    if( !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) && !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()) ) {
+        return std::nullopt;
+    }
+    // Check the case where one segment is completely contained in the other
+    else if( std::min(segment1.toVector().lensq(), segment2.toVector().lensq())) {
+
+    }
+    // Check if the beginning of segment2 lays inside segment1
+    else if( contains(segment1, segment2.getSegStart()) ) {
+
+        // If segment2.getSegStart() lays in segment1, then the combined segment is segment2,getEnd() and the point furtherst from segmen2.getEnd()
+        std::optional<Segment> combined_segment = (segment1.getSegStart() - segment2.getEnd()).lensq() > (segment1.getEnd() - segment2.getEnd()).lensq() ? Segment(segment1.getSegStart(), segment2.getEnd()) : Segment(segment1.getEnd(), segment2.getEnd());
+    }
+    // Now check if the end of segment2 lays inside segment1
+    else if( contains(segment1, segment2.getEnd()) ) {
+
+        // If segment2.getSegStart() lays in segment1, then the combined segment is segment2,getEnd() and the point furtherst from segmen2.getEnd()
+        std::optional<Segment> combined_segment = (segment1.getSegStart() - segment2.getSegStart()).lensq() > (segment1.getEnd() - segment2.getSegStart()).lensq() ? Segment(segment1.getSegStart(), segment2.getSegStart()) : Segment(segment1.getEnd(), segment2.getSegStart());
+    }
+}
+
+std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2) {
+
+    // If the segments are not parallel, then return std::nullopt. (The segments are parallel of all points are collinear)
+    if( !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) && !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()) ) {
+        return std::nullopt;
+    }
+
+    // Grab the largest segment
+    Segment largest_segment, smallest_segment = segment1.toVector().lensq() > segment2.toVector().lensq() ? [segment1, segment2[] : [segment2, segment1];
+
+    // The segment is redundant if both points of the smallest segment are contained in the largest segment
+    if( contains(largest_segment, smallest_segment.getSegStart() ) && contains(largest_segment,smallest_segment.getEnd()) {
+        return std::make_optional(largest_segment);
+    }
+    else {
+        return std::nullopt;
+    }
 }
 
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,

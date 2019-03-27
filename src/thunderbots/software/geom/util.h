@@ -540,6 +540,26 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
  */
 std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2);
 
+/**
+ * Function merges overlapping parallel segments into one combined segment
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and overlapping
+ *         Returns std::nullopt if the segments aren't parallel or overlapping
+ */
+std::optional<Segment> mergeOverlappingParllelSegments(Segment segment1, Segment segment2);
+
+/**
+ * Function calculates if the segment parameters are redundant, for example, if segment2 is parallel and contained within segment1
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment: If the segments are redundant, returns the larger segment
+ *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or aren't redundant
+ */
+std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2);
+
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
                                                             std::vector<Point> obstacles,
                                                             double obstacle_radius);
