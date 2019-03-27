@@ -7,8 +7,9 @@
 
 namespace Evaluation
 {
-    std::optional<Robot> getTeamBaller(const Team &team, const Ball &ball,
-                                       const Field &field)
+    std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
+                                                             const Ball &ball,
+                                                             const Field &field)
     {
         if (team.numRobots() == 0)
         {

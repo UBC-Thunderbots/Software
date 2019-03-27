@@ -16,7 +16,7 @@ TEST(BallerEvaluationTest, get_team_baller_with_empty_team)
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
-    auto baller = Evaluation::getTeamBaller(team, ball, field);
+    auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
     EXPECT_FALSE(baller);
 }
 
@@ -35,7 +35,7 @@ TEST(BallerEvaluationTest, get_team_baller_robots_and_ball_stationary)
 
     team.updateRobots({robot0, robot1, robot2});
 
-    auto baller = Evaluation::getTeamBaller(team, ball, field);
+    auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
     EXPECT_EQ(*baller, robot0);
@@ -56,7 +56,7 @@ TEST(BallerEvaluationTest, get_team_baller_robot_already_has_ball)
 
     team.updateRobots({robot0, robot1, robot2});
 
-    auto baller = Evaluation::getTeamBaller(team, ball, field);
+    auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
     EXPECT_EQ(*baller, robot1);
@@ -79,7 +79,7 @@ TEST(BallerEvaluationTest, get_team_baller_ball_moving_towards_robot)
 
     // The ball is closer to robot0, but is moving towards robot1 so we expect robot1
     // to be the baller
-    auto baller = Evaluation::getTeamBaller(team, ball, field);
+    auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
     EXPECT_EQ(*baller, robot1);
@@ -104,7 +104,7 @@ TEST(BallerEvaluationTest, get_team_baller_robot_chasing_ball)
 
     // The ball is closer to robot0, but is moving towards robot1 so we expect robot1
     // to be the baller
-    auto baller = Evaluation::getTeamBaller(team, ball, field);
+    auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
     EXPECT_EQ(*baller, robot0);
@@ -127,7 +127,7 @@ TEST(BallerEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of_fie
 
     // The ball is moving too fast to be caught by any robot within the field, so we
     // expect robot to be the baller since it's the closest at this time.
-    auto baller = Evaluation::getTeamBaller(team, ball, field);
+    auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
     EXPECT_EQ(*baller, robot1);
