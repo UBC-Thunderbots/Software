@@ -10,7 +10,7 @@
 #include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
-TEST(BallerEvaluationTest, get_team_baller_with_empty_team)
+TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
@@ -20,7 +20,7 @@ TEST(BallerEvaluationTest, get_team_baller_with_empty_team)
     EXPECT_FALSE(baller);
 }
 
-TEST(BallerEvaluationTest, get_team_baller_robots_and_ball_stationary)
+TEST(PossessionEvaluationTest, get_team_baller_robots_and_ball_stationary)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0));
@@ -41,7 +41,7 @@ TEST(BallerEvaluationTest, get_team_baller_robots_and_ball_stationary)
     EXPECT_EQ(*baller, robot0);
 }
 
-TEST(BallerEvaluationTest, get_team_baller_robot_already_has_ball)
+TEST(PossessionEvaluationTest, get_team_baller_robot_already_has_ball)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({-2 + DIST_TO_FRONT_OF_ROBOT_METERS, 1}, {0, 0}, Timestamp::fromSeconds(0));
@@ -62,7 +62,7 @@ TEST(BallerEvaluationTest, get_team_baller_robot_already_has_ball)
     EXPECT_EQ(*baller, robot1);
 }
 
-TEST(BallerEvaluationTest, get_team_baller_ball_moving_towards_robot)
+TEST(PossessionEvaluationTest, get_team_baller_ball_moving_towards_robot)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({-2, 4}, {0, -2}, Timestamp::fromSeconds(0));
@@ -85,7 +85,7 @@ TEST(BallerEvaluationTest, get_team_baller_ball_moving_towards_robot)
     EXPECT_EQ(*baller, robot1);
 }
 
-TEST(BallerEvaluationTest, get_team_baller_robot_chasing_ball)
+TEST(PossessionEvaluationTest, get_team_baller_robot_chasing_ball)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({0, 3}, {0, -0.5}, Timestamp::fromSeconds(0));
@@ -110,7 +110,7 @@ TEST(BallerEvaluationTest, get_team_baller_robot_chasing_ball)
     EXPECT_EQ(*baller, robot0);
 }
 
-TEST(BallerEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of_field)
+TEST(PossessionEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of_field)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Ball ball({0, 0}, {0, 10}, Timestamp::fromSeconds(0));
