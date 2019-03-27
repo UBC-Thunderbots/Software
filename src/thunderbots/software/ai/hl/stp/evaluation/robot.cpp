@@ -24,10 +24,9 @@ bool Evaluation::robotHasPossession(const Ball ball, const Robot robot)
 
     // Calculate the ideal vector from the robot to the ball for the robot to have
     // possession.
-    Angle orientation          = robot.orientation();
-    double expected_position_x = orientation.cos() * DIST_TO_FRONT_OF_ROBOT_METERS;
-    double expected_position_y = orientation.sin() * DIST_TO_FRONT_OF_ROBOT_METERS;
-    Vector expected_point      = Vector(expected_position_x, expected_position_y);
+    Angle orientation = robot.orientation();
+    Vector expected_point =
+        Point::createFromAngle(orientation).norm(DIST_TO_FRONT_OF_ROBOT_METERS);
 
     return robot_center_to_ball.isClose(expected_point, DRIBBLER_LENGTH / 2);
 };
