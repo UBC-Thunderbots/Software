@@ -857,52 +857,57 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
-// Check the case where both rays intersect the segment only once (forming an intersection segment within the segment)
-TEST(GeomUtilTest, test_segment_intersect_with_existing_segment) {
-    Ray ray1 = Ray( Point(-1,0), Vector(0,1));
-    Ray ray2 = Ray( Point(1,0), Vector(0,1) );
+// Check the case where both rays intersect the segment only once (forming an intersection
+// segment within the segment)
+TEST(GeomUtilTest, test_segment_intersect_with_existing_segment)
+{
+    Ray ray1 = Ray(Point(-1, 0), Vector(0, 1));
+    Ray ray2 = Ray(Point(1, 0), Vector(0, 1));
 
-    Segment segment = Segment( Point(-5, 4), Point(5,4));
+    Segment segment = Segment(Point(-5, 4), Point(5, 4));
 
-    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray1, ray2, segment);
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
 
-    EXPECT_EQ( Segment(Point(-1,4), Point(1,4)), intersecting_segment.value());
-
+    EXPECT_EQ(Segment(Point(-1, 4), Point(1, 4)), intersecting_segment.value());
 }
 
-// Test that no segment is returned if both rays do not intersect the segment, and the area between the rays do not enclose the segment
-TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting) {
-    Ray ray1 = Ray( Point(-4,0), Vector(0,-1));
-    Ray ray2 = Ray( Point(4,0), Vector(0,-1) );
+// Test that no segment is returned if both rays do not intersect the segment, and the
+// area between the rays do not enclose the segment
+TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting)
+{
+    Ray ray1 = Ray(Point(-4, 0), Vector(0, -1));
+    Ray ray2 = Ray(Point(4, 0), Vector(0, -1));
 
-    Segment segment = Segment( Point(-1, 4), Point(1,4));
+    Segment segment = Segment(Point(-1, 4), Point(1, 4));
 
-    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray1, ray2, segment);
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
 
-    EXPECT_EQ( false, intersecting_segment.has_value());
+    EXPECT_EQ(false, intersecting_segment.has_value());
 }
 
 // Test that a correct intersection point is returned for 2 rays that intersect once
-TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once) {
-
+TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once)
+{
     // Ray at origin pointing upwards
-    Ray ray1 = Ray( Point(0,0), Vector(0,1));
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
     // Ray up and to the right that points right
-    Ray ray2 = Ray( Point(-1,1), Vector(1,0));
+    Ray ray2 = Ray(Point(-1, 1), Vector(1, 0));
 
     std::optional<Point> intersection = intersects(ray1, ray2);
 
-    EXPECT_EQ(intersection.value(), Point(0,1));
-
+    EXPECT_EQ(intersection.value(), Point(0, 1));
 }
 
-// Test that an intersection is not returned if the opposite direction of the rays intersect
-TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects) {
-
+// Test that an intersection is not returned if the opposite direction of the rays
+// intersect
+TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects)
+{
     // Ray positioned at origin pointing down
-    Ray ray1 = Ray( Point(0,0), Vector(0,-1));
+    Ray ray1 = Ray(Point(0, 0), Vector(0, -1));
 
-    Ray ray2 = Ray( Point(-1,1), Vector(-1,0));
+    Ray ray2 = Ray(Point(-1, 1), Vector(-1, 0));
 
     std::optional<Point> intersection = intersects(ray1, ray2);
 
@@ -910,98 +915,104 @@ TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects) {
 }
 
 // Test that an intersection is not returned if the Rays are overlapping
-TEST(GeomUtilTest, test_intersect_ray_ray_overlapping){
+TEST(GeomUtilTest, test_intersect_ray_ray_overlapping)
+{
+    // Ray positioned at origin pointing up
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray2 = Ray(Point(0, 1), Vector(0, 1));
 
-// Ray positioned at origin pointing up
-Ray ray1 = Ray( Point(0,0), Vector(0,1));
-Ray ray2 = Ray( Point(0,1), Vector(0,1));
+    std::optional<Point> intersection = intersects(ray1, ray2);
 
-std::optional<Point> intersection = intersects(ray1, ray2);
-
-EXPECT_EQ(intersection, std::nullopt);
+    EXPECT_EQ(intersection, std::nullopt);
 }
 
-// Test that the segment between the intersecting ray and the segment extreme is returned when one ray intersects, and the other would intersect an infinitely long segment
-TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme1) {
+// Test that the segment between the intersecting ray and the segment extreme is returned
+// when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme1)
+{
+    Ray ray_intersecting          = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0, 0), Vector(-14, 1));
 
-    Ray ray_intersecting = Ray( Point(0,0), Vector(0,1));
-    Ray ray_intersects_out_of_seg = Ray(Point(0,0), Vector(-14,1) );
+    Segment segment = Segment(Point(-1, 2), Point(1, 2));
 
-    Segment segment = Segment( Point(-1,2), Point(1,2));
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
 
-    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
-
-    EXPECT_EQ( intersecting_segment.value(), Segment( Point(0,2), Point(-1,2)));
-
+    EXPECT_EQ(intersecting_segment.value(), Segment(Point(0, 2), Point(-1, 2)));
 }
-// Test that the segment between the intersecting ray and the segment extreme is returned when one ray intersects, and the other would intersect an infinitely long segment
-TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme2) {
+// Test that the segment between the intersecting ray and the segment extreme is returned
+// when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme2)
+{
+    Ray ray_intersecting          = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0, 0), Vector(20, 2));
 
-    Ray ray_intersecting = Ray( Point(0,0), Vector(0,1));
-    Ray ray_intersects_out_of_seg = Ray(Point(0,0), Vector(20,2) );
+    Segment segment = Segment(Point(-1, 2), Point(1, 2));
 
-    Segment segment = Segment( Point(-1,2), Point(1,2));
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
 
-    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
-
-    EXPECT_EQ( intersecting_segment.value(), Segment( Point(0,2), Point(1,2)));
-
+    EXPECT_EQ(intersecting_segment.value(), Segment(Point(0, 2), Point(1, 2)));
 }
 
-TEST(GeomUtilTest, test_segment_intersect_segment_enclosed_by_rays) {
+TEST(GeomUtilTest, test_segment_intersect_segment_enclosed_by_rays)
+{
+    Ray ray1 = Ray(Point(0, 0), Vector(-20, 1));
+    Ray ray2 = Ray(Point(0, 0), Vector(20, 1));
 
-    Ray ray1 = Ray( Point(0,0), Vector(-20,1));
-    Ray ray2 = Ray( Point(0,0), Vector(20,1));
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
 
-    Segment segment = Segment( Point(-2,2), Point(2,2));
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
 
-    std::optional<Segment> intersecting_segment = getIntersectingSegment(ray1,ray2,segment);
-
-    //EXPECT_EQ(intersecting_segment.value(), segment);
-    //FIXME
-    EXPECT_EQ(true, true);
+    EXPECT_EQ(intersecting_segment.value(), segment);
 }
 
 // Test that the function returns the segment when the rays enclose the segemnt
-TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_enclosed) {
+TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_enclosed)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
 
-    Segment segment = Segment( Point(-2,2), Point(2,2));
+    Ray ray1 = Ray(Point(0, 0), Vector(-20, 1));
 
-    Ray ray1 = Ray( Point(0,0), Vector(-20,1));
+    Ray ray2 = Ray(Point(0, 0), Vector(20, 1));
 
-    Ray ray2 = Ray( Point(0,0), Vector(20,1));
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
 
-    std::optional<Segment> enclosed_segment = segmentEnclosedBetweenRays(segment, ray1, ray2);
-
-    EXPECT_EQ( segment, enclosed_segment.value() );
+    EXPECT_EQ(segment, enclosed_segment.value());
 }
 
 // Test that the function returns null when the rays only partially intersect the segment
-TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_partially_enclosed) {
+TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_partially_enclosed)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
 
-    Segment segment = Segment( Point(-2,2), Point(2,2));
+    Ray ray1 = Ray(Point(0, 0), Vector(-0.2, 1));
 
-    Ray ray1 = Ray( Point(0,0), Vector(-0.2,1));
+    Ray ray2 = Ray(Point(0, 0), Vector(0.2, 1));
 
-    Ray ray2 = Ray( Point(0,0), Vector(0.2,1));
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
 
-    std::optional<Segment> enclosed_segment = segmentEnclosedBetweenRays(segment, ray1, ray2);
-
-    EXPECT_EQ( std::nullopt, enclosed_segment );
+    EXPECT_EQ(std::nullopt, enclosed_segment);
 }
 
-// Test that the function returns null if the segment is only partially enclosed with 1 real intersection
-TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_partially_enclosed_one_real_intersection) {
+// Test that the function returns null if the segment is only partially enclosed with 1
+// real intersection
+TEST(GeomUtilTest,
+     test_segment_enclosed_between_rays_is_partially_enclosed_one_real_intersection)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
 
-    Segment segment = Segment( Point(-2,2), Point(2,2));
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
 
-    Ray ray1 = Ray( Point(0,0), Vector(0,1));
+    Ray ray2 = Ray(Point(0, 0), Vector(-20, 1));
 
-    Ray ray2 = Ray( Point(0,0), Vector(-20,1));
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
 
-    std::optional<Segment> enclosed_segment = segmentEnclosedBetweenRays(segment, ray1, ray2);
-
-    EXPECT_EQ( std::nullopt, enclosed_segment );
+    EXPECT_EQ(std::nullopt, enclosed_segment);
 }
 int main(int argc, char **argv)
 {

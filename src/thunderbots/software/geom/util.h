@@ -358,10 +358,10 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
  *
  * @param ray1: First Ray
  * @param ray2: Second Ray
- * @return Returns std::nullopt if no intersections exist, or if there are infinite intersections (overlapping)
- * Returns Point if a single intersection exists.
- * Returns Point if the ray and segment are overlapping, where the points define
- * the line segment of overlap.
+ * @return Returns std::nullopt if no intersections exist, or if there are infinite
+ * intersections (overlapping) Returns Point if a single intersection exists. Returns
+ * Point if the ray and segment are overlapping, where the points define the line segment
+ * of overlap.
  */
 std::optional<Point> intersects(Ray ray1, Ray ray2);
 
@@ -490,7 +490,9 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
  * @param buffer:
  * @return the mean point of points
  */
-std::pair<Vector, Vector> getCircleTangentVectors(const Point reference, const Circle circle, double buffer =0.0);
+std::pair<Vector, Vector> getCircleTangentVectors(const Point reference,
+                                                  const Circle circle,
+                                                  double buffer = 0.0);
 
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
@@ -512,26 +514,32 @@ double getPointsVariance(const std::vector<Point> &points);
 
 
 /**
- * Function returns the segment defined by the segment between the intersections of two Rays on a segment
+ * Function returns the segment defined by the segment between the intersections of two
+ * Rays on a segment
  *
  * @param ray1 (Starting point and direction)
  * @param ray2 (Starting point and direction)
  * @param segment (Segment to find segment of intersection upon)
- * @return Segment, the segment defined by the space between two intersecting rays on the segment parameter
- *         std::nullopt, if both rays don't intersect the segment, and the segment is not enclosed between the rays
- *         Segment, if one ray intersects the segment, but one of the segment parameters extremes are enclosed within the two rays
+ * @return Segment, the segment defined by the space between two intersecting rays on the
+ * segment parameter std::nullopt, if both rays don't intersect the segment, and the
+ * segment is not enclosed between the rays Segment, if one ray intersects the segment,
+ * but one of the segment parameters extremes are enclosed within the two rays
  */
-std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment);
+std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment);
 
 /**
- * Function calculates whether the segment parameter is enclosed between the ray parameters. This means the entirety of the segment lays between the rays
+ * Function calculates whether the segment parameter is enclosed between the ray
+ * parameters. This means the entirety of the segment lays between the rays
  *
  * @param segment : segment parameter to calculate if its definition lies between the rays
  * @param ray1 : Starting point and direction
  * @param ray2 : Starting point an direction
  * @return Segment: Returns the segment parameter if it is enclosed between ray1 and ray2
- *         Returns std::nullopt of the ray is not completely enclosed between the rays, or not at all
+ *         Returns std::nullopt of the ray is not completely enclosed between the rays, or
+ * not at all
  */
-std::optional<Segment> segmentEnclosedBetweenRays( Segment segment, Ray ray1, Ray ray2);
+std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2);
 
-std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius);
+std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
+                                                            std::vector<Point> obstacles,
+                                                            double obstacle_radius);

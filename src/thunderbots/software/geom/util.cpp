@@ -798,21 +798,28 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     }
 }
 
-std::optional<Point> intersects(Ray ray1, Ray ray2) {
-
+std::optional<Point> intersects(Ray ray1, Ray ray2)
+{
     // Calculate if the intersecion exists along segments of infinite length
-    std::optional<Point> intersection = lineIntersection(ray1.getRayStart(), ray1.getRayStart() + ray1.getDirection(), ray2.getRayStart(), ray2.getRayStart() + ray2.getDirection());
+    std::optional<Point> intersection =
+        lineIntersection(ray1.getRayStart(), ray1.getRayStart() + ray1.getDirection(),
+                         ray2.getRayStart(), ray2.getRayStart() + ray2.getDirection());
 
     // Return if no intersection exists
-    if( !intersection.has_value()) {
+    if (!intersection.has_value())
+    {
         return std::nullopt;
     }
 
     // Check of the intersection exits along the direction of both rays
-    if( ((intersection.value() - ray1.getRayStart()).norm() == ray1.getDirection().norm()) && (intersection.value() - ray2.getRayStart()).norm() == ray2.getDirection().norm() ) {
+    if (((intersection.value() - ray1.getRayStart()).norm() ==
+         ray1.getDirection().norm()) &&
+        (intersection.value() - ray2.getRayStart()).norm() == ray2.getDirection().norm())
+    {
         return intersection.value();
     }
-    else{
+    else
+    {
         return std::nullopt;
     }
 }
@@ -992,11 +999,14 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
-std::pair<Vector, Vector> getCircleTangentVectors( const Point reference, const Circle circle, double buffer) {
+std::pair<Vector, Vector> getCircleTangentVectors(const Point reference,
+                                                  const Circle circle, double buffer)
+{
+    auto [tangent_point1, tangent_point2] =
+        getCircleTangentPoints(reference, circle, buffer);
 
-    auto [tangent_point1, tangent_point2] = getCircleTangentPoints(reference, circle, buffer);
-
-    return std::make_pair((tangent_point1 - reference).norm(), (tangent_point2 - reference).norm());
+    return std::make_pair((tangent_point1 - reference).norm(),
+                          (tangent_point2 - reference).norm());
 }
 
 bool pointIsRightOfLine(const Segment &line, const Point &point)
@@ -1034,10 +1044,15 @@ double getPointsVariance(const std::vector<Point> &points)
     return sqrt(sum);
 }
 
-std::optional<Segment> segmentEnclosedBetweenRays( Segment segment, Ray ray1, Ray ray2) {
-    // Create a rays located at the extremes of the segment, that point in the direction outwards are parallel to the segment
-    const Ray extremes1 = Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
-    const Ray extremes2 = Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));;
+std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2)
+{
+    // Create a rays located at the extremes of the segment, that point in the direction
+    // outwards are parallel to the segment
+    const Ray extremes1 =
+        Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+    const Ray extremes2 =
+        Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
+    ;
 
     const std::optional<Point> extreme_intersect11 = intersects(extremes1, ray1);
     const std::optional<Point> extreme_intersect12 = intersects(extremes2, ray1);
@@ -1046,100 +1061,134 @@ std::optional<Segment> segmentEnclosedBetweenRays( Segment segment, Ray ray1, Ra
 
     // Check for the cases that the rays intersect the same segment projection
     if ((extreme_intersect11.has_value() == extreme_intersect21.has_value()) ||
-        (extreme_intersect21.has_value() == extreme_intersect22.has_value())) {
+        (extreme_intersect21.has_value() == extreme_intersect22.has_value()))
+    {
         return std::nullopt;
-    } else {
-
-        // Since we know that both rays aren't passing through the same side of the segment at this point, then as long as they both only intersect 1 point the segment must be enclosed between them
-        if ( (extreme_intersect11.has_value() != extreme_intersect12.has_value()) && (extreme_intersect21.has_value() != extreme_intersect22.has_value()) ) {
-
+    }
+    else
+    {
+        // Since we know that both rays aren't passing through the same side of the
+        // segment at this point, then as long as they both only intersect 1 point the
+        // segment must be enclosed between them
+        if ((extreme_intersect11.has_value() != extreme_intersect12.has_value()) &&
+            (extreme_intersect21.has_value() != extreme_intersect22.has_value()))
+        {
             return std::make_optional(segment);
         }
         // Covers the case where a single ray passes by both sides of the segment
-        else {
+        else
+        {
             return std::nullopt;
         }
     }
 }
 
-std::optional<Segment> getIntersectingSegment( Ray ray1, Ray ray2, Segment segment) {
+std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment)
+{
+    // Check if the segment is enclosed between the rays
+    if (segmentEnclosedBetweenRays(segment, ray1, ray2))
+    {
+        return segment;
+    }
 
     // Calculate intersections of each individual ray and the segment
     auto [intersect11, intersect12] = raySegmentIntersection(ray1, segment);
     auto [intersect21, intersect22] = raySegmentIntersection(ray2, segment);
 
     // Check if there are any real intersections
-    if( !intersect11.has_value() && !intersect21.has_value() ) {
-
-
-        // FIXME: This needs to be made into it's own function
-
-        // If the segment parameter isn't enclosed between the rays, then there is no intersecting segment
+    if (!intersect11.has_value() && !intersect21.has_value())
+    {
         return std::nullopt;
     }
-    // Check if one of the rays is overlapping the segment
-    else if( (intersect11.has_value() && intersect12.has_value()) || (intersect21.has_value() && intersect22.has_value()) ) {
+    // Check if one of the rays is overlapping the segment. If this is the case, return
+    // the segment (If a ray intersects a ray more than one time it must be overlapping)
+    else if ((intersect11.has_value() && intersect12.has_value()) ||
+             (intersect21.has_value() && intersect22.has_value()))
+    {
         return segment;
     }
-    // If there is only one intersection point for each ray
-    else if( (intersect11.has_value() && !intersect12.has_value() ) && ( intersect21.has_value() && !intersect22.has_value() ))  {
-        return std::make_optional( Segment( intersect11.value(), intersect21.value()) );
+    // If there is only one intersection point for each ray combine the intersections into
+    // a segment
+    else if ((intersect11.has_value() && !intersect12.has_value()) &&
+             (intersect21.has_value() && !intersect22.has_value()))
+    {
+        return std::make_optional(Segment(intersect11.value(), intersect21.value()));
     }
-    // If only one ray intersects the segment return the segment between the intersection and the segment extreme (part1)
-    else if( intersect11.has_value() && !intersect21.has_value() ) {
-
-        const Ray extremes1 = Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
-        const Ray extremes2 = Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));;
+    // If only one ray intersects the segment return the segment between the intersection
+    // and the segment extreme (part1)
+    else if (intersect11.has_value() && !intersect21.has_value())
+    {
+        const Ray extremes1 =
+            Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+        const Ray extremes2 =
+            Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
+        ;
 
         std::optional<Point> extreme_intersect1 = intersects(extremes1, ray2);
         std::optional<Point> extreme_intersect2 = intersects(extremes2, ray2);
 
-        if( extreme_intersect1.has_value()) {
-            return std::make_optional( Segment( intersect11.value(), segment.getEnd() ));
+        if (extreme_intersect1.has_value())
+        {
+            return std::make_optional(Segment(intersect11.value(), segment.getEnd()));
         }
-        else if( extreme_intersect2.has_value()) {
-            return std::make_optional( Segment( intersect11.value(), segment.getSegStart()));
+        else if (extreme_intersect2.has_value())
+        {
+            return std::make_optional(
+                Segment(intersect11.value(), segment.getSegStart()));
         }
     }
-    // If only one ray intersects the segment return the segment between the intersection and the segment extreme (part2)
-    else if( intersect11.has_value() && !intersect21.has_value() ) {
-
-        const Ray extremes1 = Ray( segment.getEnd(), Vector(segment.getEnd()-segment.getSegStart()) );
-        const Ray extremes2 = Ray( segment.getSegStart(), Vector(segment.getSegStart()-segment.getEnd()) );;
+    // If only one ray intersects the segment return the segment between the intersection
+    // and the segment extreme (part2)
+    else if (intersect11.has_value() && !intersect21.has_value())
+    {
+        const Ray extremes1 =
+            Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
+        const Ray extremes2 =
+            Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
+        ;
 
         std::optional<Point> extreme_intersect1 = intersects(extremes1, ray1);
         std::optional<Point> extreme_intersect2 = intersects(extremes2, ray1);
 
-        if( extreme_intersect1.has_value()) {
-            return std::make_optional( Segment( intersect21.value(), segment.getEnd() ));
+        if (extreme_intersect1.has_value())
+        {
+            return std::make_optional(Segment(intersect21.value(), segment.getEnd()));
         }
-        else if( extreme_intersect2.has_value()) {
-            return std::make_optional( Segment( intersect21.value(), segment.getSegStart()));
+        else if (extreme_intersect2.has_value())
+        {
+            return std::make_optional(
+                Segment(intersect21.value(), segment.getSegStart()));
         }
     }
     // All cases have been checked, return std::nullopt
-    else {
+    else
+    {
         return std::nullopt;
     }
-
 }
 
-std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1, Segment segment2) {
-
+std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
+                                                        Segment segment2)
+{
 }
 
-std::pair<Angle, Point> calculateMostOpenDirectionToSegment( Point origin, Segment segment, std::vector<Point> obstacles, double obstacle_radius) {
+std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
+                                                            std::vector<Point> obstacles,
+                                                            double obstacle_radius){
     // IDEA:
     // Project all objects onto the line segment and keep track of open points
 
     // How to get blocked segment:
     // Get tangent vectors from obstacle circle to origin
-    //  flip vector direction and form a ray. If both rays of an obstacle pass through the segment then, block it off
-    //  if one ray intersects, then check block off from the intersecting ray to the segment extreme in the same direction
-//    for( Point obstacle : obstacles) {
-//        auto
-//    }
+    //  flip vector direction and form a ray. If both rays of an obstacle pass through the
+    //  segment then, block it off
+    //  if one ray intersects, then check block off from the intersecting ray to the
+    //  segment extreme in the same direction
+    //    for( Point obstacle : obstacles) {
+    //        auto
+    //    }
     // Combine overlapping obstacle line segments to reduce complexity
-    // iterate over combined line segments to find the largest open segments, and then back-calculate the coresponding angle from the origin
+    // iterate over combined line segments to find the largest open segments, and then
+    // back-calculate the coresponding angle from the origin
 
 };
