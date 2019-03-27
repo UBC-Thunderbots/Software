@@ -3,7 +3,7 @@
  * in baller.cpp
  */
 
-#include "ai/hl/stp/evaluation/baller.h"
+#include "ai/hl/stp/evaluation/possession.h"
 
 #include <gtest/gtest.h>
 
