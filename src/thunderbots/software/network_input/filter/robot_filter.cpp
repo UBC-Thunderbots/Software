@@ -13,7 +13,7 @@ FilteredRobotData RobotFilter::getFilteredData(
 
     filtered_data.id               = 0;
     filtered_data.position         = Point();
-    filtered_data.velocity         = Vector(;
+    filtered_data.velocity         = Vector();
     filtered_data.orientation      = Angle::zero();
     filtered_data.angular_velocity = AngularVelocity::zero();
     filtered_data.timestamp        = Timestamp::fromSeconds(0);
