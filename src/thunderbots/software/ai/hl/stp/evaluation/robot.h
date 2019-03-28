@@ -36,7 +36,7 @@ namespace Evaluation
      *
      * @param ball The ball the is wanted to be possessed
      * @param robot The Robot which wants to know if it has the ball.
-     * @return True is the ball is close to the front dribbler and false otherwise
+     * @return True if the ball is close to the front dribbler and false otherwise
      */
     bool robotHasPossession(Ball ball, Robot robot);
 }  // namespace Evaluation

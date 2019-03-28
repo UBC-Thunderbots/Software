@@ -28,5 +28,5 @@ bool Evaluation::robotHasPossession(const Ball ball, const Robot robot)
     Vector expected_point =
         Point::createFromAngle(orientation).norm(DIST_TO_FRONT_OF_ROBOT_METERS);
 
-    return robot_center_to_ball.isClose(expected_point, DRIBBLER_LENGTH / 2);
+    return robot_center_to_ball.isClose(expected_point, DRIBBLER_WIDTH / 2);
 };

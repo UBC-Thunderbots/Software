@@ -101,7 +101,7 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot)
     EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
 }
 
-TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot_but_robot_turned)
+TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
 {
     Point ball_position  = Point(0.07, 0);
     Vector ball_velocity = Vector(0, 0);
@@ -114,7 +114,7 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot_but_robot_tu
     EXPECT_FALSE(Evaluation::robotHasPossession(ball, robot));
 }
 
-TEST(RobotEvaluationTest, has_possession_robot_moving)
+TEST(RobotEvaluationTest, has_possession_robot_moving_ball_in_dribbler)
 {
     Point ball_position  = Point(0.07, 0);
     Vector ball_velocity = Vector(0, 0);
@@ -127,7 +127,7 @@ TEST(RobotEvaluationTest, has_possession_robot_moving)
     EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
 }
 
-TEST(RobotEvaluationTest, has_possession_ball_far_away)
+TEST(RobotEvaluationTest, has_possession_ball_far_away_from_robot)
 {
     Point ball_position  = Point(-1, -2);
     Vector ball_velocity = Vector(0, 0);
@@ -140,7 +140,7 @@ TEST(RobotEvaluationTest, has_possession_ball_far_away)
     EXPECT_FALSE(Evaluation::robotHasPossession(ball, robot));
 }
 
-TEST(RobotEvaluationTest, has_possession_slightly_off_center_return_true)
+TEST(RobotEvaluationTest, has_possession_ball_slightly_off_center_but_still_on_dribbler)
 {
     Point ball_position  = Point(0.07, 0.005);
     Vector ball_velocity = Vector(0, 0);
@@ -155,7 +155,7 @@ TEST(RobotEvaluationTest, has_possession_slightly_off_center_return_true)
 
 
 
-TEST(RobotEvaluationTest, has_possession_weird_angle)
+TEST(RobotEvaluationTest, has_possession_robot_on_angle_with_ball_in_dribbler)
 {
     Point ball_position  = Point(0.035, 0.06);
     Vector ball_velocity = Vector(0, 0);
