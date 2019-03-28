@@ -91,8 +91,6 @@ TEST(PossessionEvaluationTest, get_team_baller_robot_chasing_ball)
     Ball ball({0, 3}, {0, -0.5}, Timestamp::fromSeconds(0));
     Team team = Team(Duration::fromSeconds(1));
 
-    // robot0 is chasing the ball and is close enough to catching it we expect it to be
-    // the baller
     Robot robot0 = Robot(0, Point(-0.0, 4), Vector(0.0, -1.0), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
     Robot robot1 = Robot(1, Point(-2, 0), Vector(), Angle::quarter(),
@@ -102,8 +100,8 @@ TEST(PossessionEvaluationTest, get_team_baller_robot_chasing_ball)
 
     team.updateRobots({robot0, robot1, robot2});
 
-    // The ball is closer to robot0, but is moving towards robot1 so we expect robot1
-    // to be the baller
+    // robot0 is chasing the ball and is close enough to catching it we expect it to be
+    // the baller
     auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
@@ -126,7 +124,7 @@ TEST(PossessionEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of
     team.updateRobots({robot0, robot1, robot2});
 
     // The ball is moving too fast to be caught by any robot within the field, so we
-    // expect robot to be the baller since it's the closest at this time.
+    // expect robot1 to be the baller since it's the closest at this time.
     auto baller = Evaluation::getRobotWithEffectiveBallPossession(team, ball, field);
 
     EXPECT_TRUE(baller);
