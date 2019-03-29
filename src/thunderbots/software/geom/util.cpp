@@ -1169,25 +1169,27 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
 
 std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                                                         Segment segment2) {
+    std::optional<Segment> redundant_segment = calcIfSegmentsAreRedundant(segment1, segment2);
+
     // If the segments are not parallel, then return std::nullopt. (The segments are parallel of all points are collinear)
     if( !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) && !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()) ) {
         return std::nullopt;
     }
     // Check the case where one segment is completely contained in the other
-    else if( std::min(segment1.toVector().lensq(), segment2.toVector().lensq())) {
-
+    else if( redundant_segment.has_value() ) {
+        return redundant_segment;
     }
     // Check if the beginning of segment2 lays inside segment1
     else if( contains(segment1, segment2.getSegStart()) ) {
 
         // If segment2.getSegStart() lays in segment1, then the combined segment is segment2,getEnd() and the point furtherst from segmen2.getEnd()
-        std::optional<Segment> combined_segment = (segment1.getSegStart() - segment2.getEnd()).lensq() > (segment1.getEnd() - segment2.getEnd()).lensq() ? Segment(segment1.getSegStart(), segment2.getEnd()) : Segment(segment1.getEnd(), segment2.getEnd());
+        return (segment1.getSegStart() - segment2.getEnd()).lensq() > (segment1.getEnd() - segment2.getEnd()).lensq() ? Segment(segment1.getSegStart(), segment2.getEnd()) : Segment(segment1.getEnd(), segment2.getEnd());
     }
     // Now check if the end of segment2 lays inside segment1
     else if( contains(segment1, segment2.getEnd()) ) {
 
         // If segment2.getSegStart() lays in segment1, then the combined segment is segment2,getEnd() and the point furtherst from segmen2.getEnd()
-        std::optional<Segment> combined_segment = (segment1.getSegStart() - segment2.getSegStart()).lensq() > (segment1.getEnd() - segment2.getSegStart()).lensq() ? Segment(segment1.getSegStart(), segment2.getSegStart()) : Segment(segment1.getEnd(), segment2.getSegStart());
+        return (segment1.getSegStart() - segment2.getSegStart()).lensq() > (segment1.getEnd() - segment2.getSegStart()).lensq() ? Segment(segment1.getSegStart(), segment2.getSegStart()) : Segment(segment1.getEnd(), segment2.getSegStart());
     }
 }
 

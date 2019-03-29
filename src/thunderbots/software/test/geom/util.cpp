@@ -1028,7 +1028,7 @@ TEST(GeomUtilTest,
     EXPECT_EQ(largest_segment.value(), segment2);
 }
 
-// Test that function returns the larger segment when considering 2 redundant segments
+// Test that function returns the larger segment when considering 2 non-parallel segments
 TEST(GeomUtilTest,
      test_segment_redundancy_segments_are_not_parallel)
 {
@@ -1041,7 +1041,7 @@ TEST(GeomUtilTest,
     EXPECT_EQ(largest_segment, std::nullopt);
 }
 
-// Test that function returns the larger segment when considering 2 redundant segments
+// Test that function returns one of the segments if they are exactly the same
 TEST(GeomUtilTest,
      test_segment_redundancy_segments_are_the_same)
 {
@@ -1052,6 +1052,54 @@ TEST(GeomUtilTest,
     std::optional<Segment> largest_segment = calcIfSegmentsAreRedundant(segment1, segment2);
 
     EXPECT_EQ(largest_segment.value(), segment1);
+}
+
+// Test if segments are merged if that are parallel and only partially overlapping
+TEST(GeomUtilTest,
+     test_merge_segment_partially_overlapping)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment( Point(-1,-1), Point(5,5));
+
+    std::optional<Segment> merged_segment = mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment.value(), Segment(Point(-2,-2), Point(5,5)));
+}
+
+// Test if segments are merged if that are parallel and only partially overlapping
+TEST(GeomUtilTest,
+     test_merge_segment_redundant_segments)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment( Point(-1,-1), Point(1,1));
+
+    std::optional<Segment> merged_segment = mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment.value(), segment1);
+}
+
+// Test if segments are not merged if that are not parallel
+TEST(GeomUtilTest,
+     test_merge_segment_non_parallel_segments)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment( Point(-1,1), Point(1,-1));
+
+    std::optional<Segment> merged_segment = mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment, std::nullopt);
+}
+
+// Test if segments are not merged if that are not parallel
+TEST(GeomUtilTest,
+     test_merge_segment_parallel_only_one_common_point)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment( Point(2,2), Point(6,6));
+
+    std::optional<Segment> merged_segment = mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment, Segment(Point(segment1.getSegStart()), Point(segment2.getEnd())));
 }
 
 int main(int argc, char **argv)
