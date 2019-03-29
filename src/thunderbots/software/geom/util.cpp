@@ -1220,6 +1220,32 @@ std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segm
     }
 }
 
+std::optional<std::vector<Segment>> mergeAllParallelSegments(std::vector<Segment> segments) {
+
+    std::optional<Segment> merged_segment = std::nullopt;
+    std::optional<std::vector<Segment>> merged_segments = std::nullopt;
+
+    if( segments.size() == 0 ) {
+        return std::nullopt;
+    }
+    else {
+        // Loop through all segments
+        for( int i = 0 ; i < segments.size(); i++ ) {
+
+            // Issue here is the changing size of the vector can miss segments
+            for( int j = 1; j < segments.size(); j++) {
+                merged_segment = mergeOverlappingParallelSegments(segments[i], segments[j]);
+
+                if(merged_segment.has_value()) {
+                    segments[i] = merged_segment.value();
+                    segments.erase(j);
+                }
+
+            }
+        }
+    }
+}
+
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
                                                             std::vector<Point> obstacles,
                                                             double obstacle_radius){

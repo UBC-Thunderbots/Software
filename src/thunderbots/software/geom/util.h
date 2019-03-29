@@ -560,6 +560,15 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1, Segmen
  */
 std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2);
 
+/**
+ * Function merges all segment parameters in the the fewest complete segments to have the same representation
+ *
+ * @param segments : vector of parallel segments
+ * @return std::vector<Segment>: If the segments are redundant, returns the larger segment
+ *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or aren't redundant
+ */
+std::optional<std::vector<Segment>> mergeAllParallelSegments(std::vector<Segment> segments);
+
 std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
                                                             std::vector<Point> obstacles,
                                                             double obstacle_radius);
