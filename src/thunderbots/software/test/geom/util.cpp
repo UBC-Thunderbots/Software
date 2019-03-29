@@ -1014,6 +1014,46 @@ TEST(GeomUtilTest,
 
     EXPECT_EQ(std::nullopt, enclosed_segment);
 }
+
+// Test that function returns the larger segment when considering 2 redundant segments
+TEST(GeomUtilTest,
+     test_segment_redundancy_segments_are_redundant)
+{
+    Segment segment1 = Segment(Point(-1, -1), Point(1, 1));
+
+    Segment segment2 = Segment( Point(-2,-2), Point(2,2));
+
+    std::optional<Segment> largest_segment = calcIfSegmentsAreRedundant(segment1, segment2);
+
+    EXPECT_EQ(largest_segment.value(), segment2);
+}
+
+// Test that function returns the larger segment when considering 2 redundant segments
+TEST(GeomUtilTest,
+     test_segment_redundancy_segments_are_not_parallel)
+{
+    Segment segment1 = Segment(Point(2, 2), Point(1, -2));
+
+    Segment segment2 = Segment( Point(1,4), Point(1,-4));
+
+    std::optional<Segment> largest_segment = calcIfSegmentsAreRedundant(segment1, segment2);
+
+    EXPECT_EQ(largest_segment, std::nullopt);
+}
+
+// Test that function returns the larger segment when considering 2 redundant segments
+TEST(GeomUtilTest,
+     test_segment_redundancy_segments_are_the_same)
+{
+    Segment segment1 = Segment(Point(2, 2), Point(1, -2));
+
+    Segment segment2 = Segment( Point(2,2), Point(1,-2));
+
+    std::optional<Segment> largest_segment = calcIfSegmentsAreRedundant(segment1, segment2);
+
+    EXPECT_EQ(largest_segment.value(), segment1);
+}
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;

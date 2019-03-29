@@ -1198,11 +1198,19 @@ std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segm
         return std::nullopt;
     }
 
+    Segment largest_segment, smallest_segment;
     // Grab the largest segment
-    Segment largest_segment, smallest_segment = segment1.toVector().lensq() > segment2.toVector().lensq() ? [segment1, segment2[] : [segment2, segment1];
+    if(segment1.toVector().lensq() > segment2.toVector().lensq()) {
+        largest_segment = segment1;
+        smallest_segment = segment2;
+    }
+    else{
+        largest_segment = segment2;
+        smallest_segment = segment1;
+    }
 
     // The segment is redundant if both points of the smallest segment are contained in the largest segment
-    if( contains(largest_segment, smallest_segment.getSegStart() ) && contains(largest_segment,smallest_segment.getEnd()) {
+    if( contains(largest_segment, smallest_segment.getSegStart() ) && contains(largest_segment,smallest_segment.getEnd()) ) {
         return std::make_optional(largest_segment);
     }
     else {
