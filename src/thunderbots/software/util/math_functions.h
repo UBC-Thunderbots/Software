@@ -2,7 +2,17 @@
 // Created by roark on 28/03/19.
 //
 
-#ifndef THUNDERBOTS_ALL_MATH_FUNCTIONS_H
-#define THUNDERBOTS_ALL_MATH_FUNCTIONS_H
+#pragma once
 
-#endif //THUNDERBOTS_ALL_MATH_FUNCTIONS_H
+namespace Util
+{
+    /**
+     * Linearly maps an input value to an output value in the range [0,1]
+     *
+     * @param value The input value
+     * @param offset The value by which to offset the input value
+     * @param linear_width the total length required for the output value to go from 0 to 1
+     */
+    double linear(double value, double offset, double linear_width);
+}
+
