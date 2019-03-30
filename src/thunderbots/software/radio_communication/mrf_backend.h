@@ -70,7 +70,9 @@ class MRFBackend
    private:
     MRFDongle dongle;
 
-    ros::Publisher robot_status_publisher;
+    // The Annunciator that sends messages from the dongle to AI
+    Annunciator annunciator;
+
     std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     Ball ball;
 };

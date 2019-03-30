@@ -45,9 +45,7 @@ namespace
 
 }  // namespace
 
-MRFDongle::MRFDongle(std::function<void(int robot, const void *data, std::size_t len,
-                                        uint8_t lqi, uint8_t rssi)>
-                         robot_msg_handler)
+MRFDongle::MRFDongle(Annunciator& annunciator)
     : context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -56,7 +54,7 @@ MRFDongle::MRFDongle(std::function<void(int robot, const void *data, std::size_t
       status_transfer(device, 3, 1, true, 0),
       pending_beep_length(0),
       estop_state(EStopState::STOP),
-      robot_msg_handler(robot_msg_handler)
+      annunciator(annunciator)
 {
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
@@ -297,26 +295,18 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
     if (transfer.size() > 2)
     {
         unsigned int robot = transfer.data()[0];
-        robot_msg_handler(robot, transfer.data() + 1, transfer.size() - 3,
+        annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
                           transfer.data()[transfer.size() - 2],
                           transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
 }
 
-// TODO #222
 void MRFDongle::handle_status(AsyncOperation<void> &)
 {
     status_transfer.result();
     estop_state = static_cast<EStopState>(status_transfer.data()[0] & 3U);
-    // if (status_transfer.data()[0U] & 4U)
-    // {
-    //     rx_fcs_fail_message.fire();
-    // }
-    // second_dongle_message.active(status_transfer.data()[0] & 8U);
-    // transmit_queue_full_message.active(status_transfer.data()[0] & 16U);
-    // receive_queue_full_message.active(status_transfer.data()[0] & 32U);
-
+    annunciator.handle_status(status_transfer.data()[0U]);
     status_transfer.submit();
 }
 

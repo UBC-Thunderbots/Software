@@ -94,6 +94,7 @@ namespace MRF
 
     /**
      * The message patterns for the level-triggered error messages.
+     * These messages fire continuously as long as the condition is true.
      */
     const std::array<const char*, ERROR_LT_COUNT> ERROR_LT_MESSAGES = {
         "charge timeout",
@@ -120,6 +121,7 @@ namespace MRF
 
     /**
      * The message patterns for the edge-triggered error messages.
+     * This message fires only once when the condition occurs.
      */
     const std::array<const char*, ERROR_ET_COUNT> ERROR_ET_MESSAGES = {
         "ICB CRC error",
@@ -179,6 +181,12 @@ namespace MRF
         nullptr,
         "SD card full",
     };
+
+    static constexpr const char* ESTOP_BROKEN_MESSAGE = "EStop missing/broken";
+    static constexpr const char* RX_FCS_FAIL_MESSAGE = "Dongle receive FCS fail";
+    static constexpr const char* SECOND_DONGLE_MESSAGE = "Second dongle on this channel+PAN";
+    static constexpr const char* TRANSMIT_QUEUE_FULL_MESSAGE = "Transmit Queue Full";
+    static constexpr const char* RECEIVE_QUEUE_FULL_MESSAGE = "Receive Queue Full";
 }  // namespace MRF
 
 #endif

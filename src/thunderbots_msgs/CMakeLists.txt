@@ -21,6 +21,7 @@ add_message_files(
     DrawShape.msg
     DrawLayer.msg
     Field.msg
+    MRFMessages.msg
     Point2D.msg
     Primitive.msg
     PrimitiveArray.msg
