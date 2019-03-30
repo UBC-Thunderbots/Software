@@ -20,6 +20,41 @@
 std::ostringstream dbgout;
 #endif
 
+TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle){
+    Point p(1,1);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ( 1.0 , dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_above_rectangle){
+    Point p(1,5);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ( 1.0 , dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_to_left_of_rectangle){
+    Point p(-1,3);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ( 1.0 , dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_right_of_rectangle){
+    Point p(3,3);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ( 1.0 , dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle){
+    Point p(-2.0, 0);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ( std::sqrt(8.0) , dist(p, rect));
+}
+
 TEST(GeomUtilTest, dist_line_vector2)
 {
     double calculated_val, expected_val;

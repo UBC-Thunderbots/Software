@@ -85,6 +85,8 @@ double dist(const Segment &first, const Point &second);
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
 
+double dist(const Point& first, const Rectangle& second);
+
 double distsq(const Point &first, const Segment &second);
 double distsq(const Segment &first, const Point &second);
 double distsq(const Point &first, const Point &second);
