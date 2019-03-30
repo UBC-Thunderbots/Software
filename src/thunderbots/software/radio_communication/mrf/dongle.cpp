@@ -45,7 +45,7 @@ namespace
 
 }  // namespace
 
-MRFDongle::MRFDongle(Annunciator& annunciator)
+MRFDongle::MRFDongle(Annunciator &annunciator)
     : context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -296,8 +296,8 @@ void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &tran
     {
         unsigned int robot = transfer.data()[0];
         annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
-                          transfer.data()[transfer.size() - 2],
-                          transfer.data()[transfer.size() - 1]);
+                                         transfer.data()[transfer.size() - 2],
+                                         transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
 }
@@ -608,4 +608,3 @@ void MRFDongle::handle_beep_done(AsyncOperation<void> &)
     beep_transfer.reset();
     beep(0);
 }
-

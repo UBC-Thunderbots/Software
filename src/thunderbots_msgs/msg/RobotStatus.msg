@@ -45,6 +45,9 @@ bool ball_in_beam
 # Whether or not the robot’s capacitor is charged enough to kick the ball.
 bool capacitor_charged
 
+# Indicates when autokick has been fired.
+bool autokick_fired
+
 
 # The voltage on the robot’s battery, in volts.
 float64 battery_voltage
@@ -88,3 +91,4 @@ uint32 fw_build_id
 
 # The FPGA bitstream build ID.
 uint32 fpga_build_id
+

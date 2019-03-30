@@ -52,4 +52,3 @@ void MRFBackend::update_dongle_events()
 {
     dongle.handle_libusb_events();
 }
-

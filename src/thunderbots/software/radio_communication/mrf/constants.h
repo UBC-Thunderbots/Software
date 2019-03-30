@@ -2,8 +2,9 @@
 #define MRF_CONSTANTS_H
 
 #include <stdint.h>
-#include <climits>
+
 #include <array>
+#include <climits>
 
 namespace MRF
 {
@@ -176,7 +177,7 @@ namespace MRF
         "SD card FIFO overrun or underrun",
     };
 
-    constexpr unsigned int LOGGER_MESSAGE_COUNT = 4;
+    constexpr unsigned int LOGGER_MESSAGE_COUNT                         = 4;
     const std::array<const char*, LOGGER_MESSAGE_COUNT> LOGGER_MESSAGES = {
         nullptr,
         "Logger uninitialized",
@@ -185,11 +186,11 @@ namespace MRF
     };
 
     static constexpr const char* ESTOP_BROKEN_MESSAGE = "EStop missing/broken";
-    static constexpr const char* RX_FCS_FAIL_MESSAGE = "Dongle receive FCS fail";
-    static constexpr const char* SECOND_DONGLE_MESSAGE = "Second dongle on this channel+PAN";
+    static constexpr const char* RX_FCS_FAIL_MESSAGE  = "Dongle receive FCS fail";
+    static constexpr const char* SECOND_DONGLE_MESSAGE =
+        "Second dongle on this channel+PAN";
     static constexpr const char* TRANSMIT_QUEUE_FULL_MESSAGE = "Transmit Queue Full";
-    static constexpr const char* RECEIVE_QUEUE_FULL_MESSAGE = "Receive Queue Full";
+    static constexpr const char* RECEIVE_QUEUE_FULL_MESSAGE  = "Receive Queue Full";
 }  // namespace MRF
 
 #endif
-

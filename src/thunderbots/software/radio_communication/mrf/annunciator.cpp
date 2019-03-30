@@ -1,10 +1,11 @@
 
 #include "annunciator.h"
-#include "dongle.h"
-#include "util/logger/init.h"
+
 #include "constants.h"
+#include "dongle.h"
 #include "shared/constants.h"
 #include "util/codec.h"
+#include "util/logger/init.h"
 
 namespace
 {
@@ -39,16 +40,17 @@ namespace
 
 }  // namespace
 
-Annunciator::Annunciator(ros::NodeHandle& node_handle)
+Annunciator::Annunciator(ros::NodeHandle &node_handle)
 {
     robot_status_publisher = node_handle.advertise<thunderbots_msgs::MRFMessages>(
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
     mrf_message.robot_statuses.resize(MAX_ROBOTS_OVER_RADIO);
 }
 
-thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const void *data,
-                                                         std::size_t len, uint8_t lqi,
-                                                         uint8_t rssi)
+thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
+                                                                const void *data,
+                                                                std::size_t len,
+                                                                uint8_t lqi, uint8_t rssi)
 {
     thunderbots_msgs::RobotStatus robot_status;
 
@@ -160,28 +162,30 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
                                 if (len >= MRF::ERROR_BYTES)
                                 {
                                     has_error_extension = true;
-                                    for (unsigned int i = 0; i < MRF::ERROR_LT_COUNT;
-                                         ++i)
+                                    for (unsigned int i = 0; i < MRF::ERROR_LT_COUNT; ++i)
                                     {
                                         unsigned int byte = i / CHAR_BIT;
                                         unsigned int bit  = i % CHAR_BIT;
 
-                                        if (bptr[byte] & (1 << bit) && MRF::ERROR_LT_MESSAGES[i])
+                                        if (bptr[byte] & (1 << bit) &&
+                                            MRF::ERROR_LT_MESSAGES[i])
                                         {
-                                            robot_status.messages.push_back(MRF::ERROR_LT_MESSAGES[i]);
+                                            robot_status.messages.push_back(
+                                                MRF::ERROR_LT_MESSAGES[i]);
                                         }
                                     }
-                                    for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT;
-                                         ++i)
+                                    for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT; ++i)
                                     {
                                         unsigned int byte =
                                             (i + MRF::ERROR_LT_COUNT) / CHAR_BIT;
                                         unsigned int bit =
                                             (i + MRF::ERROR_LT_COUNT) % CHAR_BIT;
                                         // TODO: Handle these messages
-                                        if (bptr[byte] & (1 << bit) && MRF::ERROR_ET_MESSAGES[i])
+                                        if (bptr[byte] & (1 << bit) &&
+                                            MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            robot_status.messages.push_back(MRF::ERROR_ET_MESSAGES[i]);
+                                            robot_status.messages.push_back(
+                                                MRF::ERROR_ET_MESSAGES[i]);
                                         }
                                     }
                                     bptr += MRF::ERROR_BYTES;
@@ -248,17 +252,6 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
                                 break;
                         }
                     }
-
-                    if (!has_error_extension)
-                    {
-                        // Error reporting extension is absent → no errors are
-                        // asserted.
-                        // TODO: figure this out
-                        // for (auto &i : error_lt_messages)
-                        // {
-                        //     i->active(false);
-                        // }
-                    }
                 }
                 else
                 {
@@ -267,31 +260,11 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
                                  << len << std::endl;
                 }
 
-                // TODO: see what this does
-                // if (!robot_status.build_ids_valid &&
-                //     request_build_ids_timer.elapsed() >
-                //         REQUEST_BUILD_IDS_INTERVAL)
-                // {
-                //     request_build_ids_timer.stop();
-                //     request_build_ids_timer.reset();
-                //     request_build_ids_timer.start();
-                //     if (request_build_ids_counter)
-                //     {
-                //         --request_build_ids_counter;
-                //         static const uint8_t REQUEST = 0x0D;
-                //         dongle_.send_unreliable(index, 20, &REQUEST, 1);
-                //     }
-                //     else
-                //     {
-                //         build_id_fetch_error_message.active(true);
-                //     }
-                // }
                 break;
 
             case 0x01:
                 // Autokick fired
-                // TODO handle this somehow
-                // signal_autokick_fired.emit();
+                robot_status.autokick_fired = true;
                 break;
 
             case 0x04:
@@ -316,11 +289,11 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
     return mrf_message;
 }
 
-thunderbots_msgs::MRFMessages Annunciator::handle_status(uint8_t status) 
+thunderbots_msgs::MRFMessages Annunciator::handle_status(uint8_t status)
 {
     mrf_message.dongle_messages.clear();
 
-    if (static_cast<MRFDongle::EStopState>(status & 3U) == MRFDongle::EStopState::BROKEN) 
+    if (static_cast<MRFDongle::EStopState>(status & 3U) == MRFDongle::EStopState::BROKEN)
     {
         mrf_message.dongle_messages.push_back(MRF::ESTOP_BROKEN_MESSAGE);
     }
@@ -345,4 +318,3 @@ thunderbots_msgs::MRFMessages Annunciator::handle_status(uint8_t status)
     robot_status_publisher.publish(mrf_message);
     return mrf_message;
 }
-
