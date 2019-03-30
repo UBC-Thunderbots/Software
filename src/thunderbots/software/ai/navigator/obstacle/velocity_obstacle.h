@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../shared/constants.h"
 #include "ai/navigator/obstacle/obstacle.h"
+#include "shared/constants.h"
 
 // Placeholder obstacle represents a stationary robot centred at (0,0)
 class VelocityObstacle : public Obstacle
