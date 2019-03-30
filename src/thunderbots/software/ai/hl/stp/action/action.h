@@ -20,10 +20,8 @@ class Action
    public:
     /**
      * Creates a new Action for the given robot.
-     *
-     * @param robot The robot that will be performing this Action
      */
-    explicit Action(const Robot &robot);
+    explicit Action();
 
     /**
      * Returns true if the Action is done and false otherwise. The Action is considered
@@ -50,7 +48,7 @@ class Action
     // The coroutine that sequentially returns the Intents the Action wants to run
     intent_coroutine::pull_type intent_sequence;
     // The robot performing this Action
-    Robot robot;
+    std::optional<Robot> robot;
 
    private:
     /**

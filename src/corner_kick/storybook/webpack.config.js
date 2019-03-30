@@ -1,14 +1,22 @@
-/*
- * Webpack configuration file for Storybook
+/**
+ * This file specifies the configuration for Storybook
  */
 
-const webpackConfig = require('../config/webpack.base.config.js');
+const path = require('path');
+module.exports = ({ config, mode }) => {
+    // Add support for Typescript
+    config.module.rules.push({
+        test: /\.(ts|tsx)$/,
+        use: [
+            {
+                loader: require.resolve('ts-loader'),
+            },
+        ],
+    });
+    config.resolve.extensions.push('.ts', '.tsx');
 
-module.exports = (baseConfig, env, config) => {
-    // Add Typescript and absolute paths support from the application
-    // general webpack build
-    return {
-        ...config,
-        ...webpackConfig.general,
-    };
+    // Add alias to src folder
+    config.resolve.alias['SRC'] = path.resolve(__dirname, '../src');
+
+    return config;
 };
