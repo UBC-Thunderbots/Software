@@ -1,17 +1,14 @@
-/**
- * An obstacle is an area to avoid based on the size of the robot and its velocity
- */
 #pragma once
 
-#include "ai/world/robot.h"
-#include "geom/angle.h"
-#include "geom/point.h"
-#include "geom/polygon.h"
-#include "geom/util.h"
+#include "../shared/constants.h"
+#include "ai/navigator/obstacle/obstacle.h"
 
-class Obstacle
+// Placeholder obstacle represents a stationary robot centred at (0,0)
+class VelocityObstacle : public Obstacle
 {
    public:
+    explicit VelocityObstacle();
+
     /*
      * Gets the boundary polygon around the given robot obstacle that other robots
      * should not enter with a buffer scaled by radiusScaling and

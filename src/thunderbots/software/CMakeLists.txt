@@ -343,6 +343,25 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(nav_ph_obstacle_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(nav_vel_obstacle_test
+            test/ai/navigator/obstacle/velocity_obstacle.cpp
+            ai/world/robot.cpp
+            ai/navigator/obstacle/velocity_obstacle.cpp
+            ai/navigator/obstacle/velocity_obstacle.h
+            ai/navigator/obstacle/obstacle.h
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            geom/polygon.h
+            geom/angle.h
+            geom/polygon.cpp
+            geom/point.h
+            geom/util.cpp
+            ../shared/constants.h
+            )
+
+    target_link_libraries(nav_vel_obstacle_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
             ../shared/util.c
