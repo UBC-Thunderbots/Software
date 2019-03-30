@@ -4,50 +4,51 @@
  */
 
 import * as React from 'react';
+import { ResizeObserver } from 'resize-observer';
 
-import { ILayerMessage } from 'SRC/types';
-import { LayerReceiver } from './layerReceiver';
+import { CanvasManager } from './canvasManager';
 
 export class Canvas extends React.Component {
-    public state = {
-        messageCount: 0,
-    };
+    private canvasManager: CanvasManager;
 
-    private shapeReceiver: LayerReceiver;
+    private wrapperRef: React.RefObject<HTMLDivElement>;
+    private resizeObserver: ResizeObserver;
+
+    constructor(props: {}) {
+        super(props);
+        this.wrapperRef = React.createRef();
+
+        this.resizeObserver = new ResizeObserver(this.handleResize);
+    }
 
     /**
      * Initializes the shape receiver and starts requesting messages.
      */
     public componentDidMount() {
-        this.shapeReceiver = new LayerReceiver(this.handleLayer);
-        this.shapeReceiver.connect();
+        this.canvasManager = new CanvasManager();
+        this.wrapperRef.current!.appendChild(this.canvasManager.getView());
+
+        this.resizeObserver.observe(this.wrapperRef.current!);
     }
 
     /**
      * Display the number of messages received.
      */
     public render() {
-        return (
-            <div>
-                Received messages: {this.state.messageCount}. Check the browser console
-                for more info.
-            </div>
-        );
+        return <div ref={this.wrapperRef} style={{ width: '100%', height: '100%' }} />;
     }
 
     /**
      * Clean-up after ourselves to avoid memory leaks
      */
     public componentWillUnmount() {
-        this.shapeReceiver.close();
+        this.resizeObserver.disconnect();
     }
 
-    /**
-     * Update message count and display message in the browser console when we receive a
-     * new message
-     */
-    private handleLayer = (layer: ILayerMessage) => {
-        this.setState({ messageCount: this.state.messageCount + 1 });
-        console.log(layer);
+    private handleResize = () => {
+        const width = this.wrapperRef.current!.clientWidth;
+        const height = this.wrapperRef.current!.clientHeight;
+
+        this.canvasManager.resize(width, height);
     };
 }
