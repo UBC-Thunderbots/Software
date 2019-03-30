@@ -11,8 +11,8 @@ namespace Util
      *
      * @param value The input value
      * @param offset The value by which to offset the input value
-     * @param linear_width the total length required for the output value to go from 0 to 1
+     * @param linear_width the total length required for the output value to go from 0 to
+     * 1
      */
     double linear(double value, double offset, double linear_width);
-}
-
+}  // namespace Util

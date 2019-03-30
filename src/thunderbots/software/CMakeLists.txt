@@ -777,6 +777,12 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(math_functions_test
+            test/util/math_functions.cpp
+            util/math_functions.cpp
+            )
+    target_link_libraries(math_functions_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
             ai/hl/stp/evaluation/detect_threat.cpp

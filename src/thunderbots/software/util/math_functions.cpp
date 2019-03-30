@@ -2,13 +2,13 @@
 // Created by roark on 28/03/19.
 //
 
-#include
+#include <algorithm>
 
 namespace Util
 {
     double linear(double value, double offset, double linear_width)
     {
-        double width_coef = 1/linear_width;
-        return std::clamp ((width_coef*(value-offset) + 0.5), 0, 1);
+        double width_coef = 1 / linear_width;
+        return std::clamp((width_coef * (value - offset) + 0.5), 0.0, 1.0);
     }
-}
+}  // namespace Util
