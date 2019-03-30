@@ -130,6 +130,8 @@ namespace MRF
         "crashed (no core dump)",
     };
 
+    static constexpr const char* LOW_CAP_MESSAGE = "Low capacitor voltage (fuse blown?)";
+
     /**
      * The total number of SD card-related messages.
      */
@@ -190,3 +192,4 @@ namespace MRF
 }  // namespace MRF
 
 #endif
+

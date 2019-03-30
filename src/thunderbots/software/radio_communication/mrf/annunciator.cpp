@@ -92,8 +92,13 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
 
                     robot_status.capacitor_voltage =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
-                    // TODO: let visualizer know about low cap voltages?
-                    // low_capacitor_message.active(capacitor_voltage < 5.0);
+
+                    // Warn if capacitor voltage is too low
+                    if (robot_status.capacitor_voltage < 5.0)
+                    {
+                        robot_status.messages.push_back(MRF::LOW_CAP_MESSAGE);
+                    }
+
                     bptr += 2;
                     len -= 2;
 
@@ -109,17 +114,20 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
 
                     robot_status.ball_in_beam      = !!(*bptr & 0x80);
                     robot_status.capacitor_charged = !!(*bptr & 0x40);
-                    // unsigned int logger_status = *bptr & 0x3F;
-                    // for (std::size_t i = 0; i < logger_messages.size(); ++i)
-                    // {
-                    //     if (logger_messages[i])
-                    //     {
-                    //         logger_messages[i]->active(logger_status == i);
-                    //     }
-                    // }
+
+                    // Robot logger status
+                    unsigned int logger_status = *bptr & 0x3F;
+                    for (std::size_t i = 0; i < MRF::LOGGER_MESSAGES.size(); ++i)
+                    {
+                        if (MRF::LOGGER_MESSAGES[i] && (logger_status == i))
+                        {
+                            robot_status.messages.push_back(MRF::LOGGER_MESSAGES[i]);
+                        }
+                    }
                     ++bptr;
                     --len;
 
+                    // SD card messages
                     for (std::size_t i = 0; i < MRF::SD_MESSAGES.size(); ++i)
                     {
                         if (MRF::SD_MESSAGES[i] && (*bptr == i))
@@ -210,7 +218,7 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index, const
                                 }
                                 break;
 
-                            case 0x02:  // LPS data.
+                            case 0x02:  // LPS data. WARNING: unused
                                 ++bptr;
                                 --len;
                                 if (len >= 4)
@@ -337,3 +345,4 @@ thunderbots_msgs::MRFMessages Annunciator::handle_status(uint8_t status)
     robot_status_publisher.publish(mrf_message);
     return mrf_message;
 }
+

@@ -54,19 +54,6 @@ class MRFBackend
      */
     void send_vision_packet();
 
-    /**
-     * Parses a robot status message from the dongle, and publishes it to the ROS topic.
-     * 
-     * @param index robot number
-     * @param data the message data
-     * @param len the length of the message
-     * @param lqi link quality
-     * @param rssi received signal strength indicator
-     */
-    thunderbots_msgs::RobotStatus handle_message(int index, const void* data,
-                                                 std::size_t len, uint8_t lqi,
-                                                 uint8_t rssi);
-
    private:
     MRFDongle dongle;
 
@@ -76,3 +63,4 @@ class MRFBackend
     std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     Ball ball;
 };
+

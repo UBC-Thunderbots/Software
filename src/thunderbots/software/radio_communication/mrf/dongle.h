@@ -200,3 +200,4 @@ inline uint16_t MRFDongle::pan() const
 }
 
 #endif
+

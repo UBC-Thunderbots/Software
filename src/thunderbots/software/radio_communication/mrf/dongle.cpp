@@ -608,3 +608,4 @@ void MRFDongle::handle_beep_done(AsyncOperation<void> &)
     beep_transfer.reset();
     beep(0);
 }
+
