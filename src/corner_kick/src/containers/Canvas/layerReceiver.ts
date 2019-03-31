@@ -19,6 +19,10 @@ export class LayerReceiver {
 
     private callback: ShapeReceiverCallback;
 
+    /**
+     * Creates a new LayerReceiver
+     * @param callback the callback to call when we receive new layer data
+     */
     constructor(callback: ShapeReceiverCallback) {
         this.callback = callback;
     }
@@ -30,7 +34,7 @@ export class LayerReceiver {
         this.ws = new WebSocket(url);
         this.ws.binaryType = 'arraybuffer';
         this.ws.addEventListener('message', (event: MessageEvent) =>
-            this.handleData(event.data),
+            this.callback(event.data),
         );
     };
 
@@ -40,12 +44,5 @@ export class LayerReceiver {
      */
     public close = () => {
         this.ws.close();
-    };
-
-    /**
-     * Parse data from the websocket
-     */
-    private handleData = (data: ArrayBuffer) => {
-        this.callback(data);
     };
 }

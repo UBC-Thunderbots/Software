@@ -5,7 +5,6 @@ import * as PIXI from 'pixi.js';
  * stores unallocated sprites for future use.
  */
 export class SpritePool {
-    private lastIncrease: number;
     private availableSprites: PIXI.Sprite[] = [];
 
     /**
@@ -23,11 +22,11 @@ export class SpritePool {
     public allocateSprites = (count: number) => {
         // Check if we have enough available sprites to allocate. If not, we create more.
         if (count > this.availableSprites.length) {
-            // We increase the number of sprites we allocate by 10%
-            this.createSprites(Math.round(this.lastIncrease * 1.1));
+            // We increase the number of sprites by the requested amount * 2
+            this.createSprites(count * 2);
         }
 
-        // We remove the allocated sprites from the pool
+        // We remove the allocated sprites from the pool and give them to the user
         return this.availableSprites.splice(this.availableSprites.length - count);
     };
 
@@ -42,6 +41,5 @@ export class SpritePool {
         for (let i = 0; i < count; i++) {
             this.availableSprites.push(new PIXI.Sprite());
         }
-        this.lastIncrease = count;
     };
 }

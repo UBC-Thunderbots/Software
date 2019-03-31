@@ -7,7 +7,7 @@ import * as PIXI from 'pixi.js';
 
 import { ISpritesheet, ShapeType } from 'SRC/types';
 
-import * as draw from './draw';
+import * as draw from './utils/draw';
 
 /**
  * Generates a spritesheet from an object
