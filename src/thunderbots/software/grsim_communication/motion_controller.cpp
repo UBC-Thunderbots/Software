@@ -196,26 +196,14 @@ Vector MotionController::determineLinearVelocityFromVelocity(
     const double max_acceleration_meters_per_second_squared, const double delta_time,
     const double max_speed_meters_per_second)
 {
-    double velocity_to_add = max_acceleration_meters_per_second_squared * delta_time;
     double new_velocity_x, new_velocity_y;
 
-    if (robot.velocity().x() < linear_velocity.x())
-    {
-        new_velocity_x = robot.velocity().x() + velocity_to_add;
-    }
-    else
-    {
-        new_velocity_x = robot.velocity().x() - velocity_to_add;
-    }
-
-    if (robot.velocity().y() < linear_velocity.y())
-    {
-        new_velocity_y = robot.velocity().y() + velocity_to_add;
-    }
-    else
-    {
-        new_velocity_y = robot.velocity().y() - velocity_to_add;
-    }
+    // the following method works best for determining how much to adjust the velocity to
+    // stay on course
+    // https://courses.cs.washington.edu/courses/cse466/11au/calendar/10-control-posted.pdf
+    // refer to slide 11,  k = -1
+    new_velocity_x = (robot.velocity().x() - linear_velocity.x());
+    new_velocity_y = (robot.velocity().y() - linear_velocity.y());
 
     Vector new_velocity_norm      = Vector(new_velocity_x, new_velocity_y).norm();
     double new_velocity_magnitude = Vector(new_velocity_x, new_velocity_y).len();
