@@ -1,28 +1,46 @@
 import * as PIXI from 'pixi.js';
 
+/**
+ * Manages a pool of sprites. Creates new sprites if needed and
+ * stores unallocated sprites for future use.
+ */
 export class SpritePool {
     private lastIncrease: number;
-    private spritePool: PIXI.Sprite[] = [];
+    private availableSprites: PIXI.Sprite[] = [];
 
+    /**
+     * Creates a new sprite pool and initializes an initial amount of sprites.
+     * @param startCount Initial count of sprites to create for this pool
+     */
     constructor(startCount: number = 1000) {
         this.createSprites(startCount);
     }
 
+    /**
+     * Allocates sprites for use by a layer. Creates new sprites
+     * if needed, which might affect performance.
+     */
     public allocateSprites = (count: number) => {
-        if (count > this.spritePool.length) {
+        // Check if we have enough available sprites to allocate. If not, we create more.
+        if (count > this.availableSprites.length) {
+            // We increase the number of sprites we allocate by 10%
             this.createSprites(Math.round(this.lastIncrease * 1.1));
         }
 
-        return this.spritePool.splice(this.spritePool.length - count);
+        // We remove the allocated sprites from the pool
+        return this.availableSprites.splice(this.availableSprites.length - count);
     };
 
+    /**
+     * Unallocates sprites and adds them back in the pool for future use.
+     */
     public unallocateSprites = (sprites: PIXI.Sprite[]) => {
-        this.spritePool.push(...sprites);
+        this.availableSprites.push(...sprites);
     };
 
     private createSprites = (count: number) => {
         for (let i = 0; i < count; i++) {
-            this.spritePool.push(new PIXI.Sprite());
+            this.availableSprites.push(new PIXI.Sprite());
         }
         this.lastIncrease = count;
     };

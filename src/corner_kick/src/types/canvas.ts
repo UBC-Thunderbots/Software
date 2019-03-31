@@ -7,7 +7,7 @@
  */
 export interface ILayer {
     /**
-     * Name of the layer
+     * ID of the layer
      */
     id: number;
 

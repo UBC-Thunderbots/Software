@@ -1,8 +1,8 @@
-import { ISpritesheet, ShapeType } from 'SRC/types';
-
-/*
+/***
  * This file defines some constants for the canvas
  */
+
+import { ISpritesheet, ShapeType } from 'SRC/types';
 
 export const LAYER_WEBSOCKET_ADDRESS = 'ws://localhost:9091';
 
@@ -11,6 +11,11 @@ export const LAYER_WEBSOCKET_ADDRESS = 'ws://localhost:9091';
  */
 export const BYTES_PER_SHAPE = 15;
 
+/**
+ * The default spritesheet for the Canvas
+ *
+ * Contains two textures: a rectangle at id 0 and a circle at id 1
+ */
 export const SPRITESHEET: ISpritesheet = {
     dimensions: {
         w: 1024,

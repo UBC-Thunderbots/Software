@@ -75,7 +75,15 @@ const LayerVisibilityToggle = styled('i')<{ visible: boolean }>`
 `;
 
 interface ILayersProps {
+    /**
+     * The layers to display
+     */
     layers: ILayer[];
+
+    /**
+     * Callback that gets triggered when the visibility is toggled
+     * on a layer
+     */
     toggleVisibility: (id: number) => void;
 }
 
@@ -86,6 +94,9 @@ interface ILayersProps {
  */
 export const LayersPanel = (props: ILayersProps) => {
     const { layers, toggleVisibility } = props;
+
+    // If number of layers to display is 0, show a screen to indicate that there
+    // is no layers.
     return (
         <>
             {layers.length > 0 ? (

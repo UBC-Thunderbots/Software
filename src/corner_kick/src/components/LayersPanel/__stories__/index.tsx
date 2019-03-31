@@ -34,9 +34,7 @@ stories.add('with layers', () => (
                     visible: true,
                 },
             ]}
-            toggleVisibility={(id) =>
-                console.log(`Layer ${id} had its visibility toggled`)
-            }
+            toggleVisibility={(id) => alert(`Layer ${id} had its visibility toggled`)}
         />
     </StorybookStage>
 ));

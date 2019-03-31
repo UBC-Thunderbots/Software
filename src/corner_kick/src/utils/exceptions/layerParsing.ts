@@ -1,6 +1,5 @@
 /**
- * Thrown if the data received from the shape WebSocket does not match
- * the expected number of bytes.
+ * Thrown if an error occurs when parsing layers
  */
 export class LayerParsingException extends Error {
     constructor(message: string) {
