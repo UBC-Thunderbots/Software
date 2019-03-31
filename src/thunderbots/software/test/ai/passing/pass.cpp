@@ -28,29 +28,35 @@ TEST(PassTest, simple_getters)
 
 // TODO: Fix these tests once you figure out what 0 deg is supposed to be (+x or +y?)
 
-TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_neg_x_axis){
-    Pass p({0,0}, {-1, 0}, 1, Timestamp::fromSeconds(10));
+TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_neg_x_axis)
+{
+    Pass p({0, 0}, {-1, 0}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(0, p.receiverAngle().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_neg_y_axis){
-    Pass p({0,0}, {0, -1}, 1, Timestamp::fromSeconds(10));
+TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_neg_y_axis)
+{
+    Pass p({0, 0}, {0, -1}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(270, p.receiverAngle().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_pos_x_axis){
-    Pass p({0,0}, {1, 0}, 1, Timestamp::fromSeconds(10));
+TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_pos_x_axis)
+{
+    Pass p({0, 0}, {1, 0}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(180, p.receiverAngle().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_pos_y_axis){
-    Pass p({0,0}, {0, 1}, 1, Timestamp::fromSeconds(10));
+TEST(PassTest, getRecieverPoint_passer_at_center_and_receiver_on_pos_y_axis)
+{
+    Pass p({0, 0}, {0, 1}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(90, p.receiverAngle().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverPoint_passer_diagonal_to_receiver){
-    Pass p({1,-1}, {4, 1}, 1, Timestamp::fromSeconds(10));
-    EXPECT_DOUBLE_EQ(90 + atan(2.0/3.0) * 180 / M_PI, p.receiverAngle().mod(Angle::full()).toDegrees());
+TEST(PassTest, getRecieverPoint_passer_diagonal_to_receiver)
+{
+    Pass p({1, -1}, {4, 1}, 1, Timestamp::fromSeconds(10));
+    EXPECT_DOUBLE_EQ(90 + atan(2.0 / 3.0) * 180 / M_PI,
+                     p.receiverAngle().mod(Angle::full()).toDegrees());
 }
 
 TEST(PassTest, stream_operator)

@@ -1,17 +1,18 @@
 #pragma once
 
 #include <ai/passing/pass_generator.h>
+
 #include "ai/hl/stp/tactic/tactic.h"
-#include "geom/rectangle.h"
 #include "ai/world/world.h"
+#include "geom/rectangle.h"
 
 /**
  * This tactic continuously finds the best pass reception location in the given target
  * region and positions the robot at that point
  */
-class CherryPickTactic : public Tactic {
-public:
-
+class CherryPickTactic : public Tactic
+{
+   public:
     /**
      * Creates a new CherryPickTactic
      */
@@ -38,9 +39,9 @@ public:
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-private:
+   private:
     std::unique_ptr<Intent> calculateNextIntent(
-    intent_coroutine::push_type& yield) override;
+        intent_coroutine::push_type& yield) override;
 
     /**
      * Calculates the location to move to in order to block the shot.

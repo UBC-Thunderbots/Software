@@ -63,18 +63,19 @@ double dist(const Segment &first, const Vector &second)
     return dist(second, first);
 }
 
-double dist(const Point& first, const Rectangle& second){
-    if (second.containsPoint(first)){
+double dist(const Point &first, const Rectangle &second)
+{
+    if (second.containsPoint(first))
+    {
         return 0;
     }
 
     // Calculate the distance from the point to each edge of the rectangle
     std::array<double, 4> distances = {
-            dist(first, Segment(second.neCorner(), second.seCorner())),
-            dist(first, Segment(second.seCorner(), second.swCorner())),
-            dist(first, Segment(second.swCorner(), second.nwCorner())),
-            dist(first, Segment(second.nwCorner(), second.neCorner()))
-    };
+        dist(first, Segment(second.neCorner(), second.seCorner())),
+        dist(first, Segment(second.seCorner(), second.swCorner())),
+        dist(first, Segment(second.swCorner(), second.nwCorner())),
+        dist(first, Segment(second.nwCorner(), second.neCorner()))};
     return *std::min_element(distances.begin(), distances.end());
 }
 
