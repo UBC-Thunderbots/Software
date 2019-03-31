@@ -18,19 +18,19 @@ stories.add('with layers', () => (
         <LayersPanel
             layers={[
                 {
-                    name: 'Friendly Robots',
+                    id: 1,
                     visible: true,
                 },
                 {
-                    name: 'Enemy Robots',
+                    id: 2,
                     visible: false,
                 },
                 {
-                    name: 'Ball',
+                    id: 3,
                     visible: true,
                 },
                 {
-                    name: 'Field',
+                    id: 4,
                     visible: true,
                 },
             ]}

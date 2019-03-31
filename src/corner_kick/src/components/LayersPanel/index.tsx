@@ -89,8 +89,8 @@ export const LayersPanel = (props: ILayersProps) => {
         <>
             {layers.length > 0 ? (
                 layers.map((layer) => (
-                    <LayerItem key={layer.name}>
-                        {layer.name}
+                    <LayerItem key={layer.id}>
+                        {layer.id}
                         <LayerVisibilityToggle
                             visible={layer.visible}
                             className="material-icons"

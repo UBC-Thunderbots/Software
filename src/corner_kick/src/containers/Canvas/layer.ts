@@ -2,8 +2,8 @@ import * as PIXI from 'pixi.js';
 
 import { BYTES_PER_SHAPE } from 'SRC/constants';
 
-import { SpritePool } from './spritePool';
 import { LayerParsingException } from 'SRC/utils/exceptions';
+import { SpritePool } from './spritePool';
 import { SpritesheetManager } from './spritesheetManager';
 
 export class Layer {

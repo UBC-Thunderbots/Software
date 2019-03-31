@@ -6,15 +6,20 @@
 import * as React from 'react';
 import { ResizeObserver } from 'resize-observer';
 
+import { ILayer } from 'SRC/types';
 import { CanvasManager } from './canvasManager';
 
-export class Canvas extends React.Component {
+interface ICanvasProps {
+    layers: ILayer[];
+    onNewLayer: (id: number) => void;
+}
+export class Canvas extends React.Component<ICanvasProps> {
     private canvasManager: CanvasManager;
 
     private wrapperRef: React.RefObject<HTMLDivElement>;
     private resizeObserver: ResizeObserver;
 
-    constructor(props: {}) {
+    constructor(props: ICanvasProps) {
         super(props);
         this.wrapperRef = React.createRef();
 
@@ -25,7 +30,7 @@ export class Canvas extends React.Component {
      * Initializes the shape receiver and starts requesting messages.
      */
     public componentDidMount() {
-        this.canvasManager = new CanvasManager();
+        this.canvasManager = new CanvasManager(this.props.onNewLayer);
         this.wrapperRef.current!.appendChild(this.canvasManager.getView());
 
         this.resizeObserver.observe(this.wrapperRef.current!);
