@@ -20,6 +20,14 @@
 std::ostringstream dbgout;
 #endif
 
+TEST(GeomUtilTest, dist_point_rectangle_point_within){
+    Point p(1,2.1);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ( 0 , dist(p, rect));
+}
+
+
 TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle){
     Point p(1,1);
     Rectangle rect({0, 2}, {2, 4});

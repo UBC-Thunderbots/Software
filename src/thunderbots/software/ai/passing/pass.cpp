@@ -2,6 +2,7 @@
  * Implementation of the "Pass" class
  */
 
+#include "geom/util.h"
 #include "ai/passing/pass.h"
 
 using namespace AI::Passing;
@@ -22,6 +23,10 @@ Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
 Point Pass::receiverPoint() const
 {
     return receiver_point;
+}
+
+Angle Pass::receiverAngle() const {
+    return vertexAngle({0,0}, receiverPoint(), passerPoint());
 }
 
 Point Pass::passerPoint() const

@@ -17,7 +17,8 @@ class BlockShotPathTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit BlockShotPathTactic(const Field& field, bool loop_forever = false);
+     // TODO: Should this loop forever???
+    explicit BlockShotPathTactic(const Field& field, bool loop_forever = true);
 
     std::string getName() const override;
 

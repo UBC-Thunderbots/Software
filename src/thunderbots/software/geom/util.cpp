@@ -64,6 +64,10 @@ double dist(const Segment &first, const Vector &second)
 }
 
 double dist(const Point& first, const Rectangle& second){
+    if (second.containsPoint(first)){
+        return 0;
+    }
+
     // Calculate the distance from the point to each edge of the rectangle
     std::array<double, 4> distances = {
             dist(first, Segment(second.neCorner(), second.seCorner())),
