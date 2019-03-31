@@ -8,7 +8,8 @@ import * as PIXI from 'pixi.js';
 import { BYTES_PER_SHAPE } from 'SRC/constants';
 
 import { LayerParsingException } from 'SRC/utils/exceptions';
-import { SpritePool } from './spritePool';
+import { Pool } from 'SRC/utils/pool';
+
 import { SpritesheetManager } from './spritesheetManager';
 
 /**
@@ -17,7 +18,7 @@ import { SpritesheetManager } from './spritesheetManager';
  */
 export class Layer {
     private id: number;
-    private spritePool: SpritePool;
+    private spritePool: Pool<PIXI.Sprite>;
     private spritesheetManager: SpritesheetManager;
 
     private layerObject: PIXI.Container;
@@ -31,7 +32,7 @@ export class Layer {
      */
     constructor(
         id: number,
-        spritePool: SpritePool,
+        spritePool: Pool<PIXI.Sprite>,
         spritesheetManager: SpritesheetManager,
     ) {
         this.id = id;
@@ -78,18 +79,18 @@ export class Layer {
         const currSpriteCount = this.layerObject.children.length;
         if (incomingSpriteCount > currSpriteCount) {
             // We allocated what we are missing
-            const newSprites = this.spritePool.allocateSprites(
+            const newSprites = this.spritePool.allocate(
                 incomingSpriteCount - currSpriteCount,
             );
             this.layerObject.addChild(...newSprites);
         } else if (incomingSpriteCount < currSpriteCount) {
             // We clear all sprites from the parent
             const oldSprites = this.layerObject.children as PIXI.Sprite[];
-            this.spritePool.unallocateSprites(oldSprites);
+            this.spritePool.unallocate(oldSprites);
             this.layerObject.removeChildren();
 
             // And add back what we need
-            const newSprites = this.spritePool.allocateSprites(incomingSpriteCount);
+            const newSprites = this.spritePool.allocate(incomingSpriteCount);
             this.layerObject.addChild(...newSprites);
         }
 
@@ -98,9 +99,6 @@ export class Layer {
             // We start at 1 as the first byte of the message
             // contain the layer number
             const startPos = 1 + index * BYTES_PER_SHAPE;
-
-            // We set the anchor (the position where x, y, rotation is conducted)
-            sprite.anchor.set(0.5, 0.5);
 
             // Get all the fields for the shape...
             const textureId = incomingDataView.getUint8(startPos);

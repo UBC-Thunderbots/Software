@@ -8,9 +8,9 @@ import * as PIXI from 'pixi.js';
 import Viewport from 'pixi-viewport';
 
 import { ILayer, ISpritesheet } from 'SRC/types';
+import { Pool } from 'SRC/utils/pool';
 
 import { Layer } from './layer';
-import { SpritePool } from './spritePool';
 import { SpritesheetManager } from './spritesheetManager';
 
 /**
@@ -21,7 +21,7 @@ export class CanvasManager {
     private app: PIXI.Application;
     private viewport: Viewport;
 
-    private spritePool: SpritePool;
+    private spritePool: Pool<PIXI.Sprite>;
     private spritesheetManager: SpritesheetManager;
 
     private layerDict: { [key: number]: Layer } = {};
@@ -34,7 +34,11 @@ export class CanvasManager {
     constructor(spritesheet: ISpritesheet) {
         this.initView();
 
-        this.spritePool = new SpritePool();
+        this.spritePool = new Pool(() => {
+            const sprite = new PIXI.Sprite();
+            sprite.anchor.set(0.5, 0.5);
+            return sprite;
+        });
         this.spritesheetManager = new SpritesheetManager(spritesheet);
     }
 
