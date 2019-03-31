@@ -13,35 +13,35 @@ export const BYTES_PER_SHAPE = 15;
 
 export const SPRITESHEET: ISpritesheet = {
     dimensions: {
-        w: 128,
-        h: 64,
+        w: 1024,
+        h: 512,
     },
     frames: [
         {
             dimensions: {
                 x: 0,
                 y: 0,
-                w: 60,
-                h: 60,
+                w: 500,
+                h: 500,
             },
             shapes: [
                 {
                     type: ShapeType.RECT,
-                    data: [0, 0, 60, 60],
+                    data: [0, 0, 500, 500],
                 },
             ],
         },
         {
             dimensions: {
-                x: 64,
+                x: 512,
                 y: 0,
-                w: 60,
-                h: 60,
+                w: 500,
+                h: 500,
             },
             shapes: [
                 {
                     type: ShapeType.ELLIPSE,
-                    data: [30, 30, 30, 30],
+                    data: [250, 250, 250, 250],
                 },
             ],
         },

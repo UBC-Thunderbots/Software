@@ -11,7 +11,8 @@ import * as canvas from '../actions/canvas';
 export type CanvasAction = ActionType<typeof canvas>;
 
 const defaultState: ICanvasState = {
-    layers: [],
+    layers: {},
+    layerOrder: [],
 };
 
 export default (state: ICanvasState = defaultState, action: CanvasAction) => {
@@ -19,7 +20,20 @@ export default (state: ICanvasState = defaultState, action: CanvasAction) => {
         case getType(canvas.addLayer):
             return {
                 ...state,
-                layers: [...state.layers, action.payload],
+                layers: { ...state.layers, [action.payload.id]: action.payload },
+                layerOrder: [...state.layerOrder, action.payload.id],
+            };
+        case getType(canvas.toggleLayerVisibility):
+            const newValue = state.layers[action.payload.id].visible ? false : true;
+            return {
+                ...state,
+                layers: {
+                    ...state.layers,
+                    [action.payload.id]: {
+                        ...state.layers[action.payload.id],
+                        visible: newValue,
+                    },
+                },
             };
         default:
             return state;

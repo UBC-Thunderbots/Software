@@ -18,7 +18,8 @@ export interface IRootState {
  * The state object for Canvas
  */
 export interface ICanvasState {
-    layers: ILayer[];
+    layers: { [id: number]: ILayer };
+    layerOrder: number[];
 }
 
 /**

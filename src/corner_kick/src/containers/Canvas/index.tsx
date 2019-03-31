@@ -23,6 +23,7 @@ export class Canvas extends React.Component<ICanvasProps> {
         super(props);
         this.wrapperRef = React.createRef();
 
+        this.canvasManager = new CanvasManager(this.props.onNewLayer);
         this.resizeObserver = new ResizeObserver(this.handleResize);
     }
 
@@ -30,7 +31,6 @@ export class Canvas extends React.Component<ICanvasProps> {
      * Initializes the shape receiver and starts requesting messages.
      */
     public componentDidMount() {
-        this.canvasManager = new CanvasManager(this.props.onNewLayer);
         this.wrapperRef.current!.appendChild(this.canvasManager.getView());
 
         this.resizeObserver.observe(this.wrapperRef.current!);
@@ -40,6 +40,7 @@ export class Canvas extends React.Component<ICanvasProps> {
      * Display the number of messages received.
      */
     public render() {
+        this.canvasManager.handleLayerOperations(this.props.layers);
         return <div ref={this.wrapperRef} style={{ width: '100%', height: '100%' }} />;
     }
 

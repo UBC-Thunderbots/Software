@@ -8,5 +8,12 @@
 import { createAction } from 'typesafe-actions';
 
 export const addLayer = createAction('canvas_ADD_LAYER', (resolve) => {
-    return (id: number) => resolve({ id, visibility: true });
+    return (id: number) => resolve({ id, visible: true });
 });
+
+export const toggleLayerVisibility = createAction(
+    'canvas_TOGGLE_VISIBILITY',
+    (resolve) => {
+        return (id: number) => resolve({ id });
+    },
+);

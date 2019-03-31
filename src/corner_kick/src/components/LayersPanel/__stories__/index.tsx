@@ -34,6 +34,9 @@ stories.add('with layers', () => (
                     visible: true,
                 },
             ]}
+            toggleVisibility={(id) =>
+                console.log(`Layer ${id} had its visibility toggled`)
+            }
         />
     </StorybookStage>
 ));
@@ -43,6 +46,11 @@ stories.add('with layers', () => (
  */
 stories.add('with empty state', () => (
     <StorybookStage width="300px">
-        <LayersPanel layers={[]} />
+        <LayersPanel
+            layers={[]}
+            toggleVisibility={() => {
+                //
+            }}
+        />
     </StorybookStage>
 ));

@@ -76,6 +76,7 @@ const LayerVisibilityToggle = styled('i')<{ visible: boolean }>`
 
 interface ILayersProps {
     layers: ILayer[];
+    toggleVisibility: (id: number) => void;
 }
 
 /**
@@ -84,7 +85,7 @@ interface ILayersProps {
  * Supports an empty state
  */
 export const LayersPanel = (props: ILayersProps) => {
-    const { layers } = props;
+    const { layers, toggleVisibility } = props;
     return (
         <>
             {layers.length > 0 ? (
@@ -94,6 +95,9 @@ export const LayersPanel = (props: ILayersProps) => {
                         <LayerVisibilityToggle
                             visible={layer.visible}
                             className="material-icons"
+                            onClick={(e) => {
+                                toggleVisibility(layer.id);
+                            }}
                         >
                             remove_red_eye
                         </LayerVisibilityToggle>
