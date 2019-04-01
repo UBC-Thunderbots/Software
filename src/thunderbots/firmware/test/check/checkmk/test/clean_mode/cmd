@@ -1,1 +1,0 @@
-checkmk_cmd='"$CHECKMK" clean_mode=1 "$infname" > "$outfname" 2>"$errfname"'
