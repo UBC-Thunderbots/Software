@@ -157,7 +157,7 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-        )
+        ai/navigator/obstacle/obstacle.cpp)
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
@@ -324,24 +324,6 @@ if (CATKIN_ENABLE_TESTING)
             geom/point.h)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(nav_ph_obstacle_test
-            test/ai/navigator/obstacle/placeholder_obstacle.cpp
-            ai/world/robot.cpp
-            ai/navigator/obstacle/placeholder_obstacle.cpp
-            ai/navigator/obstacle/placeholder_obstacle.h
-            ai/navigator/obstacle/obstacle.h
-            util/time/duration.cpp
-            util/time/time.cpp
-            util/time/timestamp.cpp
-            geom/polygon.h
-            geom/polygon.cpp
-            geom/point.h
-            geom/util.cpp
-            ../shared/constants.h
-            )
-
-    target_link_libraries(nav_ph_obstacle_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
