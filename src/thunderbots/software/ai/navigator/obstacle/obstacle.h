@@ -15,7 +15,7 @@ public:
     static Obstacle createPlaceholderObstacle();
     static Obstacle createRobotObstacle(const Robot& robot);
     static Obstacle createBallObstacle(const Ball& ball);
-    const Polygon &getBoundaryPolygon();
+    const Polygon &getBoundaryPolygon() const;
 private:
     // placeholder obstacle is a 1x1 square
     Obstacle();
