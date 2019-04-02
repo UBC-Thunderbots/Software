@@ -3,6 +3,7 @@
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/World.h>
 
+#include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
 #include "grsim_communication/grsim_backend.h"

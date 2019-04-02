@@ -207,6 +207,19 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
 Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
 
 /**
+ * Finds the Point on line closest to point.
+ *
+ * @param centre the point.
+ *
+ * @param lineA one point on the line.
+ *
+ * @param lineB another point on the line segment.
+ *
+ * @return the Point on line closest to centre point.
+ */
+Point closestPointOnLine(const Point &p, const Point &lineA, const Point &lineB);
+
+/**
  * Finds the points of intersection between a circle and a line.
  * There may be zero, one, or two such points.
  *

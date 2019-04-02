@@ -17,6 +17,12 @@
 #include "util/gradient_descent.h"
 
 template <size_t NUM_PARAMS>
+Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer()
+    : GradientDescentOptimizer(GradientDescentOptimizer<NUM_PARAMS>::ParamArray{1})
+{
+}
+
+template <size_t NUM_PARAMS>
 Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer(
     std::array<double, NUM_PARAMS> param_weights)
     : GradientDescentOptimizer(param_weights, DEFAULT_GRADIENT_APPROX_STEP_SIZE)

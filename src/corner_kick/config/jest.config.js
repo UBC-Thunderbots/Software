@@ -13,6 +13,8 @@ module.exports = {
     },
     // Any files inside __tests__ is a test file
     testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+    // Ignore folders with __*__ inside the test folders
+    testPathIgnorePatterns: ['/node_modules/', '/__tests__/__.*__/'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
     // SRC points to the src folder
     moduleNameMapper: {

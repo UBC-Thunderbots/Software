@@ -14,6 +14,8 @@
 #include "ai/primitive/stop_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "geom/util.h"
+#include "shared/constants.h"
 #include "util/logger/init.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
@@ -77,7 +79,34 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
+    Point chip_origin    = chip_primitive.getChipOrigin();
+    Angle chip_direction = chip_primitive.getChipDirection();
+
+    double final_speed_at_destination = 0.0;
+
+    Point point_behind = chip_origin + Vector(Point::createFromAngle(chip_direction).x(),
+                                              Point::createFromAngle(chip_direction).y());
+
+    Point closest_point_to_line =
+        closestPointOnLine(robot.position(), chip_origin, point_behind);
+
+    // If current robot position is in line with the shot (i.e. less than two robot radius
+    // within the line in the direction of the shot), can go for the shot
+    if (offsetToLine(chip_origin, point_behind, robot.position()) <=
+        2 * ROBOT_MAX_RADIUS_METERS)
+    {
+        motion_controller_command = MotionController::PositionCommand(
+            chip_origin, chip_direction, final_speed_at_destination,
+            chip_primitive.getChipDistance(), true, false);
+    }
+    else
+    {
+        // If robot is not in line, move to the closest point on the line from the current
+        // position
+        motion_controller_command = MotionController::PositionCommand(
+            closest_point_to_line, chip_direction, 0.0, chip_primitive.getChipDistance(),
+            true, false);
+    }
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
@@ -124,7 +153,35 @@ void GrsimCommandPrimitiveVisitor::visit(
 
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
+    Point kick_origin    = kick_primitive.getKickOrigin();
+    Angle kick_direction = kick_primitive.getKickDirection();
+
+    double final_speed_at_destination = 0.0;
+
+    Point point_behind = kick_origin + Vector(Point::createFromAngle(kick_direction).x(),
+                                              Point::createFromAngle(kick_direction).y());
+
+    Point closest_point_to_line =
+        closestPointOnLine(robot.position(), kick_origin, point_behind);
+
+    // If current robot position is in line with the shot (i.e. less than two robot radius
+    // within the line in the direction of the shot), can go for the shot
+    if (offsetToLine(kick_origin, point_behind, robot.position()) <=
+        2 * ROBOT_MAX_RADIUS_METERS)
+    {
+        motion_controller_command = MotionController::PositionCommand(
+            kick_origin, kick_direction, final_speed_at_destination,
+            kick_primitive.getKickSpeed(), false, false);
+    }
+    else
+    {
+        // If robot is not in line, move to the closest point on the line from the current
+        // position
+        motion_controller_command = MotionController::PositionCommand(
+            closest_point_to_line, kick_direction, 0.0, kick_primitive.getKickSpeed(),
+            false, false);
+        ;
+    }
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
@@ -197,7 +254,9 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/107
+    motion_controller_command = MotionController::PositionCommand(
+        dribble_primitive.getDestination(), dribble_primitive.getFinalAngle(),
+        dribble_primitive.getFinalSpeed(), 0.0, false, true);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
