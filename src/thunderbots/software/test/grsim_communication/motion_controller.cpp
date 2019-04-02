@@ -8,7 +8,6 @@
 #include "gtest/gtest.h"
 #include "shared/constants.h"
 
-
 using namespace std::chrono;
 using MotionControllerCommand =
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;
@@ -997,7 +996,7 @@ TEST_F(MotionControllerTest, velocity_command_robot_stationary_greater_than_velo
     MotionController::Velocity robot_velocities =
         motionController.bangBangVelocityController(robot, delta_time, motion_command);
 
-    double expected_speed = ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED * delta_time;
+    double expected_speed = 1;
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
@@ -1025,8 +1024,10 @@ TEST_F(MotionControllerTest,
 
     Angle expected_angular_velocity = Angle::ofRadians(0);
 
-    EXPECT_DOUBLE_EQ(linear_velocity.x(), robot_velocities.linear_velocity.x());
-    EXPECT_DOUBLE_EQ(linear_velocity.y(), robot_velocities.linear_velocity.y());
+    EXPECT_DOUBLE_EQ(linear_velocity.x() - robot.velocity().x(),
+                     robot_velocities.linear_velocity.x());
+    EXPECT_DOUBLE_EQ(linear_velocity.y() - robot.velocity().y(),
+                     robot_velocities.linear_velocity.y());
     EXPECT_EQ(expected_angular_velocity, robot_velocities.angular_velocity);
 }
 

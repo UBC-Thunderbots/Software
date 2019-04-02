@@ -198,12 +198,11 @@ Vector MotionController::determineLinearVelocityFromVelocity(
 {
     double new_velocity_x, new_velocity_y;
 
-    // the following method works best for determining how much to adjust the velocity to
-    // stay on course
+    // the following method works best for determining how much to adjust the velocity
     // https://courses.cs.washington.edu/courses/cse466/11au/calendar/10-control-posted.pdf
-    // refer to slide 11,  k = -1
-    new_velocity_x = (robot.velocity().x() - linear_velocity.x());
-    new_velocity_y = (robot.velocity().y() - linear_velocity.y());
+    // refer to slide 11
+    new_velocity_x = -(robot.velocity().x() - linear_velocity.x());
+    new_velocity_y = -(robot.velocity().y() - linear_velocity.y());
 
     Vector new_velocity_norm      = Vector(new_velocity_x, new_velocity_y).norm();
     double new_velocity_magnitude = Vector(new_velocity_x, new_velocity_y).len();
