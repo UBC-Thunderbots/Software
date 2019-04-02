@@ -1,3 +1,6 @@
+/**
+ * Declaration for the CherryPickTactic class
+ */
 #pragma once
 
 #include <ai/passing/pass_generator.h>
@@ -7,8 +10,10 @@
 #include "geom/rectangle.h"
 
 /**
- * This tactic continuously finds the best pass reception location in the given target
- * region and positions the robot at that point
+ * This tactic is intended to place a robot in a given region, and have the robot
+ * constantly move towards the best location within that region such that if we were to
+ * pass the ball from it's current position, the robot would be in the best possible place
+ * to receive it.
  */
 class CherryPickTactic : public Tactic
 {
@@ -16,7 +21,7 @@ class CherryPickTactic : public Tactic
     /**
      * Creates a new CherryPickTactic
      */
-    explicit CherryPickTactic(const Rectangle& target_region, bool loop_forever = false);
+    explicit CherryPickTactic(const Rectangle& target_region, bool loop_forever);
 
     std::string getName() const override;
 
@@ -42,12 +47,6 @@ class CherryPickTactic : public Tactic
    private:
     std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type& yield) override;
-
-    /**
-     * Calculates the location to move to in order to block the shot.
-     * @return the Point to move to in order to block the shot
-     */
-    Point getBlockPosition();
 
     // The region in which we want to position the cherry picking robot
     Rectangle target_region;

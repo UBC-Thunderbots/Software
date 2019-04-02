@@ -26,9 +26,9 @@ Point Pass::receiverPoint() const
     return receiver_point;
 }
 
-Angle Pass::receiverAngle() const
+Angle Pass::receiverOrientation() const
 {
-    return vertexAngle({0, 0}, receiverPoint(), passerPoint());
+    return (passerPoint() - receiverPoint()).orientation();
 }
 
 Point Pass::passerPoint() const

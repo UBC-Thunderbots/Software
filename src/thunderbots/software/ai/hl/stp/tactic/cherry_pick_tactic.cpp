@@ -1,3 +1,7 @@
+/**
+ * Definition for the CherryPickTactic class
+ */
+
 #include "ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "ai/hl/stp/action/move_action.h"
@@ -29,16 +33,16 @@ std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction();
+    std::optional<AI::Passing::Pass> best_pass = pass_generator.getBestPassSoFar();
     do
     {
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
-        std::optional<AI::Passing::Pass> best_pass = pass_generator.getBestPassSoFar();
+        best_pass = pass_generator.getBestPassSoFar();
         if (best_pass)
         {
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, best_pass->receiverPoint(), best_pass->receiverAngle(), 0));
-            best_pass->passerPoint();
+                *robot, best_pass->receiverPoint(), best_pass->receiverOrientation(), 0));
         }
-    } while (!move_action.done());
+    } while (!move_action.done() && best_pass);
 }
