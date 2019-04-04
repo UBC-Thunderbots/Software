@@ -1,13 +1,16 @@
-#include "ball.h"
-#include "ai/world/world.h"
 #include "ai/world/ball.h"
+
 #include "ai/world/field.h"
-#include "geom/rectangle.h"
 
-bool Evaluation::ballInFriendlyHalf(const Field &field, const Ball &ball){
+namespace Evaluation
+{
+    bool ballInFriendlyHalf(const Field &field, const Ball &ball)
+    {
+        return ball.position().x() < field.centerPoint().x();
+    }
 
-}
-
-bool Evaluation::ballInEnemyHalf(const Field &field, const Ball &ball){
-
-}
+    bool ballInEnemyHalf(const Field &field, const Ball &ball)
+    {
+        return ball.position().x() >= field.centerPoint().x();
+    }
+}  // namespace Evaluation
