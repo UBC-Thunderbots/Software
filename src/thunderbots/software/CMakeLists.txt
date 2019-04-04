@@ -525,6 +525,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(ai_evaluation_test
             ai/evaluation/pass.cpp
+            ai/hl/stp/evaluation/ball.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/evaluation/possession.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
@@ -542,6 +543,7 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.cpp
             test/ai/evaluation/indirect_chip.cpp
             test/ai/evaluation/calc_best_shot.cpp
+            test/ai/hl/stp/evaluation/ball.cpp
             test/ai/hl/stp/evaluation/possession.cpp
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp

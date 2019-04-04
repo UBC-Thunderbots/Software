@@ -74,6 +74,8 @@ TEST_F(FieldTest, update_with_all_parameters)
     EXPECT_EQ(Point(-4.5, -3.0), field_to_update.friendlyCornerNeg());
     EXPECT_EQ(Point(4.5, 3.0), field_to_update.enemyCornerPos());
     EXPECT_EQ(Point(4.5, -3.0), field_to_update.enemyCornerNeg());
+
+    EXPECT_EQ(Point(0, 0), field_to_update.centerPoint());
 }
 
 TEST_F(FieldTest, update_with_new_field)
@@ -108,6 +110,8 @@ TEST_F(FieldTest, update_with_new_field)
     EXPECT_EQ(Point(-4.5, -3.0), field_to_update.friendlyCornerNeg());
     EXPECT_EQ(Point(4.5, 3.0), field_to_update.enemyCornerPos());
     EXPECT_EQ(Point(4.5, -3.0), field_to_update.enemyCornerNeg());
+
+    EXPECT_EQ(Point(0, 0), field_to_update.centerPoint());
 }
 
 TEST_F(FieldTest, equality_operator_fields_with_different_lengths)
