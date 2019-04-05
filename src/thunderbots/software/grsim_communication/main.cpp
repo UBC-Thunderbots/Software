@@ -31,7 +31,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     std::vector<std::unique_ptr<Primitive>> primitives;
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     primitives.emplace_back(
-        new PivotPrimitive(0, world.ball().position(), Angle::zero(), 1));
+        new PivotPrimitive(0, world.ball().position(), Angle::zero(), 0.3));
     grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
 }
 

@@ -220,8 +220,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     Vector tangential_vector(unit_pivot_point_to_robot_pos.y(),
                              -unit_pivot_point_to_robot_pos.x());
 
-    // get collinear point on orbit, radius with away, between the robot and the pivot
-    // point, used to maintain radius
+    // get collinear point on orbit, between the robot and the pivot point, used 
+    // to maintain orbit
     Point collinear_point_on_orbit =
         pivot_primitive.getPivotPoint() +
         pivot_primitive.getPivotRadius() * -unit_pivot_point_to_robot_pos;
@@ -233,7 +233,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         final_robot_position - robot.position();
 
 
-    // scale the magnitude by 2 so that the robot stops, otherwise
+    // always move to colinear point on orbit, plus a portion in the tangential direction 
+    // based on how much linear displacement is left from the current and final position
     motion_controller_command = MotionController::PositionCommand(
         collinear_point_on_orbit +
             tangential_vector * linear_displacement_to_final_robot_position.len() / 2,

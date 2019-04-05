@@ -437,6 +437,7 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_communication/dribble_primitive.cpp
             test/grsim_communication/grsim_backend.cpp
             test/grsim_communication/catch_primitive.cpp
+            test/grsim_communication/pivot_primitive.cpp
             test/grsim_communication/movespin_primitive.cpp
             test/grsim_communication/main.cpp
             test/grsim_communication/motion_controller.cpp
