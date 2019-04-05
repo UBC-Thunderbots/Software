@@ -205,51 +205,39 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    // Compute final position
+    // compute final position
     Point final_robot_position(
         pivot_primitive.getPivotPoint().x() +
             (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().cos()),
         pivot_primitive.getPivotPoint().y() +
             (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().sin()));
 
-    Vector robot_to_pivot_point = robot.position() - pivot_primitive.getPivotPoint();
+    // get current vector from pivot point to robot position
+    Vector unit_pivot_point_to_robot_pos =
+        (pivot_primitive.getPivotPoint() - robot.position()).norm();
 
-    // find the general direction to travel
-    Vector general_direction_to_destination = final_robot_position - robot.position();
+    // get a vector in the tangential direction
+    Vector tangential_vector(unit_pivot_point_to_robot_pos.y(),
+                             -unit_pivot_point_to_robot_pos.x());
 
-    // there are two directions to rotate CW and CCW to consider
-    Vector unit_robot_to_pivot_point = robot_to_pivot_point.norm();
-    Vector tangential_dir_1(unit_robot_to_pivot_point.y(),
-                            -unit_robot_to_pivot_point.x());
-    Vector tangential_dir_2(-unit_robot_to_pivot_point.y(),
-                            unit_robot_to_pivot_point.x());
+    // get collinear point on orbit, radius with away, between the robot and the pivot
+    // point, used to maintain radius
+    Point collinear_point_on_orbit =
+        pivot_primitive.getPivotPoint() +
+        pivot_primitive.getPivotRadius() * -unit_pivot_point_to_robot_pos;
 
-    // based on how much of the general direction projects onto the two tangential
-    // direction vector, the direction is selected. The one with the higher magnitude
-    // is selected, as it will be the shortest path to rotate
-    float weight_of_direction_1 = general_direction_to_destination.dot(tangential_dir_1);
-    float weight_of_direction_2 = general_direction_to_destination.dot(tangential_dir_2);
+    // get displacement to final robot position, if the robot were to move there linearly.
+    // This value is used to scale the tangential vector added to the collinear point to
+    // allow for rotation.
+    Vector linear_displacement_to_final_robot_position =
+        final_robot_position - robot.position();
 
-    // get tangential and radial directions
-    Vector tangential_dir = (weight_of_direction_1 >= weight_of_direction_2)
-                                ? tangential_dir_1
-                                : tangential_dir_2;
 
-    // compute correction based on current radius betwen pivot point and robot to the
-    // given pivot radius
-    float correction = pivot_primitive.getPivotRadius() - robot_to_pivot_point.len();
-
-    // gets the magnitude of a straight line from the current position and the final
-    // position this value is used to scale the speed
-    double linear_displacement_to_final_position =
-        (final_robot_position - robot.position()).len();
-
-    Vector final_vector = (correction * unit_robot_to_pivot_point) +
-                          (linear_displacement_to_final_position * tangential_dir);
-
-    motion_controller_command = MotionController::VelocityCommand(
-        0.0, 0.0, false, final_vector,
-        robot.orientation() - unit_robot_to_pivot_point.orientation());
+    // scale the magnitude by 2 so that the robot stops, otherwise
+    motion_controller_command = MotionController::PositionCommand(
+        collinear_point_on_orbit +
+            tangential_vector * linear_displacement_to_final_robot_position.len() / 2,
+        unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
