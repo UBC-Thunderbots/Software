@@ -528,6 +528,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/evaluation/ball.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/evaluation/possession.cpp
+            ai/hl/stp/evaluation/enemy_threat.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/intercept.cpp
@@ -545,6 +546,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/evaluation/calc_best_shot.cpp
             test/ai/hl/stp/evaluation/ball.cpp
             test/ai/hl/stp/evaluation/possession.cpp
+            test/ai/hl/stp/evaluation/enemy_threat.cpp
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp
             test/ai/hl/stp/evaluation/intercept.cpp
