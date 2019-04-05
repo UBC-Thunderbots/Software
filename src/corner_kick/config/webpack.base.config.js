@@ -60,7 +60,6 @@ const generalWebpackBuild = {
         // We set an alias to our src directory to reduce the need for relative paths.
         alias: {
             SRC: path.resolve(__dirname, '../src'),
-            THUNDERBOTS_ROOT: path.resolve(__dirname, '../../../'),
         },
     },
 };

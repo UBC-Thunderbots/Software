@@ -18,8 +18,7 @@
         "suppressImplicitAnyIndexErrors": true,
         "noUnusedLocals": true,
         "paths": {
-            "SRC/*": ["src/*"],
-            "THUNDERBOTS_ROOT": ["../.."]
+            "SRC/*": ["src/*"]
         },
         "allowSyntheticDefaultImports": true
     },

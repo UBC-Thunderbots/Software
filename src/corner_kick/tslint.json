@@ -11,6 +11,7 @@
         "object-literal-sort-keys": [true, "shorthand-first"],
         "variable-name": false,
         "quotemark": [true, "single", "jsx-double"],
-        "no-string-literal": false
+        "no-string-literal": false,
+        "import-spacing": false
     }
 }

@@ -1,3 +1,4 @@
+import { IROSParam } from './rosParams';
 import { IRosoutMessage } from './standardROSMessages';
 
 /*
@@ -25,4 +26,11 @@ export interface IROSState {
  */
 export interface IMessagesState {
     rosout: IRosoutMessage[];
+}
+
+/**
+ * The ROS settings state
+ */
+export interface IROSParamState {
+    [key: string]: IROSParam;
 }
