@@ -35,6 +35,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
     Team friendly_team     = Team(Duration::fromSeconds(1));
     friendly_team.updateRobots({friendly_robot_0, friendly_robot_1});
 
+    // Robot 0 should be able to pass to robot 1 in a single pass
     auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_1,
                                                   friendly_team, {});
 
@@ -44,7 +45,6 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
     int num_passes              = result.value().first;
     std::optional<Robot> passer = result.value().second;
 
-    // Robot 0 should be able to pass to robot 1 in a single pass
     EXPECT_EQ(1, num_passes);
     EXPECT_TRUE(passer);
     EXPECT_EQ(passer.value(), friendly_robot_0);
@@ -75,7 +75,6 @@ TEST(GetNumPassesToRobotTest, two_passes_around_a_single_obstacle)
     int num_passes              = result.value().first;
     std::optional<Robot> passer = result.value().second;
 
-    // Robot 0 should be able to pass to robot 1 in a single pass
     EXPECT_EQ(2, num_passes);
     EXPECT_TRUE(passer);
     EXPECT_EQ(passer.value(), friendly_robot_1);
@@ -117,7 +116,6 @@ TEST(GetNumPassesToRobotTest, multiple_friendly_robots_and_blocking_enemies)
     int num_passes              = result.value().first;
     std::optional<Robot> passer = result.value().second;
 
-    // Robot 0 should be able to pass to robot 1 in a single pass
     EXPECT_EQ(3, num_passes);
     EXPECT_TRUE(passer);
     EXPECT_EQ(passer.value(), friendly_robot_2);
@@ -140,4 +138,41 @@ TEST(GetNumPassesToRobotTest, all_passes_blocked)
 
     // We don't expect any pass info to be returned
     EXPECT_FALSE(result);
+}
+
+TEST(GetNumPassesToRobotTest, final_receiver_can_receive_passes_from_multiple_robots)
+{
+    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_1 = Robot(1, Point(1, 1.5), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_2 = Robot(2, Point(3.5, -2), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_robot_3 = Robot(3, Point(5, 0), Vector(0, 0), Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team friendly_team     = Team(Duration::fromSeconds(1));
+    friendly_team.updateRobots(
+        {friendly_robot_0, friendly_robot_1, friendly_robot_2, friendly_robot_3});
+
+    // Blocks the pass between robot 0 and robot 3
+    Robot enemy_robot_0 = Robot(0, Point(4, 0), Vector(0, 0), Angle::zero(),
+                                AngularVelocity::zero(), Timestamp::fromSeconds(0));
+
+    // robot 3 can receive the ball from either:
+    // robot 0 -> robot 1 -> robot 3
+    // or
+    // robot 0 -> robot 2 -> robot 3
+    // Robot 2 is closer to robot 3 so we expect it to be the most likely passer
+    auto result = Evaluation::getNumPassesToRobot(friendly_robot_0, friendly_robot_3,
+                                                  friendly_team, {enemy_robot_0});
+
+    // A valid result should have been found
+    EXPECT_TRUE(result);
+
+    int num_passes              = result.value().first;
+    std::optional<Robot> passer = result.value().second;
+
+    EXPECT_EQ(2, num_passes);
+    EXPECT_TRUE(passer);
+    EXPECT_EQ(passer.value(), friendly_robot_2);
 }
