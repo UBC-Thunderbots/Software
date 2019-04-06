@@ -1,7 +1,3 @@
-/*
- * This file defines custom exception types for the application
- */
-
 /**
  * Thrown when we are trying to portal to an unknown location
  * in the DOM.

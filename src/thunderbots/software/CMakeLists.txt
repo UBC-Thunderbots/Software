@@ -430,11 +430,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/util.cpp
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
+            test/grsim_communication/dribble_primitive.cpp
             test/grsim_communication/grsim_backend.cpp
             test/grsim_communication/catch_primitive.cpp
+            test/grsim_communication/pivot_primitive.cpp
             test/grsim_communication/movespin_primitive.cpp
             test/grsim_communication/main.cpp
             test/grsim_communication/motion_controller.cpp
@@ -523,6 +526,8 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(ai_evaluation_test
             ai/evaluation/pass.cpp
+            ai/hl/stp/evaluation/calc_best_shot.cpp
+            ai/hl/stp/evaluation/possession.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/intercept.cpp
@@ -537,9 +542,11 @@ if (CATKIN_ENABLE_TESTING)
             geom/rectangle.cpp
             geom/util.cpp
             test/ai/evaluation/indirect_chip.cpp
+            test/ai/evaluation/calc_best_shot.cpp
+            test/ai/hl/stp/evaluation/possession.cpp
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp
-            test/ai/hl/stp/evaluation/pass.cpp
+            test/ai/hl/stp/evaluation/intercept.cpp
             test/ai/hl/stp/evaluation/robot.cpp
             test/ai/hl/stp/evaluation/team.cpp
             test/test_util/test_util.cpp
@@ -771,6 +778,12 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(math_functions_test
+            test/util/math_functions.cpp
+            util/math_functions.cpp
+            )
+    target_link_libraries(math_functions_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
             ai/hl/stp/evaluation/detect_threat.cpp
@@ -843,6 +856,16 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(polygon_test
             ${catkin_LIBRARIES}
             ${G3LOG})
+
+
+    catkin_add_gtest(straight_line_path_planner_test
+            test/ai/navigator/path_planner/straight_line_path_planner.cpp
+            ai/navigator/path_planner/straight_line_path_planner.cpp
+            )
+    target_link_libraries(straight_line_path_planner_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
 endif()
 

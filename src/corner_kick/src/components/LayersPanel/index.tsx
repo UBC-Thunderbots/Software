@@ -75,7 +75,16 @@ const LayerVisibilityToggle = styled('i')<{ visible: boolean }>`
 `;
 
 interface ILayersProps {
+    /**
+     * The layers to display
+     */
     layers: ILayer[];
+
+    /**
+     * Callback that gets triggered when the visibility is toggled
+     * on a layer
+     */
+    toggleVisibility: (id: number) => void;
 }
 
 /**
@@ -84,16 +93,22 @@ interface ILayersProps {
  * Supports an empty state
  */
 export const LayersPanel = (props: ILayersProps) => {
-    const { layers } = props;
+    const { layers, toggleVisibility } = props;
+
+    // If number of layers to display is 0, show a screen to indicate that there
+    // is no layers.
     return (
         <>
             {layers.length > 0 ? (
                 layers.map((layer) => (
-                    <LayerItem key={layer.name}>
-                        {layer.name}
+                    <LayerItem key={layer.id}>
+                        {layer.id}
                         <LayerVisibilityToggle
                             visible={layer.visible}
                             className="material-icons"
+                            onClick={(e) => {
+                                toggleVisibility(layer.id);
+                            }}
                         >
                             remove_red_eye
                         </LayerVisibilityToggle>

@@ -629,19 +629,19 @@ TEST(GeomUtilTest, test_calc_block_other_ray)
 
 TEST(GeomUtilTest, test_offset_to_line)
 {
-    Point x0(1, -1);
+    Point x0(1, -2);
     Point x1(5, -2);
     Point p(2, -3);
 
-    EXPECT_NEAR(-1.69775, offsetToLine(x0, x1, p), 1e-5);
+    EXPECT_NEAR(1, offsetToLine(x0, x1, p), 1e-5);
 
     p = Point(2, 1);
 
-    EXPECT_NEAR(2.18282, offsetToLine(x0, x1, p), 1e-5);
+    EXPECT_NEAR(3, offsetToLine(x0, x1, p), 1e-5);
 
     p = Point(2, 0);
 
-    EXPECT_NEAR(1.21268, offsetToLine(x0, x1, p), 1e-5);
+    EXPECT_NEAR(2, offsetToLine(x0, x1, p), 1e-5);
 }
 
 TEST(GeomUtilTest, test_offset_along_line)

@@ -14,10 +14,9 @@
 #include "ai/primitive/stop_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "geom/util.h"
+#include "shared/constants.h"
 #include "util/logger/init.h"
-
-#define THRESH 0.05f
-#define WITHIN_THRESH(X) (X<=THRESH && X>=-THRESH)
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)
@@ -80,7 +79,34 @@ void GrsimCommandPrimitiveVisitor::visit(const CatchPrimitive &catch_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const ChipPrimitive &chip_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
+    Point chip_origin    = chip_primitive.getChipOrigin();
+    Angle chip_direction = chip_primitive.getChipDirection();
+
+    double final_speed_at_destination = 0.0;
+
+    Point point_behind = chip_origin + Vector(Point::createFromAngle(chip_direction).x(),
+                                              Point::createFromAngle(chip_direction).y());
+
+    Point closest_point_to_line =
+        closestPointOnLine(robot.position(), chip_origin, point_behind);
+
+    // If current robot position is in line with the shot (i.e. less than two robot radius
+    // within the line in the direction of the shot), can go for the shot
+    if (offsetToLine(chip_origin, point_behind, robot.position()) <=
+        2 * ROBOT_MAX_RADIUS_METERS)
+    {
+        motion_controller_command = MotionController::PositionCommand(
+            chip_origin, chip_direction, final_speed_at_destination,
+            chip_primitive.getChipDistance(), true, false);
+    }
+    else
+    {
+        // If robot is not in line, move to the closest point on the line from the current
+        // position
+        motion_controller_command = MotionController::PositionCommand(
+            closest_point_to_line, chip_direction, 0.0, chip_primitive.getChipDistance(),
+            true, false);
+    }
 }
 
 void GrsimCommandPrimitiveVisitor::visit(
@@ -127,7 +153,35 @@ void GrsimCommandPrimitiveVisitor::visit(
 
 void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/93
+    Point kick_origin    = kick_primitive.getKickOrigin();
+    Angle kick_direction = kick_primitive.getKickDirection();
+
+    double final_speed_at_destination = 0.0;
+
+    Point point_behind = kick_origin + Vector(Point::createFromAngle(kick_direction).x(),
+                                              Point::createFromAngle(kick_direction).y());
+
+    Point closest_point_to_line =
+        closestPointOnLine(robot.position(), kick_origin, point_behind);
+
+    // If current robot position is in line with the shot (i.e. less than two robot radius
+    // within the line in the direction of the shot), can go for the shot
+    if (offsetToLine(kick_origin, point_behind, robot.position()) <=
+        2 * ROBOT_MAX_RADIUS_METERS)
+    {
+        motion_controller_command = MotionController::PositionCommand(
+            kick_origin, kick_direction, final_speed_at_destination,
+            kick_primitive.getKickSpeed(), false, false);
+    }
+    else
+    {
+        // If robot is not in line, move to the closest point on the line from the current
+        // position
+        motion_controller_command = MotionController::PositionCommand(
+            closest_point_to_line, kick_direction, 0.0, kick_primitive.getKickSpeed(),
+            false, false);
+        ;
+    }
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
@@ -151,52 +205,57 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    // Compute final position
+    // compute final position
     Point final_robot_position(
         pivot_primitive.getPivotPoint().x() +
             (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().cos()),
         pivot_primitive.getPivotPoint().y() +
             (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().sin()));
 
-    Vector pivot_point_to_robot = pivot_primitive.getPivotPoint() - robot.position();
-    Vector unit_pivot_point_to_robot = (pivot_primitive.getPivotPoint() - robot.position())/pivot_point_to_robot.len();
+    // get current vector from pivot point to robot position
+    Vector unit_pivot_point_to_robot_pos =
+        (pivot_primitive.getPivotPoint() - robot.position()).norm();
 
-    // find the general direction to travel, project those onto the two possible
-    // directions and see which one is better
-    Vector general_direction_to_destination = final_robot_position - robot.position();
+    // get a vector in the tangential direction
+    Vector tangential_dir_1(unit_pivot_point_to_robot_pos.y(),
+                            -unit_pivot_point_to_robot_pos.x());
+    Vector tangential_dir_2(-unit_pivot_point_to_robot_pos.y(),
+                            unit_pivot_point_to_robot_pos.x());
 
-    // there are two directions to rotate CW and CCW, the one with the 
-    Vector tangential_dir_1(unit_pivot_point_to_robot.y(), -unit_pivot_point_to_robot.x());
-    Vector tangential_dir_2(-unit_pivot_point_to_robot.y(), unit_pivot_point_to_robot.x());
+    // get collinear point on orbit, between the robot and the pivot point, used
+    // to maintain orbit
+    Point collinear_point_on_orbit =
+        pivot_primitive.getPivotPoint() +
+        pivot_primitive.getPivotRadius() * -unit_pivot_point_to_robot_pos;
 
-    // based on how much of the general direction projects onto the two tangential 
-    // direction vector, the direction is selected. The one with the lower mangnitude 
-    // is selected, as it will be the shortest path to rotate
-    float weight_of_direction_1 = general_direction_to_destination.dot(tangential_dir_1);
-    float weight_of_direction_2 = general_direction_to_destination.dot(tangential_dir_2);
+    // select orbit direction based on the magnitude of the vector connecting the robots
+    // next position to the final position
+    Vector tangential_vector =
+        (((collinear_point_on_orbit + tangential_dir_1) - final_robot_position).len() <
+         ((collinear_point_on_orbit + tangential_dir_2) - final_robot_position).len())
+            ? tangential_dir_1
+            : tangential_dir_2;
 
-    // get tangential and radial directions
-    Vector tangential_dir = (weight_of_direction_1 >= weight_of_direction_1) ? tangential_dir_1 : tangential_dir_2;
-    Vector radial_dir = unit_pivot_point_to_robot;
-    
-    // compute correction based on current radius betwen pivot point and robot to the given pivot radius
-    float correction = pivot_point_to_robot.len() - pivot_primitive.getPivotRadius();
+    // get displacement to final robot position, if the robot were to move there linearly.
+    // This value is used to scale the tangential vector added to the collinear point to
+    // allow for rotation.
+    Vector linear_displacement_to_final_robot_position =
+        final_robot_position - robot.position();
 
-    // gets the magnitude of a straight line from the current position and the final position 
-    // this value is used to scale the speed
-    double linear_displacement_to_final_position = (final_robot_position - robot.position()).len();
-
-    // project current velocity onto tangential and radial vectors
-    float current_tangential_velocity = robot.velocity().dot(tangential_dir);
-    float current_radial_velocity = robot.velocity().dot(radial_dir);
-
-    AngularVelocity test;
-    motion_controller_command = MotionController::VelocityCommand(0.0, 0.0, false, tangential_dir, test);
+    // always move to collinear point on orbit, plus a portion in the tangential direction
+    // based on how much linear displacement is left from the current and final position
+    motion_controller_command = MotionController::PositionCommand(
+        collinear_point_on_orbit + tangential_vector  // next position
+                                       *
+                                       linear_displacement_to_final_robot_position.len(),
+        unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/107
+    motion_controller_command = MotionController::PositionCommand(
+        dribble_primitive.getDestination(), dribble_primitive.getFinalAngle(),
+        dribble_primitive.getFinalSpeed(), 0.0, false, true);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
