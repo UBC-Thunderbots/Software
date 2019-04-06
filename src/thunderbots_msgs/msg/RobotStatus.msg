@@ -15,10 +15,6 @@ string[] robot_messages
 string[] dongle_messages
 
 
-# The rough maximum full-scale deflection of the laser sensor.
-float64 break_beam_scale
-
-
 # The maximum possible kick speed, in m/s.
 float64 kick_speed_max
 
@@ -68,6 +64,10 @@ float64 capacitor_voltage
 
 # The reading of the robot’s laser sensor.
 float64 break_beam_reading
+
+
+# The rough maximum full-scale deflection (maximum possible reading) of the laser sensor.
+float64 break_beam_scale
 
 
 # The temperature of the robot’s dribbler motor, in degrees Celsius.
