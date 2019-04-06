@@ -4,6 +4,8 @@
 
 #include "ai/passing/pass.h"
 
+#include "geom/util.h"
+
 using namespace AI::Passing;
 
 Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
@@ -22,6 +24,11 @@ Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
 Point Pass::receiverPoint() const
 {
     return receiver_point;
+}
+
+Angle Pass::receiverOrientation() const
+{
+    return (passerPoint() - receiverPoint()).orientation();
 }
 
 Point Pass::passerPoint() const
