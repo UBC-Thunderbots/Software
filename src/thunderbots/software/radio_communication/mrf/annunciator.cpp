@@ -19,10 +19,15 @@ namespace
      */
     const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
 
-    // Represents a mapping from RSSI to decibels.
+    /** 
+     * Represents a mapping from RSSI to decibels.
+     */
     struct RSSITableEntry final
     {
+        /* Received Signal Strength Indicator */
         int rssi;
+
+        /* Corresponding decibel value */
         int db;
     };
 
