@@ -36,10 +36,10 @@ class Obstacle
      *
      * @return a six-sided Polygon to represent the boundary around the obstacle
      */
-    static Obstacle createRobotObstacleWithScalingParams(const Robot& robot,
-                                                         double radius_cushion_scaling,
-                                                         double velocity_cushion_scaling,
-                                                         bool enable_velocity_cushion);
+    static Obstacle createRobotObstacleWithScalingParams(
+        const Robot& robot, bool enable_velocity_cushion,
+        double radius_cushion_scaling = 1.0, double tick_length = 1.0,
+        double velocity_cushion_scaling = 1.0);
 
     /*
      * Gets the boundary polygon around the given robot obstacle that other robots
@@ -61,10 +61,10 @@ class Obstacle
      *
      * @return a six-sided Polygon to represent the boundary around the obstacle
      */
-    static Obstacle createRobotObstacleWithBufferParams(const Robot& robot,
-                                                        double radial_cushion_buffer,
-                                                        double velocity_cushion_buffer,
-                                                        bool enable_velocity_cushion);
+    static Obstacle createRobotObstacleWithBufferParams(
+        const Robot& robot, bool enable_velocity_cushion,
+        double radius_cushion_buffer = 0.0, double tick_length = 1.0,
+        double velocity_cushion_buffer = 0.0);
 
     static Obstacle createBallObstacle(const Ball& ball);
 

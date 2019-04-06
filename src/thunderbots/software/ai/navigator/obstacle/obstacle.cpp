@@ -33,17 +33,11 @@ Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_
         enable_velocity_cushion);
 }
 
-Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
-                                                        double radius_cushion_scaling,
-                                                        double velocity_cushion_scaling,
-                                                        bool enable_velocity_cushion)
+Obstacle Obstacle::createRobotObstacleWithScalingParams(
+    const Robot& robot, bool enable_velocity_cushion, double radius_cushion_scaling,
+    double tick_length, double velocity_cushion_scaling)
 {
-    // TODO: figure out how to get tick length
-    double tick_length = 1.0;
-
-    // TODO: figure out actual factor (not 2) needed to clear two robot based on hexagon
-    // implementation
-    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 2 * radius_cushion_scaling;
+    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 4 / std::sqrt(3) * radius_cushion_scaling;
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector = robot.velocity().norm(
@@ -54,17 +48,11 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
         enable_velocity_cushion && velocity_cushion_vector.len() > radius_cushion);
 }
 
-Obstacle Obstacle::createRobotObstacleWithBufferParams(const Robot& robot,
-                                                       double radius_cushion_buffer,
-                                                       double velocity_cushion_buffer,
-                                                       bool enable_velocity_cushion)
+Obstacle Obstacle::createRobotObstacleWithBufferParams(
+    const Robot& robot, bool enable_velocity_cushion, double radius_cushion_buffer,
+    double tick_length, double velocity_cushion_buffer)
 {
-    // TODO: figure out how to get tick length
-    double tick_length = 1.0;
-
-    // TODO: figure out actual factor (not 2) needed to clear two robot based on hexagon
-    // implementation
-    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 2 + radius_cushion_buffer;
+    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 4 / std::sqrt(3) + radius_cushion_buffer;
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector = robot.velocity().norm(
