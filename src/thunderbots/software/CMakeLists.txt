@@ -434,6 +434,7 @@ if (CATKIN_ENABLE_TESTING)
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
+            test/grsim_communication/dribble_primitive.cpp
             test/grsim_communication/grsim_backend.cpp
             test/grsim_communication/catch_primitive.cpp
             test/grsim_communication/movespin_primitive.cpp
@@ -524,7 +525,9 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(ai_evaluation_test
             ai/evaluation/pass.cpp
+            ai/hl/stp/evaluation/ball.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
+            ai/hl/stp/evaluation/possession.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/intercept.cpp
@@ -540,9 +543,11 @@ if (CATKIN_ENABLE_TESTING)
             geom/util.cpp
             test/ai/evaluation/indirect_chip.cpp
             test/ai/evaluation/calc_best_shot.cpp
+            test/ai/hl/stp/evaluation/ball.cpp
+            test/ai/hl/stp/evaluation/possession.cpp
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp
-            test/ai/hl/stp/evaluation/pass.cpp
+            test/ai/hl/stp/evaluation/intercept.cpp
             test/ai/hl/stp/evaluation/robot.cpp
             test/ai/hl/stp/evaluation/team.cpp
             test/test_util/test_util.cpp
@@ -593,13 +598,18 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(tactic_test
+            ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
-            ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
+            ai/hl/stp/tactic/cherry_pick_tactic.cpp
+            ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
+            ai/passing/evaluation.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
@@ -608,13 +618,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/util.cpp
+            test/ai/hl/stp/tactic/block_shot_path_tactic.cpp
+            test/ai/hl/stp/tactic/cherry_pick_tactic.cpp
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
-            test/ai/hl/stp/tactic/block_shot_path_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
-            geom/util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/parameter/dynamic_parameters.cpp
@@ -774,6 +785,12 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(math_functions_test
+            test/util/math_functions.cpp
+            util/math_functions.cpp
+            )
+    target_link_libraries(math_functions_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
             ai/hl/stp/evaluation/detect_threat.cpp
@@ -846,6 +863,16 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(polygon_test
             ${catkin_LIBRARIES}
             ${G3LOG})
+
+
+    catkin_add_gtest(straight_line_path_planner_test
+            test/ai/navigator/path_planner/straight_line_path_planner.cpp
+            ai/navigator/path_planner/straight_line_path_planner.cpp
+            )
+    target_link_libraries(straight_line_path_planner_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
 endif()
 
