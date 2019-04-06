@@ -566,6 +566,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/movespin_action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/chip_action.cpp
+            ai/hl/stp/action/pivot_action.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
