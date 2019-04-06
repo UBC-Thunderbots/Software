@@ -91,9 +91,9 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     unvisited_robots.erase(
         std::remove(unvisited_robots.begin(), unvisited_robots.end(), initial_passer),
         unvisited_robots.end());
-    std::vector<Robot> all_robots = passing_team.getAllRobots();
-    all_robots.insert(all_robots.end(), other_team.getAllRobots().begin(),
-                      other_team.getAllRobots().end());
+    std::vector<Robot> all_robots   = passing_team.getAllRobots();
+    std::vector<Robot> other_robots = other_team.getAllRobots();
+    all_robots.insert(all_robots.end(), other_robots.begin(), other_robots.end());
 
     // On each iteration, check what robots can be passed to. These receivers will
     // become the passers on the next iteration. This is like expanding the frontier
