@@ -26,8 +26,6 @@ TEST(PassTest, simple_getters)
     EXPECT_EQ(Timestamp::fromSeconds(10), p.startTime());
 }
 
-// TODO: Fix these tests once you figure out what 0 deg is supposed to be (+x or +y?)
-
 TEST(PassTest, getRecieverOrientation_passer_at_center_and_receiver_on_neg_x_axis)
 {
     Pass p({0, 0}, {-1, 0}, 1, Timestamp::fromSeconds(10));

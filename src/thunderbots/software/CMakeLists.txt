@@ -596,6 +596,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(tactic_test
+            ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
@@ -604,6 +605,9 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
+            ai/passing/evaluation.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
