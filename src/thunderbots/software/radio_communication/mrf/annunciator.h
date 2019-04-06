@@ -1,7 +1,6 @@
 #pragma once
 #include <ros/ros.h>
 
-#include "thunderbots_msgs/MRFMessages.h"
 #include "thunderbots_msgs/RobotStatus.h"
 
 /**
@@ -24,19 +23,21 @@ class Annunciator
      * @param len The length of the packet.
      * @param lqi Link quality.
      * @param rssi Received signal strength indicator.
+     * 
+     * @return the fully-constructed RobotStatus that was published
      */
-    thunderbots_msgs::MRFMessages handle_robot_message(int index, const void* data,
+    thunderbots_msgs::RobotStatus handle_robot_message(int index, const void* data,
                                                        std::size_t len, uint8_t lqi,
                                                        uint8_t rssi);
 
     /**
      * Handles general dongle messages.
      *
-     * @param status The integer encoding all the status data.
+     * @param status The uint8 encoding all the status data.
      */
-    thunderbots_msgs::MRFMessages handle_status(uint8_t status);
+    void handle_status(uint8_t status);
 
    private:
     ros::Publisher robot_status_publisher;
-    thunderbots_msgs::MRFMessages mrf_message;
+    std::vector<std::string> dongle_messages;
 };

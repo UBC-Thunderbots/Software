@@ -16,7 +16,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "constants.h"
+#include "messages.h"
 #include "radio_communication/visitor/mrf_primitive_visitor.h"
 #include "util/logger/init.h"
 

@@ -1,8 +1,8 @@
 
 #include "annunciator.h"
 
-#include "constants.h"
 #include "dongle.h"
+#include "messages.h"
 #include "shared/constants.h"
 #include "util/codec.h"
 #include "util/logger/init.h"
@@ -20,11 +20,14 @@ namespace
      */
     const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
 
+    // Represents a mapping from RSSI to decibels.
     struct RSSITableEntry final
     {
         int rssi;
         int db;
     };
+
+    // Table of conversions from RSSI to decibels
     const struct RSSITableEntry RSSI_TABLE[] = {
         {255, -35}, {254, -36}, {253, -37}, {250, -38}, {245, -39}, {239, -40},
         {233, -41}, {228, -42}, {225, -43}, {221, -44}, {216, -45}, {212, -46},
@@ -42,12 +45,11 @@ namespace
 
 Annunciator::Annunciator(ros::NodeHandle &node_handle)
 {
-    robot_status_publisher = node_handle.advertise<thunderbots_msgs::MRFMessages>(
+    robot_status_publisher = node_handle.advertise<thunderbots_msgs::RobotStatus>(
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
-    mrf_message.robot_statuses.resize(MAX_ROBOTS_OVER_RADIO);
 }
 
-thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
+thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                                                 const void *data,
                                                                 std::size_t len,
                                                                 uint8_t lqi, uint8_t rssi)
@@ -98,7 +100,7 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
                     // Warn if capacitor voltage is too low
                     if (robot_status.capacitor_voltage < 5.0)
                     {
-                        robot_status.messages.push_back(MRF::LOW_CAP_MESSAGE);
+                        robot_status.robot_messages.push_back(MRF::LOW_CAP_MESSAGE);
                     }
 
                     bptr += 2;
@@ -123,7 +125,8 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
                     {
                         if (MRF::LOGGER_MESSAGES[i] && (logger_status == i))
                         {
-                            robot_status.messages.push_back(MRF::LOGGER_MESSAGES[i]);
+                            robot_status.robot_messages.push_back(
+                                MRF::LOGGER_MESSAGES[i]);
                         }
                     }
                     ++bptr;
@@ -134,7 +137,7 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
                     {
                         if (MRF::SD_MESSAGES[i] && (*bptr == i))
                         {
-                            robot_status.messages.push_back(MRF::SD_MESSAGES[i]);
+                            robot_status.robot_messages.push_back(MRF::SD_MESSAGES[i]);
                         }
                     }
                     ++bptr;
@@ -170,7 +173,7 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_LT_MESSAGES[i])
                                         {
-                                            robot_status.messages.push_back(
+                                            robot_status.robot_messages.push_back(
                                                 MRF::ERROR_LT_MESSAGES[i]);
                                         }
                                     }
@@ -184,7 +187,7 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            robot_status.messages.push_back(
+                                            robot_status.robot_messages.push_back(
                                                 MRF::ERROR_ET_MESSAGES[i]);
                                         }
                                     }
@@ -284,37 +287,36 @@ thunderbots_msgs::MRFMessages Annunciator::handle_robot_message(int index,
         }
     }
 
-    mrf_message.robot_statuses[index] = robot_status;
-    robot_status_publisher.publish(mrf_message);
-    return mrf_message;
+    // Add the latest dongle status messages
+    robot_status.dongle_messages = dongle_messages;
+
+    robot_status_publisher.publish(robot_status);
+    return robot_status;
 }
 
-thunderbots_msgs::MRFMessages Annunciator::handle_status(uint8_t status)
+void Annunciator::handle_status(uint8_t status)
 {
-    mrf_message.dongle_messages.clear();
+    dongle_messages.clear();
 
     if (static_cast<MRFDongle::EStopState>(status & 3U) == MRFDongle::EStopState::BROKEN)
     {
-        mrf_message.dongle_messages.push_back(MRF::ESTOP_BROKEN_MESSAGE);
+        dongle_messages.push_back(MRF::ESTOP_BROKEN_MESSAGE);
     }
 
     if (status & 4U)
     {
-        mrf_message.dongle_messages.push_back(MRF::RX_FCS_FAIL_MESSAGE);
+        dongle_messages.push_back(MRF::RX_FCS_FAIL_MESSAGE);
     }
     if (status & 8U)
     {
-        mrf_message.dongle_messages.push_back(MRF::SECOND_DONGLE_MESSAGE);
+        dongle_messages.push_back(MRF::SECOND_DONGLE_MESSAGE);
     }
     if (status & 16U)
     {
-        mrf_message.dongle_messages.push_back(MRF::TRANSMIT_QUEUE_FULL_MESSAGE);
+        dongle_messages.push_back(MRF::TRANSMIT_QUEUE_FULL_MESSAGE);
     }
     if (status & 32U)
     {
-        mrf_message.dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
+        dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
     }
-
-    robot_status_publisher.publish(mrf_message);
-    return mrf_message;
 }

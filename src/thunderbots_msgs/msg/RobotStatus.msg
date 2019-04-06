@@ -5,7 +5,10 @@ int32 robot
 
 # Messages related to the robot that are to be displayed in the visualizer
 # (usually errors that need attention)
-string[] messages
+string[] robot_messages
+
+# Messages that are related to the dongle itself (usually errors that need attention)
+string[] dongle_messages
 
 # The rough maximum full-scale deflection of the laser sensor.
 float64 break_beam_scale

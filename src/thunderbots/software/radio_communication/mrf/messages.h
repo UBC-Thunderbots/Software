@@ -1,5 +1,4 @@
-#ifndef MRF_CONSTANTS_H
-#define MRF_CONSTANTS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -192,5 +191,3 @@ namespace MRF
     static constexpr const char* TRANSMIT_QUEUE_FULL_MESSAGE = "Transmit Queue Full";
     static constexpr const char* RECEIVE_QUEUE_FULL_MESSAGE  = "Receive Queue Full";
 }  // namespace MRF
-
-#endif
