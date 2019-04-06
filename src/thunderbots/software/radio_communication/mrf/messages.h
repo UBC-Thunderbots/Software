@@ -1,3 +1,4 @@
+/** This file contains constants and messages related to MRF communication */
 #pragma once
 
 #include <stdint.h>
@@ -176,6 +177,7 @@ namespace MRF
         "SD card FIFO overrun or underrun",
     };
 
+    /* Robot logger messages */
     constexpr unsigned int LOGGER_MESSAGE_COUNT                         = 4;
     const std::array<const char*, LOGGER_MESSAGE_COUNT> LOGGER_MESSAGES = {
         nullptr,
@@ -184,6 +186,7 @@ namespace MRF
         "SD card full",
     };
 
+    /* Dongle messages */
     static constexpr const char* ESTOP_BROKEN_MESSAGE = "EStop missing/broken";
     static constexpr const char* RX_FCS_FAIL_MESSAGE  = "Dongle receive FCS fail";
     static constexpr const char* SECOND_DONGLE_MESSAGE =

@@ -194,13 +194,19 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                                 MRF::ERROR_LT_MESSAGES[i]);
                                         }
                                     }
+
+                                    /**
+                                     * TODO (#544): Edge-triggered messages only show up
+                                     * once when the event occurs. Need to add some timer
+                                     * event to persist these messages for a few seconds.
+                                     */
                                     for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT; ++i)
                                     {
                                         unsigned int byte =
                                             (i + MRF::ERROR_LT_COUNT) / CHAR_BIT;
                                         unsigned int bit =
                                             (i + MRF::ERROR_LT_COUNT) % CHAR_BIT;
-                                        // TODO: Handle these messages
+
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
@@ -240,7 +246,8 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                 }
                                 break;
 
-                            case 0x02:  // LPS data. WARNING: unused, do not delete until it's removed from firmware
+                            case 0x02:  // LPS data. WARNING: unused, do not delete until
+                                        // it's removed from firmware
                                 ++bptr;
                                 --len;
                                 if (len >= 4)
@@ -330,4 +337,3 @@ void Annunciator::handle_status(uint8_t status)
         dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
     }
 }
-

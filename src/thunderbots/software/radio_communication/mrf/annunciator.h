@@ -23,7 +23,7 @@ class Annunciator
      * @param len The length of the packet.
      * @param lqi Link quality.
      * @param rssi Received signal strength indicator.
-     * 
+     *
      * @return the fully-constructed RobotStatus that was published
      */
     thunderbots_msgs::RobotStatus handle_robot_message(int index, const void* data,
