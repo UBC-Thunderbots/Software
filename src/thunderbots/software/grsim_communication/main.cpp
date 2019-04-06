@@ -4,7 +4,6 @@
 #include <thunderbots_msgs/World.h>
 
 #include "ai/primitive/chip_primitive.h"
-#include "ai/primitive/pivot_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
 #include "grsim_communication/grsim_backend.h"
@@ -30,8 +29,11 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
 {
     std::vector<std::unique_ptr<Primitive>> primitives;
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
-    primitives.emplace_back(
-        new PivotPrimitive(0, world.ball().position(), Angle::threeQuarter(), 0.3));
+    for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
+    {
+        primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
+    }
+
     grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
 }
 

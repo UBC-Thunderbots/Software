@@ -251,10 +251,11 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 
     // always move to collinear point on orbit, plus a portion in the tangential direction
     // based on how much linear displacement is left from the current and final position
+    // NOTE: Scaling the displacement by a half, ensures that the robot slows down more
+    // aggressively
     motion_controller_command = MotionController::PositionCommand(
-        collinear_point_on_orbit + tangential_vector  // next position
-                                       *
-                                       linear_displacement_to_final_robot_position.len(),
+        collinear_point_on_orbit +
+            tangential_vector * 0.5 * linear_displacement_to_final_robot_position.len(),
         unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 
