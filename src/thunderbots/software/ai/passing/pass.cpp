@@ -31,6 +31,12 @@ Angle Pass::receiverOrientation() const
     return (passerPoint() - receiverPoint()).orientation();
 }
 
+Angle Pass::passerOrientation() const
+{
+    return (receiverPoint() - passerPoint()).orientation();
+}
+
+
 Point Pass::passerPoint() const
 {
     return passer_point;

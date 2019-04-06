@@ -26,35 +26,66 @@ TEST(PassTest, simple_getters)
     EXPECT_EQ(Timestamp::fromSeconds(10), p.startTime());
 }
 
-TEST(PassTest, getRecieverOrientation_passer_at_center_and_receiver_on_neg_x_axis)
+TEST(PassTest, receiverOrientation_passer_at_center_and_receiver_on_neg_x_axis)
 {
     Pass p({0, 0}, {-1, 0}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(0, p.receiverOrientation().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverOrientation_passer_at_center_and_receiver_on_neg_y_axis)
+TEST(PassTest, receiverOrientation_passer_at_center_and_receiver_on_neg_y_axis)
 {
     Pass p({0, 0}, {0, -1}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(90, p.receiverOrientation().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverOrientation_passer_at_center_and_receiver_on_pos_x_axis)
+TEST(PassTest, receiverOrientation_passer_at_center_and_receiver_on_pos_x_axis)
 {
     Pass p({0, 0}, {1, 0}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(180, p.receiverOrientation().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverOrientation_passer_at_center_and_receiver_on_pos_y_axis)
+TEST(PassTest, receiverOrientation_passer_at_center_and_receiver_on_pos_y_axis)
 {
     Pass p({0, 0}, {0, 1}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(-90, p.receiverOrientation().mod(Angle::full()).toDegrees());
 }
 
-TEST(PassTest, getRecieverOrientation_passer_diagonal_to_receiver)
+TEST(PassTest, receiverOrientation_passer_diagonal_to_receiver)
 {
     Pass p({1, -1}, {4, 1}, 1, Timestamp::fromSeconds(10));
     EXPECT_DOUBLE_EQ(-180 + atan(2.0 / 3.0) * 180 / M_PI,
                      p.receiverOrientation().mod(Angle::full()).toDegrees());
+}
+
+TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_neg_x_axis)
+{
+    Pass p({-1, 0}, {0, 0}, 1, Timestamp::fromSeconds(10));
+    EXPECT_DOUBLE_EQ(0, p.passerOrientation().mod(Angle::full()).toDegrees());
+}
+
+TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_neg_y_axis)
+{
+    Pass p({0, -1}, {0, 0}, 1, Timestamp::fromSeconds(10));
+    EXPECT_DOUBLE_EQ(90, p.passerOrientation().mod(Angle::full()).toDegrees());
+}
+
+TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_pos_x_axis)
+{
+    Pass p({1, 0}, {0, 0}, 1, Timestamp::fromSeconds(10));
+    EXPECT_DOUBLE_EQ(180, p.passerOrientation().mod(Angle::full()).toDegrees());
+}
+
+TEST(PassTest, passerOrientation_receiver_at_center_and_passer_on_pos_y_axis)
+{
+    Pass p({0, 1}, {0, 0}, 1, Timestamp::fromSeconds(10));
+    EXPECT_DOUBLE_EQ(-90, p.passerOrientation().mod(Angle::full()).toDegrees());
+}
+
+TEST(PassTest, passerOrientation_passer_diagonal_to_receiver)
+{
+    Pass p({4, 1}, {1, -1}, 1, Timestamp::fromSeconds(10));
+    EXPECT_DOUBLE_EQ(-180 + atan(2.0 / 3.0) * 180 / M_PI,
+                     p.passerOrientation().mod(Angle::full()).toDegrees());
 }
 
 TEST(PassTest, stream_operator)
