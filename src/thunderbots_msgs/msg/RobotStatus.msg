@@ -1,17 +1,23 @@
-# This message contains various robot parameters (e.g. voltages, link quality, etc.)
+# This message contains various robot diagnostics (e.g. voltages, link quality, etc.)
+# and messages related to robot and dongle condition.
 
 # The robot number.
 int32 robot
+
 
 # Messages related to the robot that are to be displayed in the visualizer
 # (usually errors that need attention)
 string[] robot_messages
 
-# Messages that are related to the dongle itself (usually errors that need attention)
+
+# Messages that are related to the dongle itself
+# (usually errors that need attention)
 string[] dongle_messages
+
 
 # The rough maximum full-scale deflection of the laser sensor.
 float64 break_beam_scale
+
 
 # The maximum possible kick speed, in m/s.
 float64 kick_speed_max
@@ -76,7 +82,7 @@ int32 dribbler_speed
 float64 board_temperature
 
 
-# The link quality of the last received packet, from 0 to 1.
+# The link quality of the last received packet, from 0 (worst) to 1 (best).
 float64 link_quality
 
 

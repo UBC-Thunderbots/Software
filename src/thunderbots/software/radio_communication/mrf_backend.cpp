@@ -2,7 +2,6 @@
 
 #include <chrono>
 
-#include "util/codec.h"
 #include "util/logger/init.h"
 
 MRFBackend::MRFBackend(ros::NodeHandle &node_handle)

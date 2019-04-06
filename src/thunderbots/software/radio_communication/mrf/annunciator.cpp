@@ -4,18 +4,17 @@
 #include "dongle.h"
 #include "messages.h"
 #include "shared/constants.h"
-#include "util/codec.h"
 #include "util/logger/init.h"
 
 namespace
 {
     /**
-     * \brief The number of attempts to request the build IDs before giving up.
+     * The number of attempts to request the build IDs before giving up.
      */
     const unsigned int REQUEST_BUILD_IDS_COUNT = 7;
 
     /**
-     * \brief The number of seconds to wait between consecutive requests for
+     * The number of seconds to wait between consecutive requests for
      * the build IDs.
      */
     const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
@@ -41,6 +40,24 @@ namespace
         {1, -89},   {0, -90},
     };
 
+    /**
+     * Extracts a 32-bit integer from a data buffer in little endian form.
+     *
+     * @param buffer the data to extract from.
+     *
+     * @return the integer.
+     */
+    inline uint32_t decode_u32_le(const void *buffer)
+    {
+        const uint8_t *buf = static_cast<const uint8_t *>(buffer);
+        uint32_t val       = 0;
+        for (std::size_t i = 0; i < 4; ++i)
+        {
+            val <<= 8;
+            val |= buf[3 - i];
+        }
+        return val;
+    }
 }  // namespace
 
 Annunciator::Annunciator(ros::NodeHandle &node_handle)
@@ -211,8 +228,6 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                     robot_status.build_ids_valid = true;
                                     robot_status.fw_build_id     = decode_u32_le(bptr);
                                     robot_status.fpga_build_id = decode_u32_le(bptr + 4);
-                                    // TODO: check this
-                                    // check_build_id_mismatch();
                                     bptr += 8;
                                     len -= 8;
                                 }
@@ -225,16 +240,11 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                 }
                                 break;
 
-                            case 0x02:  // LPS data. WARNING: unused
+                            case 0x02:  // LPS data. WARNING: unused, do not delete until it's removed from firmware
                                 ++bptr;
                                 --len;
                                 if (len >= 4)
                                 {
-                                    // for (unsigned int i = 0; i < 4; ++i)
-                                    // {
-                                    //     lps_values[i] =
-                                    //         static_cast<int8_t>(*bptr++) / 10.0;
-                                    // }
                                     len -= 4;
                                 }
                                 else
@@ -320,3 +330,4 @@ void Annunciator::handle_status(uint8_t status)
         dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
     }
 }
+
