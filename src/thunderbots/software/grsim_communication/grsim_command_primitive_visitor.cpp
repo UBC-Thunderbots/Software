@@ -247,8 +247,7 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     motion_controller_command = MotionController::PositionCommand(
         collinear_point_on_orbit + tangential_vector  // next position
                                        *
-                                       linear_displacement_to_final_robot_position.len() /
-                                       2,  // scaled by displacement to final position
+                                       linear_displacement_to_final_robot_position.len(),
         unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 
