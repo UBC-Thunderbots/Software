@@ -292,6 +292,8 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
     transfer.result();
+
+    // Only handle if there are more than 2 bytes in the transfer.
     if (transfer.size() > 2)
     {
         unsigned int robot = transfer.data()[0];
