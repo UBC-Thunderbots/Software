@@ -9,9 +9,65 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
+std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>
+Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passers,
+                                       const std::vector<Robot> &possible_receivers,
+                                       const std::vector<Robot> &all_robots)
+{
+    // Store a map of robots that can receive the ball, and the list of all robots
+    // that could pass to them. The custom comparator is necessary to use the Robot
+    // class as a key in the map
+    std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> receiver_passer_pairs;
+
+    // For each of the passers, check which robots they could pass to
+    for (const auto &passer : possible_passers)
+    {
+        for (const auto &receiver : possible_receivers)
+        {
+            // Create a vector of obstacles that includes all robots except the
+            // current passer and receiver
+            std::vector<Robot> obstacles = all_robots;
+            obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), passer),
+                            obstacles.end());
+            obstacles.erase(std::remove(obstacles.begin(), obstacles.end(), receiver),
+                            obstacles.end());
+
+            // Check if the pass from the passer to the receiver would be blocked by any
+            // robots
+            bool pass_blocked =
+                std::any_of(obstacles.begin(), obstacles.end(),
+                            [passer, receiver](const Robot &obstacle) {
+                                return intersects(
+                                    Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
+                                    Segment(passer.position(), receiver.position()));
+                            });
+
+            if (!pass_blocked)
+            {
+                if (receiver_passer_pairs.count(receiver) > 0)
+                {
+                    // This receiver already exists in the map and can
+                    // already be passed to by another robot. We add the passer
+                    // to the list of possible passers for this robot
+                    receiver_passer_pairs.at(receiver).emplace_back(passer);
+                }
+                else
+                {
+                    // This receiver robot does not exist in the map. Create a
+                    // new entry to track this receiver and add the passer
+                    receiver_passer_pairs.insert(
+                        std::make_pair(receiver, std::vector<Robot>{passer}));
+                }
+            }
+        }
+    }
+
+    return receiver_passer_pairs;
+}
+
 std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRobot(
-    const Robot& initial_passer, const Robot& final_receiver, const Team& team,
-    const std::vector<Robot>& other_robots)
+    const Robot &initial_passer, const Robot &final_receiver, const Team &passing_team,
+    const Team &other_team)
 {
     if (initial_passer == final_receiver)
     {
@@ -29,11 +85,15 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     // are on the "frontier" of the graph search
     std::vector<Robot> current_passers{initial_passer};
     // The remaining robots we haven't checked yet
-    std::vector<Robot> unvisited_robots = team.getAllRobots();
-    // Remove the robot already in the current_passers since it starts off as visited
+    std::vector<Robot> unvisited_robots = passing_team.getAllRobots();
+    // Remove the initial passer since we already start off visiting it, and don't need
+    // to again
     unvisited_robots.erase(
         std::remove(unvisited_robots.begin(), unvisited_robots.end(), initial_passer),
         unvisited_robots.end());
+    std::vector<Robot> all_robots = passing_team.getAllRobots();
+    all_robots.insert(all_robots.end(), other_team.getAllRobots().begin(),
+                      other_team.getAllRobots().end());
 
     // On each iteration, check what robots can be passed to. These receivers will
     // become the passers on the next iteration. This is like expanding the frontier
@@ -47,86 +107,16 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     // * We have iterated up to the size of the team. This is a fallback case to
     //   prevent any infinite loops, just in case
     //
-    // The pass_num starts at one since the 0-th pass would be when the robot already
-    // has the ball
-    for (int pass_num = 1; pass_num < team.numRobots() && !current_passers.empty() &&
-                           !unvisited_robots.empty();
+    // We already check the case where the passer and receiver are the same. If this was
+    // the case, 0 passes would be required. Since that case is already checked, when we
+    // start the loop we are checking for the possibility of the receiver getting the ball
+    // in 1 pass. This is why pass_num starts at 1.
+    for (int pass_num = 1; pass_num < passing_team.numRobots() &&
+                           !current_passers.empty() && !unvisited_robots.empty();
          pass_num++)
     {
-        // A comparator for the map below that stores passer and receiver robots.
-        // This comparator is necessary for the Robot class to be used as a key in the
-        // map. This comparator compares robots by ID.
-        // See
-        // https://stackoverflow.com/questions/6573225/what-requirements-must-stdmap-key-classes-meet-to-be-valid-keys
-        // and
-        // https://stackoverflow.com/questions/5733254/how-can-i-create-my-own-comparator-for-a-map
-        //
-        // This "custom" comparator is defined here rather than in the Robot class
-        // as the '<' operator because there are many possible ways to order robots,
-        // so it doesn't really make sense to define a single "correct" way in the
-        // class, so we just define it as we need it here.
-        struct cmpRobotByID
-        {
-            bool operator()(const Robot& r1, const Robot& r2) const
-            {
-                return r1.id() < r2.id();
-            }
-        };
-
-        // Store a map of robots that can receive the ball, and the list of all robots
-        // that could pass to them
-        std::map<Robot, std::vector<Robot>, cmpRobotByID> receiver_passer_pairs;
-
-        // For each of the current passers, check which unvisited robots they can
-        // pass to
-        for (const auto& current_passer : current_passers)
-        {
-            // Check if the current passer could pass to each unvisited robot
-            for (const auto& unvisited_robot : unvisited_robots)
-            {
-                // Create a vector of obstacles that includes all robots except the
-                // current passer and unvisited robot (aka the receiver)
-                std::vector<Robot> obstacles = team.getAllRobots();
-                obstacles.erase(
-                    std::remove(obstacles.begin(), obstacles.end(), current_passer),
-                    obstacles.end());
-                obstacles.erase(
-                    std::remove(obstacles.begin(), obstacles.end(), unvisited_robot),
-                    obstacles.end());
-                obstacles.insert(obstacles.end(), other_robots.begin(),
-                                 other_robots.end());
-
-                // Check if the pass from the current passer to the unvisited robot
-                // would be blocked by any obstacle (other robot)
-                bool pass_blocked = std::any_of(
-                    obstacles.begin(), obstacles.end(),
-                    [current_passer, unvisited_robot](const Robot& obstacle) {
-                        return intersects(
-                            Circle(obstacle.position(), ROBOT_MAX_RADIUS_METERS),
-                            Segment(current_passer.position(),
-                                    unvisited_robot.position()));
-                    });
-
-                if (!pass_blocked)
-                {
-                    if (receiver_passer_pairs.count(unvisited_robot) > 0)
-                    {
-                        // This unvisited_robot already exists in the map and can
-                        // already be passed to by another robot. We add the passer
-                        // to the list of possible passers for this robot
-                        receiver_passer_pairs.at(unvisited_robot)
-                            .emplace_back(current_passer);
-                    }
-                    else
-                    {
-                        // This unvisited robot does not exist in the map. Create a
-                        // new entry to track this receiver and add the passer
-                        receiver_passer_pairs.insert(std::make_pair(
-                            unvisited_robot, std::vector<Robot>{current_passer}));
-                    }
-                }
-            }
-        }
+        std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> receiver_passer_pairs =
+            findAllReceiverPasserPairs(current_passers, unvisited_robots, all_robots);
 
         // If the robot we are looking for is a receiver, return the number of
         // passes and the passer to this robot
