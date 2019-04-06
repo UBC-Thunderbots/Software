@@ -141,6 +141,13 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
     EXPECT_GE(c, 0);
 }
 
+// Create the parameterize test case for the tests above
+//
+// Robot should not move test, uses it for both robot position and pivot point position
+// The following two tests use it to place the pivot point at different locations, and 
+// then the tests make sure that the robot choses the right direction to move. 
+//
+// If stopping, and rotating work, pivot should work
 INSTANTIATE_TEST_CASE_P(Positions, GrsimCommandPrimitiveVisitorParameterizedTest,
                         ::testing::Values(Point(1, 0), Point(0, 1), Point(-1, 0),
                                           Point(0, -1), Point(4, 2), Point(-4, 2)));

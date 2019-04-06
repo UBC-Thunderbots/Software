@@ -228,11 +228,18 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         pivot_primitive.getPivotPoint() +
         pivot_primitive.getPivotRadius() * -unit_pivot_point_to_robot_pos;
 
-    // select orbit direction based on the magnitude of the vector connecting the robots
-    // next position to the final position
+    // the robot can take go to two tangential points on the nex call
+    // based on which one is closer to the final destination
+    Point robot_next_position_1 = collinear_point_on_orbit + tangential_dir_1;
+    Point robot_next_position_2 = collinear_point_on_orbit + tangential_dir_2;
+
+    // comparing the magnitude of vector from the two possible next positions to the final
+    // position, will tell the robot which way to move. The shorter magnitude is the
+    // shorter path on orbit. since this is resolved every time this function is called,
+    // if pivot overshoots, it will rotate the other way
     Vector tangential_vector =
-        (((collinear_point_on_orbit + tangential_dir_1) - final_robot_position).len() <
-         ((collinear_point_on_orbit + tangential_dir_2) - final_robot_position).len())
+        (robot_next_position_1 - final_robot_position).len() <
+                (robot_next_position_2 - final_robot_position).len()
             ? tangential_dir_1
             : tangential_dir_2;
 
