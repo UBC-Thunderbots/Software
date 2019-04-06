@@ -7,27 +7,23 @@
 #include "software/ai/world/robot.h"
 
 // pivot primtive grsim visit function test
-TEST(GrsimCommandPrimitiveVisitorTest,
-     visit_pivot_primitive_robot_close_to_ball_a)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_pivot_primitive_robot_close_to_ball_a)
 {
-    //TODO
-    ASSERT_EQ(1,1);
+    // TODO
+    ASSERT_EQ(1, 1);
 }
-TEST(GrsimCommandPrimitiveVisitorTest,
-     visit_pivot_primitive_robot_close_to_ball_b)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_pivot_primitive_robot_close_to_ball_b)
 {
-    //TODO
-    ASSERT_EQ(1,1);
+    // TODO
+    ASSERT_EQ(1, 1);
 }
-TEST(GrsimCommandPrimitiveVisitorTest,
-     visit_pivot_primitive_robot_close_to_ball_c)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_pivot_primitive_robot_close_to_ball_c)
 {
-    //TODO
-    ASSERT_EQ(1,1);
+    // TODO
+    ASSERT_EQ(1, 1);
 }
-TEST(GrsimCommandPrimitiveVisitorTest,
-     visit_pivot_primitive_robot_close_to_ball_d)
+TEST(GrsimCommandPrimitiveVisitorTest, visit_pivot_primitive_robot_close_to_ball_d)
 {
-    //TODO
-    ASSERT_EQ(1,1);
+    // TODO
+    ASSERT_EQ(1, 1);
 }

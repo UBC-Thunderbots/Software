@@ -217,14 +217,24 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         (pivot_primitive.getPivotPoint() - robot.position()).norm();
 
     // get a vector in the tangential direction
-    Vector tangential_vector(unit_pivot_point_to_robot_pos.y(),
-                             -unit_pivot_point_to_robot_pos.x());
+    Vector tangential_dir_1(unit_pivot_point_to_robot_pos.y(),
+                            -unit_pivot_point_to_robot_pos.x());
+    Vector tangential_dir_2(-unit_pivot_point_to_robot_pos.y(),
+                            unit_pivot_point_to_robot_pos.x());
 
-    // get collinear point on orbit, between the robot and the pivot point, used 
+    // get collinear point on orbit, between the robot and the pivot point, used
     // to maintain orbit
     Point collinear_point_on_orbit =
         pivot_primitive.getPivotPoint() +
         pivot_primitive.getPivotRadius() * -unit_pivot_point_to_robot_pos;
+
+    // select orbit direction based on the magnitude of the vector connecting the robots
+    // next position to the final position
+    Vector tangential_vector =
+        (((collinear_point_on_orbit + tangential_dir_1) - final_robot_position).len() <
+         ((collinear_point_on_orbit + tangential_dir_2) - final_robot_position).len())
+            ? tangential_dir_1
+            : tangential_dir_2;
 
     // get displacement to final robot position, if the robot were to move there linearly.
     // This value is used to scale the tangential vector added to the collinear point to
@@ -232,12 +242,13 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
     Vector linear_displacement_to_final_robot_position =
         final_robot_position - robot.position();
 
-
-    // always move to colinear point on orbit, plus a portion in the tangential direction 
+    // always move to collinear point on orbit, plus a portion in the tangential direction
     // based on how much linear displacement is left from the current and final position
     motion_controller_command = MotionController::PositionCommand(
-        collinear_point_on_orbit +
-            tangential_vector * linear_displacement_to_final_robot_position.len() / 2,
+        collinear_point_on_orbit + tangential_vector  // next position
+                                       *
+                                       linear_displacement_to_final_robot_position.len() /
+                                       2,  // scaled by displacement to final position
         unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 
