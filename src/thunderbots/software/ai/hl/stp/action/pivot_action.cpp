@@ -28,7 +28,7 @@ std::unique_ptr<Intent> PivotAction::calculateNextIntent(
     do
     {
         // Compute collinear point (point_of_entry), radius with away,
-        // between the robot and the pivot point. To navigte to before
+        // between the robot and the pivot point. To move there before
         // attempting to pivot
         //
         //                             |---radius---|
