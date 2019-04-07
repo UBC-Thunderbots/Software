@@ -1,24 +1,28 @@
 #include "ai/hl/stp/evaluation/team.h"
 
-std::optional<Robot> Evaluation::nearest_robot(const Team team, const Point ref_point)
+
+std::optional<Robot> Evaluation::nearestRobot(const Team &team, const Point &ref_point)
 {
-    if (team.getAllRobots().empty())
+    return nearestRobot(team.getAllRobots(), ref_point);
+}
+
+std::optional<Robot> Evaluation::nearestRobot(const std::vector<Robot> &robots,
+                                              const Point &ref_point)
+{
+    if (robots.empty())
     {
         return std::nullopt;
     }
 
-    unsigned nearestRobotId = team.getAllRobots()[0].id();
-    double minDist          = (ref_point - team.getAllRobots()[0].position()).len();
-
-    for (const Robot &curRobot : team.getAllRobots())
+    Robot nearest_robot = robots.at(0);
+    for (const Robot &curRobot : robots)
     {
         double curDistance = (ref_point - curRobot.position()).len();
-        if (curDistance < minDist)
+        if (curDistance < (nearest_robot.position() - ref_point).len())
         {
-            nearestRobotId = curRobot.id();
-            minDist        = curDistance;
+            nearest_robot = curRobot;
         }
     }
 
-    return team.getRobotById(nearestRobotId).value();
+    return nearest_robot;
 }
