@@ -1,3 +1,6 @@
+/**
+ * Implementation of the PasserTactic
+ */
 #include "ai/hl/stp/tactic/passer_tactic.h"
 #include "ai/hl/stp/action/kick_action.h"
 
