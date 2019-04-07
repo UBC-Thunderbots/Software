@@ -30,10 +30,10 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
 std::unique_ptr<Intent> MoveTactic::calculateNextIntent(
     intent_coroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction();
+    PivotAction move_action = PivotAction();
     do
     {
-        yield(move_action.updateStateAndGetNextIntent(*robot, destination,
-                                                      final_orientation, final_speed));
+        yield(move_action.updateStateAndGetNextIntent(*robot, Point(0, 0), Angle::zero(),
+                                                      0.5));
     } while (!move_action.done());
 }
