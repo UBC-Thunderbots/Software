@@ -601,16 +601,20 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(tactic_test
             ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
             ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/passer_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
+            ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
@@ -619,11 +623,13 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/polygon.cpp
             geom/util.cpp
             test/ai/hl/stp/tactic/block_shot_path_tactic.cpp
             test/ai/hl/stp/tactic/cherry_pick_tactic.cpp
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
+            test/ai/hl/stp/tactic/passer_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
