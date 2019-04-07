@@ -2,8 +2,8 @@
  * Implementation of the PasserTactic
  */
 #include "ai/hl/stp/tactic/passer_tactic.h"
-#include "ai/hl/stp/action/kick_action.h"
 
+#include "ai/hl/stp/action/kick_action.h"
 #include "geom/util.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
@@ -30,7 +30,8 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
     // Prefer robots closer to the pass start position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - pass.passerPoint()).len() / world.field().totalLength();
+    double cost =
+        (robot.position() - pass.passerPoint()).len() / world.field().totalLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -42,7 +43,7 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
-        yield(kick_action.updateStateAndGetNextIntent(*robot, pass.passerPoint(),
-                                                      pass.passerOrientation(), pass.speed()));
+        yield(kick_action.updateStateAndGetNextIntent(
+            *robot, pass.passerPoint(), pass.passerOrientation(), pass.speed()));
     } while (!kick_action.done());
 }

@@ -2,22 +2,23 @@
  * Tests for the Passer Tactic
  */
 #include "ai/hl/stp/tactic/passer_tactic.h"
-#include "ai/intent/kick_intent.h"
-#include "ai/intent/move_intent.h"
 
 #include <gtest/gtest.h>
 
+#include "ai/intent/kick_intent.h"
+#include "ai/intent/move_intent.h"
 #include "test/test_util/test_util.h"
 
 using namespace AI::Passing;
 
-TEST(PasserTacticTest, passer_already_at_pass_start_position_but_oriented_incorrectly){
+TEST(PasserTacticTest, passer_already_at_pass_start_position_but_oriented_incorrectly)
+{
     // Robot is sitting at origin facing towards enemy goal
-    Robot robot = Robot(13, Point(0, 0), Vector(), Angle::zero(),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot robot = Robot(13, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0,0}, {0,-1}, 2.29, Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(0));
     PasserTactic tactic(pass, false);
 
     tactic.updateRobot(robot);
@@ -33,13 +34,14 @@ TEST(PasserTacticTest, passer_already_at_pass_start_position_but_oriented_incorr
     EXPECT_EQ(0, move_intent.getFinalSpeed());
 }
 
-TEST(PasserTacticTest, passer_oriented_correctly_but_not_at_pass_start_position){
+TEST(PasserTacticTest, passer_oriented_correctly_but_not_at_pass_start_position)
+{
     // Robot is sitting at {1,2} facing towards -y
     Robot robot = Robot(13, Point(1, 2), Vector(), Angle::ofDegrees(-90),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0,0}, {0,-1}, 2.29, Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(0));
     PasserTactic tactic(pass, false);
 
     tactic.updateRobot(robot);
@@ -55,14 +57,16 @@ TEST(PasserTacticTest, passer_oriented_correctly_but_not_at_pass_start_position)
     EXPECT_EQ(0, move_intent.getFinalSpeed());
 }
 
-TEST(PasserTacticTest, passer_oriented_incorrectly_and_close_to_start_position_but_in_front_of_pass){
+TEST(PasserTacticTest,
+     passer_oriented_incorrectly_and_close_to_start_position_but_in_front_of_pass)
+{
     // Robot is sitting at {-0.3,0.2} facing towards -y
     Robot robot = Robot(13, Point(-0.3, 0.2), Vector(), Angle::ofDegrees(-90),
-                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     // We want to pass from the origin to 1 meter in the -y direction. This means the
     // robot needs to move around the ball to get toa point where it can kick
-    Pass pass({0,0}, {0,-1}, 2.29, Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(0));
     PasserTactic tactic(pass, false);
 
     tactic.updateRobot(robot);
@@ -78,14 +82,15 @@ TEST(PasserTacticTest, passer_oriented_incorrectly_and_close_to_start_position_b
     EXPECT_EQ(0, move_intent.getFinalSpeed());
 }
 
-TEST(PasserTacticTest, passer_in_position_to_kick){
+TEST(PasserTacticTest, passer_in_position_to_kick)
+{
     // Robot is sitting just behind where we want to pass from, in the perfect
     // position to just move forward a bit and take the kick
     Robot robot = Robot(13, Point(0, 0.3), Vector(), Angle::ofDegrees(-90),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     // We want to pass from the origin to 1 meter in the -y direction
-    Pass pass({0,0}, {0,-1}, 2.29, Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {0, -1}, 2.29, Timestamp::fromSeconds(0));
     PasserTactic tactic(pass, false);
 
     tactic.updateRobot(robot);
@@ -94,8 +99,6 @@ TEST(PasserTacticTest, passer_in_position_to_kick){
     KickIntent kick_intent = dynamic_cast<KickIntent &>(*tactic.getNextIntent());
     EXPECT_EQ(13, kick_intent.getRobotId());
     EXPECT_EQ(-90, kick_intent.getKickDirection().toDegrees());
-    EXPECT_EQ(Point(0,0), kick_intent.getKickOrigin());
+    EXPECT_EQ(Point(0, 0), kick_intent.getKickOrigin());
     EXPECT_EQ(2.29, kick_intent.getKickSpeed());
-
-
 }
