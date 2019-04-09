@@ -6,6 +6,7 @@ import { combineReducers } from 'redux';
 
 import consoleReducer from './console';
 import rosReducer from './ros';
+import rosParametersReducer from './rosParameters';
 
 /**
  * Combines all reducers. This is what the Redux accepts when being
@@ -14,4 +15,5 @@ import rosReducer from './ros';
 export default combineReducers({
     console: consoleReducer,
     ros: rosReducer,
+    rosParameters: rosParametersReducer,
 });

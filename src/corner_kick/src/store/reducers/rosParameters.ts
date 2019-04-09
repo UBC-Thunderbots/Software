@@ -23,6 +23,12 @@ export default (state: IROSParamState = defaultState, action: RosParamsActions) 
                 ...action.payload.params,
             };
 
+        case getType(rosParameters.setROSParams):
+            return {
+                ...state,
+                [action.payload.name]: action.payload.value,
+            };
+
         default:
             return state;
     }

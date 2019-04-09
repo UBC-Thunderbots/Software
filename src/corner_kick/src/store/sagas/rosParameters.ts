@@ -1,10 +1,14 @@
 /*
  * This file specifies the saga for ROSParams
  */
-import { takeLatest } from 'redux-saga/effects';
+import { put, takeLatest } from 'redux-saga/effects';
+import { IROSParamState } from 'SRC/types';
 import { getType } from 'typesafe-actions';
 
 import { actions } from '../actions';
+import { hydrateROSParams } from '../actions/rosParameters';
+
+const rosParamSettings: { [key: string]: any } = {};
 
 export default function* init() {
     // Listen to start actions and start ROS Parameter
@@ -14,17 +18,14 @@ export default function* init() {
 /**
  * We subscribe to topic rosout to start receiving messages
  */
-function startROSParameter() {
+function* startROSParameter() {
     const params = require.context('SRC/utils/ros/params', false, /.*\.yaml/);
 
-    const arrayOfParams: { [key: string]: any } = {};
-
     params.keys().forEach((key) => {
-        parseParam(arrayOfParams, params(key));
+        parseParam(rosParamSettings, params(key));
     });
 
-    console.log(arrayOfParams);
-    // concatenate the arrays to one array
+    yield put(hydrateROSParams(rosParamSettings as IROSParamState));
 }
 
 const parseParam = (arrayOfParams: { [key: string]: any }, params: any) => {
