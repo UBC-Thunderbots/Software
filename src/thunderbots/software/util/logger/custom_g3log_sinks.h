@@ -45,7 +45,7 @@ namespace Util
                 // ROSTests. If it is disabled the test subscriber will miss the published
                 // test messages.
                 robot_status_publisher = node_handle.advertise<std_msgs::String>(
-                    Util::Constants::ROBOT_STATUS_TOPIC, 100, true);
+                    Util::Constants::ROBOT_MESSAGE_TOPIC, 100, true);
             }
 
             /**

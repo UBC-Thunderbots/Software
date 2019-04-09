@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "ai/primitive/primitive.h"
+#include "annunciator.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "send_reliable_message_operation.h"
@@ -43,7 +44,7 @@ class MRFDongle final
     /**
      * Constructs a new MRFDongle.
      */
-    explicit MRFDongle();
+    explicit MRFDongle(Annunciator &annunciator);
 
     /**
      * Destroys an MRFDongle.
@@ -163,9 +164,9 @@ class MRFDongle final
     std::array<std::unique_ptr<USB::BulkInTransfer>, 32> message_transfers;
     USB::InterruptInTransfer status_transfer;
     std::list<std::unique_ptr<USB::BulkOutTransfer>> unreliable_messages;
-
     std::queue<uint8_t> free_message_ids;
     sigc::signal<void, uint8_t, uint8_t> signal_message_delivery_report;
+    Annunciator &annunciator;
 
     uint8_t alloc_message_id();
     void free_message_id(uint8_t id);
