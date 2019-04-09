@@ -174,9 +174,11 @@ bool contains(const Segment &out, const Point &in)
 {
     if (collinear(in, out.getSegStart(), out.getEnd()))
     {
-        // If the segment and point are in a perfect vertical line, we must use Y coordinate centric logic
-        if( (in.x() - out.getEnd().x() == 0) && (out.getEnd().x() - out.getSegStart().x() == 0)) {
-
+        // If the segment and point are in a perfect vertical line, we must use Y
+        // coordinate centric logic
+        if ((in.x() - out.getEnd().x() == 0) &&
+            (out.getEnd().x() - out.getSegStart().x() == 0))
+        {
             // if collinear we only need to check one of the coordinates,
             // in this case we select Y because all X values are equal
             return (in.y() <= out.getSegStart().y() && in.y() >= out.getEnd().y()) ||
