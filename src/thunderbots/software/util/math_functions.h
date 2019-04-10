@@ -36,4 +36,32 @@ namespace Util
      * @return The result of unitStep(x, a)
      */
     unsigned int binary(double x, double a);
+
+    /**
+     * Map values from one range to another range
+     * (A more generalized function of `linear`)
+     * 
+     * @param[in] double x: The input variable
+     * @param[in] double in_min: The input range minimum
+     * @param[in] double in_max: The input range maximum
+     * @param[in] double out_min: The output range minimum
+     * @param[in] double out_max: The output range maximum
+     * 
+     * @return The result mapped number
+     */
+    double map(double x, double in_min, double in_max, double out_min, double out_max);
+
+    /**
+     * Constrained map function -- same as map function
+     * except the output is clamped to [0, 1]
+     * 
+     * @param[in] double x: The input variable
+     * @param[in] double in_min: The input range minimum
+     * @param[in] double in_max: The input range maximum
+     * @param[in] double out_min: The output range minimum
+     * @param[in] double out_max: The output range maximum
+     *
+     * @return The result mapped number clampped between [0, 1]
+     */
+    double mapClampped(double x, double in_min, double in_max, double out_min, double out_max);
 }  // namespace Util
