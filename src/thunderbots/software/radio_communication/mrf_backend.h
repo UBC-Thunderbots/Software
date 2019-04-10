@@ -1,10 +1,13 @@
 #pragma once
 
+#include <ros/ros.h>
+
 #include <limits>
 
 #include "ai/world/ball.h"
 #include "ai/world/team.h"
 #include "mrf/dongle.h"
+#include "thunderbots_msgs/RobotStatus.h"
 
 class MRFBackend
 {
@@ -12,8 +15,10 @@ class MRFBackend
     /**
      * Creates a new MRFBackend.
      * Automatically connects to the dongle upon initialization.
+     *
+     * @param node_handle the ROS NodeHandle of the radio_communication node
      */
-    explicit MRFBackend();
+    explicit MRFBackend(ros::NodeHandle& node_handle);
 
     ~MRFBackend();
 
@@ -51,6 +56,10 @@ class MRFBackend
 
    private:
     MRFDongle dongle;
+
+    // The Annunciator that sends messages from the dongle to AI
+    Annunciator annunciator;
+
     std::vector<std::tuple<uint8_t, Point, Angle>> robots;
     Ball ball;
 };

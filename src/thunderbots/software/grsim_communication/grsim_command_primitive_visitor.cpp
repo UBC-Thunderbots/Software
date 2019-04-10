@@ -205,7 +205,58 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 {
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/94
+    // compute final position
+    Point final_robot_position(
+        pivot_primitive.getPivotPoint().x() +
+            (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().cos()),
+        pivot_primitive.getPivotPoint().y() +
+            (pivot_primitive.getPivotRadius() * pivot_primitive.getFinalAngle().sin()));
+
+    // get current vector from pivot point to robot position
+    Vector unit_pivot_point_to_robot_pos =
+        (pivot_primitive.getPivotPoint() - robot.position()).norm();
+
+    // get a vector in the tangential direction
+    Vector tangential_dir_1(unit_pivot_point_to_robot_pos.y(),
+                            -unit_pivot_point_to_robot_pos.x());
+    Vector tangential_dir_2(-unit_pivot_point_to_robot_pos.y(),
+                            unit_pivot_point_to_robot_pos.x());
+
+    // get collinear point on orbit, between the robot and the pivot point, used
+    // to maintain orbit
+    Point collinear_point_on_orbit =
+        pivot_primitive.getPivotPoint() +
+        pivot_primitive.getPivotRadius() * -unit_pivot_point_to_robot_pos;
+
+    // the robot can take go to two tangential points on the nex call
+    // based on which one is closer to the final destination
+    Point robot_next_position_1 = collinear_point_on_orbit + tangential_dir_1;
+    Point robot_next_position_2 = collinear_point_on_orbit + tangential_dir_2;
+
+    // comparing the magnitude of vector from the two possible next positions to the final
+    // position, will tell the robot which way to move. The shorter magnitude is the
+    // shorter path on orbit. since this is resolved every time this function is called,
+    // if pivot overshoots, it will rotate the other way
+    Vector tangential_vector =
+        (robot_next_position_1 - final_robot_position).len() <
+                (robot_next_position_2 - final_robot_position).len()
+            ? tangential_dir_1
+            : tangential_dir_2;
+
+    // get displacement to final robot position, if the robot were to move there linearly.
+    // This value is used to scale the tangential vector added to the collinear point to
+    // allow for rotation.
+    Vector linear_displacement_to_final_robot_position =
+        final_robot_position - robot.position();
+
+    // always move to collinear point on orbit, plus a portion in the tangential direction
+    // based on how much linear displacement is left from the current and final position
+    // NOTE: Scaling the displacement by a half, ensures that the robot slows down more
+    // aggressively
+    motion_controller_command = MotionController::PositionCommand(
+        collinear_point_on_orbit +
+            tangential_vector * 0.5 * linear_displacement_to_final_robot_position.len(),
+        unit_pivot_point_to_robot_pos.orientation(), 0, 0.0, false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)

@@ -98,6 +98,13 @@ class Field
     double centreCircleRadius() const;
 
     /**
+     * Returns the center point of the field
+     *
+     * @return the center point of the field
+     */
+    Point centerPoint() const;
+
+    /**
      * Gets the width of the defense area in metres, which runs along the y-axis. This is
      * the total width of how far the defense area stretches from one side of the goal to
      * the other.
