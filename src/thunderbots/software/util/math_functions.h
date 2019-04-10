@@ -15,4 +15,14 @@ namespace Util
      * 1
      */
     double linear(double value, double offset, double linear_width);
+
+    /**
+     * Unit step function with output {0, 1}
+     *
+     * @param[in] double x: The input variable
+     * @param[in] double a: The offset constant
+     * 
+     * @return The evaluation of the math function u(x + a)
+     */
+    unsigned int unitStep(double x, double a);
 }  // namespace Util
