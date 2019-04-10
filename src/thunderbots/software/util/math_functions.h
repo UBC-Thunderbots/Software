@@ -25,4 +25,15 @@ namespace Util
      * @return The evaluation of the math function u(x + a)
      */
     unsigned int unitStep(double x, double a);
+
+    /**
+     * Binary function that basically mirrors unit step function
+     * except it uses a different name
+     * 
+     * @param[in] double x: The input variable
+     * @param[in] double a: The offset constant
+     * 
+     * @return The result of unitStep(x, a)
+     */
+    unsigned int binary(double x, double a);
 }  // namespace Util

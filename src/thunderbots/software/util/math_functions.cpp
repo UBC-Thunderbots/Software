@@ -17,4 +17,9 @@ namespace Util
         // Assuming u(0) = 1
         return x >= a ? 1 : 0;
     }
+
+    unsigned int binary(double x, double a)
+    {
+        return unitStep(x, a);
+    }
 }  // namespace Util
