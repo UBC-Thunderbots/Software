@@ -30,6 +30,6 @@ namespace Util
 
     double mapClamped(double x, double in_min, double in_max, double out_min, double out_max)
     {
-        return std::clamp(map(x, in_min, in_max, out_min, out_max), 0, 1);
+        return std::clamp(map(x, in_min, in_max, out_min, out_max), 0.0, 1.0);
     }
 }  // namespace Util
