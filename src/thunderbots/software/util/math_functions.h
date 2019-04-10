@@ -27,6 +27,7 @@ namespace Util
     unsigned int unitStep(double x, double a);
 
     /**
+     * ??? not sure if needed
      * Binary function that basically mirrors unit step function
      * except it uses a different name
      * 

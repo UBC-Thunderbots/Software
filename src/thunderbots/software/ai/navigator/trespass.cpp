@@ -30,7 +30,15 @@ namespace Navigator
             const double dy = point.y() - circle.getOrigin().y();
             const double r  = circle.getRadius();
 
-            return dx * dx + dy * dy > r * r;
+            if (dx * dx + dy * dy > r * r)
+            {
+                // inside the circle
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         double calcLinearTrespassScore(Circle circle, Point point)
