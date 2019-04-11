@@ -562,4 +562,3 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
  * aren't redundant
  */
 std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2);
-
