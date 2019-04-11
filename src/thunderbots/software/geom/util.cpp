@@ -1046,13 +1046,12 @@ double getPointsVariance(const std::vector<Point> &points)
 
 std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2)
 {
-    // Create a rays located at the extremes of the segment, that point in the direction
+    // Create rays located at the extremes of the segment, that point in the direction
     // outwards are parallel to the segment
     const Ray extremes1 =
         Ray(segment.getEnd(), Vector(segment.getEnd() - segment.getSegStart()));
     const Ray extremes2 =
         Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
-    ;
 
     const std::optional<Point> extreme_intersect11 = intersects(extremes1, ray1);
     const std::optional<Point> extreme_intersect12 = intersects(extremes2, ray1);
