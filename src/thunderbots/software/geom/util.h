@@ -545,26 +545,32 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
  *
  * @param segment1 : first segment
  * @param segment2 : second segment
- * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and overlapping
- *         Returns std::nullopt if the segments aren't parallel or overlapping
+ * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and
+ * overlapping Returns std::nullopt if the segments aren't parallel or overlapping
  */
-std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1, Segment segment2);
+std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
+                                                        Segment segment2);
 
 /**
- * Function calculates if the segment parameters are redundant, for example, if segment2 is parallel and contained within segment1
+ * Function calculates if the segment parameters are redundant, for example, if segment2
+ * is parallel and contained within segment1
  *
  * @param segment1 : first segment
  * @param segment2 : second segment
  * @return Segment: If the segments are redundant, returns the larger segment
- *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or aren't redundant
+ *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
+ * aren't redundant
  */
 std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2);
 
 /**
- * Function merges all segment parameters in the the fewest complete segments to have the same representation
+ * Function merges all segment parameters in the the fewest complete segments to have the
+ * same representation
  *
  * @param segments : vector of parallel segments
  * @return std::vector<Segment>: If the segments are redundant, returns the larger segment
- *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or aren't redundant
+ *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
+ * aren't redundant
  */
-std::optional<std::vector<Segment>> mergeAllParallelSegments(std::vector<Segment> segments);
+std::optional<std::vector<Segment>> mergeAllParallelSegments(
+    std::vector<Segment> segments);
