@@ -568,7 +568,3 @@ std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segm
  *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or aren't redundant
  */
 std::optional<std::vector<Segment>> mergeAllParallelSegments(std::vector<Segment> segments);
-
-std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
-                                                            std::vector<Point> obstacles,
-                                                            double obstacle_radius);

@@ -1115,7 +1115,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
         return std::make_optional(Segment(intersect11.value(), intersect21.value()));
     }
     // If only one ray intersects the segment return the segment between the intersection
-    // and the segment extreme (part1)
+    // and the segment extreme (intersection11 is real, intersection22 is not)
     else if (intersect11.has_value() && !intersect21.has_value())
     {
         const Ray extremes1 =
@@ -1138,7 +1138,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
         }
     }
     // If only one ray intersects the segment return the segment between the intersection
-    // and the segment extreme (part2)
+    // and the segment extreme (intersection11 is real, intersection22 is not)
     else if (intersect11.has_value() && !intersect21.has_value())
     {
         const Ray extremes1 =
@@ -1182,7 +1182,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
     // Check if the beginning of segment2 lays inside segment1
     else if( contains(segment1, segment2.getSegStart()) ) {
 
-        // If segment2.getSegStart() lays in segment1, then the combined segment is segment2,getEnd() and the point furtherst from segmen2.getEnd()
+        // If segment2.getSegStart() lays in segment1, then the combined segment is segment2,getEnd() and the point furthest from segmen2.getEnd()
         return (segment1.getSegStart() - segment2.getEnd()).lensq() > (segment1.getEnd() - segment2.getEnd()).lensq() ? Segment(segment1.getSegStart(), segment2.getEnd()) : Segment(segment1.getEnd(), segment2.getEnd());
     }
     // Now check if the end of segment2 lays inside segment1
@@ -1219,50 +1219,3 @@ std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segm
         return std::nullopt;
     }
 }
-
-std::optional<std::vector<Segment>> mergeAllParallelSegments(std::vector<Segment> segments) {
-
-    std::optional<Segment> merged_segment = std::nullopt;
-    std::optional<std::vector<Segment>> merged_segments = std::nullopt;
-
-    if( segments.size() == 0 ) {
-        return std::nullopt;
-    }
-    else {
-        // Loop through all segments
-        for( int i = 0 ; i < segments.size(); i++ ) {
-
-            // Issue here is the changing size of the vector can miss segments
-            for( int j = 1; j < segments.size(); j++) {
-                merged_segment = mergeOverlappingParallelSegments(segments[i], segments[j]);
-
-                if(merged_segment.has_value()) {
-                    segments[i] = merged_segment.value();
-                    segments.erase(j);
-                }
-
-            }
-        }
-    }
-}
-
-std::pair<Angle, Point> calculateMostOpenDirectionToSegment(Point origin, Segment segment,
-                                                            std::vector<Point> obstacles,
-                                                            double obstacle_radius){
-    // IDEA:
-    // Project all objects onto the line segment and keep track of open points
-
-    // How to get blocked segment:
-    // Get tangent vectors from obstacle circle to origin
-    //  flip vector direction and form a ray. If both rays of an obstacle pass through the
-    //  segment then, block it off
-    //  if one ray intersects, then check block off from the intersecting ray to the
-    //  segment extreme in the same direction
-    //    for( Point obstacle : obstacles) {
-    //        auto
-    //    }
-    // Combine overlapping obstacle line segments to reduce complexity
-    // iterate over combined line segments to find the largest open segments, and then
-    // back-calculate the coresponding angle from the origin
-
-};
