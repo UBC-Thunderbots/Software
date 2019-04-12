@@ -2,24 +2,46 @@
 
 #include "util/math_functions.h"
 
+using namespace Util;
+
 namespace Navigator
 {
     namespace Trespass
     {
-        double calcLinearTresspassScore(Rectangle r, Point p)
+        double calcLinearTrespassScore(Rectangle r, Point p)
         {
             if (!r.containsPoint(p))
+                // return 0 if p is not inside r
                 return 0.0;
             else
             {
+                // distances to each edge
                 double width_w  = p.x() - r.seCorner().x();
                 double width_e  = r.nwCorner().x() - p.x();
                 double height_s = p.y() - r.seCorner().y();
                 double height_n = r.nwCorner().y() - p.y();
-                return fmax(Util::linear(fmin(width_w, width_e), r.width() / 4.0,
-                                         r.width() / 2.0),
-                            Util::linear(fmin(height_s, height_n), r.height() / 4.0,
-                                         r.height() / 2.0));
+
+                /* Util::linear returns 0 if the point is on the edge of the rectangle,
+                 * i.e. if the distance from the nearest edge to p is 0 and returns 1 if
+                 * the point is at the centre, i.e. if the distance from the edge to p is
+                 * equal to half the width of the rectangle.
+                 *
+                 * The offset is half the total length given to the linear function, so it
+                 * will return a value of 0 with an input of 0, and a value of 1 with an
+                 * input equal to the total length.
+                 *
+                 * We use fmin because we want to use the point closer to the edge.
+                 * For example, if p is near the bottom of a rectangle, we use the dist
+                 * from p to the bottom edge rather than the top.
+                 *
+                 * Then we use fmax because we want to use the largest of the
+                 * distances to the two closest edges.
+                 *
+                 */
+
+                return fmax(
+                    linear(fmin(width_w, width_e), r.width() / 4.0, r.width() / 2.0),
+                    linear(fmin(height_s, height_n), r.height() / 4.0, r.height() / 2.0));
             }
         }
 

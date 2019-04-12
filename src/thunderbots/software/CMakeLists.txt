@@ -883,6 +883,15 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             )
 
+    catkin_add_gtest(trespass_test
+            test/ai/navigator/trespass/trespass.cpp
+            ai/navigator/trespass.cpp
+            )
+    target_link_libraries(straight_line_path_planner_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
