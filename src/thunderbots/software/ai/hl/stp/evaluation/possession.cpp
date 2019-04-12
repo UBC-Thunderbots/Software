@@ -41,7 +41,7 @@ namespace Evaluation
         }
         else
         {
-            return Evaluation::nearest_robot(team, ball.position());
+            return Evaluation::nearestRobot(team, ball.position());
         }
     }
 }  // namespace Evaluation

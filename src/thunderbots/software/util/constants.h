@@ -18,7 +18,8 @@ namespace Util
             "backend/gamecontroller";
         static const std::string NETWORK_INPUT_WORLD_TOPIC   = "backend/world";
         static const std::string AI_PRIMITIVES_TOPIC         = "backend/primitives";
-        static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
+        static const std::string ROBOT_MESSAGE_TOPIC         = "log/robot_message";
+        static const std::string ROBOT_STATUS_TOPIC          = "backend/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
         // The topic published by the joy_node that contains information about any plugged
         // in joysticks / controllers
