@@ -18,22 +18,23 @@ stories.add('with layers', () => (
         <LayersPanel
             layers={[
                 {
-                    name: 'Friendly Robots',
+                    id: 1,
                     visible: true,
                 },
                 {
-                    name: 'Enemy Robots',
+                    id: 2,
                     visible: false,
                 },
                 {
-                    name: 'Ball',
+                    id: 3,
                     visible: true,
                 },
                 {
-                    name: 'Field',
+                    id: 4,
                     visible: true,
                 },
             ]}
+            toggleVisibility={(id) => alert(`Layer ${id} had its visibility toggled`)}
         />
     </StorybookStage>
 ));
@@ -43,6 +44,11 @@ stories.add('with layers', () => (
  */
 stories.add('with empty state', () => (
     <StorybookStage width="300px">
-        <LayersPanel layers={[]} />
+        <LayersPanel
+            layers={[]}
+            toggleVisibility={() => {
+                //
+            }}
+        />
     </StorybookStage>
 ));
