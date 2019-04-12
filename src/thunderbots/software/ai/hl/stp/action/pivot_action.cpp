@@ -36,9 +36,9 @@ std::unique_ptr<Intent> PivotAction::calculateNextIntent(
         // robot                 point_of_entry
 
         Vector unit_pivot_point_to_robot_pos =
-            (this->pivot_point - robot->position()).norm();
+            (robot->position() - this->pivot_point).norm();
         Point point_of_entry =
-            this->pivot_point + this->pivot_radius * -unit_pivot_point_to_robot_pos;
+            this->pivot_point + this->pivot_radius * unit_pivot_point_to_robot_pos;
 
         // If we're not in position to pivot, move into position
         if ((robot->position() - point_of_entry).len() > ROBOT_MAX_RADIUS_METERS)
