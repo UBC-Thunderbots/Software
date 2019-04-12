@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+#include "boost/circular_buffer.hpp"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "util/time/timestamp.h"
@@ -24,7 +27,7 @@ class Robot
      */
     explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp);
+                   const Timestamp &timestamp, unsigned int history_duration = 20);
 
     /**
      * Updates the state of the robot.
@@ -179,6 +182,41 @@ class Robot
         const Duration &duration_in_future) const;
 
     /**
+     * Gets the buffer which holds all the previous position states of the robot
+     *
+     * @return Circular buffer with the position states
+     */
+    std::vector<Point> getPreviousPositions();
+
+    /**
+     * Gets the buffer which holds all the previous velocity states of the robot
+     *
+     * @return Circular buffer with the velocity states
+     */
+    std::vector<Vector> getPreviousVelocities();
+
+    /**
+     * Gets the buffer which holds all the previous orientation states of the robot
+     *
+     * @return Circular buffer with the orientations states
+     */
+    std::vector<Angle> getPreviousOrientations();
+
+    /**
+     * Gets the buffer which holds all the previous angular velocity states of the robot
+     *
+     * @return Circular buffer with the angular velocity states
+     */
+    std::vector<AngularVelocity> getPreviousAngularVelocities();
+
+    /**
+     * Gets the buffer which holds all the timestamps of the previous states
+     *
+     * @return Circular buffer with the position states
+     */
+    std::vector<Timestamp> getPreviousTimestamps();
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.
@@ -200,13 +238,13 @@ class Robot
     // The id of this robot
     unsigned int id_;
     // The current position of the robot, with coordinates in metres
-    Point position_;
+    boost::circular_buffer<Point> positions_;
     // The current velocity of the robot, in metres per second
-    Vector velocity_;
+    boost::circular_buffer<Vector> velocities_;
     // The current orientation of the robot, in radians
-    Angle orientation_;
+    boost::circular_buffer<Angle> orientations_;
     // The current angular velocity of the robot, in radians per second
-    AngularVelocity angularVelocity_;
+    boost::circular_buffer<AngularVelocity> angularVelocities_;
     // The timestamp for when this Robot was last updated
-    Timestamp last_update_timestamp;
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };
