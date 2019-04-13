@@ -3,6 +3,16 @@
  */
 
 /**
+ * Represent a layer message received from ROS
+ */
+export interface ILayerMessage {
+    /**
+     * Contains sprite data. Encoded as a base64 string.
+     */
+    data: string;
+}
+
+/**
  * Represents a layer in the canvas
  */
 export interface ILayer {

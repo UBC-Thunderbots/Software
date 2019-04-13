@@ -3,13 +3,13 @@
 #include "ai/ai.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/World.h"
+#include "util/canvas_messenger/canvas_messenger.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
-#include "util/visualizer_messenger/visualizer_messenger.h"
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
@@ -21,6 +21,8 @@ namespace
     // Our instance of the AI that decides what Primitives to run
     AI ai;
 }  // namespace
+
+int count;
 
 // Runs the AI and sends new Primitive commands every time we get new information
 // about the World
@@ -40,8 +42,22 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     }
     primitive_publisher.publish(primitive_array_message);
 
+    // On every tick, send test sprites
+    for (int i = 0; i < 10000; i++)
+    {
+        Util::CanvasMessenger::Sprite sprite;
+        sprite.x        = (i % 100) * 12;
+        sprite.y        = (i / 100) * 12;
+        sprite.width    = 10;
+        sprite.height   = 10;
+        sprite.rotation = count;
+        Util::CanvasMessenger::getInstance()->drawSprite(0, sprite);
+    }
+
     // On every tick, send the layer messages
-    Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
+    Util::CanvasMessenger::getInstance()->publishAndClearLayers();
+
+    count++;
 }
 
 int main(int argc, char **argv)
@@ -62,7 +78,7 @@ int main(int argc, char **argv)
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Initialize the draw visualizer messenger
-    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
+    Util::CanvasMessenger::getInstance()->initializePublisher(node_handle);
 
     // Initialize Dynamic Parameters
     auto update_subscribers =

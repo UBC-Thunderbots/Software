@@ -1,9 +1,12 @@
 /**
- * This file defines the logic that connects to the ROS layer websocket and
- * processes new layer data.
+ * This file defines the logic that receives ROS shape messages and passes them
+ * on to be rendered in the Canvas.
  */
 
-import { LAYER_WEBSOCKET_ADDRESS } from 'SRC/constants';
+import { decode } from 'base64-arraybuffer';
+
+import { ILayerMessage } from 'SRC/types';
+import * as ROS from 'SRC/utils/ros';
 
 /**
  * Type of the callback called when new layer data is received
@@ -11,12 +14,9 @@ import { LAYER_WEBSOCKET_ADDRESS } from 'SRC/constants';
 type ShapeReceiverCallback = (data: ArrayBuffer) => void;
 
 /**
- * Connects and manages the connection between the visualizer and
- * the layer data websocket.
+ * Receives and parses layer messages received from ROS.
  */
 export class LayerReceiver {
-    private ws: WebSocket;
-
     private callback: ShapeReceiverCallback;
 
     /**
@@ -28,21 +28,34 @@ export class LayerReceiver {
     }
 
     /**
-     * Connects to the websocket
+     * Connects to the ROS layer topic
      */
-    public connect = (url: string = LAYER_WEBSOCKET_ADDRESS) => {
-        this.ws = new WebSocket(url);
-        this.ws.binaryType = 'arraybuffer';
-        this.ws.addEventListener('message', (event: MessageEvent) =>
-            this.callback(event.data),
+    public connect = () => {
+        ROS.subscribeToROSTopic(
+            '/visualizer/layers',
+            'thunderbots_msgs/CanvasLayer',
+            this.handleROSMessage,
+            16,
         );
     };
 
     /**
-     * Close the websocket connection. MUST be called
-     * to avoid memory leaks.
+     * Unsubscribes from the ROS layer topic
      */
     public close = () => {
-        this.ws.close();
+        ROS.unsubscribeToROSTopic(
+            '/visualizer/layers',
+            'thunderbots_msgs/CanvasLayer',
+            this.handleROSMessage,
+        );
+    };
+
+    /**
+     * We received the layer data (containing all sprite information)
+     * in the form of a base64 string. We convert it to an ArrayBuffer for
+     * further processing.
+     */
+    private handleROSMessage = (message: ILayerMessage) => {
+        this.callback(decode(message.data));
     };
 }
