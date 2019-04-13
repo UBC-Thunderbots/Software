@@ -184,35 +184,40 @@ class Robot
     /**
      * Gets the buffer which holds all the previous position states of the robot
      *
-     * @return Circular buffer with the position states
+     * @return Vector containing the position history starting with the oldest available
+     * data at index 0
      */
     std::vector<Point> getPreviousPositions();
 
     /**
      * Gets the buffer which holds all the previous velocity states of the robot
      *
-     * @return Circular buffer with the velocity states
+     * @return Vector containing the velocity history starting with the oldest available
+     * data at index 0
      */
     std::vector<Vector> getPreviousVelocities();
 
     /**
      * Gets the buffer which holds all the previous orientation states of the robot
      *
-     * @return Circular buffer with the orientations states
+     * @return Vector containing the orientation history starting with the oldest
+     * available data at index 0
      */
     std::vector<Angle> getPreviousOrientations();
 
     /**
      * Gets the buffer which holds all the previous angular velocity states of the robot
      *
-     * @return Circular buffer with the angular velocity states
+     * @return Vector containing the angular velocity history starting with the oldest
+     * available data at index 0
      */
     std::vector<AngularVelocity> getPreviousAngularVelocities();
 
     /**
      * Gets the buffer which holds all the timestamps of the previous states
      *
-     * @return Circular buffer with the position states
+     * @return Vector containing the update timestamp history starting with the oldest
+     * available data at index 0
      */
     std::vector<Timestamp> getPreviousTimestamps();
 
