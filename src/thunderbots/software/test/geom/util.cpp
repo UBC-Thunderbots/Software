@@ -895,7 +895,7 @@ TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once)
     // Ray up and to the right that points right
     Ray ray2 = Ray(Point(-1, 1), Vector(1, 0));
 
-    std::optional<Point> intersection = intersects(ray1, ray2);
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
 
     EXPECT_EQ(intersection.value(), Point(0, 1));
 }
@@ -909,7 +909,7 @@ TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects)
 
     Ray ray2 = Ray(Point(-1, 1), Vector(-1, 0));
 
-    std::optional<Point> intersection = intersects(ray1, ray2);
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
 
     EXPECT_EQ(intersection, std::nullopt);
 }
@@ -921,7 +921,7 @@ TEST(GeomUtilTest, test_intersect_ray_ray_overlapping)
     Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
     Ray ray2 = Ray(Point(0, 1), Vector(0, 1));
 
-    std::optional<Point> intersection = intersects(ray1, ray2);
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
 
     EXPECT_EQ(intersection, std::nullopt);
 }

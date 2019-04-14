@@ -359,11 +359,9 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
  * @param ray1: First Ray
  * @param ray2: Second Ray
  * @return Returns std::nullopt if no intersections exist, or if there are infinite
- * intersections (overlapping) Returns Point if a single intersection exists. Returns
- * Point if the ray and segment are overlapping, where the points define the line segment
- * of overlap.
+ * intersections (overlapping) Returns Point if a single intersection exists.
  */
-std::optional<Point> intersects(Ray ray1, Ray ray2);
+std::optional<Point> getRayIntersection(Ray ray1, Ray ray2);
 
 /**
  * Reflects a point across a line.
@@ -487,12 +485,9 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
  *
  * @param reference: The point which the tangent vectors will intersect
  * @param circle: The circle to calculate the tangent vectors of
- * @param buffer:
  * @return the mean point of points
  */
-std::pair<Vector, Vector> getCircleTangentVectors(const Point reference,
-                                                  const Circle circle,
-                                                  double buffer = 0.0);
+std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle);
 
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
@@ -534,8 +529,18 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
  * @param segment : segment parameter to calculate if its definition lies between the rays
  * @param ray1 : Starting point and direction
  * @param ray2 : Starting point an direction
- * @return Segment: Returns the segment parameter if it is enclosed between ray1 and ray2
- *         Returns std::nullopt of the ray is not completely enclosed between the rays, or
+ * @return Segment: Returns the segment parameter if it is completely enclosed between
+ * ray1 and ray2.
+ *
+ * Example of segment being enclosed by rays:
+ *
+ *        segment
+ *     \ *----*  /
+ *      \       /
+ *  ray1 \     /ray2
+ *        *   *
+ *
+ * Returns std::nullopt of the ray is not completely enclosed between the rays, or
  * not at all
  */
 std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2);
@@ -546,7 +551,8 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
  * @param segment1 : first segment
  * @param segment2 : second segment
  * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and
- * overlapping Returns std::nullopt if the segments aren't parallel or overlapping
+ * partially/completely overlapping
+ * Returns std::nullopt if the segments aren't parallel or overlapping
  */
 std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                                                         Segment segment2);

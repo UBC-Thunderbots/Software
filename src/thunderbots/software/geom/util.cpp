@@ -798,7 +798,7 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     }
 }
 
-std::optional<Point> intersects(Ray ray1, Ray ray2)
+std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
 {
     // Calculate if the intersecion exists along segments of infinite length
     std::optional<Point> intersection =
@@ -999,14 +999,14 @@ std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle 
     }
 }
 
-std::pair<Vector, Vector> getCircleTangentVectors(const Point reference,
-                                                  const Circle circle, double buffer)
+std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle,
+                                         double buffer)
 {
     auto [tangent_point1, tangent_point2] =
         getCircleTangentPoints(reference, circle, buffer);
 
-    return std::make_pair((tangent_point1 - reference).norm(),
-                          (tangent_point2 - reference).norm());
+    return std::make_pair(Ray(tangent_point1, (tangent_point1 - reference).norm()),
+                          Ray(tangent_point2, (tangent_point2 - reference).norm()));
 }
 
 bool pointIsRightOfLine(const Segment &line, const Point &point)
@@ -1053,10 +1053,10 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
     const Ray extremes2 =
         Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
 
-    const std::optional<Point> extreme_intersect11 = intersects(extremes1, ray1);
-    const std::optional<Point> extreme_intersect12 = intersects(extremes2, ray1);
-    const std::optional<Point> extreme_intersect21 = intersects(extremes1, ray2);
-    const std::optional<Point> extreme_intersect22 = intersects(extremes2, ray2);
+    const std::optional<Point> extreme_intersect11 = getRayIntersection(extremes1, ray1);
+    const std::optional<Point> extreme_intersect12 = getRayIntersection(extremes2, ray1);
+    const std::optional<Point> extreme_intersect21 = getRayIntersection(extremes1, ray2);
+    const std::optional<Point> extreme_intersect22 = getRayIntersection(extremes2, ray2);
 
     // Check for the cases that the rays intersect the same segment projection
     if ((extreme_intersect11.has_value() == extreme_intersect21.has_value()) ||
@@ -1123,8 +1123,8 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
             Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
         ;
 
-        std::optional<Point> extreme_intersect1 = intersects(extremes1, ray2);
-        std::optional<Point> extreme_intersect2 = intersects(extremes2, ray2);
+        std::optional<Point> extreme_intersect1 = getRayIntersection(extremes1, ray2);
+        std::optional<Point> extreme_intersect2 = getRayIntersection(extremes2, ray2);
 
         if (extreme_intersect1.has_value())
         {
@@ -1146,8 +1146,8 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
             Ray(segment.getSegStart(), Vector(segment.getSegStart() - segment.getEnd()));
         ;
 
-        std::optional<Point> extreme_intersect1 = intersects(extremes1, ray1);
-        std::optional<Point> extreme_intersect2 = intersects(extremes2, ray1);
+        std::optional<Point> extreme_intersect1 = getRayIntersection(extremes1, ray1);
+        std::optional<Point> extreme_intersect2 = getRayIntersection(extremes2, ray1);
 
         if (extreme_intersect1.has_value())
         {
