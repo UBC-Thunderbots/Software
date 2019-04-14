@@ -546,7 +546,7 @@ std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray
  * @param segment1 : first segment
  * @param segment2 : second segment
  * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and
- * overlapping Returns std::nullopt if the segments aren't parallel or overlapping
+ * overlapping Returns std::nullopt if the segments aren't parallel and overlapping
  */
 std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                                                         Segment segment2);
