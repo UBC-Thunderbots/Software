@@ -1209,7 +1209,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
 std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2)
 {
     // If the segments are not parallel, then return std::nullopt. (The segments are
-    // parallel of all points are collinear)
+    // parallel if all points are collinear)
     if (!collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
         !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
     {
