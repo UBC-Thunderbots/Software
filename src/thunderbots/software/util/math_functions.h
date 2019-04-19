@@ -64,5 +64,5 @@ namespace Util
      *
      * @return The result mapped number clampped between [0, 1]
      */
-    double mapClampped(double x, double in_min, double in_max, double out_min, double out_max);
+    double mapClamped(double x, double in_min, double in_max, double out_min, double out_max);
 }  // namespace Util
