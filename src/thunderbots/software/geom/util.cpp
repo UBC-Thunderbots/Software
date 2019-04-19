@@ -144,7 +144,7 @@ double lensq(const Line &line)
     return std::numeric_limits<double>::infinity();
 }
 
-bool contains(const LegacyTriangle &out, const Vector &in)
+bool contains(const LegacyTriangle &out, const Point &in)
 {
     double angle = 0;
     for (int i = 0, j = 2; i < 3; j = i++)
@@ -160,7 +160,7 @@ bool contains(const LegacyTriangle &out, const Vector &in)
     return std::fabs(angle) > 6;
 }
 
-bool contains(const Circle &out, const Vector &in)
+bool contains(const Circle &out, const Point &in)
 {
     return distsq(out.getOrigin(), in) <= out.getRadius() * out.getRadius();
 }
@@ -170,12 +170,23 @@ bool contains(const Circle &out, const Segment &in)
     return dist(in, out.getOrigin()) < out.getRadius();
 }
 
-bool contains(const Segment &out, const Vector &in)
+bool contains(const Segment &out, const Point &in)
 {
     if (collinear(in, out.getSegStart(), out.getEnd()))
     {
+        // If the segment and point are in a perfect vertical line, we must use Y
+        // coordinate centric logic
+        if ((in.x() - out.getEnd().x() == 0) &&
+            (out.getEnd().x() - out.getSegStart().x() == 0))
+        {
+            // if collinear we only need to check one of the coordinates,
+            // in this case we select Y because all X values are equal
+            return (in.y() <= out.getSegStart().y() && in.y() >= out.getEnd().y()) ||
+                   (in.y() <= out.getEnd().y() && in.y() >= out.getSegStart().y());
+        }
+
         // if collinear we only need to check one of the coordinates,
-        // arbitrarily choose x
+        // choose x because we know there is variance in these values
         return (in.x() <= out.getSegStart().x() && in.x() >= out.getEnd().x()) ||
                (in.x() <= out.getEnd().x() && in.x() >= out.getSegStart().x());
     }
@@ -183,7 +194,7 @@ bool contains(const Segment &out, const Vector &in)
     return false;
 }
 
-bool contains(const Ray &out, const Vector &in)
+bool contains(const Ray &out, const Point &in)
 {
     Point point_in_ray_direction = out.getRayStart() + out.getDirection();
     if (collinear(in, out.getRayStart(), point_in_ray_direction) &&
@@ -194,7 +205,7 @@ bool contains(const Ray &out, const Vector &in)
     return false;
 }
 
-bool contains(const Rectangle &out, const Vector &in)
+bool contains(const Rectangle &out, const Point &in)
 {
     return out.containsPoint(in);
 }
