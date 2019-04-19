@@ -10,20 +10,8 @@ namespace Navigator
 {
     namespace Trespass
     {
-        // Don't know where to put this???
-        struct NanException : public std::exception
-        {
-            const char* what() const throw()
-            {
-                return "NaN operation exception";
-            }
-        };
-
         unsigned int calcBinaryTrespassScore(Circle circle, Point point)
         {
-            if (point.isnan() || circle.getOrigin().isnan())
-                throw NanException();
-
             // The point is in the circle if the distance to
             // the center of the circle is less than the radius
             const double dx = point.x() - circle.getOrigin().x();
@@ -43,9 +31,6 @@ namespace Navigator
 
         double calcLinearTrespassScore(Circle circle, Point point)
         {
-            if (point.isnan() || circle.getOrigin().isnan())
-                throw NanException();
-
             // The point is in the circle if the distance to
             // the center of the circle is less than the radius
             const double dx = point.x() - circle.getOrigin().x();
