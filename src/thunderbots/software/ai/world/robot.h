@@ -196,6 +196,26 @@ class Robot
      */
     bool operator!=(const Robot &other) const;
 
+    // A comparator for the Robot class that compares Robots by ID. This is equivalent
+    // to the "less-than" operator.
+    // This comparator is necessary for the Robot class to be used as a key in maps. See
+    // https://stackoverflow.com/questions/6573225/what-requirements-must-stdmap-key-classes-meet-to-be-valid-keys
+    // and
+    // https://stackoverflow.com/questions/5733254/how-can-i-create-my-own-comparator-for-a-map
+    //
+    // We define this "custom" comparator rather than define the '<' operator for this
+    // class because there are many possible ways to order robots, so it doesn't make
+    // sense to define a single "normal" way with the '<' operator. Defining this
+    // comparator struct lets us use it explicitly when necessary and maintain multiple
+    // ways of comparing robots
+    struct cmpRobotByID
+    {
+        bool operator()(const Robot &r1, const Robot &r2) const
+        {
+            return r1.id() < r2.id();
+        }
+    };
+
    private:
     // The id of this robot
     unsigned int id_;
