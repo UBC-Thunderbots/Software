@@ -2,6 +2,7 @@
 
 #include "proto/messages_robocup_ssl_detection.pb.h"
 #include "proto/messages_robocup_ssl_geometry.pb.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "shared/constants.h"
 #include "util/constants.h"
 
@@ -304,14 +305,13 @@ const static std::unordered_map<Referee::Command, int> yellow_team_command_map =
 
 int32_t Backend::getTeamCommand(const Referee::Command &command)
 {
-    auto our_team_colour = Util::Constants::FRIENDLY_TEAM_COLOUR;
-    if (our_team_colour == TeamColour::BLUE)
+    if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
     {
-        return blue_team_command_map.at(command);
+        return yellow_team_command_map.at(command);
     }
     else
     {
-        return yellow_team_command_map.at(command);
+        return blue_team_command_map.at(command);
     }
 }
 
@@ -331,24 +331,24 @@ void Backend::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
     {
-        if (Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE)
+        if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value()) 
         {
-            our_field_side = FieldSide::WEST;
+            our_field_side = FieldSide::EAST;
         }
         else
         {
-            our_field_side = FieldSide::EAST;
+            our_field_side = FieldSide::WEST;
         }
     }
     else
     {
-        if (Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE)
+        if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value()) 
         {
-            our_field_side = FieldSide::EAST;
+            our_field_side = FieldSide::WEST;
         }
         else
         {
-            our_field_side = FieldSide::WEST;
+            our_field_side = FieldSide::EAST;
         }
     }
 }
