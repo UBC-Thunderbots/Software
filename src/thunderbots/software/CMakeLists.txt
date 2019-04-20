@@ -568,10 +568,13 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/movespin_action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/chip_action.cpp
+            ai/hl/stp/action/pivot_action.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
+            ai/intent/pivot_intent.cpp
             ai/intent/kick_intent.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/intent/chip_intent.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
@@ -586,6 +589,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/action/movespin_action.cpp
             test/ai/hl/stp/action/kick_action.cpp
             test/ai/hl/stp/action/chip_action.cpp
+            test/ai/hl/stp/action/pivot_action.cpp
             geom/polygon.cpp
             geom/util.cpp
             util/logger/custom_g3log_sinks.h

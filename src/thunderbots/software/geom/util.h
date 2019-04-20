@@ -50,12 +50,12 @@ double proj_len(const Segment &first, const Vector &second);
  * inside the first parameter.
  */
 
-bool contains(const LegacyTriangle &out, const Vector &in);
-bool contains(const Circle &out, const Vector &in);
+bool contains(const LegacyTriangle &out, const Point &in);
+bool contains(const Circle &out, const Point &in);
 bool contains(const Circle &out, const Segment &in);
-bool contains(const Ray &out, const Vector &in);
-bool contains(const Segment &out, const Vector &in);
-bool contains(const Rectangle &out, const Vector &in);
+bool contains(const Ray &out, const Point &in);
+bool contains(const Segment &out, const Point &in);
+bool contains(const Rectangle &out, const Point &in);
 
 /*
  * The family of `intersects` functions determines whether there

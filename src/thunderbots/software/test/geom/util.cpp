@@ -165,6 +165,24 @@ TEST(GeomUtilTest, test_contains_triangle_point)
     EXPECT_EQ(expected_val, calculated_val);
 }
 
+TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(0, 1));
+
+    Point point = Point(0, 0.5);
+
+    EXPECT_EQ(contains(segment, point), true);
+}
+
+TEST(GeomUtilTest, test_segment_contains_point_no_y_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(1, 0));
+
+    Point point = Point(0.5, 0);
+
+    EXPECT_EQ(contains(segment, point), true);
+}
+
 TEST(GeomUtilTest, test_collinear)
 {
     for (unsigned int i = 0; i < 10; ++i)
