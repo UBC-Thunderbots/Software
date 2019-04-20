@@ -886,6 +886,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(trespass_test
             test/ai/navigator/trespass/trespass.cpp
             ai/navigator/trespass.cpp
+            util/math_functions.cpp
             )
     target_link_libraries(straight_line_path_planner_test
             ${catkin_LIBRARIES}
