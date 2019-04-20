@@ -6,24 +6,17 @@ const Polygon& Obstacle::getBoundaryPolygon() const
     return _polygon;
 }
 
-Obstacle::Obstacle() : _polygon{Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 0)} {}
-
 Obstacle::Obstacle(Polygon polygon) : _polygon(polygon) {}
-
-Obstacle Obstacle::createPlaceholderObstacle()
-{
-    return Obstacle();
-}
 
 Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_cushion)
 {
-    double tick_length = 1.0;
+    double tick_length_in_seconds = 1.0;
 
     double radius_cushion = getRadiusForHexagon(ROBOT_MAX_RADIUS_METERS);
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector =
-        robot.velocity().norm(robot.velocity().len() * tick_length);
+        robot.velocity().norm(robot.velocity().len() * tick_length_in_seconds);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
@@ -34,14 +27,14 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
                                                         bool enable_velocity_cushion,
                                                         double radius_cushion_scaling,
                                                         double velocity_cushion_scaling,
-                                                        double tick_length)
+                                                        double tick_length_in_seconds)
 {
     double radius_cushion =
         getRadiusForHexagon(ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector = robot.velocity().norm(
-        robot.velocity().len() * tick_length * velocity_cushion_scaling);
+        robot.velocity().len() * tick_length_in_seconds * velocity_cushion_scaling);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
@@ -51,21 +44,22 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
 Obstacle Obstacle::createRobotObstacleWithBufferParams(
     const Robot& robot, bool enable_velocity_cushion,
     double additional_radius_cushion_buffer, double additional_velocity_cushion_buffer,
-    double tick_length)
+    double tick_length_in_seconds)
 {
     double radius_cushion =
         getRadiusForHexagon(ROBOT_MAX_RADIUS_METERS + additional_radius_cushion_buffer);
 
     // vector in the direction of the velocity and with the scaled size of the velocity
-    Vector velocity_cushion_vector = robot.velocity().norm(
-        robot.velocity().len() * tick_length + additional_velocity_cushion_buffer);
+    Vector velocity_cushion_vector =
+        robot.velocity().norm(robot.velocity().len() * tick_length_in_seconds +
+                              additional_velocity_cushion_buffer);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
         enable_velocity_cushion && velocity_cushion_vector.len() > radius_cushion);
 }
 
-
+// This is a helper function to factor out some of the logic from the other functions
 Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
     Point position, double radius_cushion, Vector velocity_cushion_vector,
     bool enable_velocity_cushion)
@@ -110,8 +104,11 @@ Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
     }
 }
 
-double Obstacle::getRadiusForHexagon(double radius)
+// this is a helper function
+double Obstacle::getRadiusCushionForHexagon(double radius)
 {
-    // return radius so that centre to side distance is at least radius
-    return radius * 4 / std::sqrt(3);
+    // return radius cushion so that centre to side distance is at least double given
+    // radius so that two robots can pass by each other this is accomplished by doubling
+    // the radius and multiplying by 2/sqrt(3)
+    return radius * 4.0 / std::sqrt(3);
 }
