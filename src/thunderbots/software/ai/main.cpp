@@ -42,18 +42,6 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     }
     primitive_publisher.publish(primitive_array_message);
 
-    // On every tick, send test sprites
-    for (int i = 0; i < 10000; i++)
-    {
-        Util::CanvasMessenger::Sprite sprite;
-        sprite.x        = (i % 100) * 12;
-        sprite.y        = (i / 100) * 12;
-        sprite.width    = 10;
-        sprite.height   = 10;
-        sprite.rotation = count;
-        Util::CanvasMessenger::getInstance()->drawSprite(0, sprite);
-    }
-
     // On every tick, send the layer messages
     Util::CanvasMessenger::getInstance()->publishAndClearLayers();
 
