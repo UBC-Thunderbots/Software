@@ -325,6 +325,26 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
 
+    catkin_add_gtest(nav_obstacle_test
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            ai/world/ball.h
+            ai/world/robot.h
+            ai/world/robot.cpp
+            geom/angle.h
+            geom/point.h
+            geom/polygon.h
+            geom/polygon.cpp
+            geom/util.h
+            geom/util.cpp
+            ../shared/constants.h
+            test/ai/navigator/obstacle/obstacle.cpp
+            ai/navigator/obstacle/obstacle.cpp
+            ai/navigator/obstacle/obstacle.h)
+
+    target_link_libraries(nav_obstacle_test ${catkin_LIBRARIES})
+
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
             ../shared/util.c
@@ -808,7 +828,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
-  
+
     catkin_add_gtest(navigator_test
             ai/intent/catch_intent.cpp
             ai/intent/chip_intent.cpp

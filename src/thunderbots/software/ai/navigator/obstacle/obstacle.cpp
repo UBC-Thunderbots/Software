@@ -17,12 +17,9 @@ Obstacle Obstacle::createPlaceholderObstacle()
 
 Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_cushion)
 {
-    // TODO: figure out how to get tick length
     double tick_length = 1.0;
 
-    // TODO: figure out actual factor (not 2) needed to clear two robot based on hexagon
-    // implementation
-    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 2;
+    double radius_cushion = getRadiusForHexagon(ROBOT_MAX_RADIUS_METERS);
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector =
@@ -33,11 +30,14 @@ Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_
         enable_velocity_cushion);
 }
 
-Obstacle Obstacle::createRobotObstacleWithScalingParams(
-    const Robot& robot, bool enable_velocity_cushion, double radius_cushion_scaling,
-    double tick_length, double velocity_cushion_scaling)
+Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
+                                                        bool enable_velocity_cushion,
+                                                        double radius_cushion_scaling,
+                                                        double velocity_cushion_scaling,
+                                                        double tick_length)
 {
-    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 4 / std::sqrt(3) * radius_cushion_scaling;
+    double radius_cushion =
+        getRadiusForHexagon(ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector = robot.velocity().norm(
@@ -49,14 +49,16 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(
 }
 
 Obstacle Obstacle::createRobotObstacleWithBufferParams(
-    const Robot& robot, bool enable_velocity_cushion, double radius_cushion_buffer,
-    double tick_length, double velocity_cushion_buffer)
+    const Robot& robot, bool enable_velocity_cushion,
+    double additional_radius_cushion_buffer, double additional_velocity_cushion_buffer,
+    double tick_length)
 {
-    double radius_cushion = ROBOT_MAX_RADIUS_METERS * 4 / std::sqrt(3) + radius_cushion_buffer;
+    double radius_cushion =
+        getRadiusForHexagon(ROBOT_MAX_RADIUS_METERS + additional_radius_cushion_buffer);
 
     // vector in the direction of the velocity and with the scaled size of the velocity
     Vector velocity_cushion_vector = robot.velocity().norm(
-        robot.velocity().len() * tick_length + velocity_cushion_buffer);
+        robot.velocity().len() * tick_length + additional_velocity_cushion_buffer);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
@@ -106,4 +108,10 @@ Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
              // front left velocity cushions
              position + facing_direction_norm_radius.rotate(Angle::ofDegrees(30))}));
     }
+}
+
+double Obstacle::getRadiusForHexagon(double radius)
+{
+    // return radius so that centre to side distance is at least radius
+    return radius * 4 / std::sqrt(3);
 }
