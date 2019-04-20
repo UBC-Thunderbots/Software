@@ -38,8 +38,9 @@ export const stop = () => {
  * Subscribe to ROS Topic
  * @param name - The name of the topic
  * @param messageType - The message type of topic
- * @param callback - The callback upon subscribing
- * @param throttle - The rate at which to limit messages arriving to the visualizer
+ * @param callback - The callback that will receive new messages
+ * @param throttle - The rate (ms between messages)
+ *                   at which to limit messages arriving to the visualizer
  */
 export const subscribeToROSTopic = (
     name: string,
@@ -60,7 +61,7 @@ export const subscribeToROSTopic = (
  * Unsubscribe from ROS Topic
  * @param name - The name of the topic
  * @param messageType - The message type of topic
- * @param callback - The callback upon unsubscribing
+ * @param callback - The callback we wish to unsubscribe
  */
 export const unsubscribeToROSTopic = (
     name: string,

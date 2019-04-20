@@ -44,6 +44,9 @@ namespace Util
         // There are 4 cameras for SSL Division B
         static const unsigned int NUMBER_OF_SSL_VISION_CAMERAS = 4;
 
+        // Canvas messenger message publishing frequency
+        static const unsigned int DESIRED_CANVAS_MESSAGE_FREQ = 60;
+
         // How many milliseconds a robot must not be seen in vision before it is
         // considered as "gone" and no longer reported.
         static const unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 200;

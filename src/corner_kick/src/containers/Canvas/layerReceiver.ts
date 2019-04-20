@@ -35,7 +35,6 @@ export class LayerReceiver {
             '/visualizer/layers',
             'thunderbots_msgs/CanvasLayer',
             this.handleROSMessage,
-            16,
         );
     };
 
