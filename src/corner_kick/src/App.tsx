@@ -6,8 +6,8 @@ import * as React from 'react';
 import { Provider } from 'react-redux';
 
 import { Portal, PortalLocation } from './components/Portal';
-import { Canvas } from './containers/Canvas';
 import { Logger } from './containers/Logger';
+import { Visualizer } from './pages/Visualizer';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
 
@@ -20,10 +20,7 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
-            <Portal portalLocation={PortalLocation.SIDEBAR}>This is the sidebar</Portal>
-            <Portal portalLocation={PortalLocation.MAIN}>
-                <Canvas />
-            </Portal>
+            <Visualizer />
             <Portal portalLocation={PortalLocation.CONSOLE}>
                 <Logger />
             </Portal>

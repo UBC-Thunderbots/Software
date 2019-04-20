@@ -16,7 +16,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "constants.h"
+#include "messages.h"
 #include "radio_communication/visitor/mrf_primitive_visitor.h"
 #include "util/logger/init.h"
 
@@ -45,7 +45,7 @@ namespace
 
 }  // namespace
 
-MRFDongle::MRFDongle()
+MRFDongle::MRFDongle(Annunciator &annunciator)
     : context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -53,7 +53,8 @@ MRFDongle::MRFDongle()
       normal_altsetting(-1),
       status_transfer(device, 3, 1, true, 0),
       pending_beep_length(0),
-      estop_state(EStopState::STOP)
+      estop_state(EStopState::STOP),
+      annunciator(annunciator)
 {
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
@@ -288,41 +289,26 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
     mdr_transfer.submit();
 }
 
-// TODO see #222
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
     transfer.result();
-    // if (transfer.size() > 2)
-    // {
-    //     unsigned int robot = transfer.data()[0];
-    //     if (logger)
-    //     {
-    //         logger->log_mrf_message_in(
-    //             robot, transfer.data() + 1, transfer.size() - 3,
-    //             transfer.data()[transfer.size() - 2],
-    //             transfer.data()[transfer.size() - 1]);
-    //     }
-    //     robots[robot]->handle_message(
-    //         transfer.data() + 1, transfer.size() - 3,
-    //         transfer.data()[transfer.size() - 2],
-    //         transfer.data()[transfer.size() - 1]);
-    // }
+
+    // Only handle if there are more than 2 bytes in the transfer.
+    if (transfer.size() > 2)
+    {
+        unsigned int robot = transfer.data()[0];
+        annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
+                                         transfer.data()[transfer.size() - 2],
+                                         transfer.data()[transfer.size() - 1]);
+    }
     transfer.submit();
 }
 
-// TODO #222
 void MRFDongle::handle_status(AsyncOperation<void> &)
 {
     status_transfer.result();
     estop_state = static_cast<EStopState>(status_transfer.data()[0] & 3U);
-    // if (status_transfer.data()[0U] & 4U)
-    // {
-    //     rx_fcs_fail_message.fire();
-    // }
-    // second_dongle_message.active(status_transfer.data()[0] & 8U);
-    // transmit_queue_full_message.active(status_transfer.data()[0] & 16U);
-    // receive_queue_full_message.active(status_transfer.data()[0] & 32U);
-
+    annunciator.handle_status(status_transfer.data()[0U]);
     status_transfer.submit();
 }
 

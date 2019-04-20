@@ -20,6 +20,55 @@
 std::ostringstream dbgout;
 #endif
 
+TEST(GeomUtilTest, dist_point_rectangle_point_within)
+{
+    Point p(1, 2.1);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(0, dist(p, rect));
+}
+
+
+TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle)
+{
+    Point p(1, 1);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_above_rectangle)
+{
+    Point p(1, 5);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_to_left_of_rectangle)
+{
+    Point p(-1, 3);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_right_of_rectangle)
+{
+    Point p(3, 3);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
+{
+    Point p(-2.0, 0);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
+}
+
 TEST(GeomUtilTest, dist_line_vector2)
 {
     double calculated_val, expected_val;
@@ -114,6 +163,24 @@ TEST(GeomUtilTest, test_contains_triangle_point)
 
     bool calculated_val = contains(triangle(p1, p2, p3), p);
     EXPECT_EQ(expected_val, calculated_val);
+}
+
+TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(0, 1));
+
+    Point point = Point(0, 0.5);
+
+    EXPECT_EQ(contains(segment, point), true);
+}
+
+TEST(GeomUtilTest, test_segment_contains_point_no_y_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(1, 0));
+
+    Point point = Point(0.5, 0);
+
+    EXPECT_EQ(contains(segment, point), true);
 }
 
 TEST(GeomUtilTest, test_collinear)

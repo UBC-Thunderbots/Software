@@ -98,6 +98,11 @@ double Field::centreCircleRadius() const
     return center_circle_radius_;
 }
 
+Point Field::centerPoint() const
+{
+    return Point(0, 0);
+}
+
 Point Field::friendlyGoal() const
 {
     return Point(-length() / 2.0, 0.0);

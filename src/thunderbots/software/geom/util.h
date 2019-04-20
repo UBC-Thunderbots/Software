@@ -50,12 +50,12 @@ double proj_len(const Segment &first, const Vector &second);
  * inside the first parameter.
  */
 
-bool contains(const LegacyTriangle &out, const Vector &in);
-bool contains(const Circle &out, const Vector &in);
+bool contains(const LegacyTriangle &out, const Point &in);
+bool contains(const Circle &out, const Point &in);
 bool contains(const Circle &out, const Segment &in);
-bool contains(const Ray &out, const Vector &in);
-bool contains(const Segment &out, const Vector &in);
-bool contains(const Rectangle &out, const Vector &in);
+bool contains(const Ray &out, const Point &in);
+bool contains(const Segment &out, const Point &in);
+bool contains(const Rectangle &out, const Point &in);
 
 /*
  * The family of `intersects` functions determines whether there
@@ -84,6 +84,12 @@ double dist(const Segment &first, const Point &second);
 
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
+
+/**
+ * NOTE: the distance from a point to a rectangle is the closest distance from the point
+ * to the edge of the rectangle, or 0 if the point is within the rectangle
+ */
+double dist(const Point &first, const Rectangle &second);
 
 double distsq(const Point &first, const Segment &second);
 double distsq(const Segment &first, const Point &second);

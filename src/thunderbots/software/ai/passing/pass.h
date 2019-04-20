@@ -40,6 +40,20 @@ namespace AI::Passing
         Point receiverPoint() const;
 
         /**
+         * Gets the angle the receiver should be facing to receive the pass
+         *
+         * @return The angle the receiver should be facing to receive the pass
+         */
+        Angle receiverOrientation() const;
+
+        /**
+         * Gets the angle the passer should be facing to perform the pass
+         *
+         * @return The angle the passer should be facing to perform the pass
+         */
+        Angle passerOrientation() const;
+
+        /**
          * Gets the value of the passer point
          *
          * @return The value of the passer point

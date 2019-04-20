@@ -23,7 +23,7 @@ namespace
     std::vector<std::unique_ptr<Primitive>> primitives;
 
     // The MRFBackend instance that connects to the dongle
-    MRFBackend backend = MRFBackend();
+    std::unique_ptr<MRFBackend> backend_ptr;
 }  // namespace
 
 // Callbacks
@@ -36,7 +36,7 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     }
 
     // Send primitives
-    backend.sendPrimitives(primitives);
+    backend_ptr->sendPrimitives(primitives);
 }
 
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
@@ -55,11 +55,11 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     }
 
     // Update robots and ball
-    backend.update_robots(robots);
-    backend.update_ball(ball);
+    backend_ptr->update_robots(robots);
+    backend_ptr->update_ball(ball);
 
     // Send vision packet
-    backend.send_vision_packet();
+    backend_ptr->send_vision_packet();
 }
 
 int main(int argc, char** argv)
@@ -67,6 +67,9 @@ int main(int argc, char** argv)
     // Init ROS node
     ros::init(argc, argv, "radio_communication");
     ros::NodeHandle node_handle;
+
+    // Init backend
+    backend_ptr = std::make_unique<MRFBackend>(node_handle);
 
     // Create subscribers to topics we care about
     ros::Subscriber prim_array_sub = node_handle.subscribe(
@@ -91,7 +94,7 @@ int main(int argc, char** argv)
         primitives.clear();
 
         // Handle libusb events for the dongle
-        backend.update_dongle_events();
+        backend_ptr->update_dongle_events();
 
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector

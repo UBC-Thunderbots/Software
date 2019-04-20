@@ -25,6 +25,7 @@ add_message_files(
     Primitive.msg
     PrimitiveArray.msg
     Robot.msg
+    RobotStatus.msg
     Team.msg
     RefboxCommand.msg
     RefboxData.msg
