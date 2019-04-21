@@ -404,7 +404,7 @@ TEST_F(RobotTest, equality_operator_robots_with_different_timestamp)
 
 TEST_F(RobotTest, get_position_history)
 {
-    std::vector prevPositions = {Point(3, 1.2), Point(-1.2, 3), Point(-1.3, 3)};
+    std::vector prevPositions = {Point(-1.3, 3), Point(-1.2, 3), Point(3, 1.2)};
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
                         AngularVelocity::ofDegrees(25), current_time, 3);
@@ -418,7 +418,7 @@ TEST_F(RobotTest, get_position_history)
 
 TEST_F(RobotTest, get_velocity_history)
 {
-    std::vector prevVelocities = {Vector(-3, 1), Vector(2.2, -0.05), Vector(2.3, -0.05)};
+    std::vector prevVelocities = {Vector(2.3, -0.05), Vector(2.2, -0.05), Vector(-3, 1)};
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
                         AngularVelocity::ofDegrees(25), current_time, 3);
@@ -432,8 +432,8 @@ TEST_F(RobotTest, get_velocity_history)
 
 TEST_F(RobotTest, get_orientation_history)
 {
-    std::vector prevOrientations = {Angle::ofDegrees(0), Angle::quarter(),
-                                    Angle::quarter()};
+    std::vector prevOrientations = {Angle::quarter(), Angle::quarter(),
+                                    Angle::ofDegrees(0)};
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
                         AngularVelocity::ofDegrees(25), current_time, 3);
@@ -447,9 +447,11 @@ TEST_F(RobotTest, get_orientation_history)
 
 TEST_F(RobotTest, get_angular_velocity_history)
 {
-    std::vector prevAngularVelocities = {AngularVelocity::ofDegrees(25),
-                                         AngularVelocity::ofRadians(1.1),
-                                         AngularVelocity::ofRadians(1.2)};
+    std::vector prevAngularVelocities = {
+        AngularVelocity::ofRadians(1.2),
+        AngularVelocity::ofRadians(1.1),
+        AngularVelocity::ofDegrees(25),
+    };
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
                         AngularVelocity::ofDegrees(25), current_time, 3);
@@ -463,8 +465,8 @@ TEST_F(RobotTest, get_angular_velocity_history)
 
 TEST_F(RobotTest, get_timestamp_history)
 {
-    std::vector prevAngularVelocities = {current_time, half_second_future,
-                                         half_second_future};
+    std::vector prevAngularVelocities = {half_second_future, half_second_future,
+                                         current_time};
 
     Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
                         AngularVelocity::ofDegrees(25), current_time, 3);

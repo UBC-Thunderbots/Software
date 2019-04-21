@@ -260,16 +260,36 @@ class Robot
     };
 
    private:
+    /**
+     * Adds a state to the front of the circular buffers storing the state histories of
+     * the robot.
+     *
+     * @param position Position of robot.
+     * @param velocity Velocity of robot
+     * @param orientation Orientation of robot.
+     * @param angular_velocity Angular velocity of robot
+     * @param timestamp Time that the robot was in this state.
+     */
+    void addStateToRobotHistory(const Point &position, const Vector &velocity,
+                                const Angle &orientation,
+                                const AngularVelocity &angular_velocity,
+                                const Timestamp &timestamp);
+
     // The id of this robot
     unsigned int id_;
-    // The current position of the robot, with coordinates in metres
+    // All previous positions of the robot, with the most recent position at the front of
+    // the queue, coordinates in meters
     boost::circular_buffer<Point> positions_;
-    // The current velocity of the robot, in metres per second
+    // All previous velocities of the robot, with the most recent position at the front of
+    // the queue, in metres per second
     boost::circular_buffer<Vector> velocities_;
-    // The current orientation of the robot, in radians
+    // All previous orientations of the robot, with the most recent position at the front
+    // of the queue, in radians
     boost::circular_buffer<Angle> orientations_;
-    // The current angular velocity of the robot, in radians per second
+    // All previous angular velocities of the robot, with the most recent position at the
+    // front of the queue, in radians per second
     boost::circular_buffer<AngularVelocity> angularVelocities_;
-    // The timestamp for when this Robot was last updated
+    // All previous timestamps of when the robot was updated, with the most recent
+    // position at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
 };
