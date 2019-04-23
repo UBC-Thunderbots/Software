@@ -20,6 +20,8 @@
 #include "thunderbots_msgs/CanvasLayer.h"
 #include "util/constants.h"
 
+#include "ai/world/field.h"
+
 namespace Util
 {
     class CanvasMessenger
@@ -80,14 +82,22 @@ namespace Util
         void clearLayers();
 
         /**
-         * Draw a sprite onto a specific layer.
+         * Draw a point at a given location with a given radius
          *
-         * @param layer: The layer number this shape is being drawn to
-         * @param sprite: the sprite data to draw
+         * @param p The point to draw
+         * // TODO: Units for the radius???
+         * @param radius The radius to draw the point with
          */
-        void drawSprite(uint8_t layer, Sprite sprite);
+        void drawPoint(Point p, double radius);
+
+        /**
+         * Draw the given field
+         * @param field
+         */
+        void drawField(const Field& field);
 
        private:
+
         /**
          * Union used to convert a int16_t into two uint8_t
          */
@@ -95,8 +105,6 @@ namespace Util
             int16_t base;
             uint8_t result[2];
         };
-
-       private:
         /**
          * Constructor; initializes an empty layers map then populates it
          */
@@ -111,7 +119,15 @@ namespace Util
          */
         void addSpriteToLayer(uint8_t layer, Sprite& sprite_data);
 
-       private:
+        /**
+         * Draw a sprite onto a specific layer.
+         *
+         * @param layer: The layer number this shape is being drawn to
+         * @param sprite: the sprite data to draw
+         */
+        void drawSprite(uint8_t layer, Sprite sprite);
+
+
         // layer to sprite data map
         std::map<uint8_t, std::vector<Sprite>> layers_map;
         ros::Publisher publisher;

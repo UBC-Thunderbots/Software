@@ -117,6 +117,7 @@ namespace Util
         }
     }
 
+
     void CanvasMessenger::drawSprite(uint8_t layer, Sprite sprite)
     {
         // We simply add the sprite to the specified layer
@@ -134,6 +135,26 @@ namespace Util
 
         // and add the sprite to the layer vector
         this->layers_map[layer].emplace_back(sprite);
+    }
+
+    void CanvasMessenger::drawPoint(Point p, double radius){
+        Sprite sprite;
+
+        sprite.x = p.x() * 100;
+        sprite.y =  p.y() * 100;
+
+        sprite.width = radius * 100;
+        sprite.height = radius * 100;
+
+        drawSprite(1, sprite);
+    }
+
+    void CanvasMessenger::drawField(const Field &field) {
+        Sprite field_sprite;
+        field_sprite.width = field.length() * 100;
+        field_sprite.height = field.width() * 100;
+
+        drawSprite(0, field_sprite);
     }
 
 }  // namespace Util
