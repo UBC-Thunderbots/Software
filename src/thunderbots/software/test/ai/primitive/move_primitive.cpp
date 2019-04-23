@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+// TODO: Update these tests with new primitive parameters
+
 TEST(MovePrimTest, primitive_name_test)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);

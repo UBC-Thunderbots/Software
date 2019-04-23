@@ -4,6 +4,8 @@
 
 #include "ai/intent/move_intent.h"
 
+// TODO: Update these tests with new primitive parameters
+
 TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),

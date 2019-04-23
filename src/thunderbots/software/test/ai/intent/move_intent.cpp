@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
+// TODO: Update these tests with new primitive parameters
+
 TEST(MoveIntentTest, intent_name_test)
 {
     MoveIntent move_intent = MoveIntent(0, Point(), Angle::zero(), 0, 0);
