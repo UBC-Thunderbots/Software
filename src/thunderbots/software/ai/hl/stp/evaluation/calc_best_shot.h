@@ -151,4 +151,5 @@ namespace Evaluation
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
+
 }  // namespace Evaluation

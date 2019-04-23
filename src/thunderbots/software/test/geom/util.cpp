@@ -375,12 +375,13 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_y
     EXPECT_NEAR(0.40, result[1].first.x(), 0.05);
 }
 
-TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacle_blocks_whole_range){
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacle_blocks_whole_range)
+{
     // Test where there is no way to draw a line from the start point to the
     // target line segment that we are sweeping over because there is one obstacle in the
     // way
     std::vector<std::pair<Point, Angle>> result =
-            angleSweepCirclesAll({-1, -0.5}, {-4.5, 0.5}, {-4.5, -0.5}, {{-1.2, -0.5}}, 0.09);
+        angleSweepCirclesAll({-1, -0.5}, {-4.5, 0.5}, {-4.5, -0.5}, {{-1.2, -0.5}}, 0.09);
 
     ASSERT_EQ(0, result.size());
 }

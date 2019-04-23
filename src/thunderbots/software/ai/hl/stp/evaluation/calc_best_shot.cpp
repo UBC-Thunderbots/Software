@@ -95,4 +95,8 @@ namespace Evaluation
         return calcBestShotOnGoal(field, friendly_team, enemy_team, false, shot_origin,
                                   radius, robots_to_ignore);
     }
+
+    double calcPercentNetOpen(const Field& field, std::pair<Point, Angle> shot){
+    }
+
 }  // namespace Evaluation

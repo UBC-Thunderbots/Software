@@ -70,12 +70,13 @@ class ReceiverTactic : public Tactic
     static Angle getOneTimeShotDirection(const Ray& shot, const Ball& ball);
 
    private:
-    // The minimum open angle we must have for a shot before we will attempt it
-    static constexpr double MIN_SHOT_OPEN_ANGLE_DEGREES = 10;
+    // The minimum proportion of open net we're shooting on vs the entire size of the net
+    // that we require before attempting a shot
+    static constexpr double MIN_SHOT_NET_PERCENT_OPEN = 0.3;
 
     // The maximum deflection angle that we will attempt a one-touch kick towards the
     // enemy goal with
-    static constexpr double MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT_DEGREES = 90;
+    static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::ofDegrees(90);
 
     std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type& yield) override;
