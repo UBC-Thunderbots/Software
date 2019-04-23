@@ -174,7 +174,7 @@ std::optional<std::pair<Vector, Angle>> angleSweepCircles(
  *
  * @pre The point \p src can't be within the radius of the obstacle
  *
- * @param src the location where the shot should start
+ * @param src the location where the sweep is centered (think center of a clock)
  *
  * @param p1 the location of the right-hand edge of the target area.
  *
