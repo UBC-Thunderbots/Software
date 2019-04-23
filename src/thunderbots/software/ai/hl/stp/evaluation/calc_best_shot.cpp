@@ -46,7 +46,7 @@ namespace Evaluation
             best_shot = calcBestShotOnGoal(world.field().enemyGoalpostNeg(),
                                            world.field().enemyGoalpostPos(), point,
                                            obstacles, radius);
-            // If not shot is found, at least set the target to the goal
+            // If no shot is found, at least set the target to the goal
             if (best_shot.second == Angle::zero())
             {
                 best_shot.first = world.field().enemyGoal();
