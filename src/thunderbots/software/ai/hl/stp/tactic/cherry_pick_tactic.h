@@ -31,7 +31,7 @@ class CherryPickTactic : public Tactic
      * @param world The current state of the world
      */
 
-    void updateParams(const World& world);
+    void updateParams();
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

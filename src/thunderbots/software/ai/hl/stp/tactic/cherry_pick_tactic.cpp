@@ -18,10 +18,7 @@ std::string CherryPickTactic::getName() const
     return "Cherry Pick Tactic";
 }
 
-void CherryPickTactic::updateParams(const World& world)
-{
-    this->world = world;
-}
+void CherryPickTactic::updateParams() {}
 
 double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
