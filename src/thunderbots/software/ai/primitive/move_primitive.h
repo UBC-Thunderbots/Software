@@ -79,14 +79,14 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    bool getAutoKickEnabled() const;
+    bool isAutoKickEnabled() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    bool getDribblerEnabled() const;
+    bool isDribblerEnabled() const;
 
     /**
      * Returns the generic vector of parameters for this Primitive
