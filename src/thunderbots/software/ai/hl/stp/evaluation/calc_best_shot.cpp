@@ -4,79 +4,102 @@
 
 namespace Evaluation
 {
-    std::pair<Point, Angle> calcBestShotOnEnemyGoal(const Field &f,
-                                                    const std::vector<Point> &obstacles,
-                                                    const Point &p, double radius)
+    std::pair<Point, Angle> calcBestShotOnGoal(const Point &goal_post_neg,
+                                               const Point &goal_post_pos, const Point &p,
+                                               const std::vector<Point> &obstacles,
+                                               double radius)
     {
-        // Calculate the location of goalpost then use angleSweepCircle function to get
-        // the pair
-        const Point p1 = f.enemyGoalpostNeg();
-        const Point p2 = f.enemyGoalpostPos();
-        return angleSweepCircles(p, p1, p2, obstacles, radius);
+        // Use angleSweepCircle function to get the pair
+        return angleSweepCircles(p, goal_post_neg, goal_post_pos, obstacles, radius);
     }
 
-    std::vector<std::pair<Point, Angle>> calcBestShotOnEnemyGoalAll(
-        const Field &f, const std::vector<Point> &obstacles, const Point &p,
-        double radius)
-    {
-        const Point p1 = f.enemyGoalpostNeg();
-        const Point p2 = f.enemyGoalpostPos();
-        return angleSweepCirclesAll(p, p1, p2, obstacles, radius);
-    }
-
-    std::pair<Point, Angle> calcBestShotOnEnemyGoal(const World &world,
-                                                    const Point &point, double radius)
+    std::pair<Point, Angle> calcBestShotOnGoal(const World &world, const Point &point,
+                                               double radius,
+                                               const std::vector<Robot> &robots_to_ignore,
+                                               bool shoot_on_enemy_goal)
     {
         std::vector<Point> obstacles;
-        const Team &enemy    = world.enemyTeam();
-        const Team &friendly = world.friendlyTeam();
-        obstacles.reserve(enemy.numRobots() + friendly.numRobots());
-        // create a vector of points for all the robots except the shooting one
-        for (const Robot &i : enemy.getAllRobots())
+        for (const Robot &enemy_robot : world.enemyTeam().getAllRobots())
         {
-            obstacles.emplace_back(i.position());
-        }
-        for (const Robot &fpl : friendly.getAllRobots())
-        {
-            if (fpl.position() == point)
+            // Only add the robot to the obstacles if it is not ignored
+            if (std::count(robots_to_ignore.begin(), robots_to_ignore.end(),
+                           enemy_robot) == 0)
             {
-                continue;
+                obstacles.emplace_back(enemy_robot.position());
             }
-            obstacles.emplace_back(fpl.position());
         }
-        std::pair<Point, Angle> best_shot =
-            calcBestShotOnEnemyGoal(world.field(), obstacles, point, radius);
-        // if there is no good shot at least make the
-        // target within the goal area
-        if (best_shot.second == Angle::zero())
+        for (const Robot &friendly_robot : world.friendlyTeam().getAllRobots())
         {
-            Point temp      = world.field().enemyGoal();
-            best_shot.first = temp;
+            // Only add the robot to the obstacles if it is not ignored
+            if (std::count(robots_to_ignore.begin(), robots_to_ignore.end(),
+                           friendly_robot) == 0)
+            {
+                obstacles.emplace_back(friendly_robot.position());
+            }
         }
+
+        std::pair<Point, Angle> best_shot;
+
+        // Calculate the best_shot based on what goal we're shooting at
+        if (shoot_on_enemy_goal)
+        {
+            best_shot = calcBestShotOnGoal(world.field().enemyGoalpostNeg(),
+                                           world.field().enemyGoalpostPos(), point,
+                                           obstacles, radius);
+            // If no shot is found, at least set the target to the goal
+            if (best_shot.second == Angle::zero())
+            {
+                best_shot.first = world.field().enemyGoal();
+            }
+        }
+        else
+        {
+            best_shot = calcBestShotOnGoal(world.field().friendlyGoalpostPos(),
+                                           world.field().friendlyGoalpostNeg(), point,
+                                           obstacles, radius);
+            // If not shot is found, at least set the target to the goal
+            if (best_shot.second == Angle::zero())
+            {
+                best_shot.first = world.field().friendlyGoal();
+            }
+        }
+
         return best_shot;
     }
 
-    std::vector<std::pair<Point, Angle>> calcBestShotOnEnemyGoalAll(const World &world,
-                                                                    const Point &point,
-                                                                    double radius)
+    std::pair<Point, Angle> calcBestShotOnEnemyGoal(
+        const World &world, const Robot &robot, double radius,
+        const std::vector<Robot> &robots_to_ignore)
     {
-        std::vector<Point> obstacles;
-        const Team &enemy    = world.enemyTeam();
-        const Team &friendly = world.friendlyTeam();
-        obstacles.reserve(enemy.numRobots() + friendly.numRobots());
-        for (const Robot &i : enemy.getAllRobots())
-        {
-            obstacles.push_back(i.position());
-        }
-        for (const Robot &fpl : friendly.getAllRobots())
-        {
-            if (fpl.position() == point)
-            {
-                continue;
-            }
-            obstacles.push_back(fpl.position());
-        }
-        return calcBestShotOnEnemyGoalAll(world.field(), obstacles, point, radius);
+        std::vector<Robot> all_robots_to_ignore = robots_to_ignore;
+        // Ignore the robot shooting the ball
+        all_robots_to_ignore.emplace_back(robot);
+        return calcBestShotOnEnemyGoal(world, robot.position(), radius,
+                                       all_robots_to_ignore);
     }
 
+    std::pair<Point, Angle> calcBestShotOnEnemyGoal(
+        const World &world, const Point &shot_origin, double radius,
+        const std::vector<Robot> &robots_to_ignore)
+    {
+        return calcBestShotOnGoal(world, shot_origin, radius, robots_to_ignore, true);
+    }
+
+    std::pair<Point, Angle> calcBestShotOnFriendlyGoal(
+        const World &world, const Robot &robot, double radius,
+        const std::vector<Robot> &robots_to_ignore)
+    {
+        std::vector<Robot> all_robots_to_ignore = robots_to_ignore;
+        // Ignore the robot shooting the ball
+        all_robots_to_ignore.emplace_back(robot);
+        return calcBestShotOnFriendlyGoal(world, robot.position(), radius,
+                                          all_robots_to_ignore);
+    }
+
+    std::pair<Point, Angle> calcBestShotOnFriendlyGoal(
+        const World &world, const Point &shot_origin, double radius,
+        const std::vector<Robot> &robots_to_ignore)
+    {
+        return calcBestShotOnGoal(world, shot_origin, radius, robots_to_ignore, false);
+    }
 }  // namespace Evaluation
