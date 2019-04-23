@@ -108,6 +108,8 @@ void PassGenerator::continuouslyGeneratePasses()
             painter->drawPoint(p, 0.1, 255, 0, 0);
         }
 
+        painter->publishAndClearLayers();
+
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
         std::this_thread::yield();

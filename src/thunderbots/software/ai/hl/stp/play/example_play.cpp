@@ -42,7 +42,8 @@ std::vector<std::shared_ptr<Tactic>> ExamplePlay::getNextTactics(
         passer->updateParams(pass, world.ball().lastUpdateTimestamp());
         receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass, world.ball());
 
-        yield({passer, receiver});
+//        yield({passer, receiver});
+    yield({});
     } while (true);
 }
 

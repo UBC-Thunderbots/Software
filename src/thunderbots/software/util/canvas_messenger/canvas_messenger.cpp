@@ -117,6 +117,7 @@ namespace Util
         for (auto& layer : this->layers_map)
         {
             layer.second.clear();
+//            Util::CanvasMessenger::getInstance()->drawPoint(Point(), 0.5, 255, 0, 0);
         }
     }
 
@@ -157,7 +158,7 @@ namespace Util
         sprite.blue = b;
 
         // 1 is a circle
-        sprite.texture = 1;
+        sprite.texture = 0;
 
         drawSprite(1, sprite);
     }
