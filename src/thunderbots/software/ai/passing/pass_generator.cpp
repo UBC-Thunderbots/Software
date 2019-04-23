@@ -6,6 +6,8 @@
 #include "ai/passing/evaluation.h"
 #include "pass_generator.h"
 
+#include "util/canvas_messenger/canvas_messenger.h"
+
 
 using namespace AI::Passing;
 using namespace Util::DynamicParameters::AI::Passing;
@@ -97,6 +99,14 @@ void PassGenerator::continuouslyGeneratePasses()
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
+
+        // Draw all the points we have so far
+        // TODO: Put this in a function
+        auto painter = Util::CanvasMessenger::getInstance();
+        for (Pass& pass : passes_to_optimize){
+            Point p = pass.receiverPoint();
+            painter->drawPoint(p, 0.1);
+        }
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
