@@ -12,7 +12,6 @@ class MoveAction : public Action
     // camera and positioning noise
     static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.02;
 
-    // TODO: Test new param here
     /**
      * Creates a new MoveAction
      *
