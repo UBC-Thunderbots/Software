@@ -74,7 +74,6 @@ class MovePrimitive : public Primitive
      */
     double getFinalSpeed() const;
 
-    // TODO: Test me!
     /**
      * Gets whether or not auto-kick should be enabled while moving
      *
@@ -82,7 +81,6 @@ class MovePrimitive : public Primitive
      */
     bool getAutoKickEnabled() const;
 
-    // TODO: Test me!
     /**
      * Gets whether or not the dribbler should be enabled while moving
      *

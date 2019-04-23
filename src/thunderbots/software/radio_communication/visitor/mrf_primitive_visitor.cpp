@@ -88,7 +88,6 @@ void MRFPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
     radio_prim->extra_bits = static_cast<uint8_t>(2 | 0);
 }
 
-// TODO: new extra bits here need to be tested!!
 void MRFPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
     radio_prim              = RadioPrimitive();
