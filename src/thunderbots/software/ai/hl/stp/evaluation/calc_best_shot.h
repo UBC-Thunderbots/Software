@@ -13,7 +13,7 @@ namespace Evaluation
      * obstacles on either side of the shot vector).
      *
      * @param goal_post_neg The goal post of the net with the negative y-coordinate
-     * @param goal_post_posThe goal post of the net with the positive y-coordinate
+     * @param goal_post_pos The goal post of the net with the positive y-coordinate
      * @param p The point that the shot will be taken from
      * @param obstacles The locations of any obstacles on the field that may obstruct the
      * shot. These are treated as circular obstacles, and are usually used to represent
