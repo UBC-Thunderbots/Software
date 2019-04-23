@@ -50,7 +50,7 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
         // ball is *almost* touching the kicker
         Vector ball_offset =
             Vector::createFromAngle(pass.passerOrientation())
-                .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+                .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS*2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
         yield(move_action.updateStateAndGetNextIntent(*robot, wait_position,
