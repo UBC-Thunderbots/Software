@@ -4,6 +4,7 @@
 #include "bangbang.h"
 #include "util/physbot.h"
 #include "shared_util/robot_constants.h"
+#include "shared_util/constants.h"
 #include "util/log.h"
 #include "util/util.h"
 #include <math.h>
@@ -14,6 +15,8 @@
 #include "dr.h"
 #include "dribbler.h"
 #include "leds.h"
+#include "../shared/constants.h"
+
 #else
 #include "simulate.h"
 #endif
@@ -178,7 +181,7 @@ static void move_start(const primitive_params_t *params)
 	// pick the wheel axis that will be used for faster movement
 	wheel_index = choose_wheel_axis(dx, dy, current_states.angle, destination[2]);
 
-    if (params->extra & 0x01) chicker_auto_arm(CHICKER_KICK, 5.5);
+    if(params->extra & 0x01) chicker_auto_arm(CHICKER_KICK, BALL_MAX_SPEED_METERS_PER_SECOND-1);
 	if(params->extra & 0x02) dribbler_set_speed(16000);
 }
 
