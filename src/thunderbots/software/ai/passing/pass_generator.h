@@ -201,6 +201,9 @@ namespace AI::Passing
          */
         std::vector<Pass> generatePasses(unsigned long num_passes_to_gen);
 
+        // TODO: Delete me
+        void visualizeStuff();
+
         // This constant is used to prevent division by 0 in our implementation of Adam
         // (gradient descent)
         static constexpr double eps = 1e-8;
