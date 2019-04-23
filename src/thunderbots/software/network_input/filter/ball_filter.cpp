@@ -1,5 +1,8 @@
 #include "ball_filter.h"
 
+BallFilter::BallFilter() : previous_ball_readings(5) {}
+
+
 Ball BallFilter::getFilteredData(const Ball& current_ball_state,
                                  const std::vector<SSLBallDetection>& new_ball_detections)
 {
@@ -17,5 +20,16 @@ Ball BallFilter::getFilteredData(const Ball& current_ball_state,
     // Set the magnitude based on the time minDiff
     ball_velocity = ball_velocity.norm(ball_velocity.len() / time_diff.getSeconds());
 
-    return Ball{filtered_detection.position, ball_velocity, filtered_detection.timestamp};
+    previous_ball_readings.push_back(ball_velocity);
+
+    auto average_ball_velocity = Vector(0, 0);
+    for (auto v : previous_ball_readings)
+    {
+        average_ball_velocity = average_ball_velocity + v;
+    }
+    average_ball_velocity =
+        average_ball_velocity.norm(average_ball_velocity.len() / previous_ball_readings.size());
+
+    return Ball{filtered_detection.position, average_ball_velocity,
+                filtered_detection.timestamp};
 }
