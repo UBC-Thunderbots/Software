@@ -180,5 +180,62 @@ namespace Util
             World world(field, ball, friendly_team, enemy_team);
             return world;
         }
+
+        thunderbots_msgs::World transformWorldMessage(
+                const thunderbots_msgs::World& old_world_msg)
+        {
+            thunderbots_msgs::World new_world_msg = old_world_msg;
+
+                    new_world_msg.ball = transformBallMessage(old_world_msg.ball);
+            new_world_msg.friendly_team.robots =
+                    transformRobotMessages(old_world_msg.friendly_team.robots);
+            new_world_msg.enemy_team.robots =
+                    transformRobotMessages(old_world_msg.enemy_team.robots);
+
+            return new_world_msg;
+        }
+
+        thunderbots_msgs::Ball transformBallMessage(
+                const thunderbots_msgs::Ball& old_ball_msg)
+        {
+            thunderbots_msgs::Ball new_ball = old_ball_msg;
+
+                    new_ball.position.x = -old_ball_msg.position.x;
+            new_ball.position.y = -old_ball_msg.position.y;
+
+            new_ball.velocity.x = -old_ball_msg.velocity.x;
+            new_ball.velocity.y = -old_ball_msg.velocity.y;
+
+            return new_ball;
+        }
+
+        std::vector<thunderbots_msgs::Robot> transformRobotMessages(
+                const std::vector<thunderbots_msgs::Robot>& old_robot_msgs)
+        {
+            std::vector<thunderbots_msgs::Robot> new_robots;
+
+            for (auto old_robot : old_robot_msgs)
+            {
+                new_robots.emplace_back(transformRobotMessage(old_robot));
+            }
+
+            return new_robots;
+        }
+
+        thunderbots_msgs::Robot transformRobotMessage(
+                const thunderbots_msgs::Robot& old_robot_msg)
+        {
+            thunderbots_msgs::Robot new_robot = old_robot_msg;
+
+                    new_robot.position.x = -old_robot_msg.position.x;
+            new_robot.position.y = -old_robot_msg.position.y;
+
+            new_robot.velocity.x = -old_robot_msg.velocity.x;
+            new_robot.velocity.y = -old_robot_msg.velocity.y;
+
+            new_robot.orientation = old_robot_msg.orientation + Angle::half().toRadians();
+
+            return new_robot;
+        }
     }  // namespace ROSMessages
 }  // namespace Util

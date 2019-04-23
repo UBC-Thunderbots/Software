@@ -55,6 +55,8 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
 {
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
 
+    std::cout << "IN MOVE" << std::endl;
+
     // Setup for the pass. We want to use any free time before the pass starts putting
     // ourself in the best position possible to take the pass
     while (ball.lastUpdateTimestamp() < pass.startTime())
@@ -63,6 +65,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
         // rotate to the correct orientation to face where the pass is coming from
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
                                                       pass.receiverOrientation(), 0));
+        std::cout << "Moving to position" << std::endl;
     }
 
     // Check if we can shoot on the enemy goal from the receiver position
@@ -125,6 +128,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
                                                           DIST_TO_FRONT_OF_ROBOT_METERS +
                                                           BALL_MAX_RADIUS_METERS);
 
+            std::cout << "ONE TIME" << std::endl;
 
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ideal_position, ideal_orientation, 0, false, true));
@@ -140,8 +144,9 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     else
     {
         while ((ball.position() - robot->position()).len() >
-               DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
+               DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS)
         {
+            std::cout << "RECECVING" << std::endl;
             Point ball_receive_pos = closestPointOnLine(
                 robot->position(), ball.position(),
                 ball.estimatePositionAtFutureTime(Duration::fromSeconds(0.1)));

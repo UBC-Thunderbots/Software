@@ -2,6 +2,10 @@
 
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
+#include "ai/passing/pass.h"
+#include "ai/passing/pass_generator.h"
+#include "ai/hl/stp/tactic/receiver_tactic.h"
+#include "ai/hl/stp/tactic/passer_tactic.h"
 
 const std::string ExamplePlay::name = "Example Play";
 
@@ -23,42 +27,19 @@ bool ExamplePlay::invariantHolds(const World &world) const
 std::vector<std::shared_ptr<Tactic>> ExamplePlay::getNextTactics(
     TacticCoroutine::push_type &yield, const World &world)
 {
-    // Create MoveTactics that will loop forever
-    auto move_tactic_1 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    Timestamp pass_start_time = world.ball().lastUpdateTimestamp() + Duration::fromSeconds(5);
+
+    AI::Passing::Pass pass(world.ball().position(), {0.5, 0}, 4, pass_start_time);
+    auto passer = std::make_shared<PasserTactic>(pass, world.ball().lastUpdateTimestamp(), false);
+    auto receiver = std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(), false);
 
     do
     {
-        // The angle between each robot spaced out in a circle around the ball
-        Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
+        pass = AI::Passing::Pass(world.ball().position(), {0.5, 0}, 3, pass_start_time);
+        passer->updateParams(pass, world.ball().lastUpdateTimestamp());
+        receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass, world.ball());
 
-        // Move the robots in a circle around the ball, facing the ball
-        move_tactic_1->updateParams(
-            world.ball().position() + Point::createFromAngle(angle_between_robots * 1),
-            (angle_between_robots * 1) + Angle::half(), 0);
-        move_tactic_2->updateParams(
-            world.ball().position() + Point::createFromAngle(angle_between_robots * 2),
-            (angle_between_robots * 2) + Angle::half(), 0);
-        move_tactic_3->updateParams(
-            world.ball().position() + Point::createFromAngle(angle_between_robots * 3),
-            (angle_between_robots * 3) + Angle::half(), 0);
-        move_tactic_4->updateParams(
-            world.ball().position() + Point::createFromAngle(angle_between_robots * 4),
-            (angle_between_robots * 4) + Angle::half(), 0);
-        move_tactic_5->updateParams(
-            world.ball().position() + Point::createFromAngle(angle_between_robots * 5),
-            (angle_between_robots * 5) + Angle::half(), 0);
-        move_tactic_6->updateParams(
-            world.ball().position() + Point::createFromAngle(angle_between_robots * 6),
-            (angle_between_robots * 6) + Angle::half(), 0);
-
-        // yield the Tactics this Play wants to run, in order of priority
-        yield({move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
-               move_tactic_6});
+        yield({passer, receiver});
     } while (true);
 }
 

@@ -96,5 +96,45 @@ namespace Util
             const thunderbots_msgs::RefboxCommand& command);
 
         World createWorldFromROSMessage(const thunderbots_msgs::World& world_msg);
+
+        /**
+         * Given a World message, it will transform the world's orientation
+         * Used when changing defending side
+         *
+         * @param old_world_msg The world message to transform
+         * @return The transformed world message
+         */
+        thunderbots_msgs::World transformWorldMessage(
+                const thunderbots_msgs::World& old_world_msg);
+
+        /**
+         * Given a Ball message, it will transform the ball's orientation
+         * Used when changing defending side
+         *
+         * @param old_ball_msg The ball message to transform
+         * @return The transformed ball message
+         */
+        thunderbots_msgs::Ball transformBallMessage(
+                const thunderbots_msgs::Ball& old_ball_msg);
+
+        /**
+         * Given a list of robots, it will transform each robot's orientation
+         * Used when changing defending side
+         *
+         * @param old_robot_msgs The vector of robot messages to transform
+         * @return A vector of transformed robot messages
+         */
+        std::vector<thunderbots_msgs::Robot> transformRobotMessages(
+                const std::vector<thunderbots_msgs::Robot>& old_robot_msgs);
+
+        /**
+         * Given a Robot message, it will transform the robot's orientation
+         * Used when changing defending side
+         *
+         * @param old_robot_msg The robot message to transform
+         * @return The transformed robot message
+         */
+        thunderbots_msgs::Robot transformRobotMessage(
+                const thunderbots_msgs::Robot& old_robot_msg);
     }  // namespace ROSMessages
 }  // namespace Util
