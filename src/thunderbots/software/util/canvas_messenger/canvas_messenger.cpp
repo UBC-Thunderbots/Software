@@ -42,10 +42,10 @@ namespace Util
             const std::vector<Sprite>& sprites = layer_pair.second;
 
             // Only send the non-empty layers
-            if (!layer_pair.second.empty())
-            {
+//            if (!layer_pair.second.empty())
+//            {
                 this->publishPayload(layer_number, sprites);
-            }
+//            }
         }
 
         // Clear shapes in layers of current frame/tick
@@ -145,6 +145,10 @@ namespace Util
 
         sprite.width = radius * 100;
         sprite.height = radius * 100;
+
+        sprite.red = 255;
+        sprite.green = 0;
+        sprite.blue = 0;
 
         drawSprite(1, sprite);
     }

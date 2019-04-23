@@ -43,7 +43,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     primitive_publisher.publish(primitive_array_message);
 
     // Display the world
-    Util::CanvasMessenger::getInstance()->drawField(world.field());
+//    Util::CanvasMessenger::getInstance()->drawField(world.field());
+    Util::CanvasMessenger::getInstance()->drawPoint(Point(), 0.5);
 
     // On every tick, send the layer messages
     Util::CanvasMessenger::getInstance()->publishAndClearLayers();
