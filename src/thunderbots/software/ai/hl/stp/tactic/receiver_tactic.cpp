@@ -54,6 +54,9 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
+
+    // Setup for the pass. We want to use any free time before the pass starts putting
+    // ourself in the best position possible to take the pass
     while (ball.lastUpdateTimestamp() < pass.startTime())
     {
         // We want the robot to move to the receiving position for the shot and also
@@ -70,12 +73,12 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     Vector robot_to_ball = ball.position() - robot->position();
 
     // The angle the robot will have to deflect the ball to shoot
-    Angle abs_deflection_angle;
+    Angle abs_angle_between_pass_and_shot_vectors;
     // The percentage of open net the robot would shoot on
     double net_percent_open;
     if (best_shot_opt){
         Vector robot_to_shot_target = best_shot_opt->first - robot->position();
-        abs_deflection_angle = (robot_to_ball.orientation() -
+        abs_angle_between_pass_and_shot_vectors = (robot_to_ball.orientation() -
          robot_to_shot_target.orientation())
                 .angleMod()
                 .abs();
@@ -88,7 +91,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     // angle that is reasonable, we should one-touch kick the ball towards the enemy net
     if (best_shot_opt &&
          net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-         abs_deflection_angle < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+         abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
     {
         auto [best_shot_target, _] = *best_shot_opt;
 
@@ -98,6 +101,8 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
         Angle ball_robot_angle =
             (ball_velocity.orientation() - robot_to_ball.orientation()).angleMod();
 
+        // Keep trying to shoot the ball while it's traveling roughly towards the robot
+        // (or moving slowly because we can't be certain of the velocity vector if it is)
         while(ball_robot_angle.toDegrees() < 90 || ball.velocity().len() < 0.5)
         {
             // Figure out the closest point on the balls trajectory to the robot
@@ -106,7 +111,6 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
                 ball.estimatePositionAtFutureTime(Duration::fromSeconds(0.1)));
             Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
 
-            // Determine the best position to be in
             Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);
             Vector ideal_orientation_vec = Vector::createFromAngle(
                 ideal_orientation);  // Vector(ideal_orientation.cos(),
@@ -124,7 +128,6 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
                 *robot, ideal_position, ideal_orientation, 0, false, true));
 
             // Calculations to check for termination conditions
-            ball_velocity = ball.velocity();
             robot_to_ball = ball.position() - robot->position();
             ball_robot_angle =
                 (ball_velocity.orientation() - robot_to_ball.orientation()).angleMod();
@@ -151,13 +154,14 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
 
 Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
 {
-    Point shot_vector = shot.getDirection();
+    Vector shot_vector = shot.getDirection();
     Angle shot_dir    = shot.getDirection().orientation();
-    Point bot_vector  = shot_vector.norm();
 
     Point ball_vel       = ball.velocity();
-    Point lateral_vel    = ball_vel - (ball_vel.dot(-bot_vector)) * (-bot_vector);
+    Point lateral_vel    = ball_vel.project(shot_vector.norm().perp());
     double lateral_speed = 0.3 * lateral_vel.len();
+    // This kick speed is based off of the value used in the firmware `MovePrimitive` when
+    // autokick is enabled
     double kick_speed    = BALL_MAX_SPEED_METERS_PER_SECOND - 1;
     Angle shot_offset    = Angle::asin(lateral_speed / kick_speed);
 

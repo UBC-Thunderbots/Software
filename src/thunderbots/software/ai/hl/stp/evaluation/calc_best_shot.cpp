@@ -12,10 +12,8 @@ namespace Evaluation
         return angleSweepCircles(p, goal_post_neg, goal_post_pos, obstacles, radius);
     }
 
-    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
-        const Field &field, const Team &friendly_team, const Team &enemy_team,
-        bool shoot_on_enemy_goal, const Point &point, double radius,
-        const std::vector<Robot> &robots_to_ignore)
+    std::optional<std::pair<Point, Angle>>
+    calcBestShotOnGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &point, bool shoot_on_enemy_goal, double radius, const std::vector<Robot> &robots_to_ignore)
     {
         std::vector<Point> obstacles;
         for (const Robot &enemy_robot : enemy_team.getAllRobots())
@@ -72,7 +70,7 @@ namespace Evaluation
         const Point &shot_origin, double radius,
         const std::vector<Robot> &robots_to_ignore)
     {
-        return calcBestShotOnGoal(field, friendly_team, enemy_team, true, shot_origin,
+        return calcBestShotOnGoal(field, friendly_team, enemy_team, shot_origin, true,
                                   radius, robots_to_ignore);
     }
 
@@ -92,11 +90,8 @@ namespace Evaluation
         const Point &shot_origin, double radius,
         const std::vector<Robot> &robots_to_ignore)
     {
-        return calcBestShotOnGoal(field, friendly_team, enemy_team, false, shot_origin,
+        return calcBestShotOnGoal(field, friendly_team, enemy_team, shot_origin, false,
                                   radius, robots_to_ignore);
-    }
-
-    double calcPercentNetOpen(const Field& field, std::pair<Point, Angle> shot){
     }
 
 }  // namespace Evaluation

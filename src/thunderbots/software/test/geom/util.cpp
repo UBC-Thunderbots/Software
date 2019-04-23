@@ -253,8 +253,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
     obs.push_back(Point(-9, 10));
     obs.push_back(Point(9, 10));
 
-    std::pair<Point, Angle> testpair =
-        *angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+    std::optional<std::pair<Point,Angle>> testpair_opt= angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+
+    // We expect to get a result
+    ASSERT_TRUE(testpair_opt);
+
+    std::pair<Point, Angle> testpair = *testpair_opt;
 
     EXPECT_TRUE((testpair.first.norm() - Point(0, 1)).len() < 0.0001);
     EXPECT_NEAR(75.449, testpair.second.toDegrees(), 1e-4);
@@ -264,7 +268,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
     obs.push_back(Point(6, 8));
     obs.push_back(Point(4, 10));
 
-    testpair = *angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+    testpair_opt = angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+
+    // We expect to get a result
+    ASSERT_TRUE(testpair_opt);
+
+    testpair = *testpair_opt;
 
     EXPECT_TRUE((testpair.first.norm() - Point(-0.0805897, 0.996747)).len() < 0.0001);
     EXPECT_NEAR(42.1928, testpair.second.toDegrees(), 1e-4);

@@ -15,7 +15,6 @@
 #include "dr.h"
 #include "dribbler.h"
 #include "leds.h"
-#include "../shared/constants.h"
 
 #else
 #include "simulate.h"
