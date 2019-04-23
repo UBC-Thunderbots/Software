@@ -7,8 +7,6 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-// TODO: Update these tests with new primitive parameters
-
 TEST(MovePrimTest, primitive_name_test)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
@@ -23,6 +21,27 @@ TEST(MovePrimTest, get_robot_id_test)
     MovePrimitive move_prim = MovePrimitive(robot_id, Point(), Angle(), 0.0);
 
     EXPECT_EQ(robot_id, move_prim.getRobotId());
+}
+
+TEST(MovePrimTest, autokick_and_dribble_disabled_by_default)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
+    EXPECT_FALSE(move_prim.getAutoKickEnabled());
+    EXPECT_FALSE(move_prim.getDribblerEnabled());
+}
+
+TEST(MovePrimTest, get_dribble_enabled)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, false);
+    EXPECT_TRUE(move_prim.getDribblerEnabled());
+    EXPECT_FALSE(move_prim.getAutoKickEnabled());
+}
+
+TEST(MovePrimTest, get_autokick_enabled)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, true);
+    EXPECT_FALSE(move_prim.getDribblerEnabled());
+    EXPECT_TRUE(move_prim.getAutoKickEnabled());
 }
 
 TEST(MovePrimTest, parameter_array_test)

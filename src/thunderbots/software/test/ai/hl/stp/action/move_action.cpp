@@ -4,8 +4,6 @@
 
 #include "ai/intent/move_intent.h"
 
-// TODO: Update these tests with new primitive parameters
-
 TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -24,6 +22,8 @@ TEST(MoveActionTest, robot_far_from_destination)
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
+    EXPECT_FALSE(move_intent.getDribblerEnabled());
+    EXPECT_FALSE(move_intent.getAutoKickEnabled());
 }
 
 TEST(MoveActionTest, robot_at_destination)
@@ -60,4 +60,48 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
+}
+
+TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(0.05);
+
+    auto intent_ptr = action.updateStateAndGetNextIntent(
+        robot, Point(1, 0), Angle::quarter(), 1.0, false, true);
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
+
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
+    EXPECT_EQ(0, move_intent.getRobotId());
+    EXPECT_EQ(Point(1, 0), move_intent.getDestination());
+    EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
+    EXPECT_EQ(1.0, move_intent.getFinalSpeed());
+    EXPECT_FALSE(move_intent.getDribblerEnabled());
+    EXPECT_TRUE(move_intent.getAutoKickEnabled());
+}
+
+TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(0.05);
+
+    auto intent_ptr = action.updateStateAndGetNextIntent(
+        robot, Point(1, 0), Angle::quarter(), 1.0, true, false);
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
+
+    MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
+    EXPECT_EQ(0, move_intent.getRobotId());
+    EXPECT_EQ(Point(1, 0), move_intent.getDestination());
+    EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
+    EXPECT_EQ(1.0, move_intent.getFinalSpeed());
+    EXPECT_TRUE(move_intent.getDribblerEnabled());
+    EXPECT_FALSE(move_intent.getAutoKickEnabled());
 }
