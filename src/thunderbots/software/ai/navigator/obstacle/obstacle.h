@@ -21,9 +21,12 @@ class Obstacle
      * should not enter with a buffer scaled by radius_cushion_scaling and
      * velocity_cushion_scaling
      *
-     * The radius cushion before scaling is the minimum distance needed for two robots to
-     * clear each other The velocity cushion before scaling is by default the distance
-     * that can be travelled in one tick
+     * The radius cushion is a hexagon such that the centre to side distance is (minimum
+     * distance needed for two robots to clear each other * radius scaling)
+     *
+     * The velocity cushion is a rectangular projection whose length is (velocity *
+     * velocity scaling) and whose width is the diameter of the radius cushion
+     *
      *
      * @param robot robot to create obstacle boundary polygon around
      * @param radius_cushion_scaling multiplicatively scales the radius of the obstacle
@@ -34,18 +37,21 @@ class Obstacle
      *
      * @return a six-sided Polygon to represent the boundary around the obstacle
      */
-    static Obstacle createRobotObstacleWithScalingParams(
-        const Robot& robot, bool enable_velocity_cushion, double radius_cushion_scaling,
-        double velocity_cushion_scaling, double tick_length_in_seconds = 1.0);
+    static Obstacle createRobotObstacleWithScalingParams(const Robot& robot,
+                                                         bool enable_velocity_cushion,
+                                                         double radius_cushion_scaling,
+                                                         double velocity_cushion_scaling);
 
     /*
      * Gets the boundary polygon around the given robot obstacle that other robots
      * should not enter with a buffer additively expanded by
      * additional_radius_cushion_buffer and additional_velocity_cushion_buffer
      *
-     * The radius cushion before adding the buffer is the minimum distance needed for two
-     * robots to clear each other The velocity cushion before adding the buffer is the
-     * distance that can be travelled in one tick
+     * The radius cushion is a hexagon such that the centre to side distance is (minimum
+     * distance needed for two robots to clear each other + radius buffer)
+     *
+     * The velocity cushion is a rectangular projection whose length is (velocity +
+     * velocity buffer) and whose width is the diameter of the radius cushion
      *
      * @param robot robot to create obstacle boundary polygon around
      * @param additional_radius_cushion_buffer additively increases the radius of the
@@ -60,7 +66,7 @@ class Obstacle
     static Obstacle createRobotObstacleWithBufferParams(
         const Robot& robot, bool enable_velocity_cushion,
         double additional_radius_cushion_buffer,
-        double additional_velocity_cushion_buffer, double tick_length_in_seconds = 1.0);
+        double additional_velocity_cushion_buffer);
 
     static Obstacle createBallObstacle(const Ball& ball);
 
@@ -71,6 +77,6 @@ class Obstacle
     static Obstacle createRobotObstacleFromPositionAndRadiusAndVelocity(
         Point position, double radius_cushion, Vector velocity_cushion_vector,
         bool enable_velocity_cushion);
-    static double getRadiusForHexagon(double radius);
+    static double getRadiusCushionForHexagon(double radius);
     Polygon _polygon;
 };
