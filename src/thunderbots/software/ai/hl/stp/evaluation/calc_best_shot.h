@@ -4,6 +4,7 @@
 #include "ai/world/robot.h"
 #include "ai/world/world.h"
 #include "geom/point.h"
+#include "shared/constants.h"
 
 namespace Evaluation
 {
@@ -24,10 +25,9 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot is possible, returns `std::nullopt`
      */
-     std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(const Point &goal_post_neg,
-                                               const Point &goal_post_pos, const Point &p,
-                                               const std::vector<Point> &obstacles,
-                                               double radius);
+    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
+        const Point &goal_post_neg, const Point &goal_post_pos, const Point &p,
+        const std::vector<Point> &obstacles, double radius);
 
     /**
      * Finds the best shot on the specified goal, and returns the best target to shoot at
@@ -37,7 +37,9 @@ namespace Evaluation
      * This function will treat all robots on the field as obstacles, except for the
      * robots_to_ignore
      *
-     * @param world The world state
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
      * @param point The point that the shot will be taken from
      * @param radius The radius for the robot obstacles
      * @param robots_to_ignore The robots to ignore
@@ -49,8 +51,10 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, bool shoot_at_enemy_goal, const Point &point, double radius, const std::vector<Robot> &robots_to_ignore);
+    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        bool shoot_at_enemy_goal, const Point &point, double radius = ROBOT_MAX_RADIUS_METERS,
+        const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the enemy goal, and returns the best target to shoot at and
@@ -60,7 +64,9 @@ namespace Evaluation
      * This function will treat all robot on the field as obstacles, except for the robot
      * taking the shot and the robots_to_ignore
      *
-     * @param world The world state
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
      * @param robot The robot taking the shot
      * @param radius The radius for the robot obstacles
      * @param robots_to_ignore The robots to ignore
@@ -69,8 +75,10 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnEnemyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Robot &robot, double radius, const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>> calcBestShotOnEnemyGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Robot &robot, double radius = ROBOT_MAX_RADIUS_METERS,
+        const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the enemy goal, and returns the best target to shoot at and
@@ -80,7 +88,9 @@ namespace Evaluation
      * This function will treat all robot on the field as obstacles, except for the
      * robots_to_ignore
      *
-     * @param world The world state
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
      * @param shot_origin The point the shot is being taken from
      * @param radius The radius for the robot obstacles
      * @param robots_to_ignore The robots to ignore
@@ -89,8 +99,10 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnEnemyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &shot_origin, double radius, const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>> calcBestShotOnEnemyGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
+        const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the friendly goal, and returns the best target to shoot at
@@ -100,7 +112,9 @@ namespace Evaluation
      * This function will treat all robot on the field as obstacles, except for the robot
      * taking the shot and the robots_to_ignore
      *
-     * @param world The world state
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
      * @param robot The robot taking the shot
      * @param radius The radius for the robot obstacles
      * @param robots_to_ignore The robots to ignore
@@ -109,8 +123,10 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnFriendlyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Robot &robot, double radius, const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>> calcBestShotOnFriendlyGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Robot &robot, double radius = ROBOT_MAX_RADIUS_METERS,
+        const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the friendly goal, and returns the best target to shoot at
@@ -120,7 +136,9 @@ namespace Evaluation
      * This function will treat all robot on the field as obstacles, except for the
      * robots_to_ignore
      *
-     * @param world The world state
+     * @param field The field
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
      * @param shot_origin The point the shot is being taken from
      * @param radius The radius for the robot obstacles
      * @param robots_to_ignore The robots to ignore
@@ -129,6 +147,8 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnFriendlyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &shot_origin, double radius, const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>> calcBestShotOnFriendlyGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
+        const std::vector<Robot> &robots_to_ignore = {});
 }  // namespace Evaluation

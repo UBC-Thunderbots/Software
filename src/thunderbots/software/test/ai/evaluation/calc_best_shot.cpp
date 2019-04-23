@@ -20,7 +20,7 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -38,7 +38,8 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     team.updateRobots({shooting_robot});
     world.updateFriendlyTeamState(team);
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
+
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
@@ -61,7 +62,7 @@ TEST(CalcBestShotTest,
         world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -85,7 +86,7 @@ TEST(CalcBestShotTest,
         world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -113,8 +114,7 @@ TEST(CalcBestShotTest,
         world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
-
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -141,7 +141,7 @@ TEST(CalcBestShotTest,
         world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
@@ -165,12 +165,10 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_ob
         world, {shooting_robot.position() + Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnEnemyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
+
     // We should not be able to find a shot
     ASSERT_FALSE(result);
-
-//    EXPECT_TRUE(result.first.isClose(world.field().enemyGoal(), 0.05));
-//    EXPECT_EQ(result.second.toDegrees(), 0);
 }
 
 TEST(CalcBestShotTest,
@@ -188,11 +186,8 @@ TEST(CalcBestShotTest,
         world, {shooting_robot.position() - Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
         Timestamp::fromSeconds(0));
 
-    auto result = Evaluation::calcBestShotOnFriendlyGoal(<#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, <#initializer#>, shooting_robot);
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), shooting_robot);
 
     // We should not be able to find a shot
     ASSERT_FALSE(result);
-
-//    EXPECT_TRUE(result.first.isClose(world.field().friendlyGoal(), 0.05));
-//    EXPECT_EQ(result.second.toDegrees(), 0);
 }
