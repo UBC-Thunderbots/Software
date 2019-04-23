@@ -56,7 +56,7 @@ double MovePrimitive::getFinalSpeed() const
     return final_speed;
 }
 
-bool MovePrimitive::getAutoKickEnabled() const
+bool MovePrimitive::isAutoKickEnabled() const
 {
     return enable_autokick;
 }
