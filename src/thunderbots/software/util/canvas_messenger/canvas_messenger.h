@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include "thunderbots_msgs/CanvasLayer.h"
 #include "util/constants.h"
@@ -141,5 +142,8 @@ namespace Util
 
         // Time point
         std::chrono::time_point<std::chrono::system_clock> time_last_published;
+
+        // The mutex for the layers
+        std::mutex layers_lock;
     };
 }  // namespace Util
