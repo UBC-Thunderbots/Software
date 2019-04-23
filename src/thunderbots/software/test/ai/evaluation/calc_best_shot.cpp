@@ -11,131 +11,173 @@
 #include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
-TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_vector_of_points_test)
+TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
 {
-    Field f                      = ::Test::TestUtil::createSSLDivBField();
-    std::vector<Point> obstacles = {Point(3.3 + 1.13, 0),
-                                    Point(3.3 + (1.13 / 1.3 * 1.2), (1.13 / 1.3) * 0.5)};
-    const Point p                = Point(3.3, 0);
-    double radius                = 0.15;
-    EXPECT_EQ(
-        std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
-                               Angle::atan(0.15 / 1.12))
-                                  .tan()),
-            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
-        Evaluation::calcBestShotOnEnemyGoal(f, obstacles, p, radius));
+    World world          = ::Test::TestUtil::createBlankTestingWorld();
+    Team team            = Team(Duration::fromSeconds(1));
+    Robot shooting_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
+
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world, shooting_robot,
+                                                      ROBOT_MAX_RADIUS_METERS);
+
+    EXPECT_TRUE(result.first.isClose(world.field().enemyGoal(), 0.05));
+    EXPECT_NEAR(result.second.toDegrees(), 12, 5);
 }
 
-TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_all_with_vector_of_points_test)
+TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
 {
-    Field f                                     = ::Test::TestUtil::createSSLDivBField();
-    std::vector<Point> obstacles                = {Point(3.3 + 1.13, 0),
-                                    Point(3.3 + (1.13 / 1.3 * 1.2), (1.13 / 1.3) * 0.5)};
-    const Point p                               = Point(3.3, 0);
-    double radius                               = 0.15;
-    std::vector<std::pair<Point, Angle>> result = {
-        std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
-                               Angle::atan(0.15 / 1.12))
-                                  .tan()),
-            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
-        std::make_pair(
-            Point(4.5,
-                  1.2 * ((Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)) / 2 +
-                         Angle::atan(0.15 / 1.12))
-                            .tan()),
-            (Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)))};
+    World world          = ::Test::TestUtil::createBlankTestingWorld();
+    Team team            = Team(Duration::fromSeconds(1));
+    Robot shooting_robot = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
 
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/516
-    // This line is added to tweak the result vector to pass the test for now, should be
-    // removed after the bug is fixed
-    result.emplace_back(std::make_pair(Point(4.5, 0.5), Angle::zero()));
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world, shooting_robot,
+                                                         ROBOT_MAX_RADIUS_METERS);
 
-
-    EXPECT_EQ(result, Evaluation::calcBestShotOnEnemyGoalAll(f, obstacles, p, radius));
+    EXPECT_TRUE(result.first.isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_NEAR(result.second.toDegrees(), 12, 5);
 }
 
-TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_world_test)
+TEST(CalcBestShotTest,
+     calc_best_shot_on_enemy_goal_with_obstacles_and_no_obstacles_being_ignored)
 {
-    World w       = ::Test::TestUtil::createBlankTestingWorld();
-    Point p       = Point(3.3, 0);
-    double radius = 0.15;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+    Robot shooting_robot =
+        Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
 
-    std::vector<Point> friendly = {p, Point(3.3 + 1.13, 0)};
-    std::vector<Point> enemy    = {Point(3.3 + (1.13 / 1.3 * 1.2), (1.13 / 1.3) * 0.5)};
+    world = ::Test::TestUtil::setEnemyRobotPositions(
+        world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
+        Timestamp::fromSeconds(0));
 
-    w = ::Test::TestUtil::setFriendlyRobotPositions(w, friendly, Timestamp());
-    w = ::Test::TestUtil::setEnemyRobotPositions(w, enemy, Timestamp());
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world, shooting_robot,
+                                                      ROBOT_MAX_RADIUS_METERS);
 
-    std::vector<Point> obstacles;
-    obstacles.insert(obstacles.end(), enemy.begin(), enemy.end());
-    obstacles.insert(obstacles.end(), friendly.begin() + 1, friendly.end());
-
-
-    EXPECT_EQ(
-        std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
-                               Angle::atan(0.15 / 1.12))
-                                  .tan()),
-            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
-        Evaluation::calcBestShotOnEnemyGoal(w, p, radius));
+    EXPECT_TRUE(result.first.isClose(Point(world.field().enemyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result.second.toDegrees(), 6, 5);
 }
 
-TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_world_no_available_shot_test)
+TEST(CalcBestShotTest,
+     calc_best_shot_on_friendly_goal_with_obstacles_and_no_obstacles_being_ignored)
 {
-    World w       = ::Test::TestUtil::createBlankTestingWorld();
-    Point p       = Point(3.3, 0);
-    double radius = 0.15;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+    Robot shooting_robot =
+        Robot(0, Point(-1, world.field().friendlyGoalpostNeg().y()), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateEnemyTeamState(team);
 
-    std::vector<Point> friendly = {p, Point(3.3 + 1.13, 0), Point(3.5, 0)};
-    std::vector<Point> enemy    = {Point(3.3 + (1.13 / 1.3 * 1.2), (1.13 / 1.3) * 0.5)};
+    world = ::Test::TestUtil::setFriendlyRobotPositions(
+        world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
+        Timestamp::fromSeconds(0));
 
-    w = ::Test::TestUtil::setFriendlyRobotPositions(w, friendly, Timestamp());
-    w = ::Test::TestUtil::setEnemyRobotPositions(w, enemy, Timestamp());
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world, shooting_robot,
+                                                         ROBOT_MAX_RADIUS_METERS);
 
-    std::vector<Point> obstacles;
-    obstacles.insert(obstacles.end(), enemy.begin(), enemy.end());
-    obstacles.insert(obstacles.end(), friendly.begin() + 1, friendly.end());
-
-    EXPECT_EQ(std::make_pair(Point(4.5, 0), Angle::zero()),
-              Evaluation::calcBestShotOnEnemyGoal(w, p, radius));
+    EXPECT_TRUE(
+        result.first.isClose(Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result.second.toDegrees(), 6, 5);
 }
 
-TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_all_with_world_test)
+TEST(CalcBestShotTest,
+     calc_best_shot_on_enemy_goal_with_obstacles_and_some_obstacles_being_ignored)
 {
-    World w       = ::Test::TestUtil::createBlankTestingWorld();
-    Point p       = Point(3.3, 0);
-    double radius = 0.15;
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+    Robot shooting_robot =
+        Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot friendly_blocking_robot =
+        Robot(1, Point(1.3, world.field().enemyGoalpostNeg().y() - 0.05), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
 
-    std::vector<Point> friendly = {p, Point(3.3 + 1.13, 0)};
-    std::vector<Point> enemy    = {Point(3.3 + (1.13 / 1.3 * 1.2), (1.13 / 1.3) * 0.5)};
+    world = ::Test::TestUtil::setEnemyRobotPositions(
+        world, {world.field().enemyGoal(), Point(2.5, 0.7), Point(-1, -1)},
+        Timestamp::fromSeconds(0));
 
-    w = ::Test::TestUtil::setFriendlyRobotPositions(w, friendly, Timestamp());
-    w = ::Test::TestUtil::setEnemyRobotPositions(w, enemy, Timestamp());
+    auto result = Evaluation::calcBestShotOnEnemyGoal(
+        world, shooting_robot, ROBOT_MAX_RADIUS_METERS, {friendly_blocking_robot});
 
-    std::vector<Point> obstacles;
-    obstacles.insert(obstacles.end(), enemy.begin(), enemy.end());
-    obstacles.insert(obstacles.end(), friendly.begin() + 1, friendly.end());
+    EXPECT_TRUE(result.first.isClose(Point(world.field().enemyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result.second.toDegrees(), 6, 5);
+}
 
-    std::vector<std::pair<Point, Angle>> result = {
-        std::make_pair(
-            Point(4.5, -1.2 * ((Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12)) / 2 +
-                               Angle::atan(0.15 / 1.12))
-                                  .tan()),
-            (Angle::atan(0.5 / 1.2) - Angle::atan(0.15 / 1.12))),
-        std::make_pair(
-            Point(4.5,
-                  1.2 * ((Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)) / 2 +
-                         Angle::atan(0.15 / 1.12))
-                            .tan()),
-            (Angle::atan(0.5 / 1.2) - 2 * Angle::atan(0.15 / 1.12)))};
+TEST(CalcBestShotTest,
+     calc_best_shot_on_friendly_goal_with_obstacles_and_some_obstacles_being_ignored)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+    Robot shooting_robot =
+        Robot(0, Point(-1, world.field().friendlyGoalpostNeg().y()), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_blocking_robot =
+        Robot(1, Point(-1.3, world.field().enemyGoalpostNeg().y() - 0.05), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateEnemyTeamState(team);
 
-    // TODO: https://github.com/UBC-Thunderbots/Software/issues/516
-    // This line is added to tweak the result vector to pass the test for now, should be
-    // removed after the bug is fixed
-    result.emplace_back(std::make_pair(Point(4.5, 0.5), Angle::zero()));
+    world = ::Test::TestUtil::setFriendlyRobotPositions(
+        world, {world.field().friendlyGoal(), Point(-2.5, -0.7), Point(1, 1)},
+        Timestamp::fromSeconds(0));
 
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(
+        world, shooting_robot, ROBOT_MAX_RADIUS_METERS, {enemy_blocking_robot});
 
-    EXPECT_EQ(result, Evaluation::calcBestShotOnEnemyGoalAll(w, p, radius));
+    EXPECT_TRUE(
+        result.first.isClose(Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result.second.toDegrees(), 6, 5);
+}
+
+TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_obstacles)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+    Robot shooting_robot =
+        Robot(0, Point(1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
+
+    world = ::Test::TestUtil::setEnemyRobotPositions(
+        world, {shooting_robot.position() + Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
+        Timestamp::fromSeconds(0));
+
+    auto result = Evaluation::calcBestShotOnEnemyGoal(world, shooting_robot,
+                                                      ROBOT_MAX_RADIUS_METERS);
+
+    EXPECT_TRUE(result.first.isClose(world.field().enemyGoal(), 0.05));
+    EXPECT_EQ(result.second.toDegrees(), 0);
+}
+
+TEST(CalcBestShotTest,
+     calc_best_shot_on_friendly_goal_with_all_shots_blocked_by_obstacles)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team team   = Team(Duration::fromSeconds(1));
+    Robot shooting_robot =
+        Robot(0, Point(-1, world.field().enemyGoalpostNeg().y()), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    team.updateRobots({shooting_robot});
+    world.updateFriendlyTeamState(team);
+
+    world = ::Test::TestUtil::setEnemyRobotPositions(
+        world, {shooting_robot.position() - Vector(ROBOT_MAX_RADIUS_METERS * 2, 0)},
+        Timestamp::fromSeconds(0));
+
+    auto result = Evaluation::calcBestShotOnFriendlyGoal(world, shooting_robot,
+                                                         ROBOT_MAX_RADIUS_METERS);
+
+    EXPECT_TRUE(result.first.isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_EQ(result.second.toDegrees(), 0);
 }
