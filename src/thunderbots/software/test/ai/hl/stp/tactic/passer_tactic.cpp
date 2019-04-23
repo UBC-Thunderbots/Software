@@ -26,7 +26,7 @@ TEST(PasserTacticTest,
     tactic.updateRobot(robot);
 
     // Robot should be offset from where the pass is supposed to start
-    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
+    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + 2*BALL_MAX_RADIUS_METERS;
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
@@ -52,7 +52,7 @@ TEST(PasserTacticTest,
     tactic.updateRobot(robot);
 
     // Robot should be offset from where the pass is supposed to start
-    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
+    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + 2*BALL_MAX_RADIUS_METERS;
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
@@ -80,7 +80,7 @@ TEST(
     tactic.updateRobot(robot);
 
     // Robot should be offset from where the pass is supposed to start
-    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
+    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + 2*BALL_MAX_RADIUS_METERS;
 
     // In this case we should be moving into position to kick the ball, since we're
     // in front of it and need to get behind it
@@ -106,7 +106,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_not_yet_started)
     tactic.updateRobot(robot);
 
     // Robot should be offset from where the pass is supposed to start
-    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
+    double robot_offset_meters = DIST_TO_FRONT_OF_ROBOT_METERS + 2*BALL_MAX_RADIUS_METERS;
 
     // We're in the perfect position to kick, but pass hasn't started yet, so
     // we should just be moving
