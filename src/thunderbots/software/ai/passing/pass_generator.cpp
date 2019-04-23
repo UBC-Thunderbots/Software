@@ -124,6 +124,14 @@ void PassGenerator::visualizeStuff() {
         painter->drawPoint(p, 0.1, 255, 0, 0, 0);
     }
 
+    double res = 4;
+
+    // Get field characteristics
+    world_mutex.lock();
+    double field_length = world.field().length();
+    double field_width = world.field().width();
+    world_mutex.unlock();
+
     // Draw the gradient
     for(int i = 0; i < world.field().length() * 10; i++){
         for(int j = 0; j < world.field().width() * 10; j++){
