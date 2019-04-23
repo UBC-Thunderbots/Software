@@ -144,7 +144,8 @@ namespace Util
         this->layers_map[layer].emplace_back(sprite);
     }
 
-    void CanvasMessenger::drawPoint(Point p, double radius, int r, int g, int b) {
+    void CanvasMessenger::drawPoint(Point p, double radius, int r, int g, int b,
+                                    int opacity) {
         Sprite sprite;
 
         sprite.x = p.x() * 100 - (radius*100/2);
@@ -156,6 +157,7 @@ namespace Util
         sprite.red = r;
         sprite.green = g;
         sprite.blue = b;
+        sprite.opacity = opacity;
 
         // 1 is a circle
         sprite.texture = 0;

@@ -89,7 +89,7 @@ namespace Util
          * // TODO: Units for the radius???
          * @param radius The radius to draw the point with
          */
-        void drawPoint(Point p, double radius, int r, int g, int b);
+        void drawPoint(Point p, double radius, int r, int g, int b, int opacity);
 
         /**
          * Draw the given field

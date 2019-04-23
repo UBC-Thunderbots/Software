@@ -56,6 +56,31 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
     return pass_quality;
 }
 
+double AI::Passing::ratePassNoTime(const World& world, const AI::Passing::Pass& pass,
+                             const std::optional<Rectangle>& target_region)
+{
+    double static_pass_quality =
+            getStaticPositionQuality(world.field(), pass.receiverPoint());
+
+    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
+
+    double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
+
+    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+
+    // Rate all passes outside our target region as 0 if we have one
+    double in_region_quality = 1;
+    if (target_region)
+    {
+        in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
+    }
+
+    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+                          shoot_pass_rating * in_region_quality;
+
+    return pass_quality;
+}
+
 double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
                                        const AI::Passing::Pass& pass)
 {

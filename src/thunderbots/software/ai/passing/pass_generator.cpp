@@ -115,25 +115,22 @@ void PassGenerator::continuouslyGeneratePasses()
 void PassGenerator::visualizeStuff() {
     // Take ownership of the world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
+    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
     // Draw all the points we have so far
     auto painter = Util::CanvasMessenger::getInstance();
     for (Pass& pass : passes_to_optimize){
         Point p = pass.receiverPoint();
-        painter->drawPoint(p, 0.1, 255, 0, 0);
+        painter->drawPoint(p, 0.1, 255, 0, 0, 0);
     }
 
     // Draw the gradient
-    auto pass_opt = getBestPassSoFar();
-    if (pass_opt){
-        Pass pass = *pass_opt;
-        for(int i = 0; i < world.field().length() * 10; i++){
-            for(int j = 0; j < world.field().width() * 10; j++){
-                Point p(i * 0.1, j*0.1);
-                pass = Pass(pass.passerPoint(), p, pass.speed(), pass.startTime());
-                double score = ratePass(pass);
-                painter->drawPoint(p, 0.1, 0, 255.0 * score, 255.0 * (1-score));
-            }
+    for(int i = 0; i < world.field().length() * 10; i++){
+        for(int j = 0; j < world.field().width() * 10; j++){
+            Point p(i * 0.1, j*0.1);
+            Pass pass({0,0}, p, 4, Timestamp::fromSeconds(0));
+            double score = ratePassNoTime(world, pass, target_region);
+            painter->drawPoint(p, 0.1, 0, 255.0 * score, 255.0 * (1 - score), 150);
         }
     }
 

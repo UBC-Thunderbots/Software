@@ -30,6 +30,9 @@ namespace AI::Passing
     double ratePass(const World& world, const AI::Passing::Pass& pass,
                     const std::optional<Rectangle>& target_region);
 
+    double ratePassNoTime(const World& world, const AI::Passing::Pass& pass,
+                    const std::optional<Rectangle>& target_region);
+
     /**
      * Rate pass based on the probability of scoring once we receive the pass
      *
