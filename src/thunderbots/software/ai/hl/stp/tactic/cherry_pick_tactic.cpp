@@ -36,6 +36,7 @@ std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
     std::optional<AI::Passing::Pass> best_pass = pass_generator.getBestPassSoFar();
     do
     {
+        pass_generator.setWorld(world);
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
         best_pass = pass_generator.getBestPassSoFar();
