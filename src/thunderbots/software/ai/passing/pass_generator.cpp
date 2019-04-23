@@ -105,7 +105,7 @@ void PassGenerator::continuouslyGeneratePasses()
         auto painter = Util::CanvasMessenger::getInstance();
         for (Pass& pass : passes_to_optimize){
             Point p = pass.receiverPoint();
-            painter->drawPoint(p, 0.1);
+            painter->drawPoint(p, 0.1, 255, 0, 0);
         }
 
         // Yield to allow other threads to run. This is particularly important if we
@@ -124,14 +124,10 @@ void PassGenerator::optimizePasses()
     // that we're optimizing
     const auto objective_function =
         [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
-            try
-            {
+            try{
                 Pass pass = convertArrayToPass(pass_array);
                 return ratePass(pass);
-            }
-            catch (std::invalid_argument& e)
-            {
-                // If the pass was invalid, just rate it as poorly as possible
+            } catch (std::invalid_argument& e){
                 return 0.0;
             }
         };
@@ -229,7 +225,15 @@ double PassGenerator::ratePass(Pass pass)
     std::lock_guard<std::mutex> world_lock(world_mutex);
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
-    return ::ratePass(world, pass, target_region);
+    double rating = 0;
+    try {
+        rating = ::ratePass(world, pass, target_region);
+    } catch (std::invalid_argument& e){
+        // If the pass is invalid, just rate it as poorly as possible
+        rating = 0;
+    }
+
+    return rating;
 }
 
 std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)

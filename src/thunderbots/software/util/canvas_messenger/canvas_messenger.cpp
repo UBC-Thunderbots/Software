@@ -150,6 +150,9 @@ namespace Util
         sprite.green = g;
         sprite.blue = b;
 
+        // 1 is a circle
+        sprite.texture = 1;
+
         drawSprite(1, sprite);
     }
 

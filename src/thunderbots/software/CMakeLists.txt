@@ -789,6 +789,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/pass.cpp
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
