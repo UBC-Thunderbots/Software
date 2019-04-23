@@ -27,8 +27,8 @@ Ball BallFilter::getFilteredData(const Ball& current_ball_state,
     {
         average_ball_velocity = average_ball_velocity + v;
     }
-    average_ball_velocity =
-        average_ball_velocity.norm(average_ball_velocity.len() / previous_ball_readings.size());
+    average_ball_velocity = average_ball_velocity.norm(average_ball_velocity.len() /
+                                                       previous_ball_readings.size());
 
     return Ball{filtered_detection.position, average_ball_velocity,
                 filtered_detection.timestamp};

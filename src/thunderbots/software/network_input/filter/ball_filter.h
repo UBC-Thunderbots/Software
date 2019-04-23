@@ -45,6 +45,5 @@ class BallFilter
                          const std::vector<SSLBallDetection>& new_ball_detections);
 
    private:
-
     boost::circular_buffer<Vector> previous_ball_readings;
 };
