@@ -123,15 +123,15 @@ namespace Util
 
     void CanvasMessenger::drawSprite(uint8_t layer, Sprite sprite)
     {
-        // Take ownership of the layers for the duration of this function
-        std::lock_guard<std::mutex> best_known_pass_lock(layers_lock);
-
         // We simply add the sprite to the specified layer
         this->addSpriteToLayer(layer, sprite);
     }
 
     void CanvasMessenger::addSpriteToLayer(uint8_t layer, Sprite& sprite)
     {
+        // Take ownership of the layers for the duration of this function
+        std::lock_guard<std::mutex> best_known_pass_lock(layers_lock);
+
         // We look if the layer exists
         if (this->layers_map.find(layer) == this->layers_map.end())
         {
