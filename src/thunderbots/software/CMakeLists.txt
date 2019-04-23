@@ -543,8 +543,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             geom/rectangle.cpp
             geom/util.cpp
-            test/ai/evaluation/indirect_chip.cpp
-            test/ai/evaluation/calc_best_shot.cpp
+            test/ai/hl/stp/evaluation/indirect_chip.cpp
+            test/ai/hl/stp/evaluation/calc_best_shot.cpp
             test/ai/hl/stp/evaluation/ball.cpp
             test/ai/hl/stp/evaluation/possession.cpp
             test/ai/hl/stp/evaluation/enemy_threat.cpp
@@ -609,10 +609,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
             ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/passer_tactic.cpp
+            ai/hl/stp/tactic/receiver_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/kick_intent.cpp
@@ -636,6 +638,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
             test/ai/hl/stp/tactic/passer_tactic.cpp
+            test/ai/hl/stp/tactic/receiver_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
