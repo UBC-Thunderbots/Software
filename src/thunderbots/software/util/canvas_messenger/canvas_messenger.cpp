@@ -18,6 +18,9 @@ namespace Util
 
     void CanvasMessenger::publishAndClearLayers()
     {
+        // Take ownership of the layers for the duration of this function
+        std::lock_guard<std::mutex> best_known_pass_lock(layers_lock);
+
         // Limit rate of the message publishing
         // Get the time right now
         const std::chrono::time_point<std::chrono::system_clock> now =
@@ -120,6 +123,9 @@ namespace Util
 
     void CanvasMessenger::drawSprite(uint8_t layer, Sprite sprite)
     {
+        // Take ownership of the layers for the duration of this function
+        std::lock_guard<std::mutex> best_known_pass_lock(layers_lock);
+
         // We simply add the sprite to the specified layer
         this->addSpriteToLayer(layer, sprite);
     }
