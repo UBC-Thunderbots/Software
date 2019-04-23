@@ -22,9 +22,9 @@ namespace Evaluation
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot
-     * vector). If no shot is possible, the returned angle will be 0
+     * vector). If no shot is possible, returns `std::nullopt`
      */
-    std::pair<Point, Angle> calcBestShotOnGoal(const Point &goal_post_neg,
+     std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(const Point &goal_post_neg,
                                                const Point &goal_post_pos, const Point &p,
                                                const std::vector<Point> &obstacles,
                                                double radius);
@@ -47,12 +47,10 @@ namespace Evaluation
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot
-     * vector).
+     * vector). If no shot can be found, returns std::nullopt
      */
-    std::pair<Point, Angle> calcBestShotOnGoal(const World &world, const Point &point,
-                                               double radius,
-                                               const std::vector<Robot> &robots_to_ignore,
-                                               bool shoot_at_enemy_goal);
+    std::optional<std::pair<Point, Angle>>
+    calcBestShotOnGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, bool shoot_at_enemy_goal, const Point &point, double radius, const std::vector<Robot> &robots_to_ignore);
 
     /**
      * Finds the best shot on the enemy goal, and returns the best target to shoot at and
@@ -69,11 +67,10 @@ namespace Evaluation
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot
-     * vector).
+     * vector). If no shot can be found, returns std::nullopt
      */
-    std::pair<Point, Angle> calcBestShotOnEnemyGoal(
-        const World &world, const Robot &robot, double radius,
-        const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>>
+    calcBestShotOnEnemyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Robot &robot, double radius, const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the enemy goal, and returns the best target to shoot at and
@@ -90,11 +87,10 @@ namespace Evaluation
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot
-     * vector).
+     * vector). If no shot can be found, returns std::nullopt
      */
-    std::pair<Point, Angle> calcBestShotOnEnemyGoal(
-        const World &world, const Point &shot_origin, double radius,
-        const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>>
+    calcBestShotOnEnemyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &shot_origin, double radius, const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the friendly goal, and returns the best target to shoot at
@@ -111,11 +107,10 @@ namespace Evaluation
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot
-     * vector).
+     * vector). If no shot can be found, returns std::nullopt
      */
-    std::pair<Point, Angle> calcBestShotOnFriendlyGoal(
-        const World &world, const Robot &robot, double radius,
-        const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>>
+    calcBestShotOnFriendlyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Robot &robot, double radius, const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the friendly goal, and returns the best target to shoot at
@@ -132,9 +127,8 @@ namespace Evaluation
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot
-     * vector).
+     * vector). If no shot can be found, returns std::nullopt
      */
-    std::pair<Point, Angle> calcBestShotOnFriendlyGoal(
-        const World &world, const Point &shot_origin, double radius,
-        const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>>
+    calcBestShotOnFriendlyGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &shot_origin, double radius, const std::vector<Robot> &robots_to_ignore = {});
 }  // namespace Evaluation

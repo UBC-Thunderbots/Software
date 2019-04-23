@@ -75,7 +75,7 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
     Angle open_angle_to_goal =
         angleSweepCircles(pass.receiverPoint(), field.enemyGoalpostNeg(),
                           field.enemyGoalpostPos(), obstacles, ROBOT_MAX_RADIUS_METERS)
-            .second;
+            ->second;
 
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // we get to the ideal shoot angle.
