@@ -26,8 +26,8 @@ MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     dest          = Point(dest_x, dest_y);
     final_angle   = Angle::ofRadians(primitive_msg.parameters.at(2));
     final_speed   = primitive_msg.parameters.at(3);
-    enable_dribbler = (bool)primitive_msg.parameters.at(4);
-    enable_autokick = (bool)primitive_msg.parameters.at(5);
+    enable_dribbler = static_cast<bool>(primitive_msg.parameters.at(4));
+    enable_autokick = static_cast<bool>(primitive_msg.parameters.at(5));
 }
 
 
@@ -56,12 +56,12 @@ double MovePrimitive::getFinalSpeed() const
     return final_speed;
 }
 
-bool MovePrimitive::getAutoKickEnabled() const
+bool MovePrimitive::isAutoKickEnabled() const
 {
     return enable_autokick;
 }
 
-bool MovePrimitive::getDribblerEnabled() const
+bool MovePrimitive::isDribblerEnabled() const
 {
     return enable_dribbler;
 }

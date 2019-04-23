@@ -22,8 +22,8 @@ TEST(MoveActionTest, robot_far_from_destination)
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
-    EXPECT_FALSE(move_intent.getDribblerEnabled());
-    EXPECT_FALSE(move_intent.getAutoKickEnabled());
+    EXPECT_FALSE(move_intent.isDribblerEnabled());
+    EXPECT_FALSE(move_intent.isAutoKickEnabled());
 }
 
 TEST(MoveActionTest, robot_at_destination)
@@ -80,8 +80,8 @@ TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
-    EXPECT_FALSE(move_intent.getDribblerEnabled());
-    EXPECT_TRUE(move_intent.getAutoKickEnabled());
+    EXPECT_FALSE(move_intent.isDribblerEnabled());
+    EXPECT_TRUE(move_intent.isAutoKickEnabled());
 }
 
 TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
@@ -102,6 +102,6 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
     EXPECT_EQ(Point(1, 0), move_intent.getDestination());
     EXPECT_EQ(Angle::quarter(), move_intent.getFinalAngle());
     EXPECT_EQ(1.0, move_intent.getFinalSpeed());
-    EXPECT_TRUE(move_intent.getDribblerEnabled());
-    EXPECT_FALSE(move_intent.getAutoKickEnabled());
+    EXPECT_TRUE(move_intent.isDribblerEnabled());
+    EXPECT_FALSE(move_intent.isAutoKickEnabled());
 }
