@@ -137,18 +137,18 @@ namespace Util
         this->layers_map[layer].emplace_back(sprite);
     }
 
-    void CanvasMessenger::drawPoint(Point p, double radius){
+    void CanvasMessenger::drawPoint(Point p, double radius, int r, int g, int b) {
         Sprite sprite;
 
         sprite.x = p.x() * 100 - (radius*100/2);
-        sprite.y =  p.y() * 100 - (radius*100/2);
+        sprite.y =  -p.y() * 100 - (radius*100/2);
 
         sprite.width = radius * 100;
         sprite.height = radius * 100;
 
-        sprite.red = 255;
-        sprite.green = 0;
-        sprite.blue = 0;
+        sprite.red = r;
+        sprite.green = g;
+        sprite.blue = b;
 
         drawSprite(1, sprite);
     }
@@ -157,8 +157,8 @@ namespace Util
         Sprite field_sprite;
         field_sprite.width = field.length() * 100;
         field_sprite.height = field.width() * 100;
-        field_sprite.x = field.length() * 100/2;
-        field_sprite.y = field.width() * 100/2;
+        field_sprite.x = -field.length() * 100/2;
+        field_sprite.y = -field.width() * 100/2;
 
         drawSprite(0, field_sprite);
     }
