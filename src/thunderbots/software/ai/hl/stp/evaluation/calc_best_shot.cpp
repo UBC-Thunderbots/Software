@@ -12,8 +12,10 @@ namespace Evaluation
         return angleSweepCircles(p, goal_post_neg, goal_post_pos, obstacles, radius);
     }
 
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &point, bool shoot_on_enemy_goal, double radius, const std::vector<Robot> &robots_to_ignore)
+    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Point &point, bool shoot_on_enemy_goal, double radius,
+        const std::vector<Robot> &robots_to_ignore)
     {
         std::vector<Point> obstacles;
         for (const Robot &enemy_robot : enemy_team.getAllRobots())

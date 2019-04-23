@@ -51,9 +51,11 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>>
-    calcBestShotOnGoal(const Field &field, const Team &friendly_team, const Team &enemy_team, const Point &point, bool shoot_at_enemy_goal, double radius = ROBOT_MAX_RADIUS_METERS,
-                       const std::vector<Robot> &robots_to_ignore = {});
+    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
+        const Field &field, const Team &friendly_team, const Team &enemy_team,
+        const Point &point, bool shoot_at_enemy_goal,
+        double radius                              = ROBOT_MAX_RADIUS_METERS,
+        const std::vector<Robot> &robots_to_ignore = {});
 
     /**
      * Finds the best shot on the enemy goal, and returns the best target to shoot at and

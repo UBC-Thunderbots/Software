@@ -72,10 +72,12 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
 
     // Figure out the range of angles for which we have an open shot to the goal after
     // receiving the pass
-    auto shot_opt = angleSweepCircles(pass.receiverPoint(), field.enemyGoalpostNeg(),
-                                   field.enemyGoalpostPos(), obstacles, ROBOT_MAX_RADIUS_METERS);
+    auto shot_opt =
+        angleSweepCircles(pass.receiverPoint(), field.enemyGoalpostNeg(),
+                          field.enemyGoalpostPos(), obstacles, ROBOT_MAX_RADIUS_METERS);
     Angle open_angle_to_goal = Angle::zero();
-    if (shot_opt){
+    if (shot_opt)
+    {
         open_angle_to_goal = shot_opt->second;
     }
 

@@ -76,22 +76,24 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     Angle abs_angle_between_pass_and_shot_vectors;
     // The percentage of open net the robot would shoot on
     double net_percent_open;
-    if (best_shot_opt){
+    if (best_shot_opt)
+    {
         Vector robot_to_shot_target = best_shot_opt->first - robot->position();
-        abs_angle_between_pass_and_shot_vectors = (robot_to_ball.orientation() -
-         robot_to_shot_target.orientation())
+        abs_angle_between_pass_and_shot_vectors =
+            (robot_to_ball.orientation() - robot_to_shot_target.orientation())
                 .angleMod()
                 .abs();
 
-        Angle goal_angle = vertexAngle(field.friendlyGoalpostPos(), robot->position(), field.friendlyGoalpostNeg()).abs();
+        Angle goal_angle = vertexAngle(field.friendlyGoalpostPos(), robot->position(),
+                                       field.friendlyGoalpostNeg())
+                               .abs();
         net_percent_open = best_shot_opt->second.toDegrees() / goal_angle.toDegrees();
     }
 
     // If we have a shot with a sufficiently large enough opening, and the deflection
     // angle that is reasonable, we should one-touch kick the ball towards the enemy net
-    if (best_shot_opt &&
-         net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-         abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+    if (best_shot_opt && net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
+        abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
     {
         auto [best_shot_target, _] = *best_shot_opt;
 
@@ -103,7 +105,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
 
         // Keep trying to shoot the ball while it's traveling roughly towards the robot
         // (or moving slowly because we can't be certain of the velocity vector if it is)
-        while(ball_robot_angle.toDegrees() < 90 || ball.velocity().len() < 0.5)
+        while (ball_robot_angle.toDegrees() < 90 || ball.velocity().len() < 0.5)
         {
             // Figure out the closest point on the balls trajectory to the robot
             Point closest_ball_pos = closestPointOnLine(
@@ -138,7 +140,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     else
     {
         while ((ball.position() - robot->position()).len() >
-               DIST_TO_FRONT_OF_ROBOT_METERS + 2*BALL_MAX_RADIUS_METERS)
+               DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
             Point ball_receive_pos = closestPointOnLine(
                 robot->position(), ball.position(),
@@ -155,15 +157,15 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
 Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
 {
     Vector shot_vector = shot.getDirection();
-    Angle shot_dir    = shot.getDirection().orientation();
+    Angle shot_dir     = shot.getDirection().orientation();
 
     Point ball_vel       = ball.velocity();
     Point lateral_vel    = ball_vel.project(shot_vector.norm().perp());
     double lateral_speed = 0.3 * lateral_vel.len();
     // This kick speed is based off of the value used in the firmware `MovePrimitive` when
     // autokick is enabled
-    double kick_speed    = BALL_MAX_SPEED_METERS_PER_SECOND - 1;
-    Angle shot_offset    = Angle::asin(lateral_speed / kick_speed);
+    double kick_speed = BALL_MAX_SPEED_METERS_PER_SECOND - 1;
+    Angle shot_offset = Angle::asin(lateral_speed / kick_speed);
 
     // check which direction the ball is going in so we can decide which direction to
     // apply the offset in
