@@ -32,13 +32,10 @@ class Obstacle
      * @param radius_cushion_scaling multiplicatively scales the radius of the obstacle
      * @param velocity_cushion_scaling multiplicatively scales the cushion of
      * velocity of the robot
-     * @param enable_velocity_cushion if true, enables the cushion of the velocity
-     * of the robot as component of the obstacle
      *
      * @return a six-sided Polygon to represent the boundary around the obstacle
      */
     static Obstacle createRobotObstacleWithScalingParams(const Robot& robot,
-                                                         bool enable_velocity_cushion,
                                                          double radius_cushion_scaling,
                                                          double velocity_cushion_scaling);
 

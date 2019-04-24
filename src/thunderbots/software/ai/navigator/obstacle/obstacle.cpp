@@ -21,7 +21,6 @@ Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_
 }
 
 Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
-                                                        bool enable_velocity_cushion,
                                                         double radius_cushion_scaling,
                                                         double velocity_cushion_scaling)
 {
@@ -34,7 +33,7 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,
-        enable_velocity_cushion && velocity_cushion_vector.len() > radius_cushion);
+        velocity_cushion_vector.len() > radius_cushion);
 }
 
 Obstacle Obstacle::createRobotObstacleWithBufferParams(

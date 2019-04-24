@@ -20,7 +20,7 @@ TEST(NavigatorObstacleTest, default_velocity_obstacle_polygon)
     Timestamp current_time = Timestamp::fromSeconds(123);
     Robot robot = Robot(3, Point(0.0, 0.0), Vector(0.0, 0.0), Angle::ofRadians(2.2),
                         AngularVelocity::ofRadians(-0.6), current_time);
-    Polygon pg  = Obstacle::createRobotObstacleWithScalingParams(robot, true, 1.0, 1.0)
+    Polygon pg  = Obstacle::createRobotObstacleWithScalingParams(robot, 1.0, 1.0)
                      .getBoundaryPolygon();
 
     // visually verified
@@ -53,7 +53,7 @@ TEST(NavigatorObstacleTest, shifted_scaling_velocity_obstacle_polygon)
     Timestamp current_time = Timestamp::fromSeconds(123);
     Robot robot            = Robot(3, Point(1, 2), Vector(3, 2), Angle::ofRadians(2.2),
                         AngularVelocity::ofRadians(-0.6), current_time);
-    Polygon pg = Obstacle::createRobotObstacleWithScalingParams(robot, true, 1.0, 1.0)
+    Polygon pg = Obstacle::createRobotObstacleWithScalingParams(robot, 1.0, 1.0)
                      .getBoundaryPolygon();
     // visually verified
     Point pt0 = Point(0.885, 2.173);
@@ -85,7 +85,7 @@ TEST(NavigatorObstacleTest, shifted_scaled_up_velocity_obstacle_polygon)
     Timestamp current_time = Timestamp::fromSeconds(123);
     Robot robot            = Robot(3, Point(-1, -2), Vector(-3, 2), Angle::ofRadians(2.2),
                         AngularVelocity::ofRadians(-0.6), current_time);
-    Polygon pg = Obstacle::createRobotObstacleWithScalingParams(robot, true, 1.2, 1.4)
+    Polygon pg = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 1.4)
                      .getBoundaryPolygon();
     // visually verified
     Point pt0 = Point(-1.138, -2.208);
