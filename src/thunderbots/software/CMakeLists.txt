@@ -157,7 +157,8 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-        ai/navigator/obstacle/obstacle.cpp)
+	)
+
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
@@ -324,26 +325,6 @@ if (CATKIN_ENABLE_TESTING)
             geom/point.h)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(nav_obstacle_test
-            util/time/duration.cpp
-            util/time/time.cpp
-            util/time/timestamp.cpp
-            ai/world/ball.h
-            ai/world/robot.h
-            ai/world/robot.cpp
-            geom/angle.h
-            geom/point.h
-            geom/polygon.h
-            geom/polygon.cpp
-            geom/util.h
-            geom/util.cpp
-            ../shared/constants.h
-            test/ai/navigator/obstacle/obstacle.cpp
-            ai/navigator/obstacle/obstacle.cpp
-            ai/navigator/obstacle/obstacle.h)
-
-    target_link_libraries(nav_obstacle_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
@@ -862,11 +843,21 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/main.cpp
             test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             test/test_util/test_util.cpp
+            test/ai/navigator/obstacle/obstacle.cpp
             util/parameter/dynamic_parameter_utils.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
+            geom/angle.h
+            geom/point.h
+            geom/polygon.h
+            geom/polygon.cpp
+            geom/util.h
+            geom/util.cpp
+            ../shared/constants.h
+            ai/navigator/obstacle/obstacle.cpp
+            ai/navigator/obstacle/obstacle.h
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}

@@ -172,10 +172,3 @@ TEST(NavigatorObstacleTest, shifted_with_buffer_velocity_obstacle_polygon)
     EXPECT_NEAR(pg.getPoints()[5].x(), pt5.x(), TEST_EPSILON);
     EXPECT_NEAR(pg.getPoints()[5].y(), pt5.y(), TEST_EPSILON);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
