@@ -45,12 +45,12 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     // Display the world
     Util::CanvasMessenger::getInstance()->drawField(world.field());
     for(const auto& r : world.friendlyTeam().getAllRobots()) {
-        Util::CanvasMessenger::getInstance()->drawPoint(r.position(), 0.2, 0, 100, 0);
+        Util::CanvasMessenger::getInstance()->drawPoint(r.position(), 0.2, 0, 100, 0, 255);
     }
     for(const auto& r : world.enemyTeam().getAllRobots()) {
-        Util::CanvasMessenger::getInstance()->drawPoint(r.position(), 0.2, 100, 0, 0);
+        Util::CanvasMessenger::getInstance()->drawPoint(r.position(), 0.2, 100, 0, 0, 255);
     }
-    Util::CanvasMessenger::getInstance()->drawPoint(world.ball().position(), 0.15, 255, 140, 0);
+    Util::CanvasMessenger::getInstance()->drawPoint(world.ball().position(), 0.15, 255, 140, 0, 255);
 
 //    Util::CanvasMessenger::getInstance()->drawPoint(Point(), 0.5, 255, 0, 0);
 //    Util::CanvasMessenger::getInstance()->drawPoint(Point(0, 2), 0.5, 0, 255, 0);
