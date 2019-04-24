@@ -75,6 +75,31 @@ TEST_F(PassingEvaluationTest, ratePass_no_target_region_pass_through_wall_of_rob
     EXPECT_LE(pass_rating, 0.1);
 }
 
+TEST_F(PassingEvaluationTest, deleteme){
+    // Test passing towards the enemy goal through a line of enemy defenders
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+
+    Team new_friendly_team(Duration::fromSeconds(0.1));
+    new_friendly_team.updateRobots({
+                                           Robot(0, Point(1, 0), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                   });
+    world.updateFriendlyTeamState(new_friendly_team);
+
+    Team new_enemy_team(Duration::fromSeconds(0.1));
+    new_enemy_team.updateRobots({
+                                        Robot(0, Point(2, 0.0), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                        Robot(1, Point(2, 0.3), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                        Robot(2, Point(2, -0.3), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                });
+    world.updateEnemyTeamState(new_enemy_team);
+
+    Pass pass({0,0}, {-0.1956, 0.36}, 2.52, Timestamp::fromSeconds(3.355));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0);
+    EXPECT_LE(pass_rating, 0.1);
+}
+
 TEST_F(PassingEvaluationTest, ratePass_with_target_region)
 {
     // This should be a really good pass, but it's outside our target region, so it

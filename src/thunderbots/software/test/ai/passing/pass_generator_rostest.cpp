@@ -28,7 +28,7 @@ TEST_F(PassGeneratorRosTest, deleteme){
 
     Team new_friendly_team(Duration::fromSeconds(0.1));
     new_friendly_team.updateRobots({
-                Robot(0, Point(1, 0), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+//                Robot(0, Point(-0.3, 0), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
                 Robot(1, Point(2, 2), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3))
             });
     world.updateFriendlyTeamState(new_friendly_team);
@@ -57,6 +57,13 @@ TEST_F(PassGeneratorRosTest, deleteme){
             Util::CanvasMessenger::getInstance()->drawPoint(r.position(), 0.2, 100, 0, 0, 255);
         }
         Util::CanvasMessenger::getInstance()->drawPoint(world.ball().position(), 0.15, 255, 140, 0, 255);
+
+
+//        Util::CanvasMessenger::getInstance()->drawPoint(world.field().friendlyCornerPos(), 0.2, 255, 0, 0, 255);
+//        Util::CanvasMessenger::getInstance()->drawPoint(world.field().enemyCornerPos(), 0.2, 0, 255, 0, 255);
+//        Util::CanvasMessenger::getInstance()->drawPoint(world.field().friendlyCornerNeg(), 0.2, 0, 0, 255, 255);
+//        Util::CanvasMessenger::getInstance()->drawPoint(world.field().enemyCornerNeg(), 0.2, 255, 0, 0, 255);
+//        Util::CanvasMessenger::getInstance()->publishAndClearLayers();
 
         pass_generator.setWorld(world);
         std::this_thread::yield();

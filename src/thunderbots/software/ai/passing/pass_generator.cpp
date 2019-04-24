@@ -121,7 +121,13 @@ void PassGenerator::visualizeStuff() {
     auto painter = Util::CanvasMessenger::getInstance();
     for (Pass& pass : passes_to_optimize){
         Point p = pass.receiverPoint();
-        painter->drawPoint(p, 0.1, 255, 0, 0, 255);
+        double score = ratePass(pass);
+        painter->drawPoint(p, 0.1, 255, 0, 0, 128 * score + 128);
+        if ((p.x() < 0 || p.y() < 0) && score > 0.2){
+            std::cout << "Pass: " << pass << std::endl;
+            std::cout << "Score: " << ratePass(pass) << std::endl;
+        }
+        score = ratePass(pass);
     }
 
     double res = 4;
@@ -136,15 +142,13 @@ void PassGenerator::visualizeStuff() {
     std::optional<Pass> pass_opt = getBestPassSoFar();
     if (pass_opt){
         Pass pass = *pass_opt;
+        double score = ratePass(pass);
+        painter->drawPoint(pass.receiverPoint(), 0.1, 0, 255, 0, 255);
         for(int i = 0; i < field_length * res; i++){
             for(int j = 0; j < field_width * res; j++){
                 Point p(i * 1/res - world.field().length()/2, j*1/res - world.field().width() / 2);
                 pass = Pass(pass.passerPoint(), p, pass.speed(), pass.startTime());
-                double score = ratePass(pass);
-                if (p.x() > 2.5 && abs(p.y()) < 0.5 && score > 0.05){
-                    std::cout << "Pass: " << pass << std::endl;
-                    std::cout << "Score: " << score << std::endl;
-                }
+                score = ratePass(pass);
                 painter->drawPoint(p, 1/res, 0, std::ceil(255.0 * score), std::ceil(255.0 * (1 - score)), 150);
             }
         }
@@ -277,10 +281,12 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     // Take ownership of world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
 
-    std::uniform_real_distribution x_distribution(-world.field().width() / 2,
-                                                  world.field().width() / 2);
-    std::uniform_real_distribution y_distribution(-world.field().length() / 2,
+    // TODO: YOU had length and width switched here. Add a unit test to check for generation
+    // failures like this...........
+    std::uniform_real_distribution x_distribution(-world.field().length() / 2,
                                                   world.field().length() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().width() / 2,
+                                                  world.field().width() / 2);
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
     double curr_time = world.ball().lastUpdateTimestamp().getSeconds();
     double min_start_time_offset =

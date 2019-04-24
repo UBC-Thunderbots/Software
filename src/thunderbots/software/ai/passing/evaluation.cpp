@@ -9,6 +9,7 @@
 
 #include "../shared/constants.h"
 #include "ai/evaluation/pass.h"
+#include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "geom/util.h"
 #include "util/parameter/dynamic_parameters.h"
 
@@ -37,13 +38,23 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
     double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
                           shoot_pass_rating * in_region_quality;
 
-    // Strict requirement that the pass occurs at a minimum time in the future
+    // Place strict limits on pass start time
     double min_pass_time_offset =
         Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    double max_pass_time_offset =
+            Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
     pass_quality *= sigmoid(
         pass.startTime().getSeconds(),
         min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+    // TODO: Test this upper bound!
+    pass_quality *= 1 - sigmoid(
+            pass.startTime().getSeconds(),
+            max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.001);
+
+    if (pass_quality > 0.1 && pass.startTime().getSeconds() >max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds()){
+        std::cout << "Pass with bad time: " << pass << std::endl;
+    }
 
     // Place strict limits on the ball speed
     double min_pass_speed =
@@ -106,11 +117,20 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
         open_angle_to_goal = shot_opt->second;
     }
 
+    // TODO: Clean this crap up
+    Angle goal_angle = vertexAngle(field.friendlyGoalpostPos(), pass.passerPoint(),
+                                   field.friendlyGoalpostNeg())
+            .abs();
+    double net_percent_open = open_angle_to_goal.toDegrees() / goal_angle.toDegrees();
+
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // we get to the ideal shoot angle.
+//    double shot_openness_score =
+//        sigmoid(open_angle_to_goal.toDegrees(), 0.5 * ideal_shoot_angle_degrees,
+//                ideal_shoot_angle_degrees);
     double shot_openness_score =
-        sigmoid(open_angle_to_goal.toDegrees(), 0.5 * ideal_shoot_angle_degrees,
-                ideal_shoot_angle_degrees);
+            sigmoid(net_percent_open, 0.5,
+                    0.95);
 
     // Prefer angles where the robot does not have to turn much after receiving the
     // pass to take the shot
