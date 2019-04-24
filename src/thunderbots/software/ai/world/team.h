@@ -196,6 +196,4 @@ class Team
     // The duration for which a Robot must not have been updated for before
     // being removed from this team.
     Duration robot_expiry_buffer_duration;
-
-    Timestamp last_update_timestamp;
 };

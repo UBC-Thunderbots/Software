@@ -160,7 +160,7 @@ std::optional<Timestamp> Team::lastUpdateTimestamp() const {
             most_recent_timestamp = robot.lastUpdateTimestamp();
         }
     }
-    return last_update_timestamp;
+    return most_recent_timestamp;
 }
 
 bool Team::operator==(const Team& other) const
