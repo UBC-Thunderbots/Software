@@ -75,7 +75,7 @@ double AI::Passing::ratePassNoTime(const World& world, const AI::Passing::Pass& 
         in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
     }
 
-    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+    double pass_quality = static_pass_quality * friendly_pass_rating *// enemy_pass_rating *
                           shoot_pass_rating * in_region_quality;
 
     return pass_quality;

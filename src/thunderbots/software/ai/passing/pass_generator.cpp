@@ -114,36 +114,35 @@ void PassGenerator::continuouslyGeneratePasses()
 
 void PassGenerator::visualizeStuff() {
     // Take ownership of the world for the duration of this function
-    std::lock_guard<std::mutex> world_lock(world_mutex);
-    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
+//    std::lock_guard<std::mutex> world_lock(world_mutex);
+//    std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
     // Draw all the points we have so far
     auto painter = Util::CanvasMessenger::getInstance();
     for (Pass& pass : passes_to_optimize){
         Point p = pass.receiverPoint();
-        painter->drawPoint(p, 0.1, 255, 0, 0, 0);
+        painter->drawPoint(p, 0.1, 255, 0, 0, 255);
     }
 
-    double res = 4;
+    double res = 10;
 
     // Get field characteristics
-//    world_mutex.lock();
+    world_mutex.lock();
     double field_length = world.field().length();
     double field_width = world.field().width();
-//    world_mutex.unlock();
+    world_mutex.unlock();
 
     // Draw the gradient
-    for(int i = 0; i < world.field().length() * res; i++){
-        for(int j = 0; j < world.field().width() * res; j++){
-            Point p(i * 1/res - world.field().length()/2, j*1/res - world.field().width() / 2);
-            Pass pass({0,0}, p, 4, world.ball().lastUpdateTimestamp() + Duration::fromSeconds(0.5));
-            double score = 0;
-            try {
-                score = ratePassNoTime(world, pass, target_region);
-            }catch(std::invalid_argument) {
-
+    std::optional<Pass> pass_opt = getBestPassSoFar();
+    if (pass_opt){
+        Pass pass = *pass_opt;
+        for(int i = 0; i < field_length * res; i++){
+            for(int j = 0; j < field_width * res; j++){
+                Point p(i * 1/res - world.field().length()/2, j*1/res - world.field().width() / 2);
+//                pass = Pass(pass.passerPoint(), p, pass.speed(), pass.startTime());
+                double score = ratePass(pass);
+                painter->drawPoint(p, 1/res, 0, std::ceil(255.0 * score), std::ceil(255.0 * (1 - score)), 150);
             }
-            painter->drawPoint(p, 1/res, 0, 255.0 * score, 255.0 * (1 - score), 150);
         }
     }
 
