@@ -26,10 +26,6 @@ Team RobotTeamFilter::getFilteredData(
                 continue;
             }
 
-            // TODO: Removing the expired robots should be moved to the Backend
-            // once https://github.com/UBC-Thunderbots/Software/issues/424 is completed
-            new_team_state.removeExpiredRobots(robot_detection.timestamp);
-
             Duration time_diff =
                 robot_detection.timestamp - previous_robot_state.lastUpdateTimestamp();
 
