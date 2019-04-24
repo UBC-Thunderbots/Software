@@ -910,6 +910,34 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(logger_test ${catkin_LIBRARIES}
             ${G3LOG})
 
+        # TODO: Decent comment here
+    add_rostest_gtest(pass_generator_rostest test/ai/passing/pass_generator_rostest.test
+            ai/world/world.cpp
+            ai/world/robot.cpp
+            ai/world/field.cpp
+            ai/world/ball.cpp
+            ai/world/team.cpp
+            test/test_util/test_util.cpp
+            ai/world/game_state.cpp
+            ai/passing/evaluation.cpp
+            ai/evaluation/pass.cpp
+            ai/hl/stp/evaluation/
+            geom/util.cpp
+            ai/passing/pass.cpp
+            util/parameter/dynamic_parameter_utils.cpp
+            util/parameter/dynamic_parameters.cpp
+            ai/passing/pass_generator.cpp
+            test/ai/passing/pass_generator_rostest.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            util/logger/custom_g3log_sinks.h
+            util/logger/init.h
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            )
+    target_link_libraries(pass_generator_rostest ${catkin_LIBRARIES}
+            ${G3LOG})
+
     # The test node that verifies the rostest utils are working correctly
     add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
             test/test_util/rostest_util_test.cpp

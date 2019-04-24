@@ -61,7 +61,7 @@ AI:
       description: "The minimum pass speed (in m/s)"
     max_pass_speed_m_per_s:
       min: 0
-      max: 5
+      max: 3
       default: 4.0
       type: "double"
       description: "The maximum pass speed (in m/s)"
@@ -92,13 +92,13 @@ AI:
     num_passes_to_keep_after_pruning:
       min: 0
       max: 1000
-      default: 10
+      default: 49
       type: "int"
       description: "The number of passes to keep after pruning"
     number_of_gradient_descent_steps_per_iter:
       min: 0
       max: 1000
-      default: 20
+      default: 1
       type: "int"
       description: "The number of steps of gradient descent to perform in each iteration"
     pass_equality_max_position_difference_meters:

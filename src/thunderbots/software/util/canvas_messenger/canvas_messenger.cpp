@@ -32,8 +32,8 @@ namespace Util
 
         // Do not do anything if the time passed hasn't been
         // long enough
-        if (elapsed_ms < DESIRED_PERIOD_MS)
-            return;
+//        if (elapsed_ms < DESIRED_PERIOD_MS)
+//            return;
 
         // Send a payload per layer of messages
         for (const std::pair<uint8_t, std::vector<Sprite>>& layer_pair : this->layers_map)
