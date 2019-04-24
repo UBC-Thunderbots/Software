@@ -42,11 +42,11 @@ class RobotFilter
     /**
      * Creates a new robot filter
      *
-     * @param id the id of the robot to filter
+     * @param current_robot_state the data of current state of the robot
      * @param expiry_buffer_duration the time when the robot is determined to be out of
      * the field if data about the robot is not received before that time
      */
-    explicit RobotFilter(unsigned int id, Duration expiry_buffer_duration);
+    explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
 
     /**
      * Updates the filter given a new set of data, and returns the most up to date
@@ -56,12 +56,9 @@ class RobotFilter
      * The data does not all have to be for a particular Robot, the filter will only use
      * the new Robot data that matches the robot id the filter was constructed with.
      *
-     * @param current_robot_state the robot state we would like to update from, could be not initialized
-     *
      * @return The filtered data for the robot
      */
     std::optional<Robot> getFilteredData(
-        std::optional<Robot> current_robot_state,
         const std::vector<SSLRobotDetection>& new_robot_data);
 
     /**
@@ -72,6 +69,6 @@ class RobotFilter
     unsigned int getRobotId() const;
 
    private:
-    unsigned int robot_id;
+    Robot current_robot_state;
     Duration expiry_buffer_duration;
 };
