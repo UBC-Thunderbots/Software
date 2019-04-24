@@ -146,6 +146,7 @@ Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detect
     // Collect all the visible robots from all camera frames
     for (const auto &detection : detections)
     {
+        std::optional<Timestamp> latest_timestamp = std::nullopt;
         auto ssl_robots = detection.robots_yellow();
         if (Util::Constants::FRIENDLY_TEAM_COLOUR == BLUE)
         {
@@ -172,10 +173,6 @@ Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detect
     Team updated_team_state = friendly_team_filter.getFilteredData(
         friendly_team_state, friendly_robot_detections);
     friendly_team_state = updated_team_state;
-    auto timestamp =friendly_team_state.lastUpdateTimestamp() ;
-    if(timestamp) {
-        friendly_team_state.removeExpiredRobots(*timestamp);
-    }
 
     return friendly_team_state;
 }
@@ -213,10 +210,6 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
     Team updated_team_state =
         enemy_team_filter.getFilteredData(enemy_team_state, enemy_robot_detections);
     enemy_team_state = updated_team_state;
-    auto timestamp =enemy_team_state.lastUpdateTimestamp() ;
-    if(timestamp) {
-        enemy_team_state.removeExpiredRobots(*timestamp);
-    }
 
     return enemy_team_state;
 }

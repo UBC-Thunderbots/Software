@@ -90,12 +90,17 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             ret.first->second = detection;
         }
 
+        std::optional<Timestamp> latest_timestamp = std::nullopt;
         // Create a vector of the latest detection data for each camera
         std::vector<SSL_DetectionFrame> latest_detections;
         for (auto it = latest_detection_data.begin(); it != latest_detection_data.end();
              it++)
         {
             latest_detections.push_back(it->second);
+            Timestamp timestamp = Timestamp::fromSeconds(it->second.t_capture());
+            if(!latest_timestamp || timestamp > latest_timestamp) {
+                latest_timestamp = timestamp;
+            }
         }
 
         Ball ball = backend.getFilteredBallData(latest_detections);
@@ -104,11 +109,17 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         world_msg.ball = ball_msg;
 
         Team friendly_team = backend.getFilteredFriendlyTeamData(latest_detections);
+        if(latest_timestamp) {
+            friendly_team.removeExpiredRobots(*latest_timestamp);
+        }
         thunderbots_msgs::Team friendly_team_msg =
             Util::ROSMessages::convertTeamToROSMessage(friendly_team);
         world_msg.friendly_team = friendly_team_msg;
 
         Team enemy_team = backend.getFilteredEnemyTeamData(latest_detections);
+        if(latest_timestamp) {
+            enemy_team.removeExpiredRobots(*latest_timestamp);
+        }
         thunderbots_msgs::Team enemy_team_msg =
             Util::ROSMessages::convertTeamToROSMessage(enemy_team);
         world_msg.enemy_team = enemy_team_msg;
