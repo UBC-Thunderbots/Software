@@ -176,6 +176,15 @@ class Team
      */
     bool operator!=(const Team& other) const;
 
+    /**
+     * Returns the timestamp of the most recently updated robot on this team
+     *
+     * @return the timestamp of the most recently updated robot on this team, or
+     *         std::nullopt if this team is empty
+     */
+     // TODO: TEST ME
+     std::optional<Timestamp> lastUpdateTimestamp() const;
+
    private:
     // The map that contains the Robots for this team. The map makes it easier to
     // guarantee we only have robots with unique IDs.
@@ -187,4 +196,6 @@ class Team
     // The duration for which a Robot must not have been updated for before
     // being removed from this team.
     Duration robot_expiry_buffer_duration;
+
+    Timestamp last_update_timestamp;
 };
