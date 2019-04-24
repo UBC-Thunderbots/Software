@@ -1061,3 +1061,12 @@ double getPointsVariance(const std::vector<Point> &points)
     sum /= static_cast<double>(points.size());
     return sqrt(sum);
 }
+
+int calcBinaryTrespassScore( const Rectangle &rectangle, const Point &point) {
+
+    if( rectangle.containsPoint(point)) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
