@@ -50,6 +50,31 @@ TEST_F(PassingEvaluationTest, ratePass_no_target_region)
     EXPECT_GE(1.0, pass_rating);
 }
 
+TEST_F(PassingEvaluationTest, ratePass_no_target_region_pass_through_wall_of_robots){
+    // Test passing towards the enemy goal through a line of enemy defenders
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+
+    Team new_friendly_team(Duration::fromSeconds(0.1));
+    new_friendly_team.updateRobots({
+                                           Robot(0, Point(1, 0), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                   });
+    world.updateFriendlyTeamState(new_friendly_team);
+
+    Team new_enemy_team(Duration::fromSeconds(0.1));
+    new_enemy_team.updateRobots({
+                                        Robot(0, Point(2, 0.0), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                        Robot(1, Point(2, 0.3), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                        Robot(2, Point(2, -0.3), Point(0,0), Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0.3)),
+                                });
+    world.updateEnemyTeamState(new_enemy_team);
+
+    Pass pass({0,0}, {3.25, 0.25}, 3.83575, Timestamp::fromSeconds(2.56783));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0);
+    EXPECT_LE(pass_rating, 0.1);
+}
+
 TEST_F(PassingEvaluationTest, ratePass_with_target_region)
 {
     // This should be a really good pass, but it's outside our target region, so it
@@ -248,12 +273,12 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
 {
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
-        Robot(0, {20, 20}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+        Robot(0, {25, 25}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(1, {-30, 50}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
+    Pass pass({0, 0}, {5, 5}, 3, Timestamp::fromSeconds(1));
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass);
     EXPECT_LE(0.95, pass_rating);
@@ -323,8 +348,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
     double intercept_risk = calculateInterceptRisk(enemy_team, pass);
-    EXPECT_LE(0.9, intercept_risk);
-    EXPECT_GE(1, intercept_risk);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
 }
 
 TEST_F(PassingEvaluationTest,
@@ -342,8 +367,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
     double intercept_risk = calculateInterceptRisk(enemy_team, pass);
-    EXPECT_LE(0.9, intercept_risk);
-    EXPECT_GE(1, intercept_risk);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
 }
 
 TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_trajectory)
@@ -355,11 +380,11 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_sitting_on_pass_t
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
-    EXPECT_LE(0.9, intercept_risk);
-    EXPECT_GE(1, intercept_risk);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
 }
 
-TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_trajectory)
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_trajectory_long_pass)
 {
     // Test calculating the intercept risk for a robot that is located just off to the
     // side of the pass trajectory, but close enough that it will be able to move onto
@@ -369,8 +394,22 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_tra
     Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
-    EXPECT_LE(0.9, intercept_risk);
-    EXPECT_GE(1, intercept_risk);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
+}
+
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_trajectory_short_pass)
+{
+    // Test calculating the intercept risk for a robot that is located just off to the
+    // side of the pass trajectory, but close enough that it will be able to move onto
+    // the pass trajectory and intercept it
+    Robot enemy_robot(0, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                      Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {3.25, 0.25}, 3.8375, Timestamp::fromSeconds(2.56));
+
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
 }
 
 TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_trajectory)
@@ -392,7 +431,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
     // friendly end of the field. The enemy robot should not be able to intercept the pass
     Robot enemy_robot(0, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
-    Pass pass({3, -3}, {3, 3}, 2, Timestamp::fromSeconds(1));
+    Pass pass({3, -3}, {3, 3}, 4, Timestamp::fromSeconds(1));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
     EXPECT_LE(0, intercept_risk);

@@ -214,13 +214,14 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // We take a smooth "max" of these two values using a log-sum-exp function
     // https://en.wikipedia.org/wiki/LogSumExp (NOTE: we use the more computationally
     // stable version mentioned towards the bottom of the wiki page)
-    double max_time_diff_unsmooth = std::max(robot_ball_time_diff_at_closest_pass_point,
-                                             robot_ball_time_diff_at_pass_receive_point);
+    // TODO: Update comment here, we're now taking the MINIMUM
+    double max_time_diff_unsmooth = std::max(-robot_ball_time_diff_at_closest_pass_point,
+                                             -robot_ball_time_diff_at_pass_receive_point);
     double max_time_diff_smooth =
         max_time_diff_unsmooth +
-        std::log(std::exp(robot_ball_time_diff_at_closest_pass_point -
+        std::log(std::exp(-robot_ball_time_diff_at_closest_pass_point -
                           max_time_diff_unsmooth) +
-                 std::exp(robot_ball_time_diff_at_pass_receive_point -
+                 std::exp(-robot_ball_time_diff_at_pass_receive_point -
                           max_time_diff_unsmooth));
 
     // Whether or not the enemy will be able to intercept the pass can be determined
@@ -229,7 +230,8 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
     // negative values. We then subtract this from 1 to essentially invert it, getting
     // a sigmoid that goes to 1 at negative values, and 0 at positive values.
-    return 1 - sigmoid(max_time_diff_smooth, 0, 1);
+    // TODO: This used to be `1 - sigmoid(...`, we changed it because of the max/min changes above. UPDATE COMMENT ACCORDINGLY
+    return sigmoid(max_time_diff_smooth, 0, 1);
 }
 
 double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
@@ -289,6 +291,7 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
     return sigmoid(receive_time.getSeconds(),
                    latest_time_to_reciever_state.getSeconds() + 0.5, 1);
 }
+
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)
 {
     // This constant is used to determine how steep the sigmoid slopes below are

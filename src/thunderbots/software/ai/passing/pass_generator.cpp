@@ -141,6 +141,10 @@ void PassGenerator::visualizeStuff() {
                 Point p(i * 1/res - world.field().length()/2, j*1/res - world.field().width() / 2);
                 pass = Pass(pass.passerPoint(), p, pass.speed(), pass.startTime());
                 double score = ratePass(pass);
+                if (p.x() > 2.5 && abs(p.y()) < 0.5 && score > 0.05){
+                    std::cout << "Pass: " << pass << std::endl;
+                    std::cout << "Score: " << score << std::endl;
+                }
                 painter->drawPoint(p, 1/res, 0, std::ceil(255.0 * score), std::ceil(255.0 * (1 - score)), 150);
             }
         }
