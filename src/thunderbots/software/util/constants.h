@@ -18,7 +18,8 @@ namespace Util
             "backend/gamecontroller";
         static const std::string NETWORK_INPUT_WORLD_TOPIC   = "backend/world";
         static const std::string AI_PRIMITIVES_TOPIC         = "backend/primitives";
-        static const std::string ROBOT_STATUS_TOPIC          = "log/robot_status";
+        static const std::string ROBOT_MESSAGE_TOPIC         = "log/robot_message";
+        static const std::string ROBOT_STATUS_TOPIC          = "backend/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
         // The topic published by the joy_node that contains information about any plugged
         // in joysticks / controllers
@@ -43,8 +44,8 @@ namespace Util
         // There are 4 cameras for SSL Division B
         static const unsigned int NUMBER_OF_SSL_VISION_CAMERAS = 4;
 
-        // Visualizer messenger message publishing frequency
-        static const unsigned int DESIRED_VISUALIZER_MESSAGE_FREQ = 60;
+        // Canvas messenger message publishing frequency
+        static const unsigned int DESIRED_CANVAS_MESSAGE_FREQ = 60;
 
         // How many milliseconds a robot must not be seen in vision before it is
         // considered as "gone" and no longer reported.
