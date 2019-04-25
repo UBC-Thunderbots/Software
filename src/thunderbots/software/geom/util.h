@@ -509,3 +509,13 @@ Point getPointsMean(const std::vector<Point> &points);
  * @return the variance of the list of points
  */
 double getPointsVariance(const std::vector<Point> &points);
+
+/**
+ * Returns the binary trespass score of a point and rectangle
+ *
+ * @param point The point to check for trespassing
+ * @param rectangle The rectangle to check for trespassing by the Point parameter
+ * @return 1 if the point exists within the rectangle, or on the boundry of the rectangle
+ *         0 if the point exists outside of the rectangle
+ */
+int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);

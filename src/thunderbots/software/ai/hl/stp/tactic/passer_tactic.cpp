@@ -24,7 +24,7 @@ std::string PasserTactic::getName() const
 void PasserTactic::updateParams(const Pass& updated_pass,
                                 const Timestamp& updated_curr_time)
 {
-    this->pass = updated_pass;
+    this->pass      = updated_pass;
     this->curr_time = updated_curr_time;
 }
 

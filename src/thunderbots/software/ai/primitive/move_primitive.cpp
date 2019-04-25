@@ -20,12 +20,12 @@ MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
 {
     validatePrimitiveMessage(primitive_msg, getPrimitiveName());
 
-    robot_id      = primitive_msg.robot_id;
-    double dest_x = primitive_msg.parameters.at(0);
-    double dest_y = primitive_msg.parameters.at(1);
-    dest          = Point(dest_x, dest_y);
-    final_angle   = Angle::ofRadians(primitive_msg.parameters.at(2));
-    final_speed   = primitive_msg.parameters.at(3);
+    robot_id        = primitive_msg.robot_id;
+    double dest_x   = primitive_msg.parameters.at(0);
+    double dest_y   = primitive_msg.parameters.at(1);
+    dest            = Point(dest_x, dest_y);
+    final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
+    final_speed     = primitive_msg.parameters.at(3);
     enable_dribbler = static_cast<bool>(primitive_msg.parameters.at(4));
     enable_autokick = static_cast<bool>(primitive_msg.parameters.at(5));
 }
