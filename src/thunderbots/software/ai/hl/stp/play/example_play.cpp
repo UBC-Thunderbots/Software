@@ -33,17 +33,18 @@ std::vector<std::shared_ptr<Tactic>> ExamplePlay::getNextTactics(
     auto passer = std::make_shared<PasserTactic>(pass, world.ball().lastUpdateTimestamp(), false);
     auto receiver = std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(), false);
 
-    AI::Passing::PassGenerator pass_generator(0.0);
+//    AI::Passing::PassGenerator pass_generator(0.0);
 
     do
     {
-        pass_generator.setWorld(world);
-        pass = AI::Passing::Pass(world.ball().position(), {0.5, 0}, 3, pass_start_time);
+//        pass_generator.setWorld(world);
+//        pass_generator.setPasserPoint(world.ball().position());
+        pass = AI::Passing::Pass(world.ball().position(), {1, 0.0}, 4, pass_start_time);
         passer->updateParams(pass, world.ball().lastUpdateTimestamp());
         receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass, world.ball());
 
-//        yield({passer, receiver});
-    yield({});
+        yield({passer, receiver});
+//    yield({});
     } while (true);
 }
 

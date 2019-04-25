@@ -80,6 +80,8 @@ namespace AI::Passing
          */
         void setTargetRegion(std::optional<Rectangle> area);
 
+        // TODO: We need to be able to set the passer robot so that we ignore it
+
         /**
          * Gets the best pass we know of so far
          *
@@ -227,12 +229,16 @@ namespace AI::Passing
         std::mutex world_mutex;
 
         // The most recent world we know about
+        // TODO: Make this an optional, we should not optimize any passes until we
+        //       have a start point
         World world;
 
         // The mutex for the passer_point
         std::mutex passer_point_mutex;
 
         // The point we are passing from
+        // TODO: Make this an optional, we should not optimize any passes until we
+        // have a start point
         Point passer_point;
 
         // The mutex for the target region

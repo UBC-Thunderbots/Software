@@ -81,13 +81,13 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
         // We make the region close enough to the ball so that the robot will still be
         // inside it when taking the kick.
         Point behind_ball_vertex_A =
-            kick_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.5);
+            kick_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 0.0);
         Point behind_ball_vertex_B =
             behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
-            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            behind_ball.perp().norm(size_of_region_behind_ball);
         Point behind_ball_vertex_C =
             behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
-            behind_ball.perp().norm(size_of_region_behind_ball / 2);
+            behind_ball.perp().norm(size_of_region_behind_ball);
 
         Polygon behind_ball_region =
             Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
@@ -109,5 +109,7 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
             yield(std::make_unique<KickIntent>(robot->id(), kick_origin, kick_direction,
                                                kick_speed_meters_per_second, 0));
         }
+
+        // TODO: Need to terminate here once we think we've kicked (see receiver tactic for example)
     } while (true);
 }

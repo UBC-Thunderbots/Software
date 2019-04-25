@@ -60,6 +60,9 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
     KickAction kick_action = KickAction();
     do
     {
+        // TODO: We should be aligning to the ball position here, NOT the passerPoint. We can use the ball
+        // timestamp instead of giving this a time as well
+
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         yield(kick_action.updateStateAndGetNextIntent(

@@ -67,6 +67,7 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
     return pass_quality;
 }
 
+// TODO: Delete this function
 double AI::Passing::ratePassNoTime(const World& world, const AI::Passing::Pass& pass,
                              const std::optional<Rectangle>& target_region)
 {
@@ -199,8 +200,12 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
 
     Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
 
+    // TODO: We need to do two checks here, one where we see if the enemy can intercept
+    // from its estimated future position/time, and one where we see if it can intercept
+    // from it's current position/time
+
     // Estimate where the enemy will be when we start the pass
-    enemy_robot.updateStateToPredictedState(time_until_pass);
+//    enemy_robot.updateStateToPredictedState(time_until_pass);
 
     // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
     // the the receiver point for the pass, then it is guaranteed that it will not be
@@ -213,7 +218,8 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     Duration enemy_robot_time_to_closest_pass_point =
         getTimeToPositionForRobot(enemy_robot, closest_point_on_pass_to_robot,
                                   ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-                                  ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+                                  ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+                                  ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
 
@@ -221,14 +227,17 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // for the pass.
     Duration enemy_robot_time_to_pass_receive_position = getTimeToPositionForRobot(
         enemy_robot, pass.receiverPoint(), ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND,
-        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+        ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
+    // TODO: DO this properly, what if the enemy robot was updated after the pass start time??
+    Duration pass_time_offset = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+
     double robot_ball_time_diff_at_closest_pass_point =
-        (enemy_robot_time_to_closest_pass_point - ball_time_to_closest_pass_point)
+        (enemy_robot_time_to_closest_pass_point - (ball_time_to_closest_pass_point + pass_time_offset))
             .getSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
-        (enemy_robot_time_to_pass_receive_position - ball_time_to_pass_receive_position)
+        (enemy_robot_time_to_pass_receive_position - (ball_time_to_pass_receive_position + pass_time_offset))
             .getSeconds();
 
     // We take a smooth "max" of these two values using a log-sum-exp function

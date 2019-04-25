@@ -28,7 +28,7 @@ AI:
     enemy_proximity_importance:
       min: 0
       max: 10
-      default: 0.5
+      default: 2
       type: "double"
       description: >-
         This controls how heavily we weight a robot being near the pass

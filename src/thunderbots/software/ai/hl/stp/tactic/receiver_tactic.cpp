@@ -59,12 +59,24 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
 
     // Setup for the pass. We want to use any free time before the pass starts putting
     // ourself in the best position possible to take the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime())
+    // TODO: Comment why we wait for ball velocity to be significant
+    while (ball.lastUpdateTimestamp() < pass.startTime() || ball.velocity().len() < 0.5)
     {
+        std::optional<std::pair<Point, Angle>> best_shot_opt =
+                calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+        // TODO: we need to check for percent net open and all that stuff below here as well
+        // TODO: COMMENT HERE
+        Angle desired_angle = pass.receiverOrientation();
+        if (best_shot_opt){
+            auto [target_position, _] = *best_shot_opt;
+//            desired_angle = (pass.receiverOrientation() + shot_angle)/2;
+            Angle shot_angle = (target_position - robot->position()).orientation();
+            desired_angle = (shot_angle + pass.receiverOrientation())/2;
+        }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation to face where the pass is coming from
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
-                                                      pass.receiverOrientation(), 0));
+                                                      desired_angle, 0));
         std::cout << "Moving to position" << std::endl;
     }
 

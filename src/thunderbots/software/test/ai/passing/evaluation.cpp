@@ -437,6 +437,31 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_just_off_pass_tra
     EXPECT_LE(intercept_risk, 1);
 }
 
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_on_pass_trajectory_due_to_radius){
+    // Test where the robot center is not on the pass trajectory, but the robot is so
+    // close to the pass trajectory that because of it's radius it is effectively
+    // blocking the ball
+    Robot enemy_robot(0, {0.25, ROBOT_MAX_RADIUS_METERS * 2/3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                      Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {3, 0}, 5, Timestamp::fromSeconds(0));
+
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
+}
+
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_has_time_to_intercept_before_pass_starts){
+    // Test where the pass does not start for a while, and so the enemy has time to
+    // move to block it
+    Robot enemy_robot(0, {0.25, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                      Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {3, 0}, 5, Timestamp::fromSeconds(5));
+
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
+    EXPECT_GE(intercept_risk, 0.9);
+    EXPECT_LE(intercept_risk, 1);
+}
+
 TEST_F(PassingEvaluationTest, calculateInterceptRisk_for_robot_far_away_from_trajectory)
 {
     // Test calculating the intercept risk for a robot that is located far enough away

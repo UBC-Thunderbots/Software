@@ -26,6 +26,7 @@ namespace AI::Evaluation
                                           const double& max_velocity,
                                           const double& max_acceleration);
 
+    // TODO: Test out the tolerance parameter here
     /**
      * Calculate minimum time it would take for the given robot to reach the given point
      *
@@ -35,12 +36,15 @@ namespace AI::Evaluation
      * @param dest The destination that the robot is going to
      * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
      * @param max_acceleration The maximum acceleration of the robot (m/s^2)
+     * // TODO: better comment here?
+     * @param tolerance_meters The distance to within the target that we want to move to
      *
      * @return The minimum theoretical time it would take the robot to reach the dest
      * point
      */
     Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
                                        const double& max_velocity,
-                                       const double& max_acceleration);
+                                       const double& max_acceleration,
+                                       const double& tolerance_meters = 0);
 
 }  // namespace AI::Evaluation

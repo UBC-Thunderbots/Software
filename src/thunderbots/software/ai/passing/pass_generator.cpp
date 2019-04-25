@@ -46,11 +46,6 @@ void PassGenerator::setPasserPoint(Point passer_point)
 
     // Update the passer point
     this->passer_point = passer_point;
-
-    // Replace all the passes we're currently trying to optimize, as they are probably
-    // not going to converge to this new passer point if they've already been converging
-    // to another passer point for a while
-    passes_to_optimize = generatePasses(num_passes_to_optimize.value());
 }
 
 std::optional<Pass> PassGenerator::getBestPassSoFar()
@@ -119,18 +114,18 @@ void PassGenerator::visualizeStuff() {
 
     // Draw all the points we have so far
     auto painter = Util::CanvasMessenger::getInstance();
-    for (Pass& pass : passes_to_optimize){
-        Point p = pass.receiverPoint();
-        double score = ratePass(pass);
-        painter->drawPoint(p, 0.1, 255, 0, 0, 128 * score + 128);
-        if ((p.x() < 0 || p.y() < 0) && score > 0.2){
-            std::cout << "Pass: " << pass << std::endl;
-            std::cout << "Score: " << ratePass(pass) << std::endl;
-        }
-        score = ratePass(pass);
-    }
+//    for (Pass& pass : passes_to_optimize){
+//        Point p = pass.receiverPoint();
+//        double score = ratePass(pass);
+//        painter->drawPoint(p, 0.1, 255, 0, 0, 128 * score + 128);
+//        if ((p.x() < 0 || p.y() < 0) && score > 0.2){
+//            std::cout << "Pass: " << pass << std::endl;
+//            std::cout << "Score: " << ratePass(pass) << std::endl;
+//        }
+//        score = ratePass(pass);
+//    }
 
-    double res = 4;
+    double res = 5;
 
     // Get field characteristics
     world_mutex.lock();
@@ -144,12 +139,13 @@ void PassGenerator::visualizeStuff() {
         Pass pass = *pass_opt;
         double score = ratePass(pass);
         painter->drawPoint(pass.receiverPoint(), 0.1, 0, 255, 0, 255);
+        painter->drawPoint(pass.passerPoint(), 0.2, 255, 0, 0, 255);
         for(int i = 0; i < field_length * res; i++){
             for(int j = 0; j < field_width * res; j++){
                 Point p(i * 1/res - world.field().length()/2, j*1/res - world.field().width() / 2);
                 pass = Pass(pass.passerPoint(), p, pass.speed(), pass.startTime());
                 score = ratePass(pass);
-                painter->drawPoint(p, 1/res, 0, std::ceil(255.0 * score), std::ceil(255.0 * (1 - score)), 150);
+                painter->drawPoint(p, 1/res, 0, std::ceil(255.0 * score*4), std::ceil(255.0 * (1 - score*4)), 150);
             }
         }
     }
