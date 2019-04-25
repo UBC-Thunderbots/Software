@@ -198,7 +198,7 @@ namespace Util
         {
             thunderbots_msgs::World new_world_msg = old_world_msg;
 
-            new_world_msg.ball  = invertMsgFieldSide(old_world_msg.ball);
+            new_world_msg.ball = invertMsgFieldSide(old_world_msg.ball);
             new_world_msg.friendly_team.robots =
                 invertMsgFieldSide(old_world_msg.friendly_team.robots);
             new_world_msg.enemy_team.robots =
