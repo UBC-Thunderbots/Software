@@ -196,15 +196,13 @@ namespace Util
         thunderbots_msgs::World invertMsgFieldSide(
             const thunderbots_msgs::World& old_world_msg)
         {
-            thunderbots_msgs::World new_world_msg;
+            thunderbots_msgs::World new_world_msg = old_world_msg;
 
-            new_world_msg.field = old_world_msg.field;
             new_world_msg.ball  = invertMsgFieldSide(old_world_msg.ball);
             new_world_msg.friendly_team.robots =
                 invertMsgFieldSide(old_world_msg.friendly_team.robots);
             new_world_msg.enemy_team.robots =
                 invertMsgFieldSide(old_world_msg.enemy_team.robots);
-            new_world_msg.refbox_data = old_world_msg.refbox_data;
 
             return new_world_msg;
         }
