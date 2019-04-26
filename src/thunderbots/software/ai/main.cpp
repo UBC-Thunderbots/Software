@@ -42,6 +42,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     }
     primitive_publisher.publish(primitive_array_message);
 
+    // On every tick, send the layer messages
+    Util::CanvasMessenger::getInstance()->publishAndClearLayers();
 
     count++;
 }
@@ -69,20 +71,6 @@ int main(int argc, char **argv)
     // Initialize Dynamic Parameters
     auto update_subscribers =
         Util::DynamicParameters::initUpdateSubscriptions(node_handle);
-
-    while (true){
-        auto painter = Util::CanvasMessenger::getInstance();
-        painter->drawRectangle(Util::CanvasMessenger::Layer::STATIC_FEATURES,
-                               Rectangle({3,1}, {-1,-1}),
-                               Angle::zero(),
-                               {0, 255, 0, 0}
-                               std::this_thread::sleep_for()
-        );
-
-        // On every tick, send the layer messages
-        Util::CanvasMessenger::getInstance()->publishAndClearLayers();
-
-    }
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown
