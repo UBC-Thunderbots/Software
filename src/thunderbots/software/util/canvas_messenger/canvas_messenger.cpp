@@ -1,5 +1,6 @@
-#include <firmware/main/shared_util/constants.h>
 #include "canvas_messenger.h"
+
+#include <firmware/main/shared_util/constants.h>
 
 #include "util/constants.h"
 
@@ -129,21 +130,22 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
     drawSprite(layer, rectangle_sprite);
 }
 
-void CanvasMessenger::drawLine(Layer layer, Point p1, Point p2, double thickness, Color color)
+void CanvasMessenger::drawLine(Layer layer, Point p1, Point p2, double thickness,
+                               Color color)
 {
     // Since we're just repurposing the Rectangle sprite as a line, we need to figure
     // out where its center is
-    Point line_center = (p2 + p1)/2;
+    Point line_center      = (p2 + p1) / 2;
     Angle line_orientation = (p2 - p1).orientation();
-    double line_length = (p2 - p1).len();
+    double line_length     = (p2 - p1).len();
 
-    Sprite rectangle_sprite(0, line_center, line_orientation, line_length,
-                            thickness, color);
+    Sprite rectangle_sprite(0, line_center, line_orientation, line_length, thickness,
+                            color);
 
     drawSprite(layer, rectangle_sprite);
 }
 
-void CanvasMessenger::drawPoint(Layer layer, const Point &p, double radius, Color color)
+void CanvasMessenger::drawPoint(Layer layer, const Point& p, double radius, Color color)
 {
     Sprite circle_sprite(
         // NOTE: Currently this uses texture ID zero, which is a rectangle, but
@@ -152,39 +154,51 @@ void CanvasMessenger::drawPoint(Layer layer, const Point &p, double radius, Colo
     drawSprite(layer, circle_sprite);
 }
 
-void CanvasMessenger::drawWorld(const World &world) {
+void CanvasMessenger::drawWorld(const World& world)
+{
     drawBall(world.ball());
     drawField(world.field());
     drawTeam(world.friendlyTeam(), FRIENDLY_TEAM_COLOR);
     drawTeam(world.enemyTeam(), ENEMY_TEAM_COLOR);
 }
 
-void CanvasMessenger::drawBall(const Ball &ball) {
-    drawPoint(Layer::ROBOTS_AND_BALL, ball.position(), BALL_MAX_RADIUS_METERS*2, BALL_COLOR);
+void CanvasMessenger::drawBall(const Ball& ball)
+{
+    drawPoint(Layer::ROBOTS_AND_BALL, ball.position(), BALL_MAX_RADIUS_METERS * 2,
+              BALL_COLOR);
 }
 
-void CanvasMessenger::drawField(Field field) {
+void CanvasMessenger::drawField(Field field)
+{
     // Draw the base of the field
-    drawRectangle(Layer::STATIC_FEATURES, Rectangle(field.enemyCornerNeg(), field.friendlyCornerPos()), Angle::zero(), FIELD_COLOR);
+    drawRectangle(Layer::STATIC_FEATURES,
+                  Rectangle(field.enemyCornerNeg(), field.friendlyCornerPos()),
+                  Angle::zero(), FIELD_COLOR);
 
     // Draw the defense areas
-    drawRectangle(Layer::STATIC_FEATURES, field.enemyDefenseArea(), Angle::zero(), DEFENSE_AREA_COLOR);
-    drawRectangle(Layer::STATIC_FEATURES, field.friendlyDefenseArea(), Angle::zero(), DEFENSE_AREA_COLOR);
+    drawRectangle(Layer::STATIC_FEATURES, field.enemyDefenseArea(), Angle::zero(),
+                  DEFENSE_AREA_COLOR);
+    drawRectangle(Layer::STATIC_FEATURES, field.friendlyDefenseArea(), Angle::zero(),
+                  DEFENSE_AREA_COLOR);
 
     // Draw the center line
-    drawLine(Layer::STATIC_FEATURES, {0, -field.width()/2}, {0, field.width()/2}, 0.05, FIELD_LINE_COLOR);
+    drawLine(Layer::STATIC_FEATURES, {0, -field.width() / 2}, {0, field.width() / 2},
+             0.05, FIELD_LINE_COLOR);
 }
 
-void CanvasMessenger::drawTeam(const Team &team, CanvasMessenger::Color color) {
-    for (const Robot& robot : team.getAllRobots()){
+void CanvasMessenger::drawTeam(const Team& team, CanvasMessenger::Color color)
+{
+    for (const Robot& robot : team.getAllRobots())
+    {
         drawRobot(robot, color);
     }
 }
 
-void CanvasMessenger::drawRobot(Robot robot, CanvasMessenger::Color color) {
-    Rectangle robot_rectangle(robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
-            robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS)
-            );
+void CanvasMessenger::drawRobot(Robot robot, CanvasMessenger::Color color)
+{
+    Rectangle robot_rectangle(
+        robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
+        robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS));
     drawRectangle(Layer::ROBOTS_AND_BALL, robot_rectangle, robot.orientation(), color);
 }
 

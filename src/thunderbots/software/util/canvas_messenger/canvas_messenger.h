@@ -18,10 +18,10 @@
 #include <string>
 #include <vector>
 
-#include "ai/world/field.h"
-#include "ai/world/world.h"
 #include "ai/world/ball.h"
+#include "ai/world/field.h"
 #include "ai/world/robot.h"
+#include "ai/world/world.h"
 #include "thunderbots_msgs/CanvasLayer.h"
 #include "util/constants.h"
 
@@ -76,7 +76,7 @@ namespace Util
              * pixels)
              * @param color The color of the sprite
              */
-            Sprite(uint8_t texture, const Point& center, const Angle& orientation,
+            Sprite(uint8_t texture, const Point &center, const Angle &orientation,
                    double width, double height, Color color)
                 : _texture(texture),
                   _center(center),
@@ -214,12 +214,12 @@ namespace Util
         static const int PIXELS_PER_METER = 100;
 
         // Colors
-        static constexpr Color FIELD_COLOR  = {0, 153, 0, 255};
-        static constexpr Color DEFENSE_AREA_COLOR = {242, 242, 242, 255};
-        static constexpr Color FIELD_LINE_COLOR = {242, 242, 242, 255};
-        static constexpr Color BALL_COLOR = {255, 153, 0, 255};
+        static constexpr Color FIELD_COLOR         = {0, 153, 0, 255};
+        static constexpr Color DEFENSE_AREA_COLOR  = {242, 242, 242, 255};
+        static constexpr Color FIELD_LINE_COLOR    = {242, 242, 242, 255};
+        static constexpr Color BALL_COLOR          = {255, 153, 0, 255};
         static constexpr Color FRIENDLY_TEAM_COLOR = {230, 230, 0, 255};
-        static constexpr Color ENEMY_TEAM_COLOR = {0, 230, 230, 255};
+        static constexpr Color ENEMY_TEAM_COLOR    = {0, 230, 230, 255};
 
         /**
          * Constructor; initializes an empty layers map then populates it
@@ -233,7 +233,7 @@ namespace Util
          * @param layer: The layer which the sprite is to be added to
          * @param sprite: The sprite data
          */
-        void addSpriteToLayer(Layer layer, Sprite& sprite);
+        void addSpriteToLayer(Layer layer, Sprite &sprite);
 
         /**
          * Draw a sprite onto a specific layer.
