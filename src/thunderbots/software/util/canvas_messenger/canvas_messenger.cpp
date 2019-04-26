@@ -184,6 +184,9 @@ void CanvasMessenger::drawField(Field field)
     // Draw the center line
     drawLine(Layer::STATIC_FEATURES, {0, -field.width() / 2}, {0, field.width() / 2},
              0.05, FIELD_LINE_COLOR);
+
+    // Draw a marker for the origin
+    drawLine(Layer::STATIC_FEATURES, {-0.1, 0}, {0.1, 0}, 0.05, FIELD_LINE_COLOR);
 }
 
 void CanvasMessenger::drawTeam(const Team& team, CanvasMessenger::Color color)
