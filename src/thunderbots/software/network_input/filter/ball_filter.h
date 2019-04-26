@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/circular_buffer.hpp>
 #include <vector>
 
 #include "ai/world/ball.h"
@@ -29,7 +30,7 @@ class BallFilter
     /**
      * Creates a new Ball Filter
      */
-    explicit BallFilter() = default;
+    explicit BallFilter();
 
     /**
      * Filters the new ball detection data, and returns the updated state of the ball
@@ -42,4 +43,7 @@ class BallFilter
      */
     Ball getFilteredData(const Ball& current_ball_state,
                          const std::vector<SSLBallDetection>& new_ball_detections);
+
+   private:
+    boost::circular_buffer<Vector> previous_ball_readings;
 };

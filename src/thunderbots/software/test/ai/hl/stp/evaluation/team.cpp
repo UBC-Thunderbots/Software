@@ -24,7 +24,7 @@ TEST_F(TeamEvaluationTest, nearest_friendy_one_robot)
 
     team.updateRobots({robot_0});
 
-    EXPECT_EQ(robot_0, Evaluation::nearest_robot(team, Point(0, 0)));
+    EXPECT_EQ(robot_0, Evaluation::nearestRobot(team, Point(0, 0)));
 }
 
 TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots)
@@ -43,7 +43,7 @@ TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_1, Evaluation::nearest_robot(team, Point(0, 0)));
+    EXPECT_EQ(robot_1, Evaluation::nearestRobot(team, Point(0, 0)));
 }
 
 TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots_closest_is_moving)
@@ -62,7 +62,7 @@ TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots_closest_is_moving)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_1, Evaluation::nearest_robot(team, Point(0, 0)));
+    EXPECT_EQ(robot_1, Evaluation::nearestRobot(team, Point(0, 0)));
 }
 
 TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots_all_moving)
@@ -81,7 +81,7 @@ TEST_F(TeamEvaluationTest, nearest_friendy_multiple_robots_all_moving)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_2, Evaluation::nearest_robot(team, Point(0, 0)));
+    EXPECT_EQ(robot_2, Evaluation::nearestRobot(team, Point(0, 0)));
 }
 
 TEST_F(TeamEvaluationTest, nearest_friendy_one_robot_on_ball)
@@ -100,12 +100,12 @@ TEST_F(TeamEvaluationTest, nearest_friendy_one_robot_on_ball)
 
     team.updateRobots({robot_0, robot_1, robot_2});
 
-    EXPECT_EQ(robot_0, Evaluation::nearest_robot(team, Point(0, 0)));
+    EXPECT_EQ(robot_0, Evaluation::nearestRobot(team, Point(0, 0)));
 }
 
 TEST_F(TeamEvaluationTest, nearest_robot_zero_robots)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
-    EXPECT_EQ(std::nullopt, Evaluation::nearest_robot(team, Point(0, 0)));
+    EXPECT_EQ(std::nullopt, Evaluation::nearestRobot(team, Point(0, 0)));
 }

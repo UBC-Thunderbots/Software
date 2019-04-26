@@ -50,12 +50,12 @@ double proj_len(const Segment &first, const Vector &second);
  * inside the first parameter.
  */
 
-bool contains(const LegacyTriangle &out, const Vector &in);
-bool contains(const Circle &out, const Vector &in);
+bool contains(const LegacyTriangle &out, const Point &in);
+bool contains(const Circle &out, const Point &in);
 bool contains(const Circle &out, const Segment &in);
-bool contains(const Ray &out, const Vector &in);
-bool contains(const Segment &out, const Vector &in);
-bool contains(const Rectangle &out, const Vector &in);
+bool contains(const Ray &out, const Point &in);
+bool contains(const Segment &out, const Point &in);
+bool contains(const Rectangle &out, const Point &in);
 
 /*
  * The family of `intersects` functions determines whether there
@@ -84,6 +84,12 @@ double dist(const Segment &first, const Point &second);
 
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
+
+/**
+ * NOTE: the distance from a point to a rectangle is the closest distance from the point
+ * to the edge of the rectangle, or 0 if the point is within the rectangle
+ */
+double dist(const Point &first, const Rectangle &second);
 
 double distsq(const Point &first, const Segment &second);
 double distsq(const Segment &first, const Point &second);
@@ -152,22 +158,23 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  *
  * @param radius the radii of the obstacles.
  *
- * @return the best direction to shoot and the size of the angle centered around
- * that direction that is completely free of obstacles,
- * or <code>(<var>p</var>, 0)</code> for some unspecified <var>p</var> if there
- * is no free path.
+ * @return The best point to aim for in the target area and the size of the open interval
+ *         through which a shot from the current point to the best point would go. If no
+ *         shot could be found, returns std::nullopt
  */
-std::pair<Point, Angle> angleSweepCircles(const Point &src, const Point &p1,
-                                          const Point &p2,
-                                          const std::vector<Point> &obstacles,
-                                          const double &radius);
+std::optional<std::pair<Vector, Angle>> angleSweepCircles(
+    const Point &src, const Point &p1, const Point &p2,
+    const std::vector<Point> &obstacles, const double &radius);
 
 /**
- * Gets all angles.
+ * Performs an angle sweep.
+ * Suppose in this world, all objects are circles of fixed radius.
+ * You are at point \p src, and you want to shoot a ray from a point to an area
+ * This function calculates the all open angle intervals that you can shoot.
  *
  * @pre The point \p src can't be within the radius of the obstacle
  *
- * @param src the location where you are standing.
+ * @param src the location where the sweep is centered (think center of a clock)
  *
  * @param p1 the location of the right-hand edge of the target area.
  *
@@ -177,12 +184,15 @@ std::pair<Point, Angle> angleSweepCircles(const Point &src, const Point &p1,
  *
  * @param radius the radii of the obstacles.
  *
- * @return a vector of all possible pairs of directions and angles to a target area.
- * If lines \p src -> \p p1 and \p src -> \p p2 are collinear, the result will contain a
- * single pair of the direction of \p src -> \p p1 and zero angle if the line is not
- * blocked by an obstacle.
- * Otherwise, an empty vector will be returned.
- * An empty vector is returned if the preconditions aren't satisfied.
+ * @return A vector of possible (ie. not blocked) pairs of points to shoot to in the
+ *         target area,  and the size of the open interval for that point.
+ *         ie. for a return point `p` and angle `a`, if `v` is a vector from `src` to `p`,
+ *         then the open interval through which we are shooting is from `angle(v) - a/2`
+ *         to `angle(v) + a/2`
+ *         If lines src -> p1 and src -> p2 are collinear and src -> p1 is not blocked by
+ *         an obstacle, the result will contain a single pair of the direction of
+ *         src -> p1 and zero angle if the line is not blocked by an obstacle.
+ *         An empty vector is returned if the preconditions aren't satisfied.
  */
 std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
     const Point &src, const Point &p1, const Point &p2,
@@ -205,6 +215,19 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
  * @return the Point on line segment closest to centre point.
  */
 Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
+
+/**
+ * Finds the Point on line closest to point.
+ *
+ * @param centre the point.
+ *
+ * @param lineA one point on the line.
+ *
+ * @param lineB another point on the line segment.
+ *
+ * @return the Point on line closest to centre point.
+ */
+Point closestPointOnLine(const Point &p, const Point &lineA, const Point &lineB);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -568,3 +591,13 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
  * aren't redundant
  */
 std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2);
+
+/**
+ * Returns the binary trespass score of a point and rectangle
+ *
+ * @param point The point to check for trespassing
+ * @param rectangle The rectangle to check for trespassing by the Point parameter
+ * @return 1 if the point exists within the rectangle, or on the boundry of the rectangle
+ *         0 if the point exists outside of the rectangle
+ */
+int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);

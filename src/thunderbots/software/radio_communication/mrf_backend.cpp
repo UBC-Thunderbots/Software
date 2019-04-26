@@ -4,15 +4,16 @@
 
 #include "util/logger/init.h"
 
-MRFBackend::MRFBackend()
-    : dongle(MRFDongle()),
-      ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)))
+MRFBackend::MRFBackend(ros::NodeHandle &node_handle)
+    : annunciator(Annunciator(node_handle)),
+      dongle(MRFDongle(annunciator)),
+      ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(1)))
 {
 }
 
 MRFBackend::~MRFBackend() {}
 
-void MRFBackend::sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives)
+void MRFBackend::sendPrimitives(const std::vector<std::unique_ptr<Primitive>> &primitives)
 {
     dongle.send_drive_packet(primitives);
 }
