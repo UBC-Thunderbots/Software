@@ -126,7 +126,8 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
 
 void CanvasMessenger::drawPoint(Layer layer, Point p, double radius, Color color) {
     Sprite circle_sprite(
-            // TODO: Change to texture id 1 once circles are properly implemented
+            // NOTE: Currently this uses texture ID zero, which is a rectangle, but
+            // eventually we should use a proper circle texture
             0, p, Angle::zero(), radius*2, radius*2, color
             );
     drawSprite(layer, circle_sprite);

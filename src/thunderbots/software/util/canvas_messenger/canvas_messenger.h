@@ -50,11 +50,9 @@ namespace Util
             uint8_t a;
         };
 
-        // TODO: Update this comment
         /**
          * Sprite is a struct that contains all the information
-         * necessary to create a sprite. The default constructor
-         * creates a 100x100 white rectangle sprite.
+         * necessary to create a sprite.
          */
         class Sprite {
         public:
@@ -96,7 +94,6 @@ namespace Util
             std::vector<uint8_t> serialize(int size_scaling_factor);
 
         private:
-            // TODO: Comment these
             uint8_t _texture;
             Point _center;
             double _width;
@@ -143,12 +140,6 @@ namespace Util
          * @param radius The radius to draw the point with
          */
         void drawPoint(Layer layer, Point p, double radius, Color color);
-
-        /**
-         * Draw the given field
-         * @param field
-         */
-        void drawField(const Field& field);
 
        private:
 
