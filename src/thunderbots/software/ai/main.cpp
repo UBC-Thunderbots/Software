@@ -42,8 +42,12 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     }
     primitive_publisher.publish(primitive_array_message);
 
+    // Draw the world
+    std::shared_ptr<Util::CanvasMessenger> canvas_messenger = Util::CanvasMessenger::getInstance();
+    canvas_messenger->drawWorld(world);
+
     // On every tick, send the layer messages
-    Util::CanvasMessenger::getInstance()->publishAndClearLayers();
+    canvas_messenger->publishAndClearAllLayers();
 
     count++;
 }

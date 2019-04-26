@@ -19,6 +19,9 @@
 #include <vector>
 
 #include "ai/world/field.h"
+#include "ai/world/world.h"
+#include "ai/world/ball.h"
+#include "ai/world/robot.h"
 #include "thunderbots_msgs/CanvasLayer.h"
 #include "util/constants.h"
 
@@ -141,13 +144,62 @@ namespace Util
                            Color color);
 
         /**
+         * Draw a straight line from p1 to p2
+         *
+         * @param layer The layer to draw the line on
+         * @param p1 The start point of the line
+         * @param p2 The end point of the line
+         * @param thickness The thickness of the line (units are in meters)
+         * @param color The color of the line
+         */
+        void drawLine(Layer layer, Point p1, Point p2, double thickness, Color color);
+
+        /**
          * Draw a point at a given location with a given radius
          *
          * @param p The point to draw
-         * // TODO: Units for the radius???
          * @param radius The radius to draw the point with
          */
-        void drawPoint(Layer layer, Point p, double radius, Color color);
+        void drawPoint(Layer layer, const Point &p, double radius, Color color);
+
+        /**
+         * Draw the given World
+         *
+         * This will draw all parts of the world over multiple layers
+         *
+         * @param world The world to draw
+         */
+        void drawWorld(const World &world);
+
+        /**
+         * Draw the given ball
+         *
+         * @param ball The ball to draw
+         */
+        void drawBall(const Ball &ball);
+
+        /**
+         * Draw the given field
+         *
+         * @param field The field to draw
+         */
+        void drawField(Field field);
+
+        /**
+         * Draw the given team
+         *
+         * @param team The team to draw
+         * @param color The color to draw the team with
+         */
+        void drawTeam(const Team &team, Color color);
+
+        /**
+         * Draw the given robot
+         *
+         * @param robot The robot to draw
+         * @param color The color of the robot
+         */
+        void drawRobot(Robot robot, Color color);
 
        private:
         /**
@@ -160,6 +212,14 @@ namespace Util
 
         // The number of pixels per meter
         static const int PIXELS_PER_METER = 100;
+
+        // Colors
+        static constexpr Color FIELD_COLOR  = {0, 153, 0, 255};
+        static constexpr Color DEFENSE_AREA_COLOR = {242, 242, 242, 255};
+        static constexpr Color FIELD_LINE_COLOR = {242, 242, 242, 255};
+        static constexpr Color BALL_COLOR = {255, 153, 0, 255};
+        static constexpr Color FRIENDLY_TEAM_COLOR = {230, 230, 0, 255};
+        static constexpr Color ENEMY_TEAM_COLOR = {0, 230, 230, 255};
 
         /**
          * Constructor; initializes an empty layers map then populates it
