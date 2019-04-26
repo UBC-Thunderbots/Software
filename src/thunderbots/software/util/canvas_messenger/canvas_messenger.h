@@ -25,7 +25,12 @@
 
 namespace Util
 {
-
+    /**
+     * This class provides an interface for drawing on the "Canvas" area of the visualizer
+     *
+     * All public methods are (and must be) thread safe, so please be careful when
+     * exposing more public functionality
+     */
     class CanvasMessenger
     {
        public:
@@ -70,7 +75,9 @@ namespace Util
                     : _texture(texture),
                       _center(center),
                       _orientation(orientation),
-                      _color(color){}
+                      _color(color),
+                      _width(width),
+                      _height(height){}
 
                       /**
                        * Get the top left corner of the sprite
@@ -86,7 +93,7 @@ namespace Util
              *
              * @return the serialized form of this sprite
              */
-            std::vector<uint8_t> serialize();
+            std::vector<uint8_t> serialize(int size_scaling_factor);
 
         private:
             // TODO: Comment these
@@ -111,12 +118,13 @@ namespace Util
          * Uses ROS publishers to publish sprite data for each layer and
          * then clears all layer data.
          */
-        void publishAndClearLayers();
+        void publishAndClearAllLayers();
 
         /**
-         * Clears all sprite data for all layers
+         * Clear the given layer
+         * @param layer The layer to clear
          */
-        void clearLayers();
+        void clearLayer(Layer layer);
 
         /**
          * Draw a rectangle on the given layer
@@ -134,7 +142,7 @@ namespace Util
          * // TODO: Units for the radius???
          * @param radius The radius to draw the point with
          */
-        void drawPoint(Point p, double radius, int r, int g, int b, int opacity);
+        void drawPoint(Layer layer, Point p, double radius, Color color);
 
         /**
          * Draw the given field
@@ -177,6 +185,10 @@ namespace Util
          */
         void drawSprite(Layer layer, Sprite sprite);
 
+        /**
+         * Clears all sprite data for all layers
+         */
+        void clearAllLayers();
 
         // layer to sprite data map
         std::map<Layer, std::vector<Sprite>> layers_map;
@@ -193,6 +205,6 @@ namespace Util
         std::chrono::time_point<std::chrono::system_clock> time_last_published;
 
         // The mutex for the layers
-        std::mutex layers_lock;
+        std::mutex layers_map_lock;
     };
 }  // namespace Util

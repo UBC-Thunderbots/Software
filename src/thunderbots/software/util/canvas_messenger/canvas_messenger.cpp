@@ -16,10 +16,10 @@ void CanvasMessenger::initializePublisher(ros::NodeHandle node_handle)
         Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, BUFFER_SIZE);
 }
 
-void CanvasMessenger::publishAndClearLayers()
+void CanvasMessenger::publishAndClearAllLayers()
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_lock);
+    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
 
     // Limit rate of the message publishing
     // Get the time right now
@@ -39,20 +39,16 @@ void CanvasMessenger::publishAndClearLayers()
     for (const auto& layer_pair : this->layers_map)
     {
         // First is the layer number
-        const uint8_t layer_number = layer_pair.first;
+        const uint8_t layer_number = (uint8_t)layer_pair.first;
 
         // Second is the vector that contains the sprites
         const std::vector<Sprite>& sprites = layer_pair.second;
 
-        // Only send the non-empty layers
-//            if (!layer_pair.second.empty())
-//            {
-            this->publishPayload(layer_number, sprites);
-//            }
+        this->publishPayload(layer_number, sprites);
     }
 
     // Clear shapes in layers of current frame/tick
-    this->clearLayers();
+    this->clearAllLayers();
 
     // Update last published time
     time_last_published = now;
@@ -69,7 +65,7 @@ void CanvasMessenger::publishPayload(uint8_t layer,
     // Convert each sprite into a binary message
     for (Sprite& sprite : sprites)
     {
-        std::vector<uint8_t> sprite_payload = sprite.serialize();
+        std::vector<uint8_t> sprite_payload = sprite.serialize(PIXELS_PER_METER);
         payload.insert(payload.end(), sprite_payload.begin(), sprite_payload.end());
     }
 
@@ -81,16 +77,23 @@ void CanvasMessenger::publishPayload(uint8_t layer,
     this->publisher.publish(new_layer);
 }
 
-void CanvasMessenger::clearLayers()
+void CanvasMessenger::clearAllLayers()
 {
     // Clears all sprite vector in all the layers
     for (auto& layer : this->layers_map)
     {
         layer.second.clear();
-//            Util::CanvasMessenger::getInstance()->drawPoint(Point(), 0.5, 255, 0, 0);
     }
 }
 
+void CanvasMessenger::clearLayer(Layer layer){
+    // Take ownership of the layers for the duration of this function
+    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+
+    if (layers_map.find(layer) != layers_map.end()){
+        layers_map[layer] = {};
+    }
+}
 
 void CanvasMessenger::drawSprite(Layer layer, Sprite sprite)
 {
@@ -101,7 +104,7 @@ void CanvasMessenger::drawSprite(Layer layer, Sprite sprite)
 void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite &sprite)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_lock);
+    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
 
     // We look if the layer exists
     if (this->layers_map.find(layer) == this->layers_map.end())
@@ -115,88 +118,65 @@ void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite &sprite)
 }
 
 void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orientation, Color color) {
+    // We switch the width and height here because they're switched in the visualizer
     Sprite rectangle_sprite(0, rectangle.centre(), orientation, rectangle.width(), rectangle.height(), color);
 
     drawSprite(layer, rectangle_sprite);
 }
 
-//void CanvasMessenger::drawPoint(Point p, double radius, int r, int g, int b,
-//                                int opacity) {
-//    Sprite sprite;
-//
-//    sprite.x = std::round(p.x() * PIXELS_PER_METER - (radius*PIXELS_PER_METER/2));
-//    sprite.y =  std::round(-p.y() * PIXELS_PER_METER - (radius*PIXELS_PER_METER/2));
-//
-//    sprite.width = radius * PIXELS_PER_METER;
-//    sprite.height = radius * PIXELS_PER_METER;
-//
-////        sprite.red = r;
-////        sprite.green = g;
-////        sprite.blue = b;
-////        sprite.opacity = opacity;
-//
-//    // 1 is a circle
-//    sprite.texture = 0;
-//
-//    drawSprite(1, sprite);
-//}
-
-//void CanvasMessenger::drawField(const Field &field) {
-//    Sprite field_sprite;
-//    field_sprite.width = field.length() * PIXELS_PER_METER;
-//    field_sprite.height = field.width() * PIXELS_PER_METER;
-//    field_sprite.x = std::round(-field.length() * PIXELS_PER_METER/2);
-//    field_sprite.y = std::round(-field.width() * PIXELS_PER_METER/2);
-//
-//    drawSprite(0, field_sprite);
-//}
-
-
-
-
-
-
-
-Point CanvasMessenger::Sprite::getTopLeftCorner() {
-    return _center + Vector(_width, _height).rotate(_orientation);
+void CanvasMessenger::drawPoint(Layer layer, Point p, double radius, Color color) {
+    Sprite circle_sprite(
+            // TODO: Change to texture id 1 once circles are properly implemented
+            0, p, Angle::zero(), radius*2, radius*2, color
+            );
+    drawSprite(layer, circle_sprite);
 }
 
+Point CanvasMessenger::Sprite::getTopLeftCorner() {
+    return _center + Vector(-_width/2, _height/2);
+}
 
-std::vector<uint8_t> CanvasMessenger::Sprite::serialize() {
+std::vector<uint8_t> CanvasMessenger::Sprite::serialize(int size_scaling_factor) {
     std::vector<uint8_t> payload;
+
+    payload.emplace_back(_texture);
 
     Point top_left_corner = getTopLeftCorner();
 
     // These are all 16 bits, we need to split them
     Int16OrTwoInt8 x;
-    x.base = top_left_corner.x();
-    payload.insert(payload.end(), x.result[1]);
-    payload.insert(payload.end(), x.result[0]);
+    x.base = top_left_corner.x() * size_scaling_factor;
+    payload.emplace_back(x.result[1]);
+    payload.emplace_back(x.result[0]);
 
     Int16OrTwoInt8 y;
-    y.base = top_left_corner.y();
-    payload.insert(payload.end(), y.result[1]);
-    payload.insert(payload.end(), y.result[0]);
+    // We negate y because we want positive y to be upwards in the visualizer, which uses
+    // the graphics convention of +y downwards
+    y.base = -top_left_corner.y() * size_scaling_factor;
+    payload.emplace_back(y.result[1]);
+    payload.emplace_back(y.result[0]);
 
     Int16OrTwoInt8 width;
-    width.base = _width;
-    payload.insert(payload.end(), width.result[1]);
-    payload.insert(payload.end(), width.result[0]);
+    width.base = _width * size_scaling_factor;
+    payload.emplace_back(width.result[1]);
+    payload.emplace_back(width.result[0]);
 
     Int16OrTwoInt8 height;
-    height.base = _height;
-    payload.insert(payload.end(), height.result[1]);
-    payload.insert(payload.end(), height.result[0]);
+    height.base = _height * size_scaling_factor;
+    payload.emplace_back(height.result[1]);
+    payload.emplace_back(height.result[0]);
 
     Int16OrTwoInt8 orientation;
-    orientation.base = _orientation.toDegrees();
-    payload.insert(payload.end(), orientation.result[1]);
-    payload.insert(payload.end(), orientation.result[0]);
+    // We serialize to tenths of degrees, and also negate the orientation to match
+    // our on-field conventions
+    orientation.base = -_orientation.toDegrees() * 10;
+    payload.emplace_back(orientation.result[1]);
+    payload.emplace_back(orientation.result[0]);
 
-    payload.insert(payload.end(), _color.a);
-    payload.insert(payload.end(), _color.r);
-    payload.insert(payload.end(), _color.g);
-    payload.insert(payload.end(), _color.b);
+    payload.emplace_back(_color.a);
+    payload.emplace_back(_color.r);
+    payload.emplace_back(_color.g);
+    payload.emplace_back(_color.b);
 
     return payload;
 }
