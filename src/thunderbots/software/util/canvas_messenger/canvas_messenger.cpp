@@ -25,9 +25,9 @@ void CanvasMessenger::publishAndClearAllLayers()
     // Get the time right now
     const std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
-    const int64_t elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                                   now - time_last_published)
-                                   .count();
+    const int64_t elapsed_ns =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now - time_last_published)
+            .count();
     const double elapsed_ms = elapsed_ns / 1.0e6;
 
     // Do not do anything if the time passed hasn't been
@@ -54,8 +54,7 @@ void CanvasMessenger::publishAndClearAllLayers()
     time_last_published = now;
 }
 
-void CanvasMessenger::publishPayload(uint8_t layer,
-                                     std::vector<Sprite> sprites)
+void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
 {
     std::vector<uint8_t> payload;
 
@@ -86,11 +85,13 @@ void CanvasMessenger::clearAllLayers()
     }
 }
 
-void CanvasMessenger::clearLayer(Layer layer){
+void CanvasMessenger::clearLayer(Layer layer)
+{
     // Take ownership of the layers for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
 
-    if (layers_map.find(layer) != layers_map.end()){
+    if (layers_map.find(layer) != layers_map.end())
+    {
         layers_map[layer] = {};
     }
 }
@@ -101,7 +102,7 @@ void CanvasMessenger::drawSprite(Layer layer, Sprite sprite)
     this->addSpriteToLayer(layer, sprite);
 }
 
-void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite &sprite)
+void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite& sprite)
 {
     // Take ownership of the layers for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
@@ -117,27 +118,32 @@ void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite &sprite)
     this->layers_map[layer].emplace_back(sprite);
 }
 
-void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orientation, Color color) {
+void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orientation,
+                                    Color color)
+{
     // We switch the width and height here because they're switched in the visualizer
-    Sprite rectangle_sprite(0, rectangle.centre(), orientation, rectangle.width(), rectangle.height(), color);
+    Sprite rectangle_sprite(0, rectangle.centre(), orientation, rectangle.width(),
+                            rectangle.height(), color);
 
     drawSprite(layer, rectangle_sprite);
 }
 
-void CanvasMessenger::drawPoint(Layer layer, Point p, double radius, Color color) {
+void CanvasMessenger::drawPoint(Layer layer, Point p, double radius, Color color)
+{
     Sprite circle_sprite(
-            // NOTE: Currently this uses texture ID zero, which is a rectangle, but
-            // eventually we should use a proper circle texture
-            0, p, Angle::zero(), radius*2, radius*2, color
-            );
+        // NOTE: Currently this uses texture ID zero, which is a rectangle, but
+        // eventually we should use a proper circle texture
+        0, p, Angle::zero(), radius * 2, radius * 2, color);
     drawSprite(layer, circle_sprite);
 }
 
-Point CanvasMessenger::Sprite::getTopLeftCorner() {
-    return _center + Vector(-_width/2, _height/2);
+Point CanvasMessenger::Sprite::getTopLeftCorner()
+{
+    return _center + Vector(-_width / 2, _height / 2);
 }
 
-std::vector<uint8_t> CanvasMessenger::Sprite::serialize(int size_scaling_factor) {
+std::vector<uint8_t> CanvasMessenger::Sprite::serialize(int size_scaling_factor)
+{
     std::vector<uint8_t> payload;
 
     payload.emplace_back(_texture);

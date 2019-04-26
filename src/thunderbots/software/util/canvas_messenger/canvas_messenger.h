@@ -14,14 +14,13 @@
 #include <chrono>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
-
-#include "thunderbots_msgs/CanvasLayer.h"
-#include "util/constants.h"
 
 #include "ai/world/field.h"
+#include "thunderbots_msgs/CanvasLayer.h"
+#include "util/constants.h"
 
 namespace Util
 {
@@ -34,12 +33,14 @@ namespace Util
     class CanvasMessenger
     {
        public:
-        enum class Layer{
+        enum class Layer
+        {
             STATIC_FEATURES,
             ROBOTS_AND_BALL
         };
 
-        struct Color {
+        struct Color
+        {
             // Red value of the color
             uint8_t r;
             // Green value of the color
@@ -54,8 +55,9 @@ namespace Util
          * Sprite is a struct that contains all the information
          * necessary to create a sprite.
          */
-        class Sprite {
-        public:
+        class Sprite
+        {
+           public:
             // delete the default constructor
             Sprite() = delete;
 
@@ -65,24 +67,29 @@ namespace Util
              *        what sprite this is (circle, rectangle, robot, etc.)
              * @param center The center of the sprite
              * @param orientation The orientation of the sprite
-             * @param width The width of the sprite (in meters, will be translated to pixels)
-             * @param height The height of the sprite (in meters, will be translated to pixels)
+             * @param width The width of the sprite (in meters, will be translated to
+             * pixels)
+             * @param height The height of the sprite (in meters, will be translated to
+             * pixels)
              * @param color The color of the sprite
              */
-            Sprite(uint8_t texture, const Point& center, const Angle& orientation, double width, double height, Color color)
-                    : _texture(texture),
-                      _center(center),
-                      _orientation(orientation),
-                      _color(color),
-                      _width(width),
-                      _height(height){}
+            Sprite(uint8_t texture, const Point& center, const Angle& orientation,
+                   double width, double height, Color color)
+                : _texture(texture),
+                  _center(center),
+                  _orientation(orientation),
+                  _color(color),
+                  _width(width),
+                  _height(height)
+            {
+            }
 
-                      /**
-                       * Get the top left corner of the sprite
-                       *
-                       * @return the top left corner of the sprite
-                       */
-                      Point getTopLeftCorner();
+            /**
+             * Get the top left corner of the sprite
+             *
+             * @return the top left corner of the sprite
+             */
+            Point getTopLeftCorner();
 
             /**
              * Get the serialized form of this sprite
@@ -93,7 +100,7 @@ namespace Util
              */
             std::vector<uint8_t> serialize(int size_scaling_factor);
 
-        private:
+           private:
             uint8_t _texture;
             Point _center;
             double _width;
@@ -130,7 +137,8 @@ namespace Util
          * @param rectangle The rectangle to draw (units are in meters)
          * @param color The color the rectangle should be
          */
-        void drawRectangle(Layer layer, Rectangle rectangle, Angle orientation, Color color);
+        void drawRectangle(Layer layer, Rectangle rectangle, Angle orientation,
+                           Color color);
 
         /**
          * Draw a point at a given location with a given radius
@@ -142,7 +150,6 @@ namespace Util
         void drawPoint(Layer layer, Point p, double radius, Color color);
 
        private:
-
         /**
          * Union used to convert a int16_t into two uint8_t
          */
@@ -166,7 +173,7 @@ namespace Util
          * @param layer: The layer which the sprite is to be added to
          * @param sprite: The sprite data
          */
-        void addSpriteToLayer(Layer layer, Sprite &sprite);
+        void addSpriteToLayer(Layer layer, Sprite& sprite);
 
         /**
          * Draw a sprite onto a specific layer.
