@@ -1224,7 +1224,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                                                         Segment segment2)
 {
     std::optional<Segment> redundant_segment =
-        calcIfSegmentsAreRedundant(segment1, segment2);
+        mergeFullyOverlappingSegments(segment1, segment2);
 
     // If the segments are not parallel, then return std::nullopt. (The segments are
     // parallel of all points are collinear)
@@ -1260,30 +1260,38 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
     }
 }
 
-std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2) {
+std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2)
+{
     // If the segments are not parallel, then return std::nullopt. (The segments are
     // parallel if all points are collinear)
     if (!collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getSegStart()) &&
-        !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd())) {
+        !collinear(segment1.getSegStart(), segment1.getEnd(), segment2.getEnd()))
+    {
         return std::nullopt;
     }
 
     Segment largest_segment, smallest_segment;
     // Grab the largest segment
-    if (segment1.toVector().lensq() > segment2.toVector().lensq()) {
-        largest_segment = segment1;
+    if (segment1.toVector().lensq() > segment2.toVector().lensq())
+    {
+        largest_segment  = segment1;
         smallest_segment = segment2;
-    } else {
-        largest_segment = segment2;
+    }
+    else
+    {
+        largest_segment  = segment2;
         smallest_segment = segment1;
     }
 
     // The segment is redundant if both points of the smallest segment are contained in
     // the largest segment
     if (contains(largest_segment, smallest_segment.getSegStart()) &&
-        contains(largest_segment, smallest_segment.getEnd())) {
+        contains(largest_segment, smallest_segment.getEnd()))
+    {
         return std::make_optional(largest_segment);
-    } else {
+    }
+    else
+    {
         return std::nullopt;
     }
 }

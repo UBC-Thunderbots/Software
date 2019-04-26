@@ -1217,7 +1217,7 @@ TEST(GeomUtilTest, test_segment_redundancy_segments_are_redundant)
     Segment segment2 = Segment(Point(-2, -2), Point(2, 2));
 
     std::optional<Segment> largest_segment =
-        calcIfSegmentsAreRedundant(segment1, segment2);
+        mergeFullyOverlappingSegments(segment1, segment2);
 
     EXPECT_EQ(largest_segment.value(), segment2);
 }
@@ -1230,7 +1230,7 @@ TEST(GeomUtilTest, test_segment_redundancy_segments_are_not_parallel)
     Segment segment2 = Segment(Point(1, 4), Point(1, -4));
 
     std::optional<Segment> largest_segment =
-        calcIfSegmentsAreRedundant(segment1, segment2);
+        mergeFullyOverlappingSegments(segment1, segment2);
 
     EXPECT_EQ(largest_segment, std::nullopt);
 }
@@ -1243,12 +1243,12 @@ TEST(GeomUtilTest, test_segment_redundancy_segments_are_the_same)
     Segment segment2 = Segment(Point(2, 2), Point(1, -2));
 
     std::optional<Segment> largest_segment =
-        calcIfSegmentsAreRedundant(segment1, segment2);
+        mergeFullyOverlappingSegments(segment1, segment2);
 
     EXPECT_EQ(largest_segment.value(), segment1);
 }
 
-// Test if segments are merged if that are parallel and only partially overlapping
+// Test if segments are merged if they are parallel and only partially overlapping
 TEST(GeomUtilTest, test_merge_segment_partially_overlapping)
 {
     Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
@@ -1260,7 +1260,7 @@ TEST(GeomUtilTest, test_merge_segment_partially_overlapping)
     EXPECT_EQ(merged_segment.value(), Segment(Point(-2, -2), Point(5, 5)));
 }
 
-// Test if segments are merged if that are parallel and only partially overlapping
+// Test if segments are merged if they are parallel and only partially overlapping
 TEST(GeomUtilTest, test_merge_segment_redundant_segments)
 {
     Segment segment1 = Segment(Point(-2, -2), Point(2, 2));

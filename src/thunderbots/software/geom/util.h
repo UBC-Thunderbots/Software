@@ -590,7 +590,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
  *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
  * aren't redundant
  */
-std::optional<Segment> calcIfSegmentsAreRedundant(Segment segment1, Segment segment2);
+std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
 /**
  * Returns the binary trespass score of a point and rectangle
