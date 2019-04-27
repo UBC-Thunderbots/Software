@@ -1,5 +1,8 @@
 #pragma once
 
+#include <vector>
+
+#include "boost/circular_buffer.hpp"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "util/time/timestamp.h"
@@ -24,7 +27,7 @@ class Robot
      */
     explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp);
+                   const Timestamp &timestamp, unsigned int history_duration = 20);
 
     /**
      * Updates the state of the robot.
@@ -179,6 +182,46 @@ class Robot
         const Duration &duration_in_future) const;
 
     /**
+     * Gets the buffer which holds all the previous position states of the robot
+     *
+     * @return Vector containing the position history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Point> getPreviousPositions();
+
+    /**
+     * Gets the buffer which holds all the previous velocity states of the robot
+     *
+     * @return Vector containing the velocity history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Vector> getPreviousVelocities();
+
+    /**
+     * Gets the buffer which holds all the previous orientation states of the robot
+     *
+     * @return Vector containing the orientation history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<Angle> getPreviousOrientations();
+
+    /**
+     * Gets the buffer which holds all the previous angular velocity states of the robot
+     *
+     * @return Vector containing the angular velocity history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<AngularVelocity> getPreviousAngularVelocities();
+
+    /**
+     * Gets the buffer which holds all the timestamps of the previous states
+     *
+     * @return Vector containing the update timestamp history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<Timestamp> getPreviousTimestamps();
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.
@@ -217,16 +260,36 @@ class Robot
     };
 
    private:
+    /**
+     * Adds a state to the front of the circular buffers storing the state histories of
+     * the robot.
+     *
+     * @param position Position of robot.
+     * @param velocity Velocity of robot
+     * @param orientation Orientation of robot.
+     * @param angular_velocity Angular velocity of robot
+     * @param timestamp Time that the robot was in this state.
+     */
+    void addStateToRobotHistory(const Point &position, const Vector &velocity,
+                                const Angle &orientation,
+                                const AngularVelocity &angular_velocity,
+                                const Timestamp &timestamp);
+
     // The id of this robot
     unsigned int id_;
-    // The current position of the robot, with coordinates in metres
-    Point position_;
-    // The current velocity of the robot, in metres per second
-    Vector velocity_;
-    // The current orientation of the robot, in radians
-    Angle orientation_;
-    // The current angular velocity of the robot, in radians per second
-    AngularVelocity angularVelocity_;
-    // The timestamp for when this Robot was last updated
-    Timestamp last_update_timestamp;
+    // All previous positions of the robot, with the most recent position at the front of
+    // the queue, coordinates in meters
+    boost::circular_buffer<Point> positions_;
+    // All previous velocities of the robot, with the most recent position at the front of
+    // the queue, in metres per second
+    boost::circular_buffer<Vector> velocities_;
+    // All previous orientations of the robot, with the most recent position at the front
+    // of the queue, in radians
+    boost::circular_buffer<Angle> orientations_;
+    // All previous angular velocities of the robot, with the most recent position at the
+    // front of the queue, in radians per second
+    boost::circular_buffer<AngularVelocity> angularVelocities_;
+    // All previous timestamps of when the robot was updated, with the most recent
+    // position at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };
