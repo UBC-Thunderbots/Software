@@ -77,7 +77,12 @@ export class Layer {
 
         // Add/remove allocated sprites in layer if needed
         const currSpriteCount = this.layerObject.children.length;
-        if (incomingSpriteCount > currSpriteCount) {
+        if (incomingSpriteCount === 0) {
+            // Special case, simply unallocate all sprites
+            const oldSprites = this.layerObject.children as PIXI.Sprite[];
+            this.spritePool.unallocate(oldSprites);
+            this.layerObject.removeChildren();
+        } else if (incomingSpriteCount > currSpriteCount) {
             // We allocated what we are missing
             const newSprites = this.spritePool.allocate(
                 incomingSpriteCount - currSpriteCount,
