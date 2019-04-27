@@ -93,7 +93,6 @@ INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCorner,
                         ::testing::Values(Point(-4.5, 3), Point(-4.5, -3), Point(-4.0, 3),
                                           Point(-4.0, -3)));
 
-// Field field = Field(9.0, 6.0, 1.0, 2.0, 1.0, 0.3, 0.5);
 TEST_P(BallPositionsNotInFriendlyCorner, out_of_corner_test)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
