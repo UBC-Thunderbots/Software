@@ -25,9 +25,11 @@ std::optional<Robot> RobotFilter::getFilteredData(
         if (robot_data.id == this->getRobotId() &&
             robot_data.timestamp > this->current_robot_state.lastUpdateTimestamp())
         {
-            filtered_data.position += robot_data.position;
-            filtered_data.orientation += robot_data.orientation;
-            filtered_data.timestamp.fromMilliseconds(
+            filtered_data.position = filtered_data.position + robot_data.position;
+            filtered_data.orientation =
+                filtered_data.orientation + robot_data.orientation;
+
+            filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
                 filtered_data.timestamp.getMilliseconds() +
                 robot_data.timestamp.getMilliseconds());
             data_num++;
@@ -59,10 +61,10 @@ std::optional<Robot> RobotFilter::getFilteredData(
     else
     {
         // update data by returning filtered robot data
-        filtered_data.position /= data_num;
-        filtered_data.orientation /= data_num;
+        filtered_data.position    = filtered_data.position / data_num;
+        filtered_data.orientation = filtered_data.orientation / data_num;
 
-        filtered_data.timestamp.fromMilliseconds(
+        filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
             filtered_data.timestamp.getMilliseconds() / data_num);
 
         // velocity = position difference/ time difference

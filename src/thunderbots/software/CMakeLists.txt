@@ -887,6 +887,20 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             )
 
+    catkin_add_gtest(robot_filter_test
+            test/network_input/filter/robot_filter.cpp
+            test/network_input/filter/main.cpp
+            network_input/filter/robot_filter.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            ai/world/robot.cpp
+            )
+    target_link_libraries(robot_filter_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
