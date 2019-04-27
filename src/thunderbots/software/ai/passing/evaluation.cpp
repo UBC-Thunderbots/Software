@@ -14,7 +14,6 @@
 
 using namespace AI::Passing;
 using namespace AI::Evaluation;
-using namespace Util;
 
 double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
                              const std::optional<Rectangle>& target_region)
