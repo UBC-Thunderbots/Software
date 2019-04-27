@@ -628,6 +628,7 @@ if (CATKIN_ENABLE_TESTING)
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
             util/parameter/dynamic_parameters.cpp
+            util/math_functions.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
@@ -773,6 +774,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             util/parameter/dynamic_parameters.cpp
+            util/math_functions.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp

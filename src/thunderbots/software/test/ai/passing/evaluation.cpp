@@ -5,12 +5,14 @@
 #include "ai/passing/evaluation.h"
 
 #include <gtest/gtest.h>
+#include <util/math_functions.h>
 #include <util/parameter/dynamic_parameters.h>
 
 #include "../shared/constants.h"
 #include "test/test_util/test_util.h"
 
 using namespace AI::Passing;
+using namespace Util;
 
 class PassingEvaluationTest : public testing::Test
 {
