@@ -19,6 +19,7 @@ class PassingEvaluationTest : public testing::Test
     {
         avg_desired_pass_speed =
             (max_pass_speed_param - min_pass_speed_param) / 2 + min_pass_speed_param;
+        avg_time_offset_for_pass_seconds = (min_time_offset_for_pass_seconds_param + max_time_offset_for_pass_seconds_param)/2;
     }
 
     // We get these values here so we can make these tests robust to change
@@ -27,6 +28,10 @@ class PassingEvaluationTest : public testing::Test
     double max_pass_speed_param =
         Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
     double avg_desired_pass_speed;
+
+    double min_time_offset_for_pass_seconds_param = Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+    double max_time_offset_for_pass_seconds_param = Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+    double avg_time_offset_for_pass_seconds;
 };
 
 TEST_F(PassingEvaluationTest, ratePass_no_target_region)
@@ -64,7 +69,7 @@ TEST_F(PassingEvaluationTest, ratePass_with_target_region)
     });
     world.updateFriendlyTeamState(friendly_team);
 
-    Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
+    Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(avg_time_offset_for_pass_seconds));
 
     Rectangle target_region({1, 1}, {2, 2});
     double pass_rating = ratePass(world, pass, target_region);
@@ -91,6 +96,30 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.0, pass_rating);
+    EXPECT_GE(0.01, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+
+    // We update the the ball state because that's what is used as a reference for the
+    // current time by the evaluation function
+    // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
+    world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+
+    Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 
     double pass_rating = ratePass(world, pass, std::nullopt);
     EXPECT_LE(0.0, pass_rating);
@@ -147,7 +176,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_g
     Pass pass({4, 0}, {3.5, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
-    EXPECT_LE(0.99, pass_shoot_score);
+    EXPECT_LE(0.95, pass_shoot_score);
     EXPECT_GE(1, pass_shoot_score);
 }
 
@@ -162,8 +191,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({-1, 0}, {0, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
-    EXPECT_LE(0, pass_shoot_score);
-    EXPECT_GE(0.5, pass_shoot_score);
+    EXPECT_GE(pass_shoot_score, 0.0);
+    EXPECT_LE(pass_shoot_score, 0.05);
 }
 
 TEST_F(PassingEvaluationTest,
@@ -181,8 +210,8 @@ TEST_F(PassingEvaluationTest,
     Pass pass({3.5, 0}, {3, 0}, 1, Timestamp::fromSeconds(1));
 
     double pass_shoot_score = ratePassShootScore(field, enemy_team, pass);
-    EXPECT_LE(0.9, pass_shoot_score);
-    EXPECT_GE(1, pass_shoot_score);
+    EXPECT_GE(pass_shoot_score, 0.9);
+    EXPECT_LE(pass_shoot_score, 1.0);
 }
 
 TEST_F(PassingEvaluationTest, ratePassShootScore_no_open_shot_to_goal)
@@ -206,7 +235,7 @@ TEST_F(PassingEvaluationTest, ratePassShootScore_decreasing_open_angle_to_goal)
 {
     // As we decrease the open angle to the goal, the shot score should also decrease
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Pass pass({3.5, 1}, {3, 0}, 1, Timestamp::fromSeconds(1));
+    Pass pass({3.5, 0.0}, {3, 0}, 1, Timestamp::fromSeconds(1));
     Team enemy_team(Duration::fromSeconds(10));
 
     enemy_team.updateRobots({
@@ -253,10 +282,10 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
         Robot(1, {-30, 50}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(1));
+    Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(0.4));
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass);
-    EXPECT_LE(0.95, pass_rating);
+    EXPECT_LE(0.90, pass_rating);
     EXPECT_GE(1, pass_rating);
 }
 
@@ -392,7 +421,7 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_robot_at_far_end_of_field)
     // friendly end of the field. The enemy robot should not be able to intercept the pass
     Robot enemy_robot(0, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
                       Timestamp::fromSeconds(0));
-    Pass pass({3, -3}, {3, 3}, 2, Timestamp::fromSeconds(1));
+    Pass pass({3, -3}, {3, 3}, 3, Timestamp::fromSeconds(0));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
     EXPECT_LE(0, intercept_risk);
@@ -410,6 +439,21 @@ TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_moving_far_away)
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
     EXPECT_LE(0, intercept_risk);
     EXPECT_GE(0.1, intercept_risk);
+}
+
+TEST_F(PassingEvaluationTest, calculateInterceptRisk_enemy_off_pass_trajectory_and_late_pass_start_time){
+    // Test where the enemy is a fair distance off the pass trajectory, but the pass
+    // doesn't start for a few seconds, so the enemy would have time to move to
+    // intercept before the pass has started
+    // An enemy robot moving towards the pass from far away should not be able to
+    // intercept it
+    Robot enemy_robot(0, {2, 5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                      Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {0, 10}, 10, Timestamp::fromSeconds(2));
+
+    double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
+    EXPECT_GE(intercept_risk, 0.95);
+    EXPECT_LE(intercept_risk, 1);
 }
 
 TEST_F(PassingEvaluationTest,
