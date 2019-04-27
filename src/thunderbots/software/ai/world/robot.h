@@ -24,6 +24,7 @@ class Robot
      * per second
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state
+     * @param history_duration The number of previous robot states that should be stored.
      */
     explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
@@ -280,16 +281,16 @@ class Robot
     // All previous positions of the robot, with the most recent position at the front of
     // the queue, coordinates in meters
     boost::circular_buffer<Point> positions_;
-    // All previous velocities of the robot, with the most recent position at the front of
+    // All previous velocities of the robot, with the most recent velocity at the front of
     // the queue, in metres per second
     boost::circular_buffer<Vector> velocities_;
-    // All previous orientations of the robot, with the most recent position at the front
-    // of the queue, in radians
+    // All previous orientations of the robot, with the most recent orientation at the
+    // front of the queue, in radians
     boost::circular_buffer<Angle> orientations_;
-    // All previous angular velocities of the robot, with the most recent position at the
-    // front of the queue, in radians per second
+    // All previous angular velocities of the robot, with the most recent angular velocity
+    // at the front of the queue, in radians per second
     boost::circular_buffer<AngularVelocity> angularVelocities_;
     // All previous timestamps of when the robot was updated, with the most recent
-    // position at the front of the queue,
+    // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
 };
