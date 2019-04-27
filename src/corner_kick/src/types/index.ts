@@ -7,4 +7,4 @@ export { IThemeProvider } from './theme';
 export { IRosoutMessage, RosoutLevel } from './standardROSMessages';
 export { ShapeType, ISpritesheet, IFrame, IShape } from './spritesheet';
 export { ICanvasState, IRootState, IROSState, IMessagesState } from './state';
-export { ILayer, ISprite } from './canvas';
+export { ILayer, ILayerMessage, ISprite } from './canvas';
