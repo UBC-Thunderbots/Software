@@ -1,7 +1,3 @@
-//
-// Created by roark on 28/03/19.
-//
-
 #include <algorithm>
 
 namespace Util
