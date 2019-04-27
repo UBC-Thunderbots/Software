@@ -39,7 +39,8 @@ namespace Util
         enum class Layer
         {
             STATIC_FEATURES,
-            ROBOTS_AND_BALL
+            ROBOTS,
+            BALL,
         };
 
         struct Color

@@ -164,7 +164,7 @@ void CanvasMessenger::drawWorld(const World& world)
 
 void CanvasMessenger::drawBall(const Ball& ball)
 {
-    drawPoint(Layer::ROBOTS_AND_BALL, ball.position(), BALL_MAX_RADIUS_METERS * 2,
+    drawPoint(Layer::BALL, ball.position(), BALL_MAX_RADIUS_METERS * 2,
               BALL_COLOR);
 }
 
@@ -202,7 +202,7 @@ void CanvasMessenger::drawRobot(Robot robot, CanvasMessenger::Color color)
     Rectangle robot_rectangle(
         robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
         robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS));
-    drawRectangle(Layer::ROBOTS_AND_BALL, robot_rectangle, robot.orientation(), color);
+    drawRectangle(Layer::ROBOTS, robot_rectangle, robot.orientation(), color);
 }
 
 Point CanvasMessenger::Sprite::getTopLeftCorner()
