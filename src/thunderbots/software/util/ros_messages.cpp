@@ -1,7 +1,5 @@
 #include "util/ros_messages.h"
 
-#include "util/time/timestamp.h"
-
 namespace Util
 {
     namespace ROSMessages
@@ -179,6 +177,77 @@ namespace Util
 
             World world(field, ball, friendly_team, enemy_team);
             return world;
+        }
+
+        thunderbots_msgs::World convertWorldToROSMessage(const World& world)
+        {
+            thunderbots_msgs::World world_msg;
+
+            world_msg.field         = convertFieldToROSMessage(world.field());
+            world_msg.ball          = convertBallToROSMessage(world.ball());
+            world_msg.friendly_team = convertTeamToROSMessage(world.friendlyTeam());
+            world_msg.enemy_team    = convertTeamToROSMessage(world.enemyTeam());
+            // world_msg.refbox_data = world.refBoxData();
+            // TODO add function "refBoxData()"
+
+            return world_msg;
+        }
+
+        thunderbots_msgs::World invertMsgFieldSide(
+            const thunderbots_msgs::World& old_world_msg)
+        {
+            thunderbots_msgs::World new_world_msg = old_world_msg;
+
+            new_world_msg.ball = invertMsgFieldSide(old_world_msg.ball);
+            new_world_msg.friendly_team.robots =
+                invertMsgFieldSide(old_world_msg.friendly_team.robots);
+            new_world_msg.enemy_team.robots =
+                invertMsgFieldSide(old_world_msg.enemy_team.robots);
+
+            return new_world_msg;
+        }
+
+        thunderbots_msgs::Ball invertMsgFieldSide(
+            const thunderbots_msgs::Ball& old_ball_msg)
+        {
+            thunderbots_msgs::Ball new_ball = old_ball_msg;
+
+            new_ball.position.x = -old_ball_msg.position.x;
+            new_ball.position.y = -old_ball_msg.position.y;
+
+            new_ball.velocity.x = -old_ball_msg.velocity.x;
+            new_ball.velocity.y = -old_ball_msg.velocity.y;
+
+            return new_ball;
+        }
+
+        std::vector<thunderbots_msgs::Robot> invertMsgFieldSide(
+            const std::vector<thunderbots_msgs::Robot>& old_robot_msgs)
+        {
+            std::vector<thunderbots_msgs::Robot> new_robots;
+
+            for (auto old_robot : old_robot_msgs)
+            {
+                new_robots.emplace_back(invertMsgFieldSide(old_robot));
+            }
+
+            return new_robots;
+        }
+
+        thunderbots_msgs::Robot invertMsgFieldSide(
+            const thunderbots_msgs::Robot& old_robot_msg)
+        {
+            thunderbots_msgs::Robot new_robot = old_robot_msg;
+
+            new_robot.position.x = -old_robot_msg.position.x;
+            new_robot.position.y = -old_robot_msg.position.y;
+
+            new_robot.velocity.x = -old_robot_msg.velocity.x;
+            new_robot.velocity.y = -old_robot_msg.velocity.y;
+
+            new_robot.orientation = old_robot_msg.orientation + Angle::half().toRadians();
+
+            return new_robot;
         }
     }  // namespace ROSMessages
 }  // namespace Util
