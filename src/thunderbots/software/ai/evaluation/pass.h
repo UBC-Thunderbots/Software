@@ -35,12 +35,15 @@ namespace AI::Evaluation
      * @param dest The destination that the robot is going to
      * @param max_velocity The maximum linear velocity the robot can travel at (m/s)
      * @param max_acceleration The maximum acceleration of the robot (m/s^2)
+     * @param tolerance_meters The radius around the target at which we will be considered
+     *                         "at" the target.
      *
      * @return The minimum theoretical time it would take the robot to reach the dest
      * point
      */
     Duration getTimeToPositionForRobot(const Robot& robot, const Point& dest,
                                        const double& max_velocity,
-                                       const double& max_acceleration);
+                                       const double& max_acceleration,
+                                       const double& tolerance_meters = 0);
 
 }  // namespace AI::Evaluation
