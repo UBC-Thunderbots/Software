@@ -113,7 +113,7 @@ export class SpritesheetManager {
      */
     public getTextureByID = (id: number) => {
         // Check that the id is in the correct range
-        if (id >= 0 && id < this.textureDictionary.length) {
+        if (id >= 0 && id <= this.textureDictionary.length) {
             // This is a special ID refering to a white rectangle.
             if (id === 0) {
                 return PIXI.Texture.WHITE;
