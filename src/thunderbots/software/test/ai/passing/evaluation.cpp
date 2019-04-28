@@ -282,11 +282,11 @@ TEST_F(PassingEvaluationTest, ratePassEnemyRisk_no_robots_near)
         Robot(1, {-30, 50}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
-    Pass pass({0, 0}, {10, 10}, 3, Timestamp::fromSeconds(0.4));
+    Pass pass({0, 0}, {10, 10}, 4, Timestamp::fromSeconds(0.1));
 
     double pass_rating = ratePassEnemyRisk(enemy_team, pass);
-    EXPECT_LE(0.90, pass_rating);
-    EXPECT_GE(1, pass_rating);
+    EXPECT_GE(pass_rating, 0.9);
+    EXPECT_LE(pass_rating, 1.0);
 }
 
 TEST_F(PassingEvaluationTest, ratePassEnemyRisk_one_robot_near_receiver_point)
