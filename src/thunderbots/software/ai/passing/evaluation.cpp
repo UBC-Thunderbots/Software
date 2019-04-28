@@ -35,19 +35,17 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
         in_region_quality = rectangleSigmoid(*target_region, pass.receiverPoint(), 0.1);
     }
 
-    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-                          shoot_pass_rating * in_region_quality;
-
     // Place strict limits on pass start time
     double min_pass_time_offset =
         Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
     double max_pass_time_offset =
             Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+    double pass_time_offset_quality = 1;
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
-    pass_quality *= sigmoid(
+    pass_time_offset_quality *= sigmoid(
         pass.startTime().getSeconds(),
         min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.5);
-    pass_quality *= 1 - sigmoid(
+    pass_time_offset_quality *= 1 - sigmoid(
             pass.startTime().getSeconds(),
             max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.5);
 
@@ -56,9 +54,12 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
         Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
     double max_pass_speed =
         Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
-    pass_quality *= sigmoid(pass.speed(), min_pass_speed, 0.2);
-    pass_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.2);
+    double pass_speed_quality = 1;
+    pass_speed_quality *= sigmoid(pass.speed(), min_pass_speed, 0.2);
+    pass_speed_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.2);
 
+    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
+                          shoot_pass_rating * in_region_quality* pass_time_offset_quality * pass_speed_quality;
     return pass_quality;
 }
 
@@ -109,7 +110,7 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
             (shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score = 1 - sigmoid(
             rotation_to_shot_target_after_pass.abs().toDegrees(),
-        0.5 * ideal_min_rotation_to_shoot_degrees, ideal_min_rotation_to_shoot_degrees);
+        ideal_min_rotation_to_shoot_degrees, 4);
 
     return shot_openness_score * required_rotation_for_shot_score;
 }
@@ -246,7 +247,7 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
         best_receiver.lastUpdateTimestamp() + min_robot_travel_time;
 
     // Figure out what angle the robot would have to be at to receive the ball
-    Angle receive_angle = (best_receiver.position() - pass.passerPoint()).orientation();
+    Angle receive_angle = (pass.passerPoint() - best_receiver.position()).orientation();
     Duration time_to_receive_angle = getTimeToOrientationForRobot(
         best_receiver, receive_angle, ROBOT_MAX_ANG_SPEED_RAD_PER_SECOND,
         ROBOT_MAX_ANG_ACCELERATION_RAD_PER_SECOND_SQUARED);
@@ -260,7 +261,7 @@ double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
     // Create a sigmoid that goes to 0 as the time required to get to the reception
     // point exceeds the time we would need to get there by
     return sigmoid(receive_time.getSeconds(),
-                   latest_time_to_reciever_state.getSeconds() + 0.5, 1);
+                   latest_time_to_reciever_state.getSeconds() + 0.25, 0.5);
 }
 
 double AI::Passing::getStaticPositionQuality(const Field& field, const Point& position)

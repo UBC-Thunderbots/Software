@@ -34,6 +34,168 @@ class PassingEvaluationTest : public testing::Test
     double avg_time_offset_for_pass_seconds;
 };
 
+TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory){
+    // A pass from halfway up the +y side of the field to the origin.
+    // There is an enemy defender right on the pass trajectory
+    Pass pass({2, 2}, {0, 0}, max_pass_speed_param-0.2, Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param+0.1));
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                    Robot(0, {1, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                          Timestamp::fromSeconds(0)),
+                            });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0.0);
+    EXPECT_LE(pass_rating, 0.01);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free){
+    // A pass from halfway up the +y side of the field to the origin.
+    // There is a defender closely marking one friendly robot on the field, but the
+    // friendly robot at the origin is free.
+    Pass pass({2, 2}, {0, 0}, max_pass_speed_param-0.2, Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param+0.1));
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                    Robot(0, {1.5, -0.8}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                          Timestamp::fromSeconds(0)),
+                            });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0.65);
+    EXPECT_LE(pass_rating, 0.9);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked){
+    // A pass from the +y side of the field to the -y side of the field, roughly 1/2 way
+    // up the enemy half of the field. There is a defender closely marking the only
+    // friendly robot on the field.
+    Pass pass({2, 2}, {1, -1}, max_pass_speed_param-0.2, Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param+0.1));
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                    Robot(0, {1.5, -0.8}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                          Timestamp::fromSeconds(0)),
+                            });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0.0);
+    EXPECT_LE(pass_rating, 0.01);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_near_pass){
+    // A pass from the +y side of the field to the -y side of the field,
+    // roughly 1/2 way up the enemy half of the field. There is a defender somewhat close
+    // to the pass, but not close enough to get there in time.
+    Pass pass({2, 2}, {1, -1}, max_pass_speed_param-0.2, Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param+0.1));
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                    Robot(0, {4, 0.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                          Timestamp::fromSeconds(0)),
+                            });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0.8);
+    EXPECT_LE(pass_rating, 1.0);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net_goalie_in_net) {
+    // A pass from the +y side of the field to the -y side of the field,
+    // roughly 1/2 way up the enemy half of the field, with a goalie in the net, but off
+    // to the positive side. We also pass as soon as we can
+    Pass pass({2, 2}, {1, -1}, avg_desired_pass_speed, Timestamp::fromSeconds(min_time_offset_for_pass_seconds_param+0.1));
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                       Robot(0, world.field().enemyGoal() + Vector(0, 0.5), {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateEnemyTeamState(enemy_team);
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_GE(pass_rating, 0.7);
+    EXPECT_LE(pass_rating, 0.9);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_net){
+    // A pass from the +y side of the field to the -y side of the field,
+    // roughly 1/2 way up the enemy half of the field
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {2, -1.8}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass({3, 2}, {2, -2}, avg_desired_pass_speed, Timestamp::fromSeconds(avg_time_offset_for_pass_seconds));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.95, pass_rating);
+    EXPECT_GE(1.0, pass_rating);
+}
+
+TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies){
+    // A pass from the positive enemy corner to a robot at the center of the field with
+    // no enemies
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Pass pass(world.field().enemyCornerPos(), {0, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(avg_time_offset_for_pass_seconds));
+
+    double pass_rating = ratePass(world, pass, std::nullopt);
+    EXPECT_LE(0.95, pass_rating);
+    EXPECT_GE(1.0, pass_rating);
+}
+
 TEST_F(PassingEvaluationTest, ratePass_no_target_region)
 {
     // This should be a really good pass, and since there is no target region it should
@@ -51,7 +213,7 @@ TEST_F(PassingEvaluationTest, ratePass_no_target_region)
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
     double pass_rating = ratePass(world, pass, std::nullopt);
-    EXPECT_LE(0.5, pass_rating);
+    EXPECT_LE(0.95, pass_rating);
     EXPECT_GE(1.0, pass_rating);
 }
 
@@ -143,7 +305,7 @@ TEST_F(PassingEvaluationTest, ratePass_below_min_ball_speed)
 
     double pass_rating = ratePass(world, pass, std::nullopt);
     EXPECT_LE(0.0, pass_rating);
-    EXPECT_GE(0.01, pass_rating);
+    EXPECT_GE(0.05, pass_rating);
 }
 
 TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
@@ -163,7 +325,7 @@ TEST_F(PassingEvaluationTest, ratePass_above_max_ball_speed)
 
     double pass_rating = ratePass(world, pass, std::nullopt);
     EXPECT_LE(0.0, pass_rating);
-    EXPECT_GE(0.01, pass_rating);
+    EXPECT_GE(0.05, pass_rating);
 }
 
 TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goal)
@@ -551,10 +713,22 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_cant_turn_
     Team team(Duration::fromSeconds(10));
     team.updateRobots({Robot(0, {1, 0}, {0, 0}, Angle::quarter(),
                              AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
-    Pass pass({0, 0}, {-1, -1}, 3, Timestamp::fromSeconds(0.1));
+    Pass pass({0, 0}, {1, 0}, 6, Timestamp::fromSeconds(0.1));
 
-    EXPECT_GE(0.1, ratePassFriendlyCapability(team, pass));
-    EXPECT_LE(0, ratePassFriendlyCapability(team, pass));
+    EXPECT_GE(ratePassFriendlyCapability(team, pass), 0.0);
+    EXPECT_LE(ratePassFriendlyCapability(team, pass), 0.1);
+}
+
+TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_single_robot_already_pointing_in_right_direction)
+{
+    // Test case where the receiver is already lined up to receive the pass
+    Team team(Duration::fromSeconds(10));
+    Pass pass({0, 0}, {1, 0}, 3, Timestamp::fromSeconds(0.1));
+    team.updateRobots({Robot(0, {1, 0}, {0, 0}, pass.receiverOrientation(),
+                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0))});
+
+    EXPECT_GE(ratePassFriendlyCapability(team, pass), 0.90);
+    EXPECT_LE(ratePassFriendlyCapability(team, pass), 1.0);
 }
 
 
