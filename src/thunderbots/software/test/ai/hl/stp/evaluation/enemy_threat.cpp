@@ -362,7 +362,7 @@ TEST(SortEnemyThreatsTest,
 }
 
 TEST(SortEnemyThreatsTest,
-     neither_robot_has_possession_but_can_be_reached_in_the_same_numer_of_passes)
+     neither_robot_has_possession_but_can_be_reached_in_the_same_number_of_passes)
 {
     // The exact state of the robots don't matter for these tests.
     // Only the data in the struct matters
