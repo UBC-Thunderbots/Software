@@ -72,6 +72,13 @@ class World final
     void updateRefboxGameState(const RefboxGameState& game_state);
 
     /**
+     * Updates the refbox game state
+     *
+     * @param game_state the game state sent by refbox
+     */
+    void updateMostRecentTimestamp(const Timestamp& timestamp);
+
+    /**
      * Returns a const reference to the Field in the world
      *
      * @return a const reference to the Field in the world
@@ -141,10 +148,18 @@ class World final
      */
     GameState& mutableGameState();
 
+    /**
+     * Returns the the Timestamp corresponding to when the World object was last updated
+     *
+     * @return Timestamp corresponding to when the World object was last updated
+     */
+    Timestamp getMostRecentUpdateTimestamp();
+
    private:
     Field field_;
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
     GameState game_state_;
+    Timestamp most_recent_update_timestamp;
 };

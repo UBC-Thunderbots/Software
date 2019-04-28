@@ -42,6 +42,10 @@ void World::updateEnemyTeamState(const Team &new_enemy_team_data)
     enemy_team_.updateState(new_enemy_team_data);
 }
 
+void World::updateMostRecentTimestamp(const Timestamp &timestamp){
+    most_recent_update_timestamp = timestamp;
+}
+
 const Field &World::field() const
 {
     return field_;
@@ -85,6 +89,10 @@ Team &World::mutableEnemyTeam()
 void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
     game_state_.updateRefboxGameState(game_state);
+}
+
+Timestamp World::getMostRecentUpdateTimestamp(){
+    return most_recent_update_timestamp;
 }
 
 const GameState &World::gameState() const
