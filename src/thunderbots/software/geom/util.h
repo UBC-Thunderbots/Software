@@ -600,4 +600,3 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
  *         0 if the point exists outside of the rectangle
  */
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
-

@@ -1307,4 +1307,3 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
         return 0;
     }
 }
-
