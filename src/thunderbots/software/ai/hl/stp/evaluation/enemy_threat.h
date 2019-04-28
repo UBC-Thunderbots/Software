@@ -93,13 +93,12 @@ namespace Evaluation
     /**
      * Sorts the given list of threats in order of decreasing threat, so the
      * "most threatening threat" will be at the front of the vector, and the
-     * "least threatening threat" will be at the end of the vector
+     * "least threatening threat" will be at the end of the vector. The vector will be
+     * sorted in-place.
      *
-     * @param threats The given list of threats to sort
-     * @return A new list of threats where the threats are sorted in decreasing order
+     * @param threats The given list of threats to sort in-place
      */
-    std::vector<Evaluation::EnemyThreat> sortThreatsInDecreasingOrder(
-        std::vector<Evaluation::EnemyThreat> threats);
+    void sortThreatsInDecreasingOrder(std::vector<Evaluation::EnemyThreat> &threats);
 
     /**
      * Calculates the threat of each enemy robot on the field, and returns them in order

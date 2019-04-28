@@ -160,8 +160,8 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     return std::nullopt;
 }
 
-std::vector<Evaluation::EnemyThreat> Evaluation::sortThreatsInDecreasingOrder(
-    std::vector<Evaluation::EnemyThreat> threats)
+void Evaluation::sortThreatsInDecreasingOrder(
+    std::vector<Evaluation::EnemyThreat> &threats)
 {
     // A lambda function that implements the '<' operator for the EnemyThreat struct
     // so it can be sorted. Lower threats are "less than" higher threats.
@@ -217,8 +217,6 @@ std::vector<Evaluation::EnemyThreat> Evaluation::sortThreatsInDecreasingOrder(
     // Sort threats from highest threat to lowest threat
     // Use reverse iterators to sort the vector in descending order
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
-
-    return threats;
 }
 
 std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
@@ -277,7 +275,7 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
 
     // Sort the threats so the "most threatening threat" is first in the vector, and the
     // "least threatening threat" is last in the vector
-    threats = sortThreatsInDecreasingOrder(threats);
+    sortThreatsInDecreasingOrder(threats);
 
     return threats;
 }

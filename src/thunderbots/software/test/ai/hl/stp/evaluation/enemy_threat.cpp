@@ -307,8 +307,9 @@ TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
     // so should be more threatening
     std::vector<Evaluation::EnemyThreat> expected_result = {threat1, threat2};
 
-    auto result = Evaluation::sortThreatsInDecreasingOrder({threat2, threat1});
-    EXPECT_EQ(result, expected_result);
+    std::vector<Evaluation::EnemyThreat> threats = {threat2, threat1};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
 }
 
 TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
@@ -332,8 +333,9 @@ TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
     // it should be more threatening
     std::vector<Evaluation::EnemyThreat> expected_result = {threat2, threat1};
 
-    auto result = Evaluation::sortThreatsInDecreasingOrder({threat1, threat2});
-    EXPECT_EQ(result, expected_result);
+    std::vector<Evaluation::EnemyThreat> threats = {threat1, threat2};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
 }
 
 TEST(SortEnemyThreatsTest,
@@ -357,8 +359,9 @@ TEST(SortEnemyThreatsTest,
     // robot1 can be reached in fewer passes, so it should be more threatening
     std::vector<Evaluation::EnemyThreat> expected_result = {threat1, threat2};
 
-    auto result = Evaluation::sortThreatsInDecreasingOrder({threat2, threat1});
-    EXPECT_EQ(result, expected_result);
+    std::vector<Evaluation::EnemyThreat> threats = {threat2, threat1};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
 }
 
 TEST(SortEnemyThreatsTest,
@@ -388,8 +391,9 @@ TEST(SortEnemyThreatsTest,
     // Robot 2 has a better view of the goal so it's more threatening
     std::vector<Evaluation::EnemyThreat> expected_result = {threat2, threat1};
 
-    auto result = Evaluation::sortThreatsInDecreasingOrder({threat1, threat2});
-    EXPECT_EQ(result, expected_result);
+    std::vector<Evaluation::EnemyThreat> threats = {threat1, threat2};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
 }
 
 TEST(EnemyThreatTest, no_enemies_on_field)
