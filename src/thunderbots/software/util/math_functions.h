@@ -1,6 +1,6 @@
-//
-// Created by roark on 28/03/19.
-//
+/*
+ * This file contains declarations for math functions
+ */
 
 #pragma once
 

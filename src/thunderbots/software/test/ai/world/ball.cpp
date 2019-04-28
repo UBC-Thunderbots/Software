@@ -258,3 +258,37 @@ TEST_F(BallTest, equality_operator_balls_with_different_timestamps)
 
     EXPECT_EQ(ball_0, ball_1);
 }
+
+TEST_F(BallTest, get_position_history)
+{
+    std::vector prevPositions = {Point(-1.3, 3), Point(-1.2, 3), Point(3, 1.2)};
+
+    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
+    ball.updateState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future);
+    ball.updateState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future);
+
+    EXPECT_EQ(prevPositions, ball.getPreviousPositions());
+}
+
+TEST_F(BallTest, get_velocity_history)
+{
+    std::vector prevVelocities = {Vector(2.3, -0.05), Vector(2.2, -0.05), Vector(-3, 1)};
+
+    Ball ball = Ball(Point(3, 1.2), Vector(-3, 1), current_time);
+    ball.updateState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future);
+    ball.updateState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future);
+
+    EXPECT_EQ(prevVelocities, ball.getPreviousVelocities());
+}
+
+TEST_F(BallTest, get_timestamp_history)
+{
+    std::vector prevAngularVelocities = {half_second_future, half_second_future,
+                                         current_time};
+
+    Ball ball = Ball(Point(3, 1.2), Vector(2.2, -0.05), current_time);
+    ball.updateState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future);
+    ball.updateState(Point(-1.3, 3), Vector(2.3, -0.05), half_second_future);
+
+    EXPECT_EQ(prevAngularVelocities, ball.getPreviousTimestamps());
+}
