@@ -213,7 +213,6 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // the pass does. As such, we place the time difference between the robot and ball
     // on a sigmoid that is centered at 0, and goes to 1 at positive values, 0 at
     // negative values.
-    double a = sigmoid(min_time_diff, 0, 1);
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 

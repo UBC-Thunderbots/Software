@@ -478,13 +478,14 @@ TEST_F(PassingEvaluationTest,
 {
     // Test a pass that the enemy robot should just barely be able to intercept, with a
     // given initial velocity
-    // x = u*t + 1/2*at^2, u=max_enemy_robot_vel, t=1
+    // x = u*t + 1/2*at^2, u=initial_velocity, t=1
+    double initial_velocity_m_per_s = 0.5;
     double enemy_travel_distance_from_stop =
-        ENEMY_ROBOT_MAX_SPEED_METERS_PER_SECOND +
+         initial_velocity_m_per_s +
         0.5 * ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
-    Robot enemy_robot(0, {0, enemy_travel_distance_from_stop}, {0, 0}, Angle::zero(),
+    Robot enemy_robot(0, {1, enemy_travel_distance_from_stop}, {0, 0}, Angle::zero(),
                       AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Pass pass({0, 0}, {0, 2}, 0.5, Timestamp::fromSeconds(0));
+    Pass pass({0, 0}, {0, 2}, 1, Timestamp::fromSeconds(0));
 
     double intercept_risk = calculateInterceptRisk(enemy_robot, pass);
     EXPECT_LE(0.9, intercept_risk);
