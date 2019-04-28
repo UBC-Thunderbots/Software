@@ -7,7 +7,7 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-KickAction::KickAction() : Action() {}
+KickAction::KickAction() : Action(), ball({0,0}, {0,0}, Timestamp::fromSeconds(0)) {}
 
 std::unique_ptr<Intent> KickAction::updateStateAndGetNextIntent(const Robot &robot, const Ball &ball, Point kick_origin, Point kick_target, double kick_speed_meters_per_second)
 {
@@ -20,6 +20,7 @@ std::unique_ptr<Intent> KickAction::updateStateAndGetNextIntent(const Robot &rob
 {
     // Update the parameters stored by this Action
     this->robot                        = robot;
+    this->ball = ball;
     this->kick_origin                  = kick_origin;
     this->kick_direction               = kick_direction;
     this->kick_speed_meters_per_second = kick_speed_meters_per_second;
@@ -64,6 +65,11 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
     //                             V
     //                     direction of kick
 
+    // The angle between the ball velocity vector and the vector formed by drawing
+    // a line from the ball to the robot. This lets us figure out if the ball is
+    // travelling towards the robot
+    Angle ball_robot_angle;
+
     do
     {
         // A vector in the direction opposite the kick (behind the ball)
@@ -106,6 +112,10 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
                                                kick_speed_meters_per_second, 0));
         }
 
-        // TODO: Need to terminate here once we think we've kicked (see receiver tactic for example)
-    } while (true);
+        Vector ball_to_robot = robot->position() - ball.position();
+
+        ball_robot_angle = ball.velocity().orientation().minDiff(ball_to_robot.orientation());
+
+        // Stop once the ball is travelling away from us with a non-zero velocity
+    } while (ball_robot_angle.toDegrees() < 90 || ball.velocity().len() < 0.5);
 }

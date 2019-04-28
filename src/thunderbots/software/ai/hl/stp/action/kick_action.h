@@ -1,12 +1,16 @@
 #pragma once
 
 #include "ai/hl/stp/action/action.h"
+#include "ai/world/ball.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 
 /**
  * The KickAction makes the robot take a kick from the given location in the given
- * direction, with the given power
+ * direction, with the given power.
+ *
+ * The KickAction will be done when the ball is travelling away from the robot at a
+ * non-zero velocity.
  */
 class KickAction : public Action
 {
@@ -49,6 +53,7 @@ class KickAction : public Action
         intent_coroutine::push_type& yield) override;
 
     // Action parameters
+    Ball ball;
     Point kick_origin;
     Angle kick_direction;
     double kick_speed_meters_per_second;
