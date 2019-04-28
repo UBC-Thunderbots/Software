@@ -161,17 +161,6 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
     // the reception point before the ball. We take the greater of these two risks.
-    // We assume that the enemy continues moving at it's current velocity until the
-    // pass starts
-
-    Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
-
-    // TODO: We need to do two checks here, one where we see if the enemy can intercept
-    //       from its estimated future position/time, and one where we see if it can intercept
-    //       from it's current position/time
-
-    // Estimate where the enemy will be when we start the pass
-//    enemy_robot.updateStateToPredictedState(time_until_pass);
 
     // If the enemy cannot intercept the pass at BOTH the closest point on the pass and
     // the the receiver point for the pass, then it is guaranteed that it will not be
@@ -196,13 +185,13 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration pass_time_offset = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
 
     double robot_ball_time_diff_at_closest_pass_point =
-        (enemy_robot_time_to_closest_pass_point - (ball_time_to_closest_pass_point + pass_time_offset))
+        (enemy_robot_time_to_closest_pass_point - (ball_time_to_closest_pass_point + time_until_pass))
             .getSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
-        (enemy_robot_time_to_pass_receive_position - (ball_time_to_pass_receive_position + pass_time_offset))
+        (enemy_robot_time_to_pass_receive_position - (ball_time_to_pass_receive_position + time_until_pass))
             .getSeconds();
 
     double min_time_diff = std::min(robot_ball_time_diff_at_closest_pass_point,
