@@ -32,3 +32,41 @@ class PassGeneratorTest : public testing::Test
     std::shared_ptr<PassGenerator> pass_generator;
 };
 
+TEST_F(PassGeneratorTest, check_pass_converges){
+    // Test that the pass converges to a stable pass when there are a a random
+    // scattering of friendly and enemy robots around the field
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                   Timestamp::fromSeconds(0)),
+                                       Robot(0, {2, 2}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+                                       Timestamp::fromSeconds(0)),
+        Robot(0, {-3, 1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(0, {-1, -1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(0, {0.2, 0.5}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0))
+            });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+                                       Robot(0, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(0, {2, 1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(0, {3, 2}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(0, {4, -1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                                       Robot(0, {0.5, 4}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0))
+                               });
+    world.updateFriendlyTeamState(enemy_team);
+
+    pass_generator->setWorld(world);
+
+    std::this_thread::sleep_for(5);
+}
+
+
