@@ -993,9 +993,14 @@ Vector intersection(Vector a1, Vector a2, Vector b1, Vector b2)
            a1;
 }
 
-Angle vertexAngle(Vector a, Vector b, Vector c)
+Angle acuteVertexAngle(Vector v1, Vector v2)
 {
-    return ((a - b).orientation() - (c - b).orientation()).angleMod();
+    return v1.orientation().minDiff(v2.orientation());
+}
+
+Angle acuteVertexAngle(Point p1, Point p2, Point p3)
+{
+    return acuteVertexAngle(p1 - p2, p3 - p2);
 }
 
 double closestPointTime(Point x1, Vector v1, Point x2, Vector v2)

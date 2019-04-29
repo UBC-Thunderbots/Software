@@ -473,9 +473,27 @@ Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 Point intersection(Point a1, Point a2, Point b1, Point b2);
 
 /**
- * gives counterclockwise angle from <a-b> to <c-b>
+ * Calculates the acute angle formed by the two given vectors
+ *
+ * @param v1
+ * @param v2
+ *
+ * @return The acute angle formed by v1 and v2
  */
-Angle vertexAngle(Point a, Point b, Point c);
+Angle acuteVertexAngle(Vector v1, Vector v2);
+
+/**
+ * Calculates the acute angle formed by the vector p2->p1 and p2->p3
+ *
+ * @param p1
+ * @param p2
+ * @param p3
+ *
+ * @return the acute angle formed by the vector p2->p1 and p2->p3
+ */
+Angle acuteVertexAngle(Point p1, Point p2, Point p3);
+
+Angle minAngleBetweenVectors(Vector v1, Vector v2);
 
 /**
  * returns time of closest point of approach of two points

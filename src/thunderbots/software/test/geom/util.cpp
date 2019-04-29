@@ -919,17 +919,48 @@ TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
     EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) == retval.end());
 }
 
-TEST(GeomUtilTest, test_vertex_angle)
+TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_neg_y_axis)
 {
-    Point a(6, 2);
-    Point b(0, 0);
-    Point c(1, 5);
+    // Two vectors that form an acute angle over the negative y-axis
 
-    EXPECT_NEAR(-60.2551, vertexAngle(a, b, c).toDegrees(), 1e-4);
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-70));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(-120));
 
-    a = Point(6, 1);
+    EXPECT_DOUBLE_EQ(50, acuteVertexAngle(v1, v2).toDegrees());
+}
 
-    EXPECT_NEAR(-69.2277, vertexAngle(a, b, c).toDegrees(), 1e-4);
+TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_pos_y_axis)
+{
+    // Two vectors that form an acute angle over the positive y-axis
+
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(70));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(120));
+
+    EXPECT_DOUBLE_EQ(50, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertexAngle_180_degrees)
+{
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-90));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(90));
+
+    EXPECT_DOUBLE_EQ(180, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertexAngle_large_angle_over_neg_x_axis)
+{
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-95));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(99));
+
+    EXPECT_DOUBLE_EQ(166, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertex_angle_between_points)
+{
+    Point p1(2, 0.5);
+    Point p2(1, -0.5);
+    Point p3(1, 0.5);
+    EXPECT_DOUBLE_EQ(45, acuteVertexAngle(p1, p2, p3).toDegrees());
 }
 
 TEST(GeomUtilTest, test_closest_point_time)
