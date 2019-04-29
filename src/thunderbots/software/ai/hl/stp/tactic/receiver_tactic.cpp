@@ -84,7 +84,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
                 .angleMod()
                 .abs();
 
-        Angle goal_angle = vertexAngle(field.friendlyGoalpostPos(), robot->position(),
+        Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
                                        field.friendlyGoalpostNeg())
                                .abs();
         net_percent_open = best_shot_opt->second.toDegrees() / goal_angle.toDegrees();

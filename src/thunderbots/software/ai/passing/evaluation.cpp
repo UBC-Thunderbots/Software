@@ -69,8 +69,8 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
 {
     double ideal_shoot_angle_degrees =
         Util::DynamicParameters::AI::Passing::ideal_min_shoot_angle_degrees.value();
-    double ideal_min_rotation_to_shoot_degrees =
-        Util::DynamicParameters::AI::Passing::ideal_min_rotation_to_shoot_degrees.value();
+    double ideal_max_rotation_to_shoot_degrees =
+        Util::DynamicParameters::AI::Passing::ideal_max_rotation_to_shoot_degrees.value();
 
     std::vector<Point> obstacles;
     for (const Robot& robot : enemy_team.getAllRobots())
@@ -110,7 +110,7 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
         (shot_target - pass.receiverPoint()).orientation());
     double required_rotation_for_shot_score =
         1 - sigmoid(rotation_to_shot_target_after_pass.abs().toDegrees(),
-                    ideal_min_rotation_to_shoot_degrees, 4);
+                    ideal_max_rotation_to_shoot_degrees, 4);
 
     return shot_openness_score * required_rotation_for_shot_score;
 }
