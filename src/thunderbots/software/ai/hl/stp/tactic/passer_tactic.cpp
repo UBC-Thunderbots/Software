@@ -11,8 +11,7 @@
 
 using namespace AI::Passing;
 
-PasserTactic::PasserTactic(AI::Passing::Pass pass, const Ball &ball,
-                           bool loop_forever)
+PasserTactic::PasserTactic(AI::Passing::Pass pass, const Ball& ball, bool loop_forever)
     : pass(std::move(pass)), ball(ball), Tactic(loop_forever)
 {
 }
@@ -22,11 +21,10 @@ std::string PasserTactic::getName() const
     return "Passer Tactic";
 }
 
-void PasserTactic::updateParams(const Pass &updated_pass,
-                                const Ball &updated_ball)
+void PasserTactic::updateParams(const Pass& updated_pass, const Ball& updated_ball)
 {
     this->pass      = updated_pass;
-    this->ball = updated_ball;
+    this->ball      = updated_ball;
 }
 
 double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
@@ -59,7 +57,8 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
     }
 
     KickAction kick_action = KickAction();
-    while (!kick_action.done()){
+    while (!kick_action.done())
+    {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         yield(kick_action.updateStateAndGetNextIntent(
