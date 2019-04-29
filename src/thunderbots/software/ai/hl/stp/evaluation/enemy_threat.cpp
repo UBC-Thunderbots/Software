@@ -231,11 +231,8 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
 
         // Get the angle from the robot to each friendly goalpost, then find the
         // difference between these angles to get the goal_angle for the robot
-        auto friendly_goalpost_angle_1 =
-            (field.friendlyGoalpostPos() - robot.position()).orientation();
-        auto friendly_goalpost_angle_2 =
-            (field.friendlyGoalpostNeg() - robot.position()).orientation();
-        Angle goal_angle = friendly_goalpost_angle_1.minDiff(friendly_goalpost_angle_2);
+        Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), robot.position(),
+                                            field.friendlyGoalpostNeg());
 
         std::optional<Angle> best_shot_angle  = std::nullopt;
         std::optional<Point> best_shot_target = std::nullopt;
