@@ -40,23 +40,22 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
         Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
     double max_pass_time_offset =
             Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
-    double pass_time_offset_quality = 1;
     // TODO (Issue #423): We should use the timestamp from the world instead of the ball
-    pass_time_offset_quality *= sigmoid(
+    double pass_time_offset_quality = sigmoid(
         pass.startTime().getSeconds(),
-        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.5);
-    pass_time_offset_quality *= 1 - sigmoid(
+        min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.5)
+    * (1 - sigmoid(
             pass.startTime().getSeconds(),
-            max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.5);
+            max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(), 0.5));
 
     // Place strict limits on the ball speed
     double min_pass_speed =
         Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
     double max_pass_speed =
         Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
-    double pass_speed_quality = 1;
-    pass_speed_quality *= sigmoid(pass.speed(), min_pass_speed, 0.2);
-    pass_speed_quality *= 1 - sigmoid(pass.speed(), max_pass_speed, 0.2);
+    double pass_speed_quality =
+    sigmoid(pass.speed(), min_pass_speed, 0.2)
+    * (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
     double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
                           shoot_pass_rating * in_region_quality* pass_time_offset_quality * pass_speed_quality;
@@ -90,7 +89,7 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
-    Angle goal_angle = vertexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
+    Angle goal_angle = acuteVertexAngle(field.enemyGoalpostNeg(), pass.receiverPoint(),
                                    field.enemyGoalpostPos())
             .abs();
     double net_percent_open = 0;
