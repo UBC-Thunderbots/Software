@@ -23,8 +23,8 @@ std::string PasserTactic::getName() const
 
 void PasserTactic::updateParams(const Pass& updated_pass, const Ball& updated_ball)
 {
-    this->pass      = updated_pass;
-    this->ball      = updated_ball;
+    this->pass = updated_pass;
+    this->ball = updated_ball;
 }
 
 double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)

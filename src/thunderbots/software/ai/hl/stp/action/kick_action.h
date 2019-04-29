@@ -51,7 +51,7 @@ class KickAction : public Action
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+        intent_coroutine::push_type &yield) override;
 
     // Action parameters
     Ball ball;
