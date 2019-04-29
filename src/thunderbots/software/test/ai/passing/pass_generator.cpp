@@ -20,8 +20,7 @@ class PassGeneratorTest : public testing::Test
     {
         world = ::Test::TestUtil::createBlankTestingWorld();
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-        pass_generator = std::make_shared<PassGenerator>(0.05);
-        pass_generator->setWorld(world);
+        pass_generator = std::make_shared<PassGenerator>(0.05, world);
     }
 
     World world;
