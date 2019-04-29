@@ -530,7 +530,6 @@ Point getPointsMean(const std::vector<Point> &points);
  */
 double getPointsVariance(const std::vector<Point> &points);
 
-
 /**
  * Function returns the segment defined by the segment between the intersections of two
  * Rays on a segment
