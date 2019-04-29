@@ -66,7 +66,7 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         yield(kick_action.updateStateAndGetNextIntent(
-            *robot, ball, pass.passerPoint(), pass.passerOrientation(), pass.speed()));
+            *robot, ball, ball.position(), pass.receiverPoint(), pass.speed()));
 
         // We want to keep trying to kick until the ball is moving along the pass
         // vector with sufficient velocity
