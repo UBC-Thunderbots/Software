@@ -176,24 +176,3 @@ TEST(KickActionTest, robot_not_behind_ball_kicking_towards_positive_x_negative_y
     EXPECT_EQ(Angle::ofDegrees(306), move_intent.getFinalAngle());
     EXPECT_EQ(0.0, move_intent.getFinalSpeed());
 }
-
-TEST(KickActionTest, ball_travelling_away_from_robot)
-{
-    // Test for the termination condition of the KickAction where the ball is travelling
-    // away from the robot
-    Robot robot(0, Point(1, 1), Vector(), Angle::threeQuarter(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(0));
-    Ball ball({0.5, 0.3}, {-1, -0.7}, Timestamp::fromSeconds(0));
-    KickAction action = KickAction();
-
-    auto intent_ptr = action.updateStateAndGetNextIntent(robot, ball, Point(0, 0),
-                                                         Angle::ofDegrees(306), 5.0);
-
-    // We expect to return one intent
-    EXPECT_TRUE(intent_ptr);
-
-    intent_ptr = action.updateStateAndGetNextIntent(robot, ball, Point(0, 0),
-                                                    Angle::ofDegrees(306), 5.0);
-    // After returning one intent the action should be done, so we should return no more
-    EXPECT_FALSE(intent_ptr);
-}
