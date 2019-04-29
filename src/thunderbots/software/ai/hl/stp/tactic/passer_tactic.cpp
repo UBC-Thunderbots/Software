@@ -56,12 +56,24 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
                                                       pass.passerOrientation(), 0));
     }
 
+    // The angle between the ball velocity vector and a vector from the passer
+    // point to the receiver point
+    Angle ball_velocity_to_pass_orientation;
+
     KickAction kick_action = KickAction();
-    while (!kick_action.done())
+    do
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         yield(kick_action.updateStateAndGetNextIntent(
             *robot, ball, pass.passerPoint(), pass.passerOrientation(), pass.speed()));
-    }
+
+        // We want to keep trying to kick until the ball is moving along the pass
+        // vector with sufficient velocity
+        Angle passer_to_receiver_angle =
+            (pass.receiverPoint() - pass.passerPoint()).orientation();
+        ball_velocity_to_pass_orientation =
+            ball.velocity().orientation().minDiff(passer_to_receiver_angle);
+    } while (ball_velocity_to_pass_orientation.abs() > Angle::ofDegrees(20) ||
+             ball.velocity().len() < 0.5);
 }

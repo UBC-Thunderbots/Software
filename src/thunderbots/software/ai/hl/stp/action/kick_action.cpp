@@ -117,11 +117,5 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
                                                kick_speed_meters_per_second, 0));
         }
 
-        Vector ball_to_robot = robot->position() - ball.position();
-
-        ball_robot_angle =
-            ball.velocity().orientation().minDiff(ball_to_robot.orientation());
-
-        // Stop once the ball is travelling away from us with a non-zero velocity
-    } while (ball_robot_angle.toDegrees() < 90 || ball.velocity().len() < 0.5);
+    } while (true);
 }
