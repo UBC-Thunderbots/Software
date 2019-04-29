@@ -70,11 +70,6 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
     //                             V
     //                     direction of kick
 
-    // The angle between the ball velocity vector and the vector formed by drawing
-    // a line from the ball to the robot. This lets us figure out if the ball is
-    // travelling towards the robot
-    Angle ball_robot_angle;
-
     do
     {
         // A vector in the direction opposite the kick (behind the ball)

@@ -8,9 +8,6 @@
 /**
  * The KickAction makes the robot take a kick from the given location in the given
  * direction, with the given power.
- *
- * The KickAction will be done when the ball is travelling away from the robot at a
- * non-zero velocity.
  */
 class KickAction : public Action
 {
