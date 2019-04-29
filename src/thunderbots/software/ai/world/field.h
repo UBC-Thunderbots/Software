@@ -256,7 +256,7 @@ class Field
      *
      * @return true if p is within the field lines of the field, false otherwise
      */
-    bool pointInFieldLines(const Point &p);
+    bool pointInFieldLines(const Point &p) const;
 
     /**
      * Compares two fields for equality

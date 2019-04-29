@@ -178,7 +178,7 @@ bool Field::pointInEnemyDefenseArea(const Point p) const
     return enemyDefenseArea().containsPoint(p);
 }
 
-bool Field::pointInFieldLines(const Point &p)
+bool Field::pointInFieldLines(const Point &p) const
 {
     return fieldLines().containsPoint(p);
 }

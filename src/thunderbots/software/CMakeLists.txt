@@ -846,11 +846,14 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             test/test_util/test_util.cpp
             test/ai/navigator/obstacle/obstacle.cpp
+            test/ai/navigator/trespass/trespass.cpp
+            test/ai/navigator/path_planner/straight_line_path_planner.cpp
             util/parameter/dynamic_parameter_utils.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
+            util/math_functions.cpp
             geom/angle.h
             geom/point.h
             geom/polygon.h
@@ -860,6 +863,8 @@ if (CATKIN_ENABLE_TESTING)
             ../shared/constants.h
             ai/navigator/obstacle/obstacle.cpp
             ai/navigator/obstacle/obstacle.h
+            ai/navigator/trespass.cpp
+            ai/navigator/path_planner/straight_line_path_planner.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}
@@ -874,27 +879,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(polygon_test
             ${catkin_LIBRARIES}
             ${G3LOG})
-
-
-    catkin_add_gtest(straight_line_path_planner_test
-            test/ai/navigator/path_planner/straight_line_path_planner.cpp
-            ai/navigator/path_planner/straight_line_path_planner.cpp
-            )
-    target_link_libraries(straight_line_path_planner_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            )
-
-    catkin_add_gtest(trespass_test
-            test/ai/navigator/trespass/trespass.cpp
-            ai/navigator/trespass.cpp
-            util/math_functions.cpp
-            )
-    target_link_libraries(straight_line_path_planner_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            )
-
 endif()
 
 ##### ROSTests / Integration Tests #####

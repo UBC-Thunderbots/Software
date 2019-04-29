@@ -16,10 +16,3 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
     EXPECT_EQ(path_points[0], start);
     EXPECT_EQ(path_points[1], dest);
 }
-
-int main(int argc, char** argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
