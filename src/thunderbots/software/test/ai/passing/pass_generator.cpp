@@ -57,7 +57,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
 
     pass_generator->setWorld(world);
 
-    std::this_thread::sleep_for(5s);
+    std::this_thread::sleep_for(10s);
 
     // Find what pass we converged to
     auto converged_pass_opt = pass_generator->getBestPassSoFar();
