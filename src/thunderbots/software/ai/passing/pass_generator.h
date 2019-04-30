@@ -49,14 +49,10 @@ namespace AI::Passing
         /**
          * Create a PassGenerator with given parameters
          *
-         * @param min_reasonable_pass_quality A value in [0,1] representing the minimum
-         *                                    quality for a pass to be considered
-         *                                    "reasonable", with higher being better
          * @param world The world we're passing int
          * @param passer_point The point we're passing from
          */
-        explicit PassGenerator(double min_reasonable_pass_quality, const World& world,
-                               const Point& passer_point);
+        explicit PassGenerator(const World &world, const Point &passer_point);
 
         /**
          * Updates the world
@@ -205,9 +201,6 @@ namespace AI::Passing
         // This constant is used to prevent division by 0 in our implementation of Adam
         // (gradient descent)
         static constexpr double eps = 1e-8;
-
-        // The minimum pass quality that we would consider a "reasonable" pass
-        double min_reasonable_pass_quality;
 
         // The thread running the pass optimization/pruning/re-generation in the
         // background. This thread will run for the entire lifetime of the class

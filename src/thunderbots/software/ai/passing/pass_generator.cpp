@@ -10,9 +10,8 @@
 using namespace AI::Passing;
 using namespace Util::DynamicParameters::AI::Passing;
 
-PassGenerator::PassGenerator(double min_reasonable_pass_quality, const World& world,
-                             const Point& passer_point)
-    : min_reasonable_pass_quality(min_reasonable_pass_quality),
+PassGenerator::PassGenerator(const World &world, const Point &passer_point)
+    :
       updated_world(world),
       optimizer(optimizer_param_weights),
       passer_point(passer_point),
@@ -205,8 +204,7 @@ void PassGenerator::saveBestPass()
     std::sort(
         passes_to_optimize.begin(), passes_to_optimize.end(),
         [this](auto pass1, auto pass2) { return comparePassQuality(pass1, pass2); });
-    if (!passes_to_optimize.empty() &&
-        ratePass(passes_to_optimize[0]) >= min_reasonable_pass_quality)
+    if (!passes_to_optimize.empty())
     {
         best_known_pass = std::optional(passes_to_optimize[0]);
     }
