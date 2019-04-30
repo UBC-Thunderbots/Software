@@ -1,5 +1,12 @@
 #include "ball_filter.h"
 
+
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+
+static std::ofstream outfile;
+
 BallFilter::BallFilter() : previous_ball_readings(5) {}
 
 
@@ -29,6 +36,20 @@ Ball BallFilter::getFilteredData(const Ball& current_ball_state,
     }
     average_ball_velocity = average_ball_velocity.norm(average_ball_velocity.len() /
                                                        previous_ball_readings.size());
+    if(!outfile.is_open()){
+        outfile.open("/home/mathew/ball_filter_log.csv");
+    }
+
+    for(auto fd : new_ball_detections) {
+            outfile << std::setprecision(17) << fd.timestamp.getSeconds() << ", "
+            << fd.position.x() << ", "
+            << fd.position.y() << ", "
+            << std::endl;
+    }
+
+//        outfile.close();
+
+
 
     return Ball{filtered_detection.position, average_ball_velocity,
                 filtered_detection.timestamp};
