@@ -279,8 +279,8 @@ TEST(PrimitiveFactoryTest, convert_DribblePrimitive_to_message_and_back_to_MoveP
     const bool small_kick_allowed = false;
     const unsigned int robot_id   = 0U;
 
-    DribblePrimitive dribble_prim = DribblePrimitive(
-        robot_id, destination, final_angle, rpm, small_kick_allowed);
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(robot_id, destination, final_angle, rpm, small_kick_allowed);
 
     thunderbots_msgs::Primitive prim_message = dribble_prim.createMsg();
 
