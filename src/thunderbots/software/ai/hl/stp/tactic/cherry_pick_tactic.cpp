@@ -7,10 +7,12 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "geom/util.h"
 
-CherryPickTactic::CherryPickTactic(const World &world,
-                                   const Rectangle &target_region,
+CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region,
                                    bool loop_forever)
-    : pass_generator(0.0, world, world.ball().position()), world(world), target_region(target_region), Tactic(loop_forever)
+    : pass_generator(0.0, world, world.ball().position()),
+      world(world),
+      target_region(target_region),
+      Tactic(loop_forever)
 {
     pass_generator.setTargetRegion(target_region);
 }

@@ -5,13 +5,13 @@
 
 #include "ai/passing/evaluation.h"
 #include "pass_generator.h"
-
 #include "util/canvas_messenger/canvas_messenger.h"
 
 using namespace AI::Passing;
 using namespace Util::DynamicParameters::AI::Passing;
 
-PassGenerator::PassGenerator(double min_reasonable_pass_quality, const World& world, const Point& passer_point)
+PassGenerator::PassGenerator(double min_reasonable_pass_quality, const World& world,
+                             const Point& passer_point)
     : min_reasonable_pass_quality(min_reasonable_pass_quality),
       updated_world(world),
       optimizer(optimizer_param_weights),
@@ -88,7 +88,6 @@ void PassGenerator::continuouslyGeneratePasses()
     in_destructor_mutex.lock();
     while (!in_destructor)
     {
-
         // Give up ownership of the in_destructor flag now that we're done the
         // conditional check
         in_destructor_mutex.unlock();
@@ -120,10 +119,13 @@ void PassGenerator::optimizePasses()
     // that we're optimizing
     const auto objective_function =
         [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
-            try{
+            try
+            {
                 Pass pass = convertArrayToPass(pass_array);
                 return ratePass(pass);
-            } catch (std::invalid_argument& e){
+            }
+            catch (std::invalid_argument& e)
+            {
                 return 0.0;
             }
         };
@@ -175,7 +177,8 @@ void PassGenerator::pruneAndReplacePasses()
         });
 
     // Replace the least promising passes with newly generated passes
-    if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value() && num_passes_to_keep_after_pruning.value() < passes_to_optimize.size())
+    if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value() &&
+        num_passes_to_keep_after_pruning.value() < passes_to_optimize.size())
     {
             passes_to_optimize.erase(
                 passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
@@ -184,9 +187,9 @@ void PassGenerator::pruneAndReplacePasses()
 
     // Generate new passes to replace the ones we just removed
     int num_new_passes = num_passes_to_optimize.value() - passes_to_optimize.size();
-    if (num_new_passes > 0){
-        std::vector<Pass> new_passes =
-                generatePasses(num_new_passes);
+    if (num_new_passes > 0)
+    {
+        std::vector<Pass> new_passes = generatePasses(num_new_passes);
         // Append our newly generated passes to replace the passes we just removed
         passes_to_optimize.insert(passes_to_optimize.end(), new_passes.begin(),
                                   new_passes.end());
@@ -220,9 +223,12 @@ double PassGenerator::ratePass(Pass pass)
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
     double rating = 0;
-    try {
+    try
+    {
         rating = ::ratePass(world, pass, target_region);
-    } catch (std::invalid_argument& e){
+    }
+    catch (std::invalid_argument& e)
+    {
         // If the pass is invalid, just rate it as poorly as possible
         rating = 0;
     }
