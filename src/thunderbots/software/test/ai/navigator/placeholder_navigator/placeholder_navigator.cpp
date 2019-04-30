@@ -86,7 +86,7 @@ TEST(PlaceholderNavigatorTest, convert_dribble_intent_to_dribble_primitive)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
-        std::make_unique<DribbleIntent>(0, Point(), Angle::quarter(), 0, 8888, true, 50));
+        std::make_unique<DribbleIntent>(0, Point(), Angle::quarter(), 8888, true, 50));
 
     auto primitive_ptrs = placeholderNavigator.getAssignedPrimitives(world, intents);
 
@@ -94,7 +94,7 @@ TEST(PlaceholderNavigatorTest, convert_dribble_intent_to_dribble_primitive)
     EXPECT_EQ(primitive_ptrs.size(), 1);
 
     auto expected_primitive =
-        DribblePrimitive(0, Point(), Angle::quarter(), 0, 8888, true);
+        DribblePrimitive(0, Point(), Angle::quarter(), 8888, true);
     auto primitive = dynamic_cast<DribblePrimitive &>(*(primitive_ptrs.at(0)));
     EXPECT_EQ(expected_primitive, primitive);
 }

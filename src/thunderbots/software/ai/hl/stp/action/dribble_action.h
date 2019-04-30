@@ -17,8 +17,8 @@ class DribbleAction : public Action
      *
      * @param close_to_dest_threshold How far from the destination the robot must be
      * before the action is considered done
-     * @param loop_forever Continue yielding new Move Intents, even after we have reached
-     *                     our goal
+     * @param loop_forever If true, continuously new DribbleIntents even after we have
+     * reached our goal
      */
     explicit DribbleAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
                            bool loop_forever              = false);
@@ -29,13 +29,11 @@ class DribbleAction : public Action
      *
      * @param robot The robot to move
      * @param destination The destination to move to (in global coordinates)
-     * @param final_orientation The final orientation the robot should have at
+     * @param final_angle The final orientation the robot should have at
      * the destination
-     * @param final_speed The final speed the robot should have at the destination
-     * @param enable_dribbler Whether or not to enable the dribbler
-     * @param enable_autokick This will enable the "break-beam" on the robot, that will
-     *                        trigger the kicker to fire as soon as the ball is in front
-     *                        of it
+     * @param rpm RPM of the dribbler
+     * @param small_kick_allowed If true, the robot can kick the ball forward a small
+     * distance while dribbling
      *
      * @return A unique pointer to the Intent the DribbleAction wants to run. If the
      * DribbleAction is done, returns an empty/null pointer
