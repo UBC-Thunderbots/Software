@@ -9,14 +9,13 @@ std::string DribbleTactic::getName() const
     return "Dribble Tactic";
 }
 
-void DribbleTactic::updateParams(const Point &dest,
-                             const Angle &final_angle, double rpm,
-                             bool small_kick_allowed)
+void DribbleTactic::updateParams(const Point &dest, const Angle &final_angle, double rpm,
+                                 bool small_kick_allowed)
 {
     // Update the parameters stored by this Tactic
-    this->destination       = dest;
-    this->final_orientation = final_angle;
-    this->dribbler_rpm = rpm;
+    this->destination        = dest;
+    this->final_orientation  = final_angle;
+    this->dribbler_rpm       = rpm;
     this->small_kick_allowed = small_kick_allowed;
 }
 
@@ -35,7 +34,7 @@ std::unique_ptr<Intent> DribbleTactic::calculateNextIntent(
     DribbleAction dribble_action = DribbleAction();
     do
     {
-        yield(dribble_action.updateStateAndGetNextIntent(*robot, destination,
-                                                      final_orientation, dribbler_rpm, small_kick_allowed));
+        yield(dribble_action.updateStateAndGetNextIntent(
+            *robot, destination, final_orientation, dribbler_rpm, small_kick_allowed));
     } while (!dribble_action.done());
 }

@@ -10,16 +10,15 @@ DribbleAction::DribbleAction(double close_to_dest_threshold, bool loop_forever)
 }
 
 std::unique_ptr<Intent> DribbleAction::updateStateAndGetNextIntent(
-    const Robot& robot, const Point& dest,
-                           const Angle& final_angle, double rpm,
-                           bool small_kick_allowed)
+    const Robot& robot, const Point& dest, const Angle& final_angle, double rpm,
+    bool small_kick_allowed)
 
 {
     // Update the parameters stored by this Action
-    this->robot             = robot;
-    this->destination       = dest;
-    this->final_orientation = final_angle;
-    this->dribbler_rpm = rpm;
+    this->robot              = robot;
+    this->destination        = dest;
+    this->final_orientation  = final_angle;
+    this->dribbler_rpm       = rpm;
     this->small_kick_allowed = small_kick_allowed;
 
     return getNextIntent();
@@ -29,14 +28,14 @@ std::unique_ptr<Intent> DribbleAction::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was
-    // already moving somewhere else, but was told to run the DribbleAction to a destination
-    // while it happened to be crossing that point, we want to make sure we send the
-    // Intent so we don't report the Action as done while still moving to a different
-    // location
+    // already moving somewhere else, but was told to run the DribbleAction to a
+    // destination while it happened to be crossing that point, we want to make sure we
+    // send the Intent so we don't report the Action as done while still moving to a
+    // different location
     do
     {
-        yield(std::make_unique<DribbleIntent>(robot->id(), destination, final_orientation, 
-                                                dribbler_rpm, small_kick_allowed, 0));
+        yield(std::make_unique<DribbleIntent>(robot->id(), destination, final_orientation,
+                                              dribbler_rpm, small_kick_allowed, 0));
     } while (loop_forever ||
              (robot->position() - destination).len() > close_to_dest_threshold);
 }

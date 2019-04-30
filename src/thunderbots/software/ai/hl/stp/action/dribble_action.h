@@ -21,7 +21,7 @@ class DribbleAction : public Action
      *                     our goal
      */
     explicit DribbleAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD,
-                        bool loop_forever              = false);
+                           bool loop_forever              = false);
 
     /**
      * Returns the next Intent this DribbleAction wants to run, given the parameters.
@@ -40,10 +40,11 @@ class DribbleAction : public Action
      * @return A unique pointer to the Intent the DribbleAction wants to run. If the
      * DribbleAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(
-        const Robot& robot, const Point &dest,
-                             const Angle &final_angle, double rpm,
-                             bool small_kick_allowed);
+    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
+                                                        const Point& dest,
+                                                        const Angle& final_angle,
+                                                        double rpm,
+                                                        bool small_kick_allowed);
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(

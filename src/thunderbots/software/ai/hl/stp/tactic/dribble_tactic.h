@@ -28,9 +28,8 @@ class DribbleTactic : public Tactic
      * the destination
      * @param final_speed The final speed the robot should have at the destination
      */
-    void updateParams(const Point &dest,
-                             const Angle &final_angle, double rpm,
-                             bool small_kick_allowed);
+    void updateParams(const Point& dest, const Angle& final_angle, double rpm,
+                      bool small_kick_allowed);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
