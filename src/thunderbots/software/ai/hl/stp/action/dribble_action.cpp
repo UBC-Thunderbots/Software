@@ -32,7 +32,6 @@ std::unique_ptr<Intent> DribbleAction::calculateNextIntent(
     // destination while it happened to be crossing that point, we want to make sure we
     // send the Intent so we don't report the Action as done while still moving to a
     // different location
-
     do
     {
         yield(std::make_unique<DribbleIntent>(robot->id(), destination, final_orientation,
