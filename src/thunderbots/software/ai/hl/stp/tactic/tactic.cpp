@@ -3,7 +3,10 @@
 #include "util/logger/init.h"
 
 Tactic::Tactic(bool loop_forever)
-    : intent_sequence(std::make_unique<intent_coroutine::pull_type>([this](intent_coroutine::push_type &yield){ return this->calculateNextIntentWrapper(yield); })),
+    : intent_sequence(std::make_unique<intent_coroutine::pull_type>(
+          [this](intent_coroutine::push_type &yield) {
+              return this->calculateNextIntentWrapper(yield);
+          })),
       done_(false),
       loop_forever(loop_forever)
 {
@@ -44,7 +47,9 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         // when this Tactic restarts
         intent_sequence.reset();
         intent_sequence = std::make_unique<intent_coroutine::pull_type>(
-            [this](intent_coroutine::push_type &yield){ return this->calculateNextIntentWrapper(yield); });
+            [this](intent_coroutine::push_type &yield) {
+                return this->calculateNextIntentWrapper(yield);
+            });
         next_intent = getNextIntentHelper();
     }
 
