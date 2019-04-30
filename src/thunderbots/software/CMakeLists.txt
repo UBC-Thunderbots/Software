@@ -1,10 +1,17 @@
 # This project name must match the name of the package defined in package.xml
 project(thunderbots)
 
-# Build in "Release" (with lots of compiler optimizations) by default
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
-endif()
+## Build in "Release" (with lots of compiler optimizations) by default
+#if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+##    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
+#    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Debug")
+#endif()
+
+# Force the build to DebugA
+# TODO: THIS IS A TEMPORARY FIX TO SUPPRESS THE MEMORY ISSUES FOUND IN
+# https://github.com/UBC-Thunderbots/Software/issues/584
+# This should be set back to the commented-out code above once the issue if fixed
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Debug")
 
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
