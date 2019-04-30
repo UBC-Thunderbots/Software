@@ -81,7 +81,10 @@ class ReceiverTactic : public Tactic
         intent_coroutine::push_type& yield) override;
 
     /**
-     * Finds a feasible shot for the robot, if any
+     * Finds a feasible shot for the robot, if any.
+     *
+     * A feasible shot is one where the robot does not have to rotate to much to
+     * take the shot, and there is a sufficient percentage of the net open for the shot.
      *
      * @return A pair of a Point to shoot at and the open angle the shot could
      *         go through, or std::nullopt if there is no feasible shot
