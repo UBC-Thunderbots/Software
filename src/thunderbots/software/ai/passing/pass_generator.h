@@ -85,10 +85,10 @@ namespace AI::Passing
          * Gradient descent must be allowed to run for some number of iterations before
          * this can be used to get a reasonable value.
          *
-         * @return The best currently known pass, or `std::nullopt` if there is no
-         *         reasonable pass
+         * @return The best currently known pass and the rating of that pass (in [0-1)
+         *         or `std::nullopt` if there is no reasonable pass,
          */
-        std::optional<Pass> getBestPassSoFar();
+        std::optional<std::pair<Pass, double>> getBestPassSoFar();
 
         /**
          * Destructs this PassGenerator

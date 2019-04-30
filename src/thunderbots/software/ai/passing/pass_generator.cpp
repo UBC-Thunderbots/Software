@@ -48,12 +48,16 @@ void PassGenerator::setPasserPoint(Point passer_point)
     this->passer_point = passer_point;
 }
 
-std::optional<Pass> PassGenerator::getBestPassSoFar()
+std::optional<std::pair<Pass, double>> PassGenerator::getBestPassSoFar()
 {
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
-    return best_known_pass;
+    if (best_known_pass){
+        Pass pass = *best_known_pass;
+        return std::make_pair<Pass, double>(std::move(pass), ratePass(pass));
+    }
+    return std::nullopt;
 }
 
 void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
