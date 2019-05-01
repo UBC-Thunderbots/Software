@@ -143,6 +143,12 @@ namespace AI::Passing
         void saveBestPass();
 
         /**
+         * Perform all the drawing operations to represent this PassGenerator
+         */
+         // TODO: rename this
+        void visualizeStuff();
+
+        /**
          * Convert the given pass to an array
          *
          * @param pass The pass to convert

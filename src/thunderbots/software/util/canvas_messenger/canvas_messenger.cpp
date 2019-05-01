@@ -18,7 +18,7 @@ void CanvasMessenger::initializePublisher(ros::NodeHandle node_handle)
         Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, BUFFER_SIZE);
 }
 
-void CanvasMessenger::publishAndClearAllLayers()
+void CanvasMessenger::publishLayer(Layer layer)
 {
     // Take ownership of the layers for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
@@ -48,9 +48,6 @@ void CanvasMessenger::publishAndClearAllLayers()
 
         this->publishPayload(layer_number, sprites);
     }
-
-    // Clear shapes in layers of current frame/tick
-    this->clearAllLayers();
 
     // Update last published time
     time_last_published = now;
@@ -130,6 +127,30 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
     drawSprite(layer, rectangle_sprite);
 }
 
+void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> f, const Rectangle &area, double min_val, double max_val, Color min_color, Color max_color, int points_per_meter) {
+    for (int i = 0; i < area.width()*points_per_meter; i++){
+        for (int j = 0; j < area.height()*points_per_meter; j++){
+            Point p = area.swCorner() + Vector(0.5/points_per_meter, 0.5/points_per_meter) + Vector(i/(double)points_per_meter, j/(double)points_per_meter);
+
+            // Get the value and clamp it appropriately
+            double val_at_p = std::clamp(f(p), min_val, max_val);
+
+            // Create the "pixel" in the gradient
+            Rectangle block(p - Vector(0.5/points_per_meter, 0.5/points_per_meter), p + Vector(0.5/points_per_meter, 0.5/points_per_meter));
+//            Rectangle block(area.swCorner(), area.swCorner() + Vector(1/points_per_meter, 1/points_per_meter));
+
+            // Linearly interpolate the color
+            Color color = {
+                    (uint8_t)((max_color.r - min_color.r)/(max_val - min_val)*(val_at_p - min_val) + min_color.r),
+                    (uint8_t)((max_color.g - min_color.g)/(max_val - min_val)*(val_at_p - min_val) + min_color.g),
+                    (uint8_t)((max_color.b - min_color.b)/(max_val - min_val)*(val_at_p - min_val) + min_color.b),
+                    (uint8_t)((max_color.a - min_color.a)/(max_val - min_val)*(val_at_p - min_val) + min_color.a)
+            };
+            drawRectangle(layer, block, Angle::zero(), color);
+        }
+    }
+}
+
 void CanvasMessenger::drawLine(Layer layer, Point p1, Point p2, double thickness,
                                Color color)
 {
@@ -156,8 +177,15 @@ void CanvasMessenger::drawPoint(Layer layer, const Point& p, double radius, Colo
 
 void CanvasMessenger::drawWorld(const World& world)
 {
+
+    // Draw the new layer
+    clearLayer(Layer::BALL);
     drawBall(world.ball());
+
+    clearLayer(Layer::STATIC_FEATURES);
     drawField(world.field());
+
+    clearLayer(Layer::ROBOTS);
     drawTeam(world.friendlyTeam(), FRIENDLY_TEAM_COLOR);
     drawTeam(world.enemyTeam(), ENEMY_TEAM_COLOR);
 }
@@ -169,6 +197,7 @@ void CanvasMessenger::drawBall(const Ball& ball)
 
 void CanvasMessenger::drawField(Field field)
 {
+
     // Draw the base of the field
     drawRectangle(Layer::STATIC_FEATURES,
                   Rectangle(field.enemyCornerNeg(), field.friendlyCornerPos()),
@@ -219,24 +248,24 @@ std::vector<uint8_t> CanvasMessenger::Sprite::serialize(int size_scaling_factor)
 
     // These are all 16 bits, we need to split them
     Int16OrTwoInt8 x;
-    x.base = top_left_corner.x() * size_scaling_factor;
+    x.base = std::floor(top_left_corner.x() * size_scaling_factor);
     payload.emplace_back(x.result[1]);
     payload.emplace_back(x.result[0]);
 
     Int16OrTwoInt8 y;
     // We negate y because we want positive y to be upwards in the visualizer, which uses
     // the graphics convention of +y downwards
-    y.base = -top_left_corner.y() * size_scaling_factor;
+    y.base = std::floor(-top_left_corner.y() * size_scaling_factor);
     payload.emplace_back(y.result[1]);
     payload.emplace_back(y.result[0]);
 
     Int16OrTwoInt8 width;
-    width.base = _width * size_scaling_factor;
+    width.base = std::round(_width * size_scaling_factor);
     payload.emplace_back(width.result[1]);
     payload.emplace_back(width.result[0]);
 
     Int16OrTwoInt8 height;
-    height.base = _height * size_scaling_factor;
+    height.base = std::round(_height * size_scaling_factor);
     payload.emplace_back(height.result[1]);
     payload.emplace_back(height.result[0]);
 

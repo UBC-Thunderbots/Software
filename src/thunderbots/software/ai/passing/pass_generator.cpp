@@ -118,6 +118,7 @@ void PassGenerator::continuouslyGeneratePasses()
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
+        visualizeStuff();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -126,6 +127,61 @@ void PassGenerator::continuouslyGeneratePasses()
         // Take ownership of the `in_destructor` flag so we can use it for the conditional
         // check
         in_destructor_mutex.lock();
+    }
+}
+
+void PassGenerator::visualizeStuff() {
+    // Take ownership of the world for the duration of this function
+    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
+
+    // Draw all the points we have so far
+    auto painter = Util::CanvasMessenger::getInstance();
+//    for (Pass& pass : passes_to_optimize){
+//        Point p = pass.receiverPoint();
+//        double score = ratePass(pass);
+//        painter->drawPoint(p, 0.1, 255, 0, 0, 128 * score + 128);
+//        if ((p.x() < 0 || p.y() < 0) && score > 0.2){
+//            std::cout << "Pass: " << pass << std::endl;
+//            std::cout << "Score: " << ratePass(pass) << std::endl;
+//        }
+//        score = ratePass(pass);
+//    }
+
+    // Get field characteristics and the current time
+    world_mutex.lock();
+    Rectangle field_area(world.field().enemyCornerNeg(), world.field().friendlyCornerPos());
+    double field_length = world.field().length();
+    double field_width = world.field().width();
+    Timestamp pass_zero_time = world.ball().lastUpdateTimestamp() + Duration::fromSeconds(0.0);
+    world_mutex.unlock();
+
+    painter->clearLayer(Util::CanvasMessenger::Layer::PASS_GENERATION);
+
+    auto best_pass_and_score = getBestPassSoFar();
+    if (best_pass_and_score) {
+        auto [best_pass, best_score] = *best_pass_and_score;
+        const auto objective_function =
+                [&](Point p) {
+                    try {
+                        double pass_speed = (max_pass_speed_m_per_s.value() +
+                                             min_pass_speed_m_per_s.value()) / 2;
+                        Timestamp pass_time = pass_zero_time + Duration::fromSeconds(
+                                min_time_offset_for_pass_seconds.value() +
+                                max_time_offset_for_pass_seconds.value());
+                        Pass pass(passer_point, p, best_pass.speed(), best_pass.startTime());
+                        return ratePass(pass);
+                    } catch (std::invalid_argument &e) {
+                        return 0.0;
+                    }
+                };
+        painter->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
+                              objective_function,
+                              field_area, 0, 0.02, {0, 0, 255, 160}, {255, 0, 0, 160},
+                              10);
+        painter->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, best_pass.receiverPoint(), 0.05, {0, 255, 0, 255});
+    }
+    for (const Pass& pass : passes_to_optimize){
+        painter->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, pass.receiverPoint(), 0.03, {0, 255, 0, 150});
     }
 }
 
