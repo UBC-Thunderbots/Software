@@ -169,6 +169,14 @@ class Team
     void clearAllRobots();
 
     /**
+     * Returns the timestamp of the most recently updated robot on this team
+     *
+     * @return the timestamp of the most recently updated robot on this team, or
+     *         std::nullopt if this team is empty
+     */
+    std::optional<Timestamp> lastUpdateTimestamp() const;
+
+    /**
      * Defines the equality operator for a Team. Teams are equal if their robots are equal
      * and have the same robot assigned as the goalie
      *

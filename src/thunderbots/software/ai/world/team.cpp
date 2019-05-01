@@ -158,6 +158,19 @@ void Team::clearAllRobots()
     team_robots.clear();
 }
 
+std::optional<Timestamp> Team::lastUpdateTimestamp() const
+{
+    std::optional<Timestamp> most_recent_timestamp = std::nullopt;
+    for (Robot& robot : getAllRobots())
+    {
+        if (!most_recent_timestamp || robot.lastUpdateTimestamp() > most_recent_timestamp)
+        {
+            most_recent_timestamp = robot.lastUpdateTimestamp();
+        }
+    }
+    return most_recent_timestamp;
+}
+
 bool Team::operator==(const Team& other) const
 {
     return this->getAllRobots() == other.getAllRobots() &&

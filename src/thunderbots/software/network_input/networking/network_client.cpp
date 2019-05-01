@@ -120,6 +120,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                 ret.first->second = detection;
             }
         }
+
         // Create a vector of the latest detection data for each camera
         std::vector<SSL_DetectionFrame> latest_detections;
         for (auto it = latest_detection_data.begin(); it != latest_detection_data.end();
