@@ -20,7 +20,7 @@ class PassGeneratorTest : public testing::Test
     {
         world = ::Test::TestUtil::createBlankTestingWorld();
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-        pass_generator = std::make_shared<PassGenerator>(0.05, world, Point(1, 0));
+        pass_generator = std::make_shared<PassGenerator>(world, Point(1, 0));
     }
 
     World world;
@@ -29,53 +29,45 @@ class PassGeneratorTest : public testing::Test
 
 TEST_F(PassGeneratorTest, check_pass_converges)
 {
-    // Test that the pass converges to a stable pass when there is a somewhat random
-    // scattering of friendly and enemy robots around the field
+    // Test that we can converge to a stable pass in a fairly simple scenario
+
     Team friendly_team(Duration::fromSeconds(10));
-    friendly_team.updateRobots(
-        {Robot(1, {2, 2}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
-               Timestamp::fromSeconds(0)),
-         Robot(2, {-3, 1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
-               Timestamp::fromSeconds(0)),
+    friendly_team.updateRobots({
          Robot(3, {-1, -1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
                Timestamp::fromSeconds(0)),
-         Robot(4, {0.2, 0.5}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
-               Timestamp::fromSeconds(0))});
+    });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(0, {1, 0}, {0, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(1, {2, 1}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(2, {3, 2}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(3, {4, -1}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+    enemy_team.updateRobots({
                              Robot(4, {0.5, 4}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);
 
-    std::this_thread::sleep_for(10s);
+
+    std::this_thread::sleep_for(15s);
 
     // Find what pass we converged to
-    auto converged_pass_opt = pass_generator->getBestPassSoFar();
-    ASSERT_TRUE(converged_pass_opt);
+    auto converged_pass_and_score = pass_generator->getBestPassSoFar();
+    ASSERT_TRUE(converged_pass_and_score);
+    auto [converged_pass, converged_score] = *converged_pass_and_score;
 
     // Check that we keep converging to the same pass
     for (int i = 0; i < 7; i++)
     {
         std::this_thread::sleep_for(0.5s);
-        auto new_pass_opt = pass_generator->getBestPassSoFar();
-        ASSERT_TRUE(new_pass_opt);
+        auto pass_and_score = pass_generator->getBestPassSoFar();
+        ASSERT_TRUE(pass_and_score);
 
-        EXPECT_EQ(converged_pass_opt->passerPoint(), new_pass_opt->passerPoint());
+        auto [pass, score] = *pass_and_score;
+
+        EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE(
-            (converged_pass_opt->receiverPoint() - new_pass_opt->receiverPoint()).len(),
+            (converged_pass.receiverPoint() - pass.receiverPoint()).len(),
             0.2);
-        EXPECT_LE(converged_pass_opt->speed() - new_pass_opt->speed(), 0.2);
-        EXPECT_LE(abs((converged_pass_opt->startTime() - new_pass_opt->startTime())
+        EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.2);
+        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime())
                           .getSeconds()),
                   0.2);
     }
