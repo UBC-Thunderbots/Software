@@ -44,6 +44,8 @@ TEST_F(PassGeneratorTest, check_pass_converges)
 
     pass_generator->setWorld(world);
 
+    std::this_thread::sleep_for(1s);
+
     // Wait until the pass stops improving or 1 minute, whichever comes first
     int seconds_so_far = 0;
     double curr_score = 0;
@@ -56,9 +58,9 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         if (curr_pass_and_score){
             curr_score = curr_pass_and_score->second;
         }
-    } while((curr_score - prev_score > 0.01 || curr_score < 0.1) && seconds_so_far < 60);
+    } while((abs(curr_score - prev_score) > 0.001 || curr_score < 0.2) && seconds_so_far < 60);
 
-    ASSERT_TRUE(seconds_so_far < 60) << "Pass generator did not converge after running for a minute";
+    ASSERT_LE(seconds_so_far, 60) << "Pass generator did not converge after running for a minute";
 
     // Find what pass we converged to
     auto converged_pass_and_score = pass_generator->getBestPassSoFar();
