@@ -102,7 +102,7 @@ TEST(MRFPrimitiveVisitorTest, visit_direct_wheels_primitive)
 
 TEST(MRFPrimitiveVisitorTest, visit_dribble_primitive)
 {
-    DribblePrimitive primitive(11, Point(22, 33.3), Angle::half(), 1.60, 30000, true);
+    DribblePrimitive primitive(11, Point(22, 33.3), Angle::half(), 30000, true);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::DRIBBLE;
     expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,
