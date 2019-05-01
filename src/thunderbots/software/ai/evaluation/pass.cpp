@@ -44,7 +44,8 @@ Duration AI::Evaluation::getTimeToOrientationForRobot(const Robot& robot,
 
 Duration AI::Evaluation::getTimeToPositionForRobot(const Robot& robot, const Point& dest,
                                                    const double& max_velocity,
-                                                   const double& max_acceleration)
+                                                   const double& max_acceleration,
+                                                   const double& tolerance_meters)
 {
     // We assume a linear acceleration profile:
     // (1) velocity = MAX_ACCELERATION*time
@@ -59,7 +60,7 @@ Duration AI::Evaluation::getTimeToPositionForRobot(const Robot& robot, const Poi
     // We re-arrange (3) to get:
     // (6) displacement = time^2 * MAX_ACCELERATION/2
 
-    double dist = (robot.position() - dest).len();
+    double dist = std::max(0.0, (robot.position() - dest).len() - tolerance_meters);
 
     // Calculate the distance required to reach max possible velocity of the robot
     // using (5)

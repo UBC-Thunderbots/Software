@@ -1,12 +1,13 @@
 #pragma once
 
 #include "ai/hl/stp/action/action.h"
+#include "ai/world/ball.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 
 /**
  * The KickAction makes the robot take a kick from the given location in the given
- * direction, with the given power
+ * direction, with the given power.
  */
 class KickAction : public Action
 {
@@ -29,7 +30,7 @@ class KickAction : public Action
      * KickAction is done, returns an empty/null pointer
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(
-        const Robot& robot, Point kick_origin, Angle kick_direction,
+        const Robot &robot, const Ball &ball, Point kick_origin, Angle kick_direction,
         double kick_speed_meters_per_second);
 
     /**
@@ -45,14 +46,15 @@ class KickAction : public Action
      * KickAction is done, returns an empty/null pointer
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(
-        const Robot& robot, Point kick_origin, Point kick_target,
+        const Robot &robot, const Ball &ball, Point kick_origin, Point kick_target,
         double kick_speed_meters_per_second);
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+        intent_coroutine::push_type &yield) override;
 
     // Action parameters
+    Ball ball;
     Point kick_origin;
     Angle kick_direction;
     double kick_speed_meters_per_second;
