@@ -49,8 +49,6 @@ class PassGeneratorTest : public testing::Test
             if (curr_pass_and_score)
             {
                 curr_score = curr_pass_and_score->second;
-                std::cout << curr_score << std::endl;
-                std::cout << curr_pass_and_score->first << std::endl;
             }
         } while ((abs(curr_score - prev_score) > 0.001 || curr_score < 0.2) &&
                  seconds_so_far < max_num_seconds);
@@ -103,9 +101,6 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         ASSERT_TRUE(pass_and_score);
 
         auto [pass, score] = *pass_and_score;
-
-        std::cout << converged_pass << std::endl;
-        std::cout << pass << std::endl;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.3);
