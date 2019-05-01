@@ -47,6 +47,13 @@ void PassGenerator::setPasserPoint(Point passer_point)
     this->passer_point = passer_point;
 }
 
+void PassGenerator::setPasserRobotId(unsigned int robot_id) {
+    // Take ownershp of the passer robot id for the duration of this function
+    std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);
+
+    this->passer_robot_id = robot_id;
+}
+
 std::optional<std::pair<Pass, double>> PassGenerator::getBestPassSoFar()
 {
     // Take ownership of the best_known_pass for the duration of this function
@@ -95,10 +102,15 @@ void PassGenerator::continuouslyGeneratePasses()
         // conditional check
         in_destructor_mutex.unlock();
 
-        // Copy over the updated world
+        // Copy over the updated world and remove the passer robot
         world_mutex.lock();
         updated_world_mutex.lock();
+        passer_robot_id_mutex.lock();
+
         world = updated_world;
+        world.mutableFriendlyTeam().removeRobotWithId(passer_robot_id);
+
+        passer_robot_id_mutex.unlock();
         updated_world_mutex.unlock();
         world_mutex.unlock();
 

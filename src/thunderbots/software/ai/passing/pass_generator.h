@@ -69,6 +69,16 @@ namespace AI::Passing
         void setPasserPoint(Point passer_point);
 
         /**
+         * Set the id of the robot performing the pass.
+         *
+         * This id will be used so we ignore the passer when determining where to
+         * pass to
+         *
+         * @param robot_id The id of the robot performing the pass
+         */
+        void setPasserRobotId(unsigned int robot_id);
+
+        /**
          * Set the target region that we would like to pass to
          *
          * @param area An optional that may contain the area to pass to. If the
@@ -233,6 +243,12 @@ namespace AI::Passing
 
         // The point we are passing from
         Point passer_point;
+
+        // The mutex for the passer robot ID
+        std::mutex passer_robot_id_mutex;
+
+        // The id of the robot that is performing the pass. We want to ignore this robot
+        unsigned int passer_robot_id;
 
         // The mutex for the target region
         std::mutex target_region_mutex;
