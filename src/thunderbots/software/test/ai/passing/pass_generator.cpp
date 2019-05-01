@@ -3,6 +3,7 @@
  */
 
 #include "ai/passing/pass_generator.h"
+#include "ai/passing/evaluation.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
@@ -19,7 +20,7 @@ class PassGeneratorTest : public testing::Test
     {
         world = ::Test::TestUtil::createBlankTestingWorld();
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-        pass_generator = std::make_shared<PassGenerator>(world, Point(1, 0));
+        pass_generator = std::make_shared<PassGenerator>(world, Point(3.5, -0.3));
     }
 
     /**
@@ -157,4 +158,53 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored)
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).len(), 0.5);
+}
+
+TEST_F(PassGeneratorTest, deleteme)
+{
+    // Test that we can converge to a stable pass in a fairly simple scenario
+
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+                                       Robot(3, {3, 0.5}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+                                             Timestamp::fromSeconds(0)),
+                               });
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({Robot(0, {1.4, -1.4}, {-0.5, 0}, Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0))
+                             });
+    world.updateEnemyTeamState(enemy_team);
+
+    pass_generator->setPasserPoint({3.5, -0.3});
+
+    pass_generator->setWorld(world);
+
+    // Wait until the pass stops improving or 30 seconds, whichever comes first
+    waitForConvergence(pass_generator, 0.00000000001, 30);
+
+    // Find what pass we converged to
+    auto converged_pass_and_score = pass_generator->getBestPassSoFar();
+    ASSERT_TRUE(converged_pass_and_score);
+    auto [converged_pass, converged_score] = *converged_pass_and_score;
+
+    // Check that we keep converging to the same pass
+    for (int i = 0; i < 7; i++)
+    {
+        std::this_thread::sleep_for(0.5s);
+        auto pass_and_score = pass_generator->getBestPassSoFar();
+        ASSERT_TRUE(pass_and_score);
+
+        auto [pass, score] = *pass_and_score;
+
+        std::cout << converged_pass << std::endl;
+        std::cout << pass << std::endl;
+
+        ratePass(world, pass, {});
+
+        EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
+        EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.3);
+        EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.3);
+        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
+    }
 }

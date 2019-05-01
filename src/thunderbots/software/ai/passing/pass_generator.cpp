@@ -12,6 +12,7 @@ using namespace Util::DynamicParameters::AI::Passing;
 
 PassGenerator::PassGenerator(const World& world, const Point& passer_point)
     : updated_world(world),
+      world(world),
       optimizer(optimizer_param_weights),
       passer_point(passer_point),
       best_known_pass(std::nullopt),
@@ -45,6 +46,8 @@ void PassGenerator::setPasserPoint(Point passer_point)
 
     // Update the passer point
     this->passer_point = passer_point;
+
+    // TODO: We need to update the passer point for every pass that we are optimizing
 }
 
 void PassGenerator::setPasserRobotId(unsigned int robot_id)
@@ -111,14 +114,20 @@ void PassGenerator::continuouslyGeneratePasses()
         world = updated_world;
         world.mutableFriendlyTeam().removeRobotWithId(passer_robot_id);
 
+        std::cout << world.ball().lastUpdateTimestamp().getSeconds() << std::endl;
+
         passer_robot_id_mutex.unlock();
         updated_world_mutex.unlock();
         world_mutex.unlock();
 
+        std::cout << "Time In Past: " << getBestPassSoFar()->first.startTime().getSeconds() - world.ball().lastUpdateTimestamp().getSeconds() << std::endl;
+
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
-        visualizeStuff();
+        std::cout << "Best Score: " << getBestPassSoFar()->second << std::endl;
+        std::cout << "Best Pass: " << getBestPassSoFar()->first << std::endl << std::endl;
+//        visualizeStuff();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -158,6 +167,8 @@ void PassGenerator::visualizeStuff() {
     auto best_pass_and_score = getBestPassSoFar();
     if (best_pass_and_score) {
         auto [best_pass, best_score] = *best_pass_and_score;
+        std::cout << best_pass << std::endl;
+        std::cout << ratePass(best_pass) << std::endl;
         const auto objective_function =
                 [&](Point p) {
                     try {
@@ -172,10 +183,10 @@ void PassGenerator::visualizeStuff() {
                         return 0.0;
                     }
                 };
-//        painter->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
-//                              objective_function,
-//                              field_area, 0, 0.02, {0, 0, 255, 160}, {255, 0, 0, 160},
-//                              10);
+        painter->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
+                              objective_function,
+                              field_area, 0, 1, {0, 0, 255, 160}, {255, 0, 0, 160},
+                              4);
         painter->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, best_pass.receiverPoint(), 0.05, {0, 255, 0, 255});
     }
     for (const Pass& pass : passes_to_optimize){

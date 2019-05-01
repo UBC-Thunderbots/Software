@@ -29,6 +29,8 @@ std::vector<std::shared_ptr<Tactic>> ExamplePlay::getNextTactics(
 
     do {
         pass_generator.setWorld(world);
+//        pass_generator.setPasserPoint(world.ball().position());
+        std::this_thread::yield();
         yield({});
     } while(true);
 

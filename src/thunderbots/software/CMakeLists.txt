@@ -769,6 +769,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             test/ai/passing/evaluation.cpp
             test/ai/passing/main.cpp
             test/ai/passing/pass.cpp

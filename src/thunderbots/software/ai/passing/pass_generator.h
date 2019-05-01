@@ -98,6 +98,7 @@ namespace AI::Passing
          * @return The best currently known pass and the rating of that pass (in [0-1)
          *         or `std::nullopt` if there is no reasonable pass,
          */
+         // TODO: There's no need for this to return an optional anymore
         std::optional<std::pair<Pass, double>> getBestPassSoFar();
 
         /**
