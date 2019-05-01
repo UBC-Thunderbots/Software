@@ -565,6 +565,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/primitive/chip_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/robot.cpp
+            ai/world/ball.cpp
             test/ai/hl/stp/action/main.cpp
             test/ai/hl/stp/test_actions/move_test_action.cpp
             test/ai/hl/stp/action/action.cpp
