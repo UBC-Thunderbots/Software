@@ -103,6 +103,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         auto [pass, score] = *pass_and_score;
 
         std::cout << converged_pass << std::endl;
+        std::cout << pass << std::endl;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.2);
