@@ -73,9 +73,9 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(0, {1, 3.7}, {-0.5, 0}, Angle::zero(),
+    enemy_team.updateRobots({Robot(0, {0.5, 0.5}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(1, {-2, 4.0}, {-0.5, 0}, Angle::zero(),
+                             Robot(1, {-2, -2}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
                              Robot(2, {3, -2}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
@@ -101,6 +101,8 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         ASSERT_TRUE(pass_and_score);
 
         auto [pass, score] = *pass_and_score;
+
+        std::cout << converged_pass << std::endl;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.2);
