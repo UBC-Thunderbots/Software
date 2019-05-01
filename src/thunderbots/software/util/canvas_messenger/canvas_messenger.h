@@ -38,10 +38,10 @@ namespace Util
        public:
         enum class Layer
         {
+            PASS_GENERATION,
             STATIC_FEATURES,
             ROBOTS,
-            BALL,
-            PASS_GENERATION
+            BALL
         };
 
         struct Color
@@ -127,7 +127,7 @@ namespace Util
          * Uses ROS publishers to publish sprite data for each layer and
          * then clears all layer data.
          */
-        void publishLayer(Layer layer);
+        void publishAndClearLayer(Layer layer);
 
         /**
          * Clear the given layer
@@ -271,8 +271,6 @@ namespace Util
          */
         void clearAllLayers();
 
-        // layer to sprite data map
-        std::map<Layer, std::vector<Sprite>> layers_map;
         ros::Publisher publisher;
 
         // Period in nanoseconds
@@ -286,6 +284,9 @@ namespace Util
         std::chrono::time_point<std::chrono::system_clock> time_last_published;
 
         // The mutex for the layers
-        std::mutex layers_map_lock;
+        std::mutex layers_map_mutex;
+
+        // layer to sprite data map
+        std::map<Layer, std::vector<Sprite>> layers_map;
     };
 }  // namespace Util

@@ -18,39 +18,55 @@ void CanvasMessenger::initializePublisher(ros::NodeHandle node_handle)
         Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, BUFFER_SIZE);
 }
 
-void CanvasMessenger::publishLayer(Layer layer)
+void CanvasMessenger::publishAndClearLayer(Layer layer)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+    std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
-    // Limit rate of the message publishing
-    // Get the time right now
-    const std::chrono::time_point<std::chrono::system_clock> now =
-        std::chrono::system_clock::now();
-    const int64_t elapsed_ns =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(now - time_last_published)
-            .count();
-    const double elapsed_ms = elapsed_ns / 1.0e6;
+//    // Limit rate of the message publishing
+//    // Get the time right now
+//    const std::chrono::time_point<std::chrono::system_clock> now =
+//        std::chrono::system_clock::now();
+//    const int64_t elapsed_ns =
+//        std::chrono::duration_cast<std::chrono::nanoseconds>(now - time_last_published)
+//            .count();
+//    const double elapsed_ms = elapsed_ns / 1.0e6;
+//
+//    // Do not do anything if the time passed hasn't been
+//    // long enough
+//    if (elapsed_ms < DESIRED_PERIOD_MS)
+//        return;
 
-    // Do not do anything if the time passed hasn't been
-    // long enough
-    if (elapsed_ms < DESIRED_PERIOD_MS)
-        return;
-
-    // Send a payload per layer of messages
-    for (const auto& layer_pair : this->layers_map)
-    {
+    // Make sure the layer exists
+    auto layer_pair = layers_map.find(layer);
+    if (layer_pair != layers_map.end()){
         // First is the layer number
-        const uint8_t layer_number = (uint8_t)layer_pair.first;
+        const uint8_t layer_number = (uint8_t)layer_pair->first;
 
         // Second is the vector that contains the sprites
-        const std::vector<Sprite>& sprites = layer_pair.second;
+        const std::vector<Sprite>& sprites = layer_pair->second;
 
+        // Publish the layer
         this->publishPayload(layer_number, sprites);
+
+        // Clear the layer
+        layer_pair->second = {};
     }
 
-    // Update last published time
-    time_last_published = now;
+//    // Send a payload per layer of messages
+//    for (const auto& layer_pair : this->layers_map)
+//    {
+//        // First is the layer number
+//        const uint8_t layer_number = (uint8_t)layer_pair.first;
+//
+//        // Second is the vector that contains the sprites
+//        const std::vector<Sprite>& sprites = layer_pair.second;
+//
+//        this->publishPayload(layer_number, sprites);
+//    }
+//
+//    // Update last published time
+//    time_last_published = now;
 }
 
 void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
@@ -87,7 +103,7 @@ void CanvasMessenger::clearAllLayers()
 void CanvasMessenger::clearLayer(Layer layer)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+    std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
     if (layers_map.find(layer) != layers_map.end())
     {
@@ -104,7 +120,7 @@ void CanvasMessenger::drawSprite(Layer layer, Sprite sprite)
 void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite& sprite)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+    std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
     // We look if the layer exists
     if (this->layers_map.find(layer) == this->layers_map.end())
@@ -179,15 +195,15 @@ void CanvasMessenger::drawWorld(const World& world)
 {
 
     // Draw the new layer
-    clearLayer(Layer::BALL);
     drawBall(world.ball());
+    publishAndClearLayer(Layer::BALL);
 
-    clearLayer(Layer::STATIC_FEATURES);
     drawField(world.field());
+    publishAndClearLayer(Layer::STATIC_FEATURES);
 
-    clearLayer(Layer::ROBOTS);
     drawTeam(world.friendlyTeam(), FRIENDLY_TEAM_COLOR);
     drawTeam(world.enemyTeam(), ENEMY_TEAM_COLOR);
+    publishAndClearLayer(Layer::ROBOTS);
 }
 
 void CanvasMessenger::drawBall(const Ball& ball)

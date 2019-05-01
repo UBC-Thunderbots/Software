@@ -1,7 +1,7 @@
 AI:
   run_ai:
     type: "bool"
-    default: false
+    default: true
     description: >-
         Selecting will allow HL and Navigator to run, unselecting will
         stop new decisions from being made, but the robots will finish
