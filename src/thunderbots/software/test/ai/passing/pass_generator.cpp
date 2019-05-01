@@ -38,15 +38,21 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(4, {0.5, 4}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0))});
+    enemy_team.updateRobots({
+                                    Robot(0, {1, 3.7}, {-0.5, 0}, Angle::zero(),
+                                          AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                                    Robot(1, {-2, 4.0}, {-0.5, 0}, Angle::zero(),
+                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                                    Robot(2, {3, -2}, {-0.5, 0}, Angle::zero(),
+                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(3, {-2.5, 4}, {-0.5, 0}, Angle::zero(),
+                                   AngularVelocity::zero(), Timestamp::fromSeconds(0))
+    });
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);
 
-    std::this_thread::sleep_for(1s);
-
-    // Wait until the pass stops improving or 1 minute, whichever comes first
+    // Wait until the pass stops improving or 30 seconds, whichever comes first
     int seconds_so_far = 0;
     double curr_score = 0;
     double prev_score = 0;
@@ -58,9 +64,9 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         if (curr_pass_and_score){
             curr_score = curr_pass_and_score->second;
         }
-    } while((abs(curr_score - prev_score) > 0.001 || curr_score < 0.2) && seconds_so_far < 60);
+    } while((abs(curr_score - prev_score) > 0.001 || curr_score < 0.2) && seconds_so_far < 30);
 
-    ASSERT_LE(seconds_so_far, 60) << "Pass generator did not converge after running for a minute";
+    ASSERT_LE(seconds_so_far, 60) << "Pass generator did not converge after running for 30 seconds";
 
     // Find what pass we converged to
     auto converged_pass_and_score = pass_generator->getBestPassSoFar();
