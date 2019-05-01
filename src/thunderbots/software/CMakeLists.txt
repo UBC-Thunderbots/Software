@@ -895,8 +895,7 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             )
-
-
+    
 endif()
 
 ##### ROSTests / Integration Tests #####
