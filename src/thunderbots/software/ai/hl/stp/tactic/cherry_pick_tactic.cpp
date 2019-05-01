@@ -37,7 +37,7 @@ std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
     MoveAction move_action                     = MoveAction();
-    auto best_pass_and_score = pass_generator.getBestPassSoFar();
+    auto best_pass_and_score                   = pass_generator.getBestPassSoFar();
     do
     {
         pass_generator.setWorld(world);
@@ -47,7 +47,8 @@ std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
         if (best_pass_and_score)
         {
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, best_pass_and_score->first.receiverPoint(), best_pass_and_score->first.receiverOrientation(), 0));
+                *robot, best_pass_and_score->first.receiverPoint(),
+                best_pass_and_score->first.receiverOrientation(), 0));
         }
     } while (!move_action.done());
 }

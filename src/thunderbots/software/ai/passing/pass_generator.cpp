@@ -10,9 +10,8 @@
 using namespace AI::Passing;
 using namespace Util::DynamicParameters::AI::Passing;
 
-PassGenerator::PassGenerator(const World &world, const Point &passer_point)
-    :
-      updated_world(world),
+PassGenerator::PassGenerator(const World& world, const Point& passer_point)
+    : updated_world(world),
       optimizer(optimizer_param_weights),
       passer_point(passer_point),
       best_known_pass(std::nullopt),
@@ -53,7 +52,8 @@ std::optional<std::pair<Pass, double>> PassGenerator::getBestPassSoFar()
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
-    if (best_known_pass){
+    if (best_known_pass)
+    {
         Pass pass = *best_known_pass;
         return std::make_pair<Pass, double>(std::move(pass), ratePass(pass));
     }

@@ -33,13 +33,12 @@ TEST_F(PassGeneratorTest, check_pass_converges)
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-         Robot(3, {-1, -1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
-               Timestamp::fromSeconds(0)),
+        Robot(3, {-1, -1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({
-                             Robot(4, {0.5, 4}, {-0.5, 0}, Angle::zero(),
+    enemy_team.updateRobots({Robot(4, {0.5, 4}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0))});
     world.updateEnemyTeamState(enemy_team);
 
@@ -63,12 +62,8 @@ TEST_F(PassGeneratorTest, check_pass_converges)
         auto [pass, score] = *pass_and_score;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
-        EXPECT_LE(
-            (converged_pass.receiverPoint() - pass.receiverPoint()).len(),
-            0.2);
+        EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.2);
         EXPECT_LE(abs(converged_pass.speed() - pass.speed()), 0.2);
-        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime())
-                          .getSeconds()),
-                  0.2);
+        EXPECT_LE(abs((converged_pass.startTime() - pass.startTime()).getSeconds()), 0.2);
     }
 }
