@@ -52,8 +52,11 @@ namespace AI::Passing
          * @param min_reasonable_pass_quality A value in [0,1] representing the minimum
          *                                    quality for a pass to be considered
          *                                    "reasonable", with higher being better
+         * @param world The world we're passing int
+         * @param passer_point The point we're passing from
          */
-        explicit PassGenerator(double min_reasonable_pass_quality);
+        explicit PassGenerator(double min_reasonable_pass_quality, const World& world,
+                               const Point& passer_point);
 
         /**
          * Updates the world
@@ -64,8 +67,6 @@ namespace AI::Passing
 
         /**
          * Updates the point that we are passing from
-         *
-         * WARNING: This will clear all passes currently being optimized
          *
          * @param passer_point the point we are passing from
          */
@@ -108,8 +109,8 @@ namespace AI::Passing
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
         static constexpr double PASS_SPACE_WEIGHT                          = 0.01;
-        static constexpr double PASS_TIME_WEIGHT                           = 1;
-        static constexpr double PASS_SPEED_WEIGHT                          = 1;
+        static constexpr double PASS_TIME_WEIGHT                           = 0.1;
+        static constexpr double PASS_SPEED_WEIGHT                          = 0.1;
         std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
             PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_TIME_WEIGHT, PASS_SPEED_WEIGHT};
 
@@ -144,7 +145,7 @@ namespace AI::Passing
          *         form: {receiver_point.x, receiver_point.y, pass_speed_m_per_s
          *                pass_start_time}
          */
-        static std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(Pass pass);
+        std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(Pass pass);
 
         /**
          * Convert a given array to a Pass
@@ -223,8 +224,16 @@ namespace AI::Passing
         // The mutex for the world
         std::mutex world_mutex;
 
-        // The most recent world we know about
+        // This world is what is used in the optimization loop
         World world;
+
+        // The mutex for the updated world
+        std::mutex updated_world_mutex;
+
+        // This world is the most recently updated one. We use this variable to "buffer"
+        // the most recently updated world so that the world stays the same for the
+        // entirety of each optimization loop, which makes things easier to reason about
+        World updated_world;
 
         // The mutex for the passer_point
         std::mutex passer_point_mutex;

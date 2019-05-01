@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
 TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)
@@ -283,4 +284,263 @@ TEST(GetNumPassesToRobotTest, final_receiver_can_receive_passes_from_multiple_ro
     EXPECT_EQ(2, num_passes);
     EXPECT_TRUE(passer);
     EXPECT_EQ(passer.value(), friendly_robot_2);
+}
+
+TEST(SortEnemyThreatsTest, only_one_robot_has_possession)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = Evaluation::EnemyThreat{
+        robot1,       true, Angle::ofDegrees(50), Angle::ofDegrees(20),
+        Point(-4, 0), 0,    std::nullopt};
+
+    auto threat2 = Evaluation::EnemyThreat{
+        robot2, false, Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0),
+        1,      robot1};
+
+    // Despite robot2 having better shooting and scoring opporunity, robot1 has the ball
+    // so should be more threatening
+    std::vector<Evaluation::EnemyThreat> expected_result = {threat1, threat2};
+
+    std::vector<Evaluation::EnemyThreat> threats = {threat2, threat1};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
+TEST(SortEnemyThreatsTest, multiple_robots_have_possession_simultaneously)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = Evaluation::EnemyThreat{
+        robot1,       true, Angle::ofDegrees(50), Angle::ofDegrees(20),
+        Point(-4, 0), 0,    std::nullopt};
+
+    auto threat2 = Evaluation::EnemyThreat{
+        robot2, true,  Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0),
+        1,      robot1};
+
+    // Both robots have posession but robot2 has a better shot on the friendly goal, so
+    // it should be more threatening
+    std::vector<Evaluation::EnemyThreat> expected_result = {threat2, threat1};
+
+    std::vector<Evaluation::EnemyThreat> threats = {threat1, threat2};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
+TEST(SortEnemyThreatsTest,
+     neither_robot_has_possession_but_take_a_different_number_of_passes_to_be_reached)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = Evaluation::EnemyThreat{
+        robot1,       false, Angle::ofDegrees(50), Angle::ofDegrees(20),
+        Point(-4, 0), 1,     std::nullopt};
+
+    auto threat2 = Evaluation::EnemyThreat{
+        robot2, false, Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0),
+        2,      robot1};
+
+    // robot1 can be reached in fewer passes, so it should be more threatening
+    std::vector<Evaluation::EnemyThreat> expected_result = {threat1, threat2};
+
+    std::vector<Evaluation::EnemyThreat> threats = {threat2, threat1};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
+TEST(SortEnemyThreatsTest,
+     neither_robot_has_possession_but_can_be_reached_in_the_same_number_of_passes)
+{
+    // The exact state of the robots don't matter for these tests.
+    // Only the data in the struct matters
+    Robot robot1 = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+    Robot robot2 = Robot(1, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    auto threat1 = Evaluation::EnemyThreat{
+        robot1,      false, Angle::ofDegrees(50), Angle::ofDegrees(20), Point(-4, 0), 2,
+        std::nullopt  // The passer doesn't matter since it doesn't affect the threat
+                      // It's only for the use of whatever code uses these threat
+                      // evaluations
+    };
+
+    auto threat2 = Evaluation::EnemyThreat{
+        robot2,      false, Angle::ofDegrees(60), Angle::ofDegrees(30), Point(-4, 0), 2,
+        std::nullopt  // The passer doesn't matter since it doesn't affect the threat
+                      // It's only for the use of whatever code uses these threat
+                      // evaluations
+    };
+
+    // Robot 2 has a better view of the goal so it's more threatening
+    std::vector<Evaluation::EnemyThreat> expected_result = {threat2, threat1};
+
+    std::vector<Evaluation::EnemyThreat> threats = {threat1, threat2};
+    Evaluation::sortThreatsInDecreasingOrder(threats);
+    EXPECT_EQ(threats, expected_result);
+}
+
+TEST(EnemyThreatTest, no_enemies_on_field)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+
+    world = ::Test::TestUtil::setBallPosition(
+        world,
+        Point(world.field().friendlyGoal()) + Point(2 - ROBOT_MAX_RADIUS_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                 world.enemyTeam(), world.ball());
+
+    // Make sure we got the correct number of results
+    EXPECT_EQ(result.size(), 0);
+}
+
+
+TEST(EnemyThreatTest, single_enemy_in_front_of_net_with_ball_and_no_obstacles)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Robot enemy_robot_0 =
+        Robot(0, Point(world.field().friendlyGoal()) + Point(2, 0), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_0});
+    world.updateEnemyTeamState(enemy_team);
+
+    world = ::Test::TestUtil::setBallPosition(
+        world,
+        Point(world.field().friendlyGoal()) + Point(2 - ROBOT_MAX_RADIUS_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                 world.enemyTeam(), world.ball());
+
+    // Make sure we got the correct number of results
+    EXPECT_EQ(result.size(), 1);
+
+    auto threat = result.at(0);
+    EXPECT_EQ(threat.robot, enemy_robot_0);
+    EXPECT_TRUE(threat.has_ball);
+    EXPECT_NEAR(threat.goal_angle.toDegrees(), 30, 5);
+    ASSERT_TRUE(threat.best_shot_angle);
+    EXPECT_NEAR(threat.best_shot_angle->toDegrees(), 30, 5);
+    ASSERT_TRUE(threat.best_shot_target);
+    EXPECT_TRUE(threat.best_shot_target->isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_EQ(threat.num_passes_to_get_possession, 0);
+    ASSERT_FALSE(threat.passer);
+}
+
+TEST(EnemyThreatTest, three_enemies_vs_one_friendly)
+{
+    // This test evaluates the enemy threat for a 3-vs-1 scenario
+    //
+    //                                    enemy robot 2
+    //
+    //
+    //      enemy robot 1
+    //          ball
+    //
+    //                         friendly robot
+    //
+    //
+    //                                                    enemy robot 3
+    //
+    //
+    //                       | friendly net |
+    //                       ----------------
+    //
+    // This tests threat cases where passes between enemy robots are possible, and where
+    // different robots have significantly different views of the goal.
+    //
+    // Enemy robot 1 is the most threatening because it has the ball and has a good view
+    // of the goal. Enemy robot 2 is the second most threatening because it also has a
+    // good view of the goal, and can receive the ball quickly via a pass from enemy 1.
+    // Finally, enemy robot 3 is the least threatening because it would take 2 passes to
+    // get the ball, and doesn't have a great angle on the goal because it's off to
+    // the side
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+
+    // Robots are positioned relative to the friendly goal
+    Robot enemy_robot_1 =
+        Robot(1, world.field().friendlyGoal() + Point(1.25, 1.5), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_2 =
+        Robot(2, world.field().friendlyGoal() + Point(2, -1), Vector(0, 0), Angle::half(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot enemy_robot_3 =
+        Robot(3, world.field().friendlyGoal() + Point(0.4, -2), Vector(0, 0),
+              Angle::half(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team enemy_team = Team(Duration::fromSeconds(1));
+    enemy_team.updateRobots({enemy_robot_1, enemy_robot_2, enemy_robot_3});
+    world.updateEnemyTeamState(enemy_team);
+
+    Robot friendly_robot =
+        Robot(0, world.field().friendlyGoal() + Point(1, 0.5), Vector(0, 0),
+              Angle::zero(), AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Team friendly_team = Team(Duration::fromSeconds(1));
+    friendly_team.updateRobots({friendly_robot});
+    world.updateFriendlyTeamState(friendly_team);
+
+    // Put the ball right in front of enemy 1
+    world = ::Test::TestUtil::setBallPosition(
+        world, enemy_robot_1.position() + Point(-ROBOT_MAX_RADIUS_METERS, 0),
+        Timestamp::fromSeconds(0));
+
+    auto result = Evaluation::getAllEnemyThreats(world.field(), world.friendlyTeam(),
+                                                 world.enemyTeam(), world.ball());
+
+    // Make sure we got the correct number of results
+    EXPECT_EQ(result.size(), 3);
+
+    auto threat_0 = result.at(0);
+    EXPECT_EQ(threat_0.robot, enemy_robot_1);
+    EXPECT_TRUE(threat_0.has_ball);
+    EXPECT_NEAR(threat_0.goal_angle.toDegrees(), 15, 5);
+    ASSERT_TRUE(threat_0.best_shot_angle);
+    EXPECT_NEAR(threat_0.best_shot_angle->toDegrees(), 15, 5);
+    ASSERT_TRUE(threat_0.best_shot_target);
+    EXPECT_TRUE(threat_0.best_shot_target->isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_EQ(threat_0.num_passes_to_get_possession, 0);
+    ASSERT_FALSE(threat_0.passer);
+
+    auto threat_1 = result.at(1);
+    EXPECT_EQ(threat_1.robot, enemy_robot_2);
+    EXPECT_FALSE(threat_1.has_ball);
+    EXPECT_NEAR(threat_1.goal_angle.toDegrees(), 20, 5);
+    ASSERT_TRUE(threat_1.best_shot_angle);
+    EXPECT_NEAR(threat_1.best_shot_angle->toDegrees(), 20, 5);
+    ASSERT_TRUE(threat_1.best_shot_target);
+    EXPECT_TRUE(threat_1.best_shot_target->isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_EQ(threat_1.num_passes_to_get_possession, 1);
+    ASSERT_TRUE(threat_1.passer);
+    EXPECT_EQ(threat_1.passer, enemy_robot_1);
+
+    auto threat_2 = result.at(2);
+    EXPECT_EQ(threat_2.robot, enemy_robot_3);
+    EXPECT_FALSE(threat_2.has_ball);
+    EXPECT_NEAR(threat_2.goal_angle.toDegrees(), 5, 5);
+    ASSERT_TRUE(threat_2.best_shot_angle);
+    EXPECT_NEAR(threat_2.best_shot_angle->toDegrees(), 5, 5);
+    ASSERT_TRUE(threat_2.best_shot_target);
+    EXPECT_TRUE(threat_2.best_shot_target->isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_EQ(threat_2.num_passes_to_get_possession, 2);
+    ASSERT_TRUE(threat_2.passer);
+    EXPECT_EQ(threat_2.passer, enemy_robot_2);
 }
