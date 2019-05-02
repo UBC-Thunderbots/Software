@@ -67,7 +67,7 @@ std::optional<Robot> RobotFilter::getFilteredData(
         filtered_data.timestamp = filtered_data.timestamp.fromMilliseconds(
             filtered_data.timestamp.getMilliseconds() / data_num);
 
-        // velocity = position difference/ time difference
+        // velocity = position difference / time difference
         filtered_data.velocity =
             (filtered_data.position - current_robot_state.position()) /
             (filtered_data.timestamp.getSeconds() -

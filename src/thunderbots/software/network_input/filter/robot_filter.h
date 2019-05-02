@@ -43,7 +43,7 @@ class RobotFilter
      * Creates a new robot filter
      *
      * @param current_robot_state the data of current state of the robot
-     * @param expiry_buffer_duration the time when the robot is determined to be out of
+     * @param expiry_buffer_duration the time when the robot is determined to be removed from
      * the field if data about the robot is not received before that time
      */
     explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
