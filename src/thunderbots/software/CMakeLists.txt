@@ -645,8 +645,10 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES})
 
     catkin_add_gtest(play_test
+            ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/play/example_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
@@ -655,30 +657,35 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
+            ai/passing/evaluation.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/primitive/move_primitive.cpp
-            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
             ai/world/game_state.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
-            test/ai/hl/stp/play/main.cpp
+            geom/util.cpp
             test/ai/hl/stp/play/example_play.cpp
+            test/ai/hl/stp/play/main.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_plays/stop_test_play.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             test/test_util/test_util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
+            util/math_functions.cpp
             util/parameter/dynamic_parameters.cpp
-            util/time/timestamp.cpp
-            util/time/time.cpp
             util/time/duration.cpp
-            geom/util.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
             )
     target_link_libraries(play_test
             ${catkin_LIBRARIES}
