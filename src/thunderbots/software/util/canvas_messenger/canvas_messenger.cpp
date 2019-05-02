@@ -80,7 +80,9 @@ void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
     thunderbots_msgs::CanvasLayer new_layer;
     new_layer.data = payload;
 
-    // and publish if we have a valid ROS publisher
+    // and publish if we have a valid ROS publisher.
+    // This check is important for cases where we're running this without running ROS,
+    // such as in unit tests.
     if (publisher)
     {
         publisher->publish(new_layer);
@@ -139,9 +141,12 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
     drawSprite(layer, rectangle_sprite);
 }
 
-void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> f,
-                                   const Rectangle& area, double min_val, double max_val,
-                                   Color min_color, Color max_color, int points_per_meter)
+void CanvasMessenger::drawGradient(Layer layer,
+                                   std::function<double(Point)> valueAtPoint,
+                                   const Rectangle &area, double min_val,
+                                   double max_val,
+                                   Color min_color, Color max_color,
+                                   int points_per_meter)
 {
     for (int i = 0; i < area.width() * points_per_meter; i++)
     {
@@ -149,28 +154,26 @@ void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> f,
         {
             Point p = area.swCorner() +
                       Vector(0.5 / points_per_meter, 0.5 / points_per_meter) +
-                      Vector(i / (double)points_per_meter, j / (double)points_per_meter);
+                      Vector(i / static_cast<double>points_per_meter, j / static_cast<double>points_per_meter);
 
             // Get the value and clamp it appropriately
-            double val_at_p = std::clamp(f(p), min_val, max_val);
+            double val_at_p = std::clamp(valueAtPoint(p), min_val, max_val);
 
             // Create the "pixel" in the gradient
             Rectangle block(p - Vector(0.5 / points_per_meter, 0.5 / points_per_meter),
                             p + Vector(0.5 / points_per_meter, 0.5 / points_per_meter));
-            //            Rectangle block(area.swCorner(), area.swCorner() +
-            //            Vector(1/points_per_meter, 1/points_per_meter));
 
             // Linearly interpolate the color
-            Color color = {(uint8_t)((max_color.r - min_color.r) / (max_val - min_val) *
+            Color color = {static_cast<uint8_t>((max_color.r - min_color.r) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.r),
-                           (uint8_t)((max_color.g - min_color.g) / (max_val - min_val) *
+                           static_cast<uint8_t>((max_color.g - min_color.g) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.g),
-                           (uint8_t)((max_color.b - min_color.b) / (max_val - min_val) *
+                           static_cast<uint8_t>((max_color.b - min_color.b) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.b),
-                           (uint8_t)((max_color.a - min_color.a) / (max_val - min_val) *
+                           static_cast<uint8_t>((max_color.a - min_color.a) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.a)};
             drawRectangle(layer, block, Angle::zero(), color);

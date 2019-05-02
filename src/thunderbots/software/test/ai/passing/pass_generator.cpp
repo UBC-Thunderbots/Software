@@ -75,7 +75,10 @@ class PassGeneratorTest : public testing::Test
 
 TEST_F(PassGeneratorTest, check_pass_converges)
 {
-    // Test that we can converge to a stable pass in a fairly simple scenario
+    // Test that we can converge to a stable pass in a fairly simple scenario.
+    // It is difficult to update all the timestamps in the world that the pass generator
+    // could use, so we don't, and hence this test does not really test convergence
+    // of pass start time.
 
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({

@@ -78,7 +78,7 @@ namespace AI::Passing
          * Set the id of the robot performing the pass.
          *
          * This id will be used so we ignore the passer when determining where to
-         * pass to
+         * pass to. We assume this robot is on the friendly team.
          *
          * @param robot_id The id of the robot performing the pass
          */

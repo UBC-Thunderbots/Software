@@ -171,7 +171,9 @@ namespace Util
          * the given minimum and the maximum colors.
          *
          * @param layer The layer to draw the gradient on
-         * @param f The function representing the gradient
+         * @param valueAtPoint The function representing the gradient. This will be
+         *                     called at points over the given area to get the value
+         *                     to plot.
          * @param area The area over which to render the gradient
          * @param points_per_meter The number of points in a meter. Setting this to higher
          *                         values will give a higher resolution gradient, but be
@@ -183,7 +185,7 @@ namespace Util
          * @param min_color The color for the minimum value
          * @param max_color The color for the maximum value
          */
-        void drawGradient(Layer layer, std::function<double(Point)> f,
+        void drawGradient(Layer layer, std::function<double(Point)> valueAtPoint,
                           const Rectangle &area, double min_val, double max_val,
                           Color min_color, Color max_color, int points_per_meter);
 

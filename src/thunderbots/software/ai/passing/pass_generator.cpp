@@ -149,8 +149,6 @@ void PassGenerator::visualizePassesAndPassQualityGradient()
                          world.field().friendlyCornerPos());
     double field_length = world.field().length();
     double field_width  = world.field().width();
-    Timestamp pass_zero_time =
-        world.ball().lastUpdateTimestamp() + Duration::fromSeconds(0.0);
     world_mutex.unlock();
 
     auto best_pass_and_score      = getBestPassSoFar();

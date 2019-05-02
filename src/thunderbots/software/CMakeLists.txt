@@ -630,10 +630,11 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
-            util/parameter/dynamic_parameters.cpp
             util/math_functions.cpp
+            util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
@@ -773,14 +774,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
-            util/canvas_messenger/canvas_messenger.cpp
             test/ai/passing/evaluation.cpp
             test/ai/passing/main.cpp
             test/ai/passing/pass.cpp
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
-            util/parameter/dynamic_parameters.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             util/math_functions.cpp
+            util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
