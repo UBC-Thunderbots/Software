@@ -183,7 +183,9 @@ namespace Util
          * @param min_color The color for the minimum value
          * @param max_color The color for the maximum value
          */
-        void drawGradient(Layer layer, std::function<double(Point)> f, const Rectangle &area, double min_val, double max_val, Color min_color, Color max_color, int points_per_meter);
+        void drawGradient(Layer layer, std::function<double(Point)> f,
+                          const Rectangle &area, double min_val, double max_val,
+                          Color min_color, Color max_color, int points_per_meter);
 
         /**
          * Draw the given World

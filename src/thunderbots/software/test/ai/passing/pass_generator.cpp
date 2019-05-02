@@ -3,11 +3,11 @@
  */
 
 #include "ai/passing/pass_generator.h"
-#include "ai/passing/evaluation.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
 
+#include "ai/passing/evaluation.h"
 #include "test/test_util/test_util.h"
 
 using namespace AI::Passing;
@@ -38,20 +38,20 @@ class PassGeneratorTest : public testing::Test
     static void waitForConvergence(std::shared_ptr<PassGenerator> pass_generator,
                                    double max_score_diff, int max_num_seconds)
     {
-        int seconds_so_far = 0;
-        double curr_score  = 0;
-        double prev_score  = 0;
-        double prev_prev_score  = 0;
+        int seconds_so_far     = 0;
+        double curr_score      = 0;
+        double prev_score      = 0;
+        double prev_prev_score = 0;
         do
         {
             prev_prev_score = prev_score;
-            prev_score = curr_score;
+            prev_score      = curr_score;
 
             std::this_thread::sleep_for(1s);
             seconds_so_far++;
 
             auto curr_pass_and_score = pass_generator->getBestPassSoFar();
-            curr_score = curr_pass_and_score.second;
+            curr_score               = curr_pass_and_score.second;
             std::cout << curr_score << std::endl;
             std::cout << curr_pass_and_score.first << std::endl;
 
@@ -59,7 +59,9 @@ class PassGeneratorTest : public testing::Test
             // time has expired, whichever comes first. We also check that the score
             // is not small, otherwise we can get "false convergence" as the
             // pass just starts to "move" towards the converged point
-        } while ((std::abs(curr_score - prev_score) > max_score_diff || (std::abs(curr_score - prev_prev_score) > max_score_diff) || curr_score < 0.01) &&
+        } while ((std::abs(curr_score - prev_score) > max_score_diff ||
+                  (std::abs(curr_score - prev_prev_score) > max_score_diff) ||
+                  curr_score < 0.01) &&
                  seconds_so_far < max_num_seconds);
 
         ASSERT_LT(seconds_so_far, max_num_seconds)
@@ -151,7 +153,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored)
     waitForConvergence(pass_generator, 0.01, 30);
 
     // Find what pass we converged to
-    auto converged_pass_and_score = pass_generator->getBestPassSoFar();
+    auto converged_pass_and_score          = pass_generator->getBestPassSoFar();
     auto [converged_pass, converged_score] = converged_pass_and_score;
 
     // We expect to have converged to a point near robot 1. The tolerance is fairly
@@ -166,20 +168,18 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Put a friendly robot on the +y and -y sides of the field, both on the enemy half
     Team friendly_team(Duration::fromSeconds(10));
-    Robot pos_y_friendly =Robot(0, {2, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
-    Robot neg_y_friendly = Robot(1, {2, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                            Timestamp::fromSeconds(0));
-    friendly_team.updateRobots({
-        pos_y_friendly, neg_y_friendly
-    });
+    Robot pos_y_friendly = Robot(0, {2, 3}, {0, 0}, Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    Robot neg_y_friendly = Robot(1, {2, -3}, {0, 0}, Angle::zero(),
+                                 AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    friendly_team.updateRobots({pos_y_friendly, neg_y_friendly});
     world.updateFriendlyTeamState(friendly_team);
 
     // Put a line of enemies along the +x axis, "separating" the two friendly robots
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
         Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                Timestamp::fromSeconds(0)),
+              Timestamp::fromSeconds(0)),
         Robot(1, {0.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(2, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
@@ -194,7 +194,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
               Timestamp::fromSeconds(0)),
         Robot(7, {3.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
-                });
+    });
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);
@@ -208,11 +208,11 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     auto converged_pass_and_score = pass_generator->getBestPassSoFar();
-    auto converged_pass = converged_pass_and_score.first;
+    auto converged_pass           = converged_pass_and_score.first;
 
-    // We expect to have converged to a point near the robot in +y. The tolerance is fairly
-    // generous here because the enemies on the field can "force" the point slightly
-    // away from the chosen receiver robot
+    // We expect to have converged to a point near the robot in +y. The tolerance is
+    // fairly generous here because the enemies on the field can "force" the point
+    // slightly away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - pos_y_friendly.position()).len(), 0.5);
 
     // Set the passer point so that the only reasonable pass is to the robot
@@ -224,11 +224,10 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     converged_pass_and_score = pass_generator->getBestPassSoFar();
-    converged_pass = converged_pass_and_score.first;
+    converged_pass           = converged_pass_and_score.first;
 
-    // We expect to have converged to a point near the robot in +y. The tolerance is fairly
-    // generous here because the enemies on the field can "force" the point slightly
-    // away from the chosen receiver robot
+    // We expect to have converged to a point near the robot in +y. The tolerance is
+    // fairly generous here because the enemies on the field can "force" the point
+    // slightly away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).len(), 0.5);
 }
-

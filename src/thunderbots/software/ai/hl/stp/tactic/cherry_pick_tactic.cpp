@@ -44,8 +44,7 @@ std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
         auto [pass, score] = pass_generator.getBestPassSoFar();
-        yield(move_action.updateStateAndGetNextIntent(
-            *robot, pass.receiverPoint(),
-            pass.receiverOrientation(), 0));
+        yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
+                                                      pass.receiverOrientation(), 0));
     } while (!move_action.done());
 }

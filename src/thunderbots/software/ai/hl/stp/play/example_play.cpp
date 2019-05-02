@@ -2,7 +2,6 @@
 
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
-
 #include "ai/passing/pass_generator.h"
 
 const std::string ExamplePlay::name = "Example Play";
@@ -27,12 +26,13 @@ std::vector<std::shared_ptr<Tactic>> ExamplePlay::getNextTactics(
 {
     AI::Passing::PassGenerator pass_generator(world, world.ball().position());
 
-    do {
+    do
+    {
         pass_generator.setWorld(world);
         pass_generator.setPasserPoint(world.ball().position());
         std::this_thread::yield();
         yield({});
-    } while(true);
+    } while (true);
 
     // Create MoveTactics that will loop forever
     auto move_tactic_1 = std::make_shared<MoveTactic>(true);

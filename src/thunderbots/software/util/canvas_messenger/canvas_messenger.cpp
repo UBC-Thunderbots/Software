@@ -23,23 +23,25 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
     // Take ownership of the layers for the duration of this function
     std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
-//    // Limit rate of the message publishing
-//    // Get the time right now
-//    const std::chrono::time_point<std::chrono::system_clock> now =
-//        std::chrono::system_clock::now();
-//    const int64_t elapsed_ns =
-//        std::chrono::duration_cast<std::chrono::nanoseconds>(now - time_last_published)
-//            .count();
-//    const double elapsed_ms = elapsed_ns / 1.0e6;
-//
-//    // Do not do anything if the time passed hasn't been
-//    // long enough
-//    if (elapsed_ms < DESIRED_PERIOD_MS)
-//        return;
+    //    // Limit rate of the message publishing
+    //    // Get the time right now
+    //    const std::chrono::time_point<std::chrono::system_clock> now =
+    //        std::chrono::system_clock::now();
+    //    const int64_t elapsed_ns =
+    //        std::chrono::duration_cast<std::chrono::nanoseconds>(now -
+    //        time_last_published)
+    //            .count();
+    //    const double elapsed_ms = elapsed_ns / 1.0e6;
+    //
+    //    // Do not do anything if the time passed hasn't been
+    //    // long enough
+    //    if (elapsed_ms < DESIRED_PERIOD_MS)
+    //        return;
 
     // Make sure the layer exists
     auto layer_pair = layers_map.find(layer);
-    if (layer_pair != layers_map.end()){
+    if (layer_pair != layers_map.end())
+    {
         // First is the layer number
         const uint8_t layer_number = (uint8_t)layer_pair->first;
 
@@ -53,20 +55,20 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
         layer_pair->second = {};
     }
 
-//    // Send a payload per layer of messages
-//    for (const auto& layer_pair : this->layers_map)
-//    {
-//        // First is the layer number
-//        const uint8_t layer_number = (uint8_t)layer_pair.first;
-//
-//        // Second is the vector that contains the sprites
-//        const std::vector<Sprite>& sprites = layer_pair.second;
-//
-//        this->publishPayload(layer_number, sprites);
-//    }
-//
-//    // Update last published time
-//    time_last_published = now;
+    //    // Send a payload per layer of messages
+    //    for (const auto& layer_pair : this->layers_map)
+    //    {
+    //        // First is the layer number
+    //        const uint8_t layer_number = (uint8_t)layer_pair.first;
+    //
+    //        // Second is the vector that contains the sprites
+    //        const std::vector<Sprite>& sprites = layer_pair.second;
+    //
+    //        this->publishPayload(layer_number, sprites);
+    //    }
+    //
+    //    // Update last published time
+    //    time_last_published = now;
 }
 
 void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
@@ -88,7 +90,8 @@ void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
     new_layer.data = payload;
 
     // and publish if we have a valid ROS publisher
-    if (publisher){
+    if (publisher)
+    {
         publisher->publish(new_layer);
     }
 }
@@ -145,25 +148,40 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
     drawSprite(layer, rectangle_sprite);
 }
 
-void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> f, const Rectangle &area, double min_val, double max_val, Color min_color, Color max_color, int points_per_meter) {
-    for (int i = 0; i < area.width()*points_per_meter; i++){
-        for (int j = 0; j < area.height()*points_per_meter; j++){
-            Point p = area.swCorner() + Vector(0.5/points_per_meter, 0.5/points_per_meter) + Vector(i/(double)points_per_meter, j/(double)points_per_meter);
+void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> f,
+                                   const Rectangle& area, double min_val, double max_val,
+                                   Color min_color, Color max_color, int points_per_meter)
+{
+    for (int i = 0; i < area.width() * points_per_meter; i++)
+    {
+        for (int j = 0; j < area.height() * points_per_meter; j++)
+        {
+            Point p = area.swCorner() +
+                      Vector(0.5 / points_per_meter, 0.5 / points_per_meter) +
+                      Vector(i / (double)points_per_meter, j / (double)points_per_meter);
 
             // Get the value and clamp it appropriately
             double val_at_p = std::clamp(f(p), min_val, max_val);
 
             // Create the "pixel" in the gradient
-            Rectangle block(p - Vector(0.5/points_per_meter, 0.5/points_per_meter), p + Vector(0.5/points_per_meter, 0.5/points_per_meter));
-//            Rectangle block(area.swCorner(), area.swCorner() + Vector(1/points_per_meter, 1/points_per_meter));
+            Rectangle block(p - Vector(0.5 / points_per_meter, 0.5 / points_per_meter),
+                            p + Vector(0.5 / points_per_meter, 0.5 / points_per_meter));
+            //            Rectangle block(area.swCorner(), area.swCorner() +
+            //            Vector(1/points_per_meter, 1/points_per_meter));
 
             // Linearly interpolate the color
-            Color color = {
-                    (uint8_t)((max_color.r - min_color.r)/(max_val - min_val)*(val_at_p - min_val) + min_color.r),
-                    (uint8_t)((max_color.g - min_color.g)/(max_val - min_val)*(val_at_p - min_val) + min_color.g),
-                    (uint8_t)((max_color.b - min_color.b)/(max_val - min_val)*(val_at_p - min_val) + min_color.b),
-                    (uint8_t)((max_color.a - min_color.a)/(max_val - min_val)*(val_at_p - min_val) + min_color.a)
-            };
+            Color color = {(uint8_t)((max_color.r - min_color.r) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.r),
+                           (uint8_t)((max_color.g - min_color.g) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.g),
+                           (uint8_t)((max_color.b - min_color.b) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.b),
+                           (uint8_t)((max_color.a - min_color.a) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.a)};
             drawRectangle(layer, block, Angle::zero(), color);
         }
     }
@@ -195,7 +213,6 @@ void CanvasMessenger::drawPoint(Layer layer, const Point& p, double radius, Colo
 
 void CanvasMessenger::drawWorld(const World& world)
 {
-
     // Draw the new layer
     drawBall(world.ball());
     publishAndClearLayer(Layer::BALL);
@@ -215,7 +232,6 @@ void CanvasMessenger::drawBall(const Ball& ball)
 
 void CanvasMessenger::drawField(Field field)
 {
-
     // Draw the base of the field
     drawRectangle(Layer::STATIC_FEATURES,
                   Rectangle(field.enemyCornerNeg(), field.friendlyCornerPos()),
