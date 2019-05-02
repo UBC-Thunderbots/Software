@@ -52,8 +52,6 @@ class PassGeneratorTest : public testing::Test
 
             auto curr_pass_and_score = pass_generator->getBestPassSoFar();
             curr_score               = curr_pass_and_score.second;
-            std::cout << curr_score << std::endl;
-            std::cout << curr_pass_and_score.first << std::endl;
 
             // Run until the pass has converged with sufficient tolerance or the given
             // time has expired, whichever comes first. We also check that the score
@@ -110,9 +108,6 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     {
         std::this_thread::sleep_for(0.5s);
         auto [pass, score] = pass_generator->getBestPassSoFar();
-
-        std::cout << converged_pass << std::endl;
-        std::cout << pass << std::endl;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.3);
