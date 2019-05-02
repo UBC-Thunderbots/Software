@@ -31,8 +31,8 @@ class DribbleIntent : public Intent, public DribblePrimitive
      *
      */
     explicit DribbleIntent(unsigned int robot_id, const Point& dest,
-                           const Angle& final_angle, double final_speed, double rpm,
-                           bool small_kick_allowed, unsigned int priority);
+                           const Angle& final_angle, double rpm, bool small_kick_allowed,
+                           unsigned int priority);
 
     std::string getIntentName(void) const override;
 

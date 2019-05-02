@@ -547,32 +547,36 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/chip_action.cpp
+            ai/hl/stp/action/dribble_action.cpp
+            ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/movespin_action.cpp
-            ai/hl/stp/action/kick_action.cpp
-            ai/hl/stp/action/chip_action.cpp
             ai/hl/stp/action/pivot_action.cpp
             ai/intent/intent.cpp
+            ai/intent/chip_intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
             ai/intent/pivot_intent.cpp
-            ai/intent/kick_intent.cpp
-            ai/primitive/pivot_primitive.cpp
-            ai/intent/chip_intent.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
-            ai/primitive/kick_primitive.cpp
-            ai/primitive/chip_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/world/robot.cpp
             ai/world/ball.cpp
             test/ai/hl/stp/action/main.cpp
             test/ai/hl/stp/test_actions/move_test_action.cpp
             test/ai/hl/stp/action/action.cpp
+            test/ai/hl/stp/action/chip_action.cpp
+            test/ai/hl/stp/action/dribble_action.cpp
+            test/ai/hl/stp/action/kick_action.cpp
             test/ai/hl/stp/action/move_action.cpp
             test/ai/hl/stp/action/movespin_action.cpp
-            test/ai/hl/stp/action/kick_action.cpp
-            test/ai/hl/stp/action/chip_action.cpp
             test/ai/hl/stp/action/pivot_action.cpp
             geom/polygon.cpp
             geom/util.cpp
@@ -881,6 +885,22 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(polygon_test
             ${catkin_LIBRARIES}
             ${G3LOG})
+
+
+    catkin_add_gtest(robot_filter_test
+            test/network_input/filter/robot_filter.cpp
+            test/network_input/filter/main.cpp
+            network_input/filter/robot_filter.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            ai/world/robot.cpp
+            )
+    target_link_libraries(robot_filter_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+    
 endif()
 
 ##### ROSTests / Integration Tests #####

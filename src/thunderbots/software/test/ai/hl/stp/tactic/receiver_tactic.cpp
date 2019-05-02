@@ -27,18 +27,18 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
 
-    // We should be moving towards the position to receive the ball, and turning to
-    // face the direction the pass is coming from
+    Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
+
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
     EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
-    EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
+    EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_intent.getFinalAngle());
     EXPECT_FALSE(move_intent.isDribblerEnabled());
     EXPECT_FALSE(move_intent.isAutoKickEnabled());
 }
@@ -58,8 +58,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
 
     Ball ball({1, 1}, {0, 0}, Timestamp::fromSeconds(0));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
 
@@ -70,11 +70,14 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     {
         tactic.updateParams(friendly_team, enemy_team, pass, ball);
 
+        Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
+
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
         EXPECT_EQ(13, move_intent.getRobotId());
         EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
         EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
-        EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
+        EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
+                  move_intent.getFinalAngle());
         EXPECT_FALSE(move_intent.isDribblerEnabled());
         EXPECT_FALSE(move_intent.isAutoKickEnabled());
     }
@@ -97,8 +100,8 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
 
     Ball ball({1, -3}, {-1, 3}, Timestamp::fromSeconds(5));
 
-    ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
-                          enemy_team, pass, ball, false);
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    ReceiverTactic tactic(field, friendly_team, enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
 
@@ -107,7 +110,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     MoveIntent move_intent = dynamic_cast<MoveIntent &>(*tactic.getNextIntent());
     EXPECT_EQ(13, move_intent.getRobotId());
     EXPECT_LT(move_intent.getDestination().x(), -0.001);
-    EXPECT_GT(move_intent.getDestination().x(), -0.1);
+    EXPECT_GT(move_intent.getDestination().x(), -0.2);
 
     EXPECT_GT(move_intent.getDestination().y(), 0.001);
     EXPECT_LT(move_intent.getDestination().y(), 0.1);
@@ -213,19 +216,26 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({});
 
-    // Position the ball just in front of the robot dribbler
-    Point ball_pos = receiver.position() +
-                     Vector(receiver.orientation().cos(), receiver.orientation().sin())
-                         .norm(DIST_TO_FRONT_OF_ROBOT_METERS + 0.02);
-    Ball ball(ball_pos, {0, 0}, Timestamp::fromSeconds(5));
+    // Ball is travelling towards the robot
+    Ball ball({-0.5, 0.5}, {-1, 1}, Timestamp::fromSeconds(5));
 
     ReceiverTactic tactic(::Test::TestUtil::createSSLDivBField(), friendly_team,
                           enemy_team, pass, ball, false);
 
     tactic.updateRobot(receiver);
 
+    // We should yield one intent here
+    EXPECT_TRUE(tactic.getNextIntent());
+
+    // Position the ball just in front of the robot dribbler
+    Point ball_pos = receiver.position() +
+                     Vector(receiver.orientation().cos(), receiver.orientation().sin())
+                         .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+    ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
+    tactic.updateParams(friendly_team, enemy_team, pass, ball);
+
     // Since we've received the ball, we shouldn't yield anything
-    EXPECT_EQ(std::unique_ptr<Intent>({}), tactic.getNextIntent());
+    EXPECT_FALSE(tactic.getNextIntent());
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
