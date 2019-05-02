@@ -229,3 +229,38 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
     // slightly away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - neg_y_friendly.position()).len(), 0.5);
 }
+
+TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_region)
+{
+    // Test that when given a target region, the pass generator returns a pass
+    // with the receiver point in that target region
+
+    pass_generator->setPasserPoint({3, 3});
+    Rectangle target_region({0.5, 0.5}, {1.5, -0.5});
+    pass_generator->setTargetRegion(target_region);
+
+    Team friendly_team(Duration::fromSeconds(10));
+    friendly_team.updateRobots({
+        Robot(0, {1, -1.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateFriendlyTeamState(friendly_team);
+
+    Team enemy_team(Duration::fromSeconds(10));
+    enemy_team.updateRobots({
+        Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
+    world.updateEnemyTeamState(enemy_team);
+    pass_generator->setWorld(world);
+
+    // Wait for the pass to converge, or 30 seconds, whichever come first
+    waitForConvergence(pass_generator, 0.001, 30);
+
+    // With no target region set, the pass generator would like to pass more to
+    // the -y side of the field (away from the enemy and closer to the friendly).
+    // With a target region set, we expect the receiver point to be within the
+    // target region instead.
+    auto [converged_pass, score] = pass_generator->getBestPassSoFar();
+    EXPECT_TRUE(target_region.containsPoint(converged_pass.receiverPoint()));
+}
