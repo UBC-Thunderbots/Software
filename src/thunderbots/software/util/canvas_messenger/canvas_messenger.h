@@ -39,9 +39,9 @@ namespace Util
         enum class Layer
         {
             PASS_GENERATION,
-            STATIC_FEATURES,
+            BALL,
             ROBOTS,
-            BALL
+            STATIC_FEATURES,
         };
 
         struct Color
