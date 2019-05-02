@@ -47,8 +47,6 @@ void PassGenerator::setPasserPoint(Point passer_point)
 
     // Update the passer point
     this->passer_point = passer_point;
-
-    // TODO: We need to update the passer point for every pass that we are optimizing
 }
 
 void PassGenerator::setPasserRobotId(unsigned int robot_id)
@@ -121,7 +119,7 @@ void PassGenerator::continuouslyGeneratePasses()
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
-        visualizeStuff();
+        visualizePassesAndPassQualityGradient();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -133,7 +131,7 @@ void PassGenerator::continuouslyGeneratePasses()
     }
 }
 
-void PassGenerator::visualizeStuff() {
+void PassGenerator::visualizePassesAndPassQualityGradient() {
     // Take ownership of the world for the duration of this function
     std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
 

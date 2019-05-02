@@ -124,7 +124,10 @@ namespace AI::Passing
 
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
-        // TODO: COMMENTS FOR WHY WEIGHTS ARE WHAT THEY ARE (ie. they are *very* roughly the step size we want to take in each dimension per iteration)
+        // These weights are *very* roughly the step that gradient descent will take
+        // in each respective dimension for a single iteration. They are tuned to
+        // ensure passes converge as fast as possible, but are also as stable as
+        // possible
         static constexpr double PASS_SPACE_WEIGHT                          = 0.01;
         static constexpr double PASS_TIME_WEIGHT                           = 0.01;
         static constexpr double PASS_SPEED_WEIGHT                          = 0.1;
@@ -154,10 +157,10 @@ namespace AI::Passing
         void saveBestPass();
 
         /**
-         * Perform all the drawing operations to represent this PassGenerator
+         * Draws all the passes we are currently optimizing and the gradient of pass
+         * receive position quality over the field
          */
-         // TODO: rename this
-        void visualizeStuff();
+        void visualizePassesAndPassQualityGradient();
 
         /**
          * Get the number of passes to keep after pruning
