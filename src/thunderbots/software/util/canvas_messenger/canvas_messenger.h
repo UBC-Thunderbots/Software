@@ -240,7 +240,8 @@ namespace Util
         /**
          * Struct that holds some sprites and a time
          */
-        struct SpritesAndTime {
+        struct SpritesAndTime
+        {
             std::vector<Sprite> sprites;
             std::chrono::time_point<std::chrono::system_clock> time;
         };

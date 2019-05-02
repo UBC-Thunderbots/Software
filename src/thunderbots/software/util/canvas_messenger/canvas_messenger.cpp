@@ -37,15 +37,15 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
         // Second is the vector that contains the sprites
         const std::vector<Sprite>& sprites = layer_pair->second.sprites;
 
-        const int64_t elapsed_ns =
-                std::chrono::duration_cast<std::chrono::nanoseconds>(now -
-                                                                     layer_pair->second.time)
-                        .count();
+        const int64_t elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       now - layer_pair->second.time)
+                                       .count();
         const double elapsed_ms = elapsed_ns / 1.0e6;
 
         // Publish the layer if enough time has passed since we
         // last published
-        if (elapsed_ms >= DESIRED_PERIOD_MS){
+        if (elapsed_ms >= DESIRED_PERIOD_MS)
+        {
             // Publish the layer
             this->publishPayload(layer_number, sprites);
 
@@ -137,12 +137,9 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
     drawSprite(layer, rectangle_sprite);
 }
 
-void CanvasMessenger::drawGradient(Layer layer,
-                                   std::function<double(Point)> valueAtPoint,
-                                   const Rectangle &area, double min_val,
-                                   double max_val,
-                                   Color min_color, Color max_color,
-                                   int points_per_meter)
+void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> valueAtPoint,
+                                   const Rectangle& area, double min_val, double max_val,
+                                   Color min_color, Color max_color, int points_per_meter)
 {
     for (int i = 0; i < area.width() * points_per_meter; i++)
     {
@@ -150,7 +147,8 @@ void CanvasMessenger::drawGradient(Layer layer,
         {
             Point p = area.swCorner() +
                       Vector(0.5 / points_per_meter, 0.5 / points_per_meter) +
-                      Vector(i / static_cast<double>(points_per_meter), j / static_cast<double>(points_per_meter));
+                      Vector(i / static_cast<double>(points_per_meter),
+                             j / static_cast<double>(points_per_meter));
 
             // Get the value and clamp it appropriately
             double val_at_p = std::clamp(valueAtPoint(p), min_val, max_val);
@@ -160,16 +158,17 @@ void CanvasMessenger::drawGradient(Layer layer,
                             p + Vector(0.5 / points_per_meter, 0.5 / points_per_meter));
 
             // Linearly interpolate the color
-            Color color = {static_cast<uint8_t>((max_color.r - min_color.r) / (max_val - min_val) *
+            Color color = {
+                static_cast<uint8_t>((max_color.r - min_color.r) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.r),
-                           static_cast<uint8_t>((max_color.g - min_color.g) / (max_val - min_val) *
+                static_cast<uint8_t>((max_color.g - min_color.g) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.g),
-                           static_cast<uint8_t>((max_color.b - min_color.b) / (max_val - min_val) *
+                static_cast<uint8_t>((max_color.b - min_color.b) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.b),
-                           static_cast<uint8_t>((max_color.a - min_color.a) / (max_val - min_val) *
+                static_cast<uint8_t>((max_color.a - min_color.a) / (max_val - min_val) *
                                          (val_at_p - min_val) +
                                      min_color.a)};
             drawRectangle(layer, block, Angle::zero(), color);

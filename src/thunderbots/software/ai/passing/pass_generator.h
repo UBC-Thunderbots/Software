@@ -37,7 +37,12 @@ namespace AI::Passing
      * time. This is because a pass is defined in part by it's start time. If the
      * pass generator only completes an interation of pass updates once every 5 seconds,
      * then the start times for the passes will be in the past (if we choose to pass
-     * very soon when optimizing the pass), and so the passes will likely be invalid by the time another iteration starts. Because of this, it isextremely important that the pass generator runs fast enough. Debug builds running on slightly slower computers could be unable to converge. It is recommended that all testing of things involving the PassGenerator be done with executables built in "Release" in order to maximize performance ("Release" can be 2-10x faster then "Debug").
+     * very soon when optimizing the pass), and so the passes will likely be invalid by
+     * the time another iteration starts. Because of this, it isextremely important that
+     * the pass generator runs fast enough. Debug builds running on slightly slower
+     * computers could be unable to converge. It is recommended that all testing of things
+     * involving the PassGenerator be done with executables built in "Release" in order to
+     * maximize performance ("Release" can be 2-10x faster then "Debug").
      */
     class PassGenerator
     {
