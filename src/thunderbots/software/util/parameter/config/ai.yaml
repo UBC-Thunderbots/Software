@@ -84,7 +84,7 @@ AI:
         upper bound on the pass start time, relative to the current time. This is in
         seconds.
     num_passes_to_optimize:
-      min: 0
+      min: 1
       max: 1000
       default: 30
       type: "int"

@@ -30,7 +30,7 @@ class PassGeneratorTest : public testing::Test
      * cause the test to fail
      *
      * @param pass_generator Modified in-place
-     * @param max_score_diff The maximum absolute difference between the scores of two
+     * @param max_score_diff The maximum absolute difference between the scores of three
      *                       consecutive optimized passes before this function returns
      * @param max_num_seconds The maximum number of seconds that the pass optimizer
      *                        can run for before this function returns
@@ -41,24 +41,25 @@ class PassGeneratorTest : public testing::Test
         int seconds_so_far = 0;
         double curr_score  = 0;
         double prev_score  = 0;
+        double prev_prev_score  = 0;
         do
         {
+            prev_prev_score = prev_score;
             prev_score = curr_score;
+
             std::this_thread::sleep_for(1s);
             seconds_so_far++;
+
             auto curr_pass_and_score = pass_generator->getBestPassSoFar();
-            if (curr_pass_and_score)
-            {
-                curr_score = curr_pass_and_score->second;
-                std::cout << curr_score << std::endl;
-                std::cout << curr_pass_and_score->first << std::endl;
-            }
+            curr_score = curr_pass_and_score.second;
+            std::cout << curr_score << std::endl;
+            std::cout << curr_pass_and_score.first << std::endl;
 
             // Run until the pass has converged with sufficient tolerance or the given
             // time has expired, whichever comes first. We also check that the score
-            // is not very small, otherwise we can get "false convergence" as the
+            // is not small, otherwise we can get "false convergence" as the
             // pass just starts to "move" towards the converged point
-        } while ((std::abs(curr_score - prev_score) > max_score_diff || curr_score < 0.001) &&
+        } while ((std::abs(curr_score - prev_score) > max_score_diff || (std::abs(curr_score - prev_prev_score) > max_score_diff) || curr_score < 0.01) &&
                  seconds_so_far < max_num_seconds);
 
         ASSERT_LT(seconds_so_far, max_num_seconds)
@@ -97,18 +98,13 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     waitForConvergence(pass_generator, 0.01, 30);
 
     // Find what pass we converged to
-    auto converged_pass_and_score = pass_generator->getBestPassSoFar();
-    ASSERT_TRUE(converged_pass_and_score);
-    auto [converged_pass, converged_score] = *converged_pass_and_score;
+    auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();
 
     // Check that we keep converging to the same pass
     for (int i = 0; i < 7; i++)
     {
         std::this_thread::sleep_for(0.5s);
-        auto pass_and_score = pass_generator->getBestPassSoFar();
-        ASSERT_TRUE(pass_and_score);
-
-        auto [pass, score] = *pass_and_score;
+        auto [pass, score] = pass_generator->getBestPassSoFar();
 
         std::cout << converged_pass << std::endl;
         std::cout << pass << std::endl;
@@ -156,8 +152,7 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored)
 
     // Find what pass we converged to
     auto converged_pass_and_score = pass_generator->getBestPassSoFar();
-    ASSERT_TRUE(converged_pass_and_score);
-    auto [converged_pass, converged_score] = *converged_pass_and_score;
+    auto [converged_pass, converged_score] = converged_pass_and_score;
 
     // We expect to have converged to a point near robot 1. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
@@ -213,8 +208,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     auto converged_pass_and_score = pass_generator->getBestPassSoFar();
-    ASSERT_TRUE(converged_pass_and_score);
-    auto converged_pass = converged_pass_and_score->first;
+    auto converged_pass = converged_pass_and_score.first;
 
     // We expect to have converged to a point near the robot in +y. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
@@ -230,8 +224,7 @@ TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)
 
     // Find what pass we converged to
     converged_pass_and_score = pass_generator->getBestPassSoFar();
-    ASSERT_TRUE(converged_pass_and_score);
-    converged_pass = converged_pass_and_score->first;
+    converged_pass = converged_pass_and_score.first;
 
     // We expect to have converged to a point near the robot in +y. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly

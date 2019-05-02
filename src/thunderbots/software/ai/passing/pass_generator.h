@@ -32,8 +32,17 @@ namespace AI::Passing
      * a lock in A, then call B, which also requires a lock, then the threads will
      * deadlock and everything will grind to a halt.
      *
-     * // TODO: Make notes here about how the pass generator needs to be fast enough in order to "keep up" with time
-     *
+     * == Performance Considerations ==
+     * It is important that the pass generator is able to "keep up" with the current
+     * time. This is because a pass is defined in part by it's start time. If the
+     * pass generator only completes an interation of pass updates once every 5 seconds,
+     * then the start times for the passes will be in the past, and so the passes will
+     * likely be invalid by the time another iteration starts. Because of this, it is
+     * extremely importatnt that the pass generator runs fast enough. Debug builds
+     * running on slightly slower computers could be unable to converge. It is
+     * recommended that all testing of things involving the PassGenerator be done with
+     * executables built in "Release" in order to maximize performance ("Release" can
+     * be 2-10x faster then "Debug").
      */
     class PassGenerator
     {
@@ -97,11 +106,9 @@ namespace AI::Passing
          * Gradient descent must be allowed to run for some number of iterations before
          * this can be used to get a reasonable value.
          *
-         * @return The best currently known pass and the rating of that pass (in [0-1)
-         *         or `std::nullopt` if there is no reasonable pass,
+         * @return The best currently known pass and the rating of that pass (in [0-1])
          */
-         // TODO: There's no need for this to return an optional anymore
-        std::optional<std::pair<Pass, double>> getBestPassSoFar();
+        std::pair<Pass, double> getBestPassSoFar();
 
         /**
          * Destructs this PassGenerator
@@ -151,6 +158,20 @@ namespace AI::Passing
          */
          // TODO: rename this
         void visualizeStuff();
+
+        /**
+         * Get the number of passes to keep after pruning
+         *
+         * @return the number of passes to keep after pruning
+         */
+        unsigned int getNumPassesToKeepAfterPruning();
+
+        /**
+         * Get the number of passes to optimize
+         *
+         * @return the number of passes to optimize
+         */
+        unsigned int getNumPassesToOptimize();
 
         /**
          * Convert the given pass to an array
@@ -277,7 +298,7 @@ namespace AI::Passing
         std::mutex best_known_pass_mutex;
 
         // The best pass we currently know about
-        std::optional<Pass> best_known_pass;
+        Pass best_known_pass;
 
         // All the passes that we are currently trying to optimize in gradient descent
         std::vector<Pass> passes_to_optimize;
