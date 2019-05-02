@@ -36,13 +36,8 @@ namespace AI::Passing
      * It is important that the pass generator is able to "keep up" with the current
      * time. This is because a pass is defined in part by it's start time. If the
      * pass generator only completes an interation of pass updates once every 5 seconds,
-     * then the start times for the passes will be in the past, and so the passes will
-     * likely be invalid by the time another iteration starts. Because of this, it is
-     * extremely importatnt that the pass generator runs fast enough. Debug builds
-     * running on slightly slower computers could be unable to converge. It is
-     * recommended that all testing of things involving the PassGenerator be done with
-     * executables built in "Release" in order to maximize performance ("Release" can
-     * be 2-10x faster then "Debug").
+     * then the start times for the passes will be in the past (if we choose to pass
+     * very soon when optimizing the pass), and so the passes will likely be invalid by the time another iteration starts. Because of this, it isextremely important that the pass generator runs fast enough. Debug builds running on slightly slower computers could be unable to converge. It is recommended that all testing of things involving the PassGenerator be done with executables built in "Release" in order to maximize performance ("Release" can be 2-10x faster then "Debug").
      */
     class PassGenerator
     {
@@ -129,8 +124,8 @@ namespace AI::Passing
         // ensure passes converge as fast as possible, but are also as stable as
         // possible
         static constexpr double PASS_SPACE_WEIGHT                          = 0.01;
-        static constexpr double PASS_TIME_WEIGHT                           = 0.01;
-        static constexpr double PASS_SPEED_WEIGHT                          = 0.1;
+        static constexpr double PASS_TIME_WEIGHT                           = 0.1;
+        static constexpr double PASS_SPEED_WEIGHT                          = 0.01;
         std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
             PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_TIME_WEIGHT, PASS_SPEED_WEIGHT};
 

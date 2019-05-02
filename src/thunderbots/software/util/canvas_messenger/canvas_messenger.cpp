@@ -23,20 +23,19 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
     // Take ownership of the layers for the duration of this function
     std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
-    //    // Limit rate of the message publishing
-    //    // Get the time right now
-    //    const std::chrono::time_point<std::chrono::system_clock> now =
-    //        std::chrono::system_clock::now();
-    //    const int64_t elapsed_ns =
-    //        std::chrono::duration_cast<std::chrono::nanoseconds>(now -
-    //        time_last_published)
-    //            .count();
-    //    const double elapsed_ms = elapsed_ns / 1.0e6;
-    //
-    //    // Do not do anything if the time passed hasn't been
-    //    // long enough
-    //    if (elapsed_ms < DESIRED_PERIOD_MS)
-    //        return;
+        // Get the time right now
+        const std::chrono::time_point<std::chrono::system_clock> now =
+            std::chrono::system_clock::now();
+        const int64_t elapsed_ns =
+            std::chrono::duration_cast<std::chrono::nanoseconds>(now -
+            time_last_published)
+                .count();
+        const double elapsed_ms = elapsed_ns / 1.0e6;
+
+        // Do not do anything if the time passed hasn't been
+        // long enough
+        if (elapsed_ms < DESIRED_PERIOD_MS)
+            return;
 
     // Make sure the layer exists
     auto layer_pair = layers_map.find(layer);
@@ -48,27 +47,19 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
         // Second is the vector that contains the sprites
         const std::vector<Sprite>& sprites = layer_pair->second;
 
-        // Publish the layer
-        this->publishPayload(layer_number, sprites);
+        // Publish the layer if enough time has passed since we
+        // last published
+        if (elapsed_ms >= DESIRED_PERIOD_MS){
+            // Publish the layer
+            this->publishPayload(layer_number, sprites);
+
+            // Update last published time
+            time_last_published = now;
+        }
 
         // Clear the layer
         layer_pair->second = {};
     }
-
-    //    // Send a payload per layer of messages
-    //    for (const auto& layer_pair : this->layers_map)
-    //    {
-    //        // First is the layer number
-    //        const uint8_t layer_number = (uint8_t)layer_pair.first;
-    //
-    //        // Second is the vector that contains the sprites
-    //        const std::vector<Sprite>& sprites = layer_pair.second;
-    //
-    //        this->publishPayload(layer_number, sprites);
-    //    }
-    //
-    //    // Update last published time
-    //    time_last_published = now;
 }
 
 void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)

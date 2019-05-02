@@ -117,7 +117,9 @@ void PassGenerator::continuouslyGeneratePasses()
         updated_world_mutex.unlock();
         world_mutex.unlock();
 
+        passer_point_mutex.lock();
         updatePasserPointOfAllPasses(passer_point);
+        passer_point_mutex.unlock();
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
@@ -135,7 +137,7 @@ void PassGenerator::continuouslyGeneratePasses()
 
 void PassGenerator::visualizePassesAndPassQualityGradient()
 {
-    // Take ownership of the world for the duration of this function
+    // Take ownership of the passer point for the duration of this function
     std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
 
     // Draw all the points we have so far
@@ -156,12 +158,6 @@ void PassGenerator::visualizePassesAndPassQualityGradient()
     const auto objective_function = [&](Point p) {
         try
         {
-            double pass_speed =
-                (max_pass_speed_m_per_s.value() + min_pass_speed_m_per_s.value()) / 2;
-            Timestamp pass_time =
-                pass_zero_time +
-                Duration::fromSeconds(min_time_offset_for_pass_seconds.value() +
-                                      max_time_offset_for_pass_seconds.value());
             Pass pass(passer_point, p, best_pass.speed(), best_pass.startTime());
             return ratePass(pass);
         }
