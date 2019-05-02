@@ -274,13 +274,13 @@ void PassGenerator::saveBestPass()
 unsigned int PassGenerator::getNumPassesToKeepAfterPruning() {
     // We want to use the parameter value for this, but clamp it so that it is
     // <= the number of passes we're optimizing
-    return std::min((unsigned int)num_passes_to_keep_after_pruning.value(), getNumPassesToOptimize());
+    return std::min(static_cast<unsigned int>(num_passes_to_keep_after_pruning.value()), getNumPassesToOptimize());
 }
 
 unsigned int PassGenerator::getNumPassesToOptimize() {
     // We want to use the parameter value for this, but clamp it so that it is
     // >= 1 so we are always optimizing at least one pass
-    return std::max((unsigned int)num_passes_to_optimize.value(), (unsigned int)1);
+    return std::max(static_cast<unsigned int>(num_passes_to_optimize.value()), static_cast<unsigned int>(1));
 }
 
 void PassGenerator::updatePasserPointOfAllPasses(const Point &new_passer_point) {
