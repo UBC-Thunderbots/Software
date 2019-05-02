@@ -1,6 +1,8 @@
 #include "field.h"
 
 #include "geom/rectangle.h"
+#include "util/time/timestamp.h"
+#include "boost/circular_buffer.hpp"
 
 Field::Field(double field_length, double field_width, double defense_length,
              double defense_width, double goal_width, double boundary_width,
@@ -181,6 +183,14 @@ bool Field::pointInEnemyDefenseArea(const Point p) const
 bool Field::pointInFieldLines(const Point &p) const
 {
     return fieldLines().containsPoint(p);
+}
+
+boost::circular_buffer<Timestamp> Field::getTimestampHistory() {
+    return last_update_timestamps;
+}
+
+Timestamp Field::getMostRecentTimestamp() {
+    return last_update_timestamps.front();
 }
 
 bool Field::operator==(const Field &other) const

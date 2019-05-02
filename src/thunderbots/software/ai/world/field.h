@@ -2,6 +2,8 @@
 
 #include "geom/point.h"
 #include "geom/rectangle.h"
+#include "util/time/timestamp.h"
+#include "boost/circular_buffer.hpp"
 
 typedef enum
 {
@@ -26,10 +28,11 @@ class Field
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
+     * @param timestamp the Timestamp associated with the creation of the Field object
      */
     explicit Field(double field_length, double field_width, double defense_length,
                    double defense_width, double goal_width, double boundary_width,
-                   double center_circle_radius);
+                   double center_circle_radius, Timestamp& timestamp);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -42,10 +45,11 @@ class Field
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
+     * @param timestamp the Timestamp corresponding to any updates to the Field object
      */
     void updateDimensions(double field_length, double field_width, double defense_length,
                           double defense_width, double goal_width, double boundary_width,
-                          double center_circle_radius);
+                          double center_circle_radius, Timestamp& timestamp);
 
     /**
      * Updates the field with new data
@@ -267,6 +271,20 @@ class Field
     bool operator==(const Field &other) const;
 
     /**
+     * Returns the entire update Timestamp history for Field object
+     *
+     * @return boost::circular_buffer of Timestamp history for the Field object
+     */
+    boost::circular_buffer<Timestamp> getTimestampHistory();
+
+    /**
+     * Returns the most Timestamp corresponding to the most recent update to Field object
+     *
+     * @return Timestamp : The Timestamp corresponding to the most recent update to the Field object
+     */
+    Timestamp getMostRecentTimestamp();
+
+    /**
      * Compares two fields for inequality
      *
      * @param other the field the compare to
@@ -293,4 +311,7 @@ class Field
     double boundary_width_;
     // The radius of the center circle in metres
     double center_circle_radius_;
+    // All previous timestamps of when the field was updated, with the most recent
+    // timestamp at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };
