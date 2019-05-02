@@ -84,21 +84,21 @@ AI:
         upper bound on the pass start time, relative to the current time. This is in
         seconds.
     num_passes_to_optimize:
-      min: 0
+      min: 1
       max: 1000
-      default: 50
+      default: 30
       type: "int"
       description: "The number of passes to try to optimize at any given time"
     num_passes_to_keep_after_pruning:
       min: 0
       max: 1000
-      default: 10
+      default: 5
       type: "int"
       description: "The number of passes to keep after pruning"
     number_of_gradient_descent_steps_per_iter:
       min: 0
       max: 1000
-      default: 20
+      default: 10
       type: "int"
       description: "The number of steps of gradient descent to perform in each iteration"
     pass_equality_max_position_difference_meters:

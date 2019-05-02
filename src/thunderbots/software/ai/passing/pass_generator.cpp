@@ -10,19 +10,19 @@
 using namespace AI::Passing;
 using namespace Util::DynamicParameters::AI::Passing;
 
-PassGenerator::PassGenerator(double min_reasonable_pass_quality, const World& world,
-                             const Point& passer_point)
-    : min_reasonable_pass_quality(min_reasonable_pass_quality),
-      updated_world(world),
+PassGenerator::PassGenerator(const World& world, const Point& passer_point)
+    : updated_world(world),
+      world(world),
+      passer_robot_id(std::nullopt),
       optimizer(optimizer_param_weights),
       passer_point(passer_point),
-      best_known_pass(std::nullopt),
+      best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
       random_num_gen(random_device()),
       in_destructor(false)
 {
     // Generate the initial set of passes
-    passes_to_optimize = generatePasses(num_passes_to_optimize.value());
+    passes_to_optimize = generatePasses(getNumPassesToOptimize());
 
     // Start the thread to do the pass generation in the background
     // The lambda expression here is needed so that we can call
@@ -49,12 +49,22 @@ void PassGenerator::setPasserPoint(Point passer_point)
     this->passer_point = passer_point;
 }
 
-std::optional<Pass> PassGenerator::getBestPassSoFar()
+void PassGenerator::setPasserRobotId(unsigned int robot_id)
+{
+    // Take ownershp of the passer robot id for the duration of this function
+    std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);
+
+    this->passer_robot_id = robot_id;
+}
+
+std::pair<Pass, double> PassGenerator::getBestPassSoFar()
 {
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
-    return best_known_pass;
+    Pass best_known_pass_copy = best_known_pass;
+    return std::make_pair<Pass, double>(std::move(best_known_pass_copy),
+                                        ratePass(best_known_pass));
 }
 
 void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
@@ -92,16 +102,28 @@ void PassGenerator::continuouslyGeneratePasses()
         // conditional check
         in_destructor_mutex.unlock();
 
-        // Copy over the updated world
+        // Copy over the updated world and remove the passer robot
         world_mutex.lock();
         updated_world_mutex.lock();
+        passer_robot_id_mutex.lock();
+
         world = updated_world;
+        if (passer_robot_id)
+        {
+            world.mutableFriendlyTeam().removeRobotWithId(*passer_robot_id);
+        }
+
+        passer_robot_id_mutex.unlock();
         updated_world_mutex.unlock();
         world_mutex.unlock();
 
+        passer_point_mutex.lock();
+        updatePasserPointOfAllPasses(passer_point);
+        passer_point_mutex.unlock();
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
+        visualizePassesAndPassQualityGradient();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -111,6 +133,49 @@ void PassGenerator::continuouslyGeneratePasses()
         // check
         in_destructor_mutex.lock();
     }
+}
+
+void PassGenerator::visualizePassesAndPassQualityGradient()
+{
+    // Take ownership of the passer point for the duration of this function
+    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
+
+    // Draw all the points we have so far
+    auto canvas_messenger = Util::CanvasMessenger::getInstance();
+
+    // Get field characteristics and the current time
+    world_mutex.lock();
+    Rectangle field_area(world.field().enemyCornerNeg(),
+                         world.field().friendlyCornerPos());
+    double field_length = world.field().length();
+    double field_width  = world.field().width();
+    world_mutex.unlock();
+
+    auto best_pass_and_score      = getBestPassSoFar();
+    auto [best_pass, best_score]  = best_pass_and_score;
+    const auto objective_function = [&](Point p) {
+        try
+        {
+            Pass pass(passer_point, p, best_pass.speed(), best_pass.startTime());
+            return ratePass(pass);
+        }
+        catch (std::invalid_argument& e)
+        {
+            return 0.0;
+        }
+    };
+    canvas_messenger->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
+                                   objective_function, field_area, 0, 1, {0, 0, 255, 160},
+                                   {255, 0, 0, 160}, 4);
+    canvas_messenger->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION,
+                                best_pass.receiverPoint(), 0.05, {0, 255, 0, 255});
+    for (const Pass& pass : passes_to_optimize)
+    {
+        canvas_messenger->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION,
+                                    pass.receiverPoint(), 0.03, {0, 255, 0, 150});
+    }
+
+    canvas_messenger->publishAndClearLayer(Util::CanvasMessenger::Layer::PASS_GENERATION);
 }
 
 void PassGenerator::optimizePasses()
@@ -176,17 +241,13 @@ void PassGenerator::pruneAndReplacePasses()
             return passes;
         });
 
-    // Replace the least promising passes with newly generated passes
-    if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value() &&
-        num_passes_to_keep_after_pruning.value() < passes_to_optimize.size())
-    {
-        passes_to_optimize.erase(
-            passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
-            passes_to_optimize.end());
-    }
+    // Replace the least promising passes
+    passes_to_optimize.erase(
+        passes_to_optimize.begin() + getNumPassesToKeepAfterPruning(),
+        passes_to_optimize.end());
 
     // Generate new passes to replace the ones we just removed
-    int num_new_passes = num_passes_to_optimize.value() - passes_to_optimize.size();
+    int num_new_passes = getNumPassesToOptimize() - passes_to_optimize.size();
     if (num_new_passes > 0)
     {
         std::vector<Pass> new_passes = generatePasses(num_new_passes);
@@ -205,14 +266,36 @@ void PassGenerator::saveBestPass()
     std::sort(
         passes_to_optimize.begin(), passes_to_optimize.end(),
         [this](auto pass1, auto pass2) { return comparePassQuality(pass1, pass2); });
-    if (!passes_to_optimize.empty() &&
-        ratePass(passes_to_optimize[0]) >= min_reasonable_pass_quality)
+    if (passes_to_optimize.empty())
     {
-        best_known_pass = std::optional(passes_to_optimize[0]);
+        throw std::runtime_error(
+            "passes_to_optimize is empty in PassGenerator, this should never happen");
     }
-    else
+    best_known_pass = passes_to_optimize[0];
+}
+
+unsigned int PassGenerator::getNumPassesToKeepAfterPruning()
+{
+    // We want to use the parameter value for this, but clamp it so that it is
+    // <= the number of passes we're optimizing
+    return std::min(static_cast<unsigned int>(num_passes_to_keep_after_pruning.value()),
+                    getNumPassesToOptimize());
+}
+
+unsigned int PassGenerator::getNumPassesToOptimize()
+{
+    // We want to use the parameter value for this, but clamp it so that it is
+    // >= 1 so we are always optimizing at least one pass
+    return std::max(static_cast<unsigned int>(num_passes_to_optimize.value()),
+                    static_cast<unsigned int>(1));
+}
+
+void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
+{
+    for (Pass& pass : passes_to_optimize)
     {
-        best_known_pass = std::nullopt;
+        pass =
+            Pass(new_passer_point, pass.receiverPoint(), pass.speed(), pass.startTime());
     }
 }
 

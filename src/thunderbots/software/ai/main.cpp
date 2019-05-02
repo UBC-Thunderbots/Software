@@ -52,9 +52,6 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
         Util::CanvasMessenger::getInstance();
     canvas_messenger->drawWorld(world);
 
-    // On every tick, send the layer messages
-    canvas_messenger->publishAndClearAllLayers();
-
     count++;
 }
 

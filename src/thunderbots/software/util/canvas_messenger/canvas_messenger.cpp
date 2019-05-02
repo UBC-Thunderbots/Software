@@ -18,42 +18,44 @@ void CanvasMessenger::initializePublisher(ros::NodeHandle node_handle)
         Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, BUFFER_SIZE);
 }
 
-void CanvasMessenger::publishAndClearAllLayers()
+void CanvasMessenger::publishAndClearLayer(Layer layer)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+    std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
-    // Limit rate of the message publishing
     // Get the time right now
     const std::chrono::time_point<std::chrono::system_clock> now =
         std::chrono::system_clock::now();
-    const int64_t elapsed_ns =
-        std::chrono::duration_cast<std::chrono::nanoseconds>(now - time_last_published)
-            .count();
-    const double elapsed_ms = elapsed_ns / 1.0e6;
 
-    // Do not do anything if the time passed hasn't been
-    // long enough
-    if (elapsed_ms < DESIRED_PERIOD_MS)
-        return;
-
-    // Send a payload per layer of messages
-    for (const auto& layer_pair : this->layers_map)
+    // Make sure the layer exists
+    auto layer_pair = layers_map.find(layer);
+    if (layer_pair != layers_map.end())
     {
         // First is the layer number
-        const uint8_t layer_number = (uint8_t)layer_pair.first;
+        const uint8_t layer_number = (uint8_t)layer_pair->first;
 
         // Second is the vector that contains the sprites
-        const std::vector<Sprite>& sprites = layer_pair.second;
+        const std::vector<Sprite>& sprites = layer_pair->second.sprites;
 
-        this->publishPayload(layer_number, sprites);
+        const int64_t elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                       now - layer_pair->second.time)
+                                       .count();
+        const double elapsed_ms = elapsed_ns / 1.0e6;
+
+        // Publish the layer if enough time has passed since we
+        // last published
+        if (elapsed_ms >= DESIRED_PERIOD_MS)
+        {
+            // Publish the layer
+            this->publishPayload(layer_number, sprites);
+
+            // Update last published time
+            layer_pair->second.time = now;
+        }
+
+        // Clear the layer
+        layer_pair->second.sprites = {};
     }
-
-    // Clear shapes in layers of current frame/tick
-    this->clearAllLayers();
-
-    // Update last published time
-    time_last_published = now;
 }
 
 void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
@@ -74,8 +76,13 @@ void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
     thunderbots_msgs::CanvasLayer new_layer;
     new_layer.data = payload;
 
-    // and publish
-    this->publisher.publish(new_layer);
+    // and publish if we have a valid ROS publisher.
+    // This check is important for cases where we're running this without running ROS,
+    // such as in unit tests.
+    if (publisher)
+    {
+        publisher->publish(new_layer);
+    }
 }
 
 void CanvasMessenger::clearAllLayers()
@@ -83,14 +90,14 @@ void CanvasMessenger::clearAllLayers()
     // Clears all sprite vector in all the layers
     for (auto& layer : this->layers_map)
     {
-        layer.second.clear();
+        layer.second.sprites.clear();
     }
 }
 
 void CanvasMessenger::clearLayer(Layer layer)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+    std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
     if (layers_map.find(layer) != layers_map.end())
     {
@@ -107,7 +114,7 @@ void CanvasMessenger::drawSprite(Layer layer, Sprite sprite)
 void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite& sprite)
 {
     // Take ownership of the layers for the duration of this function
-    std::lock_guard<std::mutex> best_known_pass_lock(layers_map_lock);
+    std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
     // We look if the layer exists
     if (this->layers_map.find(layer) == this->layers_map.end())
@@ -117,7 +124,7 @@ void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite& sprite)
     }
 
     // and add the sprite to the layer vector
-    this->layers_map[layer].emplace_back(sprite);
+    this->layers_map[layer].sprites.emplace_back(sprite);
 }
 
 void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orientation,
@@ -128,6 +135,45 @@ void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orie
                             rectangle.height(), color);
 
     drawSprite(layer, rectangle_sprite);
+}
+
+void CanvasMessenger::drawGradient(Layer layer, std::function<double(Point)> valueAtPoint,
+                                   const Rectangle& area, double min_val, double max_val,
+                                   Color min_color, Color max_color, int points_per_meter)
+{
+    for (int i = 0; i < area.width() * points_per_meter; i++)
+    {
+        for (int j = 0; j < area.height() * points_per_meter; j++)
+        {
+            Point p = area.swCorner() +
+                      Vector(0.5 / points_per_meter, 0.5 / points_per_meter) +
+                      Vector(i / static_cast<double>(points_per_meter),
+                             j / static_cast<double>(points_per_meter));
+
+            // Get the value and clamp it appropriately
+            double val_at_p = std::clamp(valueAtPoint(p), min_val, max_val);
+
+            // Create the "pixel" in the gradient
+            Rectangle block(p - Vector(0.5 / points_per_meter, 0.5 / points_per_meter),
+                            p + Vector(0.5 / points_per_meter, 0.5 / points_per_meter));
+
+            // Linearly interpolate the color
+            Color color = {
+                static_cast<uint8_t>((max_color.r - min_color.r) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.r),
+                static_cast<uint8_t>((max_color.g - min_color.g) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.g),
+                static_cast<uint8_t>((max_color.b - min_color.b) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.b),
+                static_cast<uint8_t>((max_color.a - min_color.a) / (max_val - min_val) *
+                                         (val_at_p - min_val) +
+                                     min_color.a)};
+            drawRectangle(layer, block, Angle::zero(), color);
+        }
+    }
 }
 
 void CanvasMessenger::drawLine(Layer layer, Point p1, Point p2, double thickness,
@@ -156,10 +202,16 @@ void CanvasMessenger::drawPoint(Layer layer, const Point& p, double radius, Colo
 
 void CanvasMessenger::drawWorld(const World& world)
 {
+    // Draw the new layer
     drawBall(world.ball());
+    publishAndClearLayer(Layer::BALL);
+
     drawField(world.field());
+    publishAndClearLayer(Layer::STATIC_FEATURES);
+
     drawTeam(world.friendlyTeam(), FRIENDLY_TEAM_COLOR);
     drawTeam(world.enemyTeam(), ENEMY_TEAM_COLOR);
+    publishAndClearLayer(Layer::ROBOTS);
 }
 
 void CanvasMessenger::drawBall(const Ball& ball)
@@ -219,24 +271,24 @@ std::vector<uint8_t> CanvasMessenger::Sprite::serialize(int size_scaling_factor)
 
     // These are all 16 bits, we need to split them
     Int16OrTwoInt8 x;
-    x.base = top_left_corner.x() * size_scaling_factor;
+    x.base = std::floor(top_left_corner.x() * size_scaling_factor);
     payload.emplace_back(x.result[1]);
     payload.emplace_back(x.result[0]);
 
     Int16OrTwoInt8 y;
     // We negate y because we want positive y to be upwards in the visualizer, which uses
     // the graphics convention of +y downwards
-    y.base = -top_left_corner.y() * size_scaling_factor;
+    y.base = std::floor(-top_left_corner.y() * size_scaling_factor);
     payload.emplace_back(y.result[1]);
     payload.emplace_back(y.result[0]);
 
     Int16OrTwoInt8 width;
-    width.base = _width * size_scaling_factor;
+    width.base = std::round(_width * size_scaling_factor);
     payload.emplace_back(width.result[1]);
     payload.emplace_back(width.result[0]);
 
     Int16OrTwoInt8 height;
-    height.base = _height * size_scaling_factor;
+    height.base = std::round(_height * size_scaling_factor);
     payload.emplace_back(height.result[1]);
     payload.emplace_back(height.result[0]);
 
