@@ -32,6 +32,8 @@ namespace AI::Passing
      * a lock in A, then call B, which also requires a lock, then the threads will
      * deadlock and everything will grind to a halt.
      *
+     * // TODO: Make notes here about how the pass generator needs to be fast enough in order to "keep up" with time
+     *
      */
     class PassGenerator
     {
@@ -115,8 +117,9 @@ namespace AI::Passing
 
         // Weights used to normalize the parameters that we pass to GradientDescent
         // (see the GradientDescent documentation for details)
+        // TODO: COMMENTS FOR WHY WEIGHTS ARE WHAT THEY ARE (ie. they are *very* roughly the step size we want to take in each dimension per iteration)
         static constexpr double PASS_SPACE_WEIGHT                          = 0.01;
-        static constexpr double PASS_TIME_WEIGHT                           = 0.1;
+        static constexpr double PASS_TIME_WEIGHT                           = 0.01;
         static constexpr double PASS_SPEED_WEIGHT                          = 0.1;
         std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
             PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_TIME_WEIGHT, PASS_SPEED_WEIGHT};
@@ -179,6 +182,13 @@ namespace AI::Passing
          *         best pass and 0 being the worst pass
          */
         double ratePass(Pass pass);
+
+        /**
+         * Updates the passer point of all passes that we're currently optimizing
+         *
+         * @param new_passer_point The new passer point
+         */
+        void updatePasserPointOfAllPasses(const Point& new_passer_point);
 
         /**
          * Compares the quality of the two given passes
@@ -255,7 +265,7 @@ namespace AI::Passing
         std::mutex passer_robot_id_mutex;
 
         // The id of the robot that is performing the pass. We want to ignore this robot
-        unsigned int passer_robot_id;
+        std::optional<unsigned int> passer_robot_id;
 
         // The mutex for the target region
         std::mutex target_region_mutex;

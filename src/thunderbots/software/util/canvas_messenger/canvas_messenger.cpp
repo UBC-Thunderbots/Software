@@ -87,8 +87,10 @@ void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
     thunderbots_msgs::CanvasLayer new_layer;
     new_layer.data = payload;
 
-    // and publish
-    this->publisher.publish(new_layer);
+    // and publish if we have a valid ROS publisher
+    if (publisher){
+        publisher->publish(new_layer);
+    }
 }
 
 void CanvasMessenger::clearAllLayers()

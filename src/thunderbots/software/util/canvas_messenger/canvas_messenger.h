@@ -271,7 +271,7 @@ namespace Util
          */
         void clearAllLayers();
 
-        ros::Publisher publisher;
+        std::optional<ros::Publisher> publisher;
 
         // Period in nanoseconds
         const double DESIRED_PERIOD_MS =

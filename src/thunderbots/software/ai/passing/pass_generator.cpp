@@ -13,6 +13,7 @@ using namespace Util::DynamicParameters::AI::Passing;
 PassGenerator::PassGenerator(const World& world, const Point& passer_point)
     : updated_world(world),
       world(world),
+      passer_robot_id(std::nullopt),
       optimizer(optimizer_param_weights),
       passer_point(passer_point),
       best_known_pass(std::nullopt),
@@ -112,22 +113,19 @@ void PassGenerator::continuouslyGeneratePasses()
         passer_robot_id_mutex.lock();
 
         world = updated_world;
-        world.mutableFriendlyTeam().removeRobotWithId(passer_robot_id);
-
-        std::cout << world.ball().lastUpdateTimestamp().getSeconds() << std::endl;
+        if (passer_robot_id){
+            world.mutableFriendlyTeam().removeRobotWithId(*passer_robot_id);
+        }
 
         passer_robot_id_mutex.unlock();
         updated_world_mutex.unlock();
         world_mutex.unlock();
 
-        std::cout << "Time In Past: " << getBestPassSoFar()->first.startTime().getSeconds() - world.ball().lastUpdateTimestamp().getSeconds() << std::endl;
-
+        updatePasserPointOfAllPasses(passer_point);
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
-        std::cout << "Best Score: " << getBestPassSoFar()->second << std::endl;
-        std::cout << "Best Pass: " << getBestPassSoFar()->first << std::endl << std::endl;
-//        visualizeStuff();
+        visualizeStuff();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -144,17 +142,7 @@ void PassGenerator::visualizeStuff() {
     std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
 
     // Draw all the points we have so far
-    auto painter = Util::CanvasMessenger::getInstance();
-//    for (Pass& pass : passes_to_optimize){
-//        Point p = pass.receiverPoint();
-//        double score = ratePass(pass);
-//        painter->drawPoint(p, 0.1, 255, 0, 0, 128 * score + 128);
-//        if ((p.x() < 0 || p.y() < 0) && score > 0.2){
-//            std::cout << "Pass: " << pass << std::endl;
-//            std::cout << "Score: " << ratePass(pass) << std::endl;
-//        }
-//        score = ratePass(pass);
-//    }
+    auto canvas_messenger = Util::CanvasMessenger::getInstance();
 
     // Get field characteristics and the current time
     world_mutex.lock();
@@ -167,8 +155,6 @@ void PassGenerator::visualizeStuff() {
     auto best_pass_and_score = getBestPassSoFar();
     if (best_pass_and_score) {
         auto [best_pass, best_score] = *best_pass_and_score;
-        std::cout << best_pass << std::endl;
-        std::cout << ratePass(best_pass) << std::endl;
         const auto objective_function =
                 [&](Point p) {
                     try {
@@ -183,17 +169,17 @@ void PassGenerator::visualizeStuff() {
                         return 0.0;
                     }
                 };
-        painter->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
+        canvas_messenger->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
                               objective_function,
                               field_area, 0, 1, {0, 0, 255, 160}, {255, 0, 0, 160},
                               4);
-        painter->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, best_pass.receiverPoint(), 0.05, {0, 255, 0, 255});
+        canvas_messenger->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, best_pass.receiverPoint(), 0.05, {0, 255, 0, 255});
     }
     for (const Pass& pass : passes_to_optimize){
-        painter->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, pass.receiverPoint(), 0.03, {0, 255, 0, 150});
+        canvas_messenger->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION, pass.receiverPoint(), 0.03, {0, 255, 0, 150});
     }
 
-    painter->publishAndClearLayer(Util::CanvasMessenger::Layer::PASS_GENERATION);
+    canvas_messenger->publishAndClearLayer(Util::CanvasMessenger::Layer::PASS_GENERATION);
 }
 
 void PassGenerator::optimizePasses()
@@ -295,6 +281,12 @@ void PassGenerator::saveBestPass()
     else
     {
         best_known_pass = std::nullopt;
+    }
+}
+
+void PassGenerator::updatePasserPointOfAllPasses(const Point &new_passer_point) {
+    for (Pass& pass : passes_to_optimize){
+        pass = Pass(new_passer_point, pass.receiverPoint(), pass.speed(), pass.startTime());
     }
 }
 
