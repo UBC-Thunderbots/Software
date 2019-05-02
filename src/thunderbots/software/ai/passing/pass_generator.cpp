@@ -237,13 +237,10 @@ void PassGenerator::pruneAndReplacePasses()
             return passes;
         });
 
-    // Replace the least promising passes with newly generated passes
-    if (getNumPassesToOptimize() < passes_to_optimize.size())
-    {
-            passes_to_optimize.erase(
-                passes_to_optimize.begin() + getNumPassesToKeepAfterPruning(),
-                passes_to_optimize.end());
-    }
+    // Replace the least promising passes
+    passes_to_optimize.erase(
+        passes_to_optimize.begin() + getNumPassesToKeepAfterPruning(),
+        passes_to_optimize.end());
 
     // Generate new passes to replace the ones we just removed
     int num_new_passes = getNumPassesToOptimize() - passes_to_optimize.size();
