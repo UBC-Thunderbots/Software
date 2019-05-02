@@ -237,6 +237,14 @@ namespace Util
             uint8_t result[2];
         };
 
+        /**
+         * Struct that holds some sprites and a time
+         */
+        struct SpritesAndTime {
+            std::vector<Sprite> sprites;
+            std::chrono::time_point<std::chrono::system_clock> time;
+        };
+
         // The number of pixels per meter
         static const int PIXELS_PER_METER = 2000;
 
@@ -290,7 +298,7 @@ namespace Util
         // The mutex for the layers
         std::mutex layers_map_mutex;
 
-        // layer to sprite data map
-        std::map<Layer, std::vector<Sprite>> layers_map;
+        // layer to sprites/time last published map
+        std::map<Layer, SpritesAndTime> layers_map;
     };
 }  // namespace Util

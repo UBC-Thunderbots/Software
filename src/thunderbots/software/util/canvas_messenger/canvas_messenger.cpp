@@ -23,19 +23,9 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
     // Take ownership of the layers for the duration of this function
     std::lock_guard<std::mutex> layers_map_lock(layers_map_mutex);
 
-        // Get the time right now
-        const std::chrono::time_point<std::chrono::system_clock> now =
-            std::chrono::system_clock::now();
-        const int64_t elapsed_ns =
-            std::chrono::duration_cast<std::chrono::nanoseconds>(now -
-            time_last_published)
-                .count();
-        const double elapsed_ms = elapsed_ns / 1.0e6;
-
-        // Do not do anything if the time passed hasn't been
-        // long enough
-        if (elapsed_ms < DESIRED_PERIOD_MS)
-            return;
+    // Get the time right now
+    const std::chrono::time_point<std::chrono::system_clock> now =
+        std::chrono::system_clock::now();
 
     // Make sure the layer exists
     auto layer_pair = layers_map.find(layer);
@@ -45,7 +35,13 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
         const uint8_t layer_number = (uint8_t)layer_pair->first;
 
         // Second is the vector that contains the sprites
-        const std::vector<Sprite>& sprites = layer_pair->second;
+        const std::vector<Sprite>& sprites = layer_pair->second.sprites;
+
+        const int64_t elapsed_ns =
+                std::chrono::duration_cast<std::chrono::nanoseconds>(now -
+                                                                     layer_pair->second.time)
+                        .count();
+        const double elapsed_ms = elapsed_ns / 1.0e6;
 
         // Publish the layer if enough time has passed since we
         // last published
@@ -54,11 +50,11 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
             this->publishPayload(layer_number, sprites);
 
             // Update last published time
-            time_last_published = now;
+            layer_pair->second.time = now;
         }
 
         // Clear the layer
-        layer_pair->second = {};
+        layer_pair->second.sprites = {};
     }
 }
 
@@ -94,7 +90,7 @@ void CanvasMessenger::clearAllLayers()
     // Clears all sprite vector in all the layers
     for (auto& layer : this->layers_map)
     {
-        layer.second.clear();
+        layer.second.sprites.clear();
     }
 }
 
@@ -128,7 +124,7 @@ void CanvasMessenger::addSpriteToLayer(Layer layer, Sprite& sprite)
     }
 
     // and add the sprite to the layer vector
-    this->layers_map[layer].emplace_back(sprite);
+    this->layers_map[layer].sprites.emplace_back(sprite);
 }
 
 void CanvasMessenger::drawRectangle(Layer layer, Rectangle rectangle, Angle orientation,
@@ -154,7 +150,7 @@ void CanvasMessenger::drawGradient(Layer layer,
         {
             Point p = area.swCorner() +
                       Vector(0.5 / points_per_meter, 0.5 / points_per_meter) +
-                      Vector(i / static_cast<double>points_per_meter, j / static_cast<double>points_per_meter);
+                      Vector(i / static_cast<double>(points_per_meter), j / static_cast<double>(points_per_meter));
 
             // Get the value and clamp it appropriately
             double val_at_p = std::clamp(valueAtPoint(p), min_val, max_val);
