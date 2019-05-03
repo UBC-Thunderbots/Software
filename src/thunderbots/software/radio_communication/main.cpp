@@ -1,9 +1,10 @@
-#include <csignal>
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <thunderbots_msgs/Primitive.h>
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/World.h>
+
+#include <csignal>
 
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
@@ -67,7 +68,7 @@ void signalHandler(int signum)
 {
     LOG(DEBUG) << "Ctrl-C signal caught" << std::endl;
 
-    // Destroys backend, allowing everything libusb-related to 
+    // Destroys backend, allowing everything libusb-related to
     // exit gracefully.
     backend_ptr.reset();
 }
