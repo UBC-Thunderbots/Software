@@ -7,8 +7,12 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "geom/util.h"
 
-CherryPickTactic::CherryPickTactic(const Rectangle& target_region, bool loop_forever)
-    : pass_generator(0.0), target_region(target_region), Tactic(loop_forever)
+CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region,
+                                   bool loop_forever)
+    : pass_generator(world, world.ball().position()),
+      world(world),
+      target_region(target_region),
+      Tactic(loop_forever)
 {
     pass_generator.setTargetRegion(target_region);
 }
@@ -33,17 +37,14 @@ std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
     MoveAction move_action                     = MoveAction();
-    std::optional<AI::Passing::Pass> best_pass = pass_generator.getBestPassSoFar();
+    auto best_pass_and_score                   = pass_generator.getBestPassSoFar();
     do
     {
         pass_generator.setWorld(world);
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
-        best_pass = pass_generator.getBestPassSoFar();
-        if (best_pass)
-        {
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, best_pass->receiverPoint(), best_pass->receiverOrientation(), 0));
-        }
-    } while (!move_action.done() && best_pass);
+        auto [pass, score] = pass_generator.getBestPassSoFar();
+        yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
+                                                      pass.receiverOrientation(), 0));
+    } while (!move_action.done());
 }

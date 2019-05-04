@@ -3,7 +3,10 @@
 #include "util/logger/init.h"
 
 Tactic::Tactic(bool loop_forever)
-    : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
+    : intent_sequence(std::make_unique<intent_coroutine::pull_type>(
+          [this](intent_coroutine::push_type &yield) {
+              return this->calculateNextIntentWrapper(yield);
+          })),
       done_(false),
       loop_forever(loop_forever)
 {
@@ -42,8 +45,11 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         // old one. This way, any callers of this function won't accidentally get a
         // nullptr returned for a single call (which could come from the "old" coroutine)
         // when this Tactic restarts
-        intent_sequence = intent_coroutine::pull_type(
-            boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
+        intent_sequence.reset();
+        intent_sequence = std::make_unique<intent_coroutine::pull_type>(
+            [this](intent_coroutine::push_type &yield) {
+                return this->calculateNextIntentWrapper(yield);
+            });
         next_intent = getNextIntentHelper();
     }
 
@@ -67,13 +73,13 @@ std::unique_ptr<Intent> Tactic::getNextIntentHelper()
     std::unique_ptr<Intent> next_intent;
     // Check if the coroutine "iterator" has any more work to do. Only run the coroutine
     // if there is work to be done otherwise the coroutine library will fail on an assert.
-    if (intent_sequence)
+    if (*intent_sequence)
     {
         // Run the coroutine
-        intent_sequence();
+        (*intent_sequence)();
         // Get the result of running the coroutine, which is the next Intent the Tactic
         // wants to run
-        next_intent = intent_sequence.get();
+        next_intent = intent_sequence->get();
     }
 
     // The Tactic is considered done once the next_intent becomes a nullptr. This could

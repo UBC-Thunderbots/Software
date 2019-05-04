@@ -1,5 +1,8 @@
 #pragma once
 
+#include <boost/circular_buffer.hpp>
+#include <vector>
+
 #include "geom/point.h"
 #include "util/time/timestamp.h"
 
@@ -13,8 +16,11 @@ class Ball final
      * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
+     * @param history_duration The number of previous ball states that should be stored.
+     *
      */
-    explicit Ball(Point position, Vector velocity, const Timestamp& timestamp);
+    explicit Ball(Point position, Vector velocity, const Timestamp& timestamp,
+                  unsigned int history_duration = 20);
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
@@ -101,6 +107,41 @@ class Ball final
     Vector estimateVelocityAtFutureTime(const Duration& duration_in_future) const;
 
     /**
+     * Gets the buffer which holds all the previous position states of the ball
+     *
+     * @return Vector containing the position history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Point> getPreviousPositions();
+
+    /**
+     * Gets the buffer which holds all the previous velocity states of the ball
+     *
+     * @return Vector containing the velocity history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Vector> getPreviousVelocities();
+
+    /**
+     * Gets the buffer which holds all the timestamps of the previous states
+     *
+     * @return Vector containing the update timestamp history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<Timestamp> getPreviousTimestamps();
+
+    /**
+     * Adds a state to the front of the circular buffers storing the state of histories of
+     * the ball
+     *
+     * @param position Position of ball
+     * @param velocity Velocity of ball
+     * @param timestamp Time that ball   was in this state
+     */
+    void addStateToBallHistory(const Point& position, const Vector& velocity,
+                               const Timestamp& timestamp);
+
+    /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
      * velocities are the same
      *
@@ -118,10 +159,13 @@ class Ball final
     bool operator!=(const Ball& other) const;
 
    private:
-    // The current position of the ball, with coordinates in metres
-    Point position_;
-    // The current velocity of the ball, in metres per second
-    Vector velocity_;
-    // The timestamp for when this ball was last updated
-    Timestamp last_update_timestamp;
+    // All previous positions of the ball, with the most recent position at the front of
+    // the queue, coordinates in meters
+    boost::circular_buffer<Point> positions_;
+    // All previous velocities of the ball, with the most recent velocity at the front of
+    // the queue, coordinates in meters
+    boost::circular_buffer<Vector> velocities_;
+    // All previous timestamps of when the ball was updated , with the most recent
+    // timestamp at the front of the queue, coordinates in meters
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };

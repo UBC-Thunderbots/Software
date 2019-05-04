@@ -9,8 +9,7 @@
 
 TEST(DribbleIntentTest, intent_name_test)
 {
-    DribbleIntent dribble_intent =
-        DribbleIntent(0, Point(), Angle::zero(), 0, 0, false, 0);
+    DribbleIntent dribble_intent = DribbleIntent(0, Point(), Angle::zero(), 0, false, 0);
 
     EXPECT_EQ("Dribble Intent", dribble_intent.getIntentName());
 }
@@ -19,20 +18,18 @@ TEST(DribbleIntentTest, intent_name_test)
 // since Intents inherit from Primitives
 TEST(DribbleIntentTest, test_equality_operator_intents_equal)
 {
-    DribbleIntent dribble_intent =
-        DribbleIntent(0, Point(), Angle::zero(), 0, 0, false, 0);
+    DribbleIntent dribble_intent = DribbleIntent(0, Point(), Angle::zero(), 0, false, 0);
     DribbleIntent dribble_intent_other =
-        DribbleIntent(0, Point(), Angle::zero(), 0, 0, false, 0);
+        DribbleIntent(0, Point(), Angle::zero(), 0, false, 0);
 
     EXPECT_EQ(dribble_intent, dribble_intent_other);
 }
 
 TEST(DribbleIntentTest, test_inequality_operator_with_mismatched_priorities)
 {
-    DribbleIntent dribble_intent =
-        DribbleIntent(0, Point(), Angle::zero(), 0, 1, false, 0);
+    DribbleIntent dribble_intent = DribbleIntent(0, Point(), Angle::zero(), 1, false, 0);
     DribbleIntent dribble_intent_other =
-        DribbleIntent(0, Point(), Angle::zero(), 0, 1, false, 4);
+        DribbleIntent(0, Point(), Angle::zero(), 1, false, 4);
 
     EXPECT_NE(dribble_intent, dribble_intent_other);
 }

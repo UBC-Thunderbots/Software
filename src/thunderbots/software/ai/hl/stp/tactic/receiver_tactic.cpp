@@ -56,13 +56,26 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
 
     // Setup for the pass. We want to use any free time before the pass starts putting
-    // ourself in the best position possible to take the pass
-    while (ball.lastUpdateTimestamp() < pass.startTime())
+    // ourselves in the best position possible to take the pass
+    // We wait for the ball to start moving at least a bit to make sure the passer
+    // has actually started the pass
+    while (ball.lastUpdateTimestamp() < pass.startTime() || ball.velocity().len() < 0.5)
     {
+        // If there is a feasible shot we can take, we want to wait for the pass at the
+        // halfway point between the angle required to receive the ball and the angle
+        // for a one-time shot
+        std::optional<std::pair<Point, Angle>> shot = findFeasibleShot();
+        Angle desired_angle                         = pass.receiverOrientation();
+        if (shot)
+        {
+            auto [target_position, _] = *shot;
+            Angle shot_angle = (target_position - robot->position()).orientation();
+            desired_angle    = (shot_angle + pass.receiverOrientation()) / 2;
+        }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation to face where the pass is coming from
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
-                                                      pass.receiverOrientation(), 0));
+                                                      desired_angle, 0));
     }
 
     // Check if we can shoot on the enemy goal from the receiver position
@@ -84,18 +97,19 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
                 .angleMod()
                 .abs();
 
-        Angle goal_angle = vertexAngle(field.friendlyGoalpostPos(), robot->position(),
-                                       field.friendlyGoalpostNeg())
-                               .abs();
+        Angle goal_angle =
+            acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
+                             field.friendlyGoalpostNeg())
+                .abs();
         net_percent_open = best_shot_opt->second.toDegrees() / goal_angle.toDegrees();
     }
 
-    // If we have a shot with a sufficiently large enough opening, and the deflection
-    // angle that is reasonable, we should one-touch kick the ball towards the enemy net
-    if (best_shot_opt && net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
-        abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+
+    std::optional<std::pair<Point, Angle>> best_shot = findFeasibleShot();
+
+    if (best_shot)
     {
-        auto [best_shot_target, _] = *best_shot_opt;
+        auto [best_shot_target, _] = *best_shot;
 
         // The angle between the ball velocity and a vector from the ball to the robot
         Vector ball_velocity = ball.velocity();
@@ -123,8 +137,7 @@ std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
             // rather then the center of the robot
             Point ideal_position = closest_ball_pos - ideal_orientation_vec.norm(
                                                           DIST_TO_FRONT_OF_ROBOT_METERS +
-                                                          BALL_MAX_RADIUS_METERS);
-
+                                                          BALL_MAX_RADIUS_METERS * 1.5);
 
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ideal_position, ideal_orientation, 0, false, true));
@@ -175,4 +188,42 @@ Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
         shot_offset = -shot_offset;
     }
     return shot_dir + shot_offset;
+}
+
+std::optional<std::pair<Point, Angle>> ReceiverTactic::findFeasibleShot()
+{
+    // Check if we can shoot on the enemy goal from the receiver position
+    std::optional<std::pair<Point, Angle>> best_shot_opt =
+        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
+
+    // Vector from the ball to the robot
+    Vector robot_to_ball = ball.position() - robot->position();
+
+    // The angle the robot will have to deflect the ball to shoot
+    Angle abs_angle_between_pass_and_shot_vectors;
+    // The percentage of open net the robot would shoot on
+    double net_percent_open;
+    if (best_shot_opt)
+    {
+        Vector robot_to_shot_target = best_shot_opt->first - robot->position();
+        abs_angle_between_pass_and_shot_vectors =
+            (robot_to_ball.orientation() - robot_to_shot_target.orientation())
+                .angleMod()
+                .abs();
+
+        Angle goal_angle =
+            acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
+                             field.friendlyGoalpostNeg())
+                .abs();
+        net_percent_open = best_shot_opt->second.toDegrees() / goal_angle.toDegrees();
+    }
+
+    // If we have a shot with a sufficiently large enough opening, and the deflection
+    // angle that is reasonable, we should one-touch kick the ball towards the enemy net
+    if (best_shot_opt && net_percent_open > MIN_SHOT_NET_PERCENT_OPEN &&
+        abs_angle_between_pass_and_shot_vectors < MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT)
+    {
+        return best_shot_opt;
+    }
+    return std::nullopt;
 }

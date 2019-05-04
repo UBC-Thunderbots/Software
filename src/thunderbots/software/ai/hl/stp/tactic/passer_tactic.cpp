@@ -11,8 +11,8 @@
 
 using namespace AI::Passing;
 
-PasserTactic::PasserTactic(Pass pass, const Timestamp& curr_time, bool loop_forever)
-    : pass(std::move(pass)), curr_time(curr_time), Tactic(loop_forever)
+PasserTactic::PasserTactic(AI::Passing::Pass pass, const Ball& ball, bool loop_forever)
+    : pass(std::move(pass)), ball(ball), Tactic(loop_forever)
 {
 }
 
@@ -21,11 +21,10 @@ std::string PasserTactic::getName() const
     return "Passer Tactic";
 }
 
-void PasserTactic::updateParams(const Pass& updated_pass,
-                                const Timestamp& updated_curr_time)
+void PasserTactic::updateParams(const Pass& updated_pass, const Ball& updated_ball)
 {
-    this->pass      = updated_pass;
-    this->curr_time = updated_curr_time;
+    this->pass = updated_pass;
+    this->ball = updated_ball;
 }
 
 double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
@@ -44,7 +43,7 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
     // Move to a position just behind the ball (in the direction of the pass)
     // until it's time to perform the pass
-    while (curr_time < pass.startTime())
+    while (ball.lastUpdateTimestamp() < pass.startTime())
     {
         // We want to wait just behind where the pass is supposed to start, so that the
         // ball is *almost* touching the kicker
@@ -57,12 +56,24 @@ std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
                                                       pass.passerOrientation(), 0));
     }
 
+    // The angle between the ball velocity vector and a vector from the passer
+    // point to the receiver point
+    Angle ball_velocity_to_pass_orientation;
+
     KickAction kick_action = KickAction();
     do
     {
         // We want the robot to move to the starting position for the shot and also
         // rotate to the correct orientation to face the shot
         yield(kick_action.updateStateAndGetNextIntent(
-            *robot, pass.passerPoint(), pass.passerOrientation(), pass.speed()));
-    } while (!kick_action.done());
+            *robot, ball, ball.position(), pass.receiverPoint(), pass.speed()));
+
+        // We want to keep trying to kick until the ball is moving along the pass
+        // vector with sufficient velocity
+        Angle passer_to_receiver_angle =
+            (pass.receiverPoint() - pass.passerPoint()).orientation();
+        ball_velocity_to_pass_orientation =
+            ball.velocity().orientation().minDiff(passer_to_receiver_angle);
+    } while (ball_velocity_to_pass_orientation.abs() > Angle::ofDegrees(20) ||
+             ball.velocity().len() < 0.5);
 }

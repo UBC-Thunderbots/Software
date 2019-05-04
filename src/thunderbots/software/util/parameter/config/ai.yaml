@@ -43,16 +43,16 @@ AI:
           pass reception position that we think will likely result in a good
           shooting opportunity. Note that we may take shots below this in some
           cases, it's more of a weight then a cutoff.
-    ideal_min_rotation_to_shoot_degrees:
-      min: -180
+    ideal_max_rotation_to_shoot_degrees:
+      min: 0
       max: 180
-      default: 5
+      default: 60
       type: "double"
       description: >- 
-          The minimum angle that we have to rotate after receiving a pass to
+          The maximum angle that we have to rotate after receiving a pass to
           shoot that we think would likely result in a goal. Note that we may
-          try to take shots that require us to rotate more then this, it's
-          more of a weight then a cutoff
+          try to take shots that require us to rotate more then this, it's more
+          of a soft limit.
     min_pass_speed_m_per_s:
       min: 0
       max: 5
@@ -68,7 +68,7 @@ AI:
     min_time_offset_for_pass_seconds:
       min: 0
       max: 5
-      default: 0.3
+      default: 0.2
       type: "double"
       description: >-
         Minimum time into the future at which the pass should occur. This is
@@ -84,21 +84,21 @@ AI:
         upper bound on the pass start time, relative to the current time. This is in
         seconds.
     num_passes_to_optimize:
-      min: 0
+      min: 1
       max: 1000
-      default: 50
+      default: 30
       type: "int"
       description: "The number of passes to try to optimize at any given time"
     num_passes_to_keep_after_pruning:
       min: 0
       max: 1000
-      default: 10
+      default: 5
       type: "int"
       description: "The number of passes to keep after pruning"
     number_of_gradient_descent_steps_per_iter:
       min: 0
       max: 1000
-      default: 20
+      default: 10
       type: "int"
       description: "The number of steps of gradient descent to perform in each iteration"
     pass_equality_max_position_difference_meters:

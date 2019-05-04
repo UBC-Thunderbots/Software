@@ -78,6 +78,11 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     }
 }
 
+void Team::removeRobotWithId(unsigned int robot_id)
+{
+    team_robots.erase(robot_id);
+}
+
 void Team::assignGoalie(unsigned int new_goalie_id)
 {
     if (getRobotById(new_goalie_id))

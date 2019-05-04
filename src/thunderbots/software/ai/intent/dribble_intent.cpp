@@ -5,9 +5,9 @@
 const std::string DribbleIntent::INTENT_NAME = "Dribble Intent";
 
 DribbleIntent::DribbleIntent(unsigned int robot_id, const Point &dest,
-                             const Angle &final_angle, double final_speed, double rpm,
+                             const Angle &final_angle, double rpm,
                              bool small_kick_allowed, unsigned int priority)
-    : DribblePrimitive(robot_id, dest, final_angle, final_speed, rpm, small_kick_allowed),
+    : DribblePrimitive(robot_id, dest, final_angle, rpm, small_kick_allowed),
       Intent(priority)
 {
 }

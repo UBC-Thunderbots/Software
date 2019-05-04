@@ -262,8 +262,8 @@ void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
 void GrsimCommandPrimitiveVisitor::visit(const DribblePrimitive &dribble_primitive)
 {
     motion_controller_command = MotionController::PositionCommand(
-        dribble_primitive.getDestination(), dribble_primitive.getFinalAngle(),
-        dribble_primitive.getFinalSpeed(), 0.0, false, true);
+        dribble_primitive.getDestination(), dribble_primitive.getFinalAngle(), 0.0, 0.0,
+        false, true);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
