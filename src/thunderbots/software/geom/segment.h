@@ -58,6 +58,10 @@ class Segment final
         return end - start;
     }
 
+    inline double length() const {
+        return (end - start).len();
+    }
+
     /**
      * Makes a line out of this Segment.
      */

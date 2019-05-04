@@ -72,6 +72,9 @@ if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
 endif()
 message("g3log path: ${G3LOG}")
 
+# Find Eigen
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
 # Find boost components
 find_package(Boost REQUIRED COMPONENTS
         coroutine
@@ -146,6 +149,7 @@ target_link_libraries(network_input
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
+        Eigen3::Eigen
         )
 
 file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -918,11 +922,9 @@ if (CATKIN_ENABLE_TESTING)
             test/geom/polygon.cpp
             geom/polygon.cpp
             geom/util.cpp)
-
     target_link_libraries(polygon_test
             ${catkin_LIBRARIES}
             ${G3LOG})
-
 
     catkin_add_gtest(robot_filter_test
             test/network_input/filter/robot_filter.cpp
@@ -1033,6 +1035,27 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES})
     
+    catkin_add_gtest(network_input_test
+            test/network_input/filter/ball_filter.cpp
+            test/network_input/main.cpp
+            test/test_util/test_util.cpp
+            network_input/filter/ball_filter.cpp
+            ai/world/ball.cpp
+            ai/world/robot.cpp
+            ai/world/field.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/game_state.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/parameter/dynamic_parameters.cpp
+            geom/util.cpp)
+    target_link_libraries(network_input_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            Eigen3::Eigen
+            )
 endif()
 
 ##### ROSTests / Integration Tests #####

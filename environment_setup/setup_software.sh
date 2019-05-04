@@ -141,6 +141,7 @@ host_software_packages=(
     protobuf-compiler
     libprotobuf-dev
     libusb-1.0-0-dev
+    libeigen3-dev # A math / numerical library used for things like linear regression
     nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
     yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
 )

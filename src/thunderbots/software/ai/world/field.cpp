@@ -202,23 +202,24 @@ Timestamp Field::getMostRecentTimestamp() const
     return last_update_timestamps.front();
 }
 
-void Field::updateTimestamp(Timestamp time_stamp)
-{
+void Field::updateTimestamp(Timestamp time_stamp) {
     // Check if the timestamp buffer is empty
-    if (last_update_timestamps.empty())
-    {
+    if (last_update_timestamps.empty()) {
         last_update_timestamps.push_front(time_stamp);
     }
-    // Check that the new timestamp is not older than the most recent timestamp
-    else if (time_stamp < Field::getMostRecentTimestamp())
-    {
+        // Check that the new timestamp is not older than the most recent timestamp
+    else if (time_stamp < Field::getMostRecentTimestamp()) {
         throw std::invalid_argument(
-            "Error: Attempt tp update Field state with old Timestamp");
-    }
-    else
-    {
+                "Error: Attempt tp update Field state with old Timestamp");
+    } else {
         last_update_timestamps.push_front(time_stamp);
     }
+}
+
+bool Field::pointInEntireField(const Point &p) const
+{
+    Rectangle entire_field = Rectangle(Point(-totalLength() / 2, -totalWidth() / 2), Point(totalLength() / 2, totalWidth() / 2));
+    return entire_field.containsPoint(p);
 }
 
 bool Field::operator==(const Field &other) const

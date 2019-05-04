@@ -1,11 +1,11 @@
 #pragma once
 
 #include <boost/circular_buffer.hpp>
-#include <vector>
-
 #include "ai/world/ball.h"
+#include "ai/world/field.h"
 #include "geom/point.h"
 #include "util/time/timestamp.h"
+#include <optional>
 
 /**
  * A lightweight datatype used to input new data into the filter.
@@ -15,9 +15,15 @@
  */
 struct SSLBallDetection
 {
+    // The position of the ball detection on the field, in meters
     Point position;
-    double confidence;
+    // The timestamp of the detection. This is the timestamp for when the camera frame
+    // containing the detection was captured
     Timestamp timestamp;
+
+    bool operator<(const SSLBallDetection& b) const {
+        return timestamp < b.timestamp;
+    }
 };
 
 /**
@@ -32,6 +38,7 @@ class BallFilter
      */
     explicit BallFilter();
 
+    // TODO: comment
     /**
      * Filters the new ball detection data, and returns the updated state of the ball
      * given the new data
@@ -41,9 +48,21 @@ class BallFilter
      *
      * @return The updated state of the ball given the new data
      */
-    Ball getFilteredData(const Ball& current_ball_state,
-                         const std::vector<SSLBallDetection>& new_ball_detections);
+    std::optional<Ball> getFilteredData(const std::vector<SSLBallDetection>& new_ball_detections, const Field& field);
 
-   private:
-    boost::circular_buffer<Vector> previous_ball_readings;
+//   private:
+    // TODO: comments
+    void addNewDetectionsToBuffer(std::vector<SSLBallDetection> new_ball_detections,
+                                  const Field &field);
+    Ball getAveragedBallPositionAndVelocity();
+    Ball getLinearRegressionPositionAndVelocity();
+    std::vector<Vector> calculateBallVelocities(
+            const boost::circular_buffer<SSLBallDetection> &ball_detections);
+
+
+
+    // A circular buffer used to store previous ball detections, so we can use them
+    // in the filter
+    boost::circular_buffer<SSLBallDetection> ball_detection_buffer;
+    unsigned int LINEAR_REGRESSION_BUFFER_SIZE;
 };
