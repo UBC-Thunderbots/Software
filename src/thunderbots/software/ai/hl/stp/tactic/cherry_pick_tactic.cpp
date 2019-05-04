@@ -36,8 +36,8 @@ double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& wor
 std::unique_ptr<Intent> CherryPickTactic::calculateNextIntent(
     intent_coroutine::push_type& yield)
 {
-    MoveAction move_action                     = MoveAction();
-    auto best_pass_and_score                   = pass_generator.getBestPassSoFar();
+    MoveAction move_action   = MoveAction();
+    auto best_pass_and_score = pass_generator.getBestPassSoFar();
     do
     {
         pass_generator.setWorld(world);
