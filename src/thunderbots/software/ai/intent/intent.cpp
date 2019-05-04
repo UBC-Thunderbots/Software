@@ -27,6 +27,20 @@ void Intent::setPriority(unsigned int new_priority)
     priority = new_priority;
 }
 
+void Intent::setMoveFlags(MoveFlags flags)
+{
+    if ((flags & ~FLAGS_VALID) != MoveFlags::NONE)
+    {
+        LOG(WARNING) << "Invalid MoveFlags set" << std::endl;
+    }
+    this->flags = flags;
+}
+
+MoveFlags Intent::getMoveFlags()
+{
+    return flags;
+}
+
 bool Intent::operator==(const Intent &other) const
 {
     return this->priority == other.priority;
