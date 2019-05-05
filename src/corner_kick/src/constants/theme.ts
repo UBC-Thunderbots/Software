@@ -2,6 +2,8 @@
  * This file defines the default parameters of the application
  */
 
+import { Colors } from '@blueprintjs/core';
+
 import { IThemeProvider } from 'SRC/types';
 
 // tslint:disable:object-literal-sort-keys
@@ -16,24 +18,17 @@ export const theme: IThemeProvider = {
     // while others define shades of a particular color (red defines the
     // shade of red we use)
     colors: {
-        fg: '#B3B1AD',
-        bg: '#0A0E14',
-        accent: '#E6B450',
-        panel: '#0D1016',
-        border: '#01060E',
-        selected: '#161F2A',
-        subdued: '#3D424D',
-        success: '#C2D94C',
-        error: '#FF3333',
-        warn: '#FF8F40',
-        info: '#39BAE6',
-        debug: '#3D424D',
-        red: '#FF3333',
-        orange: '#FF8F40',
-        yellow: '#FFEE99',
-        green: '#C2D94C',
-        cyan: '#39BAE6',
-        blue: '#6994BF',
-        purple: '#D4BFFF',
+        fg: Colors.GRAY1,
+        bg: Colors.LIGHT_GRAY5,
+        accent: Colors.FOREST5,
+        panel: Colors.WHITE,
+        border: Colors.LIGHT_GRAY3,
+        selected: Colors.LIGHT_GRAY4,
+        subdued: Colors.GRAY5,
+        success: Colors.GREEN2,
+        error: Colors.RED2,
+        warn: Colors.ORANGE2,
+        info: Colors.BLUE2,
+        debug: Colors.GRAY5,
     },
 };
