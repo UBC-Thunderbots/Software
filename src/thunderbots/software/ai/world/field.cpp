@@ -6,7 +6,7 @@
 
 Field::Field(double field_length, double field_width, double defense_length,
              double defense_width, double goal_width, double boundary_width,
-             double center_circle_radius)
+             double center_circle_radius, const Timestamp& timestamp, unsigned int buffer_size)
     : field_length_(field_length),
       field_width_(field_width),
       defense_length_(defense_length),
@@ -15,6 +15,10 @@ Field::Field(double field_length, double field_width, double defense_length,
       boundary_width_(boundary_width),
       center_circle_radius_(center_circle_radius)
 {
+    // Set the size of the Timestamp history buffer
+    last_update_timestamps.set_capacity(buffer_size);
+
+    last_update_timestamps.push_front(timestamp);
 }
 
 void Field::updateDimensions(const Field &new_field_data)
@@ -26,12 +30,13 @@ void Field::updateDimensions(const Field &new_field_data)
     goal_width_           = new_field_data.goalWidth();
     boundary_width_       = new_field_data.boundaryWidth();
     center_circle_radius_ = new_field_data.centreCircleRadius();
+    last_update_timestamps = new_field_data.getTimestampHistory();
 }
 
 void Field::updateDimensions(double field_length, double field_width,
                              double defense_length, double defense_width,
                              double goal_width, double boundary_width,
-                             double center_circle_radius)
+                             double center_circle_radius, const Timestamp& timestamp)
 {
     field_length_         = field_length;
     field_width_          = field_width;
@@ -40,6 +45,7 @@ void Field::updateDimensions(double field_length, double field_width,
     goal_width_           = goal_width;
     boundary_width_       = boundary_width;
     center_circle_radius_ = center_circle_radius;
+    last_update_timestamps.push_front(timestamp);
 }
 
 double Field::length() const
@@ -185,7 +191,7 @@ bool Field::pointInFieldLines(const Point &p) const
     return fieldLines().containsPoint(p);
 }
 
-boost::circular_buffer<Timestamp> Field::getTimestampHistory() {
+boost::circular_buffer<Timestamp> Field::getTimestampHistory() const {
     return last_update_timestamps;
 }
 
