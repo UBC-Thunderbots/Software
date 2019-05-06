@@ -7,6 +7,7 @@
 
 #include "ai/intent/kick_intent.h"
 #include "ai/intent/move_intent.h"
+#include "geom/util.h"
 #include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
@@ -310,3 +311,68 @@ INSTANTIATE_TEST_CASE_P(
         std::make_tuple<Point, Point, double, double>({3, 1}, {4.5, 3}, -45, 0),
         // Corner kick, robot is close to the goal and directly in front of it
         std::make_tuple<Point, Point, double, double>({4, 0}, {4.5, -3}, -45, -1)));
+
+class OneTimeShotPositionTest
+    : public ::testing::TestWithParam<std::tuple<double, double, double, double, double>>
+{
+};
+/**
+ * This test was added because during field testing we observed that in rare cases, the
+ * receiver robot would move away from the ball's trajectory rather than towards it, and
+ * therefore completely miss the pass. The behaviour did not seem to be caused by bad
+ * vision data, and seemed more like a logic issue, so this test was added to try catch
+ * any strange edge cases in the logic that would cause the robot to move to the wrong
+ * position
+ */
+TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_position)
+{
+    Point robot_position(std::get<0>(GetParam()), std::get<1>(GetParam()));
+    Point ball_position(std::get<2>(GetParam()), std::get<3>(GetParam()));
+    // We just choose a moderate speed for these tests. Varying the speed won't change
+    // the results since it's treated as an "ideal ball trajectory" anyway
+    double ball_speed                 = 4;
+    Angle ball_velocity_vector_offset = Angle::ofDegrees(std::get<4>(GetParam()));
+    // We apply angular "noise" to the ball velocity vector to simulate imperfect passes
+    Vector ball_velocity_vector = Vector::createFromAngle(
+        (robot_position - ball_position).orientation() + ball_velocity_vector_offset);
+
+    // Create a ball traveling from the specified position towards the robot
+    Ball ball(ball_position, ball_velocity_vector.norm(ball_speed),
+              Timestamp::fromSeconds(0));
+
+    // Create a robot at the robot location with no velocity. The initial orientation
+    // does not matter.
+    Robot robot(0, robot_position, Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
+                Timestamp::fromSeconds(0));
+
+    // Create a best shot towards the center of the enemy goal
+    Point best_shot_target = Point(4.5, 0);
+
+    auto [ideal_position, ideal_orientation] =
+        ReceiverTactic::getOneTimeShotPositionAndOrientation(robot, ball,
+                                                             best_shot_target);
+
+    // The position where the ball should make contact with the receiver robot
+    Point ball_contact_position =
+        ideal_position +
+        Point::createFromAngle(ideal_orientation)
+            .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
+
+    // We check that the position the receiver tries to move to will cause the
+    // ball contact point to intersect with the ball's trajectory, meaning that we are
+    // in the correct position to make contact with the ball
+    Line ball_path = Line(ball.position(), ball.position() + ball.velocity());
+    double dist_to_ball_passthrough = dist(ball_path, ball_contact_position);
+
+    EXPECT_TRUE(dist_to_ball_passthrough < 0.001);
+}
+
+INSTANTIATE_TEST_CASE_P(
+    All, OneTimeShotPositionTest,
+    ::testing::Combine(testing::Values(-0.2),           // Robot x coordinate
+                       testing::Values(0.0),            // Robot y coordinate
+                       testing::Range(-3.0, 3.0, 0.1),  // Ball x coordinate
+                       testing::Range(-4.5, 0.0, 0.1),  // Ball y coordinate
+                       testing::Range(-5.0, 5.0, 1.0)  // Angle deviation from ideal pass,
+                                                       // in degrees
+                       ));
