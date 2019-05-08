@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ai/flags.h"
 #include "ai/intent/intent.h"
 #include "ai/primitive/move_primitive.h"
 #include "geom/angle.h"
@@ -31,6 +32,20 @@ class MoveIntent : public Intent, public MovePrimitive
 
     std::string getIntentName(void) const override;
 
+    /**
+     * Sets MoveFlags of this intent.
+     *
+     * @param flags The MoveFlags to set to this intent.
+     */
+    void setMoveFlags(MoveFlags flags);
+
+    /**
+     * Returns the current MoveFlags of this intent.
+     *
+     * @return The current MoveFlags of this intent.
+     */
+    MoveFlags getMoveFlags();
+
     void accept(IntentVisitor& visitor) const override;
 
     /**
@@ -49,4 +64,10 @@ class MoveIntent : public Intent, public MovePrimitive
      * @return true if the MoveIntents are not equal and false otherwise
      */
     bool operator!=(const MoveIntent& other) const;
+
+   private:
+    /**
+     * MoveFlags of this intent.
+     */
+    MoveFlags flags;
 };
