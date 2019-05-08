@@ -894,6 +894,15 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG})
 
+    catkin_add_gtest(triangle_test
+            test/geom/triangle.cpp
+            geom/triangle.cpp
+            geom/util.cpp)
+
+    target_link_libraries(triangle_test
+            ${catkin_LIBRARIES}
+            ${G3LOG})
+
 
     catkin_add_gtest(robot_filter_test
             test/network_input/filter/robot_filter.cpp
