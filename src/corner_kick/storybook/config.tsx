@@ -10,6 +10,9 @@ import { Theme } from 'SRC/style/Theme';
 
 import theme from './theme';
 
+import '@blueprintjs/core/lib/css/blueprint.css';
+import '@blueprintjs/icons/lib/css/blueprint-icons.css';
+
 // automatically import all files in the __stories__ directory
 const req = (require as any).context('../src', true, /__stories__\/.*.tsx$/);
 
