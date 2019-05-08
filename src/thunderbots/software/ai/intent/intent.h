@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "ai/flags.h"
-
 // We forward-declare the IntentVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
 // accept() function. We cannot use an #include statement because this creates a cyclic
@@ -59,13 +57,6 @@ class Intent
     void setPriority(unsigned int new_priority);
 
     /**
-     * Sets MoveFlags of this intent.
-     */
-    void setMoveFlags(MoveFlags flags);
-
-    MoveFlags getMoveFlags();
-
-    /**
      * Compares Intents for equality. Intents are considered equal if all
      * their member variables are equal.
      *
@@ -97,9 +88,4 @@ class Intent
      * higher value => higher priority
      */
     unsigned int priority;
-
-    /**
-     * MoveFlags of this intent.
-     */
-    MoveFlags flags;
 };

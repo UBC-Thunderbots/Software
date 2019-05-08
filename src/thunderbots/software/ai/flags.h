@@ -1,46 +1,7 @@
 #pragma once
 #include <cstdint>
 
-#include "util/refbox_constants.h"
-#define GEN_BITWISE(CLASS, UNDERLYING)                                                   \
-    static constexpr inline CLASS operator|(CLASS lhs, CLASS rhs)                        \
-    {                                                                                    \
-        return static_cast<CLASS>(static_cast<UNDERLYING>(lhs) |                         \
-                                  static_cast<UNDERLYING>(rhs));                         \
-    }                                                                                    \
-    static inline CLASS& operator|=(CLASS& lhs, CLASS rhs)                               \
-    {                                                                                    \
-        lhs = static_cast<CLASS>(static_cast<UNDERLYING>(lhs) |                          \
-                                 static_cast<UNDERLYING>(rhs));                          \
-        return lhs;                                                                      \
-    }                                                                                    \
-    static constexpr inline CLASS operator&(CLASS lhs, CLASS rhs)                        \
-    {                                                                                    \
-        return static_cast<CLASS>(static_cast<UNDERLYING>(lhs) &                         \
-                                  static_cast<UNDERLYING>(rhs));                         \
-    }                                                                                    \
-    static inline CLASS& operator&=(CLASS& lhs, CLASS rhs)                               \
-    {                                                                                    \
-        lhs = static_cast<CLASS>(static_cast<UNDERLYING>(lhs) &                          \
-                                 static_cast<UNDERLYING>(rhs));                          \
-        return lhs;                                                                      \
-    }                                                                                    \
-    static constexpr inline CLASS operator^(CLASS lhs, CLASS rhs)                        \
-    {                                                                                    \
-        return static_cast<CLASS>(static_cast<UNDERLYING>(lhs) ^                         \
-                                  static_cast<UNDERLYING>(rhs));                         \
-    }                                                                                    \
-    static inline CLASS& operator^=(CLASS& lhs, CLASS rhs)                               \
-    {                                                                                    \
-        lhs = static_cast<CLASS>(static_cast<UNDERLYING>(lhs) ^                          \
-                                 static_cast<UNDERLYING>(rhs));                          \
-        return lhs;                                                                      \
-    }                                                                                    \
-    static constexpr inline CLASS operator~(CLASS lhs)                                   \
-    {                                                                                    \
-        return static_cast<CLASS>(~static_cast<UNDERLYING>(lhs));                        \
-    }
-
+#include "util.h"
 
 /**
  * Flags indicating how robots comply with game rules.
@@ -99,7 +60,7 @@ enum class MoveFlags : uint64_t
     PENALTY_KICK_THEM = 0x0080,
 
     /**
-     * \brief Drive carefully instead of quickly.
+     * Drive carefully instead of quickly.
      */
     CAREFUL = 0x0100,
 
@@ -110,6 +71,7 @@ enum class MoveFlags : uint64_t
 };
 
 GEN_BITWISE(MoveFlags, uint64_t)
+
 /**
  * The union of all existent flags.
  */
@@ -119,36 +81,12 @@ constexpr MoveFlags FLAGS_VALID =
     MoveFlags::AVOID_THEM_DEFENSE | MoveFlags::STAY_OWN_HALF |
     MoveFlags::PENALTY_KICK_US | MoveFlags::PENALTY_KICK_THEM | MoveFlags::CAREFUL;
 
-inline MoveFlags calc_flags(RefboxGameState pt)
+/**
+ * Checks if a MoveFlag is valid.
+ * @param flag MoveFlag to check
+ * @return true if valid, false if not
+ */
+inline bool isMoveFlagValid(MoveFlags flag)
 {
-    // All robots want to avoid the defence area (except for the goalie).
-    MoveFlags flags = MoveFlags::AVOID_US_DEFENSE | MoveFlags::AVOID_THEM_DEFENSE;
-    switch (pt)
-    {
-        case RefboxGameState::STOP:
-        case RefboxGameState::DIRECT_FREE_THEM:
-        case RefboxGameState::INDIRECT_FREE_THEM:
-        case RefboxGameState::BALL_PLACEMENT_THEM:
-        case RefboxGameState::BALL_PLACEMENT_US:
-            flags |= MoveFlags::AVOID_BALL_STOP;
-            return flags;
-
-        case RefboxGameState::PREPARE_KICKOFF_US:
-        case RefboxGameState::PREPARE_KICKOFF_THEM:
-            // case RefboxGameState::KICKOFF_THEM:
-            flags |= MoveFlags::AVOID_BALL_STOP;
-            flags |= MoveFlags::STAY_OWN_HALF;
-            return flags;
-
-        case RefboxGameState::PREPARE_PENALTY_THEM:
-            // case RefboxGameState::PENALTY_THEM:
-            flags |= MoveFlags::AVOID_BALL_STOP;
-            flags |= MoveFlags::PENALTY_KICK_THEM;
-            return flags;
-
-        // case RefboxGameState::NONE:
-        //     return MoveFlags::NONE;
-        default:
-            return flags;
-    }
+    return (flag & ~FLAGS_VALID) == MoveFlags::NONE;
 }
