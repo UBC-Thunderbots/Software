@@ -195,7 +195,7 @@ boost::circular_buffer<Timestamp> Field::getTimestampHistory() const {
     return last_update_timestamps;
 }
 
-Timestamp Field::getMostRecentTimestamp() {
+Timestamp Field::getMostRecentTimestamp() const {
     return last_update_timestamps.front();
 }
 

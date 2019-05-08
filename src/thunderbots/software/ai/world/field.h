@@ -282,7 +282,7 @@ class Field
      *
      * @return Timestamp : The Timestamp corresponding to the most recent update to the Field object
      */
-    Timestamp getMostRecentTimestamp();
+    Timestamp getMostRecentTimestamp() const;
 
     /**
      * Compares two fields for inequality
