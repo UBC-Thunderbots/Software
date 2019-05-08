@@ -9,7 +9,7 @@
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
 Backend::Backend()
-    : field_state(0, 0, 0, 0, 0, 0, 0),
+    : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(Duration::fromMilliseconds(
           Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
@@ -111,7 +111,7 @@ Field Backend::createFieldFromPacketGeometry(
         (defense_width_p1 - defense_width_p2).len() * METERS_PER_MILLIMETER;
 
     Field field = Field(field_length, field_width, defense_length, defense_width,
-                        goal_width, boundary_width, center_circle_radius);
+                        goal_width, boundary_width, center_circle_radius, Timestamp::fromSeconds(0));
     return field;
 }
 

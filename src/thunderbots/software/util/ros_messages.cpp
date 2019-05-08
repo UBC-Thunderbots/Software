@@ -70,7 +70,7 @@ namespace Util
             Field field = Field(field_msg.field_length, field_msg.field_width,
                                 field_msg.defense_length, field_msg.defense_width,
                                 field_msg.goal_width, field_msg.boundary_width,
-                                field_msg.center_circle_radius);
+                                field_msg.center_circle_radius, Timestamp::fromSeconds(0) );
 
             return field;
         }
