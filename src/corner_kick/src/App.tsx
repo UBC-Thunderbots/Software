@@ -10,6 +10,8 @@ import { Logger } from './containers/Logger';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
 
+import { actions } from './store/actions';
+
 const store = createStore();
 
 // Top-level React component in the application
@@ -19,7 +21,9 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
-            <Portal portalLocation={PortalLocation.SIDEBAR}>This is the sidebar</Portal>
+            <Portal portalLocation={PortalLocation.SIDEBAR}>
+                <button onClick={dispatchBtnAction}>Set Value</button>
+            </Portal>
             <Portal portalLocation={PortalLocation.MAIN}>This is main</Portal>
             <Portal portalLocation={PortalLocation.CONSOLE}>
                 <Logger />
@@ -27,3 +31,8 @@ export const App = () => (
         </Theme>
     </Provider>
 );
+
+/* Testing the action changing state */
+function dispatchBtnAction() {
+    store.dispatch(actions.rosParameters.setRunAI(true));
+}
