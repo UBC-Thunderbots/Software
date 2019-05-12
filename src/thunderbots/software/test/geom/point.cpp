@@ -23,7 +23,7 @@ TEST(MinusEqualOperatorTest, minus_equal_operator_test)
     Point q = Point(3, 4);
 
     p -= q;
-    
+
     EXPECT_EQ(Point(1, 2), p);
 }
 
