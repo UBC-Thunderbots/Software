@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "geom/point.h"
+#include "geom/util.h"
 
 TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_parallel_segments)
 {
@@ -73,6 +74,33 @@ TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_nan_corner_cases
     final_speed = 2.2;
     EXPECT_FALSE(isnormal(
         calculateTransitionSpeedBetweenSegments(testp1, testp2, testp3, final_speed)));
+}
+
+TEST(getPointTrespassTest, distance_within_threshold_test)
+{
+    const Point &p1  = Point(0, 0);
+    const Point &p2  = Point(0, 3);
+    double threshold = 4.0;
+
+    EXPECT_EQ(3, getPointTrespass(p1, p2, threshold));
+}
+
+TEST(getPointTrespassTest, distance_equals_threshold_test)
+{
+    const Point &p1  = Point(0, 0);
+    const Point &p2  = Point(0, 3);
+    double threshold = 3.0;
+
+    EXPECT_EQ(3, getPointTrespass(p1, p2, threshold));
+}
+
+TEST(getPointTrespassTest, distance_greater_than_threshold_test)
+{
+    const Point &p1  = Point(0, 0);
+    const Point &p2  = Point(0, 3);
+    double threshold = 1.0;
+
+    EXPECT_EQ(0, getPointTrespass(p1, p2, threshold));
 }
 
 int main(int argc, char **argv)
