@@ -81,6 +81,7 @@ TEST(ROSMessageUtilTest, create_field_from_ros_message)
     double defense_length       = 1.0;
     double boundary_width       = 0.3;
     double center_circle_radius = 0.5;
+    double default_timestamp = 0;
 
     thunderbots_msgs::Field field_msg;
 
@@ -95,7 +96,7 @@ TEST(ROSMessageUtilTest, create_field_from_ros_message)
     Field field = Util::ROSMessages::createFieldFromROSMessage(field_msg);
 
     Field field_other = Field(length, width, defense_length, defense_width, goal_width,
-                              boundary_width, center_circle_radius);
+                              boundary_width, center_circle_radius, Timestamp::fromSeconds(default_timestamp));
 
     EXPECT_EQ(field_other, field);
 }
@@ -109,9 +110,10 @@ TEST(ROSMessageUtilTest, convert_field_to_ros_message)
     double defense_length       = 1.0;
     double boundary_width       = 0.3;
     double center_circle_radius = 0.5;
+    double default_timestamp = 0;
 
     Field field = Field(length, width, defense_length, defense_width, goal_width,
-                        boundary_width, center_circle_radius);
+                        boundary_width, center_circle_radius, Timestamp::fromSeconds(default_timestamp));
 
     thunderbots_msgs::Field field_msg =
         Util::ROSMessages::convertFieldToROSMessage(field);
@@ -257,7 +259,7 @@ TEST(ROSMessageUtilTest, convert_team_with_no_goalie_to_ros_message)
 
 TEST(ROSMessageUtilTest, invert_world_field_side)
 {
-    Field field = Field(10, 10, 5, 5, 3, 3, 2);
+    Field field = Field(10, 10, 5, 5, 3, 3, 2, Timestamp::fromSeconds(0));
     Ball ball   = Ball(Point(-1.5, 0.2), Vector(-1.3, 6), Timestamp::fromSeconds(123.45));
 
     Robot friendly_robot =

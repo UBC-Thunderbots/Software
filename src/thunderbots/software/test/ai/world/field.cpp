@@ -27,7 +27,7 @@ class FieldTest : public ::testing::Test
     double goal_width;
     double boundary_width;
     double center_circle_radius;
-    Timestamp default_time_stamp = Timestamp::fromSeconds(5);
+    Timestamp default_time_stamp = Timestamp::fromSeconds(0);
 };
 
 TEST_F(FieldTest, construct_with_parameters)
@@ -192,6 +192,33 @@ TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
                           boundary_width, center_circle_radius * 10, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
+}
+
+// Test that the timestamp history is saved when the Field is updated
+TEST_F(FieldTest, field_timestamp_history_is_saved)
+{
+    Field field = Field(length, width, defense_length, defense_width, goal_width,
+                          boundary_width, center_circle_radius, default_time_stamp);
+
+    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
+                           boundary_width, center_circle_radius, Timestamp::fromSeconds(default_time_stamp.getSeconds()+1));
+
+    field.updateDimensions(length, width, defense_length, defense_width, goal_width,
+                           boundary_width, center_circle_radius, Timestamp::fromSeconds(default_time_stamp.getSeconds()+2));
+
+    EXPECT_EQ( field.getTimestampHistory().size(), 3);
+    EXPECT_EQ( field.getTimestampHistory()[0].getSeconds(), default_time_stamp.getSeconds()+2);
+    EXPECT_EQ( field.getTimestampHistory()[1].getSeconds(), default_time_stamp.getSeconds()+1 );
+    EXPECT_EQ( field.getTimestampHistory()[2].getSeconds(), default_time_stamp.getSeconds());
+
+    EXPECT_EQ( field.getMostRecentTimestamp().getSeconds(), default_time_stamp.getSeconds()+2);
+}
+
+TEST_F(FieldTest, exception_thrown_when_older_timestamp_is_used)
+{
+
+    ASSERT_THROW(Field field = Field(length, width, defense_length, defense_width, goal_width,
+                                     boundary_width, center_circle_radius, Timestamp::fromSeconds(default_time_stamp.getSeconds()-1)), std::invalid_argument);
 }
 
 TEST_F(FieldTest, point_not_in_defense_area)

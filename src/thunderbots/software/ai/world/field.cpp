@@ -18,7 +18,7 @@ Field::Field(double field_length, double field_width, double defense_length,
     // Set the size of the Timestamp history buffer
     last_update_timestamps.set_capacity(buffer_size);
 
-    last_update_timestamps.push_front(timestamp);
+    updateTimestamp(timestamp);
 }
 
 void Field::updateDimensions(const Field &new_field_data)
@@ -45,7 +45,7 @@ void Field::updateDimensions(double field_length, double field_width,
     goal_width_           = goal_width;
     boundary_width_       = boundary_width;
     center_circle_radius_ = center_circle_radius;
-    last_update_timestamps.push_front(timestamp);
+    updateTimestamp(timestamp);
 }
 
 double Field::length() const
@@ -198,6 +198,23 @@ boost::circular_buffer<Timestamp> Field::getTimestampHistory() const {
 Timestamp Field::getMostRecentTimestamp() const {
     return last_update_timestamps.front();
 }
+
+void Field::updateTimestamp(Timestamp time_stamp) {
+
+    // Check if the timestamp buffer is empty
+    if( last_update_timestamps.empty() ) {
+        last_update_timestamps.push_front(time_stamp);
+    }
+    // Check that the new timestamp is not older than the most recent timestamp
+    else if (time_stamp < Field::getMostRecentTimestamp())
+    {
+        throw std::invalid_argument(
+                "Error: Attempt tp update Field state with old Timestamp");
+    }
+    else {
+        last_update_timestamps.push_front(time_stamp);
+    }
+    }
 
 bool Field::operator==(const Field &other) const
 {
