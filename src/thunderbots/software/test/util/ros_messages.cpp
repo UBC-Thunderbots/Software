@@ -81,7 +81,7 @@ TEST(ROSMessageUtilTest, create_field_from_ros_message)
     double defense_length       = 1.0;
     double boundary_width       = 0.3;
     double center_circle_radius = 0.5;
-    double default_timestamp = 0;
+    double default_timestamp    = 0;
 
     thunderbots_msgs::Field field_msg;
 
@@ -95,8 +95,9 @@ TEST(ROSMessageUtilTest, create_field_from_ros_message)
 
     Field field = Util::ROSMessages::createFieldFromROSMessage(field_msg);
 
-    Field field_other = Field(length, width, defense_length, defense_width, goal_width,
-                              boundary_width, center_circle_radius, Timestamp::fromSeconds(default_timestamp));
+    Field field_other =
+        Field(length, width, defense_length, defense_width, goal_width, boundary_width,
+              center_circle_radius, Timestamp::fromSeconds(default_timestamp));
 
     EXPECT_EQ(field_other, field);
 }
@@ -110,10 +111,11 @@ TEST(ROSMessageUtilTest, convert_field_to_ros_message)
     double defense_length       = 1.0;
     double boundary_width       = 0.3;
     double center_circle_radius = 0.5;
-    double default_timestamp = 0;
+    double default_timestamp    = 0;
 
-    Field field = Field(length, width, defense_length, defense_width, goal_width,
-                        boundary_width, center_circle_radius, Timestamp::fromSeconds(default_timestamp));
+    Field field =
+        Field(length, width, defense_length, defense_width, goal_width, boundary_width,
+              center_circle_radius, Timestamp::fromSeconds(default_timestamp));
 
     thunderbots_msgs::Field field_msg =
         Util::ROSMessages::convertFieldToROSMessage(field);

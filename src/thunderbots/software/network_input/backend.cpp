@@ -110,8 +110,9 @@ Field Backend::createFieldFromPacketGeometry(
     double defense_width =
         (defense_width_p1 - defense_width_p2).len() * METERS_PER_MILLIMETER;
 
-    Field field = Field(field_length, field_width, defense_length, defense_width,
-                        goal_width, boundary_width, center_circle_radius, Timestamp::fromSeconds(0));
+    Field field =
+        Field(field_length, field_width, defense_length, defense_width, goal_width,
+              boundary_width, center_circle_radius, Timestamp::fromSeconds(0));
     return field;
 }
 

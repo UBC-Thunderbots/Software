@@ -180,9 +180,9 @@ void PassGenerator::pruneAndReplacePasses()
     if (num_passes_to_keep_after_pruning.value() < num_passes_to_optimize.value() &&
         num_passes_to_keep_after_pruning.value() < passes_to_optimize.size())
     {
-            passes_to_optimize.erase(
-                passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
-                passes_to_optimize.end());
+        passes_to_optimize.erase(
+            passes_to_optimize.begin() + num_passes_to_keep_after_pruning.value(),
+            passes_to_optimize.end());
     }
 
     // Generate new passes to replace the ones we just removed

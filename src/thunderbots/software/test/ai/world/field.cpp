@@ -48,7 +48,8 @@ TEST_F(FieldTest, update_with_all_parameters)
     Field field_to_update = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
 
     field_to_update.updateDimensions(length, width, defense_length, defense_width,
-                                     goal_width, boundary_width, center_circle_radius, default_time_stamp);
+                                     goal_width, boundary_width, center_circle_radius,
+                                     default_time_stamp);
 
     EXPECT_DOUBLE_EQ(9.6, field_to_update.totalLength());
     EXPECT_DOUBLE_EQ(6.6, field_to_update.totalWidth());
@@ -198,27 +199,35 @@ TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
 TEST_F(FieldTest, field_timestamp_history_is_saved)
 {
     Field field = Field(length, width, defense_length, defense_width, goal_width,
-                          boundary_width, center_circle_radius, default_time_stamp);
+                        boundary_width, center_circle_radius, default_time_stamp);
 
     field.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                           boundary_width, center_circle_radius, Timestamp::fromSeconds(default_time_stamp.getSeconds()+1));
+                           boundary_width, center_circle_radius,
+                           Timestamp::fromSeconds(default_time_stamp.getSeconds() + 1));
 
     field.updateDimensions(length, width, defense_length, defense_width, goal_width,
-                           boundary_width, center_circle_radius, Timestamp::fromSeconds(default_time_stamp.getSeconds()+2));
+                           boundary_width, center_circle_radius,
+                           Timestamp::fromSeconds(default_time_stamp.getSeconds() + 2));
 
-    EXPECT_EQ( field.getTimestampHistory().size(), 3);
-    EXPECT_EQ( field.getTimestampHistory()[0].getSeconds(), default_time_stamp.getSeconds()+2);
-    EXPECT_EQ( field.getTimestampHistory()[1].getSeconds(), default_time_stamp.getSeconds()+1 );
-    EXPECT_EQ( field.getTimestampHistory()[2].getSeconds(), default_time_stamp.getSeconds());
+    EXPECT_EQ(field.getTimestampHistory().size(), 3);
+    EXPECT_EQ(field.getTimestampHistory()[0].getSeconds(),
+              default_time_stamp.getSeconds() + 2);
+    EXPECT_EQ(field.getTimestampHistory()[1].getSeconds(),
+              default_time_stamp.getSeconds() + 1);
+    EXPECT_EQ(field.getTimestampHistory()[2].getSeconds(),
+              default_time_stamp.getSeconds());
 
-    EXPECT_EQ( field.getMostRecentTimestamp().getSeconds(), default_time_stamp.getSeconds()+2);
+    EXPECT_EQ(field.getMostRecentTimestamp().getSeconds(),
+              default_time_stamp.getSeconds() + 2);
 }
 
 TEST_F(FieldTest, exception_thrown_when_older_timestamp_is_used)
 {
-
-    ASSERT_THROW(Field field = Field(length, width, defense_length, defense_width, goal_width,
-                                     boundary_width, center_circle_radius, Timestamp::fromSeconds(default_time_stamp.getSeconds()-1)), std::invalid_argument);
+    ASSERT_THROW(
+        Field field = Field(length, width, defense_length, defense_width, goal_width,
+                            boundary_width, center_circle_radius,
+                            Timestamp::fromSeconds(default_time_stamp.getSeconds() - 1)),
+        std::invalid_argument);
 }
 
 TEST_F(FieldTest, point_not_in_defense_area)

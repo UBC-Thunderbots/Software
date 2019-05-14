@@ -1,9 +1,9 @@
 #pragma once
 
+#include "boost/circular_buffer.hpp"
 #include "geom/point.h"
 #include "geom/rectangle.h"
 #include "util/time/timestamp.h"
-#include "boost/circular_buffer.hpp"
 
 typedef enum
 {
@@ -32,7 +32,8 @@ class Field
      */
     explicit Field(double field_length, double field_width, double defense_length,
                    double defense_width, double goal_width, double boundary_width,
-                   double center_circle_radius, const Timestamp& timestamp, unsigned int buffer_size = 20);
+                   double center_circle_radius, const Timestamp &timestamp,
+                   unsigned int buffer_size = 20);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -49,7 +50,7 @@ class Field
      */
     void updateDimensions(double field_length, double field_width, double defense_length,
                           double defense_width, double goal_width, double boundary_width,
-                          double center_circle_radius, const Timestamp& timestamp);
+                          double center_circle_radius, const Timestamp &timestamp);
 
     /**
      * Updates the field with new data
@@ -280,7 +281,8 @@ class Field
     /**
      * Returns the most Timestamp corresponding to the most recent update to Field object
      *
-     * @return Timestamp : The Timestamp corresponding to the most recent update to the Field object
+     * @return Timestamp : The Timestamp corresponding to the most recent update to the
+     * Field object
      */
     Timestamp getMostRecentTimestamp() const;
 
