@@ -37,11 +37,11 @@ function* listenToRosParametersChannel() {
         // Access saga to find what type and reassign accordingly for config
 
         ROS.sendRequestToService(
-            '/' + serviceName + '/set_parameters',
+            '/ai/set_parameters',
             'dynamic_reconfigure/Reconfigure',
             {
                 config: {
-                    double: [{ value: serviceValue }],
+                    bools: [{ name: serviceName, value: serviceValue }],
                 },
             },
         );
