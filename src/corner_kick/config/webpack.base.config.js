@@ -38,7 +38,7 @@ const generalWebpackBuild = {
                 use: ['style-loader', 'css-loader'],
             },
             {
-                test: /\.(png|jpg|gif|svg)$/,
+                test: /\.(jpe?g|gif|bmp|mp3|mp4|ogg|wav|eot|ttf|woff|woff2|png|svg)$/,
                 use: [
                     {
                         loader: 'file-loader',

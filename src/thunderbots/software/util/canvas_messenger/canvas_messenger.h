@@ -38,9 +38,10 @@ namespace Util
        public:
         enum class Layer
         {
-            STATIC_FEATURES,
-            ROBOTS,
+            PASS_GENERATION,
             BALL,
+            ROBOTS,
+            STATIC_FEATURES,
         };
 
         struct Color
@@ -126,7 +127,7 @@ namespace Util
          * Uses ROS publishers to publish sprite data for each layer and
          * then clears all layer data.
          */
-        void publishAndClearAllLayers();
+        void publishAndClearLayer(Layer layer);
 
         /**
          * Clear the given layer
@@ -162,6 +163,31 @@ namespace Util
          * @param radius The radius to draw the point with
          */
         void drawPoint(Layer layer, const Point &p, double radius, Color color);
+
+        /**
+         * Draw a gradient created by the given function
+         *
+         * The color of the gradient will be determined by linear interpolation between
+         * the given minimum and the maximum colors.
+         *
+         * @param layer The layer to draw the gradient on
+         * @param valueAtPoint The function representing the gradient. This will be
+         *                     called at points over the given area to get the value
+         *                     to plot.
+         * @param area The area over which to render the gradient
+         * @param points_per_meter The number of points in a meter. Setting this to higher
+         *                         values will give a higher resolution gradient, but be
+         *                         wary, it increase the number of points at an n^2 rate
+         * @param min_val The minimum value we expect `f` to return (values below this
+         *                will automatically be clamped to this)
+         * @param max_val The maximum value we expect `f` to return (values above this
+         *                will automatically be clamped to this)
+         * @param min_color The color for the minimum value
+         * @param max_color The color for the maximum value
+         */
+        void drawGradient(Layer layer, std::function<double(Point)> valueAtPoint,
+                          const Rectangle &area, double min_val, double max_val,
+                          Color min_color, Color max_color, int points_per_meter);
 
         /**
          * Draw the given World
@@ -211,8 +237,17 @@ namespace Util
             uint8_t result[2];
         };
 
+        /**
+         * Struct that holds some sprites and a time
+         */
+        struct SpritesAndTime
+        {
+            std::vector<Sprite> sprites;
+            std::chrono::time_point<std::chrono::system_clock> time;
+        };
+
         // The number of pixels per meter
-        static const int PIXELS_PER_METER = 100;
+        static const int PIXELS_PER_METER = 2000;
 
         // Colors
         static constexpr Color FIELD_COLOR         = {0, 153, 0, 255};
@@ -249,9 +284,7 @@ namespace Util
          */
         void clearAllLayers();
 
-        // layer to sprite data map
-        std::map<Layer, std::vector<Sprite>> layers_map;
-        ros::Publisher publisher;
+        std::optional<ros::Publisher> publisher;
 
         // Period in nanoseconds
         const double DESIRED_PERIOD_MS =
@@ -264,6 +297,9 @@ namespace Util
         std::chrono::time_point<std::chrono::system_clock> time_last_published;
 
         // The mutex for the layers
-        std::mutex layers_map_lock;
+        std::mutex layers_map_mutex;
+
+        // layer to sprites/time last published map
+        std::map<Layer, SpritesAndTime> layers_map;
     };
 }  // namespace Util

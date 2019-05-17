@@ -20,11 +20,9 @@ const Wrapper = styled('div')<{ level: number }>`
     justify-content: space-between;
     align-items: center;
 
-    border-bottom: 1px solid ${(props) => props.theme.colors.panel};
+    border-bottom: 1px solid ${(props) => props.theme.colors.border};
 
     font-size: 12px;
-
-    user-select: text;
 
     ${(props) => {
         switch (props.level) {
@@ -59,6 +57,8 @@ const Body = styled.span`
     height: 100%;
 
     padding-right: 8px;
+
+    user-select: text;
 
     flex-grow: 1;
     overflow: hidden;

@@ -76,6 +76,15 @@ class Team
     void removeExpiredRobots(const Timestamp& timestamp);
 
     /**
+     * Remove the robot with the given ID from the team
+     *
+     * If there is no robot with the given id on the team, does nothing
+     *
+     * @param robot_id The id of the robot to remove
+     */
+    void removeRobotWithId(unsigned int robot_id);
+
+    /**
      * Assigns the goalie for this team, making it the robot with the newly given id.
      * A robot with the given id must already exist on the team.
      *

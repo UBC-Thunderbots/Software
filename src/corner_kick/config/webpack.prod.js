@@ -13,7 +13,10 @@ const webpackConfig = require('./webpack.base.config.js');
 module.exports = {
     ...webpackConfig,
     mode: 'production',
-    devtool: false,
+
+    // We use source-maps to debug from our typescript files, rather than
+    // from the bundle directly
+    devtool: 'inline-source-map',
 
     // Webpack complains that our bundle is too large.
     // We run the visualizer locally so we can keep our bundles bigger
