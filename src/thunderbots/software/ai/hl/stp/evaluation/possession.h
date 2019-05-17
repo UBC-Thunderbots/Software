@@ -17,4 +17,12 @@ namespace Evaluation
     std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
                                                              const Ball &ball,
                                                              const Field &field);
+    /**
+     * Return true is the provided team has possession of the ball.
+     *
+     * @param team The team containing the robots to check for possession
+     * @param ball The ball
+     * @return True if the team has possession, false otherwise
+     */
+    bool teamHasPossession(const Team &team, const Ball &ball);
 }  // namespace Evaluation

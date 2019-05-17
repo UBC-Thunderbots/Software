@@ -38,7 +38,17 @@ namespace Evaluation
      * @param robot The Robot which wants to know if it has the ball.
      * @return True if the ball is close to the front dribbler and false otherwise
      */
-    bool robotHasPossession(Ball ball, Robot robot);
+
+    /**
+     * Determines if a robot has possession of the ball. A robot is considered to have
+     * possession if the ball is in a area close to the its dribbler.
+     *
+     * @param  The ball the is wanted to be possessed
+     * @param robot The Robot which wants to know if it has the ball.
+     * @param timestamp The time at which we want to know if the robot had the ball
+     * @return True if the ball is close to the front dribbler and false otherwise
+     */
+    bool robotHasPossession(Ball ball, Robot robot, Timestamp timestamp=Timestamp());
 }  // namespace Evaluation
 
 

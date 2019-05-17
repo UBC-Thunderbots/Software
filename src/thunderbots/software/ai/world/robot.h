@@ -188,7 +188,7 @@ class Robot
      * @return Vector containing the position history starting with the oldest available
      * data at index 0
      */
-    std::vector<Point> getPreviousPositions();
+    std::vector<Point> getPreviousPositions() const;
 
     /**
      * Gets the buffer which holds all the previous velocity states of the robot
@@ -196,7 +196,7 @@ class Robot
      * @return Vector containing the velocity history starting with the oldest available
      * data at index 0
      */
-    std::vector<Vector> getPreviousVelocities();
+    std::vector<Vector> getPreviousVelocities() const;
 
     /**
      * Gets the buffer which holds all the previous orientation states of the robot
@@ -204,7 +204,7 @@ class Robot
      * @return Vector containing the orientation history starting with the oldest
      * available data at index 0
      */
-    std::vector<Angle> getPreviousOrientations();
+    std::vector<Angle> getPreviousOrientations() const;
 
     /**
      * Gets the buffer which holds all the previous angular velocity states of the robot
@@ -212,7 +212,7 @@ class Robot
      * @return Vector containing the angular velocity history starting with the oldest
      * available data at index 0
      */
-    std::vector<AngularVelocity> getPreviousAngularVelocities();
+    std::vector<AngularVelocity> getPreviousAngularVelocities() const;
 
     /**
      * Gets the buffer which holds all the timestamps of the previous states
@@ -220,7 +220,16 @@ class Robot
      * @return Vector containing the update timestamp history starting with the oldest
      * available data at index 0
      */
-    std::vector<Timestamp> getPreviousTimestamps();
+    std::vector<Timestamp> getPreviousTimestamps() const;
+
+    /**
+     * Finds an update timestamp that is close to the provided timestamp and returns the index of the timestamp in the
+     * history buffer.
+     *
+     * @param timestamp timestamp of the update state index we wish to fetch
+     * @return Index of the robot's update timestamp closest to the desired time.
+     */
+    int getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and

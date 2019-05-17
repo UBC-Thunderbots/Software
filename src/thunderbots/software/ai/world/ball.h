@@ -112,7 +112,7 @@ class Ball final
      * @return Vector containing the position history starting with the oldest available
      * data at index 0
      */
-    std::vector<Point> getPreviousPositions();
+    std::vector<Point> getPreviousPositions() const;
 
     /**
      * Gets the buffer which holds all the previous velocity states of the ball
@@ -120,7 +120,7 @@ class Ball final
      * @return Vector containing the velocity history starting with the oldest available
      * data at index 0
      */
-    std::vector<Vector> getPreviousVelocities();
+    std::vector<Vector> getPreviousVelocities() const;
 
     /**
      * Gets the buffer which holds all the timestamps of the previous states
@@ -128,7 +128,7 @@ class Ball final
      * @return Vector containing the update timestamp history starting with the oldest
      * available data at index 0
      */
-    std::vector<Timestamp> getPreviousTimestamps();
+    std::vector<Timestamp> getPreviousTimestamps() const;
 
     /**
      * Adds a state to the front of the circular buffers storing the state of histories of
@@ -140,6 +140,15 @@ class Ball final
      */
     void addStateToBallHistory(const Point& position, const Vector& velocity,
                                const Timestamp& timestamp);
+
+    /**
+     * Finds an update timestamp that is close to the provided timestamp and returns the index of the timestamp in the
+     * history buffer.
+     *
+     * @param timestamp timestamp of the update state index we wish to fetch
+     * @return Index of the ball's update timestamp closest to the desired time.
+     */
+    int getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and

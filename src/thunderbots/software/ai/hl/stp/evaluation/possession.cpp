@@ -4,6 +4,7 @@
 #include "ai/hl/stp/evaluation/team.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
+#include "robot.h"
 
 namespace Evaluation
 {
@@ -43,5 +44,22 @@ namespace Evaluation
         {
             return Evaluation::nearestRobot(team, ball.position());
         }
+    }
+
+    bool teamHasPossession(const Team &team, const Ball &ball)
+    {
+        for (Robot robot : team.getAllRobots())
+        {
+            std::vector<Timestamp> robot_history_timestamps = robot.getPreviousTimestamps();
+
+            int i = 0;
+            while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] < Duration::fromSeconds(3))
+            {
+                if (robotHasPossession(ball, robot, robot_history_timestamps[i])) return true;
+                i++;
+            }
+        }
+
+        return false;
     }
 }  // namespace Evaluation

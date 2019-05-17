@@ -477,3 +477,19 @@ TEST_F(RobotTest, get_timestamp_history)
 
     EXPECT_EQ(prevAngularVelocities, robot.getPreviousTimestamps());
 }
+
+TEST_F(RobotTest, get_timestamp_index_fetches_first_index)
+{
+    //TODO: DO tests for finding the correct timestamp index.
+    std::vector prevAngularVelocities = {half_second_future, half_second_future,
+                                         current_time};
+
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time, 3);
+    robot.updateState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                      AngularVelocity::ofRadians(1.1), half_second_future);
+    robot.updateState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                      AngularVelocity::ofRadians(1.2), half_second_future);
+
+    EXPECT_EQ(prevAngularVelocities, robot.getPreviousTimestamps());
+}
