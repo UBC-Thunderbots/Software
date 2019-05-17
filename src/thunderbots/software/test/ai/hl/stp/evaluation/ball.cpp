@@ -68,3 +68,79 @@ TEST(BallInEnemyHalfTest, ball_at_friendly_goal)
 
     EXPECT_FALSE(Evaluation::ballInEnemyHalf(field, ball));
 }
+
+class BallPositionsInFriendlyCornerOffField : public ::testing::TestWithParam<Point>
+{
+};
+
+class BallPositionsInFriendlyCornerOnField : public ::testing::TestWithParam<Point>
+{
+};
+
+class BallPositionsInEnemyCornerOnField : public ::testing::TestWithParam<Point>
+{
+};
+
+class BallPositionsInEnemyCornerOffField : public ::testing::TestWithParam<Point>
+{
+};
+
+TEST_P(BallPositionsInFriendlyCornerOnField, in_corner_inside_field)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball   = Ball(GetParam(), Point(0, 0), Timestamp::fromMilliseconds(0));
+
+    EXPECT_FALSE(Evaluation::ballInEnemyCorner(field, ball, 2.0));
+    EXPECT_TRUE(Evaluation::ballInFriendlyCorner(field, ball, 2.0));
+
+    EXPECT_FALSE(Evaluation::ballInEnemyCorner(field, ball, 1.0));
+    EXPECT_TRUE(Evaluation::ballInFriendlyCorner(field, ball, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOnField,
+                        ::testing::Values(Point(-4.5, 3), Point(-4.5, -3), Point(-4.0, 3),
+                                          Point(-4.0, -3)));
+
+TEST_P(BallPositionsInFriendlyCornerOffField, in_corner_outside_field)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball   = Ball(GetParam(), Point(0, 0), Timestamp::fromMilliseconds(0));
+
+    EXPECT_FALSE(Evaluation::ballInFriendlyCorner(field, ball, 1.0));
+    EXPECT_FALSE(Evaluation::ballInEnemyCorner(field, ball, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInFriendlyCornerOffField,
+                        ::testing::Values(Point(-4.6, 3), Point(-4.6, -3), Point(-5.0, 3),
+                                          Point(-5.0, -3), Point(-4.5, -3.1),
+                                          Point(-4.0, -3.1)));
+
+TEST_P(BallPositionsInEnemyCornerOnField, in_corner_inside_field)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball   = Ball(GetParam(), Point(0, 0), Timestamp::fromMilliseconds(0));
+
+    EXPECT_TRUE(Evaluation::ballInEnemyCorner(field, ball, 2.0));
+    EXPECT_FALSE(Evaluation::ballInFriendlyCorner(field, ball, 2.0));
+
+    EXPECT_TRUE(Evaluation::ballInEnemyCorner(field, ball, 1.0));
+    EXPECT_FALSE(Evaluation::ballInFriendlyCorner(field, ball, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOnField,
+                        ::testing::Values(Point(4.5, 3), Point(4.5, -3), Point(4.0, 3),
+                                          Point(4.0, -3)));
+
+TEST_P(BallPositionsInEnemyCornerOffField, in_corner_outside_field)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball   = Ball(GetParam(), Point(0, 0), Timestamp::fromMilliseconds(0));
+
+    EXPECT_FALSE(Evaluation::ballInEnemyCorner(field, ball, 1.0));
+    EXPECT_FALSE(Evaluation::ballInFriendlyCorner(field, ball, 1.0));
+}
+
+INSTANTIATE_TEST_CASE_P(Positions, BallPositionsInEnemyCornerOffField,
+                        ::testing::Values(Point(4.6, 3), Point(4.6, -3), Point(5.0, 3),
+                                          Point(5.0, -3), Point(4.5, -3.1),
+                                          Point(4.0, -3.1)));

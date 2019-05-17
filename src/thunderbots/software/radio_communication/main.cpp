@@ -4,6 +4,8 @@
 #include <thunderbots_msgs/PrimitiveArray.h>
 #include <thunderbots_msgs/World.h>
 
+#include <csignal>
+
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
 #include "geom/point.h"
@@ -62,11 +64,23 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     backend_ptr->send_vision_packet();
 }
 
+void signalHandler(int signum)
+{
+    LOG(DEBUG) << "Ctrl-C signal caught" << std::endl;
+
+    // Destroys backend, allowing everything libusb-related to
+    // exit gracefully.
+    backend_ptr.reset();
+}
+
 int main(int argc, char** argv)
 {
     // Init ROS node
     ros::init(argc, argv, "radio_communication");
     ros::NodeHandle node_handle;
+
+    // Register signal handler (has to be after ros::init)
+    signal(SIGINT, signalHandler);
 
     // Init backend
     backend_ptr = std::make_unique<MRFBackend>(node_handle);

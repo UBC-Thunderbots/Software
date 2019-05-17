@@ -254,9 +254,9 @@ std::optional<LegacyTriangle> Evaluation::getLargestValidTriangle(
             double l2        = (t[2] - t[0]).len();
             double l3        = (t[2] - t[1]).len();
 
-            Angle a1 = vertexAngle(t[1], t[0], t[2]).angleMod().abs();
-            Angle a2 = vertexAngle(t[0], t[1], t[2]).angleMod().abs();
-            Angle a3 = vertexAngle(t[0], t[2], t[1]).angleMod().abs();
+            Angle a1 = acuteVertexAngle(t[1], t[0], t[2]).angleMod().abs();
+            Angle a2 = acuteVertexAngle(t[0], t[1], t[2]).angleMod().abs();
+            Angle a3 = acuteVertexAngle(t[0], t[2], t[1]).angleMod().abs();
 
             if (area >= largest_area && area >= min_area && l1 >= min_edge_len &&
                 l2 >= min_edge_len && l3 >= min_edge_len &&

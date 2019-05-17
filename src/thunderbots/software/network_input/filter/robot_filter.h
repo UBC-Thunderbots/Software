@@ -1,7 +1,9 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
+#include "ai/world/robot.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "util/time/timestamp.h"
@@ -40,9 +42,11 @@ class RobotFilter
     /**
      * Creates a new robot filter
      *
-     * @param id the id of the robot to filter
+     * @param current_robot_state the data of current state of the robot
+     * @param expiry_buffer_duration the time when the robot is determined to be removed
+     * from the field if data about the robot is not received before that time
      */
-    explicit RobotFilter(unsigned int id);
+    explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
 
     /**
      * Updates the filter given a new set of data, and returns the most up to date
@@ -54,8 +58,8 @@ class RobotFilter
      *
      * @return The filtered data for the robot
      */
-    FilteredRobotData getFilteredData(
-        const std::vector<SSLRobotDetection> &new_robot_data);
+    std::optional<Robot> getFilteredData(
+        const std::vector<SSLRobotDetection>& new_robot_data);
 
     /**
      * Returns the id of the Robot that this filter is filtering for
@@ -65,5 +69,6 @@ class RobotFilter
     unsigned int getRobotId() const;
 
    private:
-    unsigned int robot_id;
+    Robot current_robot_state;
+    Duration expiry_buffer_duration;
 };

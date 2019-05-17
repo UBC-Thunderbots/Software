@@ -31,12 +31,4 @@ interface IColorProvider {
     warn: Color;
     info: Color;
     debug: Color;
-
-    red: Color;
-    orange: Color;
-    yellow: Color;
-    green: Color;
-    cyan: Color;
-    blue: Color;
-    purple: Color;
 }

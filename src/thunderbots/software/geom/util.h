@@ -375,6 +375,17 @@ Point reflect(const Point &v, const Point &n);
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     Ray &ray, Segment &segment);
 
+
+/**
+ * Calculates the intersection of two Rays
+ *
+ * @param ray1: First Ray
+ * @param ray2: Second Ray
+ * @return Returns std::nullopt if no intersections exist, or if there are infinite
+ * intersections (overlapping) Returns Point if a single intersection exists.
+ */
+std::optional<Point> getRayIntersection(Ray ray1, Ray ray2);
+
 /**
  * Reflects a point across a line.
  *
@@ -462,9 +473,27 @@ Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 Point intersection(Point a1, Point a2, Point b1, Point b2);
 
 /**
- * gives counterclockwise angle from <a-b> to <c-b>
+ * Calculates the acute angle formed by the two given vectors
+ *
+ * @param v1
+ * @param v2
+ *
+ * @return The acute angle formed by v1 and v2
  */
-Angle vertexAngle(Point a, Point b, Point c);
+Angle acuteVertexAngle(Vector v1, Vector v2);
+
+/**
+ * Calculates the acute angle formed by the vector p2->p1 and p2->p3
+ *
+ * @param p1
+ * @param p2
+ * @param p3
+ *
+ * @return the acute angle formed by the vector p2->p1 and p2->p3
+ */
+Angle acuteVertexAngle(Point p1, Point p2, Point p3);
+
+Angle minAngleBetweenVectors(Vector v1, Vector v2);
 
 /**
  * returns time of closest point of approach of two points
@@ -492,6 +521,15 @@ bool pointInFrontVector(Point offset, Point dir, Point p);
 std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle &circle,
                                                double buffer = 0.0);
 
+/**
+ * Returns the tangent vectors of a Circle and Point (Vectors are directed towards Circle)
+ *
+ * @param reference: The point which the tangent vectors will intersect
+ * @param circle: The circle to calculate the tangent vectors of
+ * @return the mean point of points
+ */
+std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle);
+
 bool pointIsRightOfLine(const Segment &line, const Point &point);
 
 /**
@@ -509,6 +547,67 @@ Point getPointsMean(const std::vector<Point> &points);
  * @return the variance of the list of points
  */
 double getPointsVariance(const std::vector<Point> &points);
+
+/**
+ * Function returns the segment defined by the segment between the intersections of two
+ * Rays on a segment
+ *
+ * @param ray1 (Starting point and direction)
+ * @param ray2 (Starting point and direction)
+ * @param segment (Segment to find segment of intersection upon)
+ * @return Segment, the segment defined by the space between two intersecting rays on the
+ * segment parameter std::nullopt, if both rays don't intersect the segment, and the
+ * segment is not enclosed between the rays Segment, if one ray intersects the segment,
+ * but one of the segment parameters extremes are enclosed within the two rays
+ */
+std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment);
+
+/**
+ * Function calculates whether the segment parameter is enclosed between the ray
+ * parameters. This means the entirety of the segment lays between the rays
+ *
+ * @param segment : segment parameter to calculate if its definition lies between the rays
+ * @param ray1 : Starting point and direction
+ * @param ray2 : Starting point an direction
+ * @return Segment: Returns the segment parameter if it is completely enclosed between
+ * ray1 and ray2.
+ *
+ * Example of segment being enclosed by rays:
+ *
+ *        segment
+ *     \ *----*  /
+ *      \       /
+ *  ray1 \     /ray2
+ *        *   *
+ *
+ * Returns std::nullopt of the ray is not completely enclosed between the rays, or
+ * not at all
+ */
+std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2);
+
+/**
+ * Function merges overlapping parallel segments into one combined segment
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and
+ * partially/completely overlapping
+ * Returns std::nullopt if the segments aren't parallel or overlapping
+ */
+std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
+                                                        Segment segment2);
+
+/**
+ * Function calculates if the segment parameters are redundant, for example, if segment2
+ * is parallel and contained within segment1
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment: If the segments are redundant, returns the larger segment
+ *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
+ * aren't redundant
+ */
+std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
 
 /**
  * Returns the binary trespass score of a point and rectangle

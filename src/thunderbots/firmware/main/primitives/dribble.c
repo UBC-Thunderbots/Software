@@ -34,8 +34,7 @@ static void dribble_init(void) {
 	destination[0] = ((float)(params->params[0])/1000.0f);
 	destination[1] = ((float)(params->params[1])/1000.0f);
 	destination[2] = ((float)(params->params[2])/100.0f);
-	unsigned int desired_dribbler_speed = ((unsigned int)(params->params[3]));
-	dribbler_set_speed(0);
+	dribbler_set_speed(((unsigned int)(params->params[3])));
 }
 
 /**

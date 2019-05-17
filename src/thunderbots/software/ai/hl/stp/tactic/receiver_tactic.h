@@ -25,8 +25,8 @@ class ReceiverTactic : public Tactic
      * @param enemy_team The enemy team
      * @param pass The pass this tactic should try to receive
      * @param ball The ball being passed
-     * @param loop_forever Whether or not this Tactic should never complete. If true, the
-     * tactic will be restarted every time it completes
+     * @param loop_forever Whether or not this Tactic should never complete. If true,
+     *                     the tactic will be restarted every time it completes
      */
     explicit ReceiverTactic(const Field& field, const Team& friendly_team,
                             const Team& enemy_team, const AI::Passing::Pass pass,
@@ -79,6 +79,17 @@ class ReceiverTactic : public Tactic
 
     std::unique_ptr<Intent> calculateNextIntent(
         intent_coroutine::push_type& yield) override;
+
+    /**
+     * Finds a feasible shot for the robot, if any.
+     *
+     * A feasible shot is one where the robot does not have to rotate to much to
+     * take the shot, and there is a sufficient percentage of the net open for the shot.
+     *
+     * @return A pair of a Point to shoot at and the open angle the shot could
+     *         go through, or std::nullopt if there is no feasible shot
+     */
+    std::optional<std::pair<Point, Angle>> findFeasibleShot();
 
     // The field the pass is occuring on
     Field field;
