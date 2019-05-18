@@ -40,12 +40,15 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
             team_robots.insert(std::make_pair(robot.id(), robot));
         }
     }
+
+    updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
 void Team::updateState(const Team& new_team_data)
 {
     updateRobots(new_team_data.getAllRobots());
     this->goalie_id = new_team_data.goalie_id;
+    updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
 void Team::updateStateToPredictedState(const Timestamp& timestamp)
@@ -55,6 +58,8 @@ void Team::updateStateToPredictedState(const Timestamp& timestamp)
     {
         it->second.updateStateToPredictedState(timestamp);
     }
+
+    updateTimestamp(timestamp);
 }
 
 void Team::removeExpiredRobots(const Timestamp& timestamp)
