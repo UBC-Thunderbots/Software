@@ -7,7 +7,7 @@
 Field::Field(double field_length, double field_width, double defense_length,
              double defense_width, double goal_width, double boundary_width,
              double center_circle_radius, const Timestamp &timestamp,
-             unsigned int buffer_size = 20)
+             unsigned int buffer_size)
     : field_length_(field_length),
       field_width_(field_width),
       defense_length_(defense_length),
