@@ -521,7 +521,9 @@ TEST_F(RobotTest, get_timestamp_index_no_matching_timestamp)
     robot.updateState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
                       AngularVelocity::ofRadians(1.2), one_second_future);
 
-    Timestamp no_matching_time = half_second_future + Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS+1.0);
+    Timestamp no_matching_time =
+        half_second_future +
+        Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1.0);
 
     EXPECT_EQ(-1, robot.getHistoryIndexFromTimestamp(no_matching_time));
 }

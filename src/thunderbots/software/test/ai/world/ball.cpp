@@ -1,7 +1,7 @@
 #include "ai/world/ball.h"
 
-#include <gtest/gtest.h>
 #include <firmware/main/shared_util/constants.h>
+#include <gtest/gtest.h>
 #include <shared/constants.h>
 
 
@@ -329,7 +329,9 @@ TEST_F(BallTest, get_timestamp_index_no_matching_timestamp)
     ball.updateState(Point(-1.2, 3), Vector(2.2, -0.05), half_second_future);
     ball.updateState(Point(-1.3, 3), Vector(2.3, -0.05), one_second_future);
 
-    Timestamp no_matching_time = half_second_future + Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS+1);
+    Timestamp no_matching_time =
+        half_second_future +
+        Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1);
 
     EXPECT_EQ(-1, ball.getHistoryIndexFromTimestamp(no_matching_time));
 }
