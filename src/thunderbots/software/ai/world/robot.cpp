@@ -1,5 +1,7 @@
 #include "robot.h"
 
+#include <shared/constants.h>
+
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration)
@@ -219,8 +221,12 @@ int Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
     for (int i = 0; i < timestamp_history.size(); i++)
     {
-        double timestamp_diff = fabs((timestamp - timestamp_history[i]).getMilliseconds());
-        if (timestamp_diff < 100) return i;
+        double timestamp_diff =
+            fabs((timestamp - timestamp_history[i]).getMilliseconds());
+
+        // If timestamp is close to desired timestamp, return the index.
+        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
+            return i;
     }
     return -1;
 }

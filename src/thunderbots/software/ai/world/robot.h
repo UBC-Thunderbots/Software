@@ -223,11 +223,12 @@ class Robot
     std::vector<Timestamp> getPreviousTimestamps() const;
 
     /**
-     * Finds an update timestamp that is close to the provided timestamp and returns the index of the timestamp in the
-     * history buffer.
+     * Finds an update timestamp that is close to the provided timestamp and returns the
+     * index of the timestamp in the history buffer.
      *
      * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the robot's update timestamp closest to the desired time.
+     * @return Index of the robot's update timestamp closest to the desired time and -1 if
+     * there is not matching timestamp.
      */
     int getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
 

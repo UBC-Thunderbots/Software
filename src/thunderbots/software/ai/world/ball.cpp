@@ -1,5 +1,7 @@
 #include "ball.h"
 
+#include <shared/constants.h>
+
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
            unsigned int history_duration)
     : positions_(history_duration),
@@ -127,8 +129,10 @@ int Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
     for (int i = 0; i < timestamp_history.size(); i++)
     {
-        double timestamp_diff = fabs((timestamp - timestamp_history[i]).getMilliseconds());
-        if (timestamp_diff < 100) return i;
+        double timestamp_diff =
+            fabs((timestamp - timestamp_history[i]).getMilliseconds());
+        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
+            return i;  // If timestamp is close to desired timestamp, return the index.
     }
     return -1;
 }

@@ -180,12 +180,12 @@ TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
 
     ball.updateState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(3));
 
-    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(3));
-    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(3));
-    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(),
-                         AngularVelocity::zero(), Timestamp::fromSeconds(3));
+    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(3));
+    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(3));
+    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(3));
 
     team.updateRobots({robot0, robot1, robot2});
 
@@ -206,12 +206,12 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 
     ball.updateState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4));
 
-    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(),
-                       AngularVelocity::zero(), Timestamp::fromSeconds(4));
-    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(),
-                       AngularVelocity::zero(), Timestamp::fromSeconds(4));
-    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(),
-                       AngularVelocity::zero(), Timestamp::fromSeconds(4));
+    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(4));
+    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(4));
+    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(4));
 
 
     team.updateRobots({robot0, robot1, robot2});
