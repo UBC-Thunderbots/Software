@@ -22,13 +22,13 @@ double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
 /**
  * Calculates how much a point is trespassing in another point's space.
  *
- * Returns the distance between the given point and the threshold point if it is within
- * the given threshold of the trespass point. Otherwise, return 0.
+ * Returns the distance that the point has trespassed within the given threshold of the
+ * trespass point. If the trespass value is out of the threshold boundary, return 0.
  *
  * @param p1 A point
  * @param p2 The trespass point
  * @param trespass_threshold The threshold of the trespass point
- * @return Distance between p1 and p2 if it is within trespass_threshold. Returns 0
+ * @return Distance p1 has trespassed if it is within trespass_threshold. Returns 0
  * otherwise.
  */
 double getPointTrespass(const Point &p1, const Point &p2, double trespass_threshold);

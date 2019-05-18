@@ -1,5 +1,6 @@
 #include "ai/navigator/util.h"
 
+#include "geom/point.h"
 #include "geom/util.h"
 
 double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
@@ -10,10 +11,12 @@ double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
 
 double getPointTrespass(const Point &p1, const Point &p2, double trespass_threshold)
 {
-    double dist_trespass = dist(p1, p2);
+    double dist_trespass = trespass_threshold - (p1 - p2).len();
 
-    if (dist_trespass <= trespass_threshold)
-        return dist_trespass;
+    if (dist_trespass < 0)
+    {
+        dist_trespass = 0;
+    }
 
-    return 0;
+    return dist_trespass;
 }
