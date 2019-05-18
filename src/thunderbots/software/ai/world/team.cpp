@@ -158,6 +158,35 @@ void Team::clearAllRobots()
     team_robots.clear();
 }
 
+boost::circular_buffer<Timestamp> Team::getTimestampHistory() const
+{
+    return last_update_timestamps;
+}
+
+Timestamp Team::getMostRecentTimestamp() const
+{
+    return last_update_timestamps.front();
+}
+
+void Team::updateTimestamp(Timestamp time_stamp)
+{
+    // Check if the timestamp buffer is empty
+    if (last_update_timestamps.empty())
+    {
+        last_update_timestamps.push_front(time_stamp);
+    }
+    // Check that the new timestamp is not older than the most recent timestamp
+    else if (time_stamp < Team::getMostRecentTimestamp())
+    {
+        throw std::invalid_argument(
+                "Error: Attempt tp update Field state with old Timestamp");
+    }
+    else
+    {
+        last_update_timestamps.push_front(time_stamp);
+    }
+}
+
 bool Team::operator==(const Team& other) const
 {
     return this->getAllRobots() == other.getAllRobots() &&

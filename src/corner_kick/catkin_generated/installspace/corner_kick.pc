@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: corner_kick
+Description: Description of corner_kick
+Version: 1.0.0
+Cflags: 
+Libs: -L/usr/local/lib 
+Requires: 
