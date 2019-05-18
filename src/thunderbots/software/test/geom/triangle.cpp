@@ -88,9 +88,9 @@ TEST(TriangleTest, test_triangle_not_contains_point)
     EXPECT_FALSE(triangle.containsPoint(point));
 }
 
-TEST(TriangleTest, test_polygon_triangle_intersects_line_segment)
+TEST(TriangleTest, test_triangle_intersects_line_segment)
 {
-    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
     Triangle triangle{p1, p2, p3};
 
     Segment seg{Point(1.0f, 1.0f), Point(0.2f, 0.2f)};
@@ -99,16 +99,25 @@ TEST(TriangleTest, test_polygon_triangle_intersects_line_segment)
 
 TEST(TriangleTest, test_triangle_not_intersects_line_segment)
 {
-    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
     Triangle triangle{p1, p2, p3};
 
     Segment seg{Point(1.0f, 1.0f), Point(2.0f, 2.0f)};
     EXPECT_FALSE(triangle.intersects(seg));
 }
 
+TEST(TriangleTest, test_triangle_intersects_two_segments)
+{
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
+    Triangle triangle{p1, p2, p3};
+
+    Segment seg{Point(0.0f, -1.0f), Point(2.0f, 1.0f)};
+    EXPECT_TRUE(triangle.intersects(seg));
+}
+
 TEST(TriangleTest, test_triangle_intersects_ray)
 {
-    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
     Triangle triangle{p1, p2, p3};
 
     Ray ray{Point(5000.0f, 5000.0f), Vector(-1.0, -1.0)};
@@ -117,7 +126,7 @@ TEST(TriangleTest, test_triangle_intersects_ray)
 
 TEST(TriangleTest, test_triangle_not_intersects_ray)
 {
-    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
     Triangle triangle{p1, p2, p3};
 
     Ray ray{Point(5000.0f, 5000.0f), Vector(1.0f, 1.0f)};
@@ -126,7 +135,7 @@ TEST(TriangleTest, test_triangle_not_intersects_ray)
 
 TEST(TriangleTest, test_triangle_intersects_ray2)
 {
-    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
     Triangle triangle{p1, p2, p3};
 
     Ray ray{Point(-0.1f, -0.1f), Vector(-1.0f, -1.0f)};

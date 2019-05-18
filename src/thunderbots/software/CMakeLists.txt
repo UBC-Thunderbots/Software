@@ -586,6 +586,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/action/movespin_action.cpp
             test/ai/hl/stp/action/pivot_action.cpp
             geom/polygon.cpp
+            geom/triangle.cpp
             geom/util.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
@@ -627,6 +628,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/polygon.cpp
+            geom/triangle.cpp
             geom/util.cpp
             test/ai/hl/stp/tactic/block_shot_path_tactic.cpp
             test/ai/hl/stp/tactic/cherry_pick_tactic.cpp

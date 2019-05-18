@@ -4,7 +4,7 @@
 
 #include "ai/intent/kick_intent.h"
 #include "ai/intent/move_intent.h"
-#include "geom/polygon.h"
+#include "geom/triangle.h"
 #include "geom/util.h"
 #include "shared/constants.h"
 
@@ -91,8 +91,8 @@ std::unique_ptr<Intent> KickAction::calculateNextIntent(
             behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) -
             behind_ball.perp().norm(size_of_region_behind_ball / 2);
 
-        Polygon behind_ball_region =
-            Polygon({behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C});
+        Triangle behind_ball_region =
+            Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
 
         bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
