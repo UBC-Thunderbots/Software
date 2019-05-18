@@ -202,6 +202,12 @@ std::vector<Timestamp> Robot::getPreviousTimestamps()
     return retval;
 }
 
+Timestamp Robot::getMostRecentTimestamp() const
+{
+    return last_update_timestamps.front();
+
+}
+
 void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity,
                                    const Angle &orientation,
                                    const AngularVelocity &angular_velocity,

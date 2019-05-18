@@ -30,8 +30,9 @@ class Team
      *
      * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
+     * @param buffer_size The number of elements in the Timestamp history buffer of the Team object
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration);
+    explicit Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size = 20);
 
     /**
      * Updates this team with new robots.
@@ -209,6 +210,13 @@ class Team
      * @param time_stamp : The timestamp at which the Field object was updated
      */
     void updateTimestamp(Timestamp time_stamp);
+
+    /**
+     * Returns the most recent Timestamp from all robots in a Team
+     *
+     * @return The most revent Timestamp from all robots in the Team
+     */
+    Timestamp getMostRecentTimestampFromRobots();
 
     // The map that contains the Robots for this team. The map makes it easier to
     // guarantee we only have robots with unique IDs.

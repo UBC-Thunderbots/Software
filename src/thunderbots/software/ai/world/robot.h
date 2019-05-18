@@ -223,6 +223,14 @@ class Robot
     std::vector<Timestamp> getPreviousTimestamps();
 
     /**
+     * Returns the most Timestamp corresponding to the most recent update to Robot object
+     *
+     * @return Timestamp : The Timestamp corresponding to the most recent update to the
+     * Robot object
+     */
+    Timestamp getMostRecentTimestamp() const;
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.

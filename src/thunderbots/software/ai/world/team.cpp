@@ -4,11 +4,13 @@
 
 #include "shared/constants.h"
 
-Team::Team(const Duration& robot_expiry_buffer_duration)
+Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)
     : team_robots(),
       goalie_id(),
       robot_expiry_buffer_duration(robot_expiry_buffer_duration)
 {
+    // Set the size of the Timestamp history buffer
+    last_update_timestamps.set_capacity(buffer_size);
 }
 
 void Team::updateRobots(const std::vector<Robot>& new_robots)
@@ -168,6 +170,21 @@ Timestamp Team::getMostRecentTimestamp() const
     return last_update_timestamps.front();
 }
 
+Timestamp Team::getMostRecentTimestampFromRobots() {
+
+    std::vector<Robot> robots = this->getAllRobots();
+
+    Timestamp most_recent_timestamp = Timestamp::fromSeconds(0);
+
+    for( Robot robot : robots) {
+        if( robot.getMostRecentTimestamp() > most_recent_timestamp) {
+            most_recent_timestamp = robot.getMostRecentTimestamp();
+        }
+    }
+
+    return most_recent_timestamp;
+}
+
 void Team::updateTimestamp(Timestamp time_stamp)
 {
     // Check if the timestamp buffer is empty
@@ -179,7 +196,7 @@ void Team::updateTimestamp(Timestamp time_stamp)
     else if (time_stamp < Team::getMostRecentTimestamp())
     {
         throw std::invalid_argument(
-                "Error: Attempt tp update Field state with old Timestamp");
+                "Error: Attempt tp update Team state with old Timestamp");
     }
     else
     {
