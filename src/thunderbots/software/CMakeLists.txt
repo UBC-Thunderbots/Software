@@ -746,7 +746,8 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/chip_intent.cpp
             ai/intent/direct_velocity_intent.cpp
             ai/intent/direct_wheels_intent.cpp
-            ai/intent/dribble_intent.cpp ai/intent/intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/intent/intent.cpp
             ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
