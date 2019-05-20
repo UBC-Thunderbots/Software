@@ -4,6 +4,7 @@
 
 #include "util/constants.h"
 #include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 
 NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_service()
@@ -79,17 +80,54 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
     if (packet.has_detection())
     {
-        auto detection = packet.detection();
-        // add the detection to the map, replacing any existing values
-        auto ret = latest_detection_data.insert(
-            std::make_pair(detection.camera_id(), detection));
-        // check if we inserted successfully. if not, modify the existing
-        // entry to be our new value
-        if (!ret.second)
+        auto detection       = packet.detection();
+        bool camera_disabled = false;
+
+        switch (detection.camera_id())
         {
-            ret.first->second = detection;
+            case 0:
+                if (Util::DynamicParameters::cameras::ignore_camera_0.value())
+                {
+                    camera_disabled = true;
+                }
+                break;
+            case 1:
+                if (Util::DynamicParameters::cameras::ignore_camera_1.value())
+                {
+                    camera_disabled = true;
+                }
+                break;
+            case 2:
+                if (Util::DynamicParameters::cameras::ignore_camera_2.value())
+                {
+                    camera_disabled = true;
+                }
+                break;
+            case 3:
+                if (Util::DynamicParameters::cameras::ignore_camera_3.value())
+                {
+                    camera_disabled = true;
+                }
+                break;
+            default:
+                LOG(INFO) << "An unkown camera id was detected, disabled by default "
+                          << "id: " << detection.camera_id() << std::endl;
+                camera_disabled = true;
+                break;
         }
 
+        if (!camera_disabled)
+        {
+            // add the detection to the map, replacing any existing values
+            auto ret = latest_detection_data.insert(
+                std::make_pair(detection.camera_id(), detection));
+            // check if we inserted successfully. if not, modify the existing
+            // entry to be our new value
+            if (!ret.second)
+            {
+                ret.first->second = detection;
+            }
+        }
         // Create a vector of the latest detection data for each camera
         std::vector<SSL_DetectionFrame> latest_detections;
         for (auto it = latest_detection_data.begin(); it != latest_detection_data.end();
