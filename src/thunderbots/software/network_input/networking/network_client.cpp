@@ -86,32 +86,24 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         switch (detection.camera_id())
         {
             case 0:
-                if (Util::DynamicParameters::cameras::ignore_camera_0.value())
-                {
-                    camera_disabled = true;
-                }
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_0.value();
                 break;
             case 1:
-                if (Util::DynamicParameters::cameras::ignore_camera_1.value())
-                {
-                    camera_disabled = true;
-                }
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_1.value();
                 break;
             case 2:
-                if (Util::DynamicParameters::cameras::ignore_camera_2.value())
-                {
-                    camera_disabled = true;
-                }
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_2.value();
                 break;
             case 3:
-                if (Util::DynamicParameters::cameras::ignore_camera_3.value())
-                {
-                    camera_disabled = true;
-                }
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_3.value();
                 break;
             default:
-                LOG(INFO) << "An unkown camera id was detected, disabled by default "
-                          << "id: " << detection.camera_id() << std::endl;
+                LOG(WARNING) << "An unkown camera id was detected, disabled by default "
+                             << "id: " << detection.camera_id() << std::endl;
                 camera_disabled = true;
                 break;
         }
