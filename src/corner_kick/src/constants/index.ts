@@ -9,6 +9,8 @@ export {
     TOPIC_ROSOUT_TYPE,
     TOPIC_PLAY_INFO,
     TOPIC_PLAY_INFO_TYPE,
+    TOPIC_ROBOT_STATUS,
+    TOPIC_ROBOT_STATUS_TYPE,
 } from './topics';
 export {
     PARAM_RUN_AI,
