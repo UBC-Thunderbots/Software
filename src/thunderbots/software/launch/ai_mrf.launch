@@ -1,6 +1,6 @@
 <launch>
 
-    <!-- Configuration of the radio; default is 0-->
+    <!-- Configuration of the radio; default is 0 -->
     <arg name="mrf_config" default="0"/>
 
     <!-- Run all the shared AI nodes -->

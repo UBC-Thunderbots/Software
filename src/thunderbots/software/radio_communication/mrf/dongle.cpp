@@ -31,7 +31,7 @@ namespace
 
     // Different configs for the dongle, to allow for communication over
     // different PANs and/or channels
-    constexpr int NUM_DEFAULT_CONFIGS = 4;
+    constexpr int NUM_DEFAULT_CONFIGS                      = 4;
     const RadioConfig DEFAULT_CONFIGS[NUM_DEFAULT_CONFIGS] = {
         {25U, 250, 0x1846U},
         {25U, 250, 0x1847U},
@@ -114,17 +114,17 @@ MRFDongle::MRFDongle(Annunciator &annunciator)
     {
         unsigned int config = 0U;
         {
-            // const char *config_string = std::getenv("MRF_CONFIG");
             ros::NodeHandle nh;
             std::string config_string;
+
             if (nh.getParam("mrf_config", config_string))
             {
                 int i = std::stoi(config_string, nullptr, 0);
                 if (i < 0 || static_cast<std::size_t>(i) >=
                                  sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
                 {
-                    throw std::out_of_range(
-                        "Config index must be between 0 and " + std::to_string(NUM_DEFAULT_CONFIGS - 1));
+                    throw std::out_of_range("Config index must be between 0 and " +
+                                            std::to_string(NUM_DEFAULT_CONFIGS - 1));
                 }
                 config = static_cast<unsigned int>(i);
             }
