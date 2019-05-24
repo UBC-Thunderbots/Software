@@ -24,10 +24,13 @@ bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
     if (timestamp.getMilliseconds() != 0)
     {
         // Get the indices for the state information at the desired timestamp.
-        ball_index  = ball.getHistoryIndexFromTimestamp(timestamp);
-        robot_index = robot.getHistoryIndexFromTimestamp(timestamp);
-        if (ball_index == -1 || robot_index == -1)
+        auto ball_index_result  = ball.getHistoryIndexFromTimestamp(timestamp);
+        auto robot_index_result = robot.getHistoryIndexFromTimestamp(timestamp);
+        if (!ball_index_result || !robot_index_result)
             return false;
+
+        ball_index  = ball_index_result.value();
+        robot_index = robot_index_result.value();
     }
 
     // The actual vector to the ball from the center of the robot

@@ -216,7 +216,7 @@ void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity
     last_update_timestamps.push_front(timestamp);
 }
 
-int Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
+std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
     for (int i = 0; i < timestamp_history.size(); i++)
@@ -228,7 +228,7 @@ int Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
         if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
             return i;
     }
-    return -1;
+    return std::nullopt;
 }
 
 bool Robot::operator==(const Robot &other) const

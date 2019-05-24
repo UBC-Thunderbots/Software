@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include "boost/circular_buffer.hpp"
@@ -227,10 +228,10 @@ class Robot
      * index of the timestamp in the history buffer.
      *
      * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the robot's update timestamp closest to the desired time and -1 if
-     * there is not matching timestamp.
+     * @return Index of the robot's update timestamp closest to the desired time or a
+     * std::nullopt if there is not matching timestamp.
      */
-    int getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
+    std::optional<int> getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and

@@ -52,5 +52,5 @@ const double MILLISECONDS_PER_MICROSECOND = 1.0 / 1000.0;
 // Converts dribbler RPM to a smaller number firmware uses
 const double DRIBBLER_RPM_TO_RADIO_CONVERSION_FACTOR = 1.0 / 300.0;
 
-const double POSSESSION_BUFFER_TIME_IN_SECONDS              = 3.0;
+const double POSSESSION_BUFFER_TIME_IN_SECONDS              = 1.5;
 const double POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS = 10;

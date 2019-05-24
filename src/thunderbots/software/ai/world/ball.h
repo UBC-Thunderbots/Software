@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/circular_buffer.hpp>
+#include <optional>
 #include <vector>
 
 #include "geom/point.h"
@@ -146,10 +147,10 @@ class Ball final
      * index of the timestamp in the history buffer.
      *
      * @param timestamp timestamp of the update state index we wish to fetch
-     * @return Index of the ball's update timestamp closest to the desired time and -1 if
-     * there is not matching timestamp.
+     * @return Index of the ball's update timestamp closest to the desired time or a
+     * std::nullopt if there is not matching timestamp.
      */
-    int getHistoryIndexFromTimestamp(Timestamp& timestamp) const;
+    std::optional<int> getHistoryIndexFromTimestamp(Timestamp& timestamp) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and

@@ -124,7 +124,7 @@ void Ball::addStateToBallHistory(const Point &position, const Vector &velocity,
     last_update_timestamps.push_front(timestamp);
 }
 
-int Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
+std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
     for (int i = 0; i < timestamp_history.size(); i++)
@@ -134,7 +134,7 @@ int Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
         if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
             return i;  // If timestamp is close to desired timestamp, return the index.
     }
-    return -1;
+    return std::nullopt;
 }
 
 bool Ball::operator==(const Ball &other) const

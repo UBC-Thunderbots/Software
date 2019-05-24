@@ -525,5 +525,5 @@ TEST_F(RobotTest, get_timestamp_index_no_matching_timestamp)
         half_second_future +
         Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1.0);
 
-    EXPECT_EQ(-1, robot.getHistoryIndexFromTimestamp(no_matching_time));
+    EXPECT_EQ(std::nullopt, robot.getHistoryIndexFromTimestamp(no_matching_time));
 }

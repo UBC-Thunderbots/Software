@@ -57,7 +57,7 @@ namespace Evaluation
 
             int i = 0;
 
-            // Check that the robot has not had possession of the ball recently.
+            // Check that the robot has had possession of the ball recently.
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
                    Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
             {

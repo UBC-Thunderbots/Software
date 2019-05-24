@@ -333,5 +333,5 @@ TEST_F(BallTest, get_timestamp_index_no_matching_timestamp)
         half_second_future +
         Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1);
 
-    EXPECT_EQ(-1, ball.getHistoryIndexFromTimestamp(no_matching_time));
+    EXPECT_EQ(std::nullopt, ball.getHistoryIndexFromTimestamp(no_matching_time));
 }
