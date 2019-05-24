@@ -222,11 +222,6 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     status_transfer.submit();
 }
 
-void MRFDongle::handle_libusb_events()
-{
-    context.handle_usb_events();
-}
-
 MRFDongle::~MRFDongle()
 {
     // Mark USB device as shutting down to squelch cancelled transfer warnings.

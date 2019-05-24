@@ -219,6 +219,12 @@ include_directories(SYSTEM "${LIBUSB_1_INCLUDE_DIRS}")
 link_directories("${LIBUSB_1_LIBRARY_DIRS}")
 add_definitions("${LIBUSB_1_DEFINITIONS}")
 
+##### GLIB #####
+pkg_search_module("GLIBMM" REQUIRED "glibmm-2.4")
+include_directories(SYSTEM "${GLIBMM_INCLUDE_DIRS}")
+link_directories("${GLIBMM_LIBRARY_DIRS}")
+add_definitions("${GLIBMM_DEFINITIONS}")
+
 ##### SIGC++  ######
 pkg_search_module("SIGC" REQUIRED "sigc++-2.0")
 include_directories(SYSTEM "${SIGC_INCLUDE_DIRS}")
@@ -228,6 +234,7 @@ target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
         ${LIBUSB_1_LIBRARIES}
         ${SIGC_LIBRARIES}
+        ${GLIBMM_LIBRARIES}
         )
 
     file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS

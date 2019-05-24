@@ -111,9 +111,6 @@ int main(int argc, char** argv)
         // Clear all primitives each tick
         primitives.clear();
 
-        // Handle libusb events for the dongle
-        backend_ptr->update_dongle_events();
-
         // Spin once to let all necessary callbacks run
         // The callbacks will populate the primitives vector
         ros::spinOnce();
