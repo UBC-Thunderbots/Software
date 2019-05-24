@@ -23,12 +23,6 @@ class MRFBackend
     ~MRFBackend();
 
     /**
-     * IMPORTANT: Must be called in the main loop
-     * Allows libusb events on the dongle to complete.
-     */
-    void update_dongle_events();
-
-    /**
      * Sends the given primitives to the backend to control the robots
      *
      * @param primitives the list of primitives to send

@@ -70,12 +70,6 @@ class MRFDongle final
                             Point ball, uint64_t timestamp);
 
     /**
-     * Handles libusb callbacks.
-     * IMPORTANT: MUST BE CALLED ON EACH LOOP
-     */
-    void handle_libusb_events();
-
-    /**
      * Generates an audible beep on the dongle.
      *
      * @param[in] length the length of the beep, in milliseconds (0 to 65,535)

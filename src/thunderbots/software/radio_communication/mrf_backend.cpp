@@ -46,8 +46,3 @@ void MRFBackend::send_vision_packet()
 
     dongle.send_camera_packet(robots, ball.position() * MILLIMETERS_PER_METER, timestamp);
 }
-
-void MRFBackend::update_dongle_events()
-{
-    dongle.handle_libusb_events();
-}
