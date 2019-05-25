@@ -228,7 +228,6 @@ target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
         ${LIBUSB_1_LIBRARIES}
         ${SIGC_LIBRARIES}
-        ${GLIBMM_LIBRARIES}
         )
 
     file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
