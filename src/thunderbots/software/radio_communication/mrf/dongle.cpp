@@ -1,9 +1,4 @@
 #include "dongle.h"
-#include "messages.h"
-#include "radio_communication/visitor/mrf_primitive_visitor.h"
-#include "util/constants.h"
-#include "util/logger/init.h"
-
 
 #include <sigc++/bind.h>
 #include <sigc++/functors/mem_fun.h>
@@ -20,6 +15,11 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+
+#include "messages.h"
+#include "radio_communication/visitor/mrf_primitive_visitor.h"
+#include "util/constants.h"
+#include "util/logger/init.h"
 
 namespace
 {
