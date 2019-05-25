@@ -5,8 +5,8 @@
 const std::string MoveSpinPrimitive::PRIMITIVE_NAME = "MoveSpin Primitive";
 
 MoveSpinPrimitive::MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
-                                     const AngularVelocity &angular_vel)
-    : robot_id(robot_id), dest(dest), angular_vel(angular_vel)
+                                     const AngularVelocity &angular_vel,double final_speed)
+    : robot_id(robot_id), dest(dest), angular_vel(angular_vel),final_speed(final_speed)
 {
 }
 
@@ -19,6 +19,7 @@ MoveSpinPrimitive::MoveSpinPrimitive(const thunderbots_msgs::Primitive &primitiv
     double dest_y = primitive_msg.parameters.at(1);
     dest          = Point(dest_x, dest_y);
     angular_vel   = Angle::ofRadians(primitive_msg.parameters.at(2));
+    final_speed = primitive_msg.parameters.at(3);
 }
 
 std::string MoveSpinPrimitive::getPrimitiveName() const
@@ -41,9 +42,14 @@ AngularVelocity MoveSpinPrimitive::getAngularVelocity() const
     return angular_vel;
 }
 
+double MoveSpinPrimitive::getFinalSpeed() const
+{
+    return final_speed;
+}
+
 std::vector<double> MoveSpinPrimitive::getParameters() const
 {
-    std::vector<double> parameters = {dest.x(), dest.y(), angular_vel.toRadians()};
+    std::vector<double> parameters = {dest.x(), dest.y(), angular_vel.toRadians(),final_speed};
 
     return parameters;
 }
@@ -61,7 +67,7 @@ void MoveSpinPrimitive::accept(PrimitiveVisitor &visitor) const
 bool MoveSpinPrimitive::operator==(const MoveSpinPrimitive &other) const
 {
     return this->robot_id == other.robot_id && this->dest == other.dest &&
-           this->angular_vel == other.angular_vel;
+           this->angular_vel == other.angular_vel&& this->final_speed==other.final_speed;
 }
 
 bool MoveSpinPrimitive::operator!=(const MoveSpinPrimitive &other) const
