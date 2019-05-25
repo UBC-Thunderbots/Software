@@ -31,6 +31,6 @@ std::unique_ptr<Intent> MoveSpinAction::calculateNextIntent(
     do
     {
         yield(std::make_unique<MoveSpinIntent>(robot->id(), destination, angular_velocity,
-                                               0));
+                                               final_speed, 0));
     } while ((robot->position() - destination).len() > close_to_dest_threshold);
 }
