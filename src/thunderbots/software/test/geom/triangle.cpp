@@ -106,12 +106,21 @@ TEST(TriangleTest, test_triangle_not_intersects_line_segment)
     EXPECT_FALSE(triangle.intersects(seg));
 }
 
-TEST(TriangleTest, test_triangle_intersects_two_segments)
+TEST(TriangleTest, test_triangle_intersects_two_segments_outside)
 {
     Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
     Triangle triangle{p1, p2, p3};
 
     Segment seg{Point(0.0f, -1.0f), Point(2.0f, 1.0f)};
+    EXPECT_TRUE(triangle.intersects(seg));
+}
+
+TEST(TriangleTest, test_triangle_intersects_two_segments_inside)
+{
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
+    Triangle triangle{p1, p2, p3};
+
+    Segment seg{Point(-0.1f, -0.1f), Point(0.1f, 0.1f)};
     EXPECT_TRUE(triangle.intersects(seg));
 }
 
@@ -140,6 +149,33 @@ TEST(TriangleTest, test_triangle_intersects_ray2)
 
     Ray ray{Point(-0.1f, -0.1f), Vector(-1.0f, -1.0f)};
     EXPECT_FALSE(triangle.intersects(ray));
+}
+
+TEST(TriangleTest, test_triangle_intersects_ray_corner)
+{
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
+    Triangle triangle{p1, p2, p3};
+
+    Ray ray{Point(0.0f, -1.0f), Vector(1.0f, 1.0f)};
+    EXPECT_TRUE(triangle.intersects(ray));
+}
+
+TEST(TriangleTest, test_triangle_intersects_ray_corner_out)
+{
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
+    Triangle triangle{p1, p2, p3};
+
+    Ray ray{Point(-0.1f, -0.1f), Vector(1.0f, 1.0f)};
+    EXPECT_TRUE(triangle.intersects(ray));
+}
+
+TEST(TriangleTest, test_triangle_intersects_ray_corner_in)
+{
+    Point p1{0.0f, 0.0f}, p2{0.0f, 1.0f}, p3{1.0f, 0.0f};
+    Triangle triangle{p1, p2, p3};
+
+    Ray ray{Point(0.1f, 0.1f), Vector(-1.0f, -1.0f)};
+    EXPECT_TRUE(triangle.intersects(ray));
 }
 
 int main(int argc, char** argv)
