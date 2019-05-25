@@ -8,7 +8,7 @@
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
-typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> intent_coroutine;
+typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> IntentCoroutine;
 
 /**
  * The Action class is the lowest level of abstraction in our STP architecture.
@@ -46,7 +46,7 @@ class Action
     std::unique_ptr<Intent> getNextIntent();
 
     // The coroutine that sequentially returns the Intents the Action wants to run
-    intent_coroutine::pull_type intent_sequence;
+    IntentCoroutine::pull_type intent_sequence;
     // The robot performing this Action
     std::optional<Robot> robot;
 
@@ -74,7 +74,7 @@ class Action
      * signify the Action is done).
      */
     std::unique_ptr<Intent> calculateNextIntentWrapper(
-        intent_coroutine::push_type &yield);
+        IntentCoroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Action. If the Action is done
@@ -87,5 +87,5 @@ class Action
      * If the Action is done, an empty/null unique pointer is returned.
      */
     virtual std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type &yield) = 0;
+        IntentCoroutine::push_type &yield) = 0;
 };

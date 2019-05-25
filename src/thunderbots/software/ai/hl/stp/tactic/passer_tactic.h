@@ -49,7 +49,7 @@ class PasserTactic : public Tactic
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+        IntentCoroutine::push_type& yield) override;
 
     // Tactic parameters
     AI::Passing::Pass pass;

@@ -20,7 +20,7 @@ double StopTestTactic::calculateRobotCost(const Robot &robot, const World &world
 }
 
 std::unique_ptr<Intent> StopTestTactic::calculateNextIntent(
-    intent_coroutine::push_type &yield)
+    IntentCoroutine::push_type &yield)
 {
     do
     {

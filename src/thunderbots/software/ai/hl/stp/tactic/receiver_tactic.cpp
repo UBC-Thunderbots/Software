@@ -51,7 +51,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 }
 
 std::unique_ptr<Intent> ReceiverTactic::calculateNextIntent(
-    intent_coroutine::push_type& yield)
+    IntentCoroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
 

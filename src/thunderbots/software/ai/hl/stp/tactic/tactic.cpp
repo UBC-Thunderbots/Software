@@ -3,8 +3,8 @@
 #include "util/logger/init.h"
 
 Tactic::Tactic(bool loop_forever)
-    : intent_sequence(std::make_unique<intent_coroutine::pull_type>(
-          [this](intent_coroutine::push_type &yield) {
+    : intent_sequence(std::make_unique<IntentCoroutine::pull_type>(
+          [this](IntentCoroutine::push_type &yield) {
               return this->calculateNextIntentWrapper(yield);
           })),
       done_(false),
@@ -46,8 +46,8 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
         // nullptr returned for a single call (which could come from the "old" coroutine)
         // when this Tactic restarts
         intent_sequence.reset();
-        intent_sequence = std::make_unique<intent_coroutine::pull_type>(
-            [this](intent_coroutine::push_type &yield) {
+        intent_sequence = std::make_unique<IntentCoroutine::pull_type>(
+            [this](IntentCoroutine::push_type &yield) {
                 return this->calculateNextIntentWrapper(yield);
             });
         next_intent = getNextIntentHelper();
@@ -57,29 +57,32 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
 }
 
 std::unique_ptr<Intent> Tactic::calculateNextIntentWrapper(
-    intent_coroutine::push_type &yield)
+    IntentCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
     yield(std::unique_ptr<Intent>{});
 
     // Anytime after the first function call, the calculateNextIntent function will be
-    // used to perform the real logic
-    return calculateNextIntent(yield);
+    // used to perform the real logic. Note that we need to "yield" up at each level of
+    // of the coroutine
+    yield(calculateNextIntent(yield));
 }
 
 std::unique_ptr<Intent> Tactic::getNextIntentHelper()
 {
-    std::unique_ptr<Intent> next_intent;
+    std::unique_ptr<Intent> next_intent = {};
     // Check if the coroutine "iterator" has any more work to do. Only run the coroutine
     // if there is work to be done otherwise the coroutine library will fail on an assert.
     if (*intent_sequence)
     {
-        // Run the coroutine
-        (*intent_sequence)();
         // Get the result of running the coroutine, which is the next Intent the Tactic
         // wants to run
         next_intent = intent_sequence->get();
+
+        // Continue to run the coroutine (basically setting up for the next time this
+        // function is called)
+        (*intent_sequence)();
     }
 
     // The Tactic is considered done once the next_intent becomes a nullptr. This could
