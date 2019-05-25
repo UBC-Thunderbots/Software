@@ -34,6 +34,9 @@ namespace
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
+    // Clear all primitives each tick
+    primitives.clear();
+
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
@@ -105,16 +108,10 @@ int main(int argc, char** argv)
     auto update_subscribers =
         Util::DynamicParameters::initUpdateSubscriptions(node_handle);
 
-    // Main loop
-    while (ros::ok())
-    {
-        // Clear all primitives each tick
-        primitives.clear();
-
-        // Spin once to let all necessary callbacks run
-        // The callbacks will populate the primitives vector
-        ros::spinOnce();
-    }
+    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+    // until the node is shutdown
+    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
+    ros::spin();
 
     return 0;
 }
