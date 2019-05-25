@@ -36,6 +36,7 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
     auto next_intent = getNextIntentHelper();
     if (done_ && loop_forever)
     {
+        // Re-start the intent sequence
         intent_sequence = IntentCoroutine::pull_type(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
         next_intent = getNextIntentHelper();
     }

@@ -154,8 +154,10 @@ class Tactic
 
     // The coroutine that sequentially returns the Intents the Tactic wants to run
     IntentCoroutine::pull_type intent_sequence;
+
     // Whether or not this Tactic is done
     bool done_;
+
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
 };
