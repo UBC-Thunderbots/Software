@@ -38,7 +38,7 @@ double PasserTactic::calculateRobotCost(const Robot& robot, const World& world)
 }
 
 std::unique_ptr<Intent> PasserTactic::calculateNextIntent(
-    intent_coroutine::push_type& yield)
+    IntentCoroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
     // Move to a position just behind the ball (in the direction of the pass)

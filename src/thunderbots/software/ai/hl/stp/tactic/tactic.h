@@ -127,7 +127,7 @@ class Tactic
      * signify the Tactic is done).
      */
     std::unique_ptr<Intent> calculateNextIntentWrapper(
-        intent_coroutine::push_type &yield);
+        IntentCoroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Tactic. If the Tactic is done
@@ -140,7 +140,7 @@ class Tactic
      * If the Tactic is done, a nullptr is returned.
      */
     virtual std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type &yield) = 0;
+        IntentCoroutine::push_type &yield) = 0;
 
     /**
      * A helper function that runs the intent_sequence coroutine and returns the result
@@ -153,7 +153,7 @@ class Tactic
     std::unique_ptr<Intent> getNextIntentHelper();
 
     // The coroutine that sequentially returns the Intents the Tactic wants to run
-    std::unique_ptr<intent_coroutine::pull_type> intent_sequence;
+    std::unique_ptr<IntentCoroutine::pull_type> intent_sequence;
     // Whether or not this Tactic is done
     bool done_;
     // Whether or not this tactic should loop forever by restarting each time it is done

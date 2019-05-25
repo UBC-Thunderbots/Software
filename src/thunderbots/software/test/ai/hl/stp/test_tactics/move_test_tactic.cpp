@@ -27,7 +27,7 @@ double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world
 }
 
 std::unique_ptr<Intent> MoveTestTactic::calculateNextIntent(
-    intent_coroutine::push_type &yield)
+    IntentCoroutine::push_type &yield)
 {
     do
     {

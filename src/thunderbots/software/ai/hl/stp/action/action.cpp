@@ -14,34 +14,38 @@ bool Action::done() const
 
 std::unique_ptr<Intent> Action::getNextIntent()
 {
+    std::unique_ptr<Intent> next_intent = {};
     if (!robot)
     {
         LOG(WARNING)
             << "Requesting the next Intent for an Action without a Robot assigned"
             << std::endl;
-        return std::unique_ptr<Intent>{};
+    }
+    // Default to returning a null pointer if the coroutine "iterator" is done, as this
+    // means that the calculateNextIntent function has completed and therefore the
+    // Action is done
+    else if (intent_sequence)
+    {
+        // Get the next intent from the coroutine
+        next_intent = intent_sequence.get();
+
+        // Continue to run the coroutine (basically setting up for the next time this
+        // function is called)
+        intent_sequence();
     }
 
-    // If the coroutine "iterator" is done, the calculateNextIntent function has completed
-    // and therefore the Action is done, so we return a null pointer
-    if (intent_sequence)
-    {
-        // Calculate and return the next Intent
-        intent_sequence();
-        auto next_intent = intent_sequence.get();
-        return next_intent;
-    }
-    return std::unique_ptr<Intent>{};
+    return next_intent;
 }
 
 std::unique_ptr<Intent> Action::calculateNextIntentWrapper(
-    intent_coroutine::push_type &yield)
+    IntentCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
     yield(std::unique_ptr<Intent>{});
 
     // Anytime after the first function call, the calculateNextIntent function will be
-    // used to perform the real logic
-    return calculateNextIntent(yield);
+    // used to perform the real logic. Note that we need to "yield" up at each level of
+    // of the coroutine
+    yield(calculateNextIntent(yield));
 }
