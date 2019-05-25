@@ -153,7 +153,7 @@ class Tactic
     std::unique_ptr<Intent> getNextIntentHelper();
 
     // The coroutine that sequentially returns the Intents the Tactic wants to run
-    std::unique_ptr<IntentCoroutine::pull_type> intent_sequence;
+    IntentCoroutine::pull_type intent_sequence;
     // Whether or not this Tactic is done
     bool done_;
     // Whether or not this tactic should loop forever by restarting each time it is done
