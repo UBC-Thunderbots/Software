@@ -1,4 +1,9 @@
 #include "dongle.h"
+#include "messages.h"
+#include "radio_communication/visitor/mrf_primitive_visitor.h"
+#include "util/constants.h"
+#include "util/logger/init.h"
+
 
 #include <sigc++/bind.h>
 #include <sigc++/functors/mem_fun.h>
@@ -15,10 +20,6 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-
-#include "messages.h"
-#include "radio_communication/visitor/mrf_primitive_visitor.h"
-#include "util/logger/init.h"
 
 namespace
 {
@@ -117,7 +118,7 @@ MRFDongle::MRFDongle(Annunciator &annunciator)
             ros::NodeHandle nh;
             std::string config_string;
 
-            if (nh.getParam("mrf_config", config_string))
+            if (nh.getParam(Util::Constants::MRF_CONFIG_PARAM, config_string))
             {
                 int i = std::stoi(config_string, nullptr, 0);
                 if (i < 0 || static_cast<std::size_t>(i) >=
@@ -129,7 +130,6 @@ MRFDongle::MRFDongle(Annunciator &annunciator)
                 config = static_cast<unsigned int>(i);
             }
         }
-        std::cout << "MRF CONFIG is " << config << std::endl;
 
         channel_ = DEFAULT_CONFIGS[config].channel;
         {

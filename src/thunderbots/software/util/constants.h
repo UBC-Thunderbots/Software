@@ -50,5 +50,8 @@ namespace Util
         // How many milliseconds a robot must not be seen in vision before it is
         // considered as "gone" and no longer reported.
         static const unsigned int ROBOT_DEBOUNCE_DURATION_MILLISECONDS = 200;
+
+        // Parameter name for MRF configuration
+        static const std::string MRF_CONFIG_PARAM = "mrf_config";
     }  // namespace Constants
 }  // namespace Util

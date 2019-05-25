@@ -26,6 +26,9 @@ namespace
 
     // The MRFBackend instance that connects to the dongle
     std::unique_ptr<MRFBackend> backend_ptr;
+
+    // Index of argv that contains the mrf_config parameter
+    constexpr int MRF_CONFIG_ARGV_INDEX = 1;
 }  // namespace
 
 // Callbacks
@@ -82,7 +85,8 @@ int main(int argc, char** argv)
     // Register signal handler (has to be after ros::init)
     signal(SIGINT, signalHandler);
 
-    // Init backend
+    // Set radio configuration from cmdline, init backend
+    node_handle.setParam(Util::Constants::MRF_CONFIG_PARAM, argv[MRF_CONFIG_ARGV_INDEX]);
     backend_ptr = std::make_unique<MRFBackend>(node_handle);
 
     // Create subscribers to topics we care about

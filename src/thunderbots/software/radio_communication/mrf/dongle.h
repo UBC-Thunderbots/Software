@@ -43,6 +43,8 @@ class MRFDongle final
    public:
     /**
      * Constructs a new MRFDongle.
+     *
+     * @param annunciator annunciator to publish robot statuses
      */
     explicit MRFDongle(Annunciator &annunciator);
 
@@ -62,9 +64,9 @@ class MRFDongle final
     /**
      * Sends a camera packet over radio to all robots, including vision coordinates of
      * all robots and the ball.
-     * @param robots
-     * @param ball
-     * @param timestamp
+     * @param robots vector of tuples of {robot ID, robot location, robot orientation}
+     * @param ball ball location
+     * @param timestamp timestamp in seconds when this data was received
      */
     void send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
                             Point ball, uint64_t timestamp);
