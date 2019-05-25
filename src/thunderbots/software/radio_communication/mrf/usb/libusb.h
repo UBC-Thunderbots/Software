@@ -28,17 +28,6 @@
 namespace USB
 {
     /**
-     * Callback functions when activity on libusb file descriptors is detected.
-     * These are for internal use only.
-     */
-    extern "C"
-    {
-        void usb_context_pollfd_add_trampoline(int fd, short events, void *user_data);
-        void usb_context_pollfd_remove_trampoline(int fd, void *user_data);
-        void usb_transfer_handle_completed_transfer_trampoline(libusb_transfer *transfer);
-    }
-
-    /**
      * A libusb context. This is the entry point to the libusb wrapper.
      */
     class Context final : public NonCopyable
@@ -62,16 +51,6 @@ namespace USB
         friend class DeviceHandle;
 
         libusb_context *context;
-
-        friend void usb_context_pollfd_add_trampoline(int fd, short events,
-                                                      void *user_data);
-        friend void usb_context_pollfd_remove_trampoline(int fd, void *user_data);
-
-        std::unordered_map<int, sigc::connection> fd_connections;
-
-        void add_pollfd(int fd, short events);
-        void remove_pollfd(int fd);
-        void handle_usb_fds();
     };
 
     /**
