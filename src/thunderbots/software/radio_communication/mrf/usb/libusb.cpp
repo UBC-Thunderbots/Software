@@ -20,14 +20,32 @@
 
 namespace
 {
-    Glib::RefPtr<Glib::MainLoop> glib_main_loop(Glib::MainLoop::create());
+    Glib::RefPtr<Glib::MainLoop> glib_main_loop(Glib::MainLoop::create(true));
+    std::thread glib_thread;
 }
 
 USB::Context::Context()
 {
     // Spin up glib main loop.
-    std::thread glib_thread([&]() { glib_main_loop->run(); });
+    glib_thread = std::thread([&]() { glib_main_loop->run(); });
+
+    // Init libusb
     check_fn("libusb_init", libusb_init(&context), 0);
+
+    // Get file descriptors to monitors
+    const libusb_pollfd **pfds = libusb_get_pollfds(context);
+    if (!pfds)
+    {
+        check_fn("libusb_get_pollfds", LIBUSB_ERROR_OTHER, 0);
+    }
+    for (const libusb_pollfd **i = pfds; *i; ++i)
+    {
+        add_pollfd((*i)->fd, (*i)->events);
+    }
+    std::free(pfds);
+    libusb_set_pollfd_notifiers(
+        context, &usb_context_pollfd_add_trampoline,
+        &usb_context_pollfd_remove_trampoline, this);
 }
 
 USB::Context::~Context()
@@ -36,6 +54,7 @@ USB::Context::~Context()
     context = nullptr;
 
     glib_main_loop->quit();
+    glib_thread.join();
 }
 
 void USB::Context::add_pollfd(int fd, short events)
