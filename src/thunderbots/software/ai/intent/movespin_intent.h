@@ -14,11 +14,12 @@ class MoveSpinIntent : public Intent, public MoveSpinPrimitive
      * @param dest The final destination of the movement
      * @param angular_vel The angular velocity of the robot
      * of the movement
+     * @param final_speed The speed at final destination
      * @param priority The priority of this Intent. A larger number indicates a higher
      * priority
      */
     explicit MoveSpinIntent(unsigned int robot_id, const Point& dest,
-                            const AngularVelocity& angular_vel, unsigned int priority);
+                            const AngularVelocity& angular_vel, double final_speed, unsigned int priority);
 
     std::string getIntentName(void) const override;
 
