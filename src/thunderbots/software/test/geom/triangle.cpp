@@ -80,6 +80,14 @@ TEST(TriangleTest, test_triangle_contains_point)
     EXPECT_TRUE(triangle.containsPoint(point));
 }
 
+TEST(TriangleTest, test_triangle_contains_point_corner)
+{
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 1.0f};
+    Point point{1.0f, 1.0f};
+    Triangle triangle{p1, p2, p3};
+    EXPECT_TRUE(triangle.containsPoint(point));
+}
+
 TEST(TriangleTest, test_triangle_not_contains_point)
 {
     Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 1.0f};

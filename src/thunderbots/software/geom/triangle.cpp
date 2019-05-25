@@ -1,5 +1,6 @@
 #include "geom/triangle.h"
 
+#include <algorithm>
 #include <unordered_set>
 
 #include "geom/util.h"
@@ -41,19 +42,26 @@ bool Triangle::containsPoint(const Point& point) const
     // cast a ray from the point in the +x direction
     Ray ray(point, point + Point(1, 0));
     unsigned int num_intersections = 0;
-    for (const Segment& seg : segments)
-    {
-        // one-definition rule, use anonymous namespace for
-        // intersects() in geom/util.h
-        if (::intersects(ray, seg))
-        {
-            num_intersections++;
-        }
-    }
 
-    // if the ray intersects the triangle exactly once
-    // it is inside the polygon, otherwise it is outside the triangle
-    return num_intersections == 1;
+    std::vector vec = getPoints();
+    if (std::find(vec.begin(), vec.end(), point) != vec.end())
+        return true;  // return true if point is on a corner
+    else
+    {
+        for (const Segment& seg : segments)
+        {
+            // one-definition rule, use anonymous namespace for
+            // intersects() in geom/util.h
+            if (::intersects(ray, seg))
+            {
+                num_intersections++;
+            }
+        }
+
+        // if the ray intersects the triangle exactly once
+        // it is inside the polygon, otherwise it is outside the triangle
+        return num_intersections == 1;
+    }
 }
 
 bool Triangle::intersects(const Segment& segment) const
