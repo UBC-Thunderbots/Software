@@ -138,6 +138,8 @@ file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
         )
 add_executable (network_input
         ${PROTO_SRCS}
