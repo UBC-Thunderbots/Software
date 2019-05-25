@@ -9,7 +9,7 @@
 
 TEST(MoveSpinIntentTest, intent_name_test)
 {
-    MoveSpinIntent movespin_intent = MoveSpinIntent(0, Point(), Angle::zero(),1.0, 0);
+    MoveSpinIntent movespin_intent = MoveSpinIntent(0, Point(), Angle::zero(), 1.0, 0);
 
     EXPECT_EQ("MoveSpin Intent", movespin_intent.getIntentName());
 }
@@ -18,16 +18,18 @@ TEST(MoveSpinIntentTest, intent_name_test)
 // since Intents inherit from Primitives
 TEST(MoveSpinIntentTest, test_equality_operator_intents_equal)
 {
-    MoveSpinIntent movespin_intent       = MoveSpinIntent(0, Point(), Angle::zero(), 1.0,0);
-    MoveSpinIntent movespin_intent_other = MoveSpinIntent(0, Point(), Angle::zero(), 1.0,0);
+    MoveSpinIntent movespin_intent = MoveSpinIntent(0, Point(), Angle::zero(), 1.0, 0);
+    MoveSpinIntent movespin_intent_other =
+        MoveSpinIntent(0, Point(), Angle::zero(), 1.0, 0);
 
     EXPECT_EQ(movespin_intent, movespin_intent_other);
 }
 
 TEST(MoveSpinIntentTest, test_inequality_operator_with_mismatched_priorities)
 {
-    MoveSpinIntent movespin_intent       = MoveSpinIntent(0, Point(), Angle::zero(),1.0, 1);
-    MoveSpinIntent movespin_intent_other = MoveSpinIntent(0, Point(), Angle::zero(),1.0, 3);
+    MoveSpinIntent movespin_intent = MoveSpinIntent(0, Point(), Angle::zero(), 1.0, 1);
+    MoveSpinIntent movespin_intent_other =
+        MoveSpinIntent(0, Point(), Angle::zero(), 1.0, 3);
 
     EXPECT_NE(movespin_intent, movespin_intent_other);
 }

@@ -39,7 +39,8 @@ class MoveSpinAction : public Action
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
                                                         Point destination,
-                                                        AngularVelocity angular_velocity, double final_speed);
+                                                        AngularVelocity angular_velocity,
+                                                        double final_speed);
 
    private:
     std::unique_ptr<Intent> calculateNextIntent(

@@ -19,7 +19,8 @@ class MoveSpinIntent : public Intent, public MoveSpinPrimitive
      * priority
      */
     explicit MoveSpinIntent(unsigned int robot_id, const Point& dest,
-                            const AngularVelocity& angular_vel, double final_speed, unsigned int priority);
+                            const AngularVelocity& angular_vel, double final_speed,
+                            unsigned int priority);
 
     std::string getIntentName(void) const override;
 

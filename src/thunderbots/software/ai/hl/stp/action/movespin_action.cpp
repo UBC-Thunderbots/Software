@@ -8,13 +8,14 @@ MoveSpinAction::MoveSpinAction(double close_to_dest_threshold)
 }
 
 std::unique_ptr<Intent> MoveSpinAction::updateStateAndGetNextIntent(
-    const Robot& robot, Point destination, AngularVelocity angular_velocity, double final_speed)
+    const Robot& robot, Point destination, AngularVelocity angular_velocity,
+    double final_speed)
 {
     // Update the parameters stored by this Action
     this->robot            = robot;
     this->destination      = destination;
     this->angular_velocity = angular_velocity;
-    this->final_speed = final_speed;
+    this->final_speed      = final_speed;
 
     return getNextIntent();
 }
