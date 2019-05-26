@@ -1,9 +1,12 @@
 #include "ai/hl/stp/evaluation/possession.h"
 
+#include <shared/constants.h>
+
 #include "ai/hl/stp/evaluation/intercept.h"
 #include "ai/hl/stp/evaluation/team.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
+#include "robot.h"
 
 namespace Evaluation
 {
@@ -43,5 +46,27 @@ namespace Evaluation
         {
             return Evaluation::nearestRobot(team, ball.position());
         }
+    }
+
+    bool teamHasPossession(const Team &team, const Ball &ball)
+    {
+        for (Robot robot : team.getAllRobots())
+        {
+            std::vector<Timestamp> robot_history_timestamps =
+                robot.getPreviousTimestamps();
+
+            int i = 0;
+
+            // Check that the robot has had possession of the ball recently.
+            while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                   Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
+            {
+                if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
+                    return true;
+                i++;
+            }
+        }
+
+        return false;
     }
 }  // namespace Evaluation

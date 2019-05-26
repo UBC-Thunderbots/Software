@@ -24,4 +24,9 @@ class RobotTeamFilter
      */
     Team getFilteredData(const Team& current_team_state,
                          const std::vector<SSLRobotDetection>& new_robot_detections);
+
+
+    // A map used to store a separate robot filter for each robot on this team, so
+    // each robot can be filtered and handled separately
+    std::map<int, RobotFilter> robot_filters;
 };
