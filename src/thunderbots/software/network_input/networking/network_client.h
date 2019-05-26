@@ -43,7 +43,6 @@ class NetworkClient
     NetworkClient(const NetworkClient&)            = delete;
 
    private:
-
     // TODO: Remove this wrapper function once we move to a better simulator
     // https://github.com/UBC-Thunderbots/Software/issues/609
     /**
