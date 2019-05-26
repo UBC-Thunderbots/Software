@@ -17,14 +17,29 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(const Ball ball, const Robot robot)
+bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
 {
+    int ball_index  = 0;
+    int robot_index = 0;
+    if (timestamp.getMilliseconds() != 0)
+    {
+        // Get the indices for the state information at the desired timestamp.
+        auto ball_index_result  = ball.getHistoryIndexFromTimestamp(timestamp);
+        auto robot_index_result = robot.getHistoryIndexFromTimestamp(timestamp);
+        if (!ball_index_result || !robot_index_result)
+            return false;
+
+        ball_index  = ball_index_result.value();
+        robot_index = robot_index_result.value();
+    }
+
     // The actual vector to the ball from the center of the robot
-    Vector robot_center_to_ball = ball.position() - robot.position();
+    Vector robot_center_to_ball = ball.getPreviousPositions()[ball_index] -
+                                  robot.getPreviousPositions()[robot_index];
 
     // Calculate the ideal vector from the robot to the ball for the robot to have
     // possession.
-    Angle orientation = robot.orientation();
+    Angle orientation = robot.getPreviousOrientations()[robot_index];
     Vector expected_point =
         Point::createFromAngle(orientation).norm(DIST_TO_FRONT_OF_ROBOT_METERS);
 
