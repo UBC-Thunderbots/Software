@@ -33,8 +33,7 @@ std::unique_ptr<Intent> KickAction::updateStateAndGetNextIntent(
     return getNextIntent();
 }
 
-std::unique_ptr<Intent> KickAction::calculateNextIntent(
-    IntentCoroutine::push_type &yield)
+void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     // How large the triangle is that defines the region where the robot is
     // behind the ball and ready to kick.

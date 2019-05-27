@@ -121,13 +121,12 @@ class Tactic
      *
      * @param yield The coroutine push_type for the Tactic
      *
-     * @return A unique pointer to the next Intent that should be run for the Tactic.
+     * @yield A unique pointer to the next Intent that should be run for the Tactic.
      * If the Tactic is done, an empty/null unique pointer is returned. The very first
      * time this function is called, a null pointer will be returned (this does not
      * signify the Tactic is done).
      */
-    std::unique_ptr<Intent> calculateNextIntentWrapper(
-        IntentCoroutine::push_type &yield);
+    void calculateNextIntentWrapper(IntentCoroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Tactic. If the Tactic is done
@@ -136,11 +135,10 @@ class Tactic
      *
      * @param yield The coroutine push_type for the Tactic
      *
-     * @return A unique pointer to the next Intent that should be run for the Tactic.
+     * @yield A unique pointer to the next Intent that should be run for the Tactic.
      * If the Tactic is done, a nullptr is returned.
      */
-    virtual std::unique_ptr<Intent> calculateNextIntent(
-        IntentCoroutine::push_type &yield) = 0;
+    virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 
     /**
      * A helper function that runs the intent_sequence coroutine and returns the result

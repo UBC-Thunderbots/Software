@@ -26,51 +26,50 @@ void Tactic::updateRobot(const Robot &robot)
 
 std::unique_ptr<Intent> Tactic::getNextIntent()
 {
+    std::unique_ptr<Intent> next_intent = nullptr;
     if (!robot)
     {
         LOG(WARNING) << "Requesting the next Intent for a Tactic without a Robot assigned"
                      << std::endl;
-        return std::unique_ptr<Intent>{};
     }
-
-    auto next_intent = getNextIntentHelper();
-    if (done_ && loop_forever)
+    else
     {
-        // Re-start the intent sequence
-        intent_sequence = IntentCoroutine::pull_type(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
         next_intent = getNextIntentHelper();
+        if (done_ && loop_forever)
+        {
+            // Re-start the intent sequence by re-creating it
+            intent_sequence = IntentCoroutine::pull_type(
+                boost::bind(&Tactic::calculateNextIntentWrapper, this, _1));
+            next_intent = getNextIntentHelper();
+        }
     }
 
     return next_intent;
 }
 
-std::unique_ptr<Intent> Tactic::calculateNextIntentWrapper(
-    IntentCoroutine::push_type &yield)
+void Tactic::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
     yield(std::unique_ptr<Intent>{});
 
     // Anytime after the first function call, the calculateNextIntent function will be
-    // used to perform the real logic. Note that we need to "yield" up at each level of
-    // of the coroutine
-    yield(calculateNextIntent(yield));
+    // used to perform the real logic. The calculateNextIntent function will yield its
+    // values to the top of the coroutine stack, where they will be retrieved by
+    // getNextIntent, so we do not need to yield or return the result of this function
+    calculateNextIntent(yield);
 }
 
 std::unique_ptr<Intent> Tactic::getNextIntentHelper()
 {
-    std::unique_ptr<Intent> next_intent = {};
+    std::unique_ptr<Intent> next_intent = nullptr;
     // Check if the coroutine "iterator" has any more work to do. Only run the coroutine
     // if there is work to be done otherwise the coroutine library will fail on an assert.
-    if (intent_sequence)
+    if (intent_sequence())
     {
-        // Get the result of running the coroutine, which is the next Intent the Tactic
-        // wants to run
+        // Extract the result from the coroutine. This will be whatever value was
+        // yielded by the calculateNextIntent function
         next_intent = intent_sequence.get();
-
-        // Continue to run the coroutine (basically setting up for the next time this
-        // function is called)
-        intent_sequence();
     }
 
     // The Tactic is considered done once the next_intent becomes a nullptr. This could

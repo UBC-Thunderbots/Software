@@ -111,11 +111,10 @@ class Play
      *
      * @param yield The coroutine push_type for the Play
      *
-     * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
+     * @yield A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    std::vector<std::shared_ptr<Tactic>> getNextTacticsWrapper(
-        TacticCoroutine::push_type& yield);
+    void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
 
     /**
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
@@ -124,11 +123,11 @@ class Play
      * @param yield The coroutine push_type for the Play
      * @param world The current state of the World
      *
-     * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
+     * @yield A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    virtual std::vector<std::shared_ptr<Tactic>> getNextTactics(
-        TacticCoroutine::push_type& yield, const World& world) = 0;
+    virtual void getNextTactics(TacticCoroutine::push_type& yield,
+                                const World& world) = 0;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;

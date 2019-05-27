@@ -24,8 +24,7 @@ std::unique_ptr<Intent> MoveAction::updateStateAndGetNextIntent(
     return getNextIntent();
 }
 
-std::unique_ptr<Intent> MoveAction::calculateNextIntent(
-    IntentCoroutine::push_type& yield)
+void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was
     // already moving somewhere else, but was told to run the MoveAction to a destination

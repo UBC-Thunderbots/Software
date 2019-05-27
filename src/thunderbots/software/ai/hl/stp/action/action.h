@@ -57,7 +57,10 @@ class Action
      * This function exists because when the coroutine (intent_sequence) is first
      * constructed the coroutine is called/entered. This would normally cause the
      * calculateNextIntentWrapper to be run once and potentially return incorrect results
-     * due to default constructed values.
+     * due to default constructed values. Calling the calculateNextIntent function this
+     * early also results in virtual function errors because this early in object
+     * construction, the concrete implementation of this Action doesn't exist yet so
+     * we would actually be trying to call the virtual function, which doesn't work.
      *
      * This wrapper function will yield a null pointer the first time it's called and
      * otherwise use the calculateNextIntent function. This first "null" value will never
@@ -68,13 +71,12 @@ class Action
      *
      * @param yield The coroutine push_type for the Action
      *
-     * @return A unique pointer to the next Intent that should be run for the Action.
+     * @yield A unique pointer to the next Intent that should be run for the Action.
      * If the Action is done, an empty/null unique pointer is returned. The very first
      * time this function is called, a null pointer will be returned (this does not
      * signify the Action is done).
      */
-    std::unique_ptr<Intent> calculateNextIntentWrapper(
-        IntentCoroutine::push_type &yield);
+    void calculateNextIntentWrapper(IntentCoroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Action. If the Action is done
@@ -83,9 +85,8 @@ class Action
      *
      * @param yield The coroutine push_type for the Action
      *
-     * @return A unique pointer to the next Intent that should be run for the Action.
+     * @yield A unique pointer to the next Intent that should be run for the Action.
      * If the Action is done, an empty/null unique pointer is returned.
      */
-    virtual std::unique_ptr<Intent> calculateNextIntent(
-        IntentCoroutine::push_type &yield) = 0;
+    virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 };
