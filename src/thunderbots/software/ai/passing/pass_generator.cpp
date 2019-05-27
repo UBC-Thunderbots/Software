@@ -75,7 +75,6 @@ void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
     this->target_region = std::move(area);
 }
 
-
 PassGenerator::~PassGenerator()
 {
     // Set this flag so pass_generation_thread knows to end (also making sure to
@@ -105,15 +104,10 @@ void PassGenerator::continuouslyGeneratePasses()
         // Copy over the updated world and remove the passer robot
         world_mutex.lock();
         updated_world_mutex.lock();
-        passer_robot_id_mutex.lock();
 
         world = updated_world;
-        if (passer_robot_id)
-        {
-            world.mutableFriendlyTeam().removeRobotWithId(*passer_robot_id);
-        }
 
-        passer_robot_id_mutex.unlock();
+        // Update the passer point for all the passes
         updated_world_mutex.unlock();
         world_mutex.unlock();
 
@@ -301,14 +295,15 @@ void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
 
 double PassGenerator::ratePass(Pass pass)
 {
-    // Take ownership of world, target_region for the duration of this function
+    // Take ownership of world, target_region, passer_robot_id for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
+    std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);
 
     double rating = 0;
     try
     {
-        rating = ::ratePass(world, pass, target_region);
+        rating = ::ratePass(world, pass, target_region, passer_robot_id);
     }
     catch (std::invalid_argument& e)
     {
