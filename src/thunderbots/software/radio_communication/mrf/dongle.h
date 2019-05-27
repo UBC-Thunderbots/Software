@@ -44,9 +44,10 @@ class MRFDongle final
     /**
      * Constructs a new MRFDongle.
      *
+     * @param config MRF configuration to start dongle in
      * @param annunciator annunciator to publish robot statuses
      */
-    explicit MRFDongle(Annunciator &annunciator);
+    explicit MRFDongle(unsigned int config, Annunciator &annunciator);
 
     /**
      * Destroys an MRFDongle.
