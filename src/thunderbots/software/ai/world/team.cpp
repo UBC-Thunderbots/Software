@@ -11,6 +11,11 @@ Team::Team(const Duration& robot_expiry_buffer_duration)
 {
 }
 
+Team::Team(const Duration& robot_expiry_buffer_duration, const std::vector<Robot>& team_robots) : Team(robot_expiry_buffer_duration) {
+    updateRobots(team_robots);
+}
+
+
 void Team::updateRobots(const std::vector<Robot>& new_robots)
 {
     // Update the robots, checking that there are no duplicate IDs in the given data
