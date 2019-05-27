@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     signal(SIGINT, signalHandler);
 
     // Set radio configuration from cmdline, init backend
-    int config = std::stoi(argv[MRF_CONFIG_ARGV_INDEX], nullptr, 0);
+    int config  = std::stoi(argv[MRF_CONFIG_ARGV_INDEX], nullptr, 0);
     backend_ptr = std::make_unique<MRFBackend>(config, node_handle);
 
     // Create subscribers to topics we care about
