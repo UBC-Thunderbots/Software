@@ -18,6 +18,7 @@
 
 #include "messages.h"
 #include "radio_communication/visitor/mrf_primitive_visitor.h"
+#include "util/constants.h"
 #include "util/logger/init.h"
 
 namespace
@@ -31,7 +32,8 @@ namespace
 
     // Different configs for the dongle, to allow for communication over
     // different PANs and/or channels
-    const RadioConfig DEFAULT_CONFIGS[4] = {
+    constexpr int NUM_DEFAULT_CONFIGS                      = 4;
+    const RadioConfig DEFAULT_CONFIGS[NUM_DEFAULT_CONFIGS] = {
         {25U, 250, 0x1846U},
         {25U, 250, 0x1847U},
         {25U, 250, 0x1848U},
@@ -45,7 +47,7 @@ namespace
 
 }  // namespace
 
-MRFDongle::MRFDongle(Annunciator &annunciator)
+MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     : context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
@@ -59,8 +61,7 @@ MRFDongle::MRFDongle(Annunciator &annunciator)
     // Sanity-check the dongle by looking for an interface with the appropriate
     // subclass and alternate settings with the appropriate protocols.
     // While doing so, discover which interface number is used for the radio and
-    // which alternate settings are for configuration-setting and normal
-    // operation.
+    // which alternate settings are for configuration-setting and normal // operation.
     {
         const libusb_config_descriptor &desc =
             device.configuration_descriptor_by_value(1);
@@ -111,22 +112,13 @@ MRFDongle::MRFDongle(Annunciator &annunciator)
     // Switch to configuration mode and configure the radio parameters.
     device.set_interface_alt_setting(radio_interface, configuration_altsetting);
     {
-        unsigned int config = 0U;
+        if (config < 0 || static_cast<std::size_t>(config) >=
+                              sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
         {
-            const char *config_string = std::getenv("MRF_CONFIG");
-            if (config_string)
-            {
-                int i = std::stoi(config_string, nullptr, 0);
-                if (i < 0 || static_cast<std::size_t>(i) >=
-                                 sizeof(DEFAULT_CONFIGS) / sizeof(*DEFAULT_CONFIGS))
-                {
-                    throw std::out_of_range(
-                        "Config index must be between 0 and number of configs "
-                        "- 1.");
-                }
-                config = static_cast<unsigned int>(i);
-            }
+            throw std::out_of_range("Config index must be between 0 and " +
+                                    std::to_string(NUM_DEFAULT_CONFIGS - 1));
         }
+
         channel_ = DEFAULT_CONFIGS[config].channel;
         {
             const char *channel_string = std::getenv("MRF_CHANNEL");
