@@ -51,8 +51,7 @@ class ChipAction : public Action
                                                         double chip_distance_meters);
 
    private:
-    std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // Action parameters
     Point chip_origin;

@@ -16,10 +16,11 @@ std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World
     // the getNextTactics function. This is easier than directly passing the World data
     // into the coroutine
     this->world = world;
-    if (tactic_sequence)
+    // Run the coroutine and check its status to see if it has any more work to do.
+    if (tactic_sequence())
     {
-        // Calculate and return the next Intent
-        tactic_sequence();
+        // Extract the result from the coroutine. This will be whatever value was
+        // yielded by the getNextTactics function
         auto next_tactics = tactic_sequence.get();
         return std::make_optional(next_tactics);
     }
@@ -29,17 +30,21 @@ std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World
     return std::nullopt;
 }
 
-std::vector<std::shared_ptr<Tactic>> Play::getNextTacticsWrapper(
-    TacticCoroutine::push_type &yield)
+void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
 {
     // Yield an empty vector the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
     yield({});
 
     // Anytime after the first function call, the getNextTactics function will be
-    // used to perform the real logic.
+    // used to perform the real logic. The calculateNextIntent function will yield its
+    // values to the top of the coroutine stack, where they will be retrieved by
+    // getNextIntent, so we do not need to yield or return the result of this function
+    //
     // The getNextTactics function is given the World as a parameter rather than using
     // the member variable since it's more explicit and obvious where the World
-    // comes from when implementing Plays
-    return getNextTactics(yield, this->world);
+    // comes from when implementing Plays. The World is passed as a reference, so when
+    // the world member variable is updated the implemented Plays will have access
+    // to the updated world as well.
+    getNextTactics(yield);
 }

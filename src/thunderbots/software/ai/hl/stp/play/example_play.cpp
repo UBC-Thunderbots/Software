@@ -20,8 +20,7 @@ bool ExamplePlay::invariantHolds(const World &world) const
     return true;
 }
 
-std::vector<std::shared_ptr<Tactic>> ExamplePlay::getNextTactics(
-    TacticCoroutine::push_type &yield, const World &world)
+void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     // Create MoveTactics that will loop forever
     auto move_tactic_1 = std::make_shared<MoveTactic>(true);
