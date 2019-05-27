@@ -102,8 +102,6 @@ double AI::Passing::ratePassShootScore(const Field& field, const Team& enemy_tea
         net_percent_open = open_angle_to_goal.toDegrees() / goal_angle.toDegrees();
     }
 
-    // TODO: We should be using the absolute open angle to the goal instead, and have a minimum value as a parameter described as "... this is a reflection of the maximum angular error we think the robot will kick with"
-    // TODO: Make the cutoff here a parameter
     // Create the shoot score by creating a sigmoid that goes to a large value as
     // the section of net we're shooting on approaches 100% (ie. completely open)
     double shot_openness_score = sigmoid(net_percent_open, 0.5, 0.95);
