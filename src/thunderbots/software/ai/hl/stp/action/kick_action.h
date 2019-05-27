@@ -50,8 +50,7 @@ class KickAction : public Action
         double kick_speed_meters_per_second);
 
    private:
-    std::unique_ptr<Intent> calculateNextIntent(
-        IntentCoroutine::push_type &yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
     // Action parameters
     Ball ball;

@@ -119,28 +119,27 @@ class Tactic
      * returned. This effectively "shields" the logic from any errors caused by default
      * values during construction.
      *
-     * @param yield The coroutine push_type for the Tactic
+     * This function yields a unique pointer to the next Intent that should be run for the
+     * Tactic. If the Tactic is done, an empty/null unique pointer is returned. The very
+     * first time this function is called, a null pointer will be returned (this does not
+     * signify the Tactic is done). This yield happens in place of a return.
      *
-     * @return A unique pointer to the next Intent that should be run for the Tactic.
-     * If the Tactic is done, an empty/null unique pointer is returned. The very first
-     * time this function is called, a null pointer will be returned (this does not
-     * signify the Tactic is done).
+     * @param yield The coroutine push_type for the Tactic
      */
-    std::unique_ptr<Intent> calculateNextIntentWrapper(
-        IntentCoroutine::push_type &yield);
+    void calculateNextIntentWrapper(IntentCoroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Tactic. If the Tactic is done
      * (ie. it has achieved its objective and has no more Intents to return),
      * a nullptr is returned.
      *
-     * @param yield The coroutine push_type for the Tactic
+     * This function yields a unique pointer to the next Intent that should be run for the
+     * Tactic. If the Tactic is done, a nullptr is returned. This yield happens in place
+     * of a return
      *
-     * @return A unique pointer to the next Intent that should be run for the Tactic.
-     * If the Tactic is done, a nullptr is returned.
+     * @param yield The coroutine push_type for the Tactic
      */
-    virtual std::unique_ptr<Intent> calculateNextIntent(
-        IntentCoroutine::push_type &yield) = 0;
+    virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 
     /**
      * A helper function that runs the intent_sequence coroutine and returns the result

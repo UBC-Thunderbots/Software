@@ -37,6 +37,5 @@ class StopTestTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
    private:
-    std::unique_ptr<Intent> calculateNextIntent(
-        IntentCoroutine::push_type& yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 };
