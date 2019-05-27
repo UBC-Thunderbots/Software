@@ -16,6 +16,7 @@ std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World
     // the getNextTactics function. This is easier than directly passing the World data
     // into the coroutine
     this->world = world;
+    // Run the coroutine and check its status to see if it has any more work to do.
     if (tactic_sequence())
     {
         // Extract the result from the coroutine. This will be whatever value was
@@ -45,5 +46,5 @@ void Play::getNextTacticsWrapper(TacticCoroutine::push_type &yield)
     // comes from when implementing Plays. The World is passed as a reference, so when
     // the world member variable is updated the implemented Plays will have access
     // to the updated world as well.
-    getNextTactics(yield, this->world);
+    getNextTactics(yield);
 }

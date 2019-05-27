@@ -69,12 +69,12 @@ class Action
      * returned. This effectively "shields" the logic from any errors caused by default
      * values during construction.
      *
-     * @param yield The coroutine push_type for the Action
+     * This function yields a unique pointer to the next Intent that should be run for the
+     * Action. If the Action is done, an empty/null unique pointer is returned. The very
+     * first time this function is called, a null pointer will be returned (this does not
+     * signify the Action is done). This yield happens in place of a return.
      *
-     * @yield A unique pointer to the next Intent that should be run for the Action.
-     * If the Action is done, an empty/null unique pointer is returned. The very first
-     * time this function is called, a null pointer will be returned (this does not
-     * signify the Action is done).
+     * @param yield The coroutine push_type for the Action
      */
     void calculateNextIntentWrapper(IntentCoroutine::push_type &yield);
 
@@ -83,10 +83,11 @@ class Action
      * (ie. it has achieved its objective and has no more Intents to return),
      * an empty/null unique pointer is returned.
      *
-     * @param yield The coroutine push_type for the Action
+     * This function yields a unique pointer to the next Intent that should be run for the
+     * Action. If the Action is done, an empty/null unique pointer is returned. This yield
+     * happens in place of a return
      *
-     * @yield A unique pointer to the next Intent that should be run for the Action.
-     * If the Action is done, an empty/null unique pointer is returned.
+     * @param yield The coroutine push_type for the Action
      */
     virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 };

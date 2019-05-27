@@ -20,7 +20,7 @@ bool MoveTestPlay::invariantHolds(const World &world) const
     return world.ball().position().x() >= 0;
 }
 
-void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield, const World &world)
+void MoveTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto move_test_tactic_friendly_goal = std::make_shared<MoveTestTactic>();
     auto move_test_tactic_enemy_goal    = std::make_shared<MoveTestTactic>();

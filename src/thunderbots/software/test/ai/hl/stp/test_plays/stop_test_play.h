@@ -26,5 +26,5 @@ class StopTestPlay : public Play
 
     bool invariantHolds(const World &world) const override;
 
-    void getNextTactics(TacticCoroutine::push_type &yield, const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield) override;
 };

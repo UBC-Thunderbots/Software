@@ -34,6 +34,10 @@ std::unique_ptr<Intent> Tactic::getNextIntent()
     }
     else
     {
+        // We call the getNextIntentHelper before checking if we should loop forever
+        // so we can catch the tactic right when it's done. Since we do not want to return
+        // any nullptrs while a tactic is looping forever, we need to perform this
+        // check after running the logic and immediately restarting.
         next_intent = getNextIntentHelper();
         if (done_ && loop_forever)
         {
@@ -63,8 +67,7 @@ void Tactic::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
 std::unique_ptr<Intent> Tactic::getNextIntentHelper()
 {
     std::unique_ptr<Intent> next_intent = nullptr;
-    // Check if the coroutine "iterator" has any more work to do. Only run the coroutine
-    // if there is work to be done otherwise the coroutine library will fail on an assert.
+    // Run the coroutine and check its status to see if it has any more work to do.
     if (intent_sequence())
     {
         // Extract the result from the coroutine. This will be whatever value was

@@ -93,6 +93,10 @@ class Play
 
     virtual ~Play() = default;
 
+   protected:
+    // The Play's knowledge of the most up-to-date World
+    World world;
+
    private:
     /**
      * A wrapper function for the getNextTactics function.
@@ -109,10 +113,10 @@ class Play
      * returned. This effectively "shields" the logic from any errors caused by default
      * values during construction.
      *
-     * @param yield The coroutine push_type for the Play
+     * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
+     * this time, in order of priority. This yield happens in place of a return.
      *
-     * @yield A list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority
+     * @param yield The coroutine push_type for the Play
      */
     void getNextTacticsWrapper(TacticCoroutine::push_type& yield);
 
@@ -120,17 +124,13 @@ class Play
      * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      *
-     * @param yield The coroutine push_type for the Play
-     * @param world The current state of the World
+     * This function yields a list of shared_ptrs to the Tactics the Play wants to run at
+     * this time, in order of priority. This yield happens in place of a return.
      *
-     * @yield A list of shared_ptrs to the Tactics the Play wants to run at this time, in
-     * order of priority
+     * @param yield The coroutine push_type for the Play
      */
-    virtual void getNextTactics(TacticCoroutine::push_type& yield,
-                                const World& world) = 0;
+    virtual void getNextTactics(TacticCoroutine::push_type& yield) = 0;
 
     // The coroutine that sequentially returns the Tactics the Play wants to run
     TacticCoroutine::pull_type tactic_sequence;
-    // The Play's knowledge of the most up-to-date World
-    World world;
 };
