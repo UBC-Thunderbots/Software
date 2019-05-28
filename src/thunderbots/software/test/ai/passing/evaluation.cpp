@@ -76,7 +76,7 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     World world = ::Test::TestUtil::createBlankTestingWorld();
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(0, {1, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
+        Robot(0, {3, -0.8}, {0, 0}, pass.receiverOrientation(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
         Robot(1, {-0.1, -0.1}, {0, 0}, pass.receiverOrientation(),
               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
@@ -84,7 +84,7 @@ TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
     enemy_team.updateRobots({
-        Robot(0, {1.5, -0.8}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+        Robot(0, {3.2, -0.8}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
     world.updateEnemyTeamState(enemy_team);
@@ -144,7 +144,7 @@ TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_n
     world.updateEnemyTeamState(enemy_team);
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
-    EXPECT_GE(pass_rating, 0.8);
+    EXPECT_GE(pass_rating, 0.5);
     EXPECT_LE(pass_rating, 1.0);
 }
 
