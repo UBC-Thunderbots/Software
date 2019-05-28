@@ -371,8 +371,8 @@ INSTANTIATE_TEST_CASE_P(
     All, OneTimeShotPositionTest,
     ::testing::Combine(testing::Values(-0.2),           // Robot x coordinate
                        testing::Values(0.0),            // Robot y coordinate
-                       testing::Range(-3.0, 3.0, 0.1),  // Ball x coordinate
-                       testing::Range(-4.5, 0.0, 0.1),  // Ball y coordinate
-                       testing::Range(-5.0, 5.0, 1.0)  // Angle deviation from ideal pass,
+                       testing::Range(-3.0, 3.0, 0.5),  // Ball x coordinate
+                       testing::Range(-4.5, 0.0, 0.5),  // Ball y coordinate
+                       testing::Range(-5.0, 5.0, 2.5)  // Angle deviation from ideal pass,
                                                        // in degrees
                        ));
