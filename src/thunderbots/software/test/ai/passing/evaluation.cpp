@@ -356,7 +356,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     Robot passer = Robot(13, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0));
+                         Timestamp::fromSeconds(0));
     unsigned int passer_robot_id = passer.id();
     Team friendly_team(Duration::fromSeconds(10), {passer});
     world.updateFriendlyTeamState(friendly_team);
@@ -724,15 +724,14 @@ TEST_F(PassingEvaluationTest, ratePassFriendlyCapability_should_ignore_passer_ro
     // The net result should be a poor friendly capability, as we can only pass to the
     // one robot that can't get to the pass reception point in time
 
-    Robot passer = Robot(13, {2, 2}, {0, 0}, Angle::ofDegrees(270),
-                             AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
-    unsigned int passer_robot_id = passer.id();
-    Robot potential_receiver = Robot(1, {-3, 3}, {0, 0}, Angle::ofDegrees(0),
+    Robot passer                 = Robot(13, {2, 2}, {0, 0}, Angle::ofDegrees(270),
                          AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+    unsigned int passer_robot_id = passer.id();
+    Robot potential_receiver =
+        Robot(1, {-3, 3}, {0, 0}, Angle::ofDegrees(0), AngularVelocity::ofDegrees(0),
+              Timestamp::fromSeconds(0));
 
-    Team team(Duration::fromSeconds(10), {
-        passer, potential_receiver
-    });
+    Team team(Duration::fromSeconds(10), {passer, potential_receiver});
     Pass pass({2, -2}, {0, 0}, 10, Timestamp::fromSeconds(1));
 
     double friendly_capability = ratePassFriendlyCapability(team, pass, passer_robot_id);

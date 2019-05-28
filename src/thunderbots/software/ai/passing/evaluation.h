@@ -30,8 +30,8 @@ namespace AI::Passing
      * @return A value in [0,1] representing the quality of the pass, with 1 being an
      *         ideal pass, and 0 being the worst pass possible
      */
-    double ratePass(const World &world, const AI::Passing::Pass &pass,
-                    const std::optional<Rectangle> &target_region,
+    double ratePass(const World& world, const AI::Passing::Pass& pass,
+                    const std::optional<Rectangle>& target_region,
                     std::optional<unsigned int> passer_robot_id);
 
     /**
@@ -102,7 +102,7 @@ namespace AI::Passing
      *         friendly team to recieve the given pass, with 1 being very likely, 0
      *         being impossible
      */
-    double ratePassFriendlyCapability(Team friendly_team, const Pass &pass,
+    double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
                                       std::optional<unsigned int> passer_robot_id);
 
     /**

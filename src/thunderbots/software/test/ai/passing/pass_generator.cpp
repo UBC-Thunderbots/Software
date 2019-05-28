@@ -169,29 +169,29 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
 
     // The passer robot
     Robot passer = Robot(0, {3.7, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                          Timestamp::fromSeconds(0));
+                         Timestamp::fromSeconds(0));
 
     // The potential receiver robot. Not in a great position, but the only friendly on
     // the field
     Robot receiver = Robot(1, {3.7, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                          Timestamp::fromSeconds(0));
+                           Timestamp::fromSeconds(0));
 
-    Team friendly_team(Duration::fromSeconds(10),
-                       {passer, receiver});
+    Team friendly_team(Duration::fromSeconds(10), {passer, receiver});
     world.updateFriendlyTeamState(friendly_team);
 
     pass_generator->setPasserRobotId(passer.id());
 
     // We put a few enemies in to force the pass generator to make a decision,
     // otherwise most of the field would be a valid point to pass to
-    Team enemy_team(Duration::fromSeconds(10), {
-            Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0)),
-            Robot(1, {0, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0)),
-            Robot(2, {2, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0)),
-    });
+    Team enemy_team(Duration::fromSeconds(10),
+                    {
+                        Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0)),
+                        Robot(1, {0, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0)),
+                        Robot(2, {2, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0)),
+                    });
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);

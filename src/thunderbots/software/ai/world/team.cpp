@@ -11,7 +11,10 @@ Team::Team(const Duration& robot_expiry_buffer_duration)
 {
 }
 
-Team::Team(const Duration& robot_expiry_buffer_duration, const std::vector<Robot>& team_robots) : Team(robot_expiry_buffer_duration) {
+Team::Team(const Duration& robot_expiry_buffer_duration,
+           const std::vector<Robot>& team_robots)
+    : Team(robot_expiry_buffer_duration)
+{
     updateRobots(team_robots);
 }
 

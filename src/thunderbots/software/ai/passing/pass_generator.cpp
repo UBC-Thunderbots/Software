@@ -295,7 +295,8 @@ void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
 
 double PassGenerator::ratePass(Pass pass)
 {
-    // Take ownership of world, target_region, passer_robot_id for the duration of this function
+    // Take ownership of world, target_region, passer_robot_id for the duration of this
+    // function
     std::lock_guard<std::mutex> world_lock(world_mutex);
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
     std::lock_guard<std::mutex> passer_robot_id_lock(passer_robot_id_mutex);

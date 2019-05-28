@@ -39,7 +39,8 @@ class Team
      * have been updated for before it is removed from the team
      * @param team_robots The robots on the team
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration, const std::vector<Robot>& team_robots);
+    explicit Team(const Duration& robot_expiry_buffer_duration,
+                  const std::vector<Robot>& team_robots);
 
     /**
      * Updates this team with new robots.
