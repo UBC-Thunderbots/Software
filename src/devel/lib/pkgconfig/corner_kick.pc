@@ -1,8 +1,0 @@
-prefix=/home/evan/roboRoss/Software/src/devel
-
-Name: corner_kick
-Description: Description of corner_kick
-Version: 1.0.0
-Cflags: 
-Libs: -L/home/evan/roboRoss/Software/src/devel/lib 
-Requires: 

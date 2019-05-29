@@ -1,8 +1,0 @@
-prefix=/home/evan/roboRoss/Software/src/devel
-
-Name: thunderbots
-Description: Description of thunderbots
-Version: 0.0.0
-Cflags: -I/home/evan/roboRoss/Software/src/devel/include
-Libs: -L/home/evan/roboRoss/Software/src/devel/lib -lthunderbots
-Requires: roscpp std_msgs dynamic_reconfigure message_runtime
