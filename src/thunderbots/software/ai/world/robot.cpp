@@ -22,8 +22,6 @@ void Robot::updateState(const Point &new_position, const Vector &new_velocity,
 {
     if (timestamp < lastUpdateTimestamp())
     {
-        printf("timestamp:%f, lastUpdate:%f", timestamp.getSeconds(),
-               lastUpdateTimestamp().getSeconds());
         throw std::invalid_argument(
             "Error: State of robot is updating times from the past");
     }
