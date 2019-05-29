@@ -22,7 +22,7 @@ class StopPrimitive : public Primitive
      *
      * @param primitive_msg The message from which to create the Stop Primitive
      */
-    explicit StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+    explicit StopPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
 
 
     std::string getPrimitiveName() const override;
@@ -51,7 +51,7 @@ class StopPrimitive : public Primitive
      */
     std::vector<bool> getExtraBits() const override;
 
-    void accept(PrimitiveVisitor &visitor) const override;
+    void accept(PrimitiveVisitor& visitor) const override;
 
     /**
      * Compares StopPrimitives for equality. StopPrimitives are considered equal if all

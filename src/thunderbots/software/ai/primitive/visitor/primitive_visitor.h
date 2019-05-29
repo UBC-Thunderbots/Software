@@ -92,5 +92,4 @@ class PrimitiveVisitor
      * @param stop_primitive The StopPrimitive to visit
      */
     virtual void visit(const StopPrimitive &stop_primitive) = 0;
-
 };

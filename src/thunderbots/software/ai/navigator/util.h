@@ -29,7 +29,9 @@ double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
  * @return a vector of move primitives converted from a vector of points
  */
 std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
-                                                   const std::vector<Point> &points, bool enable_dribbler, bool enable_autokick);
+                                                   const std::vector<Point> &points,
+                                                   bool enable_dribbler,
+                                                   bool enable_autokick);
 /**
  * Calculates how much a point is trespassing in another point's space.
  *
