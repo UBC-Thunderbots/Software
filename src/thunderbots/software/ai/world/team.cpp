@@ -176,14 +176,16 @@ Timestamp Team::getMostRecentTimestamp() const
     return last_update_timestamps.front();
 }
 
-Timestamp Team::getMostRecentTimestampFromRobots() {
-
+Timestamp Team::getMostRecentTimestampFromRobots()
+{
     std::vector<Robot> robots = this->getAllRobots();
 
     Timestamp most_recent_timestamp = Timestamp::fromSeconds(0);
 
-    for( Robot robot : robots) {
-        if( robot.getMostRecentTimestamp() > most_recent_timestamp) {
+    for (Robot robot : robots)
+    {
+        if (robot.getMostRecentTimestamp() > most_recent_timestamp)
+        {
             most_recent_timestamp = robot.getMostRecentTimestamp();
         }
     }
@@ -202,10 +204,12 @@ void Team::updateTimestamp(Timestamp time_stamp)
     else if (time_stamp < Team::getMostRecentTimestamp())
     {
         throw std::invalid_argument(
-                "Error: Attempt tp update Team state with old Timestamp");
+            "Error: Attempt tp update Team state with old Timestamp");
     }
-    else if (time_stamp == Team::getMostRecentTimestamp()) {
-        // Don't update if the timestamp is the same as the most recent already assigned to Team
+    else if (time_stamp == Team::getMostRecentTimestamp())
+    {
+        // Don't update if the timestamp is the same as the most recent already assigned
+        // to Team
         return;
     }
     else

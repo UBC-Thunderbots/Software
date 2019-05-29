@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "ai/world/robot.h"
-#include "util/time/timestamp.h"
 #include "boost/circular_buffer.hpp"
+#include "util/time/timestamp.h"
 
 
 /**
@@ -30,9 +30,11 @@ class Team
      *
      * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
-     * @param buffer_size The number of elements in the Timestamp history buffer of the Team object
+     * @param buffer_size The number of elements in the Timestamp history buffer of the
+     * Team object
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size = 20);
+    explicit Team(const Duration& robot_expiry_buffer_duration,
+                  unsigned int buffer_size = 20);
 
     /**
      * Updates this team with new robots.
@@ -203,7 +205,6 @@ class Team
     Timestamp getMostRecentTimestamp() const;
 
    private:
-
     /**
      * Updates the timestamp history for the Field object
      *
