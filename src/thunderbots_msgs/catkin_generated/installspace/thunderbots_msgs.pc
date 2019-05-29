@@ -1,8 +1,0 @@
-prefix=/usr/local
-
-Name: thunderbots_msgs
-Description: Description of thunderbots_msgs
-Version: 0.0.0
-Cflags: -I/usr/local/include
-Libs: -L/usr/local/lib 
-Requires: message_runtime std_msgs
