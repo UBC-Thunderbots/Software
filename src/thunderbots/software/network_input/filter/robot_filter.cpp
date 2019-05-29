@@ -1,7 +1,17 @@
 #include "network_input/filter/robot_filter.h"
 
-RobotFilter::RobotFilter(Robot robot, Duration expiry_buffer_duration)
-    : current_robot_state(robot), expiry_buffer_duration(expiry_buffer_duration)
+RobotFilter::RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration)
+    : current_robot_state(current_robot_state),
+      expiry_buffer_duration(expiry_buffer_duration)
+{
+}
+
+RobotFilter::RobotFilter(SSLRobotDetection current_robot_state,
+                         Duration expiry_buffer_duration)
+    : current_robot_state(current_robot_state.id, current_robot_state.position,
+                          Vector(0, 0), current_robot_state.orientation,
+                          AngularVelocity::zero(), current_robot_state.timestamp),
+      expiry_buffer_duration(expiry_buffer_duration)
 {
 }
 

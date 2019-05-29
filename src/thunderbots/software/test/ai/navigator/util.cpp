@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "geom/point.h"
+#include "geom/util.h"
 
 TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_parallel_segments)
 {
@@ -107,6 +108,42 @@ TEST(NavUtilTest, convertPointsToMovePrimitives_test)
     EXPECT_EQ(movePrimitive3.getDestination(), point3);
     EXPECT_EQ(movePrimitive3.getFinalSpeed(), 0);
     EXPECT_EQ(movePrimitive3.getFinalAngle(), point3.orientation());
+}
+
+TEST(getPointTrespassTest, distance_within_threshold_test)
+{
+    const Point &p1  = Point(0, 0);
+    const Point &p2  = Point(0, 4);
+    double threshold = 6.0;
+
+    EXPECT_EQ(2, getPointTrespass(p1, p2, threshold));
+}
+
+TEST(getPointTrespassTest, distance_closer_within_threshold_test)
+{
+    const Point &p1  = Point(0, 2);
+    const Point &p2  = Point(0, 3);
+    double threshold = 6.0;
+
+    EXPECT_EQ(5, getPointTrespass(p1, p2, threshold));
+}
+
+TEST(getPointTrespassTest, distance_equals_threshold_test)
+{
+    const Point &p1  = Point(0, 0);
+    const Point &p2  = Point(0, 3);
+    double threshold = 3.0;
+
+    EXPECT_EQ(0, getPointTrespass(p1, p2, threshold));
+}
+
+TEST(getPointTrespassTest, distance_greater_than_threshold_test)
+{
+    const Point &p1  = Point(0, 0);
+    const Point &p2  = Point(0, 3);
+    double threshold = 1.0;
+
+    EXPECT_EQ(0, getPointTrespass(p1, p2, threshold));
 }
 
 int main(int argc, char **argv)

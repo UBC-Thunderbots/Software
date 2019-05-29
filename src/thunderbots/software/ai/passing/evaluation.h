@@ -21,12 +21,18 @@ namespace AI::Passing
      * @param pass The pass to rate
      * @param target_region The area we want to pass to (if there is a specific area,
      *                      set to `std::nullopt` otherwise
+     * @param passer_robot_id The id of the robot performing the pass. This will be used
+     *                        when calculating friendly capability to ensure the passer
+     *                        robot does not try to pass to itself. If `std::nullopt` is
+     *                        given, it is assumed the passer robot is not on the
+     *                        friendly team of the given world
      *
      * @return A value in [0,1] representing the quality of the pass, with 1 being an
      *         ideal pass, and 0 being the worst pass possible
      */
     double ratePass(const World& world, const AI::Passing::Pass& pass,
-                    const std::optional<Rectangle>& target_region);
+                    const std::optional<Rectangle>& target_region,
+                    std::optional<unsigned int> passer_robot_id);
 
     /**
      * Rate pass based on the probability of scoring once we receive the pass
@@ -87,12 +93,17 @@ namespace AI::Passing
      *
      * @param friendly_team The team of robots that might receive the given pass
      * @param pass The pass we want a robot to receive
+     * @param passer_robot_id The id of the robot performing the pass. This will be used
+     *                        to ensure the passer robot does not try to pass to itself.
+     *                        If `std::nullopt` is given, it is assumed the passer robot
+     *                        is not on `friendly_team`
      *
      * @return A value in [0,1] indicating how likely it would be for a robot on the
      *         friendly team to recieve the given pass, with 1 being very likely, 0
      *         being impossible
      */
-    double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass);
+    double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+                                      std::optional<unsigned int> passer_robot_id);
 
     /**
      * Calculates the static position quality for a given position on a given field
