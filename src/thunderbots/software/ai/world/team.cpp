@@ -48,6 +48,7 @@ void Team::updateState(const Team& new_team_data)
 {
     updateRobots(new_team_data.getAllRobots());
     this->goalie_id = new_team_data.goalie_id;
+
     updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
@@ -202,6 +203,10 @@ void Team::updateTimestamp(Timestamp time_stamp)
     {
         throw std::invalid_argument(
                 "Error: Attempt tp update Team state with old Timestamp");
+    }
+    else if (time_stamp == Team::getMostRecentTimestamp()) {
+        // Don't update if the timestamp is the same as the most recent already assigned to Team
+        return;
     }
     else
     {

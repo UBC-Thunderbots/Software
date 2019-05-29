@@ -20,6 +20,7 @@ void Robot::updateState(const Point &new_position, const Vector &new_velocity,
 {
     if (timestamp < lastUpdateTimestamp())
     {
+        printf("timestamp:%f, lastUpdate:%f", timestamp.getSeconds(), lastUpdateTimestamp().getSeconds());
         throw std::invalid_argument(
             "Error: State of robot is updating times from the past");
     }
@@ -36,7 +37,7 @@ void Robot::updateState(const Robot &new_robot_data)
             "Error: Robot updated using a robot with a mismatched id");
     }
 
-    for (int i = 0; i < new_robot_data.positions_.size(); i++)
+    for (int i = new_robot_data.positions_.size()-1; i >= 0; i--)
     {
         updateState(new_robot_data.positions_.at(i), new_robot_data.velocities_.at(i),
                     new_robot_data.orientations_.at(i),
