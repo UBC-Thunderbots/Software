@@ -17,12 +17,14 @@ using namespace AI::Passing;
 using namespace AI::Evaluation;
 
 double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
-                             const std::optional<Rectangle>& target_region)
+                             const std::optional<Rectangle>& target_region,
+                             std::optional<unsigned int> passer_robot_id)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
 
-    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
+    double friendly_pass_rating =
+        ratePassFriendlyCapability(world.friendlyTeam(), pass, passer_robot_id);
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
@@ -207,9 +209,16 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
-                                               const Pass& pass)
+double AI::Passing::ratePassFriendlyCapability(
+    Team friendly_team, const Pass& pass, std::optional<unsigned int> passer_robot_id)
 {
+    // Remove the passer robot from the friendly team before evaluating, as we assume
+    // the passer is not passing to itself
+    if (passer_robot_id)
+    {
+        friendly_team.removeRobotWithId(*passer_robot_id);
+    }
+
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty())
     {

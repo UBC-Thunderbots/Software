@@ -249,10 +249,6 @@ namespace AI::Passing
          */
         std::vector<Pass> generatePasses(unsigned long num_passes_to_gen);
 
-        // This constant is used to prevent division by 0 in our implementation of Adam
-        // (gradient descent)
-        static constexpr double eps = 1e-8;
-
         // The thread running the pass optimization/pruning/re-generation in the
         // background. This thread will run for the entire lifetime of the class
         std::thread pass_generation_thread;

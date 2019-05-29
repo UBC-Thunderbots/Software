@@ -4,9 +4,9 @@
 
 #include "util/logger/init.h"
 
-MRFBackend::MRFBackend(ros::NodeHandle &node_handle)
+MRFBackend::MRFBackend(unsigned int config, ros::NodeHandle &node_handle)
     : annunciator(Annunciator(node_handle)),
-      dongle(MRFDongle(annunciator)),
+      dongle(MRFDongle(config, annunciator)),
       ball(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(1)))
 {
 }

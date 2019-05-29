@@ -1,6 +1,7 @@
 #include "ai/world/robot.h"
 
 #include <gtest/gtest.h>
+#include <shared/constants.h>
 
 class RobotTest : public ::testing::Test
 {
@@ -478,7 +479,7 @@ TEST_F(RobotTest, get_timestamp_history)
     EXPECT_EQ(prevAngularVelocities, robot.getPreviousTimestamps());
 }
 
-TEST_F(RobotTest, get_most_recent_timestamp)
+TEST_F(RobotTest, get_timestamp_index_fetches_first_index)
 {
     std::vector prevAngularVelocities = {half_second_future, half_second_future,
                                          current_time};
@@ -490,5 +491,39 @@ TEST_F(RobotTest, get_most_recent_timestamp)
     robot.updateState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
                       AngularVelocity::ofRadians(1.2), one_second_future);
 
-    EXPECT_EQ(one_second_future, robot.getMostRecentTimestamp());
+    EXPECT_EQ(0, robot.getHistoryIndexFromTimestamp(one_second_future));
+}
+
+TEST_F(RobotTest, get_timestamp_index_fetches_last_index)
+{
+    std::vector prevAngularVelocities = {half_second_future, half_second_future,
+                                         current_time};
+
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time, 3);
+    robot.updateState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                      AngularVelocity::ofRadians(1.1), half_second_future);
+    robot.updateState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                      AngularVelocity::ofRadians(1.2), one_second_future);
+
+    EXPECT_EQ(2, robot.getHistoryIndexFromTimestamp(current_time));
+}
+
+TEST_F(RobotTest, get_timestamp_index_no_matching_timestamp)
+{
+    std::vector prevAngularVelocities = {half_second_future, half_second_future,
+                                         current_time};
+
+    Robot robot = Robot(0, Point(3, 1.2), Vector(-3, 1), Angle::ofDegrees(0),
+                        AngularVelocity::ofDegrees(25), current_time, 3);
+    robot.updateState(Point(-1.2, 3), Vector(2.2, -0.05), Angle::quarter(),
+                      AngularVelocity::ofRadians(1.1), half_second_future);
+    robot.updateState(Point(-1.3, 3), Vector(2.3, -0.05), Angle::quarter(),
+                      AngularVelocity::ofRadians(1.2), one_second_future);
+
+    Timestamp no_matching_time =
+        half_second_future +
+        Duration::fromMilliseconds(POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS + 1.0);
+
+    EXPECT_EQ(std::nullopt, robot.getHistoryIndexFromTimestamp(no_matching_time));
 }

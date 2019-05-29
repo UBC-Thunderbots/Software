@@ -37,6 +37,16 @@ class Team
                   unsigned int buffer_size = 20);
 
     /**
+     * Create a new team
+     *
+     * @param robot_expiry_buffer_duration The Duration for which a robot must not
+     * have been updated for before it is removed from the team
+     * @param team_robots The robots on the team
+     */
+    explicit Team(const Duration& robot_expiry_buffer_duration,
+                  const std::vector<Robot>& team_robots);
+
+    /**
      * Updates this team with new robots.
      *
      * @throws std::invalid_argument if multiple robots have the same id
@@ -171,6 +181,14 @@ class Team
      * Removes all Robots from this team. Does not affect the goalie id.
      */
     void clearAllRobots();
+
+    /**
+     * Returns the timestamp of the most recently updated robot on this team
+     *
+     * @return the timestamp of the most recently updated robot on this team, or
+     *         std::nullopt if this team is empty
+     */
+    std::optional<Timestamp> lastUpdateTimestamp() const;
 
     /**
      * Defines the equality operator for a Team. Teams are equal if their robots are equal

@@ -13,6 +13,14 @@ Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_siz
     last_update_timestamps.set_capacity(buffer_size);
 }
 
+Team::Team(const Duration& robot_expiry_buffer_duration,
+           const std::vector<Robot>& team_robots)
+    : Team(robot_expiry_buffer_duration)
+{
+    updateRobots(team_robots);
+}
+
+
 void Team::updateRobots(const std::vector<Robot>& new_robots)
 {
     // Update the robots, checking that there are no duplicate IDs in the given data
@@ -216,6 +224,19 @@ void Team::updateTimestamp(Timestamp time_stamp)
     {
         last_update_timestamps.push_front(time_stamp);
     }
+}
+
+std::optional<Timestamp> Team::lastUpdateTimestamp() const
+{
+    std::optional<Timestamp> most_recent_timestamp = std::nullopt;
+    for (Robot& robot : getAllRobots())
+    {
+        if (!most_recent_timestamp || robot.lastUpdateTimestamp() > most_recent_timestamp)
+        {
+            most_recent_timestamp = robot.lastUpdateTimestamp();
+        }
+    }
+    return most_recent_timestamp;
 }
 
 bool Team::operator==(const Team& other) const
