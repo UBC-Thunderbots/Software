@@ -24,16 +24,22 @@ class MovePrimitive : public Primitive
      * of the movement
      * @param final_speed The final speed the Robot should have when it reaches
      * its destination at the end of the movement
+     * @param enable_dribbler Whether or not to enable the dribbler
+     * @param enable_autokick This will enable the "break-beam" on the robot, that will
+     *                        trigger the kicker to fire as soon as the ball is in front
+     *                        of it
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
-                           const Angle &final_angle, double final_speed);
+                           const Angle &final_angle, double final_speed,
+                           bool enable_dribbler = false, bool enable_autokick = false);
 
     /**
      * Creates a new Move Primitive from a Primitive message
      *
-     * @param primtiive_msg The message from which to create the Move Primitive
+     * @param primitive_msg The message from which to create the Move Primitive
      */
     explicit MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+
     /**
      * Gets the primitive name
      *
@@ -69,10 +75,24 @@ class MovePrimitive : public Primitive
     double getFinalSpeed() const;
 
     /**
+     * Gets whether or not auto-kick should be enabled while moving
+     *
+     * @return whether or not auto-kick should be enabled while moving
+     */
+    bool isAutoKickEnabled() const;
+
+    /**
+     * Gets whether or not the dribbler should be enabled while moving
+     *
+     * @return whether or not the dribbler should be enabled while moving
+     */
+    bool isDribblerEnabled() const;
+
+    /**
      * Returns the generic vector of parameters for this Primitive
      *
      * @return A vector of the form {dest.x(), dest.y(), final_angle.toRadians(),
-     *                               final_speed}
+     *                               final_speed, enable_dribbler, enable_autokick}
      */
     std::vector<double> getParameters() const override;
 
@@ -85,9 +105,28 @@ class MovePrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares MovePrimitives for equality. MovePrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the MovePrimitive to compare with for equality
+     * @return true if the MovePrimitives are equal and false otherwise
+     */
+    bool operator==(const MovePrimitive &other) const;
+
+    /**
+     * Compares MovePrimitives for inequality.
+     *
+     * @param other the MovePrimitive to compare with for inequality
+     * @return true if the MovePrimitives are not equal and false otherwise
+     */
+    bool operator!=(const MovePrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point dest;
     Angle final_angle;
     double final_speed;
+    bool enable_dribbler;
+    bool enable_autokick;
 };

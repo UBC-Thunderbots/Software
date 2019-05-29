@@ -42,7 +42,8 @@ namespace Test
          * @return A new world object with friendly robots in the given positions
          */
         static World setFriendlyRobotPositions(World world,
-                                               std::vector<Point> robot_positions);
+                                               std::vector<Point> robot_positions,
+                                               const Timestamp &timestamp);
 
         /**
          * Returns a new World object with enemy robots in the positions specified
@@ -55,7 +56,8 @@ namespace Test
          * @return A new world object with enemy robots in the given positions
          */
         static World setEnemyRobotPositions(World world,
-                                            std::vector<Point> robot_positions);
+                                            std::vector<Point> robot_positions,
+                                            const Timestamp &timestamp);
 
         /**
          * Returns a new World object with the Ball placed in the new position
@@ -65,7 +67,8 @@ namespace Test
          * @param ball_position The new position for the ball
          * @return A new World object with the ball placed in the given position
          */
-        static World setBallPosition(World world, Point ball_position);
+        static World setBallPosition(World world, Point ball_position,
+                                     Timestamp timestamp);
 
         /**
          * Returns a new World object with the Ball's velocity set to the new velocity
@@ -74,7 +77,8 @@ namespace Test
          * @param ball_velocity The new velocity for the ball
          * @return A new World object with the ball's velocity set to the new velocity
          */
-        static World setBallVelocity(World world, Vector ball_velocity);
+        static World setBallVelocity(World world, Vector ball_velocity,
+                                     Timestamp timestamp);
 
         /**
          * Returns a vector containing all Refbox game states except for
@@ -96,6 +100,7 @@ namespace Test
          * @return A new team with robots placed at the given positions
          */
         static Team setRobotPositionsHelper(Team team,
-                                            const std::vector<Point> &robot_positions);
+                                            const std::vector<Point> &robot_positions,
+                                            const Timestamp &timestamp);
     };
 }  // namespace Test

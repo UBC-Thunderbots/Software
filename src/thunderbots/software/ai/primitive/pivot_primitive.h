@@ -14,17 +14,16 @@ class PivotPrimitive : public Primitive
      * Pivots the robot around the specified point, maintaining a constant
      * distance from this point.
      * 	   The robot will pivot in the direction of the shortest path
-     * 	   The robot will always face the point around which it pivots
+     * 	   Assume robot always faces the point around which it pivots
      *
      *
-     * @param robot_id          The id of the robot to run this primitive
-     * @param pivot_point       The point around which the robot will pivot
-     * @param final_angle       Global angle from rotation point to robot (in radians)
-     * @param robot_orientation The orientation of robot (facing direction)
-     *                          during pivot (radians; Not used)
+     * @param robot_id      The id of the robot to run this primitive
+     * @param pivot_point   The point around which the robot will pivot
+     * @param final_angle   Global angle from rotation point to robot (in radians)
+     * @param pivot_radius  The distance from robot to pivot_point during movement
      */
     explicit PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                            const Angle &final_angle, const Angle &robot_orientation);
+                            const Angle &final_angle, const double pivot_radius);
 
     /**
      * Create a new Pivot Primitive from a Primitive message
@@ -54,16 +53,16 @@ class PivotPrimitive : public Primitive
     /**
      * Get the robot's final orientation
      *
-     * @return the robot's orientation after a pivot as an Angle
+     * @return the radius the robot maintains during pivot (as double)
      */
-    Angle getRobotOrientation() const;
+    double getPivotRadius() const;
 
     /**
      * Returns the generic vector of parameters for this Primitive
      *
      * @return A vector of the form {pivot_point.x(), pivot_point.y(),
      *                               final_angle.toRadians(),
-     *                               robot_orientation.toRadians()}
+     *                               pivot_radius}
      */
     std::vector<double> getParameters() const override;
 
@@ -76,9 +75,26 @@ class PivotPrimitive : public Primitive
 
     void accept(PrimitiveVisitor &visitor) const override;
 
+    /**
+     * Compares PivotPrimitives for equality. PivotPrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the PivotPrimitive to compare with for equality
+     * @return true if the PivotPrimitives are equal and false otherwise
+     */
+    bool operator==(const PivotPrimitive &other) const;
+
+    /**
+     * Compares PivotPrimitives for inequality.
+     *
+     * @param other the PivotPrimitive to compare with for inequality
+     * @return true if the PivotPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const PivotPrimitive &other) const;
+
    private:
     unsigned int robot_id;
     Point pivot_point;
     Angle final_angle;
-    Angle robot_orientation;
+    double pivot_radius;
 };

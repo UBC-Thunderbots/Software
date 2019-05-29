@@ -58,18 +58,18 @@ TEST(AngleTest, Angle_isFinite)
 
 TEST(AngleTest, Angle_diff)
 {
-    EXPECT_DOUBLE_EQ(27, Angle::ofDegrees(50).diff(Angle::ofDegrees(23)).toDegrees());
+    EXPECT_DOUBLE_EQ(27, Angle::ofDegrees(50).minDiff(Angle::ofDegrees(23)).toDegrees());
     // We require a slightly larger tolerance for this test to pass
-    EXPECT_NEAR(27, Angle::ofDegrees(360 + 13).diff(Angle::ofDegrees(-14)).toDegrees(),
+    EXPECT_NEAR(27, Angle::ofDegrees(360 + 13).minDiff(Angle::ofDegrees(-14)).toDegrees(),
                 1e-13);
     EXPECT_DOUBLE_EQ(
-        27, Angle::ofDegrees(180 - 13).diff(Angle::ofDegrees(-180 + 14)).toDegrees());
+        27, Angle::ofDegrees(180 - 13).minDiff(Angle::ofDegrees(-180 + 14)).toDegrees());
     EXPECT_DOUBLE_EQ(
-        27, Angle::ofDegrees(180 + 13).diff(Angle::ofDegrees(-180 - 14)).toDegrees());
+        27, Angle::ofDegrees(180 + 13).minDiff(Angle::ofDegrees(-180 - 14)).toDegrees());
     EXPECT_DOUBLE_EQ(
-        27, Angle::ofDegrees(-180 + 13).diff(Angle::ofDegrees(180 - 14)).toDegrees());
+        27, Angle::ofDegrees(-180 + 13).minDiff(Angle::ofDegrees(180 - 14)).toDegrees());
     EXPECT_DOUBLE_EQ(
-        27, Angle::ofDegrees(-180 - 13).diff(Angle::ofDegrees(180 + 14)).toDegrees());
+        27, Angle::ofDegrees(-180 - 13).minDiff(Angle::ofDegrees(180 + 14)).toDegrees());
 }
 
 TEST(AngleTest, asin)

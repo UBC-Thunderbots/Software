@@ -25,6 +25,14 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Add user to dialout group for USB comms
+sudo adduser $USER dialout
+
+# Create a new 'thunderbots' group that is used by the udev file
+# This allows the udev rules file to properly grant USB permission
+sudo groupadd thunderbots
+sudo adduser $USER thunderbots
+
 echo "================================================================"
 echo "Done"
 echo ""

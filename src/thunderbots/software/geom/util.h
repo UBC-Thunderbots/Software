@@ -3,13 +3,17 @@
 #include <cstddef>
 #include <vector>
 
+#include "geom/circle.h"
+#include "geom/line.h"
 #include "geom/point.h"
-#include "geom/shapes.h"
+#include "geom/ray.h"
+#include "geom/rectangle.h"
+#include "geom/segment.h"
 
 template <size_t N>
-using Poly     = std::array<Vector, N>;
-using Triangle = Poly<3>;
-using Quad     = Poly<4>;
+using LegacyPolygon       = std::array<Vector, N>;
+using LegacyTriangle      = LegacyPolygon<3>;
+using LegacyQuadrilateral = LegacyPolygon<4>;
 
 constexpr double EPS = 1e-9;
 
@@ -20,11 +24,12 @@ constexpr int sign(double n)
     return n > EPS ? 1 : (n < -EPS ? -1 : 0);
 }
 
-inline Triangle triangle(const Point &a, const Point &b, const Point &c)
+inline LegacyTriangle triangle(const Point &a, const Point &b, const Point &c)
 {
     return {a, b, c};
 }
-inline Quad quad(const Point &a, const Point &b, const Point &c, const Point &d)
+inline LegacyQuadrilateral quad(const Point &a, const Point &b, const Point &c,
+                                const Point &d)
 {
     return {a, b, c, d};
 }
@@ -37,72 +42,79 @@ double proj_len(const Vector &first, const Vector &second);
 /**
  * Signed magnitude of the projection of `first.start -> second` on `first`
  */
-double proj_len(const Seg &first, const Vector &second);
+double proj_len(const Segment &first, const Vector &second);
 
 /*
- * The family of `contains` functions determins whether
+ * The family of `contains` functions determines whether
  * the second parameter is contained, even if partially,
  * inside the first parameter.
  */
 
-bool contains(const Triangle &out, const Vector &in);
-bool contains(const Circle &out, const Vector &in);
-bool contains(const Circle &out, const Seg &in);
-bool contains(const Ray &out, const Vector &in);
-bool contains(const Seg &out, const Vector &in);
-bool contains(const Rect &out, const Vector &in);
+bool contains(const LegacyTriangle &out, const Point &in);
+bool contains(const Circle &out, const Point &in);
+bool contains(const Circle &out, const Segment &in);
+bool contains(const Ray &out, const Point &in);
+bool contains(const Segment &out, const Point &in);
+bool contains(const Rectangle &out, const Point &in);
 
 /*
  * The family of `intersects` functions determines whether there
  * exists an intersection between one object and another.
  */
 
-bool intersects(const Triangle &first, const Circle &second);
-bool intersects(const Circle &first, const Triangle &second);
+bool intersects(const LegacyTriangle &first, const Circle &second);
+bool intersects(const Circle &first, const LegacyTriangle &second);
 bool intersects(const Circle &first, const Circle &second);
-bool intersects(const Seg &first, const Circle &second);
-bool intersects(const Circle &first, const Seg &second);
-bool intersects(const Seg &first, const Seg &second);
-bool intersects(const Ray &first, const Seg &second);
-bool intersects(const Seg &first, const Ray &second);
+bool intersects(const Segment &first, const Circle &second);
+bool intersects(const Circle &first, const Segment &second);
+bool intersects(const Segment &first, const Segment &second);
+bool intersects(const Ray &first, const Segment &second);
+bool intersects(const Segment &first, const Ray &second);
 
 /*
  * The family of `dist` functions calculates the unsigned distance
  * between one object and another.
  */
-double dist(const Point &first, const Point &second);
-double dist(const Seg &first, const Seg &second);
 
-double dist(const Point &first, const Seg &second);
-double dist(const Seg &first, const Point &second);
+double dist(const Point &first, const Point &second);
+double dist(const Segment &first, const Segment &second);
+
+double dist(const Point &first, const Segment &second);
+double dist(const Segment &first, const Point &second);
 
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
 
-double distsq(const Point &first, const Seg &second);
-double distsq(const Seg &first, const Point &second);
+/**
+ * NOTE: the distance from a point to a rectangle is the closest distance from the point
+ * to the edge of the rectangle, or 0 if the point is within the rectangle
+ */
+double dist(const Point &first, const Rectangle &second);
+
+double distsq(const Point &first, const Segment &second);
+double distsq(const Segment &first, const Point &second);
 double distsq(const Point &first, const Point &second);
 
-bool isDegenerate(const Seg &seg);
-bool isDegenerate(const Ray &seg);
+bool isDegenerate(const Segment &segment);
+bool isDegenerate(const Ray &segment);
 bool isDegenerate(const Line &line);
 
-double len(const Seg &seg);
+double len(const Segment &segment);
 
-double lensq(const Seg &seg);
+double lensq(const Segment &segment);
 double lensq(const Line &line);
 
 template <size_t N>
-Vector getVertex(const Poly<N> &poly, unsigned int i);
+Vector getVertex(const LegacyPolygon<N> &poly, unsigned int i);
 template <size_t N>
-void setVertex(Poly<N> &poly, unsigned int i, Vector &v);
+void setVertex(LegacyPolygon<N> &poly, unsigned int i, Vector &v);
 
 /**
  * Gets the side that is connected to the vertex with index provided
  * and also connected to the vertex with the next index.
  */
 template <size_t N>
-Seg getSide(const Poly<N> &poly, unsigned int i);
+Segment getSide(const LegacyPolygon<N> &poly, unsigned int i);
 
 /**
  * Checks if 3 points are collinear.
@@ -146,22 +158,23 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  *
  * @param radius the radii of the obstacles.
  *
- * @return the best direction to shoot and the size of the angle centered around
- * that direction that is completely free of obstacles,
- * or <code>(<var>p</var>, 0)</code> for some unspecified <var>p</var> if there
- * is no free path.
+ * @return The best point to aim for in the target area and the size of the open interval
+ *         through which a shot from the current point to the best point would go. If no
+ *         shot could be found, returns std::nullopt
  */
-std::pair<Point, Angle> angleSweepCircles(const Point &src, const Point &p1,
-                                          const Point &p2,
-                                          const std::vector<Point> &obstacles,
-                                          const double &radius);
+std::optional<std::pair<Vector, Angle>> angleSweepCircles(
+    const Point &src, const Point &p1, const Point &p2,
+    const std::vector<Point> &obstacles, const double &radius);
 
 /**
- * Gets all angles.
+ * Performs an angle sweep.
+ * Suppose in this world, all objects are circles of fixed radius.
+ * You are at point \p src, and you want to shoot a ray from a point to an area
+ * This function calculates the all open angle intervals that you can shoot.
  *
  * @pre The point \p src can't be within the radius of the obstacle
  *
- * @param src the location where you are standing.
+ * @param src the location where the sweep is centered (think center of a clock)
  *
  * @param p1 the location of the right-hand edge of the target area.
  *
@@ -171,12 +184,15 @@ std::pair<Point, Angle> angleSweepCircles(const Point &src, const Point &p1,
  *
  * @param radius the radii of the obstacles.
  *
- * @return a vector of all possible pairs of directions and angles to a target area.
- * If lines \p src -> \p p1 and \p src -> \p p2 are collinear, the result will contain a
- * single pair of the direction of \p src -> \p p1 and zero angle if the line is not
- * blocked by an obstacle.
- * Otherwise, an empty vector will be returned.
- * An empty vector is returned if the preconditions aren't satisfied.
+ * @return A vector of possible (ie. not blocked) pairs of points to shoot to in the
+ *         target area,  and the size of the open interval for that point.
+ *         ie. for a return point `p` and angle `a`, if `v` is a vector from `src` to `p`,
+ *         then the open interval through which we are shooting is from `angle(v) - a/2`
+ *         to `angle(v) + a/2`
+ *         If lines src -> p1 and src -> p2 are collinear and src -> p1 is not blocked by
+ *         an obstacle, the result will contain a single pair of the direction of
+ *         src -> p1 and zero angle if the line is not blocked by an obstacle.
+ *         An empty vector is returned if the preconditions aren't satisfied.
  */
 std::vector<std::pair<Point, Angle>> angleSweepCirclesAll(
     const Point &src, const Point &p1, const Point &p2,
@@ -199,6 +215,19 @@ std::vector<Point> circleBoundaries(const Point &centre, double radius, int num_
  * @return the Point on line segment closest to centre point.
  */
 Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
+
+/**
+ * Finds the Point on line closest to point.
+ *
+ * @param centre the point.
+ *
+ * @param lineA one point on the line.
+ *
+ * @param lineB another point on the line segment.
+ *
+ * @return the Point on line closest to centre point.
+ */
+Point closestPointOnLine(const Point &p, const Point &lineA, const Point &lineB);
 
 /**
  * Finds the points of intersection between a circle and a line.
@@ -229,7 +258,8 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
  *
  * @return the points of intersection.
  */
-std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Point &segB);
+std::vector<Point> lineRectIntersect(const Rectangle &r, const Point &segA,
+                                     const Point &segB);
 
 /**
  * Find where a vector intersect a rectangle
@@ -243,7 +273,7 @@ std::vector<Point> lineRectIntersect(const Rect &r, const Point &segA, const Poi
  *
  * @return the points of intersection.
  */
-Point vectorRectIntersect(const Rect &r, const Point &segA, const Point &segB);
+Point vectorRectIntersect(const Rectangle &r, const Point &segA, const Point &segB);
 
 /**
  * Clips a point to a rectangle boundary.
@@ -267,7 +297,7 @@ Point clipPoint(const Point &p, const Point &bound1, const Point &bound2);
  *
  * @return the closest point to \p p that lies within the rectangle.
  */
-Point clipPoint(const Point &p, const Rect &r);
+Point clipPoint(const Point &p, const Rectangle &r);
 
 /**
  * Computes whether there is a unique intersection of two lines.
@@ -317,7 +347,7 @@ std::optional<Point> lineIntersection(const Point &a, const Point &b, const Poin
  *         and overlapping
  *         otherwise, an empty vector
  */
-std::vector<Point> lineIntersection(const Seg &a, const Seg &b);
+std::vector<Point> lineIntersection(const Segment &a, const Segment &b);
 
 /**
  * Reflects a ray incident on origin given the normal of the reflecting plane.
@@ -331,6 +361,30 @@ std::vector<Point> lineIntersection(const Seg &a, const Seg &b);
  * @return the reflected ray.
  */
 Point reflect(const Point &v, const Point &n);
+
+/**
+ * Calculates the intersection of a Ray and Segment
+ *
+ * @param ray: The point and direction
+ * @param segment: Line segment defined by 2 points
+ * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
+ * Returns {Point, std::nullopt} if a single intersection exists.
+ * Returns {Point, Point} if the ray and segment are overlapping, where the points define
+ * the line segment of overlap.
+ */
+std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
+    Ray &ray, Segment &segment);
+
+
+/**
+ * Calculates the intersection of two Rays
+ *
+ * @param ray1: First Ray
+ * @param ray2: Second Ray
+ * @return Returns std::nullopt if no intersections exist, or if there are infinite
+ * intersections (overlapping) Returns Point if a single intersection exists.
+ */
+std::optional<Point> getRayIntersection(Ray ray1, Ray ray2);
 
 /**
  * Reflects a point across a line.
@@ -419,9 +473,27 @@ Point segmentNearLine(Point a0, Point a1, Point b0, Point b1);
 Point intersection(Point a1, Point a2, Point b1, Point b2);
 
 /**
- * gives counterclockwise angle from <a-b> to <c-b>
+ * Calculates the acute angle formed by the two given vectors
+ *
+ * @param v1
+ * @param v2
+ *
+ * @return The acute angle formed by v1 and v2
  */
-Angle vertexAngle(Point a, Point b, Point c);
+Angle acuteVertexAngle(Vector v1, Vector v2);
+
+/**
+ * Calculates the acute angle formed by the vector p2->p1 and p2->p3
+ *
+ * @param p1
+ * @param p2
+ * @param p3
+ *
+ * @return the acute angle formed by the vector p2->p1 and p2->p3
+ */
+Angle acuteVertexAngle(Point p1, Point p2, Point p3);
+
+Angle minAngleBetweenVectors(Vector v1, Vector v2);
 
 /**
  * returns time of closest point of approach of two points
@@ -449,7 +521,16 @@ bool pointInFrontVector(Point offset, Point dir, Point p);
 std::pair<Point, Point> getCircleTangentPoints(const Point &start, const Circle &circle,
                                                double buffer = 0.0);
 
-bool pointIsRightOfLine(const Seg &line, const Point &point);
+/**
+ * Returns the tangent vectors of a Circle and Point (Vectors are directed towards Circle)
+ *
+ * @param reference: The point which the tangent vectors will intersect
+ * @param circle: The circle to calculate the tangent vectors of
+ * @return the mean point of points
+ */
+std::pair<Ray, Ray> getCircleTangentRays(const Point reference, const Circle circle);
+
+bool pointIsRightOfLine(const Segment &line, const Point &point);
 
 /**
  * Returns the mean of a list of points
@@ -466,3 +547,74 @@ Point getPointsMean(const std::vector<Point> &points);
  * @return the variance of the list of points
  */
 double getPointsVariance(const std::vector<Point> &points);
+
+/**
+ * Function returns the segment defined by the segment between the intersections of two
+ * Rays on a segment
+ *
+ * @param ray1 (Starting point and direction)
+ * @param ray2 (Starting point and direction)
+ * @param segment (Segment to find segment of intersection upon)
+ * @return Segment, the segment defined by the space between two intersecting rays on the
+ * segment parameter std::nullopt, if both rays don't intersect the segment, and the
+ * segment is not enclosed between the rays Segment, if one ray intersects the segment,
+ * but one of the segment parameters extremes are enclosed within the two rays
+ */
+std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segment);
+
+/**
+ * Function calculates whether the segment parameter is enclosed between the ray
+ * parameters. This means the entirety of the segment lays between the rays
+ *
+ * @param segment : segment parameter to calculate if its definition lies between the rays
+ * @param ray1 : Starting point and direction
+ * @param ray2 : Starting point an direction
+ * @return Segment: Returns the segment parameter if it is completely enclosed between
+ * ray1 and ray2.
+ *
+ * Example of segment being enclosed by rays:
+ *
+ *        segment
+ *     \ *----*  /
+ *      \       /
+ *  ray1 \     /ray2
+ *        *   *
+ *
+ * Returns std::nullopt of the ray is not completely enclosed between the rays, or
+ * not at all
+ */
+std::optional<Segment> segmentEnclosedBetweenRays(Segment segment, Ray ray1, Ray ray2);
+
+/**
+ * Function merges overlapping parallel segments into one combined segment
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment: Returns the merged segment if segment1 & segment2 are parallel and
+ * partially/completely overlapping
+ * Returns std::nullopt if the segments aren't parallel or overlapping
+ */
+std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
+                                                        Segment segment2);
+
+/**
+ * Function calculates if the segment parameters are redundant, for example, if segment2
+ * is parallel and contained within segment1
+ *
+ * @param segment1 : first segment
+ * @param segment2 : second segment
+ * @return Segment: If the segments are redundant, returns the larger segment
+ *         Returns std::nullopt if the segments aren't parallel, arem't overlapping, or
+ * aren't redundant
+ */
+std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2);
+
+/**
+ * Returns the binary trespass score of a point and rectangle
+ *
+ * @param point The point to check for trespassing
+ * @param rectangle The rectangle to check for trespassing by the Point parameter
+ * @return 1 if the point exists within the rectangle, or on the boundry of the rectangle
+ *         0 if the point exists outside of the rectangle
+ */
+int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);

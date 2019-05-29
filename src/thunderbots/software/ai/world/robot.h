@@ -1,9 +1,11 @@
 #pragma once
 
-#include <chrono>
+#include <vector>
 
+#include "boost/circular_buffer.hpp"
 #include "geom/angle.h"
 #include "geom/point.h"
+#include "util/time/timestamp.h"
 
 /**
  * Defines an SSL robot
@@ -21,11 +23,12 @@ class Robot
      * @param angular_velocity the new angular velocity of the robot, in Radians
      * per second
      * @param timestamp The timestamp at which the robot was observed to be in the given
-     * state. The timestamp must be >= the robot's latest update timestamp
+     * state
+     * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(unsigned int id, const Point& position, const Vector& velocity,
-                   const Angle& orientation, const AngularVelocity& angular_velocity,
-                   std::chrono::steady_clock::time_point timestamp);
+    explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
+                   const Angle &orientation, const AngularVelocity &angular_velocity,
+                   const Timestamp &timestamp, unsigned int history_duration = 20);
 
     /**
      * Updates the state of the robot.
@@ -39,10 +42,10 @@ class Robot
      * @param timestamp The timestamp at which the robot was observed to be in the given
      * state. The timestamp must be >= the robot's latest update timestamp
      */
-    void updateState(const Point& new_position, const Vector& new_velocity,
-                     const Angle& new_orientation,
-                     const AngularVelocity& new_angular_velocity,
-                     std::chrono::steady_clock::time_point timestamp);
+    void updateState(const Point &new_position, const Vector &new_velocity,
+                     const Angle &new_orientation,
+                     const AngularVelocity &new_angular_velocity,
+                     const Timestamp &timestamp);
 
     /**
      * Updates the robot with new data, updating the current state as well as the
@@ -50,24 +53,34 @@ class Robot
      *
      * @param new_robot_data A robot containing new robot data
      */
-    void updateState(const Robot& new_robot_data);
+    void updateState(const Robot &new_robot_data);
 
     /**
      * Updates the robot's state to be its predicted state at the given timestamp.
      * The timestamp must be >= the robot's last update timestamp
      *
-     * @throws std::invalid_argument if the robot is updated with a time from the past
      * @param timestamp The timestamp at which to update the robot's state to. Must
      * be >= the robot's last update timestamp
+     * @throws std::invalid_argument if the robot is updated with a time from the past
      */
-    void updateStateToPredictedState(std::chrono::steady_clock::time_point timestamp);
+    void updateStateToPredictedState(const Timestamp &timestamp);
+
+    /**
+     * Updates the robot's state to be its predicted state at the given duration from the
+     * last time it was updated.
+     *
+     * @param duration_in_future A duration >= 0.0 that indicates how long in the future
+     * (from the last time this robot was updated) to update the robot state by
+     * @throws std::invalid_argument if the duration given is negative
+     */
+    void updateStateToPredictedState(const Duration &duration_in_future);
 
     /**
      * Returns the timestamp for when this robot's data was last updated
      *
      * @return the timestamp for when this robot's data was last updated
      */
-    std::chrono::steady_clock::time_point lastUpdateTimestamp() const;
+    Timestamp lastUpdateTimestamp() const;
 
     /**
      * Returns the id of the robot
@@ -87,18 +100,17 @@ class Robot
      * Returns the estimated position of the robot at a future time, relative to when
      * the robot was last updated
      *
-     * @param milliseconds_in_future The relative amount of time in the future
-     * (in milliseconds) at which to predict the robot's position. Value must be >= 0.
-     * For example, a value of 1500 would return the estimated position of the robot
-     * 1.5 seconds in the future.
+     * @param duration_in_future The relative amount of time in the future
+     * at which to predict the robot's position. Value must be >= 0.
+     * For example, a value of 1.5 seconds would return the estimated position of the
+     * robot 1.5 seconds in the future.
      *
      * @throws std::invalid_argument if the robot is estimating the position with a time
      * from the past
      * @return the estimated position of the robot at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
-    Point estimatePositionAtFutureTime(
-        const std::chrono::milliseconds& milliseconds_in_future) const;
+    Point estimatePositionAtFutureTime(const Duration &duration_in_future) const;
 
     /**
      * Returns the current velocity of the robot
@@ -111,18 +123,17 @@ class Robot
      * Returns the estimated velocity of the robot at a future time, relative to when
      * the robot was last updated
      *
-     * @param milliseconds_in_future The relative amount of time in the future
-     * (in milliseconds) at which to predict the robot's velocity. Value must be >= 0.
-     * For example, a value of 1500 would return the estimated velocity of the robot
-     * 1.5 seconds in the future.
+     * @param duration_in_future The relative amount of time in the future
+     * at which to predict the robot's velocity. Value must be >= 0.
+     * For example, a value of 1.5 seconds would return the estimated velocity of the
+     * robot 1.5 seconds in the future.
      *
      * @throws std::invalid_argument if the robot is estimating the velocity with a time
      * from the past
      * @return the estimated velocity of the robot at the given number of milliseconds
      * in the future, in metres per second
      */
-    Vector estimateVelocityAtFutureTime(
-        const std::chrono::milliseconds& milliseconds_in_future) const;
+    Vector estimateVelocityAtFutureTime(const Duration &duration_in_future) const;
 
     /**
      * Returns the current orientation of the robot
@@ -135,18 +146,17 @@ class Robot
      * Returns the estimated orientation of the robot at a future time, relative to when
      * the robot was last updated
      *
-     * @param milliseconds_in_future The relative amount of time in the future
-     * (in milliseconds) at which to predict the robot's orientation. Value must be >= 0.
-     * For example, a value of 1500 would return the estimated orientation of the robot
-     * 1.5 seconds in the future.
+     * @param duration_in_future The relative amount of time in the future
+     * at which to predict the robot's orientation. Value must be >= 0.
+     * For example, a value of 1.5 seconds would return the estimated orientation of the
+     * robot 1.5 seconds in the future.
      *
      * @throws std::invalid_argument if the robot is estimating the orientation with a
      * time from the past
      * @return the estimated orientation of the robot at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
-    Angle estimateOrientationAtFutureTime(
-        const std::chrono::milliseconds& milliseconds_in_future) const;
+    Angle estimateOrientationAtFutureTime(const Duration &duration_in_future) const;
 
     /**
      * Returns the current angular velocity of the robot
@@ -157,13 +167,12 @@ class Robot
 
     /**
      * Returns the estimated angular velocity of the robot at a future time, relative to
-     * when
-     * the robot was last updated
+     * when the robot was last updated
      *
-     * @param milliseconds_in_future The relative amount of time in the future
-     * (in milliseconds) at which to predict the robot's angular velocity. Value must be
-     * >= 0. For example, a value of 1500 would return the estimated angular velocity of
-     * the robot 1.5 seconds in the future.
+     * @param duration_in_future The relative amount of time in the future
+     * at which to predict the robot's angular velocity. Value must be
+     * >= 0. For example, a value of 1.5 seconds would return the estimated angular
+     * velocity of the robot 1.5 seconds in the future.
      *
      * @throws std::invalid_argument if the robot is estimating the angular velocity with
      * a time from the past
@@ -171,7 +180,47 @@ class Robot
      * milliseconds in the future. Coordinates are in metres. Coordinates are in metres.
      */
     AngularVelocity estimateAngularVelocityAtFutureTime(
-        const std::chrono::milliseconds& milliseconds_in_future) const;
+        const Duration &duration_in_future) const;
+
+    /**
+     * Gets the buffer which holds all the previous position states of the robot
+     *
+     * @return Vector containing the position history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Point> getPreviousPositions();
+
+    /**
+     * Gets the buffer which holds all the previous velocity states of the robot
+     *
+     * @return Vector containing the velocity history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Vector> getPreviousVelocities();
+
+    /**
+     * Gets the buffer which holds all the previous orientation states of the robot
+     *
+     * @return Vector containing the orientation history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<Angle> getPreviousOrientations();
+
+    /**
+     * Gets the buffer which holds all the previous angular velocity states of the robot
+     *
+     * @return Vector containing the angular velocity history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<AngularVelocity> getPreviousAngularVelocities();
+
+    /**
+     * Gets the buffer which holds all the timestamps of the previous states
+     *
+     * @return Vector containing the update timestamp history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<Timestamp> getPreviousTimestamps();
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -181,7 +230,7 @@ class Robot
      * @param other The robot to compare against for equality
      * @return True if the other robot is equal to this robot, and false otherwise
      */
-    bool operator==(const Robot& other) const;
+    bool operator==(const Robot &other) const;
 
     /**
      * Defines the inequality operator for a Robot.
@@ -189,19 +238,59 @@ class Robot
      * @param other The robot to compare against for inequality
      * @return True if the other robot is not equal to this robots, and false otherwise
      */
-    bool operator!=(const Robot& other) const;
+    bool operator!=(const Robot &other) const;
+
+    // A comparator for the Robot class that compares Robots by ID. This is equivalent
+    // to the "less-than" operator.
+    // This comparator is necessary for the Robot class to be used as a key in maps. See
+    // https://stackoverflow.com/questions/6573225/what-requirements-must-stdmap-key-classes-meet-to-be-valid-keys
+    // and
+    // https://stackoverflow.com/questions/5733254/how-can-i-create-my-own-comparator-for-a-map
+    //
+    // We define this "custom" comparator rather than define the '<' operator for this
+    // class because there are many possible ways to order robots, so it doesn't make
+    // sense to define a single "normal" way with the '<' operator. Defining this
+    // comparator struct lets us use it explicitly when necessary and maintain multiple
+    // ways of comparing robots
+    struct cmpRobotByID
+    {
+        bool operator()(const Robot &r1, const Robot &r2) const
+        {
+            return r1.id() < r2.id();
+        }
+    };
 
    private:
+    /**
+     * Adds a state to the front of the circular buffers storing the state histories of
+     * the robot.
+     *
+     * @param position Position of robot.
+     * @param velocity Velocity of robot
+     * @param orientation Orientation of robot.
+     * @param angular_velocity Angular velocity of robot
+     * @param timestamp Time that the robot was in this state.
+     */
+    void addStateToRobotHistory(const Point &position, const Vector &velocity,
+                                const Angle &orientation,
+                                const AngularVelocity &angular_velocity,
+                                const Timestamp &timestamp);
+
     // The id of this robot
-    const unsigned int id_;
-    // The current position of the robot, with coordinates in metres
-    Point position_;
-    // The current velocity of the robot, in metres per second
-    Vector velocity_;
-    // The current orientation of the robot, in radians
-    Angle orientation_;
-    // The current angular velocity of the robot, in radians per second
-    AngularVelocity angularVelocity_;
-    // The timestamp for when this Robot was last updated
-    std::chrono::steady_clock::time_point last_update_timestamp;
+    unsigned int id_;
+    // All previous positions of the robot, with the most recent position at the front of
+    // the queue, coordinates in meters
+    boost::circular_buffer<Point> positions_;
+    // All previous velocities of the robot, with the most recent velocity at the front of
+    // the queue, in metres per second
+    boost::circular_buffer<Vector> velocities_;
+    // All previous orientations of the robot, with the most recent orientation at the
+    // front of the queue, in radians
+    boost::circular_buffer<Angle> orientations_;
+    // All previous angular velocities of the robot, with the most recent angular velocity
+    // at the front of the queue, in radians per second
+    boost::circular_buffer<AngularVelocity> angularVelocities_;
+    // All previous timestamps of when the robot was updated, with the most recent
+    // timestamp at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };

@@ -70,3 +70,15 @@ void KickPrimitive::accept(PrimitiveVisitor &visitor) const
 {
     visitor.visit(*this);
 }
+
+bool KickPrimitive::operator==(const KickPrimitive &other) const
+{
+    return this->robot_id == other.robot_id && this->kick_origin == other.kick_origin &&
+           this->kick_direction == other.kick_direction &&
+           this->kick_speed_meters_per_second == other.kick_speed_meters_per_second;
+}
+
+bool KickPrimitive::operator!=(const KickPrimitive &other) const
+{
+    return !((*this) == other);
+}

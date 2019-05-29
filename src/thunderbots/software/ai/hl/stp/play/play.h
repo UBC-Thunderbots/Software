@@ -1,48 +1,41 @@
 #pragma once
 
+#include <boost/coroutine2/all.hpp>
 #include <memory>
 #include <vector>
 
 #include "ai/hl/stp/tactic/tactic.h"
 #include "ai/world/world.h"
 
-// Forward declaration of the Play class so the PlayFactory can reference it.
-class Play;
-
-/** Note **/
-// We keep the PlayFactory and Play classes in the same file to avoid cyclic includes
-// (where each file includes the other), since it causes compilation to fail
-
-/**
- * The PlayFactory is an Abstract class that provides an interface for Play Factories
- * to follow. This makes it easy to maintain a list of factories and get the corresponding
- * plays through the generic interface.
- */
-class PlayFactory
-{
-   public:
-    /**
-     * Returns a pointer to the Play constructed by this Factory
-     *
-     * @return a shared pointer to the Play constructed by this Factory
-     */
-    virtual std::shared_ptr<Play> getInstance() = 0;
-
-    virtual ~PlayFactory() = default;
-};
+// We typedef the coroutine return type to make it shorter, more descriptive,
+// and easier to work with.
+// This coroutine returns a list of shared_ptrs to Tactic objects
+typedef boost::coroutines2::coroutine<std::vector<std::shared_ptr<Tactic>>>
+    TacticCoroutine;
 
 /**
- * In the STP framework, a Play is essentially a collection of tactics that represent some
+ * In the STP framework, a Play is a collection of tactics that represent some
  * "team-wide" goal. It can be thought of like a traditional play in soccer, such as an
  * offensive play, defensive play, or a specific play used for corner kicks.
  *
  * When we are running autonomously, different Plays are selected at different times
  * based on the state of the world, and this switching of Plays is what allows our AI to
  * play a full game of soccer, as long a we provide a Play for any given scenario.
+ *
+ * Plays must define what conditions must be met for them to start (with the isApplicable
+ * function), and what conditions must be continously met for the Play to continue
+ * running (with the invariantHolds function). These are very important to get right,
+ * so that we can always run at least 1 Play in every scenario, and that Plays don't
+ * unexpectedly stop.
  */
 class Play
 {
    public:
+    /**
+     * Creates a new Play
+     */
+    explicit Play();
+
     /**
      * Returns whether or not this Play can be started. For example, the Enemy Team
      * must have the ball for a defensive play to be applicable.
@@ -50,7 +43,7 @@ class Play
      * @param world The current state of the world
      * @return true if this Play can be started, and false otherwise
      */
-    virtual bool isApplicable(const World& world) = 0;
+    virtual bool isApplicable(const World& world) const = 0;
 
     /**
      * Returns whether or not the invariant for this Play holds (is true). The invariant
@@ -63,108 +56,82 @@ class Play
      * @param world The current state of the world
      * @return true if this Play's invariant holds (is true), and false otherwise
      */
-    virtual bool invariantHolds(const World& world) = 0;
+    virtual bool invariantHolds(const World& world) const = 0;
 
     /**
-     * Returns whether or not the Play has failed. This is kept as a separate condition
-     * from the Invariant because it is easier to reason about. For example, a Play that
-     * is supposed to retrieve a loose ball would fail if the enemy team got possession
-     * of the ball
+     * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
+     * order of priority. The Tactic at the beginning of the vector has the highest
+     * priority, and the Tactic at the end has the lowest priority.
+     *
+     * shared_ptrs are used so that the Play can own the objects (and have control over
+     * updating the Tactic parameters, etc), but callers of this function can still
+     * access their updated state. Using unique_ptrs wouldn't allow the Play to maintain
+     * the Tactic's state because the objects would have to be constructed and moved every
+     * time the function is called.
      *
      * @param world The current state of the world
-     * @return true if this Play has failed, and false otherwise
-     */
-    virtual bool hasFailed(const World& world) = 0;
-
-    /**
-     * Gets the tactics that make up this Play. The tactics are returned in decreasing
-     * order of priority (the first tactic has the highest priority, the last one has the
-     * least). This means that if there are not enough available robots to run all of the
-     * tactics, the tactics with the least priority will not be assigned/run
-     *
-     * @param world The current state of the world
-     * @return A list of tactics that should be run as part of this Play, in decreasing
+     * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
      * order of priority
      */
-    virtual std::vector<std::unique_ptr<Tactic>> getTactics(const World& world) = 0;
+    std::optional<std::vector<std::shared_ptr<Tactic>>> getTactics(const World& world);
+
+    /**
+     * Returns true if the Play is done and false otherwise. The Play is considered
+     * done when its coroutine is done (the getNextTactics() function has no
+     * more work to do)
+     *
+     * @return true if the Play is done and false otherwise
+     */
+    bool done() const;
 
     /**
      * Returns the name of this Play
      *
      * @return the name of this Play
      */
-    virtual std::string name() = 0;
+    virtual std::string getName() const = 0;
 
     virtual ~Play() = default;
 
-    /** Factory Stuff **/
-    /**
-     * Returns a reference to the Play registry. The registry is a list of pointers
-     * to all the factories for the existing Play, which allows the code to be aware
-     * of all the Plays that are available.
-     *
-     * @return a const reference to the Play registry
-     */
-    static const std::vector<std::shared_ptr<PlayFactory>>& getRegistry();
-
-    /**
-     * Adds a Play to the Play Registry by adding the corresponding Play Factory
-     * @param play_factory A Pointer to the Play Factory to be added
-     */
-    static void registerPlay(std::shared_ptr<PlayFactory> play_factory);
-
-    /**
-     * Returns a list of names of all the existing Plays
-     * @return a list of names of all the existing Plays
-     */
-    static std::vector<std::string> getPlayNames();
-
    private:
     /**
-     * Returns a reference to the Play registry. The registry is a list of pointers
-     * to all the factories for the existing Play, which allows the code to be aware
-     * of all the Plays that are available.
+     * A wrapper function for the getNextTactics function.
      *
-     * This is the same as the above public getRegistry function. We need a mutable
-     * version in order to add entries to the registry. The function is private so that
-     * only this class can make the modifications. Outside sources should not have direct
-     * access to modify the registry.
+     * This function exists because when the coroutine (tactic_sequence) is first
+     * constructed the coroutine is called/entered. This would normally cause the
+     * getNextTactics to be run once and potentially return incorrect results
+     * due to default constructed values.
      *
-     * @return a mutable reference to the Play registry
+     * This wrapper function will yield an empty vector the first time it's called and
+     * otherwise use the getNextTactics function. This first "empty" value will never
+     * be seen/used by the rest of the system since this will be during construction,
+     * and the coroutine will be called again with valid parameters before any values are
+     * returned. This effectively "shields" the logic from any errors caused by default
+     * values during construction.
+     *
+     * @param yield The coroutine push_type for the Play
+     *
+     * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
+     * order of priority
      */
-    static std::vector<std::shared_ptr<PlayFactory>>& getMutableRegistry();
-};
+    std::vector<std::shared_ptr<Tactic>> getNextTacticsWrapper(
+        TacticCoroutine::push_type& yield);
 
-/**
- * This templated play factory class is used by Plays that are derived from the Abstract
- * Play class above. Its purpose is to create a Factory for the implemented Play and
- * automatically register the play in the play registry.
- *
- * Declaring the static variable will also cause it to be initialized at the start of the
- * program (because it's static). This will immediately call the constructor, which adds
- * a pointer to the Factory to the Play registry. From then on, the rest of the program
- * can use the registry to find all the Plays that are available (and register with this
- * templated class).
- *
- * @tparam T The class of the Play to be added to the registry. For example, to add a
- * new class called MovePlay that inherits from Play, the following line should be added
- * to the end of the .cpp file (without the quotations):
- * "static TPlayFactory<MovePlay> factory;"
- */
-template <class T>
-class TPlayFactory : public PlayFactory
-{
-    // compile time type checking that T is derived class of Play
-    static_assert(std::is_base_of<Play, T>::value, "T must be derived class of Play!");
+    /**
+     * Returns a list of shared_ptrs to the Tactics the Play wants to run at this time, in
+     * order of priority
+     *
+     * @param yield The coroutine push_type for the Play
+     * @param world The current state of the World
+     *
+     * @return A list of shared_ptrs to the Tactics the Play wants to run at this time, in
+     * order of priority
+     */
+    virtual std::vector<std::shared_ptr<Tactic>> getNextTactics(
+        TacticCoroutine::push_type& yield, const World& world) = 0;
 
-   public:
-    TPlayFactory()
-    {
-        Play::registerPlay(std::make_shared<TPlayFactory>(*this));
-    }
-
-    std::shared_ptr<Play> getInstance() override
-    {
-        return std::make_shared<T>();
-    }
+    // The coroutine that sequentially returns the Tactics the Play wants to run
+    TacticCoroutine::pull_type tactic_sequence;
+    // The Play's knowledge of the most up-to-date World
+    World world;
 };

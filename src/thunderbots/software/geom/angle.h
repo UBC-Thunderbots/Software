@@ -184,7 +184,7 @@ class Angle final
      *
      * @return the angle between this Angle and other, in the range [0, π].
      */
-    constexpr Angle diff(Angle other) const;
+    constexpr Angle minDiff(Angle other) const;
 
     /**
      * Limits this angle to [−π, π].
@@ -493,7 +493,7 @@ inline constexpr Angle Angle::clamp() const
     return remainder(Angle::full());
 }
 
-inline constexpr Angle Angle::diff(Angle other) const
+inline constexpr Angle Angle::minDiff(Angle other) const
 {
     return (*this - other).clamp().abs();
 }
@@ -582,7 +582,7 @@ inline constexpr bool operator>=(Angle x, Angle y)
 
 inline bool operator==(Angle x, Angle y)
 {
-    Angle diff = x.angleMod().diff(y.angleMod());
+    Angle diff = x.angleMod().minDiff(y.angleMod());
     return diff.toRadians() <= Angle::EPSILON;
 }
 
