@@ -7,7 +7,8 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 
-NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_service()
+NetworkClient::NetworkClient(ros::NodeHandle& node_handle)
+    : backend(), io_service(), initial_packet_count(0), last_valid_t_capture(9999999)
 {
     // Set up publishers
     world_publisher = node_handle.advertise<thunderbots_msgs::World>(
@@ -21,7 +22,7 @@ NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_servi
         ssl_vision_client = std::make_unique<SSLVisionClient>(
             io_service, Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
             Util::Constants::SSL_VISION_MULTICAST_PORT,
-            boost::bind(&NetworkClient::filterAndPublishVisionData, this, _1));
+            boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -66,6 +67,37 @@ NetworkClient::~NetworkClient()
     io_service_thread.join();
 }
 
+void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
+{
+    // We analyze the first 60 packets we receive to find the "real" starting time.
+    // The real starting time is the smaller value of the ones we receive
+    if (initial_packet_count < 60)
+    {
+        initial_packet_count++;
+        if (packet.has_detection() &&
+            packet.detection().t_capture() < last_valid_t_capture)
+        {
+            last_valid_t_capture = packet.detection().t_capture();
+        }
+    }
+    else
+    {
+        // We pass all packets without a detection to the logic (since they are likely
+        // geometry packet). Packets with detection timestamps are compared to the last
+        // valid timestamp to make sure they are close enough before the data is passed
+        // along. This ensures we ignore any of the garbage packets grsim sends that
+        // are thousands of seconds in the future.
+        if (!packet.has_detection())
+        {
+            filterAndPublishVisionData(packet);
+        }
+        else if (packet.detection().t_capture() - last_valid_t_capture < 100)
+        {
+            last_valid_t_capture = packet.detection().t_capture();
+            filterAndPublishVisionData(packet);
+        }
+    }
+}
 
 void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 {
@@ -120,6 +152,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                 ret.first->second = detection;
             }
         }
+
         // Create a vector of the latest detection data for each camera
         std::vector<SSL_DetectionFrame> latest_detections;
         for (auto it = latest_detection_data.begin(); it != latest_detection_data.end();

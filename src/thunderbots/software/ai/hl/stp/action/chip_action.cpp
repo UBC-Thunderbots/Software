@@ -29,8 +29,7 @@ std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
     return getNextIntent();
 }
 
-std::unique_ptr<Intent> ChipAction::calculateNextIntent(
-    intent_coroutine::push_type& yield)
+void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // How large the triangle is that defines the region where the robot is
     // behind the ball and ready to chip.

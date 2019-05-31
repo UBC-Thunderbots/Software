@@ -3,7 +3,7 @@
 #include <util/parameter/dynamic_parameters.h>
 
 World::World()
-    : World(Field(0, 0, 0, 0, 0, 0, 0),
+    : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
             Ball(Point(), Vector(), Timestamp::fromSeconds(0)),
             Team(Duration::fromMilliseconds(
                 Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
