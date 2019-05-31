@@ -45,7 +45,7 @@ bool Triangle::containsPoint(const Point& point) const
 
     std::vector vec = getPoints();
     if (std::find(vec.begin(), vec.end(), point) != vec.end())
-        return true;  // return true if point is on a corner
+        return false;  // return false if point is on a corner
     else
     {
         for (const Segment& seg : segments)
