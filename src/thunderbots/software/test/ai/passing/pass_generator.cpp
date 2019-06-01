@@ -1,5 +1,9 @@
 /**
  * This file contains unit tests for the GradientDescent class
+ *
+ * NOTE: A lot of the testing for the PassGenerator should be done in the `ratePass`
+ *       function, as the PassGenerator essentially just maximizes the value returned
+ *       by `ratePass`
  */
 
 #include "ai/passing/pass_generator.h"

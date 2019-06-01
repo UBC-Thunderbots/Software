@@ -1,5 +1,14 @@
 /**
  * This file contains unit tests passing evaluation functions
+ *
+ * These tests effectively test the PassGenerator as well, as the PassGenerator
+ * basically just tries to maximize `ratePass`.
+ *
+ * These tests are also testing our configuration values for passing, as they dictate
+ * how certain scenarios should be rated. As such, if configuration changes cause tests
+ * here to fail, please please please carefully consider if the configuration change is
+ * correct (ie. is the testing showing a scenario which the configuration change has
+ * now broken?).
  */
 
 #include "ai/passing/evaluation.h"
@@ -215,6 +224,40 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_center_no_enemies)
     EXPECT_GE(1.0, pass_rating);
 }
 
+TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_center)
+{
+    // A corner kick from the +x, +y corner of the field to a robot on the +x axis part
+    // way up the enemy half of the field. The receiver friendly is marked by an enemy,
+    // but it has enough space that it should be able to break away from it's marker in
+    // time to make space to receive the pass and one-time shoot it into the net.
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Team friendly_team(Duration::fromSeconds(10),
+                       {// Robot doing corner kick
+                        Robot(0, world.field().enemyCornerPos(), {0, 0}, Angle::zero(),
+                              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+                        // Robot at center field
+                        Robot(1, {2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0))});
+    world.updateFriendlyTeamState(friendly_team);
+    Team enemy_team(
+        Duration::fromSeconds(10),
+        {// Enemy goalie
+         Robot(0, world.field().enemyGoal() + Vector(-0.1, 0.5), {0, 0}, Angle::quarter(),
+               AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+         // Enemy marking friendly in the center
+         Robot(1, {2.4, 0}, {0, 0}, Angle::half(), AngularVelocity::zero(),
+               Timestamp::fromSeconds(0))});
+    world.updateEnemyTeamState(enemy_team);
+
+    Pass pass(world.field().enemyCornerPos(), {1.8, 0.6}, 4.8,
+              Timestamp::fromSeconds(0.6));
+
+    double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
+    EXPECT_GE(pass_rating, 0.2);
+    EXPECT_LE(pass_rating, 0.7);
+}
+
 TEST_F(PassingEvaluationTest, ratePass_no_target_region)
 {
     // This should be a really good pass, and since there is no target region it should
@@ -366,6 +409,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_passer_on_field)
     double pass_rating = ratePass(world, pass, std::nullopt, passer_robot_id);
     EXPECT_DOUBLE_EQ(0, pass_rating);
 }
+
 TEST_F(PassingEvaluationTest, ratePassShootScore_no_robots_and_directly_facing_goal)
 {
     // No robots on the field, we receive the pass and are directly facing the goal
