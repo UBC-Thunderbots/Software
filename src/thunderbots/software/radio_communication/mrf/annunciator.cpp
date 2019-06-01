@@ -1,10 +1,11 @@
 
 #include "annunciator.h"
-
 #include "dongle.h"
 #include "messages.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
+
+#include <time.h>
 
 namespace
 {
@@ -18,6 +19,11 @@ namespace
      * the build IDs.
      */
     const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
+
+    /**
+     * Amount of time to keep an edge-triggered message sending, in seconds.
+     */
+    const int ET_MESSAGE_KEEPALIVE_TIME = 5;
 
     /**
      * Represents a mapping from RSSI to decibels.
@@ -64,8 +70,11 @@ namespace
         return val;
     }
 
-
+    // ROS message to be published
     thunderbots_msgs::RobotStatus robot_status;
+
+    // Map of message to timestamp for edge-triggered messages
+    std::map<std::string, time_t> edge_triggered_msg_map;
 }  // namespace
 
 Annunciator::Annunciator(ros::NodeHandle &node_handle)
@@ -214,9 +223,10 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            new_msgs.push_back(MRF::ERROR_ET_MESSAGES[i]);
+                                            edge_triggered_msg_map[MRF::ERROR_ET_MESSAGES[i]] = time(nullptr);
                                         }
                                     }
+
                                     bptr += MRF::ERROR_BYTES;
                                     len -= MRF::ERROR_BYTES;
                                 }
@@ -307,7 +317,15 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    // Add the latest robot and dongle status messages
+    for (auto const& et_msg : edge_triggered_msg_map)
+    {   
+        if (difftime(time(nullptr), et_msg.second) < ET_MESSAGE_KEEPALIVE_TIME)
+        {
+            new_msgs.push_back(et_msg.first);
+        }
+    }
+
+    // If new message, beep the dongle
     bool to_beep = false;
     for (std::string msg : new_msgs)
     {
@@ -320,6 +338,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
+    // Add the latest robot and dongle status messages
     robot_status.robot_messages  = new_msgs;
     robot_status.dongle_messages = dongle_messages;
 
