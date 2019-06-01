@@ -1,10 +1,13 @@
 #include "field.h"
 
+#include "boost/circular_buffer.hpp"
 #include "geom/rectangle.h"
+#include "util/time/timestamp.h"
 
 Field::Field(double field_length, double field_width, double defense_length,
              double defense_width, double goal_width, double boundary_width,
-             double center_circle_radius)
+             double center_circle_radius, const Timestamp &timestamp,
+             unsigned int buffer_size)
     : field_length_(field_length),
       field_width_(field_width),
       defense_length_(defense_length),
@@ -13,23 +16,28 @@ Field::Field(double field_length, double field_width, double defense_length,
       boundary_width_(boundary_width),
       center_circle_radius_(center_circle_radius)
 {
+    // Set the size of the Timestamp history buffer
+    last_update_timestamps.set_capacity(buffer_size);
+
+    updateTimestamp(timestamp);
 }
 
 void Field::updateDimensions(const Field &new_field_data)
 {
-    field_length_         = new_field_data.length();
-    field_width_          = new_field_data.width();
-    defense_width_        = new_field_data.defenseAreaWidth();
-    defense_length_       = new_field_data.defenseAreaLength();
-    goal_width_           = new_field_data.goalWidth();
-    boundary_width_       = new_field_data.boundaryWidth();
-    center_circle_radius_ = new_field_data.centreCircleRadius();
+    field_length_          = new_field_data.length();
+    field_width_           = new_field_data.width();
+    defense_width_         = new_field_data.defenseAreaWidth();
+    defense_length_        = new_field_data.defenseAreaLength();
+    goal_width_            = new_field_data.goalWidth();
+    boundary_width_        = new_field_data.boundaryWidth();
+    center_circle_radius_  = new_field_data.centreCircleRadius();
+    last_update_timestamps = new_field_data.getTimestampHistory();
 }
 
 void Field::updateDimensions(double field_length, double field_width,
                              double defense_length, double defense_width,
                              double goal_width, double boundary_width,
-                             double center_circle_radius)
+                             double center_circle_radius, const Timestamp &timestamp)
 {
     field_length_         = field_length;
     field_width_          = field_width;
@@ -38,6 +46,7 @@ void Field::updateDimensions(double field_length, double field_width,
     goal_width_           = goal_width;
     boundary_width_       = boundary_width;
     center_circle_radius_ = center_circle_radius;
+    updateTimestamp(timestamp);
 }
 
 double Field::length() const
@@ -181,6 +190,35 @@ bool Field::pointInEnemyDefenseArea(const Point p) const
 bool Field::pointInFieldLines(const Point &p) const
 {
     return fieldLines().containsPoint(p);
+}
+
+boost::circular_buffer<Timestamp> Field::getTimestampHistory() const
+{
+    return last_update_timestamps;
+}
+
+Timestamp Field::getMostRecentTimestamp() const
+{
+    return last_update_timestamps.front();
+}
+
+void Field::updateTimestamp(Timestamp time_stamp)
+{
+    // Check if the timestamp buffer is empty
+    if (last_update_timestamps.empty())
+    {
+        last_update_timestamps.push_front(time_stamp);
+    }
+    // Check that the new timestamp is not older than the most recent timestamp
+    else if (time_stamp < Field::getMostRecentTimestamp())
+    {
+        throw std::invalid_argument(
+            "Error: Attempt tp update Field state with old Timestamp");
+    }
+    else
+    {
+        last_update_timestamps.push_front(time_stamp);
+    }
 }
 
 bool Field::operator==(const Field &other) const

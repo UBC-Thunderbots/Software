@@ -47,6 +47,8 @@ class RobotFilter
      * from the field if data about the robot is not received before that time
      */
     explicit RobotFilter(Robot current_robot_state, Duration expiry_buffer_duration);
+    explicit RobotFilter(SSLRobotDetection current_robot_state,
+                         Duration expiry_buffer_duration);
 
     /**
      * Updates the filter given a new set of data, and returns the most up to date

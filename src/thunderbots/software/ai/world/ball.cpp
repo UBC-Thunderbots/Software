@@ -1,5 +1,7 @@
 #include "ball.h"
 
+#include <shared/constants.h>
+
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
            unsigned int history_duration)
     : positions_(history_duration),
@@ -87,7 +89,7 @@ Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) co
     return velocity() * exp(-0.1 * seconds_in_future);
 }
 
-std::vector<Point> Ball::getPreviousPositions()
+std::vector<Point> Ball::getPreviousPositions() const
 {
     std::vector<Point> retval{};
     for (Point p : positions_)
@@ -96,7 +98,7 @@ std::vector<Point> Ball::getPreviousPositions()
     return retval;
 }
 
-std::vector<Vector> Ball::getPreviousVelocities()
+std::vector<Vector> Ball::getPreviousVelocities() const
 {
     std::vector<Vector> retval{};
     for (Vector v : velocities_)
@@ -105,7 +107,7 @@ std::vector<Vector> Ball::getPreviousVelocities()
     return retval;
 }
 
-std::vector<Timestamp> Ball::getPreviousTimestamps()
+std::vector<Timestamp> Ball::getPreviousTimestamps() const
 {
     std::vector<Timestamp> retval{};
     for (Timestamp t : last_update_timestamps)
@@ -120,6 +122,19 @@ void Ball::addStateToBallHistory(const Point &position, const Vector &velocity,
     positions_.push_front(position);
     velocities_.push_front(velocity);
     last_update_timestamps.push_front(timestamp);
+}
+
+std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
+{
+    std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
+    for (int i = 0; i < timestamp_history.size(); i++)
+    {
+        double timestamp_diff =
+            fabs((timestamp - timestamp_history[i]).getMilliseconds());
+        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
+            return i;  // If timestamp is close to desired timestamp, return the index.
+    }
+    return std::nullopt;
 }
 
 bool Ball::operator==(const Ball &other) const

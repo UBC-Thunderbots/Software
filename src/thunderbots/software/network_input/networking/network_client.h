@@ -43,6 +43,18 @@ class NetworkClient
     NetworkClient(const NetworkClient&)            = delete;
 
    private:
+    // TODO: Remove this wrapper function once we move to a better simulator
+    // https://github.com/UBC-Thunderbots/Software/issues/609
+    /**
+     * A wrapper function for the filterAndPublishVisionData function. This wrapper is
+     * responsible for ignoring any bad packets we get from grSim, because grSim
+     * sends garbage packets from very far in the future that causes issues if they
+     * get through to our filters and logic.
+     *
+     * @param packet The vision packet
+     */
+    void filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet);
+
     /**
      * Filters and publishes the new vision data
      *
@@ -90,4 +102,12 @@ class NetworkClient
     // The thread running the io_service in the background. This thread will run for the
     // entire lifetime of the class
     std::thread io_service_thread;
+
+    // Both these values are used for the filterAndPublishVisionDataWrapper function
+    // and should be removed when the function is removed
+    // The t_capture of the latest SSL_WrapperPacket we received with a valid timestamp
+    double last_valid_t_capture;
+    // How many packets to analyze to find the true starting time of the vision system
+    // before passing the packets on to the actual logic
+    int initial_packet_count;
 };

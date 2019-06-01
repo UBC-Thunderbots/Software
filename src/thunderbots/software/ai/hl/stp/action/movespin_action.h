@@ -43,8 +43,7 @@ class MoveSpinAction : public Action
                                                         double final_speed);
 
    private:
-    std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // Action parameters
     Point destination;
