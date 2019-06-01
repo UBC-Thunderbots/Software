@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
+import * as ROS from 'SRC/utils/ros';
 import { Portal, PortalLocation } from './components/Portal';
 import { Logger } from './containers/Logger';
 import { createStore } from './store';
@@ -23,6 +24,7 @@ export const App = () => (
         <Theme>
             <Portal portalLocation={PortalLocation.SIDEBAR}>
                 <button onClick={dispatchBtnAction}>Set Value</button>
+                <button onClick={testROS}>Test ROS</button>
             </Portal>
             <Portal portalLocation={PortalLocation.MAIN}>This is main</Portal>
             <Portal portalLocation={PortalLocation.CONSOLE}>
@@ -35,4 +37,17 @@ export const App = () => (
 /* Testing the action changing state */
 function dispatchBtnAction() {
     store.dispatch(actions.rosParameters.setRunAI(true));
+}
+
+function testROS() {
+    ROS.sendRequestToService(
+        '/ai_control/set_parameters',
+        'dynamic_reconfigure/Reconfigure',
+        {
+            config: {
+                bools: [{ name: 'run_ai', value: true }],
+            },
+        },
+    );
+    console.log('Pressed testROS');
 }
