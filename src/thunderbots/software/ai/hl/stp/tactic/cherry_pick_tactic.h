@@ -21,7 +21,8 @@ class CherryPickTactic : public Tactic
     /**
      * Creates a new CherryPickTactic
      */
-    explicit CherryPickTactic(const Rectangle& target_region, bool loop_forever);
+    explicit CherryPickTactic(const World& world, const Rectangle& target_region,
+                              bool loop_forever);
 
     std::string getName() const override;
 
@@ -45,8 +46,7 @@ class CherryPickTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
    private:
-    std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // The region in which we want to position the cherry picking robot
     Rectangle target_region;

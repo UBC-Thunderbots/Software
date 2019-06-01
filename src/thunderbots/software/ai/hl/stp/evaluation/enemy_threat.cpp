@@ -2,8 +2,10 @@
 
 #include <deque>
 
+#include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "ai/hl/stp/evaluation/intercept.h"
 #include "ai/hl/stp/evaluation/possession.h"
+#include "ai/hl/stp/evaluation/robot.h"
 #include "ai/hl/stp/evaluation/team.h"
 #include "ai/world/world.h"
 #include "geom/util.h"
@@ -156,4 +158,121 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     // are looking for, it must be blocked and unable to be passed to in the current
     // state. Therefore, we return an std::nullopt
     return std::nullopt;
+}
+
+void Evaluation::sortThreatsInDecreasingOrder(
+    std::vector<Evaluation::EnemyThreat> &threats)
+{
+    // A lambda function that implements the '<' operator for the EnemyThreat struct
+    // so it can be sorted. Lower threats are "less than" higher threats.
+    auto enemyThreatLessThanComparator = [](const EnemyThreat &a, const EnemyThreat &b) {
+        // Robots with the ball are more threatening than robots without the ball, and
+        // robots with the ball are the most threatening since they can shoot or move
+        // the ball towards our net
+        if (a.has_ball && !b.has_ball)
+        {
+            return false;
+        }
+        else if (!a.has_ball && b.has_ball)
+        {
+            return true;
+        }
+        // If both robots have the ball, the robot with a worse shot on our net is less
+        // threatening (although this case is unlikely to happen since usually only 1
+        // robot can have the ball at a time)
+        else if (a.has_ball && b.has_ball)
+        {
+            return a.best_shot_angle < b.best_shot_angle;
+        }
+        else
+        {
+            // If neither robot has the ball, the robot that takes longer to reach via
+            // passing is less threatening
+            if (a.num_passes_to_get_possession < b.num_passes_to_get_possession)
+            {
+                return false;
+            }
+            else if (a.num_passes_to_get_possession > b.num_passes_to_get_possession)
+            {
+                return true;
+            }
+            else
+            {
+                // Finally, if both robots can be reached in the same number of passes,
+                // the robot with a smaller view of the net is considered less
+                // threatening. The reason we use goal_angle here rather than the
+                // best_shot_angle is that the goal_angle doesn't change if the robot is
+                // blocked from shooting (eg. by a defender). This makes the evaluation
+                // more stable since the value won't change drastically as our robots
+                // move into defensive positions and change the best_shot_angle. If we had
+                // fewer robots than the enemy team and were using the best_shot_angle,
+                // defenders could oscillate between enemies since when the defender
+                // blocks one enemy, the unblocked one becomes more threatening and the
+                // defender would then move there.
+                return a.goal_angle < b.goal_angle;
+            }
+        }
+    };
+
+    // Sort threats from highest threat to lowest threat
+    // Use reverse iterators to sort the vector in descending order
+    std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
+}
+
+std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
+    const Field &field, const Team &friendly_team, const Team &enemy_team,
+    const Ball &ball)
+{
+    std::vector<Evaluation::EnemyThreat> threats;
+
+    for (const auto &robot : enemy_team.getAllRobots())
+    {
+        bool has_ball = Evaluation::robotHasPossession(ball, robot);
+
+        // Get the angle from the robot to each friendly goalpost, then find the
+        // difference between these angles to get the goal_angle for the robot
+        Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), robot.position(),
+                                            field.friendlyGoalpostNeg());
+
+        std::optional<Angle> best_shot_angle  = std::nullopt;
+        std::optional<Point> best_shot_target = std::nullopt;
+        auto best_shot_data = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team,
+                                                                     enemy_team, robot);
+        if (best_shot_data)
+        {
+            best_shot_angle  = best_shot_data->second;
+            best_shot_target = best_shot_data->first;
+        }
+
+        // Set default values. If the robot can't be passed to we set the number of passes
+        // to the size of the enemy team so it is the largest reasonable value, and the
+        // passer to be an empty optional
+        int num_passes              = enemy_team.numRobots();
+        std::optional<Robot> passer = std::nullopt;
+        auto robot_with_effective_possession =
+            Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
+        if (robot_with_effective_possession)
+        {
+            auto pass_data =
+                Evaluation::getNumPassesToRobot(robot_with_effective_possession.value(),
+                                                robot, enemy_team, friendly_team);
+            if (pass_data)
+            {
+                num_passes = pass_data->first;
+                passer     = pass_data->second;
+            }
+        }
+
+        Evaluation::EnemyThreat threat{robot,           has_ball,         goal_angle,
+                                       best_shot_angle, best_shot_target, num_passes,
+                                       passer};
+
+        threats.emplace_back(threat);
+    }
+
+    // Sort the threats so the "most threatening threat" is first in the vector, and the
+    // "least threatening threat" is last in the vector
+    sortThreatsInDecreasingOrder(threats);
+
+    return threats;
 }

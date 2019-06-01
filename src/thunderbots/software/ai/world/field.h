@@ -1,7 +1,9 @@
 #pragma once
 
+#include "boost/circular_buffer.hpp"
 #include "geom/point.h"
 #include "geom/rectangle.h"
+#include "util/time/timestamp.h"
 
 typedef enum
 {
@@ -26,10 +28,12 @@ class Field
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
+     * @param timestamp the Timestamp associated with the creation of the Field object
      */
     explicit Field(double field_length, double field_width, double defense_length,
                    double defense_width, double goal_width, double boundary_width,
-                   double center_circle_radius);
+                   double center_circle_radius, const Timestamp &timestamp,
+                   unsigned int buffer_size = 20);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -42,10 +46,11 @@ class Field
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
+     * @param timestamp the Timestamp corresponding to any updates to the Field object
      */
     void updateDimensions(double field_length, double field_width, double defense_length,
                           double defense_width, double goal_width, double boundary_width,
-                          double center_circle_radius);
+                          double center_circle_radius, const Timestamp &timestamp);
 
     /**
      * Updates the field with new data
@@ -256,7 +261,7 @@ class Field
      *
      * @return true if p is within the field lines of the field, false otherwise
      */
-    bool pointInFieldLines(const Point &p);
+    bool pointInFieldLines(const Point &p) const;
 
     /**
      * Compares two fields for equality
@@ -267,6 +272,21 @@ class Field
     bool operator==(const Field &other) const;
 
     /**
+     * Returns the entire update Timestamp history for Field object
+     *
+     * @return boost::circular_buffer of Timestamp history for the Field object
+     */
+    boost::circular_buffer<Timestamp> getTimestampHistory() const;
+
+    /**
+     * Returns the most Timestamp corresponding to the most recent update to Field object
+     *
+     * @return Timestamp : The Timestamp corresponding to the most recent update to the
+     * Field object
+     */
+    Timestamp getMostRecentTimestamp() const;
+
+    /**
      * Compares two fields for inequality
      *
      * @param other the field the compare to
@@ -274,9 +294,17 @@ class Field
      */
     bool operator!=(const Field &other) const;
 
+
    private:
     // Private variables have underscores at the end of their names
     // to avoid conflicts with function names
+
+    /**
+     * Updates the timestamp history for the Field object
+     *
+     * @param time_stamp : The timestamp at which the Field object was updated
+     */
+    void updateTimestamp(Timestamp time_stamp);
 
     // The length of the playable field (between the goal lines) in metres
     double field_length_;
@@ -293,4 +321,7 @@ class Field
     double boundary_width_;
     // The radius of the center circle in metres
     double center_circle_radius_;
+    // All previous timestamps of when the field was updated, with the most recent
+    // timestamp at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };

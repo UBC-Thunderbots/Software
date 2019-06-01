@@ -8,7 +8,7 @@
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with
-typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> intent_coroutine;
+typedef boost::coroutines2::coroutine<std::unique_ptr<Intent>> IntentCoroutine;
 
 /**
  * The Action class is the lowest level of abstraction in our STP architecture.
@@ -46,7 +46,7 @@ class Action
     std::unique_ptr<Intent> getNextIntent();
 
     // The coroutine that sequentially returns the Intents the Action wants to run
-    intent_coroutine::pull_type intent_sequence;
+    IntentCoroutine::pull_type intent_sequence;
     // The robot performing this Action
     std::optional<Robot> robot;
 
@@ -57,7 +57,10 @@ class Action
      * This function exists because when the coroutine (intent_sequence) is first
      * constructed the coroutine is called/entered. This would normally cause the
      * calculateNextIntentWrapper to be run once and potentially return incorrect results
-     * due to default constructed values.
+     * due to default constructed values. Calling the calculateNextIntent function this
+     * early also results in virtual function errors because this early in object
+     * construction, the concrete implementation of this Action doesn't exist yet so
+     * we would actually be trying to call the virtual function, which doesn't work.
      *
      * This wrapper function will yield a null pointer the first time it's called and
      * otherwise use the calculateNextIntent function. This first "null" value will never
@@ -66,26 +69,25 @@ class Action
      * returned. This effectively "shields" the logic from any errors caused by default
      * values during construction.
      *
-     * @param yield The coroutine push_type for the Action
+     * This function yields a unique pointer to the next Intent that should be run for the
+     * Action. If the Action is done, an empty/null unique pointer is returned. The very
+     * first time this function is called, a null pointer will be returned (this does not
+     * signify the Action is done). This yield happens in place of a return.
      *
-     * @return A unique pointer to the next Intent that should be run for the Action.
-     * If the Action is done, an empty/null unique pointer is returned. The very first
-     * time this function is called, a null pointer will be returned (this does not
-     * signify the Action is done).
+     * @param yield The coroutine push_type for the Action
      */
-    std::unique_ptr<Intent> calculateNextIntentWrapper(
-        intent_coroutine::push_type &yield);
+    void calculateNextIntentWrapper(IntentCoroutine::push_type &yield);
 
     /**
      * Calculates the next Intent for the Action. If the Action is done
      * (ie. it has achieved its objective and has no more Intents to return),
      * an empty/null unique pointer is returned.
      *
-     * @param yield The coroutine push_type for the Action
+     * This function yields a unique pointer to the next Intent that should be run for the
+     * Action. If the Action is done, an empty/null unique pointer is returned. This yield
+     * happens in place of a return
      *
-     * @return A unique pointer to the next Intent that should be run for the Action.
-     * If the Action is done, an empty/null unique pointer is returned.
+     * @param yield The coroutine push_type for the Action
      */
-    virtual std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type &yield) = 0;
+    virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 };

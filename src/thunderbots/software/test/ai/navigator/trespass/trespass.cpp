@@ -46,9 +46,43 @@ TEST(TrespassTest, calcLinearTrespassScore_rectangle_test)
     EXPECT_EQ(Navigator::Trespass::calcLinearTrespassScore(rect, two_thirds), 2.0 / 3.0);
 }
 
-int main(int argc, char **argv)
+// Test to see if the 1 is returned when the point exists within the rectangle
+TEST(TrespassTest, test_binary_trespass_point_is_trespassing_in_rectangle)
 {
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    EXPECT_EQ(1, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(0, 0)));
+    EXPECT_EQ(1,
+              Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(0.5, 0.5)));
+    EXPECT_EQ(1,
+              Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-0.5, -0.5)));
+    EXPECT_EQ(1,
+              Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(0.5, -0.5)));
+    EXPECT_EQ(1,
+              Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-0.5, 0.5)));
+}
+
+// Test to see if the 1 is returned when the point exists on the boundries of the
+// rectangle
+TEST(TrespassTest, test_binary_trespass_point_is_on_rectangle_boundry)
+{
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    EXPECT_EQ(1, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-1, -1)));
+    EXPECT_EQ(1, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(1, 1)));
+    EXPECT_EQ(1, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-1, 1)));
+    EXPECT_EQ(1, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(1, -1)));
+    EXPECT_EQ(1, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-1, 0.5)));
+}
+
+// Test to see if the 0 is returned when the point exists outside of the rectangle
+TEST(TrespassTest, test_binary_trespass_point_is_outside_rectangle)
+{
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    EXPECT_EQ(0, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-1, -2)));
+    EXPECT_EQ(0, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(2, 1)));
+    EXPECT_EQ(0, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-1, 3)));
+    EXPECT_EQ(0, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(5, -0.2)));
+    EXPECT_EQ(0, Navigator::Trespass::calcBinaryTrespassScore(rectangle, Point(-4, 5)));
 }

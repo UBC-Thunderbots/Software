@@ -22,8 +22,6 @@ class DribblePrimitive : public Primitive
      * @param dest The final destination of the movement
      * @param final_angle The final orientation the robot should have at the end
      * of the movement
-     * @param final_speed The final speed the Robot should have when it reaches
-     * its destination at the end of the movement
      * @param rpm The rotation speed of the dribbler in RPMs
      * @param small_kick_allowed Boolean of whether the robot is allowed o do a small
      * kick while dribbling in order to release the ball. This is due to the rule that
@@ -32,7 +30,7 @@ class DribblePrimitive : public Primitive
      *
      */
     explicit DribblePrimitive(unsigned int robot_id, const Point &dest,
-                              const Angle &final_angle, double final_speed, double rpm,
+                              const Angle &final_angle, double rpm,
                               bool small_kick_allowed);
 
     /**
@@ -67,13 +65,6 @@ class DribblePrimitive : public Primitive
      * @return The robots final orientation as an Angle
      */
     Angle getFinalAngle() const;
-
-    /**
-     * Gets the robot's final speed in m/s
-     *
-     * @return The robots speed in m/s
-     */
-    double getFinalSpeed() const;
 
     /**
      * Returns the generic vector of parameters for this Primitive
@@ -130,7 +121,6 @@ class DribblePrimitive : public Primitive
     unsigned int robot_id;
     Point dest;
     Angle final_angle;
-    double final_speed;
     double rpm;
     bool small_kick_allowed;
 };

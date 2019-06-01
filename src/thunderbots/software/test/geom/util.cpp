@@ -919,17 +919,48 @@ TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
     EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) == retval.end());
 }
 
-TEST(GeomUtilTest, test_vertex_angle)
+TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_neg_y_axis)
 {
-    Point a(6, 2);
-    Point b(0, 0);
-    Point c(1, 5);
+    // Two vectors that form an acute angle over the negative y-axis
 
-    EXPECT_NEAR(-60.2551, vertexAngle(a, b, c).toDegrees(), 1e-4);
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-70));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(-120));
 
-    a = Point(6, 1);
+    EXPECT_DOUBLE_EQ(50, acuteVertexAngle(v1, v2).toDegrees());
+}
 
-    EXPECT_NEAR(-69.2277, vertexAngle(a, b, c).toDegrees(), 1e-4);
+TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_pos_y_axis)
+{
+    // Two vectors that form an acute angle over the positive y-axis
+
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(70));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(120));
+
+    EXPECT_DOUBLE_EQ(50, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertexAngle_180_degrees)
+{
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-90));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(90));
+
+    EXPECT_DOUBLE_EQ(180, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertexAngle_large_angle_over_neg_x_axis)
+{
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-95));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(99));
+
+    EXPECT_DOUBLE_EQ(166, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertex_angle_between_points)
+{
+    Point p1(2, 0.5);
+    Point p2(1, -0.5);
+    Point p3(1, 0.5);
+    EXPECT_DOUBLE_EQ(45, acuteVertexAngle(p1, p2, p3).toDegrees());
 }
 
 TEST(GeomUtilTest, test_closest_point_time)
@@ -1051,6 +1082,226 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end
     EXPECT_EQ(intersection2.value(), segment.getEnd());
 }
 
+// Check the case where both rays intersect the segment only once (forming an intersection
+// segment within the segment)
+TEST(GeomUtilTest, test_segment_intersect_with_existing_segment)
+{
+    Ray ray1 = Ray(Point(-1, 0), Vector(0, 1));
+    Ray ray2 = Ray(Point(1, 0), Vector(0, 1));
+
+    Segment segment = Segment(Point(-5, 4), Point(5, 4));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ(Segment(Point(-1, 4), Point(1, 4)), intersecting_segment.value());
+}
+
+// Test that no segment is returned if both rays do not intersect the segment, and the
+// area between the rays do not enclose the segment
+TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting)
+{
+    Ray ray1 = Ray(Point(-4, 0), Vector(0, -1));
+    Ray ray2 = Ray(Point(4, 0), Vector(0, -1));
+
+    Segment segment = Segment(Point(-1, 4), Point(1, 4));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ(false, intersecting_segment.has_value());
+}
+
+// Test that a correct intersection point is returned for 2 rays that intersect once
+TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once)
+{
+    // Ray at origin pointing upwards
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+    // Ray up and to the right that points right
+    Ray ray2 = Ray(Point(-1, 1), Vector(1, 0));
+
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
+
+    EXPECT_EQ(intersection.value(), Point(0, 1));
+}
+
+// Test that an intersection is not returned if the opposite direction of the rays
+// intersect
+TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects)
+{
+    // Ray positioned at origin pointing down
+    Ray ray1 = Ray(Point(0, 0), Vector(0, -1));
+
+    Ray ray2 = Ray(Point(-1, 1), Vector(-1, 0));
+
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
+
+    EXPECT_EQ(intersection, std::nullopt);
+}
+
+// Test that an intersection is not returned if the Rays are overlapping
+TEST(GeomUtilTest, test_intersect_ray_ray_overlapping)
+{
+    // Ray positioned at origin pointing up
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray2 = Ray(Point(0, 1), Vector(0, 1));
+
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
+
+    EXPECT_EQ(intersection, std::nullopt);
+}
+
+// Test that the segment between the intersecting ray and the segment extreme is returned
+// when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme1)
+{
+    Ray ray_intersecting          = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0, 0), Vector(-14, 1));
+
+    Segment segment = Segment(Point(-1, 2), Point(1, 2));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
+
+    EXPECT_EQ(intersecting_segment.value(), Segment(Point(0, 2), Point(-1, 2)));
+}
+// Test that the segment between the intersecting ray and the segment extreme is returned
+// when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme2)
+{
+    Ray ray_intersecting          = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0, 0), Vector(20, 2));
+
+    Segment segment = Segment(Point(-1, 2), Point(1, 2));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
+
+    EXPECT_EQ(intersecting_segment.value(), Segment(Point(0, 2), Point(1, 2)));
+}
+
+TEST(GeomUtilTest, test_segment_intersect_segment_enclosed_by_rays)
+{
+    Ray ray1 = Ray(Point(0, 0), Vector(-20, 1));
+    Ray ray2 = Ray(Point(0, 0), Vector(20, 1));
+
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ(intersecting_segment.value(), segment);
+}
+
+// Test that the function returns the segment when the rays enclose the segemnt
+TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_enclosed)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    Ray ray1 = Ray(Point(0, 0), Vector(-20, 1));
+
+    Ray ray2 = Ray(Point(0, 0), Vector(20, 1));
+
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
+
+    EXPECT_EQ(segment, enclosed_segment.value());
+}
+
+// Test that the function returns null when the rays only partially intersect the segment
+TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_partially_enclosed)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    Ray ray1 = Ray(Point(0, 0), Vector(-0.2, 1));
+
+    Ray ray2 = Ray(Point(0, 0), Vector(0.2, 1));
+
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
+
+    EXPECT_EQ(std::nullopt, enclosed_segment);
+}
+
+// Test that the function returns null if the segment is only partially enclosed with 1
+// real intersection
+TEST(GeomUtilTest,
+     test_segment_enclosed_between_rays_is_partially_enclosed_one_real_intersection)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+
+    Ray ray2 = Ray(Point(0, 0), Vector(-20, 1));
+
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
+
+    EXPECT_EQ(std::nullopt, enclosed_segment);
+}
+
+// Test that function returns the larger segment when considering 2 redundant segments
+TEST(GeomUtilTest, test_segment_redundancy_segments_are_redundant)
+{
+    Segment segment1 = Segment(Point(-1, -1), Point(1, 1));
+
+    Segment segment2 = Segment(Point(-2, -2), Point(2, 2));
+
+    std::optional<Segment> largest_segment =
+        mergeFullyOverlappingSegments(segment1, segment2);
+
+    EXPECT_EQ(largest_segment.value(), segment2);
+}
+
+// Test that function returns the larger segment when considering 2 non-parallel segments
+TEST(GeomUtilTest, test_segment_redundancy_segments_are_not_parallel)
+{
+    Segment segment1 = Segment(Point(2, 2), Point(1, -2));
+
+    Segment segment2 = Segment(Point(1, 4), Point(1, -4));
+
+    std::optional<Segment> largest_segment =
+        mergeFullyOverlappingSegments(segment1, segment2);
+
+    EXPECT_EQ(largest_segment, std::nullopt);
+}
+
+// Test that function returns one of the segments if they are exactly the same
+TEST(GeomUtilTest, test_segment_redundancy_segments_are_the_same)
+{
+    Segment segment1 = Segment(Point(2, 2), Point(1, -2));
+
+    Segment segment2 = Segment(Point(2, 2), Point(1, -2));
+
+    std::optional<Segment> largest_segment =
+        mergeFullyOverlappingSegments(segment1, segment2);
+
+    EXPECT_EQ(largest_segment.value(), segment1);
+}
+
+// Test if segments are merged if they are parallel and only partially overlapping
+TEST(GeomUtilTest, test_merge_segment_partially_overlapping)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment(Point(-1, -1), Point(5, 5));
+
+    std::optional<Segment> merged_segment =
+        mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment.value(), Segment(Point(-2, -2), Point(5, 5)));
+}
+
+// Test if segments are merged if they are parallel and only partially overlapping
+TEST(GeomUtilTest, test_merge_segment_redundant_segments)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment(Point(-1, -1), Point(1, 1));
+
+    std::optional<Segment> merged_segment =
+        mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment.value(), segment1);
+}
 
 // Test to see if the 1 is returned when the point exists within the rectangle
 TEST(GeomUtilTest, test_binary_trespass_point_is_trespassing_in_rectangle)
