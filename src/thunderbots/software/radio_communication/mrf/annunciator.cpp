@@ -63,6 +63,9 @@ namespace
         }
         return val;
     }
+
+
+    thunderbots_msgs::RobotStatus robot_status;
 }  // namespace
 
 Annunciator::Annunciator(ros::NodeHandle &node_handle)
@@ -71,12 +74,10 @@ Annunciator::Annunciator(ros::NodeHandle &node_handle)
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
 }
 
-thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
-                                                                const void *data,
-                                                                std::size_t len,
-                                                                uint8_t lqi, uint8_t rssi)
+bool Annunciator::handle_robot_message(int index, const void *data, std::size_t len,
+                                       uint8_t lqi, uint8_t rssi)
 {
-    thunderbots_msgs::RobotStatus robot_status;
+    std::vector<std::string> new_msgs;
 
     robot_status.link_quality = lqi / 255.0;
 
@@ -122,7 +123,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                     // Warn if capacitor voltage is too low
                     if (robot_status.capacitor_voltage < 5.0)
                     {
-                        robot_status.robot_messages.push_back(MRF::LOW_CAP_MESSAGE);
+                        new_msgs.push_back(MRF::LOW_CAP_MESSAGE);
                     }
 
                     bptr += 2;
@@ -147,8 +148,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                     {
                         if (MRF::LOGGER_MESSAGES[i] && (logger_status == i))
                         {
-                            robot_status.robot_messages.push_back(
-                                MRF::LOGGER_MESSAGES[i]);
+                            new_msgs.push_back(MRF::LOGGER_MESSAGES[i]);
                         }
                     }
                     ++bptr;
@@ -159,7 +159,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                     {
                         if (MRF::SD_MESSAGES[i] && (*bptr == i))
                         {
-                            robot_status.robot_messages.push_back(MRF::SD_MESSAGES[i]);
+                            new_msgs.push_back(MRF::SD_MESSAGES[i]);
                         }
                     }
                     ++bptr;
@@ -195,8 +195,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_LT_MESSAGES[i])
                                         {
-                                            robot_status.robot_messages.push_back(
-                                                MRF::ERROR_LT_MESSAGES[i]);
+                                            new_msgs.push_back(MRF::ERROR_LT_MESSAGES[i]);
                                         }
                                     }
 
@@ -215,8 +214,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            robot_status.robot_messages.push_back(
-                                                MRF::ERROR_ET_MESSAGES[i]);
+                                            new_msgs.push_back(MRF::ERROR_ET_MESSAGES[i]);
                                         }
                                     }
                                     bptr += MRF::ERROR_BYTES;
@@ -309,11 +307,24 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
         }
     }
 
-    // Add the latest dongle status messages
+    // Add the latest robot and dongle status messages
+    bool to_beep = false;
+    for (std::string msg : new_msgs)
+    {
+        if (std::find(robot_status.robot_messages.begin(),
+                      robot_status.robot_messages.end(),
+                      msg) == robot_status.robot_messages.end())
+        {
+            to_beep = true;
+            break;
+        }
+    }
+
+    robot_status.robot_messages  = new_msgs;
     robot_status.dongle_messages = dongle_messages;
 
     robot_status_publisher.publish(robot_status);
-    return robot_status;
+    return to_beep;
 }
 
 void Annunciator::handle_status(uint8_t status)

@@ -24,11 +24,10 @@ class Annunciator
      * @param lqi Link quality.
      * @param rssi Received signal strength indicator.
      *
-     * @return the fully-constructed RobotStatus that was published
+     * @return true if a dongle beep is required, false otherwise
      */
-    thunderbots_msgs::RobotStatus handle_robot_message(int index, const void* data,
-                                                       std::size_t len, uint8_t lqi,
-                                                       uint8_t rssi);
+    bool handle_robot_message(int index, const void* data, std::size_t len, uint8_t lqi,
+                              uint8_t rssi);
 
     /**
      * Handles general dongle messages.
