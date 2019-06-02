@@ -89,7 +89,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(0, {0.5, 0.5}, {-0.5, 0}, Angle::zero(),
+    enemy_team.updateRobots({Robot(0, {0, 0}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
                              Robot(1, {-2, -2}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),

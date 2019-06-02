@@ -71,7 +71,7 @@ TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
     EXPECT_GE(pass_rating, 0.0);
-    EXPECT_LE(pass_rating, 0.01);
+    EXPECT_LE(pass_rating, 0.02);
 }
 
 TEST_F(PassingEvaluationTest, ratePass_one_friendly_marked_and_one_friendly_free)
@@ -127,7 +127,7 @@ TEST_F(PassingEvaluationTest, ratePass_only_friendly_marked)
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
     EXPECT_GE(pass_rating, 0.0);
-    EXPECT_LE(pass_rating, 0.01);
+    EXPECT_LE(pass_rating, 0.02);
 }
 
 TEST_F(PassingEvaluationTest, ratePass_cross_over_enemy_goal_defender_somewhat_near_pass)
