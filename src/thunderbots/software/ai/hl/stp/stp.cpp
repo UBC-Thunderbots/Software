@@ -202,16 +202,16 @@ PlayInfo STP::getPlayInfo()
         auto tactics = *current_tactics;
         std::sort(tactics.begin(), tactics.end(), compare_tactic_by_robot_id);
 
-        for (const auto& t : tactics)
+        for (const auto& tactic : tactics)
         {
-            auto robot = t->getAssignedRobot();
+            auto robot = tactic->getAssignedRobot();
             if (!robot)
             {
                 continue;
             }
-            std::string s = "Robot " + std::to_string(t->getAssignedRobot()->id()) +
-                            "  -  " + t->getName();
-            info.tactics.emplace_back(s);
+            std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
+                            "  -  " + tactic->getName();
+            info.robot_tactic_assignment.emplace_back(s);
         }
     }
 

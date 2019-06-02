@@ -5,4 +5,4 @@ string play_type
 
 string play_name
 
-string[] tactics
+string[] robot_tactic_assignment

@@ -6,12 +6,12 @@ struct PlayInfo
 {
     std::string play_type;
     std::string play_name;
-    std::vector<std::string> tactics;
+    std::vector<std::string> robot_tactic_assignment;
 
     PlayInfo()
     {
         play_name = "";
         play_type = "";
-        tactics   = {};
+        robot_tactic_assignment   = {};
     }
 };

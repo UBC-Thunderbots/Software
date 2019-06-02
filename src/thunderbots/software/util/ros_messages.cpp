@@ -259,9 +259,9 @@ namespace Util
             msg.play_name = play_info.play_name;
             msg.play_type = play_info.play_type;
 
-            for (const auto& tactic : play_info.tactics)
+            for (const auto& tactic : play_info.robot_tactic_assignment)
             {
-                msg.tactics.emplace_back(tactic);
+                msg.robot_tactic_assignment.emplace_back(tactic);
             }
 
             return msg;
