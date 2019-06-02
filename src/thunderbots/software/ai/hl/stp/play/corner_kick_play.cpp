@@ -69,9 +69,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     } while(!align_to_ball_tactic->done() || best_pass_and_score_so_far.second < MIN_PASS_SCORE);
 
-    std::cout << "COMMITING" << std::endl;
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.first;
+
+    std::cout << "COMMITING TO: " << pass << std::endl;
 
     // TODO: need to stop the pass generator here, need start/stop methods
 
