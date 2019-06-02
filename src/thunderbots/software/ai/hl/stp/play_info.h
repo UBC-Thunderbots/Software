@@ -10,8 +10,8 @@ struct PlayInfo
 
     PlayInfo()
     {
-        play_name = "";
-        play_type = "";
-        robot_tactic_assignment   = {};
+        play_name               = "";
+        play_type               = "";
+        robot_tactic_assignment = {};
     }
 };
