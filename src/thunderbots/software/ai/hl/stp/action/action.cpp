@@ -23,12 +23,21 @@ std::unique_ptr<Intent> Action::getNextIntent()
             << "Requesting the next Intent for an Action without a Robot assigned"
             << std::endl;
     }
-    // Run the coroutine and check its status to see if it has any more work to do.
-    else if (intent_sequence())
+    // Check the coroutine status to see if it has any more work to do.
+    else if (intent_sequence)
     {
-        // Extract the result from the coroutine. This will be whatever value was
-        // yielded by the calculateNextIntent function
-        next_intent = intent_sequence.get();
+        // Run the coroutine. This will call the bound calculateNextIntent function
+        intent_sequence();
+
+        // Check if the coroutine is still valid before getting the result. This makes
+        // sure we don't try get the result after "running out the bottom" of the
+        // coroutine function
+        if (intent_sequence)
+        {
+            // Extract the result from the coroutine. This will be whatever value was
+            // yielded by the calculateNextIntent function
+            next_intent = intent_sequence.get();
+        }
     }
 
     return next_intent;
