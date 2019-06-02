@@ -250,5 +250,21 @@ namespace Util
 
             return new_robot;
         }
+
+        thunderbots_msgs::PlayInfo convertPlayPlayInfoToROSMessage(
+            const PlayInfo& play_info)
+        {
+            thunderbots_msgs::PlayInfo msg;
+
+            msg.play_name = play_info.play_name;
+            msg.play_type = play_info.play_type;
+
+            for (const auto& tactic : play_info.tactics)
+            {
+                msg.tactics.emplace_back(tactic);
+            }
+
+            return msg;
+        }
     }  // namespace ROSMessages
 }  // namespace Util

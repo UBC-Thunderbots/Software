@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ai/hl/hl.h"
+#include "ai/hl/stp/play_info.h"
 #include "ai/navigator/navigator.h"
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
@@ -28,6 +29,14 @@ class AI final
      * of the world.
      */
     std::vector<std::unique_ptr<Primitive>> getPrimitives(const World& world) const;
+
+    /**
+     * Returns information about the currently running plays and tactics, including the
+     * name of the play, and which robots are running which tactics
+     *
+     * @return information about the currently running plays and tactics
+     */
+    PlayInfo getPlayInfo() const;
 
    private:
     std::unique_ptr<HL> high_level;
