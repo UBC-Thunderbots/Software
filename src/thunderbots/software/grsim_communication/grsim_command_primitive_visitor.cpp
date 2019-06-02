@@ -186,9 +186,13 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
+    double kick_speed = move_primitive.isAutoKickEnabled() ? 5.5 : 0;
+
+    // TODO: YOU ARE HERE - FIX ANGLE SWEEP CIRCLES
+
     motion_controller_command = MotionController::PositionCommand(
         move_primitive.getDestination(), move_primitive.getFinalAngle(),
-        move_primitive.getFinalSpeed(), 0.0, false, false);
+        move_primitive.getFinalSpeed(), kick_speed, false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_primitive)

@@ -28,7 +28,8 @@ double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
-    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+    //double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+    double shoot_pass_rating = 1;
 
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
@@ -179,6 +180,11 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_closest_pass_point = Duration::fromSeconds(
         (closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
+
+    // Check for division by 0
+    if (pass.speed() == 0){
+        ball_time_to_closest_pass_point = Duration::fromSeconds(9999999);
+    }
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
     // for the pass.

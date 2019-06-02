@@ -47,11 +47,17 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         yield({align_to_ball_tactic, cherry_pick_tactic_1});
     }
 
+    std::cout << "ASSIGNED" << std::endl;
     // Set the passer on the pass generator
     pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
 
     // Align the kicker to take the corner kick and wait for a good pass
     do {
+        // Continue trying to align to deal with the case where we've finished
+        // aligning but there's not passing to
+        if (align_to_ball_tactic->done()){
+            align_to_ball_tactic = std::make_shared<MoveTactic>();
+        }
         updateAlignToBallTactic(align_to_ball_tactic);
         updateCherryPickTactics({cherry_pick_tactic_1});
         updatePassGenerator(pass_generator);
@@ -59,9 +65,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         yield({align_to_ball_tactic, cherry_pick_tactic_1});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        std::cout << best_pass_and_score_so_far.second << std::endl;
 
     } while(!align_to_ball_tactic->done() || best_pass_and_score_so_far.second < MIN_PASS_SCORE);
 
+    std::cout << "COMMITING" << std::endl;
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.first;
 
@@ -73,7 +81,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
     auto receiver = std::make_shared<ReceiverTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(), false);
-    while(align_to_ball_tactic->getAssignedRobot()){
+    while(true){
         passer->updateParams(pass, world.ball());
         receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass, world.ball());
 
@@ -91,11 +99,11 @@ void CornerKickPlay::updateCherryPickTactics(
 
 void CornerKickPlay::updateAlignToBallTactic(
         std::shared_ptr<MoveTactic> align_to_ball_tactic) {
-    Vector ball_to_center_vec = world.ball().position() - Vector(0,0);
+    Vector ball_to_center_vec = Vector(0,0) - world.ball().position();
 // We want the kicker to get into position behind the ball facing the center
 // of the field
     align_to_ball_tactic->updateParams(
-            world.ball().position() + ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS*2), ball_to_center_vec.orientation(), 0);
+            world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS*2), ball_to_center_vec.orientation(), 0);
 }
 
 void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator) {
