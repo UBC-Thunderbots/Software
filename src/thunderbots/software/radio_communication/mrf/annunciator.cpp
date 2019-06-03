@@ -1,11 +1,12 @@
 
 #include "annunciator.h"
+
+#include <time.h>
+
 #include "dongle.h"
 #include "messages.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
-
-#include <time.h>
 
 namespace
 {
@@ -70,11 +71,20 @@ namespace
         return val;
     }
 
-    // ROS message to be published
-    thunderbots_msgs::RobotStatus robot_status;
+    // Struct to keep track of previously published messages for a robot
+    typedef struct
+    {
+        // Previously published messages for this robot
+        std::vector<std::string> old_msgs;
 
-    // Map of message to timestamp for edge-triggered messages
-    std::map<std::string, time_t> edge_triggered_msg_map;
+        // Map of message to timestamp for edge-triggered messages
+        std::map<std::string, time_t> edge_triggered_msg_map;
+
+    } RobotStatusState;
+
+    // Map of robot number to their previously published messages
+    std::map<int, RobotStatusState> robot_status_states;
+
 }  // namespace
 
 Annunciator::Annunciator(ros::NodeHandle &node_handle)
@@ -87,6 +97,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                        uint8_t lqi, uint8_t rssi)
 {
     std::vector<std::string> new_msgs;
+    thunderbots_msgs::RobotStatus robot_status;
 
     robot_status.link_quality = lqi / 255.0;
 
@@ -196,6 +207,8 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                 if (len >= MRF::ERROR_BYTES)
                                 {
                                     has_error_extension = true;
+
+                                    // Handling of level-triggered messages.
                                     for (unsigned int i = 0; i < MRF::ERROR_LT_COUNT; ++i)
                                     {
                                         unsigned int byte = i / CHAR_BIT;
@@ -209,9 +222,11 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                     }
 
                                     /**
-                                     * TODO (#544): Edge-triggered messages only show up
-                                     * once when the event occurs. Need to add some timer
-                                     * event to persist these messages for a few seconds.
+                                     * Handling of edge-triggered messages.
+                                     * These messages are added to a separate map,
+                                     * mapping to a timestamp of when it was most recently
+                                     * transmitted
+
                                      */
                                     for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT; ++i)
                                     {
@@ -223,7 +238,10 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            edge_triggered_msg_map[MRF::ERROR_ET_MESSAGES[i]] = time(nullptr);
+                                            robot_status_states[index]
+                                                .edge_triggered_msg_map
+                                                    [MRF::ERROR_ET_MESSAGES[i]] =
+                                                time(nullptr);
                                         }
                                     }
 
@@ -317,8 +335,8 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    for (auto const& et_msg : edge_triggered_msg_map)
-    {   
+    for (auto const &et_msg : robot_status_states[index].edge_triggered_msg_map)
+    {
         if (difftime(time(nullptr), et_msg.second) < ET_MESSAGE_KEEPALIVE_TIME)
         {
             new_msgs.push_back(et_msg.first);
@@ -329,9 +347,9 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     bool to_beep = false;
     for (std::string msg : new_msgs)
     {
-        if (std::find(robot_status.robot_messages.begin(),
-                      robot_status.robot_messages.end(),
-                      msg) == robot_status.robot_messages.end())
+        if (std::find(robot_status_states[index].old_msgs.begin(),
+                      robot_status_states[index].old_msgs.end(),
+                      msg) == robot_status_states[index].old_msgs.end())
         {
             to_beep = true;
             break;
@@ -342,6 +360,10 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     robot_status.robot_messages  = new_msgs;
     robot_status.dongle_messages = dongle_messages;
 
+    // Update previous message state
+    robot_status_states[index].old_msgs = new_msgs;
+
+    // Publish robot status
     robot_status_publisher.publish(robot_status);
     return to_beep;
 }
