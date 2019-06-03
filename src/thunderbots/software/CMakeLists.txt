@@ -555,6 +555,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/movespin_action.cpp
             ai/hl/stp/action/pivot_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/intent/intent.cpp
             ai/intent/chip_intent.cpp
             ai/intent/dribble_intent.cpp
@@ -562,13 +563,17 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
             ai/intent/pivot_intent.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/chip_primitive.cpp
-            ai/primitive/dribble_primitive.cpp
-            ai/primitive/kick_primitive.cpp
+            ai/intent/stop_intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/intent/chip_intent.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/world/robot.cpp
             ai/world/ball.cpp
             test/ai/hl/stp/action/main.cpp
@@ -580,6 +585,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/action/move_action.cpp
             test/ai/hl/stp/action/movespin_action.cpp
             test/ai/hl/stp/action/pivot_action.cpp
+            test/ai/hl/stp/action/stop_action.cpp
             geom/polygon.cpp
             geom/util.cpp
             util/logger/custom_g3log_sinks.h
