@@ -3,11 +3,14 @@
 #include "ai/intent/stop_intent.h"
 
 StopAction::StopAction(double stopped_speed_threshold, bool loop_forever)
-        : Action(), stopped_speed_threshold(stopped_speed_threshold), loop_forever(loop_forever)
+    : Action(),
+      stopped_speed_threshold(stopped_speed_threshold),
+      loop_forever(loop_forever)
 {
 }
 
-std::unique_ptr<Intent> StopAction::updateStateAndGetNextIntent(const Robot& robot, bool coast)
+std::unique_ptr<Intent> StopAction::updateStateAndGetNextIntent(const Robot& robot,
+                                                                bool coast)
 {
     // Update the parameters stored by this action
     this->robot = robot;

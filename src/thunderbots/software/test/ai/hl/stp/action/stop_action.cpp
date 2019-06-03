@@ -38,7 +38,7 @@ TEST(StopAction, robot_stopping_while_already_stopped)
     // ensure the Robot is doing the right thing. In all future calls, the action will be
     // done and so will return a null pointer
     auto intent_ptr = action.updateStateAndGetNextIntent(robot, false);
-    intent_ptr = action.updateStateAndGetNextIntent(robot, false);
+    intent_ptr      = action.updateStateAndGetNextIntent(robot, false);
 
     EXPECT_TRUE(action.done());
 }

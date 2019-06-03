@@ -4,8 +4,8 @@
 #include "ai/hl/stp/tactic/tactic.h"
 
 /**
- * The StopTactic will stop the robot from moving. The robot will actively try and brake to come to a halt unless
- * is it told to coast, in which case it will coast to a stop.
+ * The StopTactic will stop the robot from moving. The robot will actively try and brake
+ * to come to a halt unless is it told to coast, in which case it will coast to a stop.
  */
 class StopTactic : public Tactic
 {
@@ -26,7 +26,8 @@ class StopTactic : public Tactic
     void updateParams();
 
     /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots equally
+     * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
+     * equally
      *
      * @param robot The robot to evaluate the cost for
      * @param world The state of the world with which to perform the evaluation

@@ -4,7 +4,9 @@
 
 #include "ai/hl/stp/action/stop_action.h"
 
-StopTactic::StopTactic(bool coast, bool loop_forever) : coast(coast), Tactic(loop_forever) {}
+StopTactic::StopTactic(bool coast, bool loop_forever) : coast(coast), Tactic(loop_forever)
+{
+}
 
 std::string StopTactic::getName() const
 {

@@ -5,9 +5,10 @@
 #include "ai/intent/stop_intent.h"
 #include "test/test_util/test_util.h"
 
-TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving) {
+TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving)
+{
     Robot robot       = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
     tactic.updateParams();
@@ -29,9 +30,10 @@ TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving) {
     }
 }
 
-TEST(StopTacticTest, robot_stopping_while_already_stopped) {
+TEST(StopTacticTest, robot_stopping_while_already_stopped)
+{
     Robot robot       = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
-                              AngularVelocity::zero(), Timestamp::fromSeconds(0));
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
     tactic.updateParams();
@@ -64,6 +66,7 @@ TEST(StopTacticTest, test_calculate_robot_cost)
     StopTactic tactic = StopTactic(false, false);
     tactic.updateParams();
 
-    // We always expect the cost to be 0.5, because the StopTactic prefers all robots equally
+    // We always expect the cost to be 0.5, because the StopTactic prefers all robots
+    // equally
     EXPECT_EQ(0.5, tactic.calculateRobotCost(robot, world));
 }

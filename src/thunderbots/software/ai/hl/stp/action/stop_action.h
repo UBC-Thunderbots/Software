@@ -10,26 +10,28 @@
 class StopAction : public Action
 {
    public:
-    // We consider the robot to be stopped when the magnitude of its velocity is less than 5cm / s
-    // When robots are stationary, noise in the camera data can cause its velocity to be non-zero, which
-    // is why we use a non-zero value here.
+    // We consider the robot to be stopped when the magnitude of its velocity is less than
+    // 5cm / s When robots are stationary, noise in the camera data can cause its velocity
+    // to be non-zero, which is why we use a non-zero value here.
     static constexpr double ROBOT_STOPPED_SPEED_THRESHOLD = 0.05;
 
     /**
      * Creates a new StopAction
      *
-     * @param stopped_speed_threshold How slow the robot must be moving before the action is considered done
+     * @param stopped_speed_threshold How slow the robot must be moving before the action
+     * is considered done
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit StopAction(double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD, bool loop_forever = false);
+    explicit StopAction(double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD,
+                        bool loop_forever              = false);
 
     /**
      * Returns the next Intent this StopAction wants to run, given the parameters.
      *
      * @param robot the robot that should stop
-     * @param coast Whether or not to coast to a stop. If this is false, the robot will try actively brake to come to
-     * a stop
+     * @param coast Whether or not to coast to a stop. If this is false, the robot will
+     * try actively brake to come to a stop
      *
      * @return A unique pointer to the Intent the StopAction wants to run.
      *
