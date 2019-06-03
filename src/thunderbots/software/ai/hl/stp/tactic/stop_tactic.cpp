@@ -26,7 +26,8 @@ double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
-    StopAction stop_action = StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD, false);
+    StopAction stop_action =
+        StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
     do
     {
         yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));

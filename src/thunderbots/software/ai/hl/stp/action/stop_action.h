@@ -13,7 +13,7 @@ class StopAction : public Action
     // We consider the robot to be stopped when the magnitude of its velocity is less than
     // 5cm / s When robots are stationary, noise in the camera data can cause its velocity
     // to be non-zero, which is why we use a non-zero value here.
-    static constexpr double ROBOT_STOPPED_SPEED_THRESHOLD = 0.05;
+    static constexpr double ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT = 0.05;
 
     /**
      * Creates a new StopAction
@@ -23,8 +23,9 @@ class StopAction : public Action
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit StopAction(double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD,
-                        bool loop_forever              = false);
+    explicit StopAction(
+        double stopped_speed_threshold = ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT,
+        bool loop_forever              = false);
 
     /**
      * Returns the next Intent this StopAction wants to run, given the parameters.
