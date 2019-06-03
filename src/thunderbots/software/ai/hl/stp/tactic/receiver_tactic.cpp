@@ -69,10 +69,14 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             auto [target_position, _] = *shot;
             Angle shot_angle = (target_position - robot->position()).orientation();
-            desired_angle    = (shot_angle + pass.receiverOrientation()) / 2;
+            // If we do have a valid shot on net, orient the robot to face in between
+            // the pass vector and shot vector, so the robot can quickly orient itself
+            // to either receive the pass, or take the shot. Also, not directly facing
+            // where we plan on kicking may throw off the enemy AI
+            desired_angle = (shot_angle + pass.receiverOrientation()) / 2;
         }
         // We want the robot to move to the receiving position for the shot and also
-        // rotate to the correct orientation to face where the pass is coming from
+        // rotate to the correct orientation
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
                                                       desired_angle, 0));
     }
@@ -82,69 +86,33 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
 
     // Vector from the ball to the robot
-    Vector robot_to_ball = ball.position() - robot->position();
-
-    // The angle the robot will have to deflect the ball to shoot
-    Angle abs_angle_between_pass_and_shot_vectors;
-    // The percentage of open net the robot would shoot on
-    double net_percent_open;
-    if (best_shot_opt)
-    {
-        Vector robot_to_shot_target = best_shot_opt->first - robot->position();
-        abs_angle_between_pass_and_shot_vectors =
-            (robot_to_ball.orientation() - robot_to_shot_target.orientation())
-                .angleMod()
-                .abs();
-
-        Angle goal_angle =
-            acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
-                             field.friendlyGoalpostNeg())
-                .abs();
-        net_percent_open = best_shot_opt->second.toDegrees() / goal_angle.toDegrees();
-    }
-
+    Vector ball_to_robot_vector = ball.position() - robot->position();
 
     std::optional<std::pair<Point, Angle>> best_shot = findFeasibleShot();
-
     if (best_shot)
     {
         auto [best_shot_target, _] = *best_shot;
 
         // The angle between the ball velocity and a vector from the ball to the robot
         Vector ball_velocity = ball.velocity();
-        robot_to_ball        = robot->position() - ball.position();
+        ball_to_robot_vector = robot->position() - ball.position();
         Angle ball_robot_angle =
-            (ball_velocity.orientation() - robot_to_ball.orientation()).angleMod();
+            ball_velocity.orientation().minDiff(ball_to_robot_vector.orientation());
 
         // Keep trying to shoot the ball while it's traveling roughly towards the robot
         // (or moving slowly because we can't be certain of the velocity vector if it is)
-        while (ball_robot_angle.toDegrees() < 90 || ball.velocity().len() < 0.5)
+        while (ball_robot_angle.abs() < Angle::ofDegrees(90) || ball_velocity.len() < 0.5)
         {
-            // Figure out the closest point on the balls trajectory to the robot
-            Point closest_ball_pos = closestPointOnLine(
-                robot->position(), ball.position(),
-                ball.estimatePositionAtFutureTime(Duration::fromSeconds(0.1)));
-            Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
-
-            Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);
-            Vector ideal_orientation_vec = Vector::createFromAngle(
-                ideal_orientation);  // Vector(ideal_orientation.cos(),
-                                     // ideal_orientation.sin());
-
-            // The best position is determined such that the robot stays in the ideal
-            // orientation, but moves forwards/backwards so that the ball hits the kicker,
-            // rather then the center of the robot
-            Point ideal_position = closest_ball_pos - ideal_orientation_vec.norm(
-                                                          DIST_TO_FRONT_OF_ROBOT_METERS +
-                                                          BALL_MAX_RADIUS_METERS * 1.5);
+            auto [ideal_position, ideal_orientation] =
+                getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
 
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ideal_position, ideal_orientation, 0, false, true));
 
             // Calculations to check for termination conditions
-            robot_to_ball = ball.position() - robot->position();
+            ball_to_robot_vector = robot->position() - ball.position();
             ball_robot_angle =
-                (ball_velocity.orientation() - robot_to_ball.orientation()).angleMod();
+                ball_velocity.orientation().minDiff(ball_to_robot_vector.orientation());
         }
     }
     // If we can't shoot on the enemy goal, just try to receive the pass as cleanly as
@@ -155,11 +123,11 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
             Point ball_receive_pos = closestPointOnLine(
-                robot->position(), ball.position(),
-                ball.estimatePositionAtFutureTime(Duration::fromSeconds(0.1)));
+                robot->position(), ball.position(), ball.position() + ball.velocity());
             Angle ball_receive_orientation =
                 (ball.position() - robot->position()).orientation();
 
+            // Move into position with the dribbler on
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ball_receive_pos, ball_receive_orientation, 0, true, false));
         }
@@ -171,8 +139,12 @@ Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
     Vector shot_vector = shot.getDirection();
     Angle shot_dir     = shot.getDirection().orientation();
 
-    Point ball_vel       = ball.velocity();
-    Point lateral_vel    = ball_vel.project(shot_vector.norm().perp());
+    Vector ball_vel    = ball.velocity();
+    Vector lateral_vel = ball_vel.project(shot_vector.norm().perp());
+    // The lateral speed is roughly a measure of the lateral velocity we need to
+    // "cancel out" in order for our shot to go in the expected direction.
+    // The scaling factor of 0.3 is a magic number that was carried over from the old
+    // code. It seems to work well on the field.
     double lateral_speed = 0.3 * lateral_vel.len();
     // This kick speed is based off of the value used in the firmware `MovePrimitive` when
     // autokick is enabled
@@ -225,4 +197,30 @@ std::optional<std::pair<Point, Angle>> ReceiverTactic::findFeasibleShot()
         return best_shot_opt;
     }
     return std::nullopt;
+}
+
+std::pair<Point, Angle> ReceiverTactic::getOneTimeShotPositionAndOrientation(
+    const Robot& robot, const Ball& ball, const Point& best_shot_target)
+{
+    double dist_to_ball_in_dribbler =
+        DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
+    Point ball_contact_point =
+        robot.position() +
+        Vector::createFromAngle(robot.orientation()).norm(dist_to_ball_in_dribbler);
+
+    // Find the closest point to the ball contact point on the ball's trajectory
+    Point closest_ball_pos = closestPointOnLine(ball_contact_point, ball.position(),
+                                                ball.position() + ball.velocity());
+    Ray shot(closest_ball_pos, best_shot_target - closest_ball_pos);
+
+    Angle ideal_orientation      = getOneTimeShotDirection(shot, ball);
+    Vector ideal_orientation_vec = Vector::createFromAngle(ideal_orientation);
+
+    // The best position is determined such that the robot stays in the ideal
+    // orientation, but moves the shortest distance possible to put its contact point
+    // in the ball's path.
+    Point ideal_position =
+        closest_ball_pos - ideal_orientation_vec.norm(dist_to_ball_in_dribbler);
+
+    return std::make_pair(ideal_position, ideal_orientation);
 }
