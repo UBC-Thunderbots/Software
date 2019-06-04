@@ -31,7 +31,7 @@ Polygon::Polygon(const std::initializer_list<Point>& _points)
 bool Polygon::containsPoint(const Point& point) const
 {
     // cast a ray from the point in the +x direction
-    Ray ray(point, point + Point(1, 0));
+    Ray ray(point, Point(1, 0));
     unsigned int num_intersections = 0;
     for (const Segment& seg : segments)
     {

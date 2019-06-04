@@ -66,6 +66,66 @@ TEST(PolygonTest, test_polygon_triangle_not_contains_point)
     EXPECT_FALSE(triangle.containsPoint(point));
 }
 
+TEST(PolygonTest, test_polygon_hexagon_contains_point)
+{
+    Point p1{-1.499421, 1.327846}, p2{-1.679421, 1.223923}, p3{-1.679421, 1.016077},
+        p4{-1.499421, 0.912154}, p5{-1.319421, 1.016077}, p6{-1.319421, 1.223923};
+
+    Point point;
+    Polygon hexagon{p1, p2, p3, p4, p5, p6};
+    point = Point{-1.050000, 0.090000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.050000, 0.180000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.230000, 0.360000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.140000, 0.450000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.320000, 0.540000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 0.630000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 0.720000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.500000, 0.810000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 0.810000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.320000, 0.810000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.230000, 0.810000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.320000, 0.900000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 0.990000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.320000, 0.990000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.500000, 1.080000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 1.080000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.320000, 1.080000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.500000, 1.170000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 1.170000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.410000, 1.170000};
+    EXPECT_TRUE(hexagon.containsPoint(point));
+    point = Point{-1.770000, 1.260000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.770000, 1.170000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.770000, 1.080000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.770000, 0.990000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+    point = Point{-1.680000, 0.990000};
+    EXPECT_FALSE(hexagon.containsPoint(point));
+}
+
+
 TEST(PolygonTest, test_polygon_triangle_intersects_line_segment)
 {
     Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
