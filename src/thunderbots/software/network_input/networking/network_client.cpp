@@ -177,6 +177,12 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         world_msg.enemy_team = enemy_team_msg;
     }
 
+    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
+        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+    {
+        world_msg = Util::ROSMessages::invertMsgFieldSide(world_msg);
+    }
+
     world_publisher.publish(world_msg);
 }
 

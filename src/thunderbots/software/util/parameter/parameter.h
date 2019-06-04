@@ -43,11 +43,10 @@ class Parameter
     explicit Parameter<T>(const std::string& parameter_name,
                           const std::string& parameter_namespace, T default_value)
     {
-        this->name_          = parameter_name;
-        this->namespace_     = parameter_namespace;
-        this->value_         = default_value;
-        this->previous_value = default_value;
-        this->value_changed  = false;
+        this->name_         = parameter_name;
+        this->namespace_    = parameter_namespace;
+        this->value_        = default_value;
+        this->value_changed = false;
 
         Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
     }
