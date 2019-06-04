@@ -1,7 +1,15 @@
 #pragma once
 
+#include "boost/circular_buffer.hpp"
 #include "geom/point.h"
-#include "geom/rect.h"
+#include "geom/rectangle.h"
+#include "util/time/timestamp.h"
+
+typedef enum
+{
+    EAST,  // positive X side according to vision
+    WEST   // negative X side
+} FieldSide;
 
 /**
  * Exposes the dimensions of various parts of the field.
@@ -20,10 +28,12 @@ class Field
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
+     * @param timestamp the Timestamp associated with the creation of the Field object
      */
     explicit Field(double field_length, double field_width, double defense_length,
                    double defense_width, double goal_width, double boundary_width,
-                   double center_circle_radius);
+                   double center_circle_radius, const Timestamp &timestamp,
+                   unsigned int buffer_size = 20);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -36,10 +46,11 @@ class Field
      * @param boundary_width the width/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
+     * @param timestamp the Timestamp corresponding to any updates to the Field object
      */
     void updateDimensions(double field_length, double field_width, double defense_length,
                           double defense_width, double goal_width, double boundary_width,
-                          double center_circle_radius);
+                          double center_circle_radius, const Timestamp &timestamp);
 
     /**
      * Updates the field with new data
@@ -92,6 +103,13 @@ class Field
     double centreCircleRadius() const;
 
     /**
+     * Returns the center point of the field
+     *
+     * @return the center point of the field
+     */
+    Point centerPoint() const;
+
+    /**
      * Gets the width of the defense area in metres, which runs along the y-axis. This is
      * the total width of how far the defense area stretches from one side of the goal to
      * the other.
@@ -109,19 +127,26 @@ class Field
     double defenseAreaLength() const;
 
     /**
-     * Gets the friendly defense area as a Rect.
+     * Gets the friendly defense area as a Rectangle.
      *
      * @return defense area of the friendly team
      */
-    Rect friendlyDefenseArea() const;
+    Rectangle friendlyDefenseArea() const;
 
     /**
-     * Gets the enemy defense area as a Rect.
+     * Gets the enemy defense area as a Rectangle.
      *
      * @return defense area of the enemy team
      */
-    Rect enemyDefenseArea() const;
+    Rectangle enemyDefenseArea() const;
 
+    /**
+     * Gets the area within the field lines as a rectangle. This is the set of locations
+     * where the ball is considered "in play".
+     *
+     * @return The area within the field lines as a rectangle
+     */
+    Rectangle fieldLines() const;
 
     /**
      * Gets the position of the centre of the friendly goal.
@@ -216,12 +241,50 @@ class Field
     double boundaryWidth() const;
 
     /**
+     * Returns whether p is in the friendly defense area
+     *
+     * @returns true if point p is in friendly defense area
+     */
+    bool pointInFriendlyDefenseArea(const Point p) const;
+
+    /**
+     * Returns whether p is in the enemy defense area
+     *
+     * @returns true if point p is in enemy defense area
+     */
+    bool pointInEnemyDefenseArea(const Point p) const;
+
+    /**
+     * Returns whether p is within the field lines of the this field.
+     *
+     * @param p
+     *
+     * @return true if p is within the field lines of the field, false otherwise
+     */
+    bool pointInFieldLines(const Point &p) const;
+
+    /**
      * Compares two fields for equality
      *
      * @param other the field to compare to
      * @return true if the fields have the same dimensions, and false otherwise
      */
     bool operator==(const Field &other) const;
+
+    /**
+     * Returns the entire update Timestamp history for Field object
+     *
+     * @return boost::circular_buffer of Timestamp history for the Field object
+     */
+    boost::circular_buffer<Timestamp> getTimestampHistory() const;
+
+    /**
+     * Returns the most Timestamp corresponding to the most recent update to Field object
+     *
+     * @return Timestamp : The Timestamp corresponding to the most recent update to the
+     * Field object
+     */
+    Timestamp getMostRecentTimestamp() const;
 
     /**
      * Compares two fields for inequality
@@ -231,9 +294,17 @@ class Field
      */
     bool operator!=(const Field &other) const;
 
+
    private:
     // Private variables have underscores at the end of their names
     // to avoid conflicts with function names
+
+    /**
+     * Updates the timestamp history for the Field object
+     *
+     * @param time_stamp : The timestamp at which the Field object was updated
+     */
+    void updateTimestamp(Timestamp time_stamp);
 
     // The length of the playable field (between the goal lines) in metres
     double field_length_;
@@ -250,4 +321,7 @@ class Field
     double boundary_width_;
     // The radius of the center circle in metres
     double center_circle_radius_;
+    // All previous timestamps of when the field was updated, with the most recent
+    // timestamp at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };

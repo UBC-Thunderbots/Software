@@ -1,9 +1,11 @@
 #pragma once
 
+#include <boost/circular_buffer.hpp>
 #include <vector>
 
+#include "ai/world/ball.h"
 #include "geom/point.h"
-#include "util/timestamp.h"
+#include "util/time/timestamp.h"
 
 /**
  * A lightweight datatype used to input new data into the filter.
@@ -11,24 +13,12 @@
  * so we can make this module more generic and abstract away
  * the protobuf for testing
  */
-typedef struct
+struct SSLBallDetection
 {
     Point position;
     double confidence;
-    double timestamp;
-} SSLBallData;
-
-/**
- * A lightweight datatype used to pass filtered ball data. We use this rather than
- * something like std::pair so it's very explicit what data is being accessed, since
- * it's accessed by name rather than by index (first/second)
- */
-typedef struct
-{
-    Point position;
-    Vector velocity;
-    AITimestamp timestamp;
-} FilteredBallData;
+    Timestamp timestamp;
+};
 
 /**
  * Given ball data from SSL Vision, filters for and returns the position/velocity of the
@@ -43,11 +33,17 @@ class BallFilter
     explicit BallFilter();
 
     /**
-     * Updates the filter given a new set of data, and returns the most up to date
-     * filtered data for the ball.
+     * Filters the new ball detection data, and returns the updated state of the ball
+     * given the new data
      *
-     * @param new_ball_data A list of new datapoints for the ball
-     * @return The filtered data for the ball
+     * @param current_ball_state The current state of the Ball
+     * @param new_ball_detections A list of new SSL Ball detections
+     *
+     * @return The updated state of the ball given the new data
      */
-    FilteredBallData getFilteredData(std::vector<SSLBallData> new_ball_data);
+    Ball getFilteredData(const Ball& current_ball_state,
+                         const std::vector<SSLBallDetection>& new_ball_detections);
+
+   private:
+    boost::circular_buffer<Vector> previous_ball_readings;
 };

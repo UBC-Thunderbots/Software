@@ -112,14 +112,14 @@ TEST_F(LoggerTest, test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_roso
 }
 
 TEST_F(LoggerTest,
-       test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_the_robot_status_topic)
+       test_log_messages_with_ROBOT_STATUS_severity_are_sent_to_the_robot_message_topic)
 {
     std::string msg_data = "ROBOT_STATUS log test message";
 
     LOG(ROBOT_STATUS) << msg_data << std::endl;
 
     auto message = RosTestUtil::waitForMessageOnTopic<std_msgs::String::ConstPtr>(
-        nh_, Util::Constants::ROBOT_STATUS_TOPIC);
+        nh_, Util::Constants::ROBOT_MESSAGE_TOPIC);
 
     std::string log_output = message->data;
 

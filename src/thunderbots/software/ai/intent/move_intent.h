@@ -1,12 +1,15 @@
 #pragma once
 
+#include "ai/flags.h"
 #include "ai/intent/intent.h"
+#include "ai/primitive/move_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 
-class MoveIntent : public Intent
+class MoveIntent : public Intent, public MovePrimitive
 {
    public:
+    static const std::string INTENT_NAME;
     /**
      * Creates a new Move Intent
      *
@@ -15,42 +18,56 @@ class MoveIntent : public Intent
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param final_speed The final speed the robot should have when it arrives at its
      * destination
+     * @param priority The priority of this Intent. A larger number indicates a higher
+     * priority
+     * @param enable_dribbler Whether or not to enable the dribbler
+     * @param enable_autokick This will enable the "break-beam" on the robot, that will
+     *                        trigger the kicker to fire as soon as the ball is in front
+     *                        of it
      */
-    // TODO: Add parameter override field/object/struct
-    explicit MoveIntent(unsigned int robot_id, const Point &dest,
-                        const Angle &final_angle, double final_speed);
+    explicit MoveIntent(unsigned int robot_id, const Point& dest,
+                        const Angle& final_angle, double final_speed,
+                        unsigned int priority, bool enable_dribbler = false,
+                        bool enable_autokick = false);
 
-    std::string getIntentName() const override;
-
-    unsigned int getRobotId() const override;
+    std::string getIntentName(void) const override;
 
     /**
-     * Returns the destination of this movement
+     * Sets MoveFlags of this intent.
      *
-     * @return the destination of this movement
+     * @param flags The MoveFlags to set to this intent.
      */
-    Point getDestination() const;
+    void setMoveFlags(MoveFlags flags);
 
     /**
-     * Returns the final orientation the robot should have at the
-     * end of its movement
+     * Returns the current MoveFlags of this intent.
      *
-     * @return the final orientation the robot should have at the end of its movement
+     * @return The current MoveFlags of this intent.
      */
-    Angle getFinalAngle() const;
+    MoveFlags getMoveFlags();
+
+    void accept(IntentVisitor& visitor) const override;
 
     /**
-     * Returns the final speed the robot should have when it arrives
-     * at its destination
+     * Compares MoveIntents for equality. MoveIntents are considered equal if all
+     * their member variables are equal.
      *
-     * @return the final speed the robot should have when it arrives
-     * at its destination
+     * @param other the MoveIntents to compare with for equality
+     * @return true if the MoveIntents are equal and false otherwise
      */
-    double getFinalSpeed() const;
+    bool operator==(const MoveIntent& other) const;
+
+    /**
+     * Compares MoveIntents for inequality.
+     *
+     * @param other the MoveIntent to compare with for inequality
+     * @return true if the MoveIntents are not equal and false otherwise
+     */
+    bool operator!=(const MoveIntent& other) const;
 
    private:
-    unsigned int robot_id;
-    Point dest;
-    Angle final_angle;
-    double final_speed;
+    /**
+     * MoveFlags of this intent.
+     */
+    MoveFlags flags;
 };

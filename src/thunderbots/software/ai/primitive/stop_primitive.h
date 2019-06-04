@@ -24,6 +24,7 @@ class StopPrimitive : public Primitive
      */
     explicit StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
 
+
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -51,6 +52,23 @@ class StopPrimitive : public Primitive
     std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor &visitor) const override;
+
+    /**
+     * Compares StopPrimitives for equality. StopPrimitives are considered equal if all
+     * their member variables are equal.
+     *
+     * @param other the StopPrimitive to compare with for equality
+     * @return true if the StopPrimitives are equal and false otherwise
+     */
+    bool operator==(const StopPrimitive& other) const;
+
+    /**
+     * Compares StopPrimitives for inequality.
+     *
+     * @param other the StopPrimitive to compare with for inequality
+     * @return true if the StopPrimitives are not equal and false otherwise
+     */
+    bool operator!=(const StopPrimitive& other) const;
 
    private:
     unsigned int robot_id;

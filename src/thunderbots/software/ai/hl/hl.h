@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 
+#include "ai/hl/stp/play_info.h"
 #include "ai/intent/intent.h"
 #include "ai/world/world.h"
 
@@ -28,8 +29,15 @@ class HL
      * @return A vector of unique pointers to the Intents our friendly robots should be
      * running
      */
-    virtual std::vector<std::unique_ptr<Intent>> getIntentAssignment(
-        const World &world) = 0;
+    virtual std::vector<std::unique_ptr<Intent>> getIntents(const World &world) = 0;
+
+    /**
+     * Returns information about the currently running plays and tactics, including the
+     * name of the play, and which robots are running which tactics
+     *
+     * @return information about the currently running plays and tactics
+     */
+    virtual PlayInfo getPlayInfo() = 0;
 
     virtual ~HL() = default;
 };

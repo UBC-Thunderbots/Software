@@ -1,63 +1,57 @@
-#include "robot_team_filter.h"
+#include "network_input/filter/robot_team_filter.h"
 
 #include <algorithm>
-#include <iomanip>
+#include <cmath>
 #include <vector>
 
-#include "robot_filter.h"
+#include "util/constants.h"
+
 
 RobotTeamFilter::RobotTeamFilter() {}
 
-std::vector<FilteredRobotData> RobotTeamFilter::getFilteredData(
-    const std::vector<SSLRobotData> &new_team_data)
+Team RobotTeamFilter::getFilteredData(
+    const Team &current_team_state,
+    const std::vector<SSLRobotDetection> &new_robot_detections)
 {
-    std::vector<FilteredRobotData> result;
-
-    for (auto new_robot_data : new_team_data)
+    // Add filters for any robot we haven't seen before
+    for (auto detection : new_robot_detections)
     {
-        if (robot_map.count(new_robot_data.id) == 0)
+        if (robot_filters.find(detection.id) == robot_filters.end())
         {
-            robot_map.insert(std::make_pair(
-                new_robot_data.id,
-                RobotData(new_robot_data.position, new_robot_data.orientation,
-                          new_robot_data.timestamp)));
-        }
-        else
-        {
-            double time_difference = std::fabs(new_robot_data.timestamp -
-                                               robot_map.at(new_robot_data.id).timestamp);
-            // If the time difference is 0, we have already received and processed this
-            // data. Do nothing so we do not calculate false values
-            if (time_difference == 0)
-            {
-                continue;
-            }
-
-            // Calculate velocities based on previous values
-            Vector robot_velocity =
-                (new_robot_data.position - robot_map.at(new_robot_data.id).position) /
-                time_difference;
-            AngularVelocity robot_angular_velocity =
-                (new_robot_data.orientation -
-                 robot_map.at(new_robot_data.id).orientation) /
-                time_difference;
-
-            // Update the robot data in the map
-            robot_map.at(new_robot_data.id) =
-                RobotData(new_robot_data.position, new_robot_data.orientation,
-                          new_robot_data.timestamp);
-
-            FilteredRobotData filtered_data;
-            filtered_data.position         = new_robot_data.position;
-            filtered_data.velocity         = robot_velocity;
-            filtered_data.orientation      = new_robot_data.orientation;
-            filtered_data.angular_velocity = robot_angular_velocity;
-            filtered_data.timestamp        = Timestamp::getTimestampNow();
-            filtered_data.id               = new_robot_data.id;
-
-            result.push_back(filtered_data);
+            robot_filters.insert(
+                {detection.id,
+                 RobotFilter(
+                     detection,
+                     Duration::fromMilliseconds(
+                         Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
         }
     }
 
-    return result;
+    // Get the filtered data for each robot from the robot filters. The robot filters
+    // handle robot expiry (robots disappearing after not being detected for a while),
+    // so we ignore any expired robots
+    std::vector<Robot> new_filtered_robot_data;
+    for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
+    {
+        auto data = it->second.getFilteredData(new_robot_detections);
+        if (data)
+        {
+            new_filtered_robot_data.emplace_back(*data);
+        }
+    }
+
+    Team new_team_state = current_team_state;
+    new_team_state.updateRobots(new_filtered_robot_data);
+
+    // Using the most recent timestamp for the team, remove any robots that have not
+    // been detected for a while
+    // TODO: Mathew - The RobotFilter and Team are both handling expiry now?
+    // Just the filter probably should
+    auto most_recent_team_timestamp = new_team_state.lastUpdateTimestamp();
+    if (most_recent_team_timestamp)
+    {
+        new_team_state.removeExpiredRobots(*most_recent_team_timestamp);
+    }
+
+    return new_team_state;
 }

@@ -1,0 +1,10 @@
+<launch>
+
+    <!-- Run all the shared AI nodes -->
+    <include file="$(find thunderbots)/launch/ai.launch" />
+
+    <!-- Launch the grsim_communication node -->
+    <node name="grsim_communication" pkg="thunderbots" type="grsim_communication" output="screen">
+    </node>
+
+</launch>

@@ -8,9 +8,10 @@
         "no-console": false,
         "jsx-no-lambda": false,
         "semicolon": [true, "always", "ignore-bound-class-methods"],
-        "object-literal-sort-keys": [true, "shorthand-first"],
+        "object-literal-sort-keys": false,
         "variable-name": false,
         "quotemark": [true, "single", "jsx-double"],
-        "no-string-literal": false
+        "no-string-literal": false,
+        "no-bitwise": false
     }
 }

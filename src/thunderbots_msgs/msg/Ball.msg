@@ -1,7 +1,7 @@
 # Describes the current state of the ball
 
-# The timestamp when this data was received, in microseconds
-int64 timestamp_microseconds
+# The timestamp of this data in seconds
+float64 timestamp_seconds
 
 # The position of the ball. Coordinates are in metres
 Point2D position

@@ -4,12 +4,20 @@
 
 #include "shared/constants.h"
 
-Team::Team(const std::chrono::milliseconds robot_expiry_buffer_milliseconds)
+Team::Team(const Duration& robot_expiry_buffer_duration)
     : team_robots(),
       goalie_id(),
-      robot_expiry_buffer_milliseconds(robot_expiry_buffer_milliseconds)
+      robot_expiry_buffer_duration(robot_expiry_buffer_duration)
 {
 }
+
+Team::Team(const Duration& robot_expiry_buffer_duration,
+           const std::vector<Robot>& team_robots)
+    : Team(robot_expiry_buffer_duration)
+{
+    updateRobots(team_robots);
+}
+
 
 void Team::updateRobots(const std::vector<Robot>& new_robots)
 {
@@ -46,8 +54,7 @@ void Team::updateState(const Team& new_team_data)
     this->goalie_id = new_team_data.goalie_id;
 }
 
-void Team::updateStateToPredictedState(
-    const std::chrono::steady_clock::time_point timestamp)
+void Team::updateStateToPredictedState(const Timestamp& timestamp)
 {
     // Update the state of all robots to their predicted state
     for (auto it = team_robots.begin(); it != team_robots.end(); it++)
@@ -56,14 +63,19 @@ void Team::updateStateToPredictedState(
     }
 }
 
-void Team::removeExpiredRobots(const std::chrono::steady_clock::time_point timestamp)
+void Team::removeExpiredRobots(const Timestamp& timestamp)
 {
     // Check to see if any Robots have "expired". If it more time than the expiry_buffer
     // has passed, then remove the robot from the team
     for (auto it = team_robots.begin(); it != team_robots.end();)
     {
-        if (std::chrono::duration(timestamp - it->second.lastUpdateTimestamp()) >
-            robot_expiry_buffer_milliseconds)
+        Duration time_diff = timestamp - it->second.lastUpdateTimestamp();
+        if (time_diff.getSeconds() < 0)
+        {
+            throw std::invalid_argument(
+                "Error: tried to remove a robot at a negative time");
+        }
+        if (time_diff > robot_expiry_buffer_duration)
         {
             it = team_robots.erase(it);
         }
@@ -72,6 +84,11 @@ void Team::removeExpiredRobots(const std::chrono::steady_clock::time_point times
             it++;
         }
     }
+}
+
+void Team::removeRobotWithId(unsigned int robot_id)
+{
+    team_robots.erase(robot_id);
 }
 
 void Team::assignGoalie(unsigned int new_goalie_id)
@@ -97,15 +114,14 @@ std::size_t Team::numRobots() const
     return team_robots.size();
 }
 
-std::chrono::milliseconds Team::getRobotExpiryBufferMilliseconds()
+Duration Team::getRobotExpiryBufferDuration() const
 {
-    return robot_expiry_buffer_milliseconds;
+    return robot_expiry_buffer_duration;
 }
 
-void Team::setRobotExpiryBuffer(
-    std::chrono::milliseconds new_robot_expiry_buffer_milliseconds)
+void Team::setRobotExpiryBuffer(const Duration& new_robot_expiry_buffer_duration)
 {
-    robot_expiry_buffer_milliseconds = new_robot_expiry_buffer_milliseconds;
+    robot_expiry_buffer_duration = new_robot_expiry_buffer_duration;
 }
 
 std::optional<Robot> Team::getRobotById(const unsigned int id) const
@@ -129,6 +145,11 @@ std::optional<Robot> Team::goalie() const
     return std::nullopt;
 }
 
+std::optional<unsigned int> Team::getGoalieID() const
+{
+    return goalie_id;
+}
+
 std::vector<Robot> Team::getAllRobots() const
 {
     std::vector<Robot> all_robots;
@@ -145,12 +166,24 @@ void Team::clearAllRobots()
     team_robots.clear();
 }
 
+std::optional<Timestamp> Team::lastUpdateTimestamp() const
+{
+    std::optional<Timestamp> most_recent_timestamp = std::nullopt;
+    for (Robot& robot : getAllRobots())
+    {
+        if (!most_recent_timestamp || robot.lastUpdateTimestamp() > most_recent_timestamp)
+        {
+            most_recent_timestamp = robot.lastUpdateTimestamp();
+        }
+    }
+    return most_recent_timestamp;
+}
+
 bool Team::operator==(const Team& other) const
 {
     return this->getAllRobots() == other.getAllRobots() &&
            this->goalie_id == other.goalie_id &&
-           this->robot_expiry_buffer_milliseconds ==
-               other.robot_expiry_buffer_milliseconds;
+           this->robot_expiry_buffer_duration == other.robot_expiry_buffer_duration;
 }
 
 bool Team::operator!=(const Team& other) const

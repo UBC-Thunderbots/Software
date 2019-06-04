@@ -1,32 +1,50 @@
-#include "move_intent.h"
+#include "ai/intent/move_intent.h"
+
+#include "ai/intent/visitor/intent_visitor.h"
+#include "util/logger/init.h"
+
+const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed)
-    : robot_id(robot_id), dest(dest), final_angle(final_angle), final_speed(final_speed)
+                       double final_speed, unsigned int priority, bool enable_dribbler,
+                       bool enable_autokick)
+    : MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler,
+                    enable_autokick),
+      Intent(priority),
+      flags(MoveFlags::NONE)
 {
 }
 
-unsigned int MoveIntent::getRobotId() const
+std::string MoveIntent::getIntentName(void) const
 {
-    return robot_id;
+    return INTENT_NAME;
 }
 
-std::string MoveIntent::getIntentName() const
+void MoveIntent::setMoveFlags(MoveFlags flags)
 {
-    return MOVE_INTENT_NAME;
+    if (!isMoveFlagValid(flags))
+    {
+        LOG(WARNING) << "Invalid MoveFlags set" << std::endl;
+    }
+    this->flags = flags;
 }
 
-Point MoveIntent::getDestination() const
+MoveFlags MoveIntent::getMoveFlags()
 {
-    return dest;
+    return flags;
 }
 
-Angle MoveIntent::getFinalAngle() const
+void MoveIntent::accept(IntentVisitor &visitor) const
 {
-    return final_angle;
+    visitor.visit(*this);
 }
 
-double MoveIntent::getFinalSpeed() const
+bool MoveIntent::operator==(const MoveIntent &other) const
 {
-    return final_speed;
+    return MovePrimitive::operator==(other) && Intent::operator==(other);
+}
+
+bool MoveIntent::operator!=(const MoveIntent &other) const
+{
+    return !((*this) == other);
 }

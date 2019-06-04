@@ -11,3 +11,7 @@
 # large diffs
 package-lock.json   binary
 yarn.lock           binary
+
+# Set yarn release as a binary
+yarn-*.js	    binary
+

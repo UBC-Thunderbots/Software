@@ -19,7 +19,7 @@ const generalWebpackBuild = {
         rules: [
             {
                 test: /\.tsx?$/,
-                exclude: /node_modules/,
+                exclude: [/node_modules/, /__.*__/],
                 use: {
                     loader: 'ts-loader',
                 },
@@ -38,7 +38,7 @@ const generalWebpackBuild = {
                 use: ['style-loader', 'css-loader'],
             },
             {
-                test: /\.(png|jpg|gif|svg)$/,
+                test: /\.(jpe?g|gif|bmp|mp3|mp4|ogg|wav|eot|ttf|woff|woff2|png|svg)$/,
                 use: [
                     {
                         loader: 'file-loader',
@@ -60,7 +60,7 @@ const generalWebpackBuild = {
     },
 };
 
-// Client build configuration
+// Build configurations
 module.exports = {
     ...generalWebpackBuild,
     // Our project entry point.

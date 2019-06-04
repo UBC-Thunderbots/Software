@@ -7,9 +7,6 @@
 /*
  * Unit tests for the unit test utilities
  */
-
-using namespace std::chrono;
-
 TEST(TestUtilsTest, create_testing_field)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
@@ -28,8 +25,9 @@ TEST(TestUtilsTest, create_testing_field)
     EXPECT_EQ(Point(4.5, 0.5), field.enemyGoalpostPos());
     EXPECT_EQ(Point(4.5, -0.5), field.enemyGoalpostNeg());
 
-    EXPECT_EQ(Rect(Point(-4.5, 1.0), Point(-3.5, -1.0)), field.friendlyDefenseArea());
-    EXPECT_EQ(Rect(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(-4.5, 1.0), Point(-3.5, -1.0)),
+              field.friendlyDefenseArea());
+    EXPECT_EQ(Rectangle(Point(4.5, 1.0), Point(3.5, -1.0)), field.enemyDefenseArea());
 
     EXPECT_EQ(Point(-3.5, 0.0), field.penaltyFriendly());
     EXPECT_EQ(Point(3.5, 0.0), field.penaltyEnemy());
@@ -45,9 +43,9 @@ TEST(TestUtilsTest, create_testing_world)
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     EXPECT_EQ(::Test::TestUtil::createSSLDivBField(), world.field());
-    EXPECT_EQ(Team(milliseconds(1000)), world.friendlyTeam());
-    EXPECT_EQ(Team(milliseconds(1000)), world.enemyTeam());
-    EXPECT_EQ(Ball(Point(), Vector()), world.ball());
+    EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world.friendlyTeam());
+    EXPECT_EQ(Team(Duration::fromMilliseconds(1000)), world.enemyTeam());
+    EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
 }
 
 TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_positive_number_of_robots)
@@ -55,7 +53,7 @@ TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_positive_number_o
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     world = ::Test::TestUtil::setFriendlyRobotPositions(
-        world, {Point(), Point(-4, 1.2), Point(2.2, -0.1)});
+        world, {Point(), Point(-4, 1.2), Point(2.2, -0.1)}, Timestamp::fromSeconds(0));
 
     EXPECT_EQ(3, world.friendlyTeam().numRobots());
     EXPECT_EQ(0, world.enemyTeam().numRobots());
@@ -70,7 +68,8 @@ TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_positive_number_of_r
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
     world = ::Test::TestUtil::setEnemyRobotPositions(
-        world, {world.field().enemyGoal(), world.field().friendlyCornerPos()});
+        world, {world.field().enemyGoal(), world.field().friendlyCornerPos()},
+        Timestamp::fromSeconds(0));
 
     EXPECT_EQ(2, world.enemyTeam().numRobots());
     EXPECT_EQ(world.field().enemyGoal(), (*world.enemyTeam().getRobotById(0)).position());
@@ -84,7 +83,8 @@ TEST(TestUtilsTest, set_friendly_robot_positions_in_world_with_zero_robots)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = ::Test::TestUtil::setFriendlyRobotPositions(world, {});
+    world =
+        ::Test::TestUtil::setFriendlyRobotPositions(world, {}, Timestamp::fromSeconds(0));
 
     EXPECT_EQ(0, world.friendlyTeam().numRobots());
 }
@@ -93,7 +93,8 @@ TEST(TestUtilsTest, set_enemy_robot_positions_in_world_with_zero_robots)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = ::Test::TestUtil::setEnemyRobotPositions(world, {});
+    world =
+        ::Test::TestUtil::setEnemyRobotPositions(world, {}, Timestamp::fromSeconds(0));
 
     EXPECT_EQ(0, world.enemyTeam().numRobots());
 }
@@ -102,7 +103,8 @@ TEST(TestUtilsTest, set_ball_position_in_world)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = ::Test::TestUtil::setBallPosition(world, Point(-0.2, 3.11));
+    world = ::Test::TestUtil::setBallPosition(world, Point(-0.2, 3.11),
+                                              Timestamp::fromSeconds(0));
     EXPECT_EQ(Point(-0.2, 3.11), world.ball().position());
     EXPECT_EQ(Vector(), world.ball().velocity());
 }
@@ -111,7 +113,8 @@ TEST(TestUtilsTest, set_ball_velocity_in_world)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    world = ::Test::TestUtil::setBallVelocity(world, Vector(0, -2));
+    world = ::Test::TestUtil::setBallVelocity(world, Vector(0, -2),
+                                              Timestamp::fromSeconds(0));
     EXPECT_EQ(Point(), world.ball().position());
     EXPECT_EQ(Vector(0, -2), world.ball().velocity());
 }
@@ -121,7 +124,7 @@ TEST(TestUtilsTest, has_all_valid_refbox_game_states)
     std::vector game_states = ::Test::TestUtil::getAllRefboxGameStates();
     // only way to test this getAllRefboxGameStates() without a literal copy-paste
     // of the implementation
-    // note that this array does not contain RefboxGameState::LAST_ENUM_ITEM_UNUSED,
+    // note that this array does not contain RefboxGameState::REFBOX_GAME_STATE_COUNT,
     // this is intentional
     std::vector<RefboxGameState> expected_game_states = {
         RefboxGameState::HALT,

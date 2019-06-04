@@ -463,7 +463,7 @@ inline constexpr Point operator+(const Point &p, const Point &q)
 
 inline Point &operator+=(Point &p, const Point &q)
 {
-    p.set(q.x(), q.y());
+    p.set(p.x() + q.x(), p.y() + q.y());
     return p;
 }
 
@@ -479,7 +479,7 @@ inline constexpr Point operator-(const Point &p, const Point &q)
 
 inline Point &operator-=(Point &p, const Point &q)
 {
-    p.set(q.x(), q.y());
+    p.set(p.x() - q.x(), p.y() - q.y());
     return p;
 }
 
