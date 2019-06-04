@@ -560,6 +560,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/movespin_action.cpp
             ai/hl/stp/action/pivot_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/intent/intent.cpp
             ai/intent/chip_intent.cpp
             ai/intent/dribble_intent.cpp
@@ -567,13 +568,17 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
             ai/intent/pivot_intent.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/chip_primitive.cpp
-            ai/primitive/dribble_primitive.cpp
-            ai/primitive/kick_primitive.cpp
+            ai/intent/stop_intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/intent/chip_intent.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/world/robot.cpp
             ai/world/ball.cpp
             test/ai/hl/stp/action/main.cpp
@@ -585,6 +590,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/action/move_action.cpp
             test/ai/hl/stp/action/movespin_action.cpp
             test/ai/hl/stp/action/pivot_action.cpp
+            test/ai/hl/stp/action/stop_action.cpp
             geom/polygon.cpp
             geom/util.cpp
             util/logger/custom_g3log_sinks.h
@@ -604,21 +610,25 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
             ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/passer_tactic.cpp
             ai/hl/stp/tactic/receiver_tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
@@ -634,6 +644,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/move_tactic.cpp
             test/ai/hl/stp/tactic/passer_tactic.cpp
             test/ai/hl/stp/tactic/receiver_tactic.cpp
+            test/ai/hl/stp/tactic/stop_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
@@ -655,11 +666,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/play/example_play.cpp
+            ai/hl/stp/play/stop_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
             ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
@@ -678,6 +692,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             geom/util.cpp
             test/ai/hl/stp/play/example_play.cpp
+            test/ai/hl/stp/play/stop_play.cpp
             test/ai/hl/stp/play/main.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
