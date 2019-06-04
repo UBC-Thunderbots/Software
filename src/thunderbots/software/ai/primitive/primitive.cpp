@@ -2,15 +2,6 @@
 
 #include <exception>
 
-#include "ai/primitive/catch_primitive.h"
-#include "ai/primitive/chip_primitive.h"
-#include "ai/primitive/direct_velocity_primitive.h"
-#include "ai/primitive/kick_primitive.h"
-#include "ai/primitive/move_primitive.h"
-#include "ai/primitive/pivot_primitive.h"
-#include "ai/primitive/stop_primitive.h"
-
-
 thunderbots_msgs::Primitive Primitive::createMsg() const
 {
     thunderbots_msgs::Primitive primitive_msg;
