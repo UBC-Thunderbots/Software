@@ -12,26 +12,55 @@
 #include "ai/hl/stp/tactic/tactic.h"
 #include "ai/intent/stop_intent.h"
 #include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 
 STP::STP(long random_seed) : random_number_generator(random_seed) {}
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
+    bool override_play = Util::DynamicParameters::AI::override_ai_play.value();
+    bool override_play_value_changed =
+        Util::DynamicParameters::AI::override_ai_play.valueChanged();
+    std::string override_play_name = Util::DynamicParameters::AI::current_ai_play.value();
+    bool override_play_name_value_changed =
+        Util::DynamicParameters::AI::current_ai_play.valueChanged();
+    auto all_play_names = PlayFactory::getRegisteredPlayNames();
+
     // Assign a new play if we don't currently have a play assigned, the current play's
     // invariant no longer holds, or the current play is done
-    if (!current_play || !current_play->invariantHolds(world) || current_play->done())
+    if (!current_play || !current_play->invariantHolds(world) || current_play->done() ||
+        override_play_name_value_changed || override_play_value_changed)
     {
-        try
+        if (override_play)
         {
-            current_play = calculateNewPlay(world);
+            if (std::find(all_play_names.begin(), all_play_names.end(),
+                          override_play_name) != all_play_names.end())
+            {
+                current_play = PlayFactory::createPlay(override_play_name);
+            }
+            else
+            {
+                LOG(WARNING) << "Error: The Play \"" << override_play_name
+                             << "\" specified in the override is not valid." << std::endl;
+                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
+                             << std::endl;
+                current_play = PlayFactory::createPlay(StopPlay::name);
+            }
         }
-        catch (const std::runtime_error& e)
+        else
         {
-            LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
-                         << std::endl;
-            LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
-                         << std::endl;
-            current_play = PlayFactory::createPlay(StopPlay::name);
+            try
+            {
+                current_play = calculateNewPlay(world);
+            }
+            catch (const std::runtime_error& e)
+            {
+                LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
+                             << std::endl;
+                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
+                             << std::endl;
+                current_play = PlayFactory::createPlay(StopPlay::name);
+            }
         }
     }
 
