@@ -85,7 +85,8 @@ TEST(NavUtilTest, convertPointsToMovePrimitives_test)
 
     std::vector<Point> points = {point1, point2, point3};
 
-    std::vector<MovePrimitive> movePrimitives = convertToMovePrimitives(robot_id, points, false, false);
+    std::vector<MovePrimitive> movePrimitives =
+        convertToMovePrimitives(robot_id, points, false, false);
 
     // testing point 1
     MovePrimitive movePrimitive1 = movePrimitives.at(0);
@@ -114,7 +115,8 @@ TEST(NavUtilTest, convertNoPointsToMovePrimitives_test)
     unsigned int robot_id = 1;
 
     std::vector<Point> points = {};
-    std::vector<MovePrimitive> movePrimitives = convertToMovePrimitives(robot_id, points, false, false);
+    std::vector<MovePrimitive> movePrimitives =
+        convertToMovePrimitives(robot_id, points, false, false);
 
     EXPECT_THROW(movePrimitives.at(0), std::out_of_range);
 }
