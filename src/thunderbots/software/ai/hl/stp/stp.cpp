@@ -34,13 +34,13 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     }
 
     // Run the current play
-    auto tactics = current_play->getTactics(world);
+    current_tactics = current_play->getTactics(world);
 
     std::vector<std::unique_ptr<Intent>> intents;
-    if (tactics)
+    if (current_tactics)
     {
         // Assign robots to tactics
-        auto assigned_tactics = assignRobotsToTactics(world, *tactics);
+        auto assigned_tactics = assignRobotsToTactics(world, *current_tactics);
 
         for (const auto& tactic : assigned_tactics)
         {
@@ -168,4 +168,52 @@ std::optional<std::string> STP::getCurrentPlayName() const
     }
 
     return std::nullopt;
+}
+
+PlayInfo STP::getPlayInfo()
+{
+    PlayInfo info;
+    info.play_type = "Unknown";
+    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "None";
+
+    // Sort the tactics by the id of the robot they are assigned to, so we can report the
+    // tactics in order or robot id. This makes it much easier to read if tactics or
+    // robots change, since the order of the robots won't change
+    if (current_play && current_tactics)
+    {
+        auto compare_tactic_by_robot_id = [](auto t1, auto t2) {
+            if (t1->getAssignedRobot() && t2->getAssignedRobot())
+            {
+                return t1->getAssignedRobot()->id() < t2->getAssignedRobot()->id();
+            }
+            else if (!t1->getAssignedRobot() && t2->getAssignedRobot())
+            {
+                return false;
+            }
+            else if (t1->getAssignedRobot() && !t2->getAssignedRobot())
+            {
+                return true;
+            }
+            else
+            {
+                return true;
+            }
+        };
+        auto tactics = *current_tactics;
+        std::sort(tactics.begin(), tactics.end(), compare_tactic_by_robot_id);
+
+        for (const auto& tactic : tactics)
+        {
+            auto robot = tactic->getAssignedRobot();
+            if (!robot)
+            {
+                continue;
+            }
+            std::string s = "Robot " + std::to_string(tactic->getAssignedRobot()->id()) +
+                            "  -  " + tactic->getName();
+            info.robot_tactic_assignment.emplace_back(s);
+        }
+    }
+
+    return info;
 }
