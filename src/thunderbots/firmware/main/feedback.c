@@ -47,8 +47,6 @@ static bool has_ball_after_antispam = false;
 static bool build_ids_pending = false;
 static TaskHandle_t feedback_task_handle;
 
-static int NUM_SENDS_BEFORE_CRASH = 10;
-
 static void feedback_task(void *UNUSED(param)) {
 	static uint8_t nullary_frame[] = {
 		9U, // Header length
@@ -227,10 +225,6 @@ static void feedback_task(void *UNUSED(param)) {
 				// So, try delivering the message again later.
 				pending_events |= EVENT_SEND_AUTOKICK;
 			}
-		}
-		if (--NUM_SENDS_BEFORE_CRASH < 0)
-		{
-			abort();
 		}
 	}
 
