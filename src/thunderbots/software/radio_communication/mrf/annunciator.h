@@ -16,7 +16,8 @@ class Annunciator
     explicit Annunciator(ros::NodeHandle& node_handle);
 
     /**
-     * Handles diagnostics for each robot.
+     * Handles diagnostics and messages for each robot.
+     * Returns a boolean if there were new messages since the last status update.
      *
      * @param index Robot number.
      * @param data The data of the status packet.
@@ -24,7 +25,7 @@ class Annunciator
      * @param lqi Link quality.
      * @param rssi Received signal strength indicator.
      *
-     * @return true if a dongle beep is required, false otherwise
+     * @return true if new messages since last status update
      */
     bool handle_robot_message(int index, const void* data, std::size_t len, uint8_t lqi,
                               uint8_t rssi);
@@ -34,7 +35,7 @@ class Annunciator
      *
      * @param status The uint8 encoding all the status data.
      */
-    void handle_status(uint8_t status);
+    void handle_dongle_messages(uint8_t status);
 
    private:
     ros::Publisher robot_status_publisher;

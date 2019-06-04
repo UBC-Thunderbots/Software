@@ -304,7 +304,8 @@ void MRFDongle::handle_status(AsyncOperation<void> &)
 {
     status_transfer.result();
     estop_state = static_cast<EStopState>(status_transfer.data()[0] & 3U);
-    annunciator.handle_status(status_transfer.data()[0U]);
+    // TODO: beep on thesemessages later?
+    annunciator.handle_dongle_messages(status_transfer.data()[0U]);
     status_transfer.submit();
 }
 

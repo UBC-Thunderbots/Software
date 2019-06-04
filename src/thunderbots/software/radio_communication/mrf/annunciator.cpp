@@ -78,7 +78,7 @@ namespace
         std::vector<std::string> old_msgs;
 
         // Map of message to timestamp for edge-triggered messages
-        std::map<std::string, time_t> edge_triggered_msg_map;
+        std::map<std::string, time_t> et_messages;
 
     } RobotStatusState;
 
@@ -239,8 +239,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
                                             robot_status_states[index]
-                                                .edge_triggered_msg_map
-                                                    [MRF::ERROR_ET_MESSAGES[i]] =
+                                                .et_messages[MRF::ERROR_ET_MESSAGES[i]] =
                                                 time(nullptr);
                                         }
                                     }
@@ -335,7 +334,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    for (auto const &et_msg : robot_status_states[index].edge_triggered_msg_map)
+    for (auto const &et_msg : robot_status_states[index].et_messages)
     {
         if (difftime(time(nullptr), et_msg.second) < ET_MESSAGE_KEEPALIVE_TIME)
         {
@@ -368,7 +367,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     return to_beep;
 }
 
-void Annunciator::handle_status(uint8_t status)
+void Annunciator::handle_dongle_messages(uint8_t status)
 {
     dongle_messages.clear();
 
