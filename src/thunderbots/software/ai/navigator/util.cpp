@@ -37,10 +37,6 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
         movePrimitives.emplace_back(movePrimitive);
     }
 
-    for (const Point &point : points)
-    {
-    }
-
     return movePrimitives;
 }
 

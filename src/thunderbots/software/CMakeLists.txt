@@ -325,6 +325,10 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/util.cpp
             ai/navigator/util.cpp
             ai/navigator/util.h
+            ai/primitive/move_primitive.cpp
+            ai/primitive/move_primitive.h
+            ai/primitive/primitive.h
+            ai/primitive/primitive.cpp
             geom/point.h)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
