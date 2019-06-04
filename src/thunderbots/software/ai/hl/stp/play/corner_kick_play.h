@@ -24,7 +24,7 @@ class CornerKickPlay : public Play
 private:
 
     // The minimum score a pass must have before we will try to take it
-    static constexpr double MIN_PASS_SCORE = 0.2;
+    static constexpr double MIN_PASS_SCORE = 0.3;
 
     /**
      * Updates the given cherry-pick tactics

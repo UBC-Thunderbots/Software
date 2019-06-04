@@ -160,7 +160,7 @@ Vector MotionController::determineLinearVelocityFromPosition(
     // a square root-esque function of the distance to the destination. This allows us to
     // bring the robot velocity to zero as we approach the destination
     double new_robot_velocity_magnitude =
-        std::sqrt(std::max<double>((dest - robot.position()).len() - 0.01, 0)) * 2 +
+        std::sqrt(std::max<double>((dest - robot.position()).len() - 0.01, 0)) +
         desired_final_speed;
 
     // https://github.com/UBC-Thunderbots/Software/issues/270

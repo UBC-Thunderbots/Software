@@ -32,7 +32,9 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
-    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, Rectangle(world.field().friendlyCornerPos(), world.field().enemyGoal()), true);
+    //auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, Rectangle(world.field().friendlyCornerPos(), world.field().enemyGoal()), true);
+    //auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, Rectangle({-0.5, -0.5}, {0.5, 0.5}), true);
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, world.field().enemyDefenseArea(), true);
 
     PassGenerator pass_generator(world, world.ball().position());
 
@@ -109,7 +111,7 @@ void CornerKickPlay::updateAlignToBallTactic(
 
 void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator) {
     pass_generator.setWorld(world);
-    pass_generator.setPasserPoint(world.ball().position());
+//    pass_generator.setPasserPoint(world.ball().position());
 }
 
 // Register this play in the PlayFactory

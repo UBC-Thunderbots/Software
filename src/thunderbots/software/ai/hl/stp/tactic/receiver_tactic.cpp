@@ -87,10 +87,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
     // Vector from the ball to the robot
     Vector ball_to_robot_vector = ball.position() - robot->position();
-
     std::optional<std::pair<Point, Angle>> best_shot = findFeasibleShot();
     if (best_shot)
     {
+        std::cout << "one-time shot" << std::endl;
         auto [best_shot_target, _] = *best_shot;
 
         // The angle between the ball velocity and a vector from the ball to the robot
@@ -114,11 +114,13 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             ball_robot_angle =
                 ball_velocity.orientation().minDiff(ball_to_robot_vector.orientation());
         }
+        std::cout << "Receiver tatic - done" << std::endl;
     }
     // If we can't shoot on the enemy goal, just try to receive the pass as cleanly as
     // possible
     else
     {
+        std::cout << "dribbling" << std::endl;
         while ((ball.position() - robot->position()).len() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
