@@ -57,13 +57,8 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     //                 X |      \     /
     //                   |       \   /
     //                   |        \ /
-    //                   >         A       <
-    //                                     |
-    //                                     | 0 dist (Point A is where the ball is)
-    //                                     |
-    //                             O       |
-    //             ball ->        O O      <
-    //                             O
+    //                   >         A
+    //             ball ->         O
     //
     //                             |
     //                             V
