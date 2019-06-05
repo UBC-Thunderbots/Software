@@ -1,5 +1,5 @@
-/*
- * This file defines the UI to control the layers in the Canvas
+/***
+ * This file defines the UI to view the current tactic
  */
 
 import { Box } from '@rebass/grid';
@@ -13,15 +13,11 @@ interface IPlayTypeProps {
 }
 
 /**
- * Describes a panel showing the active layers inside the application.
- *
- * Supports an empty state
+ * Describes a panel showing the current tactics in the AI.
  */
 export const PlayTypePanel = (props: IPlayTypeProps) => {
     const { playType, playName, tactics } = props;
 
-    // If number of layers to display is 0, show a screen to indicate that there
-    // is no layers.
     return (
         <Box
             width="100%"

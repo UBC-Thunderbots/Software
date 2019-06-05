@@ -6,7 +6,7 @@ import { storiesOf } from '@storybook/react';
 import * as React from 'react';
 
 import { StorybookStage } from 'SRC/components/StorybookStage';
-import { LayersPanel } from '../index';
+import { LayersPanel } from '..';
 
 const stories = storiesOf('Layers Panel', module);
 

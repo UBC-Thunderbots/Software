@@ -8,13 +8,14 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 
-import { LayersPanel } from 'SRC/pages/Visualizer/panels/LayersPanel';
 import { Portal, PortalLocation } from 'SRC/components/Portal';
 import { SPRITESHEET } from 'SRC/constants';
 import { Canvas, CanvasManager, LayerReceiver } from 'SRC/containers/Canvas';
 import { actions, RootAction } from 'SRC/store';
 import { ILayer, IRootState } from 'SRC/types';
-import { PlayTypePanel } from './panels/PlayTypePanel/index';
+
+import { LayersPanel } from './panels/LayersPanel';
+import { PlayTypePanel } from './panels/PlayTypePanel';
 
 // We request the layer data from the store
 const mapStateToProps = (state: IRootState) => ({
