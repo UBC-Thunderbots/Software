@@ -131,6 +131,8 @@ file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
         )
 add_executable (network_input
         ${PROTO_SRCS}
@@ -157,7 +159,8 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-        )
+	)
+
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
@@ -325,24 +328,6 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(nav_ph_obstacle_test
-            test/ai/navigator/obstacle/placeholder_obstacle.cpp
-            ai/world/robot.cpp
-            ai/navigator/obstacle/placeholder_obstacle.cpp
-            ai/navigator/obstacle/placeholder_obstacle.h
-            ai/navigator/obstacle/obstacle.h
-            util/time/duration.cpp
-            util/time/time.cpp
-            util/time/timestamp.cpp
-            geom/polygon.h
-            geom/polygon.cpp
-            geom/point.h
-            geom/util.cpp
-            ../shared/constants.h
-            )
-
-    target_link_libraries(nav_ph_obstacle_test ${catkin_LIBRARIES})
-
     catkin_add_gtest(shared_util_test
             ../shared/test/util.cpp
             ../shared/util.c
@@ -430,11 +415,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/util.cpp
             grsim_communication/grsim_backend.cpp
             grsim_communication/grsim_command_primitive_visitor.cpp
             grsim_communication/motion_controller.cpp
+            test/grsim_communication/dribble_primitive.cpp
             test/grsim_communication/grsim_backend.cpp
             test/grsim_communication/catch_primitive.cpp
+            test/grsim_communication/pivot_primitive.cpp
             test/grsim_communication/movespin_primitive.cpp
             test/grsim_communication/main.cpp
             test/grsim_communication/motion_controller.cpp
@@ -523,6 +511,10 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(ai_evaluation_test
             ai/evaluation/pass.cpp
+            ai/hl/stp/evaluation/ball.cpp
+            ai/hl/stp/evaluation/calc_best_shot.cpp
+            ai/hl/stp/evaluation/possession.cpp
+            ai/hl/stp/evaluation/enemy_threat.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/intercept.cpp
@@ -536,10 +528,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             geom/rectangle.cpp
             geom/util.cpp
-            test/ai/evaluation/indirect_chip.cpp
+            test/ai/hl/stp/evaluation/indirect_chip.cpp
+            test/ai/hl/stp/evaluation/calc_best_shot.cpp
+            test/ai/hl/stp/evaluation/ball.cpp
+            test/ai/hl/stp/evaluation/possession.cpp
+            test/ai/hl/stp/evaluation/enemy_threat.cpp
             test/ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             test/ai/hl/stp/evaluation/main.cpp
-            test/ai/hl/stp/evaluation/pass.cpp
+            test/ai/hl/stp/evaluation/intercept.cpp
             test/ai/hl/stp/evaluation/robot.cpp
             test/ai/hl/stp/evaluation/team.cpp
             test/test_util/test_util.cpp
@@ -553,28 +549,37 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/chip_action.cpp
+            ai/hl/stp/action/dribble_action.cpp
+            ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/movespin_action.cpp
-            ai/hl/stp/action/kick_action.cpp
-            ai/hl/stp/action/chip_action.cpp
+            ai/hl/stp/action/pivot_action.cpp
             ai/intent/intent.cpp
+            ai/intent/chip_intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
-            ai/intent/kick_intent.cpp
-            ai/intent/chip_intent.cpp
+            ai/intent/pivot_intent.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
-            ai/primitive/kick_primitive.cpp
-            ai/primitive/chip_primitive.cpp
-            ai/primitive/primitive.cpp
+            ai/primitive/pivot_primitive.cpp
             ai/world/robot.cpp
+            ai/world/ball.cpp
             test/ai/hl/stp/action/main.cpp
             test/ai/hl/stp/test_actions/move_test_action.cpp
             test/ai/hl/stp/action/action.cpp
+            test/ai/hl/stp/action/chip_action.cpp
+            test/ai/hl/stp/action/dribble_action.cpp
+            test/ai/hl/stp/action/kick_action.cpp
             test/ai/hl/stp/action/move_action.cpp
             test/ai/hl/stp/action/movespin_action.cpp
-            test/ai/hl/stp/action/kick_action.cpp
-            test/ai/hl/stp/action/chip_action.cpp
+            test/ai/hl/stp/action/pivot_action.cpp
             geom/polygon.cpp
             geom/util.cpp
             util/logger/custom_g3log_sinks.h
@@ -590,13 +595,24 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(tactic_test
+            ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
-            ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
+            ai/hl/stp/tactic/cherry_pick_tactic.cpp
+            ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/passer_tactic.cpp
+            ai/hl/stp/tactic/receiver_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
+            ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
+            ai/passing/evaluation.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
+            ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
@@ -605,15 +621,21 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            geom/polygon.cpp
+            geom/util.cpp
+            test/ai/hl/stp/tactic/block_shot_path_tactic.cpp
+            test/ai/hl/stp/tactic/cherry_pick_tactic.cpp
             test/ai/hl/stp/tactic/main.cpp
             test/ai/hl/stp/tactic/move_tactic.cpp
-            test/ai/hl/stp/tactic/block_shot_path_tactic.cpp
+            test/ai/hl/stp/tactic/passer_tactic.cpp
+            test/ai/hl/stp/tactic/receiver_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
-            geom/util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
+            util/math_functions.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
@@ -625,8 +647,10 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES})
 
     catkin_add_gtest(play_test
+            ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/play/example_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
@@ -635,30 +659,35 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
+            ai/passing/evaluation.cpp
+            ai/passing/pass.cpp
+            ai/passing/pass_generator.cpp
             ai/primitive/move_primitive.cpp
-            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
             ai/world/game_state.cpp
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
-            test/ai/hl/stp/play/main.cpp
+            geom/util.cpp
             test/ai/hl/stp/play/example_play.cpp
+            test/ai/hl/stp/play/main.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_plays/stop_test_play.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             test/test_util/test_util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
             util/logger/custom_g3log_sinks.h
             util/logger/init.h
+            util/math_functions.cpp
             util/parameter/dynamic_parameters.cpp
-            util/time/timestamp.cpp
-            util/time/time.cpp
             util/time/duration.cpp
-            geom/util.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
             )
     target_link_libraries(play_test
             ${catkin_LIBRARIES}
@@ -759,6 +788,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/pass.cpp
             test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            util/math_functions.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
@@ -770,6 +801,12 @@ if (CATKIN_ENABLE_TESTING)
             test/util/gradient_descent_optimizer.cpp
             )
     target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
+
+    catkin_add_gtest(math_functions_test
+            test/util/math_functions.cpp
+            util/math_functions.cpp
+            )
+    target_link_libraries(math_functions_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
@@ -790,7 +827,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
-  
+
     catkin_add_gtest(navigator_test
             ai/intent/catch_intent.cpp
             ai/intent/chip_intent.cpp
@@ -824,11 +861,26 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/main.cpp
             test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             test/test_util/test_util.cpp
+            test/ai/navigator/obstacle/obstacle.cpp
+            test/ai/navigator/trespass/trespass.cpp
+            test/ai/navigator/path_planner/straight_line_path_planner.cpp
             util/parameter/dynamic_parameter_utils.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/duration.cpp
             util/time/time.cpp
             util/time/timestamp.cpp
+            util/math_functions.cpp
+            geom/angle.h
+            geom/point.h
+            geom/polygon.h
+            geom/polygon.cpp
+            geom/util.h
+            geom/util.cpp
+            ../shared/constants.h
+            ai/navigator/obstacle/obstacle.cpp
+            ai/navigator/obstacle/obstacle.h
+            ai/navigator/trespass.cpp
+            ai/navigator/path_planner/straight_line_path_planner.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}
@@ -844,6 +896,21 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG})
 
+
+    catkin_add_gtest(robot_filter_test
+            test/network_input/filter/robot_filter.cpp
+            test/network_input/filter/main.cpp
+            network_input/filter/robot_filter.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            ai/world/robot.cpp
+            )
+    target_link_libraries(robot_filter_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+    
 endif()
 
 ##### ROSTests / Integration Tests #####

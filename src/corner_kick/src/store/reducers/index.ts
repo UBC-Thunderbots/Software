@@ -4,6 +4,7 @@
 
 import { combineReducers } from 'redux';
 
+import canvasReducer from './canvas';
 import consoleReducer from './console';
 import rosReducer from './ros';
 import rosParametersReducer from './rosParameters';
@@ -13,6 +14,7 @@ import rosParametersReducer from './rosParameters';
  * initialized
  */
 export default combineReducers({
+    canvas: canvasReducer,
     console: consoleReducer,
     ros: rosReducer,
     rosParameters: rosParametersReducer,

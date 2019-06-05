@@ -275,13 +275,12 @@ TEST(PrimitiveFactoryTest, convert_DribblePrimitive_to_message_and_back_to_MoveP
 {
     const Point destination       = Point(-3, -3);
     const Angle final_angle       = Angle::ofRadians(4.55);
-    const double final_speed      = 4.22;
     const double rpm              = 4.5;
     const bool small_kick_allowed = false;
     const unsigned int robot_id   = 0U;
 
-    DribblePrimitive dribble_prim = DribblePrimitive(
-        robot_id, destination, final_angle, final_speed, rpm, small_kick_allowed);
+    DribblePrimitive dribble_prim =
+        DribblePrimitive(robot_id, destination, final_angle, rpm, small_kick_allowed);
 
     thunderbots_msgs::Primitive prim_message = dribble_prim.createMsg();
 
@@ -298,7 +297,6 @@ TEST(PrimitiveFactoryTest, convert_DribblePrimitive_to_message_and_back_to_MoveP
     EXPECT_DOUBLE_EQ(destination.x(), params[0]);
     EXPECT_DOUBLE_EQ(destination.y(), params[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), params[2]);
-    EXPECT_DOUBLE_EQ(final_speed, params[3]);
-    EXPECT_DOUBLE_EQ(rpm, params[4]);
+    EXPECT_DOUBLE_EQ(rpm, params[3]);
     EXPECT_EQ(small_kick_allowed, extraBits[0]);
 }

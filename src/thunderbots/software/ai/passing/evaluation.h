@@ -10,9 +10,7 @@
 #include "ai/world/field.h"
 #include "ai/world/team.h"
 #include "ai/world/world.h"
-#include "geom/circle.h"
-#include "geom/point.h"
-#include "geom/rectangle.h"
+#include "util/math_functions.h"
 
 namespace AI::Passing
 {
@@ -23,12 +21,18 @@ namespace AI::Passing
      * @param pass The pass to rate
      * @param target_region The area we want to pass to (if there is a specific area,
      *                      set to `std::nullopt` otherwise
+     * @param passer_robot_id The id of the robot performing the pass. This will be used
+     *                        when calculating friendly capability to ensure the passer
+     *                        robot does not try to pass to itself. If `std::nullopt` is
+     *                        given, it is assumed the passer robot is not on the
+     *                        friendly team of the given world
      *
      * @return A value in [0,1] representing the quality of the pass, with 1 being an
      *         ideal pass, and 0 being the worst pass possible
      */
     double ratePass(const World& world, const AI::Passing::Pass& pass,
-                    const std::optional<Rectangle>& target_region);
+                    const std::optional<Rectangle>& target_region,
+                    std::optional<unsigned int> passer_robot_id);
 
     /**
      * Rate pass based on the probability of scoring once we receive the pass
@@ -89,12 +93,17 @@ namespace AI::Passing
      *
      * @param friendly_team The team of robots that might receive the given pass
      * @param pass The pass we want a robot to receive
+     * @param passer_robot_id The id of the robot performing the pass. This will be used
+     *                        to ensure the passer robot does not try to pass to itself.
+     *                        If `std::nullopt` is given, it is assumed the passer robot
+     *                        is not on `friendly_team`
      *
      * @return A value in [0,1] indicating how likely it would be for a robot on the
      *         friendly team to recieve the given pass, with 1 being very likely, 0
      *         being impossible
      */
-    double ratePassFriendlyCapability(const Team& friendly_team, const Pass& pass);
+    double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+                                      std::optional<unsigned int> passer_robot_id);
 
     /**
      * Calculates the static position quality for a given position on a given field
@@ -110,58 +119,5 @@ namespace AI::Passing
      *         field, with a higher value representing a more desirable position
      */
     double getStaticPositionQuality(const Field& field, const Point& position);
-
-    /**
-     * Calculates the value at the given point over a 2D sigmoid over the given rectangle
-     *
-     * The sigmoid constructed will approach 0 far enough outside the rectangle, and
-     * approach 1 far enough within the rectangle. The value on the edge of the rectangle
-     * will be 0.5
-     *
-     * @param rect The rectangle over which to make sigmoid function. The width of the
-     *             the rectangle is considered to be in x, and the height in y
-     * @param sig_width The length (in either x or y) required to cause the value of the
-     *                 sigmoid to go from 0.018 to 0.982
-     *
-     * @return A value in [0,1], representing the value of the 2D sigmoid function over
-     *         the given rectangle at the given point
-     */
-    double rectangleSigmoid(const Rectangle& rect, const Point& point,
-                            const double& sig_width);
-
-    /**
-     * Calculates the value at the given point over a 2D sigmoid over the given circle
-     *
-     * The sigmoid constructed will approach 0 far enough outside the circle, and approach
-     * 1 far enough within the circle. The value on the edge of the circle will be 0.5
-     *
-     * @param circle The circle over which to make sigmoid function
-     * @param sig_width The length required to cause the value of the sigmoid to go from
-     *                  0.018 to 0.982 across the edge of the circle
-     *
-     * @return A value in [0,1], representing the value of the 2D sigmoid function over
-     *         the given circle at the given point
-     */
-    double circleSigmoid(const Circle& circle, const Point& point,
-                         const double& sig_width);
-
-    /**
-     * A sigmoid function with a given offset from 0 and rate of change
-     *
-     * By default this increases from -v to positive v, ie. y = 1 / (1+e^(-x))
-     * To flip the sigmoid around (ie. increasing from +v to -v), subtract it from 1
-     *
-     * When using this function, it is strongly encouraged that you look at it's
-     * implementation and go plot it, play around with the numbers a bit to really
-     * understand what they're doing.
-     *
-     * @param v The value to evaluate over the sigmoid
-     * @param offset The offset of the center of the  sigmoid from 0
-     * @param sig_width The length (in either x or y) required to cause the value of the
-     *                 sigmoid to go from 0.018 to 0.982
-     *
-     * @return A value in [0,1] that is the value of the sigmoid at the value v
-     */
-    double sigmoid(const double& v, const double& offset, const double& sig_width);
 
 }  // namespace AI::Passing

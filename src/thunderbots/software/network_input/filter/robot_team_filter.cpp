@@ -4,6 +4,8 @@
 #include <cmath>
 #include <vector>
 
+#include "util/constants.h"
+
 
 RobotTeamFilter::RobotTeamFilter() {}
 
@@ -11,53 +13,44 @@ Team RobotTeamFilter::getFilteredData(
     const Team &current_team_state,
     const std::vector<SSLRobotDetection> &new_robot_detections)
 {
-    Team new_team_state = current_team_state;
-
-    for (auto robot_detection : new_robot_detections)
+    // Add filters for any robot we haven't seen before
+    for (auto detection : new_robot_detections)
     {
-        if (new_team_state.getRobotById(robot_detection.id))
+        if (robot_filters.find(detection.id) == robot_filters.end())
         {
-            Robot previous_robot_state = *new_team_state.getRobotById(robot_detection.id);
-
-            // Discard any data with an older timestamp. It's likely from a frame that
-            // hasn't been updated yet
-            if (previous_robot_state.lastUpdateTimestamp() >= robot_detection.timestamp)
-            {
-                continue;
-            }
-
-            // TODO: Removing the expired robots should be moved to the Backend
-            // once https://github.com/UBC-Thunderbots/Software/issues/424 is completed
-            new_team_state.removeExpiredRobots(robot_detection.timestamp);
-
-            Duration time_diff =
-                robot_detection.timestamp - previous_robot_state.lastUpdateTimestamp();
-
-            Vector new_robot_velocity =
-                robot_detection.position - previous_robot_state.position();
-            new_robot_velocity = new_robot_velocity.norm(new_robot_velocity.len() /
-                                                         time_diff.getSeconds());
-
-            AngularVelocity new_robot_angular_velocity =
-                robot_detection.orientation - previous_robot_state.orientation();
-            new_robot_angular_velocity /= time_diff.getSeconds();
-
-            Robot new_robot_state =
-                Robot(robot_detection.id, robot_detection.position, new_robot_velocity,
-                      robot_detection.orientation, new_robot_angular_velocity,
-                      robot_detection.timestamp);
-
-            new_team_state.updateRobots({new_robot_state});
+            robot_filters.insert(
+                {detection.id,
+                 RobotFilter(
+                     detection,
+                     Duration::fromMilliseconds(
+                         Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS))});
         }
-        else
+    }
+
+    // Get the filtered data for each robot from the robot filters. The robot filters
+    // handle robot expiry (robots disappearing after not being detected for a while),
+    // so we ignore any expired robots
+    std::vector<Robot> new_filtered_robot_data;
+    for (auto it = robot_filters.begin(); it != robot_filters.end(); it++)
+    {
+        auto data = it->second.getFilteredData(new_robot_detections);
+        if (data)
         {
-            Robot new_robot_state =
-                Robot(robot_detection.id, robot_detection.position, Vector(69, 69),
-                      robot_detection.orientation, AngularVelocity::zero(),
-                      robot_detection.timestamp);
-
-            new_team_state.updateRobots({new_robot_state});
+            new_filtered_robot_data.emplace_back(*data);
         }
+    }
+
+    Team new_team_state = current_team_state;
+    new_team_state.updateRobots(new_filtered_robot_data);
+
+    // Using the most recent timestamp for the team, remove any robots that have not
+    // been detected for a while
+    // TODO: Mathew - The RobotFilter and Team are both handling expiry now?
+    // Just the filter probably should
+    auto most_recent_team_timestamp = new_team_state.lastUpdateTimestamp();
+    if (most_recent_team_timestamp)
+    {
+        new_team_state.removeExpiredRobots(*most_recent_team_timestamp);
     }
 
     return new_team_state;

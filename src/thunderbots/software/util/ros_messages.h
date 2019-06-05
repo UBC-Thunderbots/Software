@@ -95,6 +95,60 @@ namespace Util
         RefboxGameState createGameStateFromROSMessage(
             const thunderbots_msgs::RefboxCommand& command);
 
+        /**
+         * Given a World message, constructs and returns a World object
+         *
+         * @param world_msg The message containing the world message data
+         * @return A World object created with the given world message data
+         */
         World createWorldFromROSMessage(const thunderbots_msgs::World& world_msg);
+
+        /**
+         * Creates and returns the ROS Message representation of the given World object
+         *
+         * @param world The World to convert to a ROS Message
+         * @return The ROS Message representation of the given World
+         */
+        thunderbots_msgs::World convertWorldToROSMessage(const World& world);
+
+        /**
+         * Given a World message, it will invert the worlds components (velocities,
+         * positions, orientations, etc.) Used when changing defending side
+         *
+         * @param old_world_msg The world message to invert
+         * @return The inverted world message
+         */
+        thunderbots_msgs::World invertMsgFieldSide(
+            const thunderbots_msgs::World& old_world_msg);
+
+        /**
+         * Given a Ball message, it will invert the balls velocity, position, and
+         * orientation Used when changing defending side
+         *
+         * @param old_ball_msg The ball message to invert
+         * @return The inverted ball message
+         */
+        thunderbots_msgs::Ball invertMsgFieldSide(
+            const thunderbots_msgs::Ball& old_ball_msg);
+
+        /**
+         * Given a list of robots, it will invert each robots velocity, position, and
+         * orientation Used when changing defending side
+         *
+         * @param old_robot_msgs The vector of robot messages to invert
+         * @return A vector of inverted robot messages
+         */
+        std::vector<thunderbots_msgs::Robot> invertMsgFieldSide(
+            const std::vector<thunderbots_msgs::Robot>& old_robot_msgs);
+
+        /**
+         * Given a Robot message, it will invert the robots velocity, position, and
+         * orientation Used when changing defending side
+         *
+         * @param old_robot_msg The robot message to invert
+         * @return The inverted robot message
+         */
+        thunderbots_msgs::Robot invertMsgFieldSide(
+            const thunderbots_msgs::Robot& old_robot_msg);
     }  // namespace ROSMessages
 }  // namespace Util

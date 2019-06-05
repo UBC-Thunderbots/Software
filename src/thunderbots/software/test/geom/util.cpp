@@ -20,6 +20,55 @@
 std::ostringstream dbgout;
 #endif
 
+TEST(GeomUtilTest, dist_point_rectangle_point_within)
+{
+    Point p(1, 2.1);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(0, dist(p, rect));
+}
+
+
+TEST(GeomUtilTest, dist_point_rectangle_point_below_rectangle)
+{
+    Point p(1, 1);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_above_rectangle)
+{
+    Point p(1, 5);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_to_left_of_rectangle)
+{
+    Point p(-1, 3);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_right_of_rectangle)
+{
+    Point p(3, 3);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(1.0, dist(p, rect));
+}
+
+TEST(GeomUtilTest, dist_point_rectangle_point_down_and_left_of_rectangle)
+{
+    Point p(-2.0, 0);
+    Rectangle rect({0, 2}, {2, 4});
+
+    EXPECT_DOUBLE_EQ(std::sqrt(8.0), dist(p, rect));
+}
+
 TEST(GeomUtilTest, dist_line_vector2)
 {
     double calculated_val, expected_val;
@@ -116,6 +165,24 @@ TEST(GeomUtilTest, test_contains_triangle_point)
     EXPECT_EQ(expected_val, calculated_val);
 }
 
+TEST(GeomUtilTest, test_segment_contains_point_no_x_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(0, 1));
+
+    Point point = Point(0, 0.5);
+
+    EXPECT_EQ(contains(segment, point), true);
+}
+
+TEST(GeomUtilTest, test_segment_contains_point_no_y_deviation)
+{
+    Segment segment = Segment(Point(0, 0), Point(1, 0));
+
+    Point point = Point(0.5, 0);
+
+    EXPECT_EQ(contains(segment, point), true);
+}
+
 TEST(GeomUtilTest, test_collinear)
 {
     for (unsigned int i = 0; i < 10; ++i)
@@ -186,8 +253,13 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
     obs.push_back(Point(-9, 10));
     obs.push_back(Point(9, 10));
 
-    std::pair<Point, Angle> testpair =
+    std::optional<std::pair<Point, Angle>> testpair_opt =
         angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+
+    // We expect to get a result
+    ASSERT_TRUE(testpair_opt);
+
+    std::pair<Point, Angle> testpair = *testpair_opt;
 
     EXPECT_TRUE((testpair.first.norm() - Point(0, 1)).len() < 0.0001);
     EXPECT_NEAR(75.449, testpair.second.toDegrees(), 1e-4);
@@ -197,10 +269,132 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
     obs.push_back(Point(6, 8));
     obs.push_back(Point(4, 10));
 
-    testpair = angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+    testpair_opt =
+        angleSweepCircles(Point(0, 0), Point(10, 10), Point(-10, 10), obs, 1.0);
+
+    // We expect to get a result
+    ASSERT_TRUE(testpair_opt);
+
+    testpair = *testpair_opt;
 
     EXPECT_TRUE((testpair.first.norm() - Point(-0.0805897, 0.996747)).len() < 0.0001);
     EXPECT_NEAR(42.1928, testpair.second.toDegrees(), 1e-4);
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_no_obstacles)
+{
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({0, 0}, {1, 1}, {-1, 1}, {}, 0.1);
+
+    ASSERT_EQ(1, result.size());
+    EXPECT_EQ(Point(0, 1), result[0].first);
+    EXPECT_EQ(90, result[0].second.toDegrees());
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_pos_y_to_neg_y)
+{
+    // Test with a single obstacle the is centered on the line segment that we are
+    // sweeping over
+
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({0, 0}, {1, -1}, {1, 1}, {{1, 0}}, 0.01);
+
+    ASSERT_EQ(2, result.size());
+
+    std::sort(result.begin(), result.end(),
+              [](auto pair1, auto pair2) { return pair1.second < pair2.second; });
+
+    EXPECT_EQ(1, result[0].first.x());
+    EXPECT_NEAR(-0.40, result[0].first.y(), 0.05);
+    EXPECT_EQ(1, result[1].first.x());
+    EXPECT_NEAR(0.40, result[1].first.y(), 0.05);
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_neg_y_to_pos_y)
+{
+    // Test with a single obstacle the is centered on the line segment that we are
+    // sweeping over
+
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({0, 0}, {1, 1}, {1, -1}, {{1, 0}}, 0.01);
+
+    ASSERT_EQ(2, result.size());
+
+    std::sort(result.begin(), result.end(),
+              [](auto pair1, auto pair2) { return pair1.second < pair2.second; });
+
+    EXPECT_EQ(1, result[0].first.x());
+    EXPECT_NEAR(-0.40, result[0].first.y(), 0.05);
+    EXPECT_EQ(1, result[1].first.x());
+    EXPECT_NEAR(0.40, result[1].first.y(), 0.05);
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_x_axis)
+{
+    // Test with a single obstacle the is centered on the line segment that we are
+    // sweeping over
+
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({0, 0}, {-1, 1}, {-1, -1}, {{-1, 0}}, 0.01);
+
+    ASSERT_EQ(2, result.size());
+
+    std::sort(result.begin(), result.end(),
+              [](auto pair1, auto pair2) { return pair1.second < pair2.second; });
+
+    EXPECT_EQ(-1, result[0].first.x());
+    EXPECT_NEAR(0.40, result[0].first.y(), 0.05);
+    EXPECT_EQ(-1, result[1].first.x());
+    EXPECT_NEAR(-0.40, result[1].first.y(), 0.05);
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_pos_y_axis)
+{
+    // Test with a single obstacle the is centered on the line segment that we are
+    // sweeping over
+
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({0, 0}, {-1, 1}, {1, 1}, {{0, 1}}, 0.01);
+
+    ASSERT_EQ(2, result.size());
+
+    std::sort(result.begin(), result.end(),
+              [](auto pair1, auto pair2) { return pair1.second < pair2.second; });
+
+    EXPECT_EQ(1, result[0].first.y());
+    EXPECT_NEAR(0.40, result[0].first.x(), 0.05);
+    EXPECT_EQ(1, result[1].first.y());
+    EXPECT_NEAR(-0.40, result[1].first.x(), 0.05);
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_y_axis)
+{
+    // Test with a single obstacle the is centered on the line segment that we are
+    // sweeping over
+
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({0, 0}, {-1, -1}, {1, -1}, {{0, -1}}, 0.01);
+
+    ASSERT_EQ(2, result.size());
+
+    std::sort(result.begin(), result.end(),
+              [](auto pair1, auto pair2) { return pair1.second < pair2.second; });
+
+    EXPECT_EQ(-1, result[0].first.y());
+    EXPECT_NEAR(-0.40, result[0].first.x(), 0.05);
+    EXPECT_EQ(-1, result[1].first.y());
+    EXPECT_NEAR(0.40, result[1].first.x(), 0.05);
+}
+
+TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacle_blocks_whole_range)
+{
+    // Test where there is no way to draw a line from the start point to the
+    // target line segment that we are sweeping over because there is one obstacle in the
+    // way
+    std::vector<std::pair<Point, Angle>> result =
+        angleSweepCirclesAll({-1, -0.5}, {-4.5, 0.5}, {-4.5, -0.5}, {{-1.2, -0.5}}, 0.09);
+
+    ASSERT_EQ(0, result.size());
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all)
@@ -629,19 +823,19 @@ TEST(GeomUtilTest, test_calc_block_other_ray)
 
 TEST(GeomUtilTest, test_offset_to_line)
 {
-    Point x0(1, -1);
+    Point x0(1, -2);
     Point x1(5, -2);
     Point p(2, -3);
 
-    EXPECT_NEAR(-1.69775, offsetToLine(x0, x1, p), 1e-5);
+    EXPECT_NEAR(1, offsetToLine(x0, x1, p), 1e-5);
 
     p = Point(2, 1);
 
-    EXPECT_NEAR(2.18282, offsetToLine(x0, x1, p), 1e-5);
+    EXPECT_NEAR(3, offsetToLine(x0, x1, p), 1e-5);
 
     p = Point(2, 0);
 
-    EXPECT_NEAR(1.21268, offsetToLine(x0, x1, p), 1e-5);
+    EXPECT_NEAR(2, offsetToLine(x0, x1, p), 1e-5);
 }
 
 TEST(GeomUtilTest, test_offset_along_line)
@@ -725,17 +919,48 @@ TEST(GeomUtilTest, test_line_intersection_segments_collinear_no_overlap)
     EXPECT_TRUE(std::find(retval.begin(), retval.end(), Point(2, 2)) == retval.end());
 }
 
-TEST(GeomUtilTest, test_vertex_angle)
+TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_neg_y_axis)
 {
-    Point a(6, 2);
-    Point b(0, 0);
-    Point c(1, 5);
+    // Two vectors that form an acute angle over the negative y-axis
 
-    EXPECT_NEAR(-60.2551, vertexAngle(a, b, c).toDegrees(), 1e-4);
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-70));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(-120));
 
-    a = Point(6, 1);
+    EXPECT_DOUBLE_EQ(50, acuteVertexAngle(v1, v2).toDegrees());
+}
 
-    EXPECT_NEAR(-69.2277, vertexAngle(a, b, c).toDegrees(), 1e-4);
+TEST(GeomUtilTest, test_acuteVertexAngle_angle_over_pos_y_axis)
+{
+    // Two vectors that form an acute angle over the positive y-axis
+
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(70));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(120));
+
+    EXPECT_DOUBLE_EQ(50, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertexAngle_180_degrees)
+{
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-90));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(90));
+
+    EXPECT_DOUBLE_EQ(180, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertexAngle_large_angle_over_neg_x_axis)
+{
+    Vector v1 = Vector::createFromAngle(Angle::ofDegrees(-95));
+    Vector v2 = Vector::createFromAngle(Angle::ofDegrees(99));
+
+    EXPECT_DOUBLE_EQ(166, acuteVertexAngle(v1, v2).toDegrees());
+}
+
+TEST(GeomUtilTest, test_acuteVertex_angle_between_points)
+{
+    Point p1(2, 0.5);
+    Point p2(1, -0.5);
+    Point p3(1, 0.5);
+    EXPECT_DOUBLE_EQ(45, acuteVertexAngle(p1, p2, p3).toDegrees());
 }
 
 TEST(GeomUtilTest, test_closest_point_time)
@@ -855,6 +1080,264 @@ TEST(GeomUtilTest, test_ray_segment_overlapping_passes_through_seg_start_and_end
 
     EXPECT_EQ(intersection1.value(), segment.getSegStart());
     EXPECT_EQ(intersection2.value(), segment.getEnd());
+}
+
+// Check the case where both rays intersect the segment only once (forming an intersection
+// segment within the segment)
+TEST(GeomUtilTest, test_segment_intersect_with_existing_segment)
+{
+    Ray ray1 = Ray(Point(-1, 0), Vector(0, 1));
+    Ray ray2 = Ray(Point(1, 0), Vector(0, 1));
+
+    Segment segment = Segment(Point(-5, 4), Point(5, 4));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ(Segment(Point(-1, 4), Point(1, 4)), intersecting_segment.value());
+}
+
+// Test that no segment is returned if both rays do not intersect the segment, and the
+// area between the rays do not enclose the segment
+TEST(GeomUtilTest, test_segment_intersect_both_rays_not_intersecting)
+{
+    Ray ray1 = Ray(Point(-4, 0), Vector(0, -1));
+    Ray ray2 = Ray(Point(4, 0), Vector(0, -1));
+
+    Segment segment = Segment(Point(-1, 4), Point(1, 4));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ(false, intersecting_segment.has_value());
+}
+
+// Test that a correct intersection point is returned for 2 rays that intersect once
+TEST(GeomUtilTest, test_intersect_ray_ray_do_intersect_once)
+{
+    // Ray at origin pointing upwards
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+    // Ray up and to the right that points right
+    Ray ray2 = Ray(Point(-1, 1), Vector(1, 0));
+
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
+
+    EXPECT_EQ(intersection.value(), Point(0, 1));
+}
+
+// Test that an intersection is not returned if the opposite direction of the rays
+// intersect
+TEST(GeomUtilTest, test_intersect_ray_ray_reverse_direction_intersects)
+{
+    // Ray positioned at origin pointing down
+    Ray ray1 = Ray(Point(0, 0), Vector(0, -1));
+
+    Ray ray2 = Ray(Point(-1, 1), Vector(-1, 0));
+
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
+
+    EXPECT_EQ(intersection, std::nullopt);
+}
+
+// Test that an intersection is not returned if the Rays are overlapping
+TEST(GeomUtilTest, test_intersect_ray_ray_overlapping)
+{
+    // Ray positioned at origin pointing up
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray2 = Ray(Point(0, 1), Vector(0, 1));
+
+    std::optional<Point> intersection = getRayIntersection(ray1, ray2);
+
+    EXPECT_EQ(intersection, std::nullopt);
+}
+
+// Test that the segment between the intersecting ray and the segment extreme is returned
+// when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme1)
+{
+    Ray ray_intersecting          = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0, 0), Vector(-14, 1));
+
+    Segment segment = Segment(Point(-1, 2), Point(1, 2));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
+
+    EXPECT_EQ(intersecting_segment.value(), Segment(Point(0, 2), Point(-1, 2)));
+}
+// Test that the segment between the intersecting ray and the segment extreme is returned
+// when one ray intersects, and the other would intersect an infinitely long segment
+TEST(GeomUtilTest, test_segment_intersect_one_ray_intersect_extreme2)
+{
+    Ray ray_intersecting          = Ray(Point(0, 0), Vector(0, 1));
+    Ray ray_intersects_out_of_seg = Ray(Point(0, 0), Vector(20, 2));
+
+    Segment segment = Segment(Point(-1, 2), Point(1, 2));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray_intersecting, ray_intersects_out_of_seg, segment);
+
+    EXPECT_EQ(intersecting_segment.value(), Segment(Point(0, 2), Point(1, 2)));
+}
+
+TEST(GeomUtilTest, test_segment_intersect_segment_enclosed_by_rays)
+{
+    Ray ray1 = Ray(Point(0, 0), Vector(-20, 1));
+    Ray ray2 = Ray(Point(0, 0), Vector(20, 1));
+
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    std::optional<Segment> intersecting_segment =
+        getIntersectingSegment(ray1, ray2, segment);
+
+    EXPECT_EQ(intersecting_segment.value(), segment);
+}
+
+// Test that the function returns the segment when the rays enclose the segemnt
+TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_enclosed)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    Ray ray1 = Ray(Point(0, 0), Vector(-20, 1));
+
+    Ray ray2 = Ray(Point(0, 0), Vector(20, 1));
+
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
+
+    EXPECT_EQ(segment, enclosed_segment.value());
+}
+
+// Test that the function returns null when the rays only partially intersect the segment
+TEST(GeomUtilTest, test_segment_enclosed_between_rays_is_partially_enclosed)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    Ray ray1 = Ray(Point(0, 0), Vector(-0.2, 1));
+
+    Ray ray2 = Ray(Point(0, 0), Vector(0.2, 1));
+
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
+
+    EXPECT_EQ(std::nullopt, enclosed_segment);
+}
+
+// Test that the function returns null if the segment is only partially enclosed with 1
+// real intersection
+TEST(GeomUtilTest,
+     test_segment_enclosed_between_rays_is_partially_enclosed_one_real_intersection)
+{
+    Segment segment = Segment(Point(-2, 2), Point(2, 2));
+
+    Ray ray1 = Ray(Point(0, 0), Vector(0, 1));
+
+    Ray ray2 = Ray(Point(0, 0), Vector(-20, 1));
+
+    std::optional<Segment> enclosed_segment =
+        segmentEnclosedBetweenRays(segment, ray1, ray2);
+
+    EXPECT_EQ(std::nullopt, enclosed_segment);
+}
+
+// Test that function returns the larger segment when considering 2 redundant segments
+TEST(GeomUtilTest, test_segment_redundancy_segments_are_redundant)
+{
+    Segment segment1 = Segment(Point(-1, -1), Point(1, 1));
+
+    Segment segment2 = Segment(Point(-2, -2), Point(2, 2));
+
+    std::optional<Segment> largest_segment =
+        mergeFullyOverlappingSegments(segment1, segment2);
+
+    EXPECT_EQ(largest_segment.value(), segment2);
+}
+
+// Test that function returns the larger segment when considering 2 non-parallel segments
+TEST(GeomUtilTest, test_segment_redundancy_segments_are_not_parallel)
+{
+    Segment segment1 = Segment(Point(2, 2), Point(1, -2));
+
+    Segment segment2 = Segment(Point(1, 4), Point(1, -4));
+
+    std::optional<Segment> largest_segment =
+        mergeFullyOverlappingSegments(segment1, segment2);
+
+    EXPECT_EQ(largest_segment, std::nullopt);
+}
+
+// Test that function returns one of the segments if they are exactly the same
+TEST(GeomUtilTest, test_segment_redundancy_segments_are_the_same)
+{
+    Segment segment1 = Segment(Point(2, 2), Point(1, -2));
+
+    Segment segment2 = Segment(Point(2, 2), Point(1, -2));
+
+    std::optional<Segment> largest_segment =
+        mergeFullyOverlappingSegments(segment1, segment2);
+
+    EXPECT_EQ(largest_segment.value(), segment1);
+}
+
+// Test if segments are merged if they are parallel and only partially overlapping
+TEST(GeomUtilTest, test_merge_segment_partially_overlapping)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment(Point(-1, -1), Point(5, 5));
+
+    std::optional<Segment> merged_segment =
+        mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment.value(), Segment(Point(-2, -2), Point(5, 5)));
+}
+
+// Test if segments are merged if they are parallel and only partially overlapping
+TEST(GeomUtilTest, test_merge_segment_redundant_segments)
+{
+    Segment segment1 = Segment(Point(-2, -2), Point(2, 2));
+
+    Segment segment2 = Segment(Point(-1, -1), Point(1, 1));
+
+    std::optional<Segment> merged_segment =
+        mergeOverlappingParallelSegments(segment1, segment2);
+    EXPECT_EQ(merged_segment.value(), segment1);
+}
+
+// Test to see if the 1 is returned when the point exists within the rectangle
+TEST(GeomUtilTest, test_binary_trespass_point_is_trespassing_in_rectangle)
+{
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(0, 0)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(0.5, 0.5)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-0.5, -0.5)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(0.5, -0.5)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-0.5, 0.5)));
+}
+
+// Test to see if the 1 is returned when the point exists on the boundries of the
+// rectangle
+TEST(GeomUtilTest, test_binary_trespass_point_is_on_rectangle_boundry)
+{
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-1, -1)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(1, 1)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-1, 1)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(1, -1)));
+    EXPECT_EQ(1, calcBinaryTrespassScore(rectangle, Point(-1, 0.5)));
+}
+
+// Test to see if the 0 is returned when the point exists outside of the rectangle
+TEST(GeomUtilTest, test_binary_trespass_point_is_outside_rectangle)
+{
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-1, -2)));
+    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(2, 1)));
+    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-1, 3)));
+    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(5, -0.2)));
+    EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-4, 5)));
 }
 
 int main(int argc, char **argv)

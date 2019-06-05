@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "ai/primitive/primitive.h"
+#include "annunciator.h"
 #include "geom/angle.h"
 #include "geom/point.h"
 #include "send_reliable_message_operation.h"
@@ -42,8 +43,11 @@ class MRFDongle final
    public:
     /**
      * Constructs a new MRFDongle.
+     *
+     * @param config MRF configuration to start dongle in
+     * @param annunciator annunciator to publish robot statuses
      */
-    explicit MRFDongle();
+    explicit MRFDongle(unsigned int config, Annunciator &annunciator);
 
     /**
      * Destroys an MRFDongle.
@@ -61,9 +65,9 @@ class MRFDongle final
     /**
      * Sends a camera packet over radio to all robots, including vision coordinates of
      * all robots and the ball.
-     * @param robots
-     * @param ball
-     * @param timestamp
+     * @param robots vector of tuples of {robot ID, robot location, robot orientation}
+     * @param ball ball location
+     * @param timestamp timestamp in seconds when this data was received
      */
     void send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
                             Point ball, uint64_t timestamp);
@@ -163,9 +167,9 @@ class MRFDongle final
     std::array<std::unique_ptr<USB::BulkInTransfer>, 32> message_transfers;
     USB::InterruptInTransfer status_transfer;
     std::list<std::unique_ptr<USB::BulkOutTransfer>> unreliable_messages;
-
     std::queue<uint8_t> free_message_ids;
     sigc::signal<void, uint8_t, uint8_t> signal_message_delivery_report;
+    Annunciator &annunciator;
 
     uint8_t alloc_message_id();
     void free_message_id(uint8_t id);

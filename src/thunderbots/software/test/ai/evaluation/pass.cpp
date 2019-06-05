@@ -85,3 +85,38 @@ TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity)
     EXPECT_EQ(Duration::fromSeconds(travel_time),
               getTimeToPositionForRobot(robot, dest, 2.0, 3.0));
 }
+
+TEST(PassingEvaluationTest, getTimeToPositionForRobot_reaches_max_velocity_with_tolerance)
+{
+    // Check that the robot reaches the dest in the at the expected time when
+    // it has enough time that it accelerates up to it's maximum velocity
+    // We set the distance here such that it the robot *should* always have time to
+    // get to the max velocity, unless our robots suddenly get *much* faster
+
+    // The point we're trying to move ot
+    Point target_location(0, 1);
+
+    // The first point within tolerance of the goal on the path of the robot
+    Point first_point_in_tolerance(0, 1.5);
+
+    Point robot_location(0, 40);
+
+    Robot robot(0, robot_location, Vector(0, 0), Angle::ofDegrees(0),
+                AngularVelocity::ofDegrees(0), Timestamp::fromSeconds(0));
+
+    double distance_to_dest = (robot_location - first_point_in_tolerance).len();
+
+    double acceleration_time = ROBOT_MAX_SPEED_METERS_PER_SECOND /
+                               ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED;
+    // x = v*t + 1/2*a*t^2, v = initial velocity = 0
+    double acceleration_distance = 0.5 *
+                                   ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED *
+                                   std::pow(acceleration_time, 2);
+    double time_at_max_vel = (distance_to_dest - 2 * acceleration_distance) /
+                             ROBOT_MAX_SPEED_METERS_PER_SECOND;
+
+    double travel_time = 2 * acceleration_time + time_at_max_vel;
+
+    EXPECT_EQ(Duration::fromSeconds(travel_time),
+              getTimeToPositionForRobot(robot, target_location, 2.0, 3.0, 0.5));
+}

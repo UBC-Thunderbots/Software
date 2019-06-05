@@ -27,7 +27,7 @@ class TeamTest : public ::testing::Test
     Timestamp one_second_past;
 };
 
-TEST_F(TeamTest, construction)
+TEST_F(TeamTest, construction_with_expiry_duration)
 {
     Team team = Team(Duration::fromMilliseconds(1000));
 
@@ -37,6 +37,32 @@ TEST_F(TeamTest, construction)
     EXPECT_EQ(std::nullopt, team.goalie());
     EXPECT_EQ(std::vector<Robot>(), team.getAllRobots());
     EXPECT_EQ(Duration::fromMilliseconds(1000), team.getRobotExpiryBufferDuration());
+}
+
+TEST_F(TeamTest, construction_with_expiry_duration_and_team_robots)
+{
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), current_time);
+
+    Robot robot_2 = Robot(2, Point(), Vector(-0.5, 4), Angle::quarter(),
+                          AngularVelocity::half(), current_time);
+
+    std::vector<Robot> robot_list = {robot_0, robot_1, robot_2};
+
+    Team team = Team(Duration::fromMilliseconds(1000), robot_list);
+
+    EXPECT_EQ(Duration::fromMilliseconds(1000), team.getRobotExpiryBufferDuration());
+
+    EXPECT_EQ(3, team.numRobots());
+    EXPECT_EQ(robot_0, team.getRobotById(0));
+    EXPECT_EQ(robot_1, team.getRobotById(1));
+    EXPECT_EQ(robot_2, team.getRobotById(2));
+    EXPECT_EQ(std::nullopt, team.getRobotById(3));
+    EXPECT_EQ(std::nullopt, team.goalie());
+    EXPECT_EQ(robot_list, team.getAllRobots());
 }
 
 TEST_F(TeamTest, update_with_3_robots)
@@ -248,6 +274,39 @@ TEST_F(TeamTest, remove_expired_robots_in_future_so_1_robot_expires_1_robot_does
     EXPECT_EQ(std::nullopt, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));
 }
+
+TEST_F(TeamTest, removeRobotWithId_robot_with_id_on_team)
+{
+    Team team     = Team(Duration::fromMilliseconds(2000));
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), one_second_future);
+    team.updateRobots({robot_0, robot_1});
+
+    team.removeRobotWithId(0);
+
+    EXPECT_EQ(1, team.getAllRobots().size());
+    EXPECT_EQ(std::vector<Robot>{robot_1}, team.getAllRobots());
+}
+
+TEST_F(TeamTest, removeRobotWithId_robot_with_id_not_on_team)
+{
+    Team team     = Team(Duration::fromMilliseconds(2000));
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), current_time);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), one_second_future);
+    team.updateRobots({robot_0, robot_1});
+
+    team.removeRobotWithId(2);
+
+    EXPECT_EQ(2, team.getAllRobots().size());
+    EXPECT_EQ(std::vector<Robot>({robot_0, robot_1}), team.getAllRobots());
+}
+
 
 TEST_F(TeamTest, clear_all_robots)
 {

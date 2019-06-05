@@ -3,13 +3,13 @@
 #include "ai/ai.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/World.h"
+#include "util/canvas_messenger/canvas_messenger.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
-#include "util/visualizer_messenger/visualizer_messenger.h"
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
@@ -22,10 +22,17 @@ namespace
     AI ai;
 }  // namespace
 
+int count;
+
 // Runs the AI and sends new Primitive commands every time we get new information
 // about the World
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
+    if (!Util::DynamicParameters::AI::run_ai.value())
+    {
+        return;
+    }
+
     thunderbots_msgs::World world_msg = *msg;
     World world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
 
@@ -40,8 +47,12 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     }
     primitive_publisher.publish(primitive_array_message);
 
-    // On every tick, send the layer messages
-    Util::VisualizerMessenger::getInstance()->publishAndClearLayers();
+    // Draw the world
+    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
+        Util::CanvasMessenger::getInstance();
+    canvas_messenger->drawWorld(world);
+
+    count++;
 }
 
 int main(int argc, char **argv)
@@ -62,7 +73,7 @@ int main(int argc, char **argv)
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Initialize the draw visualizer messenger
-    Util::VisualizerMessenger::getInstance()->initializePublisher(node_handle);
+    Util::CanvasMessenger::getInstance()->initializePublisher(node_handle);
 
     // Initialize Dynamic Parameters
     auto update_subscribers =

@@ -23,6 +23,27 @@ TEST(MovePrimTest, get_robot_id_test)
     EXPECT_EQ(robot_id, move_prim.getRobotId());
 }
 
+TEST(MovePrimTest, autokick_and_dribble_disabled_by_default)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
+    EXPECT_FALSE(move_prim.isAutoKickEnabled());
+    EXPECT_FALSE(move_prim.isDribblerEnabled());
+}
+
+TEST(MovePrimTest, get_dribble_enabled)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, false);
+    EXPECT_TRUE(move_prim.isDribblerEnabled());
+    EXPECT_FALSE(move_prim.isAutoKickEnabled());
+}
+
+TEST(MovePrimTest, get_autokick_enabled)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, true);
+    EXPECT_FALSE(move_prim.isDribblerEnabled());
+    EXPECT_TRUE(move_prim.isAutoKickEnabled());
+}
+
 TEST(MovePrimTest, parameter_array_test)
 {
     const Point destination     = Point(-1, 2);

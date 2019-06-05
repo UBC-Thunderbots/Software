@@ -8,10 +8,14 @@
         "no-console": false,
         "jsx-no-lambda": false,
         "semicolon": [true, "always", "ignore-bound-class-methods"],
-        "object-literal-sort-keys": [true, "shorthand-first"],
+        "object-literal-sort-keys": false,
         "variable-name": false,
         "quotemark": [true, "single", "jsx-double"],
         "no-string-literal": false,
+<<<<<<< HEAD
         "import-spacing": false
+=======
+        "no-bitwise": false
+>>>>>>> c3d7b6ce575f25d68375edb39e37aaa4f9c6b07c
     }
 }
