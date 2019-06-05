@@ -334,6 +334,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
+    // Edge-triggered messages: keep sending message for ET_MESSAGE_KEEPALIVE_TIME seconds
     for (auto const &et_msg : robot_status_states[index].et_messages)
     {
         if (difftime(time(nullptr), et_msg.second) < ET_MESSAGE_KEEPALIVE_TIME)
@@ -342,7 +343,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    // If new message, beep the dongle
+    // If is a new message that was present in the previous status update, return true
     bool to_beep = false;
     for (std::string msg : new_msgs)
     {
