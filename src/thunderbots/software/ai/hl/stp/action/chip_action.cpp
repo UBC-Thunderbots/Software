@@ -34,10 +34,10 @@ std::unique_ptr<Intent> ChipAction::updateStateAndGetNextIntent(
 void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // How large the triangle is that defines the region where the robot is
-    // behind the ball and ready to kick.
-    // We want to keep the region small enough that we won't use the KickIntent from too
-    // far away (since the KickIntent doesn't avoid obstacles and we risk colliding
-    // with something), but large enough we can reasonably get in the region and kick the
+    // behind the ball and ready to chip.
+    // We want to keep the region small enough that we won't use the ChipIntent from too
+    // far away (since the ChipIntent doesn't avoid obstacles and we risk colliding
+    // with something), but large enough we can reasonably get in the region and chip the
     // ball successfully.
     // This value is 'X' in the ASCII art below
     double size_of_region_behind_ball = 4 * ROBOT_MAX_RADIUS_METERS;
@@ -65,11 +65,11 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     //
     //                             |
     //                             V
-    //                     direction of kick
+    //                     direction of chip
 
     do
     {
-        // A vector in the direction opposite the kick (behind the ball)
+        // A vector in the direction opposite the chip (behind the ball)
         Vector behind_ball =
             Vector::createFromAngle(this->chip_direction + Angle::half());
 
@@ -79,7 +79,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // in the ASCII diagram
 
         // We make the region close enough to the ball so that the robot will still be
-        // inside it when taking the kick.
+        // inside it when taking the chip.
         Point behind_ball_vertex_A = chip_origin;
         Point behind_ball_vertex_B =
             behind_ball_vertex_A + behind_ball.norm(size_of_region_behind_ball) +
@@ -96,7 +96,7 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         Point point_behind_ball =
             chip_origin + behind_ball.norm(size_of_region_behind_ball * 3 / 4);
 
-        // If we're not in position to kick, move into position
+        // If we're not in position to chip, move into position
         if (!robot_behind_ball)
         {
             yield(std::make_unique<MoveIntent>(robot->id(), point_behind_ball,
