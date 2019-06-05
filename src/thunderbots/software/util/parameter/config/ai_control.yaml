@@ -14,7 +14,12 @@ AI:
         specified by current_play parameter
   current_ai_play:
     type: "string"
-    default: "Example Play"
+    default: "Kickoff Play"
+    options:
+        - "Kickoff Play"
+        - "Sketchy Play"
+        - "Play Play"
+        - "Test Play"
     description: >- 
         Specifies the ai play that should be in use
   refbox:
@@ -26,7 +31,12 @@ AI:
           specified by current_play parameter
     current_refbox_play:
       type: "string"
-      default: "Halt"
+      options:
+          - "Kickoff Play"
+          - "Sketchy Play"
+          - "Play Play"
+          - "Test Play"
+      default: "Test Play"
       description: >- 
           Specifies the refbox play that should be in use
     override_refbox_defending_side:

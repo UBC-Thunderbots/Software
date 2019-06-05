@@ -71,7 +71,10 @@ CPP_TYPE_MAP = {
 
 CFG_NEW_NAMESPACE = '{namespace} = gen.add_group(\"{namespace}\")\n'
 CFG_SUB_NAMESPACE = '{sub_namespace} = {namespace}.add_group(\"{sub_namespace}\")\n'
-CFG_PARAMETER = '{namespace}.add(\"{name}\", {type}, 0, \"{description}\", {quote}{default}{quote}, {min_val}, {max_val})\n'
+CFG_PARAMETER = '{namespace}.add(\"{name}\", {type}, 0, \"{description}\", {quote}{default}{quote}, {min_val}, {max_val}, edit_method={enum})\n'
+
+CFG_CONST = "{qualified_name} = gen.const(\"{qualified_name}\", {type}, {quote}{value}{quote}, \"\")\n"
+CFG_ENUM = "{qualified_name}_enum = gen.enum([{cfg_options}], \"Selector for {param_name}\")\n"
 
 CFG_HEADER = \
 """#!/usr/bin/env python
