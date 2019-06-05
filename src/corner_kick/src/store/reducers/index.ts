@@ -5,7 +5,7 @@
 import { combineReducers } from 'redux';
 
 import canvasReducer from './canvas';
-import consoleReducer from './console';
+import thunderbots from './thunderbots';
 import rosReducer from './ros';
 
 /**
@@ -14,6 +14,6 @@ import rosReducer from './ros';
  */
 export default combineReducers({
     canvas: canvasReducer,
-    console: consoleReducer,
+    thunderbots: thunderbots,
     ros: rosReducer,
 });

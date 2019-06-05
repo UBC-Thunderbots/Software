@@ -8,17 +8,21 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 
-import { LayersPanel } from 'SRC/components/LayersPanel';
+import { LayersPanel } from 'SRC/pages/Visualizer/panels/LayersPanel';
 import { Portal, PortalLocation } from 'SRC/components/Portal';
 import { SPRITESHEET } from 'SRC/constants';
 import { Canvas, CanvasManager, LayerReceiver } from 'SRC/containers/Canvas';
 import { actions, RootAction } from 'SRC/store';
 import { ILayer, IRootState } from 'SRC/types';
+import { PlayTypePanel } from './panels/PlayTypePanel/index';
 
 // We request the layer data from the store
 const mapStateToProps = (state: IRootState) => ({
     layers: state.canvas.layers,
     layerOrder: state.canvas.layerOrder,
+    playType: state.thunderbots.playType,
+    playName: state.thunderbots.playName,
+    tactics: state.thunderbots.tactics,
 });
 
 // We request layer related actions
@@ -36,6 +40,9 @@ interface IVisualizerProps {
     toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
     layers: { [id: number]: ILayer };
     layerOrder: number[];
+    playType: string;
+    playName: string;
+    tactics: string[];
 }
 
 class VisualizerInternal extends React.Component<IVisualizerProps> {
@@ -70,6 +77,7 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
                         layers={orderedLayers}
                         toggleVisibility={this.onLayerVisibilityToggle}
                     />
+                    <PlayTypePanel {...this.props} />
                 </Portal>
                 <Portal portalLocation={PortalLocation.MAIN}>
                     <Canvas canvasManager={this.canvasManager} />
