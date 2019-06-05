@@ -39,6 +39,13 @@ class ChipAction : public Action
     /**
      * Returns the next Intent this ChipAction wants to run, given the parameters.
      *
+     * The ball and chip origin are given separately so that we can line up chips where
+     * the ball isn't present yet. For example, specifying where a chip will take place
+     * where the robot will meet the ball as it's moving. We need to be able to specify
+     * where the chip will take place even if the ball isn't there yet, which is why the
+     * chip_origin is separate. The ball is used for other calculations, such as when
+     * the ball has been chipped and the action is done.
+     *
      * @param robot The robot that should perform the chip
      * @param ball The ball being kicked
      * @param chip_origin The location where the chip will be taken
