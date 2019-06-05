@@ -176,6 +176,63 @@ TEST(PolygonTest, test_polygon_triangle_intersects_ray2)
     EXPECT_FALSE(triangle.intersects(ray));
 }
 
+// All of the below are what's known as "white box tests". That means these tests are
+// written with knowledge of how the function is implemented, to test certain internal
+// edge cases. These tests are written with the knowledge that the 'containsPoint'
+// function uses a ray that is shot in the +x direction
+TEST(
+    PolygonTest,
+    test_polygon_triangle_contains_point_with_point_outside_triangle_and_ray_intersecting_vertex)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(0, 1)});
+    Point point(-1, 1);
+
+    bool result = polygon.containsPoint(point);
+    EXPECT_FALSE(result);
+}
+
+TEST(
+    PolygonTest,
+    test_polygon_triangle_contains_point_with_point_on_edge_of_triangle_and_ray_overlapping_segment)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(0, 1)});
+    Point point(0.5, 0);
+
+    bool result = polygon.containsPoint(point);
+    EXPECT_TRUE(result);
+}
+
+TEST(
+    PolygonTest,
+    test_polygon_triangle_contains_point_with_point_inside_triangle_and_ray_intersecting_vertex)
+{
+    Polygon polygon({Point(1, 0), Point(0, 1), Point(0, -1)});
+    Point point(0.25, 0);
+
+    bool result = polygon.containsPoint(point);
+    EXPECT_TRUE(result);
+}
+
+TEST(
+    PolygonTest,
+    test_polygon_triangle_contains_point_with_point_outside_triangle_and_ray_overlapping_segment)
+{
+    Polygon polygon({Point(0, 0), Point(1, 0), Point(0, 1)});
+    Point point(-1, 0);
+
+    bool result = polygon.containsPoint(point);
+    EXPECT_FALSE(result);
+}
+
+TEST(PolygonTest, test_polygon_triangle_contains_point_with_point_on_vertex)
+{
+    Polygon polygon({Point(1, 0), Point(0, 1), Point(0, -1)});
+    Point point(0.25, 0);
+
+    bool result = polygon.containsPoint(point);
+    EXPECT_TRUE(result);
+}
+
 int main(int argc, char** argv)
 {
     std::cout << argv[0] << std::endl;

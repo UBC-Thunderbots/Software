@@ -37,6 +37,7 @@ class KickAction : public Action
      * Returns the next Intent this KickAction wants to run, given the parameters.
      *
      * @param robot The robot that should perform the kick
+     * @param ball The ball being kicked
      * @param kick_origin The location where the kick will be taken
      * @param kick_target The target to kick at
      * @param kick_speed_meters_per_second The speed of how fast the Robot
