@@ -20,10 +20,10 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     bool override_play = Util::DynamicParameters::AI::override_ai_play.value();
     bool override_play_value_changed =
-        Util::DynamicParameters::AI::override_ai_play.valueChanged();
+        Util::DynamicParameters::AI::override_ai_play.valueUpdated();
     std::string override_play_name = Util::DynamicParameters::AI::current_ai_play.value();
     bool override_play_name_value_changed =
-        Util::DynamicParameters::AI::current_ai_play.valueChanged();
+        Util::DynamicParameters::AI::current_ai_play.valueUpdated();
     auto all_play_names = PlayFactory::getRegisteredPlayNames();
 
     // Assign a new play if we don't currently have a play assigned, the current play's

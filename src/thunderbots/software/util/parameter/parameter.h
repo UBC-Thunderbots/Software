@@ -79,11 +79,16 @@ class Parameter
     }
 
     /**
-     * Returns true if the value has recently changed, and false otherwise
+     * Returns true if the value of this parameter has been updated, either manually or
+     * from an automatic dynamic reconfigure message. Once this value is read, the return
+     * value is reset to false until the parameter is updated again. This makes the
+     * assumption that this function is only being called once / being called in one place
+     * per parameter, otherwise subsequent calls would not detect the update.
      *
-     * @return true if the value has recently changed, and false otherwise
+     * @return true if the value of this parameter has been updated since this function
+     * was last called, and false otherwise
      */
-    const bool valueChanged()
+    const bool valueUpdated()
     {
         bool ret = this->value_changed;
 
