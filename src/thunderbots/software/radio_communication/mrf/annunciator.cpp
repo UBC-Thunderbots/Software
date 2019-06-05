@@ -24,7 +24,7 @@ namespace
     /**
      * Amount of time to keep an edge-triggered message sending, in seconds.
      */
-    const int ET_MESSAGE_KEEPALIVE_TIME = 5;
+    const int ET_MESSAGE_KEEPALIVE_TIME = 10;
 
     /**
      * Represents a mapping from RSSI to decibels.
@@ -343,15 +343,16 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    // If is a new message that was present in the previous status update, return true
-    bool to_beep = false;
+    // If there is a new message that wasn't present in the previous status update, return
+    // true
+    bool new_msgs_present = false;
     for (std::string msg : new_msgs)
     {
         if (std::find(robot_status_states[index].old_msgs.begin(),
                       robot_status_states[index].old_msgs.end(),
                       msg) == robot_status_states[index].old_msgs.end())
         {
-            to_beep = true;
+            new_msgs_present = true;
             break;
         }
     }
@@ -365,10 +366,10 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 
     // Publish robot status
     robot_status_publisher.publish(robot_status);
-    return to_beep;
+    return new_msgs_present;
 }
 
-void Annunciator::handle_dongle_messages(uint8_t status)
+std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
 {
     dongle_messages.clear();
 
@@ -393,4 +394,6 @@ void Annunciator::handle_dongle_messages(uint8_t status)
     {
         dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
     }
+
+    return dongle_messages;
 }

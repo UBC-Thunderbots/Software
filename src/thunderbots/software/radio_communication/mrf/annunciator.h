@@ -16,7 +16,7 @@ class Annunciator
     explicit Annunciator(ros::NodeHandle& node_handle);
 
     /**
-     * Handles diagnostics and messages for each robot.
+     * Decodes diagnostics and messages for each robot, and publishes them.
      * Returns a boolean if there were new messages since the last status update.
      *
      * @param index Robot number.
@@ -34,8 +34,9 @@ class Annunciator
      * Handles general dongle messages.
      *
      * @param status The uint8 encoding all the status data.
+     * @return vector of dongle messages sent from the dongle
      */
-    void handle_dongle_messages(uint8_t status);
+    std::vector<std::string> handle_dongle_messages(uint8_t status);
 
    private:
     ros::Publisher robot_status_publisher;
