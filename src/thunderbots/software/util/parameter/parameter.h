@@ -43,10 +43,9 @@ class Parameter
     explicit Parameter<T>(const std::string& parameter_name,
                           const std::string& parameter_namespace, T default_value)
     {
-        this->name_         = parameter_name;
-        this->namespace_    = parameter_namespace;
-        this->value_        = default_value;
-        this->value_changed = false;
+        this->name_      = parameter_name;
+        this->namespace_ = parameter_namespace;
+        this->value_     = default_value;
 
         Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
     }
@@ -77,36 +76,6 @@ class Parameter
         // if the parameter hasn't been registered yet, return default value
         return this->value_;
     }
-
-    /**
-     * Returns true if the value of this parameter has been updated, either manually or
-     * from an automatic dynamic reconfigure message. Once this value is read, the return
-     * value is reset to false until the parameter is updated again. This makes the
-     * assumption that this function is only being called once / being called in one place
-     * per parameter, otherwise subsequent calls would not detect the update.
-     *
-     * @return true if the value of this parameter has been updated since this function
-     * was last called, and false otherwise
-     */
-    const bool valueUpdated()
-    {
-        bool ret = this->value_changed;
-
-        // get the value from the parameter in the registry
-        if (Parameter<T>::getMutableRegistry().count(this->name_))
-        {
-            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            ret                     = param_in_registry->value_changed;
-            param_in_registry->value_changed = false;
-        }
-        else
-        {
-            value_changed = false;
-        }
-
-        return ret;
-    }
-
     /**
      * Returns the name of this parameter
      *
@@ -121,6 +90,7 @@ class Parameter
      * Checks if the parameter currently exists in the ros parameter server
      *
      * @return true if the parameter exists, false otherwise
+     *
      */
     const bool existsInParameterServer() const
     {
@@ -134,7 +104,6 @@ class Parameter
     void updateValueFromROSParameterServer()
     {
         ros::param::get(getROSParameterPath(), this->value_);
-        value_changed = true;
     }
 
     /**
@@ -148,7 +117,6 @@ class Parameter
     {
         dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
                                                        this->value_);
-        value_changed = true;
     }
 
     /**
@@ -253,9 +221,6 @@ class Parameter
 
     // Store the namespace of the parameter
     std::string namespace_;
-
-    // Whether or not this parameter value has recently changed
-    bool value_changed;
 
     /**
      * Returns a mutable configuration msg that will hold all the
