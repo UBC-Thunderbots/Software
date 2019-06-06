@@ -12,10 +12,6 @@
         "variable-name": false,
         "quotemark": [true, "single", "jsx-double"],
         "no-string-literal": false,
-<<<<<<< HEAD
-        "import-spacing": false
-=======
         "no-bitwise": false
->>>>>>> c3d7b6ce575f25d68375edb39e37aaa4f9c6b07c
     }
 }
