@@ -1,6 +1,8 @@
 
 #include "annunciator.h"
 
+#include <time.h>
+
 #include "dongle.h"
 #include "messages.h"
 #include "shared/constants.h"
@@ -18,6 +20,11 @@ namespace
      * the build IDs.
      */
     const double REQUEST_BUILD_IDS_INTERVAL = 0.5;
+
+    /**
+     * Amount of time to keep an edge-triggered message sending, in seconds.
+     */
+    const int ET_MESSAGE_KEEPALIVE_TIME = 10;
 
     /**
      * Represents a mapping from RSSI to decibels.
@@ -63,6 +70,21 @@ namespace
         }
         return val;
     }
+
+    // Struct to keep track of previously published messages for a robot
+    typedef struct
+    {
+        // Previously published messages for this robot
+        std::vector<std::string> old_msgs;
+
+        // Map of message to timestamp for edge-triggered messages
+        std::map<std::string, time_t> et_messages;
+
+    } RobotStatusState;
+
+    // Map of robot number to their previously published messages
+    std::map<int, RobotStatusState> robot_status_states;
+
 }  // namespace
 
 Annunciator::Annunciator(ros::NodeHandle &node_handle)
@@ -71,11 +93,10 @@ Annunciator::Annunciator(ros::NodeHandle &node_handle)
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
 }
 
-thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
-                                                                const void *data,
-                                                                std::size_t len,
-                                                                uint8_t lqi, uint8_t rssi)
+bool Annunciator::handle_robot_message(int index, const void *data, std::size_t len,
+                                       uint8_t lqi, uint8_t rssi)
 {
+    std::vector<std::string> new_msgs;
     thunderbots_msgs::RobotStatus robot_status;
 
     robot_status.link_quality = lqi / 255.0;
@@ -122,7 +143,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                     // Warn if capacitor voltage is too low
                     if (robot_status.capacitor_voltage < 5.0)
                     {
-                        robot_status.robot_messages.push_back(MRF::LOW_CAP_MESSAGE);
+                        new_msgs.push_back(MRF::LOW_CAP_MESSAGE);
                     }
 
                     bptr += 2;
@@ -147,8 +168,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                     {
                         if (MRF::LOGGER_MESSAGES[i] && (logger_status == i))
                         {
-                            robot_status.robot_messages.push_back(
-                                MRF::LOGGER_MESSAGES[i]);
+                            new_msgs.push_back(MRF::LOGGER_MESSAGES[i]);
                         }
                     }
                     ++bptr;
@@ -159,7 +179,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                     {
                         if (MRF::SD_MESSAGES[i] && (*bptr == i))
                         {
-                            robot_status.robot_messages.push_back(MRF::SD_MESSAGES[i]);
+                            new_msgs.push_back(MRF::SD_MESSAGES[i]);
                         }
                     }
                     ++bptr;
@@ -187,6 +207,8 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                 if (len >= MRF::ERROR_BYTES)
                                 {
                                     has_error_extension = true;
+
+                                    // Handling of level-triggered messages.
                                     for (unsigned int i = 0; i < MRF::ERROR_LT_COUNT; ++i)
                                     {
                                         unsigned int byte = i / CHAR_BIT;
@@ -195,15 +217,16 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_LT_MESSAGES[i])
                                         {
-                                            robot_status.robot_messages.push_back(
-                                                MRF::ERROR_LT_MESSAGES[i]);
+                                            new_msgs.push_back(MRF::ERROR_LT_MESSAGES[i]);
                                         }
                                     }
 
                                     /**
-                                     * TODO (#544): Edge-triggered messages only show up
-                                     * once when the event occurs. Need to add some timer
-                                     * event to persist these messages for a few seconds.
+                                     * Handling of edge-triggered messages.
+                                     * These messages are added to a separate map,
+                                     * mapping to a timestamp of when it was most recently
+                                     * transmitted
+
                                      */
                                     for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT; ++i)
                                     {
@@ -215,10 +238,12 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                                         if (bptr[byte] & (1 << bit) &&
                                             MRF::ERROR_ET_MESSAGES[i])
                                         {
-                                            robot_status.robot_messages.push_back(
-                                                MRF::ERROR_ET_MESSAGES[i]);
+                                            robot_status_states[index]
+                                                .et_messages[MRF::ERROR_ET_MESSAGES[i]] =
+                                                time(nullptr);
                                         }
                                     }
+
                                     bptr += MRF::ERROR_BYTES;
                                     len -= MRF::ERROR_BYTES;
                                 }
@@ -309,14 +334,42 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
         }
     }
 
-    // Add the latest dongle status messages
+    // Edge-triggered messages: keep sending message for ET_MESSAGE_KEEPALIVE_TIME seconds
+    for (auto const &et_msg : robot_status_states[index].et_messages)
+    {
+        if (difftime(time(nullptr), et_msg.second) < ET_MESSAGE_KEEPALIVE_TIME)
+        {
+            new_msgs.push_back(et_msg.first);
+        }
+    }
+
+    // If there is a new message that wasn't present in the previous status update, return
+    // true
+    bool new_msgs_present = false;
+    for (std::string msg : new_msgs)
+    {
+        if (std::find(robot_status_states[index].old_msgs.begin(),
+                      robot_status_states[index].old_msgs.end(),
+                      msg) == robot_status_states[index].old_msgs.end())
+        {
+            new_msgs_present = true;
+            break;
+        }
+    }
+
+    // Add the latest robot and dongle status messages
+    robot_status.robot_messages  = new_msgs;
     robot_status.dongle_messages = dongle_messages;
 
+    // Update previous message state
+    robot_status_states[index].old_msgs = new_msgs;
+
+    // Publish robot status
     robot_status_publisher.publish(robot_status);
-    return robot_status;
+    return new_msgs_present;
 }
 
-void Annunciator::handle_status(uint8_t status)
+std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
 {
     dongle_messages.clear();
 
@@ -341,4 +394,6 @@ void Annunciator::handle_status(uint8_t status)
     {
         dongle_messages.push_back(MRF::RECEIVE_QUEUE_FULL_MESSAGE);
     }
+
+    return dongle_messages;
 }
