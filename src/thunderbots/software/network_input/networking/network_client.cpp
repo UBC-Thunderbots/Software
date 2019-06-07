@@ -177,6 +177,15 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         world_msg.enemy_team = enemy_team_msg;
     }
 
+    // We invert the field side if we explicitly choose to override the values provided by
+    // refbox. The 'defending_positive_side' parameter dictates the side we are defending
+    // if we are overriding the value
+    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
+        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+    {
+        world_msg = Util::ROSMessages::invertMsgFieldSide(world_msg);
+    }
+
     world_publisher.publish(world_msg);
 }
 
