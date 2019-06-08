@@ -91,7 +91,7 @@ void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
         {
             filterAndPublishVisionData(packet);
         }
-        else if (packet.detection().t_capture() - last_valid_t_capture < 100)
+        else if (std::fabs(packet.detection().t_capture() - last_valid_t_capture) < 100)
         {
             last_valid_t_capture = packet.detection().t_capture();
             filterAndPublishVisionData(packet);
