@@ -7,6 +7,7 @@
 #include <exception>
 
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/play/stop_play.h"
 #include "test/ai/hl/stp/test_plays/move_test_play.h"
 #include "test/ai/hl/stp/test_plays/stop_test_play.h"
 #include "test/test_util/test_util.h"
@@ -28,9 +29,12 @@ class STPTest : public ::testing::Test
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
     auto play_names = PlayFactory::getRegisteredPlayNames();
-    EXPECT_EQ(play_names.size(), 2);
+    EXPECT_EQ(play_names.size(), 3);
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), MoveTestPlay::name), 1);
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), StopTestPlay::name), 1);
+    // We also expect the normal StopPlay since it is used in core functions in stp.cpp so
+    // has to be included in the tests
+    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), StopPlay::name), 1);
 }
 
 TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)

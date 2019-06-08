@@ -7,13 +7,13 @@
 
 import { spawn } from 'redux-saga/effects';
 
-import initConsole from './console';
 import initROS from './ros';
+import initThunderbots from './thunderbots';
 
 /**
  * Starts all application sagas
  */
 export function* init() {
     yield spawn(initROS);
-    yield spawn(initConsole);
+    yield spawn(initThunderbots);
 }

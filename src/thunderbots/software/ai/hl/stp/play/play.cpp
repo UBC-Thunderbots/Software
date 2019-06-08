@@ -16,13 +16,22 @@ std::optional<std::vector<std::shared_ptr<Tactic>>> Play::getTactics(const World
     // the getNextTactics function. This is easier than directly passing the World data
     // into the coroutine
     this->world = world;
-    // Run the coroutine and check its status to see if it has any more work to do.
-    if (tactic_sequence())
+    // Check the coroutine status to see if it has any more work to do.
+    if (tactic_sequence)
     {
-        // Extract the result from the coroutine. This will be whatever value was
-        // yielded by the getNextTactics function
-        auto next_tactics = tactic_sequence.get();
-        return std::make_optional(next_tactics);
+        // Run the coroutine. This will call the bound getNextTactics function
+        tactic_sequence();
+
+        // Check if the coroutine is still valid before getting the result. This makes
+        // sure we don't try get the result after "running out the bottom" of the
+        // coroutine function
+        if (tactic_sequence)
+        {
+            // Extract the result from the coroutine. This will be whatever value was
+            // yielded by the getNextTactics function
+            auto next_tactics = tactic_sequence.get();
+            return std::make_optional(next_tactics);
+        }
     }
     // If the coroutine "iterator" is done, the getNextTactics function has completed
     // and has no more work to do. Therefore, the Play is done so wereturn an empty
