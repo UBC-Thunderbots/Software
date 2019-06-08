@@ -23,8 +23,7 @@ bool StopTestPlay::invariantHolds(const World &world) const
         world.ball().position());
 }
 
-std::vector<std::shared_ptr<Tactic>> StopTestPlay::getNextTactics(
-    TacticCoroutine::push_type &yield, const World &world)
+void StopTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto stop_test_tactic_1 = std::make_shared<StopTestTactic>();
     auto stop_test_tactic_2 = std::make_shared<StopTestTactic>();

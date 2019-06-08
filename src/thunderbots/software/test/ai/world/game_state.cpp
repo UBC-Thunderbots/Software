@@ -166,7 +166,9 @@ PREDICATE_TEST(isStopped, RefboxGameState::STOP, RefboxGameState::GOAL_US,
                RefboxGameState::GOAL_THEM)
 // PLAYING state must be manually set after a transition from a restart state to
 // NORMAL_START
-PREDICATE_TEST(isPlaying, RefboxGameState::FORCE_START)
+PREDICATE_TEST(isPlaying, RefboxGameState::FORCE_START, RefboxGameState::DIRECT_FREE_US,
+               RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_US,
+               RefboxGameState::INDIRECT_FREE_THEM)
 PREDICATE_TEST(isKickoff, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(isPenalty, RefboxGameState::PREPARE_PENALTY_US,
@@ -193,22 +195,20 @@ PREDICATE_TEST(isTheirFreeKick, RefboxGameState::DIRECT_FREE_THEM,
 PREDICATE_TEST(isTheirBallPlacement, RefboxGameState::BALL_PLACEMENT_THEM)
 PREDICATE_TEST(
     isSetupRestart, RefboxGameState::PREPARE_KICKOFF_US,
-    RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::DIRECT_FREE_US,
-    RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_US,
-    RefboxGameState::INDIRECT_FREE_THEM, RefboxGameState::BALL_PLACEMENT_US,
+    RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
     RefboxGameState::BALL_PLACEMENT_THEM,
     // NORMAL_START is a ready state until the restart is cleared when the ball moves
     RefboxGameState::NORMAL_START, RefboxGameState::PREPARE_PENALTY_US,
     RefboxGameState::PREPARE_PENALTY_THEM)
 PREDICATE_TEST(isSetupState, RefboxGameState::PREPARE_KICKOFF_US,
-               RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::DIRECT_FREE_US,
-               RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_US,
-               RefboxGameState::INDIRECT_FREE_THEM, RefboxGameState::BALL_PLACEMENT_US,
+               RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
                RefboxGameState::BALL_PLACEMENT_THEM, RefboxGameState::PREPARE_PENALTY_US,
                RefboxGameState::PREPARE_PENALTY_THEM)
 PREDICATE_TEST(isReadyState, RefboxGameState::NORMAL_START)
 // canKick needs to be tested with a proper restart sequence
-PREDICATE_TEST(canKick, RefboxGameState::FORCE_START)
+PREDICATE_TEST(canKick, RefboxGameState::FORCE_START, RefboxGameState::DIRECT_FREE_US,
+               RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_US,
+               RefboxGameState::INDIRECT_FREE_THEM)
 PREDICATE_TEST(stayOnSide, RefboxGameState::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(stayBehindPenaltyLine, RefboxGameState::PREPARE_PENALTY_THEM,
                RefboxGameState::PREPARE_PENALTY_US)
@@ -343,99 +343,4 @@ TEST_F(GameStateRestartTest, penalty_them_restart_test)
     game_state.setRestartCompleted();
     EXPECT_TRUE(game_state.isPlaying());
     EXPECT_FALSE(game_state.isPenalty());
-}
-
-TEST_F(GameStateRestartTest, direct_free_us_restart_test)
-{
-    GameState game_state;
-
-    RefboxGameState restart_type = RefboxGameState::DIRECT_FREE_US;
-
-    // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP);
-    game_state.updateRefboxGameState(restart_type);
-
-    // verify game_state is in the correct state
-    EXPECT_TRUE(game_state.isSetupState());
-    EXPECT_TRUE(game_state.isDirectFree());
-    EXPECT_TRUE(game_state.isOurRestart());
-    EXPECT_TRUE(game_state.isOurDirect());
-
-    // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
-
-    // verify state again
-    EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(game_state.isDirectFree());
-    EXPECT_TRUE(game_state.isOurRestart());
-    EXPECT_TRUE(game_state.isOurDirect());
-
-    // restart state is cleared when the ball is kicked, enter regular
-    // playing state
-    game_state.setRestartCompleted();
-    EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_FALSE(game_state.isDirectFree());
-}
-
-TEST_F(GameStateRestartTest, direct_free_them_restart_test)
-{
-    GameState game_state;
-
-    RefboxGameState restart_type = RefboxGameState::DIRECT_FREE_THEM;
-    // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP);
-    game_state.updateRefboxGameState(restart_type);
-
-    // verify game_state is in the correct state
-    EXPECT_TRUE(game_state.isSetupState());
-    EXPECT_TRUE(game_state.isDirectFree());
-    EXPECT_FALSE(game_state.isOurRestart());
-    EXPECT_TRUE(game_state.isTheirDirect());
-
-    // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
-
-    // verify state again
-    EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(game_state.isDirectFree());
-    EXPECT_FALSE(game_state.isOurRestart());
-    EXPECT_TRUE(game_state.isTheirDirect());
-
-    // restart state is cleared when the ball is kicked, enter regular
-    // playing state
-    game_state.setRestartCompleted();
-    EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_FALSE(game_state.isDirectFree());
-}
-
-TEST_F(GameStateRestartTest, indirect_free_us_restart_test)
-{
-    GameState game_state;
-
-    RefboxGameState restart_type = RefboxGameState::INDIRECT_FREE_US;
-
-    // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP);
-    game_state.updateRefboxGameState(restart_type);
-
-    // verify game_state is in the correct state
-    EXPECT_TRUE(game_state.isSetupState());
-    EXPECT_TRUE(game_state.isIndirectFree());
-    EXPECT_TRUE(game_state.isOurRestart());
-    EXPECT_TRUE(game_state.isOurIndirect());
-
-    // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
-
-    // verify state again
-    EXPECT_TRUE(game_state.isReadyState());
-    EXPECT_TRUE(game_state.isIndirectFree());
-    EXPECT_TRUE(game_state.isOurRestart());
-    EXPECT_TRUE(game_state.isOurIndirect());
-
-    // restart state is cleared when the ball is kicked, enter regular
-    // playing state
-    game_state.setRestartCompleted();
-    EXPECT_TRUE(game_state.isPlaying());
-    EXPECT_FALSE(game_state.isIndirectFree());
 }

@@ -18,6 +18,5 @@ class ExamplePlay : public Play
 
     bool invariantHolds(const World &world) const override;
 
-    std::vector<std::shared_ptr<Tactic>> getNextTactics(TacticCoroutine::push_type &yield,
-                                                        const World &world) override;
+    void getNextTactics(TacticCoroutine::push_type &yield) override;
 };

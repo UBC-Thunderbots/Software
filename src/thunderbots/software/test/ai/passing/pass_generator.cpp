@@ -1,5 +1,9 @@
 /**
  * This file contains unit tests for the GradientDescent class
+ *
+ * NOTE: A lot of the testing for the PassGenerator should be done in the `ratePass`
+ *       function, as the PassGenerator essentially just maximizes the value returned
+ *       by `ratePass`
  */
 
 #include "ai/passing/pass_generator.h"
@@ -85,7 +89,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(0, {0.5, 0.5}, {-0.5, 0}, Angle::zero(),
+    enemy_team.updateRobots({Robot(0, {0, 0}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
                              Robot(1, {-2, -2}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
@@ -116,7 +120,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     }
 }
 
-TEST_F(PassGeneratorTest, check_passer_robot_is_ignored)
+TEST_F(PassGeneratorTest, check_passer_robot_is_ignored_for_friendly_capability)
 {
     // Test that the pass generator does not converge to use the robot set as the passer
 
@@ -158,6 +162,58 @@ TEST_F(PassGeneratorTest, check_passer_robot_is_ignored)
     // generous here because the enemies on the field can "force" the point slightly
     // away from the chosen receiver robot
     EXPECT_LE((converged_pass.receiverPoint() - robot_1.position()).len(), 0.5);
+}
+
+TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
+{
+    // Test that we do not converge to a pass from the passer robot to itself
+
+    world.updateBallState(Ball({3.5, 0}, {0, 0}, Timestamp::fromSeconds(0)));
+    pass_generator->setPasserPoint({3.5, 0});
+
+    // The passer robot
+    Robot passer = Robot(0, {3.7, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                         Timestamp::fromSeconds(0));
+
+    // The potential receiver robot. Not in a great position, but the only friendly on
+    // the field
+    Robot receiver = Robot(1, {3.7, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                           Timestamp::fromSeconds(0));
+
+    Team friendly_team(Duration::fromSeconds(10), {passer, receiver});
+    world.updateFriendlyTeamState(friendly_team);
+
+    pass_generator->setPasserRobotId(passer.id());
+
+    // We put a few enemies in to force the pass generator to make a decision,
+    // otherwise most of the field would be a valid point to pass to
+    Team enemy_team(Duration::fromSeconds(10),
+                    {
+                        Robot(0, {0, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0)),
+                        Robot(1, {0, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0)),
+                        Robot(2, {2, 3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                              Timestamp::fromSeconds(0)),
+                    });
+    world.updateEnemyTeamState(enemy_team);
+
+    pass_generator->setWorld(world);
+    pass_generator->setPasserRobotId(0);
+
+    // Wait until the pass stops improving or 30 seconds, whichever comes first
+    waitForConvergence(pass_generator, 0.01, 30);
+
+    // Find what pass we converged to
+    auto converged_pass_and_score          = pass_generator->getBestPassSoFar();
+    auto [converged_pass, converged_score] = converged_pass_and_score;
+
+    ::ratePass(world, converged_pass, std::nullopt, 0);
+
+    // We expect to have converged to a point near robot 2. The tolerance is fairly
+    // generous here because the enemies on the field can "force" the point slightly
+    // away from the chosen receiver robot
+    EXPECT_LE((converged_pass.receiverPoint() - receiver.position()).len(), 0.6);
 }
 
 TEST_F(PassGeneratorTest, test_passer_point_changes_are_respected)

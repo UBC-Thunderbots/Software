@@ -4,9 +4,11 @@
 
 #include "util/constants.h"
 #include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 
-NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_service()
+NetworkClient::NetworkClient(ros::NodeHandle& node_handle)
+    : backend(), io_service(), initial_packet_count(0), last_valid_t_capture(9999999)
 {
     // Set up publishers
     world_publisher = node_handle.advertise<thunderbots_msgs::World>(
@@ -20,7 +22,7 @@ NetworkClient::NetworkClient(ros::NodeHandle& node_handle) : backend(), io_servi
         ssl_vision_client = std::make_unique<SSLVisionClient>(
             io_service, Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
             Util::Constants::SSL_VISION_MULTICAST_PORT,
-            boost::bind(&NetworkClient::filterAndPublishVisionData, this, _1));
+            boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -65,6 +67,37 @@ NetworkClient::~NetworkClient()
     io_service_thread.join();
 }
 
+void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
+{
+    // We analyze the first 60 packets we receive to find the "real" starting time.
+    // The real starting time is the smaller value of the ones we receive
+    if (initial_packet_count < 60)
+    {
+        initial_packet_count++;
+        if (packet.has_detection() &&
+            packet.detection().t_capture() < last_valid_t_capture)
+        {
+            last_valid_t_capture = packet.detection().t_capture();
+        }
+    }
+    else
+    {
+        // We pass all packets without a detection to the logic (since they are likely
+        // geometry packet). Packets with detection timestamps are compared to the last
+        // valid timestamp to make sure they are close enough before the data is passed
+        // along. This ensures we ignore any of the garbage packets grsim sends that
+        // are thousands of seconds in the future.
+        if (!packet.has_detection())
+        {
+            filterAndPublishVisionData(packet);
+        }
+        else if (packet.detection().t_capture() - last_valid_t_capture < 100)
+        {
+            last_valid_t_capture = packet.detection().t_capture();
+            filterAndPublishVisionData(packet);
+        }
+    }
+}
 
 void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 {
@@ -79,15 +112,45 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
     if (packet.has_detection())
     {
-        auto detection = packet.detection();
-        // add the detection to the map, replacing any existing values
-        auto ret = latest_detection_data.insert(
-            std::make_pair(detection.camera_id(), detection));
-        // check if we inserted successfully. if not, modify the existing
-        // entry to be our new value
-        if (!ret.second)
+        auto detection       = packet.detection();
+        bool camera_disabled = false;
+
+        switch (detection.camera_id())
         {
-            ret.first->second = detection;
+            case 0:
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_0.value();
+                break;
+            case 1:
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_1.value();
+                break;
+            case 2:
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_2.value();
+                break;
+            case 3:
+                camera_disabled =
+                    Util::DynamicParameters::cameras::ignore_camera_3.value();
+                break;
+            default:
+                LOG(WARNING) << "An unkown camera id was detected, disabled by default "
+                             << "id: " << detection.camera_id() << std::endl;
+                camera_disabled = true;
+                break;
+        }
+
+        if (!camera_disabled)
+        {
+            // add the detection to the map, replacing any existing values
+            auto ret = latest_detection_data.insert(
+                std::make_pair(detection.camera_id(), detection));
+            // check if we inserted successfully. if not, modify the existing
+            // entry to be our new value
+            if (!ret.second)
+            {
+                ret.first->second = detection;
+            }
         }
 
         // Create a vector of the latest detection data for each camera
@@ -112,6 +175,15 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         thunderbots_msgs::Team enemy_team_msg =
             Util::ROSMessages::convertTeamToROSMessage(enemy_team);
         world_msg.enemy_team = enemy_team_msg;
+    }
+
+    // We invert the field side if we explicitly choose to override the values provided by
+    // refbox. The 'defending_positive_side' parameter dictates the side we are defending
+    // if we are overriding the value
+    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
+        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+    {
+        world_msg = Util::ROSMessages::invertMsgFieldSide(world_msg);
     }
 
     world_publisher.publish(world_msg);

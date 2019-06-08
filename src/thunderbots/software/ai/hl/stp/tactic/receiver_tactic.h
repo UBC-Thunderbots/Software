@@ -68,6 +68,19 @@ class ReceiverTactic : public Tactic
      */
     static Angle getOneTimeShotDirection(const Ray& shot, const Ball& ball);
 
+    /**
+     * Get the position the receiver robot should be in, and the orientation it should
+     * have in order to perform a one-time shot when receiving a pass.
+     *
+     * @param robot The receiver robot
+     * @param ball The ball
+     * @param best_shot_target The point the receiver robot should shoot at
+     * @return A pair containing the position and orientation the receiver robot should
+     * have in order to perform a one-time shot
+     */
+    static std::pair<Point, Angle> getOneTimeShotPositionAndOrientation(
+        const Robot& robot, const Ball& ball, const Point& best_shot_target);
+
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot
@@ -77,8 +90,7 @@ class ReceiverTactic : public Tactic
     // enemy goal with
     static constexpr Angle MAX_DEFLECTION_FOR_ONE_TOUCH_SHOT = Angle::ofDegrees(90);
 
-    std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type& yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     /**
      * Finds a feasible shot for the robot, if any.

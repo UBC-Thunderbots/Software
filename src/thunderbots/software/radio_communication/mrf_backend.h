@@ -16,9 +16,10 @@ class MRFBackend
      * Creates a new MRFBackend.
      * Automatically connects to the dongle upon initialization.
      *
+     * @param config MRF configuration to start dongle in
      * @param node_handle the ROS NodeHandle of the radio_communication node
      */
-    explicit MRFBackend(ros::NodeHandle& node_handle);
+    explicit MRFBackend(unsigned int config, ros::NodeHandle& node_handle);
 
     ~MRFBackend();
 

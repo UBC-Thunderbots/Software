@@ -17,12 +17,14 @@ using namespace AI::Passing;
 using namespace AI::Evaluation;
 
 double AI::Passing::ratePass(const World& world, const AI::Passing::Pass& pass,
-                             const std::optional<Rectangle>& target_region)
+                             const std::optional<Rectangle>& target_region,
+                             std::optional<unsigned int> passer_robot_id)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
 
-    double friendly_pass_rating = ratePassFriendlyCapability(world.friendlyTeam(), pass);
+    double friendly_pass_rating =
+        ratePassFriendlyCapability(world.friendlyTeam(), pass, passer_robot_id);
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
@@ -185,14 +187,16 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration time_until_pass     = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration enemy_reaction_time = Duration::fromSeconds(
+        Util::DynamicParameters::AI::Passing::enemy_reaction_time.value());
 
     double robot_ball_time_diff_at_closest_pass_point =
-        (enemy_robot_time_to_closest_pass_point -
+        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
          (ball_time_to_closest_pass_point + time_until_pass))
             .getSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
-        (enemy_robot_time_to_pass_receive_position -
+        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
          (ball_time_to_pass_receive_position + time_until_pass))
             .getSeconds();
 
@@ -207,9 +211,16 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double AI::Passing::ratePassFriendlyCapability(const Team& friendly_team,
-                                               const Pass& pass)
+double AI::Passing::ratePassFriendlyCapability(
+    Team friendly_team, const Pass& pass, std::optional<unsigned int> passer_robot_id)
 {
+    // Remove the passer robot from the friendly team before evaluating, as we assume
+    // the passer is not passing to itself
+    if (passer_robot_id)
+    {
+        friendly_team.removeRobotWithId(*passer_robot_id);
+    }
+
     // We need at least one robot to pass to
     if (friendly_team.getAllRobots().empty())
     {
