@@ -27,3 +27,5 @@ PlayInfo AI::getPlayInfo() const
 {
     return high_level->getPlayInfo();
 }
+
+const std::string AI::NO_PLAY_NAME = "None";

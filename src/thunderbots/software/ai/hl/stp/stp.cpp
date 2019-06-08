@@ -11,6 +11,7 @@
 #include "ai/hl/stp/tactic/tactic.h"
 #include "ai/intent/move_intent.h"
 #include "util/logger/init.h"
+#include "ai/ai.h"
 
 STP::STP(long random_seed) : random_number_generator(random_seed) {}
 
@@ -174,7 +175,7 @@ PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
     info.play_type = "Unknown";
-    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "None";
+    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : AI::NO_PLAY_NAME;
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report the
     // tactics in order or robot id. This makes it much easier to read if tactics or

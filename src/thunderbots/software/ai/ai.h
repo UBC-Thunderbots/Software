@@ -38,6 +38,11 @@ class AI final
      */
     PlayInfo getPlayInfo() const;
 
+    /**
+     * The name that is the PlayInfo play name is set to if no play is selected.
+     */
+    const static std::string NO_PLAY_NAME;
+
    private:
     std::unique_ptr<HL> high_level;
     std::unique_ptr<Navigator> navigator;
