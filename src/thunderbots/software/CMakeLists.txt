@@ -920,6 +920,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(triangle_test
             test/geom/triangle.cpp
             geom/triangle.cpp
+            geom/polygon.cpp
             geom/util.cpp)
 
     target_link_libraries(triangle_test

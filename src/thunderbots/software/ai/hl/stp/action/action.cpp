@@ -3,7 +3,7 @@
 #include "util/logger/init.h"
 
 Action::Action()
-        : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))
+    : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))
 {
 }
 
