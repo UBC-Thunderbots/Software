@@ -13,15 +13,15 @@ import { RosParametersActions } from '../reducers/rosParameters';
 import { ThunderbotsAction } from '../reducers/thunderbots';
 
 export const actions = {
-  canvas: canvasActions,
-  thunderbots: thunderbotsActions,
-  ros: rosActions,
-  rosParameters: rosParametersActions,
+    canvas: canvasActions,
+    thunderbots: thunderbotsActions,
+    ros: rosActions,
+    rosParameters: rosParametersActions,
 };
 
 // We combine all action types for convenient access throughout the application
 export type RootAction =
-  | CanvasAction
-  | ThunderbotsAction
-  | ROSAction
-  | RosParametersActions;
+    | CanvasAction
+    | ThunderbotsAction
+    | ROSAction
+    | RosParametersActions;
