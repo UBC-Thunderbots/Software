@@ -4,6 +4,7 @@
 
 #include "ai/hl/hl.h"
 #include "ai/hl/stp/play/play.h"
+#include "ai/hl/stp/play_info.h"
 #include "ai/intent/intent.h"
 
 /**
@@ -66,9 +67,22 @@ class STP : public HL
      */
     std::optional<std::string> getCurrentPlayName() const;
 
+    /**
+     * Returns information about the currently running plays and tactics, including the
+     * name of the play, and which robots are running which tactics
+     *
+     * @return information about the currently running plays and tactics
+     */
+    PlayInfo getPlayInfo() override;
+
    private:
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
+    std::optional<std::vector<std::shared_ptr<Tactic>>> current_tactics;
     // The random number generator
     std::mt19937 random_number_generator;
+    std::string override_play_name;
+    std::string previous_override_play_name;
+    bool override_play;
+    bool previous_override_play;
 };

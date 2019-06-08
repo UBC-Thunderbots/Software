@@ -283,25 +283,40 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
 
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
+    bool to_beep = false;
+
     transfer.result();
 
     // Only handle if there are more than 2 bytes in the transfer.
     if (transfer.size() > 2)
     {
         unsigned int robot = transfer.data()[0];
-        annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
-                                         transfer.data()[transfer.size() - 2],
-                                         transfer.data()[transfer.size() - 1]);
+        to_beep            = annunciator.handle_robot_message(
+            robot, transfer.data() + 1, transfer.size() - 3,
+            transfer.data()[transfer.size() - 2], transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
+
+    // If there are new messages since the last update, beep.
+    if (to_beep)
+    {
+        beep(ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS);
+    }
 }
 
 void MRFDongle::handle_status(AsyncOperation<void> &)
 {
     status_transfer.result();
-    estop_state = static_cast<EStopState>(status_transfer.data()[0] & 3U);
-    annunciator.handle_status(status_transfer.data()[0U]);
+    estop_state      = static_cast<EStopState>(status_transfer.data()[0] & 3U);
+    auto dongle_msgs = annunciator.handle_dongle_messages(status_transfer.data()[0U]);
     status_transfer.submit();
+
+    // These messages are critical enough that the dongle should continuously beep
+    // while the conditions are true.
+    if (!dongle_msgs.empty())
+    {
+        beep(ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS);
+    }
 }
 
 

@@ -2,6 +2,7 @@
 
 #include <thunderbots_msgs/World.h>
 
+#include "ai/hl/stp/play_info.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
@@ -10,6 +11,7 @@
 #include "refbox_constants.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
+#include "thunderbots_msgs/PlayInfo.h"
 #include "thunderbots_msgs/RefboxCommand.h"
 #include "thunderbots_msgs/Robot.h"
 #include "thunderbots_msgs/Team.h"
@@ -150,5 +152,9 @@ namespace Util
          */
         thunderbots_msgs::Robot invertMsgFieldSide(
             const thunderbots_msgs::Robot& old_robot_msg);
+
+        // TODO: comment
+        thunderbots_msgs::PlayInfo convertPlayPlayInfoToROSMessage(
+            const PlayInfo& play_info);
     }  // namespace ROSMessages
 }  // namespace Util

@@ -1,46 +1,44 @@
-import { IROSParam } from './rosParams';
-import { ILayer } from './canvas';
-import { IRosoutMessage } from './standardROSMessages';
-
-/*
+/***
  * This file specifies the format of the application state
  */
+
+import { ILayer } from './canvas';
+import { IROSParam } from './rosParams';
 
 /**
  * The application state
  */
 export interface IRootState {
-    canvas: ICanvasState;
-    console: IMessagesState;
-    ros: IROSState;
+  canvas: ICanvasState;
+  thunderbots: IThunderbotsState;
+  ros: IROSState;
 }
 
 /**
  * The state object for Canvas
  */
 export interface ICanvasState {
-    layers: { [id: number]: ILayer };
-    layerOrder: number[];
+  layers: { [id: number]: ILayer };
+  layerOrder: number[];
 }
 
 /**
  * The state object for ROS
  */
 export interface IROSState {
-    status: 'connected' | 'disconnected' | 'error';
-    errorMessage: string;
+  status: 'connected' | 'disconnected' | 'error';
+  errorMessage: string;
 }
 
-/**
- * The messages state
- */
-export interface IMessagesState {
-    rosout: IRosoutMessage[];
+export interface IThunderbotsState {
+  playType: string;
+  playName: string;
+  tactics: string[];
 }
 
 /**
  * The ROS settings state
  */
 export interface IROSParamState {
-    [key: string]: IROSParam;
+  [key: string]: IROSParam;
 }
