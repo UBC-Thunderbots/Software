@@ -1,6 +1,7 @@
 #include "network_input/networking/network_client.h"
 
 #include <boost/bind.hpp>
+#include <limits>
 
 #include "util/constants.h"
 #include "util/logger/init.h"
@@ -8,7 +9,10 @@
 #include "util/ros_messages.h"
 
 NetworkClient::NetworkClient(ros::NodeHandle& node_handle)
-    : backend(), io_service(), initial_packet_count(0), last_valid_t_capture(9999999)
+    : backend(),
+      io_service(),
+      initial_packet_count(0),
+      last_valid_t_capture(std::numeric_limits<double>::max())
 {
     // Set up publishers
     world_publisher = node_handle.advertise<thunderbots_msgs::World>(
@@ -91,7 +95,7 @@ void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
         {
             filterAndPublishVisionData(packet);
         }
-        else if (packet.detection().t_capture() - last_valid_t_capture < 100)
+        else if (std::fabs(packet.detection().t_capture() - last_valid_t_capture) < 100)
         {
             last_valid_t_capture = packet.detection().t_capture();
             filterAndPublishVisionData(packet);
