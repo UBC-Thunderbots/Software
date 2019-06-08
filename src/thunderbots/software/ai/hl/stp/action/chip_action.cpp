@@ -55,9 +55,8 @@ void ChipAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     //                 X |      \     /
     //                   |       \   /
     //                   |        \ /
-    //                   >         A
-    //             ball ->         O
-    //
+    //    The ball is    >         A
+    //    at A
     //                             |
     //                             V
     //                     direction of chip
