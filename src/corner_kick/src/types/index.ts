@@ -5,6 +5,12 @@
 export { Color } from './primitives';
 export { IThemeProvider } from './theme';
 export { ShapeType, ISpritesheet, IFrame, IShape } from './spritesheet';
-export { ICanvasState, IRootState, IROSState, IThunderbotsState } from './state';
+export {
+  ICanvasState,
+  IRootState,
+  IROSState,
+  IThunderbotsState,
+  IROSParamState,
+} from './state';
 export { ILayer, ILayerMessage, ISprite } from './canvas';
 export { IPlayInfoMessage } from './thunderbotsROSMessages';
