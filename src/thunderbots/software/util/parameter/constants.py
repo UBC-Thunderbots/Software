@@ -6,7 +6,11 @@
 # printed in a terminal, the espace charecter at the end clears and resets
 # back to the original color. More info can be found here:
 # https://stackoverflow.com/questions/287871/print-in-terminal-with-colors
-AUTOGEN_FAILURE_MSG = '\033[91m ======== cfg autogen failure ======== \033[0m'
+AUTOGEN_FAILURE_MSG = \
+"""\033[91m====================================================\033[0m
+\033[91m                CFG AUTOGEN FAILURE
+\u001b[34;1m Reason: {}
+\033[91m====================================================\033[0m"""
 
 # the working directory is set to the current folder in CMakeLists
 PATH_TO_YAML = './util/parameter/config/'

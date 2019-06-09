@@ -102,6 +102,15 @@ def __options_gen(param_info: dict, file_pointer, namespace: str = None):
             # create an enum for the parameter to use later
             if isinstance(param_info[key], dict) and 'options' in param_info[key]:
 
+                # sanity check to make sure options have a default specified
+                # and that default exists in the list of options
+                if 'default' not in param_info[key].keys() or \
+                        param_info[key]['default'] not in param_info[key]['options']:
+
+                    error_msg = 'Default not specified, or not present in options for {}'.format(key)
+                    print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
+                    sys.exit(error_msg)
+
                 # generate constants for earch option
                 generated_options = []
                 for option in param_info[key]['options']:
