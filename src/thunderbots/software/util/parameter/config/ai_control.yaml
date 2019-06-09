@@ -31,7 +31,7 @@ AI:
           Specifies the refbox play that should be in use
     override_refbox_defending_side:
       type: "bool"
-      default: false
+      default: true
       description: >-
           Overrides the defending side provided by refbox, 
           with defending_positive_side parameter

@@ -81,4 +81,8 @@ class STP : public HL
     std::optional<std::vector<std::shared_ptr<Tactic>>> current_tactics;
     // The random number generator
     std::mt19937 random_number_generator;
+    std::string override_play_name;
+    std::string previous_override_play_name;
+    bool override_play;
+    bool previous_override_play;
 };
