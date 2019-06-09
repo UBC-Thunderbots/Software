@@ -176,8 +176,8 @@ bool contains(const Segment &out, const Point &in)
     {
         // If the segment and point are in a perfect vertical line, we must use Y
         // coordinate centric logic
-        if ((in.x() - out.getEnd().x() == 0) &&
-            (out.getEnd().x() - out.getSegStart().x() == 0))
+        if ((std::abs(in.x() - out.getEnd().x()) < EPS) &&
+            (std::abs(out.getEnd().x() - out.getSegStart().x()) < EPS))
         {
             // if collinear we only need to check one of the coordinates,
             // in this case we select Y because all X values are equal
@@ -198,7 +198,7 @@ bool contains(const Ray &out, const Point &in)
 {
     Point point_in_ray_direction = out.getRayStart() + out.getDirection();
     if (collinear(in, out.getRayStart(), point_in_ray_direction) &&
-        (in - out.getRayStart()).norm() == out.getDirection().norm())
+        (((in - out.getRayStart()).norm() - out.getDirection().norm()).len() < EPS))
     {
         return true;
     }
