@@ -38,9 +38,9 @@ def load_configuration(path_to_yaml: str):
                 try:
                     param_info[filename.split(".")[0]] = yaml.load(param_yaml)
                 except yaml.YAMLError as ymle:
-                    print(constants.AUTOGEN_FAILURE_MSG)
-                    sys.exit(
-                        "{} could not be loaded correctly, please check format".format(filename))
+                    error_msg = "{} could not be loaded correctly, please check format".format(filename)
+                    print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
+                    sys.exit(error_msg)
     return param_info
 
 #######################################################################
@@ -149,9 +149,9 @@ def __options_gen(param_info: dict, file_pointer, namespace: str = None):
                 return
 
         except OSError as ose:
-            print(constants.AUTOGEN_FAILURE_MSG)
-            sys.exit('Error when setting up option for parameter: {}, context:{}'.format(
-                key, kerr))
+            error_msg = 'Error when setting up option for parameter: {}, context:{}'.format(key, ose)
+            print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
+            sys.exit(error_msg)
 
 
 def __cfg_gen(param_info: dict, file_pointer, group_name=None, namespace=None):
@@ -200,9 +200,9 @@ def __cfg_gen(param_info: dict, file_pointer, group_name=None, namespace=None):
                     ))
 
             except KeyError as kerr:
-                print(constants.AUTOGEN_FAILURE_MSG)
-                sys.exit('Required key missing from config: {}, please check parameter {}'.format(
-                    kerr, key))
+                error_msg = 'Required key missing from config: {}, please check parameter {}'.format(kerr, key)
+                print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
+                sys.exit(error_msg)
 
         # if there is no current group, a new namespace must be created
         elif group_name is None:
