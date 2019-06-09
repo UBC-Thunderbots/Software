@@ -179,47 +179,54 @@ def __cfg_gen(param_info: dict, file_pointer, group_name=None, namespace=None):
     # iterate through keys
     for key in param_info.keys():
 
-        # if type key is found, create a parameter
-        if "type" in param_info[key]:
-            try:
-                parameter = param_info[key]
 
-                # write parameter to file
-                file_pointer.write(
-                    constants.CFG_PARAMETER.format(
-                        namespace=group_name if group_name is not None else "gen",
-                        name=key,
-                        type=constants.CFG_TYPE_MAP[parameter["type"]],
-                        description=parameter["description"],
-                        default=parameter["default"],
-                        quote="\"" if parameter["type"] in constants.QUOTE_TYPES else "",
-                        min_val=parameter["min"] if parameter["type"] in constants.RANGE_TYPES else None,
-                        max_val=parameter["max"] if parameter["type"] in constants.RANGE_TYPES else None,
-                        enum=('{}_{}_enum'.format(namespace, key)
-                              ).lower() if "options" in parameter else "\"\""
-                    ))
+        try:
+            # if type key is found, create a parameter
+            if "type" in param_info[key]:
+                try:
+                    parameter = param_info[key]
 
-            except KeyError as kerr:
-                error_msg = 'Required key missing from config: {}, please check parameter {}'.format(kerr, key)
-                print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
-                sys.exit(error_msg)
+                    # write parameter to file
+                    file_pointer.write(
+                        constants.CFG_PARAMETER.format(
+                            namespace=group_name if group_name is not None else "gen",
+                            name=key,
+                            type=constants.CFG_TYPE_MAP[parameter["type"]],
+                            description=parameter["description"],
+                            default=parameter["default"],
+                            quote="\"" if parameter["type"] in constants.QUOTE_TYPES else "",
+                            min_val=parameter["min"] if parameter["type"] in constants.RANGE_TYPES else None,
+                            max_val=parameter["max"] if parameter["type"] in constants.RANGE_TYPES else None,
+                            enum=('{}_{}_enum'.format(namespace, key)
+                                  ).lower() if "options" in parameter else "\"\""
+                        ))
 
-        # if there is no current group, a new namespace must be created
-        elif group_name is None:
-            file_pointer.write(constants.CFG_NEW_NAMESPACE.format(
-                namespace=key
-            ))
-            __cfg_gen(param_info[key], file_pointer,
-                      group_name=key, namespace=key)
+                except KeyError as kerr:
+                    error_msg = 'Required key missing from config: {}, please check parameter {}'.format(kerr, key)
+                    print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
+                    sys.exit(error_msg)
 
-        # if there already is a group, add to that namespace
-        else:
-            file_pointer.write(constants.CFG_SUB_NAMESPACE.format(
-                namespace=group_name,
-                sub_namespace=key
-            ))
-            __cfg_gen(param_info[key], file_pointer,
-                      group_name=key, namespace=namespace+"_"+key)
+            # if there is no current group, a new namespace must be created
+            elif group_name is None:
+                file_pointer.write(constants.CFG_NEW_NAMESPACE.format(
+                    namespace=key
+                ))
+                __cfg_gen(param_info[key], file_pointer,
+                          group_name=key, namespace=key)
+
+            # if there already is a group, add to that namespace
+            else:
+                file_pointer.write(constants.CFG_SUB_NAMESPACE.format(
+                    namespace=group_name,
+                    sub_namespace=key
+                ))
+                __cfg_gen(param_info[key], file_pointer,
+                          group_name=key, namespace=namespace+"_"+key)
+
+        except Exception as generic_exception:
+            error_msg = 'Parameter configuration is corrupt, perhaps missing type?'
+            print(constants.AUTOGEN_FAILURE_MSG.format(error_msg))
+            sys.exit(error_msg)
 
 #######################################################################
 #                            CPP Generator                            #
