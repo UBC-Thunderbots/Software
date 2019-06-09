@@ -20,12 +20,12 @@ FILETYPE="*.*"
 # Check if checksum file exists.
 if [ ! -f $CACHE ]; then
     # File does not exist, assume src is dirty and save the checksum.
-    find "$SRC" -type f -name "$FILETYPE" -exec md5sum {} + | awk '{print $1}' | sort | md5sum > $CACHE
+    find -L "$SRC" -type f -name "$FILETYPE" -exec md5deep {} + | awk '{print $1}' | sort | md5sum > $CACHE
     exit 1
 else 
     # File exists, get the old value and generate the new value.
     OLDCHECKSUM=$(<$CACHE)
-    NEWCHECKSUM=$(find "$SRC" -type f -name "$FILETYPE" -exec md5sum {} + | awk '{print $1}' | sort | md5sum)
+    NEWCHECKSUM=$(find -L "$SRC" -type f -name "$FILETYPE" -exec md5sum {} + | awk '{print $1}' | sort | md5sum)
 
     # The actual checksum is 32 characters long, 
     # so only get that portion of the string.
