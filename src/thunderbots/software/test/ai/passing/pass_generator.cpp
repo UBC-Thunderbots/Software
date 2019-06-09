@@ -102,7 +102,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     pass_generator->setWorld(world);
 
     // Wait until the pass stops improving or 30 seconds, whichever comes first
-    waitForConvergence(pass_generator, 0.01, 30);
+    waitForConvergence(pass_generator, 0.0001, 30);
 
     // Find what pass we converged to
     auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();
@@ -320,3 +320,4 @@ TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_regio
     auto [converged_pass, score] = pass_generator->getBestPassSoFar();
     EXPECT_TRUE(target_region.containsPoint(converged_pass.receiverPoint()));
 }
+
