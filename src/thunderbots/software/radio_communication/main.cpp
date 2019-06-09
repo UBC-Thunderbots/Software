@@ -85,6 +85,9 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "radio_communication");
     ros::NodeHandle node_handle;
 
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+
     // Register signal handler (has to be after ros::init)
     signal(SIGINT, signalHandler);
 
@@ -97,9 +100,6 @@ int main(int argc, char** argv)
         Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
     ros::Subscriber world_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
-
-    // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Initialize variables
     primitives = std::vector<std::unique_ptr<Primitive>>();

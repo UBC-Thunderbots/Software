@@ -555,7 +555,7 @@ void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 }
 
 void MRFDongle::handle_camera_transfer_done(
-    AsyncOperation<void> &,
+    AsyncOperation<void> & op,
     std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -569,7 +569,7 @@ void MRFDongle::handle_camera_transfer_done(
     std::lock_guard<std::mutex> lock(cam_mtx);
     LOG(DEBUG) << "Camera transfer done, took: " << stamp - (*iter).second
                << " microseconds" << std::endl;
-    (*iter).first->result();
+    op.result();
     camera_transfers.erase(iter);
 }
 
