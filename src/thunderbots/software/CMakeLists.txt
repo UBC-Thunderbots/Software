@@ -722,11 +722,23 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_plays/stop_test_play.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
             ai/primitive/primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
@@ -734,6 +746,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            ai/ai.cpp
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_tactic_assignment.cpp
@@ -741,6 +754,7 @@ if (CATKIN_ENABLE_TESTING)
             util/time/timestamp.cpp
             util/time/duration.cpp
             util/time/time.cpp
+            util/refbox_constants.cpp
             geom/util.cpp
             test/test_util/test_util.cpp
             )
@@ -975,6 +989,51 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES}
             ${Threads_LIBRARIES})
+
+    catkin_add_gtest(stp_refbox_game_state_play_selection
+            ai/hl/stp/stp.cpp
+            ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/stop_action.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
+            ai/hl/stp/play/play.cpp
+            ai/hl/stp/play/stop_play.cpp
+            ai/hl/stp/play/play_factory.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/ai.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/refbox_constants.cpp
+            geom/util.cpp
+            test/test_util/test_util.cpp
+            test/ai/hl/stp/stp_refbox_game_state_play_selection.cpp
+            )
+    target_link_libraries(stp_refbox_game_state_play_selection
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
     
 endif()
 
