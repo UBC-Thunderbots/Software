@@ -15,6 +15,9 @@ AI:
   current_ai_play:
     type: "string"
     default: "Example Play"
+    options:
+        - "Example Play"
+        - "Stop Play"
     description: >- 
         Specifies the ai play that should be in use
   refbox:
