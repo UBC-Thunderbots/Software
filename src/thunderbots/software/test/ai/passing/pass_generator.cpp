@@ -320,4 +320,3 @@ TEST_F(PassGeneratorTest, test_receiver_point_converges_to_point_in_target_regio
     auto [converged_pass, score] = pass_generator->getBestPassSoFar();
     EXPECT_TRUE(target_region.containsPoint(converged_pass.receiverPoint()));
 }
-
