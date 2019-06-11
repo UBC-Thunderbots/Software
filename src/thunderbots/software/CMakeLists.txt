@@ -946,6 +946,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(game_state_play_selection_test
             ai/hl/stp/stp.cpp
+	    ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/tactic/tactic.cpp
 	    ai/hl/stp/tactic/stop_tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
