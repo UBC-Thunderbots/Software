@@ -951,6 +951,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
+	    ai/hl/stp/play/stop_play.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_plays/stop_test_play.cpp
             ai/intent/intent.cpp
