@@ -6,7 +6,11 @@
 # printed in a terminal, the espace charecter at the end clears and resets
 # back to the original color. More info can be found here:
 # https://stackoverflow.com/questions/287871/print-in-terminal-with-colors
-AUTOGEN_FAILURE_MSG = '\033[91m ======== cfg autogen failure ======== \033[0m'
+AUTOGEN_FAILURE_MSG = \
+"""\033[91m====================================================\033[0m
+\033[91m                CFG AUTOGEN FAILURE
+\u001b[34;1m Reason: {}
+\033[91m====================================================\033[0m"""
 
 # the working directory is set to the current folder in CMakeLists
 PATH_TO_YAML = './util/parameter/config/'
@@ -71,7 +75,10 @@ CPP_TYPE_MAP = {
 
 CFG_NEW_NAMESPACE = '{namespace} = gen.add_group(\"{namespace}\")\n'
 CFG_SUB_NAMESPACE = '{sub_namespace} = {namespace}.add_group(\"{sub_namespace}\")\n'
-CFG_PARAMETER = '{namespace}.add(\"{name}\", {type}, 0, \"{description}\", {quote}{default}{quote}, {min_val}, {max_val})\n'
+CFG_PARAMETER = '{namespace}.add(\"{name}\", {type}, 0, \"{description}\", {quote}{default}{quote}, {min_val}, {max_val}, edit_method={enum})\n'
+
+CFG_CONST = "{qualified_name} = gen.const(\"{qualified_name}\", {type}, {quote}{value}{quote}, \"\")\n"
+CFG_ENUM = "{qualified_name}_enum = gen.enum([{cfg_options}], \"Selector for {param_name}\")\n"
 
 CFG_HEADER = \
 """#!/usr/bin/env python
