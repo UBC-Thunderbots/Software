@@ -16,6 +16,7 @@ import { ILayer, IRootState } from 'SRC/types';
 
 import { LayersPanel } from './panels/LayersPanel';
 import { PlayTypePanel } from './panels/PlayTypePanel';
+import { SettingsPanel } from './panels/SettingsPanel';
 
 // We request the layer data from the store
 const mapStateToProps = (state: IRootState) => ({
@@ -79,6 +80,7 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
                         toggleVisibility={this.onLayerVisibilityToggle}
                     />
                     <PlayTypePanel {...this.props} />
+                    <SettingsPanel />
                 </Portal>
                 <Portal portalLocation={PortalLocation.MAIN}>
                     <Canvas canvasManager={this.canvasManager} />
