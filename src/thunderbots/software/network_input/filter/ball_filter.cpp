@@ -10,7 +10,7 @@
 
 static std::ofstream outfile;
 
-BallFilter::BallFilter() : ball_detection_buffer(5), LINEAR_REGRESSION_BUFFER_SIZE(3) {}
+BallFilter::BallFilter() : ball_detection_buffer(5), LINEAR_REGRESSION_BUFFER_SIZE(5) {}
 
 void BallFilter::addNewDetectionsToBuffer(
         std::vector<SSLBallDetection> new_ball_detections, const Field &field) {

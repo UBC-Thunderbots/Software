@@ -109,14 +109,14 @@ protected:
             EXPECT_LT(ball_position_difference, expected_position_tolerance);
             // Only check the velocity once we have more than 1 data entry in the filter
             // since the filter can't return a realistic velocity with only a single detection
-//            if(i > 0) {
-//                // Check the direction of the velocity
-//                double velocity_orientation_difference = std::fabs(filtered_ball->velocity().orientation().minDiff(ball_velocity.orientation()).toDegrees());
-//                EXPECT_LE(velocity_orientation_difference, expected_velocity_angle_tolerance.toDegrees());
-//                // Check the magnitude of the velocity
-//                double velocity_magnitude_difference = std::fabs(filtered_ball->velocity().len() - ball_velocity.len());
-//                EXPECT_LE(velocity_magnitude_difference, expected_velocity_magnitude_tolerance);
-//            }
+            if(i > 0) {
+                // Check the direction of the velocity
+                double velocity_orientation_difference = std::fabs(filtered_ball->velocity().orientation().minDiff(ball_velocity.orientation()).toDegrees());
+                EXPECT_LE(velocity_orientation_difference, expected_velocity_angle_tolerance.toDegrees());
+                // Check the magnitude of the velocity
+                double velocity_magnitude_difference = std::fabs(filtered_ball->velocity().len() - ball_velocity.len());
+                EXPECT_LE(velocity_magnitude_difference, expected_velocity_magnitude_tolerance);
+            }
 
             // Make sure the timestamps are always increasing
             EXPECT_GE(filtered_ball->lastUpdateTimestamp(), current_timestamp);
@@ -194,7 +194,7 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_d
     // When the ball is sitting still, the velocity could be any direction so we do
     // not use a strict tolerance for this test. We only really care about the
     // magnitude of the velocity to make sure it's small enough
-    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(1);
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(10);
     double expected_velocity_magnitude_tolerance = 0.1;
     int num_steps_to_ignore = 5;
     Timestamp start_time = current_timestamp;
@@ -238,7 +238,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_data) {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
-    double ball_velocity_magnitude = 4.72;
+    double ball_velocity_magnitude = 5.72;
     double ball_position_variance = 0.001;
     double time_step_variance = 0.001;
     double expected_position_tolerance = 0.003;
@@ -258,227 +258,14 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
     double ball_velocity_magnitude = 5.04;
     double ball_position_variance = 0.005;
     double time_step_variance = 0.001;
-    double expected_position_tolerance = 0.003;
+    double expected_position_tolerance = 0.015;
     // When the ball is sitting still, the velocity could be any direction so we do
     // not use a strict tolerance for this test. We only really care about the
     // magnitude of the velocity to make sure it's small enough
-    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(1);
-    double expected_velocity_magnitude_tolerance = 0.08;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.01);
+    double expected_velocity_magnitude_tolerance = 0.00;
     int num_steps_to_ignore = 5;
     Timestamp start_time = current_timestamp;
 
     testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
 }
-
-//
-//TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_data) {
-//    // The ball is moving from one corner of the field to the other at 5m/s
-//    Point ball_starting_position = field.friendlyCornerNeg();
-//    Vector velocity = (field.enemyCornerPos() - field.friendlyCornerNeg()).norm(0.4);
-//
-//    // Variance of 1mm
-//    std::normal_distribution<double> position_noise_distribution(0, 0.001);
-//    // Time noise of 1ms
-//    std::normal_distribution<double> time_step_noise_distribution(0, 0.001);
-//
-//    for(int i = 0; i < 100; i++) {
-//        // Generate the noise that will be added to the position and time step to simulate
-//        // imperfect data
-//        Point position_noise(position_noise_distribution(random_generator), position_noise_distribution(random_generator));
-//        Duration time_step_noise = Duration::fromSeconds(time_step_noise_distribution(random_generator));
-//
-//        // Calculate the "correct" ball position
-//        Timestamp current_timestamp = starting_time + Duration::fromSeconds(i * time_step.getSeconds() + time_step_noise.getSeconds());
-//        Duration time_diff = current_timestamp - starting_time;
-//        Point current_ball_position = ball_starting_position + velocity.norm(velocity.len() * time_diff.getSeconds());
-//
-//        // Apply noise to the position
-//        Point ball_position_with_noise = current_ball_position + position_noise;
-//
-//        std::vector<SSLBallDetection> ball_detections = {
-//                SSLBallDetection{ball_position_with_noise, current_timestamp}
-//        };
-//        auto ball = ball_filter.getFilteredData(ball_detections, field);
-//
-//        std::cout << ball_position_with_noise << ", " << (ball_position_with_noise - current_ball_position).len()  << ", " << ball->velocity() << ", " << (ball->velocity() - velocity).len() << ", " << (ball->velocity().orientation() - velocity.orientation()).toDegrees() << ", " << std::fabs(ball->velocity().len() - velocity.len()) << std::endl;
-//
-//        ASSERT_TRUE(ball);
-//        EXPECT_TRUE(ball->position().isClose(current_ball_position, 0.005));
-//        // Only check the velocity once we have more than 1 data entry in the filter
-//        // since the filter can't return a realistic velocity with only a single detection
-//        if(i > 0) {
-//            EXPECT_NEAR(ball->velocity().orientation().toDegrees(), velocity.orientation().toDegrees(), 0.9);
-//            EXPECT_NEAR(ball->velocity().len(), velocity.len(), 0.1);
-//        }
-//        EXPECT_EQ(ball->lastUpdateTimestamp(), current_timestamp);
-//    }
-//}
-//
-//TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_moderate_noise_in_data) {
-//    // The ball is moving from one corner of the field to the other at 5m/s
-//    Point ball_starting_position = field.friendlyCornerNeg();
-//    Vector velocity = (field.enemyCornerPos() - field.friendlyCornerNeg()).norm(0.4);
-//
-//    // Variance of 1mm
-//    std::normal_distribution<double> position_noise_distribution(0, 0.008);
-//    // Time noise of 1ms
-//    std::normal_distribution<double> time_step_noise_distribution(0, 0.01);
-//
-//    for(int i = 0; i < 100; i++) {
-//        // Generate the noise that will be added to the position and time step to simulate
-//        // imperfect data
-//        Point position_noise(position_noise_distribution(random_generator), position_noise_distribution(random_generator));
-//        Duration time_step_noise = Duration::fromSeconds(time_step_noise_distribution(random_generator));
-//
-//        // Calculate the "correct" ball position
-//        Timestamp current_timestamp = starting_time + Duration::fromSeconds(i * time_step.getSeconds() + time_step_noise.getSeconds());
-//        Duration time_diff = current_timestamp - starting_time;
-//        Point current_ball_position = ball_starting_position + velocity.norm(velocity.len() * time_diff.getSeconds());
-//
-//        // Apply noise to the position
-//        Point ball_position_with_noise = current_ball_position + position_noise;
-//
-//        std::vector<SSLBallDetection> ball_detections = {
-//                SSLBallDetection{ball_position_with_noise, current_timestamp}
-//        };
-//        auto ball = ball_filter.getFilteredData(ball_detections, field);
-//
-//        std::cout << ball_position_with_noise << ", " << (ball_position_with_noise - current_ball_position).len()  << ", " << ball->velocity() << ", " << (ball->velocity() - velocity).len() << ", " << (ball->velocity().orientation() - velocity.orientation()).toDegrees() << ", " << std::fabs(ball->velocity().len() - velocity.len()) << std::endl;
-//
-//        ASSERT_TRUE(ball);
-//        EXPECT_TRUE(ball->position().isClose(current_ball_position, 0.005));
-//        // Only check the velocity once we have more than 1 data entry in the filter
-//        // since the filter can't return a realistic velocity with only a single detection
-//        if(i > 0) {
-//            EXPECT_NEAR(ball->velocity().orientation().toDegrees(), velocity.orientation().toDegrees(), 0.9);
-//            EXPECT_NEAR(ball->velocity().len(), velocity.len(), 0.1);
-//        }
-//        EXPECT_EQ(ball->lastUpdateTimestamp(), current_timestamp);
-//    }
-//}
-//
-//TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_a_sharp_bounce_and_small_noise_in_data) {
-//    // The ball is moving from one corner of the field to the other at 5m/s
-//    Point ball_starting_position = field.friendlyCornerNeg();
-//    Vector velocity = (field.enemyCornerPos() - field.friendlyCornerNeg()).norm(5);
-//
-//    // Variance of 1mm
-//    std::normal_distribution<double> position_noise_distribution(0, 0.008);
-//    // Time noise of 1ms
-//    std::normal_distribution<double> time_step_noise_distribution(0, 0.01);
-//
-//    for(int i = 0; i < 100; i++) {
-//        // Generate the noise that will be added to the position and time step to simulate
-//        // imperfect data
-//        Point position_noise(position_noise_distribution(random_generator), position_noise_distribution(random_generator));
-//        Duration time_step_noise = Duration::fromSeconds(time_step_noise_distribution(random_generator));
-//
-//        // Calculate the "correct" ball position
-//        Timestamp current_timestamp = starting_time + Duration::fromSeconds(i * time_step.getSeconds() + time_step_noise.getSeconds());
-//        Duration time_diff = current_timestamp - starting_time;
-//        Point current_ball_position = ball_starting_position + velocity.norm(velocity.len() * time_diff.getSeconds());
-//
-//        // Apply noise to the position
-//        Point ball_position_with_noise = current_ball_position + position_noise;
-//
-//        std::vector<SSLBallDetection> ball_detections = {
-//                SSLBallDetection{ball_position_with_noise, current_timestamp}
-//        };
-//        auto ball = ball_filter.getFilteredData(ball_detections, field);
-//
-//        std::cout << ball_position_with_noise << ", " << (ball_position_with_noise - current_ball_position).len()  << ", " << ball->velocity() << ", " << (ball->velocity() - velocity).len() << ", " << (ball->velocity().orientation() - velocity.orientation()).toDegrees() << ", " << std::fabs(ball->velocity().len() - velocity.len()) << std::endl;
-//
-//        ASSERT_TRUE(ball);
-//        EXPECT_TRUE(ball->position().isClose(current_ball_position, 0.005));
-//        // Only check the velocity once we have more than 1 data entry in the filter
-//        // since the filter can't return a realistic velocity with only a single detection
-//        if(i > 0) {
-//            EXPECT_NEAR(ball->velocity().orientation().toDegrees(), velocity.orientation().toDegrees(), 0.9);
-//            EXPECT_NEAR(ball->velocity().len(), velocity.len(), 0.1);
-//        }
-//        EXPECT_EQ(ball->lastUpdateTimestamp(), current_timestamp);
-//    }
-//}
-//
-//TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_moderate_noise_in_data) {
-//    // The ball is moving from one corner of the field to the other at 5m/s
-//    Point ball_starting_position = field.friendlyCornerNeg();
-//    Vector velocity = (field.enemyCornerPos() - field.friendlyCornerNeg()).norm(5);
-//
-//    // Variance of 1mm
-//    std::normal_distribution<double> position_noise_distribution(0, 0.008);
-//    // Time noise of 1ms
-//    std::normal_distribution<double> time_step_noise_distribution(0, 0.01);
-//
-//    for(int i = 0; i < 100; i++) {
-//        // Generate the noise that will be added to the position and time step to simulate
-//        // imperfect data
-//        Point position_noise(position_noise_distribution(random_generator), position_noise_distribution(random_generator));
-//        Duration time_step_noise = Duration::fromSeconds(time_step_noise_distribution(random_generator));
-//
-//        // Calculate the "correct" ball position
-//        Timestamp current_timestamp = starting_time + Duration::fromSeconds(i * time_step.getSeconds() + time_step_noise.getSeconds());
-//        Duration time_diff = current_timestamp - starting_time;
-//        Point current_ball_position = ball_starting_position + velocity.norm(velocity.len() * time_diff.getSeconds());
-//
-//        // Apply noise to the position
-//        Point ball_position_with_noise = current_ball_position + position_noise;
-//
-//        std::vector<SSLBallDetection> ball_detections = {
-//                SSLBallDetection{ball_position_with_noise, current_timestamp}
-//        };
-//        auto ball = ball_filter.getFilteredData(ball_detections, field);
-//
-//        std::cout << ball_position_with_noise << ", " << (ball_position_with_noise - current_ball_position).len()  << ", " << ball->velocity() << ", " << (ball->velocity() - velocity).len() << ", " << (ball->velocity().orientation() - velocity.orientation()).toDegrees() << ", " << std::fabs(ball->velocity().len() - velocity.len()) << std::endl;
-//
-//        ASSERT_TRUE(ball);
-//        EXPECT_TRUE(ball->position().isClose(current_ball_position, 0.005));
-//        // Only check the velocity once we have more than 1 data entry in the filter
-//        // since the filter can't return a realistic velocity with only a single detection
-//        if(i > 0) {
-//            EXPECT_NEAR(ball->velocity().orientation().toDegrees(), velocity.orientation().toDegrees(), 0.9);
-//            EXPECT_NEAR(ball->velocity().len(), velocity.len(), 0.1);
-//        }
-//        EXPECT_EQ(ball->lastUpdateTimestamp(), current_timestamp);
-//    }
-//}
-//
-////TEST_F(BallFilterTest, ball_moving_in_a_straight_line_with_no_noise_in_data) {
-////    double ball_velocity_magnitude = 4.0;
-////    Point ball_starting_position = Point(-2, -1);
-////    std::normal_distribution<double> position_noise_distribution(0, 0);
-////    std::normal_distribution<double> time_step_noise_distribution(0, 0);
-////
-////    Vector velocity = Vector(1, 1).norm(ball_velocity_magnitude);
-////    Vector position_increment = velocity.norm(velocity.len() * time_step.getSeconds());
-////
-////    Point current_ball_position = ball_starting_position;
-////    Timestamp current_timestamp = starting_time;
-////
-////    for(int i = 0; i < 100; i++) {
-////        // Generate the noise that will be added to the position and time step to simulate
-////        // imperfect data
-////        Point position_noise(position_noise_distribution(random_generator), position_noise_distribution(random_generator));
-////        Duration time_step_noise = Duration::fromSeconds(time_step_noise_distribution(random_generator));
-////
-////        // Update the "correct" state of the ball
-////        current_ball_position = current_ball_position + position_increment;
-////        current_timestamp = current_timestamp + Duration::fromSeconds(time_step.getSeconds());
-////
-////        // Apply noise to the current state
-////        Point ball_position_with_noise = current_ball_position + position_noise;
-////        Timestamp current_timestamp_with_noise = current_timestamp + time_step_noise;
-////
-////        std::vector<SSLBallDetection> ball_detections = {
-////                SSLBallDetection{ball_position_with_noise, current_timestamp_with_noise}
-////        };
-////        auto ball = ball_filter.getFilteredData(ball_detections, field);
-////
-////        ASSERT_TRUE(ball);
-////        EXPECT_TRUE(ball->position().isClose(current_ball_position, 0.01));
-////        EXPECT_TRUE(ball->velocity().isClose(velocity, 0.01));
-////        EXPECT_EQ(ball->lastUpdateTimestamp(), current_timestamp);
-////    }
-////}
-////
-
