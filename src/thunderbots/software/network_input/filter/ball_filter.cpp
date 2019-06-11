@@ -103,31 +103,6 @@ std::vector<Vector> BallFilter::calculateBallVelocities(
     return ball_velocities;
 }
 
-Ball BallFilter::getAveragedBallPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections) {
-    // Sort the detections in decreasing order before processing. This places the most recent detections (with the
-    // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
-    // the buffer
-    std::sort(ball_detections.rbegin(), ball_detections.rend());
-
-    Point average_position = Point(0, 0);
-    for(const auto& detection : ball_detections) {
-        average_position = average_position + detection.position;
-    }
-
-    average_position = average_position.norm(average_position.len() / ball_detections.size());
-
-    std::vector<Vector> buffer_velocities = calculateBallVelocities(ball_detections);
-    Vector average_velocity = Vector(0, 0);
-    for(const auto& velocity : buffer_velocities) {
-        average_velocity = average_velocity + velocity;
-    }
-
-    average_velocity = average_velocity.norm(average_velocity.len() / buffer_velocities.size());
-
-    Ball filtered_ball = Ball(average_position, average_velocity, ball_detections.front().timestamp);
-    return filtered_ball;
-}
-
 Ball
 BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections) {
     // Sort the detections in decreasing order before processing. This places the most recent detections (with the
@@ -191,33 +166,9 @@ BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBal
 std::optional<Ball> BallFilter::getFilteredData(const std::vector<SSLBallDetection>& new_ball_detections, const Field& field)
 {
     addNewDetectionsToBuffer(new_ball_detections, field);
-    // Sort the detections in decreasing order before processing. This places the most recent detections (with the
-    // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
-    // the buffer
-    std::sort(ball_detection_buffer.rbegin(), ball_detection_buffer.rend());
 
     if(ball_detection_buffer.size() >= 2) {
-
         return getLinearRegressionPositionAndVelocity(ball_detection_buffer);
-        // Estimate the ball's velocity. If no velocities can be calculated (this will happen if all values in the
-        // buffer have the same timestamp), we leave the esimated velocity as 0 which will cause us to default to
-        // the averaging filter
-        auto velocities = calculateBallVelocities(ball_detection_buffer);
-        double estimated_ball_velocity_magnitude = 0.0;
-        if(!velocities.empty()) {
-            estimated_ball_velocity_magnitude = velocities.at(0).len();
-        }
-
-        if(estimated_ball_velocity_magnitude < 0.25) {
-            // If the ball is moving slowly, we use the average position and velocity
-            // of the buffer since it handles slow and stationary balls better
-//            return getAveragedBallPositionAndVelocity(ball_detection_buffer);
-            return getLinearRegressionPositionAndVelocity(ball_detection_buffer);
-        }else {
-            // If the ball is moving quickly, we use a filter based on linear regression because it handles moving
-            // balls better
-            return getLinearRegressionPositionAndVelocity(ball_detection_buffer);
-        }
     }else if(ball_detection_buffer.size() == 1) {
         // If there is only 1 entry in the buffer, we can't calculate a velocity so
         // just set it to 0
