@@ -25,7 +25,7 @@ struct SSLBallDetection
         return timestamp < b.timestamp;
     }
 };
-
+// TODO: COMMENTS AND ASCII ART
 /**
  * Given ball data from SSL Vision, filters for and returns the position/velocity of the
  * "real" ball
@@ -54,10 +54,10 @@ class BallFilter
     // TODO: comments
     void addNewDetectionsToBuffer(std::vector<SSLBallDetection> new_ball_detections,
                                   const Field &field);
-    Ball getAveragedBallPositionAndVelocity();
-    Ball getLinearRegressionPositionAndVelocity();
+    Ball getAveragedBallPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
+    Ball getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
     std::vector<Vector> calculateBallVelocities(
-            const boost::circular_buffer<SSLBallDetection> &ball_detections);
+            boost::circular_buffer<SSLBallDetection> ball_detections);
 
 
 
