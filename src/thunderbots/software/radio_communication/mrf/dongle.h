@@ -148,13 +148,9 @@ class MRFDongle final
 
     /* Camera (vision) packet stuff */
     void handle_camera_transfer_done(
-        AsyncOperation<void> &,
-        std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator
-            iter);
+        AsyncOperation<void> &);
     std::mutex cam_mtx;
     std::unique_ptr<USB::BulkOutTransfer> camera_transfer;
-    std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>
-        camera_transfers;
 
     /* Handling of messages from the robots. */
     std::array<std::unique_ptr<USB::BulkInTransfer>, 32> mdr_transfers;
