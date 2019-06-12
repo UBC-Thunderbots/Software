@@ -5,6 +5,7 @@
 #include "ai/world/game_state.h"
 #include "ai/world/team.h"
 #include "util/refbox_constants.h"
+#include "boost/circular_buffer.hpp"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -72,9 +73,9 @@ class World final
     void updateRefboxGameState(const RefboxGameState& game_state);
 
     /**
-     * Updates the refbox game state
+     * Updates the Timestamp history of the World with the new Timestamp
      *
-     * @param game_state the game state sent by refbox
+     * @param timestamp : Timestamp corresponding to the most recent data in the World
      */
     void updateMostRecentTimestamp(const Timestamp& timestamp);
 
@@ -162,4 +163,7 @@ class World final
     Team enemy_team_;
     GameState game_state_;
     Timestamp most_recent_update_timestamp;
+    // All previous timestamps of when the field was updated, with the most recent
+    // timestamp at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };
