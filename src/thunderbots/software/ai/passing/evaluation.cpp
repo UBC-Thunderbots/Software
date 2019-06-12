@@ -187,14 +187,16 @@ double AI::Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
         ENEMY_ROBOT_MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, ROBOT_MAX_RADIUS_METERS);
     Duration ball_time_to_pass_receive_position = pass.estimatePassDuration();
 
-    Duration time_until_pass = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration time_until_pass     = pass.startTime() - enemy_robot.lastUpdateTimestamp();
+    Duration enemy_reaction_time = Duration::fromSeconds(
+        Util::DynamicParameters::AI::Passing::enemy_reaction_time.value());
 
     double robot_ball_time_diff_at_closest_pass_point =
-        (enemy_robot_time_to_closest_pass_point -
+        ((enemy_robot_time_to_closest_pass_point + enemy_reaction_time) -
          (ball_time_to_closest_pass_point + time_until_pass))
             .getSeconds();
     double robot_ball_time_diff_at_pass_receive_point =
-        (enemy_robot_time_to_pass_receive_position -
+        ((enemy_robot_time_to_pass_receive_position + enemy_reaction_time) -
          (ball_time_to_pass_receive_position + time_until_pass))
             .getSeconds();
 

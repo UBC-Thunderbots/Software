@@ -57,14 +57,8 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
     //                 X |      \     /
     //                   |       \   /
     //                   |        \ /
-    //                   >         A       <
-    //                                     |
-    //                                     | DIST_TO_FRONT_OF_ROBOT / 2
-    //                                     |
-    //                             O       |
-    //             ball ->        O O      <
-    //                             O
-    //
+    //    The ball is    >         A
+    //    at A
     //                             |
     //                             V
     //                     direction of kick
@@ -96,9 +90,8 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
         bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
-            kick_origin + behind_ball.norm(DIST_TO_FRONT_OF_ROBOT_METERS * 1 +
-                                           size_of_region_behind_ball / 2);
-        //
+            kick_origin + behind_ball.norm(size_of_region_behind_ball * 3 / 4);
+
         // If we're not in position to kick, move into position
         if (!robot_behind_ball)
         {
@@ -110,6 +103,5 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
             yield(std::make_unique<KickIntent>(robot->id(), kick_origin, kick_direction,
                                                kick_speed_meters_per_second, 0));
         }
-
     } while (true);
 }

@@ -16,7 +16,8 @@ class Annunciator
     explicit Annunciator(ros::NodeHandle& node_handle);
 
     /**
-     * Handles diagnostics for each robot.
+     * Decodes diagnostics and messages for each robot, and publishes them.
+     * Returns a boolean if there were new messages since the last status update.
      *
      * @param index Robot number.
      * @param data The data of the status packet.
@@ -24,18 +25,18 @@ class Annunciator
      * @param lqi Link quality.
      * @param rssi Received signal strength indicator.
      *
-     * @return the fully-constructed RobotStatus that was published
+     * @return true if new messages since last status update
      */
-    thunderbots_msgs::RobotStatus handle_robot_message(int index, const void* data,
-                                                       std::size_t len, uint8_t lqi,
-                                                       uint8_t rssi);
+    bool handle_robot_message(int index, const void* data, std::size_t len, uint8_t lqi,
+                              uint8_t rssi);
 
     /**
      * Handles general dongle messages.
      *
      * @param status The uint8 encoding all the status data.
+     * @return vector of dongle messages sent from the dongle
      */
-    void handle_status(uint8_t status);
+    std::vector<std::string> handle_dongle_messages(uint8_t status);
 
    private:
     ros::Publisher robot_status_publisher;

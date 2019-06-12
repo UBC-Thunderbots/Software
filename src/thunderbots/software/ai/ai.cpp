@@ -22,3 +22,8 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(const World &world) co
 
     return assignedPrimitives;
 }
+
+PlayInfo AI::getPlayInfo() const
+{
+    return high_level->getPlayInfo();
+}
