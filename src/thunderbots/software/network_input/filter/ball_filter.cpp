@@ -8,9 +8,7 @@
 #include "geom/util.h"
 #include <algorithm>
 
-static std::ofstream outfile;
-
-BallFilter::BallFilter() : ball_detection_buffer(5), LINEAR_REGRESSION_BUFFER_SIZE(5) {}
+BallFilter::BallFilter() : ball_detection_buffer(5), LINEAR_REGRESSION_BUFFER_SIZE(3) {}
 
 void BallFilter::addNewDetectionsToBuffer(
         std::vector<SSLBallDetection> new_ball_detections, const Field &field) {
@@ -104,7 +102,8 @@ std::vector<Vector> BallFilter::calculateBallVelocities(
 }
 
 Ball
-BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections) {
+BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections,
+                                                   std::ofstream &outfile, bool draw) {
     // Sort the detections in decreasing order before processing. This places the most recent detections (with the
     // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
     // the buffer
@@ -159,16 +158,33 @@ BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBal
     Vector vel_along_line = average_velocity.project(best_fit_line_vector);
     Vector filtered_velocity = vel_along_line.norm(average_velocity_magnitude);
 
+    if(draw) {
+        Point r1 = ball_detections.begin()->position;
+        Point r2 = (ball_detections.end()-1)->position;
+        Point g1 = closestPointOnLine(r1, p1, p2);
+        Point g2 = closestPointOnLine(r2, p1, p2);
+        for(auto d : ball_detections) {
+            outfile << d.position.x() << ", " << d.position.y() << ", "
+            << g1.x() << ", " << g1.y() << ", "
+            << g2.x() << ", " << g2.y() << ", "
+            << std::endl;
+        }
+    }
+
+
     Ball ball(filtered_ball_position, filtered_velocity, latest_ball_detection.timestamp);
     return ball;
 }
 
-std::optional<Ball> BallFilter::getFilteredData(const std::vector<SSLBallDetection>& new_ball_detections, const Field& field)
+std::optional<Ball>
+BallFilter::getFilteredData(const std::vector<SSLBallDetection> &new_ball_detections, const Field &field,
+                            std::ofstream &outfile,
+                            bool draw)
 {
     addNewDetectionsToBuffer(new_ball_detections, field);
 
     if(ball_detection_buffer.size() >= 2) {
-        return getLinearRegressionPositionAndVelocity(ball_detection_buffer);
+        return getLinearRegressionPositionAndVelocity(ball_detection_buffer, outfile, draw);
     }else if(ball_detection_buffer.size() == 1) {
         // If there is only 1 entry in the buffer, we can't calculate a velocity so
         // just set it to 0

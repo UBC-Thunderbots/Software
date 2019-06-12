@@ -48,14 +48,17 @@ class BallFilter
      *
      * @return The updated state of the ball given the new data
      */
-    std::optional<Ball> getFilteredData(const std::vector<SSLBallDetection>& new_ball_detections, const Field& field);
+    std::optional<Ball> getFilteredData(const std::vector<SSLBallDetection> &new_ball_detections, const Field &field,
+                                        std::ofstream &outfile,
+                                        bool draw);
 
 //   private:
     // TODO: comments
     void addNewDetectionsToBuffer(std::vector<SSLBallDetection> new_ball_detections,
                                   const Field &field);
     Ball getAveragedBallPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
-    Ball getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
+    Ball getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections,
+                                                std::ofstream &outfile, bool draw);
     std::vector<Vector> calculateBallVelocities(
             boost::circular_buffer<SSLBallDetection> ball_detections);
 
