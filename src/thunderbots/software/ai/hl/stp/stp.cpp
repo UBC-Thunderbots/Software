@@ -7,6 +7,7 @@
 #include <exception>
 #include <random>
 
+#include "ai/ai.h"
 #include "ai/hl/stp/play/play.h"
 #include "ai/hl/stp/play/stop_play.h"
 #include "ai/hl/stp/tactic/tactic.h"
@@ -219,7 +220,7 @@ PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
     info.play_type = "Unknown";
-    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "None";
+    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : AI::NO_PLAY_NAME;
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report the
     // tactics in order or robot id. This makes it much easier to read if tactics or
