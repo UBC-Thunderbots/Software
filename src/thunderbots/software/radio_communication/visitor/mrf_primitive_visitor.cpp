@@ -110,8 +110,8 @@ void MRFPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)
         movespin_primitive.getDestination().x() * MILLIMETERS_PER_METER,
         movespin_primitive.getDestination().y() * MILLIMETERS_PER_METER,
         movespin_primitive.getAngularVelocity().toRadians() * CENTIRADIANS_PER_RADIAN,
-        movespin_primitive.getFinalSpeed() * MILLIMETERS_PER_METER};
-    radio_prim->extra_bits = 0;
+        0};
+    radio_prim->extra_bits = movespin_primitive.getFinalSpeed() * MILLIMETERS_PER_METER;
 }
 
 void MRFPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
