@@ -1,5 +1,9 @@
 /**
  * This file contains unit tests for the GradientDescent class
+ *
+ * NOTE: A lot of the testing for the PassGenerator should be done in the `ratePass`
+ *       function, as the PassGenerator essentially just maximizes the value returned
+ *       by `ratePass`
  */
 
 #include "ai/passing/pass_generator.h"
@@ -85,7 +89,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(0, {0.5, 0.5}, {-0.5, 0}, Angle::zero(),
+    enemy_team.updateRobots({Robot(0, {0, 0}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
                              Robot(1, {-2, -2}, {-0.5, 0}, Angle::zero(),
                                    AngularVelocity::zero(), Timestamp::fromSeconds(0)),
@@ -98,7 +102,7 @@ TEST_F(PassGeneratorTest, check_pass_converges)
     pass_generator->setWorld(world);
 
     // Wait until the pass stops improving or 30 seconds, whichever comes first
-    waitForConvergence(pass_generator, 0.01, 30);
+    waitForConvergence(pass_generator, 0.0001, 30);
 
     // Find what pass we converged to
     auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();

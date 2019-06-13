@@ -27,7 +27,7 @@ interface ILayersProps {
  * Supports an empty state
  */
 export const LayersPanel = (props: ILayersProps) => {
-    const { layers } = props;
+    const { layers, toggleVisibility } = props;
 
     // If number of layers to display is 0, show a screen to indicate that there
     // is no layers.
@@ -44,7 +44,11 @@ export const LayersPanel = (props: ILayersProps) => {
                         key={layer.id}
                     >
                         {layer.id}
-                        <Button icon="eye-open" minimal={true} />
+                        <Button
+                            icon={layer.visible ? 'eye-open' : 'eye-off'}
+                            minimal={true}
+                            onClick={() => toggleVisibility(layer.id)}
+                        />
                     </Flex>
                 ))
             ) : (

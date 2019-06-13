@@ -38,7 +38,7 @@ void Robot::updateState(const Robot &new_robot_data)
             "Error: Robot updated using a robot with a mismatched id");
     }
 
-    for (int i = 0; i < new_robot_data.positions_.size(); i++)
+    for (int i = new_robot_data.positions_.size() - 1; i >= 0; i--)
     {
         updateState(new_robot_data.positions_.at(i), new_robot_data.velocities_.at(i),
                     new_robot_data.orientations_.at(i),
@@ -202,6 +202,11 @@ std::vector<Timestamp> Robot::getPreviousTimestamps() const
         retval.push_back(t);
 
     return retval;
+}
+
+Timestamp Robot::getMostRecentTimestamp() const
+{
+    return last_update_timestamps.front();
 }
 
 void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity,

@@ -14,6 +14,7 @@ class TeamTest : public ::testing::Test
         one_second_future        = current_time + Duration::fromSeconds(1);
         two_seconds_future       = current_time + Duration::fromSeconds(2);
         two_seconds_100ms_future = current_time + Duration::fromMilliseconds(2100);
+        three_seconds_future     = current_time + Duration::fromSeconds(3);
 
         one_second_past = current_time - Duration::fromSeconds(1);
     }
@@ -23,6 +24,7 @@ class TeamTest : public ::testing::Test
     Timestamp one_second_future;
     Timestamp two_seconds_future;
     Timestamp two_seconds_100ms_future;
+    Timestamp three_seconds_future;
 
     Timestamp one_second_past;
 };
@@ -519,4 +521,90 @@ TEST_F(TeamTest, equality_operator_teams_with_different_goalie)
     team_1.assignGoalie(1);
 
     EXPECT_NE(team_0, team_1);
+}
+
+TEST_F(TeamTest, get_most_recent_timestamp)
+{
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), one_second_future);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), one_second_past);
+
+    Robot robot_2 = Robot(2, Point(), Vector(-0.5, 4), Angle::quarter(),
+                          AngularVelocity::half(), current_time);
+
+    Team team = Team(Duration::fromMilliseconds(1000));
+    team.updateRobots({robot_0, robot_1, robot_2});
+    team.assignGoalie(0);
+
+    EXPECT_EQ(one_second_future, team.getMostRecentTimestamp());
+}
+
+TEST_F(TeamTest, update_timestamp_history_from_robot_update)
+{
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), one_second_future);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), one_second_past);
+
+    Team team = Team(Duration::fromMilliseconds(1000));
+    team.updateRobots({robot_0, robot_1});
+
+    robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), two_seconds_future);
+    robot_1 = Robot(1, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), one_second_future);
+
+    team.updateRobots({robot_0, robot_1});
+
+    robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), two_seconds_100ms_future);
+    robot_1 = Robot(1, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), two_seconds_100ms_future);
+
+    team.updateRobots({robot_0, robot_1});
+
+    EXPECT_EQ(one_second_future, team.getTimestampHistory()[2]);
+    EXPECT_EQ(two_seconds_future, team.getTimestampHistory()[1]);
+    EXPECT_EQ(two_seconds_100ms_future, team.getTimestampHistory()[0]);
+    EXPECT_EQ(3, team.getTimestampHistory().size());
+}
+
+TEST_F(TeamTest, update_timestamp_history_from_team_update)
+{
+    Robot robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                          AngularVelocity::threeQuarter(), one_second_future);
+
+    Robot robot_1 = Robot(1, Point(3, -1), Vector(), Angle::zero(),
+                          AngularVelocity::zero(), one_second_past);
+
+    Team team = Team(Duration::fromMilliseconds(1000));
+    team.updateRobots({robot_0, robot_1});
+
+    robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), two_seconds_future);
+
+    robot_1 = Robot(1, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), one_second_future);
+
+    Team team_temp = Team(Duration::fromMilliseconds(1000));
+    team_temp.updateRobots({robot_0, robot_1});
+    team.updateState(team_temp);
+
+    robot_0 = Robot(0, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), three_seconds_future);
+
+    robot_1 = Robot(1, Point(0, 1), Vector(-1, -2), Angle::half(),
+                    AngularVelocity::threeQuarter(), three_seconds_future);
+    team_temp.updateRobots({robot_0, robot_1});
+
+    team.updateState(team_temp);
+    boost::circular_buffer timestamps = team.getTimestampHistory();
+
+    EXPECT_EQ(one_second_future, team.getTimestampHistory()[2]);
+    EXPECT_EQ(two_seconds_future, team.getTimestampHistory()[1]);
+    EXPECT_EQ(three_seconds_future, team.getTimestampHistory()[0]);
+    EXPECT_EQ(3, team.getTimestampHistory().size());
 }

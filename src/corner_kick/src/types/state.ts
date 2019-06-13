@@ -1,16 +1,16 @@
-import { ILayer } from './canvas';
-import { IRosoutMessage } from './standardROSMessages';
-
-/*
+/***
  * This file specifies the format of the application state
  */
+
+import { ILayer } from './canvas';
+import { IROSParam } from './rosParams';
 
 /**
  * The application state
  */
 export interface IRootState {
     canvas: ICanvasState;
-    console: IMessagesState;
+    thunderbots: IThunderbotsState;
     ros: IROSState;
 }
 
@@ -30,9 +30,15 @@ export interface IROSState {
     errorMessage: string;
 }
 
+export interface IThunderbotsState {
+    playType: string;
+    playName: string;
+    tactics: string[];
+}
+
 /**
- * The messages state
+ * The ROS settings state
  */
-export interface IMessagesState {
-    rosout: IRosoutMessage[];
+export interface IROSParamState {
+    [key: string]: IROSParam;
 }

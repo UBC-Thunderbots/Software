@@ -4,3 +4,6 @@
 
 export const TOPIC_ROSOUT = '/rosout';
 export const TOPIC_ROSOUT_TYPE = 'rosgraph_msgs/Log';
+
+export const TOPIC_PLAY_INFO = '/backend/play_info';
+export const TOPIC_PLAY_INFO_TYPE = 'thunderbots_msgs/PlayInfo';

@@ -15,6 +15,9 @@ AI:
   current_ai_play:
     type: "string"
     default: "Example Play"
+    options:
+        - "Example Play"
+        - "Stop Play"
     description: >- 
         Specifies the ai play that should be in use
   refbox:
@@ -31,7 +34,7 @@ AI:
           Specifies the refbox play that should be in use
     override_refbox_defending_side:
       type: "bool"
-      default: false
+      default: true
       description: >-
           Overrides the defending side provided by refbox, 
           with defending_positive_side parameter
