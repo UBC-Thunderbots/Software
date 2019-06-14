@@ -5,7 +5,6 @@
 #include <memory>
 
 #include "util/noncopyable.h"
-using namespace boost;
 
 /**
  * An asynchronous operation which is currently in progress.
@@ -21,7 +20,7 @@ class AsyncOperation : public NonCopyable
      *
      * The callback functions are passed the operation itself.
      */
-    signals2::signal<void(AsyncOperation<T> &)> signal_done;
+    boost::signals2::signal<void(AsyncOperation<T> &)> signal_done;
 
     /**
      * Destroys the object.

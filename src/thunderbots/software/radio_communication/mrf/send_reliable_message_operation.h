@@ -59,7 +59,7 @@ class SendReliableMessageOperation final : public AsyncOperation<void>
      *
      * replaces inheriting from sigc::trackable
      */
-    signals2::scoped_connection mdr_connection;
+    boost::signals2::scoped_connection mdr_connection;
 
     void out_transfer_done(AsyncOperation<void> &);
     void message_delivery_report(uint8_t id, uint8_t code);

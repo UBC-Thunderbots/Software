@@ -140,7 +140,7 @@ class MRFDongle final
     USB::InterruptInTransfer status_transfer;
     std::list<std::unique_ptr<USB::BulkOutTransfer>> unreliable_messages;
     std::queue<uint8_t> free_message_ids;
-    signals2::signal<void(uint8_t, uint8_t)> signal_message_delivery_report;
+    boost::signals2::signal<void(uint8_t, uint8_t)> signal_message_delivery_report;
     Annunciator &annunciator;
 
     uint8_t alloc_message_id();
