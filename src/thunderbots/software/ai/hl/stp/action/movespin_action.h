@@ -32,7 +32,8 @@ class MoveSpinAction : public Action
      * @param destination The destination to move to (in global coordinates)
      * @param angular_velocity The how fast the robot should spin, in radians per second.
      * A positive value spins counterclockwise, and a negative value spins clockwise
-     * @param final_linear_speed The final speed that robot should have at the final destination
+     * @param final_linear_speed The final speed that robot should have at the final
+     * destination
      *
      * @return A unique pointer to the Intent the MoveSpinAction wants to run. If the
      * MoveSpinAction is done, returns an empty/null pointer

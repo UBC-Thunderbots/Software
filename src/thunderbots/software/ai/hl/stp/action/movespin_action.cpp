@@ -12,10 +12,10 @@ std::unique_ptr<Intent> MoveSpinAction::updateStateAndGetNextIntent(
     double final_linear_speed)
 {
     // Update the parameters stored by this Action
-    this->robot            = robot;
-    this->destination      = destination;
-    this->angular_velocity = angular_velocity;
-    this->final_linear_speed      = final_linear_speed;
+    this->robot              = robot;
+    this->destination        = destination;
+    this->angular_velocity   = angular_velocity;
+    this->final_linear_speed = final_linear_speed;
 
     return getNextIntent();
 }
