@@ -44,8 +44,8 @@ SendReliableMessageOperation::SendReliableMessageOperation(MRFDongle &dongle,
     transfer->signal_done.connect(
         boost::bind(&SendReliableMessageOperation::out_transfer_done, this, _1));
     transfer->submit();
-    mdr_connection = dongle.signal_message_delivery_report.connect(
-        sigc::mem_fun(this, &SendReliableMessageOperation::message_delivery_report));
+    mdr_connection = dongle.signal_message_delivery_report.connect(boost::bind(
+        &SendReliableMessageOperation::message_delivery_report, this, _1, _2));
 }
 
 void SendReliableMessageOperation::result() const

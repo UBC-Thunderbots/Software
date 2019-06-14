@@ -2,7 +2,6 @@
 #define UTIL_ASYNC_OPERATION_H
 
 #include <boost/signals2.hpp>
-
 #include <memory>
 
 #include "util/noncopyable.h"

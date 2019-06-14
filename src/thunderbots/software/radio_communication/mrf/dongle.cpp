@@ -1,8 +1,5 @@
 #include "dongle.h"
 
-#include <sigc++/bind.h>
-#include <sigc++/functors/mem_fun.h>
-#include <sigc++/reference_wrapper.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -212,8 +209,8 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     {
         // Attempt to receive at most 105 bytes from endpoint 2
         i.reset(new USB::BulkInTransfer(device, 2, 105, false, 0));
-        i->signal_done.connect(boost::bind(&MRFDongle::handle_message, this, _1,
-                                          boost::ref(*i.get())));
+        i->signal_done.connect(
+            boost::bind(&MRFDongle::handle_message, this, _1, boost::ref(*i.get())));
         i->submit();
     }
 
@@ -270,8 +267,8 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
     }
     for (unsigned int i = 0; i < mdr_transfer.size(); i += 2)
     {
-        signal_message_delivery_report.emit(mdr_transfer.data()[i],
-                                            mdr_transfer.data()[i + 1]);
+        signal_message_delivery_report(mdr_transfer.data()[i],
+                                       mdr_transfer.data()[i + 1]);
     }
     mdr_transfer.submit();
 }
@@ -545,7 +542,7 @@ void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
     drive_transfer.reset();
 }
 
-void MRFDongle::handle_camera_transfer_done(AsyncOperation<void> & op)
+void MRFDongle::handle_camera_transfer_done(AsyncOperation<void> &op)
 {
     // std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     // std::chrono::system_clock::time_point epoch =

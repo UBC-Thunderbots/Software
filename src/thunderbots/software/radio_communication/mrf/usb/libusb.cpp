@@ -27,7 +27,7 @@ USB::Context::Context()
 {
     // Init libusb
     check_fn("libusb_init", libusb_init(&context), 0);
-    running             = true;
+    running = true;
 
     // Init event handling thread
     libusb_event_thread = std::thread([&]() {

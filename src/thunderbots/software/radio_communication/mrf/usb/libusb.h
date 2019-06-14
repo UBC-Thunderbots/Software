@@ -2,7 +2,6 @@
 #define UTIL_LIBUSB_H
 
 #include <libusb.h>
-#include <sigc++/connection.h>
 
 #include <cassert>
 #include <cstddef>
