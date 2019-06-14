@@ -42,7 +42,7 @@ SendReliableMessageOperation::SendReliableMessageOperation(MRFDongle &dongle,
                                                 data, length))
 {
     transfer->signal_done.connect(
-        sigc::mem_fun(this, &SendReliableMessageOperation::out_transfer_done));
+        boost::bind(&SendReliableMessageOperation::out_transfer_done, this, _1));
     transfer->submit();
     mdr_connection = dongle.signal_message_delivery_report.connect(
         sigc::mem_fun(this, &SendReliableMessageOperation::message_delivery_report));
@@ -70,18 +70,19 @@ void SendReliableMessageOperation::out_transfer_done(AsyncOperation &op)
 {
     if (!op.succeeded())
     {
-        signal_done.emit(*this);
+        signal_done(*this);
     }
 }
 
 void SendReliableMessageOperation::message_delivery_report(uint8_t id, uint8_t code)
 {
+    std::cout << "test" << std::endl;
     if (id == message_id)
     {
         mdr_connection.disconnect();
         delivery_status = code;
         dongle.free_message_id(message_id);
-        signal_done.emit(*this);
+        signal_done(*this);
     }
 }
 

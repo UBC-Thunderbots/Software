@@ -1,11 +1,12 @@
 #ifndef UTIL_ASYNC_OPERATION_H
 #define UTIL_ASYNC_OPERATION_H
 
-#include <sigc++/signal.h>
+#include <boost/signals2.hpp>
 
 #include <memory>
 
 #include "util/noncopyable.h"
+using namespace boost;
 
 /**
  * An asynchronous operation which is currently in progress.
@@ -21,7 +22,7 @@ class AsyncOperation : public NonCopyable
      *
      * The callback functions are passed the operation itself.
      */
-    sigc::signal<void, AsyncOperation<T> &> signal_done;
+    signals2::signal<void(AsyncOperation<T> &)> signal_done;
 
     /**
      * Destroys the object.

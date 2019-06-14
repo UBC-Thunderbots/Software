@@ -203,7 +203,7 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     {
         // Attempt to receive at most 8 bytes from endpoint 1
         i.reset(new USB::BulkInTransfer(device, 1, 8, false, 0));
-        i->signal_done.connect(sigc::mem_fun(this, &MRFDongle::handle_mdrs));
+        i->signal_done.connect(boost::bind(&MRFDongle::handle_mdrs, this, _1));
         i->submit();
     }
 
@@ -212,13 +212,13 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     {
         // Attempt to receive at most 105 bytes from endpoint 2
         i.reset(new USB::BulkInTransfer(device, 2, 105, false, 0));
-        i->signal_done.connect(sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_message),
-                                          sigc::ref(*i.get())));
+        i->signal_done.connect(boost::bind(&MRFDongle::handle_message, this, _1,
+                                          boost::ref(*i.get())));
         i->submit();
     }
 
     // Submit the estop transfer.
-    status_transfer.signal_done.connect(sigc::mem_fun(this, &MRFDongle::handle_status));
+    status_transfer.signal_done.connect(boost::bind(&MRFDongle::handle_status, this, _1));
     status_transfer.submit();
 }
 
@@ -238,7 +238,7 @@ void MRFDongle::beep(unsigned int length)
             MRF::CONTROL_REQUEST_BEEP, static_cast<uint16_t>(pending_beep_length),
             static_cast<uint16_t>(radio_interface), 0));
         beep_transfer->signal_done.connect(
-            sigc::mem_fun(this, &MRFDongle::handle_beep_done));
+            boost::bind(&MRFDongle::handle_beep_done, this, _1));
         beep_transfer->submit();
         pending_beep_length = 0;
     }
@@ -388,7 +388,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         camera_transfer.reset(
             new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
         camera_transfer->signal_done.connect(
-            sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done));
+            boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1));
         camera_transfer->submit();
 
         LOG(DEBUG) << "Submitted camera transfer" << std::endl;
@@ -442,7 +442,7 @@ bool MRFDongle::submit_drive_transfer()
         drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet,
                                                       drive_packet_length, 64, 0));
         drive_transfer->signal_done.connect(
-            sigc::mem_fun(this, &MRFDongle::handle_drive_transfer_done));
+            boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
         drive_transfer->submit();
     }
 
@@ -581,7 +581,7 @@ void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const vo
         new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
     auto i = unreliable_messages.insert(unreliable_messages.end(), std::move(elt));
     (*i)->signal_done.connect(
-        sigc::bind(sigc::mem_fun(this, &MRFDongle::check_unreliable_transfer), i));
+        boost::bind(&MRFDongle::check_unreliable_transfer, this, _1, i));
     (*i)->submit();
 }
 

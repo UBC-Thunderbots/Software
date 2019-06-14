@@ -142,7 +142,7 @@ void USB::Transfer::handle_completed_transfer()
     }
     done_      = true;
     submitted_ = false;
-    signal_done.emit(*this);
+    signal_done(*this);
 }
 
 void USB::usb_transfer_handle_completed_transfer_trampoline(libusb_transfer *transfer)
