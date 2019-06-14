@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 
 #include "ai/ai.h"
+#include "thunderbots_msgs/PlayInfo.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/World.h"
 #include "util/canvas_messenger/canvas_messenger.h"
@@ -18,6 +19,7 @@ namespace
 {
     // The publisher used to send new Primitive commands
     ros::Publisher primitive_publisher;
+    ros::Publisher play_info_publisher;
     // Our instance of the AI that decides what Primitives to run
     AI ai;
 }  // namespace
@@ -47,6 +49,11 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     }
     primitive_publisher.publish(primitive_array_message);
 
+    // Publish play info so we can display it in the visualizer
+    auto play_info_msg =
+        Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
+    play_info_publisher.publish(play_info_msg);
+
     // Draw the world
     std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
         Util::CanvasMessenger::getInstance();
@@ -64,6 +71,8 @@ int main(int argc, char **argv)
     // Create publishers
     primitive_publisher = node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
         Util::Constants::AI_PRIMITIVES_TOPIC, 1);
+    play_info_publisher = node_handle.advertise<thunderbots_msgs::PlayInfo>(
+        Util::Constants::PLAY_INFO_TOPIC, 1);
 
     // Create subscribers
     ros::Subscriber world_subscriber = node_handle.subscribe(

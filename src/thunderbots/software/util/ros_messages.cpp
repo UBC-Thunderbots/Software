@@ -70,7 +70,8 @@ namespace Util
             Field field = Field(field_msg.field_length, field_msg.field_width,
                                 field_msg.defense_length, field_msg.defense_width,
                                 field_msg.goal_width, field_msg.boundary_width,
-                                field_msg.center_circle_radius);
+                                field_msg.center_circle_radius,
+                                Timestamp::fromSeconds(field_msg.timestamp_seconds));
 
             return field;
         }
@@ -86,7 +87,7 @@ namespace Util
             field_msg.goal_width           = field.goalWidth();
             field_msg.boundary_width       = field.boundaryWidth();
             field_msg.center_circle_radius = field.centreCircleRadius();
-
+            field_msg.timestamp_seconds    = field.getMostRecentTimestamp().getSeconds();
             return field_msg;
         }
 
@@ -248,6 +249,22 @@ namespace Util
             new_robot.orientation = old_robot_msg.orientation + Angle::half().toRadians();
 
             return new_robot;
+        }
+
+        thunderbots_msgs::PlayInfo convertPlayPlayInfoToROSMessage(
+            const PlayInfo& play_info)
+        {
+            thunderbots_msgs::PlayInfo msg;
+
+            msg.play_name = play_info.play_name;
+            msg.play_type = play_info.play_type;
+
+            for (const auto& tactic : play_info.robot_tactic_assignment)
+            {
+                msg.robot_tactic_assignment.emplace_back(tactic);
+            }
+
+            return msg;
         }
     }  // namespace ROSMessages
 }  // namespace Util

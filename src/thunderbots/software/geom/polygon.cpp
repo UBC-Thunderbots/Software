@@ -30,24 +30,37 @@ Polygon::Polygon(const std::initializer_list<Point>& _points)
 
 bool Polygon::containsPoint(const Point& point) const
 {
-    // cast a ray from the point in the +x direction
-    Ray ray(point, point + Point(1, 0));
-    unsigned int num_intersections = 0;
-    for (const Segment& seg : segments)
+    // This algorithm is from https://stackoverflow.com/a/16391873
+    // but does not include the bounding boxes.
+    //
+    // A quick description of the algorithm (also from the same post) is as follows:
+    // "I run a semi-infinite ray horizontally (increasing x, fixed y) out from the test
+    // point, and count how many edges it crosses. At each crossing, the ray switches
+    // between inside and outside. This is called the Jordan curve theorem."
+    //
+    // NOTE: This algorithm will treat boundaries on the bottom-left of the polygon
+    // different from the boundaries on the top-right of the polygon. This small
+    // inconsistency does not matter for our use cases, and actually has the benefit that
+    // should two distinct polygons share an edge, any point along this edge will be
+    // located in one and only one polygon.
+    bool point_is_contained = false;
+    int i                   = 0;
+    int j                   = points.size() - 1;
+    while (i < points.size())
     {
-        // one-definition rule, use anonymous namespace for
-        // intersects() in geom/util.h
-        if (::intersects(ray, seg))
+        if (((points.at(i).y() > point.y()) != (points.at(j).y() > point.y())) &&
+            (point.x() < (points.at(j).x() - points.at(i).x()) *
+                                 (point.y() - points.at(i).y()) /
+                                 (points.at(j).y() - points.at(i).y()) +
+                             points.at(i).x()))
         {
-            num_intersections++;
+            point_is_contained = !point_is_contained;
         }
+
+        j = i++;
     }
 
-    // if the ray intersects the polygon an odd number of times,
-    // it is inside the polygon, otherwise it is outside the polygon
-    // see
-    // https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
-    return num_intersections % 2 != 0;
+    return point_is_contained;
 }
 
 bool Polygon::intersects(const Segment& segment) const

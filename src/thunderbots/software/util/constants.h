@@ -21,6 +21,7 @@ namespace Util
         static const std::string ROBOT_MESSAGE_TOPIC         = "log/robot_message";
         static const std::string ROBOT_STATUS_TOPIC          = "backend/robot_status";
         static const std::string VISUALIZER_DRAW_LAYER_TOPIC = "visualizer/layers";
+        static const std::string PLAY_INFO_TOPIC             = "backend/play_info";
         // The topic published by the joy_node that contains information about any plugged
         // in joysticks / controllers
         static const std::string JOY_NODE_TOPIC = "joy";

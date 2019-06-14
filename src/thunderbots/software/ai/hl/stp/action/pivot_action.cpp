@@ -22,8 +22,7 @@ std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& ro
     return getNextIntent();
 }
 
-std::unique_ptr<Intent> PivotAction::calculateNextIntent(
-    intent_coroutine::push_type& yield)
+void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     do
     {

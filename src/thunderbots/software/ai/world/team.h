@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "ai/world/robot.h"
+#include "boost/circular_buffer.hpp"
 #include "util/time/timestamp.h"
 
 
@@ -29,8 +30,21 @@ class Team
      *
      * @param robot_expiry_buffer_duration The Duration for which a robot must not
      * have been updated for before it is removed from the team
+     * @param buffer_size The number of elements in the Timestamp history buffer of the
+     * Team object
      */
-    explicit Team(const Duration& robot_expiry_buffer_duration);
+    explicit Team(const Duration& robot_expiry_buffer_duration,
+                  unsigned int buffer_size = 20);
+
+    /**
+     * Create a new team
+     *
+     * @param robot_expiry_buffer_duration The Duration for which a robot must not
+     * have been updated for before it is removed from the team
+     * @param team_robots The robots on the team
+     */
+    explicit Team(const Duration& robot_expiry_buffer_duration,
+                  const std::vector<Robot>& team_robots);
 
     /**
      * Updates this team with new robots.
@@ -169,6 +183,14 @@ class Team
     void clearAllRobots();
 
     /**
+     * Returns the timestamp of the most recently updated robot on this team
+     *
+     * @return the timestamp of the most recently updated robot on this team, or
+     *         std::nullopt if this team is empty
+     */
+    std::optional<Timestamp> lastUpdateTimestamp() const;
+
+    /**
      * Defines the equality operator for a Team. Teams are equal if their robots are equal
      * and have the same robot assigned as the goalie
      *
@@ -185,7 +207,36 @@ class Team
      */
     bool operator!=(const Team& other) const;
 
+    /**
+     * Returns the entire update Timestamp history for Field object
+     *
+     * @return boost::circular_buffer of Timestamp history for the Field object
+     */
+    boost::circular_buffer<Timestamp> getTimestampHistory() const;
+
+    /**
+     * Returns the most Timestamp corresponding to the most recent update to Field object
+     *
+     * @return Timestamp : The Timestamp corresponding to the most recent update to the
+     * Field object
+     */
+    Timestamp getMostRecentTimestamp() const;
+
    private:
+    /**
+     * Updates the timestamp history for the Field object
+     *
+     * @param time_stamp : The timestamp at which the Field object was updated
+     */
+    void updateTimestamp(Timestamp time_stamp);
+
+    /**
+     * Returns the most recent Timestamp from all robots in a Team
+     *
+     * @return The most revent Timestamp from all robots in the Team
+     */
+    Timestamp getMostRecentTimestampFromRobots();
+
     // The map that contains the Robots for this team. The map makes it easier to
     // guarantee we only have robots with unique IDs.
     std::map<unsigned int, Robot> team_robots;
@@ -196,4 +247,8 @@ class Team
     // The duration for which a Robot must not have been updated for before
     // being removed from this team.
     Duration robot_expiry_buffer_duration;
+
+    // All previous timestamps of when the field was updated, with the most recent
+    // timestamp at the front of the queue,
+    boost::circular_buffer<Timestamp> last_update_timestamps;
 };

@@ -1,17 +1,10 @@
 # This project name must match the name of the package defined in package.xml
 project(thunderbots)
 
-## Build in "Release" (with lots of compiler optimizations) by default
-#if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-##    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
-#    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Debug")
-#endif()
-
-# Force the build to DebugA
-# TODO: THIS IS A TEMPORARY FIX TO SUPPRESS THE MEMORY ISSUES FOUND IN
-# https://github.com/UBC-Thunderbots/Software/issues/584
-# This should be set back to the commented-out code above once the issue if fixed
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Debug")
+# Build in "Release" (with lots of compiler optimizations) by default
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY VALUE "Release")
+endif()
 
 # For external editor code completion (Visual Studio Code, Vim, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -562,6 +555,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/movespin_action.cpp
             ai/hl/stp/action/pivot_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/intent/intent.cpp
             ai/intent/chip_intent.cpp
             ai/intent/dribble_intent.cpp
@@ -569,13 +563,17 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/move_intent.cpp
             ai/intent/movespin_intent.cpp
             ai/intent/pivot_intent.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/chip_primitive.cpp
-            ai/primitive/dribble_primitive.cpp
-            ai/primitive/kick_primitive.cpp
+            ai/intent/stop_intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/intent/chip_intent.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/movespin_primitive.cpp
             ai/primitive/pivot_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/dribble_primitive.cpp
             ai/world/robot.cpp
             ai/world/ball.cpp
             test/ai/hl/stp/action/main.cpp
@@ -587,6 +585,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/action/move_action.cpp
             test/ai/hl/stp/action/movespin_action.cpp
             test/ai/hl/stp/action/pivot_action.cpp
+            test/ai/hl/stp/action/stop_action.cpp
             geom/polygon.cpp
             geom/util.cpp
             util/logger/custom_g3log_sinks.h
@@ -606,21 +605,25 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
             ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/passer_tactic.cpp
             ai/hl/stp/tactic/receiver_tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
             ai/primitive/kick_primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
@@ -636,6 +639,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/move_tactic.cpp
             test/ai/hl/stp/tactic/passer_tactic.cpp
             test/ai/hl/stp/tactic/receiver_tactic.cpp
+            test/ai/hl/stp/tactic/stop_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
@@ -657,11 +661,14 @@ if (CATKIN_ENABLE_TESTING)
             ai/evaluation/pass.cpp
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/play/example_play.cpp
+            ai/hl/stp/play/stop_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
             ai/hl/stp/tactic/move_tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
@@ -680,6 +687,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             geom/util.cpp
             test/ai/hl/stp/play/example_play.cpp
+            test/ai/hl/stp/play/stop_play.cpp
             test/ai/hl/stp/play/main.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
@@ -703,18 +711,34 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(stp_test
             ai/hl/stp/stp.cpp
+            ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             ai/hl/stp/play/play.cpp
+            ai/hl/stp/play/stop_play.cpp
             ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_plays/stop_test_play.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
             ai/primitive/primitive.cpp
             ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/world/ball.cpp
             ai/world/field.cpp
@@ -722,6 +746,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
+            ai/ai.cpp
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_tactic_assignment.cpp
@@ -729,6 +754,7 @@ if (CATKIN_ENABLE_TESTING)
             util/time/timestamp.cpp
             util/time/duration.cpp
             util/time/time.cpp
+            util/refbox_constants.cpp
             geom/util.cpp
             test/test_util/test_util.cpp
             )
@@ -917,6 +943,101 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             )
+
+    catkin_add_gtest(game_state_play_selection_test
+            ai/hl/stp/stp.cpp
+            ai/hl/stp/action/action.cpp
+	        ai/hl/stp/action/stop_action.cpp
+            ai/hl/stp/tactic/tactic.cpp
+	        ai/hl/stp/tactic/stop_tactic.cpp
+            test/ai/hl/stp/test_tactics/move_test_tactic.cpp
+            test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
+            ai/hl/stp/play/play.cpp
+            ai/hl/stp/play/play_factory.cpp
+	        ai/hl/stp/play/stop_play.cpp
+            test/ai/hl/stp/test_plays/move_test_play.cpp
+            test/ai/hl/stp/test_plays/stop_test_play.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/ai.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            test/ai/game_state_play_selection.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/refbox_constants.cpp
+            geom/util.cpp
+            test/test_util/test_util.cpp
+            )
+    target_link_libraries(game_state_play_selection_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES}
+            ${Threads_LIBRARIES})
+
+    catkin_add_gtest(stp_refbox_game_state_play_selection
+            ai/hl/stp/stp.cpp
+            ai/hl/stp/action/action.cpp
+            ai/hl/stp/action/stop_action.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/hl/stp/tactic/tactic.cpp
+            ai/hl/stp/tactic/stop_tactic.cpp
+            ai/hl/stp/play/play.cpp
+            ai/hl/stp/play/stop_play.cpp
+            ai/hl/stp/play/play_factory.cpp
+            ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/intent/intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/ai.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/refbox_constants.cpp
+            geom/util.cpp
+            test/test_util/test_util.cpp
+            test/ai/hl/stp/stp_refbox_game_state_play_selection.cpp
+            )
+    target_link_libraries(stp_refbox_game_state_play_selection
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
     
 endif()
 

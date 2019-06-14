@@ -1,5 +1,7 @@
 #include "robot.h"
 
+#include <shared/constants.h>
+
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration)
@@ -36,7 +38,7 @@ void Robot::updateState(const Robot &new_robot_data)
             "Error: Robot updated using a robot with a mismatched id");
     }
 
-    for (int i = 0; i < new_robot_data.positions_.size(); i++)
+    for (int i = new_robot_data.positions_.size() - 1; i >= 0; i--)
     {
         updateState(new_robot_data.positions_.at(i), new_robot_data.velocities_.at(i),
                     new_robot_data.orientations_.at(i),
@@ -157,7 +159,7 @@ AngularVelocity Robot::estimateAngularVelocityAtFutureTime(
     return angularVelocity();
 }
 
-std::vector<Point> Robot::getPreviousPositions()
+std::vector<Point> Robot::getPreviousPositions() const
 {
     std::vector<Point> retval{};
     for (Point p : positions_)
@@ -166,7 +168,7 @@ std::vector<Point> Robot::getPreviousPositions()
     return retval;
 }
 
-std::vector<Vector> Robot::getPreviousVelocities()
+std::vector<Vector> Robot::getPreviousVelocities() const
 {
     std::vector<Vector> retval{};
     for (Vector v : velocities_)
@@ -175,7 +177,7 @@ std::vector<Vector> Robot::getPreviousVelocities()
     return retval;
 }
 
-std::vector<Angle> Robot::getPreviousOrientations()
+std::vector<Angle> Robot::getPreviousOrientations() const
 {
     std::vector<Angle> retval{};
     for (Angle a : orientations_)
@@ -184,7 +186,7 @@ std::vector<Angle> Robot::getPreviousOrientations()
     return retval;
 }
 
-std::vector<AngularVelocity> Robot::getPreviousAngularVelocities()
+std::vector<AngularVelocity> Robot::getPreviousAngularVelocities() const
 {
     std::vector<AngularVelocity> retval{};
     for (AngularVelocity av : angularVelocities_)
@@ -193,13 +195,18 @@ std::vector<AngularVelocity> Robot::getPreviousAngularVelocities()
     return retval;
 }
 
-std::vector<Timestamp> Robot::getPreviousTimestamps()
+std::vector<Timestamp> Robot::getPreviousTimestamps() const
 {
     std::vector<Timestamp> retval{};
     for (Timestamp t : last_update_timestamps)
         retval.push_back(t);
 
     return retval;
+}
+
+Timestamp Robot::getMostRecentTimestamp() const
+{
+    return last_update_timestamps.front();
 }
 
 void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity,
@@ -212,6 +219,21 @@ void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity
     orientations_.push_front(orientation);
     angularVelocities_.push_front(angular_velocity);
     last_update_timestamps.push_front(timestamp);
+}
+
+std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
+{
+    std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
+    for (int i = 0; i < timestamp_history.size(); i++)
+    {
+        double timestamp_diff =
+            fabs((timestamp - timestamp_history[i]).getMilliseconds());
+
+        // If timestamp is close to desired timestamp, return the index.
+        if (timestamp_diff < POSSESSION_TIMESTAMP_TOLERANCE_IN_MILLISECONDS)
+            return i;
+    }
+    return std::nullopt;
 }
 
 bool Robot::operator==(const Robot &other) const

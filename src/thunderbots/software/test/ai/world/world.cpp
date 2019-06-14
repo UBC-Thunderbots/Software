@@ -10,7 +10,7 @@ class WorldTest : public ::testing::Test
    protected:
     WorldTest()
         : current_time(Timestamp::fromSeconds(123)),
-          field(0, 0, 0, 0, 0, 0, 0),
+          field(0, 0, 0, 0, 0, 0, 0, current_time),
           ball(Point(1, 2), Vector(-0.3, 0), current_time),
           friendly_team(Duration::fromMilliseconds(1000)),
           enemy_team(Duration::fromMilliseconds(1000)),
@@ -58,7 +58,7 @@ TEST_F(WorldTest, default_constructor)
 {
     World world;
     // Check that objects used for construction are returned by the accessors
-    EXPECT_EQ(Field(0, 0, 0, 0, 0, 0, 0), world.field());
+    EXPECT_EQ(Field(0, 0, 0, 0, 0, 0, 0, current_time), world.field());
     EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
     EXPECT_EQ(Team(Duration::fromMilliseconds(
                   Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),

@@ -20,8 +20,7 @@ std::unique_ptr<Intent> MoveSpinAction::updateStateAndGetNextIntent(
     return getNextIntent();
 }
 
-std::unique_ptr<Intent> MoveSpinAction::calculateNextIntent(
-    intent_coroutine::push_type& yield)
+void MoveSpinAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // We use a do-while loop so that we return the Intent at least once. If the robot was
     // already moving somewhere else, but was told to run the MoveSpinAction to a

@@ -36,7 +36,15 @@ class KickAction : public Action
     /**
      * Returns the next Intent this KickAction wants to run, given the parameters.
      *
+     * The ball and kick origin are given separately so that we can line up kicks where
+     * the ball isn't present yet. For example, specifying where a kick will take place
+     * where the robot will meet the ball as it's moving. We need to be able to specify
+     * where the kick will take place even if the ball isn't there yet, which is why the
+     * kick_origin is separate. The ball is used for other calculations, such as when
+     * the ball has been kicked and the action is done.
+     *
      * @param robot The robot that should perform the kick
+     * @param ball The ball being kicked
      * @param kick_origin The location where the kick will be taken
      * @param kick_target The target to kick at
      * @param kick_speed_meters_per_second The speed of how fast the Robot
@@ -50,8 +58,7 @@ class KickAction : public Action
         double kick_speed_meters_per_second);
 
    private:
-    std::unique_ptr<Intent> calculateNextIntent(
-        intent_coroutine::push_type &yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
     // Action parameters
     Ball ball;
