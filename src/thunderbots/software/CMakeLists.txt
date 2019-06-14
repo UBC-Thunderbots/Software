@@ -159,7 +159,7 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-	)
+        ai/hl/stp/play/movespin_example_play.cpp ai/hl/stp/play/movespin_example_play.h)
 
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
