@@ -10,7 +10,7 @@
  */
 class MoveSpinTactic : public Tactic
 {
-public:
+   public:
     /**
      * Creates a new MoveSpinTactic
      *
@@ -42,7 +42,7 @@ public:
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-private:
+   private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // Tactic parameters
@@ -53,5 +53,3 @@ private:
     // The speed the robot should have when it arrives at its destination
     double final_speed;
 };
-
-

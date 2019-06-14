@@ -23,13 +23,12 @@ bool ExamplePlay::invariantHolds(const World &world) const
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-
     // Create MoveSpinTactics that will loop forever
     auto movespin_tactic_1 = std::make_shared<MoveSpinTactic>(true);
     auto movespin_tactic_2 = std::make_shared<MoveSpinTactic>(true);
 
 
-    for (int i = 0;i<3;i++)
+    for (int i = 0; i < 3; i++)
     {
         // The angle between each robot spaced out in a circle around the ball
         Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
@@ -38,9 +37,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({movespin_tactic_1});
-        std::cout<<i+100000;
+        std::cout << i + 100000;
     }
-
 }
 
 // Register this play in the PlayFactory

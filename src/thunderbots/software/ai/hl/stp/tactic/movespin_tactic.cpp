@@ -1,10 +1,9 @@
 #include "ai/hl/stp/tactic/movespin_tactic.h"
 
 #include <algorithm>
-
-#include <iostream>       // std::cout, std::endl
-#include <thread>         // std::this_thread::sleep_for
 #include <chrono>
+#include <iostream>  // std::cout, std::endl
+#include <thread>    // std::this_thread::sleep_for
 
 MoveSpinTactic::MoveSpinTactic(bool loop_forever) : Tactic(loop_forever) {}
 
@@ -14,12 +13,12 @@ std::string MoveSpinTactic::getName() const
 }
 
 void MoveSpinTactic::updateParams(Point destination, AngularVelocity angular_velocity,
-                              double final_speed)
+                                  double final_speed)
 {
     // Update the parameters stored by this Tactic
-    this->destination       = destination;
+    this->destination      = destination;
     this->angular_velocity = angular_velocity;
-    this->final_speed       = final_speed;
+    this->final_speed      = final_speed;
 }
 
 double MoveSpinTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -33,23 +32,21 @@ double MoveSpinTactic::calculateRobotCost(const Robot &robot, const World &world
 
 void MoveSpinTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
-    MoveSpinAction movespin_action = MoveSpinAction();
+    MoveSpinAction movespin_action   = MoveSpinAction();
     MoveSpinAction movespin_action_2 = MoveSpinAction();
     do
     {
-        yield(movespin_action.updateStateAndGetNextIntent(*robot, Point(-3,1),
-                                                      Angle::ofRadians(0.5), 2));
-        std::cout<<"1\t";
-    } while (!((robot->position()-Point(-3,1)).len()<0.1));
+        yield(movespin_action.updateStateAndGetNextIntent(*robot, Point(-3, 1),
+                                                          Angle::ofRadians(0.5), 2));
+        std::cout << "1\t";
+    } while (!((robot->position() - Point(-3, 1)).len() < 0.1));
 
     do
     {
-        yield(movespin_action_2.updateStateAndGetNextIntent(*robot, Point(-1,-1),
-                                                          Angle::ofRadians(1), 0));
-        std::cout<<"2\t\t";
-    } while (!((robot->position()-Point(-1,-1)).len()<0.1));
+        yield(movespin_action_2.updateStateAndGetNextIntent(*robot, Point(-1, -1),
+                                                            Angle::ofRadians(1), 0));
+        std::cout << "2\t\t";
+    } while (!((robot->position() - Point(-1, -1)).len() < 0.1));
 
-    std::this_thread::sleep_for (std::chrono::seconds(3));
-
+    std::this_thread::sleep_for(std::chrono::seconds(3));
 }
-

@@ -34,11 +34,11 @@ void MoveSpinExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move the robots in a circle around the ball, facing the ball
         movespin_tactic_1->updateParams(
-                world.ball().position() + Point::createFromAngle(angle_between_robots * 1),
-                (angle_between_robots * 1) + Angle::half(), 0);
+            world.ball().position() + Point::createFromAngle(angle_between_robots * 1),
+            (angle_between_robots * 1) + Angle::half(), 0);
         movespin_tactic_2->updateParams(
-                world.ball().position() + Point::createFromAngle(angle_between_robots * 2),
-                (angle_between_robots * 2) + Angle::half(), 2);
+            world.ball().position() + Point::createFromAngle(angle_between_robots * 2),
+            (angle_between_robots * 2) + Angle::half(), 2);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({movespin_tactic_1, movespin_tactic_2});
@@ -47,4 +47,3 @@ void MoveSpinExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
 // Register this play in the PlayFactory
 static TPlayFactory<MoveSpinExamplePlay> factory;
-
