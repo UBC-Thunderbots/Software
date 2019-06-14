@@ -24,11 +24,6 @@ cd $CURR_DIR
 # The root directory of the reopsitory and git tree
 GIT_ROOT="$CURR_DIR/.."
 
-echo "================================================================"
-echo "Setting up your git hooks"
-echo "================================================================"
-# Setup the users git hooks to point to our custom ones
-git config core.hooksPath .git-hooks
 
 echo "================================================================"
 echo "Setting up your shell config files"
