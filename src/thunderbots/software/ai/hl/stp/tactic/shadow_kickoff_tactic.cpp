@@ -1,10 +1,14 @@
 #include "ai/hl/stp/tactic/shadow_kickoff_tactic.h"
-#include "ai/hl/stp/action/move_action.h"
-#include "shared/constants.h"
 
 #include <algorithm>
 
-ShadowKickoffTactic::ShadowKickoffTactic(const Field& field, bool loop_forever) : field(field), Tactic(loop_forever) {}
+#include "ai/hl/stp/action/move_action.h"
+#include "shared/constants.h"
+
+ShadowKickoffTactic::ShadowKickoffTactic(const Field& field, bool loop_forever)
+    : field(field), Tactic(loop_forever)
+{
+}
 
 std::string ShadowKickoffTactic::getName() const
 {
@@ -14,10 +18,10 @@ std::string ShadowKickoffTactic::getName() const
 void ShadowKickoffTactic::updateParams(Point enemy_robot_position)
 {
     // Update the parameters stored by this Tactic
-    this->enemy_robot_position       = enemy_robot_position;
+    this->enemy_robot_position = enemy_robot_position;
 }
 
-double ShadowKickoffTactic::calculateRobotCost(const Robot &robot, const World &world)
+double ShadowKickoffTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
     // Prefer robots closer to the destination
     // We normalize with the diagonal so that the cost of a robot to shadow another robot
@@ -27,24 +31,31 @@ double ShadowKickoffTactic::calculateRobotCost(const Robot &robot, const World &
     return std::clamp<double>(cost, 0, 1);
 }
 
-void ShadowKickoffTactic::calculateNextIntent(
-        IntentCoroutine::push_type &yield)
+void ShadowKickoffTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     MoveAction move_action = MoveAction();
     do
     {
-        yield(move_action.updateStateAndGetNextIntent(*robot, this->calculateShadowPoint(field, enemy_robot_position), Angle::half(), 0));
+        yield(move_action.updateStateAndGetNextIntent(
+            *robot, this->calculateShadowPoint(field, enemy_robot_position),
+            Angle::half(), 0));
     } while (!move_action.done());
 }
 
-Point ShadowKickoffTactic::calculateShadowPoint(const Field& field, const Point& enemy_robot_position){
-
+Point ShadowKickoffTactic::calculateShadowPoint(const Field& field,
+                                                const Point& enemy_robot_position)
+{
     Point destination;
 
-    if (std::fabs(enemy_robot_position.y()) < (field.centreCircleRadius() + 4*ROBOT_MAX_RADIUS_METERS)){
-        destination = Point(field.centreCircleRadius()+2*ROBOT_MAX_RADIUS_METERS, enemy_robot_position.y());
-    } else {
-        destination = Point(2*ROBOT_MAX_RADIUS_METERS, enemy_robot_position.y());
+    if (std::fabs(enemy_robot_position.y()) <
+        (field.centreCircleRadius() + 4 * ROBOT_MAX_RADIUS_METERS))
+    {
+        destination = Point(field.centreCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS,
+                            enemy_robot_position.y());
+    }
+    else
+    {
+        destination = Point(2 * ROBOT_MAX_RADIUS_METERS, enemy_robot_position.y());
     }
 
     return destination;
