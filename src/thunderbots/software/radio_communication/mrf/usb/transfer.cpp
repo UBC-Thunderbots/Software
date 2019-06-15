@@ -97,12 +97,13 @@ void USB::Transfer::result() const
 void USB::Transfer::submit()
 {
     assert(!submitted_);
-    check_fn("libusb_submit_transfer", libusb_submit_transfer(transfer),
-             transfer->endpoint);
     submitted_         = true;
     done_              = false;
     stall_retries_left = retry_on_stall_ ? 30 : 0;
     ++device.submitted_transfer_count;
+
+    check_fn("libusb_submit_transfer", libusb_submit_transfer(transfer),
+             transfer->endpoint);
 }
 
 USB::Transfer::Transfer(DeviceHandle &dev)
