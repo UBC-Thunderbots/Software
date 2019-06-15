@@ -93,13 +93,13 @@ Passing:
   num_passes_to_optimize:
     min: 1
     max: 1000
-    default: 30
+    default: 15
     type: "int"
     description: "The number of passes to try to optimize at any given time"
   num_passes_to_keep_after_pruning:
     min: 0
     max: 1000
-    default: 5
+    default: 3
     type: "int"
     description: "The number of passes to keep after pruning"
   number_of_gradient_descent_steps_per_iter:

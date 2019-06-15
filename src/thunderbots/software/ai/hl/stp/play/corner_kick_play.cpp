@@ -1,3 +1,4 @@
+#include <g3log/g3log.hpp>
 #include "ai/hl/stp/play/corner_kick_play.h"
 
 #include "ai/hl/stp/evaluation/possession.h"
@@ -8,9 +9,17 @@
 #include "ai/passing/pass_generator.h"
 #include "shared/constants.h"
 
+#include "util/logger/custom_logging_levels.h"
+
 using namespace Passing;
 
-const std::string CornerKickPlay::name = "CornerKick Play";
+const std::string CornerKickPlay::name = "Corner Kick Play";
+
+CornerKickPlay::CornerKickPlay() :
+MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(5))
+{
+
+}
 
 std::string CornerKickPlay::getName() const
 {
@@ -25,6 +34,8 @@ bool CornerKickPlay::isApplicable(const World &world) const
 
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
+    return true;
+    // TODO: THis is broken somehow
     return Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
 }
 
@@ -32,9 +43,12 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
-    //auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, Rectangle(world.field().friendlyCornerPos(), world.field().enemyGoal()), true);
-    //auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, Rectangle({-0.5, -0.5}, {0.5, 0.5}), true);
-    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(world, world.field().enemyDefenseArea(), true);
+    auto cherry_pick_tactic_1 = std::make_shared<CherryPickTactic>(
+            world,
+            Rectangle(world.field().centerPoint(), world.field().enemyCornerNeg() - Vector{2, 0}));
+    auto cherry_pick_tactic_3 = std::make_shared<CherryPickTactic>(
+            world,
+            Rectangle(world.field().centerPoint(), world.field().enemyCornerPos() - Vector{2, 0}));
 
     PassGenerator pass_generator(world, world.ball().position());
 
@@ -42,11 +56,12 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Wait for a robot to be assigned to align to take the corner
     while(!align_to_ball_tactic->getAssignedRobot()){
+        LOG(INFO) << "Nothing assigned to align yet";
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_1});
+        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_3});
         updatePassGenerator(pass_generator);
 
-        yield({align_to_ball_tactic, cherry_pick_tactic_1});
+        yield({align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_3});
     }
 
     std::cout << "ASSIGNED" << std::endl;
@@ -54,21 +69,28 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
 
     // Align the kicker to take the corner kick and wait for a good pass
+    // To get the best pass possible we start by aiming for a perfect one and then
+    // decrease the minimum score over time
+    double min_score = 1;
+    Timestamp commit_stage_start_time = world.ball().lastUpdateTimestamp();
     do {
+        // TODO: Bit of hack this.......
         // Continue trying to align to deal with the case where we've finished
         // aligning but there's not passing to
-        if (align_to_ball_tactic->done()){
+        if (align_to_ball_tactic->done()) {
             align_to_ball_tactic = std::make_shared<MoveTactic>();
         }
         updateAlignToBallTactic(align_to_ball_tactic);
-        updateCherryPickTactics({cherry_pick_tactic_1});
+        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_3});
         updatePassGenerator(pass_generator);
 
-        yield({align_to_ball_tactic, cherry_pick_tactic_1});
+        yield({align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_3});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
         std::cout << best_pass_and_score_so_far.second << std::endl;
+        std::cout << best_pass_and_score_so_far.first << std::endl;
 
+//    } while (true);
     } while(!align_to_ball_tactic->done() || best_pass_and_score_so_far.second < MIN_PASS_SCORE);
 
     // Commit to a pass
@@ -76,7 +98,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     std::cout << "COMMITING TO: " << pass << std::endl;
 
-    // TODO: need to stop the pass generator here, need start/stop methods
+    // TODO: need to stop the pass generator here, need start/stop methods instead of just desctructing.......
+    pass_generator.~PassGenerator();
+    cherry_pick_tactic_1->~CherryPickTactic();
+//    cherry_pick_tactic_2->~CherryPickTactic();
+    cherry_pick_tactic_3->~CherryPickTactic();
 
     // TODO: send the remaining robots forward in the hope we'll make opportunities
 

@@ -19,7 +19,8 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point)
       best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
       random_num_gen(random_device()),
-      in_destructor(false)
+      in_destructor(false),
+      running_optimization(false)
 {
     // Generate the initial set of passes
     passes_to_optimize = generatePasses(getNumPassesToOptimize());
@@ -73,6 +74,18 @@ void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
     std::lock_guard<std::mutex> target_region_lock(target_region_mutex);
 
     this->target_region = std::move(area);
+}
+
+void PassGenerator::start(){
+    // Take ownership of running_optimization for the duration of this function
+    std::lock_guard<std::mutex> running_optimization_lock(running_optimization_mutex);
+    running_optimization = true;
+}
+
+void PassGenerator::stop(){
+    // Take ownership of running_optimization for the duration of this function
+    std::lock_guard<std::mutex> running_optimization_lock(running_optimization_mutex);
+    running_optimization = false;
 }
 
 PassGenerator::~PassGenerator()
@@ -343,6 +356,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
                              y_distribution(random_num_gen));
         Timestamp start_time =
             Timestamp::fromSeconds(start_time_distribution(random_num_gen));
+
         double pass_speed = speed_distribution(random_num_gen);
 
         Pass p(passer_point, receiver_point, pass_speed, start_time);

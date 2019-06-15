@@ -1,3 +1,5 @@
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include "ai/hl/stp/play/example_play.h"
 
 #include "ai/hl/stp/play/play_factory.h"
@@ -25,10 +27,11 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto cherry_pick_tactic = std::make_shared<CherryPickTactic>(
             world,
-            Rectangle(Point(0, -0.5), Point(3, 0.5)),
-            false);
+            Rectangle(Point(-4, -0.5), Point(4, 0.5)));
+
 
     while(true){
+        LOG(INFO) << "RUNNING";
         cherry_pick_tactic->updateParams(world);
         yield({cherry_pick_tactic});
     }
@@ -43,6 +46,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
+        LOG(INFO) << "RUNNING";
         // The angle between each robot spaced out in a circle around the ball
         Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
 

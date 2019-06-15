@@ -38,7 +38,7 @@ namespace Passing
      * pass generator only completes an interation of pass updates once every 5 seconds,
      * then the start times for the passes will be in the past (if we choose to pass
      * very soon when optimizing the pass), and so the passes will likely be invalid by
-     * the time another iteration starts. Because of this, it isextremely important that
+     * the time another iteration starts. Because of this, it is extremely important that
      * the pass generator runs fast enough. Debug builds running on slightly slower
      * computers could be unable to converge. It is recommended that all testing of things
      * involving the PassGenerator be done with executables built in "Release" in order to
@@ -98,6 +98,18 @@ namespace Passing
          */
         void setTargetRegion(std::optional<Rectangle> area);
 
+        // TODO: test this
+        /**
+         * Start running pass optimization
+         */
+        void start();
+
+        // TODO: test this
+        /**
+         * Stop running pass optimization
+         */
+        void stop();
+
         /**
          * Gets the best pass we know of so far
          *
@@ -128,7 +140,7 @@ namespace Passing
         // in each respective dimension for a single iteration. They are tuned to
         // ensure passes converge as fast as possible, but are also as stable as
         // possible
-        static constexpr double PASS_SPACE_WEIGHT                          = 0.01;
+        static constexpr double PASS_SPACE_WEIGHT                          = 0.1;
         static constexpr double PASS_TIME_WEIGHT                           = 0.1;
         static constexpr double PASS_SPEED_WEIGHT                          = 0.01;
         std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
@@ -260,6 +272,12 @@ namespace Passing
         // communicate with pass_generation_thread that it is
         // time to stop
         bool in_destructor;
+
+        // The mutex for the running_optimization flag
+        std::mutex running_optimization_mutex;
+
+        // Whether or not we are currently running optimization
+        bool running_optimization;
 
         // The mutex for the world
         std::mutex world_mutex;

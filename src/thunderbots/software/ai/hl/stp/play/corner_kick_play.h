@@ -12,7 +12,7 @@ class CornerKickPlay : public Play
    public:
     static const std::string name;
 
-    CornerKickPlay() = default;
+    CornerKickPlay();
 
     std::string getName() const override;
 
@@ -23,8 +23,12 @@ class CornerKickPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 private:
 
+    // TODO: Unused, delete this
     // The minimum score a pass must have before we will try to take it
     static constexpr double MIN_PASS_SCORE = 0.3;
+
+    // The maximum time that we will wait before committing to a pass
+    const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
     /**
      * Updates the given cherry-pick tactics
