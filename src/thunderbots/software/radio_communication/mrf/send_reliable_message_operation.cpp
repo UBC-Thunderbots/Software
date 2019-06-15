@@ -76,7 +76,6 @@ void SendReliableMessageOperation::out_transfer_done(AsyncOperation &op)
 
 void SendReliableMessageOperation::message_delivery_report(uint8_t id, uint8_t code)
 {
-    std::cout << "test" << std::endl;
     if (id == message_id)
     {
         mdr_connection.disconnect();

@@ -394,7 +394,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
                                                                    stamp));
     (*i).first->signal_done.connect(
-        sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
+        boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
     (*i).first->submit();
 
     LOG(DEBUG) << "Submitted camera transfer in position:" << camera_transfers.size()
@@ -552,7 +552,7 @@ void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 }
 
 void MRFDongle::handle_camera_transfer_done(
-    AsyncOperation<void> & op,
+    AsyncOperation<void> &op,
     std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
