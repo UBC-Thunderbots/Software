@@ -15,12 +15,15 @@ const ros: Ros = new Ros({});
  * @param url - The WebSocket URL for Rosbridge
  * @param timeout - The set time before the promise is rejected
  */
-export const connect = (url = 'ws://localhost:9090', timeout = 100) => {
+export const connect = (url = 'ws://localhost:9090', timeout = 5000) => {
     return new Promise((resolve, reject) => {
         ros.connect(url);
 
         ros.on('connection', () => resolve());
-        ros.on('error', () => reject('Cannot connect'));
+        ros.on('error', (error) => {
+            console.error(error);
+            reject(error);
+        });
 
         // We reject if the timeout has elapsed
         setTimeout(() => reject(), timeout);

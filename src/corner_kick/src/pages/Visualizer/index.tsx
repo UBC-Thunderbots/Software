@@ -8,12 +8,14 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 
+import { Sidebar, Panel } from 'SRC/components/Sidebar';
 import { Portal, PortalLocation } from 'SRC/components/Portal';
 import { SPRITESHEET } from 'SRC/constants';
 import { Canvas, CanvasManager, LayerReceiver } from 'SRC/containers/Canvas';
 import { actions, RootAction } from 'SRC/store';
-import { ILayer, IRootState } from 'SRC/types';
+import { ILayer, IRootState, IROSParamState } from 'SRC/types';
 
+import { ParamPanel } from './panels/ParamPanel';
 import { LayersPanel } from './panels/LayersPanel';
 import { PlayTypePanel } from './panels/PlayTypePanel';
 
@@ -24,6 +26,7 @@ const mapStateToProps = (state: IRootState) => ({
     playType: state.thunderbots.playType,
     playName: state.thunderbots.playName,
     tactics: state.thunderbots.tactics,
+    params: state.rosParameters,
 });
 
 // We request layer related actions
@@ -32,18 +35,23 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
         {
             addLayer: actions.canvas.addLayer,
             toggleVisibility: actions.canvas.toggleLayerVisibility,
+            setRunAI: actions.rosParameters.setRunAI,
         },
         dispatch,
     );
 
 interface IVisualizerProps {
-    addLayer: typeof actions.canvas.addLayer;
-    toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
     layers: { [id: number]: ILayer };
     layerOrder: number[];
     playType: string;
     playName: string;
     tactics: string[];
+    params: IROSParamState;
+
+    // Actions
+    addLayer: typeof actions.canvas.addLayer;
+    toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
+    setRunAI: typeof actions.rosParameters.setRunAI;
 }
 
 class VisualizerInternal extends React.Component<IVisualizerProps> {
@@ -74,11 +82,23 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
         return (
             <>
                 <Portal portalLocation={PortalLocation.SIDEBAR}>
-                    <LayersPanel
-                        layers={orderedLayers}
-                        toggleVisibility={this.onLayerVisibilityToggle}
-                    />
-                    <PlayTypePanel {...this.props} />
+                    <Sidebar inactivePanelHeight={32} minPanelHeight={100}>
+                        <Panel title="Layers">
+                            <LayersPanel
+                                layers={orderedLayers}
+                                toggleVisibility={this.onLayerVisibilityToggle}
+                            />
+                        </Panel>
+                        <Panel title="AI Controls">
+                            <ParamPanel
+                                config={this.props.params}
+                                onClick={this.onParamClick}
+                            />
+                        </Panel>
+                        <Panel title="AI Status">
+                            <PlayTypePanel {...this.props} />
+                        </Panel>
+                    </Sidebar>
                 </Portal>
                 <Portal portalLocation={PortalLocation.MAIN}>
                     <Canvas canvasManager={this.canvasManager} />
@@ -90,6 +110,14 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
     public componentWillUnmount() {
         this.layerReceiver.close();
     }
+
+    private onParamClick = (id: string, value: any) => {
+        switch (id) {
+            case 'run_ai':
+                this.props.setRunAI(value);
+                break;
+        }
+    };
 
     /**
      * Called when we received layer data from the websocket

@@ -23,7 +23,6 @@ const GlobalStylesheet = createGlobalStyle`
         overflow: hidden;
         user-select: none;
 
-        background: ${(props) => props.theme.colors.bg};
         color: ${(props) => props.theme.colors.fg};
 
         font-family: 'Open Sans', sans-serif;
@@ -35,11 +34,16 @@ const GlobalStylesheet = createGlobalStyle`
     }
 
     #root > div {
+        background: ${(props) => props.theme.colors.bg};
         border-color: ${(props) => props.theme.colors.border} !important;
     }
 
+    #root > div:fullscreen {
+        border-color: none !important;
+    }
+
     #main {
-        background: ${(props) => props.theme.colors.panel};
+        background: ${(props) => props.theme.colors.panel} !important;
     }
 `;
 
