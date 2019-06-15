@@ -9,7 +9,8 @@
 
 TEST(MoveSpinPrimTest, primitive_name_test)
 {
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
 
     EXPECT_EQ("MoveSpin Primitive", movespin_prim.getPrimitiveName());
 }
@@ -19,7 +20,7 @@ TEST(MoveSpinPrimTest, get_robot_id_test)
     unsigned int robot_id = 3U;
 
     MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(robot_id, Point(), AngularVelocity());
+        MoveSpinPrimitive(robot_id, Point(), AngularVelocity(), 1.0);
 
     EXPECT_EQ(robot_id, movespin_prim.getRobotId());
 }
@@ -29,22 +30,24 @@ TEST(MoveSpinPrimTest, parameter_array_test)
     const Point destination           = Point(1, -2);
     const AngularVelocity angular_vel = AngularVelocity::ofRadians(2.5);
     const unsigned int robot_id       = 1U;
+    const double final_speed          = 1.0;
 
     MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel, final_speed);
 
     std::vector<double> param_array = movespin_prim.getParameters();
 
     EXPECT_DOUBLE_EQ(destination.x(), param_array[0]);
     EXPECT_DOUBLE_EQ(destination.y(), param_array[1]);
     EXPECT_DOUBLE_EQ(angular_vel.toRadians(), param_array[2]);
+    EXPECT_DOUBLE_EQ(final_speed, param_array[3]);
 }
 
 TEST(MoveSpinPrimTest, get_angular_vel_test)
 {
     const AngularVelocity angular_vel = AngularVelocity::ofRadians(2.5);
 
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), angular_vel);
+    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), angular_vel, 1.0);
 
     EXPECT_EQ(movespin_prim.getAngularVelocity(), angular_vel);
 }
@@ -54,14 +57,24 @@ TEST(MoveSpinPrimTest, get_final_destination_test)
     const Point destination = Point(1, -2);
 
     MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(0, destination, AngularVelocity());
+        MoveSpinPrimitive(0, destination, AngularVelocity(), 1.0);
 
     EXPECT_EQ(movespin_prim.getDestination(), destination);
 }
 
+TEST(MoveSpinPrimTest, get_final_speed_test)
+{
+    const double final_speed = 2.0;
+
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), final_speed);
+
+    EXPECT_DOUBLE_EQ(movespin_prim.getFinalSpeed(), final_speed);
+}
 TEST(MoveSpinPrimTest, get_extra_bit_array_test)
 {
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
 
     std::vector<bool> extra_bit_array = movespin_prim.getExtraBits();
 
@@ -73,9 +86,10 @@ TEST(MoveSpinPrimTest, create_primitive_from_message_test)
     const Point destination     = Point(-2, 3);
     const Angle angular_vel     = AngularVelocity::ofRadians(1.45);
     const unsigned int robot_id = 2U;
+    const double final_speed    = 2.0;
 
     MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel, final_speed);
 
     thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
 
@@ -89,36 +103,50 @@ TEST(MoveSpinPrimTest, create_primitive_from_message_test)
 
 TEST(MoveSpinPrimTest, test_equality_operator_primitives_equal)
 {
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
     MoveSpinPrimitive movespin_prim_other =
-        MoveSpinPrimitive(0, Point(), AngularVelocity());
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
 
     EXPECT_EQ(movespin_prim, movespin_prim_other);
 }
 
 TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_robot_id)
 {
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
     MoveSpinPrimitive movespin_prim_other =
-        MoveSpinPrimitive(6, Point(), AngularVelocity());
+        MoveSpinPrimitive(6, Point(), AngularVelocity(), 1.0);
 
     EXPECT_NE(movespin_prim, movespin_prim_other);
 }
 
 TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_dest)
 {
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
     MoveSpinPrimitive movespin_prim_other =
-        MoveSpinPrimitive(0, Point(-0.3, 5), AngularVelocity());
+        MoveSpinPrimitive(0, Point(-0.3, 5), AngularVelocity(), 1.0);
 
     EXPECT_NE(movespin_prim, movespin_prim_other);
 }
 
 TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_angular_velocity)
 {
-    MoveSpinPrimitive movespin_prim = MoveSpinPrimitive(0, Point(), AngularVelocity());
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
     MoveSpinPrimitive movespin_prim_other =
-        MoveSpinPrimitive(0, Point(), AngularVelocity::half());
+        MoveSpinPrimitive(0, Point(), AngularVelocity::half(), 1.0);
+
+    EXPECT_NE(movespin_prim, movespin_prim_other);
+}
+
+TEST(MoveSpinPrimTest, test_inequality_operator_with_mismatched_final_speed)
+{
+    MoveSpinPrimitive movespin_prim =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
+    MoveSpinPrimitive movespin_prim_other =
+        MoveSpinPrimitive(0, Point(), AngularVelocity(), 0.5);
 
     EXPECT_NE(movespin_prim, movespin_prim_other);
 }
