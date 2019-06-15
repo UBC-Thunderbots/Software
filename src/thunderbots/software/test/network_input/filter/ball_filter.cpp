@@ -275,4 +275,74 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
     testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
 }
 
-// TODO: You are here. Quick bounce tests
+TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data) {
+    Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude = 5.04;
+    double ball_position_variance = 0;
+    double time_step_variance = 0;
+    double expected_position_tolerance = 0.0001;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
+    double expected_velocity_magnitude_tolerance = 0.1;
+    int num_steps_to_ignore = 5;
+    Timestamp start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+
+    ball_path = Segment(field.enemyCornerPos(), field.enemyCornerNeg());
+    ball_velocity_magnitude = 4.8;
+    expected_position_tolerance = 0.0001;
+    expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
+    expected_velocity_magnitude_tolerance = 0.1;
+    num_steps_to_ignore = 5;
+    start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+}
+
+TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_2) {
+    Segment ball_path = Segment(field.friendlyCornerNeg(), Point(0, 3));
+    double ball_velocity_magnitude = 5.04;
+    double ball_position_variance = 0;
+    double time_step_variance = 0;
+    double expected_position_tolerance = 0.0001;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
+    double expected_velocity_magnitude_tolerance = 0.1;
+    int num_steps_to_ignore = 5;
+    Timestamp start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+
+    ball_path = Segment(Point(0, 3), field.enemyCornerNeg());
+    ball_velocity_magnitude = 4.8;
+    expected_position_tolerance = 0.0001;
+    expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
+    expected_velocity_magnitude_tolerance = 0.1;
+    num_steps_to_ignore = 5;
+    start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+}
+
+TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_and_then_bouncing_with_no_noise_in_data_3) {
+    Segment ball_path = Segment(Point(-3, -1), Point(0, 0));
+    double ball_velocity_magnitude = 5.04;
+    double ball_position_variance = 0;
+    double time_step_variance = 0;
+    double expected_position_tolerance = 0.0001;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
+    double expected_velocity_magnitude_tolerance = 0.1;
+    int num_steps_to_ignore = 5;
+    Timestamp start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+
+    ball_path = Segment(Point(0, 0), Point(3, 0));
+    ball_velocity_magnitude = 4.8;
+    expected_position_tolerance = 0.0001;
+    expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
+    expected_velocity_magnitude_tolerance = 0.1;
+    num_steps_to_ignore = 1;
+    start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+}

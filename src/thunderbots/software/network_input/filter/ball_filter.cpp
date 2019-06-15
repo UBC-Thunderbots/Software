@@ -124,9 +124,26 @@ BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBal
         b(i) = ball_detections.at(i).position.y();
     }
 
+    // TODO: for testing
+    // Construct matrix A and vector b for linear regression. The first column of A contains the bias variable, and the
+    // second column contains the x coordinates of the ball. Vector b contains the y coordinates of the ball.
+    Eigen::MatrixXf A_inv(ball_detections.size(), 2);
+    Eigen::VectorXf b_inv(ball_detections.size());
+    for(int i = 0; i < ball_detections.size(); i++) {
+        A_inv(i, 0) = 1.0;
+        A_inv(i, 1) = ball_detections.at(i).position.y();
+
+        b_inv(i) = ball_detections.at(i).position.x();
+    }
+
     // Perform linear regression to find the line of best fit through the ball positions.
     // This is solving the formula Ax = b, where x is the vector we want to solve for.
     Eigen::Vector2f result = A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+    double relative_error = (A*result - b).norm() / b.norm(); // norm() is L2 norm'
+
+    Eigen::Vector2f result_inv = A_inv.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_inv);
+    double relative_error_inv = (A_inv*result_inv - b_inv).norm() / b_inv.norm(); // norm() is L2 norm
+
 
     // Find 2 points on the line of best fit that we solved for, and use these points to create a Vector along the
     // line of best fit. We will use this as the velocity vector of the ball.
@@ -135,6 +152,23 @@ BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBal
     Eigen::Vector2f p2_vec(1, 1);
     Point p2(1, p2_vec.dot(result));
     Vector best_fit_line_vector = p2 - p1;
+
+
+    Eigen::Vector2f p1_vec_inv(1, 0);
+    Point p1_inv(0, p1_vec_inv.dot(result_inv));
+    p1_inv = Point(p1_inv.y(), p1_inv.x());
+    Eigen::Vector2f p2_vec_inv(1, 1);
+    Point p2_inv(1, p2_vec_inv.dot(result_inv));
+    p2_inv = Point(p2_inv.y(), p2_inv.x());
+    Vector best_fit_line_vector_inv = p2_inv - p1_inv;
+//    best_fit_line_vector_inv = Vector(best_fit_line_vector_inv.y(), best_fit_line_vector_inv.x());
+
+    if(relative_error_inv < relative_error) {
+        best_fit_line_vector = best_fit_line_vector_inv;
+        p1 = p1_inv;
+        p2 = p2_inv;
+    }
+
 
     // Take the position of the most recent ball position and project it onto the line of best fit. We do this because
     // we assume the ball must be travelling along its velocity vector, and this allows us to return more stable
