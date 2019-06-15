@@ -2,6 +2,7 @@
 
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
+#include "ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 const std::string ExamplePlay::name = "Example Play";
 
@@ -22,6 +23,16 @@ bool ExamplePlay::invariantHolds(const World &world) const
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
+    auto cherry_pick_tactic = std::make_shared<CherryPickTactic>(
+            world,
+            Rectangle(Point(0, -0.5), Point(3, 0.5)),
+            false);
+
+    while(true){
+        cherry_pick_tactic->updateParams(world);
+        yield({cherry_pick_tactic});
+    }
+
     // Create MoveTactics that will loop forever
     auto move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);

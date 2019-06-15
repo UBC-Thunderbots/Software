@@ -20,7 +20,7 @@
 #include "../shared/constants.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 class PassingEvaluationTest : public testing::Test
 {
@@ -36,15 +36,15 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value();
     double max_pass_speed_param =
-        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
     double avg_time_offset_for_pass_seconds;
 };
 

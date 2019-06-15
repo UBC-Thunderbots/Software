@@ -8,7 +8,7 @@
 #include "ai/passing/pass_generator.h"
 #include "shared/constants.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 const std::string CornerKickPlay::name = "CornerKick Play";
 

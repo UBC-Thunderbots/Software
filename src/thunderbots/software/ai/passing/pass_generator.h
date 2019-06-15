@@ -10,7 +10,7 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/time/timestamp.h"
 
-namespace AI::Passing
+namespace Passing
 {
     /**
      * This class is responsible for generating passes for us to perform
@@ -311,4 +311,4 @@ namespace AI::Passing
     };
 
 
-}  // namespace AI::Passing
+}  // namespace Passing

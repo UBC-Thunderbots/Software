@@ -14,7 +14,7 @@
 #include "ai/passing/evaluation.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 using namespace std::chrono_literals;
 
 class PassGeneratorTest : public testing::Test

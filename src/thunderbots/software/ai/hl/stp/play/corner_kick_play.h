@@ -44,5 +44,5 @@ private:
      *
      * @param pass_generator
      */
-    void updatePassGenerator(AI::Passing::PassGenerator& pass_generator);
+    void updatePassGenerator(Passing::PassGenerator& pass_generator);
 };

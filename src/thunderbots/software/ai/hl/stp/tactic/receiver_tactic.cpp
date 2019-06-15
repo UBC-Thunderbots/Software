@@ -9,11 +9,11 @@
 #include "shared/constants.h"
 #include "util/logger/init.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 using namespace Evaluation;
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
-                               const Team& enemy_team, const AI::Passing::Pass pass,
+                               const Team& enemy_team, const Passing::Pass pass,
                                const Ball& ball, bool loop_forever)
     : field(field),
       pass(pass),
@@ -31,7 +31,7 @@ std::string ReceiverTactic::getName() const
 
 void ReceiverTactic::updateParams(const Team& updated_friendly_team,
                                   const Team& updated_enemy_team,
-                                  const AI::Passing::Pass& updated_pass,
+                                  const Passing::Pass& updated_pass,
                                   const Ball& updated_ball)
 {
     this->friendly_team = updated_friendly_team;

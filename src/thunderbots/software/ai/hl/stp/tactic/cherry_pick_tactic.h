@@ -52,7 +52,7 @@ class CherryPickTactic : public Tactic
     Rectangle target_region;
 
     // The pass optimizer being used to figure out the best position for the robot
-    AI::Passing::PassGenerator pass_generator;
+    Passing::PassGenerator pass_generator;
 
     // Tactic parameters
     // The current state of the world
