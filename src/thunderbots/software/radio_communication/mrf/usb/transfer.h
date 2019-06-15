@@ -51,6 +51,7 @@ namespace USB
          */
         void submit();
 
+       protected:
         friend void usb_transfer_handle_completed_transfer_trampoline(
             libusb_transfer *transfer);
 

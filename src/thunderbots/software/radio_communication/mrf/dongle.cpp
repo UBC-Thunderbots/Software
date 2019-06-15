@@ -371,25 +371,34 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     // the packet
     camera_packet[0] = mask_vec;
 
-    // std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    // std::chrono::system_clock::time_point epoch =
-    //     std::chrono::system_clock::from_time_t(0);
-    // std::chrono::system_clock::duration diff = now - epoch;
-    // std::chrono::microseconds micros =
-    //     std::chrono::duration_cast<std::chrono::microseconds>(diff);
-    // uint64_t stamp = static_cast<uint64_t>(micros.count());
+    std::lock_guard<std::mutex> lock(cam_mtx);
 
-    // Submit camera transfer when possible.
-    if (!camera_transfer)
+    if (camera_transfers.size() >= 8)
     {
-        camera_transfer.reset(
-            new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
-        camera_transfer->signal_done.connect(
-            boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1));
-        camera_transfer->submit();
-
-        LOG(DEBUG) << "Submitted camera transfer" << std::endl;
+        LOG(WARNING) << "Camera transfer queue is full, ignoring camera packet"
+                     << std::endl;
+        return;
     }
+
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point epoch =
+        std::chrono::system_clock::from_time_t(0);
+    std::chrono::system_clock::duration diff = now - epoch;
+    std::chrono::microseconds micros =
+        std::chrono::duration_cast<std::chrono::microseconds>(diff);
+    uint64_t stamp = static_cast<uint64_t>(micros.count());
+    std::unique_ptr<USB::BulkOutTransfer> elt(
+        new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
+    auto i = camera_transfers.insert(
+        camera_transfers.end(),
+        std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
+                                                                   stamp));
+    (*i).first->signal_done.connect(
+        sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
+    (*i).first->submit();
+
+    LOG(DEBUG) << "Submitted camera transfer in position:" << camera_transfers.size()
+               << std::endl;
 };
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
@@ -542,19 +551,23 @@ void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
     drive_transfer.reset();
 }
 
-void MRFDongle::handle_camera_transfer_done(AsyncOperation<void> &op)
+void MRFDongle::handle_camera_transfer_done(
+    AsyncOperation<void> & op,
+    std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
-    // std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    // std::chrono::system_clock::time_point epoch =
-    //     std::chrono::system_clock::from_time_t(0);
-    // std::chrono::system_clock::duration diff = now - epoch;
-    // std::chrono::microseconds micros =
-    //     std::chrono::duration_cast<std::chrono::microseconds>(diff);
-    // uint64_t stamp = static_cast<uint64_t>(micros.count());
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point epoch =
+        std::chrono::system_clock::from_time_t(0);
+    std::chrono::system_clock::duration diff = now - epoch;
+    std::chrono::microseconds micros =
+        std::chrono::duration_cast<std::chrono::microseconds>(diff);
+    uint64_t stamp = static_cast<uint64_t>(micros.count());
 
-    // std::lock_guard<std::mutex> lock(cam_mtx);
+    std::lock_guard<std::mutex> lock(cam_mtx);
+    LOG(DEBUG) << "Camera transfer done, took: " << stamp - (*iter).second
+               << " microseconds" << std::endl;
     op.result();
-    camera_transfer.reset();
+    camera_transfers.erase(iter);
 }
 
 void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const void *data,
