@@ -3,6 +3,7 @@
  */
 
 import { ILayer } from './canvas';
+import { IROSParam } from './rosParams';
 
 /**
  * The application state
@@ -33,4 +34,11 @@ export interface IThunderbotsState {
     playType: string;
     playName: string;
     tactics: string[];
+}
+
+/**
+ * The ROS settings state
+ */
+export interface IROSParamState {
+    [key: string]: IROSParam;
 }
