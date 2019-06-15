@@ -86,7 +86,7 @@ void KickAction::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         Triangle behind_ball_region =
             Triangle(behind_ball_vertex_A, behind_ball_vertex_B, behind_ball_vertex_C);
-        bool robot_behind_ball     = behind_ball_region.containsPoint(robot->position());
+        bool robot_behind_ball = behind_ball_region.containsPoint(robot->position());
         // The point in the middle of the region behind the ball
         Point point_behind_ball =
             kick_origin + behind_ball.norm(size_of_region_behind_ball * 3 / 4);
