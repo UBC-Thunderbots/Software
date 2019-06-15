@@ -3,10 +3,10 @@
 #include <chrono>
 
 #include "ai/hl/stp/stp.h"
-#include "ai/navigator/placeholder_navigator/placeholder_navigator.h"
+#include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 AI::AI()
-    : navigator(std::make_unique<PlaceholderNavigator>()),
+    : navigator(std::make_unique<PathPlanningNavigator>()),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
           std::chrono::system_clock::now().time_since_epoch().count()))

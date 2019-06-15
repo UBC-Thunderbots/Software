@@ -38,5 +38,9 @@ class PathPlanner
     virtual std::optional<std::vector<Point>> findPath(
         const Point &start, const Point &dest, const std::vector<Obstacle> &obstacles,
         const ViolationFunction &violation_function) = 0;
-    virtual ~PathPlanner()                           = default;
+
+    virtual std::optional<std::vector<Point>> findPath(const Point &start,
+                                                       const Point &dest) = 0;
+
+    virtual ~PathPlanner() = default;
 };

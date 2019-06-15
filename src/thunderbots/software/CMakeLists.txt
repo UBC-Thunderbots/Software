@@ -155,6 +155,13 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/navigator/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/navigator/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/navigator/path_planning_navigator/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/navigator/path_planning_navigator/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/navigator/path_planner/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/navigator/path_planner/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/primitive/*.h
         )
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
@@ -940,6 +947,30 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             )
     target_link_libraries(robot_filter_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+
+    catkin_add_gtest(theta_star_path_planner_test
+            test/ai/navigator/path_planner/theta_star_path_planner.cpp
+            ai/navigator/path_planner/theta_star_path_planner.cpp
+            ai/navigator/obstacle/obstacle.cpp
+            geom/polygon.h
+            geom/polygon.cpp
+            test/test_util/test_util.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            geom/util.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            )
+    target_link_libraries(theta_star_path_planner_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             )
