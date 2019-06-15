@@ -1,4 +1,5 @@
 #include "ai/hl/stp/tactic/movespin_tactic.h"
+#include "util/logger/init.h"
 
 #include <algorithm>
 #include <chrono>
@@ -34,19 +35,22 @@ void MoveSpinTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     MoveSpinAction movespin_action   = MoveSpinAction();
     MoveSpinAction movespin_action_2 = MoveSpinAction();
+
+    Point point1(-2, 0);
+    Point point2(-1, -1);
     do
     {
-        yield(movespin_action.updateStateAndGetNextIntent(*robot, Point(-3, 1),
-                                                          Angle::ofRadians(0.5), 2));
-        std::cout << "1\t";
-    } while (!((robot->position() - Point(-3, 1)).len() < 0.1));
+        yield(movespin_action.updateStateAndGetNextIntent(*robot, point1,
+                                                          Angle::ofRadians(3.5), 2));
+        LOG(DEBUG) << "Spin tactic 1" << std::endl;
+    } while (!((robot->position() - point1).len() < 0.1));
 
     do
     {
-        yield(movespin_action_2.updateStateAndGetNextIntent(*robot, Point(-1, -1),
-                                                            Angle::ofRadians(1), 0));
-        std::cout << "2\t\t";
-    } while (!((robot->position() - Point(-1, -1)).len() < 0.1));
+        yield(movespin_action_2.updateStateAndGetNextIntent(*robot, point2,
+                                                            Angle::ofRadians(-2), 0));
+        LOG(DEBUG) << "Spin tactic 2" << std::endl;
+    } while (!((robot->position() - point2).len() < 0.1));
 
     std::this_thread::sleep_for(std::chrono::seconds(3));
 }

@@ -28,7 +28,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto movespin_tactic_2 = std::make_shared<MoveSpinTactic>(true);
 
 
-    for (int i = 0; i < 3; i++)
+    while (true)
     {
         // The angle between each robot spaced out in a circle around the ball
         Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
@@ -37,7 +37,6 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({movespin_tactic_1});
-        std::cout << i + 100000;
     }
 }
 
