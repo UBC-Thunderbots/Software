@@ -19,18 +19,18 @@ TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 
-    //    try
-    //    {
-    KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
-    EXPECT_EQ(0, kick_intent.getRobotId());
-    EXPECT_EQ(Point(0, 0), kick_intent.getKickOrigin());
-    EXPECT_EQ(Angle::zero(), kick_intent.getKickDirection());
-    EXPECT_EQ(5.0, kick_intent.getKickSpeed());
-    //    }
-    //    catch (...)
-    //    {
-    //        ADD_FAILURE() << "Kick intent not returned by Kick Action!";
-    //    }
+    try
+    {
+        KickIntent kick_intent = dynamic_cast<KickIntent &>(*intent_ptr);
+        EXPECT_EQ(0, kick_intent.getRobotId());
+        EXPECT_EQ(Point(0, 0), kick_intent.getKickOrigin());
+        EXPECT_EQ(Angle::zero(), kick_intent.getKickDirection());
+        EXPECT_EQ(5.0, kick_intent.getKickSpeed());
+    }
+    catch (...)
+    {
+        ADD_FAILURE() << "Kick intent not returned by Kick Action!";
+    }
 }
 
 TEST(KickActionTest, robot_behind_ball_kicking_towards_negative_x_positive_y)
