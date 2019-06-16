@@ -180,7 +180,7 @@ void CornerKickPlay::updateAlignToBallTactic(
 void CornerKickPlay::updatePassGenerator(PassGenerator &pass_generator)
 {
     pass_generator.setWorld(world);
-    //    pass_generator.setPasserPoint(world.ball().position());
+    pass_generator.setPasserPoint(world.ball().position());
 }
 
 // Register this play in the PlayFactory

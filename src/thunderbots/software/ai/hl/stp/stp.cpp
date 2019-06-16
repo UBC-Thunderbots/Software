@@ -15,9 +15,6 @@
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 
-#include "ai/hl/stp/play/corner_kick_play.h"
-#include "ai/hl/stp/play/example_play.h"
-
 STP::STP(long random_seed) : random_number_generator(random_seed) {}
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)

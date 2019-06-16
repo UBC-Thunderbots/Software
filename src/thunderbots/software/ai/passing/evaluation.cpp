@@ -28,8 +28,8 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
 
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
-    //double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
-    double shoot_pass_rating = 1;
+    double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
+//    double shoot_pass_rating = 1;
 
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
@@ -183,7 +183,7 @@ double Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
 
     // Check for division by 0
     if (pass.speed() == 0){
-        ball_time_to_closest_pass_point = Duration::fromSeconds(9999999);
+        ball_time_to_closest_pass_point = Duration::fromSeconds(std::numeric_limits<int>::max());
     }
 
     // Figure out how long the enemy robot and ball will take to reach the receive point

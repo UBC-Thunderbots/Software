@@ -67,7 +67,7 @@ void Tactic::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
 std::unique_ptr<Intent> Tactic::getNextIntentHelper()
 {
     std::unique_ptr<Intent> next_intent = nullptr;
-    // Run the coroutine and check its status to see if it has any more work to do.
+    // Check the coroutine status to see if it has any more work to do.
     if (intent_sequence)
     {
         // Run the coroutine. This will call the bound calculateNextIntent function

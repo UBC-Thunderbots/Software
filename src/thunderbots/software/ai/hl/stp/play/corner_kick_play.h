@@ -27,10 +27,6 @@ private:
     // considered a corner kick
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
 
-    // TODO: Unused, delete this
-    // The minimum score a pass must have before we will try to take it
-    static constexpr double MIN_PASS_SCORE = 0.3;
-
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 

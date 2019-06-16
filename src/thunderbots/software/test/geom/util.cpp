@@ -11,7 +11,6 @@
 #include "geom/angle.h"
 #include "geom/point.h"
 
-// TODO: Can we get rid of this?
 // Set this to 1 to enable debug output.
 #define DEBUG 0
 
