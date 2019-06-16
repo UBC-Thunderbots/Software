@@ -4,8 +4,8 @@
 #include "ai/world/field.h"
 #include "ai/world/game_state.h"
 #include "ai/world/team.h"
-#include "util/refbox_constants.h"
 #include "boost/circular_buffer.hpp"
+#include "util/refbox_constants.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the
@@ -35,7 +35,7 @@ class World final
      * @param enemy_team the enemy_team for the world
      */
     explicit World(const Field& field, const Ball& ball, const Team& friendly_team,
-                   const Team& enemy_team);
+                   const Team& enemy_team, unsigned int buffer_size = 20);
 
     /**
      * Updates the state of the field in the world with the new field data
@@ -72,12 +72,6 @@ class World final
      */
     void updateRefboxGameState(const RefboxGameState& game_state);
 
-    /**
-     * Updates the Timestamp history of the World with the new Timestamp
-     *
-     * @param timestamp : Timestamp corresponding to the most recent data in the World
-     */
-    void updateMostRecentTimestamp(const Timestamp& timestamp);
 
     /**
      * Returns a const reference to the Field in the world
@@ -149,20 +143,45 @@ class World final
      */
     GameState& mutableGameState();
 
+
+
     /**
-     * Returns the the Timestamp corresponding to when the World object was last updated
+     * Gets the most recent Timestamp stored in the history of the World
      *
-     * @return Timestamp corresponding to when the World object was last updated
+     * @return returns Timestamp : The most recent Timestamp stored in the history
      */
-    Timestamp getMostRecentUpdateTimestamp();
+    Timestamp getMostRecentTimestamp();
+
+    /**
+     * Gets the update Timestamp history stored World
+     *
+     * @return returns circular_buffer<Timestamp> : The Timestamp history stored in the
+     * World
+     */
+    boost::circular_buffer<Timestamp> getTimestampHistory();
 
    private:
+    /**
+     * Searches all member objects of world for the most recent Timestamp value
+     *
+     */
+    Timestamp getMostRecentTimestampFromMembers();
+
+    /**
+     * Updates the timestamp history for World to include a new timestamp (On the
+     * condition that the parameter Timestamp is newer than any Timestamp already in the
+     * history)
+     *
+     * @param Timestamp corresponding to when the World was last updated
+     */
+    void updateTimestamp(Timestamp timestamp);
+
+    // Private Variables
     Field field_;
     Ball ball_;
     Team friendly_team_;
     Team enemy_team_;
     GameState game_state_;
-    Timestamp most_recent_update_timestamp;
     // All previous timestamps of when the field was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
