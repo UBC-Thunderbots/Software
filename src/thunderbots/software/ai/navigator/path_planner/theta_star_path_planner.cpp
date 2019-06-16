@@ -68,17 +68,18 @@ double ThetaStarPathPlanner::calculateHValue(int row, int col, CellCoordinate de
 bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
                                        CellCoordinate new_pair)
 {
-    Point nextPoint = Point(new_pair.first, new_pair.second);
-    Point parentPoint = Point(curr_parent_i, curr_parent_j);
+    Point nextPoint    = Point(new_pair.first, new_pair.second);
+    Point parentPoint  = Point(curr_parent_i, curr_parent_j);
     Point pointToCheck = parentPoint;
 
-    Vector diff = nextPoint - parentPoint;
+    Vector diff      = nextPoint - parentPoint;
     Vector direction = diff.norm();
-    int dist = (int) diff.len();
-    for(int i = 0; i < dist; i++)
+    int dist         = (int)diff.len();
+    for (int i = 0; i < dist; i++)
     {
         pointToCheck = pointToCheck + direction;
-        if(!isUnBlocked((int) std::round(pointToCheck.x()), (int) std::round(pointToCheck.y())))
+        if (!isUnBlocked((int)std::round(pointToCheck.x()),
+                         (int)std::round(pointToCheck.y())))
         {
             return false;
         }
@@ -144,11 +145,12 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
         else if (closedList[pNew.first][pNew.second] == false &&
                  isUnBlocked(pNew.first, pNew.second) == true)
         {
-	    int parent_i = cellDetails[pCurr.first][pCurr.second].parent_i_;
-	    int parent_j = cellDetails[pCurr.first][pCurr.second].parent_j_;
+            int parent_i = cellDetails[pCurr.first][pCurr.second].parent_i_;
+            int parent_j = cellDetails[pCurr.first][pCurr.second].parent_j_;
             if (lineOfSight(parent_i, parent_j, pNew))
             {
-                gNew = cellDetails[parent_i][parent_j].g_ + calculateHValue(parent_i, parent_j, pNew);
+                gNew = cellDetails[parent_i][parent_j].g_ +
+                       calculateHValue(parent_i, parent_j, pNew);
                 hNew = calculateHValue(pNew.first, pNew.second, dest);
                 fNew = gNew + hNew;
 
@@ -172,10 +174,10 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
                     cellDetails[pNew.first][pNew.second].h_        = hNew;
                     cellDetails[pNew.first][pNew.second].parent_i_ = parent_i;
                     cellDetails[pNew.first][pNew.second].parent_j_ = parent_j;
-		}
-	    }
-	    else
-	    {
+                }
+            }
+            else
+            {
                 gNew = cellDetails[pCurr.first][pCurr.second].g_ + currToNextNodeDist;
                 hNew = calculateHValue(pNew.first, pNew.second, dest);
                 fNew = gNew + hNew;

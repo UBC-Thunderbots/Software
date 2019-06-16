@@ -64,7 +64,18 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1, 0);
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        obstacles.push_back(o);
+    }
+
+    for (auto &robot : world.friendlyTeam().getAllRobots())
+    {
+        if (robot.id() == move_intent.getRobotId())
+        {
+            // skip current robot
+            continue;
+        }
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
         obstacles.push_back(o);
     }
 
