@@ -2,7 +2,6 @@
 #define UTIL_LIBUSB_H
 
 #include <libusb.h>
-#include <sigc++/connection.h>
 
 #include <cassert>
 #include <cstddef>
@@ -37,11 +36,6 @@ namespace USB
          * Initializes the library and creates a context.
          */
         explicit Context();
-
-        /**
-         * This function must be called in order to update pending libusb events.
-         */
-        void handle_usb_events();
 
         /**
          * Deinitializes the library and destroys the context.

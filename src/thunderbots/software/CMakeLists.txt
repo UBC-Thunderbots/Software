@@ -159,7 +159,7 @@ file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
         ${SHARED_UTIL_SRC}
-	)
+        )
 
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
@@ -219,15 +219,9 @@ include_directories(SYSTEM "${LIBUSB_1_INCLUDE_DIRS}")
 link_directories("${LIBUSB_1_LIBRARY_DIRS}")
 add_definitions("${LIBUSB_1_DEFINITIONS}")
 
-##### SIGC++  ######
-pkg_search_module("SIGC" REQUIRED "sigc++-2.0")
-include_directories(SYSTEM "${SIGC_INCLUDE_DIRS}")
-link_directories("${SIGC_LIBRARY_DIRS}")
-
 target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${G3LOG}
         ${LIBUSB_1_LIBRARIES}
-        ${SIGC_LIBRARIES}
         )
 
     file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS

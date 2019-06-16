@@ -192,11 +192,11 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_and_dribble_enabled)
 
 TEST(MRFPrimitiveVisitorTest, visit_movespin_primitive)
 {
-    MoveSpinPrimitive primitive(11, Point(22, 33.3), Angle::half());
+    MoveSpinPrimitive primitive(11, Point(22, 33.3), Angle::half(), 1.0);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::SPIN;
     expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,
-                                            Angle::half().toRadians() * 100, 0};
+                                            Angle::half().toRadians() * 100, 1.0 * 1000};
     expected_radio_primitive.extra_bits  = 0;
 
     MRFPrimitiveVisitor prim_visitor;
