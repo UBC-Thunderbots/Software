@@ -4,11 +4,7 @@
 /**
  * Provides access to an MRF24J40 dongle.
  */
-
-#include <sigc++/connection.h>
-#include <sigc++/signal.h>
-#include <sigc++/trackable.h>
-
+#include <boost/signals2.hpp>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +24,6 @@
 #include "usb/libusb.h"
 #include "util/async_operation.h"
 #include "util/noncopyable.h"
-#include "util/property.h"
 
 /**
  * An operation to send a reliable message.
@@ -73,12 +68,6 @@ class MRFDongle final
                             Point ball, uint64_t timestamp);
 
     /**
-     * Handles libusb callbacks.
-     * IMPORTANT: MUST BE CALLED ON EACH LOOP
-     */
-    void handle_libusb_events();
-
-    /**
      * Generates an audible beep on the dongle.
      *
      * @param[in] length the length of the beep, in milliseconds (0 to 65,535)
@@ -119,18 +108,7 @@ class MRFDongle final
     /**
      * The current state of the emergency stop switch.
      */
-    Property<EStopState> estop_state;
-
-    /**
-     * Emitted when a message is received.
-     *
-     * @param[in] robot the robot who sent the message
-     *
-     * @param[in] data the message
-     *
-     * @param[in] length the length of the message
-     */
-    sigc::signal<void, unsigned int, const void *, std::size_t> signal_message_received;
+    EStopState estop_state;
 
    private:
     friend class SendReliableMessageOperation;
@@ -147,7 +125,6 @@ class MRFDongle final
     void encode_primitive(const std::unique_ptr<Primitive> &prim, void *out);
     bool submit_drive_transfer();
     void handle_drive_transfer_done(AsyncOperation<void> &);
-    sigc::connection drive_submit_connection;
     uint8_t drive_packet[64];
     std::size_t drive_packet_length;
     std::unique_ptr<USB::BulkOutTransfer> drive_transfer;
@@ -168,7 +145,7 @@ class MRFDongle final
     USB::InterruptInTransfer status_transfer;
     std::list<std::unique_ptr<USB::BulkOutTransfer>> unreliable_messages;
     std::queue<uint8_t> free_message_ids;
-    sigc::signal<void, uint8_t, uint8_t> signal_message_delivery_report;
+    boost::signals2::signal<void(uint8_t, uint8_t)> signal_message_delivery_report;
     Annunciator &annunciator;
 
     uint8_t alloc_message_id();
@@ -189,7 +166,6 @@ class MRFDongle final
     void handle_beep_done(AsyncOperation<void> &);
     std::unique_ptr<USB::ControlNoDataTransfer> beep_transfer;
     unsigned int pending_beep_length;
-    sigc::connection annunciator_beep_connections[2];
 };
 
 inline uint8_t MRFDongle::channel() const
