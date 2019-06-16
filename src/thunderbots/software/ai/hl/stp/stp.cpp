@@ -38,7 +38,6 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     if (!current_play || !current_play->invariantHolds(world) || current_play->done() ||
         override_play_name_value_changed || override_play_value_changed)
     {
-        LOG(INFO) << "switch triggered";
         if (override_play)
         {
             if (std::find(all_play_names.begin(), all_play_names.end(),

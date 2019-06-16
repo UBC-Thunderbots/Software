@@ -23,6 +23,10 @@ class CornerKickPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 private:
 
+    // The maximum distance from the corner that the ball can be for it to be
+    // considered a corner kick
+    static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
+
     // TODO: Unused, delete this
     // The minimum score a pass must have before we will try to take it
     static constexpr double MIN_PASS_SCORE = 0.3;

@@ -41,7 +41,7 @@ AI:
           with defending_positive_side parameter
     defending_positive_side:
       type: "bool"
-      default: false
+      default: true
       description: >-
           Positive if selected, Negative if unselected
     override_refbox_friendly_team_color:
