@@ -21,7 +21,7 @@ protected:
         // Initialize the time
         current_timestamp = Timestamp::fromSeconds(123);
         field = ::Test::TestUtil::createSSLDivBField();
-        ball_filter = BallFilter();
+        ball_filter = BallFilter(4, 10);
         time_step = Duration::fromSeconds(1.0 / 60.0);
         // Use a constant seed to results are deterministic
         random_generator.seed(1);
@@ -124,7 +124,7 @@ protected:
     }
 
     Field field = ::Test::TestUtil::createSSLDivBField();
-    BallFilter ball_filter;
+    BallFilter ball_filter = BallFilter(0, 0);
     Duration time_step;
     std::mt19937 random_generator;
     Timestamp current_timestamp;

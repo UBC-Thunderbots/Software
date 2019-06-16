@@ -1,16 +1,13 @@
 #include "ball_filter.h"
 
-#include <fstream>
-#include <iostream>
-#include <iomanip>
 #include <shared/constants.h>
 #include <Eigen/Dense>
 #include "geom/util.h"
 #include <algorithm>
+#include <limits>
+#include "util/math_functions.h"
 
-static std::ofstream outfile;
-
-BallFilter::BallFilter() : ball_detection_buffer(5), LINEAR_REGRESSION_BUFFER_SIZE(5) {}
+BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size) : _min_buffer_size(min_buffer_size), _max_buffer_size(max_buffer_size), ball_detection_buffer(max_buffer_size) {}
 
 void BallFilter::addNewDetectionsToBuffer(
         std::vector<SSLBallDetection> new_ball_detections, const Field &field) {
@@ -27,7 +24,7 @@ void BallFilter::addNewDetectionsToBuffer(
         }
 
         if(!ball_detection_buffer.empty()) {
-            auto detection_with_smallest_timestamp = *std::min(ball_detection_buffer.begin(), ball_detection_buffer.end());
+            auto detection_with_smallest_timestamp = *std::min_element(ball_detection_buffer.begin(), ball_detection_buffer.end());
             Duration time_diff = detection.timestamp - detection_with_smallest_timestamp.timestamp;
 
             // Ignore any data from the past, and any data that is as old as the oldest data in the buffer since it
@@ -48,7 +45,7 @@ void BallFilter::addNewDetectionsToBuffer(
             // Make the maximum acceptable velocity a bit larger than the strict limits according to the game rules
             // to account for measurement error, and to be a bit on the safe side. We
             // don't want to risk discarding real data
-            double maximum_acceptable_velocity_magnitude = BALL_MAX_SPEED_METERS_PER_SECOND + 1.0;
+            double maximum_acceptable_velocity_magnitude = BALL_MAX_SPEED_METERS_PER_SECOND + 2.0;
             if(estimated_detection_velocity_magnitude > maximum_acceptable_velocity_magnitude) {
                 // If we determine the data to be noise, remove an entry from the buffer.
                 // This way if we have messed up and now the ball is too far away for the
@@ -66,132 +63,144 @@ void BallFilter::addNewDetectionsToBuffer(
             }
         }else {
             // If there is no data in the buffer, we always add the new data
-            // We sort the vector in decreasing order first so that we can always ensure any elements that are
-            // ejected from the end of the buffer are the oldest data
-            std::sort(ball_detection_buffer.rbegin(), ball_detection_buffer.rend());
             ball_detection_buffer.push_front(detection);
         }
     }
 }
 
-std::vector<Vector> BallFilter::calculateBallVelocities(
+BallVelocityEstimate BallFilter::estimateBallVelocity(boost::circular_buffer<SSLBallDetection> ball_detections) {
+    // Sort the detections in decreasing order before processing. This places the most recent detections (with the
+    // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
+    // the buffer
+    std::sort(ball_detections.begin(), ball_detections.end());
+
+    std::vector<double> ball_velocity_magnitudes;
+    for(int i = 0; i < ball_detections.size() - 1; i++) {
+        for(int j = i + 1; j < ball_detections.size(); j++) {
+            SSLBallDetection previous_detection = ball_detections.at(i);
+            SSLBallDetection current_detection = ball_detections.at(j);
+
+            Duration time_diff = current_detection.timestamp - previous_detection.timestamp;
+            // Avoid division by 0. If we have adjacent detections with the same timestamp the velocity cannot be
+            // calculated
+            if(time_diff.getSeconds() == 0){
+                continue;
+            }
+
+            Vector velocity_vector = current_detection.position - previous_detection.position;
+            double velocity_magnitude = velocity_vector.len() / time_diff.getSeconds();
+
+            ball_velocity_magnitudes.emplace_back(velocity_magnitude);
+        }
+    }
+
+    double velocity_magnitude_sum = 0;
+    for(const auto& velocity_magnitude : ball_velocity_magnitudes) {
+        velocity_magnitude_sum += velocity_magnitude;
+    }
+    double average_velocity_magnitude = velocity_magnitude_sum / ball_velocity_magnitudes.size();
+
+    double velocity_magnitude_max = *std::max_element(ball_velocity_magnitudes.begin(), ball_velocity_magnitudes.end());
+    double velocity_magnitude_min = *std::min_element(ball_velocity_magnitudes.begin(), ball_velocity_magnitudes.end());
+    double min_max_average = (velocity_magnitude_min + velocity_magnitude_max) / 2.0;
+
+    BallVelocityEstimate velocity_data({average_velocity_magnitude, min_max_average});
+
+    return velocity_data;
+}
+
+boost::circular_buffer<SSLBallDetection> BallFilter::getResizedDetectionBuffer(
         boost::circular_buffer<SSLBallDetection> ball_detections) {
     // Sort the detections in decreasing order before processing. This places the most recent detections (with the
     // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
     // the buffer
     std::sort(ball_detections.rbegin(), ball_detections.rend());
 
-    std::vector<Vector> ball_velocities;
-    for(int i = 0; i < ball_detections.size() - 1; i++) {
-        SSLBallDetection current_detection = ball_detections.at(i);
-        SSLBallDetection previous_detection = ball_detections.at(i + 1);
+    double max_buffer_size_velocity_magnitude = BALL_MAX_SPEED_METERS_PER_SECOND - 1.5;
+    double min_buffer_size_velocity_magnitude = 0.5;
+    double buffer_size_velocity_magnitude_diff = max_buffer_size_velocity_magnitude - min_buffer_size_velocity_magnitude;
 
-        Duration time_diff = current_detection.timestamp - previous_detection.timestamp;
-        // Avoid division by 0. If we have adjacent detections with the same timestamp the velocity cannot be
-        // calculated
-        if(time_diff.getSeconds() == 0){
-            continue;
-        }
+    unsigned int max_buffer_size = std::min(this->_max_buffer_size, static_cast<unsigned int>(ball_detections.size()));
+    unsigned int min_buffer_size = std::min(this->_min_buffer_size, static_cast<unsigned int>(ball_detections.size()));
+    double buffer_size_diff = max_buffer_size - min_buffer_size;
 
-        Vector velocity_vector = current_detection.position - previous_detection.position;
-        double velocity_magnitude = velocity_vector.len() / time_diff.getSeconds();
-        Vector velocity = velocity_vector.norm(velocity_magnitude);
+    double min_max_magnitude_average = estimateBallVelocity(ball_detections).min_max_magnitude_average;
 
-        ball_velocities.emplace_back(velocity);
-    }
+    double linear_offset =  min_buffer_size_velocity_magnitude + (buffer_size_velocity_magnitude_diff / 2);
+    double linear_scaling_factor = Util::linear(min_max_magnitude_average, linear_offset, buffer_size_velocity_magnitude_diff);
 
-    return ball_velocities;
+    int buffer_size = min_buffer_size + std::floor(linear_scaling_factor * buffer_size_diff);
+
+    ball_detections.resize(buffer_size);
+
+    return ball_detections;
 }
 
-Ball
-BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections) {
-    // Sort the detections in decreasing order before processing. This places the most recent detections (with the
-    // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
-    // the buffer
-    std::sort(ball_detections.rbegin(), ball_detections.rend());
-    // We use a slightly smaller buffer for the linear regression so that it is more responsive to bounces
-    // and sudden changes in trajectory
-    ball_detections.resize(LINEAR_REGRESSION_BUFFER_SIZE);
-
+LinearRegressionResults BallFilter::getLinearRegressionLine(
+        const boost::circular_buffer<SSLBallDetection> &ball_detections) {
     // Construct matrix A and vector b for linear regression. The first column of A contains the bias variable, and the
     // second column contains the x coordinates of the ball. Vector b contains the y coordinates of the ball.
     Eigen::MatrixXf A(ball_detections.size(), 2);
     Eigen::VectorXf b(ball_detections.size());
     for(int i = 0; i < ball_detections.size(); i++) {
+        // This extra column of 1's is the bias variable, so that we can regress with a y-intercept
         A(i, 0) = 1.0;
         A(i, 1) = ball_detections.at(i).position.x();
 
         b(i) = ball_detections.at(i).position.y();
     }
 
-    // TODO: for testing
-    // Construct matrix A and vector b for linear regression. The first column of A contains the bias variable, and the
-    // second column contains the x coordinates of the ball. Vector b contains the y coordinates of the ball.
-    Eigen::MatrixXf A_inv(ball_detections.size(), 2);
-    Eigen::VectorXf b_inv(ball_detections.size());
-    for(int i = 0; i < ball_detections.size(); i++) {
-        A_inv(i, 0) = 1.0;
-        A_inv(i, 1) = ball_detections.at(i).position.y();
-
-        b_inv(i) = ball_detections.at(i).position.x();
-    }
-
     // Perform linear regression to find the line of best fit through the ball positions.
     // This is solving the formula Ax = b, where x is the vector we want to solve for.
-    Eigen::Vector2f result = A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
-    double relative_error = (A*result - b).norm() / b.norm(); // norm() is L2 norm'
+    Eigen::Vector2f regression_vector = A.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);
+    // How to calculate the error is from https://eigen.tuxfamily.org/dox/group__TutorialLinearAlgebra.html
+    double regression_error = (A*regression_vector - b).norm() / b.norm(); // norm() is L2 norm
 
-    Eigen::Vector2f result_inv = A_inv.bdcSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_inv);
-    double relative_error_inv = (A_inv*result_inv - b_inv).norm() / b_inv.norm(); // norm() is L2 norm
-
-
-    // Find 2 points on the line of best fit that we solved for, and use these points to create a Vector along the
-    // line of best fit. We will use this as the velocity vector of the ball.
+    // Find 2 points on the regression line that we solved for, and use this to construct our own Line class
     Eigen::Vector2f p1_vec(1, 0);
-    Point p1(0, p1_vec.dot(result));
+    Point p1(0, p1_vec.dot(regression_vector));
     Eigen::Vector2f p2_vec(1, 1);
-    Point p2(1, p2_vec.dot(result));
-    Vector best_fit_line_vector = p2 - p1;
+    Point p2(1, p2_vec.dot(regression_vector));
+    Line regression_line = Line(p1, p2);
 
+    LinearRegressionResults results({regression_line, regression_error});
 
-    Eigen::Vector2f p1_vec_inv(1, 0);
-    Point p1_inv(0, p1_vec_inv.dot(result_inv));
-    p1_inv = Point(p1_inv.y(), p1_inv.x());
-    Eigen::Vector2f p2_vec_inv(1, 1);
-    Point p2_inv(1, p2_vec_inv.dot(result_inv));
-    p2_inv = Point(p2_inv.y(), p2_inv.x());
-    Vector best_fit_line_vector_inv = p2_inv - p1_inv;
-//    best_fit_line_vector_inv = Vector(best_fit_line_vector_inv.y(), best_fit_line_vector_inv.x());
+    return results;
+}
 
-    if(relative_error_inv < relative_error) {
-        best_fit_line_vector = best_fit_line_vector_inv;
-        p1 = p1_inv;
-        p2 = p2_inv;
-    }
+Ball
+BallFilter::getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections) {
+    auto resized_ball_detections = getResizedDetectionBuffer(ball_detections);
 
+    // Sort the detections in decreasing order before processing. This places the most recent detections (with the
+    // largest timestamp) at the front of the buffer, and the oldest detections (smallest timestamp) at the end of
+    // the buffer
+    std::sort(ball_detections.rbegin(), ball_detections.rend());
+
+    auto x_vs_y_regression = getLinearRegressionLine(ball_detections);
+
+     boost::circular_buffer<SSLBallDetection> inverse_ball_detections = ball_detections;
+     for(auto& detection : ball_detections) {
+         detection.position = Point(detection.position.y(), detection.position.x());
+     }
+     auto y_vs_x_regression = getLinearRegressionLine(inverse_ball_detections);
+     y_vs_x_regression.regression_line = Line(Point(y_vs_x_regression.regression_line.getFirst().y(), y_vs_x_regression.regression_line.getFirst().x()),
+             Point(y_vs_x_regression.regression_line.getSecond().y(), y_vs_x_regression.regression_line.getSecond().x()));
+
+    Line regression_line = x_vs_y_regression.regression_error < y_vs_x_regression.regression_error ? x_vs_y_regression.regression_line : y_vs_x_regression.regression_line;
 
     // Take the position of the most recent ball position and project it onto the line of best fit. We do this because
     // we assume the ball must be travelling along its velocity vector, and this allows us to return more stable
     // position values since the line of best fit is less likely to fluctuate compared to the raw position of a ball
     // detection
     SSLBallDetection latest_ball_detection = ball_detections.front();
-    Point filtered_ball_position = closestPointOnLine(latest_ball_detection.position, p1, p2);
-
-    // Calculate the velocity of the ball using the average of the velocities calculated from the values currently
-    // in the detection buffer
-    auto velocities = calculateBallVelocities(ball_detections);
-    Vector average_velocity = Vector(0, 0);
-    for(const auto& v : velocities) {
-        average_velocity = average_velocity + v;
-    }
-    average_velocity = average_velocity.norm(average_velocity.len() / velocities.size());
-    double average_velocity_magnitude = average_velocity.len();
+    Point filtered_ball_position = closestPointOnLine(latest_ball_detection.position, regression_line);
 
     // Project the velocity so it also lies along the line of best fit calculated above. Again, this gives more stable
     // values because the line of best fit is more robust to fluctiations in ball position, so will not vary as much
     // as using the "raw" ball velocity
-    Vector vel_along_line = average_velocity.project(best_fit_line_vector);
-    Vector filtered_velocity = vel_along_line.norm(average_velocity_magnitude);
+    double ball_velocity_magnitude = estimateBallVelocity(resized_ball_detections).average_velocity_magnitude;
+    Vector filtered_velocity = (regression_line.getSecond() - regression_line.getFirst()).norm(ball_velocity_magnitude);
 
     Ball ball(filtered_ball_position, filtered_velocity, latest_ball_detection.timestamp);
     return ball;

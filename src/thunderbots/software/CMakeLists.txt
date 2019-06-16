@@ -1049,6 +1049,7 @@ if (CATKIN_ENABLE_TESTING)
             util/time/time.cpp
             util/time/timestamp.cpp
             util/time/duration.cpp
+            util/math_functions.cpp
             util/parameter/dynamic_parameters.cpp
             geom/util.cpp)
     target_link_libraries(network_input_test

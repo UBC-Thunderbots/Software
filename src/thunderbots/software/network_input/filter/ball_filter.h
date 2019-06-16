@@ -6,6 +6,7 @@
 #include "geom/point.h"
 #include "util/time/timestamp.h"
 #include <optional>
+#include "geom/line.h"
 
 /**
  * A lightweight datatype used to input new data into the filter.
@@ -25,6 +26,19 @@ struct SSLBallDetection
         return timestamp < b.timestamp;
     }
 };
+
+// TODO: comment
+struct BallVelocityEstimate
+{
+    double average_velocity_magnitude;
+    double min_max_magnitude_average;
+};
+
+struct LinearRegressionResults {
+    Line regression_line;
+    double regression_error;
+};
+
 // TODO: COMMENTS AND ASCII ART
 /**
  * Given ball data from SSL Vision, filters for and returns the position/velocity of the
@@ -36,7 +50,7 @@ class BallFilter
     /**
      * Creates a new Ball Filter
      */
-    explicit BallFilter();
+    explicit BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size);
 
     // TODO: comment
     /**
@@ -50,19 +64,22 @@ class BallFilter
      */
     std::optional<Ball> getFilteredData(const std::vector<SSLBallDetection>& new_ball_detections, const Field& field);
 
+    boost::circular_buffer<SSLBallDetection> getResizedDetectionBuffer(
+            boost::circular_buffer<SSLBallDetection> ball_detections);
+
 //   private:
     // TODO: comments
     void addNewDetectionsToBuffer(std::vector<SSLBallDetection> new_ball_detections,
                                   const Field &field);
-    Ball getAveragedBallPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
     Ball getLinearRegressionPositionAndVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
-    std::vector<Vector> calculateBallVelocities(
-            boost::circular_buffer<SSLBallDetection> ball_detections);
+    BallVelocityEstimate estimateBallVelocity(boost::circular_buffer<SSLBallDetection> ball_detections);
 
+    LinearRegressionResults getLinearRegressionLine(const boost::circular_buffer<SSLBallDetection> &ball_detections);
 
 
     // A circular buffer used to store previous ball detections, so we can use them
     // in the filter
     boost::circular_buffer<SSLBallDetection> ball_detection_buffer;
-    unsigned int LINEAR_REGRESSION_BUFFER_SIZE;
+    unsigned int _min_buffer_size;
+    unsigned int _max_buffer_size;
 };
