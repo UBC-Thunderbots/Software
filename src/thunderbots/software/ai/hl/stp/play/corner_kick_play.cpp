@@ -48,7 +48,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             Rectangle(world.field().centerPoint(), world.field().enemyCornerNeg() - Vector{2, 0}));
     auto cherry_pick_tactic_3 = std::make_shared<CherryPickTactic>(
             world,
-            Rectangle(world.field().centerPoint(), world.field().enemyCornerPos()));
+            Rectangle(world.field().centerPoint(), world.field().enemyCornerPos() - Vector(0, 0.75)));
 
     PassGenerator pass_generator(world, world.ball().position());
 
