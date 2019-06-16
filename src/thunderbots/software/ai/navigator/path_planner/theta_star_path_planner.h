@@ -94,15 +94,69 @@ class ThetaStarPathPlanner : public PathPlanner
     std::vector<std::vector<bool>> unblocked_grid;
 
 
+    /**
+     * Returns if a cell is within bounds of grid
+     * @param row y position of cell
+     * @param col x position of cell
+     * @return true if cell is valid
+     */
     bool isValid(int row, int col);
+
+    /**
+     * Returns if a cell is unblocked
+     * @param row y position of cell
+     * @param col x position of cell
+     * @return true if cell is unblocked
+     */
     bool isUnBlocked(int row, int col);
+
+    /**
+     * Returns if a cell is the destination
+     * @param row y position of cell
+     * @param col x position of cell
+     * @param dest destination cell
+     * @return true if cell is the destination
+     */
     bool isDestination(int row, int col, CellCoordinate dest);
+
+    /**
+     * Returns heuristic value of a cell
+     * This is currently the Euclidean distance to the destination
+     * @param row y position of cell
+     * @param col x position of cell
+     * @param dest destination cell
+     * @return Euclidean distance to dest
+     */
     double calculateHValue(int row, int col, CellCoordinate dest);
+
+    /**
+     * Traces a path from the destination back to the start 
+     * and populates a vector of points with that path
+     * @param dest destination cell
+     * @return vector of points with the path from start to dest
+     */
     std::vector<Point> tracePath(CellCoordinate dest);
+
+    /**
+     * Updates pNew's fields based on pCurr dest, currToNextNodeDist
+     * and checks if destination is reached
+     * @param pCurr                 current cell
+     * @param pNext                 next cell to be updated
+     * @param dest                  destination cell
+     * @param currToNextNodeDist    Euclidean distance between pCurr and pNext
+     * @return                      true if pNew is destination
+     */
     bool updateVertex(CellCoordinate pCurr, CellCoordinate pNew, CellCoordinate dest,
                       double currToNextNodeDist);
-    bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
 
+    /**
+     * Checks for line of sight between parent cell and new cell
+     * @param curr_parent_i         parent cell's x coordinate
+     * @param curr_parent_j         parent cell's y coordinate
+     * @param new_pair              cell to check line of sight to
+     * @return                      true if line of sight from parent to new cell
+     */
+    bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
 
     Field field_;
     Ball ball_;
