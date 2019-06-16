@@ -72,6 +72,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
     double min_score = 1;
+    // TODO: change this to world timestamp (COMMMIT # HERE)
     Timestamp commit_stage_start_time = world.ball().lastUpdateTimestamp();
     do {
         // TODO: Bit of hack this.......
@@ -90,8 +91,12 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::cout << best_pass_and_score_so_far.second << std::endl;
         std::cout << best_pass_and_score_so_far.first << std::endl;
 
+        // TODO: change this to world timestamp (COMMMIT # HERE)
+        Duration time_since_commit_stage_start = world.ball().lastUpdateTimestamp() - commit_stage_start_time;
+        min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() / MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(), 1.0);
+
 //    } while (true);
-    } while(!align_to_ball_tactic->done() || best_pass_and_score_so_far.second < MIN_PASS_SCORE);
+    } while(!align_to_ball_tactic->done() || best_pass_and_score_so_far.second < min_score);
 
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.first;
