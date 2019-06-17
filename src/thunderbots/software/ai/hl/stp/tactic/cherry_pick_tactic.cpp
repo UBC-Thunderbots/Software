@@ -7,8 +7,7 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "geom/util.h"
 
-CherryPickTactic::CherryPickTactic(const World &world,
-                                   const Rectangle &target_region)
+CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : pass_generator(world, world.ball().position()),
       world(world),
       target_region(target_region),
@@ -35,7 +34,7 @@ double CherryPickTactic::calculateRobotCost(const Robot& robot, const World& wor
 
 void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-    MoveAction move_action   = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
+    MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
     auto best_pass_and_score = pass_generator.getBestPassSoFar();
     do
     {

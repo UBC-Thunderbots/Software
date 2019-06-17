@@ -1,7 +1,6 @@
-#include "ai/hl/stp/play/example_play.h"
-
 #include <gtest/gtest.h>
 
+#include "ai/hl/stp/play/example_play.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "test/test_util/test_util.h"
 

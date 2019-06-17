@@ -17,8 +17,8 @@ using namespace Passing;
 using namespace AI::Evaluation;
 
 double Passing::ratePass(const World& world, const Passing::Pass& pass,
-                             const std::optional<Rectangle>& target_region,
-                             std::optional<unsigned int> passer_robot_id)
+                         const std::optional<Rectangle>& target_region,
+                         std::optional<unsigned int> passer_robot_id)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
@@ -67,7 +67,7 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
 }
 
 double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
-                                       const Passing::Pass& pass)
+                                   const Passing::Pass& pass)
 {
     // TODO: You don't even use this first parameter, but stuff is hardcoded below
     double ideal_shoot_angle_degrees =
@@ -182,8 +182,10 @@ double Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
         (closest_point_on_pass_to_robot - pass.passerPoint()).len() / pass.speed());
 
     // Check for division by 0
-    if (pass.speed() == 0){
-        ball_time_to_closest_pass_point = Duration::fromSeconds(std::numeric_limits<int>::max());
+    if (pass.speed() == 0)
+    {
+        ball_time_to_closest_pass_point =
+            Duration::fromSeconds(std::numeric_limits<int>::max());
     }
 
     // Figure out how long the enemy robot and ball will take to reach the receive point
@@ -217,8 +219,8 @@ double Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double Passing::ratePassFriendlyCapability(
-    Team friendly_team, const Pass& pass, std::optional<unsigned int> passer_robot_id)
+double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+                                           std::optional<unsigned int> passer_robot_id)
 {
     // Remove the passer robot from the friendly team before evaluating, as we assume
     // the passer is not passing to itself
@@ -289,11 +291,9 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
 
     // The offset from the sides of the field for the center of the sigmoid functions
     double x_offset =
-        Util::DynamicParameters::Passing::static_field_position_quality_x_offset
-            .value();
+        Util::DynamicParameters::Passing::static_field_position_quality_x_offset.value();
     double y_offset =
-        Util::DynamicParameters::Passing::static_field_position_quality_y_offset
-            .value();
+        Util::DynamicParameters::Passing::static_field_position_quality_y_offset.value();
     double friendly_goal_weight =
         Util::DynamicParameters::Passing::
             static_field_position_quality_friendly_goal_distance_weight.value();

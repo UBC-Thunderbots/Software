@@ -21,8 +21,8 @@ class CornerKickPlay : public Play
     bool invariantHolds(const World &world) const override;
 
     void getNextTactics(TacticCoroutine::push_type &yield) override;
-private:
 
+   private:
     // The maximum distance from the corner that the ball can be for it to be
     // considered a corner kick
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
@@ -48,5 +48,5 @@ private:
      *
      * @param pass_generator
      */
-    void updatePassGenerator(Passing::PassGenerator& pass_generator);
+    void updatePassGenerator(Passing::PassGenerator &pass_generator);
 };

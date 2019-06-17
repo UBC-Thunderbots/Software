@@ -363,8 +363,8 @@ bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
         Util::DynamicParameters::Passing::pass_equality_max_position_difference_meters
             .value();
     double max_time_difference_seconds =
-        Util::DynamicParameters::Passing::
-            pass_equality_max_start_time_difference_seconds.value();
+        Util::DynamicParameters::Passing::pass_equality_max_start_time_difference_seconds
+            .value();
     double max_speed_difference =
         Util::DynamicParameters::Passing::
             pass_equality_max_speed_difference_meters_per_second.value();
