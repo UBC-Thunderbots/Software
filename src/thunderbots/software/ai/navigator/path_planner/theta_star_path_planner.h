@@ -130,7 +130,7 @@ class ThetaStarPathPlanner : public PathPlanner
     double calculateHValue(int row, int col, CellCoordinate dest);
 
     /**
-     * Traces a path from the destination back to the start 
+     * Traces a path from the destination back to the start
      * and populates a vector of points with that path
      * @param dest destination cell
      * @return vector of points with the path from start to dest
