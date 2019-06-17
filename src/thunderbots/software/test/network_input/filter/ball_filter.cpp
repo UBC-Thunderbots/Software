@@ -6,6 +6,7 @@
 #include "test/test_util/test_util.h"
 #include "geom/ray.h"
 #include <random>
+#include "geom/util.h"
 
 #include <gtest/gtest.h>
 #include "geom/segment.h"
@@ -27,6 +28,23 @@ protected:
         random_generator.seed(1);
     }
 
+    /**
+     * Simulates the ball moving in a certain direction with a specified amount of noise in the measurements, and
+     * verifies that the filtered ball data is within the given tolerances of the real ball.
+     *
+     * @param start_time The time at which the ball starts moving
+     * @param ball_trajectory A ray indicating the ball's starting position and direction of travel
+     * @param ball_velocity_magnitude How fast the ball is moving
+     * @param ball_position_variance The variance in the noise the ball's position will be sampled with
+     * @param time_step_variance The variance in the timestep the ball will be sampled with
+     * @param expected_position_tolerance How close to the real position the filtered ball position should be
+     * @param expected_velocity_angle_tolerance How close to the real velocity angle the filtered ball velocity angle
+     * should be
+     * @param expected_velocity_magnitude_tolerance How close to the real velocity magnitude the filtered ball velocity
+     * magnitude should be
+     * @param num_iterations For how many iterations the simulation should run
+     * @param num_steps_to_ignore The number of iterations at the beginning of the simulation to not check tolerances
+     */
     void testFilterAlongBallTrajectory(const Timestamp& start_time, const Ray& ball_trajectory, double ball_velocity_magnitude, double ball_position_variance,
                                     double time_step_variance, double expected_position_tolerance, Angle expected_velocity_angle_tolerance,
                                     double expected_velocity_magnitude_tolerance, unsigned int num_iterations, unsigned int num_steps_to_ignore) {
@@ -39,6 +57,22 @@ protected:
                 expected_velocity_magnitude_tolerance, num_iterations, max_ball_travel_duration, num_steps_to_ignore);
     }
 
+    /**
+     * Simulates the ball moving in a line, starting at one point and ending at another with a specified amount of noise
+     * in the measurements, and verifies the filtered ball data is within the given tolerances of the real ball.
+     *
+     * @param start_time The time at which the ball starts moving
+     * @param ball_path The segment along which the ball will travel
+     * @param ball_velocity_magnitude How fast the ball is moving
+     * @param ball_position_variance The variance in the noise the ball's position will be sampled with
+     * @param time_step_variance The variance in the timestep the ball will be sampled with
+     * @param expected_position_tolerance How close to the real position the filtered ball position should be
+     * @param expected_velocity_angle_tolerance How close to the real velocity angle the filtered ball velocity angle
+     * should be
+     * @param expected_velocity_magnitude_tolerance How close to the real velocity magnitude the filtered ball velocity
+     * magnitude should be
+     * @param num_steps_to_ignore The number of iterations at the beginning of the simulation to not check tolerances
+     */
     void testFilterAlongLineSegment(const Timestamp& start_time, const Segment& ball_path, double ball_velocity_magnitude, double ball_position_variance,
             double time_step_variance, double expected_position_tolerance, Angle expected_velocity_angle_tolerance,
             double expected_velocity_magnitude_tolerance, unsigned int num_steps_to_ignore) {
@@ -58,6 +92,24 @@ protected:
                          expected_velocity_magnitude_tolerance, num_iterations, max_ball_travel_duration, num_steps_to_ignore);
     }
 
+    /**
+     * A helper function that simulates the ball moving in a straight line. The ball's position will be sampled with
+     * a given amount of noise / variance, and the filtered data will be checked to verify it is within the specified
+     * tolerances compared to the real ball
+     * @param start_time The time at which the ball starts moving
+     * @param ball_starting_position The position the ball starts from
+     * @param ball_velocity The velocity of the ball
+     * @param ball_position_variance The variance in the noise the ball's position will be sampled with
+     * @param time_step_variance The variance in the timestep the ball will be sampled with
+     * @param expected_position_tolerance How close to the real position the filtered ball position should be
+     * @param expected_velocity_angle_tolerance How close to the real velocity angle the filtered ball velocity angle
+     * should be
+     * @param expected_velocity_magnitude_tolerance How close to the real velocity magnitude the filtered ball velocity
+     * magnitude should be
+     * @param num_iterations For how many iterations the simulation should run
+     * @param max_ball_travel_duration The maximum duration for which the ball may travel / be simulated
+     * @param num_steps_to_ignore The number of iterations at the beginning of the simulation to not check tolerances
+     */
     void testFilterHelper(const Timestamp& start_time,
                           const Point& ball_starting_position,
                           const Vector& ball_velocity,
@@ -69,6 +121,7 @@ protected:
                           unsigned int num_iterations,
                           const Duration& max_ball_travel_duration,
                           unsigned int num_steps_to_ignore = 0) {
+        // Create the distrubutions we use to generate noise when sampling the ball
         std::normal_distribution<double> position_noise_distribution(0, ball_position_variance);
         std::normal_distribution<double> time_step_noise_distribution(0, time_step_variance);
 
@@ -174,9 +227,6 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_no_noise_in_data
     double ball_position_variance = 0;
     double time_step_variance = 0;
     double expected_position_tolerance = 0.001;
-    // When the ball is sitting still, the velocity could be any direction so we do
-    // not use a strict tolerance for this test. We only really care about the
-    // magnitude of the velocity to make sure it's small enough
     Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore = 5;
@@ -190,39 +240,28 @@ TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_small_noise_in_d
     double ball_velocity_magnitude = 0.3;
     double ball_position_variance = 0.001;
     double time_step_variance = 0.001;
-    double expected_position_tolerance = 0.005;
-    // When the ball is sitting still, the velocity could be any direction so we do
-    // not use a strict tolerance for this test. We only really care about the
-    // magnitude of the velocity to make sure it's small enough
-    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(31);
-    double expected_velocity_magnitude_tolerance = 0.15;
+    double expected_position_tolerance = 0.004;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(5.5);
+    double expected_velocity_magnitude_tolerance = 0.04;
     int num_steps_to_ignore = 5;
     Timestamp start_time = current_timestamp;
 
     testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
 }
 
-// TODO: Enhance the filter and re-enable this test after resolving the following issue
-// https://github.com/UBC-Thunderbots/Software/issues/634
-// Currently, a noisy ball moving slowly causes the filter to report several values with very large errors
-// They don't happen all the time, but enough that setting the thresholds for this test is pointless since they're so
-// large
-//TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_data) {
-//    Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
-//    double ball_velocity_magnitude = 0.3;
-//    double ball_position_variance = 0.005;
-//    double time_step_variance = 0.001;
-//    double expected_position_tolerance = 0.022;
-//    // When the ball is sitting still, the velocity could be any direction so we do
-//    // not use a strict tolerance for this test. We only really care about the
-//    // magnitude of the velocity to make sure it's small enough
-//    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(45);
-//    double expected_velocity_magnitude_tolerance = 0.5;
-//    int num_steps_to_ignore = 5;
-//    Timestamp start_time = current_timestamp;
-//
-//    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
-//}
+TEST_F(BallFilterTest, ball_moving_slow_in_a_straight_line_with_medium_noise_in_data) {
+    Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
+    double ball_velocity_magnitude = 0.3;
+    double ball_position_variance = 0.003;
+    double time_step_variance = 0.001;
+    double expected_position_tolerance = 0.011;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(16);
+    double expected_velocity_magnitude_tolerance = 0.11;
+    int num_steps_to_ignore = 5;
+    Timestamp start_time = current_timestamp;
+
+    testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+}
 
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data) {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
@@ -230,9 +269,6 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_no_noise_in_data
     double ball_position_variance = 0;
     double time_step_variance = 0;
     double expected_position_tolerance = 0.001;
-    // When the ball is sitting still, the velocity could be any direction so we do
-    // not use a strict tolerance for this test. We only really care about the
-    // magnitude of the velocity to make sure it's small enough
     Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.01);
     double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore = 5;
@@ -247,11 +283,8 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_d
     double ball_position_variance = 0.001;
     double time_step_variance = 0.001;
     double expected_position_tolerance = 0.003;
-    // When the ball is sitting still, the velocity could be any direction so we do
-    // not use a strict tolerance for this test. We only really care about the
-    // magnitude of the velocity to make sure it's small enough
-    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(2);
-    double expected_velocity_magnitude_tolerance = 0.1;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.9);
+    double expected_velocity_magnitude_tolerance = 0.07;
     int num_steps_to_ignore = 5;
     Timestamp start_time = current_timestamp;
 
@@ -261,14 +294,11 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_small_noise_in_d
 TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_data) {
     Segment ball_path = Segment(field.friendlyCornerNeg(), field.enemyCornerPos());
     double ball_velocity_magnitude = 5.04;
-    double ball_position_variance = 0.005;
+    double ball_position_variance = 0.003;
     double time_step_variance = 0.001;
-    double expected_position_tolerance = 0.015;
-    // When the ball is sitting still, the velocity could be any direction so we do
-    // not use a strict tolerance for this test. We only really care about the
-    // magnitude of the velocity to make sure it's small enough
-    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(9);
-    double expected_velocity_magnitude_tolerance = 0.5;
+    double expected_position_tolerance = 0.008;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(2.8);
+    double expected_velocity_magnitude_tolerance = 0.21;
     int num_steps_to_ignore = 5;
     Timestamp start_time = current_timestamp;
 
@@ -281,8 +311,8 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_and_then_bouncing_wit
     double ball_position_variance = 0;
     double time_step_variance = 0;
     double expected_position_tolerance = 0.0001;
-    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
-    double expected_velocity_magnitude_tolerance = 0.1;
+    Angle expected_velocity_angle_tolernace = Angle::ofDegrees(0.01);
+    double expected_velocity_magnitude_tolerance = 0.01;
     int num_steps_to_ignore = 5;
     Timestamp start_time = current_timestamp;
 
@@ -291,8 +321,8 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_and_then_bouncing_wit
     ball_path = Segment(field.enemyCornerPos(), field.enemyCornerNeg());
     ball_velocity_magnitude = 4.8;
     expected_position_tolerance = 0.0001;
-    expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
-    expected_velocity_magnitude_tolerance = 0.1;
+    expected_velocity_angle_tolernace = Angle::ofDegrees(0.01);
+    expected_velocity_magnitude_tolerance = 0.01;
     num_steps_to_ignore = 5;
     start_time = current_timestamp;
 
@@ -336,13 +366,48 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_and_then_bouncing_wit
 
     testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
 
+    // TODO: You are here. WHy is this failing?
     ball_path = Segment(Point(0, 0), Point(3, 0));
     ball_velocity_magnitude = 4.8;
     expected_position_tolerance = 0.0001;
     expected_velocity_angle_tolernace = Angle::ofDegrees(0.1);
     expected_velocity_magnitude_tolerance = 0.1;
-    num_steps_to_ignore = 1;
+    num_steps_to_ignore = 5;
     start_time = current_timestamp;
 
     testFilterAlongLineSegment(start_time, ball_path, ball_velocity_magnitude, ball_position_variance, time_step_variance, expected_position_tolerance, expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance, num_steps_to_ignore);
+}
+
+TEST_F(BallFilterTest, test_linear_regression_returns_same_results_for_inverted_coordinates) {
+    boost::circular_buffer<SSLBallDetection> ball_detections(2);
+    Point p1(0, 0);
+    Point p2(1, 0.5);
+    ball_detections.push_front({p1, Timestamp::fromSeconds(1)});
+    ball_detections.push_front({p2, Timestamp::fromSeconds(2)});
+    auto x_vs_y_regression = ball_filter.getLinearRegressionLine(ball_detections);
+
+    double d1 = dist(x_vs_y_regression.regression_line, p1);
+    double d2 = dist(x_vs_y_regression.regression_line, p2);
+
+    EXPECT_LT(d1, 0.001);
+    EXPECT_LT(d2, 0.001);
+
+    // test the inverse regression
+    boost::circular_buffer<SSLBallDetection> inv_ball_detections = ball_detections;
+    for(auto& detection : inv_ball_detections) {
+        detection.position = Point(detection.position.y(), detection.position.x());
+    }
+
+    auto y_vs_x_regression = ball_filter.getLinearRegressionLine(inv_ball_detections);
+    y_vs_x_regression.regression_line = Line(Point(y_vs_x_regression.regression_line.getFirst().y(), y_vs_x_regression.regression_line.getFirst().x()),
+                                             Point(y_vs_x_regression.regression_line.getSecond().y(), y_vs_x_regression.regression_line.getSecond().x()));
+
+    double inv_d1 = dist(y_vs_x_regression.regression_line, p1);
+    double inv_d2 = dist(y_vs_x_regression.regression_line, p2);
+
+    EXPECT_LT(inv_d1, 0.001);
+    EXPECT_LT(inv_d2, 0.001);
+
+    // Check the lines are pointing in the same direction
+    EXPECT_NEAR(x_vs_y_regression.regression_line.slope(), y_vs_x_regression.regression_line.slope(), 1.0e-6);
 }
