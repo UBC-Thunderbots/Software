@@ -85,9 +85,10 @@ class BallFilter
      * since the datapoints will be very close to one another.
      *
      * @param ball_detections The full list of ball detections
-     * @return The size the buffer should be to perform filtering operations
+     * @return The size the buffer should be to perform filtering operations. If an error
+     * occurs that prevents the size from being calculated correctly, returns std::nullopt
      */
-    size_t getAdjustedBufferSize(
+    std::optional<size_t> getAdjustedBufferSize(
         boost::circular_buffer<SSLBallDetection> ball_detections);
 
     /**
@@ -104,15 +105,16 @@ class BallFilter
     /**
      * Estimates the ball's velocitybased on the current detections in the given buffer.
      * If the ball_regression_line is provided, the detection positions are projected onto
-     * the line before the velocities are calculated.
+     * the line before the velocities are calculated. If no velocity can be estimated,
+     * std::nullopt is returned.
      *
      * @param ball_detections The ball detections to use to calculate
      * @param ball_regression_line The ball_regression_line to snap detections to before
      * calculating velocities.
      * @return A struct containing various estimates of the ball's velocity based on the
-     * given detections
+     * given detections. If no velocity can be estimated, std::nullopt is returned
      */
-    BallVelocityEstimate estimateBallVelocity(
+    std::optional<BallVelocityEstimate> estimateBallVelocity(
         boost::circular_buffer<SSLBallDetection> ball_detections,
         const std::optional<Line> &ball_regression_line = std::nullopt);
 
@@ -131,9 +133,10 @@ class BallFilter
      * current "real" state of the ball.
      *
      * @param ball_detections The detections to filter
-     * @return The filtered current state of the ball
+     * @return The filtered current state of the ball. If a filtered result cannot be
+     * calculated, returns std::nullopt
      */
-    Ball getLinearRegressionPositionAndVelocity(
+    std::optional<Ball> getLinearRegressionPositionAndVelocity(
         boost::circular_buffer<SSLBallDetection> ball_detections);
 
    private:
