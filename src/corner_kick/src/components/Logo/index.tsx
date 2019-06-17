@@ -13,7 +13,7 @@ const AppTitle = styled.div`
 
 export const Logo = () => {
     return (
-        <Grid width="100%" height="100%" rows={1} columns="16px 1fr 30px" padding="0 8px">
+        <Grid width="100%" height="100%" rows={1} columns="16px 1fr 30px" padding="0 5px">
             <GridCell middle={true}>
                 <img src={logo} width={16} height={16} />
             </GridCell>

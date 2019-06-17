@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 `;
 
 const PanelTitle = styled.div`
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
     color: ${(props) => props.theme.colors.subdued};
@@ -42,7 +42,7 @@ export const InternalPanel = (props: IInternalPanelProps) => {
             <Grid
                 width="100%"
                 height="30px"
-                padding="0 8px"
+                padding="0 5px"
                 rows={1}
                 columns="16px 1fr"
                 onClick={onTitleClick}

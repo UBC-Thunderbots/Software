@@ -3,8 +3,10 @@ import styled from 'styled-components';
 interface IGridCellProps {
     width?: number;
     height?: number;
-    top?: number | string;
-    left?: number | string;
+    topStart?: number | string;
+    leftStart?: number | string;
+    topEnd?: number | string;
+    leftEnd?: number | string;
     middle?: boolean;
     center?: boolean;
     area?: string;
@@ -15,8 +17,10 @@ export const GridCell = styled.div<IGridCellProps>`
     min-width: 0;
     grid-column-end: ${({ width = 1 }) => `span ${width}`};
     grid-row-end: ${({ height = 1 }) => `span ${height}`};
-    ${({ left }) => left && `grid-column-start: ${left}`};
-    ${({ top }) => top && `grid-row-start: ${top}`};
+    ${({ leftStart }) => leftStart && `grid-column-start: ${leftStart}`};
+    ${({ topStart }) => topStart && `grid-row-start: ${topStart}`};
+    ${({ leftEnd }) => leftEnd && `grid-column-end: ${leftEnd}`};
+    ${({ topEnd }) => topEnd && `grid-row-end: ${topEnd}`};
     ${({ center }) => center && `text-align: center`};
     ${({ area }) => area && `grid-area: ${area}`};
     ${/* prettier-ignore */

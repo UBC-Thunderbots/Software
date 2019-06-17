@@ -21,7 +21,7 @@ const autoRows = ({ minRowHeight = '20px' }) => `minmax(${minRowHeight}, auto)`;
 const frGetter = (value: string | number) =>
     typeof value === 'number' ? `repeat(${value}, 1fr)` : value;
 
-const gap = ({ gap = '8px' }) => gap;
+const gap = ({ gap = '5px' }) => gap;
 
 const flow = ({ flow = 'row' }) => flow;
 
@@ -41,5 +41,5 @@ export const Grid = styled.div<IGridProps>`
     ${({ columnGap }) => columnGap && `column-gap: ${columnGap}`};
     ${({ rowGap }) => rowGap && `row-gap: ${rowGap}`};
     ${({ areas }) => areas && `grid-template-areas: ${formatAreas(areas)}`};
-    cursor: ${({ cursor = 'initial' }) => cursor};
+    ${({ cursor }) => cursor && `cursor: ${cursor}`};
 `;

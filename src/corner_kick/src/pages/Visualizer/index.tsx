@@ -36,6 +36,8 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
             addLayer: actions.canvas.addLayer,
             toggleVisibility: actions.canvas.toggleLayerVisibility,
             setRunAI: actions.rosParameters.setRunAI,
+            setOverrideDefending: actions.rosParameters.setOverrideRefboxDefending,
+            setDefendingPositiveSide: actions.rosParameters.setDefendingPositiveSide,
         },
         dispatch,
     );
@@ -52,6 +54,8 @@ interface IVisualizerProps {
     addLayer: typeof actions.canvas.addLayer;
     toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
     setRunAI: typeof actions.rosParameters.setRunAI;
+    setOverrideDefending: typeof actions.rosParameters.setOverrideRefboxDefending;
+    setDefendingPositiveSide: typeof actions.rosParameters.setDefendingPositiveSide;
 }
 
 class VisualizerInternal extends React.Component<IVisualizerProps> {
@@ -82,7 +86,7 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
         return (
             <>
                 <Portal portalLocation={PortalLocation.SIDEBAR}>
-                    <Sidebar inactivePanelHeight={32} minPanelHeight={100}>
+                    <Sidebar inactivePanelHeight={32} minPanelHeight={200}>
                         <Panel title="Layers">
                             <LayersPanel
                                 layers={orderedLayers}
@@ -115,6 +119,12 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
         switch (id) {
             case 'run_ai':
                 this.props.setRunAI(value);
+                break;
+            case 'defending_positive_side':
+                this.props.setDefendingPositiveSide(value);
+                break;
+            case 'override_refbox_defending_side':
+                this.props.setOverrideDefending(value);
                 break;
         }
     };

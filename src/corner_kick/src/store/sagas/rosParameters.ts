@@ -37,6 +37,26 @@ function* startROSParameter() {
             });
         },
     );
+    yield takeLatest(
+        getType(actions.rosParameters.setDefendingPositiveSide),
+        ({
+            payload,
+        }: ReturnType<typeof actions.rosParameters.setDefendingPositiveSide>) => {
+            setParam({
+                bools: [{ name: 'defending_positive_side', value: payload.value }],
+            });
+        },
+    );
+    yield takeLatest(
+        getType(actions.rosParameters.setOverrideRefboxDefending),
+        ({
+            payload,
+        }: ReturnType<typeof actions.rosParameters.setOverrideRefboxDefending>) => {
+            setParam({
+                bools: [{ name: 'override_refbox_defending_side', value: payload.value }],
+            });
+        },
+    );
 }
 
 const parseParam = (arrayOfParams: { [key: string]: any }, params: any) => {
