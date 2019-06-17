@@ -29,7 +29,6 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
     double enemy_pass_rating = ratePassEnemyRisk(world.enemyTeam(), pass);
 
     double shoot_pass_rating = ratePassShootScore(world.field(), world.enemyTeam(), pass);
-//    double shoot_pass_rating = 1;
 
     // Rate all passes outside our target region as 0 if we have one
     double in_region_quality = 1;
@@ -70,6 +69,7 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
 double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
                                        const Passing::Pass& pass)
 {
+    // TODO: You don't even use this first parameter, but stuff is hardcoded below
     double ideal_shoot_angle_degrees =
         Util::DynamicParameters::Passing::ideal_min_shoot_angle_degrees.value();
     double ideal_max_rotation_to_shoot_degrees =

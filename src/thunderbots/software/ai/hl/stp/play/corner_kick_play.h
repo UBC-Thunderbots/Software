@@ -5,7 +5,7 @@
 #include "ai/hl/stp/tactic/move_tactic.h"
 
 /**
- * The play for corner kicks
+ * A Play for Corner Kicks
  */
 class CornerKickPlay : public Play
 {
