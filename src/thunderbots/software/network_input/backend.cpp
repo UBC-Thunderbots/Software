@@ -15,7 +15,7 @@ Backend::Backend()
           Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
       enemy_team_state(Duration::fromMilliseconds(
           Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      ball_filter(),
+      ball_filter(4, 10),
       friendly_team_filter(),
       enemy_team_filter()
 {
