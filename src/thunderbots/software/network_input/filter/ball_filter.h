@@ -56,6 +56,10 @@ struct LinearRegressionResults
 class BallFilter
 {
    public:
+    // The default min and max sizes of the ball detection buffer
+    static constexpr unsigned int DEFAULT_MIN_BUFFER_SIZE = 4;
+    static constexpr unsigned int DEFAULT_MAX_BUFFER_SIZE = 10;
+
     /**
      * Creates a new Ball Filter
      *
@@ -151,4 +155,6 @@ class BallFilter
     // If the estimated ball speed is less than this value, the largest possible buffer
     // will be used by the filter
     const double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
+    // The extra amount beyond the ball's max speed that we treat ball detections as valid
+    const double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
 };

@@ -63,7 +63,7 @@ void BallFilter::addNewDetectionsToBuffer(
             // according to the game rules to account for measurement error, and to be a
             // bit on the safe side. We don't want to risk discarding real data
             double maximum_acceptable_velocity_magnitude =
-                BALL_MAX_SPEED_METERS_PER_SECOND + 2.0;
+                BALL_MAX_SPEED_METERS_PER_SECOND + MAX_ACCEPTABLE_BALL_SPEED_BUFFER;
             if (estimated_detection_velocity_magnitude >
                 maximum_acceptable_velocity_magnitude)
             {
