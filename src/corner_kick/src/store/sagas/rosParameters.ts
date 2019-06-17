@@ -30,31 +30,9 @@ function* startROSParameter() {
     yield put(actions.rosParameters.hydrateROSParams(rosParamSettings as IROSParamState));
 
     yield takeLatest(
-        getType(actions.rosParameters.setRunAI),
-        ({ payload }: ReturnType<typeof actions.rosParameters.setRunAI>) => {
-            setParam({
-                bools: [{ name: 'run_ai', value: payload.value }],
-            });
-        },
-    );
-    yield takeLatest(
-        getType(actions.rosParameters.setDefendingPositiveSide),
-        ({
-            payload,
-        }: ReturnType<typeof actions.rosParameters.setDefendingPositiveSide>) => {
-            setParam({
-                bools: [{ name: 'defending_positive_side', value: payload.value }],
-            });
-        },
-    );
-    yield takeLatest(
-        getType(actions.rosParameters.setOverrideRefboxDefending),
-        ({
-            payload,
-        }: ReturnType<typeof actions.rosParameters.setOverrideRefboxDefending>) => {
-            setParam({
-                bools: [{ name: 'override_refbox_defending_side', value: payload.value }],
-            });
+        getType(actions.rosParameters.setBooleanParam),
+        ({ payload }: ReturnType<typeof actions.rosParameters.setBooleanParam>) => {
+            setBooleanParam(payload.key, payload.value);
         },
     );
 }
@@ -71,12 +49,14 @@ const parseParam = (arrayOfParams: { [key: string]: any }, params: any) => {
     });
 };
 
-const setParam = (config: any) => {
+const setBooleanParam = (key: string, value: boolean) => {
     ROS.sendRequestToService(
         '/ai_control/set_parameters',
         'dynamic_reconfigure/Reconfigure',
         {
-            config,
+            config: {
+                bools: [{ name: key, value }],
+            },
         },
     );
 };

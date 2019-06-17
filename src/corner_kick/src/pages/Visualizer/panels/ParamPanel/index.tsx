@@ -11,6 +11,13 @@ import {
 } from '@blueprintjs/core';
 import * as React from 'react';
 
+import {
+    PARAM_RUN_AI,
+    PARAM_OVERRIDE_DEFENDING_SIDE,
+    PARAM_DEFENDING_POSITIVE_SIDE,
+    PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR,
+    PARAM_FRIENDLY_COLOR_YELLOW,
+} from 'SRC/constants';
 import { Grid, GridCell } from 'SRC/components/Layout';
 import { IROSParamState } from 'SRC/types';
 
@@ -33,12 +40,6 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
                     <GridCell topStart={2} leftStart={4} leftEnd={7} middle>
                         <TeamColor {...this.props} />
                     </GridCell>
-                    <GridCell topStart={3} leftStart={1} leftEnd={7} middle>
-                        <ControlGroup fill>
-                            <Button className={Classes.FIXED} icon="flow-branch" />
-                            <HTMLSelect options={['Default', 'Yellow', 'Blue']} />
-                        </ControlGroup>
-                    </GridCell>
                     <GridCell topStart={4} leftStart={1} leftEnd={7} middle>
                         <ControlGroup fill>
                             <Button
@@ -55,7 +56,7 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
 }
 
 const StartStopAI = ({ config, onClick }: IParamPanelProps) => {
-    const runAI = config['run_ai'];
+    const runAI = config[PARAM_RUN_AI];
     if (runAI !== undefined) {
         return (
             <Button
@@ -63,7 +64,7 @@ const StartStopAI = ({ config, onClick }: IParamPanelProps) => {
                 text={runAI.value ? 'Stop the AI' : 'Start the AI'}
                 fill
                 onClick={() => {
-                    onClick('run_ai', !runAI.value);
+                    onClick(PARAM_RUN_AI, !runAI.value);
                 }}
             />
         );
@@ -73,8 +74,8 @@ const StartStopAI = ({ config, onClick }: IParamPanelProps) => {
 };
 
 const TeamSide = ({ config, onClick }: IParamPanelProps) => {
-    const override = config['override_refbox_defending_side'];
-    const side = config['defending_positive_side'];
+    const override = config[PARAM_OVERRIDE_DEFENDING_SIDE];
+    const side = config[PARAM_DEFENDING_POSITIVE_SIDE];
 
     if (override !== undefined) {
         return (
@@ -90,8 +91,8 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
                             override.value && side.value ? Intent.PRIMARY : Intent.NONE
                         }
                         onClick={() => {
-                            onClick('defending_positive_side', true);
-                            onClick('override_refbox_defending_side', true);
+                            onClick(PARAM_DEFENDING_POSITIVE_SIDE, true);
+                            onClick(PARAM_OVERRIDE_DEFENDING_SIDE, true);
                         }}
                     />
                 </Tooltip>
@@ -106,8 +107,8 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
                             override.value && !side.value ? Intent.PRIMARY : Intent.NONE
                         }
                         onClick={() => {
-                            onClick('defending_positive_side', false);
-                            onClick('override_refbox_defending_side', true);
+                            onClick(PARAM_DEFENDING_POSITIVE_SIDE, false);
+                            onClick(PARAM_OVERRIDE_DEFENDING_SIDE, true);
                         }}
                     />
                 </Tooltip>
@@ -120,7 +121,7 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
                         icon="cross"
                         intent={!override.value ? Intent.PRIMARY : Intent.NONE}
                         onClick={() => {
-                            onClick('override_refbox_defending_side', false);
+                            onClick(PARAM_OVERRIDE_DEFENDING_SIDE, false);
                         }}
                     />
                 </Tooltip>
@@ -132,8 +133,10 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
 };
 
 const TeamColor = ({ config, onClick }: IParamPanelProps) => {
-    const runAI = config['run_ai'];
-    if (runAI !== undefined) {
+    const override = config[PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR];
+    const color = config[PARAM_FRIENDLY_COLOR_YELLOW];
+
+    if (override !== undefined) {
         return (
             <ButtonGroup fill>
                 <Tooltip
@@ -141,21 +144,45 @@ const TeamColor = ({ config, onClick }: IParamPanelProps) => {
                     position={Position.BOTTOM}
                     hoverOpenDelay={500}
                 >
-                    <Button icon={<Icon icon="dot" color="orange" />} />
+                    <Button
+                        icon={<Icon icon="dot" color="orange" />}
+                        intent={
+                            override.value && color.value ? Intent.PRIMARY : Intent.NONE
+                        }
+                        onClick={() => {
+                            onClick(PARAM_FRIENDLY_COLOR_YELLOW, true);
+                            onClick(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, true);
+                        }}
+                    />
                 </Tooltip>
                 <Tooltip
                     content="Set team color to BLUE"
                     position={Position.BOTTOM}
                     hoverOpenDelay={500}
                 >
-                    <Button icon={<Icon icon="dot" color="blue" />} />
+                    <Button
+                        icon={<Icon icon="dot" color="cyan" />}
+                        intent={
+                            override.value && !color.value ? Intent.PRIMARY : Intent.NONE
+                        }
+                        onClick={() => {
+                            onClick(PARAM_FRIENDLY_COLOR_YELLOW, false);
+                            onClick(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, true);
+                        }}
+                    />
                 </Tooltip>
                 <Tooltip
                     content="Set team color to DEFAULT"
                     position={Position.BOTTOM}
                     hoverOpenDelay={500}
                 >
-                    <Button icon="cross" intent={Intent.PRIMARY} />
+                    <Button
+                        icon="cross"
+                        intent={!override.value ? Intent.PRIMARY : Intent.NONE}
+                        onClick={() => {
+                            onClick(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, false);
+                        }}
+                    />
                 </Tooltip>
             </ButtonGroup>
         );

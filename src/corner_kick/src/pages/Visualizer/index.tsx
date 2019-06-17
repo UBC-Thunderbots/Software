@@ -35,9 +35,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
         {
             addLayer: actions.canvas.addLayer,
             toggleVisibility: actions.canvas.toggleLayerVisibility,
-            setRunAI: actions.rosParameters.setRunAI,
-            setOverrideDefending: actions.rosParameters.setOverrideRefboxDefending,
-            setDefendingPositiveSide: actions.rosParameters.setDefendingPositiveSide,
+            setBooleanParam: actions.rosParameters.setBooleanParam,
         },
         dispatch,
     );
@@ -53,9 +51,7 @@ interface IVisualizerProps {
     // Actions
     addLayer: typeof actions.canvas.addLayer;
     toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
-    setRunAI: typeof actions.rosParameters.setRunAI;
-    setOverrideDefending: typeof actions.rosParameters.setOverrideRefboxDefending;
-    setDefendingPositiveSide: typeof actions.rosParameters.setDefendingPositiveSide;
+    setBooleanParam: typeof actions.rosParameters.setBooleanParam;
 }
 
 class VisualizerInternal extends React.Component<IVisualizerProps> {
@@ -115,17 +111,9 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
         this.layerReceiver.close();
     }
 
-    private onParamClick = (id: string, value: any) => {
-        switch (id) {
-            case 'run_ai':
-                this.props.setRunAI(value);
-                break;
-            case 'defending_positive_side':
-                this.props.setDefendingPositiveSide(value);
-                break;
-            case 'override_refbox_defending_side':
-                this.props.setOverrideDefending(value);
-                break;
+    private onParamClick = (key: string, value: any) => {
+        if (typeof value === 'boolean') {
+            this.props.setBooleanParam(key, value);
         }
     };
 
