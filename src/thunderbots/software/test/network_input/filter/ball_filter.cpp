@@ -234,8 +234,8 @@ class BallFilterTest : public ::testing::Test
         }
     }
 
-    Field field            = ::Test::TestUtil::createSSLDivBField();
-    BallFilter ball_filter = BallFilter(0, 0);
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    BallFilter ball_filter;
     Duration time_step;
     std::mt19937 random_generator;
     Timestamp current_timestamp;

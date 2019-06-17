@@ -59,6 +59,14 @@ class BallFilter
     // The default min and max sizes of the ball detection buffer
     static constexpr unsigned int DEFAULT_MIN_BUFFER_SIZE = 4;
     static constexpr unsigned int DEFAULT_MAX_BUFFER_SIZE = 10;
+    // If the estimated ball speed is less than this value, the largest possible buffer
+    // will be used by the filter
+    static constexpr double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
+    // If the estimated ball speed is greater than this value, the smallest possible
+    // buffer will be used by the filter
+    static constexpr double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
+    // The extra amount beyond the ball's max speed that we treat ball detections as valid
+    static constexpr double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
 
     /**
      * Creates a new Ball Filter
@@ -68,7 +76,8 @@ class BallFilter
      * @param min_buffer_size The maximum size of the buffer the filter will use to filter
      * the ball. The buffer will grow to this size as the ball slows down
      */
-    explicit BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size);
+    explicit BallFilter(unsigned int min_buffer_size = DEFAULT_MIN_BUFFER_SIZE,
+                        unsigned int max_buffer_size = DEFAULT_MAX_BUFFER_SIZE);
 
     /**
      * Filters the new ball detection data, and returns the updated state of the ball
@@ -149,12 +158,4 @@ class BallFilter
     boost::circular_buffer<SSLBallDetection> ball_detection_buffer;
     unsigned int _min_buffer_size;
     unsigned int _max_buffer_size;
-    // If the estimated ball speed is greater than this value, the smallest possible
-    // buffer will be used by the filter
-    const double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
-    // If the estimated ball speed is less than this value, the largest possible buffer
-    // will be used by the filter
-    const double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
-    // The extra amount beyond the ball's max speed that we treat ball detections as valid
-    const double MAX_ACCEPTABLE_BALL_SPEED_BUFFER = 2.0;
 };
