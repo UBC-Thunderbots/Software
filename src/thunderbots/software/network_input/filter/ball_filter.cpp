@@ -261,7 +261,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     return results;
 }
 
-std::optional<Ball> BallFilter::getLinearRegressionPositionAndVelocity(
+std::optional<Ball> BallFilter::estimateBallState(
     boost::circular_buffer<SSLBallDetection> ball_detections)
 {
     std::optional<size_t> adjusted_buffer_size = getAdjustedBufferSize(ball_detections);
@@ -281,12 +281,12 @@ std::optional<Ball> BallFilter::getLinearRegressionPositionAndVelocity(
     // Linear regression cannot fit a vertical line. To get around this, we fit two lines,
     // one with x and y swapped, so any vertical line becomes horizontal. Then we take the
     // line of the two that fit the best.
-    boost::circular_buffer<SSLBallDetection> inverse_ball_detections = ball_detections;
-    for (auto &detection : inverse_ball_detections)
+    boost::circular_buffer<SSLBallDetection> swapped_ball_detections = ball_detections;
+    for (auto &detection : swapped_ball_detections)
     {
         detection.position = Point(detection.position.y(), detection.position.x());
     }
-    auto y_vs_x_regression = getLinearRegressionLine(inverse_ball_detections);
+    auto y_vs_x_regression = getLinearRegressionLine(swapped_ball_detections);
     // Because we swapped the coordinates of the input, we have to swap the coordinates of
     // the output to get back to our expected coordinate space
     y_vs_x_regression.regression_line =
@@ -340,8 +340,7 @@ std::optional<Ball> BallFilter::getFilteredData(
 
     if (ball_detection_buffer.size() >= 2)
     {
-        std::optional<Ball> filtered_ball =
-            getLinearRegressionPositionAndVelocity(ball_detection_buffer);
+        std::optional<Ball> filtered_ball = estimateBallState(ball_detection_buffer);
         if (filtered_ball)
         {
             return *filtered_ball;

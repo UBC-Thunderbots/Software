@@ -136,7 +136,7 @@ class BallFilter
      * @return The filtered current state of the ball. If a filtered result cannot be
      * calculated, returns std::nullopt
      */
-    std::optional<Ball> getLinearRegressionPositionAndVelocity(
+    std::optional<Ball> estimateBallState(
         boost::circular_buffer<SSLBallDetection> ball_detections);
 
    private:
@@ -147,8 +147,8 @@ class BallFilter
     unsigned int _max_buffer_size;
     // If the estimated ball speed is greater than this value, the smallest possible
     // buffer will be used by the filter
-    double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
+    const double MAX_BUFFER_SIZE_VELOCITY_MAGNITUDE = 4.0;
     // If the estimated ball speed is less than this value, the largest possible buffer
     // will be used by the filter
-    double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
+    const double MIN_BUFFER_SIZE_VELOCITY_MAGNITUDE = 0.5;
 };
