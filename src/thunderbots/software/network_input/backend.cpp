@@ -128,13 +128,14 @@ Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detecti
             SSLBallDetection ball_detection;
             ball_detection.position =
                 Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
-            ball_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
+            ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
             ball_detections.push_back(ball_detection);
         }
     }
 
     auto new_ball_state = ball_filter.getFilteredData(ball_detections, field_state);
-    if(new_ball_state) {
+    if (new_ball_state)
+    {
         ball_state = *new_ball_state;
     }
 
