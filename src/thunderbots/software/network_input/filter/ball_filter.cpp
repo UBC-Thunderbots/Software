@@ -262,19 +262,15 @@ Ball BallFilter::getLinearRegressionPositionAndVelocity(
 
     auto x_vs_y_regression = getLinearRegressionLine(ball_detections);
 
-    // Flip the detection coordinates and perform the regression again. This is to account
-    // for edge cases where the first regression does not work, such as a line directly
-    // along the y-axis. If we try perform regression with the y coordinate as the
-    // dependant variable (eg. y = mx + b), lines such as x=3 cannot be represented.
-    // However, if the flip the variables so we solve x = my + b then we can represent
-    // these lines. So by doing both forms of regression we cover all our bases.
+    // Linear regression cannot fit a vertical line. To get around this, we fit two lines, one with x and y swapped,
+    // so any vertical line becomes horizontal. Then we take the line of the two that fit the best.
     boost::circular_buffer<SSLBallDetection> inverse_ball_detections = ball_detections;
     for (auto &detection : inverse_ball_detections)
     {
         detection.position = Point(detection.position.y(), detection.position.x());
     }
     auto y_vs_x_regression = getLinearRegressionLine(inverse_ball_detections);
-    // Because we flipped the coordinates of the input, we have to slip the coordinates of
+    // Because we swapped the coordinates of the input, we have to swap the coordinates of
     // the output to get back to our expected coordinate space
     y_vs_x_regression.regression_line =
         Line(Point(y_vs_x_regression.regression_line.getFirst().y(),
@@ -324,6 +320,7 @@ std::optional<Ball> BallFilter::getFilteredData(
     else if (ball_detection_buffer.size() == 1)
     {
         // If there is only 1 entry in the buffer, we can't calculate a velocity so
+
         // just set it to 0
         Ball filtered_ball = Ball(ball_detection_buffer.front().position, Vector(0, 0),
                                   ball_detection_buffer.front().timestamp);

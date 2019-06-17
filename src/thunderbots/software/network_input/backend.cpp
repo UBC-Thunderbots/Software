@@ -133,7 +133,7 @@ Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detecti
         }
     }
 
-    auto new_ball_state = ball_filter.getFilteredData(ball_detections, field_state);
+    std::optional<Ball> new_ball_state = ball_filter.getFilteredData(ball_detections, field_state);
     if (new_ball_state)
     {
         ball_state = *new_ball_state;

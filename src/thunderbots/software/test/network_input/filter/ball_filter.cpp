@@ -488,7 +488,6 @@ TEST_F(BallFilterTest,
         expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 
-    // TODO: You are here. WHy is this failing?
     ball_path                             = Segment(Point(0, 0), Point(3, 0));
     ball_velocity_magnitude               = 4.8;
     expected_position_tolerance           = 0.0001;
