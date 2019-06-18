@@ -16,6 +16,11 @@ class Annunciator
     explicit Annunciator(ros::NodeHandle& node_handle);
 
     /**
+     * Updates detected robots from vision, used to determine dead bots.
+     */
+    void update_vision_detections();
+
+    /**
      * Decodes diagnostics and messages for each robot, and publishes them.
      * Returns a boolean if there were new messages since the last status update.
      *

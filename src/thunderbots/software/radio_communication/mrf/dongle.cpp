@@ -42,6 +42,16 @@ namespace
     // The dongle's MAC address
     static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
 
+    // Used for sorting by robot ID
+    struct
+    {
+        bool operator()(std::tuple<uint8_t, Point, Angle> a,
+                        std::tuple<uint8_t, Point, Angle> b) const
+        {
+            return std::get<0>(a) < std::get<0>(b);
+        }
+    } customLess;
+
 }  // namespace
 
 MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
@@ -331,15 +341,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
     *rptr++ = static_cast<int8_t>(ballY);  // Add Ball Y position
     *rptr++ = static_cast<int8_t>(ballY >> 8);
-    struct
-    {
-        bool operator()(std::tuple<uint8_t, Point, Angle> a,
-                        std::tuple<uint8_t, Point, Angle> b) const
-        {
-            return std::get<0>(a) < std::get<0>(b);
-        }
-    } customLess;
 
+    // Sort robots in ascending order by ID
     std::sort(detbots.begin(), detbots.end(), customLess);
 
     // For the number of robot for which data was passed in, assign robot ids to
