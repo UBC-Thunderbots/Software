@@ -215,6 +215,7 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
 std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &start,
                                                                  const Point &destination)
 {
+    bool blocked_dest = false;
     CellCoordinate src, dest;
     src =
         std::make_pair((int)((start.x() + field_.length() / 2) / GRID_DIVISION_IN_METERS),
@@ -235,11 +236,17 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         return std::nullopt;
     }
 
-    // Either the source or the destination is blocked
-    if (isUnBlocked(src.first, src.second) == false ||
-        isUnBlocked(dest.first, dest.second) == false)
+    // The source is blocked
+    if (isUnBlocked(src.first, src.second) == false)
     {
-        return std::nullopt;
+        src = findClosestUnblockedCell(src);
+    }
+
+    // The destination is blocked
+    if (isUnBlocked(dest.first, dest.second) == false)
+    {
+        dest         = findClosestUnblockedCell(dest);
+        blocked_dest = true;
     }
 
     // If the destination GridCell is the same as source GridCell
@@ -387,9 +394,48 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     }
 
     auto path_points = tracePath(dest);
-    path_points.pop_back();
-    path_points.push_back(destination);
+
+    if (!blocked_dest)
+    {
+        // replace destination with actual destination
+        // Note that this isn't needed for start since we don't care about that
+        path_points.pop_back();
+        path_points.push_back(destination);
+    }
     return path_points;
+}
+
+// spiral out from currCell looking for unblocked cells
+// this should be good enough
+ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::findClosestUnblockedCell(
+    CellCoordinate currCell)
+{
+    int i = currCell.first;
+    int j = currCell.second;
+    unsigned nextIndex, currIndex = 3;
+    int nextIncrement[4] = {1, 0, -1, 0};
+    for (int depth = 1; depth < numRows; depth++)
+    {
+        nextIndex = (currIndex + 1) % 4;
+        i += nextIncrement[nextIndex] * depth;
+        j += nextIncrement[currIndex] * depth;
+        if (isValid(i, j) && isUnBlocked(i, j))
+        {
+            return std::make_pair(i, j);
+        }
+        currIndex = nextIndex;
+
+        nextIndex = (currIndex + 1) % 4;
+        i += nextIncrement[nextIndex] * depth;
+        j += nextIncrement[currIndex] * depth;
+        if (isValid(i, j) && isUnBlocked(i, j))
+        {
+            return std::make_pair(i, j);
+        }
+        currIndex = nextIndex;
+    }
+
+    return currCell;
 }
 
 //==========================//

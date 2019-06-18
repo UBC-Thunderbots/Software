@@ -158,6 +158,13 @@ class ThetaStarPathPlanner : public PathPlanner
      */
     bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
 
+    /**
+     * Finds closest unblocked cell to currCell
+     * @param currCell  current cell
+     * @return          closest unblocked cell to currCell
+     */
+    CellCoordinate findClosestUnblockedCell(CellCoordinate currCell);
+
     Field field_;
     Ball ball_;
     std::vector<Obstacle> obstacles_;
