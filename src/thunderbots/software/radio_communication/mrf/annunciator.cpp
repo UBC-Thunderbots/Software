@@ -27,6 +27,12 @@ namespace
     const int ET_MESSAGE_KEEPALIVE_TIME = 10;
 
     /**
+     * Amount of time without radio communication (but detected on vision)
+     * for a robot to be declared as dead, in seconds.
+     */
+    const int ROBOT_DEAD_TIME = 2;
+
+    /**
      * Represents a mapping from RSSI to decibels.
      */
     struct RSSITableEntry final
@@ -74,17 +80,18 @@ namespace
     // Struct to keep track of previously published messages for a robot
     typedef struct
     {
+        // Because vision updates and status updates occur from different
+        // threads, a mutex is used to prevent race conditions.
         std::mutex bot_mutex;
 
-        // Previously published messages for this robot
-        std::vector<std::string> old_msgs;
+        // Previously published status for this robot
+        thunderbots_msgs::RobotStatus previous_status;
 
         // Map of message to timestamp for edge-triggered messages
         std::map<std::string, time_t> et_messages;
 
-        // Timestamp of when this bot was last seen by vision, measured from when
-        // the info was received from network_input
-        time_t last_vision_detection;
+        // Timestamp of when this bot last sent a status update
+        time_t last_status_update;
 
     } RobotStatusState;
 
@@ -149,7 +156,7 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                     {
                         new_msgs.insert(new_msgs.begin(), MRF::LOW_BATTERY_MESSAGE);
                     }
-                    
+
                     bptr += 2;
                     len -= 2;
 
@@ -249,7 +256,6 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                      * These messages are added to a separate map,
                                      * mapping to a timestamp of when it was most recently
                                      * transmitted
-
                                      */
                                     for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT; ++i)
                                     {
@@ -371,9 +377,10 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     bool new_msgs_present = false;
     for (std::string msg : new_msgs)
     {
-        if (std::find(robot_status_states[index].old_msgs.begin(),
-                      robot_status_states[index].old_msgs.end(),
-                      msg) == robot_status_states[index].old_msgs.end())
+        if (std::find(robot_status_states[index].previous_status.robot_messages.begin(),
+                      robot_status_states[index].previous_status.robot_messages.end(),
+                      msg) ==
+            robot_status_states[index].previous_status.robot_messages.end())
         {
             new_msgs_present = true;
             break;
@@ -385,7 +392,10 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
     robot_status.dongle_messages = dongle_messages;
 
     // Update previous message state
-    robot_status_states[index].old_msgs = new_msgs;
+    robot_status_states[index].previous_status = robot_status;
+
+    // Update last communicated time
+    robot_status_states[index].last_status_update = time(nullptr);
 
     // Publish robot status
     robot_status_publisher.publish(robot_status);
@@ -421,24 +431,26 @@ std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
     return dongle_messages;
 }
 
-void update_vision_detections(std::vector<uint8_t> robots)
+void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
 {
-
-    time_t current_time = time(nullptr);
     for (uint8_t bot : robots)
     {
         // Guard robot status state for this bot
         robot_status_states[bot].bot_mutex.lock();
 
-        if (robot_status_states[bot].last_vision_detection < current_time)
+        // Check if robot is dead, publish old status update with dead message if so
+        if (difftime(time(nullptr), robot_status_states[bot].last_status_update) <
+            ROBOT_DEAD_TIME)
         {
-            robot_status_states[bot].last_vision_detection = current_time;
+            thunderbots_msgs::RobotStatus new_status =
+                robot_status_states[bot].previous_status;
+            new_status.robot_messages.clear();
+            new_status.robot_messages.push_back(MRF::ROBOT_DEAD_MESSAGE);
+            robot_status_states[bot].previous_status = new_status;
+
+            robot_status_publisher.publish(new_status);
         }
-        else
-        {
-            LOG(WARNING) << "Bot " << bot << " last vision timestamp newer than current time???";
-        }
+
         robot_status_states[bot].bot_mutex.unlock();
     }
 }
-
