@@ -3,7 +3,7 @@
 #include "ai/hl/stp/play/play.h"
 
 /**
- * A play that runs when its currently the enemys kick off,
+ * A play that runs when its currently the enemies kick off,
  * prioritizes defending the net and shadowing the robot
  * that is nearest to the ball. Any remaining bots will block
  * some odd angles to the net.

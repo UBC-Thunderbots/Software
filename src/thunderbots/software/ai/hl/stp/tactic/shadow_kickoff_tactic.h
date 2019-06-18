@@ -4,7 +4,7 @@
 
 /**
  * The ShadowKickoffTactic will move the assigned robot to shadow an enemy
- * robot during kick off. The robot thats the closest to an enemy robot that
+ * robot during kick off. The robot that is the closest to an enemy robot that
  * will shadow the robot and make sure that it is nearby to intercept any action
  * that the enemy may perform.
  */
@@ -44,7 +44,7 @@ class ShadowKickoffTactic : public Tactic
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
     /*
-     * Calculates the point which the robot needes to position it self on the feild to
+     * Calculates the point which the robot needs to position it self on the field to
      * shadow the specified enemy robot. Takes into account the field lines, and does not
      * return points in the centre circle, complying with the rules of the kickoff.
      *
