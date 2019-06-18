@@ -81,6 +81,8 @@ USB::DeviceHandle::~DeviceHandle()
     //     }
     // }
     libusb_close(handle);
+
+    LOG(DEBUG) << "DeviceHandle destroyed";
 }
 
 void USB::DeviceHandle::reset()
