@@ -45,6 +45,9 @@ namespace USB
          */
         ~Context();
 
+       protected:
+        std::vector<USB::DeviceHandle*> open_devices;
+
        private:
         friend class DeviceList;
         friend class DeviceHandle;
