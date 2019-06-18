@@ -13,7 +13,7 @@ export const hydrateROSParams = createAction('params_HYDRATE_ROS_PARAMS', (resol
 });
 
 /**
- * Writes to the ROS param
+ * Writes to the ROS param server
  */
 export const setParam = createAction('params_SET_PARAM', (resolve) => {
     return (key: string, value: boolean | string) => resolve({ key, value });
