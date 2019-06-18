@@ -23,7 +23,7 @@ namespace
     bool running;
 }  // namespace
 
-USB::Context::Context()
+USB::Context::Context() : open_devices(0)
 {
     // Init libusb
     check_fn("libusb_init", libusb_init(&context), 0);
@@ -40,6 +40,14 @@ USB::Context::~Context()
 {
     // Terminate event thread
     running = false;
+
+    // Close all devices
+    for (auto &dev : open_devices)
+    {
+        dev->~DeviceHandle();
+    }
+
+    // This wakes up libusb_handle_events, now let the thread join
     libusb_event_thread.join();
 
     // Cleanup libusb
