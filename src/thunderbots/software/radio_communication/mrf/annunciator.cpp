@@ -74,16 +74,22 @@ namespace
     // Struct to keep track of previously published messages for a robot
     typedef struct
     {
+        std::mutex bot_mutex;
+
         // Previously published messages for this robot
         std::vector<std::string> old_msgs;
 
         // Map of message to timestamp for edge-triggered messages
         std::map<std::string, time_t> et_messages;
 
+        // Timestamp of when this bot was last seen by vision, measured from when
+        // the info was received from network_input
+        time_t last_vision_detection;
+
     } RobotStatusState;
 
     // Map of robot number to their previously published messages
-    std::map<int, RobotStatusState> robot_status_states;
+    std::map<uint8_t, RobotStatusState> robot_status_states;
 
 }  // namespace
 
@@ -98,6 +104,9 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 {
     std::vector<std::string> new_msgs;
     thunderbots_msgs::RobotStatus robot_status;
+
+    // Guard robot status state for this bot
+    std::lock_guard<std::mutex> lock(robot_status_states[index].bot_mutex);
 
     robot_status.link_quality = lqi / 255.0;
 
@@ -134,6 +143,13 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 
                     robot_status.battery_voltage =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 1000.0;
+
+                    // Warn if battery voltage is too low
+                    if (robot_status.battery_voltage < MRF::MIN_BATTERY_VOLTAGE)
+                    {
+                        new_msgs.insert(new_msgs.begin(), MRF::LOW_BATTERY_MESSAGE);
+                    }
+                    
                     bptr += 2;
                     len -= 2;
 
@@ -141,9 +157,9 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
 
                     // Warn if capacitor voltage is too low
-                    if (robot_status.capacitor_voltage < 5.0)
+                    if (robot_status.capacitor_voltage < MRF::MIN_CAP_VOLTAGE)
                     {
-                        new_msgs.push_back(MRF::LOW_CAP_MESSAGE);
+                        new_msgs.insert(new_msgs.begin(), MRF::LOW_CAP_MESSAGE);
                     }
 
                     bptr += 2;
@@ -156,6 +172,13 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 
                     robot_status.board_temperature =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
+
+                    // Warn if board temperature too high
+                    if (robot_status.capacitor_voltage > MRF::MAX_BOARD_TEMPERATURE)
+                    {
+                        new_msgs.insert(new_msgs.begin(), MRF::HIGH_BOARD_TEMP_MESSAGE);
+                    }
+
                     bptr += 2;
                     len -= 2;
 
@@ -397,3 +420,25 @@ std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
 
     return dongle_messages;
 }
+
+void update_vision_detections(std::vector<uint8_t> robots)
+{
+
+    time_t current_time = time(nullptr);
+    for (uint8_t bot : robots)
+    {
+        // Guard robot status state for this bot
+        robot_status_states[bot].bot_mutex.lock();
+
+        if (robot_status_states[bot].last_vision_detection < current_time)
+        {
+            robot_status_states[bot].last_vision_detection = current_time;
+        }
+        else
+        {
+            LOG(WARNING) << "Bot " << bot << " last vision timestamp newer than current time???";
+        }
+        robot_status_states[bot].bot_mutex.unlock();
+    }
+}
+

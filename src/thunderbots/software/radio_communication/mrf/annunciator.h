@@ -18,7 +18,7 @@ class Annunciator
     /**
      * Updates detected robots from vision, used to determine dead bots.
      */
-    void update_vision_detections();
+    void update_vision_detections(std::vector<uint8_t> robots);
 
     /**
      * Decodes diagnostics and messages for each robot, and publishes them.
