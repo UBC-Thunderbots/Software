@@ -21,13 +21,18 @@ export default function* init() {
 function* startROSParameter() {
     const params = require.context('SRC/utils/ros/params', false, /.*\.yaml/);
 
-    const rosParamSettings: { [key: string]: any } = {};
+    const rosParamSettings: IROSParamState = {};
 
     params.keys().forEach((key) => {
-        parseParam(rosParamSettings, params(key));
+        const filename = key.replace(/.*\//, '').replace(/\..*/, '');
+        parseParam(rosParamSettings, `/${filename}`, params(key));
     });
 
-    yield put(actions.rosParameters.hydrateROSParams(rosParamSettings as IROSParamState));
+    for (const key in rosParamSettings) {
+        rosParamSettings[key].value = yield ROS.getParam(rosParamSettings[key].fullPath);
+    }
+
+    yield put(actions.rosParameters.hydrateROSParams(rosParamSettings));
 
     yield takeLatest(
         getType(actions.rosParameters.setBooleanParam),
@@ -37,14 +42,13 @@ function* startROSParameter() {
     );
 }
 
-const parseParam = (arrayOfParams: { [key: string]: any }, params: any) => {
+const parseParam = (arrayOfParams: IROSParamState, file: string, params: any) => {
     Object.keys(params).forEach((key) => {
         if (params[key]['type'] !== undefined) {
             arrayOfParams[key] = params[key];
-
-            arrayOfParams[key]['value'] = params[key]['default'];
+            arrayOfParams[key].fullPath = `${file}/${key.toLowerCase()}`;
         } else {
-            parseParam(arrayOfParams, params[key]);
+            parseParam(arrayOfParams, file, params[key]);
         }
     });
 };

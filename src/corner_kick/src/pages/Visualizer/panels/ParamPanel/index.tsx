@@ -40,7 +40,7 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
                     <GridCell topStart={2} leftStart={4} leftEnd={7} middle>
                         <TeamColor {...this.props} />
                     </GridCell>
-                    <GridCell topStart={4} leftStart={1} leftEnd={7} middle>
+                    <GridCell topStart={3} leftStart={1} leftEnd={7} middle>
                         <ControlGroup fill>
                             <Button
                                 className={Classes.FIXED}

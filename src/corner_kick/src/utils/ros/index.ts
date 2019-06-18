@@ -2,7 +2,7 @@
  * This file contains ROS methods to get and set values in the ROS Param Server
  */
 
-import { Message, Ros, Service, ServiceRequest, Topic } from 'roslib';
+import { Message, Ros, Service, ServiceRequest, Topic, Param } from 'roslib';
 
 const ros: Ros = new Ros({});
 
@@ -79,6 +79,21 @@ export const unsubscribeToROSTopic = (
     topic.unsubscribe(callback);
 };
 
+export const getParam = (key: string, timeout = 5000) => {
+    return new Promise((resolve, reject) => {
+        const param = new Param({
+            ros,
+            name: key,
+        });
+
+        param.get((value) => {
+            resolve(value);
+        });
+
+        setTimeout(() => reject(), timeout);
+    });
+};
+
 /**
  * Update ROS Param server by sending request to service
  * @param name - The name of the service
@@ -90,7 +105,7 @@ export const sendRequestToService = (
     name: string,
     serviceType: string,
     requestFormat: any,
-    timeout = 100,
+    timeout = 5000,
 ) => {
     return new Promise((resolve, reject) => {
         const service = new Service({

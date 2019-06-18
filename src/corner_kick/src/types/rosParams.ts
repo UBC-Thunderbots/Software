@@ -4,4 +4,5 @@ export interface IROSParam {
     name: string;
     description: string;
     value: any;
+    fullPath: string;
 }
