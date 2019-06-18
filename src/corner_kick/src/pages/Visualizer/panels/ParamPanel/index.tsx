@@ -20,10 +20,14 @@ import {
 } from 'SRC/constants';
 import { Grid, GridCell } from 'SRC/components/Layout';
 import { IROSParamState } from 'SRC/types';
+import {
+    PARAM_OVERRIDE_AI_PLAY,
+    PARAM_CURRENT_AI_PLAY,
+} from 'SRC/constants/rosParameters';
 
 interface IParamPanelProps {
     config: IROSParamState;
-    onClick: (id: string, value: any) => void;
+    onParamChange: (id: string, value: string | boolean) => void;
 }
 
 export class ParamPanel extends React.Component<IParamPanelProps> {
@@ -41,13 +45,7 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
                         <TeamColor {...this.props} />
                     </GridCell>
                     <GridCell topStart={3} leftStart={1} leftEnd={7} middle>
-                        <ControlGroup fill>
-                            <Button
-                                className={Classes.FIXED}
-                                icon="layout-sorted-clusters"
-                            />
-                            <HTMLSelect options={['Default', 'Yellow', 'Blue']} />
-                        </ControlGroup>
+                        <AIPlay {...this.props} />
                     </GridCell>
                 </Grid>
             </>
@@ -55,7 +53,7 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
     }
 }
 
-const StartStopAI = ({ config, onClick }: IParamPanelProps) => {
+const StartStopAI = ({ config, onParamChange }: IParamPanelProps) => {
     const runAI = config[PARAM_RUN_AI];
     if (runAI !== undefined) {
         return (
@@ -64,7 +62,7 @@ const StartStopAI = ({ config, onClick }: IParamPanelProps) => {
                 text={runAI.value ? 'Stop the AI' : 'Start the AI'}
                 fill
                 onClick={() => {
-                    onClick(PARAM_RUN_AI, !runAI.value);
+                    onParamChange(PARAM_RUN_AI, !runAI.value);
                 }}
             />
         );
@@ -73,7 +71,7 @@ const StartStopAI = ({ config, onClick }: IParamPanelProps) => {
     }
 };
 
-const TeamSide = ({ config, onClick }: IParamPanelProps) => {
+const TeamSide = ({ config, onParamChange }: IParamPanelProps) => {
     const override = config[PARAM_OVERRIDE_DEFENDING_SIDE];
     const side = config[PARAM_DEFENDING_POSITIVE_SIDE];
 
@@ -91,8 +89,8 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
                             override.value && side.value ? Intent.PRIMARY : Intent.NONE
                         }
                         onClick={() => {
-                            onClick(PARAM_DEFENDING_POSITIVE_SIDE, true);
-                            onClick(PARAM_OVERRIDE_DEFENDING_SIDE, true);
+                            onParamChange(PARAM_DEFENDING_POSITIVE_SIDE, true);
+                            onParamChange(PARAM_OVERRIDE_DEFENDING_SIDE, true);
                         }}
                     />
                 </Tooltip>
@@ -107,8 +105,8 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
                             override.value && !side.value ? Intent.PRIMARY : Intent.NONE
                         }
                         onClick={() => {
-                            onClick(PARAM_DEFENDING_POSITIVE_SIDE, false);
-                            onClick(PARAM_OVERRIDE_DEFENDING_SIDE, true);
+                            onParamChange(PARAM_DEFENDING_POSITIVE_SIDE, false);
+                            onParamChange(PARAM_OVERRIDE_DEFENDING_SIDE, true);
                         }}
                     />
                 </Tooltip>
@@ -121,7 +119,7 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
                         icon="cross"
                         intent={!override.value ? Intent.PRIMARY : Intent.NONE}
                         onClick={() => {
-                            onClick(PARAM_OVERRIDE_DEFENDING_SIDE, false);
+                            onParamChange(PARAM_OVERRIDE_DEFENDING_SIDE, false);
                         }}
                     />
                 </Tooltip>
@@ -132,7 +130,7 @@ const TeamSide = ({ config, onClick }: IParamPanelProps) => {
     }
 };
 
-const TeamColor = ({ config, onClick }: IParamPanelProps) => {
+const TeamColor = ({ config, onParamChange }: IParamPanelProps) => {
     const override = config[PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR];
     const color = config[PARAM_FRIENDLY_COLOR_YELLOW];
 
@@ -150,8 +148,8 @@ const TeamColor = ({ config, onClick }: IParamPanelProps) => {
                             override.value && color.value ? Intent.PRIMARY : Intent.NONE
                         }
                         onClick={() => {
-                            onClick(PARAM_FRIENDLY_COLOR_YELLOW, true);
-                            onClick(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, true);
+                            onParamChange(PARAM_FRIENDLY_COLOR_YELLOW, true);
+                            onParamChange(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, true);
                         }}
                     />
                 </Tooltip>
@@ -166,8 +164,8 @@ const TeamColor = ({ config, onClick }: IParamPanelProps) => {
                             override.value && !color.value ? Intent.PRIMARY : Intent.NONE
                         }
                         onClick={() => {
-                            onClick(PARAM_FRIENDLY_COLOR_YELLOW, false);
-                            onClick(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, true);
+                            onParamChange(PARAM_FRIENDLY_COLOR_YELLOW, false);
+                            onParamChange(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, true);
                         }}
                     />
                 </Tooltip>
@@ -180,11 +178,39 @@ const TeamColor = ({ config, onClick }: IParamPanelProps) => {
                         icon="cross"
                         intent={!override.value ? Intent.PRIMARY : Intent.NONE}
                         onClick={() => {
-                            onClick(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, false);
+                            onParamChange(PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR, false);
                         }}
                     />
                 </Tooltip>
             </ButtonGroup>
+        );
+    } else {
+        return null;
+    }
+};
+
+const AIPlay = ({ config, onParamChange }: IParamPanelProps) => {
+    const override = config[PARAM_OVERRIDE_AI_PLAY];
+    const play = config[PARAM_CURRENT_AI_PLAY];
+
+    if (override !== undefined && play.options !== undefined) {
+        return (
+            <ControlGroup fill>
+                <Button className={Classes.FIXED} icon="layout-sorted-clusters" />
+                <HTMLSelect
+                    options={['Default', ...play.options]}
+                    value={!override.value ? 'Default' : play.value}
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'Default') {
+                            onParamChange(PARAM_OVERRIDE_AI_PLAY, false);
+                        } else {
+                            onParamChange(PARAM_OVERRIDE_AI_PLAY, true);
+                            onParamChange(PARAM_CURRENT_AI_PLAY, value);
+                        }
+                    }}
+                />
+            </ControlGroup>
         );
     } else {
         return null;

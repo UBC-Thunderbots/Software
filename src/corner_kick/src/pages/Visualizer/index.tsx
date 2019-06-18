@@ -35,7 +35,7 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
         {
             addLayer: actions.canvas.addLayer,
             toggleVisibility: actions.canvas.toggleLayerVisibility,
-            setBooleanParam: actions.rosParameters.setBooleanParam,
+            setParam: actions.rosParameters.setParam,
         },
         dispatch,
     );
@@ -51,7 +51,7 @@ interface IVisualizerProps {
     // Actions
     addLayer: typeof actions.canvas.addLayer;
     toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
-    setBooleanParam: typeof actions.rosParameters.setBooleanParam;
+    setParam: typeof actions.rosParameters.setParam;
 }
 
 class VisualizerInternal extends React.Component<IVisualizerProps> {
@@ -92,7 +92,7 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
                         <Panel title="AI Controls">
                             <ParamPanel
                                 config={this.props.params}
-                                onClick={this.onParamClick}
+                                onParamChange={this.props.setParam}
                             />
                         </Panel>
                         <Panel title="AI Status">
@@ -110,12 +110,6 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
     public componentWillUnmount() {
         this.layerReceiver.close();
     }
-
-    private onParamClick = (key: string, value: any) => {
-        if (typeof value === 'boolean') {
-            this.props.setBooleanParam(key, value);
-        }
-    };
 
     /**
      * Called when we received layer data from the websocket

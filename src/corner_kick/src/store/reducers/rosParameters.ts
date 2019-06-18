@@ -23,11 +23,11 @@ export default (state: IROSParamState = defaultState, action: RosParametersActio
                 ...action.payload.params,
             };
 
-        case getType(rosParameters.setBooleanParam):
+        case getType(rosParameters.setParam):
             return {
                 ...state,
                 [action.payload.key]: {
-                    ...state.run_ai,
+                    ...state[action.payload.key],
                     value: action.payload.value,
                 },
             };

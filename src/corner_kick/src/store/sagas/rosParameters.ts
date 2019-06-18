@@ -25,19 +25,21 @@ function* startROSParameter() {
 
     params.keys().forEach((key) => {
         const filename = key.replace(/.*\//, '').replace(/\..*/, '');
-        parseParam(rosParamSettings, `/${filename}`, params(key));
+        parseParam(rosParamSettings, `/${filename.toLowerCase()}`, params(key));
     });
 
     for (const key in rosParamSettings) {
-        rosParamSettings[key].value = yield ROS.getParam(rosParamSettings[key].fullPath);
+        rosParamSettings[key].value = yield ROS.getParam(
+            `${rosParamSettings[key].root}/${key}`,
+        );
     }
 
     yield put(actions.rosParameters.hydrateROSParams(rosParamSettings));
 
     yield takeLatest(
-        getType(actions.rosParameters.setBooleanParam),
-        ({ payload }: ReturnType<typeof actions.rosParameters.setBooleanParam>) => {
-            setBooleanParam(payload.key, payload.value);
+        getType(actions.rosParameters.setParam),
+        ({ payload }: ReturnType<typeof actions.rosParameters.setParam>) => {
+            setParam(payload.key, payload.value);
         },
     );
 }
@@ -46,21 +48,29 @@ const parseParam = (arrayOfParams: IROSParamState, file: string, params: any) =>
     Object.keys(params).forEach((key) => {
         if (params[key]['type'] !== undefined) {
             arrayOfParams[key] = params[key];
-            arrayOfParams[key].fullPath = `${file}/${key.toLowerCase()}`;
+            arrayOfParams[key].root = file;
         } else {
             parseParam(arrayOfParams, file, params[key]);
         }
     });
 };
 
-const setBooleanParam = (key: string, value: boolean) => {
+const setParam = (key: string, value: boolean | string) => {
+    const config = {};
+    switch (typeof value) {
+        case 'string':
+            config['strs'] = [{ name: key, value }];
+            break;
+        case 'boolean':
+            config['bools'] = [{ name: key, value }];
+            break;
+    }
+
     ROS.sendRequestToService(
         '/ai_control/set_parameters',
         'dynamic_reconfigure/Reconfigure',
         {
-            config: {
-                bools: [{ name: key, value }],
-            },
+            config,
         },
     );
 };
