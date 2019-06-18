@@ -328,6 +328,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     int8_t camera_packet[55] = {0};
     int8_t mask_vec = 0;  // Assume all robots don't have valid position at the start
     uint8_t numbots = static_cast<uint8_t>(detbots.size());
+    std::vector<uint8_t> robot_ids;
 
     // Initialize pointer to start at location of storing ball data. First 2
     // bytes are for mask and flag vector
@@ -350,8 +351,10 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     for (std::size_t i = 0; i < numbots; i++)
     {
         uint8_t robotID = std::get<0>(detbots[i]);
-        int16_t robotX  = static_cast<int16_t>((std::get<1>(detbots[i])).x() * 1000);
-        int16_t robotY  = static_cast<int16_t>((std::get<1>(detbots[i])).y() * 1000);
+        robot_ids.push_back(robotID);
+
+        int16_t robotX = static_cast<int16_t>((std::get<1>(detbots[i])).x() * 1000);
+        int16_t robotY = static_cast<int16_t>((std::get<1>(detbots[i])).y() * 1000);
         int16_t robotT =
             static_cast<int16_t>((std::get<2>(detbots[i])).toRadians() * 1000);
 
@@ -390,6 +393,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     std::chrono::microseconds micros =
         std::chrono::duration_cast<std::chrono::microseconds>(diff);
     uint64_t stamp = static_cast<uint64_t>(micros.count());
+
+    // Create and submit USB transfer with camera packet
     std::unique_ptr<USB::BulkOutTransfer> elt(
         new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
     auto i = camera_transfers.insert(
@@ -399,6 +404,9 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     (*i).first->signal_done.connect(
         boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
     (*i).first->submit();
+
+    // Update annunciator with detected bots for dead bot detection
+    annunciator.update_vision_detections(robot_ids);
 };
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
