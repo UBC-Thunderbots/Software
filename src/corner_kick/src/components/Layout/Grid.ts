@@ -1,3 +1,7 @@
+/***
+ * This file specifies the Grid component, which simplifies the creation of
+ * a common UI layout element
+ */
 import styled from 'SRC/utils/styled-components';
 
 interface IGridProps {
@@ -27,6 +31,10 @@ const flow = ({ flow = 'row' }) => flow;
 
 const formatAreas = (areas: string[]) => areas.map((area) => `"${area}"`).join(' ');
 
+/**
+ * This component creates a gridbox, which is used in conjunction with GridCell
+ * to create grid layouts.
+ */
 export const Grid = styled.div<IGridProps>`
     display: grid;
     width: ${({ width = 'auto' }) => width};

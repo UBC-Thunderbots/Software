@@ -21,7 +21,6 @@ export const connect = (url = 'ws://localhost:9090', timeout = 5000) => {
 
         ros.on('connection', () => resolve());
         ros.on('error', (error) => {
-            console.error(error);
             reject(error);
         });
 
@@ -79,6 +78,11 @@ export const unsubscribeToROSTopic = (
     topic.unsubscribe(callback);
 };
 
+/**
+ * Retrieves a parameter from ROS, based on the key
+ * @param key - The parameter key we want to retreive the value from
+ * @param timeout - The time before the promise is rejected
+ */
 export const getParam = (key: string, timeout = 5000) => {
     return new Promise((resolve, reject) => {
         const param = new Param({

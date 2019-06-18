@@ -1,3 +1,8 @@
+/***
+ * This file specifies a Panel element, which is used inside a Sidebar to create
+ * resizeable panes
+ */
+
 import { Icon } from '@blueprintjs/core';
 import * as React from 'react';
 import Scrollbars from 'react-custom-scrollbars';
@@ -25,6 +30,9 @@ const PanelTitle = styled.div`
 `;
 
 interface IPanelProps {
+    /**
+     * The title will be displayed at the top of the Panel
+     */
     title: string;
     children?: React.ReactNode | React.ReactNodeArray;
 }
@@ -34,6 +42,10 @@ export interface IInternalPanelProps extends IPanelProps {
     onTitleClick?: () => void;
 }
 
+/**
+ * Manages the Panel content, responding to whether the content of the Panel should
+ * be displayed or not
+ */
 export const InternalPanel = (props: IInternalPanelProps) => {
     const { active, children, id, onTitleClick, title } = props;
 
@@ -72,4 +84,7 @@ export const InternalPanel = (props: IInternalPanelProps) => {
     );
 };
 
+/**
+ * A Panel is used inside a Sidebar and provides access to the resizeable pane title
+ */
 export const Panel = InternalPanel as (props: IPanelProps) => JSX.Element;

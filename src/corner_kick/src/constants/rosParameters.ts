@@ -1,3 +1,7 @@
+/***
+ * This file specifies important param keys used in Corner Kick
+ */
+
 export const PARAM_RUN_AI = 'run_ai';
 export const PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR = 'override_refbox_friendly_team_color';
 export const PARAM_FRIENDLY_COLOR_YELLOW = 'friendly_color_yellow';

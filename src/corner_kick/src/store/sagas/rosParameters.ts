@@ -23,19 +23,26 @@ function* startROSParameter() {
 
     const rosParamSettings: IROSParamState = {};
 
+    // We generate our param config object from the yaml description files
     params.keys().forEach((key) => {
+        // We isolate the filename of the param as it is used by ROS to fetch
+        // the current param value
         const filename = key.replace(/.*\//, '').replace(/\..*/, '');
+
         parseParam(rosParamSettings, `/${filename.toLowerCase()}`, params(key));
     });
 
+    // We then fetch the current param value from ROS
     for (const key in rosParamSettings) {
         rosParamSettings[key].value = yield ROS.getParam(
             `${rosParamSettings[key].root}/${key}`,
         );
     }
 
+    // Send the config to our state
     yield put(actions.rosParameters.hydrateROSParams(rosParamSettings));
 
+    // Wait for param changes and send them to ROS
     yield takeLatest(
         getType(actions.rosParameters.setParam),
         ({ payload }: ReturnType<typeof actions.rosParameters.setParam>) => {
@@ -44,19 +51,34 @@ function* startROSParameter() {
     );
 }
 
+/**
+ * Parses a JSON object representation of a param description YAML file into an
+ * indexed flat tree
+ */
 const parseParam = (arrayOfParams: IROSParamState, file: string, params: any) => {
     Object.keys(params).forEach((key) => {
+        // Check if current param is a leaf, defined by having a type attribute
         if (params[key]['type'] !== undefined) {
+            // Add it to our flat tree
             arrayOfParams[key] = params[key];
+
+            // Keep a reference to the filename this param comes from as we will
+            // need it to access the param value
             arrayOfParams[key].root = file;
         } else {
+            // If we did not arrive to a param leaf, we try again at the node
             parseParam(arrayOfParams, file, params[key]);
         }
     });
 };
 
+/**
+ * Updates the param value in the ROS param server
+ */
 const setParam = (key: string, value: boolean | string) => {
     const config = {};
+
+    // Behaviour will vary depending on variable type, we need to check it
     switch (typeof value) {
         case 'string':
             config['strs'] = [{ name: key, value }];

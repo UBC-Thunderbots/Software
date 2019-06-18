@@ -1,3 +1,7 @@
+/***
+ * This file specifies the Flex component, which simplifies the creation of
+ * a common UI layout element
+ */
 import styled from 'SRC/utils/styled-components';
 
 interface IFlexProps {
@@ -12,6 +16,9 @@ interface IFlexProps {
     alignItems?: string;
 }
 
+/**
+ * Flex creates a flexbox HTML div element
+ */
 export const Flex = styled.div<IFlexProps>`
     display: flex;
     width: ${({ width = 'auto' }) => width};

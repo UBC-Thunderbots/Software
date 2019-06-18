@@ -11,6 +11,7 @@ import { App } from './App';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 
+// Prevent showing focus unless tabing through the UI
 FocusStyleManager.onlyShowFocusOnTabs();
 
 // Mount the React component App to the div `#react`

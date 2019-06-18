@@ -1,4 +1,4 @@
-/*
+/***
  * This file specifies a React component enabling resizeable panels.
  * The actual resizing logic is specified in utils.ts in the same directory
  */

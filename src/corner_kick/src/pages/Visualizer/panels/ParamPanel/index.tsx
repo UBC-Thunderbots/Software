@@ -1,3 +1,7 @@
+/***
+ * This files specifies a panel used to modify ROS parameters
+ */
+
 import {
     Button,
     ButtonGroup,
@@ -17,19 +21,38 @@ import {
     PARAM_DEFENDING_POSITIVE_SIDE,
     PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR,
     PARAM_FRIENDLY_COLOR_YELLOW,
+    PARAM_OVERRIDE_AI_PLAY,
+    PARAM_CURRENT_AI_PLAY,
 } from 'SRC/constants';
 import { Grid, GridCell } from 'SRC/components/Layout';
 import { IROSParamState } from 'SRC/types';
-import {
-    PARAM_OVERRIDE_AI_PLAY,
-    PARAM_CURRENT_AI_PLAY,
-} from 'SRC/constants/rosParameters';
+import styled from 'SRC/utils/styled-components';
+
+const ParamTitle = styled.div`
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: ${({ theme }) => theme.colors.subdued};
+`;
 
 interface IParamPanelProps {
+    /**
+     * The ROS config object, containing info about all ROS parameters
+     */
     config: IROSParamState;
+
+    /**
+     * Function called when a parameter is changed
+     */
     onParamChange: (id: string, value: string | boolean) => void;
 }
 
+/**
+ * This panel provides the ability to change ROS parameters
+ */
 export class ParamPanel extends React.Component<IParamPanelProps> {
     public render() {
         return (
@@ -38,13 +61,22 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
                     <GridCell topStart={1} leftStart={1} leftEnd={7} center>
                         <StartStopAI {...this.props} />
                     </GridCell>
-                    <GridCell topStart={2} leftStart={1} leftEnd={4} middle>
+                    <GridCell topStart={2} leftStart={1} leftEnd={4}>
+                        <ParamTitle>Side to defend</ParamTitle>
+                    </GridCell>
+                    <GridCell topStart={3} leftStart={1} leftEnd={4} middle>
                         <TeamSide {...this.props} />
                     </GridCell>
-                    <GridCell topStart={2} leftStart={4} leftEnd={7} middle>
+                    <GridCell topStart={2} leftStart={4} leftEnd={7}>
+                        <ParamTitle>Team color</ParamTitle>
+                    </GridCell>
+                    <GridCell topStart={3} leftStart={4} leftEnd={7} middle>
                         <TeamColor {...this.props} />
                     </GridCell>
-                    <GridCell topStart={3} leftStart={1} leftEnd={7} middle>
+                    <GridCell topStart={4} leftStart={1} leftEnd={7}>
+                        <ParamTitle>AI Play Type</ParamTitle>
+                    </GridCell>
+                    <GridCell topStart={5} leftStart={1} leftEnd={7} middle>
                         <AIPlay {...this.props} />
                     </GridCell>
                 </Grid>
@@ -53,6 +85,9 @@ export class ParamPanel extends React.Component<IParamPanelProps> {
     }
 }
 
+/**
+ * UI element to start/stop the Thunderbots AI
+ */
 const StartStopAI = ({ config, onParamChange }: IParamPanelProps) => {
     const runAI = config[PARAM_RUN_AI];
     if (runAI !== undefined) {
@@ -71,6 +106,9 @@ const StartStopAI = ({ config, onParamChange }: IParamPanelProps) => {
     }
 };
 
+/**
+ * UI element to select the robot defense side
+ */
 const TeamSide = ({ config, onParamChange }: IParamPanelProps) => {
     const override = config[PARAM_OVERRIDE_DEFENDING_SIDE];
     const side = config[PARAM_DEFENDING_POSITIVE_SIDE];
@@ -130,6 +168,9 @@ const TeamSide = ({ config, onParamChange }: IParamPanelProps) => {
     }
 };
 
+/**
+ * UI element to specify the robot team color
+ */
 const TeamColor = ({ config, onParamChange }: IParamPanelProps) => {
     const override = config[PARAM_OVERRIDE_FRIENDLY_TEAM_COLOR];
     const color = config[PARAM_FRIENDLY_COLOR_YELLOW];
@@ -189,6 +230,9 @@ const TeamColor = ({ config, onParamChange }: IParamPanelProps) => {
     }
 };
 
+/**
+ * UI element to specify the current AI play type
+ */
 const AIPlay = ({ config, onParamChange }: IParamPanelProps) => {
     const override = config[PARAM_OVERRIDE_AI_PLAY];
     const play = config[PARAM_CURRENT_AI_PLAY];
@@ -196,13 +240,20 @@ const AIPlay = ({ config, onParamChange }: IParamPanelProps) => {
     if (override !== undefined && play.options !== undefined) {
         return (
             <ControlGroup fill>
-                <Button className={Classes.FIXED} icon="layout-sorted-clusters" />
+                <Tooltip
+                    className={Classes.FIXED}
+                    content="Set current AI play"
+                    position={Position.BOTTOM}
+                    hoverOpenDelay={500}
+                >
+                    <Button icon="layout-sorted-clusters" />
+                </Tooltip>
                 <HTMLSelect
-                    options={['Default', ...play.options]}
-                    value={!override.value ? 'Default' : play.value}
+                    options={['Do not override', ...play.options]}
+                    value={!override.value ? 'Do not override' : play.value}
                     onChange={(e) => {
                         const value = e.target.value;
-                        if (value === 'Default') {
+                        if (value === 'Do not override') {
                             onParamChange(PARAM_OVERRIDE_AI_PLAY, false);
                         } else {
                             onParamChange(PARAM_OVERRIDE_AI_PLAY, true);

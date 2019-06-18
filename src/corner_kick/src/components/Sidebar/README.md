@@ -7,19 +7,19 @@ needs.
 
 ## Table of content<!-- omit in toc -->
 
-- [How to use](#how-to-use)
-    - [Example](#example)
-- [Implementation overview](#implementation-overview)
-    - [The resize operation](#the-resize-operation)
-        - [Scenario 1: both panel have sufficient height](#scenario-1-both-panel-have-sufficient-height)
-        - [Scenario 2: a panel is almost at minimum height](#scenario-2-a-panel-is-almost-at-minimum-height)
-        - [Scenario 3: a panel is at minimum height](#scenario-3-a-panel-is-at-minimum-height)
-        - [Scenario 4: all panels are at minimum height](#scenario-4-all-panels-are-at-minimum-height)
-    - [Opening/closing panels](#openingclosing-panels)
-        - [Closing a panel](#closing-a-panel)
-        - [Opening a panel](#opening-a-panel)
-    - [Resizing the window](#resizing-the-window)
-    - [Performance](#performance)
+- [How to use](#How-to-use)
+  - [Example](#Example)
+- [Implementation overview](#Implementation-overview)
+  - [The resize operation](#The-resize-operation)
+    - [Scenario 1: both panel have sufficient height](#Scenario-1-both-panel-have-sufficient-height)
+    - [Scenario 2: a panel is almost at minimum height](#Scenario-2-a-panel-is-almost-at-minimum-height)
+    - [Scenario 3: a panel is at minimum height](#Scenario-3-a-panel-is-at-minimum-height)
+    - [Scenario 4: all panels are at minimum height](#Scenario-4-all-panels-are-at-minimum-height)
+  - [Opening/closing panels](#Openingclosing-panels)
+    - [Closing a panel](#Closing-a-panel)
+    - [Opening a panel](#Opening-a-panel)
+  - [Resizing the window](#Resizing-the-window)
+  - [Performance](#Performance)
 
 ## How to use
 
@@ -87,20 +87,12 @@ Due to the constraints in the resize operations, there are four different scenar
 
 #### Scenario 1: both panel have sufficient height
 
-<p align="center">
-  <img src="./__doc__/scenario_1.png">
-</p>
-
 In the case where both panels have sufficent height, then the panel surround the resize handle
 (in this example panel #1 and #2) will take part in the height transaction. After the resize
 logic has run, panel #1's height will be reduced by the amount specified in `mouseDelta` (here,
 the black arrow) and panel #2's height will be increased by the amount specified in `mouseDelta`.
 
 #### Scenario 2: a panel is almost at minimum height
-
-<p align="center">
-  <img src="./__doc__/scenario_2.png">
-</p>
 
 In the case that a panel is not at its minimum height, but following scenario 1 would cause it
 to have its height reduced past its miminum height, not all of `mouseDelta` will be used in the
@@ -111,20 +103,12 @@ following frame, which would most likely follow scenario 3.
 
 #### Scenario 3: a panel is at minimum height
 
-<p align="center">
-  <img src="./__doc__/scenario_3.png">
-</p>
-
 If a panel is at minimum height, its height cannot be reduced further. The resize logic must then
 look at the next panel if it has a height suitable for this transaction. In this example, panel #2
 is at its minimum height, but panel #1 is not. Hence, the height transaction can occur between
 panel #3 and panel #1, following either scenario 1 or 2.
 
 #### Scenario 4: all panels are at minimum height
-
-<p align="center">
-  <img src="./__doc__/scenario_4.png">
-</p>
 
 If there are no panels with a height greater than the minimum height, then no transaction can occur.
 `mouseDelta` is not changed, and no panel has their height modified.

@@ -1,3 +1,8 @@
+/***
+ * This file specifies the Grid component, which simplifies the creation of
+ * a common UI layout element
+ */
+
 import styled from 'styled-components';
 
 interface IGridCellProps {
@@ -12,6 +17,9 @@ interface IGridCellProps {
     area?: string;
 }
 
+/**
+ * This component represents a cell inside a Grid.
+ */
 export const GridCell = styled.div<IGridCellProps>`
     height: 100%;
     min-width: 0;

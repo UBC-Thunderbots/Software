@@ -34,16 +34,11 @@ const GlobalStylesheet = createGlobalStyle`
     }
 
     #root > div {
-        background: ${(props) => props.theme.colors.bg};
         border-color: ${(props) => props.theme.colors.border} !important;
     }
 
-    #root > div:fullscreen {
-        border-color: none !important;
-    }
-
     #main {
-        background: ${(props) => props.theme.colors.panel} !important;
+        background: ${(props) => props.theme.colors.panel};
     }
 `;
 
