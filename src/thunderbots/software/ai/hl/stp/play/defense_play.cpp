@@ -1,12 +1,12 @@
 #include "ai/hl/stp/play/defense_play.h"
 
-#include <firmware/main/shared_util/constants.h>
-
 #include "ai/hl/stp/evaluation/enemy_threat.h"
+#include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
+#include "ai/world/game_state.h"
 #include "util/parameter/dynamic_parameters.h"
 
 const std::string DefensePlay::name = "Defense Play";
@@ -18,14 +18,14 @@ std::string DefensePlay::getName() const
 
 bool DefensePlay::isApplicable(const World &world) const
 {
-    // TODO: conditions
-    return false;
+    world.gameState().isPlaying() &&
+        Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
-    // TODO: conditions
-    return true;
+    world.gameState().isPlaying() &&
+        Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
