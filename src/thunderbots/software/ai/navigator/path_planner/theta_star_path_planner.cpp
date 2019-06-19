@@ -20,13 +20,13 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field, Ball ball,
     {
         for (unsigned col = 0; col < numCols; col++)
         {
-            Point p(col * GRID_DIVISION_IN_METERS - field_.length() / 2,
-                    row * GRID_DIVISION_IN_METERS - field_.width() / 2);
+            Point p(row * GRID_DIVISION_IN_METERS - field_.length() / 2,
+                    col * GRID_DIVISION_IN_METERS - field_.width() / 2);
             for (unsigned index = 0; index < obstacles.size(); index++)
             {
                 if (obstacles[index].getBoundaryPolygon().containsPoint(p))
                 {
-                    unblocked_grid[col][row] = false;
+                    unblocked_grid[row][col] = false;
                 }
             }
         }
