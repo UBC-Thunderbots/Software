@@ -165,6 +165,25 @@ class ThetaStarPathPlanner : public PathPlanner
      */
     CellCoordinate findClosestUnblockedCell(CellCoordinate currCell);
 
+    /**
+     * Converts a cell in grid to a point on field
+     *
+     * @param row row of cell
+     * @param col col of cell
+     *
+     * @return Point on field
+     */
+    Point convertCellToPoint(int row, int col);
+
+    /**
+     * Converts a point on field to a cell in grid
+     *
+     * @param p point on field
+     *
+     * @return cell in grid
+     */
+    CellCoordinate convertPointToCell(Point p);
+
     Field field_;
     Ball ball_;
     std::vector<Obstacle> obstacles_;

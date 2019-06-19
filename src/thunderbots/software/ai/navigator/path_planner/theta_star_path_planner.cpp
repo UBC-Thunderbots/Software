@@ -10,8 +10,8 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field, Ball ball,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), ball_(ball), obstacles_(obstacles)
 {
-    numRows = (int)field_.length() / GRID_DIVISION_IN_METERS;
-    numCols = (int)field_.width() / GRID_DIVISION_IN_METERS;
+    numRows = (int)(field_.totalLength() / GRID_DIVISION_IN_METERS);
+    numCols = (int)(field_.totalWidth() / GRID_DIVISION_IN_METERS);
 
     unblocked_grid =
         std::vector<std::vector<bool>>(numRows, std::vector<bool>(numCols, true));
@@ -20,8 +20,7 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field, Ball ball,
     {
         for (unsigned col = 0; col < numCols; col++)
         {
-            Point p(row * GRID_DIVISION_IN_METERS - field_.length() / 2,
-                    col * GRID_DIVISION_IN_METERS - field_.width() / 2);
+            Point p = convertCellToPoint(row, col);
             for (unsigned index = 0; index < obstacles.size(); index++)
             {
                 if (obstacles[index].getBoundaryPolygon().containsPoint(p))
@@ -112,9 +111,7 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(CellCoordinate dest)
     {
         CellCoordinate p = Path.top();
         Path.pop();
-        path_points.push_back(
-            Point(p.first * GRID_DIVISION_IN_METERS - field_.length() / 2,
-                  p.second * GRID_DIVISION_IN_METERS - field_.width() / 2));
+        path_points.push_back(convertCellToPoint(p.first, p.second));
     }
 
     return path_points;
@@ -217,12 +214,9 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
 {
     bool blocked_dest = false;
     CellCoordinate src, dest;
-    src =
-        std::make_pair((int)((start.x() + field_.length() / 2) / GRID_DIVISION_IN_METERS),
-                       (int)((start.y() + field_.width() / 2) / GRID_DIVISION_IN_METERS));
-    dest = std::make_pair(
-        (int)((destination.x() + field_.length() / 2) / GRID_DIVISION_IN_METERS),
-        (int)((destination.y() + field_.width() / 2) / GRID_DIVISION_IN_METERS));
+
+    src  = convertPointToCell(start);
+    dest = convertPointToCell(destination);
 
     // If the source is out of range
     if (isValid(src.first, src.second) == false)
@@ -436,6 +430,19 @@ ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::findClosestUnblockedC
     }
 
     return currCell;
+}
+
+Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
+{
+    return Point((row * GRID_DIVISION_IN_METERS) - (field_.totalLength() / 2.0),
+                 (col * GRID_DIVISION_IN_METERS) - (field_.totalWidth() / 2.0));
+}
+
+ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::convertPointToCell(Point p)
+{
+    return std::make_pair(
+        (int)((p.x() + (field_.totalLength() / 2.0)) / GRID_DIVISION_IN_METERS),
+        (int)((p.y() + (field_.totalWidth() / 2.0)) / GRID_DIVISION_IN_METERS));
 }
 
 //==========================//
