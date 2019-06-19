@@ -228,6 +228,7 @@ Point closestPointOnSeg(const Point &p, const Point &segA, const Point &segB);
  * @return the Point on line closest to centre point.
  */
 Point closestPointOnLine(const Point &p, const Point &lineA, const Point &lineB);
+Point closestPointOnLine(const Point &p, const Line &line);
 
 /**
  * Finds the points of intersection between a circle and a line.

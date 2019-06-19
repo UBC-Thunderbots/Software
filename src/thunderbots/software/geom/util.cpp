@@ -649,6 +649,10 @@ Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector 
     return segB;
 }
 
+Point closestPointOnLine(const Point &p, const Line &line)
+{
+    return closestPointOnLine(p, line.getFirst(), line.getSecond());
+}
 Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vector &lineB)
 {
     // find point C, the projection onto the line

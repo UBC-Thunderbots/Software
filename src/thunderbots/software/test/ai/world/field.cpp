@@ -277,3 +277,22 @@ TEST_F(FieldTest, point_not_in_field_lines)
     Point p(4.6, 3.1);
     EXPECT_FALSE(field.pointInFieldLines(p));
 }
+
+TEST_F(FieldTest, point_in_entire_field_and_in_field_lines)
+{
+    Point p(-4.4, 2.9);
+    EXPECT_TRUE(field.pointInEntireField(p));
+}
+
+TEST_F(FieldTest, point_in_entire_field_and_not_in_field_lines)
+{
+    Point p(-4.6, 3.22);
+    EXPECT_TRUE(field.pointInEntireField(p));
+    EXPECT_FALSE(field.pointInFieldLines(p));
+}
+
+TEST_F(FieldTest, point_not_in_entire_field)
+{
+    Point p(-4.91, -0.88);
+    EXPECT_FALSE(field.pointInEntireField(p));
+}
