@@ -95,9 +95,9 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
         unvisited_robots.end());
     std::vector<Robot> all_robots   = passing_team.getAllRobots();
     std::vector<Robot> other_robots = other_team.getAllRobots();
-    // TODO: possibly re-enable using friendly robots as obstacles if we can find a way to stop
-    // defenders from oscillating between positions
-    // See https://github.com/UBC-Thunderbots/Software/issues/642
+    // TODO: possibly re-enable using friendly robots as obstacles if we can find a way to
+    // stop defenders from oscillating between positions See
+    // https://github.com/UBC-Thunderbots/Software/issues/642
     // all_robots.insert(all_robots.end(), other_robots.begin(), other_robots.end());
 
     // On each iteration, check what robots can be passed to. These receivers will
@@ -222,11 +222,12 @@ void Evaluation::sortThreatsInDecreasingOrder(
     std::sort(threats.rbegin(), threats.rend(), enemyThreatLessThanComparator);
 }
 
-std::vector<Evaluation::EnemyThreat>
-Evaluation::getAllEnemyThreats(const Field &field, const Team &friendly_team, Team enemy_team, const Ball &ball,
-                               bool include_goalie)
+std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
+    const Field &field, const Team &friendly_team, Team enemy_team, const Ball &ball,
+    bool include_goalie)
 {
-    if(!include_goalie && enemy_team.getGoalieID()) {
+    if (!include_goalie && enemy_team.getGoalieID())
+    {
         enemy_team.removeRobotWithId(*enemy_team.getGoalieID());
     }
 

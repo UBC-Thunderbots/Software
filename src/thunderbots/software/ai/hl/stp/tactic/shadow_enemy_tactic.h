@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
 #include "ai/hl/stp/evaluation/enemy_threat.h"
+#include "ai/hl/stp/tactic/tactic.h"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given
@@ -34,8 +34,9 @@ class ShadowEnemyTactic : public Tactic
      * @param enemy_team The enemy team
      * @param enemy_team_can_pass Whether or not we think the enemy team can pass the ball
      */
-    void updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field, const Team &friendly_team,
-                      const Team &enemy_team, bool enemy_team_can_pass);
+    void updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field,
+                      const Team &friendly_team, const Team &enemy_team,
+                      bool enemy_team_can_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -46,10 +47,10 @@ class ShadowEnemyTactic : public Tactic
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
-    double calculateRobotCost(const Robot& robot, const World& world) override;
+    double calculateRobotCost(const Robot &robot, const World &world) override;
 
    private:
-    void calculateNextIntent(IntentCoroutine::push_type& yield) override;
+    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
     // Tactic parameters
     // The Enemy Threat indicating which enemy to shadow

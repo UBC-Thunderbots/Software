@@ -153,7 +153,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 }
 
 // TODO: Re-enable as part of https://github.com/UBC-Thunderbots/Software/issues/642
-//TEST(GetNumPassesToRobotTest, two_passes_around_a_single_obstacle)
+// TEST(GetNumPassesToRobotTest, two_passes_around_a_single_obstacle)
 //{
 //    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
 //                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -186,7 +186,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 //}
 
 // TODO: Re-enable as part of https://github.com/UBC-Thunderbots/Software/issues/642
-//TEST(GetNumPassesToRobotTest, multiple_friendly_robots_and_blocking_enemies)
+// TEST(GetNumPassesToRobotTest, multiple_friendly_robots_and_blocking_enemies)
 //{
 //    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
 //                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -230,7 +230,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 
 
 // TODO: Re-enable as part of https://github.com/UBC-Thunderbots/Software/issues/642
-//TEST(GetNumPassesToRobotTest, all_passes_blocked)
+// TEST(GetNumPassesToRobotTest, all_passes_blocked)
 //{
 //    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
 //                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -251,7 +251,7 @@ TEST(GetNumPassesToRobotTest, one_simple_pass_to_robot_with_no_obstacles)
 //    EXPECT_FALSE(result);
 //}
 
-//TEST(GetNumPassesToRobotTest, final_receiver_can_receive_passes_from_multiple_robots)
+// TEST(GetNumPassesToRobotTest, final_receiver_can_receive_passes_from_multiple_robots)
 //{
 //    Robot friendly_robot_0 = Robot(0, Point(0, 0), Vector(0, 0), Angle::zero(),
 //                                   AngularVelocity::zero(), Timestamp::fromSeconds(0));

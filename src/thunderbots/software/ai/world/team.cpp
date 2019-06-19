@@ -175,7 +175,8 @@ std::vector<Robot> Team::getAllRobotsExceptGoalie() const
     std::vector<Robot> all_robots;
     for (auto it = team_robots.begin(); it != team_robots.end(); it++)
     {
-        if(goalie_robot && it->second == *goalie_robot) {
+        if (goalie_robot && it->second == *goalie_robot)
+        {
             continue;
         }
         all_robots.emplace_back(it->second);

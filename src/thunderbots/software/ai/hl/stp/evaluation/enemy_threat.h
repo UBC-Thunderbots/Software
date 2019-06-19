@@ -115,11 +115,14 @@ namespace Evaluation
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
      * @param ball The ball
-     * @param include_goalie Whether or not to include the enemy goalie in the evaluation and resultant threats
+     * @param include_goalie Whether or not to include the enemy goalie in the evaluation
+     * and resultant threats
      * @return A list of EnemyThreats in order of decreasing threat
      */
-    std::vector<Evaluation::EnemyThreat>
-    getAllEnemyThreats(const Field &field, const Team &friendly_team, Team enemy_team, const Ball &ball,
-                       bool include_goalie);
+    std::vector<Evaluation::EnemyThreat> getAllEnemyThreats(const Field &field,
+                                                            const Team &friendly_team,
+                                                            Team enemy_team,
+                                                            const Ball &ball,
+                                                            bool include_goalie);
 
 }  // namespace Evaluation
