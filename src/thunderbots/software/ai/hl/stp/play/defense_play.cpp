@@ -1,5 +1,7 @@
 #include "ai/hl/stp/play/defense_play.h"
 
+#include <firmware/main/shared_util/constants.h>
+
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
@@ -72,7 +74,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             {
                 shadow_enemy_tactics.at(i)->updateParams(
                     enemy_threats.at(i), world.field(), world.friendlyTeam(),
-                    world.enemyTeam(), enemy_team_can_pass);
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

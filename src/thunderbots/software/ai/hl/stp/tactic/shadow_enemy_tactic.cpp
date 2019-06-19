@@ -10,6 +10,7 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
+      shadow_distance(ROBOT_MAX_RADIUS_METERS * 3),
       Tactic(loop_forever)
 {
 }
@@ -21,12 +22,14 @@ std::string ShadowEnemyTactic::getName() const
 
 void ShadowEnemyTactic::updateParams(const Evaluation::EnemyThreat &enemy_threat,
                                      const Field &field, const Team &friendly_team,
-                                     const Team &enemy_team, bool enemy_team_can_pass)
+                                     const Team &enemy_team, double shadow_distance,
+                                     bool enemy_team_can_pass)
 {
     this->enemy_threat        = enemy_threat;
     this->field               = field;
     this->friendly_team       = friendly_team;
     this->enemy_team          = enemy_team;
+    this->shadow_distance     = shadow_distance;
     this->enemy_team_can_pass = enemy_team_can_pass;
 }
 
@@ -66,7 +69,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_threat->passer->position() - enemy_robot.position();
             Point position_to_block_pass =
                 enemy_robot.position() +
-                enemy_to_passer_vector.norm(ROBOT_MAX_RADIUS_METERS * 4);
+                enemy_to_passer_vector.norm(this->shadow_distance);
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0));
         }
@@ -85,8 +88,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
             }
             Point position_to_block_shot =
-                enemy_robot.position() +
-                enemy_shot_vector.norm(ROBOT_MAX_RADIUS_METERS * 4);
+                enemy_robot.position() + enemy_shot_vector.norm(this->shadow_distance);
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, position_to_block_shot,
                 enemy_shot_vector.orientation() + Angle::half(), 0));

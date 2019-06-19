@@ -33,10 +33,16 @@ class ShadowEnemyTactic : public Tactic
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
      * @param enemy_team_can_pass Whether or not we think the enemy team can pass the ball
+     * @param shadow_distance How far from the enemy the robot will shadow. This is the
+     * distance between the center of the enemy robot and the center of the robot
+     * shadowing it
+     * @param enemy_team_can_pass Whether or not the enemy team can pass. If this value is
+     * true, the robot will try block passes to the robot being shadowed. Otherwise, it
+     * will block the net.
      */
     void updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field,
                       const Team &friendly_team, const Team &enemy_team,
-                      bool enemy_team_can_pass);
+                      double shadow_distance, bool enemy_team_can_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -61,6 +67,8 @@ class ShadowEnemyTactic : public Tactic
     Team friendly_team;
     // The enemy team
     Team enemy_team;
+    // How far from the enemy the robot will position itself to shadow
+    double shadow_distance;
     // Whether or not we think the enemy team can pass the ball
     bool enemy_team_can_pass;
 };
