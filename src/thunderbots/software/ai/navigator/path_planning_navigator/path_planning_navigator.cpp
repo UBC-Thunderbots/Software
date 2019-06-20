@@ -92,7 +92,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     {
         auto next_point = (*path_points)[1];
         auto move       = std::make_unique<MovePrimitive>(
-            p->getRobotId(), next_point, next_point.orientation(),
+            p->getRobotId(), next_point, move_intent.getFinalAngle(),
             calculateTransitionSpeedBetweenSegments((*path_points)[0], (*path_points)[1],
                                                     (*path_points)[2], 0),
             false, false);
