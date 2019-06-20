@@ -8,17 +8,25 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
 
-import { LayersPanel } from 'SRC/components/LayersPanel';
+import { Sidebar, Panel } from 'SRC/components/Sidebar';
 import { Portal, PortalLocation } from 'SRC/components/Portal';
 import { SPRITESHEET } from 'SRC/constants';
 import { Canvas, CanvasManager, LayerReceiver } from 'SRC/containers/Canvas';
 import { actions, RootAction } from 'SRC/store';
-import { ILayer, IRootState } from 'SRC/types';
+import { ILayer, IRootState, IROSParamState } from 'SRC/types';
+
+import { ParamPanel } from './panels/ParamPanel';
+import { LayersPanel } from './panels/LayersPanel';
+import { PlayTypePanel } from './panels/PlayTypePanel';
 
 // We request the layer data from the store
 const mapStateToProps = (state: IRootState) => ({
     layers: state.canvas.layers,
     layerOrder: state.canvas.layerOrder,
+    playType: state.thunderbots.playType,
+    playName: state.thunderbots.playName,
+    tactics: state.thunderbots.tactics,
+    params: state.rosParameters,
 });
 
 // We request layer related actions
@@ -27,15 +35,23 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
         {
             addLayer: actions.canvas.addLayer,
             toggleVisibility: actions.canvas.toggleLayerVisibility,
+            setParam: actions.rosParameters.setParam,
         },
         dispatch,
     );
 
 interface IVisualizerProps {
-    addLayer: typeof actions.canvas.addLayer;
-    toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
     layers: { [id: number]: ILayer };
     layerOrder: number[];
+    playType: string;
+    playName: string;
+    tactics: string[];
+    params: IROSParamState;
+
+    // Actions
+    addLayer: typeof actions.canvas.addLayer;
+    toggleVisibility: typeof actions.canvas.toggleLayerVisibility;
+    setParam: typeof actions.rosParameters.setParam;
 }
 
 class VisualizerInternal extends React.Component<IVisualizerProps> {
@@ -66,10 +82,23 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
         return (
             <>
                 <Portal portalLocation={PortalLocation.SIDEBAR}>
-                    <LayersPanel
-                        layers={orderedLayers}
-                        toggleVisibility={this.onLayerVisibilityToggle}
-                    />
+                    <Sidebar inactivePanelHeight={32} minPanelHeight={200}>
+                        <Panel title="Layers">
+                            <LayersPanel
+                                layers={orderedLayers}
+                                toggleVisibility={this.onLayerVisibilityToggle}
+                            />
+                        </Panel>
+                        <Panel title="AI Controls">
+                            <ParamPanel
+                                config={this.props.params}
+                                onParamChange={this.props.setParam}
+                            />
+                        </Panel>
+                        <Panel title="AI Status">
+                            <PlayTypePanel {...this.props} />
+                        </Panel>
+                    </Sidebar>
                 </Portal>
                 <Portal portalLocation={PortalLocation.MAIN}>
                     <Canvas canvasManager={this.canvasManager} />

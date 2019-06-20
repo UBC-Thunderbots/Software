@@ -15,9 +15,10 @@ class MoveSpinPrimitive : public Primitive
      * @param dest The final destination of the movement
      * @param angular_vel The angular velocity of the robot
      * of the movement
+     * @param final_speed The speed at final destination
      */
     explicit MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
-                               const AngularVelocity &angular_vel);
+                               const AngularVelocity &angular_vel, double final_speed);
 
     /**
      * Creates a new MoveSpin Primitive from a Primitive message
@@ -43,6 +44,13 @@ class MoveSpinPrimitive : public Primitive
      * @return The robot's angular velocity in rad/s
      */
     AngularVelocity getAngularVelocity() const;
+
+    /**
+     * Gets the robot's final speed in m/s
+     *
+     * @return The robots speed in m/s
+     */
+    double getFinalSpeed() const;
 
     /**
      * Returns the generic vector of parameters for this Primitive
@@ -81,4 +89,5 @@ class MoveSpinPrimitive : public Primitive
     unsigned int robot_id;
     Point dest;
     AngularVelocity angular_vel;
+    double final_speed;
 };

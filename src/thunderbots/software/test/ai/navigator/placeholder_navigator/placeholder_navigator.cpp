@@ -143,14 +143,14 @@ TEST(PlaceholderNavigatorTest, convert_movespin_intent_to_movespin_primitive)
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
-        std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1));
+        std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1.0, 1));
 
     auto primitive_ptrs = placeholderNavigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
 
-    auto expected_primitive = MoveSpinPrimitive(0, Point(), AngularVelocity::full());
+    auto expected_primitive = MoveSpinPrimitive(0, Point(), AngularVelocity::full(), 1.0);
     auto primitive          = dynamic_cast<MoveSpinPrimitive &>(*(primitive_ptrs.at(0)));
     EXPECT_EQ(expected_primitive, primitive);
 }

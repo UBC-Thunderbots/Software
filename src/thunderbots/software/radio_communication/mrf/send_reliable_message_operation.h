@@ -1,5 +1,4 @@
 #pragma once
-#include <sigc++/trackable.h>
 
 #include "dongle.h"
 #include "usb/libusb.h"
@@ -7,8 +6,7 @@
 
 class MRFDongle;
 
-class SendReliableMessageOperation final : public AsyncOperation<void>,
-                                           public sigc::trackable
+class SendReliableMessageOperation final : public AsyncOperation<void>
 {
    public:
     /**
@@ -54,7 +52,14 @@ class SendReliableMessageOperation final : public AsyncOperation<void>,
     MRFDongle &dongle;
     uint8_t message_id, delivery_status;
     std::unique_ptr<USB::BulkOutTransfer> transfer;
-    sigc::connection mdr_connection;
+
+    /**
+     * scoped_connection allows for the automatic disconnection of
+     * this signal when this object gets destroyed
+     *
+     * replaces inheriting from sigc::trackable
+     */
+    boost::signals2::scoped_connection mdr_connection;
 
     void out_transfer_done(AsyncOperation<void> &);
     void message_delivery_report(uint8_t id, uint8_t code);

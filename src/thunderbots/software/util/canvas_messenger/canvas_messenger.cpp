@@ -217,6 +217,8 @@ void CanvasMessenger::drawWorld(const World& world)
 void CanvasMessenger::drawBall(const Ball& ball)
 {
     drawPoint(Layer::BALL, ball.position(), BALL_MAX_RADIUS_METERS * 2, BALL_COLOR);
+    drawLine(Layer::BALL, ball.position(), ball.position() + ball.velocity(),
+             BALL_MAX_RADIUS_METERS / 2, BALL_COLOR);
 }
 
 void CanvasMessenger::drawField(Field field)

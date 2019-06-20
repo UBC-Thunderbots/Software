@@ -1,6 +1,7 @@
 #include "network_input/networking/network_client.h"
 
 #include <boost/bind.hpp>
+#include <limits>
 
 #include "util/constants.h"
 #include "util/logger/init.h"
@@ -8,7 +9,10 @@
 #include "util/ros_messages.h"
 
 NetworkClient::NetworkClient(ros::NodeHandle& node_handle)
-    : backend(), io_service(), initial_packet_count(0), last_valid_t_capture(9999999)
+    : backend(),
+      io_service(),
+      initial_packet_count(0),
+      last_valid_t_capture(std::numeric_limits<double>::max())
 {
     // Set up publishers
     world_publisher = node_handle.advertise<thunderbots_msgs::World>(
@@ -91,7 +95,7 @@ void NetworkClient::filterAndPublishVisionDataWrapper(SSL_WrapperPacket packet)
         {
             filterAndPublishVisionData(packet);
         }
-        else if (packet.detection().t_capture() - last_valid_t_capture < 100)
+        else if (std::fabs(packet.detection().t_capture() - last_valid_t_capture) < 100)
         {
             last_valid_t_capture = packet.detection().t_capture();
             filterAndPublishVisionData(packet);
@@ -142,39 +146,30 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
         if (!camera_disabled)
         {
-            // add the detection to the map, replacing any existing values
-            auto ret = latest_detection_data.insert(
-                std::make_pair(detection.camera_id(), detection));
-            // check if we inserted successfully. if not, modify the existing
-            // entry to be our new value
-            if (!ret.second)
-            {
-                ret.first->second = detection;
-            }
+            Ball ball = backend.getFilteredBallData({detection});
+            thunderbots_msgs::Ball ball_msg =
+                Util::ROSMessages::convertBallToROSMessage(ball);
+            world_msg.ball = ball_msg;
+
+            Team friendly_team = backend.getFilteredFriendlyTeamData({detection});
+            thunderbots_msgs::Team friendly_team_msg =
+                Util::ROSMessages::convertTeamToROSMessage(friendly_team);
+            world_msg.friendly_team = friendly_team_msg;
+
+            Team enemy_team = backend.getFilteredEnemyTeamData({detection});
+            thunderbots_msgs::Team enemy_team_msg =
+                Util::ROSMessages::convertTeamToROSMessage(enemy_team);
+            world_msg.enemy_team = enemy_team_msg;
         }
+    }
 
-        // Create a vector of the latest detection data for each camera
-        std::vector<SSL_DetectionFrame> latest_detections;
-        for (auto it = latest_detection_data.begin(); it != latest_detection_data.end();
-             it++)
-        {
-            latest_detections.push_back(it->second);
-        }
-
-        Ball ball = backend.getFilteredBallData(latest_detections);
-        thunderbots_msgs::Ball ball_msg =
-            Util::ROSMessages::convertBallToROSMessage(ball);
-        world_msg.ball = ball_msg;
-
-        Team friendly_team = backend.getFilteredFriendlyTeamData(latest_detections);
-        thunderbots_msgs::Team friendly_team_msg =
-            Util::ROSMessages::convertTeamToROSMessage(friendly_team);
-        world_msg.friendly_team = friendly_team_msg;
-
-        Team enemy_team = backend.getFilteredEnemyTeamData(latest_detections);
-        thunderbots_msgs::Team enemy_team_msg =
-            Util::ROSMessages::convertTeamToROSMessage(enemy_team);
-        world_msg.enemy_team = enemy_team_msg;
+    // We invert the field side if we explicitly choose to override the values provided by
+    // refbox. The 'defending_positive_side' parameter dictates the side we are defending
+    // if we are overriding the value
+    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
+        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+    {
+        world_msg = Util::ROSMessages::invertMsgFieldSide(world_msg);
     }
 
     world_publisher.publish(world_msg);

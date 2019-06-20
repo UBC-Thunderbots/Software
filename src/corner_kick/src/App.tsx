@@ -5,11 +5,12 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
-import { Portal, PortalLocation } from './components/Portal';
-import { Logger } from './containers/Logger';
 import { Visualizer } from './pages/Visualizer';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
+
+import { Logo } from './components/Logo';
+import { Portal, PortalLocation } from './components/Portal';
 
 const store = createStore();
 
@@ -20,10 +21,10 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
-            <Visualizer />
-            <Portal portalLocation={PortalLocation.CONSOLE}>
-                <Logger />
+            <Portal portalLocation={PortalLocation.SIDEBAR_TITLE}>
+                <Logo />
             </Portal>
+            <Visualizer />
         </Theme>
     </Provider>
 );

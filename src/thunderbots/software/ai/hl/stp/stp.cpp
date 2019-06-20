@@ -7,29 +7,64 @@
 #include <exception>
 #include <random>
 
+#include "ai/ai.h"
 #include "ai/hl/stp/play/play.h"
+#include "ai/hl/stp/play/stop_play.h"
 #include "ai/hl/stp/tactic/tactic.h"
-#include "ai/intent/move_intent.h"
+#include "ai/intent/stop_intent.h"
 #include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 
 STP::STP(long random_seed) : random_number_generator(random_seed) {}
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
+    previous_override_play = override_play;
+    override_play          = Util::DynamicParameters::AI::override_ai_play.value();
+    bool override_play_value_changed = previous_override_play != override_play;
+
+    previous_override_play_name = override_play_name;
+    override_play_name          = Util::DynamicParameters::AI::current_ai_play.value();
+    bool override_play_name_value_changed =
+        previous_override_play_name != override_play_name;
+
+    auto all_play_names = PlayFactory::getRegisteredPlayNames();
+
     // Assign a new play if we don't currently have a play assigned, the current play's
     // invariant no longer holds, or the current play is done
-    if (!current_play || !current_play->invariantHolds(world) || current_play->done())
+    if (!current_play || !current_play->invariantHolds(world) || current_play->done() ||
+        override_play_name_value_changed || override_play_value_changed)
     {
-        try
+        if (override_play)
         {
-            current_play = calculateNewPlay(world);
+            if (std::find(all_play_names.begin(), all_play_names.end(),
+                          override_play_name) != all_play_names.end())
+            {
+                current_play = PlayFactory::createPlay(override_play_name);
+            }
+            else
+            {
+                LOG(WARNING) << "Error: The Play \"" << override_play_name
+                             << "\" specified in the override is not valid." << std::endl;
+                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
+                             << std::endl;
+                current_play = PlayFactory::createPlay(StopPlay::name);
+            }
         }
-        catch (const std::runtime_error& e)
+        else
         {
-            LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
-                         << std::endl;
-            // TODO: Set current_play to a reasonable default, like our Stop play
-            // https://github.com/UBC-Thunderbots/Software/issues/410
+            try
+            {
+                current_play = calculateNewPlay(world);
+            }
+            catch (const std::runtime_error& e)
+            {
+                LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
+                             << std::endl;
+                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
+                             << std::endl;
+                current_play = PlayFactory::createPlay(StopPlay::name);
+            }
         }
     }
 
@@ -46,9 +81,20 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
         {
             // Get the Intent the tactic wants to run
             auto intent = tactic->getNextIntent();
-            if (intent)
+
+            // If the tactic is not done and a valid intent was returned, the intent will
+            // be run by the robot. Otherwise, the robot will default to running a
+            // StopIntent so it doesn't do anything crazy.
+            if (intent && !tactic->done())
             {
                 intents.emplace_back(std::move(intent));
+            }
+            else if (tactic->getAssignedRobot())
+            {
+                // If the assigned tactic is done, we send the robot a StopIntent so it
+                // doesn't do anything crazy until it starts running a new Tactic
+                intents.emplace_back(std::make_unique<StopIntent>(
+                    tactic->getAssignedRobot()->id(), false, 0));
             }
         }
     }
@@ -174,7 +220,7 @@ PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
     info.play_type = "Unknown";
-    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "None";
+    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : AI::NO_PLAY_NAME;
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report the
     // tactics in order or robot id. This makes it much easier to read if tactics or

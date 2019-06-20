@@ -2,7 +2,7 @@
  * This file contains ROS methods to get and set values in the ROS Param Server
  */
 
-import { Message, Ros, Service, ServiceRequest, Topic } from 'roslib';
+import { Message, Ros, Service, ServiceRequest, Topic, Param } from 'roslib';
 
 const ros: Ros = new Ros({});
 
@@ -15,12 +15,14 @@ const ros: Ros = new Ros({});
  * @param url - The WebSocket URL for Rosbridge
  * @param timeout - The set time before the promise is rejected
  */
-export const connect = (url = 'ws://localhost:9090', timeout = 100) => {
+export const connect = (url = 'ws://localhost:9090', timeout = 5000) => {
     return new Promise((resolve, reject) => {
         ros.connect(url);
 
         ros.on('connection', () => resolve());
-        ros.on('error', () => reject('Cannot connect'));
+        ros.on('error', (error) => {
+            reject(error);
+        });
 
         // We reject if the timeout has elapsed
         setTimeout(() => reject(), timeout);
@@ -77,6 +79,26 @@ export const unsubscribeToROSTopic = (
 };
 
 /**
+ * Retrieves a parameter from ROS, based on the key
+ * @param key - The parameter key we want to retreive the value from
+ * @param timeout - The time before the promise is rejected
+ */
+export const getParam = (key: string, timeout = 5000) => {
+    return new Promise((resolve, reject) => {
+        const param = new Param({
+            ros,
+            name: key,
+        });
+
+        param.get((value) => {
+            resolve(value);
+        });
+
+        setTimeout(() => reject(), timeout);
+    });
+};
+
+/**
  * Update ROS Param server by sending request to service
  * @param name - The name of the service
  * @param serviceType - The service type of request
@@ -87,7 +109,7 @@ export const sendRequestToService = (
     name: string,
     serviceType: string,
     requestFormat: any,
-    timeout = 100,
+    timeout = 5000,
 ) => {
     return new Promise((resolve, reject) => {
         const service = new Service({

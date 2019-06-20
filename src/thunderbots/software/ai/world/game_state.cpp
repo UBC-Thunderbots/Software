@@ -201,22 +201,22 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = false;
             break;
         case RefboxGameState::DIRECT_FREE_US:
-            state          = SETUP;
+            state          = PLAYING;
             restart_reason = DIRECT;
             our_restart    = true;
             break;
         case RefboxGameState::DIRECT_FREE_THEM:
-            state          = SETUP;
+            state          = PLAYING;
             restart_reason = DIRECT;
             our_restart    = false;
             break;
         case RefboxGameState::INDIRECT_FREE_US:
-            state          = SETUP;
+            state          = PLAYING;
             restart_reason = INDIRECT;
             our_restart    = true;
             break;
         case RefboxGameState::INDIRECT_FREE_THEM:
-            state          = SETUP;
+            state          = PLAYING;
             restart_reason = INDIRECT;
             our_restart    = false;
             break;

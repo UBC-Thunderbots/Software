@@ -15,7 +15,8 @@ Backend::Backend()
           Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
       enemy_team_state(Duration::fromMilliseconds(
           Util::Constants::ROBOT_DEBOUNCE_DURATION_MILLISECONDS)),
-      ball_filter(),
+      ball_filter(BallFilter::DEFAULT_MIN_BUFFER_SIZE,
+                  BallFilter::DEFAULT_MAX_BUFFER_SIZE),
       friendly_team_filter(),
       enemy_team_filter()
 {
@@ -128,14 +129,17 @@ Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detecti
             SSLBallDetection ball_detection;
             ball_detection.position =
                 Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
-            ball_detection.confidence = ball.confidence();
-            ball_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
+            ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
             ball_detections.push_back(ball_detection);
         }
     }
 
-    Ball updated_ball_state = ball_filter.getFilteredData(ball_state, ball_detections);
-    ball_state              = updated_ball_state;
+    std::optional<Ball> new_ball_state =
+        ball_filter.getFilteredData(ball_detections, field_state);
+    if (new_ball_state)
+    {
+        ball_state = *new_ball_state;
+    }
 
     return ball_state;
 }
