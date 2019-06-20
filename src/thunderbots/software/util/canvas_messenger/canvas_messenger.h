@@ -228,6 +228,8 @@ namespace Util
          */
         void drawRobot(Robot robot, Color color);
 
+        void drawRobotPath(std::vector<Point> path_points);
+
        private:
         /**
          * Union used to convert a int16_t into two uint8_t

@@ -1,6 +1,7 @@
 #include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 #include "ai/navigator/util.h"
+#include "util/canvas_messenger/canvas_messenger.h"
 
 std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
@@ -97,9 +98,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             false, false);
         current_primitive = std::move(move);
 
-
-        double calculateTransitionSpeedBetweenSegments(
-            const Point &p1, const Point &p2, const Point &p3, double final_speed);
+        Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
     }
     else
     {
