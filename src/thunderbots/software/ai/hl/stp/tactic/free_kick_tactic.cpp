@@ -33,25 +33,24 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     KickAction kick_action = KickAction();
     Point target = world.field().enemyGoal();
 
-    // Get best shot pair
-    auto best_shot = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), *robot);
+        // Get best shot, if any
+        auto best_shot = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), *robot);
 
-    if (best_shot)
-    {
-
-        target = std::get<0>(*best_shot);
-        
-    }
-    else
-    {
-        // No shot found, shoot at enemy and get deflection towards goal (hopefully)
-        target = Evaluation::deflect_off_enemy_target(world);
-    }
+        if (best_shot)
+        {
+            target = std::get<0>(*best_shot);
+        }
+        else
+        {
+            // No shot found, shoot at enemy and get deflection towards goal (hopefully)
+            target = Evaluation::deflect_off_enemy_target(world);
+        }
 
     do
     {
-        
         yield(kick_action.updateStateAndGetNextIntent(*robot, world.ball(), world.ball().position(), 
                 target, BALL_MAX_SPEED_METERS_PER_SECOND));
-    } while (!kick_action.done());
+
+        // Temporary done condition
+    } while (world.ball().velocity().len() < 2.0 );
 }

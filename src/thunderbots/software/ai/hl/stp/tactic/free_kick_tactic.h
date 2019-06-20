@@ -5,21 +5,32 @@
 /**
  * This tactic is used when performing a free kick.
  * 
+ * For now, it attempts to find a shot towards the enemy goal;
+ * if none are found, it will shoot at an enemy robot to get a deflection. 
  */
 
 class FreeKickTactic : public Tactic
 {
     public:
+
+        /**
+         * Constructs new FreeKickTactic from World
+         */
         explicit FreeKickTactic(const World& world, bool loop_forever); 
 
         std::string getName() const override;
 
+        /**
+         * Updates the parameters for this tactic
+         *
+         * @param world The current state of the world
+         */
         void updateParams(const World& updated_world);
 
         
         /**
          * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-         * closer to the block destination
+         * closer to the ball
          *
          * @param robot The robot to evaluate the cost for
          * @param world The state of the world with which to perform the evaluation
