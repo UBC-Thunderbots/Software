@@ -7,6 +7,7 @@
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
 #include "ai/world/game_state.h"
+#include "shared/constants.h"
 #include "util/parameter/dynamic_parameters.h"
 
 const std::string DefensePlay::name = "Defense Play";
