@@ -17,11 +17,14 @@ class ShadowEnemyTactic : public Tactic
      * @param field The field being played on
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
+     * @param ignore_goalie Whether or not to ignore the friendly goalie when calculating
+     * where to shadow the enemy
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
     explicit ShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                               const Team &enemy_team, bool loop_forever = false);
+                               const Team &enemy_team, bool ignore_goalie,
+                               bool loop_forever = false);
 
     std::string getName() const override;
 
@@ -71,4 +74,7 @@ class ShadowEnemyTactic : public Tactic
     double shadow_distance;
     // Whether or not we think the enemy team can pass the ball
     bool enemy_team_can_pass;
+    // Whether or not to ignore the friendly goalie when calculating the enemy's best shot
+    // to shadow
+    bool ignore_goalie;
 };

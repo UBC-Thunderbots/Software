@@ -3,6 +3,7 @@
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
@@ -31,20 +32,23 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
+    world.mutableFriendlyTeam().assignGoalie(2);
+
     // TODO: replcae the goalie placeholder with a real goalie
-    auto goalie_tactic = std::make_shared<MoveTactic>(true);
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     // TODO: Robot to try steal the ball from most threatening enemy
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true),
+                                            world.enemyTeam(), true, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true),
+                                            world.enemyTeam(), true, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true),
+                                            world.enemyTeam(), true, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true),
+                                            world.enemyTeam(), true, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true)};
+                                            world.enemyTeam(), true, true)};
 
     // TODO: replace with reasonable fallback tactics
     std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
@@ -62,8 +66,10 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
 
         goalie_tactic->updateParams(
-            world.field().friendlyGoal(),
-            (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+            enemy_threats.empty() ? std::nullopt
+                                  : std::make_optional(enemy_threats.at(0)));
+
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there any
         // extra friendly robots, have them perform a reasonable default defensive tactic

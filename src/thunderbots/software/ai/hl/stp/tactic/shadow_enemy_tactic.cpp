@@ -6,11 +6,13 @@
 #include "shadow_enemy_tactic.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                                     const Team &enemy_team, bool loop_forever)
+                                     const Team &enemy_team, bool ignore_goalie,
+                                     bool loop_forever)
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       shadow_distance(ROBOT_MAX_RADIUS_METERS * 3),
+      ignore_goalie(ignore_goalie),
       Tactic(loop_forever)
 {
 }
@@ -75,9 +77,14 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
         else
         {
+            std::vector<Robot> robots_to_ignore = {*robot};
+            if (ignore_goalie && friendly_team.goalie())
+            {
+                robots_to_ignore.emplace_back(*friendly_team.goalie());
+            }
             auto best_enemy_shot_opt = Evaluation::calcBestShotOnFriendlyGoal(
                 field, friendly_team, enemy_team, enemy_robot, ROBOT_MAX_RADIUS_METERS,
-                {*robot});
+                robots_to_ignore);
             Vector enemy_shot_vector = Vector(0, 0);
             if (best_enemy_shot_opt)
             {
