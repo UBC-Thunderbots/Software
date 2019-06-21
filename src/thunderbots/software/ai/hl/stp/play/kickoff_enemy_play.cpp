@@ -46,32 +46,33 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     //
     // Positions 1,2 are the most important, 3,4,5 are a fallback
     // if there aren't as many threats to shadow. Robots will be assigned
-    // to those positions in order of priority
+    // to those positions in order of priority. The 5 positions shown below
+    // are in the same order as in the defense_position vector.
     //
     // 		+--------------------+--------------------+
     // 		|                    |                    |
     // 		|                    |                    |
     // 		|                    |                    |
-    // 		+--+                 |  4            2 +--+
+    // 		+--+ 2            4  |                 +--+
     // 		|  |                 |                 |  |
     // 		|  |               +-+-+               |  |
-    // 		|  |               |   |             3 |  |
+    // 		|  | 3             |   |               |  |
     // 		|  |               +-+-+               |  |
     // 		|  |                 |                 |  |
-    // 		+--+                 |  5            1 +--+
+    // 		+--+ 1            5  |                 +--+
     // 		|                    |                    |
     // 		|                    |                    |
     // 		|                    |                    |
     // 		+--------------------+--------------------+
 
     std::vector<Point> defense_positions = {
-        Point(world.field().friendlyGoalpostNeg().x() + world.field().goalWidth() +
-                  2 * ROBOT_MAX_RADIUS_METERS,
+        Point(world.field().friendlyGoalpostNeg().x() +
+                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoalpostNeg().y()),
-        Point(world.field().friendlyGoalpostPos().x() + world.field().goalWidth() +
-                  2 * ROBOT_MAX_RADIUS_METERS,
+        Point(world.field().friendlyGoalpostPos().x() +
+                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoalpostPos().y()),
-        Point(world.field().friendlyGoal().x() + world.field().goalWidth() +
+        Point(world.field().friendlyGoal().x() + world.field().defenseAreaLength() +
                   2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoal().y()),
         Point(-(world.field().centreCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
