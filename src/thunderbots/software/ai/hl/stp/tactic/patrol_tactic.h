@@ -54,7 +54,9 @@ class PatrolTactic : public Tactic
     double at_patrol_point_tolerance;
     // The orientation the robot should have when it arrives at its destination
     Angle orientation_at_patrol_points;
-    // The final speed the robot will aim to have at each patrol point
+    // The final speed the robot will aim to have at each patrol point. Combined with the
+    // 'at_patrol_point_tolerance', this affect whether the robot will stop at each patrol
+    // point, or maintain speed and roughly drive through them
     double linear_speed_at_patrol_points;
     // The desired linear speed of the robot at each patrol point
     unsigned int patrol_point_index;
