@@ -6,7 +6,7 @@
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 
-#define GRID_DIVISION_IN_METERS (ROBOT_MAX_RADIUS_METERS)
+#define GRID_DIVISION_IN_METERS (ROBOT_MAX_RADIUS_METERS/2)
 
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
