@@ -228,7 +228,7 @@ target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${LIBUSB_1_LIBRARIES}
         )
 
-    file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
@@ -322,6 +322,10 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/util.cpp
             ai/navigator/util.cpp
             ai/navigator/util.h
+            ai/primitive/move_primitive.h
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/primitive.h
             geom/point.h)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
@@ -1034,7 +1038,7 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES})
-    
+
     catkin_add_gtest(network_input_test
             test/network_input/filter/ball_filter.cpp
             test/network_input/main.cpp
@@ -1085,7 +1089,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters are working
+    # The test node that verifies the dynamic_parameters are working
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp
             util/parameter/dynamic_parameters.cpp
@@ -1093,7 +1097,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters exist in the parameter server
+    # The test node that verifies the dynamic_parameters exist in the parameter server
     add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
             test/util/test_parameter_exists.cpp
             util/parameter/dynamic_parameters.cpp
