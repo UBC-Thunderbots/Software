@@ -33,9 +33,6 @@ int count;
 // about the World
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
-    microseconds ms_start =
-        duration_cast<microseconds>(system_clock::now().time_since_epoch());
-    //    LOG(INFO) << "START: " << ms.count();
     if (!Util::DynamicParameters::AI::run_ai.value())
     {
         return;
@@ -66,10 +63,6 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     canvas_messenger->drawWorld(world);
 
     count++;
-
-    microseconds ms_end =
-        duration_cast<microseconds>(system_clock::now().time_since_epoch());
-    LOG(INFO) << "Tick time: " << (ms_end - ms_start).count() / 1000.0;
 }
 
 int main(int argc, char **argv)
