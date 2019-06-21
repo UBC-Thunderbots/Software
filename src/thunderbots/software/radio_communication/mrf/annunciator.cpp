@@ -439,7 +439,7 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
         robot_status_states[bot].bot_mutex.lock();
 
         // Check if robot is dead, publish old status update with dead message if so
-        if (difftime(time(nullptr), robot_status_states[bot].last_status_update) <
+        if (difftime(time(nullptr), robot_status_states[bot].last_status_update) >
             ROBOT_DEAD_TIME)
         {
             thunderbots_msgs::RobotStatus new_status =
