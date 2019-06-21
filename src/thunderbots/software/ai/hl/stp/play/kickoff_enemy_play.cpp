@@ -16,15 +16,13 @@ std::string KickoffEnemyPlay::getName() const
 
 bool KickoffEnemyPlay::isApplicable(const World &world) const
 {
-    //return (world.isReadyState() | world.isSetupState()) &&
-           //world.gameState().isTheirKickoff();
-return true;
+    return (world.gameState().isReadyState() | world.gameState().isSetupState()) &&
+           world.gameState().isTheirKickoff();
 }
 
 bool KickoffEnemyPlay::invariantHolds(const World &world) const
 {
-    //return !world.isPlaying();
-return true;
+    return !world.gameState().isPlaying();
 }
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
