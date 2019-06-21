@@ -4,6 +4,7 @@
 #include "ai/hl/stp/action/chip_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "ai/hl/stp/evaluation/deflect_off_enemy_target.h"
+#include "ai/hl/stp/evaluation/indirect_chip.h"
 
 #include "shared/constants.h"
 
@@ -33,24 +34,30 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     KickAction kick_action = KickAction();
     Point target = world.field().enemyGoal();
 
+    do
+    {
         // Get best shot, if any
         auto best_shot = Evaluation::calcBestShotOnEnemyGoal(world.field(), world.friendlyTeam(), world.enemyTeam(), *robot);
+
+        auto chip_and_chase_shot = Evaluation::findTargetPointForIndirectChipAndChase(world);
 
         if (best_shot)
         {
             target = std::get<0>(*best_shot);
+        }
+        else if (chip_and_chase_shot)
+        {
+            // Chip and Chase; TODO
+
         }
         else
         {
             // No shot found, shoot at enemy and get deflection towards goal (hopefully)
             target = Evaluation::deflect_off_enemy_target(world);
         }
-
-    do
-    {
         yield(kick_action.updateStateAndGetNextIntent(*robot, world.ball(), world.ball().position(), 
                 target, BALL_MAX_SPEED_METERS_PER_SECOND));
 
         // Temporary done condition
-    } while (world.ball().velocity().len() < 2.0 );
+    } while (world.ball().velocity().len() < 2.0);
 }

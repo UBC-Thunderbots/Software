@@ -3,7 +3,8 @@
 #include "ai/hl/stp/tactic/tactic.h"
 
 /**
- * This tactic is used when performing a free kick.
+ * This tactic is used when performing a free kick, and no pass is available.
+ * It is also assumed that the ball is stationary, in preparation for a set piece.
  * 
  * For now, it attempts to find a shot towards the enemy goal;
  * if none are found, it will shoot at an enemy robot to get a deflection. 
