@@ -59,5 +59,5 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 target, BALL_MAX_SPEED_METERS_PER_SECOND));
 
         // Temporary done condition
-    } while (world.ball().velocity().len() < 2.0);
+    } while (world.ball().velocity().len() < 2.0 );
 }

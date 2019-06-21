@@ -605,8 +605,11 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
+            ai/hl/stp/evaluation/indirect_chip.cpp
+            ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
+            ai/hl/stp/tactic/free_kick_tactic.cpp
             ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/passer_tactic.cpp
             ai/hl/stp/tactic/receiver_tactic.cpp
