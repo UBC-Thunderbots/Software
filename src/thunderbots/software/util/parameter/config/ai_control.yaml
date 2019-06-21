@@ -19,6 +19,7 @@ AI:
         - "Example Play"
         - "Stop Play"
         - "Defense Play"
+        - "KickoffEnemy Play"
     description: >-
         Specifies the ai play that should be in use
   refbox:

@@ -23,7 +23,6 @@ const GlobalStylesheet = createGlobalStyle`
         overflow: hidden;
         user-select: none;
 
-        background: ${(props) => props.theme.colors.bg};
         color: ${(props) => props.theme.colors.fg};
 
         font-family: 'Open Sans', sans-serif;
