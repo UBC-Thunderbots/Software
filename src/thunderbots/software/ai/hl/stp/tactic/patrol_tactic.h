@@ -13,21 +13,24 @@ class PatrolTactic : public Tactic
      * Creates a new PatrolTactic
      *
      * @param points The sequence of points to patrol, in order
-     * @param dist_from_points How from from the current point in the patrol sequence the
-     * robot must be before it moves on to the next point
+     * @param at_patrol_point_tolerance How from from the current point in the
+     * patrol sequence the robot must be before it moves on to the next point
+     * @param linear_speed_at_patrol_points The desired linear speed
+     * of the robot at each patrol point
      */
-    explicit PatrolTactic(const std::vector<Point>& points, double dist_from_points);
+    explicit PatrolTactic(const std::vector<Point>& points,
+                          double at_patrol_point_tolerance,
+                          double linear_speed_at_patrol_points);
 
     std::string getName() const override;
 
     /**
      * Updates the parameters for this PatrolTactic.
      *
-     * @param orientation The orientation the robot should have while patrolling
-     * @param final_speed The final speed the robot should aim to have at each patrol
-     * point
+     * @param orientation_at_patrol_points The orientation the robot
+     * should have while patrolling
      */
-    void updateParams(Angle orientation, double final_speed);
+    void updateParams(Angle orientation_at_patrol_points);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
@@ -47,12 +50,12 @@ class PatrolTactic : public Tactic
     // Tactic parameters
     // The list of points the robot will patrol, in order
     std::vector<Point> patrol_points;
-    // How far the robot must be from each point before moving on to the next one
-    double dist_from_points;
+    // How far the robot must be from each patrol point before moving on to the next one
+    double at_patrol_point_tolerance;
     // The orientation the robot should have when it arrives at its destination
-    Angle orientation;
+    Angle orientation_at_patrol_points;
     // The final speed the robot will aim to have at each patrol point
-    double final_speed;
-    // The index of the patrol point currently being moved to
+    double linear_speed_at_patrol_points;
+    // The desired linear speed of the robot at each patrol point
     unsigned int patrol_point_index;
 };

@@ -4,12 +4,14 @@
 #include "ai/hl/stp/action/stop_action.h"
 #include "util/logger/init.h"
 
-PatrolTactic::PatrolTactic(const std::vector<Point> &points, double dist_from_points)
+PatrolTactic::PatrolTactic(const std::vector<Point> &points,
+                           double at_patrol_point_tolerance,
+                           double linear_speed_at_patrol_points)
     : Tactic(true),
       patrol_points(points),
-      dist_from_points(dist_from_points),
-      orientation(Angle::zero()),
-      final_speed(0),
+      at_patrol_point_tolerance(at_patrol_point_tolerance),
+      orientation_at_patrol_points(Angle::zero()),
+      linear_speed_at_patrol_points(linear_speed_at_patrol_points),
       patrol_point_index(0)
 {
 }
@@ -19,11 +21,10 @@ std::string PatrolTactic::getName() const
     return "Patrol Tactic";
 }
 
-void PatrolTactic::updateParams(Angle orientation, double final_speed)
+void PatrolTactic::updateParams(Angle orientation_at_patrol_points)
 {
     // Update the parameters stored by this Tactic
-    this->orientation = orientation;
-    this->final_speed = final_speed;
+    this->orientation_at_patrol_points = orientation_at_patrol_points;
 }
 
 double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -66,16 +67,18 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         } while (true);
     }
 
-    MoveAction move_action = MoveAction(this->dist_from_points);
+    MoveAction move_action = MoveAction(this->at_patrol_point_tolerance);
     do
     {
         auto next_intent = move_action.updateStateAndGetNextIntent(
-            *robot, patrol_points.at(patrol_point_index), orientation, final_speed);
+            *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
+            linear_speed_at_patrol_points);
         if (!next_intent || move_action.done())
         {
             patrol_point_index = (patrol_point_index + 1) % patrol_points.size();
             next_intent        = move_action.updateStateAndGetNextIntent(
-                *robot, patrol_points.at(patrol_point_index), orientation, final_speed);
+                *robot, patrol_points.at(patrol_point_index),
+                orientation_at_patrol_points, linear_speed_at_patrol_points);
         }
 
         yield(std::move(next_intent));
