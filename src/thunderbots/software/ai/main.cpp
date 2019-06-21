@@ -1,5 +1,7 @@
 #include <ros/ros.h>
 
+#include <chrono>
+
 #include "ai/ai.h"
 #include "thunderbots_msgs/PlayInfo.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
@@ -11,7 +13,6 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
-#include <chrono>
 using namespace std::chrono;
 
 // Member variables we need to maintain state
@@ -32,10 +33,9 @@ int count;
 // about the World
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
-    microseconds ms_start = duration_cast< microseconds >(
-            system_clock::now().time_since_epoch()
-    );
-//    LOG(INFO) << "START: " << ms.count();
+    microseconds ms_start =
+        duration_cast<microseconds>(system_clock::now().time_since_epoch());
+    //    LOG(INFO) << "START: " << ms.count();
     if (!Util::DynamicParameters::AI::run_ai.value())
     {
         return;
@@ -57,19 +57,18 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 
     // Publish play info so we can display it in the visualizer
     auto play_info_msg =
-            Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
+        Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
     play_info_publisher.publish(play_info_msg);
 
     // Draw the world
     std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
-            Util::CanvasMessenger::getInstance();
+        Util::CanvasMessenger::getInstance();
     canvas_messenger->drawWorld(world);
 
     count++;
 
-    microseconds ms_end = duration_cast< microseconds >(
-            system_clock::now().time_since_epoch()
-    );
+    microseconds ms_end =
+        duration_cast<microseconds>(system_clock::now().time_since_epoch());
     LOG(INFO) << "Tick time: " << (ms_end - ms_start).count() / 1000.0;
 }
 

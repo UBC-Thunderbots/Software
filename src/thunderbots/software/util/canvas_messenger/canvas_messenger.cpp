@@ -256,8 +256,10 @@ void CanvasMessenger::drawRobot(Robot robot, CanvasMessenger::Color color)
     drawRectangle(Layer::ROBOTS, robot_rectangle, robot.orientation(), color);
 }
 
-void CanvasMessenger::drawRobotPath(std::vector<Point> path_points) {
-    for(int i = 0; i < path_points.size() - 1; i++) {
+void CanvasMessenger::drawRobotPath(std::vector<Point> path_points)
+{
+    for (int i = 0; i < path_points.size() - 1; i++)
+    {
         Point p1 = path_points[i];
         Point p2 = path_points[i + 1];
         drawLine(Layer::ROBOTS, p1, p2, 0.05, FRIENDLY_TEAM_COLOR);

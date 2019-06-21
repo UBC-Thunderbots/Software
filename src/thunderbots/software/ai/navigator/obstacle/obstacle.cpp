@@ -52,6 +52,7 @@ Obstacle Obstacle::createRobotObstacleWithBufferParams(
         enable_velocity_cushion && velocity_cushion_vector.len() > radius_cushion);
 }
 
+// TODO: using this for more then robots now, should probably rename
 // This is a helper function to factor out some of the logic from the other functions
 Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
     Point position, double radius_cushion, Vector velocity_cushion_vector,
@@ -104,4 +105,17 @@ double Obstacle::getRadiusCushionForHexagon(double radius)
     // radius so that two robots can pass by each other this is accomplished by doubling
     // the radius and multiplying by 2/sqrt(3)
     return radius * 4.0 / std::sqrt(3);
+}
+
+Obstacle Obstacle::createBallObstacle(const Ball& ball,
+                                      double additional_radius_cushion_buffer,
+                                      double additional_velocity_cushion_buffer)
+{
+    // TODO: handle `additional_velocity_cushion_buffer` here
+
+    double radius_cushion = getRadiusCushionForHexagon(BALL_MAX_RADIUS_METERS +
+                                                       additional_radius_cushion_buffer);
+
+    return createRobotObstacleFromPositionAndRadiusAndVelocity(
+        ball.position(), radius_cushion, ball.velocity(), false);
 }

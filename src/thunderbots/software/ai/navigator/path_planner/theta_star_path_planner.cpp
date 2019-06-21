@@ -8,7 +8,7 @@
 
 ThetaStarPathPlanner::ThetaStarPathPlanner(Field field, Ball ball,
                                            const std::vector<Obstacle> &obstacles)
-    : field_(field), ball_(ball), obstacles_(obstacles)
+    : field_(field), obstacles_(obstacles)
 {
     numRows = (int)(field_.totalLength() / GRID_DIVISION_IN_METERS);
     numCols = (int)(field_.totalWidth() / GRID_DIVISION_IN_METERS);

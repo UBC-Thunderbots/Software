@@ -185,7 +185,6 @@ class ThetaStarPathPlanner : public PathPlanner
     CellCoordinate convertPointToCell(Point p);
 
     Field field_;
-    Ball ball_;
     std::vector<Obstacle> obstacles_;
     int numRows;
     int numCols;
