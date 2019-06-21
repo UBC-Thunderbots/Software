@@ -16,12 +16,12 @@ std::string KickoffEnemyPlay::getName() const
 
 bool KickoffEnemyPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isTheirKickoff();
+    return true;
 }
 
 bool KickoffEnemyPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isTheirKickoff();
+    return true;
 }
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -29,56 +29,86 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // TODO: This needs to be a goalie tactic
     auto lone_goalie_tactic_0 = std::make_shared<MoveTactic>(true);
 
-    // these tactics will be assigned
-    auto shadow_kickoff_tactic_1 =
-        std::make_shared<ShadowKickoffTactic>(world.field(), true);
-    auto shadow_kickoff_tactic_2 =
-        std::make_shared<ShadowKickoffTactic>(world.field(), true);
-    auto shadow_kickoff_tactic_3 =
-        std::make_shared<ShadowKickoffTactic>(world.field(), true);
+    // 3 robots assigned to shadow enemies. Other robots will be assigned positions
+    // on the feild to be evenly spread out
+    std::vector<std::shared_ptr<ShadowKickoffTactic>> shadow_kickoff_tactics = {
+        std::make_shared<ShadowKickoffTactic>(world.field(), true),
+        std::make_shared<ShadowKickoffTactic>(world.field(), true),
+        std::make_shared<ShadowKickoffTactic>(world.field(), true),
+    };
 
-    // move tactic for robots to defend net
-    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    // these positions are picked according to the following slide
+    // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
+    // since we only have 6 robots at the maximum, 3 robots will shadow threats
+    // up front, 1 robot is dedicated as the goalie, and the other 2 robots will defend
+    // either post (as show in the image, minus the 7th robot)
+    //
+    // The 3 positions following the first 2 are fallbacks if shadowing
+    // is not required as there arent any enough threats to shadow. 
+    // Robots will be assigned to those positions in order of priority
+    std::vector<std::shared_ptr<Point>> defense_positions = {
+        // TODO Update defense points
+        std::make_shared<Point>(-2,0),
+        std::make_shared<Point>(-2,1),
+        std::make_shared<Point>(-2,2),
+        std::make_shared<Point>(-2,3),
+        std::make_shared<Point>(-2,4),
+        //std::make_shared<Point>(world.field().friendlyGoal().x() + world.field().goalWidth(),
+                //world.field().friendlyGoal().y()),
+        //std::make_shared<Point>(world.field().friendlyGoalpostPos()+Point(2,2)),
+        //std::make_shared<Point>(world.field().friendlyGoalpostNeg()+Point(2,2)),
+    };
+
+    // these move tactics will be used to go to those positions
+    std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
+        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true),
+        std::make_shared<MoveTactic>(true)
+    };
 
     do
     {
         // TODO: Replace placeholder tactic with goalie tactic
-        lone_goalie_tactic_0->updateParams(Point(4, 0), Angle::half(), 0);
+        lone_goalie_tactic_0->updateParams(
+                world.field().friendlyGoal(),
+                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
 
-        // Assign a robot to deal with the enemy robot doing the immediate kicking
-        auto robot = Evaluation::getRobotWithEffectiveBallPossession(
-            world.enemyTeam(), world.ball(), world.field());
+        std::vector<std::shared_ptr<Tactic>> result = {lone_goalie_tactic_0};
 
-        if (robot)
-        {
-            shadow_kickoff_tactic_1->updateParams((*robot).position());
-        }
-
-        // the next two most threatening robots need to be blocked
+        // 5 robots remaining, assign up to 3 to shadow top 3 threats if possible
         auto enemy_threats = Evaluation::getAllEnemyThreats(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
+                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
         Evaluation::sortThreatsInDecreasingOrder(enemy_threats);
 
-        // threat 0 is always the ball with position, threat 1 is always the goalie, so
-        // threats 2 and 3 need to be shadowed during kickoff
-        shadow_kickoff_tactic_2->updateParams(enemy_threats[2].robot.position());
-        shadow_kickoff_tactic_3->updateParams(enemy_threats[3].robot.position());
+        // keeps track of the next defense position to assign
+        int defense_position_index = 0;
 
-        auto goal_post_pos = world.field().enemyGoalpostPos();
-        auto goal_post_neg = world.field().enemyGoalpostNeg();
-        auto goal_width    = world.field().goalWidth();
+        for (int i = 0; i < 3; ++i){
+            if (i < enemy_threats.size()){
+                shadow_kickoff_tactics.at(i)->updateParams(enemy_threats.at(i).robot.position());
+                result.emplace_back(shadow_kickoff_tactics.at(i));
+            }
+            else{
+                move_tactics.at(defense_position_index)->updateParams(
+                        *defense_positions.at(defense_position_index), Angle::half(), 0);
+                result.emplace_back(move_tactics.at(defense_position_index));
+                defense_position_index++;
+            }
+        }
 
-        // remaining robots can stay near the goalie, defending each post
-        move_tactic_4->updateParams(
-            Point(goal_post_pos.x() - goal_width, goal_post_pos.y()), Angle::half(), 0);
+        // assign the remaining robots to the remaining move tactics. If 3 robots were properly
+        // assigned to the top 3 threats, then only the first 2 defense positions will be assigned
+        for (defense_position_index; defense_position_index < defense_positions.size(); defense_position_index++){
+            move_tactics.at(defense_position_index)->updateParams(
+                    *defense_positions.at(defense_position_index), Angle::half(), 0);
+            result.emplace_back(move_tactics.at(defense_position_index));
 
-        move_tactic_5->updateParams(
-            Point(goal_post_neg.x() - goal_width, goal_post_neg.y()), Angle::half(), 0);
+        }
 
         // yield the Tactics this Play wants to run, in order of priority
-        yield({lone_goalie_tactic_0, shadow_kickoff_tactic_1, shadow_kickoff_tactic_2,
-               shadow_kickoff_tactic_3, move_tactic_4, move_tactic_5});
+        yield(result);
     } while (true);
 }
 

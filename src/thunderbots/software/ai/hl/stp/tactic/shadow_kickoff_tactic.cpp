@@ -37,25 +37,25 @@ void ShadowKickoffTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         yield(move_action.updateStateAndGetNextIntent(
-            *robot, this->calculateShadowPoint(field, enemy_robot_position),
-            Angle::half(), 0));
+                    *robot, this->calculateShadowPoint(field, enemy_robot_position),
+                    Angle::half(), 0));
     } while (!move_action.done());
 }
 
 Point ShadowKickoffTactic::calculateShadowPoint(const Field& field,
-                                                const Point& enemy_robot_position)
+        const Point& enemy_robot_position)
 {
     Point destination;
 
     if (std::fabs(enemy_robot_position.y()) <
-        (field.centreCircleRadius() + 4 * ROBOT_MAX_RADIUS_METERS))
+            (field.centreCircleRadius() + 4 * ROBOT_MAX_RADIUS_METERS))
     {
-        destination = Point(field.centreCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS,
-                            enemy_robot_position.y());
+        destination = Point(-(field.centreCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+                enemy_robot_position.y());
     }
     else
     {
-        destination = Point(2 * ROBOT_MAX_RADIUS_METERS, enemy_robot_position.y());
+        destination = Point(-2 * ROBOT_MAX_RADIUS_METERS, enemy_robot_position.y());
     }
 
     return destination;
