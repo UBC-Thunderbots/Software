@@ -39,7 +39,27 @@ bool CornerKickPlay::invariantHolds(const World &world) const
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-    // TODO: Rough description of what this function does (stages, tactics, etc.) here
+    /**
+     * There are three main stages to this Play:
+     * NOTE: "pass" below can mean a pass where the robot receives the ball and dribbles
+     *       it, or when we try to pass but instantly kick it (a "one-touch" kick)
+     * 1. Align the passer to the ball
+     *  - In this stage we roughly line up the passer robot to be behind the ball, ready
+     *    to take the kick
+     *  - We also run two cherry-pickers, which move around the field in specified areas
+     *    and try and find good points for the passer to pass to
+     *  - We also run two "bait" robots that move to static positions to draw enemies
+     *    away from where we're likely to pass to
+     * 2. Decide on a pass:
+     *  - During this stage we start by looking for the best pass possible, but over
+     *    time decrease the minimum "quality" of pass we'll accept so we're eventually
+     *    forced to at least accept one
+     *  - During this time we continue to run the cherry pick and bait robots
+     * 3. Execute the pass:
+     *  - Once we've decided on a pass, we simply yield a passer/receiver and execute
+     *    the pass
+     *
+     */
 
     // Figure out if we're taking the kick from the +y or -y corner
     bool kick_from_pos_corner = world.ball().position().y() > 0;
@@ -170,8 +190,6 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     pass_generator.~PassGenerator();
     cherry_pick_tactic_pos_y->~CherryPickTactic();
     cherry_pick_tactic_neg_y->~CherryPickTactic();
-
-    // TODO: send the remaining robots forward in the hope we'll make opportunities
 
     // Perform the pass and wait until the receiver is finished
     auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
