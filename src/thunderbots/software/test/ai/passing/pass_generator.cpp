@@ -77,41 +77,62 @@ class PassGeneratorTest : public testing::Test
 
 TEST_F(PassGeneratorTest, check_pass_converges)
 {
-    // Test that we can converge to a stable pass in a fairly simple scenario.
+    // Test that we can converge to a stable pass in a scenario where there is a
+    // fairly clear best pass.
     // It is difficult to update all the timestamps in the world that the pass generator
     // could use, so we don't, and hence this test does not really test convergence
     // of pass start time.
 
+    world.updateBallState(Ball(Point(2, 2), Vector(0, 0), Timestamp::fromSeconds(0)));
     Team friendly_team(Duration::fromSeconds(10));
     friendly_team.updateRobots({
-        Robot(3, {-1, -1}, {-0.5, 0}, Angle::zero(), AngularVelocity::zero(),
+        Robot(3, {1, 0}, {0.5, 0}, Angle::zero(), AngularVelocity::zero(),
               Timestamp::fromSeconds(0)),
     });
     world.updateFriendlyTeamState(friendly_team);
     Team enemy_team(Duration::fromSeconds(10));
-    enemy_team.updateRobots({Robot(0, {0, 0}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(1, {-2, -2}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(2, {3, -2}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0)),
-                             Robot(3, {-2.5, 4}, {-0.5, 0}, Angle::zero(),
-                                   AngularVelocity::zero(), Timestamp::fromSeconds(0))});
+    enemy_team.updateRobots({
+        Robot(0, world.field().enemyGoalpostNeg(), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(1, world.field().enemyGoalpostNeg() - Vector(0.1, 0), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(2, world.field().enemyGoalpostNeg() - Vector(0.2, 0), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(3, world.field().enemyGoalpostPos(), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(4, world.field().enemyGoalpostPos() - Vector(0.1, 0), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(5, world.field().enemyGoalpostPos() - Vector(0.2, 0), {0, 0}, Angle::zero(),
+              AngularVelocity::zero(), Timestamp::fromSeconds(0)),
+        Robot(6, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(7, {-1, 0.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+        Robot(8, {-1, -0.5}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+              Timestamp::fromSeconds(0)),
+    });
     world.updateEnemyTeamState(enemy_team);
 
     pass_generator->setWorld(world);
+    pass_generator->setPasserPoint(world.ball().position());
 
     // Wait until the pass stops improving or 30 seconds, whichever comes first
-    waitForConvergence(pass_generator, 0.0001, 30);
+    waitForConvergence(pass_generator, 0.001, 30);
 
     // Find what pass we converged to
     auto [converged_pass, converged_score] = pass_generator->getBestPassSoFar();
+
+    std::cout << converged_score;
+    std::cout << converged_pass;
 
     // Check that we keep converging to the same pass
     for (int i = 0; i < 7; i++)
     {
         std::this_thread::sleep_for(0.5s);
         auto [pass, score] = pass_generator->getBestPassSoFar();
+
+        std::cout << score;
+        std::cout << pass;
 
         EXPECT_EQ(pass.passerPoint(), converged_pass.passerPoint());
         EXPECT_LE((converged_pass.receiverPoint() - pass.receiverPoint()).len(), 0.3);

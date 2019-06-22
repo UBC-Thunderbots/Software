@@ -221,6 +221,13 @@ void Field::updateTimestamp(Timestamp time_stamp)
     }
 }
 
+bool Field::pointInEntireField(const Point &p) const
+{
+    Rectangle entire_field = Rectangle(Point(-totalLength() / 2, -totalWidth() / 2),
+                                       Point(totalLength() / 2, totalWidth() / 2));
+    return entire_field.containsPoint(p);
+}
+
 bool Field::operator==(const Field &other) const
 {
     return this->field_width_ == other.field_width_ &&

@@ -11,6 +11,7 @@ import { IROSParam } from './rosParams';
 export interface IRootState {
     canvas: ICanvasState;
     thunderbots: IThunderbotsState;
+    rosParameters: IROSParamState;
     ros: IROSState;
 }
 

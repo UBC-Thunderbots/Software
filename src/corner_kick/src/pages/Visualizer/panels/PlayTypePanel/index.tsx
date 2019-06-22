@@ -4,7 +4,6 @@
 
 import { Box } from '@rebass/grid';
 import * as React from 'react';
-import { theme } from 'SRC/constants';
 
 interface IPlayTypeProps {
     playType: string;
@@ -19,15 +18,7 @@ export const PlayTypePanel = (props: IPlayTypeProps) => {
     const { playType, playName, tactics } = props;
 
     return (
-        <Box
-            width="100%"
-            py="16px"
-            px="16px"
-            style={{
-                borderTop: `1px solid ${theme.colors.border}`,
-                borderBottom: `1px solid ${theme.colors.border}`,
-            }}
-        >
+        <Box width="100%" py="8px" px="8px">
             <b>Play Type: </b>
             {playType}
             <br />

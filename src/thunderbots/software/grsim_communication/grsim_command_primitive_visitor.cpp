@@ -203,7 +203,8 @@ void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_prim
          : targetAngle -= Angle::ofDegrees(45));
 
     motion_controller_command = MotionController::PositionCommand(
-        move_spin_primitive.getDestination(), targetAngle, 0.0, 0.0, false, false);
+        move_spin_primitive.getDestination(), targetAngle,
+        move_spin_primitive.getFinalSpeed(), 0.0, false, false);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)

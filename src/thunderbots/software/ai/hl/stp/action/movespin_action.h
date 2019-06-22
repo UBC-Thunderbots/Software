@@ -32,13 +32,16 @@ class MoveSpinAction : public Action
      * @param destination The destination to move to (in global coordinates)
      * @param angular_velocity The how fast the robot should spin, in radians per second.
      * A positive value spins counterclockwise, and a negative value spins clockwise
+     * @param final_linear_speed The final speed that robot should have at the final
+     * destination
      *
      * @return A unique pointer to the Intent the MoveSpinAction wants to run. If the
      * MoveSpinAction is done, returns an empty/null pointer
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
                                                         Point destination,
-                                                        AngularVelocity angular_velocity);
+                                                        AngularVelocity angular_velocity,
+                                                        double final_linear_speed);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -46,5 +49,6 @@ class MoveSpinAction : public Action
     // Action parameters
     Point destination;
     AngularVelocity angular_velocity;
+    double final_linear_speed;
     double close_to_dest_threshold;
 };
