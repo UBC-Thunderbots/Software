@@ -213,6 +213,7 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
                                                                  const Point &destination)
 {
     bool blocked_dest = false;
+    bool blocked_src  = false;
     CellCoordinate src, dest;
 
     src  = convertPointToCell(start);
@@ -233,7 +234,8 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
     {
-        src = findClosestUnblockedCell(src);
+        src         = findClosestUnblockedCell(src);
+        blocked_src = true;
     }
 
     // The destination is blocked
@@ -392,9 +394,15 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     if (!blocked_dest)
     {
         // replace destination with actual destination
-        // Note that this isn't needed for start since we don't care about that
         path_points.pop_back();
         path_points.push_back(destination);
+    }
+
+    if (blocked_src)
+    {
+        // replace src with actual start
+        path_points.erase(path_points.begin());
+        path_points.insert(path_points.begin(), start);
     }
     return path_points;
 }

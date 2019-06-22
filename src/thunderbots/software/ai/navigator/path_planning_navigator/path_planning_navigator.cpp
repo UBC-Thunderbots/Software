@@ -61,6 +61,10 @@ double PathPlanningNavigator::place_holder_violation_func(const Point &input_poi
 
 void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 {
+    auto p      = std::make_unique<MovePrimitive>(move_intent);
+    Point start = this->world.friendlyTeam().getRobotById(p->getRobotId())->position();
+    Point dest  = p->getDestination();
+
     std::vector<Obstacle> obstacles = {};
 
     for (auto &robot : world.enemyTeam().getAllRobots())
@@ -83,31 +87,38 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     // TODO: should we be using velocity scaling here?
     obstacles.push_back(Obstacle::createBallObstacle(world.ball(), 0.06, 0));
 
-    auto p            = std::make_unique<MovePrimitive>(move_intent);
     auto path_planner = std::make_unique<ThetaStarPathPlanner>(
         this->world.field(), this->world.ball(), obstacles);
 
-    auto path_points = path_planner->findPath(
-        this->world.friendlyTeam().getRobotById(p->getRobotId())->position(),
-        p->getDestination());
+    auto path_points = path_planner->findPath(start, dest);
 
     if (path_points)
     {
-        auto next_point = (*path_points)[1];
-        auto move       = std::make_unique<MovePrimitive>(
-            p->getRobotId(), next_point, move_intent.getFinalAngle(),
-            calculateTransitionSpeedBetweenSegments((*path_points)[0], (*path_points)[1],
-                                                    (*path_points)[2], 0),
-            move_intent.isDribblerEnabled(), move_intent.isAutoKickEnabled());
-        current_primitive = std::move(move);
-
-        Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
+        if ((*path_points).size() > 2)
+        {
+            auto next_point = (*path_points)[1];
+            auto move       = std::make_unique<MovePrimitive>(
+                p->getRobotId(), next_point, move_intent.getFinalAngle(),
+                calculateTransitionSpeedBetweenSegments(
+                    (*path_points)[0], (*path_points)[1], (*path_points)[2], 0),
+                move_intent.isDribblerEnabled(), move_intent.isAutoKickEnabled());
+            current_primitive = std::move(move);
+            Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
+            return;
+        }
+        if ((*path_points).size() == 2)
+        {
+            auto next_point = (*path_points)[1];
+            auto move       = std::make_unique<MovePrimitive>(
+                p->getRobotId(), next_point, move_intent.getFinalAngle(), 0,
+                move_intent.isDribblerEnabled(), move_intent.isAutoKickEnabled());
+            current_primitive = std::move(move);
+            Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
+            return;
+        }
     }
-    else
-    {
-        auto stop         = std::make_unique<StopPrimitive>(p->getRobotId(), false);
-        current_primitive = std::move(stop);
-    }
+    auto stop         = std::make_unique<StopPrimitive>(p->getRobotId(), false);
+    current_primitive = std::move(stop);
 }
 
 void PathPlanningNavigator::visit(const MoveSpinIntent &move_spin_intent)
