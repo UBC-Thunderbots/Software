@@ -285,25 +285,23 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
 
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
-    bool to_beep = false;
-
+    if (!annunciator.beep_dongle.num_slots())
+    {
+        // Connect signal to beep dongle when annunciator requests it.
+        this->annunciator.beep_dongle.connect(
+            boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
+    }
     transfer.result();
 
     // Only handle if there are more than 2 bytes in the transfer.
     if (transfer.size() > 2)
     {
         unsigned int robot = transfer.data()[0];
-        to_beep            = annunciator.handle_robot_message(
-            robot, transfer.data() + 1, transfer.size() - 3,
-            transfer.data()[transfer.size() - 2], transfer.data()[transfer.size() - 1]);
+        annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
+                                         transfer.data()[transfer.size() - 2],
+                                         transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
-
-    // If there are new messages since the last update, beep.
-    if (to_beep)
-    {
-        beep(ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS);
-    }
 }
 
 void MRFDongle::handle_status(AsyncOperation<void> &)
@@ -406,6 +404,12 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     (*i).first->submit();
 
     // Update annunciator with detected bots for dead bot detection
+    if (!annunciator.beep_dongle.num_slots())
+    {
+        // Connect signal to beep dongle when annunciator requests it.
+        this->annunciator.beep_dongle.connect(
+            boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
+    }
     annunciator.update_vision_detections(robot_ids);
 };
 
