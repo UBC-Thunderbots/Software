@@ -47,26 +47,26 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
-    Vector enemy_defense_area_pos_y_x_offset(world.field().enemyDefenseArea().width(), 0);
-    Vector enemy_defense_area_neg_y_x_offset(world.field().enemyDefenseArea().width(), 0);
+    Vector pos_y_goalline_x_offset(world.field().enemyDefenseArea().width(), 0);
+    Vector neg_y_goalline_x_offset(world.field().enemyDefenseArea().width(), 0);
     if (kick_from_pos_corner)
     {
-        enemy_defense_area_pos_y_x_offset +=
+        pos_y_goalline_x_offset +=
             {world.field().enemyDefenseArea().width(), 0};
     }
     else
     {
         // kick from neg corner
-        enemy_defense_area_neg_y_x_offset +=
+        neg_y_goalline_x_offset +=
             {world.field().enemyDefenseArea().width(), 0};
     }
     Vector center_line_x_offset(1, 0);
-    Rectangle neg_y_cherry_pick_rectangle(
-        world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerNeg() - enemy_defense_area_neg_y_x_offset);
     Rectangle pos_y_cherry_pick_rectangle(
         world.field().centerPoint() + center_line_x_offset,
-        world.field().enemyCornerPos() - enemy_defense_area_pos_y_x_offset);
+        world.field().enemyCornerPos() - pos_y_goalline_x_offset);
+    Rectangle neg_y_cherry_pick_rectangle(
+            world.field().centerPoint() + center_line_x_offset,
+            world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -120,21 +120,25 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Assigned robot " << align_to_ball_tactic->getAssignedRobot()->id()
                << " to be the passer in the PassGenerator";
 
+    // Put the robot in roughly the right position to perform the kick
+    do {
+        updateAlignToBallTactic(align_to_ball_tactic);
+        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+        updatePassGenerator(pass_generator);
+        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
+               bait_move_tactic_1, bait_move_tactic_2});
+    } while(!align_to_ball_tactic->done());
+
+    LOG(DEBUG) << "Finished aligning to ball";
+
     // Align the kicker to take the corner kick and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
-    double min_score = 1;
+    double min_score = 1.0;
     // TODO: change this to use the world timestamp (Issue #423)
     Timestamp commit_stage_start_time = world.ball().lastUpdateTimestamp();
     do
     {
-        // TODO: Bit of hack this.......
-        // Continue trying to align to deal with the case where we've finished
-        // aligning but there's not passing to
-        if (align_to_ball_tactic->done())
-        {
-            align_to_ball_tactic = std::make_shared<MoveTactic>();
-        }
         updateAlignToBallTactic(align_to_ball_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
@@ -152,8 +156,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
                                      MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
                                  1.0);
-    } while (!align_to_ball_tactic->done() ||
-             best_pass_and_score_so_far.second < min_score);
+    } while (best_pass_and_score_so_far.second < min_score);
 
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.first;
