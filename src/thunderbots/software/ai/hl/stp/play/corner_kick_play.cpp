@@ -71,22 +71,20 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Vector neg_y_goalline_x_offset(world.field().enemyDefenseArea().width(), 0);
     if (kick_from_pos_corner)
     {
-        pos_y_goalline_x_offset +=
-            {world.field().enemyDefenseArea().width(), 0};
+        pos_y_goalline_x_offset += {world.field().enemyDefenseArea().width(), 0};
     }
     else
     {
         // kick from neg corner
-        neg_y_goalline_x_offset +=
-            {world.field().enemyDefenseArea().width(), 0};
+        neg_y_goalline_x_offset += {world.field().enemyDefenseArea().width(), 0};
     }
     Vector center_line_x_offset(1, 0);
     Rectangle pos_y_cherry_pick_rectangle(
         world.field().centerPoint() + center_line_x_offset,
         world.field().enemyCornerPos() - pos_y_goalline_x_offset);
     Rectangle neg_y_cherry_pick_rectangle(
-            world.field().centerPoint() + center_line_x_offset,
-            world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
+        world.field().centerPoint() + center_line_x_offset,
+        world.field().enemyCornerNeg() - neg_y_goalline_x_offset);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -141,13 +139,14 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                << " to be the passer in the PassGenerator";
 
     // Put the robot in roughly the right position to perform the kick
-    do {
+    do
+    {
         updateAlignToBallTactic(align_to_ball_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
                bait_move_tactic_1, bait_move_tactic_2});
-    } while(!align_to_ball_tactic->done());
+    } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
 
