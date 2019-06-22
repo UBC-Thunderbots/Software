@@ -689,7 +689,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/team.cpp
             ai/world/world.cpp
             geom/util.cpp
-            test/ai/hl/stp/play/corner_kick_play.cpp
             test/ai/hl/stp/play/example_play.cpp
             test/ai/hl/stp/play/stop_play.cpp
             test/ai/hl/stp/play/main.cpp
