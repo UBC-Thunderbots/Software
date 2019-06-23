@@ -6,12 +6,12 @@
  */
 
 
-ThetaStarPathPlanner::ThetaStarPathPlanner(Field field, Ball ball,
+ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), obstacles_(obstacles)
 {
-    numRows = (int)(field_.totalLength() / GRID_DIVISION_IN_METERS);
-    numCols = (int)(field_.totalWidth() / GRID_DIVISION_IN_METERS);
+    numRows = (int)(field_.totalLength() / SIZE_OF_GRID_CELL_IN_METERS);
+    numCols = (int)(field_.totalWidth() / SIZE_OF_GRID_CELL_IN_METERS);
 
     unblocked_grid =
         std::vector<std::vector<bool>>(numRows, std::vector<bool>(numCols, true));
@@ -96,6 +96,7 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(CellCoordinate dest)
 
     std::stack<CellCoordinate> Path;
 
+    // loop until parent is self
     while (!(cellDetails[row][col].parent_i_ == row &&
              cellDetails[row][col].parent_j_ == col))
     {
@@ -117,13 +118,9 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(CellCoordinate dest)
     return path_points;
 }
 
-// returns true if path found
 bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNew,
                                         CellCoordinate dest, double currToNextNodeDist)
 {
-    // To store the 'g', 'h' and 'f' of the 8 successors
-    double gNew, hNew, fNew;
-
     // Only process this GridCell if this is a valid one
     if (isValid(pNew.first, pNew.second) == true)
     {
@@ -131,66 +128,49 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
         // list or if it is blocked, then ignore it.
         // Else do the following
         if (closedList[pNew.first][pNew.second] == false &&
-                 isUnBlocked(pNew.first, pNew.second) == true)
+            isUnBlocked(pNew.first, pNew.second) == true)
         {
+            double gNew;
+            int new_parent_i, new_parent_j;
             int parent_i = cellDetails[pCurr.first][pCurr.second].parent_i_;
             int parent_j = cellDetails[pCurr.first][pCurr.second].parent_j_;
             if (lineOfSight(parent_i, parent_j, pNew))
             {
-                gNew = cellDetails[parent_i][parent_j].g_ +
+                new_parent_i = parent_i;
+                new_parent_j = parent_j;
+                gNew         = cellDetails[parent_i][parent_j].g_ +
                        calculateHValue(parent_i, parent_j, pNew);
-                hNew = calculateHValue(pNew.first, pNew.second, dest);
-                fNew = gNew + hNew;
-
-                // If it isn’t on the open list, add it to
-                // the open list. Make the current square
-                // the parent of this square. Record the
-                // f, g, and h costs of the square GridCell
-                //			 OR
-                // If it is on the open list already, check
-                // to see if this path to that square is better,
-                // using 'f' cost as the measure.
-                if (cellDetails[pNew.first][pNew.second].f_ == DBL_MAX ||
-                    cellDetails[pNew.first][pNew.second].f_ > fNew)
-                {
-                    openList.insert(
-                        std::make_pair(fNew, std::make_pair(pNew.first, pNew.second)));
-
-                    // Update the details of this GridCell
-                    cellDetails[pNew.first][pNew.second].f_        = fNew;
-                    cellDetails[pNew.first][pNew.second].g_        = gNew;
-                    cellDetails[pNew.first][pNew.second].h_        = hNew;
-                    cellDetails[pNew.first][pNew.second].parent_i_ = parent_i;
-                    cellDetails[pNew.first][pNew.second].parent_j_ = parent_j;
-                }
             }
             else
             {
+                new_parent_i = pCurr.first;
+                new_parent_j = pCurr.second;
                 gNew = cellDetails[pCurr.first][pCurr.second].g_ + currToNextNodeDist;
-                hNew = calculateHValue(pNew.first, pNew.second, dest);
-                fNew = gNew + hNew;
+            }
 
-                // If it isn’t on the open list, add it to
-                // the open list. Make the current square
-                // the parent of this square. Record the
-                // f, g, and h costs of the square GridCell
-                //			 OR
-                // If it is on the open list already, check
-                // to see if this path to that square is better,
-                // using 'f' cost as the measure.
-                if (cellDetails[pNew.first][pNew.second].f_ == DBL_MAX ||
-                    cellDetails[pNew.first][pNew.second].f_ > fNew)
-                {
-                    openList.insert(
-                        std::make_pair(fNew, std::make_pair(pNew.first, pNew.second)));
+            double hNew = calculateHValue(pNew.first, pNew.second, dest);
+            double fNew = gNew + hNew;
 
-                    // Update the details of this GridCell
-                    cellDetails[pNew.first][pNew.second].f_        = fNew;
-                    cellDetails[pNew.first][pNew.second].g_        = gNew;
-                    cellDetails[pNew.first][pNew.second].h_        = hNew;
-                    cellDetails[pNew.first][pNew.second].parent_i_ = pCurr.first;
-                    cellDetails[pNew.first][pNew.second].parent_j_ = pCurr.second;
-                }
+            // If it isn’t on the open list, add it to
+            // the open list. Make the current square
+            // the parent of this square. Record the
+            // f, g, and h costs of the square GridCell
+            //			 OR
+            // If it is on the open list already, check
+            // to see if this path to that square is better,
+            // using 'f' cost as the measure.
+            if (cellDetails[pNew.first][pNew.second].f_ == DBL_MAX ||
+                cellDetails[pNew.first][pNew.second].f_ > fNew)
+            {
+                openList.insert(
+                    std::make_pair(fNew, std::make_pair(pNew.first, pNew.second)));
+
+                // Update the details of this GridCell
+                cellDetails[pNew.first][pNew.second].f_        = fNew;
+                cellDetails[pNew.first][pNew.second].g_        = gNew;
+                cellDetails[pNew.first][pNew.second].h_        = hNew;
+                cellDetails[pNew.first][pNew.second].parent_i_ = new_parent_i;
+                cellDetails[pNew.first][pNew.second].parent_j_ = new_parent_j;
             }
             // If the destination GridCell is the same as the
             // current successor
@@ -203,14 +183,11 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
     return false;
 }
 
-// A Function to find the shortest path between
-// a given source GridCell to a destination GridCell according
-// to A* Search Algorithm
+// top level function
 std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &start,
                                                                  const Point &destination)
 {
     bool blocked_dest = false;
-    bool blocked_src  = false;
     CellCoordinate src, dest;
 
     src  = convertPointToCell(start);
@@ -231,8 +208,7 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
     {
-        src         = findClosestUnblockedCell(src);
-        blocked_src = true;
+        src = findClosestUnblockedCell(src);
     }
 
     // The destination is blocked
@@ -311,71 +287,22 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         CellCoordinate pCurr, pNew;
         pCurr = std::make_pair(i, j);
 
-        //----------- 1st Successor (North) ------------
-
-        pNew = std::make_pair(i - 1, j);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.0))
+        for (int x_offset : {-1, 0, 1})
         {
-            break;
-        }
-
-        //----------- 2nd Successor (South) ------------
-
-        pNew = std::make_pair(i + 1, j);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.0))
-        {
-            break;
-        }
-
-        //----------- 3rd Successor (East) ------------
-
-        pNew = std::make_pair(i, j + 1);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.0))
-        {
-            break;
-        }
-
-        //----------- 4th Successor (West) ------------
-
-
-        pNew = std::make_pair(i, j - 1);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.0))
-        {
-            break;
-        }
-
-        //----------- 5th Successor (North-East) ------------
-
-        pNew = std::make_pair(i - 1, j + 1);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.414))
-        {
-            break;
-        }
-
-        //----------- 6th Successor (North-West) ------------
-
-        pNew = std::make_pair(i - 1, j - 1);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.414))
-        {
-            break;
-        }
-
-        //----------- 7th Successor (South-East) ------------
-
-        pNew = std::make_pair(i + 1, j + 1);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.414))
-        {
-            break;
-        }
-
-        //----------- 8th Successor (South-West) ------------
-
-        pNew = std::make_pair(i + 1, j - 1);
-        if (foundDest = updateVertex(pCurr, pNew, dest, 1.414))
-        {
-            break;
+            for (int y_offset : {-1, 0, 1})
+            {
+                double dist_to_neighbour =
+                    std::sqrt(std::pow(x_offset, 2) + std::pow(y_offset, 2));
+                pNew = std::make_pair(i + x_offset, j + y_offset);
+                if (foundDest = updateVertex(pCurr, pNew, dest, dist_to_neighbour))
+                {
+                    goto loop_end;
+                }
+            }
         }
     }
+
+loop_end:
 
     // When the destination GridCell is not found and the open
     // list is empty, then we conclude that we failed to
@@ -395,12 +322,10 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         path_points.push_back(destination);
     }
 
-    if (blocked_src)
-    {
-        // replace src with actual start
-        path_points.erase(path_points.begin());
-        path_points.insert(path_points.begin(), start);
-    }
+    // replace src with actual start
+    path_points.erase(path_points.begin());
+    path_points.insert(path_points.begin(), start);
+
     return path_points;
 }
 
@@ -439,28 +364,13 @@ ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::findClosestUnblockedC
 
 Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
 {
-    return Point((row * GRID_DIVISION_IN_METERS) - (field_.totalLength() / 2.0),
-                 (col * GRID_DIVISION_IN_METERS) - (field_.totalWidth() / 2.0));
+    return Point((row * SIZE_OF_GRID_CELL_IN_METERS) - (field_.totalLength() / 2.0),
+                 (col * SIZE_OF_GRID_CELL_IN_METERS) - (field_.totalWidth() / 2.0));
 }
 
 ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::convertPointToCell(Point p)
 {
     return std::make_pair(
-        (int)((p.x() + (field_.totalLength() / 2.0)) / GRID_DIVISION_IN_METERS),
-        (int)((p.y() + (field_.totalWidth() / 2.0)) / GRID_DIVISION_IN_METERS));
-}
-
-//==========================//
-std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(
-    const Point &start, const Point &dest, const std::vector<Obstacle> &obstacles,
-    const ViolationFunction &violation_function)
-{
-    if (true)
-    {
-        return std::make_optional<std::vector<Point>>({start, dest});
-    }
-    else
-    {
-        return std::nullopt;
-    }
+        (int)((p.x() + (field_.totalLength() / 2.0)) / SIZE_OF_GRID_CELL_IN_METERS),
+        (int)((p.y() + (field_.totalWidth() / 2.0)) / SIZE_OF_GRID_CELL_IN_METERS));
 }

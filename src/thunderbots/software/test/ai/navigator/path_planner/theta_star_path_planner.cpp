@@ -20,9 +20,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner)
     obstacles.push_back(Obstacle::createRobotObstacleWithScalingParams(robot, .2, .2));
 
     std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, ball, obstacles);
+        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
-    PathPlanner::ViolationFunction vf = [](const Point& point) { return 0; };
 
     auto path_points = planner->findPath(start, dest);
     if (path_points != std::nullopt)
@@ -52,7 +51,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
 
     std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, ball, obstacles);
+        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
     auto path_points = planner->findPath(start, dest);
     if (path_points != std::nullopt)

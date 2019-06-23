@@ -6,7 +6,7 @@
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 
-#define GRID_DIVISION_IN_METERS (ROBOT_MAX_RADIUS_METERS / 2)
+#define SIZE_OF_GRID_CELL_IN_METERS (ROBOT_MAX_RADIUS_METERS / 2)
 
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
@@ -17,10 +17,27 @@
 
 class ThetaStarPathPlanner : public PathPlanner
 {
-    // Creating a shortcut for int, int pair type
-    typedef std::pair<int, int> CellCoordinate;
+   public:
+    /**
+     * Constructs a theta star path planner
+     * @param field field
+     * @param ball ball
+     * @param obstacles obstacles to avoid
+     */
+    explicit ThetaStarPathPlanner(Field field, const std::vector<Obstacle> &obstacles);
 
-    // Creating a shortcut for std::pair<int, std::pair<int, int>> type
+    /**
+     * Returns a path that is an optimized path between start and dest.
+     * @param start start point
+     * @param dest destination point
+     * @return a vector that is the optimal path avoiding obstacles
+     * 		if no valid path then return std::nullopt
+     */
+    std::optional<std::vector<Point>> findPath(const Point &start,
+                                               const Point &dest) override;
+
+   private:
+    typedef std::pair<int, int> CellCoordinate;
     typedef std::pair<double, CellCoordinate> OpenListCell;
 
     class GridCell
@@ -35,40 +52,6 @@ class ThetaStarPathPlanner : public PathPlanner
         double f_, g_, h_;
     };
 
-   public:
-    /**
-     * Constructs a theta star path planner
-     * @param field field
-     * @param ball ball
-     * @param obstacles obstacles to avoid
-     */
-    explicit ThetaStarPathPlanner(Field field, Ball ball,
-                                  const std::vector<Obstacle> &obstacles);
-
-    /**
-     * Returns a path that is an optimized path between start and dest.
-     * @param start start point
-     * @param dest destination point
-     * @return a vector that is the optimal path avoiding obstacles
-     * 		if no path void then return std::nullopt
-     */
-    std::optional<std::vector<Point>> findPath(const Point &start,
-                                               const Point &dest) override;
-
-    /**
-     * Returns a path that is a straight line between start and dest.
-     * @param start start point
-     * @param dest destination point
-     * @param obstacles obstacles to avoid
-     * @param violation_function unused parameter
-     * @return a vector that is the optimal path avoiding obstacles
-     * 		if no path void then return std::nullopt
-     */
-    std::optional<std::vector<Point>> findPath(
-        const Point &start, const Point &dest, const std::vector<Obstacle> &obstacles,
-        const ViolationFunction &violation_function) override;
-
-   private:
     /*
     Create an open list having information as-
     <f, <i, j>>
@@ -138,7 +121,8 @@ class ThetaStarPathPlanner : public PathPlanner
     std::vector<Point> tracePath(CellCoordinate dest);
 
     /**
-     * Updates pNew's fields based on pCurr dest, currToNextNodeDist
+     * Updates the new node's fields based on the current node, destination
+     * and the distance to the next node
      * and checks if destination is reached
      * @param pCurr                 current cell
      * @param pNext                 next cell to be updated

@@ -730,6 +730,12 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_plays/stop_test_play.cpp
             ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/navigator/path_planning_navigator/path_planning_navigator.cpp
+            ai/navigator/path_planner/theta_star_path_planner.cpp
+            geom/polygon.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            ai/navigator/util.cpp
+            ai/navigator/obstacle/obstacle.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
@@ -881,6 +887,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/pivot_intent.cpp
             ai/intent/stop_intent.cpp
             ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/navigator/path_planning_navigator/path_planning_navigator.cpp
+            ai/navigator/path_planner/theta_star_path_planner.cpp
+            geom/polygon.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            ai/navigator/util.cpp
+            ai/navigator/obstacle/obstacle.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
             ai/primitive/direct_velocity_primitive.cpp
@@ -954,6 +966,8 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(theta_star_path_planner_test
             test/ai/navigator/path_planner/theta_star_path_planner.cpp
             ai/navigator/path_planner/theta_star_path_planner.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            ai/navigator/util.cpp
             ai/navigator/obstacle/obstacle.cpp
             geom/polygon.h
             geom/polygon.cpp
@@ -1010,6 +1024,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             ai/ai.cpp
             ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/navigator/path_planning_navigator/path_planning_navigator.cpp
+            ai/navigator/path_planner/theta_star_path_planner.cpp
+            geom/polygon.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            ai/navigator/util.cpp
+            ai/navigator/obstacle/obstacle.cpp
             test/ai/game_state_play_selection.cpp
             util/parameter/dynamic_parameters.cpp
             util/time/timestamp.cpp
@@ -1046,6 +1066,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/play/stop_play.cpp
             ai/hl/stp/play/play_factory.cpp
             ai/navigator/placeholder_navigator/placeholder_navigator.cpp
+            ai/navigator/path_planning_navigator/path_planning_navigator.cpp
+            ai/navigator/path_planner/theta_star_path_planner.cpp
+            geom/polygon.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            ai/navigator/util.cpp
+            ai/navigator/obstacle/obstacle.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
