@@ -105,14 +105,14 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     {
         EXPECT_EQ(start, (*path_points)[0]);
         EXPECT_NE(dest, (*path_points)[(*path_points).size() - 1]);
-//        printf("\nThe Path is ");
-//        for (Point p : *path_points)
-//        {
-//            {
-//                printf("-> (%lf,%lf) ", p.x(), p.y());
-//            }
-//        }
-//        printf("\n");
+        //        printf("\nThe Path is ");
+        //        for (Point p : *path_points)
+        //        {
+        //            {
+        //                printf("-> (%lf,%lf) ", p.x(), p.y());
+        //            }
+        //        }
+        //        printf("\n");
     }
 }
 
@@ -134,13 +134,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
         EXPECT_EQ(2, (*path_points).size());
         EXPECT_EQ(start, (*path_points)[0]);
         EXPECT_EQ(dest, (*path_points)[1]);
-//        printf("\nThe Path is ");
-//        for (Point p : *path_points)
-//        {
-//            {
-//                printf("-> (%lf,%lf) ", p.x(), p.y());
-//            }
-//        }
-//        printf("\n");
+        //        printf("\nThe Path is ");
+        //        for (Point p : *path_points)
+        //        {
+        //            {
+        //                printf("-> (%lf,%lf) ", p.x(), p.y());
+        //            }
+        //        }
+        //        printf("\n");
     }
 }
