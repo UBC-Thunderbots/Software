@@ -78,11 +78,12 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{3, 0};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-
     // Place a rectangle over our starting location
-    obstacles.emplace_back(Obstacle(
-        Polygon({Point(0.5, 1), Point(-0.5, 1), Point(-0.5, -1), Point(0.5, -1)})));
+    std::vector<Obstacle> obstacles = {
+            Obstacle(
+                    Polygon({Point(0.5, 1), Point(-0.5, 1), Point(-0.5, -1), Point(0.5, -1)}))
+    };
+
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
@@ -112,11 +113,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{2.7, 0};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-
     // Place a rectangle over our destination location
-    obstacles.emplace_back(Obstacle(
-        Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)})));
+    std::vector<Obstacle> obstacles = {
+
+            Obstacle(
+                    Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))
+    };
+
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
@@ -142,11 +145,12 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{3, 0};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-
     // Place a rectangle over our destination location
-    obstacles.emplace_back(Obstacle(
-            Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)})));
+    std::vector<Obstacle> obstacles = {
+            Obstacle(
+                    Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)}))
+    };
+
     std::unique_ptr<PathPlanner> planner =
             std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
@@ -173,11 +177,12 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{0, 0}, dest{0, 3};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-
     // Place a rectangle over our destination location
-    obstacles.emplace_back(Obstacle(
-            Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)})));
+    std::vector<Obstacle> obstacles = {
+            Obstacle(
+                    Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)}))
+    };
+
     std::unique_ptr<PathPlanner> planner =
             std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
@@ -199,13 +204,12 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     checkPathDoesNotIntersectObstacle(*path_points, obstacles);
 }
 
-
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
     Point start{2, 2}, dest{-3, -3};
 
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+    std::vector<Obstacle> obstacles = {};
 
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
