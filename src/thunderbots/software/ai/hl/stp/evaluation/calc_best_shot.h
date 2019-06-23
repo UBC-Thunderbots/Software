@@ -153,4 +153,19 @@ namespace Evaluation
         const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
 
+    /**
+     * Calculates the percentage of net that a given shot is aiming for
+     *
+     * @param field The field the shot is being performed on
+     * @param shot_origin The robot performing the shot. The shot is presumed to start at
+     *                the position of this robot
+     * @param shot The shot being performed
+     *
+     * @return A value in [0,1] indicating the percentage of open net the shot is
+     *         being taken on.
+     */
+    // TODO: test me
+    double calcShotOpenNetPercentage(const Field &field, const Point &shot_origin,
+                                     const std::pair<Point, Angle> &shot);
+
 }  // namespace Evaluation
