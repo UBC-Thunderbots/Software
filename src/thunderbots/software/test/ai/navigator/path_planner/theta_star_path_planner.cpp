@@ -27,6 +27,37 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner)
     auto path_points = planner->findPath(start, dest);
     if (path_points != std::nullopt)
     {
+        EXPECT_EQ(2, (*path_points).size());
+        printf("\nThe Path is ");
+        for (Point p : *path_points)
+        {
+            {
+                printf("-> (%lf,%lf) ", p.x(), p.y());
+            }
+        }
+        printf("\n");
+    }
+    else
+    {
+        printf("No path\n");
+    }
+}
+
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Ball ball   = Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
+    Point start{2, 2}, dest{-3, -3};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+
+    std::unique_ptr<PathPlanner> planner =
+        std::make_unique<ThetaStarPathPlanner>(field, ball, obstacles);
+
+    auto path_points = planner->findPath(start, dest);
+    if (path_points != std::nullopt)
+    {
+        EXPECT_EQ(2, (*path_points).size());
         printf("\nThe Path is ");
         for (Point p : *path_points)
         {

@@ -127,19 +127,10 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
     // Only process this GridCell if this is a valid one
     if (isValid(pNew.first, pNew.second) == true)
     {
-        // If the destination GridCell is the same as the
-        // current successor
-        if (isDestination(pNew.first, pNew.second, dest) == true)
-        {
-            // Set the Parent of the destination GridCell
-            cellDetails[pNew.first][pNew.second].parent_i_ = pCurr.first;
-            cellDetails[pNew.first][pNew.second].parent_j_ = pCurr.second;
-            return true;
-        }
         // If the successor is already on the closed
         // list or if it is blocked, then ignore it.
         // Else do the following
-        else if (closedList[pNew.first][pNew.second] == false &&
+        if (closedList[pNew.first][pNew.second] == false &&
                  isUnBlocked(pNew.first, pNew.second) == true)
         {
             int parent_i = cellDetails[pCurr.first][pCurr.second].parent_i_;
@@ -200,6 +191,12 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
                     cellDetails[pNew.first][pNew.second].parent_i_ = pCurr.first;
                     cellDetails[pNew.first][pNew.second].parent_j_ = pCurr.second;
                 }
+            }
+            // If the destination GridCell is the same as the
+            // current successor
+            if (isDestination(pNew.first, pNew.second, dest) == true)
+            {
+                return true;
             }
         }
     }
