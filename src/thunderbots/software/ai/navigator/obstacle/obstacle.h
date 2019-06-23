@@ -14,6 +14,14 @@
 class Obstacle
 {
    public:
+
+    /**
+     * Create an obstacle from the given polygon
+     *
+     * @param polygon
+     */
+    Obstacle(Polygon polygon);
+
     static Obstacle createRobotObstacle(const Robot& robot, bool enable_velocity_cushion);
 
     /*
@@ -72,8 +80,8 @@ class Obstacle
 
     const Polygon& getBoundaryPolygon() const;
 
+
    private:
-    Obstacle(Polygon polygon);
     static Obstacle createRobotObstacleFromPositionAndRadiusAndVelocity(
         Point position, double radius_cushion, Vector velocity_cushion_vector,
         bool enable_velocity_cushion);
