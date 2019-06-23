@@ -107,10 +107,10 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
 {
-    // Test where we start in an obstacle. We should find the closest edge of
-    // the obstacle and start our path planning there
+    // Test where we try to end in an obstacle. We should navigate to the closest point
+    // on the edge of the destination
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Point start{0, 0}, dest{3, 0};
+    Point start{0, 0}, dest{2.7, 0};
 
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
 
@@ -137,6 +137,69 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     checkPathDoesNotIntersectObstacle(*path_points, obstacles);
 }
 
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_x_axis){
+    // Test where we need to navigate around a single obstacle along the x-axis
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{0, 0}, dest{3, 0};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+
+    // Place a rectangle over our destination location
+    obstacles.emplace_back(Obstacle(
+            Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)})));
+    std::unique_ptr<PathPlanner> planner =
+            std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+
+
+    auto path_points = planner->findPath(start, dest);
+
+    // We expect to find a path
+    ASSERT_TRUE(path_points);
+
+    // The path should start at exactly the start point and end at exactly the dest
+    EXPECT_EQ(start, path_points->front());
+    EXPECT_EQ(dest, path_points->back());
+
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
+    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+
+    // Make sure the path does not go through any obstacles
+    checkPathDoesNotIntersectObstacle(*path_points, obstacles);
+}
+
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_y_axis){
+    // Test where we need to navigate around a single obstacle along the x-axis
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{0, 0}, dest{0, 3};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+
+    // Place a rectangle over our destination location
+    obstacles.emplace_back(Obstacle(
+            Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)})));
+    std::unique_ptr<PathPlanner> planner =
+            std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+
+
+    auto path_points = planner->findPath(start, dest);
+
+    // We expect to find a path
+    ASSERT_TRUE(path_points);
+
+    // The path should start at exactly the start point and end at exactly the dest
+    EXPECT_EQ(start, path_points->front());
+    EXPECT_EQ(dest, path_points->back());
+
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box({1.2, -0.1,}, {-1.2, 3.1});
+    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+
+    // Make sure the path does not go through any obstacles
+    checkPathDoesNotIntersectObstacle(*path_points, obstacles);
+}
+
+
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
@@ -158,3 +221,4 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     ASSERT_EQ(start, path_points->front());
     ASSERT_EQ(dest, path_points->back());
 }
+
