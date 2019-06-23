@@ -10,35 +10,63 @@
  * Prints out the path formed by the points given
  * @param path_points
  */
-void printPath(std::vector<Point> path_points){
-        for (Point p : path_points)
+void printPath(std::vector<Point> path_points)
+{
+    for (Point p : path_points)
+    {
         {
-            {
-                printf("-> (%lf,%lf) ", p.x(), p.y());
-            }
+            printf("-> (%lf,%lf) ", p.x(), p.y());
         }
-        printf("\n");
+    }
+    printf("\n");
 }
 
-void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points, Rectangle bounding_box){
-    for (auto const& path_point : path_points){
-            EXPECT_TRUE(bounding_box.containsPoint(path_point));
+std::string getObstacleAsString(const Obstacle& obstacle)
+{
+    std::stringstream ss;
+    ss << "{";
+    for (const Point& point : obstacle.getBoundaryPolygon().getPoints())
+    {
+        ss << point << ",";
+    }
+    ss << "}";
+    return ss.str();
+}
+
+void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
+                                       Rectangle bounding_box)
+{
+    for (auto const& path_point : path_points)
+    {
+        EXPECT_TRUE(bounding_box.containsPoint(path_point))
+            << "Path point " << path_point << " not in bounding box {"
+            << bounding_box.swCorner() << "," << bounding_box.neCorner() << "}";
     }
 }
 
-void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points, std::vector<Obstacle> obstacles){
+void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
+                                       std::vector<Obstacle> obstacles)
+{
     // If the path size is 1, just need to check that the point is not within the obstacle
-    if (path_points.size() == 1){
-        for (auto const& obstacle : obstacles){
-            EXPECT_FALSE(obstacle.getBoundaryPolygon().containsPoint(path_points[0]));
+    if (path_points.size() == 1)
+    {
+        for (auto const& obstacle : obstacles)
+        {
+            EXPECT_FALSE(obstacle.getBoundaryPolygon().containsPoint(path_points[0]))
+                << "Only point on path " << path_points[0] << " is in obstacle "
+                << getObstacleAsString(obstacle);
         }
     }
 
     // Check that no line segment on the path intersects the obstacle
-    for (std::size_t i = 0; i < path_points.size()-1; i++){
-        Segment path_segment(path_points[i], path_points[i+1]);
-        for (auto const& obstacle : obstacles){
-            EXPECT_FALSE(obstacle.getBoundaryPolygon().intersects(path_segment));
+    for (std::size_t i = 0; i < path_points.size() - 1; i++)
+    {
+        Segment path_segment(path_points[i], path_points[i + 1]);
+        for (auto const& obstacle : obstacles)
+        {
+            EXPECT_FALSE(obstacle.getBoundaryPolygon().intersects(path_segment))
+                << "Line segment {" << path_points[i] << "," << path_points[i + 1]
+                << "} intersects obstacle " << getObstacleAsString(obstacle);
         }
     }
 }
@@ -53,14 +81,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
 
     // Place a rectangle over our starting location
-    obstacles.emplace_back(Obstacle(Polygon(
-            {
-                    Point(0.5,1),
-                    Point(-0.5,1),
-                    Point(-0.5,-1),
-                    Point(0.5,-1)
-            }
-            )));
+    obstacles.emplace_back(Obstacle(
+        Polygon({Point(0.5, 1), Point(-0.5, 1), Point(-0.5, -1), Point(0.5, -1)})));
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
@@ -74,52 +96,50 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     EXPECT_EQ(start, path_points->front());
     EXPECT_EQ(dest, path_points->back());
 
-    // Make sure the path does not exceed a simple bounding box
-    Rectangle bounding_box({1, 0.1}, {3.1, -0.1});
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box({0, 0.1}, {3.1, -0.1});
+    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+
+    // Make sure the path does not go through any obstacles, except for the
+    // first point, which is in the obstacle blocking the start position
+    checkPathDoesNotIntersectObstacle({path_points->begin()+1, path_points->end()}, obstacles);
+}
+
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
+{
+    // Test where we start in an obstacle. We should find the closest edge of
+    // the obstacle and start our path planning there
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{0, 0}, dest{3, 0};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+
+    // Place a rectangle over our destination location
+    obstacles.emplace_back(Obstacle(
+        Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)})));
+    std::unique_ptr<PathPlanner> planner =
+        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+
+
+    auto path_points = planner->findPath(start, dest);
+
+    // We expect to find a path
+    ASSERT_TRUE(path_points);
+
+    // The path should start at exactly the start point
+    EXPECT_EQ(start, path_points->front());
+
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box({-0.1, 0.1}, {3.1, -0.1});
     checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
 
     // Make sure the path does not go through any obstacles
     checkPathDoesNotIntersectObstacle(*path_points, obstacles);
 }
 
-TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
-{
-    Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball   = Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
-    Point start{0, 0}, dest{2, 2};
-
-    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-
-    Timestamp current_time = Timestamp::fromSeconds(123);
-    Robot robot = Robot(3, Point(2.0, 2.0), Vector(0.0, 0.0), Angle::ofRadians(2.2),
-                        AngularVelocity::ofRadians(-0.6), current_time);
-    obstacles.push_back(Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 1.2));
-
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
-
-
-    auto path_points = planner->findPath(start, dest);
-    EXPECT_TRUE(path_points != std::nullopt);
-    if (path_points != std::nullopt)
-    {
-        EXPECT_EQ(start, (*path_points)[0]);
-        EXPECT_NE(dest, (*path_points)[(*path_points).size() - 1]);
-        //        printf("\nThe Path is ");
-        //        for (Point p : *path_points)
-        //        {
-        //            {
-        //                printf("-> (%lf,%lf) ", p.x(), p.y());
-        //            }
-        //        }
-        //        printf("\n");
-    }
-}
-
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball   = Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5));
     Point start{2, 2}, dest{-3, -3};
 
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
@@ -128,19 +148,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
 
     auto path_points = planner->findPath(start, dest);
-    EXPECT_TRUE(path_points != std::nullopt);
-    if (path_points != std::nullopt)
-    {
-        EXPECT_EQ(2, (*path_points).size());
-        EXPECT_EQ(start, (*path_points)[0]);
-        EXPECT_EQ(dest, (*path_points)[1]);
-        //        printf("\nThe Path is ");
-        //        for (Point p : *path_points)
-        //        {
-        //            {
-        //                printf("-> (%lf,%lf) ", p.x(), p.y());
-        //            }
-        //        }
-        //        printf("\n");
-    }
+
+    // We should be able to find path points
+    ASSERT_TRUE(path_points);
+
+    // Since there are no obstacles, there should be two path points, one at the start
+    // and one at the destination
+    ASSERT_EQ(2, path_points->size());
+    ASSERT_EQ(start, path_points->front());
+    ASSERT_EQ(dest, path_points->back());
 }
