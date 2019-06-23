@@ -26,7 +26,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
-    static double place_holder_violation_func(const Point &input_point);
     /**
      * Visits a CatchIntent to perform an operation.
      *

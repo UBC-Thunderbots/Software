@@ -54,11 +54,6 @@ void PathPlanningNavigator::visit(const KickIntent &kick_intent)
     current_primitive = std::move(p);
 }
 
-double PathPlanningNavigator::place_holder_violation_func(const Point &input_point)
-{
-    return 0.0;
-}
-
 void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 {
     auto p      = std::make_unique<MovePrimitive>(move_intent);

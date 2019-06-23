@@ -873,7 +873,7 @@ if (CATKIN_ENABLE_TESTING)
 
     target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(navigator_test
+    catkin_add_gtest(placeholder_navigator_test
             ai/intent/catch_intent.cpp
             ai/intent/chip_intent.cpp
             ai/intent/direct_velocity_intent.cpp
@@ -933,7 +933,68 @@ if (CATKIN_ENABLE_TESTING)
             ai/navigator/trespass.cpp
             ai/navigator/path_planner/straight_line_path_planner.cpp
             )
-    target_link_libraries(navigator_test
+    target_link_libraries(placeholder_navigator_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
+
+    catkin_add_gtest(path_planning_navigator_test
+            ../shared/constants.h
+            ai/intent/catch_intent.cpp
+            ai/intent/chip_intent.cpp
+            ai/intent/direct_velocity_intent.cpp
+            ai/intent/direct_wheels_intent.cpp
+            ai/intent/dribble_intent.cpp
+            ai/intent/intent.cpp
+            ai/intent/kick_intent.cpp
+            ai/intent/move_intent.cpp
+            ai/intent/movespin_intent.cpp
+            ai/intent/pivot_intent.cpp
+            ai/intent/stop_intent.cpp
+            ai/navigator/obstacle/obstacle.cpp
+            ai/navigator/obstacle/obstacle.h
+            ai/navigator/path_planner/theta_star_path_planner.cpp
+            ai/navigator/path_planning_navigator/path_planning_navigator.cpp
+            ai/navigator/trespass.cpp
+            ai/navigator/util.cpp
+            ai/primitive/catch_primitive.cpp
+            ai/primitive/chip_primitive.cpp
+            ai/primitive/direct_velocity_primitive.cpp
+            ai/primitive/direct_wheels_primitive.cpp
+            ai/primitive/dribble_primitive.cpp
+            ai/primitive/kick_primitive.cpp
+            ai/primitive/move_primitive.cpp
+            ai/primitive/movespin_primitive.cpp
+            ai/primitive/pivot_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/stop_primitive.cpp
+            ai/world/ball.cpp
+            ai/world/field.cpp
+            ai/world/game_state.cpp
+            ai/world/robot.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            geom/angle.h
+            geom/point.h
+            geom/polygon.cpp
+            geom/polygon.h
+            geom/util.cpp
+            geom/util.h
+            test/ai/navigator/main.cpp
+            test/ai/navigator/obstacle/obstacle.cpp
+            test/ai/navigator/path_planner/theta_star_path_planner.cpp
+            test/ai/navigator/path_planning_navigator/path_planning_navigator.cpp
+            test/ai/navigator/trespass/trespass.cpp
+            test/test_util/test_util.cpp
+            util/canvas_messenger/canvas_messenger.cpp
+            util/math_functions.cpp
+            util/parameter/dynamic_parameter_utils.cpp
+            util/parameter/dynamic_parameters.cpp
+            util/time/duration.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            )
+    target_link_libraries(path_planning_navigator_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             )
@@ -958,34 +1019,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             )
     target_link_libraries(robot_filter_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            )
-
-    catkin_add_gtest(theta_star_path_planner_test
-            test/ai/navigator/path_planner/theta_star_path_planner.cpp
-            ai/navigator/path_planner/theta_star_path_planner.cpp
-            util/canvas_messenger/canvas_messenger.cpp
-            ai/navigator/util.cpp
-            ai/navigator/obstacle/obstacle.cpp
-            ai/primitive/primitive.cpp
-            ai/primitive/move_primitive.cpp
-            geom/polygon.h
-            geom/polygon.cpp
-            test/test_util/test_util.cpp
-            ai/world/ball.cpp
-            ai/world/field.cpp
-            ai/world/game_state.cpp
-            ai/world/robot.cpp
-            ai/world/team.cpp
-            ai/world/world.cpp
-            geom/util.cpp
-            util/parameter/dynamic_parameters.cpp
-            util/time/duration.cpp
-            util/time/time.cpp
-            util/time/timestamp.cpp
-            )
-    target_link_libraries(theta_star_path_planner_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             )
