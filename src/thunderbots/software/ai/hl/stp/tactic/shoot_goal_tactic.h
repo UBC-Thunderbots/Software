@@ -124,4 +124,6 @@ class ShootGoalTactic : public Tactic
     // that we chip over the enemy, but don't launch the ball so far we have no chance of
     // recovering possession
     const double CHIP_DIST = 0.5;
+    // The distance between the robot's kicker and the ball while tracking the ball waiting for a shot
+    const double TRACK_BALL_DIST = 0.05;
 };

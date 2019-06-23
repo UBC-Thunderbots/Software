@@ -7,16 +7,35 @@
 #include "quadratic_test.h"
 #include "shoot_test.h"
 #include "util_test.h"
+/**
 #include <stdlib.h>
+ * Main entry point for the test cases. Each test to run should 
 #include <stdio.h>
+ * be wrapped inside a function that should be added here so that
 #include "check.h"
+ * when the main function is called each test is run.
 #include "test.h"
+ */
+int main(void)
 
+{
 static int number_failed = 0;
+    printf("\nStart Tests\n");
 
+    run_math_test();
+    run_matrix_test();
+    run_move_test();
+    run_physbot_test();
+    run_physics_test();
+    run_quadratic_test();
+    run_shoot_test();
+    run_util_test();
 void run_test(TCase *tc, Suite *s) {
+    (number_failed == 0) ? printf("All tests passed.\n") : printf("%d Tests failed.\n\n", number_failed);
     suite_add_tcase(s, tc);
+    return 0;
     SRunner *sr = srunner_create(s);
+}
     srunner_run_all(sr, CK_NORMAL);
     number_failed += srunner_ntests_failed(sr);
     srunner_free(sr);
