@@ -1,4 +1,5 @@
 #include "ai/navigator/path_planner/theta_star_path_planner.h"
+#include "util/logger/init.h"
 
 /**
  * This file contains the implementation of a theta star path planner
@@ -196,26 +197,44 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     // If the source is out of range
     if (isValid(src.first, src.second) == false)
     {
+        LOG(WARNING) << "Source is not valid; no path found" << std::endl;
         return std::nullopt;
     }
 
     // If the destination is out of range
     if (isValid(dest.first, dest.second) == false)
     {
+        LOG(WARNING) << "Destination is not valid; no path found" << std::endl;
         return std::nullopt;
     }
 
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
     {
-        src = findClosestUnblockedCell(src);
+        auto tmp_src = findClosestUnblockedCell(src);
+        if (tmp_src)
+        {
+            src = *tmp_src;
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
     // The destination is blocked
     if (isUnBlocked(dest.first, dest.second) == false)
     {
-        dest         = findClosestUnblockedCell(dest);
-        blocked_dest = true;
+        auto tmp_dest = findClosestUnblockedCell(dest);
+        if (tmp_dest)
+        {
+            dest = *tmp_dest;
+            blocked_dest = true;
+        }
+        else
+        {
+            return std::nullopt;
+        }
     }
 
     // If the destination GridCell is the same as source GridCell
@@ -331,7 +350,7 @@ loop_end:
 
 // spiral out from currCell looking for unblocked cells
 // this should be good enough
-ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::findClosestUnblockedCell(
+std::optional<ThetaStarPathPlanner::CellCoordinate> ThetaStarPathPlanner::findClosestUnblockedCell(
     CellCoordinate currCell)
 {
     int i = currCell.first;
@@ -359,7 +378,7 @@ ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::findClosestUnblockedC
         currIndex = nextIndex;
     }
 
-    return currCell;
+    return std::nullopt;
 }
 
 Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)

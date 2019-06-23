@@ -79,6 +79,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * Returns if a cell is within bounds of grid
      * @param row y position of cell
      * @param col x position of cell
+     *
      * @return true if cell is valid
      */
     bool isValid(int row, int col);
@@ -87,6 +88,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * Returns if a cell is unblocked
      * @param row y position of cell
      * @param col x position of cell
+     *
      * @return true if cell is unblocked
      */
     bool isUnBlocked(int row, int col);
@@ -96,6 +98,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param row y position of cell
      * @param col x position of cell
      * @param dest destination cell
+     *
      * @return true if cell is the destination
      */
     bool isDestination(int row, int col, CellCoordinate dest);
@@ -106,6 +109,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param row y position of cell
      * @param col x position of cell
      * @param dest destination cell
+     *
      * @return Euclidean distance to dest
      */
     double calculateHValue(int row, int col, CellCoordinate dest);
@@ -114,6 +118,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * Traces a path from the destination back to the start
      * and populates a vector of points with that path
      * @param dest destination cell
+     *
      * @return vector of points with the path from start to dest
      */
     std::vector<Point> tracePath(CellCoordinate dest);
@@ -126,6 +131,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param pNext                 next cell to be updated
      * @param dest                  destination cell
      * @param currToNextNodeDist    Euclidean distance between pCurr and pNext
+     *
      * @return                      true if pNew is destination
      */
     bool updateVertex(CellCoordinate pCurr, CellCoordinate pNew, CellCoordinate dest,
@@ -136,6 +142,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param curr_parent_i         parent cell's x coordinate
      * @param curr_parent_j         parent cell's y coordinate
      * @param new_pair              cell to check line of sight to
+     * 
      * @return                      true if line of sight from parent to new cell
      */
     bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
@@ -143,9 +150,11 @@ class ThetaStarPathPlanner : public PathPlanner
     /**
      * Finds closest unblocked cell to currCell
      * @param currCell  current cell
+     *
      * @return          closest unblocked cell to currCell
+     *                  if none found, return nullopt
      */
-    CellCoordinate findClosestUnblockedCell(CellCoordinate currCell);
+    std::optional<CellCoordinate> findClosestUnblockedCell(CellCoordinate currCell);
 
     /**
      * Converts a cell in grid to a point on field
@@ -166,7 +175,10 @@ class ThetaStarPathPlanner : public PathPlanner
      */
     CellCoordinate convertPointToCell(Point p);
 
-    const double SIZE_OF_GRID_CELL_IN_METERS = (ROBOT_MAX_RADIUS_METERS / 2);
+    //only change this value
+    static constexpr int GRID_DIVISION_FACTOR = 2;
+    //don't change this calculation
+    const double SIZE_OF_GRID_CELL_IN_METERS = (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
     Field field_;
     std::vector<Obstacle> obstacles_;
