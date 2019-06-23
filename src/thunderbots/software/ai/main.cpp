@@ -1,7 +1,5 @@
 #include <ros/ros.h>
 
-#include <chrono>
-
 #include "ai/ai.h"
 #include "thunderbots_msgs/PlayInfo.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
@@ -13,7 +11,6 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
-using namespace std::chrono;
 
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this

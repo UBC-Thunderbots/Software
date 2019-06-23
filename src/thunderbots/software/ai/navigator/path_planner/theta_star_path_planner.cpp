@@ -34,8 +34,6 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
     }
 }
 
-// A Utility Function to check whether given GridCell (row, col)
-// is a valid GridCell or not.
 bool ThetaStarPathPlanner::isValid(int row, int col)
 {
     // Returns true if row number and column number
@@ -43,21 +41,16 @@ bool ThetaStarPathPlanner::isValid(int row, int col)
     return (row >= 0) && (row < numRows) && (col >= 0) && (col < numCols);
 }
 
-// A Utility Function to check whether the given GridCell is
-// blocked or not
 bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
 {
     return unblocked_grid[row][col];
 }
 
-// A Utility Function to check whether destination GridCell has
-// been reached or not
 bool ThetaStarPathPlanner::isDestination(int row, int col, CellCoordinate dest)
 {
     return (row == dest.first && col == dest.second);
 }
 
-// A Utility Function to calculate the 'h' heuristics.
 double ThetaStarPathPlanner::calculateHValue(int row, int col, CellCoordinate dest)
 {
     // Return using the distance formula
@@ -65,7 +58,6 @@ double ThetaStarPathPlanner::calculateHValue(int row, int col, CellCoordinate de
                          (col - dest.second) * (col - dest.second)));
 }
 
-// A Utility Function to check for line of sight
 bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
                                        CellCoordinate new_pair)
 {
@@ -88,8 +80,6 @@ bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
     return true;
 }
 
-// A Utility Function to trace the path from the source
-// to destination
 std::vector<Point> ThetaStarPathPlanner::tracePath(CellCoordinate dest)
 {
     int row                        = dest.first;
@@ -349,11 +339,10 @@ loop_end:
     return path_points;
 }
 
-// spiral out from currCell looking for unblocked cells
-// this should be good enough
 std::optional<ThetaStarPathPlanner::CellCoordinate>
 ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
 {
+    // spiral out from currCell looking for unblocked cells
     int i = currCell.first;
     int j = currCell.second;
     unsigned nextIndex, currIndex = 3;

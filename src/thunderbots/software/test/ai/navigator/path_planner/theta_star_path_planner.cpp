@@ -17,7 +17,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Timestamp current_time = Timestamp::fromSeconds(123);
     Robot robot = Robot(3, Point(2.0, 2.0), Vector(0.0, 0.0), Angle::ofRadians(2.2),
                         AngularVelocity::ofRadians(-0.6), current_time);
-    obstacles.push_back(Obstacle::createRobotObstacleWithScalingParams(robot, .2, .2));
+    obstacles.push_back(Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 1.2));
 
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
@@ -51,7 +51,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Timestamp current_time = Timestamp::fromSeconds(123);
     Robot robot = Robot(3, Point(2.0, 2.0), Vector(0.0, 0.0), Angle::ofRadians(2.2),
                         AngularVelocity::ofRadians(-0.6), current_time);
-    obstacles.push_back(Obstacle::createRobotObstacleWithScalingParams(robot, .2, .2));
+    obstacles.push_back(Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 1.2));
 
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);

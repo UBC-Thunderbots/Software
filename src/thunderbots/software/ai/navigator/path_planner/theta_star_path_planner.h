@@ -176,7 +176,7 @@ class ThetaStarPathPlanner : public PathPlanner
     CellCoordinate convertPointToCell(Point p);
 
     // only change this value
-    static constexpr int GRID_DIVISION_FACTOR = 2;
+    static constexpr int GRID_DIVISION_FACTOR = 1;  // the n in the O(n^2) algorithm :p
     // don't change this calculation
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
