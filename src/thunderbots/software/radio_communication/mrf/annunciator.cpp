@@ -106,8 +106,10 @@ Annunciator::Annunciator(ros::NodeHandle &node_handle)
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
 }
 
-bool Annunciator::handle_robot_message(int index, const void *data, std::size_t len,
-                                       uint8_t lqi, uint8_t rssi)
+thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
+                                                                const void *data,
+                                                                std::size_t len,
+                                                                uint8_t lqi, uint8_t rssi)
 {
     std::vector<std::string> new_msgs;
     thunderbots_msgs::RobotStatus robot_status;
@@ -372,20 +374,8 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    // If there is a new message that wasn't present in the previous status update, return
-    // true
-    bool new_msgs_present = false;
-    for (std::string msg : new_msgs)
-    {
-        if (std::find(robot_status_states[index].previous_status.robot_messages.begin(),
-                      robot_status_states[index].previous_status.robot_messages.end(),
-                      msg) ==
-            robot_status_states[index].previous_status.robot_messages.end())
-        {
-            new_msgs_present = true;
-            break;
-        }
-    }
+    // Beep the dongle if there were new messages since the last update
+    checkNewMessages(new_msgs, robot_status_states[index].previous_status.robot_messages);
 
     // Add the latest robot and dongle status messages
     robot_status.robot_messages  = new_msgs;
@@ -399,7 +389,22 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 
     // Publish robot status
     robot_status_publisher.publish(robot_status);
-    return new_msgs_present;
+    return robot_status;
+}
+
+void Annunciator::checkNewMessages(std::vector<std::string> new_msgs,
+                                   std::vector<std::string> old_msgs)
+{
+    // If there is a new message that wasn't present in the previous status update, beep
+    // the dongle
+    for (std::string msg : new_msgs)
+    {
+        if (std::find(old_msgs.begin(), old_msgs.end(), msg) == old_msgs.end())
+        {
+            beep_dongle();
+            break;
+        }
+    }
 }
 
 std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
@@ -439,17 +444,23 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
         robot_status_states[bot].bot_mutex.lock();
 
         // Check if robot is dead, publish old status update with dead message if so
-        if (difftime(time(nullptr), robot_status_states[bot].last_status_update) <
+        if (difftime(time(nullptr), robot_status_states[bot].last_status_update) >
             ROBOT_DEAD_TIME)
         {
             thunderbots_msgs::RobotStatus new_status =
                 robot_status_states[bot].previous_status;
             new_status.robot_messages.clear();
             new_status.robot_messages.push_back(MRF::ROBOT_DEAD_MESSAGE);
-            robot_status_states[bot].previous_status = new_status;
 
+            // Beep dongle if this is a recent event
+            checkNewMessages(new_status.robot_messages,
+                             robot_status_states[bot].previous_status.robot_messages);
+
+            // Update and publish latest status
+            robot_status_states[bot].previous_status = new_status;
             robot_status_publisher.publish(new_status);
         }
+
 
         robot_status_states[bot].bot_mutex.unlock();
     }
