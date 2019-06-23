@@ -6,6 +6,8 @@
 #include <iostream>
 #include <limits>
 #include <tuple>
+#include <boost/geometry/geometries/segment.hpp>
+#include <boost/geometry/algorithms/intersection.hpp>
 
 #include "geom/angle.h"
 #include "geom/rectangle.h"
@@ -264,32 +266,10 @@ bool intersects(const Circle &first, const Segment &second)
 
 bool intersects(const Segment &first, const Segment &second)
 {
-    if (sign((first.getSegStart() - first.getEnd())
-                 .cross(second.getSegStart() - second.getEnd())) == 0)
-    {
-        // find distance of two endpoints on segments furthest away from each
-        // other
-        double mx_len = std::sqrt(
-            std::max(std::max((second.getSegStart() - first.getEnd()).lensq(),
-                              (second.getEnd() - first.getEnd()).lensq()),
-                     std::max((second.getSegStart() - first.getSegStart()).lensq(),
-                              (second.getEnd() - first.getSegStart()).lensq())));
-        // if the segments cross then this distance should be less than
-        // the sum of the distances of the line segments
-        return mx_len < (first.getSegStart() - first.getEnd()).len() +
-                            (second.getSegStart() - second.getEnd()).len() + EPS;
-    }
+    boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
+    boost::geometry::model::segment<Point> CD(second.getSegStart(), second.getEnd()); //similar code
 
-    return sign((first.getEnd() - first.getSegStart())
-                    .cross(second.getSegStart() - first.getSegStart())) *
-                   sign((first.getEnd() - first.getSegStart())
-                            .cross(second.getEnd() - first.getSegStart())) <=
-               0 &&
-           sign((second.getEnd() - second.getSegStart())
-                    .cross(first.getSegStart() - second.getSegStart())) *
-                   sign((second.getEnd() - second.getSegStart())
-                            .cross(first.getEnd() - second.getSegStart())) <=
-               0;
+    return boost::geometry::intersects(AB, CD);
 }
 
 template <size_t N>
