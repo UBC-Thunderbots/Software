@@ -6,8 +6,6 @@
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 
-#define SIZE_OF_GRID_CELL_IN_METERS (ROBOT_MAX_RADIUS_METERS / 2)
-
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
  * the PathPlanner interface.
@@ -167,6 +165,8 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return cell in grid
      */
     CellCoordinate convertPointToCell(Point p);
+
+    const double SIZE_OF_GRID_CELL_IN_METERS = (ROBOT_MAX_RADIUS_METERS / 2);
 
     Field field_;
     std::vector<Obstacle> obstacles_;

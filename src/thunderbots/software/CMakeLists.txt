@@ -740,7 +740,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
             ai/primitive/primitive.cpp
-            ai/primitive/move_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
@@ -969,6 +968,8 @@ if (CATKIN_ENABLE_TESTING)
             util/canvas_messenger/canvas_messenger.cpp
             ai/navigator/util.cpp
             ai/navigator/obstacle/obstacle.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
             geom/polygon.h
             geom/polygon.cpp
             test/test_util/test_util.cpp
