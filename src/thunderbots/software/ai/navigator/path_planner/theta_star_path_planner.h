@@ -142,7 +142,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param curr_parent_i         parent cell's x coordinate
      * @param curr_parent_j         parent cell's y coordinate
      * @param new_pair              cell to check line of sight to
-     * 
+     *
      * @return                      true if line of sight from parent to new cell
      */
     bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
@@ -175,10 +175,11 @@ class ThetaStarPathPlanner : public PathPlanner
      */
     CellCoordinate convertPointToCell(Point p);
 
-    //only change this value
+    // only change this value
     static constexpr int GRID_DIVISION_FACTOR = 2;
-    //don't change this calculation
-    const double SIZE_OF_GRID_CELL_IN_METERS = (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
+    // don't change this calculation
+    const double SIZE_OF_GRID_CELL_IN_METERS =
+        (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
     Field field_;
     std::vector<Obstacle> obstacles_;

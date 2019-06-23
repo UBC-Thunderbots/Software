@@ -1,4 +1,5 @@
 #include "ai/navigator/path_planner/theta_star_path_planner.h"
+
 #include "util/logger/init.h"
 
 /**
@@ -228,7 +229,7 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         auto tmp_dest = findClosestUnblockedCell(dest);
         if (tmp_dest)
         {
-            dest = *tmp_dest;
+            dest         = *tmp_dest;
             blocked_dest = true;
         }
         else
@@ -350,8 +351,8 @@ loop_end:
 
 // spiral out from currCell looking for unblocked cells
 // this should be good enough
-std::optional<ThetaStarPathPlanner::CellCoordinate> ThetaStarPathPlanner::findClosestUnblockedCell(
-    CellCoordinate currCell)
+std::optional<ThetaStarPathPlanner::CellCoordinate>
+ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
 {
     int i = currCell.first;
     int j = currCell.second;
