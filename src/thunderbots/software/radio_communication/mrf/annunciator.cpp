@@ -82,7 +82,7 @@ namespace
     {
         // Because vision updates and status updates occur from different
         // threads, a mutex is used to prevent race conditions.
-        std::mutex bot_mutex;
+        std::mutex bot_mutex = std::mutex();
 
         // Previously published status for this robot
         thunderbots_msgs::RobotStatus previous_status;
@@ -104,6 +104,14 @@ Annunciator::Annunciator(ros::NodeHandle &node_handle)
 {
     robot_status_publisher = node_handle.advertise<thunderbots_msgs::RobotStatus>(
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
+
+    // Initialize messages with the correct robot ID
+    for (uint8_t bot = 0; bot < MAX_ROBOTS_OVER_RADIO; ++bot)
+    {
+        robot_status_states[bot].bot_mutex.lock();
+        robot_status_states[bot].previous_status.robot = bot;
+        robot_status_states[bot].bot_mutex.unlock();
+    }
 }
 
 thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
@@ -460,7 +468,6 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
             robot_status_states[bot].previous_status = new_status;
             robot_status_publisher.publish(new_status);
         }
-
 
         robot_status_states[bot].bot_mutex.unlock();
     }
