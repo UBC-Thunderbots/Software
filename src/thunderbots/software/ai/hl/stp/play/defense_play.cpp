@@ -32,9 +32,6 @@ bool DefensePlay::invariantHolds(const World &world) const
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-    // TODO: This is for testing. Remove it
-    world.mutableFriendlyTeam().assignGoalie(2);
-
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     // TODO: Robot to try steal the ball from most threatening enemy

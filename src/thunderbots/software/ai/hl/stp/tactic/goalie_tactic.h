@@ -45,4 +45,7 @@ class GoalieTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
     std::optional<Evaluation::EnemyThreat> enemy_threat;
+
+    // How slow the ball must be moving for us to clear it from the defense area
+    double BALL_SLOW_SPEED_THRESHOLD = 0.2;
 };

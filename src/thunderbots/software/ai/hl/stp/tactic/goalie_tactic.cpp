@@ -73,24 +73,22 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         auto [intersection1, intersection2] =
             raySegmentIntersection(ball_ray, full_goal_segment);
-        if (intersection1 && ball.velocity().len() > 0.2)
+        if (intersection1.has_value() && ball.velocity().len() > BALL_SLOW_SPEED_THRESHOLD)
         {
             // The ball is heading towards the net. Move to block the shot
             goalie_pos  = closestPointOnSeg(*intersection1, goalie_movement_segment);
             next_intent = move_action.updateStateAndGetNextIntent(
                 *robot, goalie_pos, goalie_orientation, 0.0, false, true);
-            std::cout << "shot" << std::endl;
         }
-        else if (ball.velocity().len() < 0.2 &&
+        else if (ball.velocity().len() < BALL_SLOW_SPEED_THRESHOLD &&
                  field.pointInFriendlyDefenseArea(ball.position()))
         {
             // If the ball is slow or stationary inside our defense area, chip it out
             next_intent = chip_action.updateStateAndGetNextIntent(
                 *robot, ball, ball.position(),
                 (ball.position() - field.friendlyGoal()).orientation(), 2);
-            std::cout << "clear ball" << std::endl;
         }
-        else if (enemy_threat)
+        else if (enemy_threat.has_value())
         {
             // If we have been provided with enemy threat information, use it to
             // preemptively block their best shot. Calculate the best shot the enemy could
@@ -98,14 +96,14 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             auto best_shot = Evaluation::calcBestShotOnFriendlyGoal(
                 field, friendly_team, enemy_team, ball.position(),
                 ROBOT_MAX_RADIUS_METERS, {*robot});
-            if (best_shot)
+            if (best_shot.has_value())
             {
                 Vector shot_vector = (best_shot->first - enemy_threat->robot.position());
                 Ray shot_ray       = Ray(enemy_threat->robot.position(), shot_vector);
                 auto [best_shot_intersection_1, best_shot_intersection_2] =
                     raySegmentIntersection(shot_ray, full_goal_segment);
 
-                if (best_shot_intersection_1)
+                if (best_shot_intersection_1.has_value())
                 {
                     // Move to block the estimated best shot the enemy could take
                     goalie_pos = closestPointOnSeg(*best_shot_intersection_1,
@@ -115,7 +113,6 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             next_intent = move_action.updateStateAndGetNextIntent(
                 *robot, goalie_pos, goalie_orientation, 0.0, false, true);
-            std::cout << "block enemy" << std::endl;
         }
 
         // TODO: autokick with chipping?
