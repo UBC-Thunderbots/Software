@@ -3,6 +3,7 @@
 #include <optional>
 #include <vector>
 
+#include "ai/world/robot_capabilities.h"
 #include "boost/circular_buffer.hpp"
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -27,9 +28,12 @@ class Robot
      * state
      * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
-                   const Angle &orientation, const AngularVelocity &angular_velocity,
-                   const Timestamp &timestamp, unsigned int history_duration = 20);
+    explicit Robot(
+        unsigned int id, const Point &position, const Vector &velocity,
+        const Angle &orientation, const AngularVelocity &angular_velocity,
+        const Timestamp &timestamp,
+        const RobotCapabilities &capabilities = RobotCapabilities::allCapabilities(),
+        unsigned int history_duration         = 20);
 
     /**
      * Updates the state of the robot.
@@ -242,6 +246,13 @@ class Robot
     Timestamp getMostRecentTimestamp() const;
 
     /**
+     * Returns the hardware capabilities of the robot
+     *
+     * @return the hardware capabilities of the robot
+     */
+    RobotCapabilities getRobotCapabilities() const;
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.
@@ -312,4 +323,7 @@ class Robot
     // All previous timestamps of when the robot was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
+    // The hardware capabilities of the robot, generated from
+    // RobotCapabilities::broken_dribblers/chippers/kickers dynamic parameters
+    RobotCapabilities capabilities_;
 };

@@ -4,13 +4,15 @@
 
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
-             const Timestamp &timestamp, unsigned int history_duration)
+             const Timestamp &timestamp, const RobotCapabilities &capabilities,
+             unsigned int history_duration)
     : id_(id),
       positions_(history_duration),
       velocities_(history_duration),
       orientations_(history_duration),
       angularVelocities_(history_duration),
-      last_update_timestamps(history_duration)
+      last_update_timestamps(history_duration),
+      capabilities_(capabilities)
 {
     addStateToRobotHistory(position, velocity, orientation, angular_velocity, timestamp);
 }
@@ -247,4 +249,9 @@ bool Robot::operator==(const Robot &other) const
 bool Robot::operator!=(const Robot &other) const
 {
     return !(*this == other);
+}
+
+RobotCapabilities Robot::getRobotCapabilities() const
+{
+    return capabilities_;
 }
