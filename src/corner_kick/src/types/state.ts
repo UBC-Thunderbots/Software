@@ -14,6 +14,7 @@ export interface IRootState {
     thunderbots: IThunderbotsState;
     rosParameters: IROSParamState;
     ros: IROSState;
+    robotStatus: IRobotStatusState;
 }
 
 /**

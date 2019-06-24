@@ -6,7 +6,7 @@ import { ActionType, getType } from 'typesafe-actions';
 
 import { IRobotStatusState } from 'SRC/types';
 
-import * as status from '../actions/status';
+import * as status from '../actions/robotStatus';
 
 export type StatusAction = ActionType<typeof status>;
 

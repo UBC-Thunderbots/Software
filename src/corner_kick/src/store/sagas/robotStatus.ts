@@ -10,7 +10,7 @@ import { TOPIC_ROBOT_STATUS, TOPIC_ROBOT_STATUS_TYPE } from 'SRC/constants';
 import { IRobotStatus, IRobotStatusMessage } from 'SRC/types';
 import * as ROS from 'SRC/utils/ros';
 
-import { actions } from '../actions';
+import { actions } from '../actions/index';
 
 const statusChannel = channel();
 
@@ -32,6 +32,8 @@ function* listenToConsoleChannel() {
     }
 }
 
+let processedMessages: { [key: string]: IRobotStatus } = {};
+
 /**
  * We subscribe to topic robot_status to start receiving messages
  */
@@ -40,10 +42,20 @@ function startRobotStatusSaga() {
         TOPIC_ROBOT_STATUS,
         TOPIC_ROBOT_STATUS_TYPE,
         (message: IRobotStatusMessage) => {
-            const processedMessage = processMessage(message);
-            statusChannel.put(actions.status.updateRobotStatuses(processedMessage));
+            processedMessages = { ...processedMessages, ...processMessage(message) };
         },
+        100,
     );
+
+    setTimeout(updateState, 1000);
+}
+
+function updateState() {
+    statusChannel.put(actions.status.updateRobotStatuses(processedMessages));
+    Object.values(processedMessages).forEach((processedMessage) => {
+        processedMessage.timestamp = processedMessage.timestamp + 1;
+    });
+    setTimeout(updateState, 1000);
 }
 
 function processMessage(message: IRobotStatusMessage) {
@@ -52,7 +64,7 @@ function processMessage(message: IRobotStatusMessage) {
         const robotStatus: IRobotStatus = {
             message: robotMessage,
             robot: message.robot,
-            timestamp: Date.now(),
+            timestamp: 0,
         };
 
         processedMessage[`${message.robot}: ${robotMessage}`] = robotStatus;

@@ -13,11 +13,12 @@ import { Portal, PortalLocation } from 'SRC/components/Portal';
 import { SPRITESHEET } from 'SRC/constants';
 import { Canvas, CanvasManager, LayerReceiver } from 'SRC/containers/Canvas';
 import { actions, RootAction } from 'SRC/store';
-import { ILayer, IRootState, IROSParamState } from 'SRC/types';
+import { ILayer, IRootState, IROSParamState, IRobotStatuses } from 'SRC/types';
 
 import { ParamPanel } from './panels/ParamPanel';
 import { LayersPanel } from './panels/LayersPanel';
 import { PlayTypePanel } from './panels/PlayTypePanel';
+import { RobotStatusPanel } from './panels/RobotStatusPanel/index';
 
 // We request the layer data from the store
 const mapStateToProps = (state: IRootState) => ({
@@ -27,6 +28,7 @@ const mapStateToProps = (state: IRootState) => ({
     playName: state.thunderbots.playName,
     tactics: state.thunderbots.tactics,
     params: state.rosParameters,
+    robotStatuses: state.robotStatus.statuses,
 });
 
 // We request layer related actions
@@ -47,6 +49,7 @@ interface IVisualizerProps {
     playName: string;
     tactics: string[];
     params: IROSParamState;
+    robotStatuses: IRobotStatuses;
 
     // Actions
     addLayer: typeof actions.canvas.addLayer;
@@ -102,6 +105,9 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
                 </Portal>
                 <Portal portalLocation={PortalLocation.MAIN}>
                     <Canvas canvasManager={this.canvasManager} />
+                </Portal>
+                <Portal portalLocation={PortalLocation.CONSOLE}>
+                    <RobotStatusPanel robotStatuses={this.props.robotStatuses} />
                 </Portal>
             </>
         );

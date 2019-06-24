@@ -6,13 +6,13 @@ import * as canvasActions from './canvas';
 import * as rosActions from './ros';
 import * as rosParametersActions from './rosParameters';
 import * as thunderbotsActions from './thunderbots';
-import * as statusActions from './status';
+import * as statusActions from './robotStatus';
 
 import { CanvasAction } from '../reducers/canvas';
 import { ROSAction } from '../reducers/ros';
 import { RosParametersActions } from '../reducers/rosParameters';
 import { ThunderbotsAction } from '../reducers/thunderbots';
-import { StatusAction } from '../reducers/status';
+import { StatusAction } from '../reducers/robotStatus';
 
 export const actions = {
     canvas: canvasActions,
