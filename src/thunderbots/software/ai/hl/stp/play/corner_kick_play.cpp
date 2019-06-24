@@ -135,10 +135,11 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Set the passer on the pass generator
     pass_generator.setPasserRobotId(align_to_ball_tactic->getAssignedRobot()->id());
-    LOG(DEBUG) << "Assigned robot " << align_to_ball_tactic->getAssignedRobot()->id()
-               << " to be the passer in the PassGenerator";
+    LOG(DEBUG) << "Aligning with robot " << align_to_ball_tactic->getAssignedRobot()->id()
+               << "as the passer";
 
     // Put the robot in roughly the right position to perform the kick
+    LOG(DEBUG) << "Aligning to ball";
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
