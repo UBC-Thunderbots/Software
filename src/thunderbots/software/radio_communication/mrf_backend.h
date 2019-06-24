@@ -32,11 +32,12 @@ class MRFBackend
 
     /**
      * Sends a camera packet with the detected robots and ball.
-     * 
+     *
      * @param robots a vector of tuples of {robot id, robot location, robot orientation}
      * @param b new ball
      */
-    void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots, Ball ball);
+    void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
+                            Ball ball);
 
    private:
     MRFDongle dongle;
