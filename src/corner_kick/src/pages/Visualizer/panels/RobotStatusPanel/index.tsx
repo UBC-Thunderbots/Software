@@ -14,7 +14,11 @@ interface IRobotStatusPanelProps {
     robotStatuses: IRobotStatuses;
 }
 
+/**
+ * Displays robot statuses sorted by time
+ */
 export const RobotStatusPanel = (props: IRobotStatusPanelProps) => {
+    // Sort by time, then by robot number, then by message alphabetically
     const sortedRobotStatuses = Object.values(props.robotStatuses).sort((a, b) => {
         const timeDelta = a.timestamp - b.timestamp;
         const robotDelta = a.robot - b.robot;

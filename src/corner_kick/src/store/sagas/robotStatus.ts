@@ -47,15 +47,19 @@ function startRobotStatusSaga() {
         100,
     );
 
-    setTimeout(updateState, 1000);
+    // We update the state once a second
+    setTimeout(updateTimestampAndPush, 1000);
 }
 
-function updateState() {
+function updateTimestampAndPush() {
+    // Push current robot status to the state
     statusChannel.put(actions.status.updateRobotStatuses(processedMessages));
+
+    // And increase timestamp by 1 (one second elapsed)
     Object.values(processedMessages).forEach((processedMessage) => {
         processedMessage.timestamp = processedMessage.timestamp + 1;
     });
-    setTimeout(updateState, 1000);
+    setTimeout(updateTimestampAndPush, 1000);
 }
 
 function processMessage(message: IRobotStatusMessage) {
