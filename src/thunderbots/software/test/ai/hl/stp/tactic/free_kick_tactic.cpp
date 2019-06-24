@@ -6,14 +6,12 @@
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/kick_intent.h"
 #include "ai/intent/chip_intent.h"
-
+#include "ai/intent/kick_intent.h"
 #include "test/test_util/test_util.h"
 
 TEST(FreeKickTacticTest, no_enemies_sanity_test)
 {
-
     // Robot is in the enemy half facing towards enemy goal
     Robot robot = Robot(2, Point(2, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
