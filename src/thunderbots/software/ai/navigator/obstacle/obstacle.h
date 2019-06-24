@@ -14,7 +14,6 @@
 class Obstacle
 {
    public:
-
     /**
      * Create an obstacle from the given polygon
      *

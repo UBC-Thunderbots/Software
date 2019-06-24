@@ -231,7 +231,7 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     // If the destination GridCell is the same as source GridCell
     if (isDestination(src.first, src.second, dest) == true)
     {
-        return std::nullopt;
+        return std::make_optional<std::vector<Point>>({start, destination});
     }
 
     closedList =
@@ -336,7 +336,7 @@ loop_end:
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
 
-    return path_points;
+    return std::make_optional<std::vector<Point>>(path_points);
 }
 
 std::optional<ThetaStarPathPlanner::CellCoordinate>

@@ -103,7 +103,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
 
     // Make sure the path does not go through any obstacles, except for the
     // first point, which is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points->begin()+1, path_points->end()}, obstacles);
+    checkPathDoesNotIntersectObstacle({path_points->begin() + 1, path_points->end()},
+                                      obstacles);
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
@@ -226,3 +227,24 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     ASSERT_EQ(dest, path_points->back());
 }
 
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{2.29, 2.29}, dest{2.3, 2.3};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+
+    std::unique_ptr<PathPlanner> planner =
+        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+
+    auto path_points = planner->findPath(start, dest);
+
+    // We should be able to find path points
+    ASSERT_TRUE(path_points);
+
+    // Since there are no obstacles, there should be two path points, one at the start
+    // and one at the destination
+    ASSERT_EQ(2, path_points->size());
+    ASSERT_EQ(start, path_points->front());
+    ASSERT_EQ(dest, path_points->back());
+}
