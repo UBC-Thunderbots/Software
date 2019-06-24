@@ -1,13 +1,13 @@
 #include "geom/util.h"
 
 #include <algorithm>
+#include <boost/geometry/algorithms/intersection.hpp>
+#include <boost/geometry/geometries/segment.hpp>
 #include <cassert>
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <tuple>
-#include <boost/geometry/geometries/segment.hpp>
-#include <boost/geometry/algorithms/intersection.hpp>
 
 #include "geom/angle.h"
 #include "geom/rectangle.h"
@@ -267,7 +267,8 @@ bool intersects(const Circle &first, const Segment &second)
 bool intersects(const Segment &first, const Segment &second)
 {
     boost::geometry::model::segment<Point> AB(first.getSegStart(), first.getEnd());
-    boost::geometry::model::segment<Point> CD(second.getSegStart(), second.getEnd()); //similar code
+    boost::geometry::model::segment<Point> CD(second.getSegStart(),
+                                              second.getEnd());  // similar code
 
     return boost::geometry::intersects(AB, CD);
 }

@@ -157,6 +157,23 @@ class ThetaStarPathPlanner : public PathPlanner
     std::optional<CellCoordinate> findClosestUnblockedCell(CellCoordinate currCell);
 
     /**
+     * Finds closest valid point that's not in an obstacle to p
+     * @param p     a given point
+     *
+     * @return          closest free point to currCell
+     *                  if not blocked then return p
+     */
+    Point findClosestFreePoint(Point p);
+
+    /**
+     * Checks if a point is valid and doesn't exist in any obstacles
+     * @param p     a given point
+     *
+     * @return      if p is valid and isn't in an obstacle
+     * */
+    bool isValidAndFreeOfObstacles(Point p);
+
+    /**
      * Converts a cell in grid to a point on field
      *
      * @param row row of cell

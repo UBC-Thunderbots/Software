@@ -1,9 +1,9 @@
 #pragma once
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/register/point.hpp>
 #include <cmath>
 #include <iostream>
-#include <boost/geometry/geometries/register/point.hpp>
- #include <boost/geometry.hpp>
 
 #include "geom/angle.h"
 
@@ -574,5 +574,3 @@ typedef Point Vector;
 
 // Make our Point class "compatible" with boost
 BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(Point, double, cs::cartesian, x, y, setX, setY)
-
-

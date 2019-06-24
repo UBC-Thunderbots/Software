@@ -630,7 +630,8 @@ TEST(GeomUtilTest, test_line_intersect)
     }
 }
 
-TEST(GeomUtilTest, test_close_parallel_segments_dont_intersect){
+TEST(GeomUtilTest, test_close_parallel_segments_dont_intersect)
+{
     // This is a test from a bug found
     Segment seg_1(Point(1.049, -1.049), Point(1.95, -1.049));
     Segment seg_2(Point(2, -1), Point(1, -1));

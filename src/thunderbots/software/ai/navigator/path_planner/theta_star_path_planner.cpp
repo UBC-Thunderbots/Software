@@ -8,6 +8,7 @@
  */
 
 
+// constructor
 ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), obstacles_(obstacles)
@@ -23,9 +24,9 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
         for (unsigned col = 0; col < numCols; col++)
         {
             Point p = convertCellToPoint(row, col);
-            for (unsigned index = 0; index < obstacles.size(); index++)
+            for (auto &obstacle : obstacles)
             {
-                if (obstacles[index].getBoundaryPolygon().containsPoint(p))
+                if (obstacle.getBoundaryPolygon().containsPoint(p))
                 {
                     unblocked_grid[row][col] = false;
                 }
@@ -182,8 +183,9 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     bool blocked_dest = false;
     CellCoordinate src, dest;
 
-    src  = convertPointToCell(start);
-    dest = convertPointToCell(destination);
+    Point closest_destination = findClosestFreePoint(destination);
+    src                       = convertPointToCell(start);
+    dest                      = convertPointToCell(closest_destination);
 
     // If the source is out of range
     if (isValid(src.first, src.second) == false)
@@ -325,12 +327,9 @@ loop_end:
 
     auto path_points = tracePath(dest);
 
-    if (!blocked_dest)
-    {
-        // replace destination with actual destination
-        path_points.pop_back();
-        path_points.push_back(destination);
-    }
+    // replace destination with actual destination
+    path_points.pop_back();
+    path_points.push_back(closest_destination);
 
     // replace src with actual start
     path_points.erase(path_points.begin());
@@ -369,6 +368,102 @@ ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
     }
 
     return std::nullopt;
+}
+
+Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
+{
+    if (isValidAndFreeOfObstacles(p))
+    {
+        return p;
+    }
+    else
+    {
+        const double RESOLUTION_FACTOR = 100.0;
+        int xc                         = (int)(p.x() * RESOLUTION_FACTOR);
+        int yc                         = (int)(p.y() * RESOLUTION_FACTOR);
+
+        for (int r = 1; r < field_.totalWidth() * RESOLUTION_FACTOR; r++)
+        {
+            int x = 0, y = r;
+            int d = 3 - 2 * r;
+
+            for (int outer : {-1, 1})
+            {
+                for (int inner : {-1, 1})
+                {
+                    Point p1 = Point((double)(xc + outer * x) / RESOLUTION_FACTOR,
+                                     (double)(yc + inner * y) / RESOLUTION_FACTOR);
+                    Point p2 = Point((double)(xc + outer * y) / RESOLUTION_FACTOR,
+                                     (double)(yc + inner * x) / RESOLUTION_FACTOR);
+                    if (isValidAndFreeOfObstacles(p1))
+                    {
+                        return p1;
+                    }
+                    if (isValidAndFreeOfObstacles(p2))
+                    {
+                        return p2;
+                    }
+                }
+            }
+
+            while (y >= x)
+            {
+                // for each pixel we will
+                // draw all eight pixels
+
+                x++;
+
+                // check for decision parameter
+                // and correspondingly
+                // update d, x, y
+                if (d > 0)
+                {
+                    y--;
+                    d = d + 4 * (x - y) + 10;
+                }
+                else
+                {
+                    d = d + 4 * x + 6;
+                }
+
+                for (int outer : {-1, 1})
+                {
+                    for (int inner : {-1, 1})
+                    {
+                        Point p1 = Point((xc + outer * x) / RESOLUTION_FACTOR,
+                                         (yc + inner * y) / RESOLUTION_FACTOR);
+                        Point p2 = Point((xc + outer * y) / RESOLUTION_FACTOR,
+                                         (yc + inner * x) / RESOLUTION_FACTOR);
+                        if (isValidAndFreeOfObstacles(p1))
+                        {
+                            return p1;
+                        }
+                        if (isValidAndFreeOfObstacles(p2))
+                        {
+                            return p2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
+{
+    if (p.x() > -field_.totalLength() / 2.0 && p.x() < field_.totalLength() / 2.0 &&
+        p.y() > -field_.totalWidth() / 2.0 && p.y() < field_.totalWidth() / 2.0)
+    {
+        for (auto &obstacle : obstacles_)
+        {
+            if (obstacle.getBoundaryPolygon().containsPoint(p))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
