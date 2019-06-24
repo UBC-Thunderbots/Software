@@ -3,8 +3,8 @@
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
+#include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "shared/constants.h"
 
@@ -28,15 +28,18 @@ bool KickoffEnemyPlay::invariantHolds(const World &world) const
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-    auto goalie_tactic = std::make_shared<GoalieTactic>(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), true, true),
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), true, true),
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), true, true)
-    };
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, true),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, true),
+        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
+                                            world.enemyTeam(), true, true)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -88,15 +91,15 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        // TODO: (Mathew): Minor instability with defenders and goalie when the ball and attacker are in the
-        // middle of the net
+        // TODO: (Mathew): Minor instability with defenders and goalie when the ball and
+        // attacker are in the middle of the net
         auto enemy_threats = Evaluation::getAllEnemyThreats(
-                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
+            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
         goalie_tactic->updateParams(
-                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-                enemy_threats.empty() ? std::nullopt
-                                      : std::make_optional(enemy_threats.at(0)));
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+            enemy_threats.empty() ? std::nullopt
+                                  : std::make_optional(enemy_threats.at(0)));
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // keeps track of the next defense position to assign
@@ -107,12 +110,17 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
             {
                 // Assign the first 3 robots to shadow enemies, if the enemies exist
                 auto enemy_threat = enemy_threats.at(i);
-                // Shadow with a distance slighlty more than the distance from the enemy robot to the center line,
-                // so we are always just on our side of the center line
-                double shadow_dist = std::fabs(enemy_threat.robot.position().x()) + 2 * ROBOT_MAX_RADIUS_METERS;
-                // We shadow assuming the robots do not pass so we do not try block passes while shadowing, since
-                // we can't go on the enemy side to block the pass anyway
-                shadow_enemy_tactics.at(i)->updateParams(enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(), shadow_dist, false);
+                // Shadow with a distance slighlty more than the distance from the enemy
+                // robot to the center line, so we are always just on our side of the
+                // center line
+                double shadow_dist = std::fabs(enemy_threat.robot.position().x()) +
+                                     2 * ROBOT_MAX_RADIUS_METERS;
+                // We shadow assuming the robots do not pass so we do not try block passes
+                // while shadowing, since we can't go on the enemy side to block the pass
+                // anyway
+                shadow_enemy_tactics.at(i)->updateParams(
+                    enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
+                    shadow_dist, false);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

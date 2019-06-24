@@ -73,7 +73,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         auto [intersection1, intersection2] =
             raySegmentIntersection(ball_ray, full_goal_segment);
-        if (intersection1.has_value() && ball.velocity().len() > BALL_SLOW_SPEED_THRESHOLD)
+        if (intersection1.has_value() &&
+            ball.velocity().len() > BALL_SLOW_SPEED_THRESHOLD)
         {
             // The ball is heading towards the net. Move to block the shot
             goalie_pos  = closestPointOnSeg(*intersection1, goalie_movement_segment);
