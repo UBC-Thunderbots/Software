@@ -1,6 +1,8 @@
 #pragma once
 #include <ros/ros.h>
 
+#include <boost/signals2.hpp>
+
 #include "thunderbots_msgs/RobotStatus.h"
 
 /**
@@ -16,6 +18,14 @@ class Annunciator
     explicit Annunciator(ros::NodeHandle& node_handle);
 
     /**
+     * Updates detected robots from vision, used to determine dead bots.
+     *
+     * @param robots vector of uints representing the robot detected in the last vision
+     * update.
+     */
+    void update_vision_detections(std::vector<uint8_t> robots);
+
+    /**
      * Decodes diagnostics and messages for each robot, and publishes them.
      * Returns a boolean if there were new messages since the last status update.
      *
@@ -25,10 +35,11 @@ class Annunciator
      * @param lqi Link quality.
      * @param rssi Received signal strength indicator.
      *
-     * @return true if new messages since last status update
+     * @return latest status update
      */
-    bool handle_robot_message(int index, const void* data, std::size_t len, uint8_t lqi,
-                              uint8_t rssi);
+    thunderbots_msgs::RobotStatus handle_robot_message(int index, const void* data,
+                                                       std::size_t len, uint8_t lqi,
+                                                       uint8_t rssi);
 
     /**
      * Handles general dongle messages.
@@ -38,7 +49,15 @@ class Annunciator
      */
     std::vector<std::string> handle_dongle_messages(uint8_t status);
 
+    /**
+     * Signal that fires when the dongle needs to be beeped.
+     */
+    boost::signals2::signal<void()> beep_dongle;
+
+
    private:
+    void checkNewMessages(std::vector<std::string> new_msgs,
+                          std::vector<std::string> old_msgs);
     ros::Publisher robot_status_publisher;
     std::vector<std::string> dongle_messages;
 };
