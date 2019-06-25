@@ -18,8 +18,9 @@ AI:
     options:
         - "Example Play"
         - "Stop Play"
+        - "Defense Play"
         - "KickoffEnemy Play"
-    description: >- 
+    description: >-
         Specifies the ai play that should be in use
   refbox:
     override_refbox_play:

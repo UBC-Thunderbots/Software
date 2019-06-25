@@ -7,21 +7,46 @@
 #include "quadratic_test.h"
 #include "shoot_test.h"
 #include "util_test.h"
-/**
-#include <stdlib.h>
- * Main entry point for the test cases. Each test to run should 
-#include <stdio.h>
- * be wrapped inside a function that should be added here so that
-#include "check.h"
- * when the main function is called each test is run.
 #include "test.h"
- */
-int main(void)
 
-{
+#include <stdlib.h>
+#include <stdio.h>
 static int number_failed = 0;
-    printf("\nStart Tests\n");
 
+#include "check.h"
+void run_test(TCase *tc, Suite *s) {
+#include "test.h"
+    suite_add_tcase(s, tc);
+
+    SRunner *sr = srunner_create(s);
+    srunner_run_all(sr, CK_NORMAL);
+static int number_failed = 0;
+    number_failed += srunner_ntests_failed(sr);
+
+    srunner_free(sr);
+void run_test(TCase *tc, Suite *s) {
+    suite_add_tcase(s, tc);
+    printf("\n");
+    SRunner *sr = srunner_create(s);
+}
+    srunner_run_all(sr, CK_NORMAL);
+
+    number_failed += srunner_ntests_failed(sr);
+/**
+    srunner_free(sr);
+ * Main entry point for the test cases. Each test to run should 
+    printf("\n");
+ * be wrapped inside a function that should be added here so that
+}
+ * when the main function is called each test is run.
+
+ */
+/**
+int main(void)
+ * Main entry point for the test cases. Each test to run should 
+{
+    printf("\nStart Tests\n");
+ * be wrapped inside a function that should be added here so that
     run_math_test();
     run_matrix_test();
     run_move_test();
@@ -30,24 +55,12 @@ static int number_failed = 0;
     run_quadratic_test();
     run_shoot_test();
     run_util_test();
-void run_test(TCase *tc, Suite *s) {
-    (number_failed == 0) ? printf("All tests passed.\n") : printf("%d Tests failed.\n\n", number_failed);
-    suite_add_tcase(s, tc);
-    return 0;
-    SRunner *sr = srunner_create(s);
-}
-    srunner_run_all(sr, CK_NORMAL);
-    number_failed += srunner_ntests_failed(sr);
-    srunner_free(sr);
-    printf("\n");
-}
-
-/**
- * Main entry point for the test cases. Each test to run should 
- * be wrapped inside a function that should be added here so that
  * when the main function is called each test is run.
+    (number_failed == 0) ? printf("All tests passed.\n") : printf("%d Tests failed.\n\n", number_failed);
  */
+    return 0;
 int main(void)
+}
 {
     printf("\nStart Tests\n");
     run_math_test();

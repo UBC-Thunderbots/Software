@@ -27,6 +27,12 @@ namespace
     const int ET_MESSAGE_KEEPALIVE_TIME = 10;
 
     /**
+     * Amount of time without radio communication (but detected on vision)
+     * for a robot to be declared as dead, in seconds.
+     */
+    const int ROBOT_DEAD_TIME = 2;
+
+    /**
      * Represents a mapping from RSSI to decibels.
      */
     struct RSSITableEntry final
@@ -74,16 +80,23 @@ namespace
     // Struct to keep track of previously published messages for a robot
     typedef struct
     {
-        // Previously published messages for this robot
-        std::vector<std::string> old_msgs;
+        // Because vision updates and status updates occur from different
+        // threads, a mutex is used to prevent race conditions.
+        std::mutex bot_mutex = std::mutex();
+
+        // Previously published status for this robot
+        thunderbots_msgs::RobotStatus previous_status;
 
         // Map of message to timestamp for edge-triggered messages
         std::map<std::string, time_t> et_messages;
 
+        // Timestamp of when this bot last sent a status update
+        time_t last_status_update;
+
     } RobotStatusState;
 
     // Map of robot number to their previously published messages
-    std::map<int, RobotStatusState> robot_status_states;
+    std::map<uint8_t, RobotStatusState> robot_status_states;
 
 }  // namespace
 
@@ -91,13 +104,26 @@ Annunciator::Annunciator(ros::NodeHandle &node_handle)
 {
     robot_status_publisher = node_handle.advertise<thunderbots_msgs::RobotStatus>(
         Util::Constants::ROBOT_STATUS_TOPIC, 1);
+
+    // Initialize messages with the correct robot ID
+    for (uint8_t bot = 0; bot < MAX_ROBOTS_OVER_RADIO; ++bot)
+    {
+        robot_status_states[bot].bot_mutex.lock();
+        robot_status_states[bot].previous_status.robot = bot;
+        robot_status_states[bot].bot_mutex.unlock();
+    }
 }
 
-bool Annunciator::handle_robot_message(int index, const void *data, std::size_t len,
-                                       uint8_t lqi, uint8_t rssi)
+thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
+                                                                const void *data,
+                                                                std::size_t len,
+                                                                uint8_t lqi, uint8_t rssi)
 {
     std::vector<std::string> new_msgs;
     thunderbots_msgs::RobotStatus robot_status;
+
+    // Guard robot status state for this bot
+    std::lock_guard<std::mutex> lock(robot_status_states[index].bot_mutex);
 
     robot_status.link_quality = lqi / 255.0;
 
@@ -134,6 +160,13 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 
                     robot_status.battery_voltage =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 1000.0;
+
+                    // Warn if battery voltage is too low
+                    if (robot_status.battery_voltage < MRF::MIN_BATTERY_VOLTAGE)
+                    {
+                        new_msgs.insert(new_msgs.begin(), MRF::LOW_BATTERY_MESSAGE);
+                    }
+
                     bptr += 2;
                     len -= 2;
 
@@ -141,9 +174,9 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
 
                     // Warn if capacitor voltage is too low
-                    if (robot_status.capacitor_voltage < 5.0)
+                    if (robot_status.capacitor_voltage < MRF::MIN_CAP_VOLTAGE)
                     {
-                        new_msgs.push_back(MRF::LOW_CAP_MESSAGE);
+                        new_msgs.insert(new_msgs.begin(), MRF::LOW_CAP_MESSAGE);
                     }
 
                     bptr += 2;
@@ -156,6 +189,13 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
 
                     robot_status.board_temperature =
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
+
+                    // Warn if board temperature too high
+                    if (robot_status.capacitor_voltage > MRF::MAX_BOARD_TEMPERATURE)
+                    {
+                        new_msgs.insert(new_msgs.begin(), MRF::HIGH_BOARD_TEMP_MESSAGE);
+                    }
+
                     bptr += 2;
                     len -= 2;
 
@@ -226,7 +266,6 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                      * These messages are added to a separate map,
                                      * mapping to a timestamp of when it was most recently
                                      * transmitted
-
                                      */
                                     for (unsigned int i = 0; i < MRF::ERROR_ET_COUNT; ++i)
                                     {
@@ -343,30 +382,37 @@ bool Annunciator::handle_robot_message(int index, const void *data, std::size_t 
         }
     }
 
-    // If there is a new message that wasn't present in the previous status update, return
-    // true
-    bool new_msgs_present = false;
-    for (std::string msg : new_msgs)
-    {
-        if (std::find(robot_status_states[index].old_msgs.begin(),
-                      robot_status_states[index].old_msgs.end(),
-                      msg) == robot_status_states[index].old_msgs.end())
-        {
-            new_msgs_present = true;
-            break;
-        }
-    }
+    // Beep the dongle if there were new messages since the last update
+    checkNewMessages(new_msgs, robot_status_states[index].previous_status.robot_messages);
 
     // Add the latest robot and dongle status messages
     robot_status.robot_messages  = new_msgs;
     robot_status.dongle_messages = dongle_messages;
 
     // Update previous message state
-    robot_status_states[index].old_msgs = new_msgs;
+    robot_status_states[index].previous_status = robot_status;
+
+    // Update last communicated time
+    robot_status_states[index].last_status_update = time(nullptr);
 
     // Publish robot status
     robot_status_publisher.publish(robot_status);
-    return new_msgs_present;
+    return robot_status;
+}
+
+void Annunciator::checkNewMessages(std::vector<std::string> new_msgs,
+                                   std::vector<std::string> old_msgs)
+{
+    // If there is a new message that wasn't present in the previous status update, beep
+    // the dongle
+    for (std::string msg : new_msgs)
+    {
+        if (std::find(old_msgs.begin(), old_msgs.end(), msg) == old_msgs.end())
+        {
+            beep_dongle();
+            break;
+        }
+    }
 }
 
 std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
@@ -396,4 +442,33 @@ std::vector<std::string> Annunciator::handle_dongle_messages(uint8_t status)
     }
 
     return dongle_messages;
+}
+
+void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
+{
+    for (uint8_t bot : robots)
+    {
+        // Guard robot status state for this bot
+        robot_status_states[bot].bot_mutex.lock();
+
+        // Check if robot is dead, publish old status update with dead message if so
+        if (difftime(time(nullptr), robot_status_states[bot].last_status_update) >
+            ROBOT_DEAD_TIME)
+        {
+            thunderbots_msgs::RobotStatus new_status =
+                robot_status_states[bot].previous_status;
+            new_status.robot_messages.clear();
+            new_status.robot_messages.push_back(MRF::ROBOT_DEAD_MESSAGE);
+
+            // Beep dongle if this is a recent event
+            checkNewMessages(new_status.robot_messages,
+                             robot_status_states[bot].previous_status.robot_messages);
+
+            // Update and publish latest status
+            robot_status_states[bot].previous_status = new_status;
+            robot_status_publisher.publish(new_status);
+        }
+
+        robot_status_states[bot].bot_mutex.unlock();
+    }
 }
