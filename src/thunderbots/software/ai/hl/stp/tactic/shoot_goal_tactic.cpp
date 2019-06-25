@@ -82,8 +82,8 @@ std::optional<std::pair<Point, double>> ShootGoalTactic::getShotData() const
                                                              enemy_team, ball.position());
     if (best_shot_opt)
     {
-        double net_percent_open =
-            Evaluation::calcShotOpenNetPercentage(field, ball.position(), *best_shot_opt);
+        double net_percent_open = Evaluation::calcShotOpenEnemyNetPercentage(
+            field, ball.position(), *best_shot_opt);
         return std::make_pair(best_shot_opt->first, net_percent_open);
     }
 
@@ -140,8 +140,8 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // If an enemy is about to steal the ball from us, we try chip over them to
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
-            yield(chip_action.updateStateAndGetNextIntent(*robot, ball, ball.position(),
-                                                          fallback_chip_target, CHIP_DIST));
+            yield(chip_action.updateStateAndGetNextIntent(
+                *robot, ball, ball.position(), fallback_chip_target, CHIP_DIST));
         }
         else
         {
