@@ -665,7 +665,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/move_action.cpp
             ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
-            ai/hl/stp/play/corner_kick_play.cpp
             ai/hl/stp/play/example_play.cpp
             ai/hl/stp/play/stop_play.cpp
             ai/hl/stp/play/play.cpp
@@ -822,7 +821,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/evaluation.cpp
             test/ai/passing/main.cpp
             test/ai/passing/pass.cpp
-            test/ai/passing/pass_generator.cpp
+            # TODO: (Issue #655) un-comment this and fix the flaky tests in it
+            # test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             util/canvas_messenger/canvas_messenger.cpp
             util/math_functions.cpp
