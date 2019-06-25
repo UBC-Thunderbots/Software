@@ -24,7 +24,7 @@ class PasserTactic : public Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit PasserTactic(AI::Passing::Pass pass, const Ball& ball, bool loop_forever);
+    explicit PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever);
 
     std::string getName() const override;
 
@@ -34,7 +34,7 @@ class PasserTactic : public Tactic
      * @param pass The pass to perform
      * @param updated_ball The ball we're passing
      */
-    void updateParams(const AI::Passing::Pass& updated_pass, const Ball& updated_ball);
+    void updateParams(const Passing::Pass& updated_pass, const Ball& updated_ball);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -51,6 +51,6 @@ class PasserTactic : public Tactic
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // Tactic parameters
-    AI::Passing::Pass pass;
+    Passing::Pass pass;
     Ball ball;
 };

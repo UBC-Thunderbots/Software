@@ -11,7 +11,7 @@
 #include "geom/point.h"
 #include "util/time/timestamp.h"
 
-namespace AI::Passing
+namespace Passing
 {
     /**
      * This class represents a Pass, with a given start position, end position,
@@ -116,4 +116,4 @@ namespace AI::Passing
     };
 
 
-}  // namespace AI::Passing
+}  // namespace Passing

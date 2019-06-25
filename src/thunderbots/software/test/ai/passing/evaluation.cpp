@@ -20,7 +20,7 @@
 #include "../shared/constants.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 class PassingEvaluationTest : public testing::Test
 {
@@ -36,15 +36,15 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value();
     double max_pass_speed_param =
-        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
     double avg_time_offset_for_pass_seconds;
 };
 
@@ -250,11 +250,11 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
                Timestamp::fromSeconds(0))});
     world.updateEnemyTeamState(enemy_team);
 
-    Pass pass(world.field().enemyCornerPos(), {1.8, 0.6}, 4.8,
-              Timestamp::fromSeconds(0.6));
+    Pass pass(world.field().enemyCornerPos(), {1.8, 0.8}, 4.8,
+              Timestamp::fromSeconds(0.8));
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
-    EXPECT_GE(pass_rating, 0.2);
+    EXPECT_GE(pass_rating, 0.1);
     EXPECT_LE(pass_rating, 0.7);
 }
 
