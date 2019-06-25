@@ -9,7 +9,7 @@
 #include "geom/angle.h"
 #include "geom/point.h"
 
-enum AutokickFlag
+enum AutokickType
 {
     NONE,
     AUTOKICK,
@@ -38,7 +38,7 @@ class MovePrimitive : public Primitive
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
-                           bool enable_dribbler = false, AutokickFlag autokick = NONE);
+                           bool enable_dribbler = false, AutokickType autokick = NONE);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -86,7 +86,7 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    AutokickFlag getAutoKickFlag() const;
+    AutokickType getAutoKickType() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
@@ -135,5 +135,5 @@ class MovePrimitive : public Primitive
     Angle final_angle;
     double final_speed;
     bool enable_dribbler;
-    AutokickFlag autokick;
+    AutokickType autokick;
 };

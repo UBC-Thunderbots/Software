@@ -11,7 +11,7 @@ MoveAction::MoveAction(double close_to_dest_threshold, bool loop_forever)
 
 std::unique_ptr<Intent> MoveAction::updateStateAndGetNextIntent(
     const Robot& robot, Point destination, Angle final_orientation, double final_speed,
-    bool enable_dribbler, AutokickFlag autokick)
+    bool enable_dribbler, AutokickType autokick)
 {
     // Update the parameters stored by this Action
     this->robot             = robot;

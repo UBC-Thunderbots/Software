@@ -28,7 +28,7 @@ class MoveIntent : public Intent, public MovePrimitive
     explicit MoveIntent(unsigned int robot_id, const Point& dest,
                         const Angle& final_angle, double final_speed,
                         unsigned int priority, bool enable_dribbler = false,
-                        AutokickFlag autokick = NONE);
+                        AutokickType autokick = NONE);
 
     std::string getIntentName(void) const override;
 

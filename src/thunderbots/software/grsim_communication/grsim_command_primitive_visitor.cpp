@@ -189,8 +189,8 @@ void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
     motion_controller_command = MotionController::PositionCommand(
         move_primitive.getDestination(), move_primitive.getFinalAngle(),
         move_primitive.getFinalSpeed(), move_primitive.isDribblerEnabled() ? 1000.0 : 0,
-        move_primitive.getAutoKickFlag() == AUTOKICK,
-        move_primitive.getAutoKickFlag() == AUTOCHIP);
+        move_primitive.getAutoKickType() == AUTOKICK,
+        move_primitive.getAutoKickType() == AUTOCHIP);
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_primitive)
