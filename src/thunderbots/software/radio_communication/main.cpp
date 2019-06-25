@@ -62,12 +62,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
         robots.push_back(std::make_tuple(r.id(), r.position(), r.orientation()));
     }
 
-    // Update robots and ball
-    backend_ptr->update_robots(robots);
-    backend_ptr->update_ball(ball);
-
     // Send vision packet
-    backend_ptr->send_vision_packet();
+    backend_ptr->send_vision_packet(robots, ball);
 }
 
 void signalHandler(int signum)

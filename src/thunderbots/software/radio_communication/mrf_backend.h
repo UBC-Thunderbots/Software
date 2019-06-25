@@ -31,30 +31,17 @@ class MRFBackend
     void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives);
 
     /**
-     * Updates the detected robots from vision.
+     * Sends a camera packet with the detected robots and ball.
      *
      * @param robots a vector of tuples of {robot id, robot location, robot orientation}
-     */
-    void update_robots(std::vector<std::tuple<uint8_t, Point, Angle>> robots);
-
-    /**
-     * Updates the backend with the latest ball.
-     *
      * @param b new ball
      */
-    void update_ball(Ball b);
-
-    /**
-     * Sends a camera packet with the detected robots and ball.
-     */
-    void send_vision_packet();
+    void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
+                            Ball ball);
 
    private:
     MRFDongle dongle;
 
     // The Annunciator that sends messages from the dongle to AI
     Annunciator annunciator;
-
-    std::vector<std::tuple<uint8_t, Point, Angle>> robots;
-    Ball ball;
 };
