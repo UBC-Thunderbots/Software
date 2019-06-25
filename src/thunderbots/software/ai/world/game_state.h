@@ -190,7 +190,7 @@ class GameState
      *
      * @return true if we are taking an indirect free kick.
      */
-    bool isOurIndirect() const;
+    bool isOurIndirectFree() const;
 
     /**
      * Returns true if we are doing any type of free kick.

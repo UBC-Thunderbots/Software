@@ -64,14 +64,14 @@ bool GameState::isOurDirectFree() const
     return isDirectFree() && our_restart;
 }
 
-bool GameState::isOurIndirect() const
+bool GameState::isOurIndirectFree() const
 {
     return isIndirectFree() && our_restart;
 }
 
 bool GameState::isOurFreeKick() const
 {
-    return isOurDirectFree() || isOurIndirect();
+    return isOurDirectFree() || isOurIndirectFree();
 }
 
 bool GameState::isOurPlacement() const
