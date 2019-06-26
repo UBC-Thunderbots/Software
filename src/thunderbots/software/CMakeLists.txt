@@ -740,6 +740,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
             ai/primitive/primitive.cpp
+            ai/primitive/move_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/catch_primitive.cpp
             ai/primitive/chip_primitive.cpp
