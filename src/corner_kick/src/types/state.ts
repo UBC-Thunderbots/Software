@@ -4,6 +4,7 @@
 
 import { ILayer } from './canvas';
 import { IROSParam } from './rosParams';
+import { IRobotStatus } from './status';
 
 /**
  * The application state
@@ -11,7 +12,9 @@ import { IROSParam } from './rosParams';
 export interface IRootState {
     canvas: ICanvasState;
     thunderbots: IThunderbotsState;
+    rosParameters: IROSParamState;
     ros: IROSState;
+    robotStatus: IRobotStatusState;
 }
 
 /**
@@ -41,4 +44,11 @@ export interface IThunderbotsState {
  */
 export interface IROSParamState {
     [key: string]: IROSParam;
+}
+
+/**
+ * The robot status state
+ */
+export interface IRobotStatusState {
+    statuses: { [key: string]: IRobotStatus };
 }

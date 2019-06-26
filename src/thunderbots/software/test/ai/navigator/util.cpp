@@ -6,7 +6,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 #include <sstream>
 
 #include "geom/point.h"
@@ -74,6 +73,52 @@ TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_nan_corner_cases
     final_speed = 2.2;
     EXPECT_FALSE(isnormal(
         calculateTransitionSpeedBetweenSegments(testp1, testp2, testp3, final_speed)));
+}
+
+TEST(NavUtilTest, convertPointsToMovePrimitives_test)
+{
+    unsigned int robot_id = 1;
+
+    Point point1 = Point(0, 1);
+    Point point2 = Point(1, 3);
+    Point point3 = Point(2, 5);
+
+    std::vector<Point> points = {point1, point2, point3};
+
+    std::vector<MovePrimitive> movePrimitives =
+        convertToMovePrimitives(robot_id, points, false, false);
+
+    // testing point 1
+    MovePrimitive movePrimitive1 = movePrimitives.at(0);
+    EXPECT_EQ(movePrimitive1.getRobotId(), robot_id);
+    EXPECT_EQ(movePrimitive1.getDestination(), point1);
+    EXPECT_EQ(movePrimitive1.getFinalSpeed(), 0);
+    EXPECT_EQ(movePrimitive1.getFinalAngle(), point1.orientation());
+
+    // testing point 2
+    MovePrimitive movePrimitive2 = movePrimitives.at(1);
+    EXPECT_EQ(movePrimitive2.getRobotId(), robot_id);
+    EXPECT_EQ(movePrimitive2.getDestination(), point2);
+    EXPECT_EQ(movePrimitive2.getFinalSpeed(), 0);
+    EXPECT_EQ(movePrimitive2.getFinalAngle(), point2.orientation());
+
+    // testing point 3
+    MovePrimitive movePrimitive3 = movePrimitives.at(2);
+    EXPECT_EQ(movePrimitive3.getRobotId(), 1);
+    EXPECT_EQ(movePrimitive3.getDestination(), point3);
+    EXPECT_EQ(movePrimitive3.getFinalSpeed(), 0);
+    EXPECT_EQ(movePrimitive3.getFinalAngle(), point3.orientation());
+}
+
+TEST(NavUtilTest, convertNoPointsToMovePrimitives_test)
+{
+    unsigned int robot_id = 1;
+
+    std::vector<Point> points = {};
+    std::vector<MovePrimitive> movePrimitives =
+        convertToMovePrimitives(robot_id, points, false, false);
+
+    EXPECT_THROW(movePrimitives.at(0), std::out_of_range);
 }
 
 TEST(getPointTrespassTest, distance_within_threshold_test)

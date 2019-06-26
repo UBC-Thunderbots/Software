@@ -199,3 +199,83 @@ TEST(CalcBestShotTest,
     // We should not be able to find a shot
     ASSERT_FALSE(result);
 }
+
+TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_unblocked_net)
+{
+    World world                  = ::Test::TestUtil::createBlankTestingWorld();
+    Field field                  = ::Test::TestUtil::createSSLDivBField();
+    Point shot_origin            = world.field().enemyGoal() - Vector(0.5, 0);
+    std::pair<Point, Angle> shot = {world.field().enemyGoal(), Angle::ofDegrees(90)};
+
+    auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+
+    // We should not be able to find a shot
+    EXPECT_NEAR(result, 1.0, 0.01);
+}
+
+TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_partially_blocked_net)
+{
+    World world                  = ::Test::TestUtil::createBlankTestingWorld();
+    Field field                  = ::Test::TestUtil::createSSLDivBField();
+    Point shot_origin            = world.field().enemyGoal() - Vector(0.5, 0);
+    std::pair<Point, Angle> shot = {world.field().enemyGoal() + Vector(0, 0.25),
+                                    Angle::ofDegrees(45)};
+
+    auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+
+    // We should not be able to find a shot
+    EXPECT_NEAR(result, 0.5, 0.01);
+}
+
+TEST(CalcBestShotTest, calc_open_enemy_net_percentage_with_fully_blocked_net)
+{
+    World world                  = ::Test::TestUtil::createBlankTestingWorld();
+    Field field                  = ::Test::TestUtil::createSSLDivBField();
+    Point shot_origin            = world.field().enemyGoal() - Vector(0.5, 0);
+    std::pair<Point, Angle> shot = {world.field().enemyGoal(), Angle::zero()};
+
+    auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+
+    // We should not be able to find a shot
+    EXPECT_NEAR(result, 0.0, 0.01);
+}
+
+TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_unblocked_net)
+{
+    World world                  = ::Test::TestUtil::createBlankTestingWorld();
+    Field field                  = ::Test::TestUtil::createSSLDivBField();
+    Point shot_origin            = world.field().friendlyGoal() + Vector(0.5, 0);
+    std::pair<Point, Angle> shot = {world.field().enemyGoal(), Angle::ofDegrees(90)};
+
+    auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+
+    // We should not be able to find a shot
+    EXPECT_NEAR(result, 1.0, 0.01);
+}
+
+TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_partially_blocked_net)
+{
+    World world                  = ::Test::TestUtil::createBlankTestingWorld();
+    Field field                  = ::Test::TestUtil::createSSLDivBField();
+    Point shot_origin            = world.field().friendlyGoal() + Vector(0.5, 0);
+    std::pair<Point, Angle> shot = {world.field().enemyGoal() + Vector(0, 0.25),
+                                    Angle::ofDegrees(45)};
+
+    auto result = Evaluation::calcShotOpenFriendlyNetPercentage(field, shot_origin, shot);
+
+    // We should not be able to find a shot
+    EXPECT_NEAR(result, 0.5, 0.01);
+}
+
+TEST(CalcBestShotTest, calc_open_friendly_net_percentage_with_fully_blocked_net)
+{
+    World world                  = ::Test::TestUtil::createBlankTestingWorld();
+    Field field                  = ::Test::TestUtil::createSSLDivBField();
+    Point shot_origin            = world.field().enemyGoal() + Vector(0.5, 0);
+    std::pair<Point, Angle> shot = {world.field().enemyGoal(), Angle::zero()};
+
+    auto result = Evaluation::calcShotOpenEnemyNetPercentage(field, shot_origin, shot);
+
+    // We should not be able to find a shot
+    EXPECT_NEAR(result, 0.0, 0.01);
+}

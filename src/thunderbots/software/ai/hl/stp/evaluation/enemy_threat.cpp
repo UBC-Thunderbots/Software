@@ -95,7 +95,10 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
         unvisited_robots.end());
     std::vector<Robot> all_robots   = passing_team.getAllRobots();
     std::vector<Robot> other_robots = other_team.getAllRobots();
-    all_robots.insert(all_robots.end(), other_robots.begin(), other_robots.end());
+    // TODO: possibly re-enable using friendly robots as obstacles if we can find a way to
+    // stop defenders from oscillating between positions See
+    // https://github.com/UBC-Thunderbots/Software/issues/642
+    // all_robots.insert(all_robots.end(), other_robots.begin(), other_robots.end());
 
     // On each iteration, check what robots can be passed to. These receivers will
     // become the passers on the next iteration. This is like expanding the frontier
@@ -220,9 +223,14 @@ void Evaluation::sortThreatsInDecreasingOrder(
 }
 
 std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
-    const Field &field, const Team &friendly_team, const Team &enemy_team,
-    const Ball &ball)
+    const Field &field, const Team &friendly_team, Team enemy_team, const Ball &ball,
+    bool include_goalie)
 {
+    if (!include_goalie && enemy_team.getGoalieID())
+    {
+        enemy_team.removeRobotWithId(*enemy_team.getGoalieID());
+    }
+
     std::vector<Evaluation::EnemyThreat> threats;
 
     for (const auto &robot : enemy_team.getAllRobots())
@@ -231,8 +239,11 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
 
         // Get the angle from the robot to each friendly goalpost, then find the
         // difference between these angles to get the goal_angle for the robot
-        Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), robot.position(),
-                                            field.friendlyGoalpostNeg());
+        auto friendly_goalpost_angle_1 =
+            (field.friendlyGoalpostPos() - robot.position()).orientation();
+        auto friendly_goalpost_angle_2 =
+            (field.friendlyGoalpostNeg() - robot.position()).orientation();
+        Angle goal_angle = friendly_goalpost_angle_1.minDiff(friendly_goalpost_angle_2);
 
         std::optional<Angle> best_shot_angle  = std::nullopt;
         std::optional<Point> best_shot_target = std::nullopt;

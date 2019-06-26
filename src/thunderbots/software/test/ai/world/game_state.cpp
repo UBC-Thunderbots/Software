@@ -182,14 +182,14 @@ PREDICATE_TEST(isIndirectFree, RefboxGameState::INDIRECT_FREE_US,
                RefboxGameState::INDIRECT_FREE_THEM)
 PREDICATE_TEST(isOurKickoff, RefboxGameState::PREPARE_KICKOFF_US)
 PREDICATE_TEST(isOurPenalty, RefboxGameState::PREPARE_PENALTY_US)
-PREDICATE_TEST(isOurDirect, RefboxGameState::DIRECT_FREE_US)
-PREDICATE_TEST(isOurIndirect, RefboxGameState::INDIRECT_FREE_US)
+PREDICATE_TEST(isOurDirectFree, RefboxGameState::DIRECT_FREE_US)
+PREDICATE_TEST(isOurIndirectFree, RefboxGameState::INDIRECT_FREE_US)
 PREDICATE_TEST(isOurPlacement, RefboxGameState::BALL_PLACEMENT_US)
 PREDICATE_TEST(isOurFreeKick, RefboxGameState::DIRECT_FREE_US,
                RefboxGameState::INDIRECT_FREE_US)
 PREDICATE_TEST(isTheirKickoff, RefboxGameState::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(isTheirPenalty, RefboxGameState::PREPARE_PENALTY_THEM)
-PREDICATE_TEST(isTheirDirect, RefboxGameState::DIRECT_FREE_THEM)
+PREDICATE_TEST(isTheirDirectFree, RefboxGameState::DIRECT_FREE_THEM)
 PREDICATE_TEST(isTheirFreeKick, RefboxGameState::DIRECT_FREE_THEM,
                RefboxGameState::INDIRECT_FREE_THEM)
 PREDICATE_TEST(isTheirBallPlacement, RefboxGameState::BALL_PLACEMENT_THEM)

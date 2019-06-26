@@ -72,6 +72,9 @@ if(NOT G3LOG OR NOT EXISTS "${G3LOG}")
 endif()
 message("g3log path: ${G3LOG}")
 
+# Find Eigen
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+
 # Find boost components
 find_package(Boost REQUIRED COMPONENTS
         coroutine
@@ -146,6 +149,7 @@ target_link_libraries(network_input
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         ${G3LOG}
+        Eigen3::Eigen
         )
 
 file(GLOB_RECURSE AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -224,7 +228,7 @@ target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${LIBUSB_1_LIBRARIES}
         )
 
-    file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
@@ -318,6 +322,10 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/util.cpp
             ai/navigator/util.cpp
             ai/navigator/util.h
+            ai/primitive/move_primitive.h
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/primitive.h
             geom/point.h)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
@@ -599,23 +607,28 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/chip_action.cpp
             ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
+            ai/hl/stp/evaluation/intercept.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
             ai/hl/stp/tactic/move_tactic.cpp
             ai/hl/stp/tactic/passer_tactic.cpp
             ai/hl/stp/tactic/receiver_tactic.cpp
             ai/hl/stp/tactic/stop_tactic.cpp
+            ai/hl/stp/tactic/shoot_goal_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/chip_intent.cpp
             ai/intent/stop_intent.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/chip_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
@@ -634,6 +647,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/passer_tactic.cpp
             test/ai/hl/stp/tactic/receiver_tactic.cpp
             test/ai/hl/stp/tactic/stop_tactic.cpp
+            test/ai/hl/stp/tactic/shoot_goal_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
@@ -813,7 +827,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/evaluation.cpp
             test/ai/passing/main.cpp
             test/ai/passing/pass.cpp
-            test/ai/passing/pass_generator.cpp
+            # TODO: (Issue #655) un-comment this and fix the flaky tests in it
+            # test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             util/canvas_messenger/canvas_messenger.cpp
             util/math_functions.cpp
@@ -918,11 +933,9 @@ if (CATKIN_ENABLE_TESTING)
             test/geom/polygon.cpp
             geom/polygon.cpp
             geom/util.cpp)
-
     target_link_libraries(polygon_test
             ${catkin_LIBRARIES}
             ${G3LOG})
-
 
     catkin_add_gtest(robot_filter_test
             test/network_input/filter/robot_filter.cpp
@@ -1032,7 +1045,29 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES})
-    
+
+    catkin_add_gtest(network_input_test
+            test/network_input/filter/ball_filter.cpp
+            test/network_input/main.cpp
+            test/test_util/test_util.cpp
+            network_input/filter/ball_filter.cpp
+            ai/world/ball.cpp
+            ai/world/robot.cpp
+            ai/world/field.cpp
+            ai/world/team.cpp
+            ai/world/world.cpp
+            ai/world/game_state.cpp
+            util/time/time.cpp
+            util/time/timestamp.cpp
+            util/time/duration.cpp
+            util/math_functions.cpp
+            util/parameter/dynamic_parameters.cpp
+            geom/util.cpp)
+    target_link_libraries(network_input_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            Eigen3::Eigen
+            )
 endif()
 
 ##### ROSTests / Integration Tests #####
@@ -1061,7 +1096,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters are working
+    # The test node that verifies the dynamic_parameters are working
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp
             util/parameter/dynamic_parameters.cpp
@@ -1069,7 +1104,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters exist in the parameter server
+    # The test node that verifies the dynamic_parameters exist in the parameter server
     add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
             test/util/test_parameter_exists.cpp
             util/parameter/dynamic_parameters.cpp

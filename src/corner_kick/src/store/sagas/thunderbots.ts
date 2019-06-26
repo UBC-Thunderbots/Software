@@ -45,6 +45,6 @@ function startThunderbotsSaga() {
         (message: IPlayInfoMessage) => {
             thunderbotsChannel.put(actions.thunderbots.setPlayInformation(message));
         },
-        500,
+        1000,
     );
 }

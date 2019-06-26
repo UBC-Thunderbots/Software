@@ -93,9 +93,6 @@ class NetworkClient
     // The most up-to-date state of the world
     thunderbots_msgs::World world_msg;
 
-    // A map used to store the latest detection data for each camera
-    std::map<unsigned int, SSL_DetectionFrame> latest_detection_data;
-
     // The io_service that will be used to serivce all network requests
     boost::asio::io_service io_service;
 

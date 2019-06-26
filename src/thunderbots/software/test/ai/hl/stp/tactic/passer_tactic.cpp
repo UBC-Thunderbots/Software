@@ -10,7 +10,7 @@
 #include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 TEST(PasserTacticTest,
      passer_already_at_pass_start_position_but_oriented_incorrectly_pass_not_yet_started)

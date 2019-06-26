@@ -17,20 +17,13 @@ import { UnknownPortalException } from 'SRC/utils/exceptions/unknownPortal';
  *     specific to the page
  * -   **sidebar:** Contains additional controls or information relevant
  *     to the current page
- * -   **sidebarControl:** Contains navigation controls to switch between pages
  * -   **console:** Contains views visible across the application
- * -   **footer(Left|Right):** Contains simple breadcrumbs of information
- *     relevant to the application as a whole or to the current page
  */
 export enum PortalLocation {
     MAIN = 'main',
     SIDEBAR = 'sidebar',
-    SIDEBAR_CONTROL = 'sidebarControl',
     SIDEBAR_TITLE = 'sidebarTitle',
     CONSOLE = 'console',
-    MAIN_TITLE = 'mainTitle',
-    FOOTER_RIGHT = 'footerRight',
-    FOOTER_LEFT = 'footerLeft',
 }
 
 interface IPortalProps {
