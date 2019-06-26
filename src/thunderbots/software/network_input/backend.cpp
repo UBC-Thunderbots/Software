@@ -190,7 +190,7 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_blue();
-        if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
+        if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
             ssl_robots = detection.robots_yellow();
         }

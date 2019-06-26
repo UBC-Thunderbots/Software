@@ -32,7 +32,7 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     thunderbots_msgs::World world_msg = *msg;
     World world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
 
-    if (!Util::DynamicParameters::AI::run_ai.value()) {
+    if (Util::DynamicParameters::AI::run_ai.value()) {
         // Get the Primitives the Robots should run from the AI
         std::vector<std::unique_ptr<Primitive>> assignedPrimitives = ai.getPrimitives(world);
 
