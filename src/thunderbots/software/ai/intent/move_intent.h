@@ -21,14 +21,14 @@ class MoveIntent : public Intent, public MovePrimitive
      * @param priority The priority of this Intent. A larger number indicates a higher
      * priority
      * @param enable_dribbler Whether or not to enable the dribbler
-     * @param enable_autokick This will enable the "break-beam" on the robot, that will
+     * @param autokick This will enable the "break-beam" on the robot, that will
      *                        trigger the kicker to fire as soon as the ball is in front
      *                        of it
      */
     explicit MoveIntent(unsigned int robot_id, const Point& dest,
                         const Angle& final_angle, double final_speed,
                         unsigned int priority, bool enable_dribbler = false,
-                        bool enable_autokick = false);
+                        AutokickType autokick = NONE);
 
     std::string getIntentName(void) const override;
 

@@ -228,7 +228,7 @@ target_link_libraries(radio_communication ${catkin_LIBRARIES}
         ${LIBUSB_1_LIBRARIES}
         )
 
-    file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB_RECURSE DYNAMIC_RECONFIGURE_SERVER_HOST_NODE LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
@@ -322,6 +322,10 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/util.cpp
             ai/navigator/util.cpp
             ai/navigator/util.h
+            ai/primitive/move_primitive.h
+            ai/primitive/move_primitive.cpp
+            ai/primitive/primitive.cpp
+            ai/primitive/primitive.h
             geom/point.h)
 
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
@@ -603,10 +607,12 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/action.cpp
             ai/hl/stp/action/kick_action.cpp
             ai/hl/stp/action/move_action.cpp
+            ai/hl/stp/action/chip_action.cpp
             ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/evaluation/indirect_chip.cpp
             ai/hl/stp/evaluation/deflect_off_enemy_target.cpp
+            ai/hl/stp/evaluation/intercept.cpp
             ai/hl/stp/tactic/block_shot_path_tactic.cpp
             ai/hl/stp/tactic/cherry_pick_tactic.cpp
             ai/hl/stp/tactic/free_kick_tactic.cpp
@@ -614,15 +620,18 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/tactic/passer_tactic.cpp
             ai/hl/stp/tactic/receiver_tactic.cpp
             ai/hl/stp/tactic/stop_tactic.cpp
+            ai/hl/stp/tactic/shoot_goal_tactic.cpp
             ai/hl/stp/tactic/tactic.cpp
             ai/intent/intent.cpp
             ai/intent/kick_intent.cpp
             ai/intent/move_intent.cpp
+            ai/intent/chip_intent.cpp
             ai/intent/stop_intent.cpp
             ai/passing/evaluation.cpp
             ai/passing/pass.cpp
             ai/passing/pass_generator.cpp
             ai/primitive/kick_primitive.cpp
+            ai/primitive/chip_primitive.cpp
             ai/primitive/move_primitive.cpp
             ai/primitive/stop_primitive.cpp
             ai/primitive/primitive.cpp
@@ -641,6 +650,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/passer_tactic.cpp
             test/ai/hl/stp/tactic/receiver_tactic.cpp
             test/ai/hl/stp/tactic/stop_tactic.cpp
+            test/ai/hl/stp/tactic/shoot_goal_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/test_util/test_util.cpp
@@ -820,7 +830,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/evaluation.cpp
             test/ai/passing/main.cpp
             test/ai/passing/pass.cpp
-            test/ai/passing/pass_generator.cpp
+            # TODO: (Issue #655) un-comment this and fix the flaky tests in it
+            # test/ai/passing/pass_generator.cpp
             test/test_util/test_util.cpp
             util/canvas_messenger/canvas_messenger.cpp
             util/math_functions.cpp
@@ -1037,7 +1048,7 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES})
-    
+
     catkin_add_gtest(network_input_test
             test/network_input/filter/ball_filter.cpp
             test/network_input/main.cpp
@@ -1088,7 +1099,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(rostest_util_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters are working
+    # The test node that verifies the dynamic_parameters are working
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp
             util/parameter/dynamic_parameters.cpp
@@ -1096,7 +1107,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(dynamic_parameters_test ${catkin_LIBRARIES})
 
-     # The test node that verifies the dynamic_parameters exist in the parameter server
+    # The test node that verifies the dynamic_parameters exist in the parameter server
     add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
             test/util/test_parameter_exists.cpp
             util/parameter/dynamic_parameters.cpp

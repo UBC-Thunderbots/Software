@@ -20,7 +20,7 @@
 #include "../shared/constants.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 class PassingEvaluationTest : public testing::Test
 {
@@ -36,15 +36,15 @@ class PassingEvaluationTest : public testing::Test
 
     // We get these values here so we can make these tests robust to change
     double min_pass_speed_param =
-        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value();
+        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value();
     double max_pass_speed_param =
-        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value();
+        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value();
     double avg_desired_pass_speed;
 
     double min_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
     double max_time_offset_for_pass_seconds_param =
-        Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
     double avg_time_offset_for_pass_seconds;
 };
 
@@ -250,11 +250,11 @@ TEST_F(PassingEvaluationTest, ratePass_corner_kick_to_marked_robot_at_field_cent
                Timestamp::fromSeconds(0))});
     world.updateEnemyTeamState(enemy_team);
 
-    Pass pass(world.field().enemyCornerPos(), {1.8, 0.6}, 4.8,
-              Timestamp::fromSeconds(0.6));
+    Pass pass(world.field().enemyCornerPos(), {1.8, 0.8}, 4.8,
+              Timestamp::fromSeconds(0.8));
 
     double pass_rating = ratePass(world, pass, std::nullopt, std::nullopt);
-    EXPECT_GE(pass_rating, 0.2);
+    EXPECT_GE(pass_rating, 0.1);
     EXPECT_LE(pass_rating, 0.7);
 }
 
@@ -317,7 +317,8 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
 
     // We update the the ball state because that's what is used as a reference for the
     // current time by the evaluation function
-    // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
+    // Here we are updating the Ball Timestamp to indirectly update the World Timestamp
+    // (as World cannot have it's Timestamp updated independently of its members)
     world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
@@ -341,7 +342,8 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
 
     // We update the the ball state because that's what is used as a reference for the
     // current time by the evaluation function
-    // TODO (Issue #423): Change this to use the `World` timestamp when `World` has one
+    // Here we are updating the Ball Timestamp to indirectly update the World Timestamp
+    // (as World cannot have it's Timestamp updated independently of its members)git sfsd
     world.updateBallState(
         Ball({0, 0}, {0, 0},
              Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));

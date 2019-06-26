@@ -178,6 +178,13 @@ class Team
     std::vector<Robot> getAllRobots() const;
 
     /**
+     * Returns a vector of all the robots on this team excluding the goalie
+     *
+     * @return a vector of all the robots on this team excluding the goalie
+     */
+    std::vector<Robot> getAllRobotsExceptGoalie() const;
+
+    /**
      * Removes all Robots from this team. Does not affect the goalie id.
      */
     void clearAllRobots();

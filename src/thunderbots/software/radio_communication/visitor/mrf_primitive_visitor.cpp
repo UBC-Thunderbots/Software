@@ -98,8 +98,9 @@ void MRFPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
         move_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN,
         move_primitive.getFinalSpeed() * MILLIMETERS_PER_METER};
     radio_prim->extra_bits = 0;
-    radio_prim->extra_bits |= move_primitive.isAutoKickEnabled() * 0x01;
+    radio_prim->extra_bits |= (move_primitive.getAutoKickType() == AUTOKICK) * 0x01;
     radio_prim->extra_bits |= move_primitive.isDribblerEnabled() * 0x02;
+    radio_prim->extra_bits |= (move_primitive.getAutoKickType() == AUTOCHIP) * 0x04;
 }
 
 void MRFPrimitiveVisitor::visit(const MoveSpinPrimitive &movespin_primitive)

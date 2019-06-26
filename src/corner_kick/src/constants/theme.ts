@@ -31,4 +31,16 @@ export const theme: IThemeProvider = {
         info: Colors.BLUE2,
         debug: Colors.GRAY5,
     },
+    qualitativeColorScale: [
+        '#2965CC',
+        '#29A634',
+        '#D99E0B',
+        '#D13913',
+        '#8F398F',
+        '#00B3A4',
+        '#DB2C6F',
+        '#9BBF30',
+        '#96622D',
+        '#7157D9',
+    ],
 };

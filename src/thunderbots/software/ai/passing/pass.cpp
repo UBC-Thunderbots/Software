@@ -6,7 +6,7 @@
 
 #include "geom/util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 Pass::Pass(Point passer_point, Point receiver_point, double pass_speed_m_per_s,
            Timestamp pass_start_time)
@@ -63,7 +63,7 @@ Duration Pass::estimatePassDuration() const
                                  pass_speed_m_per_s);
 }
 
-namespace AI::Passing
+namespace Passing
 {
     std::ostream& operator<<(std::ostream& output_stream, const Pass& pass)
     {
@@ -74,4 +74,4 @@ namespace AI::Passing
 
         return output_stream;
     }
-}  // namespace AI::Passing
+}  // namespace Passing

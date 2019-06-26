@@ -11,7 +11,7 @@
 #include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 {
@@ -41,7 +41,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_intent.getFinalAngle());
     EXPECT_FALSE(move_intent.isDribblerEnabled());
-    EXPECT_FALSE(move_intent.isAutoKickEnabled());
+    EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
@@ -80,7 +80,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_intent.getFinalAngle());
         EXPECT_FALSE(move_intent.isDribblerEnabled());
-        EXPECT_FALSE(move_intent.isAutoKickEnabled());
+        EXPECT_EQ(move_intent.getAutoKickType(), NONE);
     }
 }
 
@@ -120,7 +120,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     EXPECT_GT(move_intent.getFinalAngle().toDegrees(), -90);
 
     EXPECT_FALSE(move_intent.isDribblerEnabled());
-    EXPECT_TRUE(move_intent.isAutoKickEnabled());
+    EXPECT_EQ(move_intent.getAutoKickType(), AUTOKICK);
 }
 
 TEST(ReceiverTacticTest,
@@ -156,7 +156,7 @@ TEST(ReceiverTacticTest,
     EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
 
     EXPECT_TRUE(move_intent.isDribblerEnabled());
-    EXPECT_FALSE(move_intent.isAutoKickEnabled());
+    EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
@@ -199,7 +199,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
 
     EXPECT_TRUE(move_intent.isDribblerEnabled());
-    EXPECT_FALSE(move_intent.isAutoKickEnabled());
+    EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
 TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)

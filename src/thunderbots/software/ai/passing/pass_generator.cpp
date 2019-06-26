@@ -7,8 +7,8 @@
 #include "pass_generator.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 
-using namespace AI::Passing;
-using namespace Util::DynamicParameters::AI::Passing;
+using namespace Passing;
+using namespace Util::DynamicParameters::Passing;
 
 PassGenerator::PassGenerator(const World& world, const Point& passer_point)
     : updated_world(world),
@@ -324,17 +324,17 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
                                                   world.field().length() / 2);
     std::uniform_real_distribution y_distribution(-world.field().width() / 2,
                                                   world.field().width() / 2);
-    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
-    double curr_time = world.ball().lastUpdateTimestamp().getSeconds();
+
+    double curr_time = world.getMostRecentTimestamp().getSeconds();
     double min_start_time_offset =
-        Util::DynamicParameters::AI::Passing::min_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
     double max_start_time_offset =
-        Util::DynamicParameters::AI::Passing::max_time_offset_for_pass_seconds.value();
+        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
     std::uniform_real_distribution start_time_distribution(
         curr_time + min_start_time_offset, curr_time + max_start_time_offset);
     std::uniform_real_distribution speed_distribution(
-        Util::DynamicParameters::AI::Passing::min_pass_speed_m_per_s.value(),
-        Util::DynamicParameters::AI::Passing::max_pass_speed_m_per_s.value());
+        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
+        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
 
     std::vector<Pass> passes;
     for (int i = 0; i < num_passes_to_gen; i++)
@@ -357,16 +357,16 @@ bool PassGenerator::comparePassQuality(const Pass& pass1, const Pass& pass2)
     return ratePass(pass1) > ratePass(pass2);
 }
 
-bool PassGenerator::passesEqual(AI::Passing::Pass pass1, AI::Passing::Pass pass2)
+bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
 {
     double max_position_difference_meters =
-        Util::DynamicParameters::AI::Passing::pass_equality_max_position_difference_meters
+        Util::DynamicParameters::Passing::pass_equality_max_position_difference_meters
             .value();
     double max_time_difference_seconds =
-        Util::DynamicParameters::AI::Passing::
-            pass_equality_max_start_time_difference_seconds.value();
+        Util::DynamicParameters::Passing::pass_equality_max_start_time_difference_seconds
+            .value();
     double max_speed_difference =
-        Util::DynamicParameters::AI::Passing::
+        Util::DynamicParameters::Passing::
             pass_equality_max_speed_difference_meters_per_second.value();
 
     double receiver_position_difference =

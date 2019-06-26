@@ -21,8 +21,7 @@ class CherryPickTactic : public Tactic
     /**
      * Creates a new CherryPickTactic
      */
-    explicit CherryPickTactic(const World& world, const Rectangle& target_region,
-                              bool loop_forever);
+    explicit CherryPickTactic(const World& world, const Rectangle& target_region);
 
     std::string getName() const override;
 
@@ -52,7 +51,7 @@ class CherryPickTactic : public Tactic
     Rectangle target_region;
 
     // The pass optimizer being used to figure out the best position for the robot
-    AI::Passing::PassGenerator pass_generator;
+    Passing::PassGenerator pass_generator;
 
     // Tactic parameters
     // The current state of the world
