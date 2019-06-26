@@ -11,7 +11,7 @@
 #include "shared/constants.h"
 #include "test/test_util/test_util.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
 TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
 {

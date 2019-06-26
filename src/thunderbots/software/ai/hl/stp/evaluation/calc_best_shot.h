@@ -153,4 +153,30 @@ namespace Evaluation
         const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
 
+    /**
+     * Calculates the percentage of the friendly net that a given shot is aiming for
+     *
+     * @param field The field the shot is being performed on
+     * @param shot_origin The point the shot is being taken from
+     * @param shot The shot being performed
+     *
+     * @return A value in [0,1] indicating the percentage of open net the shot is
+     *         being taken on. Larger numbers mean a larger percentage of the net is open
+     */
+    double calcShotOpenFriendlyNetPercentage(const Field &field, const Point &shot_origin,
+                                             const std::pair<Point, Angle> &shot);
+
+    /**
+     * Calculates the percentage of the enemy net that a given shot is aiming for
+     *
+     * @param field The field the shot is being performed on
+     * @param shot_origin The point the shot is being taken from
+     * @param shot The shot being performed
+     *
+     * @return A value in [0,1] indicating the percentage of open net the shot is
+     *         being taken on. Larger numbers mean a larger percentage of the net is open
+     */
+    double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_origin,
+                                          const std::pair<Point, Angle> &shot);
+
 }  // namespace Evaluation
