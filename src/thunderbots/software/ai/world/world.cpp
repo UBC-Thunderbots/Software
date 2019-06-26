@@ -133,7 +133,7 @@ Timestamp World::getMostRecentTimestampFromMembers()
     return std::max(member_timestamps);
 }
 
-Timestamp World::getMostRecentTimestamp()
+const Timestamp World::getMostRecentTimestamp() const
 {
     return last_update_timestamps.front();
 }

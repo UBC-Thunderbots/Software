@@ -150,7 +150,7 @@ class World final
      *
      * @return returns Timestamp : The most recent Timestamp stored in the history
      */
-    Timestamp getMostRecentTimestamp();
+    const Timestamp getMostRecentTimestamp() const;
 
     /**
      * Gets the update Timestamp history stored World

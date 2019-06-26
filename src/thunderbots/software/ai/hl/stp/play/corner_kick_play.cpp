@@ -154,9 +154,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Align the kicker to take the corner kick and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
-    double min_score = 1.0;
-    // TODO: change this to use the world timestamp (Issue #423)
-    Timestamp commit_stage_start_time = world.ball().lastUpdateTimestamp();
+    double min_score                  = 1.0;
+    Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
@@ -170,9 +169,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.first;
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.second;
 
-        // TODO: change this to use the world timestamp (Issue #423)
         Duration time_since_commit_stage_start =
-            world.ball().lastUpdateTimestamp() - commit_stage_start_time;
+            world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
                                      MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
                                  1.0);
