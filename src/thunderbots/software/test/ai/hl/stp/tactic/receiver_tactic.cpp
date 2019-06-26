@@ -263,7 +263,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_one_touch_kicked)
     tactic.updateRobot(receiver);
 
     // Since we've kicked the ball, we shouldn't yield anything
-    EXPECT_EQ(std::unique_ptr<Intent>({}), tactic.getNextIntent());
+    EXPECT_EQ(std::unique_ptr<Intent>{}, tactic.getNextIntent());
 }
 
 class OneTimeShotDirectionTest
