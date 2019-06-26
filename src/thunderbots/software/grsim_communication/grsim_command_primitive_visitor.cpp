@@ -187,15 +187,19 @@ void GrsimCommandPrimitiveVisitor::visit(const KickPrimitive &kick_primitive)
 void GrsimCommandPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
 {
     double kick_speed = 0.0;
-    if(move_primitive.getAutoKickType() == AUTOKICK) {
+    if (move_primitive.getAutoKickType() == AUTOKICK)
+    {
         kick_speed = BALL_MAX_SPEED_METERS_PER_SECOND - 1;
-    }else if(move_primitive.getAutoKickType() == AUTOCHIP){
+    }
+    else if (move_primitive.getAutoKickType() == AUTOCHIP)
+    {
         kick_speed = 2.0;
     }
 
     motion_controller_command = MotionController::PositionCommand(
         move_primitive.getDestination(), move_primitive.getFinalAngle(),
-        move_primitive.getFinalSpeed(), kick_speed, move_primitive.getAutoKickType() != NONE, move_primitive.isDribblerEnabled());
+        move_primitive.getFinalSpeed(), kick_speed,
+        move_primitive.getAutoKickType() != NONE, move_primitive.isDribblerEnabled());
 }
 
 void GrsimCommandPrimitiveVisitor::visit(const MoveSpinPrimitive &move_spin_primitive)
