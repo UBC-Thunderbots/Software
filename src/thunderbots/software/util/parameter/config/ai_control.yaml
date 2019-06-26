@@ -48,7 +48,7 @@ AI:
           Positive if selected, Negative if unselected
     override_refbox_friendly_team_color:
       type: "bool"
-      default: false
+      default: true
       description: >-
           Overrides the team color provided by refbox, 
           with friendly_color_yellow parameter
@@ -57,4 +57,28 @@ AI:
       default: false
       description: >-
           Yellow if selected, Blue if unselected
+#    override_refbox_friendly_goalie:
+#      type: "bool"
+#      default: true
+#      description: >-
+#        Overrides the friendly goalie id provided by the refbox
+    friendly_goalie_id:
+      type: "int"
+      min: 0
+      max: 16
+      default: 0
+      description: >-
+        The id of the friendly goalie
+#    override_refbox_enemy_goalie:
+#      type: "bool"
+#      default: true
+#      description: >-
+#        Overrides the enemy goalie id provided by the refbox
+    enemy_goalie_id:
+      type: "int"
+      min: 0
+      max: 16
+      default: 0
+      description: >-
+        The id of the enemy goalie
 

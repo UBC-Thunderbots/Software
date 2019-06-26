@@ -254,6 +254,8 @@ file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_D
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/logger/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/logger/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
         )
@@ -266,6 +268,7 @@ add_executable (xbox_controller_mapping
 add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
 target_link_libraries(xbox_controller_mapping
         ${catkin_LIBRARIES}
+        ${G3LOG}
         )
 
 
