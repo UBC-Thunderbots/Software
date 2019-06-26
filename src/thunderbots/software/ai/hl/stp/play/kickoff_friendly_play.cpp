@@ -14,7 +14,7 @@ std::string KickoffFriendlyPlay::getName() const
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() | world.gameState().isSetupState()) &&
-        world.gameState().isOurKickoff();
+           world.gameState().isOurKickoff();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
@@ -50,30 +50,33 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // 		+--------------------+--------------------+
     //
     // This is a two part play:
-    //      Part 1: Get into position for the kickoff, but don't touch the ball (ref kickoff)
-    //      Part 2: Chip the ball over the defender (ref normal start)
+    //      Part 1: Get into position for the kickoff, but don't touch the ball (ref
+    //      kickoff) Part 2: Chip the ball over the defender (ref normal start)
 
     // the following positions are in the same order as the positions shown above,
     // excluding the goalie for part 1 of this play
     std::vector<Point> kickoff_setup_positions = {
         // Robot 1
-        Point(world.field().centerPoint() + Point(world.field().centreCircleRadius(), 0)),
+        Point(world.field().centerPoint() +
+              Point(-world.field().centreCircleRadius(), 0)),
         // Robot 2
         // Goalie positions will be handled by the goalie tactic
         // Robot 3
         Point(world.field().centerPoint() +
-                Point(-world.field().centreCircleRadius() - 4*ROBOT_MAX_RADIUS_METERS, -2/3*world.field().width())),
+              Point(-world.field().centreCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+                    -1.0 / 3.0 * world.field().width())),
         // Robot 4
         Point(world.field().centerPoint() +
-                Point(-world.field().centreCircleRadius() - 4*ROBOT_MAX_RADIUS_METERS, +2/3*world.field().width())),
+              Point(-world.field().centreCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+                    1.0 / 3.0 * world.field().width())),
         // Robot 5
         Point(world.field().friendlyGoalpostPos().x() +
-                world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                world.field().friendlyGoalpostPos().y()),
+                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world.field().friendlyGoalpostPos().y()),
         // Robot 6
         Point(world.field().friendlyGoalpostNeg().x() +
-                world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-                world.field().friendlyGoalpostNeg().y()),
+                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world.field().friendlyGoalpostNeg().y()),
     };
 
     // move to setup positions
@@ -86,8 +89,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         // TODO: Replace placeholder tactic with goalie tactic
         lone_goalie_tactic_0->updateParams(
-                world.field().friendlyGoal(),
-                (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+            world.field().friendlyGoal(),
+            (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
 
         std::vector<std::shared_ptr<Tactic>> result = {lone_goalie_tactic_0};
 
@@ -96,9 +99,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // will be assigned
         for (int i = 0; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)
-                ->updateParams(kickoff_setup_positions.at(i),
-                        Angle::half(), 0);
+            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
+                                             0);
             result.emplace_back(move_tactics.at(i));
         }
 
