@@ -1,7 +1,6 @@
-#include "ai/hl/stp/play/stop_play.h"
-
 #include <gtest/gtest.h>
 
+#include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
 #include "test/test_util/test_util.h"
 

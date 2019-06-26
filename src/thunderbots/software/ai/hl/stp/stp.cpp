@@ -8,8 +8,8 @@
 #include <random>
 
 #include "ai/ai.h"
+#include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/play/play.h"
-#include "ai/hl/stp/play/stop_play.h"
 #include "ai/hl/stp/tactic/tactic.h"
 #include "ai/intent/stop_intent.h"
 #include "util/logger/init.h"
@@ -46,9 +46,9 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             {
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
+                LOG(WARNING) << "Falling back to the default Play - " << HaltPlay::name
                              << std::endl;
-                current_play = PlayFactory::createPlay(StopPlay::name);
+                current_play = PlayFactory::createPlay(HaltPlay::name);
             }
         }
         else
@@ -61,9 +61,9 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             {
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
+                LOG(WARNING) << "Falling back to the default Play - " << HaltPlay::name
                              << std::endl;
-                current_play = PlayFactory::createPlay(StopPlay::name);
+                current_play = PlayFactory::createPlay(HaltPlay::name);
             }
         }
     }

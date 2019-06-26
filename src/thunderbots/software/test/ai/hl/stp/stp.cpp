@@ -6,8 +6,8 @@
 #include <algorithm>
 #include <exception>
 
+#include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/play/stop_play.h"
 #include "test/ai/hl/stp/test_plays/move_test_play.h"
 #include "test/ai/hl/stp/test_plays/stop_test_play.h"
 #include "test/test_util/test_util.h"
