@@ -9,16 +9,6 @@
 #include "boost/circular_buffer.hpp"
 #include "util/time/timestamp.h"
 
-
-/**
- * Defines the available colors for an SSL team
- */
-typedef enum
-{
-    BLUE   = 0,
-    YELLOW = 1
-} TeamColour;
-
 /**
  * A team of robots
  */

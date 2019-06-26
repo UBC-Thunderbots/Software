@@ -54,7 +54,7 @@ AI:
           with friendly_color_yellow parameter
     friendly_color_yellow:
       type: "bool"
-      default: false
+      default: true
       description: >-
           Yellow if selected, Blue if unselected
 #    override_refbox_friendly_goalie:

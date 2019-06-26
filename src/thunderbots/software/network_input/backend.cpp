@@ -1,3 +1,4 @@
+#include <util/parameter/dynamic_parameters.h>
 #include "network_input/backend.h"
 
 #include "proto/messages_robocup_ssl_detection.pb.h"
@@ -152,7 +153,7 @@ Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detect
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_yellow();
-        if (Util::Constants::FRIENDLY_TEAM_COLOUR == BLUE)
+        if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
             ssl_robots = detection.robots_blue();
         }
@@ -189,7 +190,7 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
     for (const auto &detection : detections)
     {
         auto ssl_robots = detection.robots_blue();
-        if (Util::Constants::FRIENDLY_TEAM_COLOUR == BLUE)
+        if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
             ssl_robots = detection.robots_yellow();
         }
@@ -232,7 +233,7 @@ thunderbots_msgs::RefboxData Backend::getRefboxDataMsg(const Referee &packet)
     thunderbots_msgs::RefboxTeamInfo blue   = getTeamInfo(packet.blue());
     thunderbots_msgs::RefboxTeamInfo yellow = getTeamInfo(packet.yellow());
 
-    if (Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE)
+    if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
     {
         refbox_data.us   = blue;
         refbox_data.them = yellow;
@@ -309,8 +310,7 @@ const static std::unordered_map<Referee::Command, int> yellow_team_command_map =
 
 int32_t Backend::getTeamCommand(const Referee::Command &command)
 {
-    auto our_team_colour = Util::Constants::FRIENDLY_TEAM_COLOUR;
-    if (our_team_colour == TeamColour::BLUE)
+    if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
     {
         return blue_team_command_map.at(command);
     }
@@ -336,7 +336,7 @@ void Backend::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
     {
-        if (Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE)
+        if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
             our_field_side = FieldSide::WEST;
         }
@@ -347,7 +347,7 @@ void Backend::setOurFieldSide(bool blue_team_on_positive_half)
     }
     else
     {
-        if (Util::Constants::FRIENDLY_TEAM_COLOUR == TeamColour::BLUE)
+        if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
             our_field_side = FieldSide::EAST;
         }
