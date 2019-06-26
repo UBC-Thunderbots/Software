@@ -9,9 +9,9 @@
 #include "shared/constants.h"
 #include "util/logger/init.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 
-PasserTactic::PasserTactic(AI::Passing::Pass pass, const Ball& ball, bool loop_forever)
+PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever)
     : pass(std::move(pass)), ball(ball), Tactic(loop_forever)
 {
 }
