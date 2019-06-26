@@ -324,8 +324,8 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
                                                   world.field().length() / 2);
     std::uniform_real_distribution y_distribution(-world.field().width() / 2,
                                                   world.field().width() / 2);
-    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
-    double curr_time = world.ball().lastUpdateTimestamp().getSeconds();
+
+    double curr_time = world.getMostRecentTimestamp().getSeconds();
     double min_start_time_offset =
         Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
     double max_start_time_offset =
