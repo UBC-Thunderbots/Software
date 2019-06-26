@@ -106,9 +106,10 @@ void GrSimBackend::sendPrimitives(
 
             // send the velocity data via grsim_packet
             grSim_Packet grsim_packet = createGrSimPacketWithRobotVelocity(
-                prim->getRobotId(), Util::DynamicParameters::AI::refbox::friendly_color_yellow.value(), robot_velocities.linear_velocity,
-                robot_velocities.angular_velocity, kick_speed_meters_per_second,
-                chip_instead_of_kick, dribbler_on);
+                prim->getRobotId(),
+                Util::DynamicParameters::AI::refbox::friendly_color_yellow.value(),
+                robot_velocities.linear_velocity, robot_velocities.angular_velocity,
+                kick_speed_meters_per_second, chip_instead_of_kick, dribbler_on);
 
             sendGrSimPacket(grsim_packet);
         }
@@ -120,9 +121,9 @@ void GrSimBackend::sendPrimitives(
 }
 
 grSim_Packet GrSimBackend::createGrSimPacketWithRobotVelocity(
-        unsigned int robot_id, bool is_yellow, Vector robot_velocity,
-        AngularVelocity angular_velocity, double kick_speed_meters_per_second, bool chip,
-        bool dribbler_on) const
+    unsigned int robot_id, bool is_yellow, Vector robot_velocity,
+    AngularVelocity angular_velocity, double kick_speed_meters_per_second, bool chip,
+    bool dribbler_on) const
 {
     grSim_Packet packet;
 

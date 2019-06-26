@@ -64,8 +64,7 @@ class GrSimBackend
      * the dribbler will be turned on, otherwise the dribbler remains off. Dribbler speed
      * cannot be controlled in grSim
      */
-    grSim_Packet createGrSimPacketWithRobotVelocity(unsigned int robot_id,
-                                                    bool is_yellow,
+    grSim_Packet createGrSimPacketWithRobotVelocity(unsigned int robot_id, bool is_yellow,
                                                     Vector robot_velocity,
                                                     AngularVelocity angular_velocity,
                                                     double kick_speed_meters_per_second,

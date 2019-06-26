@@ -1,5 +1,6 @@
-#include <util/parameter/dynamic_parameters.h>
 #include "network_input/backend.h"
+
+#include <util/parameter/dynamic_parameters.h>
 
 #include "proto/messages_robocup_ssl_detection.pb.h"
 #include "proto/messages_robocup_ssl_geometry.pb.h"

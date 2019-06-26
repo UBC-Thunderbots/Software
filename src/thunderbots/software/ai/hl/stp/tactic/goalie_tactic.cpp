@@ -39,11 +39,15 @@ void GoalieTactic::updateParams(
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // Strongly prefer the robot assigned to be the goalie.
-    // TODO: This is a hack to "ensure" the right robot will be assigned. We should normally return values in the
-    // range [0, 1]
-    if(world.friendlyTeam().getGoalieID() && robot.id() == world.friendlyTeam().getGoalieID().value()) {
+    // TODO: This is a hack to "ensure" the right robot will be assigned. We should
+    // normally return values in the range [0, 1]
+    if (world.friendlyTeam().getGoalieID() &&
+        robot.id() == world.friendlyTeam().getGoalieID().value())
+    {
         return 0.0;
-    }else {
+    }
+    else
+    {
         return 1000000;
     }
 }

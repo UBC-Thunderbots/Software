@@ -32,20 +32,23 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     thunderbots_msgs::World world_msg = *msg;
     World world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
 
-    if (Util::DynamicParameters::AI::run_ai.value()) {
+    if (Util::DynamicParameters::AI::run_ai.value())
+    {
         // Get the Primitives the Robots should run from the AI
-        std::vector<std::unique_ptr<Primitive>> assignedPrimitives = ai.getPrimitives(world);
+        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+            ai.getPrimitives(world);
 
         // Put these Primitives into a message and publish it
         thunderbots_msgs::PrimitiveArray primitive_array_message;
-        for (auto const &prim : assignedPrimitives) {
+        for (auto const &prim : assignedPrimitives)
+        {
             primitive_array_message.primitives.emplace_back(prim->createMsg());
         }
         primitive_publisher.publish(primitive_array_message);
 
         // Publish play info so we can display it in the visualizer
         auto play_info_msg =
-                Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
+            Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
         play_info_publisher.publish(play_info_msg);
     }
 
