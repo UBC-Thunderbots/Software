@@ -31,7 +31,7 @@ double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
 std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
                                                    const std::vector<Point> &points,
                                                    bool enable_dribbler,
-                                                   bool enable_autokick);
+                                                   AutokickType autokick);
 /**
  * Calculates how much a point is trespassing in another point's space.
  *

@@ -26,22 +26,29 @@ TEST(MovePrimTest, get_robot_id_test)
 TEST(MovePrimTest, autokick_and_dribble_disabled_by_default)
 {
     MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0);
-    EXPECT_FALSE(move_prim.isAutoKickEnabled());
+    EXPECT_FALSE(move_prim.getAutoKickType());
     EXPECT_FALSE(move_prim.isDribblerEnabled());
 }
 
 TEST(MovePrimTest, get_dribble_enabled)
 {
-    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, false);
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, NONE);
     EXPECT_TRUE(move_prim.isDribblerEnabled());
-    EXPECT_FALSE(move_prim.isAutoKickEnabled());
+    EXPECT_EQ(move_prim.getAutoKickType(), NONE);
 }
 
 TEST(MovePrimTest, get_autokick_enabled)
 {
-    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, true);
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, AUTOKICK);
     EXPECT_FALSE(move_prim.isDribblerEnabled());
-    EXPECT_TRUE(move_prim.isAutoKickEnabled());
+    EXPECT_EQ(move_prim.getAutoKickType(), AUTOKICK);
+}
+
+TEST(MovePrimTest, get_autochip_enabled)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, AUTOCHIP);
+    EXPECT_FALSE(move_prim.isDribblerEnabled());
+    EXPECT_EQ(move_prim.getAutoKickType(), AUTOCHIP);
 }
 
 TEST(MovePrimTest, parameter_array_test)

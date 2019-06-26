@@ -79,7 +79,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // The ball is heading towards the net. Move to block the shot
             goalie_pos  = closestPointOnSeg(*intersection1, goalie_movement_segment);
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, 0.0, false, true);
+                *robot, goalie_pos, goalie_orientation, 0.0, false, AUTOCHIP);
         }
         else if (ball.velocity().len() < BALL_SLOW_SPEED_THRESHOLD &&
                  field.pointInFriendlyDefenseArea(ball.position()))
@@ -113,10 +113,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             }
 
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, 0.0, false, true);
+                *robot, goalie_pos, goalie_orientation, 0.0, false, AUTOCHIP);
         }
 
-        // TODO: autokick with chipping?
         yield(std::move(next_intent));
 
     } while (!move_action.done());
