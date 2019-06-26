@@ -79,12 +79,12 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
               world.field().friendlyGoalpostNeg().y()),
     };
 
-    // move to setup positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
+    // Part 1: setup state (move to key positions)
     do
     {
         // TODO: Replace placeholder tactic with goalie tactic
@@ -106,7 +106,30 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
-    } while (true);
+    } while (world.gameState.isSetupState());
+
+    // Part 2: ready state (chip the ball)
+    do
+    {
+        // TODO: Replace placeholder tactic with goalie tactic
+        lone_goalie_tactic_0->updateParams(
+            world.field().friendlyGoal(),
+            (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+
+        std::vector<std::shared_ptr<Tactic>> result = {lone_goalie_tactic_0};
+
+        // assign the remaining robots to the remaining move tactics so that they stay
+        // in their current positions
+        for (int i = 1; i < kickoff_setup_positions.size(); i++)
+        {
+            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
+                                             0);
+            result.emplace_back(move_tactics.at(i));
+        }
+
+        // yield the Tactics this Play wants to run, in order of priority
+        yield(result);
+    } while (world.gameState.isReadyState());
 }
 
 // Register this play in the PlayFactory
