@@ -36,6 +36,6 @@ sudo adduser $USER thunderbots
 echo "================================================================"
 echo "Done"
 echo ""
-echo "Make sure to log out and log back in for permissions changes to take effect!"
+echo "Make sure to restart your computer for permissions changes to take effect!"
 echo "================================================================"
 

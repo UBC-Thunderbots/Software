@@ -11,27 +11,40 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <thread>
 
 #include "util/logger/init.h"
 
 #define STALL_RETRIES 3
 
+namespace
+{
+    std::thread libusb_event_thread;
+    bool running;
+}  // namespace
+
 USB::Context::Context()
 {
+    // Init libusb
     check_fn("libusb_init", libusb_init(&context), 0);
+    running = true;
+
+    // Init event handling thread
+    libusb_event_thread = std::thread([&]() {
+        while (running)
+            libusb_handle_events(context);
+    });
 }
 
 USB::Context::~Context()
 {
+    // Terminate event thread
+    running = false;
+    libusb_event_thread.join();
+
+    // Cleanup libusb
     libusb_exit(context);
     context = nullptr;
-}
-
-void USB::Context::handle_usb_events()
-{
-    timeval tv = {0, 0};
-    check_fn("libusb_handle_events_timeout", libusb_handle_events_timeout(context, &tv),
-             0);
 }
 
 USB::ConfigurationSetter::ConfigurationSetter(DeviceHandle &device, int configuration)

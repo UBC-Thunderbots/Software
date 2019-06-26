@@ -59,7 +59,7 @@ TEST(PrimitiveFactoryTest,
     const unsigned int robot_id = 2U;
 
     MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(robot_id, destination, angular_vel);
+        MoveSpinPrimitive(robot_id, destination, angular_vel, 1.0);
 
     thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
 
@@ -73,6 +73,7 @@ TEST(PrimitiveFactoryTest,
     EXPECT_DOUBLE_EQ(destination.x(), parameters[0]);
     EXPECT_DOUBLE_EQ(destination.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(angular_vel.toRadians(), parameters[2]);
+    EXPECT_DOUBLE_EQ(1.0, parameters[3]);
     EXPECT_EQ(new_prim->getExtraBits(), std::vector<bool>());
 }
 

@@ -34,6 +34,9 @@ namespace
 // Callbacks
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
+    // Clear all primitives each tick
+    primitives.clear();
+
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
@@ -59,12 +62,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
         robots.push_back(std::make_tuple(r.id(), r.position(), r.orientation()));
     }
 
-    // Update robots and ball
-    backend_ptr->update_robots(robots);
-    backend_ptr->update_ball(ball);
-
     // Send vision packet
-    backend_ptr->send_vision_packet();
+    backend_ptr->send_vision_packet(robots, ball);
 }
 
 void signalHandler(int signum)
@@ -82,6 +81,9 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "radio_communication");
     ros::NodeHandle node_handle;
 
+    // Initialize the logger
+    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+
     // Register signal handler (has to be after ros::init)
     signal(SIGINT, signalHandler);
 
@@ -95,9 +97,6 @@ int main(int argc, char** argv)
     ros::Subscriber world_sub = node_handle.subscribe(
         Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
 
-    // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
-
     // Initialize variables
     primitives = std::vector<std::unique_ptr<Primitive>>();
 
@@ -105,19 +104,10 @@ int main(int argc, char** argv)
     auto update_subscribers =
         Util::DynamicParameters::initUpdateSubscriptions(node_handle);
 
-    // Main loop
-    while (ros::ok())
-    {
-        // Clear all primitives each tick
-        primitives.clear();
-
-        // Handle libusb events for the dongle
-        backend_ptr->update_dongle_events();
-
-        // Spin once to let all necessary callbacks run
-        // The callbacks will populate the primitives vector
-        ros::spinOnce();
-    }
+    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+    // until the node is shutdown
+    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
+    ros::spin();
 
     return 0;
 }

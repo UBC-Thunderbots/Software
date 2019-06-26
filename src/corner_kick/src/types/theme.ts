@@ -10,6 +10,7 @@ import { Color } from './primitives';
  */
 export interface IThemeProvider {
     colors: IColorProvider;
+    qualitativeColorScale: string[];
 }
 
 /**

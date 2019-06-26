@@ -5,13 +5,12 @@
 import * as React from 'react';
 import { Provider } from 'react-redux';
 
-import * as ROS from 'SRC/utils/ros';
-
 import { Visualizer } from './pages/Visualizer';
 import { createStore } from './store';
 import { Theme } from './style/Theme';
 
-import { actions } from './store/actions';
+import { Logo } from './components/Logo';
+import { Portal, PortalLocation } from './components/Portal';
 
 const store = createStore();
 
@@ -22,41 +21,10 @@ const store = createStore();
 export const App = () => (
     <Provider store={store}>
         <Theme>
+            <Portal portalLocation={PortalLocation.SIDEBAR_TITLE}>
+                <Logo />
+            </Portal>
             <Visualizer />
-            <button onClick={startRunAi}>Start run_ai</button>
-            <button onClick={stopRunAi}>Stop run_ai</button>
         </Theme>
     </Provider>
 );
-
-/**
- * Start run_ai
- */
-function startRunAi() {
-    ROS.sendRequestToService(
-        '/ai_control/set_parameters',
-        'dynamic_reconfigure/Reconfigure',
-        {
-            config: {
-                bools: [{ name: 'run_ai', value: true }],
-            },
-        },
-    );
-    store.dispatch(actions.rosParameters.setRunAI(true));
-}
-
-/**
- * Stop run_ai
- */
-function stopRunAi() {
-    ROS.sendRequestToService(
-        '/ai_control/set_parameters',
-        'dynamic_reconfigure/Reconfigure',
-        {
-            config: {
-                bools: [{ name: 'run_ai', value: false }],
-            },
-        },
-    );
-    store.dispatch(actions.rosParameters.setRunAI(false));
-}

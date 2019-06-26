@@ -257,11 +257,22 @@ class Field
     /**
      * Returns whether p is within the field lines of the this field.
      *
-     * @param p
+     * @param p The point to check
      *
      * @return true if p is within the field lines of the field, false otherwise
      */
     bool pointInFieldLines(const Point &p) const;
+
+    /**
+     * Returns whether p is anywhere within the entire field, including the boundary
+     * area around the field lines. ie, if the point is within the total width and height
+     * of the field.
+     *
+     * @param p The point to check
+     *
+     * @return true if p is anywhere within the entire field, and false otherwise
+     */
+    bool pointInEntireField(const Point &p) const;
 
     /**
      * Compares two fields for equality

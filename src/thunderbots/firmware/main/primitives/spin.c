@@ -16,6 +16,7 @@
 static float x_final;
 static float y_final;
 static float avel_final;
+static float end_speed;
 static bool slow;
 
 static float major_vec[2];
@@ -46,12 +47,13 @@ static void spin_start(const primitive_params_t *p) {
     // Parameters:  param[0]: g_destination_x   [mm]
     //              param[1]: g_destination_y   [mm]
     //              param[2]: g_angular_v_final [centi-rad/s]
-    //              extra:    g_end_speed       [millimeter/s]
+    //              param[3]: g_end_speed       [millimeter/s]
 
     // Parse the parameters with the standard units
     x_final = (float)p->params[0] / 1000.0f;
     y_final = (float)p->params[1] / 1000.0f;
     avel_final = (float)p->params[2] / 100.0f;
+    end_speed = (float)p->params[3] / 1000.0f;
     slow = p->slow;
 
     // Get robot current data
@@ -113,7 +115,7 @@ dr_data_t now;
     float minor_vel = now.vx*minor_vec[0] + now.vy*minor_vec[1];
 
     // Prepare trajectory
-    PrepareBBTrajectoryMaxV(&major, major_disp, major_vel, 0, MAX_X_A, MAX_X_V);
+    PrepareBBTrajectoryMaxV(&major, major_disp, major_vel, end_speed, MAX_X_A, MAX_X_V);
     PrepareBBTrajectoryMaxV(&minor, minor_disp, minor_vel, 0, MAX_Y_A, MAX_Y_V);
 
     // Plan

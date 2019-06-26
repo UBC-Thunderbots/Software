@@ -9,11 +9,11 @@
 #include "shared/constants.h"
 #include "util/logger/init.h"
 
-using namespace AI::Passing;
+using namespace Passing;
 using namespace Evaluation;
 
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
-                               const Team& enemy_team, const AI::Passing::Pass pass,
+                               const Team& enemy_team, const Passing::Pass pass,
                                const Ball& ball, bool loop_forever)
     : field(field),
       pass(pass),
@@ -31,7 +31,7 @@ std::string ReceiverTactic::getName() const
 
 void ReceiverTactic::updateParams(const Team& updated_friendly_team,
                                   const Team& updated_enemy_team,
-                                  const AI::Passing::Pass& updated_pass,
+                                  const Passing::Pass& updated_pass,
                                   const Ball& updated_ball)
 {
     this->friendly_team = updated_friendly_team;
@@ -87,10 +87,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
     // Vector from the ball to the robot
     Vector ball_to_robot_vector = ball.position() - robot->position();
-
     std::optional<std::pair<Point, Angle>> best_shot = findFeasibleShot();
     if (best_shot)
     {
+        LOG(DEBUG) << "Taking one-touch shot";
         auto [best_shot_target, _] = *best_shot;
 
         // The angle between the ball velocity and a vector from the ball to the robot
@@ -107,7 +107,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
 
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ideal_position, ideal_orientation, 0, false, true));
+                *robot, ideal_position, ideal_orientation, 0, false, AUTOKICK));
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -119,6 +119,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     // possible
     else
     {
+        LOG(DEBUG) << "Receiving and dribbling";
         while ((ball.position() - robot->position()).len() >
                DIST_TO_FRONT_OF_ROBOT_METERS + 2 * BALL_MAX_RADIUS_METERS)
         {
@@ -129,9 +130,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             // Move into position with the dribbler on
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ball_receive_pos, ball_receive_orientation, 0, true, false));
+                *robot, ball_receive_pos, ball_receive_orientation, 0, true, NONE));
         }
     }
+    LOG(DEBUG) << "Finished";
 }
 
 Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)

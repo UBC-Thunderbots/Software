@@ -182,6 +182,7 @@ static void move_start(const primitive_params_t *params)
 
     if(params->extra & 0x01) chicker_auto_arm(CHICKER_KICK, BALL_MAX_SPEED_METERS_PER_SECOND-1);
 	if(params->extra & 0x02) dribbler_set_speed(16000);
+    if(params->extra & 0x04) chicker_auto_arm(CHICKER_CHIP, 2);
 }
 
 /**

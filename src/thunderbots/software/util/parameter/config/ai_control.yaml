@@ -18,7 +18,10 @@ AI:
     options:
         - "Example Play"
         - "Stop Play"
-    description: >- 
+        - "Corner Kick Play"
+        - "Defense Play"
+        - "KickoffEnemy Play"
+    description: >-
         Specifies the ai play that should be in use
   refbox:
     override_refbox_play:
@@ -40,7 +43,7 @@ AI:
           with defending_positive_side parameter
     defending_positive_side:
       type: "bool"
-      default: false
+      default: true
       description: >-
           Positive if selected, Negative if unselected
     override_refbox_friendly_team_color:

@@ -7,8 +7,19 @@
 #include "quadratic_test.h"
 #include "shoot_test.h"
 #include "util_test.h"
+    run_math_test();
+    run_matrix_test();
+    run_move_test();
+    run_physbot_test();
+    run_physics_test();
+    run_quadratic_test();
+    run_shoot_test();
+    run_util_test();
 #include <stdlib.h>
+    (number_failed == 0) ? printf("All tests passed.\n") : printf("%d Tests failed.\n\n", number_failed);
+    return 0;
 #include <stdio.h>
+}
 #include "check.h"
 #include "test.h"
 

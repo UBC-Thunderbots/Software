@@ -583,6 +583,11 @@ Vector vectorRectIntersect(const Rectangle &r, const Vector &vecA, const Vector 
     return Vector(1.0 / 0.0, 1.0 / 0.0);  // no solution found, propagate infinity
 }
 
+
+Point closestPointOnSeg(const Point &p, const Segment &segment)
+{
+    return closestPointOnSeg(p, segment.getSegStart(), segment.getEnd());
+}
 Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector &segB)
 {
     // if one of the end-points is extremely close to the centre point
@@ -630,6 +635,10 @@ Vector closestPointOnSeg(const Vector &centre, const Vector &segA, const Vector 
     return segB;
 }
 
+Point closestPointOnLine(const Point &p, const Line &line)
+{
+    return closestPointOnLine(p, line.getFirst(), line.getSecond());
+}
 Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vector &lineB)
 {
     // find point C, the projection onto the line

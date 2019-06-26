@@ -9,6 +9,13 @@
 #include "geom/angle.h"
 #include "geom/point.h"
 
+enum AutokickType
+{
+    NONE,
+    AUTOKICK,
+    AUTOCHIP
+};
+
 class MovePrimitive : public Primitive
 {
    public:
@@ -25,13 +32,13 @@ class MovePrimitive : public Primitive
      * @param final_speed The final speed the Robot should have when it reaches
      * its destination at the end of the movement
      * @param enable_dribbler Whether or not to enable the dribbler
-     * @param enable_autokick This will enable the "break-beam" on the robot, that will
-     *                        trigger the kicker to fire as soon as the ball is in front
-     *                        of it
+     * @param autokick A flag indicating if autokick should be enabled while the robot is
+     * moving. This will enable the "break-beam" on the robot that will trigger the kicker
+     * or chipper to fire as soon as the ball is in front of it
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
-                           bool enable_dribbler = false, bool enable_autokick = false);
+                           bool enable_dribbler = false, AutokickType autokick = NONE);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -79,7 +86,7 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not auto-kick should be enabled while moving
      */
-    bool isAutoKickEnabled() const;
+    AutokickType getAutoKickType() const;
 
     /**
      * Gets whether or not the dribbler should be enabled while moving
@@ -128,5 +135,5 @@ class MovePrimitive : public Primitive
     Angle final_angle;
     double final_speed;
     bool enable_dribbler;
-    bool enable_autokick;
+    AutokickType autokick;
 };
