@@ -10,20 +10,53 @@
 #include "ai/intent/kick_intent.h"
 #include "test/test_util/test_util.h"
 
-TEST(FreeKickTacticTest, no_enemies_sanity_test)
+TEST(FreeKickTacticTest, no_enemies_shoot_towards_goal)
 {
     // Robot is in the enemy half facing towards enemy goal
     Robot robot = Robot(2, Point(2, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     Ball ball({2.1, 0}, {0, 0}, Timestamp::fromSeconds(0));
     World world = TestUtil::createBlankTestingWorld();
+    world.updateBallState(ball);
 
     FreeKickTactic tactic(world, false);
 
     tactic.updateRobot(robot);
 
-    KickIntent kick_intent = dynamic_cast<KickIntent&>(*tactic.getNextIntent());
+    try
+    {
+        KickIntent kick_intent = dynamic_cast<KickIntent&>(*tactic.getNextIntent());
+        EXPECT_EQ(world.ball().position(), kick_intent.getKickOrigin());
+        EXPECT_EQ(2, kick_intent.getRobotId());
+    }
+    catch (...)
+    {
+        ADD_FAILURE("FreeKickTactic did not return a KickIntent!");
+    }
+}
 
-    EXPECT_EQ(world.ball().position(), kick_intent.getKickOrigin());
-    // EXPECT_EQ(world.field().enemyGoal(), kick_intent.)
+TEST(FreeKickTacticTest, no_direct_shot_then_chip)
+{
+    // Robot is in the enemy half facing towards enemy goal
+    Robot robot = Robot(2, Point(2, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    Ball ball({2.1, 0}, {0, 0}, Timestamp::fromSeconds(0));
+    World world = TestUtil::createBlankTestingWorld();
+    world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(2.5, 0)},
+        Timestamp::fromSeconds(0));
+    world.updateBallState(ball);
+
+    FreeKickTactic tactic(world, false);
+
+    tactic.updateRobot(robot);
+
+    try
+    {
+        ChipIntent chip_intent = dynamic_cast<ChipIntent&>(*tactic.getNextIntent());
+        EXPECT_EQ(2, chip_intent.getRobotId());
+    }
+    catch (...)
+    {
+        ADD_FAILURE("FreeKickTactic did not return a ChipIntent!");
+    }
 }
