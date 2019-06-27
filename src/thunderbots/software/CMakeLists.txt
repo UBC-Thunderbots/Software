@@ -695,7 +695,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             geom/util.cpp
             test/ai/hl/stp/play/example_play.cpp
-            test/ai/hl/stp/play/stop_play.cpp
+            test/ai/hl/stp/play/halt_play.cpp
             test/ai/hl/stp/play/main.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
