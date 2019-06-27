@@ -20,6 +20,10 @@ class RobotCapabilities
 
     bool operator==(const RobotCapabilities& other) const;
 
+    void addCapability(const RobotCapability& capability);
+
+    void removeCapability(const RobotCapability& capability);
+
    private:
     std::bitset<MAX> capabilities;
 };
@@ -47,4 +51,16 @@ inline bool RobotCapabilities::hasCapability(const RobotCapability& capability) 
 inline bool RobotCapabilities::operator==(const RobotCapabilities& other) const
 {
     return capabilities == other.capabilities;
+}
+
+void RobotCapabilities::addCapability(
+    const RobotCapabilities::RobotCapability& capability)
+{
+    capabilities.set(capability, false);
+}
+
+void RobotCapabilities::removeCapability(
+    const RobotCapabilities::RobotCapability& capability)
+{
+    capabilities.set(capability);
 }

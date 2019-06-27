@@ -924,6 +924,15 @@ if (CATKIN_ENABLE_TESTING)
             tbots_test_util
             tbots_math
             )
+
+    catkin_add_gtest(ai_util_test
+                    test/ai/test_util.cpp)
+
+    target_link_libraries(ai_util_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
+
 endif()
 
 ##### ROSTests / Integration Tests #####

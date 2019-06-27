@@ -30,7 +30,11 @@ namespace Util
             return ball_msg;
         }
 
-        Robot createRobotFromROSMessage(const thunderbots_msgs::Robot& robot_msg)
+        Robot createRobotFromROSMessage(
+            const thunderbots_msgs::Robot& robot_msg,
+            const std::unordered_set<unsigned int>& broken_dribblers,
+            const std::unordered_set<unsigned int>& broken_kickers,
+            const std::unordered_set<unsigned int>& broken_chippers)
         {
             unsigned int robot_id   = robot_msg.id;
             Point robot_position    = Point(robot_msg.position.x, robot_msg.position.y);
