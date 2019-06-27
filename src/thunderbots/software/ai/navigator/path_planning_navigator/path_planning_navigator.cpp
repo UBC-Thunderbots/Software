@@ -4,14 +4,50 @@
 #include "util/canvas_messenger/canvas_messenger.h"
 
 std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
+    const World &world, const std::vector<Obstacle> &additional_obstacles,
+    const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
-    this->world = world;
+    this->world                = world;
+    this->current_robot        = std::nullopt;
+    this->additional_obstacles = additional_obstacles;
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
     {
         intent->accept(*this);
+        if (this->current_robot)
+        {
+            this->additional_obstacles.emplace_back(
+                Obstacle::createVelocityObstacleWithScalingParams(
+                    this->current_robot->position(), this->current_destination,
+                    this->current_robot->velocity().len(), 1.2, .04));
+            this->current_robot = std::nullopt;
+        }
+        assigned_primitives.emplace_back(std::move(current_primitive));
+    }
+
+    return assigned_primitives;
+}
+
+std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
+    const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
+{
+    this->world                = world;
+    this->current_robot        = std::nullopt;
+    this->additional_obstacles = {};
+
+    auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
+    for (const auto &intent : assignedIntents)
+    {
+        intent->accept(*this);
+        if (this->current_robot)
+        {
+            this->additional_obstacles.emplace_back(
+                Obstacle::createVelocityObstacleWithScalingParams(
+                    this->current_robot->position(), this->current_destination,
+                    this->current_robot->velocity().len(), 1.2, .04));
+            this->current_robot = std::nullopt;
+        }
         assigned_primitives.emplace_back(std::move(current_primitive));
     }
 
@@ -60,7 +96,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     Point start = this->world.friendlyTeam().getRobotById(p->getRobotId())->position();
     Point dest  = p->getDestination();
 
-    std::vector<Obstacle> obstacles = {};
+    std::vector<Obstacle> obstacles = this->additional_obstacles;  // copy assignment
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
@@ -72,10 +108,17 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     {
         if (robot.id() == move_intent.getRobotId())
         {
+            // store current robot
+            this->current_robot = robot;
             // skip current robot
             continue;
         }
         Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        obstacles.push_back(o);
+    }
+
+    for (auto o : move_intent.getAdditionalObstacles())
+    {
         obstacles.push_back(o);
     }
 
@@ -91,9 +134,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     {
         if ((*path_points).size() > 2)
         {
-            auto next_point = (*path_points)[1];
-            auto move       = std::make_unique<MovePrimitive>(
-                p->getRobotId(), next_point, move_intent.getFinalAngle(),
+            current_destination = (*path_points)[1];
+            auto move           = std::make_unique<MovePrimitive>(
+                p->getRobotId(), current_destination, move_intent.getFinalAngle(),
                 calculateTransitionSpeedBetweenSegments(
                     (*path_points)[0], (*path_points)[1], (*path_points)[2], 0),
                 move_intent.isDribblerEnabled(), move_intent.isAutoKickEnabled());
@@ -103,9 +146,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         }
         if ((*path_points).size() == 2)
         {
-            auto next_point = (*path_points)[1];
-            auto move       = std::make_unique<MovePrimitive>(
-                p->getRobotId(), next_point, move_intent.getFinalAngle(), 0,
+            current_destination = (*path_points)[1];
+            auto move           = std::make_unique<MovePrimitive>(
+                p->getRobotId(), current_destination, move_intent.getFinalAngle(), 0,
                 move_intent.isDribblerEnabled(), move_intent.isAutoKickEnabled());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);

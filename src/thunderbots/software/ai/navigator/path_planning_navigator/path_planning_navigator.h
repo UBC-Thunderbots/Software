@@ -23,6 +23,10 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
+        const World &world, const std::vector<Obstacle> &additional_obstacles,
+        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+
+    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
@@ -102,4 +106,13 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     // The current Primitive the navigator has created from an Intent.
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
+    // The current Robot the navigator has navigated for from an Intent.
+    // This variable is set by each `visit` function
+    std::optional<Robot> current_robot;
+    // The current destination the navigator has navigated to from an Intent.
+    // This variable is set by each `visit` function
+    Point current_destination;
+    //@TODO clean up this competition hack; should use some sort of flag system instead of
+    //passing in obstacles
+    std::vector<Obstacle> additional_obstacles;
 };

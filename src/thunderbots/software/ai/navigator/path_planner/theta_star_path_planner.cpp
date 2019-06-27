@@ -378,7 +378,7 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
     }
     else
     {
-        const double RESOLUTION_FACTOR = 100.0;
+        const double RESOLUTION_FACTOR = 5.0;
         int xc                         = (int)(p.x() * RESOLUTION_FACTOR);
         int yc                         = (int)(p.y() * RESOLUTION_FACTOR);
 

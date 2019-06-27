@@ -20,6 +20,34 @@ Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_
         enable_velocity_cushion);
 }
 
+Obstacle Obstacle::createVelocityObstacleWithScalingParams(Point start, Point end,
+                                                           double initial_speed,
+                                                           double width_scaling,
+                                                           double length_scaling)
+{
+    double radius_cushion =
+        getRadiusCushionForHexagon(ROBOT_MAX_RADIUS_METERS * width_scaling);
+
+    Vector velocity_cushion_vector =
+        (end - start)
+            .norm((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 2 *
+                  length_scaling);
+
+    Vector velocity_direction_norm_radius = velocity_cushion_vector.norm(radius_cushion);
+
+    return Obstacle(
+        Polygon({// left side of robot
+                 start + velocity_direction_norm_radius.rotate(Angle::quarter()),
+                 // right side of robot
+                 start + velocity_direction_norm_radius.rotate(Angle::threeQuarter()),
+                 // right side velocity cushions
+                 start + velocity_direction_norm_radius.rotate(Angle::threeQuarter()) +
+                     velocity_cushion_vector,
+                 // left side velocity cushions
+                 start + velocity_direction_norm_radius.rotate(Angle::quarter()) +
+                     velocity_cushion_vector}));
+}
+
 Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
                                                         double radius_cushion_scaling,
                                                         double velocity_cushion_scaling)
