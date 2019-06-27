@@ -12,8 +12,8 @@ class STPRefboxGameStatePlaySelectionTest
     : public ::testing::Test,
       public ::testing::WithParamInterface<RefboxGameState>
 {
-public:
-    STPRefboxGameStatePlaySelectionTest() : stp([]() {return nullptr;}) {}
+   public:
+    STPRefboxGameStatePlaySelectionTest() : stp([]() { return nullptr; }) {}
 
    protected:
     void SetUp() override
@@ -22,7 +22,7 @@ public:
             return std::make_unique<HaltPlay>();
         };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(default_play_constructor, 0);
+        stp                  = STP(default_play_constructor, 0);
         world.mutableField() = ::Test::TestUtil::createSSLDivBField();
 
         Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),
