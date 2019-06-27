@@ -24,16 +24,14 @@ std::string GoalieTactic::getName() const
     return "Goalie Tactic";
 }
 
-void GoalieTactic::updateParams(
-    const Ball &ball, const Field &field, const Team &friendly_team,
-    const Team &enemy_team, const std::optional<Evaluation::EnemyThreat> &enemy_threat)
+void GoalieTactic::updateParams(const Ball &ball, const Field &field,
+                                const Team &friendly_team, const Team &enemy_team)
 {
     // Update the parameters stored by this Tactic
     this->ball          = ball;
     this->field         = field;
     this->friendly_team = friendly_team;
     this->enemy_team    = enemy_team;
-    this->enemy_threat  = enemy_threat;
 }
 
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -94,21 +92,19 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             next_intent = chip_action.updateStateAndGetNextIntent(
                 *robot, ball, ball.position(),
                 (ball.position() - field.friendlyGoal()).orientation(), 2);
-        }
-        else if (enemy_threat.has_value())
-        {
+        } else {
             // If we have been provided with enemy threat information, use it to
             // preemptively block their best shot. Calculate the best shot the enemy could
             // take, ignoring the goalie as an obstacle
             auto best_shot = Evaluation::calcBestShotOnFriendlyGoal(
-                field, friendly_team, enemy_team, ball.position(),
-                ROBOT_MAX_RADIUS_METERS, {*robot});
+                    field, friendly_team, enemy_team, ball.position(),
+                    ROBOT_MAX_RADIUS_METERS, {*robot});
             if (best_shot.has_value())
             {
-                Vector shot_vector = (best_shot->first - enemy_threat->robot.position());
-                Ray shot_ray       = Ray(enemy_threat->robot.position(), shot_vector);
+                Vector shot_vector = best_shot->first - ball.position();
+                Ray shot_ray       = Ray(ball.position(), shot_vector);
                 auto [best_shot_intersection_1, best_shot_intersection_2] =
-                    raySegmentIntersection(shot_ray, full_goal_segment);
+                raySegmentIntersection(shot_ray, full_goal_segment);
 
                 if (best_shot_intersection_1.has_value())
                 {
@@ -117,10 +113,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                                    goalie_movement_segment);
                 }
             }
-
-            next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, 0.0, false, AUTOCHIP);
         }
+
+        next_intent = move_action.updateStateAndGetNextIntent(
+            *robot, goalie_pos, goalie_orientation, 0.0, false, AUTOCHIP);
 
         yield(std::move(next_intent));
 
