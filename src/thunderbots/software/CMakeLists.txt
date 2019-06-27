@@ -304,7 +304,12 @@ target_link_libraries(tbots_intent
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 ## Find the generated files
 file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
-add_library(tbots_proto ${TBOTS_PROTO_SRCS})
+add_library(tbots_proto 
+    ${TBOTS_PROTO_SRCS}
+    )
+target_link_libraries(tbots_proto 
+    ${PROTOBUF_LIBRARIES}
+    )
 
 # Shared
 file(GLOB TBOTS_SHARED_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
