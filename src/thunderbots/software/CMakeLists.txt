@@ -224,8 +224,10 @@ target_link_libraries(tbots_passing
 file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
         )
-add_library(tbots_action 
+add_library(tbots_action
     ${TBOTS_ACTION_LIB_SRC}
+    )
+target_link_libraries(tbots_action
     ${Boost_LIBRARIES}
     )
 add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
