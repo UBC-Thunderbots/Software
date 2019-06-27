@@ -1,29 +1,29 @@
-#include "test/ai/hl/stp/test_plays/stop_test_play.h"
+#include "test/ai/hl/stp/test_plays/halt_test_play.h"
 
 #include "ai/hl/stp/play/play_factory.h"
 #include "geom/util.h"
 #include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
 
-const std::string StopTestPlay::name = "Stop Test Play";
+const std::string HaltTestPlay::name = "Halt Test Play";
 
-std::string StopTestPlay::getName() const
+std::string HaltTestPlay::getName() const
 {
-    return StopTestPlay::name;
+    return HaltTestPlay::name;
 }
 
-bool StopTestPlay::isApplicable(const World &world) const
+bool HaltTestPlay::isApplicable(const World &world) const
 {
     return world.ball().position().y() >= 0;
 }
 
-bool StopTestPlay::invariantHolds(const World &world) const
+bool HaltTestPlay::invariantHolds(const World &world) const
 {
     return contains(
         Rectangle(world.field().enemyCornerNeg(), world.field().friendlyCornerPos()),
         world.ball().position());
 }
 
-void StopTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
+void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto stop_test_tactic_1 = std::make_shared<StopTestTactic>();
     auto stop_test_tactic_2 = std::make_shared<StopTestTactic>();
@@ -40,4 +40,4 @@ void StopTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 // Register this play in the PlayFactory
-static TPlayFactory<StopTestPlay> factory;
+static TPlayFactory<HaltTestPlay> factory;

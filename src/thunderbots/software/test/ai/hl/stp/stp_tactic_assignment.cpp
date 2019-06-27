@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/ai/hl/stp/test_tactics/move_test_tactic.h>
 #include <test/ai/hl/stp/test_tactics/stop_test_tactic.h>
+#include <test/ai/hl/stp/test_plays/halt_test_play.h>
 
 #include <algorithm>
 
@@ -15,11 +16,17 @@
 
 class STPTacticAssignmentTest : public ::testing::Test
 {
+public:
+    STPTacticAssignmentTest() : stp([](){return nullptr;}, 0)
+    {}
    protected:
     void SetUp() override
     {
+        auto default_play_constructor = []() -> std::unique_ptr<Play> {
+            return std::make_unique<HaltTestPlay>();
+        };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(0);
+        stp   = STP(default_play_constructor, 0);
         world = ::Test::TestUtil::createBlankTestingWorld();
     }
 
