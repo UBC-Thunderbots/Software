@@ -2,6 +2,7 @@
 
 #include <exception>
 
+#include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/stp.h"
 #include "ai/world/world.h"
 #include "test/test_util/test_util.h"
@@ -11,10 +12,17 @@ class STPRefboxGameStatePlaySelectionTest
     : public ::testing::Test,
       public ::testing::WithParamInterface<RefboxGameState>
 {
+   public:
+    STPRefboxGameStatePlaySelectionTest() : stp([]() { return nullptr; }) {}
+
    protected:
     void SetUp() override
     {
-        stp                  = STP(0);
+        auto default_play_constructor = []() -> std::unique_ptr<Play> {
+            return std::make_unique<HaltPlay>();
+        };
+        // Give an explicit seed to STP so that our tests are deterministic
+        stp                  = STP(default_play_constructor, 0);
         world.mutableField() = ::Test::TestUtil::createSSLDivBField();
 
         Robot robot_0(0, Point(-1.1, 1), Point(), Angle::zero(), AngularVelocity::zero(),

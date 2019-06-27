@@ -1,4 +1,4 @@
-#include "ai/hl/stp/play/stop_play.h"
+#include "ai/hl/stp/play/halt_play.h"
 
 #include <gtest/gtest.h>
 
@@ -9,16 +9,16 @@ TEST(StopPlayTest, test_example_play_invariant_always_holds)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    StopPlay example_play;
-    EXPECT_TRUE(example_play.invariantHolds(world));
+    HaltPlay halt_play;
+    EXPECT_TRUE(halt_play.invariantHolds(world));
 }
 
 TEST(StopPlayTest, test_stop_play_returns_correct_tactics)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
 
-    StopPlay example_play;
-    auto tactics = example_play.getTactics(world);
+    HaltPlay halt_play;
+    auto tactics = halt_play.getTactics(world);
 
     // Make sure something was returned
     EXPECT_TRUE(tactics);

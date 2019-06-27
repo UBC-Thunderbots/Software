@@ -8,14 +8,19 @@
 #include <random>
 
 #include "ai/ai.h"
+#include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/play/play.h"
-#include "ai/hl/stp/play/stop_play.h"
 #include "ai/hl/stp/tactic/tactic.h"
 #include "ai/intent/stop_intent.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 
-STP::STP(long random_seed) : random_number_generator(random_seed) {}
+STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
+         long random_seed)
+    : default_play_constructor(default_play_constructor),
+      random_number_generator(random_seed)
+{
+}
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
@@ -44,11 +49,12 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
             else
             {
+                auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
-                             << std::endl;
-                current_play = PlayFactory::createPlay(StopPlay::name);
+                LOG(WARNING) << "Falling back to the default Play - "
+                             << default_play->getName() << std::endl;
+                current_play = std::move(default_play);
             }
         }
         else
@@ -59,11 +65,12 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
             }
             catch (const std::runtime_error& e)
             {
+                auto default_play = default_play_constructor();
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - " << StopPlay::name
-                             << std::endl;
-                current_play = PlayFactory::createPlay(StopPlay::name);
+                LOG(WARNING) << "Falling back to the default Play - "
+                             << default_play->getName() << std::endl;
+                current_play = std::move(default_play);
             }
         }
     }
@@ -220,7 +227,7 @@ PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
     info.play_type = "Unknown";
-    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : AI::NO_PLAY_NAME;
+    info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report the
     // tactics in order or robot id. This makes it much easier to read if tactics or
