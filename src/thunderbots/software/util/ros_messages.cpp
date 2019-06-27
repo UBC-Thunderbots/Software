@@ -1,3 +1,4 @@
+#include <util/parameter/dynamic_parameters.h>
 #include "util/ros_messages.h"
 
 namespace Util
@@ -97,10 +98,34 @@ namespace Util
 
         Team createTeamFromROSMessage(const thunderbots_msgs::Team& team_msg)
         {
+            // parse the dynamic parameters for hardware capabilities into sets
+            auto broken_dribblers_set = commaSeparatedListToSet(
+                    Util::DynamicParameters::RobotCapabilities::broken_dribblers.value()
+                    );
+            auto broken_kickers_set = commaSeparatedListToSet(
+                    Util::DynamicParameters::RobotCapabilities::broken_kickers.value()
+            );
+            auto broken_chippers_set = commaSeparatedListToSet(
+                    Util::DynamicParameters::RobotCapabilities::broken_chippers.value()
+            );
+
+
             std::vector<Robot> robots;
             for (const auto& robot_msg : team_msg.robots)
             {
                 Robot robot = createRobotFromROSMessage(robot_msg);
+
+                // Set the robot hardware capabilities from the dynamic parameters
+                if (broken_dribblers_set.find(robot.id()) == broken_dribblers_set.end()) {
+                    robot.getRobotCapabilities().removeCapability(RobotCapabilities::Dribble);
+                }
+                if (broken_kickers_set.find(robot.id()) == broken_kickers_set.end()) {
+                    robot.getRobotCapabilities().removeCapability(RobotCapabilities::Kick);
+                }
+                if (broken_chippers_set.find(robot.id()) == broken_chippers_set.end()) {
+                    robot.getRobotCapabilities().removeCapability(RobotCapabilities::Chip);
+                }
+
                 robots.emplace_back(robot);
             }
 

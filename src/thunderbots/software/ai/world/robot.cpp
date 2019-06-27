@@ -255,3 +255,7 @@ RobotCapabilities Robot::getRobotCapabilities() const
 {
     return capabilities_;
 }
+
+RobotCapabilities &Robot::getMutableRobotCapabilities() {
+    return capabilities_;
+}

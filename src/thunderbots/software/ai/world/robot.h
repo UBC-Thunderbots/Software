@@ -253,6 +253,13 @@ class Robot
     RobotCapabilities getRobotCapabilities() const;
 
     /**
+     * Returns the mutable hardware capabilities of the robot
+     *
+     * @return the mutable hardware capabilities of the robot
+     */
+    RobotCapabilities& getMutableRobotCapabilities();
+
+    /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
      * all other parameters (position, orientation, etc) are equal. The last update
      * timestamp is not part of the equality.

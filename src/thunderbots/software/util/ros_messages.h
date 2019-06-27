@@ -10,6 +10,7 @@
 #include "ai/world/robot.h"
 #include "ai/world/team.h"
 #include "ai/world/world.h"
+#include "ai/util.h"
 #include "refbox_constants.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
