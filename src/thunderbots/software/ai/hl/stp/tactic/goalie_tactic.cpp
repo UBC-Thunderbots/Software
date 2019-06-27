@@ -92,19 +92,21 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             next_intent = chip_action.updateStateAndGetNextIntent(
                 *robot, ball, ball.position(),
                 (ball.position() - field.friendlyGoal()).orientation(), 2);
-        } else {
+        }
+        else
+        {
             // If we have been provided with enemy threat information, use it to
             // preemptively block their best shot. Calculate the best shot the enemy could
             // take, ignoring the goalie as an obstacle
             auto best_shot = Evaluation::calcBestShotOnFriendlyGoal(
-                    field, friendly_team, enemy_team, ball.position(),
-                    ROBOT_MAX_RADIUS_METERS, {*robot});
+                field, friendly_team, enemy_team, ball.position(),
+                ROBOT_MAX_RADIUS_METERS, {*robot});
             if (best_shot.has_value())
             {
                 Vector shot_vector = best_shot->first - ball.position();
                 Ray shot_ray       = Ray(ball.position(), shot_vector);
                 auto [best_shot_intersection_1, best_shot_intersection_2] =
-                raySegmentIntersection(shot_ray, full_goal_segment);
+                    raySegmentIntersection(shot_ray, full_goal_segment);
 
                 if (best_shot_intersection_1.has_value())
                 {

@@ -32,8 +32,7 @@ std::string CreaseDefenderTactic::getName() const
 }
 
 void CreaseDefenderTactic::updateParams(const Ball &ball, const Field &field,
-                                        const Team &friendly_team,
-                                        const Team &enemy_team)
+                                        const Team &friendly_team, const Team &enemy_team)
 {
     // Update the parameters stored by this Tactic
     this->ball          = ball;
@@ -47,24 +46,24 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World 
     // Prefer robots closer to the crease defender desired position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    std::optional<std::pair<Point, Angle>> desired_state = calculateDesiredState(
-            robot);
-    double cost = 0;
-    if (desired_state){
-        cost = (robot.position() - calculateDesiredState(
-                robot)->first).len() /
+    std::optional<std::pair<Point, Angle>> desired_state = calculateDesiredState(robot);
+    double cost                                          = 0;
+    if (desired_state)
+    {
+        cost = (robot.position() - calculateDesiredState(robot)->first).len() /
                world.field().totalLength();
     }
     return std::clamp<double>(cost, 0, 1);
 }
 
-std::optional<std::pair<Point, Angle>>
-CreaseDefenderTactic::calculateDesiredState(const Robot &robot) {
+std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredState(
+    const Robot &robot)
+{
     if (friendly_team.goalie())
     {
         // Get the point on the crease path exactly between the two defenders
         std::optional<Point> defender_reference_position =
-                getPointOnCreasePath(field, *friendly_team.goalie(), ball, Angle::zero());
+            getPointOnCreasePath(field, *friendly_team.goalie(), ball, Angle::zero());
 
         if (defender_reference_position)
         {
@@ -72,15 +71,15 @@ CreaseDefenderTactic::calculateDesiredState(const Robot &robot) {
             double ball_dist = (ball.position() - *defender_reference_position).len();
 
             double min_defender_seperation_deg =
-                    Util::DynamicParameters::DefenderCreaseTactic::
-                    min_defender_seperation_deg.value();
+                Util::DynamicParameters::DefenderCreaseTactic::min_defender_seperation_deg
+                    .value();
             double max_defender_seperation_deg =
-                    Util::DynamicParameters::DefenderCreaseTactic::
-                    max_defender_seperation_deg.value();
+                Util::DynamicParameters::DefenderCreaseTactic::max_defender_seperation_deg
+                    .value();
             double min_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-            ball_dist_for_min_defender_seperation.value();
+                                       ball_dist_for_min_defender_seperation.value();
             double max_ball_dist = Util::DynamicParameters::DefenderCreaseTactic::
-            ball_dist_for_max_defender_seperation.value();
+                                       ball_dist_for_max_defender_seperation.value();
 
             if (min_defender_seperation_deg > max_defender_seperation_deg)
             {
@@ -96,22 +95,23 @@ CreaseDefenderTactic::calculateDesiredState(const Robot &robot) {
             }
 
             Angle defender_seperation = Angle::ofDegrees(
-                    (max_defender_seperation_deg - min_defender_seperation_deg) /
+                (max_defender_seperation_deg - min_defender_seperation_deg) /
                     (max_ball_dist - min_ball_dist) *
                     std::clamp(ball_dist, min_ball_dist, max_ball_dist) +
-                    min_defender_seperation_deg);
+                min_defender_seperation_deg);
 
-            Angle defender_offset = defender_seperation/2;
-            if (left_or_right == RIGHT){
+            Angle defender_offset = defender_seperation / 2;
+            if (left_or_right == RIGHT)
+            {
                 defender_offset = defender_offset * -1;
             }
 
             std::optional<Point> defender_position = getPointOnCreasePath(
-                    field, *friendly_team.goalie(), ball, defender_offset);
+                field, *friendly_team.goalie(), ball, defender_offset);
             if (defender_position)
             {
                 Angle defender_orientation =
-                        (ball.position() - robot.position()).orientation();
+                    (ball.position() - robot.position()).orientation();
                 return std::make_pair(*defender_position, defender_orientation);
             }
             else
@@ -137,8 +137,8 @@ CreaseDefenderTactic::calculateDesiredState(const Robot &robot) {
 
         // Find the best shot
         auto best_shot = Evaluation::calcBestShotOnFriendlyGoal(
-                field, friendly_team, enemy_team, ball.position(),
-                ROBOT_MAX_RADIUS_METERS, {robot});
+            field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
+            {robot});
         Vector shot_vector = best_shot->first - ball.position();
         Ray shot_ray       = Ray(ball.position(), shot_vector);
 
@@ -157,7 +157,7 @@ CreaseDefenderTactic::calculateDesiredState(const Robot &robot) {
         if (defender_position)
         {
             Angle defender_orientation =
-                    (ball.position() - robot.position()).orientation();
+                (ball.position() - robot.position()).orientation();
             return std::make_pair(*defender_position, defender_orientation);
         }
         else
@@ -176,26 +176,30 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
     StopAction stop_action = StopAction();
     do
     {
-        std::optional<std::pair<Point,Angle>> desired_robot_state_opt = calculateDesiredState(
-                *this->robot);
-        if (desired_robot_state_opt){
+        std::optional<std::pair<Point, Angle>> desired_robot_state_opt =
+            calculateDesiredState(*this->robot);
+        if (desired_robot_state_opt)
+        {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            yield(move_action.updateStateAndGetNextIntent(
-                    *robot, defender_position, defender_orientation, 0.0, false,
-                    AutokickType::AUTOCHIP));
-        } else {
+            yield(move_action.updateStateAndGetNextIntent(*robot, defender_position,
+                                                          defender_orientation, 0.0,
+                                                          false, AutokickType::AUTOCHIP));
+        }
+        else
+        {
             LOG(WARNING) << "Error updating robot state, stopping";
             yield(std::move(stop_action.updateStateAndGetNextIntent(*robot, false)));
         }
     } while (!move_action.done());
 }
 
-std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field) {
+std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field)
+{
     // Return the segments that form the path around the crease that the
     // defenders must follow. It's basically the crease inflated by one robot radius
 
     Rectangle inflated_defense_area = field.friendlyDefenseArea();
-    inflated_defense_area.expand(ROBOT_MAX_RADIUS_METERS*1.5);
+    inflated_defense_area.expand(ROBOT_MAX_RADIUS_METERS * 1.5);
 
     return {
         // +x segment
@@ -207,15 +211,16 @@ std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field) {
     };
 }
 
-std::optional<Point>
-CreaseDefenderTactic::getPointOnCreasePath(Field field, Robot goalie, Ball ball,
-                                           Angle offset) {
+std::optional<Point> CreaseDefenderTactic::getPointOnCreasePath(Field field, Robot goalie,
+                                                                Ball ball, Angle offset)
+{
     // Draw a ray from the goalie out of the crease
     Vector goalie_to_ball_vector = ball.position() - goalie.position();
-    Vector rotated_vec = goalie_to_ball_vector.rotate(offset);
+    Vector rotated_vec           = goalie_to_ball_vector.rotate(offset);
     Ray ray(goalie.position(), rotated_vec);
 
-    for (auto segment : getPathSegments(field)){
+    for (auto segment : getPathSegments(field))
+    {
         auto intersection = raySegmentIntersection(ray, segment);
         if (intersection.first)
         {

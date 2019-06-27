@@ -22,8 +22,8 @@ class GoalieTactic : public Tactic
      *
 // TODO: comment
      */
-    void updateParams(const Ball &ball, const Field &field,
-                      const Team &friendly_team, const Team &enemy_team);
+    void updateParams(const Ball &ball, const Field &field, const Team &friendly_team,
+                      const Team &enemy_team);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

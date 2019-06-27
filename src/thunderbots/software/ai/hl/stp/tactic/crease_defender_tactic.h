@@ -1,6 +1,7 @@
 #pragma once
 
 #include <geom/segment.h>
+
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/tactic/tactic.h"
 
@@ -26,8 +27,8 @@
 class CreaseDefenderTactic : public Tactic
 {
    public:
-
-    enum LeftOrRight {
+    enum LeftOrRight
+    {
         LEFT,
         RIGHT
     };
@@ -35,7 +36,9 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Creates a new CreaseDefenderTactic
      */
-    explicit CreaseDefenderTactic(const Field &field, const Ball &ball, const Team& friendly_team, const Team& enemy_team, LeftOrRight left_or_right);
+    explicit CreaseDefenderTactic(const Field &field, const Ball &ball,
+                                  const Team &friendly_team, const Team &enemy_team,
+                                  LeftOrRight left_or_right);
 
     std::string getName() const override;
 
@@ -85,7 +88,8 @@ class CreaseDefenderTactic : public Tactic
      *
      * @return The point on the path the ray from the goalie intersects, if
      */
-    static std::optional<Point> getPointOnCreasePath(Field field, Robot goalie, Ball ball, Angle offset);
+    static std::optional<Point> getPointOnCreasePath(Field field, Robot goalie, Ball ball,
+                                                     Angle offset);
 
     // Tactic parameters
     Ball ball;
