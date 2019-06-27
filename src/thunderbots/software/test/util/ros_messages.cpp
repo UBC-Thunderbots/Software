@@ -199,14 +199,14 @@ TEST(ROSMessageUtilTest, create_team_from_ros_message_with_non_member)
     team_msg.robot_expiry_buffer_milliseconds =
         robot_expiry_buffer_duration.getMilliseconds();
 
-    ASSERT_THROW(Team team = Util::ROSMessages::createTeamFromROSMessage(team_msg);
+    Team team = Util::ROSMessages::createTeamFromROSMessage(team_msg);
 
-                 Team team_other = Team(robot_expiry_buffer_duration);
-                 Robot robot     = Robot(robot_id, position, velocity, orientation,
-                                     angular_velocity, Timestamp::fromSeconds(33));
+    Team team_other = Team(robot_expiry_buffer_duration);
+    Robot robot     = Robot(robot_id, position, velocity, orientation, angular_velocity,
+                        Timestamp::fromSeconds(33));
 
-                 team_other.updateRobots({robot}); team_other.assignGoalie(goalie_id);
-                 , std::invalid_argument);
+    team_other.updateRobots({robot});
+    team_other.assignGoalie(goalie_id);
 }
 
 TEST(ROSMessageUtilTest, convert_team_with_goalie_to_ros_message)
