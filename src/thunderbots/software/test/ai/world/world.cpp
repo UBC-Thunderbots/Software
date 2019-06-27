@@ -76,3 +76,41 @@ TEST_F(WorldTest, construction_with_parameters)
     EXPECT_EQ(friendly_team, world.friendlyTeam());
     EXPECT_EQ(enemy_team, world.enemyTeam());
 }
+
+// Test that getMostRecentTimestamp functions properly
+TEST_F(WorldTest, get_most_recent_from_members)
+{
+    World world;
+
+    EXPECT_EQ(world.getMostRecentTimestamp(), Timestamp::fromSeconds(0));
+}
+
+// Test that most recent timestamp from member objects works
+TEST_F(WorldTest, get_most_recent_timestamp_from_members)
+{
+    EXPECT_EQ(world.getMostRecentTimestamp(), current_time);
+}
+
+// Test that the timestamp history is accurate
+TEST_F(WorldTest, get_timestamp_history)
+{
+    Timestamp timestamp_1 =
+        Timestamp::fromSeconds(ball.lastUpdateTimestamp().getSeconds() + 1);
+    Ball temp_ball = Ball(ball.position(), ball.velocity(), timestamp_1);
+    world.updateBallState(temp_ball);
+
+    Timestamp timestamp_2 =
+        Timestamp::fromSeconds(ball.lastUpdateTimestamp().getSeconds() + 1);
+    temp_ball = Ball(ball.position(), ball.velocity(), timestamp_2);
+    world.updateBallState(temp_ball);
+
+    Timestamp timestamp_3 =
+        Timestamp::fromSeconds(ball.lastUpdateTimestamp().getSeconds() + 1);
+    temp_ball = Ball(ball.position(), ball.velocity(), timestamp_3);
+    world.updateBallState(temp_ball);
+
+    EXPECT_EQ(world.getTimestampHistory()[3], current_time);
+    EXPECT_EQ(world.getTimestampHistory()[2], timestamp_1);
+    EXPECT_EQ(world.getTimestampHistory()[1], timestamp_2);
+    EXPECT_EQ(world.getTimestampHistory()[0], timestamp_3);
+}

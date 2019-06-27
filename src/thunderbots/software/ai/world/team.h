@@ -9,16 +9,6 @@
 #include "boost/circular_buffer.hpp"
 #include "util/time/timestamp.h"
 
-
-/**
- * Defines the available colors for an SSL team
- */
-typedef enum
-{
-    BLUE   = 0,
-    YELLOW = 1
-} TeamColour;
-
 /**
  * A team of robots
  */
@@ -176,6 +166,13 @@ class Team
      * @return a vector of all the robots on this team.
      */
     std::vector<Robot> getAllRobots() const;
+
+    /**
+     * Returns a vector of all the robots on this team excluding the goalie
+     *
+     * @return a vector of all the robots on this team excluding the goalie
+     */
+    std::vector<Robot> getAllRobotsExceptGoalie() const;
 
     /**
      * Removes all Robots from this team. Does not affect the goalie id.

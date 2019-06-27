@@ -10,12 +10,14 @@ import { spawn } from 'redux-saga/effects';
 import initROS from './ros';
 import initROSParameters from './rosParameters';
 import initThunderbots from './thunderbots';
+import initRobotStatus from './robotStatus';
 
 /**
  * Starts all application sagas
  */
 export function* init() {
-  yield spawn(initROS);
-  yield spawn(initROSParameters);
-  yield spawn(initThunderbots);
+    yield spawn(initROS);
+    yield spawn(initROSParameters);
+    yield spawn(initThunderbots);
+    yield spawn(initRobotStatus);
 }

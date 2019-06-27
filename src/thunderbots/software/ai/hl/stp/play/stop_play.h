@@ -3,8 +3,9 @@
 #include "ai/hl/stp/play/play.h"
 
 /**
- * A Play that stops all the robots on the field. This is primarily used to obey the
- * referee "Halt" command, as well as a fallback for when we don't have a play assigned.
+ * This Play moves our robots in a formation while keeping them at least 0.5m from the
+ * ball. Additionally, the robots are limited to moving no more than 1.5m/s. This Play is
+ * used during the referee "Stop" command.
  */
 class StopPlay : public Play
 {

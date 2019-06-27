@@ -1,8 +1,5 @@
 #include "dongle.h"
 
-#include <sigc++/bind.h>
-#include <sigc++/functors/mem_fun.h>
-#include <sigc++/reference_wrapper.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -44,6 +41,16 @@ namespace
 
     // The dongle's MAC address
     static const uint64_t MAC = UINT64_C(0x20cb13bd834ab817);
+
+    // Used for sorting by robot ID
+    struct
+    {
+        bool operator()(std::tuple<uint8_t, Point, Angle> a,
+                        std::tuple<uint8_t, Point, Angle> b) const
+        {
+            return std::get<0>(a) < std::get<0>(b);
+        }
+    } customLess;
 
 }  // namespace
 
@@ -203,7 +210,7 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     {
         // Attempt to receive at most 8 bytes from endpoint 1
         i.reset(new USB::BulkInTransfer(device, 1, 8, false, 0));
-        i->signal_done.connect(sigc::mem_fun(this, &MRFDongle::handle_mdrs));
+        i->signal_done.connect(boost::bind(&MRFDongle::handle_mdrs, this, _1));
         i->submit();
     }
 
@@ -212,19 +219,14 @@ MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
     {
         // Attempt to receive at most 105 bytes from endpoint 2
         i.reset(new USB::BulkInTransfer(device, 2, 105, false, 0));
-        i->signal_done.connect(sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_message),
-                                          sigc::ref(*i.get())));
+        i->signal_done.connect(
+            boost::bind(&MRFDongle::handle_message, this, _1, boost::ref(*i.get())));
         i->submit();
     }
 
     // Submit the estop transfer.
-    status_transfer.signal_done.connect(sigc::mem_fun(this, &MRFDongle::handle_status));
+    status_transfer.signal_done.connect(boost::bind(&MRFDongle::handle_status, this, _1));
     status_transfer.submit();
-}
-
-void MRFDongle::handle_libusb_events()
-{
-    context.handle_usb_events();
 }
 
 MRFDongle::~MRFDongle()
@@ -243,7 +245,7 @@ void MRFDongle::beep(unsigned int length)
             MRF::CONTROL_REQUEST_BEEP, static_cast<uint16_t>(pending_beep_length),
             static_cast<uint16_t>(radio_interface), 0));
         beep_transfer->signal_done.connect(
-            sigc::mem_fun(this, &MRFDongle::handle_beep_done));
+            boost::bind(&MRFDongle::handle_beep_done, this, _1));
         beep_transfer->submit();
         pending_beep_length = 0;
     }
@@ -275,33 +277,31 @@ void MRFDongle::handle_mdrs(AsyncOperation<void> &op)
     }
     for (unsigned int i = 0; i < mdr_transfer.size(); i += 2)
     {
-        signal_message_delivery_report.emit(mdr_transfer.data()[i],
-                                            mdr_transfer.data()[i + 1]);
+        signal_message_delivery_report(mdr_transfer.data()[i],
+                                       mdr_transfer.data()[i + 1]);
     }
     mdr_transfer.submit();
 }
 
 void MRFDongle::handle_message(AsyncOperation<void> &, USB::BulkInTransfer &transfer)
 {
-    bool to_beep = false;
-
+    if (!annunciator.beep_dongle.num_slots())
+    {
+        // Connect signal to beep dongle when annunciator requests it.
+        this->annunciator.beep_dongle.connect(
+            boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
+    }
     transfer.result();
 
     // Only handle if there are more than 2 bytes in the transfer.
     if (transfer.size() > 2)
     {
         unsigned int robot = transfer.data()[0];
-        to_beep            = annunciator.handle_robot_message(
-            robot, transfer.data() + 1, transfer.size() - 3,
-            transfer.data()[transfer.size() - 2], transfer.data()[transfer.size() - 1]);
+        annunciator.handle_robot_message(robot, transfer.data() + 1, transfer.size() - 3,
+                                         transfer.data()[transfer.size() - 2],
+                                         transfer.data()[transfer.size() - 1]);
     }
     transfer.submit();
-
-    // If there are new messages since the last update, beep.
-    if (to_beep)
-    {
-        beep(ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS);
-    }
 }
 
 void MRFDongle::handle_status(AsyncOperation<void> &)
@@ -326,6 +326,7 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     int8_t camera_packet[55] = {0};
     int8_t mask_vec = 0;  // Assume all robots don't have valid position at the start
     uint8_t numbots = static_cast<uint8_t>(detbots.size());
+    std::vector<uint8_t> robot_ids;
 
     // Initialize pointer to start at location of storing ball data. First 2
     // bytes are for mask and flag vector
@@ -339,15 +340,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
 
     *rptr++ = static_cast<int8_t>(ballY);  // Add Ball Y position
     *rptr++ = static_cast<int8_t>(ballY >> 8);
-    struct
-    {
-        bool operator()(std::tuple<uint8_t, Point, Angle> a,
-                        std::tuple<uint8_t, Point, Angle> b) const
-        {
-            return std::get<0>(a) < std::get<0>(b);
-        }
-    } customLess;
 
+    // Sort robots in ascending order by ID
     std::sort(detbots.begin(), detbots.end(), customLess);
 
     // For the number of robot for which data was passed in, assign robot ids to
@@ -355,8 +349,10 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     for (std::size_t i = 0; i < numbots; i++)
     {
         uint8_t robotID = std::get<0>(detbots[i]);
-        int16_t robotX  = static_cast<int16_t>((std::get<1>(detbots[i])).x() * 1000);
-        int16_t robotY  = static_cast<int16_t>((std::get<1>(detbots[i])).y() * 1000);
+        robot_ids.push_back(robotID);
+
+        int16_t robotX = static_cast<int16_t>((std::get<1>(detbots[i])).x() * 1000);
+        int16_t robotY = static_cast<int16_t>((std::get<1>(detbots[i])).y() * 1000);
         int16_t robotT =
             static_cast<int16_t>((std::get<2>(detbots[i])).toRadians() * 1000);
 
@@ -395,6 +391,8 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
     std::chrono::microseconds micros =
         std::chrono::duration_cast<std::chrono::microseconds>(diff);
     uint64_t stamp = static_cast<uint64_t>(micros.count());
+
+    // Create and submit USB transfer with camera packet
     std::unique_ptr<USB::BulkOutTransfer> elt(
         new USB::BulkOutTransfer(device, 2, camera_packet, 55, 55, 0));
     auto i = camera_transfers.insert(
@@ -402,11 +400,17 @@ void MRFDongle::send_camera_packet(std::vector<std::tuple<uint8_t, Point, Angle>
         std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>(std::move(elt),
                                                                    stamp));
     (*i).first->signal_done.connect(
-        sigc::bind(sigc::mem_fun(this, &MRFDongle::handle_camera_transfer_done), i));
+        boost::bind(&MRFDongle::handle_camera_transfer_done, this, _1, i));
     (*i).first->submit();
 
-    LOG(DEBUG) << "Submitted camera transfer in position:" << camera_transfers.size()
-               << std::endl;
+    // Update annunciator with detected bots for dead bot detection
+    if (!annunciator.beep_dongle.num_slots())
+    {
+        // Connect signal to beep dongle when annunciator requests it.
+        this->annunciator.beep_dongle.connect(
+            boost::bind(&MRFDongle::beep, this, ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS));
+    }
+    annunciator.update_vision_detections(robot_ids);
 };
 
 void MRFDongle::send_drive_packet(const std::vector<std::unique_ptr<Primitive>> &prims)
@@ -456,7 +460,7 @@ bool MRFDongle::submit_drive_transfer()
         drive_transfer.reset(new USB::BulkOutTransfer(device, 1, drive_packet,
                                                       drive_packet_length, 64, 0));
         drive_transfer->signal_done.connect(
-            sigc::mem_fun(this, &MRFDongle::handle_drive_transfer_done));
+            boost::bind(&MRFDongle::handle_drive_transfer_done, this, _1));
         drive_transfer->submit();
     }
 
@@ -560,21 +564,11 @@ void MRFDongle::handle_drive_transfer_done(AsyncOperation<void> &op)
 }
 
 void MRFDongle::handle_camera_transfer_done(
-    AsyncOperation<void> &,
+    AsyncOperation<void> &op,
     std::list<std::pair<std::unique_ptr<USB::BulkOutTransfer>, uint64_t>>::iterator iter)
 {
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point epoch =
-        std::chrono::system_clock::from_time_t(0);
-    std::chrono::system_clock::duration diff = now - epoch;
-    std::chrono::microseconds micros =
-        std::chrono::duration_cast<std::chrono::microseconds>(diff);
-    uint64_t stamp = static_cast<uint64_t>(micros.count());
-
     std::lock_guard<std::mutex> lock(cam_mtx);
-    LOG(DEBUG) << "Camera transfer done, took: " << stamp - (*iter).second
-               << " microseconds" << std::endl;
-    (*iter).first->result();
+    op.result();
     camera_transfers.erase(iter);
 }
 
@@ -599,7 +593,7 @@ void MRFDongle::send_unreliable(unsigned int robot, unsigned int tries, const vo
         new USB::BulkOutTransfer(device, 3, buffer, sizeof(buffer), 64, 0));
     auto i = unreliable_messages.insert(unreliable_messages.end(), std::move(elt));
     (*i)->signal_done.connect(
-        sigc::bind(sigc::mem_fun(this, &MRFDongle::check_unreliable_transfer), i));
+        boost::bind(&MRFDongle::check_unreliable_transfer, this, _1, i));
     (*i)->submit();
 }
 

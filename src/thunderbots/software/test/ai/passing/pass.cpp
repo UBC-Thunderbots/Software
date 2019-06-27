@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace AI::Passing;
+using namespace Passing;
 
 TEST(PassTest, constructing_pass_with_negative_speed)
 {

@@ -40,7 +40,7 @@ class GrSimBackend
      * so it is easy to test.
      *
      * @param robot_id The id of the robot to send the command to
-     * @param team_colour_yellow Specifies if the robot to send the command to is on the
+     * @param is_yellow Specifies if the robot to send the command to is on the
      * yellow team
      * @param robot_velocity The velocity to set for the robot, in robot coordinates. X
      * corresponds to "forward" from the robot's perspective, and Y corresponds to the
@@ -64,8 +64,7 @@ class GrSimBackend
      * the dribbler will be turned on, otherwise the dribbler remains off. Dribbler speed
      * cannot be controlled in grSim
      */
-    grSim_Packet createGrSimPacketWithRobotVelocity(unsigned int robot_id,
-                                                    TeamColour team_colour,
+    grSim_Packet createGrSimPacketWithRobotVelocity(unsigned int robot_id, bool is_yellow,
                                                     Vector robot_velocity,
                                                     AngularVelocity angular_velocity,
                                                     double kick_speed_meters_per_second,

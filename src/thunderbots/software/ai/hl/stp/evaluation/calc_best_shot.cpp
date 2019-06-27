@@ -96,4 +96,21 @@ namespace Evaluation
                                   radius, robots_to_ignore);
     }
 
+    double calcShotOpenFriendlyNetPercentage(const Field &field, const Point &shot_origin,
+                                             const std::pair<Point, Angle> &shot)
+    {
+        Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), shot_origin,
+                                            field.friendlyGoalpostNeg())
+                               .abs();
+        return shot.second.toDegrees() / goal_angle.toDegrees();
+    }
+
+    double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_origin,
+                                          const std::pair<Point, Angle> &shot)
+    {
+        Angle goal_angle = acuteVertexAngle(field.enemyGoalpostPos(), shot_origin,
+                                            field.enemyGoalpostNeg())
+                               .abs();
+        return shot.second.toDegrees() / goal_angle.toDegrees();
+    }
 }  // namespace Evaluation

@@ -18,10 +18,14 @@ class STP : public HL
      * Creates a new High-Level logic module that uses the STP framework for
      * decision-making.
      *
+     * @param default_play_constructor A function that constructs and returns a unique ptr
+     * to a Play. This constructor will be used to return a Play if no other Play is
+     * applicable during gameplay.
      * @param random_seed The random seed used for STP's internal random number generator.
      * The default value is 0
      */
-    explicit STP(long random_seed = 0);
+    explicit STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
+                 long random_seed = 0);
 
     std::vector<std::unique_ptr<Intent>> getIntents(const World &world) override;
 
@@ -76,6 +80,9 @@ class STP : public HL
     PlayInfo getPlayInfo() override;
 
    private:
+    // A function that constructs a Play that will be used if no other Plays are
+    // applicable
+    std::function<std::unique_ptr<Play>()> default_play_constructor;
     // The Play that is currently running
     std::unique_ptr<Play> current_play;
     std::optional<std::vector<std::shared_ptr<Tactic>>> current_tactics;

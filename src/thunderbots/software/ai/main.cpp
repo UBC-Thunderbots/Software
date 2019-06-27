@@ -24,42 +24,38 @@ namespace
     AI ai;
 }  // namespace
 
-int count;
 
 // Runs the AI and sends new Primitive commands every time we get new information
 // about the World
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
-    if (!Util::DynamicParameters::AI::run_ai.value())
-    {
-        return;
-    }
-
     thunderbots_msgs::World world_msg = *msg;
     World world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
 
-    // Get the Primitives the Robots should run from the AI
-    std::vector<std::unique_ptr<Primitive>> assignedPrimitives = ai.getPrimitives(world);
-
-    // Put these Primitives into a message and publish it
-    thunderbots_msgs::PrimitiveArray primitive_array_message;
-    for (auto const &prim : assignedPrimitives)
+    if (Util::DynamicParameters::AI::run_ai.value())
     {
-        primitive_array_message.primitives.emplace_back(prim->createMsg());
-    }
-    primitive_publisher.publish(primitive_array_message);
+        // Get the Primitives the Robots should run from the AI
+        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+            ai.getPrimitives(world);
 
-    // Publish play info so we can display it in the visualizer
-    auto play_info_msg =
-        Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
-    play_info_publisher.publish(play_info_msg);
+        // Put these Primitives into a message and publish it
+        thunderbots_msgs::PrimitiveArray primitive_array_message;
+        for (auto const &prim : assignedPrimitives)
+        {
+            primitive_array_message.primitives.emplace_back(prim->createMsg());
+        }
+        primitive_publisher.publish(primitive_array_message);
+
+        // Publish play info so we can display it in the visualizer
+        auto play_info_msg =
+            Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
+        play_info_publisher.publish(play_info_msg);
+    }
 
     // Draw the world
     std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
         Util::CanvasMessenger::getInstance();
     canvas_messenger->drawWorld(world);
-
-    count++;
 }
 
 int main(int argc, char **argv)

@@ -131,7 +131,19 @@ namespace MRF
         "crashed (no core dump)",
     };
 
+    /**
+     * Electrical-related thresholds and messages.
+     */
+    constexpr double MIN_CAP_VOLTAGE             = 5.0;
     static constexpr const char* LOW_CAP_MESSAGE = "Low capacitor voltage (fuse blown?)";
+
+    constexpr double MIN_BATTERY_VOLTAGE             = 13.5;
+    static constexpr const char* LOW_BATTERY_MESSAGE = "Low battery voltage";
+
+    constexpr double MAX_BOARD_TEMPERATURE               = 90.0;
+    static constexpr const char* HIGH_BOARD_TEMP_MESSAGE = "High board temperature";
+
+    static constexpr const char* ROBOT_DEAD_MESSAGE = "Lost communication, dead?";
 
     /**
      * The total number of SD card-related messages.

@@ -3,6 +3,7 @@
 #include <set>
 
 #include "shared/constants.h"
+#include "util/logger/init.h"
 
 Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)
     : team_robots(),
@@ -11,6 +12,7 @@ Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_siz
 {
     // Set the size of the Timestamp history buffer
     last_update_timestamps.set_capacity(buffer_size);
+    updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
 Team::Team(const Duration& robot_expiry_buffer_duration,
@@ -107,8 +109,8 @@ void Team::assignGoalie(unsigned int new_goalie_id)
     }
     else
     {
-        throw std::invalid_argument(
-            "Error: Assigning the goalie to a robot that is not a member of the team");
+        LOG(WARNING) << "Warning: Tried to assign the goalie (id " << new_goalie_id
+                     << ") to a robot that is not a member of the team" << std::endl;
     }
 }
 
@@ -168,6 +170,23 @@ std::vector<Robot> Team::getAllRobots() const
 
     return all_robots;
 }
+
+std::vector<Robot> Team::getAllRobotsExceptGoalie() const
+{
+    auto goalie_robot = goalie();
+    std::vector<Robot> all_robots;
+    for (auto it = team_robots.begin(); it != team_robots.end(); it++)
+    {
+        if (goalie_robot && it->second == *goalie_robot)
+        {
+            continue;
+        }
+        all_robots.emplace_back(it->second);
+    }
+
+    return all_robots;
+}
+
 
 void Team::clearAllRobots()
 {
