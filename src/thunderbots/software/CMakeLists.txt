@@ -335,7 +335,6 @@ add_executable (network_input
 add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
 target_link_libraries(network_input
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         Eigen3::Eigen
         tbots_geom
@@ -388,7 +387,6 @@ add_executable (grsim_communication
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
 target_link_libraries(grsim_communication ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         tbots_primitive
         tbots_world
@@ -435,7 +433,6 @@ add_dependencies(parameters
     )
 target_link_libraries(parameters  
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         tbots_proto
         tbots_shared
         tbots_parameter
@@ -580,7 +577,6 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(grsim_communication_test 
             ${catkin_LIBRARIES}
-            ${PROTOBUF_LIBRARIES}
             ${G3LOG}
             tbots_proto
             tbots_geom
