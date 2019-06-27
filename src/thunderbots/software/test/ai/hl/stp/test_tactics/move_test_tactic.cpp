@@ -34,3 +34,8 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                            Angle::zero(), 0.0, 0));
     } while ((this->robot->position() - this->destination).len() > 0.01);
 }
+
+RobotCapabilityFlags MoveTestTactic::robotCapabilityRequirements() const
+{
+    return {RobotCapabilityFlags::Dribble};
+}

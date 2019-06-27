@@ -2,7 +2,6 @@
 #include <bitset>
 #include <initializer_list>
 
-// TODO: this name is slightly confusing
 class RobotCapabilityFlags
 {
    public:
