@@ -13,7 +13,7 @@ namespace
     /**
      * Minimum opening seen by robot for a shot on goal.
      */
-    const Angle MIN_SHOT_ANGLE = Angle::ofDegrees(15);
+    const Angle MIN_SHOT_ANGLE = Angle::ofDegrees(6);
 
     /**
      * Scaling factor for the chip distance (ball - target)
@@ -24,6 +24,11 @@ namespace
      * Max ball velocity for this tactic to be not done.
      */
     const double MAX_BALL_VELOCITY = 1.5;
+
+    /**
+     * Kick speed to use, slightly below BALL_MAX_SPEED for safety.
+     */
+    const double KICK_SPEED = BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
 }  // namespace
 
 FreeKickTactic::FreeKickTactic(const World& world, bool loop_forever)
@@ -44,7 +49,9 @@ void FreeKickTactic::updateParams(const World& updated_world)
 
 double FreeKickTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
-    return dist(robot.position(), world.ball().position());
+    double normalized_cost =
+        dist(robot.position(), world.ball().position()) / world.field().totalLength();
+    return std::clamp<double>(normalized_cost, 0, 1);
 }
 
 
@@ -69,8 +76,7 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             target = std::get<0>(*best_shot);
             yield(kick_action.updateStateAndGetNextIntent(
-                *robot, world.ball(), world.ball().position(), target,
-                BALL_MAX_SPEED_METERS_PER_SECOND));
+                *robot, world.ball(), world.ball().position(), target, KICK_SPEED));
         }
         else if (chip_and_chase_shot)
         {
@@ -89,8 +95,7 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             // note: this case rarely gets hit
             target = Evaluation::deflect_off_enemy_target(world);
             yield(kick_action.updateStateAndGetNextIntent(
-                *robot, world.ball(), world.ball().position(), target,
-                BALL_MAX_SPEED_METERS_PER_SECOND));
+                *robot, world.ball(), world.ball().position(), target, KICK_SPEED));
         }
     } while (world.ball().velocity().len() < MAX_BALL_VELOCITY);
 }
