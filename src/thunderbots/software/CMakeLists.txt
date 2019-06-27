@@ -141,18 +141,52 @@ target_link_libraries(tbots_world
     ${G3LOG}
     )
 
-# Util
-# TODO: We should split up this. There are several logical seperate libraries in util
-file(GLOB_RECURSE TBOTS_UTIL_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/*.cpp
+# Canvas Messenger 
+file(GLOB_RECURSE TBOTS_CANVAS_MESSENGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/canvas_messenger/*.cpp
         )
-add_library(tbots_util ${TBOTS_UTIL_LIB_SRC})
-target_link_libraries(tbots_util
+add_library(tbots_canvas_messenger ${TBOTS_CANVAS_MESSENGER_LIB_SRC})
+target_link_libraries(tbots_canvas_messenger
     ${catkin_LIBRARIES}
     ${G3LOG}
-    tbots_world
     )
 
+# Logger
+file(GLOB_RECURSE TBOTS_LOGGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/logger/*.cpp
+        )
+add_library(tbots_logger ${TBOTS_LOGGER_LIB_SRC})
+target_link_libraries(tbots_logger
+    ${G3LOG}
+    )
+
+# Parameter
+file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
+        )
+add_library(tbots_parameter ${TBOTS_PARAMETER_LIB_SRC})
+target_link_libraries(tbots_parameter
+    ${G3LOG}
+    )
+
+# Time
+file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
+        )
+add_library(tbots_time ${TBOTS_TIME_LIB_SRC})
+target_link_libraries(tbots_time
+    ${G3LOG}
+    )
+
+# Misc. Util
+# TODO: Have a "misc" library is gross. We should figure out something better then this
+file(GLOB TBOTS_MISC_UTIL_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
+        )
+add_library(tbots_misc_util ${TBOTS_MISC_UTIL_LIB_SRC})
+target_link_libraries(tbots_misc_util
+    ${G3LOG}
+    )
 
 # Evaluation
 file(GLOB TBOTS_EVALUATION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -226,7 +260,6 @@ add_library(tbots_primitive ${TBOTS_PRIMITIVE_LIB_SRC})
 add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tbots_primitive
     ${G3LOG}
-    tbots_util
     )
 
 # Intent
@@ -275,7 +308,6 @@ target_link_libraries(network_input
         Eigen3::Eigen
         tbots_geom
         tbots_world
-        tbots_util
         tbots_proto
         )
 
@@ -294,7 +326,6 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_geom
         tbots_world
-        tbots_util
         tbots_proto
         tbots_shared
         tbots_evaluation
@@ -324,7 +355,6 @@ target_link_libraries(grsim_communication ${catkin_LIBRARIES}
         tbots_primitive
         tbots_world
         tbots_geom
-        tbots_util
         tbots_proto
         )
 
@@ -345,7 +375,6 @@ target_link_libraries(radio_communication
     tbots_shared
     tbots_primitive
     tbots_world
-    tbots_util
     )
 
 file(GLOB DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -365,7 +394,6 @@ target_link_libraries(parameters
         ${catkin_LIBRARIES}
         ${PROTOBUF_LIBRARIES}
         tbots_proto
-        tbots_util
         tbots_shared
         )
 
@@ -383,7 +411,6 @@ target_link_libraries(xbox_controller_mapping
         ${G3LOG}
         tbots_primitive
         tbots_world
-        tbots_util
         tbots_shared
         )
 
@@ -461,7 +488,6 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             tbots_world
             tbots_geom
-            tbots_util
             )
 
     catkin_add_gtest(world_test
@@ -478,7 +504,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
-            tbots_util
             )
 
 
@@ -491,7 +516,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
-            tbots_util
             )
 
     catkin_add_gtest(grsim_communication_test
@@ -512,7 +536,6 @@ if (CATKIN_ENABLE_TESTING)
             ${PROTOBUF_LIBRARIES}
             ${G3LOG}
             tbots_proto
-            tbots_util
             tbots_geom
             tbots_world
             tbots_primitive
@@ -557,7 +580,6 @@ if (CATKIN_ENABLE_TESTING)
             test/util/time/timestamp.cpp
             )
     target_link_libraries(time_test
-        tbots_util
         )
 
     catkin_add_gtest(shared_evaluation_test
@@ -568,7 +590,6 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(shared_evaluation_test 
         ${catkin_LIBRARIES}
-        tbots_util
         )
 
     catkin_add_gtest(ai_evaluation_test
@@ -589,7 +610,6 @@ if (CATKIN_ENABLE_TESTING)
         tbots_evaluation
         tbots_world
         tbots_geom
-        tbots_util
         )
 
     catkin_add_gtest(action_test
@@ -608,7 +628,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_util
             tbots_world
             tbots_action
             tbots_intent
@@ -633,7 +652,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_util
             tbots_tactic
             tbots_world
             tbots_geom
@@ -660,7 +678,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_util
             tbots_tactic
             tbots_world
             tbots_geom
@@ -690,7 +707,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_util
             tbots_tactic
             tbots_world
             tbots_geom
@@ -736,7 +752,6 @@ if (CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_passing
-        tbots_util
         )
 
     catkin_add_gtest(gradient_descent_optimizer_test
@@ -757,7 +772,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(evaluation_detect_threat_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_util
         tbots_geom
         tbots_world
         tbots_evaluation
@@ -777,7 +791,6 @@ if (CATKIN_ENABLE_TESTING)
             tbots_navigator
             tbots_shared
             tbots_geom
-            tbots_util
             tbots_world
             tbots_intent
             tbots_primitive
@@ -800,7 +813,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(robot_filter_test
             ${catkin_LIBRARIES}
             ${G3LOG}
-            tbots_util
             tbots_world
             )
 
@@ -821,7 +833,6 @@ if (CATKIN_ENABLE_TESTING)
             ${Threads_LIBRARIES}
             tbots_geom
             tbots_world
-            tbots_util
             tbots_navigator
             tbots_primitive
             tbots_intent
@@ -840,7 +851,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_util
             tbots_world
             tbots_geom
             tbots_primitive
@@ -861,7 +871,6 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             Eigen3::Eigen
-            tbots_util
             tbots_geom
             tbots_world
             )
@@ -879,7 +888,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(logger_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_util
         )
 
     # The test node that verifies the rostest utils are working correctly
@@ -888,7 +896,6 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(rostest_util_test 
         ${catkin_LIBRARIES}
-        tbots_util
         )
 
     # The test node that verifies the dynamic_parameters are working
@@ -897,7 +904,6 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(dynamic_parameters_test 
         ${catkin_LIBRARIES}
-        tbots_util
         )
 
     # The test node that verifies the dynamic_parameters exist in the parameter server
@@ -906,7 +912,6 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(check_parameter_existance_test 
         ${catkin_LIBRARIES}
-        tbots_util
         )
 
 endif()
