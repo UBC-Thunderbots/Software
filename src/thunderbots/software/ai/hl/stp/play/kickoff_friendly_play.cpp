@@ -86,7 +86,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<MoveTactic>(true)};
 
     // Part 1: setup state (move to key positions)
-    do
+    while (world.gameState().isSetupState())
     {
         // TODO: Replace placeholder tactic with goalie tactic
         lone_goalie_tactic_0->updateParams(
@@ -107,10 +107,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
-    } while (world.gameState().isSetupState());
+    }
 
     // Part 2: ready state (chip the ball)
-    do
+    while (world.gameState().isReadyState())
     {
         // TODO: Replace placeholder tactic with goalie tactic
         lone_goalie_tactic_0->updateParams(
@@ -126,7 +126,6 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
             world.ball(), world.field().centerPoint(),
             world.field().centerPoint() + Point(world.field().length() / 4, 0),
             world.field().length() / 2);
-        ;
         result.emplace_back(chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
@@ -140,7 +139,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
-    } while (world.gameState().isReadyState());
+    }
 }
 
 // Register this play in the PlayFactory
