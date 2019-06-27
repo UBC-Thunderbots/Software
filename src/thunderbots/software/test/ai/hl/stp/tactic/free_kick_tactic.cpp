@@ -10,7 +10,7 @@
 #include "ai/intent/kick_intent.h"
 #include "test/test_util/test_util.h"
 
-TEST(FreeKickTacticTest, no_enemies_shoot_towards_goal)
+TEST(FreeKickTacticTest, shoot_on_open_net)
 {
     // Robot is in the enemy half facing towards enemy goal
     Robot robot = Robot(2, Point(2, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -35,15 +35,17 @@ TEST(FreeKickTacticTest, no_enemies_shoot_towards_goal)
     }
 }
 
-TEST(FreeKickTacticTest, no_direct_shot_then_chip)
+TEST(FreeKickTacticTest, chip_when_blocked_by_enemy)
 {
     // Robot is in the enemy half facing towards enemy goal
     Robot robot = Robot(2, Point(2, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     Ball ball({2.1, 0}, {0, 0}, Timestamp::fromSeconds(0));
     World world = TestUtil::createBlankTestingWorld();
+
+    // Have enemy robot directly block the kicker
     world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(2.5, 0)},
-        Timestamp::fromSeconds(0));
+                                                     Timestamp::fromSeconds(0));
     world.updateBallState(ball);
 
     FreeKickTactic tactic(world, false);
@@ -53,6 +55,7 @@ TEST(FreeKickTacticTest, no_direct_shot_then_chip)
     try
     {
         ChipIntent chip_intent = dynamic_cast<ChipIntent&>(*tactic.getNextIntent());
+        EXPECT_EQ(world.ball().position(), chip_intent.getChipOrigin());
         EXPECT_EQ(2, chip_intent.getRobotId());
     }
     catch (...)

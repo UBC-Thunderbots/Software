@@ -11,9 +11,9 @@
 namespace
 {
     /**
-     * Maximum opening seen by robot for a shot on goal.
+     * Minimum opening seen by robot for a shot on goal.
      */
-    const Angle MAX_SHOT_ANGLE = Angle::ofDegrees(15);
+    const Angle MIN_SHOT_ANGLE = Angle::ofDegrees(15);
 
     /**
      * Scaling factor for the chip distance (ball - target)
@@ -24,7 +24,7 @@ namespace
      * Max ball velocity for this tactic to be not done.
      */
     const double MAX_BALL_VELOCITY = 2.0;
-}
+}  // namespace
 
 FreeKickTactic::FreeKickTactic(const World& world, bool loop_forever)
     : world(world), Tactic(loop_forever)
@@ -65,10 +65,9 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             Evaluation::findTargetPointForIndirectChipAndChase(world);
 
         // Check if there is a shot with a big enough window
-        if (best_shot && (std::get<1>(*best_shot) > MAX_SHOT_ANGLE))
+        if (best_shot && (std::get<1>(*best_shot) > MIN_SHOT_ANGLE))
         {
             target = std::get<0>(*best_shot);
-            LOG(DEBUG) << "Shooting at goal";
             yield(kick_action.updateStateAndGetNextIntent(
                 *robot, world.ball(), world.ball().position(), target,
                 BALL_MAX_SPEED_METERS_PER_SECOND));
@@ -76,9 +75,10 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         else if (chip_and_chase_shot)
         {
             // Chip and Chase
-            double chip_power =
-                (*chip_and_chase_shot - world.ball().position()).len() * CHIP_DISTANCE_SCALING_FACTOR;
-            LOG(DEBUG) << "Chipping and chasing for " << chip_power << " meters";
+            // TODO: possibly modify the evaluation so that it chips over the defending
+            // enemies
+            double chip_power = (*chip_and_chase_shot - world.ball().position()).len() *
+                                CHIP_DISTANCE_SCALING_FACTOR;
             yield(chip_action.updateStateAndGetNextIntent(
                 *robot, world.ball(), world.ball().position(), *chip_and_chase_shot,
                 chip_power));
@@ -86,7 +86,7 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         else
         {
             // No shot found, shoot at enemy and get deflection towards goal (hopefully)
-            LOG(DEBUG) << "Deflecting off enemy";
+            // note: this case rarely gets hit
             target = Evaluation::deflect_off_enemy_target(world);
             yield(kick_action.updateStateAndGetNextIntent(
                 *robot, world.ball(), world.ball().position(), target,
