@@ -4,8 +4,8 @@
 
 #include <exception>
 
+#include "test/ai/hl/stp/test_plays/halt_test_play.h"
 #include "test/ai/hl/stp/test_plays/move_test_play.h"
-#include "test/ai/hl/stp/test_plays/stop_test_play.h"
 #include "test/test_util/test_util.h"
 
 TEST(PlayFactoryTest, test_create_play_with_invalid_name)
@@ -31,7 +31,7 @@ TEST(PlayFactoryTest, test_get_registered_play_names)
         std::count(registered_names.begin(), registered_names.end(), MoveTestPlay::name),
         1);
     EXPECT_EQ(
-        std::count(registered_names.begin(), registered_names.end(), StopTestPlay::name),
+        std::count(registered_names.begin(), registered_names.end(), HaltTestPlay::name),
         1);
 }
 

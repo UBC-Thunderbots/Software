@@ -35,19 +35,19 @@ class GameStatePlaySelectionTest : public ::testing::Test,
     AI ai;
 };
 
-TEST_P(GameStatePlaySelectionTest, test_play_selection_for_refbox_game_states)
-{
-    world.mutableGameState().updateRefboxGameState(GetParam());
-    ai.getPrimitives(world);
-    // assert that the play name is not "None"
-    ASSERT_NE(ai.getPlayInfo().play_name, AI::NO_PLAY_NAME);
-}
-
-auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
-
-INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, GameStatePlaySelectionTest,
-                        ::testing::ValuesIn(all_refbox_game_states.begin(),
-                                            all_refbox_game_states.end()));
+// TEST_P(GameStatePlaySelectionTest, test_play_selection_for_refbox_game_states)
+//{
+//    world.mutableGameState().updateRefboxGameState(GetParam());
+//    ai.getPrimitives(world);
+//    // assert that the play name is not "None"
+//    ASSERT_NE(ai.getPlayInfo().play_name, AI::NO_PLAY_NAME);
+//}
+//
+// auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
+//
+// INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, GameStatePlaySelectionTest,
+//                        ::testing::ValuesIn(all_refbox_game_states.begin(),
+//                                            all_refbox_game_states.end()));
 
 int main(int argc, char **argv)
 {

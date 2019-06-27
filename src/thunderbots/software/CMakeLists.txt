@@ -672,7 +672,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/action/stop_action.cpp
             ai/hl/stp/evaluation/calc_best_shot.cpp
             ai/hl/stp/play/example_play.cpp
-            ai/hl/stp/play/stop_play.cpp
+            ai/hl/stp/play/halt_play.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
             ai/hl/stp/tactic/move_tactic.cpp
@@ -695,11 +695,11 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/world.cpp
             geom/util.cpp
             test/ai/hl/stp/play/example_play.cpp
-            test/ai/hl/stp/play/stop_play.cpp
+            test/ai/hl/stp/play/halt_play.cpp
             test/ai/hl/stp/play/main.cpp
             test/ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
-            test/ai/hl/stp/test_plays/stop_test_play.cpp
+            test/ai/hl/stp/test_plays/halt_test_play.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             test/test_util/test_util.cpp
@@ -726,10 +726,9 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             ai/hl/stp/play/play.cpp
-            ai/hl/stp/play/stop_play.cpp
             ai/hl/stp/play/play_factory.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
-            test/ai/hl/stp/test_plays/stop_test_play.cpp
+            test/ai/hl/stp/test_plays/halt_test_play.cpp
             ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
@@ -754,7 +753,6 @@ if (CATKIN_ENABLE_TESTING)
             ai/world/robot.cpp
             ai/world/team.cpp
             ai/world/world.cpp
-            ai/ai.cpp
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_tactic_assignment.cpp
@@ -961,9 +959,9 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
             ai/hl/stp/play/play.cpp
             ai/hl/stp/play/play_factory.cpp
-	        ai/hl/stp/play/stop_play.cpp
+            ai/hl/stp/play/halt_play.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
-            test/ai/hl/stp/test_plays/stop_test_play.cpp
+            test/ai/hl/stp/test_plays/halt_test_play.cpp
             ai/intent/intent.cpp
             ai/intent/move_intent.cpp
             ai/intent/stop_intent.cpp
@@ -1019,7 +1017,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/hl/stp/tactic/tactic.cpp
             ai/hl/stp/tactic/stop_tactic.cpp
             ai/hl/stp/play/play.cpp
-            ai/hl/stp/play/stop_play.cpp
+            ai/hl/stp/play/halt_play.cpp
             ai/hl/stp/play/play_factory.cpp
             ai/navigator/placeholder_navigator/placeholder_navigator.cpp
             ai/intent/intent.cpp

@@ -7,18 +7,23 @@
 #include <exception>
 
 #include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/play/stop_play.h"
+#include "test/ai/hl/stp/test_plays/halt_test_play.h"
 #include "test/ai/hl/stp/test_plays/move_test_play.h"
-#include "test/ai/hl/stp/test_plays/stop_test_play.h"
 #include "test/test_util/test_util.h"
 
 class STPTest : public ::testing::Test
 {
+   public:
+    STPTest() : stp([]() { return nullptr; }, 0) {}
+
    protected:
     void SetUp() override
     {
+        auto default_play_constructor = []() -> std::unique_ptr<Play> {
+            return std::make_unique<HaltTestPlay>();
+        };
         // Give an explicit seed to STP so that our tests are deterministic
-        stp   = STP(0);
+        stp   = STP(default_play_constructor, 0);
         world = ::Test::TestUtil::createBlankTestingWorld();
     }
 
@@ -29,12 +34,9 @@ class STPTest : public ::testing::Test
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
     auto play_names = PlayFactory::getRegisteredPlayNames();
-    EXPECT_EQ(play_names.size(), 3);
+    EXPECT_EQ(play_names.size(), 2);
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), MoveTestPlay::name), 1);
-    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), StopTestPlay::name), 1);
-    // We also expect the normal StopPlay since it is used in core functions in stp.cpp so
-    // has to be included in the tests
-    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), StopPlay::name), 1);
+    EXPECT_EQ(std::count(play_names.begin(), play_names.end(), HaltTestPlay::name), 1);
 }
 
 TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
@@ -48,17 +50,17 @@ TEST_F(STPTest, test_exception_thrown_when_no_play_applicable)
 
 TEST_F(STPTest, test_calculate_new_play_when_one_play_valid)
 {
-    // Only the StopTestPlay should be applicable
+    // Only the HaltTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     auto play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(play->getName(), StopTestPlay::name);
+    EXPECT_EQ(play->getName(), HaltTestPlay::name);
 }
 
 TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
 {
-    // Both StopTestPlay and MoveTestPlay should be applicable
+    // Both HaltTestPlay and MoveTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(1, 1), Timestamp::fromSeconds(0));
 
@@ -75,7 +77,7 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
 
     play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(play->getName(), StopTestPlay::name);
+    EXPECT_EQ(play->getName(), HaltTestPlay::name);
 
     for (int i = 0; i < 2; i++)
     {
@@ -88,7 +90,7 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     {
         play = stp.calculateNewPlay(world);
         EXPECT_TRUE(play);
-        EXPECT_EQ(play->getName(), StopTestPlay::name);
+        EXPECT_EQ(play->getName(), HaltTestPlay::name);
     }
 
     play = stp.calculateNewPlay(world);
@@ -97,7 +99,7 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
 
     play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
-    EXPECT_EQ(play->getName(), StopTestPlay::name);
+    EXPECT_EQ(play->getName(), HaltTestPlay::name);
 
     play = stp.calculateNewPlay(world);
     EXPECT_TRUE(play);
@@ -112,24 +114,24 @@ TEST_F(STPTest, test_current_play_initially_unassigned)
 // Test that we can successfully assign Plays when there is currently no Play assigned
 TEST_F(STPTest, test_play_assignment_transition_from_unassigned_to_assigned)
 {
-    // Only the StopTestPlay should be applicable
+    // Only the HaltTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), StopTestPlay::name);
+    EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 }
 
 TEST_F(
     STPTest,
     test_play_assignment_from_one_play_to_another_when_current_play_invariant_no_longer_holds)
 {
-    // Only the StopTestPlay should be applicable
+    // Only the HaltTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), StopTestPlay::name);
+    EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 
-    // The StopTestPlays invariant should no longer hold, and the MoveTestPlay should now
+    // The HaltTestPlays invariant should no longer hold, and the MoveTestPlay should now
     // be applicable
     world = ::Test::TestUtil::setBallPosition(
         world, world.field().enemyCornerNeg() + Vector(1, 0), Timestamp::fromSeconds(0));
@@ -145,12 +147,12 @@ TEST_F(STPTest, test_play_assignment_from_one_play_to_another_when_current_play_
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), MoveTestPlay::name);
 
-    // Now only the StopTestPlay should be applicable, and the MoveTestPlay's invariant
-    // no longer holds, so we expect the current play to become the StopTestPlay
+    // Now only the HaltTestPlay should be applicable, and the MoveTestPlay's invariant
+    // no longer holds, so we expect the current play to become the HaltTestPlay
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), StopTestPlay::name);
+    EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 }
 
 TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
@@ -158,16 +160,16 @@ TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
     // TODO: Update this test when https://github.com/UBC-Thunderbots/Software/issues/396
     // is completed. For now, we just check that the previous play remains assigned
 
-    // Only the StopTestPlay should be applicable
+    // Only the HaltTestPlay should be applicable
     world =
         ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), StopTestPlay::name);
+    EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 
     // Put the ball where both its x and y coordinates are negative. Neither test Play
     // is applicable in this case
     world = ::Test::TestUtil::setBallPosition(world, Point(-1, -1),
                                               Timestamp::fromSeconds(0));
     stp.getIntents(world);
-    EXPECT_EQ(*(stp.getCurrentPlayName()), StopTestPlay::name);
+    EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 }

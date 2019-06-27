@@ -3,7 +3,7 @@
 #include "ai/hl/stp/play/play.h"
 
 /**
- * A test Play that stops 3 robots.
+ * A test Play that halts 3 robots.
  *
  * The Play is never done
  *
@@ -13,12 +13,12 @@
  * We use the Ball's position to control the 'isApplicable' and 'invariantHolds' values
  * because it is easy to change during tests
  */
-class StopTestPlay : public Play
+class HaltTestPlay : public Play
 {
    public:
     static const std::string name;
 
-    StopTestPlay() = default;
+    HaltTestPlay() = default;
 
     std::string getName() const override;
 
