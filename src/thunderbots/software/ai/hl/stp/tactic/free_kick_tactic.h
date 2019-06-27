@@ -7,7 +7,8 @@
  * It is also assumed that the ball is stationary, in preparation for a set piece.
  *
  * For now, it attempts to find a shot towards the enemy goal;
- * if none are found, it will shoot at an enemy robot to get a deflection.
+ * if none are found, it will chip to an open area.
+ * If that isn't possible, we shoot at an enemy and hope for a good deflection.
  */
 
 class FreeKickTactic : public Tactic
