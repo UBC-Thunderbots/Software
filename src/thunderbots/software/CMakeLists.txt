@@ -132,6 +132,30 @@ file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         )
 add_library(tbots_geom ${TBOTS_GEOM_LIB_SRC})
 
+# Time
+file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
+        )
+add_library(tbots_time ${TBOTS_TIME_LIB_SRC})
+target_link_libraries(tbots_time
+    ${G3LOG}
+    )
+
+# Parameter
+file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
+        )
+add_library(tbots_parameter ${TBOTS_PARAMETER_LIB_SRC})
+target_link_libraries(tbots_parameter
+    ${catkin_LIBRARIES}
+    )
+
+# Refbox Utils
+add_library(tbots_refbox_util 
+    util/refbox_constants.cpp
+    )
+add_dependencies(tbots_refbox_util ${catkin_EXPORTED_TARGETS})
+
 # World
 file(GLOB_RECURSE TBOTS_WORLD_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
@@ -139,6 +163,9 @@ file(GLOB_RECURSE TBOTS_WORLD_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_library(tbots_world ${TBOTS_WORLD_LIB_SRC})
 target_link_libraries(tbots_world
     ${G3LOG}
+    tbots_time
+    tbots_parameter
+    tbots_refbox_util
     )
 
 # Canvas Messenger 
@@ -150,42 +177,17 @@ target_link_libraries(tbots_canvas_messenger
     ${catkin_LIBRARIES}
     ${G3LOG}
     )
+add_dependencies(tbots_canvas_messenger ${catkin_EXPORTED_TARGETS})
 
-# Logger
-file(GLOB_RECURSE TBOTS_LOGGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/logger/*.cpp
-        )
-add_library(tbots_logger ${TBOTS_LOGGER_LIB_SRC})
-target_link_libraries(tbots_logger
-    ${G3LOG}
+# ROS Message Utils
+add_library(tbots_ros_msg_util 
+    util/ros_messages.cpp
     )
+add_dependencies(tbots_ros_msg_util ${catkin_EXPORTED_TARGETS})
 
-# Parameter
-file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
-        )
-add_library(tbots_parameter ${TBOTS_PARAMETER_LIB_SRC})
-target_link_libraries(tbots_parameter
-    ${G3LOG}
-    )
-
-# Time
-file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
-        )
-add_library(tbots_time ${TBOTS_TIME_LIB_SRC})
-target_link_libraries(tbots_time
-    ${G3LOG}
-    )
-
-# Misc. Util
-# TODO: Have a "misc" library is gross. We should figure out something better then this
-file(GLOB TBOTS_MISC_UTIL_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
-        )
-add_library(tbots_misc_util ${TBOTS_MISC_UTIL_LIB_SRC})
-target_link_libraries(tbots_misc_util
-    ${G3LOG}
+# Math Utils
+add_library(tbots_math
+    util/math_functions.cpp
     )
 
 # Evaluation
@@ -196,6 +198,9 @@ file(GLOB TBOTS_EVALUATION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_library(tbots_evaluation ${TBOTS_EVALUATION_LIB_SRC})
 target_link_libraries(tbots_evaluation
     tbots_geom
+    tbots_parameter
+    tbots_time
+    tbots_world
     )
 
 # Passing
@@ -206,8 +211,9 @@ add_library(tbots_passing ${TBOTS_PASSING_LIB_SRC})
 target_link_libraries(tbots_passing
     tbots_evaluation
     tbots_geom
+    tbots_canvas_messenger
+    tbots_math
     )
-
 
 # Action
 file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -250,6 +256,7 @@ file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPEN
 add_library(tbots_navigator ${TBOTS_NAVIGATOR_LIB_SRC})
 target_link_libraries(tbots_navigator
     tbots_geom
+    tbots_math
     )
 
 # Primitive 
@@ -269,6 +276,16 @@ file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 add_library(tbots_intent ${TBOTS_INTENT_LIB_SRC})
 target_link_libraries(tbots_intent
     tbots_primitive
+    )
+
+# Test Utils
+add_library(tbots_test_util
+    test/test_util/test_util.cpp
+    )
+target_link_libraries(tbots_intent
+    tbots_primitive
+    tbots_time
+    tbots_world
     )
 
 
@@ -309,6 +326,9 @@ target_link_libraries(network_input
         tbots_geom
         tbots_world
         tbots_proto
+        tbots_parameter
+        tbots_ros_msg_util
+        tbots_math
         )
 
 file(GLOB AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -336,6 +356,9 @@ target_link_libraries(ai_logic ${catkin_LIBRARIES}
         tbots_navigator
         tbots_passing
         tbots_primitive
+        tbots_parameter
+        tbots_ros_msg_util
+        tbots_canvas_messenger
         )
 
 file(GLOB GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -356,6 +379,8 @@ target_link_libraries(grsim_communication ${catkin_LIBRARIES}
         tbots_world
         tbots_geom
         tbots_proto
+        tbots_parameter
+        tbots_ros_msg_util
         )
 
 file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -369,13 +394,16 @@ add_executable (radio_communication
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
 target_link_libraries(radio_communication
-    ${catkin_LIBRARIES}
-    ${G3LOG}
-    ${LIBUSB_1_LIBRARIES}
-    tbots_shared
-    tbots_primitive
-    tbots_world
-    )
+        ${catkin_LIBRARIES}
+        ${G3LOG}
+        ${LIBUSB_1_LIBRARIES}
+        tbots_shared
+        tbots_primitive
+        tbots_world
+        tbots_time
+        tbots_parameter
+        tbots_ros_msg_util
+        )
 
 file(GLOB DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
@@ -395,6 +423,7 @@ target_link_libraries(parameters
         ${PROTOBUF_LIBRARIES}
         tbots_proto
         tbots_shared
+        tbots_parameter
         )
 
 file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -412,6 +441,9 @@ target_link_libraries(xbox_controller_mapping
         tbots_primitive
         tbots_world
         tbots_shared
+        tbots_time
+        tbots_parameter
+        tbots_ros_msg_util
         )
 
 
@@ -488,6 +520,7 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             tbots_world
             tbots_geom
+            tbots_ros_msg_util
             )
 
     catkin_add_gtest(world_test
@@ -498,24 +531,24 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/world/robot.cpp
             test/ai/world/team.cpp
             test/ai/world/world.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(world_test 
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
+            tbots_test_util
             )
 
 
     catkin_add_gtest(test_util_test
             test/test_util/test_util_test.cpp
-            test/test_util/test_util.cpp
             )
 
     target_link_libraries(test_util_test 
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
+            tbots_test_util
             )
 
     catkin_add_gtest(grsim_communication_test
@@ -529,7 +562,6 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_communication/movespin_primitive.cpp
             test/grsim_communication/main.cpp
             test/grsim_communication/motion_controller.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(grsim_communication_test 
             ${catkin_LIBRARIES}
@@ -539,6 +571,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_geom
             tbots_world
             tbots_primitive
+            tbots_test_util
             )
 
     catkin_add_gtest(primitive_test
@@ -580,6 +613,8 @@ if (CATKIN_ENABLE_TESTING)
             test/util/time/timestamp.cpp
             )
     target_link_libraries(time_test
+        ${catkin_LIBRARIES}
+        tbots_time
         )
 
     catkin_add_gtest(shared_evaluation_test
@@ -590,6 +625,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(shared_evaluation_test 
         ${catkin_LIBRARIES}
+        tbots_world
         )
 
     catkin_add_gtest(ai_evaluation_test
@@ -603,13 +639,13 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/evaluation/intercept.cpp
             test/ai/hl/stp/evaluation/robot.cpp
             test/ai/hl/stp/evaluation/team.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(ai_evaluation_test 
         ${G3LOG}
         tbots_evaluation
         tbots_world
         tbots_geom
+        tbots_test_util
         )
 
     catkin_add_gtest(action_test
@@ -646,7 +682,6 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/shoot_goal_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(tactic_test
             ${catkin_LIBRARIES}
@@ -661,6 +696,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_tactic
             tbots_action
             tbots_evaluation
+            tbots_test_util
             )
 
     catkin_add_gtest(play_test
@@ -672,7 +708,6 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/test_plays/halt_test_play.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(play_test
             ${catkin_LIBRARIES}
@@ -688,6 +723,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_action
             tbots_evaluation
             tbots_play
+            tbots_test_util
             )
 
     catkin_add_gtest(stp_test
@@ -701,7 +737,6 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_tactic_assignment.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(stp_test
             ${catkin_LIBRARIES}
@@ -717,6 +752,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_action
             tbots_evaluation
             tbots_navigator
+            tbots_test_util
             )
 
     catkin_add_gtest(intent_test
@@ -746,12 +782,12 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/passing/pass.cpp
             # TODO: (Issue #655) un-comment this and fix the flaky tests in it
             # test/ai/passing/pass_generator.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(passing_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_passing
+        tbots_test_util
         )
 
     catkin_add_gtest(gradient_descent_optimizer_test
@@ -767,7 +803,6 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(evaluation_detect_threat_test 
         ${catkin_LIBRARIES}
@@ -775,12 +810,12 @@ if (CATKIN_ENABLE_TESTING)
         tbots_geom
         tbots_world
         tbots_evaluation
+        tbots_test_util
         )
 
     catkin_add_gtest(navigator_test
             test/ai/navigator/main.cpp
             test/ai/navigator/placeholder_navigator/placeholder_navigator.cpp
-            test/test_util/test_util.cpp
             test/ai/navigator/obstacle/obstacle.cpp
             test/ai/navigator/trespass/trespass.cpp
             test/ai/navigator/path_planner/straight_line_path_planner.cpp
@@ -794,6 +829,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_world
             tbots_intent
             tbots_primitive
+            tbots_test_util
             )
 
     catkin_add_gtest(polygon_test
@@ -824,7 +860,6 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
             test/ai/hl/stp/test_tactics/stop_test_tactic.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(game_state_play_selection_test
             ${catkin_LIBRARIES}
@@ -839,13 +874,13 @@ if (CATKIN_ENABLE_TESTING)
             tbots_action
             tbots_play
             tbots_tactic
+            tbots_test_util
             )
 
     catkin_add_gtest(stp_refbox_game_state_play_selection
             ai/ai.cpp
             ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_refbox_game_state_play_selection.cpp
-            test/test_util/test_util.cpp
             )
     target_link_libraries(stp_refbox_game_state_play_selection
             ${catkin_LIBRARIES}
@@ -859,12 +894,12 @@ if (CATKIN_ENABLE_TESTING)
             tbots_tactic
             tbots_action
             tbots_play
+            tbots_test_util
             )
 
     catkin_add_gtest(network_input_test
             test/network_input/filter/ball_filter.cpp
             test/network_input/main.cpp
-            test/test_util/test_util.cpp
             network_input/filter/ball_filter.cpp
             )
     target_link_libraries(network_input_test
@@ -873,6 +908,8 @@ if (CATKIN_ENABLE_TESTING)
             Eigen3::Eigen
             tbots_geom
             tbots_world
+            tbots_test_util
+            tbots_math
             )
 endif()
 
@@ -888,14 +925,17 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(logger_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
+        tbots_time
         )
 
     # The test node that verifies the rostest utils are working correctly
-    add_rostest_gtest(rostest_util_test test/test_util/rostest_util_test.test
-            test/test_util/rostest_util_test.cpp
-            )
+    add_rostest_gtest(rostest_util_test 
+        test/test_util/rostest_util_test.test
+        test/test_util/rostest_util_test.cpp
+        )
     target_link_libraries(rostest_util_test 
         ${catkin_LIBRARIES}
+        tbots_time
         )
 
     # The test node that verifies the dynamic_parameters are working
@@ -904,6 +944,7 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(dynamic_parameters_test 
         ${catkin_LIBRARIES}
+        tbots_parameter
         )
 
     # The test node that verifies the dynamic_parameters exist in the parameter server
