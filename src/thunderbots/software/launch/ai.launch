@@ -9,8 +9,6 @@
     </node>
 
     <!-- Launch the ai logic node -->
-    <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen">
-    </node>
 
     <!-- Launch the dynamic parameters node -->
     <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>

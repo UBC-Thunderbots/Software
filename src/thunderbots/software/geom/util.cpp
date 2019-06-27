@@ -1228,10 +1228,7 @@ std::optional<Segment> getIntersectingSegment(Ray ray1, Ray ray2, Segment segmen
         }
     }
     // All cases have been checked, return std::nullopt
-    else
-    {
-        return std::nullopt;
-    }
+    return std::nullopt;
 }
 
 std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
@@ -1272,6 +1269,7 @@ std::optional<Segment> mergeOverlappingParallelSegments(Segment segment1,
                    ? Segment(segment1.getSegStart(), segment2.getSegStart())
                    : Segment(segment1.getEnd(), segment2.getSegStart());
     }
+    return std::nullopt;
 }
 
 std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment segment2)
