@@ -958,11 +958,13 @@ if (CATKIN_ENABLE_TESTING)
         )
 
     # The test node that verifies the dynamic_parameters exist in the parameter server
-    add_rostest_gtest(check_parameter_existance_test test/util/rostest_parameter_exists.test
-            test/util/test_parameter_exists.cpp
-            )
+    add_rostest_gtest(check_parameter_existance_test 
+        test/util/rostest_parameter_exists.test
+        test/util/test_parameter_exists.cpp
+        )
     target_link_libraries(check_parameter_existance_test 
         ${catkin_LIBRARIES}
+        tbots_parameter
         )
 
 endif()
