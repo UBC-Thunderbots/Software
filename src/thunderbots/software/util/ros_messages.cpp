@@ -1,5 +1,6 @@
-#include <util/parameter/dynamic_parameters.h>
 #include "util/ros_messages.h"
+
+#include <util/parameter/dynamic_parameters.h>
 
 namespace Util
 {
@@ -100,14 +101,11 @@ namespace Util
         {
             // parse the dynamic parameters for hardware capabilities into sets
             auto broken_dribblers_set = commaSeparatedListToSet(
-                    Util::DynamicParameters::RobotCapabilities::broken_dribblers.value()
-                    );
+                Util::DynamicParameters::RobotCapabilities::broken_dribblers.value());
             auto broken_kickers_set = commaSeparatedListToSet(
-                    Util::DynamicParameters::RobotCapabilities::broken_kickers.value()
-            );
+                Util::DynamicParameters::RobotCapabilities::broken_kickers.value());
             auto broken_chippers_set = commaSeparatedListToSet(
-                    Util::DynamicParameters::RobotCapabilities::broken_chippers.value()
-            );
+                Util::DynamicParameters::RobotCapabilities::broken_chippers.value());
 
 
             std::vector<Robot> robots;
@@ -116,14 +114,20 @@ namespace Util
                 Robot robot = createRobotFromROSMessage(robot_msg);
 
                 // Set the robot hardware capabilities from the dynamic parameters
-                if (broken_dribblers_set.find(robot.id()) == broken_dribblers_set.end()) {
-                    robot.getRobotCapabilities().removeCapability(RobotCapabilities::Dribble);
+                if (broken_dribblers_set.find(robot.id()) == broken_dribblers_set.end())
+                {
+                    robot.getRobotCapabilities().removeCapability(
+                        RobotCapabilityFlags::Dribble);
                 }
-                if (broken_kickers_set.find(robot.id()) == broken_kickers_set.end()) {
-                    robot.getRobotCapabilities().removeCapability(RobotCapabilities::Kick);
+                if (broken_kickers_set.find(robot.id()) == broken_kickers_set.end())
+                {
+                    robot.getRobotCapabilities().removeCapability(
+                        RobotCapabilityFlags::Kick);
                 }
-                if (broken_chippers_set.find(robot.id()) == broken_chippers_set.end()) {
-                    robot.getRobotCapabilities().removeCapability(RobotCapabilities::Chip);
+                if (broken_chippers_set.find(robot.id()) == broken_chippers_set.end())
+                {
+                    robot.getRobotCapabilities().removeCapability(
+                        RobotCapabilityFlags::Chip);
                 }
 
                 robots.emplace_back(robot);

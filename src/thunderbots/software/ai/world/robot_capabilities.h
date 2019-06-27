@@ -1,7 +1,9 @@
+#pragma once
 #include <bitset>
 #include <initializer_list>
 
-class RobotCapabilities
+// TODO: this name is slightly confusing
+class RobotCapabilityFlags
 {
    public:
     typedef enum
@@ -12,55 +14,63 @@ class RobotCapabilities
         MAX     = 3
     } RobotCapability;
 
-    static RobotCapabilities allCapabilities();
+    static RobotCapabilityFlags allCapabilities();
 
-    RobotCapabilities(const std::initializer_list<RobotCapability>& _capabilities);
+    RobotCapabilityFlags(const std::initializer_list<RobotCapability>& capabilities);
 
     bool hasCapability(const RobotCapability& capability) const;
 
-    bool operator==(const RobotCapabilities& other) const;
+    bool hasAllCapabilities(const RobotCapabilityFlags& other) const;
+
+    bool operator==(const RobotCapabilityFlags& other) const;
 
     void addCapability(const RobotCapability& capability);
 
     void removeCapability(const RobotCapability& capability);
 
    private:
-    std::bitset<MAX> capabilities;
+    std::bitset<MAX> capability_bits;
 };
 
-inline RobotCapabilities RobotCapabilities::allCapabilities()
+inline RobotCapabilityFlags RobotCapabilityFlags::allCapabilities()
 {
-    return RobotCapabilities{RobotCapabilities::Kick, RobotCapabilities::Chip,
-                             RobotCapabilities::Dribble};
+    return RobotCapabilityFlags{RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip,
+                                RobotCapabilityFlags::Dribble};
 }
 
-inline RobotCapabilities::RobotCapabilities(
+inline RobotCapabilityFlags::RobotCapabilityFlags(
     const std::initializer_list<RobotCapability>& _capabilities)
 {
     for (const RobotCapability& cap : _capabilities)
     {
-        capabilities.set(cap);
+        capability_bits.set(cap);
     }
 }
 
-inline bool RobotCapabilities::hasCapability(const RobotCapability& capability) const
+inline bool RobotCapabilityFlags::hasCapability(const RobotCapability& capability) const
 {
-    return capabilities.test(capability);
+    return capability_bits.test(capability);
 }
 
-inline bool RobotCapabilities::operator==(const RobotCapabilities& other) const
+inline bool RobotCapabilityFlags::operator==(const RobotCapabilityFlags& other) const
 {
-    return capabilities == other.capabilities;
+    return capability_bits == other.capability_bits;
 }
 
-void RobotCapabilities::addCapability(
-    const RobotCapabilities::RobotCapability& capability)
+inline void RobotCapabilityFlags::addCapability(
+    const RobotCapabilityFlags::RobotCapability& capability)
 {
-    capabilities.set(capability, false);
+    capability_bits.set(capability, false);
 }
 
-void RobotCapabilities::removeCapability(
-    const RobotCapabilities::RobotCapability& capability)
+inline void RobotCapabilityFlags::removeCapability(
+    const RobotCapabilityFlags::RobotCapability& capability)
 {
-    capabilities.set(capability);
+    capability_bits.set(capability);
+}
+
+inline bool RobotCapabilityFlags::hasAllCapabilities(
+    const RobotCapabilityFlags& other) const
+{
+    return (capability_bits & other.capability_bits) == other.capability_bits;
 }

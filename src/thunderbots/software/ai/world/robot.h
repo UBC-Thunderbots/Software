@@ -28,12 +28,11 @@ class Robot
      * state
      * @param history_duration The number of previous robot states that should be stored.
      */
-    explicit Robot(
-        unsigned int id, const Point &position, const Vector &velocity,
-        const Angle &orientation, const AngularVelocity &angular_velocity,
-        const Timestamp &timestamp,
-        const RobotCapabilities &capabilities = RobotCapabilities::allCapabilities(),
-        unsigned int history_duration         = 20);
+    explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
+                   const Angle &orientation, const AngularVelocity &angular_velocity,
+                   const Timestamp &timestamp, unsigned int history_duration = 20,
+                   const RobotCapabilityFlags &capabilities =
+                       RobotCapabilityFlags::allCapabilities());
 
     /**
      * Updates the state of the robot.
@@ -250,14 +249,14 @@ class Robot
      *
      * @return the hardware capabilities of the robot
      */
-    RobotCapabilities getRobotCapabilities() const;
+    RobotCapabilityFlags getRobotCapabilities() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
      *
      * @return the mutable hardware capabilities of the robot
      */
-    RobotCapabilities& getMutableRobotCapabilities();
+    RobotCapabilityFlags &getMutableRobotCapabilities();
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -331,6 +330,6 @@ class Robot
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // The hardware capabilities of the robot, generated from
-    // RobotCapabilities::broken_dribblers/chippers/kickers dynamic parameters
-    RobotCapabilities capabilities_;
+    // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
+    RobotCapabilityFlags capabilities_;
 };

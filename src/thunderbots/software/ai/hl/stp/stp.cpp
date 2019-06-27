@@ -153,8 +153,19 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     {
         for (int col = 0; col < num_cols; col++)
         {
-            matrix(row, col) =
-                tactics.at(col)->calculateRobotCost(friendly_team_robots.at(row), world);
+            if (!friendly_team_robots.at(row).getRobotCapabilities().hasAllCapabilities(
+                    tactics.at(col)->robotCapabilityRequirements()))
+            {
+                // hardware requirements of tactic are not satisfied by the current robot
+                // set cost to 1.0f
+                matrix(row, col) = 1.0f;
+            }
+            else
+            {
+                // hardware requirements are satisfied, calculate real cost
+                matrix(row, col) = tactics.at(col)->calculateRobotCost(
+                    friendly_team_robots.at(row), world);
+            }
         }
     }
 

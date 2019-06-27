@@ -5,12 +5,12 @@
 #include <unordered_set>
 
 #include "ai/hl/stp/play_info.h"
+#include "ai/util.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
 #include "ai/world/team.h"
 #include "ai/world/world.h"
-#include "ai/util.h"
 #include "refbox_constants.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"

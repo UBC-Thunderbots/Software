@@ -65,6 +65,15 @@ class Tactic
     void updateRobot(const Robot &robot);
 
     /**
+     * robot hardware capability requirements of the tactic. Default implementation
+     * requires nothing.
+     */
+    virtual RobotCapabilityFlags robotCapabilityRequirements() const
+    {
+        return RobotCapabilityFlags{};
+    }
+
+    /**
      * Calculates the cost of assigning the given robot to this Tactic. The returned cost
      * value must be in the range [0, 1], with smaller values indicating a higher
      * preference for the robot.

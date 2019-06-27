@@ -76,3 +76,8 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (ball_velocity_to_pass_orientation.abs() > Angle::ofDegrees(20) ||
              ball.velocity().len() < 0.5);
 }
+
+RobotCapabilityFlags PasserTactic::robotCapabilityRequirements() const
+{
+    return {RobotCapabilityFlags::Kick};
+}
