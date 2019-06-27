@@ -566,10 +566,11 @@ TEST_F(TeamTest, update_timestamp_history_from_robot_update)
 
     team.updateRobots({robot_0, robot_1});
 
+    EXPECT_EQ(Timestamp::fromSeconds(0.0), team.getTimestampHistory()[3]);
     EXPECT_EQ(one_second_future, team.getTimestampHistory()[2]);
     EXPECT_EQ(two_seconds_future, team.getTimestampHistory()[1]);
     EXPECT_EQ(two_seconds_100ms_future, team.getTimestampHistory()[0]);
-    EXPECT_EQ(3, team.getTimestampHistory().size());
+    EXPECT_EQ(4, team.getTimestampHistory().size());
 }
 
 TEST_F(TeamTest, update_timestamp_history_from_team_update)
@@ -603,8 +604,9 @@ TEST_F(TeamTest, update_timestamp_history_from_team_update)
     team.updateState(team_temp);
     boost::circular_buffer timestamps = team.getTimestampHistory();
 
+    EXPECT_EQ(Timestamp::fromSeconds(0.0), team.getTimestampHistory()[3]);
     EXPECT_EQ(one_second_future, team.getTimestampHistory()[2]);
     EXPECT_EQ(two_seconds_future, team.getTimestampHistory()[1]);
     EXPECT_EQ(three_seconds_future, team.getTimestampHistory()[0]);
-    EXPECT_EQ(3, team.getTimestampHistory().size());
+    EXPECT_EQ(4, team.getTimestampHistory().size());
 }

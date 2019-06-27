@@ -107,7 +107,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
 
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ideal_position, ideal_orientation, 0, false, true));
+                *robot, ideal_position, ideal_orientation, 0, false, AUTOKICK));
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -130,7 +130,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             // Move into position with the dribbler on
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ball_receive_pos, ball_receive_orientation, 0, true, false));
+                *robot, ball_receive_pos, ball_receive_orientation, 0, true, NONE));
         }
     }
     LOG(DEBUG) << "Finished";

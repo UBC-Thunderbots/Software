@@ -147,7 +147,7 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_and_dribble_off)
 
 TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_enabled_dribble_off)
 {
-    MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, false, true);
+    MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, false, AUTOKICK);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::MOVE;
     expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,
@@ -162,7 +162,7 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_enabled_dribble_off)
 
 TEST(MRFPrimitiveVisitorTest, visit_move_primitive_dribble_enabled_autokick_off)
 {
-    MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, true, false);
+    MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, true, NONE);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::MOVE;
     expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,
@@ -177,7 +177,7 @@ TEST(MRFPrimitiveVisitorTest, visit_move_primitive_dribble_enabled_autokick_off)
 
 TEST(MRFPrimitiveVisitorTest, visit_move_primitive_autokick_and_dribble_enabled)
 {
-    MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, true, true);
+    MovePrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33, true, AUTOKICK);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::MOVE;
     expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,

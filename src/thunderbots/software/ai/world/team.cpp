@@ -11,6 +11,7 @@ Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_siz
 {
     // Set the size of the Timestamp history buffer
     last_update_timestamps.set_capacity(buffer_size);
+    updateTimestamp(getMostRecentTimestampFromRobots());
 }
 
 Team::Team(const Duration& robot_expiry_buffer_duration,

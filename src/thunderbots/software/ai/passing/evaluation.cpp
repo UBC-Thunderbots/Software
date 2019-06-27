@@ -42,11 +42,9 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
         Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
     double max_pass_time_offset =
         Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
-    // TODO (Issue #423): We should use the timestamp from the world instead of the ball
     double pass_time_offset_quality =
         sigmoid(pass.startTime().getSeconds(),
-                min_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(),
-                0.5) *
+                min_pass_time_offset + world.getMostRecentTimestamp().getSeconds(), 0.5) *
         (1 -
          sigmoid(pass.startTime().getSeconds(),
                  max_pass_time_offset + world.ball().lastUpdateTimestamp().getSeconds(),
