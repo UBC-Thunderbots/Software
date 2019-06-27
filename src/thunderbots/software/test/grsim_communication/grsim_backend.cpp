@@ -13,7 +13,7 @@ TEST(GrSimBackendTest, create_grsim_packet_zero_vel)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        0, YELLOW, Point(), Angle::zero(), 0.0, false, false);
+        0, true, Point(), Angle::zero(), 0.0, false, false);
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -45,7 +45,7 @@ TEST(GrSimBackendTest, create_grsim_packet_positive_vel)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        6, BLUE, Point(89.6, 0.1589), Angle::ofRadians(1.23), 0.0, false, false);
+        6, false, Point(89.6, 0.1589), Angle::ofRadians(1.23), 0.0, false, false);
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -77,7 +77,7 @@ TEST(GrSimBackendTest, create_grsim_packet_negative_vel)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        1, YELLOW, Point(-0.001, 2.49), Angle::ofRadians(-0.04), 0.0, false, false);
+        1, true, Point(-0.001, 2.49), Angle::ofRadians(-0.04), 0.0, false, false);
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -109,7 +109,7 @@ TEST(GrSimBackendTest, create_grsim_packet_at_numeric_limits)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        2, YELLOW,
+        2, true,
         Point(std::numeric_limits<float>::min(), std::numeric_limits<float>::min()),
         Angle::ofRadians(std::numeric_limits<float>::min()), 0.0, false, false);
 
@@ -143,7 +143,7 @@ TEST(GrSimBackendTest, create_grsim_packet_beyond_numeric_limits)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        2, YELLOW,
+        2, true,
         Point(std::numeric_limits<double>::min(), std::numeric_limits<double>::min()),
         Angle::ofRadians(std::numeric_limits<double>::min()), 0.0, false, false);
 
@@ -177,7 +177,7 @@ TEST(GrSimBackendTest, create_grsim_packet_with_kick)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        0, YELLOW, Point(), Angle::zero(), 4.0, false, false);
+        0, true, Point(), Angle::zero(), 4.0, false, false);
 
     // Create the packet we expect.
     grSim_Packet expected;
@@ -209,7 +209,7 @@ TEST(GrSimBackendTest, create_grsim_packet_with_chip)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        2, YELLOW,
+        2, true,
         Point(std::numeric_limits<double>::min(), std::numeric_limits<double>::min()),
         Angle::ofRadians(std::numeric_limits<double>::min()), 4.0, true, false);
 
@@ -243,7 +243,7 @@ TEST(GrSimBackendTest, create_grsim_packet_with_dribbler_on)
     GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
-        2, YELLOW,
+        2, true,
         Point(std::numeric_limits<double>::min(), std::numeric_limits<double>::min()),
         Angle::ofRadians(std::numeric_limits<double>::min()), 0.0, false, true);
 
