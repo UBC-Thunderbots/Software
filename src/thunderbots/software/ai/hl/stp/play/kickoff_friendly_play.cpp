@@ -2,6 +2,7 @@
 
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/chip_tactic.h"
+#include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "shared/constants.h"
 
@@ -25,9 +26,6 @@ bool KickoffFriendlyPlay::invariantHolds(const World &world) const
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-    // TODO: This needs to be a goalie tactic
-    auto lone_goalie_tactic_0 = std::make_shared<MoveTactic>(true);
-
     // Since we only have 6 robots at the maximum, the number one priority
     // is the robot doing the kickoff up front. The goalie is the second most
     // important, followed by 3 and 4 setup for offense. 5 and 6 will stay
@@ -80,24 +78,30 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
               world.field().friendlyGoalpostNeg().y()),
     };
 
+    // move tactics to use to move to positions defined above
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true),
         std::make_shared<MoveTactic>(true)};
 
+    // specific tactics
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+    auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
+
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
-        // TODO: Replace placeholder tactic with goalie tactic
-        lone_goalie_tactic_0->updateParams(
-            world.field().friendlyGoal(),
-            (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+        auto enemy_threats = Evaluation::getAllEnemyThreats(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {lone_goalie_tactic_0};
+        goalie_tactic->updateParams(
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+            enemy_threats.empty() ? std::nullopt
+                                  : std::make_optional(enemy_threats.at(0)));
+        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
-        // assign the remaining robots to the remaining move tactics. If 3 robots were
-        // properly assigned to the top 3 threats, then only the first 2 defense positions
-        // will be assigned
+        // setup 5 kickoff positions in order of priority
         for (int i = 0; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
@@ -112,13 +116,14 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Part 2: ready state (chip the ball)
     while (world.gameState().isReadyState())
     {
-        // TODO: Replace placeholder tactic with goalie tactic
-        lone_goalie_tactic_0->updateParams(
-            world.field().friendlyGoal(),
-            (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+        auto enemy_threats = Evaluation::getAllEnemyThreats(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        std::vector<std::shared_ptr<Tactic>> result = {lone_goalie_tactic_0};
-        auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
+        goalie_tactic->updateParams(
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
+            enemy_threats.empty() ? std::nullopt
+                                  : std::make_optional(enemy_threats.at(0)));
+        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
