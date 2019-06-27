@@ -131,6 +131,7 @@ file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         )
 add_library(tbots_geom ${TBOTS_GEOM_LIB_SRC})
+add_dependencies(tbots_geom ${catkin_EXPORTED_TARGETS})
 
 # Time
 file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -140,6 +141,7 @@ add_library(tbots_time ${TBOTS_TIME_LIB_SRC})
 target_link_libraries(tbots_time
     ${G3LOG}
     )
+add_dependencies(tbots_time ${catkin_EXPORTED_TARGETS})
 
 # Parameter
 file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -149,6 +151,7 @@ add_library(tbots_parameter ${TBOTS_PARAMETER_LIB_SRC})
 target_link_libraries(tbots_parameter
     ${catkin_LIBRARIES}
     )
+add_dependencies(tbots_parameter ${catkin_EXPORTED_TARGETS})
 
 # Refbox Utils
 add_library(tbots_refbox_util 
@@ -167,6 +170,7 @@ target_link_libraries(tbots_world
     tbots_parameter
     tbots_refbox_util
     )
+add_dependencies(tbots_world ${catkin_EXPORTED_TARGETS})
 
 # Canvas Messenger 
 file(GLOB_RECURSE TBOTS_CANVAS_MESSENGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -213,6 +217,7 @@ target_link_libraries(tbots_passing
     tbots_geom
     tbots_canvas_messenger
     tbots_math
+    tbots_world
     )
 
 # Action
@@ -235,6 +240,7 @@ target_link_libraries(tbots_play
     tbots_evaluation
     tbots_passing
     )
+add_dependencies(tbots_play ${catkin_EXPORTED_TARGETS})
 
 # Tactic
 file(GLOB TBOTS_TACTIC_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -248,6 +254,7 @@ target_link_libraries(tbots_tactic
     tbots_passing
     tbots_evaluation
     )
+add_dependencies(tbots_tactic ${catkin_EXPORTED_TARGETS})
 
 # Navigator
 file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -257,17 +264,19 @@ add_library(tbots_navigator ${TBOTS_NAVIGATOR_LIB_SRC})
 target_link_libraries(tbots_navigator
     tbots_geom
     tbots_math
+    tbots_world
     )
+add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
 # Primitive 
 file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
         )
 add_library(tbots_primitive ${TBOTS_PRIMITIVE_LIB_SRC})
-add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tbots_primitive
     ${G3LOG}
     )
+add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
 
 # Intent
 file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -277,6 +286,7 @@ add_library(tbots_intent ${TBOTS_INTENT_LIB_SRC})
 target_link_libraries(tbots_intent
     tbots_primitive
     )
+add_dependencies(tbots_intent ${catkin_EXPORTED_TARGETS})
 
 # Test Utils
 add_library(tbots_test_util
