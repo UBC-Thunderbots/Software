@@ -23,7 +23,7 @@ namespace
     /**
      * Max ball velocity for this tactic to be not done.
      */
-    const double MAX_BALL_VELOCITY = 2.0;
+    const double MAX_BALL_VELOCITY = 1.5;
 }  // namespace
 
 FreeKickTactic::FreeKickTactic(const World& world, bool loop_forever)
@@ -92,7 +92,5 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 *robot, world.ball(), world.ball().position(), target,
                 BALL_MAX_SPEED_METERS_PER_SECOND));
         }
-
-        // Temporary done condition
     } while (world.ball().velocity().len() < MAX_BALL_VELOCITY);
 }
