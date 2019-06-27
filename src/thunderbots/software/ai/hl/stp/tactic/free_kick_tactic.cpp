@@ -6,7 +6,6 @@
 #include "ai/hl/stp/evaluation/deflect_off_enemy_target.h"
 #include "ai/hl/stp/evaluation/indirect_chip.h"
 #include "shared/constants.h"
-
 #include "util/logger/init.h"
 
 FreeKickTactic::FreeKickTactic(const World& world, bool loop_forever)
@@ -51,28 +50,28 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             target = std::get<0>(*best_shot);
             LOG(DEBUG) << "Shooting at goal";
-            yield(kick_action.updateStateAndGetNextIntent(*robot, world.ball(),
-                                                        world.ball().position(), target,
-                                                        BALL_MAX_SPEED_METERS_PER_SECOND));
+            yield(kick_action.updateStateAndGetNextIntent(
+                *robot, world.ball(), world.ball().position(), target,
+                BALL_MAX_SPEED_METERS_PER_SECOND));
         }
         else if (chip_and_chase_shot)
         {
             // Chip and Chase; TODO
-            double chip_power = (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
+            double chip_power =
+                (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
             LOG(DEBUG) << "Chipping and chasing for " << chip_power << " meters";
-            yield(chip_action.updateStateAndGetNextIntent(*robot, world.ball(),
-                                                        world.ball().position(), *chip_and_chase_shot,
-                                                        chip_power));
-
+            yield(chip_action.updateStateAndGetNextIntent(
+                *robot, world.ball(), world.ball().position(), *chip_and_chase_shot,
+                chip_power));
         }
         else
         {
             // No shot found, shoot at enemy and get deflection towards goal (hopefully)
             LOG(DEBUG) << "Deflecting off enemy";
             target = Evaluation::deflect_off_enemy_target(world);
-            yield(kick_action.updateStateAndGetNextIntent(*robot, world.ball(),
-                                                        world.ball().position(), target,
-                                                        BALL_MAX_SPEED_METERS_PER_SECOND));
+            yield(kick_action.updateStateAndGetNextIntent(
+                *robot, world.ball(), world.ball().position(), target,
+                BALL_MAX_SPEED_METERS_PER_SECOND));
         }
 
         // Temporary done condition
