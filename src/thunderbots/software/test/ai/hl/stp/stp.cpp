@@ -7,15 +7,14 @@
 #include <exception>
 
 #include "ai/hl/stp/play/play_factory.h"
-#include "test/ai/hl/stp/test_plays/move_test_play.h"
 #include "test/ai/hl/stp/test_plays/halt_test_play.h"
+#include "test/ai/hl/stp/test_plays/move_test_play.h"
 #include "test/test_util/test_util.h"
 
 class STPTest : public ::testing::Test
 {
-public:
-    STPTest() : stp([](){return nullptr;}, 0)
-    {}
+   public:
+    STPTest() : stp([]() { return nullptr; }, 0) {}
 
    protected:
     void SetUp() override

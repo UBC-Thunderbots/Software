@@ -15,7 +15,12 @@
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 
-STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor, long random_seed) : default_play_constructor(default_play_constructor), random_number_generator(random_seed) {}
+STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
+         long random_seed)
+    : default_play_constructor(default_play_constructor),
+      random_number_generator(random_seed)
+{
+}
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
@@ -47,8 +52,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - " << default_play->getName()
-                             << std::endl;
+                LOG(WARNING) << "Falling back to the default Play - "
+                             << default_play->getName() << std::endl;
                 current_play = std::move(default_play);
             }
         }
@@ -63,8 +68,8 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
                 auto default_play = default_play_constructor();
                 LOG(WARNING) << "Unable to assign a new Play. No Plays are valid"
                              << std::endl;
-                LOG(WARNING) << "Falling back to the default Play - " << default_play->getName()
-                             << std::endl;
+                LOG(WARNING) << "Falling back to the default Play - "
+                             << default_play->getName() << std::endl;
                 current_play = std::move(default_play);
             }
         }
