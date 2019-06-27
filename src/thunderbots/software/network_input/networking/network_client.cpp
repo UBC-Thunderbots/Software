@@ -152,11 +152,17 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             world_msg.ball = ball_msg;
 
             Team friendly_team = backend.getFilteredFriendlyTeamData({detection});
+            int friendly_goalie_id =
+                Util::DynamicParameters::AI::refbox::friendly_goalie_id.value();
+            friendly_team.assignGoalie(friendly_goalie_id);
             thunderbots_msgs::Team friendly_team_msg =
                 Util::ROSMessages::convertTeamToROSMessage(friendly_team);
             world_msg.friendly_team = friendly_team_msg;
 
             Team enemy_team = backend.getFilteredEnemyTeamData({detection});
+            int enemy_goalie_id =
+                Util::DynamicParameters::AI::refbox::enemy_goalie_id.value();
+            enemy_team.assignGoalie(enemy_goalie_id);
             thunderbots_msgs::Team enemy_team_msg =
                 Util::ROSMessages::convertTeamToROSMessage(enemy_team);
             world_msg.enemy_team = enemy_team_msg;

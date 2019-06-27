@@ -3,6 +3,7 @@
 #include <set>
 
 #include "shared/constants.h"
+#include "util/logger/init.h"
 
 Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)
     : team_robots(),
@@ -108,8 +109,8 @@ void Team::assignGoalie(unsigned int new_goalie_id)
     }
     else
     {
-        throw std::invalid_argument(
-            "Error: Assigning the goalie to a robot that is not a member of the team");
+        LOG(WARNING) << "Warning: Tried to assign the goalie (id " << new_goalie_id
+                     << ") to a robot that is not a member of the team" << std::endl;
     }
 }
 

@@ -254,6 +254,8 @@ file(GLOB_RECURSE XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_D
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/logger/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/util/logger/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/util/ros_messages.cpp
         )
@@ -266,6 +268,7 @@ add_executable (xbox_controller_mapping
 add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
 target_link_libraries(xbox_controller_mapping
         ${catkin_LIBRARIES}
+        ${G3LOG}
         )
 
 
@@ -354,7 +357,9 @@ if (CATKIN_ENABLE_TESTING)
             util/time/timestamp.cpp
             )
 
-    target_link_libraries(ros_message_util_test ${catkin_LIBRARIES})
+    target_link_libraries(ros_message_util_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
     catkin_add_gtest(world_test
             ai/world/ball.cpp
@@ -378,7 +383,9 @@ if (CATKIN_ENABLE_TESTING)
             util/time/time.cpp
             util/time/timestamp.cpp
             )
-    target_link_libraries(world_test ${catkin_LIBRARIES})
+    target_link_libraries(world_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
 
     catkin_add_gtest(test_util_test
@@ -396,7 +403,9 @@ if (CATKIN_ENABLE_TESTING)
             util/parameter/dynamic_parameters.cpp
             )
 
-    target_link_libraries(test_util_test ${catkin_LIBRARIES})
+    target_link_libraries(test_util_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
     catkin_add_gtest(grsim_communication_test
             ${PROTO_SRCS}
@@ -547,7 +556,9 @@ if (CATKIN_ENABLE_TESTING)
             util/time/time.cpp
             util/time/timestamp.cpp
             )
-    target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES})
+    target_link_libraries(ai_evaluation_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
     catkin_add_gtest(action_test
             ai/hl/stp/action/action.cpp
@@ -835,7 +846,9 @@ if (CATKIN_ENABLE_TESTING)
             util/time/time.cpp
             util/time/timestamp.cpp
             )
-    target_link_libraries(passing_test ${catkin_LIBRARIES})
+    target_link_libraries(passing_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
     catkin_add_gtest(gradient_descent_optimizer_test
             test/util/gradient_descent_optimizer.cpp
@@ -866,7 +879,9 @@ if (CATKIN_ENABLE_TESTING)
             util/parameter/dynamic_parameters.cpp
             )
 
-    target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES})
+    target_link_libraries(evaluation_detect_threat_test ${catkin_LIBRARIES}
+            ${G3LOG}
+            )
 
     catkin_add_gtest(navigator_test
             ai/intent/catch_intent.cpp

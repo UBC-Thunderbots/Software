@@ -38,12 +38,18 @@ void GoalieTactic::updateParams(
 
 double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
-    // Prefer robots closer to the destination
-    // We normalize with the total field length so that robots that are within the field
-    // have a cost less than 1
-    double cost = (robot.position() - world.field().friendlyGoal()).len() /
-                  world.field().totalLength();
-    return std::clamp<double>(cost, 0, 1);
+    // Strongly prefer the robot assigned to be the goalie.
+    // TODO: This is a hack to "ensure" the right robot will be assigned. We should
+    // normally return values in the range [0, 1]
+    if (world.friendlyTeam().getGoalieID() &&
+        robot.id() == world.friendlyTeam().getGoalieID().value())
+    {
+        return 0.0;
+    }
+    else
+    {
+        return 1000000;
+    }
 }
 
 void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)

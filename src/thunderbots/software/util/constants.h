@@ -26,9 +26,6 @@ namespace Util
         // in joysticks / controllers
         static const std::string JOY_NODE_TOPIC = "joy";
 
-        // TODO: Make this a tuneable parameter
-        static const TeamColour FRIENDLY_TEAM_COLOUR = YELLOW;
-
         // Networking and vision
         static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
         static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
