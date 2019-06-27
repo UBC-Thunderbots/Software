@@ -20,14 +20,14 @@ std::string DefensePlay::getName() const
 
 bool DefensePlay::isApplicable(const World &world) const
 {
-    world.gameState().isPlaying() &&
-        Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
+    return world.gameState().isPlaying() &&
+           Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
-    world.gameState().isPlaying() &&
-        Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
+    return world.gameState().isPlaying() &&
+           Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
