@@ -15,7 +15,7 @@ std::string KickoffFriendlyPlay::getName() const
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isReadyState() | world.gameState().isSetupState()) &&
+    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
            world.gameState().isOurKickoff();
 }
 
@@ -113,8 +113,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         yield(result);
     }
 
-    // Part 2: ready state (chip the ball)
-    while (world.gameState().isReadyState())
+    // Part 2: not normal play, currently ready state (chip the ball)
+    while (!world.gameState().isPlaying())
     {
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
