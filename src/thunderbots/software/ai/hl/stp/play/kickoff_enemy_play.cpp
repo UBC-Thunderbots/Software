@@ -17,7 +17,7 @@ std::string KickoffEnemyPlay::getName() const
 
 bool KickoffEnemyPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isReadyState() | world.gameState().isSetupState()) &&
+    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
            world.gameState().isTheirKickoff();
 }
 

@@ -22,7 +22,8 @@ AI:
         - "Corner Kick Play"
         - "Defense Play"
         - "KickoffEnemy Play"
-    description: >-
+        - "KickoffFriendly Play"
+    description: >- 
         Specifies the ai play that should be in use
   refbox:
     override_refbox_play:
