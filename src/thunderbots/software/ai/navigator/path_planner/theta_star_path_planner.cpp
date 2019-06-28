@@ -201,6 +201,13 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         return std::nullopt;
     }
 
+    if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD || (start - closest_destination).len() < (CLOSE_TO_DEST_THRESHOLD * 2))
+    {
+        // start and destination, or start and closest_destination, within threshold
+        return std::nullopt;
+    }
+
+
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
     {
@@ -372,13 +379,8 @@ ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
 
 Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 {
-    if (isValidAndFreeOfObstacles(p))
+    if (!isValidAndFreeOfObstacles(p))
     {
-        return p;
-    }
-    else
-    {
-        const double RESOLUTION_FACTOR = 5.0;
         int xc                         = (int)(p.x() * RESOLUTION_FACTOR);
         int yc                         = (int)(p.y() * RESOLUTION_FACTOR);
 
@@ -447,6 +449,8 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
             }
         }
     }
+
+    return p;
 }
 
 bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
