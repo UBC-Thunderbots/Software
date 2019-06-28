@@ -11,10 +11,10 @@ std::string MoveTestTactic::getName() const
     return "Move Test Tactic";
 }
 
-void MoveTestTactic::updateParams(Point destination)
+void MoveTestTactic::updateParams(Point destination_)
 {
     // Update the parameters stored by this Tactic
-    this->destination = destination;
+    this->destination = destination_;
 }
 
 double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -37,5 +37,6 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
 RobotCapabilityFlags MoveTestTactic::robotCapabilityRequirements() const
 {
-    return {RobotCapabilityFlags::Dribble};
+    return {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
+            RobotCapabilityFlags::Chip};
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <bitset>
 #include <initializer_list>
+#include <ostream>
 
 class RobotCapabilityFlags
 {
@@ -72,4 +73,24 @@ inline bool RobotCapabilityFlags::hasAllCapabilities(
     const RobotCapabilityFlags& other) const
 {
     return (capability_bits & other.capability_bits) == other.capability_bits;
+}
+
+inline std::ostream& operator<<(std::ostream& os,
+                                const RobotCapabilityFlags& capabilityFlags)
+{
+    os << "{";
+    if (capabilityFlags.hasCapability(RobotCapabilityFlags::Dribble))
+    {
+        os << "Dribble, ";
+    }
+    if (capabilityFlags.hasCapability(RobotCapabilityFlags::Kick))
+    {
+        os << "Kick, ";
+    }
+    if (capabilityFlags.hasCapability(RobotCapabilityFlags::Chip))
+    {
+        os << "Chip";
+    }
+    os << "}";
+    return os;
 }

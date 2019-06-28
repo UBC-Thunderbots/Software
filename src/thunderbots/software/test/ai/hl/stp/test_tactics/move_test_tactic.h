@@ -23,9 +23,9 @@ class MoveTestTactic : public Tactic
     /**
      * Updates the parameters for this MoveTestTactic.
      *
-     * @param destination The destination to move to (in global coordinates)
+     * @param destination_ The destination to move to (in global coordinates)
      */
-    void updateParams(Point destination);
+    void updateParams(Point destination_);
 
     RobotCapabilityFlags robotCapabilityRequirements() const override;
 

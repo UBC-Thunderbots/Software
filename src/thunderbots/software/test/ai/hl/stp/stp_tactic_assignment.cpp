@@ -364,10 +364,11 @@ TEST_F(STPTacticAssignmentTest,
     // test that the robot that matches capability requirements is selected over the robot
     // that doesn't even though the former has lower cost
     Team friendly_team(Duration::fromSeconds(0));
+    // this robot has no capabilities
     Robot robot_0(0, Point(0.1, 0.1), Point(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0), 10, RobotCapabilityFlags{});
     // default is all capabilities, if not specified otherwise
-    Robot robot_1(1, Point(-3, -3), Point(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot_1(1, Point(-10, -10), Point(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));
     friendly_team.updateRobots({robot_0, robot_1});
     world.updateFriendlyTeamState(friendly_team);
@@ -378,10 +379,6 @@ TEST_F(STPTacticAssignmentTest,
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
-    // Both robots are now closest to move_tactic_1's destination. We do NOT want
-    // robot_0 to be assigned to move_tactic_1, because then robot_1 has to move all the
-    // way around to move_tactic_2. What we expect is that robot_0 will be assigned to
-    // move_tactic_2 and "slide over" to make room for robot_1
 
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
