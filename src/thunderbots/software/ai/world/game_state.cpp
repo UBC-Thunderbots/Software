@@ -94,14 +94,14 @@ bool GameState::isTheirDirectFree() const
     return isDirectFree() && !our_restart;
 }
 
-bool GameState::isTheirIndirect() const
+bool GameState::isTheirIndirectFree() const
 {
     return isIndirectFree() && !our_restart;
 }
 
 bool GameState::isTheirFreeKick() const
 {
-    return isTheirDirectFree() || isTheirIndirect();
+    return isTheirDirectFree() || isTheirIndirectFree();
 }
 
 bool GameState::isTheirBallPlacement() const
@@ -109,37 +109,14 @@ bool GameState::isTheirBallPlacement() const
     return isBallPlacement() && !our_restart;
 }
 
-// Robots must be in position for a restart
-bool GameState::isSetupRestart() const
-{
-    return state == SETUP || state == READY;
-}
-
 bool GameState::isSetupState() const
 {
     return state == SETUP;
 }
 
-bool GameState::isReadyState() const
-{
-    return state == READY;
-}
-
-// One of our robots can kick the ball
-bool GameState::canKick() const
-{
-    return state == PLAYING || (our_restart && state == READY);
-}
-
 bool GameState::stayAwayFromBall() const
 {
     return state != PLAYING && !our_restart;
-}
-
-// Our robots must stay on our half of the field
-bool GameState::stayOnSide() const
-{
-    return isSetupRestart() && restart_reason == KICKOFF && !our_restart;
 }
 
 // Our robots (except the penalty kicker) must stay a set distance behind the penalty line
@@ -174,7 +151,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = false;
             break;
         case RefboxGameState::NORMAL_START:
-            state = READY;
+            state = PLAYING;
             break;
         case RefboxGameState::FORCE_START:
             state          = PLAYING;
@@ -201,22 +178,22 @@ void GameState::updateRefboxGameState(RefboxGameState gameState)
             our_restart    = false;
             break;
         case RefboxGameState::DIRECT_FREE_US:
-            state          = PLAYING;
+            state          = SETUP;
             restart_reason = DIRECT;
             our_restart    = true;
             break;
         case RefboxGameState::DIRECT_FREE_THEM:
-            state          = PLAYING;
+            state          = SETUP;
             restart_reason = DIRECT;
             our_restart    = false;
             break;
         case RefboxGameState::INDIRECT_FREE_US:
-            state          = PLAYING;
+            state          = SETUP;
             restart_reason = INDIRECT;
             our_restart    = true;
             break;
         case RefboxGameState::INDIRECT_FREE_THEM:
-            state          = PLAYING;
+            state          = SETUP;
             restart_reason = INDIRECT;
             our_restart    = false;
             break;
@@ -257,10 +234,4 @@ RefboxGameState GameState::getRefboxGameState() const
 GameState::RestartReason GameState::getRestartReason() const
 {
     return restart_reason;
-}
-
-void GameState::setRestartCompleted()
-{
-    state          = PLAYING;
-    restart_reason = NONE;
 }
