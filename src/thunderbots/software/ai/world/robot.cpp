@@ -251,7 +251,7 @@ bool Robot::operator!=(const Robot &other) const
     return !(*this == other);
 }
 
-const RobotCapabilityFlags Robot::getRobotCapabilities() const
+const RobotCapabilityFlags &Robot::getRobotCapabilities() const
 {
     return capabilities_;
 }

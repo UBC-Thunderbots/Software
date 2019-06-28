@@ -249,7 +249,7 @@ class Robot
      *
      * @return the hardware capabilities of the robot
      */
-    const RobotCapabilityFlags getRobotCapabilities() const;
+    const RobotCapabilityFlags &getRobotCapabilities() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
