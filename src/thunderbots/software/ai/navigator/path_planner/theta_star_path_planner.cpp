@@ -201,6 +201,13 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         return std::nullopt;
     }
 
+    if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD || (start - closest_destination).len() < CLOSE_TO_DEST_THRESHOLD)
+    {
+        // start and destination, or start and closest_destination, within threshold
+        return std::nullopt;
+    }
+
+
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
     {

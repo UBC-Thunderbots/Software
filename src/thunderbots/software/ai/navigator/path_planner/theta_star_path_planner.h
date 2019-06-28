@@ -192,6 +192,8 @@ class ThetaStarPathPlanner : public PathPlanner
      */
     CellCoordinate convertPointToCell(Point p);
 
+    static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;
+
     // only change this value
     static constexpr int GRID_DIVISION_FACTOR = 1;  // the n in the O(n^2) algorithm :p
     // don't change this calculation
