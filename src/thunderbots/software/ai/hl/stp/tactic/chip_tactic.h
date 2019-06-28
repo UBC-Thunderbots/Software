@@ -21,6 +21,12 @@ class ChipTactic : public Tactic
     std::string getName() const override;
 
     /**
+     * Returns {RobotCapabilityFlags::Chip}
+     * @return {RobotCapabilityFlags::Chip}
+     */
+    RobotCapabilityFlags robotCapabilityRequirements() const override;
+
+    /**
      * Updates the parameters for this ChipTactic.
      *
      * @param ball The ball being kicked

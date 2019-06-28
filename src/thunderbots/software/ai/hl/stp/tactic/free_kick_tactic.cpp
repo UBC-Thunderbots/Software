@@ -99,3 +99,8 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
     } while (world.ball().velocity().len() < MAX_BALL_VELOCITY);
 }
+
+RobotCapabilityFlags FreeKickTactic::robotCapabilityRequirements() const
+{
+    return {RobotCapabilityFlags::Chip, RobotCapabilityFlags::Kick};
+}

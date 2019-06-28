@@ -22,6 +22,12 @@ class FreeKickTactic : public Tactic
     std::string getName() const override;
 
     /**
+     * Returns {RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip}
+     * @return {RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip}
+     */
+    RobotCapabilityFlags robotCapabilityRequirements() const override;
+
+    /**
      * Updates the parameters for this tactic
      *
      * @param world The current state of the world

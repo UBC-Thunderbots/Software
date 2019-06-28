@@ -34,6 +34,12 @@ class ShootGoalTactic : public Tactic
     std::string getName() const override;
 
     /**
+     * Return {RobotCapabilityFlags::Kick}
+     * @return {RobotCapabilityFlags::Kick}
+     */
+    RobotCapabilityFlags robotCapabilityRequirements() const override;
+
+    /**
      * Updates the parameters for this ShootGoalTactic
      *
      * @param field The field being played on
