@@ -96,13 +96,13 @@ inline bool RobotCapabilityFlags::operator==(const RobotCapabilityFlags& other) 
 inline void RobotCapabilityFlags::addCapability(
     const RobotCapabilityFlags::RobotCapability& capability)
 {
-    capability_bits.set(capability, false);
+    capability_bits.set(capability, true);
 }
 
 inline void RobotCapabilityFlags::removeCapability(
     const RobotCapabilityFlags::RobotCapability& capability)
 {
-    capability_bits.set(capability);
+    capability_bits.set(capability, false);
 }
 
 inline bool RobotCapabilityFlags::hasAllCapabilities(
