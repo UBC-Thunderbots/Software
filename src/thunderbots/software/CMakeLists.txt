@@ -267,6 +267,7 @@ target_link_libraries(tbots_navigator
     tbots_geom
     tbots_math
     tbots_world
+    tbots_canvas_messenger
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
