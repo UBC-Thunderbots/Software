@@ -23,7 +23,7 @@ Obstacle::Obstacle(const Point& circle_center, const double circle_radius,
     for (size_t i = 0; i < num_points; i++)
     {
         poly_points.emplace_back(
-            circle_center + Point(circle_radius, 0).rotate(Angle::ofDegrees(360 / num_points)));
+            circle_center + Point(circle_radius, 0).rotate(Angle::ofDegrees(360.0 / num_points * i)));
     }
     _polygon = Polygon(poly_points);
 }

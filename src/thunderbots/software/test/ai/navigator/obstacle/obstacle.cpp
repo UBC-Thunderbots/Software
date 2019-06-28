@@ -177,7 +177,7 @@ TEST(NavigatorObstacleTest, create_from_rectangle){
     Obstacle obstacle(Rectangle({-1, 1}, {2, -3}));
 
     Polygon expected = Polygon({
-                              {-1,1}, {2, -1}, {2, -3}, {-1, -3}
+                              {-1, -3}, {-1,1}, {2, 1}, {2, -3},
     });
     EXPECT_EQ(expected.getPoints(), obstacle.getBoundaryPolygon().getPoints());
 }
@@ -194,7 +194,6 @@ TEST(NavigatorObstacleTest, create_from_circle){
                               Point(2,2) + Vector(1, 0).rotate(Angle::ofDegrees(225)),
                               Point(2,2) + Vector(1, 0).rotate(Angle::ofDegrees(270)),
                               Point(2,2) + Vector(1, 0).rotate(Angle::ofDegrees(315)),
-                              Point(2,2) + Vector(1, 0).rotate(Angle::ofDegrees(360)),
                       });
     EXPECT_EQ(expected.getPoints(), obstacle.getBoundaryPolygon().getPoints());
 }
