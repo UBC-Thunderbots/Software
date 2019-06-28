@@ -38,7 +38,7 @@ bool Intent::operator!=(const Intent &other) const
     return !((*this) == other);
 }
 
-std::vector<AvoidArea> Intent::getAreasToAvoid(){
+std::vector<AvoidArea> Intent::getAreasToAvoid() const {
     return areas_to_avoid;
 }
 

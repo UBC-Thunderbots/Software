@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "ai/intent/avoid_areas.h"
+#include "ai/intent/avoid_area.h"
 
 // We forward-declare the IntentVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
@@ -87,7 +87,7 @@ class Intent
      *
      * @return The areas this intent should avoid moving into
      */
-    std::vector<AvoidArea> getAreasToAvoid();
+    std::vector<AvoidArea> getAreasToAvoid() const;
 
     /**
      * Set the areas this intent should avoid moving into
