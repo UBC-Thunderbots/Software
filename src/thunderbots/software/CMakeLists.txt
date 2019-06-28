@@ -833,6 +833,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/obstacle/obstacle.cpp
             test/ai/navigator/trespass/trespass.cpp
             test/ai/navigator/path_planner/straight_line_path_planner.cpp
+            test/ai/navigator/path_planner/theta_star_path_planner.cpp
+            test/ai/navigator/path_planning_navigator/path_planning_navigator.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}

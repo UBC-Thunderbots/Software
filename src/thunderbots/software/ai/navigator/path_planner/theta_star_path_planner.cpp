@@ -201,7 +201,8 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         return std::nullopt;
     }
 
-    if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD || (start - closest_destination).len() < (CLOSE_TO_DEST_THRESHOLD * 2))
+    if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
+        (start - closest_destination).len() < (CLOSE_TO_DEST_THRESHOLD * 2))
     {
         // start and destination, or start and closest_destination, within threshold
         return std::nullopt;
@@ -381,8 +382,8 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 {
     if (!isValidAndFreeOfObstacles(p))
     {
-        int xc                         = (int)(p.x() * RESOLUTION_FACTOR);
-        int yc                         = (int)(p.y() * RESOLUTION_FACTOR);
+        int xc = (int)(p.x() * RESOLUTION_FACTOR);
+        int yc = (int)(p.y() * RESOLUTION_FACTOR);
 
         for (int r = 1; r < field_.totalWidth() * RESOLUTION_FACTOR; r++)
         {

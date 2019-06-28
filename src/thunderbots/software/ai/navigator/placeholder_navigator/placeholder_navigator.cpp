@@ -15,9 +15,10 @@ std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimiti
     return assigned_primitives;
 }
 
-std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimitives(const World &world,
-                                                                                    const std::vector<Obstacle> &additional_obstacles,
-                                                                                    const std::vector<std::unique_ptr<Intent>> &assignedIntents) {
+std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimitives(
+    const World &world, const std::vector<Obstacle> &additional_obstacles,
+    const std::vector<std::unique_ptr<Intent>> &assignedIntents)
+{
     return getAssignedPrimitives(world, assignedIntents);
 }
 

@@ -21,8 +21,8 @@ class PlaceholderNavigator : public Navigator, public IntentVisitor
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-            const World &world, const std::vector<Obstacle> &additional_obstacles,
-            const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+        const World &world, const std::vector<Obstacle> &additional_obstacles,
+        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
     /**
      * Visits a CatchIntent to perform an operation.
