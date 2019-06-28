@@ -10,48 +10,45 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "check.h"
+#include "test.h"
 #include <stdio.h>
-#include "test.h"
+
 #include "check.h"
-
+static int number_failed = 0;
 #include "test.h"
-static int number_failed = 0;
 
-
-static int number_failed = 0;
-void run_test(TCase *tc, Suite *s) {
 
 void run_test(TCase *tc, Suite *s) {
+static int number_failed = 0;
     suite_add_tcase(s, tc);
+
     SRunner *sr = srunner_create(s);
     srunner_run_all(sr, CK_NORMAL);
-    suite_add_tcase(s, tc);
+void run_test(TCase *tc, Suite *s) {
     number_failed += srunner_ntests_failed(sr);
-    SRunner *sr = srunner_create(s);
-    srunner_run_all(sr, CK_NORMAL);
+    suite_add_tcase(s, tc);
     srunner_free(sr);
-    number_failed += srunner_ntests_failed(sr);
+    SRunner *sr = srunner_create(s);
     printf("\n");
-    srunner_free(sr);
+    srunner_run_all(sr, CK_NORMAL);
 }
-    printf("\n");
+    number_failed += srunner_ntests_failed(sr);
 
 /**
-}
+    srunner_free(sr);
  * Main entry point for the test cases. Each test to run should 
-
+    printf("\n");
  * be wrapped inside a function that should be added here so that
-/**
+}
  * when the main function is called each test is run.
- * Main entry point for the test cases. Each test to run should 
+
  */
- * be wrapped inside a function that should be added here so that
+/**
 int main(void)
- * when the main function is called each test is run.
+ * Main entry point for the test cases. Each test to run should 
 {
- */
     printf("\nStart Tests\n");
-int main(void)
+ * be wrapped inside a function that should be added here so that
     run_math_test();
     run_matrix_test();
     run_move_test();
@@ -60,10 +57,14 @@ int main(void)
     run_quadratic_test();
     run_shoot_test();
     run_util_test();
-{
+ * when the main function is called each test is run.
     (number_failed == 0) ? printf("All tests passed.\n") : printf("%d Tests failed.\n\n", number_failed);
-    printf("\nStart Tests\n");
+ */
     return 0;
+int main(void)
+{
+}
+    printf("\nStart Tests\n");
     run_math_test();
     run_matrix_test();
     run_move_test();
@@ -72,7 +73,6 @@ int main(void)
     run_quadratic_test();
     run_shoot_test();
     run_util_test();
-}
     (number_failed == 0) ? printf("All tests passed.\n") : printf("%d Tests failed.\n\n", number_failed);
     return 0;
 }

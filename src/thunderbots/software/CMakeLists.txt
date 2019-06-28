@@ -225,11 +225,11 @@ file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
         )
 add_library(tbots_action
-        ${TBOTS_ACTION_LIB_SRC}
-        )
+    ${TBOTS_ACTION_LIB_SRC}
+    )
 target_link_libraries(tbots_action
-        ${Boost_LIBRARIES}
-        )
+    ${Boost_LIBRARIES}
+    )
 add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
 
 # Play
@@ -306,7 +306,12 @@ target_link_libraries(tbots_intent
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 ## Find the generated files
 file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
-add_library(tbots_proto ${TBOTS_PROTO_SRCS})
+add_library(tbots_proto 
+    ${TBOTS_PROTO_SRCS}
+    )
+target_link_libraries(tbots_proto 
+    ${PROTOBUF_LIBRARIES}
+    )
 
 # Shared
 file(GLOB TBOTS_SHARED_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -332,7 +337,6 @@ add_executable (network_input
 add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
 target_link_libraries(network_input
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         Eigen3::Eigen
         tbots_geom
@@ -385,7 +389,6 @@ add_executable (grsim_communication
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
 target_link_libraries(grsim_communication ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         ${G3LOG}
         tbots_primitive
         tbots_world
@@ -432,7 +435,6 @@ add_dependencies(parameters
         )
 target_link_libraries(parameters
         ${catkin_LIBRARIES}
-        ${PROTOBUF_LIBRARIES}
         tbots_proto
         tbots_shared
         tbots_parameter
@@ -577,7 +579,6 @@ if (CATKIN_ENABLE_TESTING)
             )
     target_link_libraries(grsim_communication_test
             ${catkin_LIBRARIES}
-            ${PROTOBUF_LIBRARIES}
             ${G3LOG}
             tbots_proto
             tbots_geom
