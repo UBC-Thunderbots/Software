@@ -241,12 +241,6 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     auto path_points = planner->findPath(start, dest);
 
-    // We should be able to find path points
-    ASSERT_TRUE(path_points);
-
-    // Since there are no obstacles, there should be two path points, one at the start
-    // and one at the destination
-    ASSERT_EQ(2, path_points->size());
-    ASSERT_EQ(start, path_points->front());
-    ASSERT_EQ(dest, path_points->back());
+    // Since we are already close to the destination no path is returned
+    ASSERT_FALSE(path_points);
 }

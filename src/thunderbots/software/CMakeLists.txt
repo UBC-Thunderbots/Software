@@ -262,7 +262,7 @@ add_dependencies(tbots_tactic ${catkin_EXPORTED_TARGETS})
 file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/navigator/*.cpp
         )
-add_library(tbots_navigator ${TBOTS_NAVIGATOR_LIB_SRC})
+add_library(tbots_navigator STATIC ${TBOTS_NAVIGATOR_LIB_SRC})
 target_link_libraries(tbots_navigator
     tbots_geom
     tbots_math
