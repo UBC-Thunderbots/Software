@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include "ai/intent/avoid_areas.h"
 
 // We forward-declare the IntentVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
@@ -80,6 +82,20 @@ class Intent
      */
     virtual void accept(IntentVisitor& visitor) const = 0;
 
+    /**
+     * Get the areas this intent should avoid moving into
+     *
+     * @return The areas this intent should avoid moving into
+     */
+    std::vector<AvoidArea> getAreasToAvoid();
+
+    /**
+     * Set the areas this intent should avoid moving into
+     *
+     * @param areas_to_avoid The areas this intent should avoid moving into
+     */
+    void setAreasToAvoid(const std::vector<AvoidArea>& areas_to_avoid);
+
     virtual ~Intent() = default;
 
    private:
@@ -88,4 +104,10 @@ class Intent
      * higher value => higher priority
      */
     unsigned int priority;
+
+    /**
+     * The areas this intent should avoid moving into. These are enforced by
+     * the navigator
+     */
+    std::vector<AvoidArea> areas_to_avoid;
 };

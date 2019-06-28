@@ -24,3 +24,13 @@ TEST(IntentTest, test_set_priority)
 
     EXPECT_EQ(7, move_intent.getPriority());
 }
+
+TEST(IntentTest, test_set_and_get_avoid_areas)
+{
+    MoveIntent move_intent = MoveIntent(0, Point(), Angle(), 0.0, 0);
+
+    std::vector<AvoidArea> areas_to_avoid = {FRIENDLY_DEFENSE_AREA, CENTER_CIRCLE};
+    move_intent.setAreasToAvoid(areas_to_avoid);
+
+    EXPECT_EQ(areas_to_avoid, move_intent.getAreasToAvoid());
+}
