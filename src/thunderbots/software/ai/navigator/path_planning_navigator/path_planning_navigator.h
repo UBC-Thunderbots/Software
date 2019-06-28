@@ -113,6 +113,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     // This variable is set by each `visit` function
     Point current_destination;
     //@TODO clean up this competition hack; should use some sort of flag system instead of
-    //passing in obstacles
+    // passing in obstacles
     std::vector<Obstacle> additional_obstacles;
 };
