@@ -2,6 +2,8 @@
 #include <sstream>
 #include <unordered_set>
 
+#include "util/logger/init.h"
+
 /**
  * Macro used to define bitwise operations for a class.
  */
@@ -52,7 +54,16 @@ inline std::unordered_set<unsigned int> commaSeparatedListToSet(
     std::string list_item_str;
     while (std::getline(ss, list_item_str, ','))
     {
-        output.emplace(std::stoi(list_item_str));
+        try
+        {
+            output.emplace(std::stoi(list_item_str));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            LOG(WARNING)
+                << "There are symbols other than numbers, spaces, and commas in the comma-separated list \""
+                << list_str << "\"";
+        }
     }
     return output;
 }

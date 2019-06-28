@@ -49,11 +49,7 @@ namespace Util
          * @param robot_msg The message containing the robot message data
          * @return A Robot object created with the given robot message data
          */
-        Robot createRobotFromROSMessage(
-            const thunderbots_msgs::Robot& robot_msg,
-            const std::unordered_set<unsigned int>& broken_dribblers = {},
-            const std::unordered_set<unsigned int>& broken_kickers   = {},
-            const std::unordered_set<unsigned int>& broken_chippers  = {});
+        Robot createRobotFromROSMessage(const thunderbots_msgs::Robot& robot_msg);
 
         /**
          * Creates and returns the ROS Message representation of the given Robot object

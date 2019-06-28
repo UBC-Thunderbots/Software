@@ -157,8 +157,8 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
                     tactics.at(col)->robotCapabilityRequirements()))
             {
                 // hardware requirements of tactic are not satisfied by the current robot
-                // set cost to 1.0f
-                matrix(row, col) = 1.0f;
+                // set cost to 10.0f
+                matrix(row, col) = 10.0f;
             }
             else
             {
