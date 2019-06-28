@@ -96,9 +96,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
         goalie_tactic->updateParams(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-            enemy_threats.empty() ? std::nullopt
-                                  : std::make_optional(enemy_threats.at(0)));
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // setup 5 kickoff positions in order of priority
@@ -120,9 +118,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
         goalie_tactic->updateParams(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-            enemy_threats.empty() ? std::nullopt
-                                  : std::make_optional(enemy_threats.at(0)));
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
