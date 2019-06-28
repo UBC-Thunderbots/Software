@@ -112,17 +112,17 @@ namespace Util
                 // Set the robot hardware capabilities from the dynamic parameters
                 if (broken_dribblers_set.find(robot.id()) != broken_dribblers_set.end())
                 {
-                    robot.getRobotCapabilities().removeCapability(
+                    robot.getMutableRobotCapabilities().removeCapability(
                         RobotCapabilityFlags::Dribble);
                 }
                 if (broken_kickers_set.find(robot.id()) != broken_kickers_set.end())
                 {
-                    robot.getRobotCapabilities().removeCapability(
+                    robot.getMutableRobotCapabilities().removeCapability(
                         RobotCapabilityFlags::Kick);
                 }
                 if (broken_chippers_set.find(robot.id()) != broken_chippers_set.end())
                 {
-                    robot.getRobotCapabilities().removeCapability(
+                    robot.getMutableRobotCapabilities().removeCapability(
                         RobotCapabilityFlags::Chip);
                 }
 
