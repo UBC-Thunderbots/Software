@@ -85,10 +85,12 @@ class Tactic
      * function. If the Tactic is not done, the next Intent is returned. If the Tactic
      * is done, a nullptr is returned.
      *
+     * @param world_opt The current world, defaults to std::nullopt
+     *
      * @return A unique pointer to the next Intent that should be run for the Tactic.
      * If the Tactic is done, a nullptr is returned.
      */
-    std::unique_ptr<Intent> getNextIntent();
+    std::unique_ptr<Intent> getNextIntent(const std::optional<World>& world_opt = std::nullopt);
 
     /**
      * Returns the name of the Tactic
@@ -96,6 +98,32 @@ class Tactic
      * @return the name of the Tactic
      */
     virtual std::string getName() const = 0;
+
+    /**
+     * Add an area to the list of areas this tactic should always be allowed to move
+     *
+     * If this area conflicts with the areas the tactic is not allowed to move due
+     * to game state, this will take precedence
+     */
+    void addWhitelistedAvoidArea(AvoidArea area);
+
+    /**
+     * Add an extra area that this intents yielded by this tactic should avoid moving into
+     *
+     * This will override any areas put in the whitelist
+     *
+     * @param area The area to add the blacklist of areas to avoid
+     */
+    void addBlacklistedAvoidArea(AvoidArea area);
+
+    /**
+     * Remove an extra area that this intents yielded by this tactic should avoid moving into
+     *
+     * If the area was not previously added, does nothing
+     *
+     * @param area The area to remove from the blacklist of areas to avoid
+     */
+    void removeBlacklistedAvoidArea(AvoidArea area);
 
     virtual ~Tactic() = default;
 
@@ -142,6 +170,16 @@ class Tactic
     virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 
     /**
+     * Get all the areas that this tactic should not be allowed to move into based on
+     * world state and the current whitelist for this tactic
+     *
+     * @param world The current state of the world
+     *
+     * @return a vector of areas this tactic should avoid
+     */
+    std::vector<AvoidArea> getAreasToAvoid(const World& world);
+
+    /**
      * A helper function that runs the intent_sequence coroutine and returns the result
      * of the coroutine. The done_ member variable is also updated to reflect whether
      * or not the Tactic is done. If the Tactic is done, a nullptr is returned.
@@ -159,4 +197,15 @@ class Tactic
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
+
+    // These are areas that the intents yielded by this tactic should be permitted
+    // to move in, even if they would normally be in this game state. These are used
+    // when one Tactic, such as GoalieTactic, is permitted in an area of the field
+    // that the rest of the robots are not (in the case of the goalie, the friendly
+    // defense area)
+    std::vector<AvoidArea> whitelisted_avoid_areas;
+
+    // These are areas that will be added to all intents yielded by this function,
+    // regardless of whitelisted areas or game state
+    std::vector<AvoidArea> blacklisted_avoid_areas;
 };
