@@ -197,6 +197,35 @@ Evaluation:
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
+DefenderCreaseTactic:
+  max_defender_seperation_deg:
+    min: 0.0
+    max: 50
+    default: 13.0
+    type: "double"
+    description: The maximum angle the crease defenders will seperate by, in degrees.
+  min_defender_seperation_deg:
+    min: 0.0
+    max: 50
+    default: 3.0
+    type: "double"
+    description: The minimum angle the crease defenders will seperate by, in degrees.
+  ball_dist_for_max_defender_seperation:
+    min: 0.0
+    max: 5
+    default: 3
+    type: "double"
+    description: >-
+      The distance between the ball and the defenders at which they will have their
+      maximum seperation.
+  ball_dist_for_min_defender_seperation:
+    min: 0.0
+    max: 5
+    default: 1
+    type: "double"
+    description: >-
+      The distance between the ball and the defenders at which they will have their
+      minimum seperation.
 RobotCapabilities:
   broken_dribblers:
     default: ""
