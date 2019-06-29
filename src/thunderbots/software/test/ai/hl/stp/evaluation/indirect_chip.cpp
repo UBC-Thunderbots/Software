@@ -24,8 +24,8 @@ TEST(findTargetPointForIndirectChipAndChaseTest,
     Point target = Point(0, (-1 + sqrt(0.75) - 1) / 3);
     target       = target.norm((target - ball_position).len() * 0.85);
 
-    EXPECT_EQ(target, Evaluation::findTargetPointForIndirectChipAndChase(triangles,
-                                                                         ball_position));
+    EXPECT_EQ(target, Evaluation::findTargetPointsForIndirectChipAndChase(triangles,
+                                                                          ball_position));
 }
 
 
@@ -42,8 +42,9 @@ TEST(findTargetPointForIndirectChipAndChaseTest,
     target       = target.norm((target - ball_position).len() * 0.85);
     target       = ball_position + (target - ball_position).norm(8.0);
 
-    EXPECT_EQ(std::optional(target), Evaluation::findTargetPointForIndirectChipAndChase(
-                                         triangles, ball_position));
+    EXPECT_EQ(std::optional(target),
+              Evaluation::findTargetPointsForIndirectChipAndChase(
+                      triangles, ball_position));
 }
 
 
@@ -53,8 +54,8 @@ TEST(findTargetPointForIndirectChipAndChaseTest, triangle_is_empty_test)
 
     Point ball_position = Point(0, 0);
 
-    EXPECT_EQ(std::nullopt, Evaluation::findTargetPointForIndirectChipAndChase(
-                                triangles, ball_position));
+    EXPECT_EQ(std::nullopt, Evaluation::findTargetPointsForIndirectChipAndChase(
+            triangles, ball_position));
 }
 
 
@@ -107,6 +108,46 @@ TEST(findOpenTrianglesTest, find_open_triangles_test)
     open_triangles.emplace_back(adjusted_triangle);
 
     EXPECT_EQ(open_triangles, Evaluation::findOpenTriangles(triangles, enemy_players));
+}
+
+TEST(findOpenTrianglesInArea, one_enemies_in_area){
+    Rectangle area(Point(-1, -1), Point(1,1));
+
+    std::vector<Point> enemies = {Point(0,0)};
+
+    std::vector<LegacyTriangle> expected_triangles = {};
+
+    EXPECT_EQ(expected_triangles, Evaluation::findOpenTrianglesInArea(area, enemies));
+}
+
+TEST(findOpenTrianglesInArea, multiple_enemies_in_area){
+    Rectangle area(Point(-1, -1), Point(1,1));
+
+    std::vector<Point> enemies = {Point(0.5,0), Point(0, -0.5)};
+
+    std::vector<LegacyTriangle> expected_triangles = {};
+
+    EXPECT_EQ(expected_triangles, Evaluation::findOpenTrianglesInArea(area, enemies));
+}
+
+TEST(findOpenTrianglesInArea, multiple_enemies_inside_and_outside_area){
+    Rectangle area(Point(-1, -1), Point(1,1));
+
+    std::vector<Point> enemies = {Point(0.5,0), Point(0, -0.5), Point(2,2)};
+
+    std::vector<LegacyTriangle> expected_triangles = {};
+
+    EXPECT_EQ(expected_triangles, Evaluation::findOpenTrianglesInArea(area, enemies));
+}
+
+TEST(findOpenTrianglesInArea, no_enemies_in_area){
+    Rectangle area(Point(-1, -1), Point(1,1));
+
+    std::vector<Point> enemies = {Point(2,2)};
+
+    std::vector<LegacyTriangle> expected_triangles = {};
+
+    EXPECT_EQ(expected_triangles, Evaluation::findOpenTrianglesInArea(area, enemies));
 }
 
 
@@ -171,7 +212,8 @@ TEST(findBestChipTargetAreaTest, find_best_chip_target_area_test)
     Rectangle target_rectangle =
         Rectangle(Point(ballX, negFieldY), Point(fieldX, posFieldY));
 
-    EXPECT_EQ(target_rectangle, Evaluation::findBestChipTargetArea(test_world, inset));
+    EXPECT_EQ(target_rectangle, Evaluation::findBestChipTargetArea(test_world.field(), test_world.ball(),
+                                                                   inset));
 }
 
 
@@ -187,7 +229,7 @@ TEST(getLargestValidTriangleTest, get_largest_valid_triangle_test)
     LegacyTriangle largest = t2;
 
     EXPECT_EQ(std::optional(largest),
-              Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
+              Evaluation::getAllValidTrianglesSortedBySize(allTriangles, 0, 0, 0));
 }
 
 
@@ -196,5 +238,6 @@ TEST(getLargestValidTriangleTest,
 {
     std::vector<LegacyTriangle> allTriangles;
 
-    EXPECT_EQ(std::nullopt, Evaluation::getLargestValidTriangle(allTriangles, 0, 0, 0));
+    EXPECT_EQ(std::nullopt,
+              Evaluation::getAllValidTrianglesSortedBySize(allTriangles, 0, 0, 0));
 }

@@ -13,19 +13,13 @@
 namespace Evaluation
 {
     /**
-     * Returns the target point that the chipper and chaser will chip and chase at.
+     * Finds good points to chip to on the field from the current ball position
      *
-     * Given the enemy robots' positions, filters and creates a vector of
-     * triangles to be used as a parameter. The target point is where ball will land
-     * according to chipping calibration, as well as where the chaser will meet the ball
-     * at.
+     * @param world The world in which we want to chip
      *
-     * @param world The world in which we want to find the target point
-     *
-     * @return Point to chip and chase at; If std::nullopt, could not find a good point to
-     * chip and chase at
+     * @return A vector of points to chip to, in decreasing order of quality
      */
-    std::optional<Point> findTargetPointForIndirectChipAndChase(const World& world);
+    std::vector<Point> findTargetPointsForIndirectChipAndChase(const World &world);
 
     /**
      * Returns the target point that the chipper and chaser will chip and chase at.
@@ -43,8 +37,8 @@ namespace Evaluation
      * @return Point to chip and chase at; If std::nullopt, could not find a good point to
      * chip and chase at
      */
-    std::optional<Point> findTargetPointForIndirectChipAndChase(
-        const std::vector<LegacyTriangle>& triangles, Point ball_position);
+    std::vector<Point> findTargetPointsForIndirectChipAndChase(
+            const std::vector<LegacyTriangle> &triangles, Point ball_position);
 
     /**
      * Returns a vector of all possible triangles between enemy players and rectangular
@@ -126,13 +120,13 @@ namespace Evaluation
     Rectangle findBestChipTargetArea(const World& world, double inset);
 
     /**
-     * Returns the largest triangle that meets the area and edge length thresholds.
+     * Returns all the valid triangles in the given list, sorted in decreasing size
      *
-     * Given a vector of triangles, returns the largest triangle with area greater than
+     * Given a vector of triangles, returns all the triangles with area greater than
      * minimum area a chip target triangle must have to be considered valid, and all edge
      * lengths greater than minimum edge length for the triangle to be considered valid.
      *
-     * @param allTriangles Vector of triangles
+     * @param all_triangles Vector of triangles to filter
      * @param min_area Minimum area that a chip target triangle must have to be considered
      * valid in meters squared
      * @param min_edge_len Minimum length in meters that each edge of the chip target
@@ -140,9 +134,9 @@ namespace Evaluation
      * @param min_edge_angle Minimum angle in degrees that any two edges of a chip
      * target triangle must have for that triangle to be considered valid
      *
-     * @return Largest triangle
+     * @return All the valid triangles, sorted in decreasing size
      */
-    std::optional<LegacyTriangle> getLargestValidTriangle(
-        std::vector<LegacyTriangle> allTriangles, double min_area = 0,
-        double min_edge_len = 0, double min_edge_angle = 0);
+    std::vector<LegacyTriangle> getAllValidTrianglesSortedBySize(
+            std::vector<LegacyTriangle> all_triangles, double min_area = 0,
+            double min_edge_len = 0, double min_edge_angle = 0);
 };  // namespace Evaluation

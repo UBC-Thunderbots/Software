@@ -69,7 +69,7 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             world.ball().position());
 
         auto chip_and_chase_shot =
-            Evaluation::findTargetPointForIndirectChipAndChase(world);
+                Evaluation::findTargetPointsForIndirectChipAndChase(world);
 
         // Check if there is a shot with a big enough window
         if (best_shot && (std::get<1>(*best_shot) > MIN_SHOT_ANGLE))

@@ -141,6 +141,20 @@ class Field
     Rectangle enemyDefenseArea() const;
 
     /**
+     * Gets the friendly half of the field
+     *
+     * @return the friendly half of the field
+     */
+    Rectangle friendlyHalf() const;
+
+    /**
+     * Gets the enemy half of the field
+     *
+     * @return the enemy half of the field
+     */
+    Rectangle enemyHalf() const;
+
+    /**
      * Gets the area within the field lines as a rectangle. This is the set of locations
      * where the ball is considered "in play".
      *
