@@ -282,4 +282,3 @@ PlayInfo STP::getPlayInfo()
 
     return info;
 }
-
