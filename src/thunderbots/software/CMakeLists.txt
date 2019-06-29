@@ -276,20 +276,6 @@ target_link_libraries(tbots_passing
     tbots_world
     )
 
-# Play
-file(GLOB TBOTS_PLAYS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
-        )
-add_library(tbots_play STATIC 
-    ${TBOTS_PLAYS_LIB_SRC}
-    )
-target_link_libraries(tbots_play
-    ${Boost_LIBRARIES}
-    tbots_evaluation
-    tbots_passing
-    )
-add_dependencies(tbots_play ${catkin_EXPORTED_TARGETS})
-
 # Tactic
 file(GLOB TBOTS_TACTIC_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/tactic/*.cpp
@@ -305,6 +291,21 @@ target_link_libraries(tbots_tactic
     tbots_evaluation
     )
 add_dependencies(tbots_tactic ${catkin_EXPORTED_TARGETS})
+
+# Play
+file(GLOB TBOTS_PLAYS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
+        )
+add_library(tbots_play STATIC 
+    ${TBOTS_PLAYS_LIB_SRC}
+    )
+target_link_libraries(tbots_play
+    ${Boost_LIBRARIES}
+    tbots_tactic
+    tbots_evaluation
+    tbots_passing
+    )
+add_dependencies(tbots_play ${catkin_EXPORTED_TARGETS})
 
 # Navigator
 file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -325,8 +326,7 @@ add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 add_library(tbots_test_util STATIC
         test/test_util/test_util.cpp
         )
-target_link_libraries(tbots_intent
-    tbots_primitive
+target_link_libraries(tbots_test_util
     tbots_time
     tbots_world
     )
