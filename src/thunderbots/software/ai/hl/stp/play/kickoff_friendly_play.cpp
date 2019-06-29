@@ -15,13 +15,13 @@ std::string KickoffFriendlyPlay::getName() const
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
+    return (world.gameState().isPlaying() || world.gameState().isSetupState()) &&
            world.gameState().isOurKickoff();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
 {
-    return !world.gameState().isPlaying();
+    return world.ball().position().len() < 1;
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
