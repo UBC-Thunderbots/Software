@@ -139,7 +139,7 @@ TEST(GeomUtilTest, test_proj_len)
     Point test4p3(-4, -4);
     calculated_val = proj_len(Segment(test4p1, test4p2), test4p3);
     expected_val   = -sqrt(32) * (cos((M_PI / 4.0f) - atan(1.0f / 4.0f)));
-    EXPECT_DOUBLE_EQ(expected_val, calculated_val);
+    EXPECT_NEAR(expected_val, calculated_val, 0.00001);
 }
 
 TEST(GeomUtilTest, test_contains_triangle_point)
@@ -628,6 +628,15 @@ TEST(GeomUtilTest, test_line_intersect)
 
         EXPECT_TRUE((expected - found).len() < 0.0001);
     }
+}
+
+TEST(GeomUtilTest, test_close_parallel_segments_dont_intersect)
+{
+    // This is a test from a bug found
+    Segment seg_1(Point(1.049, -1.049), Point(1.95, -1.049));
+    Segment seg_2(Point(2, -1), Point(1, -1));
+
+    EXPECT_FALSE(intersects(seg_1, seg_2));
 }
 
 TEST(GeomUtilTest, test_seg_crosses_seg)

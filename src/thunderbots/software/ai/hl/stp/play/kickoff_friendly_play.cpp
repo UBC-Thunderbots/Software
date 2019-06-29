@@ -101,6 +101,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                   : std::make_optional(enemy_threats.at(0)));
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
+        // set the requirement that Robot 1 must be able to kick and chip
+        move_tactics.at(0)->mutableRobotCapabilityRequirements() = {
+            RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip};
+
         // setup 5 kickoff positions in order of priority
         for (int i = 0; i < kickoff_setup_positions.size(); i++)
         {

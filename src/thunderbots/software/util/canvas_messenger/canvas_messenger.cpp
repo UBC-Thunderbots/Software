@@ -239,7 +239,7 @@ void CanvasMessenger::drawField(Field field)
              0.05, FIELD_LINE_COLOR);
 
     // Draw a marker for the origin
-    drawLine(Layer::STATIC_FEATURES, {-0.1, 0}, {0.1, 0}, 0.05, FIELD_LINE_COLOR);
+    drawLine(Layer::STATIC_FEATURES, {-0.1, 0}, {0.1, 0}, 0.005, FIELD_LINE_COLOR);
 }
 
 void CanvasMessenger::drawTeam(const Team& team, CanvasMessenger::Color color)
@@ -256,6 +256,16 @@ void CanvasMessenger::drawRobot(Robot robot, CanvasMessenger::Color color)
         robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS),
         robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS));
     drawRectangle(Layer::ROBOTS, robot_rectangle, robot.orientation(), color);
+}
+
+void CanvasMessenger::drawRobotPath(std::vector<Point> path_points)
+{
+    for (int i = 0; i < path_points.size() - 1; i++)
+    {
+        Point p1 = path_points[i];
+        Point p2 = path_points[i + 1];
+        drawLine(Layer::ROBOTS, p1, p2, 0.05, FRIENDLY_TEAM_COLOR);
+    }
 }
 
 Point CanvasMessenger::Sprite::getTopLeftCorner()

@@ -15,7 +15,7 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       min_percent_net_open(min_percent_net_open),
       chip_target(chip_target),
       has_shot_available(false),
-      Tactic(loop_forever)
+      Tactic(loop_forever, {RobotCapabilityFlags::Kick})
 {
 }
 

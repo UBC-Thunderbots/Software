@@ -197,3 +197,16 @@ Evaluation:
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
+RobotCapabilities:
+  broken_dribblers:
+    default: ""
+    type: "string"
+    description: Comma-separated list of numbers of robots with broken dribblers
+  broken_chippers:
+    default: ""
+    type: "string"
+    description: Comma-separated list of numbers of robots with broken chippers
+  broken_kickers:
+    default: ""
+    type: "string"
+    description: Comma-separated list of numbers of robots with broken kickers
