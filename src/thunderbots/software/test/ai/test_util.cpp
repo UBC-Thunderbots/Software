@@ -26,6 +26,15 @@ TEST(comma_separated_list_to_set_3, CommaSeparatedListToSetTest)
     EXPECT_EQ(output, expected);
 }
 
+TEST(comma_separated_list_to_set_exception, CommaSeparatedListToSetTest)
+{
+    std::string input("1, wadwadwadwad, 3");
+    std::unordered_set<unsigned int> output = commaSeparatedListToSet(input);
+    // we should be robust against non-number/comma symbols
+    std::unordered_set<unsigned int> expected{1, 3};
+    EXPECT_EQ(output, expected);
+}
+
 int main(int argc, char **argv)
 {
     testing::InitGoogleTest(&argc, argv);
