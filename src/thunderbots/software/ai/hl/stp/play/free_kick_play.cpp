@@ -46,6 +46,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
      * Other bots should move to the other side of field to lure enemies.
      */
 
+    // Figure out if we're taking the kick from the +y or -y corner
+    bool kick_from_pos_corner = world.ball().position().y() > 0;
 
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
