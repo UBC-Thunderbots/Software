@@ -154,7 +154,7 @@ target_link_libraries(tbots_parameter
 add_dependencies(tbots_parameter ${catkin_EXPORTED_TARGETS})
 
 # Refbox Utils
-add_library(tbots_refbox_util 
+add_library(tbots_refbox_util
     util/refbox_constants.cpp
     )
 add_dependencies(tbots_refbox_util ${catkin_EXPORTED_TARGETS})
@@ -172,7 +172,7 @@ target_link_libraries(tbots_world
     )
 add_dependencies(tbots_world ${catkin_EXPORTED_TARGETS})
 
-# Canvas Messenger 
+# Canvas Messenger
 file(GLOB_RECURSE TBOTS_CANVAS_MESSENGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/canvas_messenger/*.cpp
         )
@@ -184,7 +184,7 @@ target_link_libraries(tbots_canvas_messenger
 add_dependencies(tbots_canvas_messenger ${catkin_EXPORTED_TARGETS})
 
 # ROS Message Utils
-add_library(tbots_ros_msg_util 
+add_library(tbots_ros_msg_util
     util/ros_messages.cpp
     )
 add_dependencies(tbots_ros_msg_util ${catkin_EXPORTED_TARGETS})
@@ -271,7 +271,7 @@ target_link_libraries(tbots_navigator
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
-# Primitive 
+# Primitive
 file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
         )
@@ -307,10 +307,10 @@ target_link_libraries(tbots_intent
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 ## Find the generated files
 file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
-add_library(tbots_proto 
+add_library(tbots_proto
     ${TBOTS_PROTO_SRCS}
     )
-target_link_libraries(tbots_proto 
+target_link_libraries(tbots_proto
     ${PROTOBUF_LIBRARIES}
     )
 
@@ -430,11 +430,11 @@ add_executable (parameters
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 # We also make sure we've generated parameters before building this target
-add_dependencies(parameters 
-    thunderbots_gencfg 
+add_dependencies(parameters
+    thunderbots_gencfg
     ${catkin_EXPORTED_TARGETS}
     )
-target_link_libraries(parameters  
+target_link_libraries(parameters
         ${catkin_LIBRARIES}
         tbots_proto
         tbots_shared
@@ -530,7 +530,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(ros_message_util_test
             test/util/ros_messages.cpp
             )
-    target_link_libraries(ros_message_util_test 
+    target_link_libraries(ros_message_util_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
@@ -546,8 +546,9 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/world/robot.cpp
             test/ai/world/team.cpp
             test/ai/world/world.cpp
+            test/ai/world/robot_capabilities.cpp
             )
-    target_link_libraries(world_test 
+    target_link_libraries(world_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
@@ -559,7 +560,7 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util_test.cpp
             )
 
-    target_link_libraries(test_util_test 
+    target_link_libraries(test_util_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
@@ -578,7 +579,7 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_communication/main.cpp
             test/grsim_communication/motion_controller.cpp
             )
-    target_link_libraries(grsim_communication_test 
+    target_link_libraries(grsim_communication_test
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_proto
@@ -604,7 +605,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/primitive/main.cpp
             )
 
-    target_link_libraries(primitive_test 
+    target_link_libraries(primitive_test
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_primitive
@@ -615,7 +616,7 @@ if (CATKIN_ENABLE_TESTING)
             test/radio_communication/visitor/mrf_primitive_visitor.cpp
             radio_communication/visitor/mrf_primitive_visitor.cpp
             )
-    target_link_libraries(mrf_primitive_visitor_test 
+    target_link_libraries(mrf_primitive_visitor_test
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_primitive
@@ -637,7 +638,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/evaluation/pass.cpp
             test/ai/evaluation/main.cpp
             )
-    target_link_libraries(shared_evaluation_test 
+    target_link_libraries(shared_evaluation_test
         ${catkin_LIBRARIES}
         tbots_world
         )
@@ -654,7 +655,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/evaluation/robot.cpp
             test/ai/hl/stp/evaluation/team.cpp
             )
-    target_link_libraries(ai_evaluation_test 
+    target_link_libraries(ai_evaluation_test
         ${G3LOG}
         tbots_evaluation
         tbots_world
@@ -797,7 +798,7 @@ if (CATKIN_ENABLE_TESTING)
             # TODO: (Issue #655) un-comment this and fix the flaky tests in it
             # test/ai/passing/pass_generator.cpp
             )
-    target_link_libraries(passing_test 
+    target_link_libraries(passing_test
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_passing
@@ -818,7 +819,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
             )
-    target_link_libraries(evaluation_detect_threat_test 
+    target_link_libraries(evaluation_detect_threat_test
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_geom
@@ -927,6 +928,15 @@ if (CATKIN_ENABLE_TESTING)
             tbots_test_util
             tbots_math
             )
+
+    catkin_add_gtest(ai_util_test
+                    test/ai/test_util.cpp)
+
+    target_link_libraries(ai_util_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            ${Boost_LIBRARIES})
+
 endif()
 
 ##### ROSTests / Integration Tests #####
@@ -938,18 +948,18 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(logger_test test/util/logger_test.test
             test/util/logger_test.cpp
             )
-    target_link_libraries(logger_test 
+    target_link_libraries(logger_test
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_time
         )
 
     # The test node that verifies the rostest utils are working correctly
-    add_rostest_gtest(rostest_util_test 
+    add_rostest_gtest(rostest_util_test
         test/test_util/rostest_util_test.test
         test/test_util/rostest_util_test.cpp
         )
-    target_link_libraries(rostest_util_test 
+    target_link_libraries(rostest_util_test
         ${catkin_LIBRARIES}
         tbots_time
         )
@@ -958,17 +968,17 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp
             )
-    target_link_libraries(dynamic_parameters_test 
+    target_link_libraries(dynamic_parameters_test
         ${catkin_LIBRARIES}
         tbots_parameter
         )
 
     # The test node that verifies the dynamic_parameters exist in the parameter server
-    add_rostest_gtest(check_parameter_existance_test 
+    add_rostest_gtest(check_parameter_existance_test
         test/util/rostest_parameter_exists.test
         test/util/test_parameter_exists.cpp
         )
-    target_link_libraries(check_parameter_existance_test 
+    target_link_libraries(check_parameter_existance_test
         ${catkin_LIBRARIES}
         tbots_parameter
         )
