@@ -262,11 +262,12 @@ add_dependencies(tbots_tactic ${catkin_EXPORTED_TARGETS})
 file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/navigator/*.cpp
         )
-add_library(tbots_navigator ${TBOTS_NAVIGATOR_LIB_SRC})
+add_library(tbots_navigator STATIC ${TBOTS_NAVIGATOR_LIB_SRC})
 target_link_libraries(tbots_navigator
     tbots_geom
     tbots_math
     tbots_world
+    tbots_canvas_messenger
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
@@ -832,6 +833,8 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/navigator/obstacle/obstacle.cpp
             test/ai/navigator/trespass/trespass.cpp
             test/ai/navigator/path_planner/straight_line_path_planner.cpp
+            test/ai/navigator/path_planner/theta_star_path_planner.cpp
+            test/ai/navigator/path_planning_navigator/path_planning_navigator.cpp
             )
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}

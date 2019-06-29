@@ -2,6 +2,7 @@
 
 #include "ai/flags.h"
 #include "ai/intent/intent.h"
+#include "ai/navigator/obstacle/obstacle.h"
 #include "ai/primitive/move_primitive.h"
 #include "geom/angle.h"
 #include "geom/point.h"
@@ -65,9 +66,25 @@ class MoveIntent : public Intent, public MovePrimitive
      */
     bool operator!=(const MoveIntent& other) const;
 
+    /*
+     * Gets additional obstacles for this move intent
+     *
+     * @return additional obstacles for this move intent
+     */
+    std::vector<Obstacle> getAdditionalObstacles() const;
+
+    /*
+     * Adds an additional obstaclesfor this move intent
+     *
+     * @param an additional obstacle for this move intent
+     */
+    void getAdditionalObstacles(Obstacle o);
+
    private:
     /**
      * MoveFlags of this intent.
      */
     MoveFlags flags;
+    // TODO: actually use move flags, this is a competition hack
+    std::vector<Obstacle> additional_obstacles;
 };
