@@ -198,6 +198,9 @@ add_library(tbots_ros_msg_util STATIC
         util/ros_messages.cpp
         )
 add_dependencies(tbots_ros_msg_util ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tbots_ros_msg_util
+    tbots_world
+    )
 
 # Math Utils
 add_library(tbots_math STATIC
