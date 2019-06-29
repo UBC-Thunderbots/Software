@@ -126,7 +126,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
 
         yield({shoot_tactic, cherry_pick_tactic_neg_y,
-               /* cherry_pick_tactic_pos_y, patrol_tactic_pos_y, patrol_tactic_neg_y*/});
+               cherry_pick_tactic_pos_y, patrol_tactic_pos_y, patrol_tactic_neg_y});
 
         // If there is a robot assigned to shoot, we assume this is the robot
         // that will be taking the shot
@@ -158,8 +158,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
 
         LOG(DEBUG) << "LOOP END";
-        //    } while(!ready_to_pass || shoot_tactic->hasShotAvailable());
-    } while (!ready_to_pass || false);
+    } while(!ready_to_pass || shoot_tactic->hasShotAvailable());
 
     // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
     // each) to save a significant number of CPU cycles
