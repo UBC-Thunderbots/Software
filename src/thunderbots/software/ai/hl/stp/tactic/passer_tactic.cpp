@@ -12,7 +12,7 @@
 using namespace Passing;
 
 PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever)
-    : pass(std::move(pass)), ball(ball), Tactic(loop_forever)
+    : pass(std::move(pass)), ball(ball), Tactic(loop_forever, {RobotCapabilityFlags::Kick})
 {
 }
 
@@ -77,7 +77,3 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
              ball.velocity().len() < 0.5);
 }
 
-RobotCapabilityFlags PasserTactic::robotCapabilityRequirements() const
-{
-    return {RobotCapabilityFlags::Kick};
-}

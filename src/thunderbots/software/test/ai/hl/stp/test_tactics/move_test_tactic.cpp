@@ -4,7 +4,9 @@
 
 #include "ai/intent/move_intent.h"
 
-MoveTestTactic::MoveTestTactic(bool loop_forever) : Tactic(loop_forever) {}
+MoveTestTactic::MoveTestTactic(bool loop_forever) :
+    Tactic(loop_forever, {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
+    RobotCapabilityFlags::Chip}) {}
 
 std::string MoveTestTactic::getName() const
 {
@@ -35,8 +37,3 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while ((this->robot->position() - this->destination).len() > 0.01);
 }
 
-RobotCapabilityFlags MoveTestTactic::robotCapabilityRequirements() const
-{
-    return {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
-            RobotCapabilityFlags::Chip};
-}

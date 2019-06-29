@@ -32,7 +32,7 @@ namespace
 }  // namespace
 
 FreeKickTactic::FreeKickTactic(const World& world, bool loop_forever)
-    : world(world), Tactic(loop_forever)
+    : world(world), Tactic(loop_forever, {RobotCapabilityFlags::Kick})
 {
 }
 
@@ -98,9 +98,4 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 *robot, world.ball(), world.ball().position(), target, KICK_SPEED));
         }
     } while (world.ball().velocity().len() < MAX_BALL_VELOCITY);
-}
-
-RobotCapabilityFlags FreeKickTactic::robotCapabilityRequirements() const
-{
-    return {RobotCapabilityFlags::Chip, RobotCapabilityFlags::Kick};
 }

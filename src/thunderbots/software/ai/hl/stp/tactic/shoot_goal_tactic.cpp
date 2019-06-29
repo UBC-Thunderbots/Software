@@ -15,7 +15,7 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       min_percent_net_open(min_percent_net_open),
       chip_target(chip_target),
       has_shot_available(false),
-      Tactic(loop_forever)
+      Tactic(loop_forever, {RobotCapabilityFlags::Kick})
 {
 }
 
@@ -160,7 +160,3 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     } while (!(kick_action.done() || chip_action.done()));
 }
 
-RobotCapabilityFlags ShootGoalTactic::robotCapabilityRequirements() const
-{
-    return {RobotCapabilityFlags::Kick};
-}

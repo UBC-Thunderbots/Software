@@ -5,7 +5,7 @@
 #include "ai/hl/stp/action/chip_action.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
-    : ball(ball), Tactic(loop_forever)
+    : ball(ball), Tactic(loop_forever, {RobotCapabilityFlags::Chip})
 {
 }
 
@@ -40,9 +40,4 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(chip_action.updateStateAndGetNextIntent(*robot, ball, chip_origin,
                                                       chip_target, chip_distance_meters));
     } while (!chip_action.done());
-}
-
-RobotCapabilityFlags ChipTactic::robotCapabilityRequirements() const
-{
-    return {RobotCapabilityFlags::Chip};
 }

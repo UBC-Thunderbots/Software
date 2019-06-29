@@ -37,13 +37,6 @@ class PasserTactic : public Tactic
     void updateParams(const Passing::Pass& updated_pass, const Ball& updated_ball);
 
     /**
-     * This tactic requires kicking capability. Return RobotCapabilities containing
-     * only RobotCapabilities::Kick
-     * @return RobotCapabilities containing RobotCapabilities::Kick
-     */
-    RobotCapabilityFlags robotCapabilityRequirements() const override;
-
-    /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
      * closer to the block destination
      *

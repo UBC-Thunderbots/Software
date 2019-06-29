@@ -27,8 +27,6 @@ class MoveTestTactic : public Tactic
      */
     void updateParams(Point destination_);
 
-    RobotCapabilityFlags robotCapabilityRequirements() const override;
-
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
      * closer to the destination
