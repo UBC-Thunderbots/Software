@@ -128,8 +128,7 @@ TEST(PolygonTest, test_polygon_hexagon_contains_point)
 
 TEST(PolygonTest, test_polygon_triangle_intersects_line_segment)
 {
-    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{1.0f, 0.0f};
-    Point point{2.0f, 2.0f};
+    Point p1{0.0f, 0.0f}, p2{1.0f, 0.0f}, p3{0.0f, 1.0f};
     Polygon triangle{p1, p2, p3};
 
     Segment seg{Point(1.0f, 1.0f), Point(0.2f, 0.2f)};

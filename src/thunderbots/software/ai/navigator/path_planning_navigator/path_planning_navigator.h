@@ -3,25 +3,31 @@
 #include "ai/intent/intent.h"
 #include "ai/intent/visitor/intent_visitor.h"
 #include "ai/navigator/navigator.h"
+#include "ai/navigator/obstacle/obstacle.h"
+#include "ai/navigator/path_planner/straight_line_path_planner.h"
+#include "ai/navigator/path_planner/theta_star_path_planner.h"
+#include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
 #include "ai/primitive/primitive.h"
 
 /**
- * This PlaceholderNavigator is a simple navigator that will convert the given Intents
+ * This PathPlanningNavigator is a simple navigator that will convert the given Intents
  * into their respective Primitives, without doing any intelligent navigation. It is meant
  * to provide an example of how to implement a navigator and act as a starting point for
  * future navigators to build off of.
  */
-class PlaceholderNavigator : public Navigator, public IntentVisitor
+class PathPlanningNavigator : public Navigator, public IntentVisitor
 {
    public:
-    explicit PlaceholderNavigator() = default;
+    explicit PathPlanningNavigator(){
 
-    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world,
-        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+    };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<Obstacle> &additional_obstacles,
+        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+
+    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
+        const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
     /**
@@ -100,4 +106,13 @@ class PlaceholderNavigator : public Navigator, public IntentVisitor
     // The current Primitive the navigator has created from an Intent.
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
+    // The current Robot the navigator has navigated for from an Intent.
+    // This variable is set by each `visit` function
+    std::optional<Robot> current_robot;
+    // The current destination the navigator has navigated to from an Intent.
+    // This variable is set by each `visit` function
+    Point current_destination;
+    //@TODO clean up this competition hack; should use some sort of flag system instead of
+    // passing in obstacles
+    std::vector<Obstacle> additional_obstacles;
 };

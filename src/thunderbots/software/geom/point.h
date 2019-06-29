@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/register/point.hpp>
 #include <cmath>
 #include <iostream>
 
@@ -7,7 +9,6 @@
 
 /**
  * A point or vector in 2D space.
- *
  * Here, point and vector are used interchangeably. A Point lies on the 2D x-y plane. The
  * corresponding
  * vector can be though of as a vector/line from the origin to the Point on the plane.
@@ -75,6 +76,20 @@ class Point final
      * @param y the new y coordinate
      */
     void set(double x, double y);
+
+    /**
+     * Sets the x coordinate of this point
+     *
+     * @param x the new x coordinate
+     */
+    void setX(double x);
+
+    /**
+     * Sets the y coordinate of this point
+     *
+     * @param y the new y coordinate
+     */
+    void setY(double y);
 
     /**
      * Returns the square of the length of the Point
@@ -384,6 +399,16 @@ inline void Point::set(double x, double y)
     this->_y = y;
 }
 
+inline void Point::setX(double x)
+{
+    this->_x = x;
+}
+
+inline void Point::setY(double y)
+{
+    this->_y = y;
+}
+
 inline constexpr double Point::lensq() const
 {
     return _x * _x + _y * _y;
@@ -546,3 +571,6 @@ namespace std
 // Since we also use Points to represent 2D vectors, we also allow
 // Points to be referred to as Vectors. This help make interfaces easier to read.
 typedef Point Vector;
+
+// Make our Point class "compatible" with boost
+BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(Point, double, cs::cartesian, x, y, setX, setY)
