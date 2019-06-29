@@ -4,17 +4,21 @@
 
 #include "ai/intent/move_intent.h"
 
-MoveTestTactic::MoveTestTactic(bool loop_forever) : Tactic(loop_forever) {}
+MoveTestTactic::MoveTestTactic(bool loop_forever)
+    : Tactic(loop_forever, {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
+                            RobotCapabilityFlags::Chip})
+{
+}
 
 std::string MoveTestTactic::getName() const
 {
     return "Move Test Tactic";
 }
 
-void MoveTestTactic::updateParams(Point destination)
+void MoveTestTactic::updateParams(Point destination_)
 {
     // Update the parameters stored by this Tactic
-    this->destination = destination;
+    this->destination = destination_;
 }
 
 double MoveTestTactic::calculateRobotCost(const Robot &robot, const World &world)

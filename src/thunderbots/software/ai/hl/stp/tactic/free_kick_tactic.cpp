@@ -32,7 +32,7 @@ namespace
 }  // namespace
 
 FreeKickTactic::FreeKickTactic(const World& world, bool loop_forever)
-    : world(world), Tactic(loop_forever)
+    : world(world), Tactic(loop_forever, {RobotCapabilityFlags::Kick})
 {
 }
 

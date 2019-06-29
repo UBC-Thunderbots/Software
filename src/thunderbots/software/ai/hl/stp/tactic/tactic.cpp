@@ -2,10 +2,11 @@
 
 #include "util/logger/init.h"
 
-Tactic::Tactic(bool loop_forever)
+Tactic::Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_)
     : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
       done_(false),
-      loop_forever(loop_forever)
+      loop_forever(loop_forever),
+      capability_reqs(capability_reqs_)
 {
 }
 
@@ -19,7 +20,7 @@ std::optional<Robot> Tactic::getAssignedRobot() const
     return robot;
 }
 
-void Tactic::updateRobot(const Robot& robot)
+void Tactic::updateRobot(const Robot &robot)
 {
     this->robot = robot;
 }
@@ -64,7 +65,7 @@ std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World>& world_
     return next_intent;
 }
 
-void Tactic::calculateNextIntentWrapper(IntentCoroutine::push_type& yield)
+void Tactic::calculateNextIntentWrapper(IntentCoroutine::push_type &yield)
 {
     // Yield a null pointer the very first time the function is called. This value will
     // never be seen/used by the rest of the system.
@@ -104,6 +105,17 @@ std::unique_ptr<Intent> Tactic::getNextIntentHelper()
 
     return next_intent;
 }
+
+const RobotCapabilityFlags &Tactic::robotCapabilityRequirements() const
+{
+    return capability_reqs;
+}
+
+RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements()
+{
+    return capability_reqs;
+}
+
 
 void Tactic::addWhitelistedAvoidArea(AvoidArea area)
 {

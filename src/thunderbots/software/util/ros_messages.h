@@ -2,7 +2,10 @@
 
 #include <thunderbots_msgs/World.h>
 
+#include <unordered_set>
+
 #include "ai/hl/stp/play_info.h"
+#include "ai/util.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
