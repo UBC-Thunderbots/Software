@@ -159,4 +159,3 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
     } while (!(kick_action.done() || chip_action.done()));
 }
-

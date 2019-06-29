@@ -93,10 +93,12 @@ std::unique_ptr<Intent> Tactic::getNextIntentHelper()
     return next_intent;
 }
 
-const RobotCapabilityFlags &Tactic::robotCapabilityRequirements() const {
+const RobotCapabilityFlags &Tactic::robotCapabilityRequirements() const
+{
     return capability_reqs;
 }
 
-RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements() {
+RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements()
+{
     return capability_reqs;
 }

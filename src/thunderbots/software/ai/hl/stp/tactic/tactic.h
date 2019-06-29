@@ -67,12 +67,12 @@ class Tactic
     /**
      * robot hardware capability requirements of the tactic.
      */
-     const RobotCapabilityFlags &robotCapabilityRequirements() const;
+    const RobotCapabilityFlags &robotCapabilityRequirements() const;
 
     /**
      * Mutable robot hardware capability requirements of the tactic.
      */
-     RobotCapabilityFlags &mutableRobotCapabilityRequirements();
+    RobotCapabilityFlags &mutableRobotCapabilityRequirements();
 
 
     /**
