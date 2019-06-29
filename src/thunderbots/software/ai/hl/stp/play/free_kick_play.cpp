@@ -77,15 +77,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                        }),
                                        AT_PATROL_POINT_TOLERANCE, SPEED_AT_PATROL_POINTS);
 
-    // Have a robot keep trying to take a shot
-    auto shoot_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_NET_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
+    // This tactic will move a robot into position to initially take the free-kick
+    auto align_to_ball_tactic = std::make_shared<MoveTactic>();
 
     // Start a PassGenerator that will continuously optimize passes into roughly
     // the enemy half of the field
-    PassGenerator pass_generator(world, world.ball().position(),
-                                 PassType::RECEIVE_AND_DRIBBLE);
+    PassGenerator pass_generator(world, world.ball().position());
     pass_generator.setTargetRegion(
         Rectangle(Point(-(world.field().length() / 4), world.field().width() / 2),
                   world.field().enemyCornerNeg()));
@@ -100,6 +97,23 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     bool ready_to_pass = false;
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
+
+    // Wait for a robot to be assigned to align to take the kick
+    while (!align_to_ball_tactic->getAssignedRobot())
+    {
+        LOG(DEBUG) << "Nothing assigned to align to ball yet";
+        updateAlignToBallTactic(align_to_ball_tactic);
+        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+        updatePassGenerator(pass_generator);
+
+        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
+               patrol_tactic_pos_y, patrol_tactic_neg_y});
+    }
+
+    // Have a robot keep trying to take a shot
+    auto shoot_tactic = std::make_shared<ShootGoalTactic>(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        0.1, std::nullopt, false);
 
     do
     {
