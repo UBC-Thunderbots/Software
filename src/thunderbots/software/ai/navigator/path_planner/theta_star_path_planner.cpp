@@ -186,7 +186,6 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     Point closest_destination = findClosestFreePoint(destination);
     src                       = convertPointToCell(start);
     dest                      = convertPointToCell(closest_destination);
-    std::cout << "here" << std::endl;
     // If the source is out of range
     if (isValid(src.first, src.second) == false)
     {

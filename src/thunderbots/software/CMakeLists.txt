@@ -1,5 +1,6 @@
 # This project name must match the name of the package defined in package.xml
 project(thunderbots)
+cmake_minimum_required(VERSION 3.8.2)
 
 # Build in "Release" (with lots of compiler optimizations) by default
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -41,12 +42,12 @@ add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
 add_definitions(-fno-common) # Do not allow multiple definitions of the same global variable
 add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 
+
+
 ### Set compiler flags only for cpp code. These flags do not work for C files ###
 # Warn if parent classes do not define a virtual destructor
 # See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
-
-
 
 #############################################
 ## Find and include packages and libraries ##
@@ -159,6 +160,44 @@ target_link_libraries(tbots_parameter
     )
 add_dependencies(tbots_parameter ${catkin_EXPORTED_TARGETS})
 
+# Primitive 
+file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        )
+add_library(tbots_primitive STATIC 
+    ${TBOTS_PRIMITIVE_LIB_SRC}
+    )
+target_link_libraries(tbots_primitive
+    ${G3LOG}
+    )
+add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
+
+# Intent
+file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/intent/*.cpp
+        )
+add_library(tbots_intent STATIC
+    ${TBOTS_INTENT_LIB_SRC}
+    )
+target_link_libraries(tbots_intent
+    tbots_primitive
+    )
+add_dependencies(tbots_intent ${catkin_EXPORTED_TARGETS})
+
+# Action
+file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
+        )
+add_library(tbots_action STATIC
+    ${TBOTS_ACTION_LIB_SRC}
+    )
+target_link_libraries(tbots_action
+    ${Boost_LIBRARIES}
+    tbots_intent
+    )
+add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
+
+
 # Refbox Utils
 add_library(tbots_refbox_util STATIC
         util/refbox_constants.cpp
@@ -237,18 +276,6 @@ target_link_libraries(tbots_passing
     tbots_world
     )
 
-# Action
-file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
-        )
-add_library(tbots_action STATIC
-    ${TBOTS_ACTION_LIB_SRC}
-    )
-target_link_libraries(tbots_action
-    ${Boost_LIBRARIES}
-    )
-add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
-
 # Play
 file(GLOB TBOTS_PLAYS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
@@ -293,30 +320,6 @@ target_link_libraries(tbots_navigator
     tbots_canvas_messenger
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
-
-# Primitive 
-file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
-        )
-add_library(tbots_primitive STATIC 
-    ${TBOTS_PRIMITIVE_LIB_SRC}
-    )
-target_link_libraries(tbots_primitive
-    ${G3LOG}
-    )
-add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
-
-# Intent
-file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/intent/*.cpp
-        )
-add_library(tbots_intent STATIC
-    ${TBOTS_INTENT_LIB_SRC}
-    )
-target_link_libraries(tbots_intent
-    tbots_primitive
-    )
-add_dependencies(tbots_intent ${catkin_EXPORTED_TARGETS})
 
 # Test Utils
 add_library(tbots_test_util STATIC
@@ -380,6 +383,11 @@ target_link_libraries(network_input
 file(GLOB AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/*.cpp
+        # We include all the plays here so that that the static variables in 
+        # the .cpp files that auto-register plays with the PlayFactory. This 
+        # addresses the issue explained here:
+        # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
         )
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
@@ -387,7 +395,8 @@ add_executable (ai_logic
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ai_logic ${catkin_LIBRARIES}
+target_link_libraries(ai_logic 
+        ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
         ${G3LOG}
         tbots_geom
