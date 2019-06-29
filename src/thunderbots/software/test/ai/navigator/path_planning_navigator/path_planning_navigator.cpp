@@ -188,7 +188,7 @@ TEST(PathPlanningNavigatorTest, convert_multiple_intents_to_primitives)
     auto primitive_ptrs = pathplanningNavigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 3 primitives back
-    EXPECT_EQ(primitive_ptrs.size(), 3);
+    EXPECT_EQ(primitive_ptrs.size(), 2);
 
     auto expected_stop_primitive = StopPrimitive(0, false);
     auto stop_primitive          = dynamic_cast<StopPrimitive &>(*(primitive_ptrs.at(0)));
