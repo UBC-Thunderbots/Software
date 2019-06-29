@@ -18,12 +18,11 @@
 class PathPlanningNavigator : public Navigator, public IntentVisitor
 {
    public:
-    explicit PathPlanningNavigator() :
-    OBSTACLE_INFLATION_DIST(1.5 * ROBOT_MAX_RADIUS_METERS),
-    NUM_POINTS_IN_CIRCLE_POLY(16)
-     {
+    explicit PathPlanningNavigator()
+        : OBSTACLE_INFLATION_DIST(1.5 * ROBOT_MAX_RADIUS_METERS),
+          NUM_POINTS_IN_CIRCLE_POLY(16){
 
-    };
+          };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<Obstacle> &additional_obstacles,
@@ -104,7 +103,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
-
     /**
      * Create an obstacle for the given avoid area, with a buffer such that the edge
      * of the robot does not protrude into the area

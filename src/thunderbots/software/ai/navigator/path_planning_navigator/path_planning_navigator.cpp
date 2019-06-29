@@ -1,6 +1,7 @@
-#include <g3log/loglevels.hpp>
-#include <g3log/g3log.hpp>
 #include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
+
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #include "ai/navigator/util.h"
 #include "util/canvas_messenger/canvas_messenger.h"
@@ -100,12 +101,13 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 
     std::vector<Obstacle> obstacles;
     // Avoid obstacles specific to this MoveIntent
-    for (auto area : move_intent.getAreasToAvoid()){
-        auto obstacle_opt =obstacleFromAvoidArea(area);
-                if (obstacle_opt){
-
-                    obstacles.emplace_back(*obstacle_opt);
-                }
+    for (auto area : move_intent.getAreasToAvoid())
+    {
+        auto obstacle_opt = obstacleFromAvoidArea(area);
+        if (obstacle_opt)
+        {
+            obstacles.emplace_back(*obstacle_opt);
+        }
     }
 
     for (auto &robot : world.enemyTeam().getAllRobots())
@@ -182,11 +184,11 @@ void PathPlanningNavigator::visit(const StopIntent &stop_intent)
     current_primitive = std::move(p);
 }
 
-std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(
-        AvoidArea avoid_area){
-
-    Rectangle rectangle({0,0}, {0,0});
-    switch (avoid_area){
+std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea avoid_area)
+{
+    Rectangle rectangle({0, 0}, {0, 0});
+    switch (avoid_area)
+    {
         case AvoidArea::FRIENDLY_DEFENSE_AREA:
             rectangle = world.field().friendlyDefenseArea();
             rectangle.expand(OBSTACLE_INFLATION_DIST);
@@ -200,19 +202,25 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(
             rectangle.expand(OBSTACLE_INFLATION_DIST + 0.2);
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
-            return Obstacle(world.field().centerPoint(), world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST, NUM_POINTS_IN_CIRCLE_POLY);
+            return Obstacle(world.field().centerPoint(),
+                            world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST,
+                            NUM_POINTS_IN_CIRCLE_POLY);
         case AvoidArea::HALF_METER_AROUND_BALL:
-            return Obstacle(world.ball().position(), 0.5 + OBSTACLE_INFLATION_DIST, NUM_POINTS_IN_CIRCLE_POLY);
+            return Obstacle(world.ball().position(), 0.5 + OBSTACLE_INFLATION_DIST,
+                            NUM_POINTS_IN_CIRCLE_POLY);
         case AvoidArea::ENEMY_HALF:
-            rectangle = Rectangle({0, world.field().width()/2}, world.field().enemyCornerNeg());
+            rectangle =
+                Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());
             rectangle.expand(OBSTACLE_INFLATION_DIST);
             return Obstacle(rectangle);
         case AvoidArea::FRIENDLY_HALF:
-            rectangle = Rectangle({0, world.field().width()/2}, world.field().friendlyCornerNeg());
+            rectangle = Rectangle({0, world.field().width() / 2},
+                                  world.field().friendlyCornerNeg());
             rectangle.expand(OBSTACLE_INFLATION_DIST);
             return Obstacle(rectangle);
         default:
-            LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area << " to obstacle";
+            LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
+                         << " to obstacle";
     }
 
     return std::nullopt;

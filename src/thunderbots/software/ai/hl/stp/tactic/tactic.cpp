@@ -25,7 +25,7 @@ void Tactic::updateRobot(const Robot &robot)
     this->robot = robot;
 }
 
-std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World>& world_opt)
+std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World> &world_opt)
 {
     std::unique_ptr<Intent> next_intent = nullptr;
     if (!robot)
@@ -49,7 +49,8 @@ std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World>& world_
         }
     }
 
-    if (next_intent != nullptr){
+    if (next_intent != nullptr)
+    {
         // Figure out where this intent should and should not move to, based on the
         // world state, whitelisted avoid areas, and blacklisted avoid areas
         std::vector<AvoidArea> avoid_areas;
@@ -57,7 +58,8 @@ std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World>& world_
         {
             avoid_areas = getAreasToAvoid(*world_opt);
         }
-        avoid_areas.insert(avoid_areas.end(), blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end());
+        avoid_areas.insert(avoid_areas.end(), blacklisted_avoid_areas.begin(),
+                           blacklisted_avoid_areas.end());
 
         next_intent->setAreasToAvoid(avoid_areas);
     }
@@ -122,18 +124,24 @@ void Tactic::addWhitelistedAvoidArea(AvoidArea area)
     whitelisted_avoid_areas.emplace_back(area);
 }
 
-void Tactic::addBlacklistedAvoidArea(AvoidArea area) {
+void Tactic::addBlacklistedAvoidArea(AvoidArea area)
+{
     // Only add this area to our list if it's not already present
-    if (std::find(blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end(), area) == blacklisted_avoid_areas.end()){
+    if (std::find(blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end(), area) ==
+        blacklisted_avoid_areas.end())
+    {
         blacklisted_avoid_areas.emplace_back(area);
     }
 }
 
-void Tactic::removeBlacklistedAvoidArea(AvoidArea area) {
-    blacklisted_avoid_areas.erase(std::remove(blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end(), area), blacklisted_avoid_areas.end());
+void Tactic::removeBlacklistedAvoidArea(AvoidArea area)
+{
+    blacklisted_avoid_areas.erase(
+        std::remove(blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end(), area),
+        blacklisted_avoid_areas.end());
 }
 
-std::vector<AvoidArea> Tactic::getAreasToAvoid(const World& world)
+std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
 {
     std::vector<AvoidArea> areas_to_avoid;
 

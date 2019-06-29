@@ -166,8 +166,7 @@ PREDICATE_TEST(isStopped, RefboxGameState::STOP, RefboxGameState::GOAL_US,
                RefboxGameState::GOAL_THEM)
 // PLAYING state must be manually set after a transition from a restart state to
 // NORMAL_START
-PREDICATE_TEST(isPlaying, RefboxGameState::FORCE_START, RefboxGameState::NORMAL_START
-               )
+PREDICATE_TEST(isPlaying, RefboxGameState::FORCE_START, RefboxGameState::NORMAL_START)
 PREDICATE_TEST(isKickoff, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(isPenalty, RefboxGameState::PREPARE_PENALTY_US,
@@ -195,7 +194,9 @@ PREDICATE_TEST(isTheirBallPlacement, RefboxGameState::BALL_PLACEMENT_THEM)
 PREDICATE_TEST(isSetupState, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
                RefboxGameState::BALL_PLACEMENT_THEM, RefboxGameState::PREPARE_PENALTY_US,
-               RefboxGameState::PREPARE_PENALTY_THEM, RefboxGameState::INDIRECT_FREE_US,RefboxGameState::INDIRECT_FREE_THEM,RefboxGameState::DIRECT_FREE_US,RefboxGameState::DIRECT_FREE_THEM)
+               RefboxGameState::PREPARE_PENALTY_THEM, RefboxGameState::INDIRECT_FREE_US,
+               RefboxGameState::INDIRECT_FREE_THEM, RefboxGameState::DIRECT_FREE_US,
+               RefboxGameState::DIRECT_FREE_THEM)
 PREDICATE_TEST(stayBehindPenaltyLine, RefboxGameState::PREPARE_PENALTY_THEM,
                RefboxGameState::PREPARE_PENALTY_US)
 

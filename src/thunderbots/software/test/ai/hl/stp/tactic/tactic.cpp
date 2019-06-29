@@ -187,9 +187,11 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(
         // Halt
         makeParams({RefboxGameState::HALT},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
+                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Stop
-        makeParams({RefboxGameState::STOP}, {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
+        makeParams({RefboxGameState::STOP}, {AvoidArea::HALF_METER_AROUND_BALL,
+                                             AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                                              AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Our kickoff setup
         makeParams({RefboxGameState::PREPARE_KICKOFF_US},
@@ -199,13 +201,15 @@ INSTANTIATE_TEST_CASE_P(
                    {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Their kickoff setup
         makeParams({RefboxGameState::PREPARE_KICKOFF_THEM},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
+                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Their kickoff
         makeParams({RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::NORMAL_START},
                    {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Their indirect free kick setup
         makeParams({RefboxGameState::INDIRECT_FREE_THEM},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
+                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Their indirect free kick
         makeParams({RefboxGameState::INDIRECT_FREE_THEM, RefboxGameState::NORMAL_START},
                    {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
@@ -218,7 +222,8 @@ INSTANTIATE_TEST_CASE_P(
                    {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Their direct free kick setup
         makeParams({RefboxGameState::DIRECT_FREE_THEM},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
+                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
         // Their direct free kick
         makeParams({RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::NORMAL_START},
                    {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
@@ -240,7 +245,8 @@ INSTANTIATE_TEST_CASE_P(
         makeParams({RefboxGameState::PREPARE_PENALTY_THEM, RefboxGameState::NORMAL_START},
                    {AvoidArea::FRIENDLY_HALF})));
 
-TEST(TacticTest, test_and_remove_extra_avoid_areas){
+TEST(TacticTest, test_and_remove_extra_avoid_areas)
+{
     // Test adding and removing extra avoid areas is correctly reflected in the
     // avoid areas produced by the tactic
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -253,16 +259,20 @@ TEST(TacticTest, test_and_remove_extra_avoid_areas){
 
     auto intent_ptr = tactic.getNextIntent();
     ASSERT_TRUE(intent_ptr);
-    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::FRIENDLY_HALF, AvoidArea::CENTER_CIRCLE}), intent_ptr->getAreasToAvoid());
+    EXPECT_EQ(
+        std::vector<AvoidArea>({AvoidArea::FRIENDLY_HALF, AvoidArea::CENTER_CIRCLE}),
+        intent_ptr->getAreasToAvoid());
 
     tactic.removeBlacklistedAvoidArea(AvoidArea::FRIENDLY_HALF);
 
-   intent_ptr = tactic.getNextIntent();
+    intent_ptr = tactic.getNextIntent();
     ASSERT_TRUE(intent_ptr);
-    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::CENTER_CIRCLE}), intent_ptr->getAreasToAvoid());
+    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::CENTER_CIRCLE}),
+              intent_ptr->getAreasToAvoid());
 }
 
-TEST(TacticTest, extra_avoid_areas_overrides_whitelist){
+TEST(TacticTest, extra_avoid_areas_overrides_whitelist)
+{
     // Test adding and removing extra avoid areas is correctly reflected in the
     // avoid areas produced by the tactic
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -277,23 +287,27 @@ TEST(TacticTest, extra_avoid_areas_overrides_whitelist){
 
     auto intent_ptr = tactic.getNextIntent();
     ASSERT_TRUE(intent_ptr);
-    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::FRIENDLY_HALF, AvoidArea::CENTER_CIRCLE}), intent_ptr->getAreasToAvoid());
+    EXPECT_EQ(
+        std::vector<AvoidArea>({AvoidArea::FRIENDLY_HALF, AvoidArea::CENTER_CIRCLE}),
+        intent_ptr->getAreasToAvoid());
 }
 
-TEST(TacticTest, test_whitelisted_areas_are_ignored){
-
+TEST(TacticTest, test_whitelisted_areas_are_ignored)
+{
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveTestTactic tactic = MoveTestTactic(true);
     tactic.updateRobot(robot);
 
     World world;
-        world.mutableGameState().updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
+    world.mutableGameState().updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
 
-        tactic.addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    tactic.addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
     auto next_intent = tactic.getNextIntent(world);
     ASSERT_TRUE(next_intent);
 
-    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}), next_intent->getAreasToAvoid());
+    EXPECT_EQ(std::vector<AvoidArea>(
+                  {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+              next_intent->getAreasToAvoid());
 }

@@ -5,7 +5,8 @@
  */
 
 // TODO: descriptions for each of these
-enum class AvoidArea {
+enum class AvoidArea
+{
     FRIENDLY_DEFENSE_AREA,
     ENEMY_DEFENSE_AREA,
     INFLATED_ENEMY_DEFENSE_AREA,

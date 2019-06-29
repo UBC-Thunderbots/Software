@@ -28,7 +28,7 @@ class Obstacle
      *
      * @param rectangle
      */
-     // TODO: test me
+    // TODO: test me
     Obstacle(Rectangle rectangle);
 
     /**
@@ -39,7 +39,8 @@ class Obstacle
      * @param num_points The number of points to use to approximate the circle as a
      *                   polygon
      */
-    Obstacle(const Point& circle_center, const double circle_radius, const int num_points);
+    Obstacle(const Point& circle_center, const double circle_radius,
+             const int num_points);
 
     static Obstacle createRobotObstacle(const Robot& robot, bool enable_velocity_cushion);
 

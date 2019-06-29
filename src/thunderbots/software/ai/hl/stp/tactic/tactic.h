@@ -101,7 +101,8 @@ class Tactic
      * @return A unique pointer to the next Intent that should be run for the Tactic.
      * If the Tactic is done, a nullptr is returned.
      */
-    std::unique_ptr<Intent> getNextIntent(const std::optional<World>& world_opt = std::nullopt);
+    std::unique_ptr<Intent> getNextIntent(
+        const std::optional<World> &world_opt = std::nullopt);
 
     /**
      * Returns the name of the Tactic
@@ -128,7 +129,8 @@ class Tactic
     void addBlacklistedAvoidArea(AvoidArea area);
 
     /**
-     * Remove an extra area that this intents yielded by this tactic should avoid moving into
+     * Remove an extra area that this intents yielded by this tactic should avoid moving
+     * into
      *
      * If the area was not previously added, does nothing
      *
@@ -188,7 +190,7 @@ class Tactic
      *
      * @return a vector of areas this tactic should avoid
      */
-    std::vector<AvoidArea> getAreasToAvoid(const World& world);
+    std::vector<AvoidArea> getAreasToAvoid(const World &world);
 
     /**
      * A helper function that runs the intent_sequence coroutine and returns the result
