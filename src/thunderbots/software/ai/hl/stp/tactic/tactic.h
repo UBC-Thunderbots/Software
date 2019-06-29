@@ -38,7 +38,7 @@ class Tactic
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes and will never report done
      */
-    explicit Tactic(bool loop_forever);
+    explicit Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_ = {});
 
     /**
      * Returns true if the Tactic is done and false otherwise. If the Tactic is supposed
@@ -63,6 +63,17 @@ class Tactic
      * this Tactic
      */
     void updateRobot(const Robot &robot);
+
+    /**
+     * robot hardware capability requirements of the tactic.
+     */
+    const RobotCapabilityFlags &robotCapabilityRequirements() const;
+
+    /**
+     * Mutable robot hardware capability requirements of the tactic.
+     */
+    RobotCapabilityFlags &mutableRobotCapabilityRequirements();
+
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. The returned cost
@@ -159,4 +170,7 @@ class Tactic
 
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
+
+    // robot capability requirements
+    RobotCapabilityFlags capability_reqs;
 };

@@ -2,10 +2,11 @@
 
 #include "util/logger/init.h"
 
-Tactic::Tactic(bool loop_forever)
+Tactic::Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_)
     : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
       done_(false),
-      loop_forever(loop_forever)
+      loop_forever(loop_forever),
+      capability_reqs(capability_reqs_)
 {
 }
 
@@ -90,4 +91,14 @@ std::unique_ptr<Intent> Tactic::getNextIntentHelper()
     done_ = !static_cast<bool>(next_intent);
 
     return next_intent;
+}
+
+const RobotCapabilityFlags &Tactic::robotCapabilityRequirements() const
+{
+    return capability_reqs;
+}
+
+RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements()
+{
+    return capability_reqs;
 }
