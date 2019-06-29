@@ -28,7 +28,6 @@ class Obstacle
      *
      * @param rectangle
      */
-    // TODO: test me
     Obstacle(Rectangle rectangle);
 
     /**
