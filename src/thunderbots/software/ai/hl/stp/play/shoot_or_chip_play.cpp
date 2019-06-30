@@ -16,9 +16,9 @@
 
 using namespace Evaluation;
 
-const std::string ShootOrChipPlay::name = "Shoot Or Chip Play";
+const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
-ShootOrChipPlay::ShootOrChipPlay() : MIN_NET_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(10)), CHIP_TARGET_FIELD_INSET(0.5) {}
+ShootOrChipPlay::ShootOrChipPlay() : MIN_NET_PERCENT_OPEN_FOR_SHOT(1), CHIP_TARGET_FIELD_INSET(0.5) {}
 
 std::string ShootOrChipPlay::getName() const
 {
@@ -65,7 +65,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)
     };
 
-    auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), MIN_NET_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
+    auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), MIN_NET_PERCENT_OPEN_FOR_SHOT, Point(0,0), false);
 
     do
     {
@@ -110,10 +110,16 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             result.emplace_back(move_to_open_area_tactics[i]);
         }
 
+        // Update chipper
+        shoot_or_chip_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
+        // We want this second in priority only to the goalie
+        result.insert(result.begin()+1, shoot_or_chip_tactic);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
-    } while (true);
+
+        // TODO: termination condition here
+    } while (!shoot_or_chip_tactic->done());
 }
 
 static TPlayFactory<ShootOrChipPlay> factory;

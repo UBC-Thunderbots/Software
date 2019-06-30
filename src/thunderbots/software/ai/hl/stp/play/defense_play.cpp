@@ -1,11 +1,6 @@
 #include "ai/hl/stp/play/defense_play.h"
 
-<<<<<<< HEAD
-#include <ai/hl/stp/tactic/crease_defender_tactic.h>
-
-=======
 #include "ai/hl/stp/tactic/crease_defender_tactic.h"
->>>>>>> wip
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"

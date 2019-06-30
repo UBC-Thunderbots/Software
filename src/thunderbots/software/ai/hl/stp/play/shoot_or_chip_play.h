@@ -24,7 +24,7 @@ class ShootOrChipPlay : public Play
 private:
 
     // The minimum open net percentage we will try to shoot at
-    const Angle MIN_NET_OPEN_ANGLE_FOR_SHOT;
+    const double MIN_NET_PERCENT_OPEN_FOR_SHOT;
 
     const double CHIP_TARGET_FIELD_INSET;
 
