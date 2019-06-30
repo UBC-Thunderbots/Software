@@ -469,7 +469,7 @@ bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
     {
         for (auto &obstacle : obstacles_)
         {
-            if (obstacle.getBoundaryPolygon().containsPoint(p))
+            if (obstacle.containsPoint(p))
             {
                 return false;
             }

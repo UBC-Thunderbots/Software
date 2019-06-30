@@ -1,13 +1,17 @@
 
 #include "obstacle.h"
 
-
-const Polygon& Obstacle::getBoundaryPolygon() const
+const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {
     return _polygon;
 }
 
-Obstacle::Obstacle(Polygon polygon) : _polygon(polygon) {}
+const std::optional<Circle> Obstacle::getBoundaryCircle() const
+{
+    return _circle;
+}
+
+Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polygon)) {}
 
 Obstacle::Obstacle(Rectangle rectangle)
     : Obstacle({rectangle.swCorner(), rectangle.nwCorner(), rectangle.neCorner(),
@@ -171,4 +175,33 @@ Obstacle Obstacle::createBallObstacle(const Ball& ball,
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         ball.position(), radius_cushion, ball.velocity(), false);
+}
+
+bool Obstacle::containsPoint(const Point& point) const
+{
+    if (isPolygon())
+    {
+        return (*_polygon).containsPoint(point);
+    }
+    else
+    {
+        return ((point - (*_circle).getOrigin()).len() < (*_circle).getRadius());
+    }
+}
+
+bool Obstacle::intersects(const Segment& segment) const
+{
+    if (isPolygon())
+    {
+        return (*_polygon).intersects(segment);
+    }
+    else
+    {
+        return (dist((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
+    }
+}
+
+bool Obstacle::isPolygon() const
+{
+    return (bool)_polygon;
 }
