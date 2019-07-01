@@ -23,8 +23,7 @@ class GoalieTactic : public Tactic
 // TODO: comment
      */
     void updateParams(const Ball &ball, const Field &field, const Team &friendly_team,
-                      const Team &enemy_team,
-                      const std::optional<Evaluation::EnemyThreat> &enemy_threat);
+                      const Team &enemy_team);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -44,7 +43,6 @@ class GoalieTactic : public Tactic
     Field field;
     Team friendly_team;
     Team enemy_team;
-    std::optional<Evaluation::EnemyThreat> enemy_threat;
 
     // How slow the ball must be moving for us to clear it from the defense area
     double BALL_SLOW_SPEED_THRESHOLD = 0.2;
