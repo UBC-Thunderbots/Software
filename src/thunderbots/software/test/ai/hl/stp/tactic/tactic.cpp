@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <variant>
+
 #include "test/ai/hl/stp/test_tactics/move_test_tactic.h"
 
 /**
@@ -133,15 +135,31 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
 }
 
 
+// Creates a struct which inherits all lambda function given to it and uses their
+// Ts::operator(). This can be passed to std::visit to easily write multiple different
+// lambdas for each type of motion controller commands below. See
+// https://en.cppreference.com/w/cpp/utility/variant/visit for more details.
+template <class... Ts>
+struct overload : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overload(Ts...)->overload<Ts...>;
 
-typedef std::tuple<std::vector<RefboxGameState>, std::vector<AvoidArea>>
+// Inputs to the gamestate that are not refbox inputs
+enum class GameStateInput {
+    SET_RESTART_COMPLETED
+};
+
+typedef std::tuple<std::vector<std::variant<RefboxGameState, GameStateInput>>, std::vector<AvoidArea>>
     AvoidAreasTestParams;
 
 
-AvoidAreasTestParams makeParams(std::vector<RefboxGameState> refbox_states,
+AvoidAreasTestParams makeParams(std::vector<std::variant<RefboxGameState, GameStateInput>> refbox_states,
                                 std::vector<AvoidArea> avoid_areas)
 {
-    return std::make_tuple<std::vector<RefboxGameState>, std::vector<AvoidArea>>(
+    return std::make_tuple<std::vector<std::variant<RefboxGameState, GameStateInput>>, std::vector<AvoidArea>>(
         std::move(refbox_states), std::move(avoid_areas));
 }
 
@@ -151,33 +169,46 @@ class TacticAvoidAreasTest : public ::testing::TestWithParam<AvoidAreasTestParam
 
 TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
 {
-    std::vector<RefboxGameState> refbox_game_states = std::get<0>(GetParam());
+    std::vector<std::variant<RefboxGameState, GameStateInput>> inputs =
+            std::get<0>(GetParam());
     std::vector<AvoidArea> expected_avoid_areas     = std::get<1>(GetParam());
 
+    // Set the robot on the tactic
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveTestTactic tactic = MoveTestTactic(true);
     tactic.updateRobot(robot);
 
     World world;
-    for (auto refbox_game_state : refbox_game_states)
-    {
-        world.mutableGameState().updateRefboxGameState(refbox_game_state);
+
+    // Process all the inputs to the game state
+    std::string input_str;
+    for (auto input : inputs){
+     std::visit(overload {
+            [&](RefboxGameState refbox_game_state) {
+                world.mutableGameState().updateRefboxGameState(refbox_game_state);
+                std::stringstream ss;
+                ss << refbox_game_state << ", ";
+                input_str += ss.str();
+                },
+            [&](GameStateInput game_state_input) {
+                switch (game_state_input) {
+                    case GameStateInput::SET_RESTART_COMPLETED:
+                        world.mutableGameState().setRestartCompleted();
+                        input_str += "setRestartCompleted, ";
+                        break;
+                    default:
+                        ADD_FAILURE() << "Unhandled input to gamestate";
+                }
+                },
+        }, input);
     }
 
     auto next_intent = tactic.getNextIntent(world);
     ASSERT_TRUE(next_intent);
 
-    std::string refbox_states_str;
-    for (auto state : refbox_game_states)
-    {
-        std::stringstream ss;
-        ss << state << ", ";
-        refbox_states_str += ss.str();
-    }
-
     EXPECT_EQ(expected_avoid_areas, next_intent->getAreasToAvoid())
-        << "Failed with refbox states: " << refbox_states_str;
+        << "Failed with input to gamestate: " << input_str;
 }
 
 // Parameterized test to check that we return the correct areas to avoid for a
