@@ -17,7 +17,8 @@ std::string KickoffEnemyPlay::getName() const
 
 bool KickoffEnemyPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isSetupState() && world.gameState().isTheirKickoff();
+    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
+           world.gameState().isTheirKickoff();
 }
 
 bool KickoffEnemyPlay::invariantHolds(const World &world) const
@@ -95,10 +96,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-            enemy_threats.empty() ? std::nullopt
-                                  : std::make_optional(enemy_threats.at(0)));
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
+                                    world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // keeps track of the next defense position to assign

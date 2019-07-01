@@ -15,13 +15,13 @@ std::string KickoffFriendlyPlay::getName() const
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isPlaying() || world.gameState().isSetupState()) &&
+    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
            world.gameState().isOurKickoff();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
 {
-    return world.ball().position().len() < 1;
+    return !world.gameState().isPlaying();
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -95,10 +95,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-            enemy_threats.empty() ? std::nullopt
-                                  : std::make_optional(enemy_threats.at(0)));
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
+                                    world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // set the requirement that Robot 1 must be able to kick and chip
@@ -123,10 +121,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam(),
-            enemy_threats.empty() ? std::nullopt
-                                  : std::make_optional(enemy_threats.at(0)));
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
+                                    world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
