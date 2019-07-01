@@ -201,7 +201,8 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     }
 
     if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
-        (start - closest_destination).len() < (CLOSE_TO_DEST_THRESHOLD * 2))
+        (start - closest_destination).len() <
+            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
         // start and destination, or start and closest_destination, within threshold
         return std::nullopt;
@@ -381,10 +382,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 {
     if (!isValidAndFreeOfObstacles(p))
     {
-        int xc = (int)(p.x() * RESOLUTION_FACTOR);
-        int yc = (int)(p.y() * RESOLUTION_FACTOR);
+        int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+        int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
 
-        for (int r = 1; r < field_.totalWidth() * RESOLUTION_FACTOR; r++)
+        for (int r = 1; r < field_.totalWidth() * BLOCKED_DESTINATION_SEARCH_RESOLUTION;
+             r++)
         {
             int x = 0, y = r;
             int d = 3 - 2 * r;
@@ -393,10 +395,12 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
             {
                 for (int inner : {-1, 1})
                 {
-                    Point p1 = Point((double)(xc + outer * x) / RESOLUTION_FACTOR,
-                                     (double)(yc + inner * y) / RESOLUTION_FACTOR);
-                    Point p2 = Point((double)(xc + outer * y) / RESOLUTION_FACTOR,
-                                     (double)(yc + inner * x) / RESOLUTION_FACTOR);
+                    Point p1 = Point(
+                        (double)(xc + outer * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                        (double)(yc + inner * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                    Point p2 = Point(
+                        (double)(xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                        (double)(yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
                     if (isValidAndFreeOfObstacles(p1))
                     {
                         return p1;
@@ -432,10 +436,12 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
                 {
                     for (int inner : {-1, 1})
                     {
-                        Point p1 = Point((xc + outer * x) / RESOLUTION_FACTOR,
-                                         (yc + inner * y) / RESOLUTION_FACTOR);
-                        Point p2 = Point((xc + outer * y) / RESOLUTION_FACTOR,
-                                         (yc + inner * x) / RESOLUTION_FACTOR);
+                        Point p1 = Point(
+                            (xc + outer * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                            (yc + inner * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
+                        Point p2 = Point(
+                            (xc + outer * y) / BLOCKED_DESTINATION_SEARCH_RESOLUTION,
+                            (yc + inner * x) / BLOCKED_DESTINATION_SEARCH_RESOLUTION);
                         if (isValidAndFreeOfObstacles(p1))
                         {
                             return p1;
