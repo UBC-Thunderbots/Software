@@ -7,7 +7,8 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(const World &world)
+std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
+    const World &world)
 {
     std::optional<Robot> enemy_goalie_opt = world.enemyTeam().goalie();
 
@@ -38,23 +39,25 @@ std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(const Wor
 
     Point ball_position = world.ball().position();
 
-    return findTargetPointsForIndirectChipAndChase(target_triangles, ball_position);
+    return findTargetPointForIndirectChipAndChase(target_triangles, ball_position);
 }
 
-std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(
+std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
     const std::vector<LegacyTriangle> &triangles, Point ball_position)
 {
-    // Get all valid triangles
-    std::vector<LegacyTriangle> valid_triangles = getAllValidTrianglesSortedBySize(
-        triangles,
-        Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_area.value(),
-        Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_edge_len
-            .value());
-
-    std::vector<Point> target_points;
-    for (const LegacyTriangle &triangle : valid_triangles)
+    if (!triangles.empty())
     {
-        Point target = getTriangleCenter(triangle);
+        // Get the largest triangle within the vector of triangles that has area greater
+        // than minimum area of chip target triangle, and all edge lengths greater than
+        // minimum edge length of chip target triangle
+        std::optional<LegacyTriangle> largest_triangle = getLargestValidTriangle(
+            triangles,
+            Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_area.value(),
+            Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_edge_len
+                .value());
+        LegacyTriangle t = largest_triangle.value();
+
+        Point target = getTriangleCenter(t);
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
         target = target.norm((target - ball_position).len() *
@@ -73,10 +76,12 @@ std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(
                             .value());
         }
 
-        target_points.emplace_back(target);
+        return std::optional(target);
     }
-
-    return target_points;
+    else
+    {
+        return std::nullopt;
+    }
 }
 
 std::vector<LegacyTriangle> Evaluation::getAllTrianglesBetweenEnemyPlayers(
@@ -232,35 +237,40 @@ Rectangle Evaluation::findBestChipTargetArea(const World &world, double inset)
     return target_rectangle;
 }
 
-std::vector<LegacyTriangle> Evaluation::getAllValidTrianglesSortedBySize(
-    std::vector<LegacyTriangle> all_triangles, double min_area, double min_edge_len,
+std::optional<LegacyTriangle> Evaluation::getLargestValidTriangle(
+    std::vector<LegacyTriangle> allTriangles, double min_area, double min_edge_len,
     double min_edge_angle)
 {
-    std::vector<LegacyTriangle> valid_triangles;
-
-    for (auto t : all_triangles)
+    if (!(allTriangles.empty()))
     {
-        double area = getTriangleArea(t);
-        double l1   = (t[1] - t[0]).len();
-        double l2   = (t[2] - t[0]).len();
-        double l3   = (t[2] - t[1]).len();
+        LegacyTriangle largest = allTriangles[0];
+        double largest_area    = getTriangleArea(largest);
 
-        Angle a1 = acuteVertexAngle(t[1], t[0], t[2]).angleMod().abs();
-        Angle a2 = acuteVertexAngle(t[0], t[1], t[2]).angleMod().abs();
-        Angle a3 = acuteVertexAngle(t[0], t[2], t[1]).angleMod().abs();
-
-        if (area >= min_area && l1 >= min_edge_len && l2 >= min_edge_len &&
-            l3 >= min_edge_len && a1.toDegrees() >= min_edge_angle &&
-            a2.toDegrees() >= min_edge_angle && a3.toDegrees() >= min_edge_angle)
+        for (unsigned int i = 0; i < allTriangles.size(); i++)
         {
-            valid_triangles.emplace_back(t);
+            LegacyTriangle t = allTriangles[i];
+            double area      = getTriangleArea(t);
+            double l1        = (t[1] - t[0]).len();
+            double l2        = (t[2] - t[0]).len();
+            double l3        = (t[2] - t[1]).len();
+
+            Angle a1 = acuteVertexAngle(t[1], t[0], t[2]).angleMod().abs();
+            Angle a2 = acuteVertexAngle(t[0], t[1], t[2]).angleMod().abs();
+            Angle a3 = acuteVertexAngle(t[0], t[2], t[1]).angleMod().abs();
+
+            if (area >= largest_area && area >= min_area && l1 >= min_edge_len &&
+                l2 >= min_edge_len && l3 >= min_edge_len &&
+                a1.toDegrees() >= min_edge_angle && a2.toDegrees() >= min_edge_angle &&
+                a3.toDegrees() >= min_edge_angle)
+            {
+                largest      = t;
+                largest_area = area;
+            }
         }
+        return std::optional(largest);
     }
-
-    std::sort(valid_triangles.begin(), valid_triangles.end(),
-              [](LegacyTriangle t1, LegacyTriangle t2) {
-                  return getTriangleArea(t1) < getTriangleArea(t2);
-              });
-
-    return valid_triangles;
+    else
+    {
+        return std::nullopt;
+    }
 }
