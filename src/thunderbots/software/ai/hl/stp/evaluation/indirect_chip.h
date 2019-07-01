@@ -19,7 +19,7 @@ namespace Evaluation
      *
      * @return A vector of points to chip to, in decreasing order of quality
      */
-    std::vector<Point> findTargetPointsForIndirectChipAndChase(const World &world);
+    std::vector<Point> findTargetPointsForIndirectChipAndChase(const World& world);
 
     /**
      * Returns the target point that the chipper and chaser will chip and chase at.
@@ -38,7 +38,7 @@ namespace Evaluation
      * chip and chase at
      */
     std::vector<Point> findTargetPointsForIndirectChipAndChase(
-            const std::vector<LegacyTriangle> &triangles, Point ball_position);
+        const std::vector<LegacyTriangle>& triangles, Point ball_position);
 
     /**
      * Returns a vector of all possible triangles between enemy players and rectangular
@@ -137,6 +137,6 @@ namespace Evaluation
      * @return All the valid triangles, sorted in decreasing size
      */
     std::vector<LegacyTriangle> getAllValidTrianglesSortedBySize(
-            std::vector<LegacyTriangle> all_triangles, double min_area = 0,
-            double min_edge_len = 0, double min_edge_angle = 0);
+        std::vector<LegacyTriangle> all_triangles, double min_area = 0,
+        double min_edge_len = 0, double min_edge_angle = 0);
 };  // namespace Evaluation

@@ -3,11 +3,8 @@
 #include <algorithm>
 #include <boost/geometry/algorithms/intersection.hpp>
 #include <boost/geometry/geometries/segment.hpp>
-#include <boost/polygon/voronoi.hpp>
 #include <cassert>
 #include <cmath>
-#include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 #include <iostream>
 #include <limits>
 #include <tuple>
@@ -16,8 +13,6 @@
 #include "geom/rectangle.h"
 #include "geom/segment.h"
 
-using boost::polygon::voronoi_builder;
-using boost::polygon::voronoi_diagram;
 
 double proj_len(const Segment &first, const Vector &second)
 {
@@ -1304,96 +1299,4 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
     {
         return 0;
     }
-}
-
-
-std::vector<Circle> findOpenCircles(Rectangle rectangle,
-                                                      std::vector<Point> points)
-{
-    // We use a Voronoi Diagram and it's Delaunay triangulation to find the largest
-    // open circles in the field
-    // Reference: https://www.cs.swarthmore.edu/~adanner/cs97/s08/papers/schuster.pdf
-    //
-    // You can think of the Delauney triangulation as a way to connect all the points
-    // (and the rectangle corners) such that every point has three edges, and the
-    // triangles formed are setup to be as regular as possible (ie. we avoid things
-    // like super narrow triangles). The Voronoi diagram is the *dual* of this (scary
-    // math words, I know), which just means you can construct it by taking the center
-    // of each triangle and connecting it to the center of every adjacent triangle.
-    //
-    // So we can take each vertex on our voronoi diagram as the center of a open circle
-    // on the field, and the size of the circle is the distance to the closest vertex
-    // on the triangle that this vertex was created from
-
-    // TODO: instead of just adding the 4 corners of the rectangle here, the proper
-    //       thing to do is to generate the voronoi with just the points given, then
-    //       also treat all intersections of the voronoi diagram with the edge of the
-    //       rectangle as vertices
-    //       https://stackoverflow.com/questions/34093602/efficient-algorithm-to-determine-largest-open-space
-
-    // Add the 4 corners of the rectangle to the list of points
-    points.emplace_back(rectangle.neCorner());
-    points.emplace_back(rectangle.nwCorner());
-    points.emplace_back(rectangle.seCorner());
-    points.emplace_back(rectangle.swCorner());
-
-    // Construct the voronoi diagram
-    voronoi_diagram<double> vd;
-    construct_voronoi(points.begin(), points.end(), &vd);
-
-    // For each vertex, construct it's delauney triangle and then compute the largest
-    // empty circle around it
-    // NOTE: Generally there is a 1:1 mapping from vertex in voronoi diagram to delauney
-    // triangle, but in the case of a degenerate vertex there may be more then one
-    // triangle for a given vertex. We just ignore this case because it normally only
-    // occurs if we created the voronoi diagram from line segments with shared endpoints
-    // (and we don't even give it segments!) see "is_degenerate" here:
-    // https://www.boost.org/doc/libs/1_60_0/libs/polygon/doc/voronoi_diagram.htm
-    // Code is a derivative of the answer to this:
-    // https://stackoverflow.com/questions/34342038/how-to-triangulate-polygons-in-boost
-    std::vector<Circle> empty_circles;
-    for (auto vertex : vd.vertices())
-    {
-        // We only want to consider vertices within our rectangle
-        if (rectangle.containsPoint(Point(vertex.x(), vertex.y()))){
-            std::vector<Point> triangle;
-            auto edge = vertex.incident_edge();
-            do
-            {
-                auto cell = edge->cell();
-                if (!cell->contains_point())
-                {
-                    LOG(WARNING)
-                        << "Found cell without point inside, something is likely seriously wrong";
-                    continue;
-                }
-
-                triangle.push_back(points[cell->source_index()]);
-                if (triangle.size() == 3)
-                {
-                    // Find the smallest distance from the vertex to a vertex on it's
-                    // corresponding delauney triangle
-                    std::vector<double> radii;
-                    for (auto const &triangle_vertex : triangle)
-                    {
-                        radii.emplace_back(
-                                (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
-                    }
-                    double smallest_radius = *std::min_element(radii.begin(), radii.end());
-
-                    empty_circles.emplace_back(Circle(Point(vertex.x(), vertex.y()), smallest_radius));
-
-                    continue;
-                }
-
-                edge = edge->rot_next();
-            } while (edge != vertex.incident_edge());
-        }
-    }
-
-    // Sort the circles in descending order of radius
-    std::sort(empty_circles.begin(), empty_circles.end(),
-              [](auto c1, auto c2) { return c1.getRadius() > c2.getRadius(); });
-
-    return empty_circles;
 }

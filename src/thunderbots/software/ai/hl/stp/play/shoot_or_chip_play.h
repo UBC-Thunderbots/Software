@@ -21,11 +21,9 @@ class ShootOrChipPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 
-private:
-
+   private:
     // The minimum open net percentage we will try to shoot at
     const double MIN_NET_PERCENT_OPEN_FOR_SHOT;
 
     const double CHIP_TARGET_FIELD_INSET;
-
 };

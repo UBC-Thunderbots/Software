@@ -1,28 +1,31 @@
 #include "ai/hl/stp/play/shoot_or_chip_play.h"
 
-#include "ai/hl/stp/tactic/crease_defender_tactic.h"
-#include "ai/hl/stp/evaluation/find_open_areas.h"
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 #include "ai/hl/stp/evaluation/enemy_threat.h"
-#include "ai/hl/stp/evaluation/possession.h"
+#include "ai/hl/stp/evaluation/find_open_areas.h"
 #include "ai/hl/stp/evaluation/indirect_chip.h"
+#include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
-#include "ai/hl/stp/tactic/stop_tactic.h"
 #include "ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "ai/hl/stp/tactic/stop_tactic.h"
 #include "ai/world/game_state.h"
 #include "shared/constants.h"
 #include "util/parameter/dynamic_parameters.h"
-
-#include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
-ShootOrChipPlay::ShootOrChipPlay() : MIN_NET_PERCENT_OPEN_FOR_SHOT(1), CHIP_TARGET_FIELD_INSET(0.5) {}
+ShootOrChipPlay::ShootOrChipPlay()
+    : MIN_NET_PERCENT_OPEN_FOR_SHOT(1), CHIP_TARGET_FIELD_INSET(0.5)
+{
+}
 
 std::string ShootOrChipPlay::getName() const
 {
@@ -66,14 +69,14 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     };
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
-            std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)
-    };
+        std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
-    auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), MIN_NET_PERCENT_OPEN_FOR_SHOT, std::nullopt, false);
+    auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        MIN_NET_PERCENT_OPEN_FOR_SHOT, std::nullopt, false);
 
     do
     {
-
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
@@ -100,30 +103,37 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;
-        for (auto const  & robot : world.enemyTeam().getAllRobots()){
+        for (auto const &robot : world.enemyTeam().getAllRobots())
+        {
             enemy_robot_points.emplace_back(robot.position());
         }
         std::vector<Circle> chip_targets = findGoodChipTargets(world);
-        for (int i = 0; i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++){
+        for (int i = 0; i < chip_targets.size() && i < move_to_open_area_tactics.size();
+             i++)
+        {
             // Face towards the ball
             Angle orientation =
-                    (world.ball().position() - chip_targets[i].getOrigin()).orientation();
+                (world.ball().position() - chip_targets[i].getOrigin()).orientation();
             // Move a bit backwards to make it more likely we'll receive the chip
-            Point position = chip_targets[i].getOrigin() - Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
-;
+            Point position =
+                chip_targets[i].getOrigin() -
+                Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
+            ;
             move_to_open_area_tactics[i]->updateParams(position, orientation, 0.0);
             result.emplace_back(move_to_open_area_tactics[i]);
         }
 
         // Update chipper
         std::optional<Point> chip_target = std::nullopt;
-        if (!chip_targets.empty()){
-         chip_target = chip_targets[0].getOrigin();
+        if (!chip_targets.empty())
+        {
+            chip_target = chip_targets[0].getOrigin();
         }
-        shoot_or_chip_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), chip_target);
+        shoot_or_chip_tactic->updateParams(world.field(), world.friendlyTeam(),
+                                           world.enemyTeam(), world.ball(), chip_target);
 
         // We want this second in priority only to the goalie
-        result.insert(result.begin()+1, shoot_or_chip_tactic);
+        result.insert(result.begin() + 1, shoot_or_chip_tactic);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

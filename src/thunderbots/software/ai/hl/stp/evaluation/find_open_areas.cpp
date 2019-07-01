@@ -17,4 +17,3 @@ std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
 
     return findOpenCircles(target_area_rectangle, enemy_locations);
 }
-

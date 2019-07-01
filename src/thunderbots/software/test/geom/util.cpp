@@ -1349,9 +1349,10 @@ TEST(GeomUtilTest, test_binary_trespass_point_is_outside_rectangle)
     EXPECT_EQ(0, calcBinaryTrespassScore(rectangle, Point(-4, 5)));
 }
 
-TEST(GeomUtilTest, test_find_open_circles_no_points_in_rectangle){
+TEST(GeomUtilTest, test_find_open_circles_no_points_in_rectangle)
+{
     // Test finding the open circles in rectangle with no points
-    Rectangle rectangle(Point(-1,-1), Point(1,1));
+    Rectangle rectangle(Point(-1, -1), Point(1, 1));
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, {});
 
@@ -1361,8 +1362,9 @@ TEST(GeomUtilTest, test_find_open_circles_no_points_in_rectangle){
     EXPECT_DOUBLE_EQ(std::sqrt(2), empty_circles[0].getRadius());
 }
 
-TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle){
-    Rectangle rectangle(Point(-1,-1), Point(1,1));
+TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle)
+{
+    Rectangle rectangle(Point(-1, -1), Point(1, 1));
     std::vector<Point> points = {Point(0.9, 0.9)};
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
@@ -1376,10 +1378,12 @@ TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle){
     EXPECT_DOUBLE_EQ(1, empty_circles[1].getRadius());
 
     EXPECT_EQ(Point(0, 1), empty_circles[2].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.9,2)+std::pow(0.1,2)), empty_circles[2].getRadius());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.9, 2) + std::pow(0.1, 2)),
+                     empty_circles[2].getRadius());
 
     EXPECT_EQ(Point(1, 0), empty_circles[3].getOrigin());
-    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.9,2)+std::pow(0.1,2)), empty_circles[3].getRadius());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.9, 2) + std::pow(0.1, 2)),
+                     empty_circles[3].getRadius());
 }
 
 int main(int argc, char **argv)

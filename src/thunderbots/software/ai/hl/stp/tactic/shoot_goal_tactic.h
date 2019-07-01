@@ -45,7 +45,8 @@ class ShootGoalTactic : public Tactic
      * not provided, the point defaults to the enemy goal
      */
     void updateParams(const Field& field, const Team& friendly_team,
-                      const Team& enemy_team, const Ball& ball, std::optional<Point> chip_target = std::nullopt);
+                      const Team& enemy_team, const Ball& ball,
+                      std::optional<Point> chip_target = std::nullopt);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

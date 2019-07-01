@@ -7,8 +7,7 @@
 #include "geom/util.h"
 #include "shared/constants.h"
 
-std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(
-        const World &world)
+std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(const World &world)
 {
     std::optional<Robot> enemy_goalie_opt = world.enemyTeam().goalie();
 
@@ -43,35 +42,35 @@ std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(
 }
 
 std::vector<Point> Evaluation::findTargetPointsForIndirectChipAndChase(
-        const std::vector<LegacyTriangle> &triangles, Point ball_position)
+    const std::vector<LegacyTriangle> &triangles, Point ball_position)
 {
     // Get all valid triangles
     std::vector<LegacyTriangle> valid_triangles = getAllValidTrianglesSortedBySize(
-            triangles,
-            Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_area.value(),
-            Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_edge_len
-                    .value());
+        triangles,
+        Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_area.value(),
+        Util::DynamicParameters::Evaluation::Indirect_Chip::min_chip_tri_edge_len
+            .value());
 
     std::vector<Point> target_points;
-    for (const LegacyTriangle& triangle : valid_triangles){
-
+    for (const LegacyTriangle &triangle : valid_triangles)
+    {
         Point target = getTriangleCenter(triangle);
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
         target = target.norm((target - ball_position).len() *
                              Util::DynamicParameters::Evaluation::Indirect_Chip::
-                             chip_cherry_power_downscale.value());
+                                 chip_cherry_power_downscale.value());
 
         // Target should never be further away than maximum chip power
         if ((target - ball_position).len() >
             Util::DynamicParameters::Evaluation::Indirect_Chip::max_chip_power.value())
         {
             target =
-                    ball_position +
-                    (target - ball_position)
-                            .norm(
-                                    Util::DynamicParameters::Evaluation::Indirect_Chip::max_chip_power
-                                            .value());
+                ball_position +
+                (target - ball_position)
+                    .norm(
+                        Util::DynamicParameters::Evaluation::Indirect_Chip::max_chip_power
+                            .value());
         }
 
         target_points.emplace_back(target);

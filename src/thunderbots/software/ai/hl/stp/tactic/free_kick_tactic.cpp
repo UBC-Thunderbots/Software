@@ -69,7 +69,7 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             world.ball().position());
 
         auto chip_and_chase_targets =
-                Evaluation::findTargetPointsForIndirectChipAndChase(world);
+            Evaluation::findTargetPointsForIndirectChipAndChase(world);
 
         // Check if there is a shot with a big enough window
         if (best_shot && (std::get<1>(*best_shot) > MIN_SHOT_ANGLE))
@@ -83,8 +83,9 @@ void FreeKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             // Chip and Chase
             // TODO: possibly modify the evaluation so that it chips over the defending
             // enemies
-            double chip_power = (chip_and_chase_targets[0] - world.ball().position()).len() *
-                                CHIP_DISTANCE_SCALING_FACTOR;
+            double chip_power =
+                (chip_and_chase_targets[0] - world.ball().position()).len() *
+                CHIP_DISTANCE_SCALING_FACTOR;
             yield(chip_action.updateStateAndGetNextIntent(
                 *robot, world.ball(), world.ball().position(), chip_and_chase_targets[0],
                 chip_power));

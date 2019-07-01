@@ -25,13 +25,14 @@ std::string ShootGoalTactic::getName() const
 }
 
 void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball, std::optional<Point> chip_target)
+                                   const Team &enemy_team, const Ball &ball,
+                                   std::optional<Point> chip_target)
 {
     this->field         = field;
     this->friendly_team = friendly_team;
     this->enemy_team    = enemy_team;
     this->ball          = ball;
-    this->chip_target = chip_target;
+    this->chip_target   = chip_target;
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
