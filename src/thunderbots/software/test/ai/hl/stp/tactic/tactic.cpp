@@ -134,15 +134,17 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
 
 
 
-typedef std::tuple<std::vector<RefboxGameState>, std::vector<AvoidArea>>
+typedef std::tuple<std::vector<std::pair<RefboxGameState, Point>>, std::vector<AvoidArea>>
     AvoidAreasTestParams;
 
 
-AvoidAreasTestParams makeParams(std::vector<RefboxGameState> refbox_states,
-                                std::vector<AvoidArea> avoid_areas)
+AvoidAreasTestParams makeParams(
+    std::vector<std::pair<RefboxGameState, Point>> refbox_and_ball_states,
+    std::vector<AvoidArea> avoid_areas)
 {
-    return std::make_tuple<std::vector<RefboxGameState>, std::vector<AvoidArea>>(
-        std::move(refbox_states), std::move(avoid_areas));
+    return std::make_tuple<std::vector<std::pair<RefboxGameState, Point>>,
+                           std::vector<AvoidArea>>(std::move(refbox_and_ball_states),
+                                                   std::move(avoid_areas));
 }
 
 class TacticAvoidAreasTest : public ::testing::TestWithParam<AvoidAreasTestParams>
@@ -151,8 +153,9 @@ class TacticAvoidAreasTest : public ::testing::TestWithParam<AvoidAreasTestParam
 
 TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
 {
-    std::vector<RefboxGameState> refbox_game_states = std::get<0>(GetParam());
-    std::vector<AvoidArea> expected_avoid_areas     = std::get<1>(GetParam());
+    std::vector<std::pair<RefboxGameState, Point>> refbox_and_ball_states =
+        std::get<0>(GetParam());
+    std::vector<AvoidArea> expected_avoid_areas = std::get<1>(GetParam());
 
     Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
@@ -160,19 +163,20 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
     tactic.updateRobot(robot);
 
     World world;
-    for (auto refbox_game_state : refbox_game_states)
+    for (auto refbox_and_ball_state : refbox_and_ball_states)
     {
-        world.mutableGameState().updateRefboxGameState(refbox_game_state);
+        Ball ball(refbox_and_ball_state.second, Vector(0, 0), Timestamp::fromSeconds(0));
+        world.mutableGameState().updateRefboxGameState(refbox_and_ball_state.first, ball);
     }
 
     auto next_intent = tactic.getNextIntent(world);
     ASSERT_TRUE(next_intent);
 
     std::string refbox_states_str;
-    for (auto state : refbox_game_states)
+    for (auto state : refbox_and_ball_states)
     {
         std::stringstream ss;
-        ss << state << ", ";
+        ss << state.first << ", ";
         refbox_states_str += ss.str();
     }
 
@@ -182,68 +186,266 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
 
 // Parameterized test to check that we return the correct areas to avoid for a
 // given refbox state
+// clang-format off
 INSTANTIATE_TEST_CASE_P(
     All, TacticAvoidAreasTest,
     ::testing::Values(
         // Halt
-        makeParams({RefboxGameState::HALT},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
-                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
+        makeParams({
+                {RefboxGameState::HALT, {0, 0}}
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_DEFENSE_AREA,
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
         // Stop
-        makeParams({RefboxGameState::STOP}, {AvoidArea::HALF_METER_AROUND_BALL,
-                                             AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                                             AvoidArea::FRIENDLY_DEFENSE_AREA}),
+        makeParams({
+                {RefboxGameState::STOP, {0, 0}}
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
         // Our kickoff setup
-        makeParams({RefboxGameState::PREPARE_KICKOFF_US},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Our kickoff
-        makeParams({RefboxGameState::PREPARE_KICKOFF_US, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+        makeParams({
+                {RefboxGameState::PREPARE_KICKOFF_US, {0, 0}}
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_HALF, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Our kickoff before we've moved the ball
+        makeParams({
+                {RefboxGameState::PREPARE_KICKOFF_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}}
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_HALF, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Our kickoff after we've moved the ball
+        makeParams({
+                {RefboxGameState::PREPARE_KICKOFF_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}}
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
         // Their kickoff setup
-        makeParams({RefboxGameState::PREPARE_KICKOFF_THEM},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
-                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Their kickoff
-        makeParams({RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Their indirect free kick setup
-        makeParams({RefboxGameState::INDIRECT_FREE_THEM},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
-                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Their indirect free kick
-        makeParams({RefboxGameState::INDIRECT_FREE_THEM, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+        makeParams({
+                {RefboxGameState::PREPARE_KICKOFF_THEM, {0, 0}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_HALF, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their kickoff before they've moved the ball
+        makeParams({
+                {RefboxGameState::PREPARE_KICKOFF_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_HALF, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their kickoff after they've moved the ball
+        makeParams({
+                {RefboxGameState::PREPARE_KICKOFF_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}}
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA,
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }
+        ),
         // Our indirect free kick setup
-        makeParams({RefboxGameState::INDIRECT_FREE_US},
-                   {AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Our indirect free kick
-        makeParams({RefboxGameState::INDIRECT_FREE_US, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Their direct free kick setup
-        makeParams({RefboxGameState::DIRECT_FREE_THEM},
-                   {AvoidArea::HALF_METER_AROUND_BALL, AvoidArea::ENEMY_DEFENSE_AREA,
-                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Their direct free kick
-        makeParams({RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+        makeParams({
+                {RefboxGameState::INDIRECT_FREE_US, {0, 0}},
+            },
+            {
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Our indirect free kick before we've moved the ball
+        makeParams({
+                {RefboxGameState::INDIRECT_FREE_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Our indirect free kick after we've moved the ball
+        makeParams({
+                {RefboxGameState::INDIRECT_FREE_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}},
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their indirect free kick setup
+        makeParams({
+                {RefboxGameState::INDIRECT_FREE_THEM, {0, 0}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their indirect free kick before they've moved the ball
+        makeParams({
+                {RefboxGameState::INDIRECT_FREE_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their indirect free kick after they've moved the ball
+        makeParams({
+                {RefboxGameState::INDIRECT_FREE_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}},
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
         // Our direct free kick setup
-        makeParams({RefboxGameState::DIRECT_FREE_US},
-                   {AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                    AvoidArea::FRIENDLY_DEFENSE_AREA}),
-        // Our direct free kick
-        makeParams({RefboxGameState::DIRECT_FREE_US, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+        makeParams({
+                {RefboxGameState::DIRECT_FREE_US, {0, 0}},
+            },
+            {
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Our direct free kick before we've moved the ball
+        makeParams({
+                {RefboxGameState::DIRECT_FREE_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Our direct free kick after we've moved the ball
+        makeParams({
+                {RefboxGameState::DIRECT_FREE_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}},
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their direct free kick setup
+        makeParams({
+                {RefboxGameState::DIRECT_FREE_THEM, {0, 0}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their direct free kick before they've moved the ball
+        makeParams({
+                {RefboxGameState::DIRECT_FREE_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
+        // Their direct free kick after they've moved the ball
+        makeParams({
+                {RefboxGameState::DIRECT_FREE_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}},
+            },
+            {
+                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::FRIENDLY_DEFENSE_AREA
+            }),
         // Our penalty kick setup
-        makeParams({RefboxGameState::PREPARE_PENALTY_US}, {AvoidArea::ENEMY_HALF}),
+        makeParams({
+                {RefboxGameState::PREPARE_PENALTY_US, {0, 0}},
+            },
+            {
+                AvoidArea::ENEMY_HALF, 
+            }),
         // Our penalty kick
-        makeParams({RefboxGameState::PREPARE_PENALTY_US, RefboxGameState::NORMAL_START},
-                   {AvoidArea::ENEMY_HALF}),
+        makeParams({
+                {RefboxGameState::PREPARE_PENALTY_US, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::ENEMY_HALF, 
+            }),
         // Their penalty kick setup
-        makeParams({RefboxGameState::PREPARE_PENALTY_THEM}, {AvoidArea::FRIENDLY_HALF}),
+        makeParams({
+                {RefboxGameState::PREPARE_PENALTY_THEM, {0, 0}},
+            },
+            {
+                AvoidArea::FRIENDLY_HALF, 
+            }),
         // Their penalty kick
-        makeParams({RefboxGameState::PREPARE_PENALTY_THEM, RefboxGameState::NORMAL_START},
-                   {AvoidArea::FRIENDLY_HALF})));
+        makeParams({
+                {RefboxGameState::PREPARE_PENALTY_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+            },
+            {
+                AvoidArea::FRIENDLY_HALF, 
+            })
+        ));
+// clang-format on
+
+
+// class TacticCheckAvoidAreasTest : public ::testing::Test
+//{
+// protected:
+//    void setup(){
+//
+//        // Add a robot to a tactic
+//        Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(),
+//        AngularVelocity::zero(),
+//                            Timestamp::fromSeconds(0));
+//        tactic.updateRobot(robot);
+//
+//    }
+//
+//    World world;
+//    Ball ball;
+//    MoveTestTactic tactic;
+//};
+//
+// TEST_F(TacticCheckAvoidAreasTest, check_default_avoid_areas_halt_state){
+////    // Halt
+////    makeParams({RefboxGameState::HALT},
+////               ),
+//    world.mutableGameState().updateRefboxGameState(RefboxGameState::HALT, ball);
+//
+//    auto next_intent = tactic.getNextIntent(world);
+//    ASSERT_TRUE(next_intent);
+//
+//    std::vector<AvoidArea> expected_avoid_areas = {AvoidArea::HALF_METER_AROUND_BALL,
+//    AvoidArea::ENEMY_DEFENSE_AREA,
+//                                                   AvoidArea::FRIENDLY_DEFENSE_AREA};
+//    EXPECT_EQ(expected_avoid_areas, next_intent->getAreasToAvoid())
+//}
+
 
 TEST(TacticTest, test_and_remove_extra_avoid_areas)
 {
@@ -300,7 +502,9 @@ TEST(TacticTest, test_whitelisted_areas_are_ignored)
     tactic.updateRobot(robot);
 
     World world;
-    world.mutableGameState().updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
+    world.mutableGameState().updateRefboxGameState(
+        RefboxGameState::DIRECT_FREE_THEM,
+        Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     tactic.addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
