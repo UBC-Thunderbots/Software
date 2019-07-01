@@ -42,12 +42,12 @@ add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
 add_definitions(-fno-common) # Do not allow multiple definitions of the same global variable
 add_definitions(-Werror) # Treat warnings as errors, so they don't build up
 
+
+
 ### Set compiler flags only for cpp code. These flags do not work for C files ###
 # Warn if parent classes do not define a virtual destructor
 # See https://www.quantstart.com/articles/C-Virtual-Destructors-How-to-Avoid-Memory-Leaks
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wnon-virtual-dtor")
-
-
 
 #############################################
 ## Find and include packages and libraries ##
@@ -131,14 +131,21 @@ include_directories(
 file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
         )
-add_library(tbots_geom ${TBOTS_GEOM_LIB_SRC})
+add_library(tbots_geom STATIC
+    ${TBOTS_GEOM_LIB_SRC}
+    )
 add_dependencies(tbots_geom ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tbots_geom
+    ${G3LOG}
+    )
 
 # Time
 file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
         )
-add_library(tbots_time ${TBOTS_TIME_LIB_SRC})
+add_library(tbots_time STATIC 
+    ${TBOTS_TIME_LIB_SRC}
+    )
 target_link_libraries(tbots_time
     ${G3LOG}
     )
@@ -148,23 +155,65 @@ add_dependencies(tbots_time ${catkin_EXPORTED_TARGETS})
 file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
         )
-add_library(tbots_parameter ${TBOTS_PARAMETER_LIB_SRC})
+add_library(tbots_parameter STATIC 
+    ${TBOTS_PARAMETER_LIB_SRC}
+    )
 target_link_libraries(tbots_parameter
     ${catkin_LIBRARIES}
     )
 add_dependencies(tbots_parameter ${catkin_EXPORTED_TARGETS})
 
-# Refbox Utils
-add_library(tbots_refbox_util
-    util/refbox_constants.cpp
+# Primitive 
+file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+        )
+add_library(tbots_primitive STATIC 
+    ${TBOTS_PRIMITIVE_LIB_SRC}
     )
+target_link_libraries(tbots_primitive
+    ${G3LOG}
+    )
+add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
+
+# Intent
+file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/intent/*.cpp
+        )
+add_library(tbots_intent STATIC
+    ${TBOTS_INTENT_LIB_SRC}
+    )
+target_link_libraries(tbots_intent
+    tbots_primitive
+    )
+add_dependencies(tbots_intent ${catkin_EXPORTED_TARGETS})
+
+# Action
+file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
+        )
+add_library(tbots_action STATIC
+    ${TBOTS_ACTION_LIB_SRC}
+    )
+target_link_libraries(tbots_action
+    ${Boost_LIBRARIES}
+    tbots_intent
+    )
+add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
+
+
+# Refbox Utils
+add_library(tbots_refbox_util STATIC
+        util/refbox_constants.cpp
+        )
 add_dependencies(tbots_refbox_util ${catkin_EXPORTED_TARGETS})
 
 # World
 file(GLOB_RECURSE TBOTS_WORLD_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
         )
-add_library(tbots_world ${TBOTS_WORLD_LIB_SRC})
+add_library(tbots_world STATIC 
+    ${TBOTS_WORLD_LIB_SRC}
+    )
 target_link_libraries(tbots_world
     ${G3LOG}
     tbots_time
@@ -173,11 +222,13 @@ target_link_libraries(tbots_world
     )
 add_dependencies(tbots_world ${catkin_EXPORTED_TARGETS})
 
-# Canvas Messenger
+# Canvas Messenger 
 file(GLOB_RECURSE TBOTS_CANVAS_MESSENGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/util/canvas_messenger/*.cpp
         )
-add_library(tbots_canvas_messenger ${TBOTS_CANVAS_MESSENGER_LIB_SRC})
+add_library(tbots_canvas_messenger STATIC
+    ${TBOTS_CANVAS_MESSENGER_LIB_SRC}
+    )
 target_link_libraries(tbots_canvas_messenger
     ${catkin_LIBRARIES}
     ${G3LOG}
@@ -185,22 +236,27 @@ target_link_libraries(tbots_canvas_messenger
 add_dependencies(tbots_canvas_messenger ${catkin_EXPORTED_TARGETS})
 
 # ROS Message Utils
-add_library(tbots_ros_msg_util
-    util/ros_messages.cpp
-    )
+add_library(tbots_ros_msg_util STATIC
+        util/ros_messages.cpp
+        )
 add_dependencies(tbots_ros_msg_util ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tbots_ros_msg_util
+    tbots_world
+    )
 
 # Math Utils
-add_library(tbots_math
-    util/math_functions.cpp
-    )
+add_library(tbots_math STATIC
+        util/math_functions.cpp
+        )
 
 # Evaluation
 file(GLOB TBOTS_EVALUATION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/evaluation/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/evaluation/*.cpp
         )
-add_library(tbots_evaluation ${TBOTS_EVALUATION_LIB_SRC})
+add_library(tbots_evaluation STATIC
+    ${TBOTS_EVALUATION_LIB_SRC}
+    )
 target_link_libraries(tbots_evaluation
     tbots_geom
     tbots_parameter
@@ -212,7 +268,9 @@ target_link_libraries(tbots_evaluation
 file(GLOB_RECURSE TBOTS_PASSING_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/passing/*.cpp
         )
-add_library(tbots_passing ${TBOTS_PASSING_LIB_SRC})
+add_library(tbots_passing STATIC
+    ${TBOTS_PASSING_LIB_SRC}
+    )
 target_link_libraries(tbots_passing
     tbots_evaluation
     tbots_geom
@@ -221,35 +279,13 @@ target_link_libraries(tbots_passing
     tbots_world
     )
 
-# Action
-file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
-        )
-add_library(tbots_action
-    ${TBOTS_ACTION_LIB_SRC}
-    )
-target_link_libraries(tbots_action
-    ${Boost_LIBRARIES}
-    )
-add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
-
-# Play
-file(GLOB TBOTS_PLAYS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
-        )
-add_library(tbots_play ${TBOTS_PLAYS_LIB_SRC})
-target_link_libraries(tbots_play
-    ${Boost_LIBRARIES}
-    tbots_evaluation
-    tbots_passing
-    )
-add_dependencies(tbots_play ${catkin_EXPORTED_TARGETS})
-
 # Tactic
 file(GLOB TBOTS_TACTIC_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/tactic/*.cpp
         )
-add_library(tbots_tactic ${TBOTS_TACTIC_LIB_SRC})
+add_library(tbots_tactic STATIC 
+    ${TBOTS_TACTIC_LIB_SRC}
+    )
 target_link_libraries(tbots_tactic
     ${Boost_LIBRARIES}
     tbots_action
@@ -259,11 +295,28 @@ target_link_libraries(tbots_tactic
     )
 add_dependencies(tbots_tactic ${catkin_EXPORTED_TARGETS})
 
+# Play
+file(GLOB TBOTS_PLAYS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
+        )
+add_library(tbots_play STATIC 
+    ${TBOTS_PLAYS_LIB_SRC}
+    )
+target_link_libraries(tbots_play
+    ${Boost_LIBRARIES}
+    tbots_tactic
+    tbots_evaluation
+    tbots_passing
+    )
+add_dependencies(tbots_play ${catkin_EXPORTED_TARGETS})
+
 # Navigator
 file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/navigator/*.cpp
         )
-add_library(tbots_navigator STATIC ${TBOTS_NAVIGATOR_LIB_SRC})
+add_library(tbots_navigator STATIC 
+    ${TBOTS_NAVIGATOR_LIB_SRC}
+    )
 target_link_libraries(tbots_navigator
     tbots_geom
     tbots_math
@@ -272,32 +325,11 @@ target_link_libraries(tbots_navigator
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
-# Primitive
-file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
-        )
-add_library(tbots_primitive ${TBOTS_PRIMITIVE_LIB_SRC})
-target_link_libraries(tbots_primitive
-    ${G3LOG}
-    )
-add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
-
-# Intent
-file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/intent/*.cpp
-        )
-add_library(tbots_intent ${TBOTS_INTENT_LIB_SRC})
-target_link_libraries(tbots_intent
-    tbots_primitive
-    )
-add_dependencies(tbots_intent ${catkin_EXPORTED_TARGETS})
-
 # Test Utils
-add_library(tbots_test_util
-    test/test_util/test_util.cpp
-    )
-target_link_libraries(tbots_intent
-    tbots_primitive
+add_library(tbots_test_util STATIC
+        test/test_util/test_util.cpp
+        )
+target_link_libraries(tbots_test_util
     tbots_time
     tbots_world
     )
@@ -308,10 +340,10 @@ target_link_libraries(tbots_intent
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 ## Find the generated files
 file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
-add_library(tbots_proto
+add_library(tbots_proto STATIC
     ${TBOTS_PROTO_SRCS}
     )
-target_link_libraries(tbots_proto
+target_link_libraries(tbots_proto 
     ${PROTOBUF_LIBRARIES}
     )
 
@@ -321,7 +353,9 @@ file(GLOB TBOTS_SHARED_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.c
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.h
         )
-add_library(tbots_shared ${TBOTS_SHARED_LIB_SRC})
+add_library(tbots_shared STATIC 
+    ${TBOTS_SHARED_LIB_SRC}
+    )
 
 #################
 ## Executables ##
@@ -352,6 +386,11 @@ target_link_libraries(network_input
 file(GLOB AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/*.cpp
+        # We include all the plays here so that that the static variables in 
+        # the .cpp files that auto-register plays with the PlayFactory. This 
+        # addresses the issue explained here:
+        # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
         )
 add_executable (ai_logic
         ${AI_LOGIC_SRC}
@@ -359,7 +398,8 @@ add_executable (ai_logic
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ai_logic ${catkin_LIBRARIES}
+target_link_libraries(ai_logic 
+        ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
         ${G3LOG}
         tbots_geom
@@ -431,11 +471,11 @@ add_executable (parameters
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
 # We also make sure we've generated parameters before building this target
-add_dependencies(parameters
-    thunderbots_gencfg
+add_dependencies(parameters 
+    thunderbots_gencfg 
     ${catkin_EXPORTED_TARGETS}
     )
-target_link_libraries(parameters
+target_link_libraries(parameters  
         ${catkin_LIBRARIES}
         tbots_proto
         tbots_shared
@@ -501,15 +541,11 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(geom_util_test
             test/geom/util.cpp
-            geom/util.cpp
-            geom/util.h
-            geom/point.h
-            geom/angle.h
-            geom/segment.h
-            geom/ray.h
-            geom/circle.h
-            geom/line.h)
-    target_link_libraries(geom_util_test ${catkin_LIBRARIES})
+            )
+    target_link_libraries(geom_util_test
+            ${catkin_LIBRARIES}
+            tbots_geom
+            )
 
     catkin_add_gtest(nav_util_test
             test/ai/navigator/util.cpp
@@ -531,7 +567,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(ros_message_util_test
             test/util/ros_messages.cpp
             )
-    target_link_libraries(ros_message_util_test
+    target_link_libraries(ros_message_util_test 
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
@@ -549,7 +585,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/world/world.cpp
             test/ai/world/robot_capabilities.cpp
             )
-    target_link_libraries(world_test
+    target_link_libraries(world_test 
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
@@ -561,7 +597,7 @@ if (CATKIN_ENABLE_TESTING)
             test/test_util/test_util_test.cpp
             )
 
-    target_link_libraries(test_util_test
+    target_link_libraries(test_util_test 
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_world
@@ -580,7 +616,7 @@ if (CATKIN_ENABLE_TESTING)
             test/grsim_communication/main.cpp
             test/grsim_communication/motion_controller.cpp
             )
-    target_link_libraries(grsim_communication_test
+    target_link_libraries(grsim_communication_test 
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_proto
@@ -606,7 +642,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/primitive/main.cpp
             )
 
-    target_link_libraries(primitive_test
+    target_link_libraries(primitive_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_primitive
@@ -617,7 +653,7 @@ if (CATKIN_ENABLE_TESTING)
             test/radio_communication/visitor/mrf_primitive_visitor.cpp
             radio_communication/visitor/mrf_primitive_visitor.cpp
             )
-    target_link_libraries(mrf_primitive_visitor_test
+    target_link_libraries(mrf_primitive_visitor_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_primitive
@@ -639,7 +675,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/evaluation/pass.cpp
             test/ai/evaluation/main.cpp
             )
-    target_link_libraries(shared_evaluation_test
+    target_link_libraries(shared_evaluation_test 
         ${catkin_LIBRARIES}
         tbots_world
         )
@@ -656,7 +692,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/evaluation/robot.cpp
             test/ai/hl/stp/evaluation/team.cpp
             )
-    target_link_libraries(ai_evaluation_test
+    target_link_libraries(ai_evaluation_test 
         ${G3LOG}
         tbots_evaluation
         tbots_world
@@ -799,7 +835,7 @@ if (CATKIN_ENABLE_TESTING)
             # TODO: (Issue #655) un-comment this and fix the flaky tests in it
             # test/ai/passing/pass_generator.cpp
             )
-    target_link_libraries(passing_test
+    target_link_libraries(passing_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_passing
@@ -820,7 +856,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
             )
-    target_link_libraries(evaluation_detect_threat_test
+    target_link_libraries(evaluation_detect_threat_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_geom
@@ -949,18 +985,18 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(logger_test test/util/logger_test.test
             test/util/logger_test.cpp
             )
-    target_link_libraries(logger_test
+    target_link_libraries(logger_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
         tbots_time
         )
 
     # The test node that verifies the rostest utils are working correctly
-    add_rostest_gtest(rostest_util_test
+    add_rostest_gtest(rostest_util_test 
         test/test_util/rostest_util_test.test
         test/test_util/rostest_util_test.cpp
         )
-    target_link_libraries(rostest_util_test
+    target_link_libraries(rostest_util_test 
         ${catkin_LIBRARIES}
         tbots_time
         )
@@ -969,17 +1005,17 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp
             )
-    target_link_libraries(dynamic_parameters_test
+    target_link_libraries(dynamic_parameters_test 
         ${catkin_LIBRARIES}
         tbots_parameter
         )
 
     # The test node that verifies the dynamic_parameters exist in the parameter server
-    add_rostest_gtest(check_parameter_existance_test
+    add_rostest_gtest(check_parameter_existance_test 
         test/util/rostest_parameter_exists.test
         test/util/test_parameter_exists.cpp
         )
-    target_link_libraries(check_parameter_existance_test
+    target_link_libraries(check_parameter_existance_test 
         ${catkin_LIBRARIES}
         tbots_parameter
         )
