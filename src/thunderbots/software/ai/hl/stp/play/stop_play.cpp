@@ -28,9 +28,9 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
     //  - 1 robot will be the goalie
     //  - 2 robots will assist the goalie in blocking the ball, they will snap
     //      to the best fit semicircle around the defense area
-    //  - 3 robots will stay within 0.5m of the ball facing the enemy net
+    //  - 3 robots will stay within 0.5m of the ball, evenly spaced
     //
-    //  If x represents the ball and G represents the goalie before, the following
+    //  If x represents the ball and G represents the goalie, the following
     //  diagram depicts a possible outcome of this play
     //
     // 		+--------------------+--------------------+
@@ -77,17 +77,19 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                   : std::make_optional(enemy_threats.at(0)));
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
-        // defense point is the point on the semicircle around the friendly defense area,
-        // that can block the direct path to the net from the ball. The robot positioning
-        // vector will be used to position the robots on the tangent line on that
-        // semicircle
+        // a unit vector from the center of the goal to the ball
         Vector goal_to_ball_unit_vector =
             (world.field().friendlyGoal() - world.ball().position()).norm();
+
+        // defense_point_center is a point on the semicircle around the friendly defense
+        // area, that can block the direct path from the ball to the net.
+        // robot_positioning_unit_vector will be used to position the robots on the
+        // tangent line on that semicircle
         Vector robot_positiioning_unit_vector = goal_to_ball_unit_vector.perp();
         Point defense_point_center =
             world.field().friendlyGoal() - radius * goal_to_ball_unit_vector;
 
-        // position robots son either side of defense point
+        // position robots on either side of the "defense point"
         Point defense_point_left = defense_point_center + robot_positiioning_unit_vector *
                                                               2 * ROBOT_MAX_RADIUS_METERS;
         Point defense_point_right =
@@ -101,8 +103,9 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
             defense_point_right,
             (world.ball().position() - defense_point_right).orientation(), 0);
 
-        // Move the robots in a triangle around the ball, facing the ball, this behaviour
-        // is very similar to the example play when there are only 3 robots
+        // move the robots in a triangle around the ball, facing the ball, this behaviour
+        // is very similar to the example play when there are only 3 robots, except spaced
+        // 0.5m away from the ball
         Angle angle_between_robots = Angle::full() / 3;
         move_tactics.at(2)->updateParams(
             world.ball().position() +
