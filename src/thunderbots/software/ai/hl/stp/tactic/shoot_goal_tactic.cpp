@@ -25,12 +25,13 @@ std::string ShootGoalTactic::getName() const
 }
 
 void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball)
+                                   const Team &enemy_team, const Ball &ball, std::optional<Point> chip_target)
 {
     this->field         = field;
     this->friendly_team = friendly_team;
     this->enemy_team    = enemy_team;
     this->ball          = ball;
+    this->chip_target = chip_target;
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -123,7 +124,6 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     ChipAction chip_action = ChipAction();
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
 
-    Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
     do
     {
         auto shot_target = getShotData();
@@ -140,6 +140,7 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // If an enemy is about to steal the ball from us, we try chip over them to
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
+            Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
             yield(chip_action.updateStateAndGetNextIntent(
                 *robot, ball, ball.position(), fallback_chip_target, CHIP_DIST));
         }

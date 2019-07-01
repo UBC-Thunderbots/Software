@@ -1325,6 +1325,12 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle,
     // on the field, and the size of the circle is the distance to the closest vertex
     // on the triangle that this vertex was created from
 
+    // TODO: instead of just adding the 4 corners of the rectangle here, the proper
+    //       thing to do is to generate the voronoi with just the points given, then
+    //       also treat all intersections of the voronoi diagram with the edge of the
+    //       rectangle as vertices
+    //       https://stackoverflow.com/questions/34093602/efficient-algorithm-to-determine-largest-open-space
+
     // Add the 4 corners of the rectangle to the list of points
     points.emplace_back(rectangle.neCorner());
     points.emplace_back(rectangle.nwCorner());
@@ -1348,38 +1354,41 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle,
     std::vector<Circle> empty_circles;
     for (auto vertex : vd.vertices())
     {
-        std::vector<Point> triangle;
-        auto edge = vertex.incident_edge();
-        do
-        {
-            auto cell = edge->cell();
-            if (!cell->contains_point())
+        // We only want to consider vertices within our rectangle
+        if (rectangle.containsPoint(Point(vertex.x(), vertex.y()))){
+            std::vector<Point> triangle;
+            auto edge = vertex.incident_edge();
+            do
             {
-                LOG(WARNING)
-                    << "Found cell without point inside, something is likely seriously wrong";
-                continue;
-            }
-
-            triangle.push_back(points[cell->source_index()]);
-            if (triangle.size() == 3)
-            {
-                // Find the smallest distance from the vertex to a vertex on it's
-                // corresponding delauney triangle
-                std::vector<double> radii;
-                for (auto const &triangle_vertex : triangle)
+                auto cell = edge->cell();
+                if (!cell->contains_point())
                 {
-                    radii.emplace_back(
-                        (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
+                    LOG(WARNING)
+                        << "Found cell without point inside, something is likely seriously wrong";
+                    continue;
                 }
-                double smallest_radius = *std::min_element(radii.begin(), radii.end());
 
-                empty_circles.emplace_back(Circle(Point(vertex.x(), vertex.y()), smallest_radius));
+                triangle.push_back(points[cell->source_index()]);
+                if (triangle.size() == 3)
+                {
+                    // Find the smallest distance from the vertex to a vertex on it's
+                    // corresponding delauney triangle
+                    std::vector<double> radii;
+                    for (auto const &triangle_vertex : triangle)
+                    {
+                        radii.emplace_back(
+                                (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
+                    }
+                    double smallest_radius = *std::min_element(radii.begin(), radii.end());
 
-                continue;
-            }
+                    empty_circles.emplace_back(Circle(Point(vertex.x(), vertex.y()), smallest_radius));
 
-            edge = edge->rot_next();
-        } while (edge != vertex.incident_edge());
+                    continue;
+                }
+
+                edge = edge->rot_next();
+            } while (edge != vertex.incident_edge());
+        }
     }
 
     // Sort the circles in descending order of radius
