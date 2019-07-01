@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ai/world/ball.h"
 #include "geom/point.h"
 #include "util/refbox_constants.h"
 
@@ -22,6 +23,7 @@ class GameState
         HALT,    // Robots must not move
         STOP,    // Robots must stay a set distance away from ball
         SETUP,   // Robots not on starting team must stay a set distance away from ball
+        READY,   // A robot on the starting team may kick the ball
         PLAYING  // Normal play
     };
 
@@ -39,6 +41,7 @@ class GameState
     State state;
     RestartReason restart_reason;
     RefboxGameState game_state;
+    std::optional<Ball> ball_state;
 
     // True if our team can kick the ball during a restart
     bool our_restart;
@@ -54,7 +57,14 @@ class GameState
      *
      * @param gameState the RefboxGameState from backend_input
      */
-    void updateRefboxGameState(RefboxGameState gameState);
+    void updateRefboxGameState(RefboxGameState gameState, const Ball &ball);
+
+    /**
+     * Clears restart state and enters normal play. Should be
+     * called when state transitions from a restart setup state
+     * such as PREPARE_KICKOFF_FRIENDLY into NORMAL_START.
+     */
+    void setRestartCompleted();
 
     /**
      * Returns the current Refbox game state
@@ -228,7 +238,7 @@ class GameState
      *
      * @return true if opposing side is taking an indirect free kick.
      */
-    bool isTheirIndirectFree() const;
+    bool isTheirIndirect() const;
 
     /**
      * Returns true if opposing side is taking any type of free kick.
@@ -246,12 +256,33 @@ class GameState
     bool isTheirBallPlacement() const;
 
     /**
+     * Returns true if robots should be setting up for a restart e.g.
+     * if a free kick is going to occur.
+     *
+     * @return true if robots should be setting up for a restart
+     */
+    bool isSetupRestart() const;
+
+    /**
      * Returns true if we are currently getting ready for a kickoff or restart.
      * e.g. Getting ready to kick the ball for a free kick.
      *
      * @return true if we are currently getting ready for a kickoff or restart
      */
     bool isSetupState() const;
+    /**
+     * Returns true if we are ready for a kickoff or restart.
+     *
+     * @return  true if we are ready for a kickoff or restart.
+     */
+    bool isReadyState() const;
+
+    /**
+     * Returns true if we can kick the ball.
+     *
+     * @return  true if we can kick the ball.
+     */
+    bool canKick() const;
 
     /**
      * Returns true if we should stay a set distance from the ball.
@@ -260,6 +291,14 @@ class GameState
      * @return  true if robots should stay a set distance from the ball.
      */
     bool stayAwayFromBall() const;
+
+    /**
+     * Returns true if robots should stay on their team's side of the field.
+     * See Robocup SSL Rules Law 8.2.1.
+     *
+     * @return  true if robots should stay on their team's side of the field.
+     */
+    bool stayOnSide() const;
 
     /**
      * Returns true if our robots except the penalty kicker should stay on
