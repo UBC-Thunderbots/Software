@@ -23,7 +23,7 @@ using namespace Evaluation;
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
 ShootOrChipPlay::ShootOrChipPlay()
-    : MIN_NET_PERCENT_OPEN_FOR_SHOT(1), CHIP_TARGET_FIELD_INSET(0.5)
+    : MIN_NET_PERCENT_OPEN_FOR_SHOT(1)
 {
 }
 
