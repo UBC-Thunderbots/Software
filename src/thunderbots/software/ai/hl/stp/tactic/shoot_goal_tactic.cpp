@@ -83,7 +83,7 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
                                             IntentCoroutine::push_type &yield) const
 {
     auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                             enemy_team, ball.position());
+                                                           enemy_team, ball.position());
     while (shot_target)
     {
         if (!isEnemyAboutToStealBall())
@@ -103,7 +103,7 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                               enemy_team, ball.position());
+                                                          enemy_team, ball.position());
     }
 }
 
@@ -115,8 +115,8 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
     do
     {
-        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                          enemy_team, ball.position());
+        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position());
         if (shot_target && shot_target->second > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the

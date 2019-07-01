@@ -22,10 +22,7 @@ using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
-ShootOrChipPlay::ShootOrChipPlay()
-    : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4))
-{
-}
+ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4)) {}
 
 std::string ShootOrChipPlay::getName() const
 {

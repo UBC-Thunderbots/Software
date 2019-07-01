@@ -1307,8 +1307,7 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point)
 }
 
 
-std::vector<Circle> findOpenCircles(Rectangle rectangle,
-                                                      std::vector<Point> points)
+std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points)
 {
     // We use a Voronoi Diagram and it's Delaunay triangulation to find the largest
     // open circles in the field
@@ -1355,7 +1354,8 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle,
     for (auto vertex : vd.vertices())
     {
         // We only want to consider vertices within our rectangle
-        if (rectangle.containsPoint(Point(vertex.x(), vertex.y()))){
+        if (rectangle.containsPoint(Point(vertex.x(), vertex.y())))
+        {
             std::vector<Point> triangle;
             auto edge = vertex.incident_edge();
             do
@@ -1377,11 +1377,13 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle,
                     for (auto const &triangle_vertex : triangle)
                     {
                         radii.emplace_back(
-                                (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
+                            (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
                     }
-                    double smallest_radius = *std::min_element(radii.begin(), radii.end());
+                    double smallest_radius =
+                        *std::min_element(radii.begin(), radii.end());
 
-                    empty_circles.emplace_back(Circle(Point(vertex.x(), vertex.y()), smallest_radius));
+                    empty_circles.emplace_back(
+                        Circle(Point(vertex.x(), vertex.y()), smallest_radius));
 
                     continue;
                 }

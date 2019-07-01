@@ -577,12 +577,17 @@ typedef Point Vector;
 // into boost algorithms
 BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(Point, double, cs::cartesian, x, y, setX, setY)
 template <>
-struct boost::polygon::geometry_concept<Point> { typedef point_concept type; };
+struct boost::polygon::geometry_concept<Point>
+{
+    typedef point_concept type;
+};
 template <>
-struct boost::polygon::point_traits<Point> {
+struct boost::polygon::point_traits<Point>
+{
     typedef int coordinate_type;
 
-    static inline coordinate_type get(const Point& point, orientation_2d orient) {
+    static inline coordinate_type get(const Point &point, orientation_2d orient)
+    {
         return (orient == HORIZONTAL) ? point.x() : point.y();
     }
 };
