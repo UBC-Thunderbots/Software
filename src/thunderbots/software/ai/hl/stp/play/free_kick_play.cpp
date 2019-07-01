@@ -32,6 +32,7 @@ std::string FreeKickPlay::getName() const
 
 bool FreeKickPlay::isApplicable(const World &world) const
 {
+    // TODO: add condition to distinguih this from corner kick
     return world.gameState().isOurFreeKick();
 }
 
@@ -63,7 +64,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Have two robots patrol along a line near the sides of the field
     // TODO: make these two patrollers into "crease defenders"
     double half_field_width        = world.field().width() / 2;
-    double patrol_point_y_position = half_field_width - half_field_width / 4;
+    double patrol_point_y_position = half_field_width - half_field_width / 4; // TODO: eh?
     auto patrol_tactic_pos_y =
         std::make_shared<PatrolTactic>(std::vector<Point>({
                                            Point(0, patrol_point_y_position),
@@ -110,6 +111,19 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                patrol_tactic_pos_y, patrol_tactic_neg_y});
     }
 
+    // Put the robot in roughly the right position to perform the kick
+    LOG(DEBUG) << "Aligning to ball";
+    do
+    {
+        updateAlignToBallTactic(align_to_ball_tactic);
+        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+        updatePassGenerator(pass_generator);
+        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
+               patrol_tactic_pos_y, patrol_tactic_neg_y});
+    } while (!align_to_ball_tactic->done());
+
+    LOG(DEBUG) << "Finished aligning to ball";
+
     // Have a robot keep trying to take a shot
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
@@ -150,7 +164,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             // TODO: change this to use the world timestamp (Issue #423)
             Duration time_since_commit_stage_start =
-                world.ball().lastUpdateTimestamp() - pass_optimization_start_time;
+                world.getMostRecentTimestamp() - pass_optimization_start_time;
             min_pass_score_threshold =
                 1 - std::min(time_since_commit_stage_start.getSeconds() /
                                  MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
