@@ -1,4 +1,6 @@
 # This project name must match the name of the package defined in package.xml
+
+cmake_minimum_required(VERSION 3.8.2)
 project(thunderbots)
 
 # Build in "Release" (with lots of compiler optimizations) by default

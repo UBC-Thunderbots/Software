@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ai/world/ball.h"
 #include "geom/point.h"
 #include "util/refbox_constants.h"
 
@@ -40,6 +41,7 @@ class GameState
     State state;
     RestartReason restart_reason;
     RefboxGameState game_state;
+    std::optional<Ball> ball_state;
 
     // True if our team can kick the ball during a restart
     bool our_restart;
@@ -55,7 +57,7 @@ class GameState
      *
      * @param gameState the RefboxGameState from backend_input
      */
-    void updateRefboxGameState(RefboxGameState gameState);
+    void updateRefboxGameState(RefboxGameState gameState, const Ball &ball);
 
     /**
      * Clears restart state and enters normal play. Should be
