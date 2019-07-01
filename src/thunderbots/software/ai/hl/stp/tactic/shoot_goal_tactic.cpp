@@ -6,13 +6,13 @@
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
-                                 double min_percent_net_open,
+                                 Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       ball(ball),
-      min_percent_net_open(min_percent_net_open),
+      min_net_open_angle(min_net_open_angle),
       chip_target(chip_target),
       has_shot_available(false),
       Tactic(loop_forever, {RobotCapabilityFlags::Kick})
@@ -78,25 +78,12 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     return false;
 }
 
-std::optional<std::pair<Point, double>> ShootGoalTactic::getShotData() const
-{
-    auto best_shot_opt = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                             enemy_team, ball.position());
-    if (best_shot_opt)
-    {
-        double net_percent_open = Evaluation::calcShotOpenEnemyNetPercentage(
-            field, ball.position(), *best_shot_opt);
-        return std::make_pair(best_shot_opt->first, net_percent_open);
-    }
-
-    return std::nullopt;
-}
-
 void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
                                             ChipAction &chip_action,
                                             IntentCoroutine::push_type &yield) const
 {
-    auto shot_target = getShotData();
+    auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
+                                                             enemy_team, ball.position());
     while (shot_target)
     {
         if (!isEnemyAboutToStealBall())
@@ -115,7 +102,8 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
                                                           shot_target->first, CHIP_DIST));
         }
 
-        shot_target = getShotData();
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
+                                                               enemy_team, ball.position());
     }
 }
 
@@ -127,8 +115,9 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
     do
     {
-        auto shot_target = getShotData();
-        if (shot_target && shot_target->second > min_percent_net_open)
+        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
+                                                          enemy_team, ball.position());
+        if (shot_target && shot_target->second > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
             // shot is entirely blocked

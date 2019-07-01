@@ -23,7 +23,7 @@ using namespace Evaluation;
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
 
 ShootOrChipPlay::ShootOrChipPlay()
-    : MIN_NET_PERCENT_OPEN_FOR_SHOT(1)
+    : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4))
 {
 }
 
@@ -73,7 +73,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_NET_PERCENT_OPEN_FOR_SHOT, std::nullopt, false);
+        MIN_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
 
     do
     {

@@ -18,8 +18,8 @@ class ShootGoalTactic : public Tactic
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
      * @param ball The ball
-     * @param min_percent_net_open A value in the range [0, 1.0] that indicates the
-     * fraction of the net that must be open in order for the robot to take a shot
+     * @param min_net_open_angle The minimum open angle we must be able to see of the
+     * goal in order to shoot
      * @param chip_target An optional point that the robot will chip towards when it is
      * unable to shoot and is in danger of losing the ball to an enemy. If this value is
      * not provided, the point defaults to the enemy goal
@@ -28,7 +28,7 @@ class ShootGoalTactic : public Tactic
      */
     explicit ShootGoalTactic(const Field& field, const Team& friendly_team,
                              const Team& enemy_team, const Ball& ball,
-                             double min_percent_net_open,
+                             Angle min_net_open_angle,
                              std::optional<Point> chip_target, bool loop_forever);
 
     std::string getName() const override;
@@ -81,17 +81,6 @@ class ShootGoalTactic : public Tactic
     bool isEnemyAboutToStealBall() const;
 
     /**
-     * A helper function to return information about shots we may want to take. Returns an
-     * optional containing a pair of the shot target to shoot at, and the fraction of the
-     * net that is open to shoot at. If the optional is null / empty, there is no possible
-     * shot on the enemy net.
-     *
-     * @return An optional pair containing the target to shoot at and the fraction of the
-     * net that is open
-     */
-    std::optional<std::pair<Point, double>> getShotData() const;
-
-    /**
      * A helper function that will continuously yield kick or chip intents until there is
      * no possible shot on net
      *
@@ -111,9 +100,8 @@ class ShootGoalTactic : public Tactic
     Team enemy_team;
     // The ball
     Ball ball;
-    // A value in the range [0, 1.0] that indicates the fraction of the net that must be
-    // open in order for the robot to take a shot
-    double min_percent_net_open;
+    // The minimum open angle we must be able to see of the goal in order to shoot
+    Angle min_net_open_angle;
     // Whether or not there is currently a shot available with at least the minimum
     // percentage of the net open
     bool has_shot_available;

@@ -22,6 +22,6 @@ class ShootOrChipPlay : public Play
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 
    private:
-    // The minimum open net percentage we will try to shoot at
-    const double MIN_NET_PERCENT_OPEN_FOR_SHOT;
+    // The minimum open net angle we will try to shoot at
+    const Angle MIN_OPEN_ANGLE_FOR_SHOT;
 };
