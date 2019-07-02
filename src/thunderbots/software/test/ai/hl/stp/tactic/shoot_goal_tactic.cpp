@@ -18,7 +18,7 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), 0.0, std::nullopt, false);
+                        world.ball(), Angle::zero(), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball());
@@ -54,7 +54,7 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), 0.5, std::nullopt, false);
+                        world.ball(), Angle::ofDegrees(6), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball());
@@ -140,7 +140,7 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), 0.1, std::nullopt, false);
+                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball());
@@ -176,7 +176,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
 
     ShootGoalTactic tactic =
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball(), 0.1, std::nullopt, false);
+                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
     tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball());
