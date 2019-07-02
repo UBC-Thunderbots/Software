@@ -39,11 +39,11 @@ namespace Util
        public:
         enum class Layer
         {
-            PASS_GENERATION,
+            PASS_GENERATION = 0,
             BALL,
             ROBOTS,
             STATIC_FEATURES,
-            OBSTACLES
+            NAVIGATOR
         };
 
         struct Color
@@ -57,6 +57,16 @@ namespace Util
             // Alpha (transparency) value of the color
             uint8_t a;
         };
+
+        // Colors
+        static constexpr Color FIELD_COLOR          = {0, 153, 0, 255};
+        static constexpr Color DEFENSE_AREA_COLOR   = {242, 242, 242, 255};
+        static constexpr Color FIELD_LINE_COLOR     = {242, 242, 242, 255};
+        static constexpr Color BALL_COLOR           = {255, 153, 0, 255};
+        static constexpr Color FRIENDLY_TEAM_COLOR  = {0, 230, 0, 255};
+        static constexpr Color ENEMY_TEAM_COLOR     = {230, 0, 0, 255};
+        static constexpr Color AVOID_AREA_COLOR     = {255, 0, 0, 127};
+        static constexpr Color ROBOT_OBSTACLE_COLOR = {0, 127, 0, 127};
 
         /**
          * Sprite is a struct that contains all the information
@@ -232,7 +242,7 @@ namespace Util
 
         void drawRobotPath(std::vector<Point> path_points);
 
-        void drawPolygon(const Polygon& poly);
+        void drawPolygonOutline(Layer layer, const Polygon &poly, double line_thickness, const Color &color);
 
        private:
         /**
@@ -254,14 +264,6 @@ namespace Util
 
         // The number of pixels per meter
         static const int PIXELS_PER_METER = 2000;
-
-        // Colors
-        static constexpr Color FIELD_COLOR         = {0, 153, 0, 255};
-        static constexpr Color DEFENSE_AREA_COLOR  = {242, 242, 242, 255};
-        static constexpr Color FIELD_LINE_COLOR    = {242, 242, 242, 255};
-        static constexpr Color BALL_COLOR          = {255, 153, 0, 255};
-        static constexpr Color FRIENDLY_TEAM_COLOR = {0, 230, 0, 255};
-        static constexpr Color ENEMY_TEAM_COLOR    = {230, 0, 0, 255};
 
         /**
          * Constructor; initializes an empty layers map then populates it

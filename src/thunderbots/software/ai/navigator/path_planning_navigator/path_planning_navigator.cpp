@@ -28,7 +28,7 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         }
         assigned_primitives.emplace_back(std::move(current_primitive));
     }
-
+    Util::CanvasMessenger::getInstance()->publishAndClearLayer(Util::CanvasMessenger::Layer::NAVIGATOR);
     return assigned_primitives;
 }
 
@@ -108,7 +108,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         {
             obstacles.emplace_back(*obstacle_opt);
             // draw the avoid area
-            Util::CanvasMessenger::getInstance()->drawPolygon(obstacle_opt->getBoundaryPolygon());
+            Util::CanvasMessenger::getInstance()->drawPolygonOutline(Util::CanvasMessenger::Layer::NAVIGATOR,
+                                                                     obstacle_opt->getBoundaryPolygon(), 0.05,
+                                                                     Util::CanvasMessenger::AVOID_AREA_COLOR);
         }
     }
 
@@ -116,6 +118,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     {
         Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
         obstacles.push_back(o);
+        Util::CanvasMessenger::getInstance()->drawPolygonOutline(Util::CanvasMessenger::Layer::NAVIGATOR,
+                                                                 o.getBoundaryPolygon(), 0.05,
+                                                                 Util::CanvasMessenger::ENEMY_TEAM_COLOR);
     }
 
     for (auto &robot : world.friendlyTeam().getAllRobots())
@@ -129,6 +134,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         }
         Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
         obstacles.push_back(o);
+        Util::CanvasMessenger::getInstance()->drawPolygonOutline(Util::CanvasMessenger::Layer::NAVIGATOR,
+                                                                 o.getBoundaryPolygon(), 0.05,
+                                                                 Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
     }
 
     // TODO: should we be using velocity scaling here?
