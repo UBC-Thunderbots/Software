@@ -137,6 +137,9 @@ add_library(tbots_geom STATIC
     ${TBOTS_GEOM_LIB_SRC}
     )
 add_dependencies(tbots_geom ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tbots_geom
+    ${G3LOG}
+    )
 
 # Time
 file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -540,15 +543,11 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(geom_util_test
             test/geom/util.cpp
-            geom/util.cpp
-            geom/util.h
-            geom/point.h
-            geom/angle.h
-            geom/segment.h
-            geom/ray.h
-            geom/circle.h
-            geom/line.h)
-    target_link_libraries(geom_util_test ${catkin_LIBRARIES})
+            )
+    target_link_libraries(geom_util_test
+            ${catkin_LIBRARIES}
+            tbots_geom
+            )
 
     catkin_add_gtest(nav_util_test
             test/ai/navigator/util.cpp
