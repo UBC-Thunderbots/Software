@@ -127,14 +127,10 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield) {
         if((robot.value().position() - behind_ball).len() <= MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD && (robot.value().orientation().minDiff((-behind_ball_vector).orientation()).toDegrees() < 5.0  )) {
             printf("\nMade it to ball!");
 
-            // TODO This set angle value doesn't work well
             if( evaluate_penalty_shot()) {
-
                 printf("\nWaiting for kick action");
-                yield(kick_action.updateStateAndGetNextIntent(*robot, ball, ball.position(), field.enemyGoalpostPos(), PENALTY_KICK_SHOT_SPEED));
+                yield(kick_action.updateStateAndGetNextIntent(*robot, ball, ball.position(), robot.value().orientation(), PENALTY_KICK_SHOT_SPEED));
             }
-
-
         }
         else if( (robot.value().position() - ball.position()).len() > MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD || (robot.value().orientation().minDiff((-behind_ball_vector).orientation()).toDegrees() < 3.0 )) {
 
