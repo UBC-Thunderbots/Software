@@ -9,10 +9,10 @@
  */
 class ShadowFreekickerTactic : public Tactic
 {
-public:
-
-    enum FreekickShadower {
-        First = 0,
+   public:
+    enum FreekickShadower
+    {
+        First  = 0,
         Second = 1,
     };
 
@@ -25,7 +25,8 @@ public:
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
-    explicit ShadowFreekickerTactic(FreekickShadower free_kick_shadower, Team enemy_team, Ball ball, Field field,  bool loop_forever = false);
+    explicit ShadowFreekickerTactic(FreekickShadower free_kick_shadower, Team enemy_team,
+                                    Ball ball, Field field, bool loop_forever = false);
 
     std::string getName() const override;
 
@@ -48,7 +49,7 @@ public:
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
-private:
+   private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // Used for defining whether this robot is a left/right Freekick Shadower
@@ -57,6 +58,6 @@ private:
     Field field;
     Team enemy_team;
 
-    const double FREE_KICK_MAX_PROXIMITY = 0.20; // Robots cannot be closer than 20cm from the ball during a freekick
-
+    const double FREE_KICK_MAX_PROXIMITY =
+        0.20;  // Robots cannot be closer than 20cm from the ball during a freekick
 };

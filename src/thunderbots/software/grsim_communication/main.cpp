@@ -49,7 +49,8 @@ void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& m
     update_primitives_vector_mutex.unlock();
 }
 
-void sendPrimtivesToGrsimBackend(const ros::TimerEvent& unused){
+void sendPrimtivesToGrsimBackend(const ros::TimerEvent& unused)
+{
     update_primitives_vector_mutex.lock();
     grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
     update_primitives_vector_mutex.unlock();
@@ -80,7 +81,8 @@ int main(int argc, char** argv)
     auto update_subscribers =
         Util::DynamicParameters::initUpdateSubscriptions(node_handle);
 
-    ros::Timer timer = node_handle.createTimer(ros::Duration(1/SEND_PRIMTIVES_REFRESH_RATE_HZ), sendPrimtivesToGrsimBackend);
+    ros::Timer timer = node_handle.createTimer(
+        ros::Duration(1 / SEND_PRIMTIVES_REFRESH_RATE_HZ), sendPrimtivesToGrsimBackend);
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown

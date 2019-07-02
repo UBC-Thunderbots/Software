@@ -7,7 +7,7 @@
  */
 class EnemyFreekickPlay : public Play
 {
-public:
+   public:
     static const std::string name;
 
     EnemyFreekickPlay() = default;
