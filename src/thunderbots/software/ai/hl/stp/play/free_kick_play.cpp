@@ -20,6 +20,11 @@ using namespace Passing;
 
 const std::string FreeKickPlay::name = "Free Kick Play";
 
+namespace
+{
+    const Angle MIN_OPEN_NET_ANGLE = Angle::ofDegrees(6);
+}
+
 FreeKickPlay::FreeKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(2.0)),
       MIN_NET_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(3))
@@ -118,7 +123,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Have a robot keep trying to take a shot
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), 0.1,
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), MIN_NET_OPEN_ANGLE_FOR_SHOT,
         std::nullopt, false);
 
     do
