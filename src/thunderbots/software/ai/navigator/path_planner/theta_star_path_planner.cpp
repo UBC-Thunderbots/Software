@@ -26,10 +26,11 @@ bool ThetaStarPathPlanner::isValid(int row, int col)
 
 bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
 {
-    auto cell = std::pair<int,int>(row,col);
+    auto cell = std::pair<int, int>(row, col);
 
     // If we haven't checked this cell before, check it now
-    if (unblocked_grid.find(cell) == unblocked_grid.end()){
+    if (unblocked_grid.find(cell) == unblocked_grid.end())
+    {
         bool blocked = false;
 
         Point p = convertCellToPoint(row, col);
@@ -44,7 +45,6 @@ bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
 
         // We use the opposite convention to indicate blocked or not
         unblocked_grid[cell] = !blocked;
-
     }
 
     return unblocked_grid[cell];
