@@ -32,13 +32,15 @@ class MovePrimitive : public Primitive
      * @param final_speed The final speed the Robot should have when it reaches
      * its destination at the end of the movement
      * @param enable_dribbler Whether or not to enable the dribbler
+     * @param slow Whether or not to move at a slower speed (1m/s)
      * @param autokick A flag indicating if autokick should be enabled while the robot is
      * moving. This will enable the "break-beam" on the robot that will trigger the kicker
      * or chipper to fire as soon as the ball is in front of it
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
-                           bool enable_dribbler = false, AutokickType autokick = NONE);
+                           bool enable_dribbler = false, bool slow = false,
+                           AutokickType autokick = NONE);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -96,10 +98,17 @@ class MovePrimitive : public Primitive
     bool isDribblerEnabled() const;
 
     /**
+     * Gets whether or not the robot should be moving slow
+     *
+     * @return whether or not the robot should be moving slow
+     */
+    bool isSlowEnabled() const;
+
+    /**
      * Returns the generic vector of parameters for this Primitive
      *
      * @return A vector of the form {dest.x(), dest.y(), final_angle.toRadians(),
-     *                               final_speed, enable_dribbler, enable_autokick}
+     *                               final_speed, enable_dribbler, slow}
      */
     std::vector<double> getParameters() const override;
 
@@ -135,5 +144,6 @@ class MovePrimitive : public Primitive
     Angle final_angle;
     double final_speed;
     bool enable_dribbler;
+    bool slow;
     AutokickType autokick;
 };

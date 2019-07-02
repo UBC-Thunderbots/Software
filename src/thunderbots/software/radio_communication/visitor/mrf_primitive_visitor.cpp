@@ -97,6 +97,7 @@ void MRFPrimitiveVisitor::visit(const MovePrimitive &move_primitive)
         move_primitive.getDestination().y() * MILLIMETERS_PER_METER,
         move_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN,
         move_primitive.getFinalSpeed() * MILLIMETERS_PER_METER};
+    radio_prim->slow       = move_primitive.isSlowEnabled();
     radio_prim->extra_bits = 0;
     radio_prim->extra_bits |= (move_primitive.getAutoKickType() == AUTOKICK) * 0x01;
     radio_prim->extra_bits |= move_primitive.isDribblerEnabled() * 0x02;
