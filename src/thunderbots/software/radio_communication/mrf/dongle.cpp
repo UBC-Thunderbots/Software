@@ -534,7 +534,6 @@ void MRFDongle::encode_primitive(const std::unique_ptr<Primitive> &prim, void *o
     }
 
     // Encode extra data plus the slow flag.
-    // TODO: do we actually use the slow flag?
     uint8_t extra = r_prim.extra_bits;
     bool slow     = r_prim.slow;
     if (extra > 127)
