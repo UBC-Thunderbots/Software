@@ -37,32 +37,33 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
         std::optional<Robot> enemy_with_ball = Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
 
         if(enemy_with_ball.has_value()) {
-
+            printf("\nEnemyHasBall");
+            printf("\nRobotWithBall%d", enemy_with_ball->id());
             const Vector enemy_pointing_direction = (ball.position() - enemy_with_ball->position()).norm(
                     FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
-            Vector perpendicular_to_enemy_direction = enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS);
+            Vector perpendicular_to_enemy_direction = enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS*1.1);
 
-            defend_position = free_kick_shadower == FreekickShadower::First ? enemy_pointing_direction +
+            defend_position = free_kick_shadower == FreekickShadower::First ? ball.position() + enemy_pointing_direction +
                                                                                           perpendicular_to_enemy_direction
-                                                                                        : enemy_pointing_direction -
+                                                                                        : ball.position() + enemy_pointing_direction -
                                                                                           perpendicular_to_enemy_direction;
         }
         else {
-
+            printf("\nEnemyDoesntHaveBall");
             const Vector ball_to_net_direction = (field.friendlyGoal() - ball.position()).norm(
                     FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
-            Vector perpendicular_to_ball_direction = ball_to_net_direction.perp().norm(ROBOT_MAX_RADIUS_METERS);
+            Vector perpendicular_to_ball_direction = ball_to_net_direction.perp().norm(ROBOT_MAX_RADIUS_METERS*1.1);
 
-            defend_position = free_kick_shadower == FreekickShadower::First ? ball_to_net_direction +
+            defend_position = free_kick_shadower == FreekickShadower::First ? ball.position() + ball_to_net_direction +
                                                                                           perpendicular_to_ball_direction
-                                                                                        : ball_to_net_direction -
+                                                                                        : ball.position() + ball_to_net_direction -
                                                                                           perpendicular_to_ball_direction;
         }
 
         yield(move_action.updateStateAndGetNextIntent(*robot, defend_position, (ball.position() - robot->position()).orientation(), 0, false ));
-    } while(!move_action.done());
+    } while(true);
 
 
 
@@ -77,4 +78,3 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
 //    {
 //        yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));
 //    } while (!stop_action.done());
-}
