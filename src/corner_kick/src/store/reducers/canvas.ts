@@ -12,7 +12,6 @@ export type CanvasAction = ActionType<typeof canvas>;
 
 const defaultState: ICanvasState = {
     layers: {},
-    layerOrder: [],
 };
 
 export default (state: ICanvasState = defaultState, action: CanvasAction) => {
@@ -22,15 +21,10 @@ export default (state: ICanvasState = defaultState, action: CanvasAction) => {
         // on top of old ones)
         case getType(canvas.addLayer):
             const { payload } = action;
-            const { layers, layerOrder } = state;
+            const { layers } = state;
             return {
                 ...state,
                 layers: { ...layers, [payload.id]: payload },
-                layerOrder: [
-                    ...layerOrder.slice(0, payload.id),
-                    payload.id,
-                    ...layerOrder.slice(payload.id),
-                ],
             };
         // Here, we toggle the visibility of the layer specified by the action
         case getType(canvas.toggleLayerVisibility):
