@@ -40,7 +40,7 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
             const Vector enemy_pointing_direction = (ball.position() - enemy_with_ball->position()).norm(
                     FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
-            Vector perpendicular_to_enemy_direction = enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS*1.1);
+            Vector perpendicular_to_enemy_direction = enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS*1.2);
 
             defend_position = free_kick_shadower == FreekickShadower::First ? ball.position() + enemy_pointing_direction +
                                                                                           perpendicular_to_enemy_direction
@@ -61,10 +61,6 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
 
         yield(move_action.updateStateAndGetNextIntent(*robot, defend_position, (ball.position() - robot->position()).orientation(), 0, false ));
     } while(true);
+
     }
-//    StopAction stop_action =
-//            StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, false);
-//    do
-//    {
-//        yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));
-//    } while (!stop_action.done());
+

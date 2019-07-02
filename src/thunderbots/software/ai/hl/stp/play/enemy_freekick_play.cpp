@@ -43,76 +43,90 @@ bool EnemyFreekickPlay::invariantHolds(const World &world) const
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-    // Use a combination of shadow and shot blocking tactics to prevent scoring on freekicks
+
+    // Init our goalie tactic
     auto goalie_tactic = std::make_shared<GoalieTactic>(
             world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    
-//    // TODO: Robot to try steal the ball from most threatening enemy
-//    std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-//            std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-//                                                world.enemyTeam(), true, true),
-//            std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-//                                                world.enemyTeam(), true, true)};
-//
-//    std::shared_ptr<CreaseDefenderTactic> crease_defender_tactic =
-//            std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-//                                                   world.friendlyTeam(), world.enemyTeam(),
-//                                                   CreaseDefenderTactic::LeftOrRight::RIGHT);
 
-    auto shadow_enemy_tactic_1 = std::make_shared<ShadowFreekickerTactic>(ShadowFreekickerTactic::First, world.enemyTeam(), world.ball(), world.field());
-    auto shadow_enemy_tactic_2 = std::make_shared<ShadowFreekickerTactic>(ShadowFreekickerTactic::Second, world.enemyTeam(), world.ball(), world.field());
+    // Init a Crease Defender Tactic
+    auto crease_defender_tactic = std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                                   world.friendlyTeam(), world.enemyTeam(),
+                                                   CreaseDefenderTactic::LeftOrRight::RIGHT);
 
-    std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
-            std::make_shared<StopTactic>(false, true),
-            std::make_shared<StopTactic>(false, true)};
+    // Init FreeKickShadower tactics (these robots will both block the enemy robot taking a free kick (at most we will have 2
+    auto shadow_freekicker_1 = std::make_shared<ShadowFreekickerTactic>(ShadowFreekickerTactic::First, world.enemyTeam(), world.ball(), world.field(), true);
+    auto shadow_freekicker_2 = std::make_shared<ShadowFreekickerTactic>(ShadowFreekickerTactic::Second, world.enemyTeam(), world.ball(), world.field(), true);
+
+    // Init Shadow Enemy Tactics for extra robots
+    auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), true, true);
+    auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), true, true);
+
+    // Init Move Tactics for extra robots (These will be used if there are no robots to shadow)
+    auto move_tactic_main = std::make_shared<MoveTactic>(true);
+    auto move_tactic_secondary = std::make_shared<MoveTactic>(true);
 
     do {
+        // Create tactic vector (starting with Goalie)
+        std::vector<std::shared_ptr<Tactic>> tactics_to_run = {goalie_tactic};
 
-//        auto enemy_threats = Evaluation::getAllEnemyThreats(
-//                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
-//        bool enemy_team_can_pass =
-//                Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
+        // Get all enemy threats
+        auto enemy_threats = Evaluation::getAllEnemyThreats(
+                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        // If we have any crease defenders, we don't want the goalie tactic to consider
-        // them when deciding where to block
-        Team friendly_team_for_goalie = world.friendlyTeam();
+        // Check if the enemy is passing-capable
+        bool enemy_team_can_pass =
+                Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
 
-//        goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
-//                                    world.enemyTeam());
+        // Update goalie tactic
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
+                                    world.enemyTeam());
 
-        shadow_enemy_tactic_1->updateParams(world.enemyTeam(), world.ball());
-        shadow_enemy_tactic_2->updateParams(world.enemyTeam(), world.ball());
-//
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
-//
-//        crease_defender_tactic->updateParams(world.ball(), world.field(),
-//                                                 world.friendlyTeam(), world.enemyTeam());
-//        result.emplace_back(crease_defender_tactic);
-        result.emplace_back(shadow_enemy_tactic_1);
-        result.emplace_back(shadow_enemy_tactic_2);
+        // Update free kicke shadowers
+        shadow_freekicker_1->updateParams(world.enemyTeam(), world.ball());
+        shadow_freekicker_2->updateParams(world.enemyTeam(), world.ball());
 
-        // Assign ShadowEnemy tactics until we have every enemy covered. If there any
-        // extra friendly robots, have them perform a reasonable default defensive tactic
+        // Update crease defenders
+        crease_defender_tactic->updateParams(world.ball(), world.field(),
+                                                 world.friendlyTeam(), world.enemyTeam());
 
-//        for (int i = 1; i < std::min(stop_tactics.size(), shadow_enemy_tactics.size());
-//             i++)
-//        {
-//            if (i < enemy_threats.size())
-//            {
-//                shadow_enemy_tactics.at(i)->updateParams(
-//                        enemy_threats.at(i), world.field(), world.friendlyTeam(),
-//                        world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
-//                result.emplace_back(shadow_enemy_tactics.at(i));
-//            }
-//            else
-//            {
-//                stop_tactics.at(i)->updateParams();
-//                result.emplace_back(stop_tactics.at(i));
-//            }
-//        }
+        // Assign ShadowEnemy tactics until we have every enemy covered. If there are not enough threats to shadow, move our robots to block the friendly net
+        if(enemy_threats.size() == 0) {
+            move_tactic_main->updateParams(world.field().friendlyGoal() + Point(0,2*ROBOT_MAX_RADIUS_METERS), (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+            move_tactic_main->updateParams(world.field().friendlyGoal() + Point(0,-2*ROBOT_MAX_RADIUS_METERS), (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+
+            tactics_to_run.emplace_back(move_tactic_main);
+            tactics_to_run.emplace_back(move_tactic_secondary);
+        }
+        if(enemy_threats.size() == 1) {
+
+                shadow_tactic_main->updateParams(
+                        enemy_threats.at(1), world.field(), world.friendlyTeam(),
+                        world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+            move_tactic_main->updateParams(world.field().friendlyGoal() + Point(0,2*ROBOT_MAX_RADIUS_METERS), (world.ball().position() - world.field().friendlyGoal()).orientation(), 0);
+
+            tactics_to_run.emplace_back(shadow_tactic_main);
+            tactics_to_run.emplace_back(move_tactic_main);
+        }
+        if(enemy_threats.size() >=2) {
+            shadow_tactic_main->updateParams(
+                    enemy_threats.at(1), world.field(), world.friendlyTeam(),
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+            shadow_tactic_secondary->updateParams(
+                    enemy_threats.at(2), world.field(), world.friendlyTeam(),
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+
+            tactics_to_run.emplace_back(shadow_tactic_main);
+            tactics_to_run.emplace_back(shadow_tactic_secondary);
+        }
+
+
+
+        tactics_to_run.emplace_back(crease_defender_tactic);
+        tactics_to_run.emplace_back(shadow_freekicker_1);
+        tactics_to_run.emplace_back(shadow_freekicker_2);
 
         // yield the Tactics this Play wants to run, in order of priority
-        yield(result);
+        yield(tactics_to_run);
     } while (true);
 }
 

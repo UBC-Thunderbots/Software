@@ -17,8 +17,11 @@ public:
     };
 
     /**
-     * Creates a new StopTactic
-     t
+     * Creates a new ShadowFreekicker tactic
+     * @param free_kick_shadower : Enum selection of the left/right Freekicker shadower
+     * @param enemy_team : The enemy team of robots
+     * @param ball : Ball object
+     * @param field : Field the robots are playing on
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
@@ -27,7 +30,10 @@ public:
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this StopTactic.
+     * Updates the parameters for this ShadowFreekicker tactic
+     *
+     * @param enemy_team : The enemy team of robots.
+     * @param ball  : The Ball being played with
      */
     void updateParams(Team enemy_team, Ball ball);
 
@@ -45,13 +51,12 @@ public:
 private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
+    // Used for defining whether this robot is a left/right Freekick Shadower
     FreekickShadower free_kick_shadower;
     Ball ball;
     Field field;
     Team enemy_team;
 
     const double FREE_KICK_MAX_PROXIMITY = 0.20; // Robots cannot be closer than 20cm from the ball during a freekick
-    // Tactic parameters
-    // Whether or not the robot should coast to a stop
 
 };
