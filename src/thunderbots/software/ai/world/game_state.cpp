@@ -257,7 +257,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
         }
     }
 
-    if (state == READY)
+    if (state == READY && restart_reason != PENALTY)
     {
         if (!ball_state)
         {

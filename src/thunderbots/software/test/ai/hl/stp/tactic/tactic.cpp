@@ -162,14 +162,14 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
     MoveTestTactic tactic = MoveTestTactic(true);
     tactic.updateRobot(robot);
 
-    World world;
+    GameState game_state;
     for (auto refbox_and_ball_state : refbox_and_ball_states)
     {
         Ball ball(refbox_and_ball_state.second, Vector(0, 0), Timestamp::fromSeconds(0));
-        world.mutableGameState().updateRefboxGameState(refbox_and_ball_state.first, ball);
+        game_state.updateRefboxGameState(refbox_and_ball_state.first, ball);
     }
 
-    auto next_intent = tactic.getNextIntent(world);
+    auto next_intent = tactic.getNextIntent(game_state);
     ASSERT_TRUE(next_intent);
 
     std::string refbox_states_str;
@@ -369,12 +369,24 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
             }),
-        // Their penalty kick
+        // Their penalty kick before they move the ball
         makeParams({
                 {RefboxGameState::PREPARE_PENALTY_THEM, {0, 0}},
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::FRIENDLY_HALF,
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+            }),
+        // Their penalty kick after they move the ball
+        makeParams({
+                {RefboxGameState::PREPARE_PENALTY_THEM, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0}},
+                {RefboxGameState::NORMAL_START, {0, 0.5}},
+            },
+            {
+                AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
             })
@@ -435,14 +447,14 @@ TEST(TacticTest, test_whitelisted_areas_are_ignored)
     MoveTestTactic tactic = MoveTestTactic(true);
     tactic.updateRobot(robot);
 
-    World world;
-    world.mutableGameState().updateRefboxGameState(
+    GameState game_state;
+    game_state.updateRefboxGameState(
         RefboxGameState::DIRECT_FREE_THEM,
         Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     tactic.addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
-    auto next_intent = tactic.getNextIntent(world);
+    auto next_intent = tactic.getNextIntent(game_state);
     ASSERT_TRUE(next_intent);
 
     EXPECT_EQ(std::vector<AvoidArea>(

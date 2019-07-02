@@ -96,13 +96,13 @@ class Tactic
      * function. If the Tactic is not done, the next Intent is returned. If the Tactic
      * is done, a nullptr is returned.
      *
-     * @param world_opt The current world, defaults to std::nullopt
+     * @param game_state_opt The current game state, defaults to std::nullopt
      *
      * @return A unique pointer to the next Intent that should be run for the Tactic.
      * If the Tactic is done, a nullptr is returned.
      */
     std::unique_ptr<Intent> getNextIntent(
-        const std::optional<World> &world_opt = std::nullopt);
+        const std::optional<GameState> &game_state_opt = std::nullopt);
 
     /**
      * Returns the name of the Tactic
@@ -184,13 +184,13 @@ class Tactic
 
     /**
      * Get all the areas that this tactic should not be allowed to move into based on
-     * world state and the current whitelist for this tactic
+     * game state and the current whitelist for this tactic
      *
-     * @param world The current state of the world
+     * @param game_state The current game state
      *
      * @return a vector of areas this tactic should avoid
      */
-    std::vector<AvoidArea> getAreasToAvoid(const World &world);
+    std::vector<AvoidArea> getAreasToAvoid(const GameState &game_state);
 
     /**
      * A helper function that runs the intent_sequence coroutine and returns the result

@@ -25,7 +25,7 @@ void Tactic::updateRobot(const Robot &robot)
     this->robot = robot;
 }
 
-std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World> &world_opt)
+std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<GameState> &game_state_opt)
 {
     std::unique_ptr<Intent> next_intent = nullptr;
     if (!robot)
@@ -54,9 +54,9 @@ std::unique_ptr<Intent> Tactic::getNextIntent(const std::optional<World> &world_
         // Figure out where this intent should and should not move to, based on the
         // world state, whitelisted avoid areas, and blacklisted avoid areas
         std::vector<AvoidArea> avoid_areas;
-        if (world_opt)
+        if (game_state_opt)
         {
-            avoid_areas = getAreasToAvoid(*world_opt);
+            avoid_areas = getAreasToAvoid(*game_state_opt);
         }
         avoid_areas.insert(avoid_areas.end(), blacklisted_avoid_areas.begin(),
                            blacklisted_avoid_areas.end());
@@ -141,7 +141,7 @@ void Tactic::removeBlacklistedAvoidArea(AvoidArea area)
         blacklisted_avoid_areas.end());
 }
 
-std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
+std::vector<AvoidArea> Tactic::getAreasToAvoid(const GameState &game_state)
 {
     std::vector<AvoidArea> areas_to_avoid;
 
@@ -160,14 +160,14 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
         }
     };
 
-    if (world.gameState().stayAwayFromBall())
+    if (game_state.stayAwayFromBall())
     {
         addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
     }
 
-    if (world.gameState().isPenalty())
+    if (game_state.isPenalty())
     {
-        if (world.gameState().isOurPenalty())
+        if (game_state.isOurPenalty())
         {
             addAreaIfNotInWhitelist(AvoidArea::ENEMY_HALF);
         }
@@ -177,7 +177,7 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
             addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_HALF);
         }
     }
-    else if (world.gameState().isKickoff())
+    else if (game_state.isKickoff())
     {
         addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
         addAreaIfNotInWhitelist(AvoidArea::CENTER_CIRCLE);
@@ -185,15 +185,15 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
     }
     else
     {
-        if (world.gameState().stayAwayFromBall() || world.gameState().isOurKickoff())
+        if (game_state.stayAwayFromBall() || game_state.isOurKickoff())
         {
             addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
         }
 
-        bool is_our_kick_setup = (world.gameState().isOurDirectFree() ||
-                                  world.gameState().isOurIndirectFree()) &&
-                                 world.gameState().isSetupState();
-        if (world.gameState().isOurFreeKick())
+        bool is_our_kick_setup = (game_state.isOurDirectFree() ||
+                                  game_state.isOurIndirectFree()) &&
+                                 game_state.isSetupState();
+        if (game_state.isStopped() || game_state.isOurFreeKick())
         {
             addAreaIfNotInWhitelist(AvoidArea::INFLATED_ENEMY_DEFENSE_AREA);
         }

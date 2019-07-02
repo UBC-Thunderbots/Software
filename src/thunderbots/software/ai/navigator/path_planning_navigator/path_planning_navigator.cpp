@@ -210,14 +210,17 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             rectangle.expand(OBSTACLE_INFLATION_DIST + 0.2);
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
+            // We tack on an extra buffer here because we only approximate the circle,
+            // and we can afford to be extra safe here
             return Obstacle(world.field().centerPoint(),
-                            world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST,
+                            world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST + 0.1,
                             NUM_POINTS_IN_CIRCLE_POLY);
         case AvoidArea::HALF_METER_AROUND_BALL:
-            return Obstacle(world.ball().position(), 0.5 + OBSTACLE_INFLATION_DIST,
+            // We tack on an extra buffer here because we only approximate the circle,
+            // and we can afford to be extra safe here
+            return Obstacle(world.ball().position(), 0.5 + OBSTACLE_INFLATION_DIST + 0.1,
                             NUM_POINTS_IN_CIRCLE_POLY);
         case AvoidArea::ENEMY_HALF:
-
             rectangle =
                 Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());
             rectangle.expand(OBSTACLE_INFLATION_DIST);
