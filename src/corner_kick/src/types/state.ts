@@ -22,7 +22,6 @@ export interface IRootState {
  */
 export interface ICanvasState {
     layers: { [id: number]: ILayer };
-    layerOrder: number[];
 }
 
 /**
