@@ -63,10 +63,9 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
 
 auto all_refbox_game_states = ::Test::TestUtil::getAllRefboxGameStates();
 
-// TODO: uncomment this when plays are completed
-// INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
-//                        ::testing::ValuesIn(all_refbox_game_states.begin(),
-//                        all_refbox_game_states.end()));
+INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, STPRefboxGameStatePlaySelectionTest,
+                        ::testing::ValuesIn(all_refbox_game_states.begin(),
+                                            all_refbox_game_states.end()));
 
 int main(int argc, char **argv)
 {
