@@ -3,17 +3,19 @@
  */
 #include "penalty_kick_tactic.h"
 
+#include "ai/hl/stp/action/dribble_action.h"
 #include "ai/hl/stp/action/kick_action.h"
 #include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/action/dribble_action.h"
+#include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "geom/util.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
 
 
-PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field, const std::optional<Robot>& enemy_goalie, bool loop_forever)
-        : ball(ball), field(field), enemy_goalie(enemy_goalie), Tactic(loop_forever)
+PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
+                                     const std::optional<Robot>& enemy_goalie,
+                                     bool loop_forever)
+    : ball(ball), field(field), enemy_goalie(enemy_goalie), Tactic(loop_forever)
 {
 }
 
@@ -22,11 +24,13 @@ std::string PenaltyKickTactic::getName() const
     return "Penalty Kick Tactic";
 }
 
-void PenaltyKickTactic::updateParams(const Ball& updated_ball, const std::optional<Robot>& updated_enemy_goalie, const Field& updated_field)
+void PenaltyKickTactic::updateParams(const Ball& updated_ball,
+                                     const std::optional<Robot>& updated_enemy_goalie,
+                                     const Field& updated_field)
 {
     this->enemy_goalie = updated_enemy_goalie;
-    this->ball = updated_ball;
-    this->field = updated_field;
+    this->ball         = updated_ball;
+    this->field        = updated_field;
 }
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world)
@@ -35,120 +39,158 @@ double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& wo
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-            (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
-bool PenaltyKickTactic::evaluate_penalty_shot() {
-
+bool PenaltyKickTactic::evaluate_penalty_shot()
+{
     // If there is no goalie, the net is wide open
-    if(!enemy_goalie.has_value()) {
+    if (!enemy_goalie.has_value())
+    {
         return true;
     }
 
-    // The value of a penalty shot is proportional to how far away the enemy goalie is from the current shot of the robot
+    // The value of a penalty shot is proportional to how far away the enemy goalie is
+    // from the current shot of the robot
 
-    // We will make a penalty shot if the enemy goalie cannot accelerate in time to block it
+    // We will make a penalty shot if the enemy goalie cannot accelerate in time to block
+    // it
     Segment goal_line = Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
 
-    Ray shot_ray = Ray(ball.position(), Point(robot.value().orientation().cos(), robot.value().orientation().sin()));
+    Ray shot_ray = Ray(ball.position(), Point(robot.value().orientation().cos(),
+                                              robot.value().orientation().sin()));
 
     auto [intersect_1, intersect_2] = raySegmentIntersection(shot_ray, goal_line);
 
-    if(intersect_1.has_value()) {
+    if (intersect_1.has_value())
+    {
         // If we have an intersection, calculate if we have a viable shot
 
-        const double shooter_to_goal_distance = (robot.value().position() - intersect_1.value()).len();
-        const double time_to_score = fabs(shooter_to_goal_distance/PENALTY_KICK_SHOT_SPEED);
-        const Point goalie_to_goal_distance = (intersect_1.value() = enemy_goalie.value().position());
+        const double shooter_to_goal_distance =
+            (robot.value().position() - intersect_1.value()).len();
+        const double time_to_score =
+            fabs(shooter_to_goal_distance / PENALTY_KICK_SHOT_SPEED);
+        const Point goalie_to_goal_distance =
+            (intersect_1.value() = enemy_goalie.value().position());
 
         // Based on constant acceleration -> // dX = init_vel*t + 0.5*a*t^2
         //          dX - init_vel - (0.5*a*t)t
-        const double max_enemy_movement_x = robot.value().velocity().x()*time_to_score + 0.5*sign(goalie_to_goal_distance.x())*1.5*pow(time_to_score,2);
-        const double max_enemy_movement_y = robot.value().velocity().y()*time_to_score + 0.5*sign(goalie_to_goal_distance.y())*1.5*pow(time_to_score,2);
+        const double max_enemy_movement_x = robot.value().velocity().x() * time_to_score +
+                                            0.5 * sign(goalie_to_goal_distance.x()) *
+                                                PENALTY_KICK_GOALIE_MAX_ACC *
+                                                pow(time_to_score, 2);
+        const double max_enemy_movement_y = robot.value().velocity().y() * time_to_score +
+                                            0.5 * sign(goalie_to_goal_distance.y()) *
+                                                PENALTY_KICK_GOALIE_MAX_ACC *
+                                                pow(time_to_score, 2);
 
-        // If the position to block the ball is further than the enemy goalie can go TODO: Make this check 2D, versus just blocking a single spot on the goal-line
-        if( fabs((goalie_to_goal_distance.x() - max_enemy_movement_x) > ROBOT_MAX_RADIUS_METERS) || fabs((goalie_to_goal_distance.y() - max_enemy_movement_y)) > ROBOT_MAX_RADIUS_METERS) {
+        // If the position to block the ball is further than the enemy goalie can reach in
+        // the time required to score
+        if (fabs((goalie_to_goal_distance.x() - max_enemy_movement_x) >
+                 ROBOT_MAX_RADIUS_METERS) ||
+            fabs((goalie_to_goal_distance.y() - max_enemy_movement_y)) >
+                ROBOT_MAX_RADIUS_METERS)
+        {
             return true;
         }
-        else{
+        else
+        {
             return false;
         }
     }
-    else {
+    else
+    {
         // If a shot in our current direction will not end in a goal, don't shoot
         return false;
     }
 }
 
-Point PenaltyKickTactic::evaluate_next_position() {
+Point PenaltyKickTactic::evaluate_next_position()
+{
     // Evaluate if the goalie is closer to the negative or positive goalpost
 
-    if(enemy_goalie.has_value()) {
-        double goalie_dist_to_neg_goalpost = (field.enemyGoalpostNeg() - enemy_goalie.value().position()).lensq();
-        double goalie_dist_to_pos_goalpost = (field.enemyGoalpostPos() - enemy_goalie.value().position()).lensq();
+    if (enemy_goalie.has_value())
+    {
+        double goalie_dist_to_neg_goalpost =
+            (field.enemyGoalpostNeg() - enemy_goalie.value().position()).lensq();
+        double goalie_dist_to_pos_goalpost =
+            (field.enemyGoalpostPos() - enemy_goalie.value().position()).lensq();
 
-        return goalie_dist_to_neg_goalpost > goalie_dist_to_pos_goalpost ? field.enemyGoalpostNeg() : field.enemyGoalpostPos();
+        return goalie_dist_to_neg_goalpost > goalie_dist_to_pos_goalpost
+                   ? field.enemyGoalpostNeg()
+                   : field.enemyGoalpostPos();
     }
-    else {
+    else
+    {
         // Return the center of the enemy goal
         return Point(field.enemyGoalpostPos().x(), 0);
     }
-
 }
 
-void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield) {
-
+void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
+{
     // Keep track if a shot has been taken
-    bool shot_taken = false;
+    bool shot_taken             = false;
     bool is_facing_pos_goalpost = false;
 
     // We will need to keep track of time so we don't break the rules by taking too long
     Timestamp penalty_kick_start = robot->getMostRecentTimestamp();
 
 
-    MoveAction approach_ball_move_act = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, false);
-    MoveAction rotate_with_ball_move_act = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, false);
-    KickAction kick_action = KickAction();
+    MoveAction approach_ball_move_act =
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, false);
+    MoveAction rotate_with_ball_move_act =
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, false);
+    KickAction kick_action       = KickAction();
     DribbleAction dribble_action = DribbleAction();
 
-    do {
-
+    do
+    {
         Vector behind_ball_vector = (ball.position() - field.enemyGoal());
         // A point behind the ball that leaves 5cm between the ball and kicker of the
         // robot
-        Point behind_ball =
-                ball.position() +
-                behind_ball_vector.norm(BALL_MAX_RADIUS_METERS +
-                                        DIST_TO_FRONT_OF_ROBOT_METERS + 0.04);
+        Point behind_ball = ball.position() +
+                            behind_ball_vector.norm(BALL_MAX_RADIUS_METERS +
+                                                    DIST_TO_FRONT_OF_ROBOT_METERS + 0.04);
 
         // If we haven't approached the ball yet, get close
 
-        if((robot.value().position() - behind_ball).len() <= MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD && (robot.value().orientation().minDiff((-behind_ball_vector).orientation()).toDegrees() < 5.0  )) {
-            printf("\nMade it to ball!");
-
-            if( evaluate_penalty_shot()) {
-                printf("\nWaiting for kick action");
-                yield(kick_action.updateStateAndGetNextIntent(*robot, ball, ball.position(), robot.value().orientation(), PENALTY_KICK_SHOT_SPEED));
+        if ((robot.value().position() - behind_ball).len() <=
+                MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD &&
+            (robot.value()
+                 .orientation()
+                 .minDiff((-behind_ball_vector).orientation())
+                 .toDegrees() < 5.0))
+        {
+            if (evaluate_penalty_shot())
+            {
+                yield(kick_action.updateStateAndGetNextIntent(
+                    *robot, ball, ball.position(), robot.value().orientation(),
+                    PENALTY_KICK_SHOT_SPEED));
             }
         }
-        else if( (robot.value().position() - ball.position()).len() > MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD || (robot.value().orientation().minDiff((-behind_ball_vector).orientation()).toDegrees() < 3.0 )) {
-
+        else if ((robot.value().position() - ball.position()).len() >
+                     MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD ||
+                 (robot.value()
+                      .orientation()
+                      .minDiff((-behind_ball_vector).orientation())
+                      .toDegrees() < 3.0))
+        {
             // The default behaviour is to move behind the ball and face the net
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
-                    *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
-            printf("\nWaiting for move action");
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
         }
-        else {
-
+        else
+        {
             const Point next_shot_position = evaluate_next_position();
-            const Angle next_angle = (next_shot_position  - ball.position()).orientation();
+            const Angle next_angle = (next_shot_position - ball.position()).orientation();
 
-            yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(*robot, robot.value().position(), next_angle, 0, true));
-            printf("\nRotateWithBall");
+            yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
+                *robot, robot.value().position(), next_angle, 0, true));
         }
 
-    } while( ! (kick_action.done() || (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout ) );
-
+    } while (
+        !(kick_action.done() ||
+          (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
 }
-

@@ -7,7 +7,7 @@
  */
 class PenaltyKickPlay : public Play
 {
-public:
+   public:
     static const std::string name;
 
     PenaltyKickPlay() = default;
