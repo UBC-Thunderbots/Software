@@ -123,8 +123,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Have a robot keep trying to take a shot
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), MIN_NET_OPEN_ANGLE_FOR_SHOT,
-        std::nullopt, false);
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
+        MIN_NET_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
 
     do
     {
