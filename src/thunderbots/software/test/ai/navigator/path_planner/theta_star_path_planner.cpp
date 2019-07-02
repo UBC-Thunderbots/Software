@@ -244,3 +244,53 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     // Since we are already close to the destination no path is returned
     ASSERT_FALSE(path_points);
 }
+
+TEST(TestThetaStarPathPlanner, performance){
+    std::vector<std::vector<Obstacle>> obstacle_sets = {
+            {
+                Obstacle({0,0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0,0.5}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0,1.0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0,1.5}, ROBOT_MAX_RADIUS_METERS, 16),
+            },
+            {
+                Obstacle({0,0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0,0.5}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0,1.0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0,1.5}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({-0.5,0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({-0.5,0.5}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({-0.5,1.0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({-0.5,1.5}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0.5,0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0.5,0.5}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0.5,1.0}, ROBOT_MAX_RADIUS_METERS, 16),
+                Obstacle({0.5,1.5}, ROBOT_MAX_RADIUS_METERS, 16),
+            }
+    };
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    int num_iterations = 10;
+
+    Point start(0,0), dest(4.5, 0);
+
+    auto start_time = std::chrono::system_clock::now();
+    for (int i = 0; i < num_iterations; i++){
+        for (auto obstacles : obstacle_sets){
+            std::unique_ptr<PathPlanner> planner =
+                    std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+
+            auto path_points = planner->findPath(start, dest);
+        }
+    }
+
+    auto end_time = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> duration = end_time-start_time;
+
+    std::chrono::duration<double> avg = duration / ((double) num_iterations * obstacle_sets.size());
+
+    std::cout << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()
+    << "ms to run, average time of " << std::chrono::duration_cast<std::chrono::milliseconds>(avg).count();
+
+}
