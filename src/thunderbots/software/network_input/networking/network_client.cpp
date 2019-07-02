@@ -183,7 +183,6 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    std::cout << packet.command() << std::endl;
     auto gamecontroller_data_msg = backend.getRefboxDataMsg(packet);
     world_msg.refbox_data        = gamecontroller_data_msg;
     world_publisher.publish(world_msg);
