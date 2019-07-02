@@ -24,7 +24,8 @@ AI:
         - "Defense Play"
         - "KickoffEnemy Play"
         - "KickoffFriendly Play"
-    description: >- 
+        - "ShootOrChip Play"
+    description: >-
         Specifies the ai play that should be in use
   refbox:
     override_refbox_play:

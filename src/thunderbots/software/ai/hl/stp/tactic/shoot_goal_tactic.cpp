@@ -6,13 +6,13 @@
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
-                                 double min_percent_net_open,
+                                 Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       ball(ball),
-      min_percent_net_open(min_percent_net_open),
+      min_net_open_angle(min_net_open_angle),
       chip_target(chip_target),
       has_shot_available(false),
       Tactic(loop_forever, {RobotCapabilityFlags::Kick})
@@ -25,12 +25,14 @@ std::string ShootGoalTactic::getName() const
 }
 
 void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball)
+                                   const Team &enemy_team, const Ball &ball,
+                                   std::optional<Point> chip_target)
 {
     this->field         = field;
     this->friendly_team = friendly_team;
     this->enemy_team    = enemy_team;
     this->ball          = ball;
+    this->chip_target   = chip_target;
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -76,25 +78,12 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     return false;
 }
 
-std::optional<std::pair<Point, double>> ShootGoalTactic::getShotData() const
-{
-    auto best_shot_opt = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
-                                                             enemy_team, ball.position());
-    if (best_shot_opt)
-    {
-        double net_percent_open = Evaluation::calcShotOpenEnemyNetPercentage(
-            field, ball.position(), *best_shot_opt);
-        return std::make_pair(best_shot_opt->first, net_percent_open);
-    }
-
-    return std::nullopt;
-}
-
 void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
                                             ChipAction &chip_action,
                                             IntentCoroutine::push_type &yield) const
 {
-    auto shot_target = getShotData();
+    auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
+                                                           enemy_team, ball.position());
     while (shot_target)
     {
         if (!isEnemyAboutToStealBall())
@@ -113,7 +102,8 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
                                                           shot_target->first, CHIP_DIST));
         }
 
-        shot_target = getShotData();
+        shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
+                                                          enemy_team, ball.position());
     }
 }
 
@@ -123,11 +113,11 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     ChipAction chip_action = ChipAction();
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
 
-    Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
     do
     {
-        auto shot_target = getShotData();
-        if (shot_target && shot_target->second > min_percent_net_open)
+        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
+            field, friendly_team, enemy_team, ball.position());
+        if (shot_target && shot_target->second > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
             // shot is entirely blocked
@@ -140,6 +130,7 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // If an enemy is about to steal the ball from us, we try chip over them to
             // try recover the ball after, which is better than being stripped of the ball
             // and directly losing possession that way
+            Point fallback_chip_target = chip_target ? *chip_target : field.enemyGoal();
             yield(chip_action.updateStateAndGetNextIntent(
                 *robot, ball, ball.position(), fallback_chip_target, CHIP_DIST));
         }
