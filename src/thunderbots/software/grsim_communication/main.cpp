@@ -23,24 +23,36 @@ namespace
                                Util::Constants::GRSIM_COMMAND_NETWORK_PORT);
     // The current state of the world
     World world;
+
+    // Cached primtive array
+    std::vector<std::unique_ptr<Primitive>> primitives;
+    std::mutex update_primitives_vector_mutex;
+
 }  // namespace
 
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
-    std::vector<std::unique_ptr<Primitive>> primitives;
+    update_primitives_vector_mutex.lock();
+
+    // clear and update primitives
+    primitives.clear();
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
         primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
     }
-
-    grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
+    update_primitives_vector_mutex.unlock();
 }
 
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
 {
     thunderbots_msgs::World world_msg = *msg;
     world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+
+    // send primitives
+    update_primitives_vector_mutex.lock();
+    grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
+    update_primitives_vector_mutex.unlock();
 }
 
 int main(int argc, char** argv)

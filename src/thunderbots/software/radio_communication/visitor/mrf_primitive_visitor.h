@@ -18,6 +18,9 @@ typedef struct RadioPrimitive_t
 
     // Extra bits used for flags and/or additional information
     uint8_t extra_bits;
+
+    // Indicates whether the robot should move slowly (<1.5 m/s)
+    bool slow;
 } RadioPrimitive;
 
 inline bool operator==(const RadioPrimitive &lhs, const RadioPrimitive &rhs)

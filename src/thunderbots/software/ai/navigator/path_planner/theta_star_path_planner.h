@@ -69,10 +69,11 @@ class ThetaStarPathPlanner : public PathPlanner
     std::vector<std::vector<GridCell>> cellDetails;
 
 
-    /* Description of the Grid-
-    true --> The cell is not blocked
-    false --> The cell is blocked */
-    std::vector<std::vector<bool>> unblocked_grid;
+    // Description of the Grid-
+    // true --> The cell is not blocked
+    // false --> The cell is blocked
+    // We update this as we go to avoid updating cells we don't use
+    std::map<std::pair<int,int>, bool> unblocked_grid;
 
 
     /**

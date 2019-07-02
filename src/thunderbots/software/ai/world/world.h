@@ -160,7 +160,6 @@ class World final
      */
     boost::circular_buffer<Timestamp> getTimestampHistory();
 
-   private:
     /**
      * Searches all member objects of world for the most recent Timestamp value
      *
@@ -176,6 +175,7 @@ class World final
      */
     void updateTimestamp(Timestamp timestamp);
 
+   private:
     // Private Variables
     Field field_;
     Ball ball_;

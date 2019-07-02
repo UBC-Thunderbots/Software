@@ -203,15 +203,15 @@ void CanvasMessenger::drawPoint(Layer layer, const Point& p, double radius, Colo
 void CanvasMessenger::drawWorld(const World& world)
 {
     // Draw the new layer
-    drawBall(world.ball());
-    publishAndClearLayer(Layer::BALL);
-
     drawField(world.field());
     publishAndClearLayer(Layer::STATIC_FEATURES);
 
     drawTeam(world.friendlyTeam(), FRIENDLY_TEAM_COLOR);
     drawTeam(world.enemyTeam(), ENEMY_TEAM_COLOR);
     publishAndClearLayer(Layer::ROBOTS);
+
+    drawBall(world.ball());
+    publishAndClearLayer(Layer::BALL);
 }
 
 void CanvasMessenger::drawBall(const Ball& ball)
