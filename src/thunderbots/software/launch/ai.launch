@@ -18,4 +18,7 @@
     <!-- Launch the rqt_reconfigure gui -->
     <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
 
+    <!-- Run the corner-kick visualizer -->
+    <include file="$(find corner_kick)/launch/corner_kick.launch" />
+
 </launch>
