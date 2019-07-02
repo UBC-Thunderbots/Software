@@ -6,6 +6,7 @@
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/cherry_pick_tactic.h"
+#include "ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/passer_tactic.h"
 #include "ai/hl/stp/tactic/patrol_tactic.h"
@@ -61,23 +62,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto cherry_pick_tactic_neg_y = std::make_shared<CherryPickTactic>(
         world, Rectangle(world.field().centerPoint(), world.field().enemyCornerNeg()));
 
-    // Have two robots patrol along a line near the sides of the field
-    // TODO: make these two patrollers into "crease defenders"
-    double half_field_width = world.field().width() / 2;
-    double patrol_point_y_position =
-        half_field_width - half_field_width / 4;  // TODO: eh?
-    auto patrol_tactic_pos_y =
-        std::make_shared<PatrolTactic>(std::vector<Point>({
-                                           Point(0, patrol_point_y_position),
-                                           Point(1, patrol_point_y_position),
-                                       }),
-                                       AT_PATROL_POINT_TOLERANCE, SPEED_AT_PATROL_POINTS);
-    auto patrol_tactic_neg_y =
-        std::make_shared<PatrolTactic>(std::vector<Point>({
-                                           Point(0, -patrol_point_y_position),
-                                           Point(1, -patrol_point_y_position),
-                                       }),
-                                       AT_PATROL_POINT_TOLERANCE, SPEED_AT_PATROL_POINTS);
+    // Setup crease defenders
+    auto crease_defender_left = std::make_shared<CreaseDefenderTactic>(
+        world.field(), world.ball(), world.friendlyTeam(), world.enemyTeam(),
+        CreaseDefenderTactic::LeftOrRight::LEFT);
+    auto crease_defender_right = std::make_shared<CreaseDefenderTactic>(
+        world.field(), world.ball(), world.friendlyTeam(), world.enemyTeam(),
+        CreaseDefenderTactic::LeftOrRight::RIGHT);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -109,7 +100,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updatePassGenerator(pass_generator);
 
         yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               patrol_tactic_pos_y, patrol_tactic_neg_y});
+               crease_defender_left, crease_defender_right});
     }
 
     // Put the robot in roughly the right position to perform the kick
@@ -120,7 +111,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               patrol_tactic_pos_y, patrol_tactic_neg_y});
+               crease_defender_left, crease_defender_right});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -132,7 +123,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        // TODO: Update "crease defenders" here when they're done
+        crease_defender_left->updateParams(world.ball(), world.field(),
+                                           world.friendlyTeam(), world.enemyTeam());
+        crease_defender_right->updateParams(world.ball(), world.field(),
+                                            world.friendlyTeam(), world.enemyTeam());
         updateShootGoalTactic(shoot_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
@@ -141,7 +135,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
 
         yield({shoot_tactic, cherry_pick_tactic_neg_y, cherry_pick_tactic_pos_y,
-               patrol_tactic_pos_y, patrol_tactic_neg_y});
+               crease_defender_left, crease_defender_right});
 
         // If there is a robot assigned to shoot, we assume this is the robot
         // that will be taking the shot
@@ -163,7 +157,6 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // we set it
         if (set_passer_robot_in_passgenerator)
         {
-            // TODO: change this to use the world timestamp (Issue #423)
             Duration time_since_commit_stage_start =
                 world.getMostRecentTimestamp() - pass_optimization_start_time;
             min_pass_score_threshold =
@@ -199,11 +192,14 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             false);
         do
         {
-            // TODO: Update "crease defenders" here when they're done
+            crease_defender_left->updateParams(world.ball(), world.field(),
+                                               world.friendlyTeam(), world.enemyTeam());
+            crease_defender_right->updateParams(world.ball(), world.field(),
+                                                world.friendlyTeam(), world.enemyTeam());
             passer->updateParams(pass, world.ball());
             receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
                                    world.ball());
-            yield({passer, receiver, patrol_tactic_pos_y, patrol_tactic_neg_y});
+            yield({passer, receiver, crease_defender_left, crease_defender_right});
         } while (!receiver->done());
     }
     else
