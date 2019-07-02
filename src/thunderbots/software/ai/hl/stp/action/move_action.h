@@ -43,7 +43,8 @@ class MoveAction : public Action
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(
         const Robot& robot, Point destination, Angle final_orientation,
-        double final_speed, bool enable_dribbler = false, bool slow = false, AutokickType autokick = NONE);
+        double final_speed, bool enable_dribbler = false, bool slow = false,
+        AutokickType autokick = NONE);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

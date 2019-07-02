@@ -39,7 +39,8 @@ class MovePrimitive : public Primitive
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
-                           bool enable_dribbler = false, bool slow = false, AutokickType autokick = NONE);
+                           bool enable_dribbler = false, bool slow = false,
+                           AutokickType autokick = NONE);
 
     /**
      * Creates a new Move Primitive from a Primitive message
@@ -95,6 +96,13 @@ class MovePrimitive : public Primitive
      * @return whether or not the dribbler should be enabled while moving
      */
     bool isDribblerEnabled() const;
+
+    /**
+     * Gets whether or not the robot should be moving slow
+     *
+     * @return whether or not the robot should be moving slow
+     */
+    bool isSlowEnabled() const;
 
     /**
      * Returns the generic vector of parameters for this Primitive

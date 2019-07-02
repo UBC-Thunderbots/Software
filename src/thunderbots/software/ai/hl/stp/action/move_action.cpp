@@ -19,7 +19,7 @@ std::unique_ptr<Intent> MoveAction::updateStateAndGetNextIntent(
     this->final_orientation = final_orientation;
     this->final_speed       = final_speed;
     this->enable_dribbler   = enable_dribbler;
-    this->slow   = slow;
+    this->slow              = slow;
     this->autokick          = autokick;
 
     return getNextIntent();
@@ -35,7 +35,8 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
-                                           final_speed, 0, enable_dribbler, slow, autokick));
+                                           final_speed, 0, enable_dribbler, slow,
+                                           autokick));
     } while (loop_forever ||
              (robot->position() - destination).len() > close_to_dest_threshold);
 }

@@ -1,4 +1,5 @@
-#include "ai/primitive/move_primitive.h" 
+#include "ai/primitive/move_primitive.h"
+
 #include "ai/primitive/visitor/primitive_visitor.h"
 
 const std::string MovePrimitive::PRIMITIVE_NAME = "Move Primitive";
@@ -27,7 +28,7 @@ MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
     final_speed     = primitive_msg.parameters.at(3);
     enable_dribbler = static_cast<bool>(primitive_msg.parameters.at(4));
-    slow = static_cast<bool>(primitive_msg.parameters.at(5));
+    slow            = static_cast<bool>(primitive_msg.parameters.at(5));
     if (primitive_msg.extra_bits.empty())
     {
         autokick = NONE;
@@ -85,8 +86,12 @@ bool MovePrimitive::isSlowEnabled() const
 
 std::vector<double> MovePrimitive::getParameters() const
 {
-    std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),
-                                      final_speed, (double)enable_dribbler, (double)slow};
+    std::vector<double> parameters = {dest.x(),
+                                      dest.y(),
+                                      final_angle.toRadians(),
+                                      final_speed,
+                                      (double)enable_dribbler,
+                                      (double)slow};
 
     return parameters;
 }
@@ -106,8 +111,7 @@ bool MovePrimitive::operator==(const MovePrimitive &other) const
     return this->robot_id == other.robot_id && this->dest == other.dest &&
            this->final_angle == other.final_angle &&
            this->final_speed == other.final_speed &&
-           this->enable_dribbler == other.enable_dribbler &&
-           this->slow == other.slow &&
+           this->enable_dribbler == other.enable_dribbler && this->slow == other.slow &&
            this->autokick == other.autokick;
 }
 
