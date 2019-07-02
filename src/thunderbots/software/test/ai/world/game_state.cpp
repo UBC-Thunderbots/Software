@@ -194,7 +194,7 @@ PREDICATE_TEST(isTheirDirectFree, RefboxGameState::DIRECT_FREE_THEM)
 PREDICATE_TEST(isTheirFreeKick, RefboxGameState::DIRECT_FREE_THEM,
                RefboxGameState::INDIRECT_FREE_THEM)
 PREDICATE_TEST(isTheirBallPlacement, RefboxGameState::BALL_PLACEMENT_THEM)
-//PREDICATE_TEST(
+// PREDICATE_TEST(
 //    isSetupRestart, RefboxGameState::PREPARE_KICKOFF_US,
 //    RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
 //    RefboxGameState::BALL_PLACEMENT_THEM,
@@ -205,9 +205,11 @@ PREDICATE_TEST(isSetupState, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::PREPARE_KICKOFF_THEM, RefboxGameState::BALL_PLACEMENT_US,
                RefboxGameState::BALL_PLACEMENT_THEM, RefboxGameState::PREPARE_PENALTY_US,
                RefboxGameState::PREPARE_PENALTY_THEM)
-PREDICATE_TEST(isReadyState, RefboxGameState::NORMAL_START, RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_THEM)
+PREDICATE_TEST(isReadyState, RefboxGameState::NORMAL_START,
+               RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_THEM)
 // canKick needs to be tested with a proper restart sequence
-PREDICATE_TEST(canKick, RefboxGameState::FORCE_START, RefboxGameState::DIRECT_FREE_US, RefboxGameState::INDIRECT_FREE_US)
+PREDICATE_TEST(canKick, RefboxGameState::FORCE_START, RefboxGameState::DIRECT_FREE_US,
+               RefboxGameState::INDIRECT_FREE_US)
 PREDICATE_TEST(stayOnSide, RefboxGameState::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(stayBehindPenaltyLine, RefboxGameState::PREPARE_PENALTY_THEM,
                RefboxGameState::PREPARE_PENALTY_US)

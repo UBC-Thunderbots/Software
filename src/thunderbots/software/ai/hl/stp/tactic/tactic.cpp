@@ -191,9 +191,12 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const GameState &game_state)
             addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
         }
 
-        if(game_state.isOurPenalty()) {
+        if (game_state.isOurPenalty())
+        {
             addAreaIfNotInWhitelist(AvoidArea::ENEMY_DEFENSE_AREA);
-        }else {
+        }
+        else
+        {
             addAreaIfNotInWhitelist(AvoidArea::INFLATED_ENEMY_DEFENSE_AREA);
         }
     }

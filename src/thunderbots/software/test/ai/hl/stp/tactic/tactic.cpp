@@ -457,7 +457,7 @@ TEST(TacticTest, test_whitelisted_areas_are_ignored)
     auto next_intent = tactic.getNextIntent(game_state);
     ASSERT_TRUE(next_intent);
 
-    EXPECT_EQ(std::vector<AvoidArea>(
-                  {AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+    EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
+                                      AvoidArea::FRIENDLY_DEFENSE_AREA}),
               next_intent->getAreasToAvoid());
 }
