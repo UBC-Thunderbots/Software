@@ -24,6 +24,7 @@ AI:
         - "Defense Play"
         - "KickoffEnemy Play"
         - "KickoffFriendly Play"
+        - "Penalty Kick Play"
         - "ShootOrChip Play"
     description: >-
         Specifies the ai play that should be in use
