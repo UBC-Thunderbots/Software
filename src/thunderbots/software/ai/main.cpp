@@ -38,7 +38,18 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     world.updateFriendlyTeamState(new_world.friendlyTeam());
     RefboxGameState new_game_state =
         Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
+//    LOG(INFO) << new_game_state << std::endl;
     world.updateRefboxGameState(new_game_state);
+    std::cout <<
+    "Halt: " << world.gameState().isHalted() << std::endl <<
+    "Stop: " << world.gameState().isStopped() << std::endl <<
+"Setup: " << world.gameState().isSetupState() << std::endl <<
+"Ready: " << world.gameState().isReadyState() << std::endl <<
+"Playing: " << world.gameState().isPlaying() << std::endl <<
+"Stay away: " << world.gameState().stayAwayFromBall() << std::endl <<
+    "can kick: " << world.gameState().canKick() << std::endl <<
+    std::endl;
+
 
     if (Util::DynamicParameters::AI::run_ai.value())
     {

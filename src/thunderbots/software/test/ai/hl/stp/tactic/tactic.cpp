@@ -198,7 +198,7 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::HALF_METER_AROUND_BALL,
-                AvoidArea::ENEMY_DEFENSE_AREA,
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Stop
@@ -238,7 +238,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0.5}}
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA,
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their kickoff setup
@@ -269,7 +269,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0.5}}
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA,
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }
         ),
@@ -287,7 +287,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::INDIRECT_FREE_US, {0, 0.5}},
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their indirect free kick setup
@@ -296,7 +296,7 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their indirect free kick after they've moved the ball
@@ -305,7 +305,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::INDIRECT_FREE_THEM, {0, 0.5}},
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Our direct free kick setup
@@ -322,7 +322,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::DIRECT_FREE_US, {0, 0.5}},
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their direct free kick setup
@@ -331,7 +331,7 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their direct free kick after they've moved the ball
@@ -340,7 +340,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::DIRECT_FREE_THEM, {0, 0.5}},
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Our penalty kick setup
@@ -458,6 +458,6 @@ TEST(TacticTest, test_whitelisted_areas_are_ignored)
     ASSERT_TRUE(next_intent);
 
     EXPECT_EQ(std::vector<AvoidArea>(
-                  {AvoidArea::ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
+                  {AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, AvoidArea::FRIENDLY_DEFENSE_AREA}),
               next_intent->getAreasToAvoid());
 }
