@@ -20,6 +20,7 @@ AI:
         - "Stop Play"
         - "Halt Play"
         - "Corner Kick Play"
+        - "Free Kick Play"
         - "Defense Play"
         - "KickoffEnemy Play"
         - "KickoffFriendly Play"

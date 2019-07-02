@@ -88,7 +88,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
         for (const auto& tactic : assigned_tactics)
         {
             // Get the Intent the tactic wants to run
-            auto intent = tactic->getNextIntent();
+            auto intent = tactic->getNextIntent(world.gameState());
 
             // If the tactic is not done and a valid intent was returned, the intent will
             // be run by the robot. Otherwise, the robot will default to running a
