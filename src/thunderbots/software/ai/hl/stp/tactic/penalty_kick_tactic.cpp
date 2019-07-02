@@ -81,12 +81,12 @@ bool PenaltyKickTactic::evaluate_penalty_shot() {
     }
 }
 
-Point PenaltyKickTactic::evaluate_next_position(){
+Point PenaltyKickTactic::evaluate_next_position() {
     // Evaluate if the goalie is closer to the negative or positive goalpost
 
     if(enemy_goalie.has_value()) {
         double goalie_dist_to_neg_goalpost = (field.enemyGoalpostNeg() - enemy_goalie.value().position()).lensq();
-        double goalie_dist_to_pos_goalpost = (field.enemyGoalpostPos() - enemy_goalie.value().position()).len();
+        double goalie_dist_to_pos_goalpost = (field.enemyGoalpostPos() - enemy_goalie.value().position()).lensq();
 
         return goalie_dist_to_neg_goalpost > goalie_dist_to_pos_goalpost ? field.enemyGoalpostNeg() : field.enemyGoalpostPos();
     }
