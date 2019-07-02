@@ -50,11 +50,11 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         penalty_shot_tactic->updateParams(world.ball(), world.enemyTeam().goalie(), world.field());
 
         // Move all non-shooter robots to the center of the field
-        move_tactic_2->updateParams(Point(0, 0));
-        move_tactic_3->updateParams(Point(0, 2*ROBOT_MAX_RADIUS_METERS));
-        move_tactic_4->updateParams(Point(0, -2*ROBOT_MAX_RADIUS_METERS));
-        move_tactic_5->updateParams(Point(0, 4*ROBOT_MAX_RADIUS_METERS));
-        move_tactic_6->updateParams(Point(0,-4*ROBOT_MAX_RADIUS_METERS));
+        move_tactic_2->updateParams(Point(0, 0), world.field().enemyGoal().orientation(), 0 );
+        move_tactic_3->updateParams(Point(0, 2*ROBOT_MAX_RADIUS_METERS), world.field().enemyGoal().orientation(), 0 );
+        move_tactic_4->updateParams(Point(0, -2*ROBOT_MAX_RADIUS_METERS), world.field().enemyGoal().orientation(), 0 );
+        move_tactic_5->updateParams(Point(0, 4*ROBOT_MAX_RADIUS_METERS), world.field().enemyGoal().orientation(), 0 );
+        move_tactic_6->updateParams(Point(0,-4*ROBOT_MAX_RADIUS_METERS), world.field().enemyGoal().orientation(), 0 );
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({penalty_shot_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,

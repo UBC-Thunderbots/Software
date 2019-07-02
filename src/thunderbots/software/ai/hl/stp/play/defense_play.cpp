@@ -1,10 +1,9 @@
 #include "ai/hl/stp/play/defense_play.h"
 
-#include <ai/hl/stp/tactic/crease_defender_tactic.h>
-
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
@@ -45,7 +44,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, true)};
 
-    std::vector<std::shared_ptr<CreaseDefenderTactic>> crease_defender_tactics = {
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
                                                world.friendlyTeam(), world.enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::LEFT),
