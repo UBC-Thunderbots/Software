@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ai/hl/stp/play/play.h"
-#include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/cherry_pick_tactic.h"
+#include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/patrol_tactic.h"
 #include "ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "ai/passing/pass_generator.h"

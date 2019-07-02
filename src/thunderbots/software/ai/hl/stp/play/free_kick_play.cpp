@@ -63,8 +63,9 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Have two robots patrol along a line near the sides of the field
     // TODO: make these two patrollers into "crease defenders"
-    double half_field_width        = world.field().width() / 2;
-    double patrol_point_y_position = half_field_width - half_field_width / 4; // TODO: eh?
+    double half_field_width = world.field().width() / 2;
+    double patrol_point_y_position =
+        half_field_width - half_field_width / 4;  // TODO: eh?
     auto patrol_tactic_pos_y =
         std::make_shared<PatrolTactic>(std::vector<Point>({
                                            Point(0, patrol_point_y_position),
@@ -126,8 +127,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Have a robot keep trying to take a shot
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        0.1, std::nullopt, false);
+        world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), 0.1,
+        std::nullopt, false);
 
     do
     {
@@ -139,8 +140,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.first;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
 
-        yield({shoot_tactic, cherry_pick_tactic_neg_y,
-               cherry_pick_tactic_pos_y, patrol_tactic_pos_y, patrol_tactic_neg_y});
+        yield({shoot_tactic, cherry_pick_tactic_neg_y, cherry_pick_tactic_pos_y,
+               patrol_tactic_pos_y, patrol_tactic_neg_y});
 
         // If there is a robot assigned to shoot, we assume this is the robot
         // that will be taking the shot
@@ -172,7 +173,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
 
         LOG(DEBUG) << "LOOP END";
-    } while(!ready_to_pass || shoot_tactic->hasShotAvailable());
+    } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
 
     // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
     // each) to save a significant number of CPU cycles
