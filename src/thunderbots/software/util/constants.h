@@ -27,7 +27,6 @@ namespace Util
         static const std::string JOY_NODE_TOPIC = "joy";
 
         // Networking and vision
-        static const std::string SSL_VISION_MULTICAST_ADDRESS = "224.5.23.2";
         static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
 
         // GrSim networking and communication
