@@ -113,7 +113,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
         //@todo consider using velocity obstacles: Obstacle o =
-        //Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        // Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
         Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
     }
