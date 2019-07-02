@@ -211,6 +211,11 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         return std::nullopt;
     }
 
+    // If the destination GridCell is within one grid size of start
+    if ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS)
+    {
+        return std::make_optional<std::vector<Point>>({start, destination});
+    }
 
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
@@ -239,12 +244,6 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         {
             return std::nullopt;
         }
-    }
-
-    // If the destination GridCell is the same as source GridCell
-    if (isDestination(src.first, src.second, dest) == true)
-    {
-        return std::make_optional<std::vector<Point>>({start, destination});
     }
 
     closedList =
