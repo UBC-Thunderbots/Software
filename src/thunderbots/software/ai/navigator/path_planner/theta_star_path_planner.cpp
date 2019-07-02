@@ -35,7 +35,7 @@ bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
         Point p = convertCellToPoint(row, col);
         for (auto &obstacle : obstacles_)
         {
-            if (obstacle.getBoundaryPolygon().containsPoint(p))
+            if (obstacle.containsPoint(p))
             {
                 blocked = true;
                 break;
