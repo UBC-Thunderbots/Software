@@ -163,21 +163,6 @@ Point GameState::getBallPlacementPoint() const
 // apologies for this monster switch statement
 void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &ball)
 {
-    if (state == READY && !ball_state)
-    {
-        ball_state = ball;
-    }
-
-    if (ball_state && (ball.position() - ball_state->position()).len() > 0.03)
-    {
-        setRestartCompleted();
-    }
-
-    if (state != READY)
-    {
-        ball_state = std::nullopt;
-    }
-
     if (gameState != game_state)
     {
         game_state = gameState;
@@ -269,6 +254,21 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
             default:
                 LOG(WARNING) << "Unrecognized RefboxGameState" << std::endl;
                 break;
+        }
+    }
+
+    if (state == READY)
+    {
+        if (!ball_state)
+        {
+            // Save the ball state so we can tell once it moves
+            ball_state = ball;
+        }
+        else if ((ball.position() - ball_state->position()).len() > 0.03)
+        {
+            // Once the ball has moved enough, the restart is finished
+            setRestartCompleted();
+            ball_state = std::nullopt;
         }
     }
 }

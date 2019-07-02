@@ -148,8 +148,13 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
     // Checks if the given area is in the whitelist and adds it to
     // the list to return if not
     auto addAreaIfNotInWhitelist = [&](AvoidArea area) {
-        if (std::find(whitelisted_avoid_areas.begin(), whitelisted_avoid_areas.end(),
-                      area) == whitelisted_avoid_areas.end())
+        bool area_is_whitelisted =
+            std::find(whitelisted_avoid_areas.begin(), whitelisted_avoid_areas.end(),
+                      area) != whitelisted_avoid_areas.end();
+        bool area_is_already_added =
+            std::find(areas_to_avoid.begin(), areas_to_avoid.end(), area) !=
+            areas_to_avoid.end();
+        if (!area_is_whitelisted && !area_is_already_added)
         {
             areas_to_avoid.emplace_back(area);
         }
@@ -171,7 +176,9 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
             // Is their penalty
             addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_HALF);
         }
-    } else if (world.gameState().isKickoff()){
+    }
+    else if (world.gameState().isKickoff())
+    {
         addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
         addAreaIfNotInWhitelist(AvoidArea::CENTER_CIRCLE);
         addAreaIfNotInWhitelist(AvoidArea::ENEMY_HALF);
@@ -186,7 +193,7 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
         bool is_our_kick_setup = (world.gameState().isOurDirectFree() ||
                                   world.gameState().isOurIndirectFree()) &&
                                  world.gameState().isSetupState();
-        if (world.gameState().isStopped())
+        if (world.gameState().isOurFreeKick())
         {
             addAreaIfNotInWhitelist(AvoidArea::INFLATED_ENEMY_DEFENSE_AREA);
         }
@@ -194,9 +201,9 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const World &world)
         {
             addAreaIfNotInWhitelist(AvoidArea::ENEMY_DEFENSE_AREA);
         }
-
-        addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_DEFENSE_AREA);
     }
+
+    addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_DEFENSE_AREA);
 
     return areas_to_avoid;
 }

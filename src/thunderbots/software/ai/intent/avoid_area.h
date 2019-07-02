@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ostream>
+
 /**
  * This enum describes the areas that an intent can choose to avoid. They serve
  * as an indicator to the navigator when it interprets the intents
@@ -21,3 +23,5 @@ enum class AvoidArea
     // The friendly half of the field
     FRIENDLY_HALF
 };
+
+std::ostream& operator<<(std::ostream& os, const AvoidArea& state);

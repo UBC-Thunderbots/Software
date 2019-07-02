@@ -186,6 +186,8 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
 
 // Parameterized test to check that we return the correct areas to avoid for a
 // given refbox state
+// We disable clang-format here because it makes these lists borderline unreadable,
+// and certainly way more difficult to edit
 // clang-format off
 INSTANTIATE_TEST_CASE_P(
     All, TacticAvoidAreasTest,
@@ -195,7 +197,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::HALT, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
+                AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
@@ -213,8 +215,9 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::PREPARE_KICKOFF_US, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_HALF, 
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::CENTER_CIRCLE,
+                AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Our kickoff before we've moved the ball
@@ -223,8 +226,9 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}}
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_HALF, 
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::CENTER_CIRCLE,
+                AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Our kickoff after we've moved the ball
@@ -234,7 +238,7 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0.5}}
             },
             {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
+                AvoidArea::ENEMY_DEFENSE_AREA,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their kickoff setup
@@ -242,8 +246,9 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::PREPARE_KICKOFF_THEM, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_HALF, 
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::CENTER_CIRCLE,
+                AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their kickoff before they've moved the ball
@@ -252,8 +257,9 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_HALF, 
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::CENTER_CIRCLE,
+                AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
         // Their kickoff after they've moved the ball
@@ -275,20 +281,10 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
-        // Our indirect free kick before we've moved the ball
-        makeParams({
-                {RefboxGameState::INDIRECT_FREE_US, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-            },
-            {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
-            }),
         // Our indirect free kick after we've moved the ball
         makeParams({
                 {RefboxGameState::INDIRECT_FREE_US, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0.5}},
+                {RefboxGameState::INDIRECT_FREE_US, {0, 0.5}},
             },
             {
                 AvoidArea::ENEMY_DEFENSE_AREA, 
@@ -303,21 +299,10 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::ENEMY_DEFENSE_AREA, 
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
-        // Their indirect free kick before they've moved the ball
-        makeParams({
-                {RefboxGameState::INDIRECT_FREE_THEM, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-            },
-            {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
-            }),
         // Their indirect free kick after they've moved the ball
         makeParams({
                 {RefboxGameState::INDIRECT_FREE_THEM, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0.5}},
+                {RefboxGameState::INDIRECT_FREE_THEM, {0, 0.5}},
             },
             {
                 AvoidArea::ENEMY_DEFENSE_AREA, 
@@ -331,20 +316,10 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
-        // Our direct free kick before we've moved the ball
-        makeParams({
-                {RefboxGameState::DIRECT_FREE_US, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-            },
-            {
-                AvoidArea::ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
-            }),
         // Our direct free kick after we've moved the ball
         makeParams({
                 {RefboxGameState::DIRECT_FREE_US, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0.5}},
+                {RefboxGameState::DIRECT_FREE_US, {0, 0.5}},
             },
             {
                 AvoidArea::ENEMY_DEFENSE_AREA, 
@@ -359,21 +334,10 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::ENEMY_DEFENSE_AREA, 
                 AvoidArea::FRIENDLY_DEFENSE_AREA
             }),
-        // Their direct free kick before they've moved the ball
-        makeParams({
-                {RefboxGameState::DIRECT_FREE_THEM, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-            },
-            {
-                AvoidArea::HALF_METER_AROUND_BALL, 
-                AvoidArea::ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
-            }),
         // Their direct free kick after they've moved the ball
         makeParams({
                 {RefboxGameState::DIRECT_FREE_THEM, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0}},
-                {RefboxGameState::NORMAL_START, {0, 0.5}},
+                {RefboxGameState::DIRECT_FREE_THEM, {0, 0.5}},
             },
             {
                 AvoidArea::ENEMY_DEFENSE_AREA, 
@@ -384,7 +348,8 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::PREPARE_PENALTY_US, {0, 0}},
             },
             {
-                AvoidArea::ENEMY_HALF, 
+                AvoidArea::ENEMY_HALF,
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
             }),
         // Our penalty kick
         makeParams({
@@ -392,14 +357,17 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
-                AvoidArea::ENEMY_HALF, 
+                AvoidArea::ENEMY_HALF,
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
             }),
         // Their penalty kick setup
         makeParams({
                 {RefboxGameState::PREPARE_PENALTY_THEM, {0, 0}},
             },
             {
-                AvoidArea::FRIENDLY_HALF, 
+                AvoidArea::HALF_METER_AROUND_BALL,
+                AvoidArea::FRIENDLY_HALF,
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
             }),
         // Their penalty kick
         makeParams({
@@ -407,45 +375,11 @@ INSTANTIATE_TEST_CASE_P(
                 {RefboxGameState::NORMAL_START, {0, 0}},
             },
             {
-                AvoidArea::FRIENDLY_HALF, 
+                AvoidArea::FRIENDLY_HALF,
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
             })
         ));
 // clang-format on
-
-
-// class TacticCheckAvoidAreasTest : public ::testing::Test
-//{
-// protected:
-//    void setup(){
-//
-//        // Add a robot to a tactic
-//        Robot robot = Robot(0, Point(1, 1), Vector(), Angle::zero(),
-//        AngularVelocity::zero(),
-//                            Timestamp::fromSeconds(0));
-//        tactic.updateRobot(robot);
-//
-//    }
-//
-//    World world;
-//    Ball ball;
-//    MoveTestTactic tactic;
-//};
-//
-// TEST_F(TacticCheckAvoidAreasTest, check_default_avoid_areas_halt_state){
-////    // Halt
-////    makeParams({RefboxGameState::HALT},
-////               ),
-//    world.mutableGameState().updateRefboxGameState(RefboxGameState::HALT, ball);
-//
-//    auto next_intent = tactic.getNextIntent(world);
-//    ASSERT_TRUE(next_intent);
-//
-//    std::vector<AvoidArea> expected_avoid_areas = {AvoidArea::HALF_METER_AROUND_BALL,
-//    AvoidArea::ENEMY_DEFENSE_AREA,
-//                                                   AvoidArea::FRIENDLY_DEFENSE_AREA};
-//    EXPECT_EQ(expected_avoid_areas, next_intent->getAreasToAvoid())
-//}
-
 
 TEST(TacticTest, test_and_remove_extra_avoid_areas)
 {
