@@ -212,9 +212,10 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
         case AvoidArea::CENTER_CIRCLE:
             // We tack on an extra buffer here because we only approximate the circle,
             // and we can afford to be extra safe here
-            return Obstacle(world.field().centerPoint(),
-                            world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST + 0.1,
-                            NUM_POINTS_IN_CIRCLE_POLY);
+            return Obstacle(
+                world.field().centerPoint(),
+                world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST + 0.1,
+                NUM_POINTS_IN_CIRCLE_POLY);
         case AvoidArea::HALF_METER_AROUND_BALL:
             // We tack on an extra buffer here because we only approximate the circle,
             // and we can afford to be extra safe here
