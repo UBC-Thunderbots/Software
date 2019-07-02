@@ -112,7 +112,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        //@todo consider using velocity obstacles: Obstacle o =
+        //Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
     }
 
@@ -125,7 +127,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             // skip current robot
             continue;
         }
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
     }
 
@@ -210,17 +212,10 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             rectangle.expand(OBSTACLE_INFLATION_DIST + 0.2);
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
-            // We tack on an extra buffer here because we only approximate the circle,
-            // and we can afford to be extra safe here
-            return Obstacle(
-                world.field().centerPoint(),
-                world.field().centreCircleRadius() + OBSTACLE_INFLATION_DIST + 0.1,
-                NUM_POINTS_IN_CIRCLE_POLY);
+            return Obstacle::createCircleObstacle(
+                world.field().centerPoint(), world.field().centreCircleRadius(), 1.2);
         case AvoidArea::HALF_METER_AROUND_BALL:
-            // We tack on an extra buffer here because we only approximate the circle,
-            // and we can afford to be extra safe here
-            return Obstacle(world.ball().position(), 0.5 + OBSTACLE_INFLATION_DIST + 0.1,
-                            NUM_POINTS_IN_CIRCLE_POLY);
+            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, 1.2);
         case AvoidArea::ENEMY_HALF:
             rectangle =
                 Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());

@@ -32,18 +32,29 @@ class Obstacle
     Obstacle(Rectangle rectangle);
 
     /**
-     * Approximate the circle defined by the given parameters
+     * Create an obstacle from a circle
      *
-     * @param circle_center The center point of the circle
-     * @param circle_radius The radius of the circle
-     * @param num_points The number of points to use to approximate the circle as a
-     *                   polygon
+     * @param circle
      */
-    Obstacle(const Point& circle_center, const double circle_radius,
-             const int num_points);
+    Obstacle(Circle circle);
+
+    /**
+     * Circle obstacle defined by the given parameters
+     *
+     * @param circle_centre The centre point of the circle
+     * @param circle_radius The radius of the circle
+     * @param radius_scaling How much to scale the radius
+     *
+     * @return circle shaped obstacle
+     */
+    static Obstacle createCircleObstacle(const Point& circle_centre,
+                                         const double circle_radius,
+                                         const double radius_scaling);
 
     static Obstacle createRobotObstacle(const Robot& robot, bool enable_velocity_cushion);
 
+    static Obstacle createCircularRobotObstacle(const Robot& robot,
+                                                double radius_cushion_scaling);
 
     /*
      * Gets the boundary polygon around the given primitive that other robots
@@ -117,6 +128,18 @@ class Obstacle
     static Obstacle createBallObstacle(const Ball& ball,
                                        double additional_radius_cushion_buffer,
                                        double additional_velocity_cushion_buffer);
+
+    /**
+     * Circle obstacle around ball with additional_radius_cushion_buffer
+     *
+     * @param ball                              ball to make obstacle around
+     * @param additional_radius_cushion_buffer  extra buffer around obstacle
+     *
+     * @return obstacle around the ball
+     */
+    static Obstacle createCircularBallObstacle(const Ball& ball,
+                                               double additional_radius_cushion_buffer);
+
 
     const std::optional<Polygon> getBoundaryPolygon() const;
 
