@@ -22,6 +22,7 @@
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
 #include "ai/world/world.h"
+#include "geom/polygon.h"
 #include "thunderbots_msgs/CanvasLayer.h"
 #include "util/constants.h"
 
@@ -42,6 +43,7 @@ namespace Util
             BALL,
             ROBOTS,
             STATIC_FEATURES,
+            OBSTACLES
         };
 
         struct Color
@@ -229,6 +231,8 @@ namespace Util
         void drawRobot(Robot robot, Color color);
 
         void drawRobotPath(std::vector<Point> path_points);
+
+        void drawPolygon(const Polygon& poly);
 
        private:
         /**

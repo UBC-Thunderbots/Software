@@ -268,6 +268,12 @@ void CanvasMessenger::drawRobotPath(std::vector<Point> path_points)
     }
 }
 
+void CanvasMessenger::drawPolygon(const Polygon &poly) {
+    for (const Segment& seg : poly.getSegments()) {
+        drawLine(Layer::OBSTACLES, seg.getSegStart(), seg.getEnd(), ENEMY_TEAM_COLOR);
+    }
+}
+
 Point CanvasMessenger::Sprite::getTopLeftCorner()
 {
     return _center + Vector(-_width / 2, _height / 2);

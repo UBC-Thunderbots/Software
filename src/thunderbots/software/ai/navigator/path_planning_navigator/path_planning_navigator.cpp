@@ -107,6 +107,8 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         if (obstacle_opt)
         {
             obstacles.emplace_back(*obstacle_opt);
+            // draw the avoid area
+            Util::CanvasMessenger::getInstance()->drawPolygon(obstacle_opt->getBoundaryPolygon());
         }
     }
 
