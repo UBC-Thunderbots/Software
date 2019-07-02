@@ -23,6 +23,24 @@ class Obstacle
      */
     Obstacle(Polygon polygon);
 
+    /**
+     * Create an obstacle from a rectangle
+     *
+     * @param rectangle
+     */
+    Obstacle(Rectangle rectangle);
+
+    /**
+     * Approximate the circle defined by the given parameters
+     *
+     * @param circle_center The center point of the circle
+     * @param circle_radius The radius of the circle
+     * @param num_points The number of points to use to approximate the circle as a
+     *                   polygon
+     */
+    Obstacle(const Point& circle_center, const double circle_radius,
+             const int num_points);
+
     static Obstacle createRobotObstacle(const Robot& robot, bool enable_velocity_cushion);
 
 

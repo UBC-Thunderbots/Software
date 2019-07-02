@@ -18,9 +18,11 @@
 class PathPlanningNavigator : public Navigator, public IntentVisitor
 {
    public:
-    explicit PathPlanningNavigator(){
+    explicit PathPlanningNavigator()
+        : OBSTACLE_INFLATION_DIST(1.5 * ROBOT_MAX_RADIUS_METERS),
+          NUM_POINTS_IN_CIRCLE_POLY(16){
 
-    };
+          };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<Obstacle> &additional_obstacles,
@@ -101,18 +103,35 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
+    /**
+     * Create an obstacle for the given avoid area, with a buffer such that the edge
+     * of the robot does not protrude into the area
+     *
+     * @param avoid_area The area to convert into an obstacle
+     *
+     * @return A obstacle representing the given area
+     */
+    std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
+
+    // How much to inflate obstacles by to prevent robot collision
+    const double OBSTACLE_INFLATION_DIST;
+
+    const unsigned int NUM_POINTS_IN_CIRCLE_POLY;
+
     // This navigators knowledge / state of the world
     World world;
+
     // The current Primitive the navigator has created from an Intent.
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
+
     // The current Robot the navigator has navigated for from an Intent.
     // This variable is set by each `visit` function
     std::optional<Robot> current_robot;
+
     // The current destination the navigator has navigated to from an Intent.
     // This variable is set by each `visit` function
     Point current_destination;
-    //@TODO clean up this competition hack; should use some sort of flag system instead of
-    // passing in obstacles
+
     std::vector<Obstacle> additional_obstacles;
 };

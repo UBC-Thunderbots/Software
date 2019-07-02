@@ -10,29 +10,13 @@ MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &fi
                        bool slow, AutokickType autokick)
     : MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler, slow,
                     autokick),
-      Intent(priority),
-      flags(MoveFlags::NONE),
-      additional_obstacles({})
+      Intent(priority)
 {
 }
 
 std::string MoveIntent::getIntentName(void) const
 {
     return INTENT_NAME;
-}
-
-void MoveIntent::setMoveFlags(MoveFlags flags)
-{
-    if (!isMoveFlagValid(flags))
-    {
-        LOG(WARNING) << "Invalid MoveFlags set" << std::endl;
-    }
-    this->flags = flags;
-}
-
-MoveFlags MoveIntent::getMoveFlags()
-{
-    return flags;
 }
 
 void MoveIntent::accept(IntentVisitor &visitor) const
@@ -48,24 +32,4 @@ bool MoveIntent::operator==(const MoveIntent &other) const
 bool MoveIntent::operator!=(const MoveIntent &other) const
 {
     return !((*this) == other);
-}
-
-/*
- * Gets additional obstacles for this move intent
- *
- * @return additional obstacles for this move intent
- */
-std::vector<Obstacle> MoveIntent::getAdditionalObstacles() const
-{
-    return additional_obstacles;
-}
-
-/*
- * Adds an additional obstaclesfor this move intent
- *
- * @param an additional obstacle for this move intent
- */
-void MoveIntent::getAdditionalObstacles(Obstacle o)
-{
-    additional_obstacles.push_back(o);
 }

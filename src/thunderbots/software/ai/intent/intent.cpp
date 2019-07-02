@@ -6,7 +6,7 @@
 
 // Implement concrete functions shared by all intents
 
-Intent::Intent(unsigned int priority)
+Intent::Intent(unsigned int priority) : areas_to_avoid({})
 {
     setPriority(priority);
 }
@@ -35,4 +35,14 @@ bool Intent::operator==(const Intent &other) const
 bool Intent::operator!=(const Intent &other) const
 {
     return !((*this) == other);
+}
+
+std::vector<AvoidArea> Intent::getAreasToAvoid() const
+{
+    return areas_to_avoid;
+}
+
+void Intent::setAreasToAvoid(const std::vector<AvoidArea> &areas_to_avoid)
+{
+    this->areas_to_avoid = areas_to_avoid;
 }
