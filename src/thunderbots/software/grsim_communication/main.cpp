@@ -23,18 +23,36 @@ namespace
                                Util::Constants::GRSIM_COMMAND_NETWORK_PORT);
     // The current state of the world
     World world;
+
+    // The refresh rate to send primtives to the grsim backend
+    const int SEND_PRIMTIVES_REFRESH_RATE_HZ = 100;
+
+    // Cached primtive array
+    std::vector<std::unique_ptr<Primitive>> primitives;
+
+    // Lock to access primtive array
+    std::mutex update_primitives_vector_mutex;
+
 }  // namespace
 
 void primitiveUpdateCallback(const thunderbots_msgs::PrimitiveArray::ConstPtr& msg)
 {
-    std::vector<std::unique_ptr<Primitive>> primitives;
+    update_primitives_vector_mutex.lock();
+
+    // clear and update primitives
+    primitives.clear();
     thunderbots_msgs::PrimitiveArray prim_array_msg = *msg;
     for (const thunderbots_msgs::Primitive& prim_msg : prim_array_msg.primitives)
     {
         primitives.emplace_back(AI::Primitive::createPrimitiveFromROSMessage(prim_msg));
     }
+    update_primitives_vector_mutex.unlock();
+}
 
+void sendPrimtivesToGrsimBackend(const ros::TimerEvent& unused){
+    update_primitives_vector_mutex.lock();
     grsim_backend.sendPrimitives(primitives, world.friendlyTeam(), world.ball());
+    update_primitives_vector_mutex.unlock();
 }
 
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
@@ -61,6 +79,8 @@ int main(int argc, char** argv)
     // Initialize Dynamic Parameters
     auto update_subscribers =
         Util::DynamicParameters::initUpdateSubscriptions(node_handle);
+
+    ros::Timer timer = node_handle.createTimer(ros::Duration(1/SEND_PRIMTIVES_REFRESH_RATE_HZ), sendPrimtivesToGrsimBackend);
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown
