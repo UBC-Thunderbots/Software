@@ -246,6 +246,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 }
 
 TEST(TestThetaStarPathPlanner, performance){
+    // This test can be used to guage performance, and profiled to find areas for
+    // improvement
     std::vector<std::vector<Obstacle>> obstacle_sets = {
             {
                 Obstacle({0,0}, ROBOT_MAX_RADIUS_METERS, 16),
@@ -290,7 +292,7 @@ TEST(TestThetaStarPathPlanner, performance){
 
     std::chrono::duration<double> avg = duration / ((double) num_iterations * obstacle_sets.size());
 
-    std::cout << "Took " << std::chrono::duration_cast<std::chrono::milliseconds>(duration).count()
-    << "ms to run, average time of " << std::chrono::duration_cast<std::chrono::milliseconds>(avg).count();
+//    std::cout << "Took " << std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
+//    << "ms to run, average time of " << std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0;
 
 }
