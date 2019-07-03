@@ -1,8 +1,8 @@
 #include "ai/hl/stp/play/penalty_kick_enemy_play.h"
 
 #include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
+#include "ai/hl/stp/tactic/move_tactic.h"
 #include "shared/constants.h"
 
 const std::string PenaltyKickEnemyPlay::name = "Penalty Kick Enemy Play";
@@ -54,8 +54,8 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                     world.field().enemyGoal().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
-        yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4,
-               move_tactic_5, move_tactic_6});
+        yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
+               move_tactic_6});
     } while (true);
 }
 
