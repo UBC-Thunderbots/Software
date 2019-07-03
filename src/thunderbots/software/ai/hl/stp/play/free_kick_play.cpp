@@ -6,7 +6,6 @@
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/passer_tactic.h"
 #include "ai/hl/stp/tactic/patrol_tactic.h"
@@ -68,12 +67,17 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world, Rectangle(world.field().centerPoint(), world.field().enemyCornerNeg()));
 
     // Setup crease defenders
-    auto crease_defender_left = std::make_shared<CreaseDefenderTactic>(
-        world.field(), world.ball(), world.friendlyTeam(), world.enemyTeam(),
-        CreaseDefenderTactic::LeftOrRight::LEFT);
-    auto crease_defender_right = std::make_shared<CreaseDefenderTactic>(
-        world.field(), world.ball(), world.friendlyTeam(), world.enemyTeam(),
-        CreaseDefenderTactic::LeftOrRight::RIGHT);
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
+        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                               world.friendlyTeam(), world.enemyTeam(),
+                                               CreaseDefenderTactic::LeftOrRight::LEFT),
+        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                               world.friendlyTeam(), world.enemyTeam(),
+                                               CreaseDefenderTactic::LeftOrRight::RIGHT)};
+
+    // Setup goalie
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -105,7 +109,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updatePassGenerator(pass_generator);
 
         yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               crease_defender_left, crease_defender_right});
+               crease_defender_tactics[0], crease_defender_tactics[1]});
     }
 
     // Put the robot in roughly the right position to perform the kick
@@ -116,7 +120,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               crease_defender_left, crease_defender_right});
+               crease_defender_tactics[0], crease_defender_tactics[1]});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -128,10 +132,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        crease_defender_left->updateParams(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
-        crease_defender_right->updateParams(world.ball(), world.field(),
-                                            world.friendlyTeam(), world.enemyTeam());
+        updateDefendersAndGoalie(crease_defender_tactics, goalie_tactic, world);
         updateShootGoalTactic(shoot_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
@@ -140,8 +141,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
 
         yield({shoot_tactic, cherry_pick_tactic_neg_y, cherry_pick_tactic_pos_y,
-               crease_defender_left, crease_defender_right});
-
+               crease_defender_tactics[0], crease_defender_tactics[1]});
         // If there is a robot assigned to shoot, we assume this is the robot
         // that will be taking the shot
         if (shoot_tactic->getAssignedRobot())
@@ -197,14 +197,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             false);
         do
         {
-            crease_defender_left->updateParams(world.ball(), world.field(),
-                                               world.friendlyTeam(), world.enemyTeam());
-            crease_defender_right->updateParams(world.ball(), world.field(),
-                                                world.friendlyTeam(), world.enemyTeam());
+            updateDefendersAndGoalie(crease_defender_tactics, goalie_tactic, world);
             passer->updateParams(pass, world.ball());
             receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
                                    world.ball());
-            yield({passer, receiver, crease_defender_left, crease_defender_right});
+            yield({passer, receiver, crease_defender_tactics[0],
+                   crease_defender_tactics[1]});
         } while (!receiver->done());
     }
     else
@@ -247,5 +245,29 @@ void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
     pass_generator.setPasserPoint(world.ball().position());
 }
 
+void FreeKickPlay::updateDefendersAndGoalie(
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+    std::shared_ptr<GoalieTactic> goalie_tactic, const World &world)
+{
+    // If we have any crease defenders, we don't want the goalie tactic to consider
+    // them when deciding where to block
+    Team friendly_team_for_goalie = world.friendlyTeam();
+    for (auto crease_defender_tactic : crease_defender_tactics)
+    {
+        if (crease_defender_tactic->getAssignedRobot())
+        {
+            friendly_team_for_goalie.removeRobotWithId(
+                crease_defender_tactic->getAssignedRobot()->id());
+        }
+    }
+    goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
+                                world.enemyTeam());
+    // Update crease defenders
+    for (auto &crease_defender_tactic : crease_defender_tactics)
+    {
+        crease_defender_tactic->updateParams(world.ball(), world.field(),
+                                             world.friendlyTeam(), world.enemyTeam());
+    }
+}
 // Register this play in the PlayFactory
 static TPlayFactory<FreeKickPlay> factory;
