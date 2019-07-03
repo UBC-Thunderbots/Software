@@ -25,10 +25,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world, const std::vector<Obstacle> &additional_obstacles,
-        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
-
-    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
@@ -117,7 +113,8 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
                       const Util::CanvasMessenger::Color &color);
 
     // How much to inflate obstacles by to prevent robot collision
-    const double OBSTACLE_INFLATION_DIST = 1.5 * ROBOT_MAX_RADIUS_METERS;
+    static constexpr double ROBOT_OBSTACLE_INFLATION_FACTOR = 1.3;
+    const double OBSTACLE_INFLATION_DIST = 1.3 * ROBOT_MAX_RADIUS_METERS;
 
     // This navigators knowledge / state of the world
     World world;
@@ -134,5 +131,8 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     // This variable is set by each `visit` function
     Point current_destination;
 
-    std::vector<Obstacle> additional_obstacles;
+    std::vector<Obstacle> velocity_obstacles;
+
+    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas,
+                                              int robot_id);
 };
