@@ -227,8 +227,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     auto path_points = planner->findPath(start, dest);
 
-    // Since we are already close to the destination no path is returned
-    ASSERT_FALSE(path_points);
+    // Even though we are already close to the destination, we still return path
+    ASSERT_TRUE(path_points);
 }
 
 TEST(TestThetaStarPathPlanner, performance)

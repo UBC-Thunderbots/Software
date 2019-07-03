@@ -158,7 +158,6 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
     return std::nullopt;
 }
 
-
 std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
@@ -181,6 +180,9 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         assigned_primitives.emplace_back(std::move(current_primitive));
     }
 
+    Util::CanvasMessenger::getInstance()->publishAndClearLayer(
+        Util::CanvasMessenger::Layer::NAVIGATOR);
+
     return assigned_primitives;
 }
 
@@ -196,6 +198,8 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
         if (obstacle_opt)
         {
             obstacles.emplace_back(*obstacle_opt);
+            // draw the avoid area
+            drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
         }
     }
 
@@ -206,6 +210,7 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
         Obstacle o =
             Obstacle::createCircularRobotObstacle(robot, ROBOT_OBSTACLE_INFLATION_FACTOR);
         obstacles.push_back(o);
+        drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
     }
 
     for (auto &robot : world.friendlyTeam().getAllRobots())
@@ -220,7 +225,25 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
         Obstacle o =
             Obstacle::createCircularRobotObstacle(robot, ROBOT_OBSTACLE_INFLATION_FACTOR);
         obstacles.push_back(o);
+        drawObstacle(o, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
     }
 
     return obstacles;
+}
+
+void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
+                                         const Util::CanvasMessenger::Color &color)
+{
+    if (obstacle.getBoundaryPolygon())
+    {
+        Util::CanvasMessenger::getInstance()->drawPolygonOutline(
+            Util::CanvasMessenger::Layer::NAVIGATOR, *obstacle.getBoundaryPolygon(),
+            0.025, color);
+    }
+    else if (obstacle.getBoundaryCircle())
+    {
+        Util::CanvasMessenger::getInstance()->drawPolygonOutline(
+            Util::CanvasMessenger::Layer::NAVIGATOR,
+            circleToPolygon(*obstacle.getBoundaryCircle(), 12), 0.025, color);
+    }
 }

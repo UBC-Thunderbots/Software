@@ -1,5 +1,7 @@
 #pragma once
 
+#include <util/canvas_messenger/canvas_messenger.h>
+
 #include "ai/intent/intent.h"
 #include "ai/intent/visitor/intent_visitor.h"
 #include "ai/navigator/navigator.h"
@@ -107,6 +109,9 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
      * @return A obstacle representing the given area
      */
     std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
+
+    void drawObstacle(const Obstacle &obstacle,
+                      const Util::CanvasMessenger::Color &color);
 
     // How much to inflate obstacles by to prevent robot collision
     const double OBSTACLE_INFLATION_DIST;
