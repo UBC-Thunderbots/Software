@@ -17,6 +17,7 @@ PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      bool loop_forever)
     : ball(ball), field(field), enemy_goalie(enemy_goalie), Tactic(loop_forever)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string PenaltyKickTactic::getName() const
