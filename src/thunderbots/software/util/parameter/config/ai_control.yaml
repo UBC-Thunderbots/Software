@@ -24,7 +24,6 @@ AI:
         - "Defense Play"
         - "KickoffEnemy Play"
         - "KickoffFriendly Play"
-        - "Enemy Freekick Play"
         - "Penalty Kick Play"
         - "ShootOrChip Play"
     description: >-

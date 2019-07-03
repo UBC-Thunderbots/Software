@@ -69,7 +69,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
         Team friendly_team_for_goalie = world.friendlyTeam();
-
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
             if (crease_defender_tactic->getAssignedRobot())
