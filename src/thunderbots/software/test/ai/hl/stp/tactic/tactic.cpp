@@ -199,7 +199,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Stop
         makeParams({
@@ -208,7 +209,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our kickoff setup
         makeParams({
@@ -218,7 +220,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our kickoff before we've moved the ball
         makeParams({
@@ -229,7 +232,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our kickoff after we've moved the ball
         makeParams({
@@ -239,7 +243,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their kickoff setup
         makeParams({
@@ -249,7 +254,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their kickoff before they've moved the ball
         makeParams({
@@ -260,7 +266,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their kickoff after they've moved the ball
         makeParams({
@@ -270,7 +277,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }
         ),
         // Our indirect free kick setup
@@ -279,7 +287,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our indirect free kick after we've moved the ball
         makeParams({
@@ -288,7 +297,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their indirect free kick setup
         makeParams({
@@ -297,7 +307,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL, 
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their indirect free kick after they've moved the ball
         makeParams({
@@ -306,7 +317,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our direct free kick setup
         makeParams({
@@ -314,7 +326,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our direct free kick after we've moved the ball
         makeParams({
@@ -323,7 +336,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their direct free kick setup
         makeParams({
@@ -332,7 +346,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL, 
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their direct free kick after they've moved the ball
         makeParams({
@@ -341,7 +356,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our penalty kick setup
         makeParams({
@@ -350,6 +366,7 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Our penalty kick
         makeParams({
@@ -359,6 +376,7 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their penalty kick setup
         makeParams({
@@ -368,6 +386,7 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their penalty kick before they move the ball
         makeParams({
@@ -378,6 +397,7 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             }),
         // Their penalty kick after they move the ball
         makeParams({
@@ -389,6 +409,7 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL,
             })
         ));
 // clang-format on
