@@ -19,8 +19,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
 {
    public:
     explicit PathPlanningNavigator()
-        : OBSTACLE_INFLATION_DIST(1.5 * ROBOT_MAX_RADIUS_METERS),
-          NUM_POINTS_IN_CIRCLE_POLY(16){
+        : OBSTACLE_INFLATION_DIST(1.3 * ROBOT_MAX_RADIUS_METERS){
 
           };
 
@@ -112,7 +111,8 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     // How much to inflate obstacles by to prevent robot collision
     const double OBSTACLE_INFLATION_DIST;
 
-    const unsigned int NUM_POINTS_IN_CIRCLE_POLY;
+    // How much to inflate obstacles by to prevent robot collision
+    static constexpr double ROBOT_OBSTACLE_INFLATION_FACTOR = 1.3;
 
     // This navigators knowledge / state of the world
     World world;
@@ -131,5 +131,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
 
     std::vector<Obstacle> velocity_obstacles;
 
-    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas, int robot_id);
+    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas,
+                                              int robot_id);
 };

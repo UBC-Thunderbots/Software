@@ -217,7 +217,7 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, 1},
         {2, -3},
     });
-    EXPECT_TRUE((bool) obstacle.getBoundaryPolygon());
+    EXPECT_TRUE((bool)obstacle.getBoundaryPolygon());
     EXPECT_EQ(expected.getPoints(), (*obstacle.getBoundaryPolygon()).getPoints());
 }
 
@@ -229,5 +229,5 @@ TEST(NavigatorObstacleTest, create_from_circle)
     EXPECT_TRUE(obstacle.getBoundaryCircle());
 
     EXPECT_EQ((*obstacle.getBoundaryCircle()).getRadius(), (1 + ROBOT_MAX_RADIUS_METERS));
-    EXPECT_EQ((*obstacle.getBoundaryCircle()).getOrigin(), Point({2,2}));
+    EXPECT_EQ((*obstacle.getBoundaryCircle()).getOrigin(), Point({2, 2}));
 }

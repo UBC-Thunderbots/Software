@@ -45,10 +45,12 @@ void PathPlanningNavigator::visit(const KickIntent &kick_intent)
 
 void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 {
-    Point start = this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
-    Point dest  = move_intent.getDestination();
+    Point start =
+        this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
+    Point dest = move_intent.getDestination();
 
-    std::vector<Obstacle> obstacles = getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
+    std::vector<Obstacle> obstacles =
+        getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
     // TODO: should we be using velocity scaling here?
     obstacles.push_back(Obstacle::createBallObstacle(world.ball(), 0.06, 0));
@@ -64,7 +66,8 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         {
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination, move_intent.getFinalAngle(),
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(),
                 calculateTransitionSpeedBetweenSegments(
                     (*path_points)[0], (*path_points)[1], (*path_points)[2], 0),
                 move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
@@ -76,8 +79,9 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         {
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination, move_intent.getFinalAngle(), 0,
-                move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(), 0, move_intent.isDribblerEnabled(),
+                move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
@@ -158,8 +162,8 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
 std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
-    this->world                = world;
-    this->current_robot        = std::nullopt;
+    this->world              = world;
+    this->current_robot      = std::nullopt;
     this->velocity_obstacles = {};
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
@@ -180,7 +184,8 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
     return assigned_primitives;
 }
 
-std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas, int robot_id)
+std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
+    const std::vector<AvoidArea> &avoid_areas, int robot_id)
 {
     std::vector<Obstacle> obstacles;
 
@@ -198,7 +203,8 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(const std::vect
     {
         //@todo consider using velocity obstacles: Obstacle o =
         // Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
-        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
+        Obstacle o =
+            Obstacle::createCircularRobotObstacle(robot, ROBOT_OBSTACLE_INFLATION_FACTOR);
         obstacles.push_back(o);
     }
 
@@ -211,9 +217,10 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(const std::vect
             // skip current robot
             continue;
         }
-        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
+        Obstacle o =
+            Obstacle::createCircularRobotObstacle(robot, ROBOT_OBSTACLE_INFLATION_FACTOR);
         obstacles.push_back(o);
     }
-    
+
     return obstacles;
 }
