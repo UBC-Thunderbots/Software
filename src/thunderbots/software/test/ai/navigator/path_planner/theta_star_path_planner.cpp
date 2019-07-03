@@ -284,5 +284,5 @@ TEST(TestThetaStarPathPlanner, performance)
     //    std::cout << "Took " <<
     //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
     //    << "ms to run, average time of " <<
-    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0;
+    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0 << "ms";
 }
