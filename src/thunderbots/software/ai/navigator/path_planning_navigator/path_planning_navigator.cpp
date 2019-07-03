@@ -52,9 +52,6 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     std::vector<Obstacle> obstacles =
         getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    // TODO: should we be using velocity scaling here?
-    obstacles.push_back(Obstacle::createBallObstacle(world.ball(), 0.06, 0));
-
     auto path_planner =
         std::make_unique<ThetaStarPathPlanner>(this->world.field(), obstacles);
 
@@ -140,6 +137,8 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
                 world.field().centerPoint(), world.field().centreCircleRadius(), 1.2);
         case AvoidArea::HALF_METER_AROUND_BALL:
             return Obstacle::createCircleObstacle(world.ball().position(), 0.5, 1.2);
+        case AvoidArea::BALL:
+            return Obstacle::createBallObstacle(world.ball(), 0.06, 0);
         case AvoidArea::ENEMY_HALF:
             rectangle =
                 Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());
