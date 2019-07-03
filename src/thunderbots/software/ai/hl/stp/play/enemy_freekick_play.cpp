@@ -101,6 +101,13 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         crease_defender_tactic->updateParams(world.ball(), world.field(),
                                              world.friendlyTeam(), world.enemyTeam());
 
+        // Add Freekick shadower tactics
+        tactics_to_run.emplace_back(shadow_freekicker_1);
+        tactics_to_run.emplace_back(shadow_freekicker_2);
+        // Add Crease defender tactic
+        tactics_to_run.emplace_back(crease_defender_tactic);
+
+
         // Assign ShadowEnemy tactics until we have every enemy covered. If there are not
         // enough threats to shadow, move our robots to block the friendly net
         if (enemy_threats.size() == 0)
@@ -142,12 +149,6 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             tactics_to_run.emplace_back(shadow_tactic_main);
             tactics_to_run.emplace_back(shadow_tactic_secondary);
         }
-
-
-
-        tactics_to_run.emplace_back(crease_defender_tactic);
-        tactics_to_run.emplace_back(shadow_freekicker_1);
-        tactics_to_run.emplace_back(shadow_freekicker_2);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(tactics_to_run);

@@ -59,5 +59,5 @@ class ShadowFreekickerTactic : public Tactic
     Team enemy_team;
 
     const double FREE_KICK_MAX_PROXIMITY =
-        0.20;  // Robots cannot be closer than 20cm from the ball during a freekick
+        0.50;  // Robots cannot be closer than 50cm from the ball during a freekick
 };
