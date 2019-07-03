@@ -146,7 +146,7 @@ double Passing::ratePassEnemyRisk(const Team& enemy_team, const Pass& pass)
 double Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
 {
     // Return the highest risk for all the enemy robots, if there are any
-    auto enemy_robots = enemy_team.getAllRobots();
+    const std::vector<Robot>& enemy_robots = enemy_team.getAllRobots();
     if (enemy_robots.empty())
     {
         return 0;
@@ -158,7 +158,7 @@ double Passing::calculateInterceptRisk(const Team& enemy_team, const Pass& pass)
     return *std::max_element(enemy_intercept_risks.begin(), enemy_intercept_risks.end());
 }
 
-double Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
+double Passing::calculateInterceptRisk(const Robot &enemy_robot, const Pass &pass)
 {
     // We estimate the intercept by the risk that the robot will get to the closest
     // point on the pass before the ball, and by the risk that the robot will get to
@@ -217,7 +217,7 @@ double Passing::calculateInterceptRisk(Robot enemy_robot, const Pass& pass)
     return 1 - sigmoid(min_time_diff, 0, 1);
 }
 
-double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
+double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass &pass,
                                            std::optional<unsigned int> passer_robot_id)
 {
     // Remove the passer robot from the friendly team before evaluating, as we assume
@@ -241,7 +241,7 @@ double Passing::ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
 
     // Get the robot that is closest to where the pass would be received
     Robot best_receiver = friendly_team.getAllRobots()[0];
-    for (Robot& robot : friendly_team.getAllRobots())
+    for (const Robot& robot : friendly_team.getAllRobots())
     {
         double distance = (robot.position() - pass.receiverPoint()).len();
         double curr_best_distance =
