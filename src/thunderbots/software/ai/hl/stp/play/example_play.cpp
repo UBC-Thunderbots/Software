@@ -12,12 +12,12 @@ std::string ExamplePlay::getName() const
 
 bool ExamplePlay::isApplicable(const World &world) const
 {
-    return true;
+    return false;
 }
 
 bool ExamplePlay::invariantHolds(const World &world) const
 {
-    return true;
+    return false;
 }
 
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
