@@ -23,7 +23,7 @@ namespace
     bool running;
 }  // namespace
 
-USB::Context::Context() : open_devices(0)
+USB::Context::Context()
 {
     // Init libusb
     check_fn("libusb_init", libusb_init(&context), 0);
