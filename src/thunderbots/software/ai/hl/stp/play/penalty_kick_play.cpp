@@ -53,6 +53,8 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Assign one robot to be the penalty shooter
         penalty_shot_tactic->updateParams(world.ball(), world.enemyTeam().goalie(),
                                           world.field());
+        penalty_shot_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        penalty_shot_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateParams(Point(0, 0), world.field().enemyGoal().orientation(),
