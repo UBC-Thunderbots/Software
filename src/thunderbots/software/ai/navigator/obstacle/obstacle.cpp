@@ -1,18 +1,49 @@
 
 #include "obstacle.h"
 
-const Polygon& Obstacle::getBoundaryPolygon() const
+const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {
     return _polygon;
 }
 
-Obstacle::Obstacle(Polygon polygon) : _polygon(polygon) {}
+const std::optional<Circle> Obstacle::getBoundaryCircle() const
+{
+    return _circle;
+}
+
+Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polygon)) {}
+
+Obstacle::Obstacle(Rectangle rectangle)
+    : Obstacle({rectangle.swCorner(), rectangle.nwCorner(), rectangle.neCorner(),
+                rectangle.seCorner()})
+{
+}
+
+Obstacle::Obstacle(Circle circle) : _polygon(std::nullopt), _circle(circle) {}
+
+Obstacle Obstacle::createCircleObstacle(const Point& circle_centre,
+                                        const double circle_radius,
+                                        const double radius_scaling)
+{
+    // Add robot radius to account for path planning robot's size
+    return Obstacle(Circle(circle_centre,
+                           (circle_radius + ROBOT_MAX_RADIUS_METERS) * radius_scaling));
+}
+
+Obstacle Obstacle::createCircularRobotObstacle(const Robot& robot,
+                                               double radius_cushion_scaling)
+{
+    return createCircleObstacle(robot.position(), ROBOT_MAX_RADIUS_METERS,
+                                radius_cushion_scaling);
+}
+
 
 Obstacle Obstacle::createRobotObstacle(const Robot& robot, bool enable_velocity_cushion)
 {
     double radius_cushion = getRadiusCushionForHexagon(ROBOT_MAX_RADIUS_METERS);
 
-    // vector in the direction of the velocity and with the scaled size of the velocity
+    // vector in the direction of the velocity and with the scaled size of the
+    // velocity
     Vector velocity_cushion_vector = robot.velocity().norm(robot.velocity().len());
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
@@ -55,7 +86,8 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
     double radius_cushion =
         getRadiusCushionForHexagon(ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
 
-    // vector in the direction of the velocity and with the scaled size of the velocity
+    // vector in the direction of the velocity and with the scaled size of the
+    // velocity
     Vector velocity_cushion_vector =
         robot.velocity().norm(robot.velocity().len() * velocity_cushion_scaling);
 
@@ -71,7 +103,8 @@ Obstacle Obstacle::createRobotObstacleWithBufferParams(
     double radius_cushion = getRadiusCushionForHexagon(ROBOT_MAX_RADIUS_METERS +
                                                        additional_radius_cushion_buffer);
 
-    // vector in the direction of the velocity and with the scaled size of the velocity
+    // vector in the direction of the velocity and with the scaled size of the
+    // velocity
     Vector velocity_cushion_vector = robot.velocity().norm(
         robot.velocity().len() + additional_velocity_cushion_buffer);
 
@@ -130,8 +163,8 @@ Obstacle Obstacle::createRobotObstacleFromPositionAndRadiusAndVelocity(
 double Obstacle::getRadiusCushionForHexagon(double radius)
 {
     // return radius cushion so that centre to side distance is at least double given
-    // radius so that two robots can pass by each other this is accomplished by doubling
-    // the radius and multiplying by 2/sqrt(3)
+    // radius so that two robots can pass by each other this is accomplished by
+    // doubling the radius and multiplying by 2/sqrt(3)
     return radius * 4.0 / std::sqrt(3);
 }
 
@@ -146,4 +179,40 @@ Obstacle Obstacle::createBallObstacle(const Ball& ball,
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         ball.position(), radius_cushion, ball.velocity(), false);
+}
+
+Obstacle Obstacle::createCircularBallObstacle(const Ball& ball,
+                                              double additional_radius_cushion_buffer)
+{
+    return createCircleObstacle(
+        ball.position(), BALL_MAX_RADIUS_METERS + additional_radius_cushion_buffer, 1);
+}
+
+bool Obstacle::containsPoint(const Point& point) const
+{
+    if (isPolygon())
+    {
+        return (*_polygon).containsPoint(point);
+    }
+    else
+    {
+        return ((point - (*_circle).getOrigin()).len() < (*_circle).getRadius());
+    }
+}
+
+bool Obstacle::intersects(const Segment& segment) const
+{
+    if (isPolygon())
+    {
+        return (*_polygon).intersects(segment);
+    }
+    else
+    {
+        return (dist((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
+    }
+}
+
+bool Obstacle::isPolygon() const
+{
+    return (bool)_polygon;
 }

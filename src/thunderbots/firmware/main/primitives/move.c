@@ -35,6 +35,8 @@ static unsigned wheel_index;
 // each wheel
 static float wheel_axes[8];
 
+static bool slow;
+
 /**
  * builds an array that contains all of the axes perpendicular to
  * each of the wheels on the bot.
@@ -163,6 +165,7 @@ static void move_start(const primitive_params_t *params)
 	destination[1] = (float) (params->params[1]) / 1000.0f;
 	destination[2] = (float) (params->params[2]) / 100.0f;
 	end_speed = (float) (params->params[3]) / 1000.0f;
+	slow = params->slow;
 
 	
 	dr_data_t current_states;
@@ -221,7 +224,7 @@ static void move_tick(log_record_t *log) {
 //	choose_rotation_destination(&pb, current_states.angle);
 	// plan major axis movement
 	float max_major_a = 3.0;
-	float max_major_v = 3.0;
+	float max_major_v = slow ? 1.25 : 3.0;
 	float major_params[3] = {end_speed, max_major_a, max_major_v};
 	plan_move(&pb.maj, major_params);
 	// plan minor axis movement

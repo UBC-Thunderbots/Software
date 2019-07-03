@@ -34,6 +34,7 @@ class MoveAction : public Action
      * the destination
      * @param final_speed The final speed the robot should have at the destination
      * @param enable_dribbler Whether or not to enable the dribbler
+     * @param slow Whether or not to move slow
      * @param autokick This will enable the "break-beam" on the robot, that will
      * trigger the kicker or chippper to fire as soon as the ball is in front of it
      *
@@ -42,7 +43,8 @@ class MoveAction : public Action
      */
     std::unique_ptr<Intent> updateStateAndGetNextIntent(
         const Robot& robot, Point destination, Angle final_orientation,
-        double final_speed, bool enable_dribbler = false, AutokickType autokick = NONE);
+        double final_speed, bool enable_dribbler = false, bool slow = false,
+        AutokickType autokick = NONE);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -52,6 +54,7 @@ class MoveAction : public Action
     Angle final_orientation;
     double final_speed;
     bool enable_dribbler;
+    bool slow;
     AutokickType autokick;
 
     double close_to_dest_threshold;

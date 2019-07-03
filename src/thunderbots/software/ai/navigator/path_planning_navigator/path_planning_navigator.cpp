@@ -1,5 +1,8 @@
 #include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 #include "ai/navigator/util.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 
@@ -96,11 +99,22 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     Point start = this->world.friendlyTeam().getRobotById(p->getRobotId())->position();
     Point dest  = p->getDestination();
 
-    std::vector<Obstacle> obstacles = this->additional_obstacles;  // copy assignment
+    std::vector<Obstacle> obstacles;
+    // Avoid obstacles specific to this MoveIntent
+    for (auto area : move_intent.getAreasToAvoid())
+    {
+        auto obstacle_opt = obstacleFromAvoidArea(area);
+        if (obstacle_opt)
+        {
+            obstacles.emplace_back(*obstacle_opt);
+        }
+    }
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        //@todo consider using velocity obstacles: Obstacle o =
+        // Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
+        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
     }
 
@@ -113,12 +127,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             // skip current robot
             continue;
         }
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
-        obstacles.push_back(o);
-    }
-
-    for (auto o : move_intent.getAdditionalObstacles())
-    {
+        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
     }
 
@@ -175,4 +184,52 @@ void PathPlanningNavigator::visit(const StopIntent &stop_intent)
 {
     auto p            = std::make_unique<StopPrimitive>(stop_intent);
     current_primitive = std::move(p);
+}
+
+std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea avoid_area)
+{
+    Rectangle rectangle({0, 0}, {0, 0});
+    switch (avoid_area)
+    {
+        case AvoidArea::FRIENDLY_DEFENSE_AREA:
+            // We extend the friendly defense area back by several meters to prevent
+            // robots going around the back of the goal
+            rectangle =
+                Rectangle(world.field().friendlyDefenseArea().neCorner(),
+                          Point(-10, world.field().friendlyDefenseArea().seCorner().y()));
+            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            return Obstacle(rectangle);
+        case AvoidArea::ENEMY_DEFENSE_AREA:
+            // We extend the enemy defense area back by several meters to prevent
+            // robots going around the back of the goal
+            rectangle =
+                Rectangle(world.field().enemyDefenseArea().nwCorner(),
+                          Point(10, world.field().enemyDefenseArea().swCorner().y()));
+            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            return Obstacle(rectangle);
+        case AvoidArea::INFLATED_ENEMY_DEFENSE_AREA:
+            rectangle = world.field().enemyDefenseArea();
+            rectangle.expand(OBSTACLE_INFLATION_DIST + 0.2);
+            return Obstacle(rectangle);
+        case AvoidArea::CENTER_CIRCLE:
+            return Obstacle::createCircleObstacle(
+                world.field().centerPoint(), world.field().centreCircleRadius(), 1.2);
+        case AvoidArea::HALF_METER_AROUND_BALL:
+            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, 1.2);
+        case AvoidArea::ENEMY_HALF:
+            rectangle =
+                Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());
+            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            return Obstacle(rectangle);
+        case AvoidArea::FRIENDLY_HALF:
+            rectangle = Rectangle({0, world.field().width() / 2},
+                                  world.field().friendlyCornerNeg());
+            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            return Obstacle(rectangle);
+        default:
+            LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
+                         << " to obstacle";
+    }
+
+    return std::nullopt;
 }

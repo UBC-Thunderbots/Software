@@ -22,6 +22,7 @@ namespace
     ros::Publisher play_info_publisher;
     // Our instance of the AI that decides what Primitives to run
     AI ai;
+    World world;
 }  // namespace
 
 
@@ -30,7 +31,15 @@ namespace
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
     thunderbots_msgs::World world_msg = *msg;
-    World world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+    World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+    world.updateBallState(new_world.ball());
+    world.updateFieldGeometry(new_world.field());
+    world.updateEnemyTeamState(new_world.enemyTeam());
+    world.updateFriendlyTeamState(new_world.friendlyTeam());
+    world.updateTimestamp(new_world.getMostRecentTimestamp());
+    RefboxGameState new_game_state =
+        Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
+    world.updateRefboxGameState(new_game_state);
 
     if (Util::DynamicParameters::AI::run_ai.value())
     {

@@ -23,7 +23,6 @@ import { RobotStatusPanel } from './panels/RobotStatusPanel/index';
 // We request the layer data from the store
 const mapStateToProps = (state: IRootState) => ({
     layers: state.canvas.layers,
-    layerOrder: state.canvas.layerOrder,
     playType: state.thunderbots.playType,
     playName: state.thunderbots.playName,
     tactics: state.thunderbots.tactics,
@@ -44,7 +43,6 @@ const mapDispatchToProps = (dispatch: Dispatch<RootAction>) =>
 
 interface IVisualizerProps {
     layers: { [id: number]: ILayer };
-    layerOrder: number[];
     playType: string;
     playName: string;
     tactics: string[];
@@ -75,9 +73,11 @@ class VisualizerInternal extends React.Component<IVisualizerProps> {
     }
 
     public render() {
-        // We use the layer order information in the store to create an ordered
+        // We use the id number in the store to create an ordered
         // array of the layers to be consumed by our UI.
-        const orderedLayers = this.props.layerOrder.map((key) => this.props.layers[key]);
+        const orderedLayers = Object.values(this.props.layers).sort(
+            (a, b) => b.id - a.id,
+        );
 
         // Update layer ordering and visibility
         this.canvasManager.handleLayerOperations(orderedLayers);

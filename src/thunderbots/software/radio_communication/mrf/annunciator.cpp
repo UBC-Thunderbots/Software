@@ -191,7 +191,7 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
                         (bptr[0] | static_cast<unsigned int>(bptr[1] << 8)) / 100.0;
 
                     // Warn if board temperature too high
-                    if (robot_status.capacitor_voltage > MRF::MAX_BOARD_TEMPERATURE)
+                    if (robot_status.board_temperature > MRF::MAX_BOARD_TEMPERATURE)
                     {
                         new_msgs.insert(new_msgs.begin(), MRF::HIGH_BOARD_TEMP_MESSAGE);
                     }

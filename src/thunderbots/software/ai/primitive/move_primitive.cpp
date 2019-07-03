@@ -6,12 +6,13 @@ const std::string MovePrimitive::PRIMITIVE_NAME = "Move Primitive";
 
 MovePrimitive::MovePrimitive(unsigned int robot_id, const Point &dest,
                              const Angle &final_angle, double final_speed,
-                             bool enable_dribbler, AutokickType autokick)
+                             bool enable_dribbler, bool slow, AutokickType autokick)
     : robot_id(robot_id),
       dest(dest),
       final_angle(final_angle),
       final_speed(final_speed),
       enable_dribbler(enable_dribbler),
+      slow(slow),
       autokick(autokick)
 {
 }
@@ -27,6 +28,7 @@ MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
     final_speed     = primitive_msg.parameters.at(3);
     enable_dribbler = static_cast<bool>(primitive_msg.parameters.at(4));
+    slow            = static_cast<bool>(primitive_msg.parameters.at(5));
     if (primitive_msg.extra_bits.empty())
     {
         autokick = NONE;
@@ -77,10 +79,19 @@ bool MovePrimitive::isDribblerEnabled() const
     return enable_dribbler;
 }
 
+bool MovePrimitive::isSlowEnabled() const
+{
+    return slow;
+}
+
 std::vector<double> MovePrimitive::getParameters() const
 {
-    std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(),
-                                      final_speed, (double)enable_dribbler};
+    std::vector<double> parameters = {dest.x(),
+                                      dest.y(),
+                                      final_angle.toRadians(),
+                                      final_speed,
+                                      (double)enable_dribbler,
+                                      (double)slow};
 
     return parameters;
 }
@@ -100,7 +111,7 @@ bool MovePrimitive::operator==(const MovePrimitive &other) const
     return this->robot_id == other.robot_id && this->dest == other.dest &&
            this->final_angle == other.final_angle &&
            this->final_speed == other.final_speed &&
-           this->enable_dribbler == other.enable_dribbler &&
+           this->enable_dribbler == other.enable_dribbler && this->slow == other.slow &&
            this->autokick == other.autokick;
 }
 
