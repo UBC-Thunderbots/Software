@@ -286,5 +286,33 @@ GameState::RestartReason GameState::getRestartReason() const
 void GameState::setRestartCompleted()
 {
     state          = PLAYING;
-    restart_reason = NONE;
+//    restart_reason = NONE;
+}
+
+static std::unordered_map<GameState::State, std::string> state_name_map = {
+        {GameState::State::HALT, "HALT"},
+        {GameState::State::STOP, "STOP"},
+        {GameState::State::SETUP, "SETUP"},
+        {GameState::State::READY, "READY"},
+        {GameState::State::PLAYING, "PLAYING"},
+};
+
+static std::unordered_map<GameState::RestartReason, std::string> restart_reason_name_map = {
+        {GameState::RestartReason::NONE, "NONE"},
+        {GameState::RestartReason::KICKOFF, "KICKOFF"},
+        {GameState::RestartReason::DIRECT, "DIRECT"},
+        {GameState::RestartReason::INDIRECT, "INDIRECT"},
+        {GameState::RestartReason::PENALTY, "PENALTY"},
+        {GameState::RestartReason::BALL_PLACEMENT, "BALL_PLACEMENT"},
+};
+
+std::ostream &operator<<(std::ostream &os, const GameState& gs) {
+    os << "{ state: " << state_name_map[gs.state]
+       << " restart_reason: " << restart_reason_name_map[gs.restart_reason]
+       << " refbox_game_state: " << gs.game_state;
+    if (gs.ball_state) {
+        os << " ball_state: " << gs.ball_state->position();
+    }
+    os << " }";
+    return os;
 }

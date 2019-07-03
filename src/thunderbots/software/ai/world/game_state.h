@@ -323,4 +323,8 @@ class GameState
      * @return the point where the ball should be placed.
      */
     Point getBallPlacementPoint() const;
+
+    friend std::ostream& operator<<(std::ostream& os, const GameState& gs);
 };
+
+std::ostream& operator<<(std::ostream& os, const GameState& gs);

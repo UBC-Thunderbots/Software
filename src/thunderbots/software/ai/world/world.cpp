@@ -1,8 +1,9 @@
 #include "world.h"
 
-#include <util/parameter/dynamic_parameters.h>
+#include "util/parameter/dynamic_parameters.h"
 
 #include "boost/circular_buffer.hpp"
+#include "util/logger/init.h"
 
 World::World()
     : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
@@ -116,6 +117,7 @@ Team &World::mutableEnemyTeam()
 void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
     game_state_.updateRefboxGameState(game_state, ball_);
+    LOG(DEBUG) << game_state_;
 }
 
 Timestamp World::getMostRecentTimestampFromMembers()
