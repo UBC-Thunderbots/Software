@@ -7,4 +7,7 @@
     <node name="grsim_communication" pkg="thunderbots" type="grsim_communication" output="screen">
     </node>
 
+    <param name="vision_multicast_address" value="$(optenv VISION_MULTICAST_ADDRESS 224.5.23.2)"/>
+
 </launch>
+

@@ -21,18 +21,6 @@ void printPath(std::vector<Point> path_points)
     printf("\n");
 }
 
-std::string getObstacleAsString(const Obstacle& obstacle)
-{
-    std::stringstream ss;
-    ss << "{";
-    for (const Point& point : obstacle.getBoundaryPolygon().getPoints())
-    {
-        ss << point << ",";
-    }
-    ss << "}";
-    return ss.str();
-}
-
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
                                        Rectangle bounding_box)
 {
@@ -52,9 +40,9 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
     {
         for (auto const& obstacle : obstacles)
         {
-            EXPECT_FALSE(obstacle.getBoundaryPolygon().containsPoint(path_points[0]))
+            EXPECT_FALSE(obstacle.containsPoint(path_points[0]))
                 << "Only point on path " << path_points[0] << " is in obstacle "
-                << getObstacleAsString(obstacle);
+                << obstacle;
         }
     }
 
@@ -64,9 +52,9 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
         Segment path_segment(path_points[i], path_points[i + 1]);
         for (auto const& obstacle : obstacles)
         {
-            EXPECT_FALSE(obstacle.getBoundaryPolygon().intersects(path_segment))
+            EXPECT_FALSE(obstacle.intersects(path_segment))
                 << "Line segment {" << path_points[i] << "," << path_points[i + 1]
-                << "} intersects obstacle " << getObstacleAsString(obstacle);
+                << "} intersects obstacle " << obstacle;
         }
     }
 }
@@ -113,10 +101,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {
-
-        Obstacle(
-            Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))};
+    std::vector<Obstacle> obstacles = {Obstacle(
+        Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))};
 
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
@@ -243,4 +229,60 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     // Since we are already close to the destination no path is returned
     ASSERT_FALSE(path_points);
+}
+
+TEST(TestThetaStarPathPlanner, performance)
+{
+    // This test can be used to guage performance, and profiled to find areas for
+    // improvement
+    std::vector<std::vector<Obstacle>> obstacle_sets = {
+        {
+            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+        },
+        {
+            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+        }};
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    int num_iterations = 10;
+
+    Point start(0, 0), dest(4.5, 0);
+
+    auto start_time = std::chrono::system_clock::now();
+    for (int i = 0; i < num_iterations; i++)
+    {
+        for (auto obstacles : obstacle_sets)
+        {
+            std::unique_ptr<PathPlanner> planner =
+                std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+
+            auto path_points = planner->findPath(start, dest);
+        }
+    }
+
+    auto end_time = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> duration = end_time - start_time;
+
+    std::chrono::duration<double> avg =
+        duration / ((double)num_iterations * obstacle_sets.size());
+
+    //    std::cout << "Took " <<
+    //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
+    //    << "ms to run, average time of " <<
+    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0;
 }

@@ -13,26 +13,11 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), obstacles_(obstacles)
 {
-    numRows = (int)(field_.totalLength() / SIZE_OF_GRID_CELL_IN_METERS);
-    numCols = (int)(field_.totalWidth() / SIZE_OF_GRID_CELL_IN_METERS);
-
-    unblocked_grid =
-        std::vector<std::vector<bool>>(numRows, std::vector<bool>(numCols, true));
-
-    for (unsigned row = 0; row < numRows; row++)
-    {
-        for (unsigned col = 0; col < numCols; col++)
-        {
-            Point p = convertCellToPoint(row, col);
-            for (auto &obstacle : obstacles)
-            {
-                if (obstacle.getBoundaryPolygon().containsPoint(p))
-                {
-                    unblocked_grid[row][col] = false;
-                }
-            }
-        }
-    }
+    // account for robot radius
+    numRows = (int)((field_.totalLength() - 2 * ROBOT_MAX_RADIUS_METERS) /
+                    SIZE_OF_GRID_CELL_IN_METERS);
+    numCols = (int)((field_.totalWidth() - 2 * ROBOT_MAX_RADIUS_METERS) /
+                    SIZE_OF_GRID_CELL_IN_METERS);
 }
 
 bool ThetaStarPathPlanner::isValid(int row, int col)
@@ -44,7 +29,28 @@ bool ThetaStarPathPlanner::isValid(int row, int col)
 
 bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
 {
-    return unblocked_grid[row][col];
+    auto cell = std::pair<int, int>(row, col);
+
+    // If we haven't checked this cell before, check it now
+    if (unblocked_grid.find(cell) == unblocked_grid.end())
+    {
+        bool blocked = false;
+
+        Point p = convertCellToPoint(row, col);
+        for (auto &obstacle : obstacles_)
+        {
+            if (obstacle.containsPoint(p))
+            {
+                blocked = true;
+                break;
+            }
+        }
+
+        // We use the opposite convention to indicate blocked or not
+        unblocked_grid[cell] = !blocked;
+    }
+
+    return unblocked_grid[cell];
 }
 
 bool ThetaStarPathPlanner::isDestination(int row, int col, CellCoordinate dest)
@@ -208,6 +214,11 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         return std::nullopt;
     }
 
+    // If the destination GridCell is within one grid size of start
+    if ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS)
+    {
+        return std::make_optional<std::vector<Point>>({start, destination});
+    }
 
     // The source is blocked
     if (isUnBlocked(src.first, src.second) == false)
@@ -236,12 +247,6 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         {
             return std::nullopt;
         }
-    }
-
-    // If the destination GridCell is the same as source GridCell
-    if (isDestination(src.first, src.second, dest) == true)
-    {
-        return std::make_optional<std::vector<Point>>({start, destination});
     }
 
     closedList =
@@ -466,7 +471,7 @@ bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
     {
         for (auto &obstacle : obstacles_)
         {
-            if (obstacle.getBoundaryPolygon().containsPoint(p))
+            if (obstacle.containsPoint(p))
             {
                 return false;
             }
@@ -478,13 +483,19 @@ bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
 
 Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
 {
-    return Point((row * SIZE_OF_GRID_CELL_IN_METERS) - (field_.totalLength() / 2.0),
-                 (col * SIZE_OF_GRID_CELL_IN_METERS) - (field_.totalWidth() / 2.0));
+    // account for robot radius
+    return Point((row * SIZE_OF_GRID_CELL_IN_METERS) -
+                     (field_.totalLength() / 2.0 - ROBOT_MAX_RADIUS_METERS),
+                 (col * SIZE_OF_GRID_CELL_IN_METERS) -
+                     (field_.totalWidth() / 2.0 - ROBOT_MAX_RADIUS_METERS));
 }
 
 ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::convertPointToCell(Point p)
 {
+    // account for robot radius
     return std::make_pair(
-        (int)((p.x() + (field_.totalLength() / 2.0)) / SIZE_OF_GRID_CELL_IN_METERS),
-        (int)((p.y() + (field_.totalWidth() / 2.0)) / SIZE_OF_GRID_CELL_IN_METERS));
+        (int)((p.x() + (field_.totalLength() / 2.0 - ROBOT_MAX_RADIUS_METERS)) /
+              SIZE_OF_GRID_CELL_IN_METERS),
+        (int)((p.y() + (field_.totalWidth() / 2.0 - ROBOT_MAX_RADIUS_METERS)) /
+              SIZE_OF_GRID_CELL_IN_METERS));
 }
