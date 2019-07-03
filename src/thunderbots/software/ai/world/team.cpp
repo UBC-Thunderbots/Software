@@ -38,16 +38,17 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
                 "Error: Multiple robots on the same team with the same id");
         }
 
-        auto it = team_robots.find(robot.id());
+        auto it = std::find_if(team_robots.begin(), team_robots.end(),
+                               [&](const Robot& r) { return r.id() == robot.id(); });
         if (it != team_robots.end())
         {
             // The robot already exists on the team. Find and update the robot
-            team_robots.at(robot.id()).updateState(robot);
+            it->updateState(robot);
         }
         else
         {
             // This robot does not exist as part of the team yet. Add the new robot
-            team_robots.insert(std::make_pair(robot.id(), robot));
+            team_robots.emplace_back(robot);
         }
     }
 
@@ -67,7 +68,7 @@ void Team::updateStateToPredictedState(const Timestamp& timestamp)
     // Update the state of all robots to their predicted state
     for (auto it = team_robots.begin(); it != team_robots.end(); it++)
     {
-        it->second.updateStateToPredictedState(timestamp);
+        it->updateStateToPredictedState(timestamp);
     }
 
     updateTimestamp(timestamp);
@@ -79,7 +80,7 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
     // has passed, then remove the robot from the team
     for (auto it = team_robots.begin(); it != team_robots.end();)
     {
-        Duration time_diff = timestamp - it->second.lastUpdateTimestamp();
+        Duration time_diff = timestamp - it->lastUpdateTimestamp();
         if (time_diff.getSeconds() < 0)
         {
             throw std::invalid_argument(
@@ -98,7 +99,13 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
 
 void Team::removeRobotWithId(unsigned int robot_id)
 {
-    team_robots.erase(robot_id);
+    auto it = std::find_if(team_robots.begin(), team_robots.end(),
+                           [&](const Robot& r) { return r.id() == robot_id; });
+
+    if (it != team_robots.end())
+    {
+        team_robots.erase(it);
+    }
 }
 
 void Team::assignGoalie(unsigned int new_goalie_id)
@@ -136,10 +143,12 @@ void Team::setRobotExpiryBuffer(const Duration& new_robot_expiry_buffer_duration
 
 std::optional<Robot> Team::getRobotById(const unsigned int id) const
 {
-    auto it = team_robots.find(id);
-    if (it != team_robots.end())
+    for (const Robot& robot : team_robots)
     {
-        return it->second;
+        if (robot.id() == id)
+        {
+            return robot;
+        }
     }
 
     return std::nullopt;
@@ -160,15 +169,9 @@ std::optional<unsigned int> Team::getGoalieID() const
     return goalie_id;
 }
 
-std::vector<Robot> Team::getAllRobots() const
+const std::vector<Robot>& Team::getAllRobots() const
 {
-    std::vector<Robot> all_robots;
-    for (auto it = team_robots.begin(); it != team_robots.end(); it++)
-    {
-        all_robots.emplace_back(it->second);
-    }
-
-    return all_robots;
+    return team_robots;
 }
 
 std::vector<Robot> Team::getAllRobotsExceptGoalie() const
@@ -177,11 +180,11 @@ std::vector<Robot> Team::getAllRobotsExceptGoalie() const
     std::vector<Robot> all_robots;
     for (auto it = team_robots.begin(); it != team_robots.end(); it++)
     {
-        if (goalie_robot && it->second == *goalie_robot)
+        if (goalie_robot && *it == *goalie_robot)
         {
             continue;
         }
-        all_robots.emplace_back(it->second);
+        all_robots.emplace_back(*it);
     }
 
     return all_robots;
@@ -248,7 +251,7 @@ void Team::updateTimestamp(Timestamp time_stamp)
 std::optional<Timestamp> Team::lastUpdateTimestamp() const
 {
     std::optional<Timestamp> most_recent_timestamp = std::nullopt;
-    for (Robot& robot : getAllRobots())
+    for (const Robot& robot : getAllRobots())
     {
         if (!most_recent_timestamp || robot.lastUpdateTimestamp() > most_recent_timestamp)
         {

@@ -165,7 +165,7 @@ class Team
      *
      * @return a vector of all the robots on this team.
      */
-    std::vector<Robot> getAllRobots() const;
+    const std::vector<Robot>& getAllRobots() const;
 
     /**
      * Returns a vector of all the robots on this team excluding the goalie
@@ -234,9 +234,8 @@ class Team
      */
     Timestamp getMostRecentTimestampFromRobots();
 
-    // The map that contains the Robots for this team. The map makes it easier to
-    // guarantee we only have robots with unique IDs.
-    std::map<unsigned int, Robot> team_robots;
+    // The robots on this team
+    std::vector<Robot> team_robots;
 
     // The robot id of the goalie for this team
     std::optional<unsigned int> goalie_id;
