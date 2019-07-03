@@ -205,7 +205,7 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
             (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
         // start and destination, or start and closest_destination, within threshold
-        return std::nullopt;
+        return std::make_optional<std::vector<Point>>({start, destination});
     }
 
 
@@ -236,12 +236,6 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         {
             return std::nullopt;
         }
-    }
-
-    // If the destination GridCell is the same as source GridCell
-    if (isDestination(src.first, src.second, dest) == true)
-    {
-        return std::make_optional<std::vector<Point>>({start, destination});
     }
 
     closedList =

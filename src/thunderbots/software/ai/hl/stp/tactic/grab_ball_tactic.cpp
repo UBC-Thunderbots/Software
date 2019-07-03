@@ -65,7 +65,8 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 yield(move_action.updateStateAndGetNextIntent(*robot, ball.position(), (ball.position() - robot->position()).orientation(), 0.0));
             }
         }else {
-            yield(intercept_action.updateStateAndGetNextIntent(*robot, field, ball));
+            auto foo = intercept_action.updateStateAndGetNextIntent(*robot, field, ball);
+            yield(std::move(foo));
         }
 
 

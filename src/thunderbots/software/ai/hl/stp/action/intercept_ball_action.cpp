@@ -21,6 +21,7 @@ std::unique_ptr<Intent> InterceptBallAction::updateStateAndGetNextIntent(
     // Update the parameters stored by this Action
     this->field = field;
     this->ball = ball;
+    this->robot = robot;
 
     return getNextIntent();
 }
@@ -57,8 +58,24 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                     LOG(WARNING) << "NO ROBOT" << std::endl;
                 }
 
-                yield(std::make_unique<MoveIntent>(robot->id(), closest_point, (ball.position() - robot->position()).orientation(),
+                bool robot_on_ball_line = pointInFrontVector(ball.position(), ball.velocity(), robot->position()) && dist(robot->position(), Line(ball.position(), ball.position() + ball.velocity())) < 0.02;
+                LOG(INFO) << dist(robot->position(), Line(ball.position(), ball.position() + ball.velocity())) << std::endl;
+
+                if(robot_on_ball_line) {
+            LOG(DEBUG) << "robot on ball line" << std::endl;
+            Vector ball_to_robot = robot->position() - ball.position();
+            double d = dist(robot->position(), ball.position());
+            double d2 = std::min<double>(d-1.0, 0.0);
+            Point point_to_meet_ball = ball.position() + ball_to_robot.norm(d2);
+            yield(std::make_unique<MoveIntent>(robot->id(), point_to_meet_ball, (ball.position() - robot->position()).orientation(),
+                                               0, 0, true, NONE));
+                }else {
+                                    yield(std::make_unique<MoveIntent>(robot->id(), closest_point, (ball.position() - robot->position()).orientation(),
                                                    0, 0, true, NONE));
+                }
+
+
+
                 closest_point = closestPointOnLine(robot->position(), ball.position(), ball.position() + ball.velocity());
                 point_in_front_of_ball = pointInFrontVector(ball.position(), ball.velocity(), closest_point);
             }
