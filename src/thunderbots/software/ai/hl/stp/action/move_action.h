@@ -11,7 +11,7 @@ class MoveAction : public Action
     // We consider the robot close to a destination when it is within 2 cm.
     // The robot should be able to reach within 1cm of the destination even with
     // camera and positioning noise
-    static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.02;
+    static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD       = 0.02;
     static constexpr Angle ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD = Angle::ofDegrees(2);
     /**
      * Creates a new MoveAction
@@ -21,7 +21,10 @@ class MoveAction : public Action
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit MoveAction(double close_to_dest_threshold = ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, bool loop_forever = false);
+    explicit MoveAction(
+        double close_to_dest_threshold       = ROBOT_CLOSE_TO_DEST_THRESHOLD,
+        Angle close_to_orientation_threshold = ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD,
+        bool loop_forever                    = false);
 
     /**
      * Returns the next Intent this MoveAction wants to run, given the parameters.

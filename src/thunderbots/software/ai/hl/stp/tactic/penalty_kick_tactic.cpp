@@ -70,7 +70,9 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
         const double shooter_to_goal_distance =
             (robot.value().position() - intersect_1.value()).len();
         const double time_to_score =
-            fabs(shooter_to_goal_distance / PENALTY_KICK_SHOT_SPEED) - SSL_VISION_DELAY; // Include the vision delay in our penalty shot calculations
+            fabs(shooter_to_goal_distance / PENALTY_KICK_SHOT_SPEED) -
+            SSL_VISION_DELAY;  // Include the vision delay in our penalty shot
+                               // calculations
         const Point goalie_to_goal_distance =
             (intersect_1.value() = enemy_goalie.value().position());
 
@@ -139,10 +141,10 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
 
     MoveAction approach_ball_move_act =
-            MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
     MoveAction rotate_with_ball_move_act =
-            MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
-    KickAction kick_action       = KickAction();
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), false);
+    KickAction kick_action = KickAction();
 
     do
     {
@@ -176,9 +178,9 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             printf("\nDistanceFromBall=%f", (ball.position() - robot->position()).len());
             printf("\nWhatWereSupposedToBe=%f", (behind_ball - robot->position()).len());
             printf("\nDegreesOff=%f", robot.value()
-                    .orientation()
-                    .minDiff((-behind_ball_vector).orientation())
-                    .toDegrees() );
+                                          .orientation()
+                                          .minDiff((-behind_ball_vector).orientation())
+                                          .toDegrees());
             printf("\nTryingToMove");
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0, true));

@@ -111,7 +111,8 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     KickAction kick_action = KickAction();
     ChipAction chip_action = ChipAction();
-    MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
+    MoveAction move_action =
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, Angle(), true);
 
     do
     {

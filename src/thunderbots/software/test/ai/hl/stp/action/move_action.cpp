@@ -73,7 +73,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
     for (int i = 0; i < 10; i++)
     {
         intent_ptr =
-                action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::quarter(), 1.0);
+            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::quarter(), 1.0);
     }
 
     // Check an intent was returned (the pointer is not null)
@@ -82,7 +82,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshol
 }
 TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
 {
-    Robot robot = Robot(0, Point(0,0), Vector(), Angle::zero(), AngularVelocity::zero(),
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
     MoveAction action = MoveAction(0.05, Angle::ofDegrees(359), false);
 
@@ -91,7 +91,7 @@ TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
     for (int i = 0; i < 10; i++)
     {
         intent_ptr =
-                action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::quarter(), 1.0);
+            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::quarter(), 1.0);
     }
 
     // Check an intent was returned (the pointer is not null)
