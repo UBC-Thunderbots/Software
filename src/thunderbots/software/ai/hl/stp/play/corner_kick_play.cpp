@@ -29,7 +29,7 @@ bool CornerKickPlay::isApplicable(const World &world) const
 {
     return world.gameState().isOurDirectFree() &&
            Evaluation::ballInEnemyCorner(world.field(), world.ball(),
-                                            BALL_IN_CORNER_RADIUS);
+                                         BALL_IN_CORNER_RADIUS);
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const

@@ -2,10 +2,10 @@
 
 #include <exception>
 
-#include "ai/hl/stp/play/halt_play.h"
-#include "ai/hl/stp/stp.h"
 #include "ai/hl/stp/play/example_play.h"
+#include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/stp.h"
 #include "ai/world/world.h"
 #include "test/test_util/test_util.h"
 
@@ -35,7 +35,7 @@ class STPRefboxGameStatePlaySelectionTestWithPositions
    protected:
     void SetUp() override
     {
-        world.mutableField() = ::Test::TestUtil::createSSLDivBField();
+        world.mutableField()     = ::Test::TestUtil::createSSLDivBField();
         world.mutableGameState() = GameState();
     }
 
@@ -51,7 +51,8 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
                                                 Timestamp());
     ::Test::TestUtil::setEnemyRobotPositions(world, GetParam().enemy_positions,
                                              Timestamp());
-    world.mutableBall() = Ball(GetParam().ball_position, GetParam().ball_velocity, Timestamp());
+    world.mutableBall() =
+        Ball(GetParam().ball_position, GetParam().ball_velocity, Timestamp());
 
     // to set restart reason, etc. properly
     world.mutableGameState().updateRefboxGameState(GetParam().first_game_state,
@@ -70,13 +71,15 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
 
     // make sure we're not getting Example Play or Halt Play for non-halt situations
     if (dynamic_cast<ExamplePlay*>(play.get()) != nullptr ||
-        (dynamic_cast<HaltPlay*>(play.get()) != nullptr && !world.gameState().isHalted())) {
+        (dynamic_cast<HaltPlay*>(play.get()) != nullptr && !world.gameState().isHalted()))
+    {
         // we got example play, fail
-        FAIL() << "Incorrect play " << play->getName() <<  " for test case: " + GetParam().name;
+        FAIL() << "Incorrect play " << play->getName()
+               << " for test case: " + GetParam().name;
     }
 
-    std::cout << "Play " << play->getName() << " selected for test case: "
-              << GetParam().name << std::endl;
+    std::cout << "Play " << play->getName()
+              << " selected for test case: " << GetParam().name << std::endl;
 }
 
 std::vector<PlaySelectionTestParams> test_params = {
@@ -144,7 +147,7 @@ std::vector<PlaySelectionTestParams> test_params = {
      .ball_velocity      = Vector(),
      .first_game_state   = RefboxGameState::DIRECT_FREE_US,
      .second_game_state  = RefboxGameState::DIRECT_FREE_US},
-    {.name               = "Friendly direct free setup on friendly field side (goal kick)",
+    {.name = "Friendly direct free setup on friendly field side (goal kick)",
      .friendly_positions = {{-4.0, 0}, {-3.5, 3.0}, {-2.0, 0.0}, {-2.0, -1.0}},
      .enemy_positions    = {{4.0, 0}, {2.0, -3.0}, {2.0, 1.0}, {2.0, -1.0}},
      .ball_position      = Point(-3.5, 2.8),
@@ -192,11 +195,37 @@ std::vector<PlaySelectionTestParams> test_params = {
      .ball_position      = Point(-(4.5 - 1.0), 0),
      .ball_velocity      = Vector(-1, 0),
      .first_game_state   = RefboxGameState::PREPARE_PENALTY_THEM,
-     .second_game_state  = RefboxGameState::NORMAL_START}
-};
+     .second_game_state  = RefboxGameState::NORMAL_START},
+    {.name               = "Loose ball on their side",
+     .friendly_positions = {{-4.0, 0}, {-0.5, 0}, {-2.0, 1.0}, {-2.0, -1.0}},
+     .enemy_positions    = {{4.0, 0}, {0.25, 0}, {2.0, 1.0}, {2.0, 0.0}},
+     .ball_position      = Point(2.0, -2.0),
+     .ball_velocity      = Vector(0, -1.0),
+     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_THEM,
+     .second_game_state  = RefboxGameState::NORMAL_START},
+    {.name               = "Loose ball on our side",
+     .friendly_positions = {{-4.0, 0}, {-0.5, 0}, {-2.0, 1.0}, {-2.0, -0.0}},
+     .enemy_positions    = {{4.0, 0}, {0.25, 0}, {2.0, 1.0}, {2.0, 0.0}},
+     .ball_position      = Point(-2.0, -2.0),
+     .ball_velocity      = Vector(0, -1.0),
+     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_THEM,
+     .second_game_state  = RefboxGameState::NORMAL_START},
+    {.name               = "Their ball on our side",
+     .friendly_positions = {{-4.0, 0}, {-0.5, 0}, {-2.0, 1.0}, {-2.0, -0.0}},
+     .enemy_positions    = {{4.0, 0}, {-3.0, 0}, {2.0, 1.0}, {2.0, 0.0}},
+     .ball_position      = Point(-3.3, 0.0),
+     .ball_velocity      = Vector(-1, 0.0),
+     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_THEM,
+     .second_game_state  = RefboxGameState::NORMAL_START},
+    {.name               = "Our ball on their side",
+     .friendly_positions = {{-4.0, 0}, {3.0, 0}, {-2.0, 1.0}, {-2.0, -0.0}},
+     .enemy_positions    = {{4.0, 0}, {0.0, 0}, {2.0, 1.0}, {2.0, 0.0}},
+     .ball_position      = Point(3.3, 0.0),
+     .ball_velocity      = Vector(1, 0),
+     .first_game_state   = RefboxGameState::PREPARE_KICKOFF_THEM,
+     .second_game_state  = RefboxGameState::NORMAL_START}};
 
- INSTANTIATE_TEST_CASE_P(TestPositions,
- STPRefboxGameStatePlaySelectionTestWithPositions,
+INSTANTIATE_TEST_CASE_P(TestPositions, STPRefboxGameStatePlaySelectionTestWithPositions,
                         ::testing::ValuesIn(test_params.begin(), test_params.end()));
 
 int main(int argc, char** argv)
