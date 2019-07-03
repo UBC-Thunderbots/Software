@@ -18,10 +18,12 @@ enum class AvoidArea
     CENTER_CIRCLE,
     // A half meter radius around the ball
     HALF_METER_AROUND_BALL,
+    // The ball itself
+    BALL,
     // The enemy half of the field
     ENEMY_HALF,
     // The friendly half of the field
-    FRIENDLY_HALF
+    FRIENDLY_HALF,
 };
 
 std::ostream& operator<<(std::ostream& os, const AvoidArea& state);

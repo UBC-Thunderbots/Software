@@ -6,6 +6,7 @@
 #include "geom/circle.h"
 #include "geom/line.h"
 #include "geom/point.h"
+#include "geom/polygon.h"
 #include "geom/ray.h"
 #include "geom/rectangle.h"
 #include "geom/segment.h"
@@ -633,3 +634,5 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
  * @return A list of circles, sorted in descending order of radius
  */
 std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points);
+
+Polygon circleToPolygon(const Circle &circle, size_t num_points);

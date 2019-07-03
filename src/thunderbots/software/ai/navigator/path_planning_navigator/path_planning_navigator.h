@@ -1,5 +1,7 @@
 #pragma once
 
+#include <util/canvas_messenger/canvas_messenger.h>
+
 #include "ai/intent/intent.h"
 #include "ai/intent/visitor/intent_visitor.h"
 #include "ai/navigator/navigator.h"
@@ -18,11 +20,9 @@
 class PathPlanningNavigator : public Navigator, public IntentVisitor
 {
    public:
-    explicit PathPlanningNavigator()
-        : OBSTACLE_INFLATION_DIST(1.5 * ROBOT_MAX_RADIUS_METERS),
-          NUM_POINTS_IN_CIRCLE_POLY(16){
+    explicit PathPlanningNavigator(){
 
-          };
+    };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<Obstacle> &additional_obstacles,
@@ -113,10 +113,11 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
      */
     std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
 
-    // How much to inflate obstacles by to prevent robot collision
-    const double OBSTACLE_INFLATION_DIST;
+    void drawObstacle(const Obstacle &obstacle,
+                      const Util::CanvasMessenger::Color &color);
 
-    const unsigned int NUM_POINTS_IN_CIRCLE_POLY;
+    // How much to inflate obstacles by to prevent robot collision
+    const double OBSTACLE_INFLATION_DIST = 1.5 * ROBOT_MAX_RADIUS_METERS;
 
     // This navigators knowledge / state of the world
     World world;

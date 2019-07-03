@@ -90,7 +90,7 @@ namespace Util
                 }
                 else
                 {
-                    throw std::invalid_argument("Unrecognized value for g3log_log_level");
+                    ROS_WARN("Unrecognized value for g3log_log_level");
                 }
             }
         };
