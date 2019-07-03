@@ -212,8 +212,8 @@ void Field::updateTimestamp(Timestamp time_stamp)
     // Check that the new timestamp is not older than the most recent timestamp
     else if (time_stamp < Field::getMostRecentTimestamp())
     {
-//        throw std::invalid_argument(
-//            "Error: Attempt tp update Field state with old Timestamp");
+        throw std::invalid_argument(
+            "Error: Attempt tp update Field state with old Timestamp");
     }
     else
     {
