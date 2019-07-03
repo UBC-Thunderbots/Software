@@ -32,13 +32,13 @@ std::string ShootOrChipPlay::getName() const
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
 }
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
