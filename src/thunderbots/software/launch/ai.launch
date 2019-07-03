@@ -7,18 +7,18 @@
     <param name="vision_multicast_address" value="$(optenv VISION_MULTICAST_ADDRESS 224.5.23.2)"/>
 
     <!-- Launch the network_input node -->
-    <node name="network_input" pkg="thunderbots" type="network_input" output="screen">
+    <node name="network_input" pkg="thunderbots" type="network_input" output="screen" respawn="true">
     </node>
 
     <!-- Launch the ai logic node -->
-    <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen">
+    <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen" respawn="true">
     </node>
 
     <!-- Launch the dynamic parameters node -->
-    <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
+    <node name="parameters" pkg="thunderbots" type="parameters" output="screen" respawn="true"/>
 
     <!-- Launch the rqt_reconfigure gui -->
-    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen" respawn="true"/>
 
     <!-- Run the corner-kick visualizer -->
     <include file="$(find corner_kick)/launch/corner_kick.launch" />

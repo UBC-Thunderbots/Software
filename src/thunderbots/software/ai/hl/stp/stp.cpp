@@ -24,6 +24,7 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
+    current_game_state = world.gameState().game_state;
     previous_override_play = override_play;
     override_play          = Util::DynamicParameters::AI::override_ai_play.value();
     bool override_play_value_changed = previous_override_play != override_play;
@@ -238,7 +239,7 @@ std::optional<std::string> STP::getCurrentPlayName() const
 PlayInfo STP::getPlayInfo()
 {
     PlayInfo info;
-    info.play_type = "Unknown";
+    info.play_type = name(current_game_state);
     info.play_name = getCurrentPlayName() ? *getCurrentPlayName() : "No Play";
 
     // Sort the tactics by the id of the robot they are assigned to, so we can report the
