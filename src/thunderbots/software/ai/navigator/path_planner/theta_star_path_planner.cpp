@@ -208,15 +208,11 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
 
     if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
         (start - closest_destination).len() <
-            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
+            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION) ||
+        ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS))
     {
+        // If the destination GridCell is within one grid size of start or
         // start and destination, or start and closest_destination, within threshold
-        return std::make_optional<std::vector<Point>>({start, destination});
-    }
-
-    // If the destination GridCell is within one grid size of start
-    if ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS)
-    {
         return std::make_optional<std::vector<Point>>({start, destination});
     }
 
@@ -466,8 +462,10 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 
 bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
 {
-    if (p.x() > -field_.totalLength() / 2.0 && p.x() < field_.totalLength() / 2.0 &&
-        p.y() > -field_.totalWidth() / 2.0 && p.y() < field_.totalWidth() / 2.0)
+    if (p.x() > -(field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
+        (p.x() < field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
+        p.y() > -(field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
+        (p.y() < field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS))
     {
         for (auto &obstacle : obstacles_)
         {

@@ -28,8 +28,8 @@ std::string CornerKickPlay::getName() const
 bool CornerKickPlay::isApplicable(const World &world) const
 {
     return world.gameState().isOurDirectFree() &&
-           Evaluation::ballInFriendlyCorner(world.field(), world.ball(),
-                                            BALL_IN_CORNER_RADIUS);
+           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
+                                         BALL_IN_CORNER_RADIUS);
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
