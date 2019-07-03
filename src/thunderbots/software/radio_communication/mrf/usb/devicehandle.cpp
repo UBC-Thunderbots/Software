@@ -52,6 +52,7 @@ USB::DeviceHandle::DeviceHandle(Context &context, unsigned int vendor_id,
 
             check_fn("libusb_open", libusb_open(device.device, &handle), 0);
             init_descriptors();
+            context.open_devices.push_back(this);
             return;
         }
     }
@@ -61,23 +62,6 @@ USB::DeviceHandle::DeviceHandle(Context &context, unsigned int vendor_id,
 
 USB::DeviceHandle::~DeviceHandle()
 {
-    try
-    {
-        while (submitted_transfer_count)
-        {
-            check_fn("libusb_handle_events", libusb_handle_events(context), 0);
-        }
-    }
-    catch (const std::exception &exp)
-    {
-        try
-        {
-            LOG(WARNING) << exp.what() << std::endl;
-        }
-        catch (...)
-        {
-        }
-    }
     libusb_close(handle);
 }
 

@@ -33,6 +33,8 @@ USB::Context::Context()
     libusb_event_thread = std::thread([&]() {
         while (running)
             libusb_handle_events(context);
+
+        LOG(DEBUG) << "Event thread exiting";
     });
 }
 
@@ -40,11 +42,21 @@ USB::Context::~Context()
 {
     // Terminate event thread
     running = false;
+
+    // Close all devices
+    for (auto &dev : open_devices)
+    {
+        dev->~DeviceHandle();
+    }
+
+    // This wakes up libusb_handle_events, now let the thread join
     libusb_event_thread.join();
 
     // Cleanup libusb
     libusb_exit(context);
     context = nullptr;
+
+    LOG(DEBUG) << "Context destroyed";
 }
 
 USB::ConfigurationSetter::ConfigurationSetter(DeviceHandle &device, int configuration)
