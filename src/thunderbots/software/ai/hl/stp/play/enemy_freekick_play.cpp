@@ -23,26 +23,12 @@ std::string EnemyFreekickPlay::getName() const
 
 bool EnemyFreekickPlay::isApplicable(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 bool EnemyFreekickPlay::invariantHolds(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
