@@ -172,3 +172,33 @@ TEST(NavigatorObstacleTest, shifted_with_buffer_velocity_obstacle_polygon)
     EXPECT_NEAR(pg.getPoints()[5].x(), pt5.x(), TEST_EPSILON);
     EXPECT_NEAR(pg.getPoints()[5].y(), pt5.y(), TEST_EPSILON);
 }
+
+TEST(NavigatorObstacleTest, create_from_rectangle)
+{
+    Obstacle obstacle(Rectangle({-1, 1}, {2, -3}));
+
+    Polygon expected = Polygon({
+        {-1, -3},
+        {-1, 1},
+        {2, 1},
+        {2, -3},
+    });
+    EXPECT_EQ(expected.getPoints(), obstacle.getBoundaryPolygon().getPoints());
+}
+
+TEST(NavigatorObstacleTest, create_from_circle)
+{
+    Obstacle obstacle({2, 2}, 1, 8);
+
+    Polygon expected = Polygon({
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(0)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(45)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(90)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(135)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(180)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(225)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(270)),
+        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(315)),
+    });
+    EXPECT_EQ(expected.getPoints(), obstacle.getBoundaryPolygon().getPoints());
+}

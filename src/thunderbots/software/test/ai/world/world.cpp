@@ -94,20 +94,14 @@ TEST_F(WorldTest, get_most_recent_timestamp_from_members)
 // Test that the timestamp history is accurate
 TEST_F(WorldTest, get_timestamp_history)
 {
-    Timestamp timestamp_1 =
-        Timestamp::fromSeconds(ball.lastUpdateTimestamp().getSeconds() + 1);
-    Ball temp_ball = Ball(ball.position(), ball.velocity(), timestamp_1);
-    world.updateBallState(temp_ball);
+    Timestamp timestamp_1 = current_time + Duration::fromSeconds(0);
+    world.updateTimestamp(timestamp_1);
 
-    Timestamp timestamp_2 =
-        Timestamp::fromSeconds(ball.lastUpdateTimestamp().getSeconds() + 1);
-    temp_ball = Ball(ball.position(), ball.velocity(), timestamp_2);
-    world.updateBallState(temp_ball);
+    Timestamp timestamp_2 = current_time + Duration::fromSeconds(1);
+    world.updateTimestamp(timestamp_2);
 
-    Timestamp timestamp_3 =
-        Timestamp::fromSeconds(ball.lastUpdateTimestamp().getSeconds() + 1);
-    temp_ball = Ball(ball.position(), ball.velocity(), timestamp_3);
-    world.updateBallState(temp_ball);
+    Timestamp timestamp_3 = current_time + Duration::fromSeconds(2);
+    world.updateTimestamp(timestamp_3);
 
     EXPECT_EQ(world.getTimestampHistory()[3], current_time);
     EXPECT_EQ(world.getTimestampHistory()[2], timestamp_1);

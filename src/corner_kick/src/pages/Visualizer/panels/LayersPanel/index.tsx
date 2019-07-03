@@ -34,23 +34,26 @@ export const LayersPanel = (props: ILayersProps) => {
     return (
         <>
             {layers.length > 0 ? (
-                layers.map((layer) => (
-                    <Flex
-                        width="100%"
-                        py="4px"
-                        px="16px"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        key={layer.id}
-                    >
-                        {layer.id}
-                        <Button
-                            icon={layer.visible ? 'eye-open' : 'eye-off'}
-                            minimal={true}
-                            onClick={() => toggleVisibility(layer.id)}
-                        />
-                    </Flex>
-                ))
+                layers
+                    .slice(0)
+                    .reverse()
+                    .map((layer) => (
+                        <Flex
+                            width="100%"
+                            py="4px"
+                            px="16px"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            key={layer.id}
+                        >
+                            {layer.id}
+                            <Button
+                                icon={layer.visible ? 'eye-open' : 'eye-off'}
+                                minimal={true}
+                                onClick={() => toggleVisibility(layer.id)}
+                            />
+                        </Flex>
+                    ))
             ) : (
                 <Flex
                     width="100%"

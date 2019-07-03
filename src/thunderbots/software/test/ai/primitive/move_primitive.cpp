@@ -32,21 +32,29 @@ TEST(MovePrimTest, autokick_and_dribble_disabled_by_default)
 
 TEST(MovePrimTest, get_dribble_enabled)
 {
-    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, NONE);
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, false, NONE);
     EXPECT_TRUE(move_prim.isDribblerEnabled());
     EXPECT_EQ(move_prim.getAutoKickType(), NONE);
 }
 
+TEST(MovePrimTest, get_slow_enabled)
+{
+    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, true, false, NONE);
+    EXPECT_FALSE(move_prim.isSlowEnabled());
+}
+
 TEST(MovePrimTest, get_autokick_enabled)
 {
-    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, AUTOKICK);
+    MovePrimitive move_prim =
+        MovePrimitive(0, Point(), Angle(), 0.0, false, false, AUTOKICK);
     EXPECT_FALSE(move_prim.isDribblerEnabled());
     EXPECT_EQ(move_prim.getAutoKickType(), AUTOKICK);
 }
 
 TEST(MovePrimTest, get_autochip_enabled)
 {
-    MovePrimitive move_prim = MovePrimitive(0, Point(), Angle(), 0.0, false, AUTOCHIP);
+    MovePrimitive move_prim =
+        MovePrimitive(0, Point(), Angle(), 0.0, false, false, AUTOCHIP);
     EXPECT_FALSE(move_prim.isDribblerEnabled());
     EXPECT_EQ(move_prim.getAutoKickType(), AUTOCHIP);
 }

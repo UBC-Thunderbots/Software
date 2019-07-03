@@ -9,11 +9,16 @@
     </node>
 
     <!-- Launch the ai logic node -->
+    <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen">
+    </node>
 
     <!-- Launch the dynamic parameters node -->
     <node name="parameters" pkg="thunderbots" type="parameters" output="screen"/>
 
     <!-- Launch the rqt_reconfigure gui -->
     <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen"/>
+
+    <!-- Run the corner-kick visualizer -->
+    <include file="$(find corner_kick)/launch/corner_kick.launch" />
 
 </launch>

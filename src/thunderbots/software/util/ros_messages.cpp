@@ -200,9 +200,7 @@ namespace Util
             Team friendly_team = createTeamFromROSMessage(world_msg.friendly_team);
             Team enemy_team    = createTeamFromROSMessage(world_msg.enemy_team);
             Field field        = createFieldFromROSMessage(world_msg.field);
-
-            // TODO: ???
-            //            RefboxGamState refbox_gamestate =
+            //            RefboxGameState refbox_gamestate =
             //            createGameStateFromROSMessage(world_msg.refbox_data);
 
             World world(field, ball, friendly_team, enemy_team);

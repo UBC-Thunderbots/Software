@@ -1,0 +1,69 @@
+#pragma once
+
+#include "ai/hl/stp/tactic/tactic.h"
+#include "ai/passing/pass.h"
+
+/**
+ * This tactic is for a robot performing a penalty kick.
+ */
+
+class PenaltyKickTactic : public Tactic
+{
+   public:
+    /**
+     * Creates a new PenaltyKickTactic
+     *
+     * @param ball : The ball that we're trying to shoot
+     * @param field : The field we are playing on
+     * @param enemy_goalie : Optional variable for the enemy goalie robot
+     * @param loop_forever Whether or not this Tactic should never complete. If true, the
+     * tactic will be restarted every time it completes
+     */
+    explicit PenaltyKickTactic(const Ball &ball, const Field &field,
+                               const std::optional<Robot> &enemy_goalie,
+                               bool loop_forever = false);
+
+    std::string getName() const override;
+
+    /**
+     * Updates the parameters for this PenaltyKickTactic.
+     *
+     * @param updated_ball : The ball we're passing
+     * @param enemy_goalie : Optional variable for the enemy goalie robot
+     * @param field : The Field we are playing on
+     */
+    void updateParams(const Ball &updated_ball, const std::optional<Robot> &enemy_goalie,
+                      const Field &field);
+
+    /**
+     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
+     * closer to the block destination
+     *
+     * @param robot The robot to evaluate the cost for
+     * @param world The state of the world with which to perform the evaluation
+     * @return A cost in the range [0,1] indicating the cost of assigning the given robot
+     * to this tactic. Lower cost values indicate a more preferred robot.
+     */
+    double calculateRobotCost(const Robot &robot, const World &world) override;
+
+   private:
+    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+
+    // Evaluation function designed specifically for 1-on-1 penalty shots
+    bool evaluate_penalty_shot();
+    // Evaluation function designed specifically for determining the next potential shot
+    // in a penalty kick
+    Point evaluate_next_position();
+
+    // Tactic parameters
+    std::optional<Robot> enemy_goalie;
+    Ball ball;
+    Field field;
+
+    const bool ENABLE_DRIBBLER = true;
+
+    static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
+    static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 1.5;
+
+    const Duration penalty_shot_timeout = Duration::fromSeconds(10);
+};

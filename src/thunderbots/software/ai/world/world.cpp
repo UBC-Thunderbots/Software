@@ -32,26 +32,26 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 
 void World::updateFieldGeometry(const Field &new_field_data)
 {
-    updateTimestamp(new_field_data.getMostRecentTimestamp());
     field_.updateDimensions(new_field_data);
+    updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateBallState(const Ball &new_ball_data)
 {
-    updateTimestamp(new_ball_data.getPreviousTimestamps().front());
     ball_.updateState(new_ball_data);
+    updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateFriendlyTeamState(const Team &new_friendly_team_data)
 {
-    updateTimestamp(new_friendly_team_data.getMostRecentTimestamp());
     friendly_team_.updateState(new_friendly_team_data);
+    updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateEnemyTeamState(const Team &new_enemy_team_data)
 {
-    updateTimestamp(enemy_team_.getMostRecentTimestamp());
     enemy_team_.updateState(new_enemy_team_data);
+    updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateTimestamp(Timestamp time_stamp)
@@ -115,7 +115,7 @@ Team &World::mutableEnemyTeam()
 
 void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
-    game_state_.updateRefboxGameState(game_state);
+    game_state_.updateRefboxGameState(game_state, ball_);
 }
 
 Timestamp World::getMostRecentTimestampFromMembers()

@@ -69,7 +69,7 @@ TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
     MoveAction action = MoveAction(0.05);
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
-        robot, Point(1, 0), Angle::quarter(), 1.0, false, AUTOKICK);
+        robot, Point(1, 0), Angle::quarter(), 1.0, false, false, AUTOKICK);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

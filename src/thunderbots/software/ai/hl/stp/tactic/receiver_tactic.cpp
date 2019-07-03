@@ -107,7 +107,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
 
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ideal_position, ideal_orientation, 0, false, AUTOKICK));
+                *robot, ideal_position, ideal_orientation, 0, false, false, AUTOKICK));
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
