@@ -268,8 +268,11 @@ void CanvasMessenger::drawRobotPath(std::vector<Point> path_points)
     }
 }
 
-void CanvasMessenger::drawPolygonOutline(Layer layer, const Polygon &poly, double line_thickness, const Color &color) {
-    for (const Segment& seg : poly.getSegments()) {
+void CanvasMessenger::drawPolygonOutline(Layer layer, const Polygon& poly,
+                                         double line_thickness, const Color& color)
+{
+    for (const Segment& seg : poly.getSegments())
+    {
         drawLine(layer, seg.getSegStart(), seg.getEnd(), line_thickness, color);
     }
 }

@@ -73,7 +73,7 @@ class ThetaStarPathPlanner : public PathPlanner
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<std::pair<int,int>, bool> unblocked_grid;
+    std::map<std::pair<int, int>, bool> unblocked_grid;
 
 
     /**
