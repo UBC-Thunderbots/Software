@@ -2,7 +2,7 @@
 
 #include "ai/intent/movespin_intent.h"
 
-MoveSpinAction::MoveSpinAction(double close_to_dest_threshold)
+MoveSpinAction::MoveSpinAction(double close_to_dest_threshold, bool loop_forever)
     : Action(), close_to_dest_threshold(close_to_dest_threshold)
 {
 }
