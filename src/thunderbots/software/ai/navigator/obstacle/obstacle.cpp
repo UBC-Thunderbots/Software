@@ -1,13 +1,17 @@
 
 #include "obstacle.h"
 
-
-const Polygon& Obstacle::getBoundaryPolygon() const
+const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {
     return _polygon;
 }
 
-Obstacle::Obstacle(Polygon polygon) : _polygon(polygon) {}
+const std::optional<Circle> Obstacle::getBoundaryCircle() const
+{
+    return _circle;
+}
+
+Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polygon)) {}
 
 Obstacle::Obstacle(Rectangle rectangle)
     : Obstacle({rectangle.swCorner(), rectangle.nwCorner(), rectangle.neCorner(),
@@ -15,18 +19,22 @@ Obstacle::Obstacle(Rectangle rectangle)
 {
 }
 
-Obstacle::Obstacle(const Point& circle_center, const double circle_radius,
-                   const int num_points)
-    : _polygon({})
+Obstacle::Obstacle(Circle circle) : _polygon(std::nullopt), _circle(circle) {}
+
+Obstacle Obstacle::createCircleObstacle(const Point& circle_centre,
+                                        const double circle_radius,
+                                        const double radius_scaling)
 {
-    std::vector<Point> poly_points;
-    for (size_t i = 0; i < num_points; i++)
-    {
-        poly_points.emplace_back(
-            circle_center +
-            Point(circle_radius, 0).rotate(Angle::ofDegrees(360.0 / num_points * i)));
-    }
-    _polygon = Polygon(poly_points);
+    // Add robot radius to account for path planning robot's size
+    return Obstacle(Circle(circle_centre,
+                           (circle_radius + ROBOT_MAX_RADIUS_METERS) * radius_scaling));
+}
+
+Obstacle Obstacle::createCircularRobotObstacle(const Robot& robot,
+                                               double radius_cushion_scaling)
+{
+    return createCircleObstacle(robot.position(), ROBOT_MAX_RADIUS_METERS,
+                                radius_cushion_scaling);
 }
 
 
@@ -171,4 +179,40 @@ Obstacle Obstacle::createBallObstacle(const Ball& ball,
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         ball.position(), radius_cushion, ball.velocity(), false);
+}
+
+Obstacle Obstacle::createCircularBallObstacle(const Ball& ball,
+                                              double additional_radius_cushion_buffer)
+{
+    return createCircleObstacle(
+        ball.position(), BALL_MAX_RADIUS_METERS + additional_radius_cushion_buffer, 1);
+}
+
+bool Obstacle::containsPoint(const Point& point) const
+{
+    if (isPolygon())
+    {
+        return (*_polygon).containsPoint(point);
+    }
+    else
+    {
+        return ((point - (*_circle).getOrigin()).len() < (*_circle).getRadius());
+    }
+}
+
+bool Obstacle::intersects(const Segment& segment) const
+{
+    if (isPolygon())
+    {
+        return (*_polygon).intersects(segment);
+    }
+    else
+    {
+        return (dist((*_circle).getOrigin(), segment) <= (*_circle).getRadius());
+    }
+}
+
+bool Obstacle::isPolygon() const
+{
+    return (bool)_polygon;
 }
