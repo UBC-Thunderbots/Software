@@ -118,9 +118,13 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                               ball.position(), radius);
 
             // restrict the goalie to a semicircle inscribed inside the defense area
-            auto goalie_pos_intersect = lineCircleIntersect(field.friendlyGoal(), std::min(field.defenseAreaWidth() / 2 - ROBOT_MAX_RADIUS_METERS, field.defenseAreaLength() - ROBOT_MAX_RADIUS_METERS),
+            auto goalie_pos_intersect = lineCircleIntersect(
+                    field.friendlyGoal(),
+                    std::min(field.defenseAreaWidth() / 2 - ROBOT_MAX_RADIUS_METERS, field.defenseAreaLength() - ROBOT_MAX_RADIUS_METERS),
                     goalie_pos, field.friendlyGoal());
+
             Point goalie_restricted_pos = goalie_pos;
+
             if(!goalie_pos_intersect.empty()) {
                 goalie_restricted_pos = goalie_pos_intersect.at(0);
             }
