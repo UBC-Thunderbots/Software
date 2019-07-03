@@ -25,10 +25,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
           };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world, const std::vector<Obstacle> &additional_obstacles,
-        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
-
-    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
@@ -133,5 +129,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     // This variable is set by each `visit` function
     Point current_destination;
 
-    std::vector<Obstacle> additional_obstacles;
+    std::vector<Obstacle> velocity_obstacles;
+
+    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas, int robot_id);
 };
