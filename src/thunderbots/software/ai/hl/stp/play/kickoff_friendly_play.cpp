@@ -89,6 +89,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
 
+    // the chipper is allowed to go into the centre circle and touch the ball
+    chip_tactic->addWhitelistedAvoidArea(AvoidArea::CENTER_CIRCLE);
+    chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
