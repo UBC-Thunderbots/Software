@@ -22,6 +22,7 @@
 #include "ai/world/field.h"
 #include "ai/world/robot.h"
 #include "ai/world/world.h"
+#include "geom/polygon.h"
 #include "thunderbots_msgs/CanvasLayer.h"
 #include "util/constants.h"
 
@@ -38,10 +39,11 @@ namespace Util
        public:
         enum class Layer
         {
+            NAVIGATOR,
             PASS_GENERATION,
             BALL,
             ROBOTS,
-            STATIC_FEATURES,
+            STATIC_FEATURES
         };
 
         struct Color
@@ -55,6 +57,15 @@ namespace Util
             // Alpha (transparency) value of the color
             uint8_t a;
         };
+
+        // Colors
+        static constexpr Color FIELD_COLOR         = {0, 153, 0, 255};
+        static constexpr Color DEFENSE_AREA_COLOR  = {242, 242, 242, 255};
+        static constexpr Color FIELD_LINE_COLOR    = {242, 242, 242, 255};
+        static constexpr Color BALL_COLOR          = {255, 153, 0, 255};
+        static constexpr Color FRIENDLY_TEAM_COLOR = {0, 230, 0, 255};
+        static constexpr Color ENEMY_TEAM_COLOR    = {230, 0, 0, 255};
+        static constexpr Color AVOID_AREA_COLOR    = {255, 0, 0, 127};
 
         /**
          * Sprite is a struct that contains all the information
@@ -230,6 +241,9 @@ namespace Util
 
         void drawRobotPath(std::vector<Point> path_points);
 
+        void drawPolygonOutline(Layer layer, const Polygon &poly, double line_thickness,
+                                const Color &color);
+
        private:
         /**
          * Union used to convert a int16_t into two uint8_t
@@ -250,14 +264,6 @@ namespace Util
 
         // The number of pixels per meter
         static const int PIXELS_PER_METER = 2000;
-
-        // Colors
-        static constexpr Color FIELD_COLOR         = {0, 153, 0, 255};
-        static constexpr Color DEFENSE_AREA_COLOR  = {242, 242, 242, 255};
-        static constexpr Color FIELD_LINE_COLOR    = {242, 242, 242, 255};
-        static constexpr Color BALL_COLOR          = {255, 153, 0, 255};
-        static constexpr Color FRIENDLY_TEAM_COLOR = {0, 230, 0, 255};
-        static constexpr Color ENEMY_TEAM_COLOR    = {230, 0, 0, 255};
 
         /**
          * Constructor; initializes an empty layers map then populates it

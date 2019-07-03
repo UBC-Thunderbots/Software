@@ -28,7 +28,8 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         }
         assigned_primitives.emplace_back(std::move(current_primitive));
     }
-
+    Util::CanvasMessenger::getInstance()->publishAndClearLayer(
+        Util::CanvasMessenger::Layer::NAVIGATOR);
     return assigned_primitives;
 }
 
@@ -107,6 +108,8 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         if (obstacle_opt)
         {
             obstacles.emplace_back(*obstacle_opt);
+            // draw the avoid area
+            drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
         }
     }
 
@@ -116,6 +119,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         // Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
         Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
+        drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
     }
 
     for (auto &robot : world.friendlyTeam().getAllRobots())
@@ -129,6 +133,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         }
         Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
         obstacles.push_back(o);
+        drawObstacle(o, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
     }
 
     // TODO: should we be using velocity scaling here?
@@ -232,4 +237,21 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
     }
 
     return std::nullopt;
+}
+
+void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
+                                         const Util::CanvasMessenger::Color &color)
+{
+    if (obstacle.getBoundaryPolygon())
+    {
+        Util::CanvasMessenger::getInstance()->drawPolygonOutline(
+            Util::CanvasMessenger::Layer::NAVIGATOR, *obstacle.getBoundaryPolygon(),
+            0.025, color);
+    }
+    else if (obstacle.getBoundaryCircle())
+    {
+        Util::CanvasMessenger::getInstance()->drawPolygonOutline(
+            Util::CanvasMessenger::Layer::NAVIGATOR,
+            circleToPolygon(*obstacle.getBoundaryCircle(), 12), 0.025, color);
+    }
 }
