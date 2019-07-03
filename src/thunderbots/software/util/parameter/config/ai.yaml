@@ -226,6 +226,15 @@ DefenderCreaseTactic:
     description: >-
       The distance between the ball and the defenders at which they will have their
       minimum seperation.
+GoalieTactic:
+  block_cone_buffer:
+      min: 0.0
+      max: 2.0
+      default: 0.0
+      type: "double"
+      description: >-
+        The block cone buffer is the extra distance to add on either side of the robot
+        to allow to it be further back in the block cone
 RobotCapabilities:
   broken_dribblers:
     default: ""
@@ -239,3 +248,4 @@ RobotCapabilities:
     default: ""
     type: "string"
     description: Comma-separated list of numbers of robots with broken kickers
+
