@@ -165,7 +165,7 @@ class Team
      *
      * @return a vector of all the robots on this team.
      */
-    const std::vector<Robot> & getAllRobots() const;
+    const std::vector<Robot>& getAllRobots() const;
 
     /**
      * Returns a vector of all the robots on this team excluding the goalie

@@ -145,13 +145,16 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
 
     // At the time of this tests creation, ratePass ran at an average 0.105ms
     // in debug on an i7
-//    std::cout << "Took "
-//              << std::chrono::duration_cast<std::chrono::microseconds>(duration).count() /
-//                     1000.0
-//              << "ms to run, average time of "
-//              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count() /
-//                     1000.0
-//              << "ms" << std::endl;
+    //    std::cout << "Took "
+    //              <<
+    //              std::chrono::duration_cast<std::chrono::microseconds>(duration).count()
+    //              /
+    //                     1000.0
+    //              << "ms to run, average time of "
+    //              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count()
+    //              /
+    //                     1000.0
+    //              << "ms" << std::endl;
 }
 
 TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)

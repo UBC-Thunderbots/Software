@@ -38,9 +38,8 @@ void Team::updateRobots(const std::vector<Robot>& new_robots)
                 "Error: Multiple robots on the same team with the same id");
         }
 
-        auto it = std::find_if(team_robots.begin(), team_robots.end(), [&](const Robot& r){
-            return r.id() == robot.id();
-        });
+        auto it = std::find_if(team_robots.begin(), team_robots.end(),
+                               [&](const Robot& r) { return r.id() == robot.id(); });
         if (it != team_robots.end())
         {
             // The robot already exists on the team. Find and update the robot
@@ -100,11 +99,11 @@ void Team::removeExpiredRobots(const Timestamp& timestamp)
 
 void Team::removeRobotWithId(unsigned int robot_id)
 {
-    auto it = std::find_if(team_robots.begin(), team_robots.end(), [&](const Robot& r){
-        return r.id() == robot_id;
-    });
+    auto it = std::find_if(team_robots.begin(), team_robots.end(),
+                           [&](const Robot& r) { return r.id() == robot_id; });
 
-    if (it != team_robots.end()){
+    if (it != team_robots.end())
+    {
         team_robots.erase(it);
     }
 }
@@ -144,8 +143,10 @@ void Team::setRobotExpiryBuffer(const Duration& new_robot_expiry_buffer_duration
 
 std::optional<Robot> Team::getRobotById(const unsigned int id) const
 {
-    for (const Robot& robot : team_robots){
-        if (robot.id() == id){
+    for (const Robot& robot : team_robots)
+    {
+        if (robot.id() == id)
+        {
             return robot;
         }
     }
@@ -168,7 +169,7 @@ std::optional<unsigned int> Team::getGoalieID() const
     return goalie_id;
 }
 
-const std::vector<Robot> & Team::getAllRobots() const
+const std::vector<Robot>& Team::getAllRobots() const
 {
     return team_robots;
 }

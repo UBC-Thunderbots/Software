@@ -82,7 +82,7 @@ namespace Passing
      *         be intercepted, and 0 indicating it's impossible for the pass to be
      *         intercepted
      */
-    double calculateInterceptRisk(const Robot &enemy_robot, const Pass &pass);
+    double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass);
 
 
     /**
@@ -102,7 +102,7 @@ namespace Passing
      *         friendly team to recieve the given pass, with 1 being very likely, 0
      *         being impossible
      */
-    double ratePassFriendlyCapability(Team friendly_team, const Pass &pass,
+    double ratePassFriendlyCapability(Team friendly_team, const Pass& pass,
                                       std::optional<unsigned int> passer_robot_id);
 
     /**
