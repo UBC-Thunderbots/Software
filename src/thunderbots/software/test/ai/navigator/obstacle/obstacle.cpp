@@ -217,22 +217,17 @@ TEST(NavigatorObstacleTest, create_from_rectangle)
         {2, 1},
         {2, -3},
     });
-    EXPECT_EQ(expected.getPoints(), obstacle.getBoundaryPolygon().getPoints());
+    EXPECT_TRUE((bool) obstacle.getBoundaryPolygon());
+    EXPECT_EQ(expected.getPoints(), (*obstacle.getBoundaryPolygon()).getPoints());
 }
 
 TEST(NavigatorObstacleTest, create_from_circle)
 {
-    Obstacle obstacle({2, 2}, 1, 8);
+    Obstacle obstacle = Obstacle::createCircleObstacle({2, 2}, 1, 1);
 
-    Polygon expected = Polygon({
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(0)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(45)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(90)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(135)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(180)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(225)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(270)),
-        Point(2, 2) + Vector(1, 0).rotate(Angle::ofDegrees(315)),
-    });
-    EXPECT_EQ(expected.getPoints(), obstacle.getBoundaryPolygon().getPoints());
+    EXPECT_FALSE(obstacle.isPolygon());
+    EXPECT_TRUE(obstacle.getBoundaryCircle());
+
+    EXPECT_EQ((*obstacle.getBoundaryCircle()).getRadius(), (1 + ROBOT_MAX_RADIUS_METERS));
+    EXPECT_EQ((*obstacle.getBoundaryCircle()).getOrigin(), Point({2,2}));
 }
