@@ -108,6 +108,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
 
@@ -121,6 +122,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
         yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,

@@ -168,19 +168,6 @@ double Obstacle::getRadiusCushionForHexagon(double radius)
     return radius * 4.0 / std::sqrt(3);
 }
 
-Obstacle Obstacle::createBallObstacle(const Ball& ball,
-                                      double additional_radius_cushion_buffer,
-                                      double additional_velocity_cushion_buffer)
-{
-    // TODO: handle `additional_velocity_cushion_buffer` here
-
-    double radius_cushion = getRadiusCushionForHexagon(BALL_MAX_RADIUS_METERS +
-                                                       additional_radius_cushion_buffer);
-
-    return createRobotObstacleFromPositionAndRadiusAndVelocity(
-        ball.position(), radius_cushion, ball.velocity(), false);
-}
-
 Obstacle Obstacle::createCircularBallObstacle(const Ball& ball,
                                               double additional_radius_cushion_buffer)
 {

@@ -124,11 +124,6 @@ class Obstacle
         double additional_radius_cushion_buffer,
         double additional_velocity_cushion_buffer);
 
-    // TODO: @jonl112: plz add javadoc and unit test this
-    static Obstacle createBallObstacle(const Ball& ball,
-                                       double additional_radius_cushion_buffer,
-                                       double additional_velocity_cushion_buffer);
-
     /**
      * Circle obstacle around ball with additional_radius_cushion_buffer
      *
