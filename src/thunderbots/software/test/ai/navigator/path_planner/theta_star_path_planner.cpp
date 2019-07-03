@@ -21,18 +21,6 @@ void printPath(std::vector<Point> path_points)
     printf("\n");
 }
 
-std::string getObstacleAsString(const Obstacle& obstacle)
-{
-    std::stringstream ss;
-    ss << "{";
-    for (const Point& point : obstacle.getBoundaryPolygon().getPoints())
-    {
-        ss << point << ",";
-    }
-    ss << "}";
-    return ss.str();
-}
-
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
                                        Rectangle bounding_box)
 {
@@ -52,9 +40,9 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
     {
         for (auto const& obstacle : obstacles)
         {
-            EXPECT_FALSE(obstacle.getBoundaryPolygon().containsPoint(path_points[0]))
+            EXPECT_FALSE(obstacle.containsPoint(path_points[0]))
                 << "Only point on path " << path_points[0] << " is in obstacle "
-                << getObstacleAsString(obstacle);
+                << obstacle;
         }
     }
 
@@ -64,9 +52,9 @@ void checkPathDoesNotIntersectObstacle(std::vector<Point> path_points,
         Segment path_segment(path_points[i], path_points[i + 1]);
         for (auto const& obstacle : obstacles)
         {
-            EXPECT_FALSE(obstacle.getBoundaryPolygon().intersects(path_segment))
+            EXPECT_FALSE(obstacle.intersects(path_segment))
                 << "Line segment {" << path_points[i] << "," << path_points[i + 1]
-                << "} intersects obstacle " << getObstacleAsString(obstacle);
+                << "} intersects obstacle " << obstacle;
         }
     }
 }
@@ -113,10 +101,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Point start{0, 0}, dest{2.7, 0};
 
     // Place a rectangle over our destination location
-    std::vector<Obstacle> obstacles = {
-
-        Obstacle(
-            Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))};
+    std::vector<Obstacle> obstacles = {Obstacle(
+        Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))};
 
     std::unique_ptr<PathPlanner> planner =
         std::make_unique<ThetaStarPathPlanner>(field, obstacles);
@@ -250,26 +236,27 @@ TEST(TestThetaStarPathPlanner, performance)
     // This test can be used to guage performance, and profiled to find areas for
     // improvement
     std::vector<std::vector<Obstacle>> obstacle_sets = {
-        {
-            Obstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 16),
-        },
-        {
-            Obstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0.5, 0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 16),
-            Obstacle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 16),
-        }};
+            {
+                Obstacle::createCircleObstacle({0,0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0,0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0,1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0,1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            },
+            {
+                Obstacle::createCircleObstacle({0,0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0,0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0,1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0,1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({-0.5,0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({-0.5,0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({-0.5,1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({-0.5,1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0.5,0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0.5,0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0.5,1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+                Obstacle::createCircleObstacle({0.5,1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            }
+    };
     Field field = ::Test::TestUtil::createSSLDivBField();
 
     int num_iterations = 10;
