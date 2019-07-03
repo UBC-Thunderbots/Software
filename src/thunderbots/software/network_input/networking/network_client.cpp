@@ -23,8 +23,11 @@ NetworkClient::NetworkClient(ros::NodeHandle& node_handle)
     // Set up our connection over udp to receive vision packets
     try
     {
+        std::string vision_multicast_address;
+        node_handle.getParam("/vision_multicast_address", vision_multicast_address);
+
         ssl_vision_client = std::make_unique<SSLVisionClient>(
-            io_service, Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+            io_service, vision_multicast_address,
             Util::Constants::SSL_VISION_MULTICAST_PORT,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
