@@ -1362,8 +1362,7 @@ TEST(GeomUtilTest, test_find_open_circles_no_points_in_rectangle)
     EXPECT_DOUBLE_EQ(std::sqrt(2), empty_circles[0].getRadius());
 }
 
-TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle)
-{
+TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle) {
     Rectangle rectangle(Point(-1, -1), Point(1, 1));
     std::vector<Point> points = {Point(0.9, 0.9)};
 
@@ -1384,6 +1383,50 @@ TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle)
     EXPECT_EQ(Point(1, 0), empty_circles[3].getOrigin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.9, 2) + std::pow(0.1, 2)),
                      empty_circles[3].getRadius());
+}
+
+TEST(GeomUtilTest, test_ray_rectangle_intersection_no_intersection)
+{
+    Ray ray(Point(5, 5), Vector(1, 1));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result = std::make_pair(std::nullopt, std::nullopt);
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
+TEST(GeomUtilTest, test_ray_rectangle_intersection_ray_start_inside_rectangle_intersects_side)
+{
+    Ray ray(Point(0, 0), Vector(1, 0));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result = std::make_pair(Point(1, 0), std::nullopt);
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
+TEST(GeomUtilTest, test_ray_rectangle_intersection_ray_start_inside_rectangle_intersects_corner)
+{
+    Ray ray(Point(0, 0), Vector(1, 1));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result = std::make_pair(Point(1, 1), std::nullopt);
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
+}
+
+TEST(GeomUtilTest, test_ray_rectangle_intersection_ray_overlaps_rectangle_segment)
+{
+    Ray ray(Point(-2, -1), Vector(1, 0));
+    Rectangle rectangle = Rectangle(Point(-1, -1), Point(1, 1));
+
+    std::pair<std::optional<Point>, std::optional<Point>> expected_result = std::make_pair(Point(-1, -1), Point(1, -1));
+    auto result = rayRectangleIntersection(ray, rectangle);
+
+    EXPECT_EQ(result, expected_result);
 }
 
 int main(int argc, char **argv)

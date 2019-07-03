@@ -8,6 +8,7 @@
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
+#include "ai/hl/stp/tactic/grab_ball_tactic.h"
 #include "ai/world/game_state.h"
 #include "shared/constants.h"
 #include "util/parameter/dynamic_parameters.h"
@@ -35,10 +36,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    // TODO: Robot to try steal the ball from most threatening enemy
+    auto grab_ball_tactic = std::make_shared<GrabBallTactic>(world.field(), world.ball(), world.enemyTeam(), true);
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
@@ -55,7 +54,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // TODO: replace with reasonable fallback tactics
     std::vector<std::shared_ptr<StopTactic>> stop_tactics = {
-        std::make_shared<StopTactic>(false, true),
         std::make_shared<StopTactic>(false, true),
         std::make_shared<StopTactic>(false, true)};
 
@@ -80,8 +78,9 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
                                     world.enemyTeam());
+        grab_ball_tactic->updateParams(world.field(), world.ball(), world.enemyTeam());
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
+        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, grab_ball_tactic};
 
         // Update crease defenders
         for (auto crease_defender_tactic : crease_defender_tactics)

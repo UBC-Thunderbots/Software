@@ -937,6 +937,7 @@ if (CATKIN_ENABLE_TESTING)
             ai/ai.cpp
             ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_refbox_game_state_play_selection.cpp
+            ${TBOTS_PLAYS_LIB_SRC}
             )
     target_link_libraries(stp_refbox_game_state_play_selection
             ${catkin_LIBRARIES}

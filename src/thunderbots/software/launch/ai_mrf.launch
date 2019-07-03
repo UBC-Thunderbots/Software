@@ -7,6 +7,6 @@
     <include file="$(find thunderbots)/launch/ai.launch" />
 
     <!-- Launch the radio_communication node -->
-    <node name="radio_communication" pkg="thunderbots" type="radio_communication" output="screen" args="$(arg mrf_config)"/>
+    <node name="radio_communication" pkg="thunderbots" type="radio_communication" output="screen" args="$(arg mrf_config)" respawn="true"/>
 
 </launch>

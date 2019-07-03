@@ -202,6 +202,7 @@ std::vector<AvoidArea> Tactic::getAreasToAvoid(const GameState &game_state)
     }
 
     addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_DEFENSE_AREA);
+    addAreaIfNotInWhitelist(AvoidArea::BALL);
 
     return areas_to_avoid;
 }

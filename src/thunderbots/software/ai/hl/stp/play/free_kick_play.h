@@ -2,6 +2,8 @@
 
 #include "ai/hl/stp/play/play.h"
 #include "ai/hl/stp/tactic/cherry_pick_tactic.h"
+#include "ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/patrol_tactic.h"
 #include "ai/hl/stp/tactic/shoot_goal_tactic.h"
@@ -61,6 +63,11 @@ class FreeKickPlay : public Play
      * @param shoot_tactic
      */
     void updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic);
+
+
+    void updateDefendersAndGoalie(
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+        std::shared_ptr<GoalieTactic> goalie_tactic, const World &world);
 
     /**
      * Updates the pass generator
