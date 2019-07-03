@@ -51,7 +51,7 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
 
 void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction();
+    MoveAction move_action = MoveAction(0, Angle(), false);
     StopAction stop_action =
         StopAction(StopAction::ROBOT_STOPPED_SPEED_THRESHOLD_DEFAULT, true);
     do
