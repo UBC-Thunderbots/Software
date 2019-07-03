@@ -89,6 +89,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
 
+    // the chipper is allowed to go into the centre circle and touch the ball
+    chip_tactic->addWhitelistedAvoidArea(AvoidArea::CENTER_CIRCLE);
+    chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
@@ -106,7 +110,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // setup 5 kickoff positions in order of priority
         for (int i = 0; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
+            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::zero(),
                                              0);
             result.emplace_back(move_tactics.at(i));
         }
@@ -137,7 +141,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // 1 will be assigned to the rest of the robots
         for (int i = 1; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
+            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::zero(),
                                              0);
             result.emplace_back(move_tactics.at(i));
         }

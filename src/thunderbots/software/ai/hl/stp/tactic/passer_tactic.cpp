@@ -16,6 +16,7 @@ PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forev
       ball(ball),
       Tactic(loop_forever, {RobotCapabilityFlags::Kick})
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string PasserTactic::getName() const

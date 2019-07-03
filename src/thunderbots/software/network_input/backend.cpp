@@ -132,7 +132,13 @@ Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detecti
             ball_detection.position =
                 Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
             ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
-            ball_detections.push_back(ball_detection);
+
+            bool ignore_ball = Util::DynamicParameters::AI::refbox::ignore_camera_data.value() &&
+            (Util::DynamicParameters::AI::refbox::min_valid_x.value() > ball_detection.position.x() || Util::DynamicParameters::AI::refbox::max_valid_x.value() < ball_detection.position.x());
+            if(!ignore_ball)             {
+
+                ball_detections.push_back(ball_detection);
+            }
         }
     }
 
@@ -172,7 +178,12 @@ Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detect
             robot_detection.confidence = friendly_robot_detection.confidence();
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
-            friendly_robot_detections.push_back(robot_detection);
+
+            bool ignore_robot = Util::DynamicParameters::AI::refbox::ignore_camera_data.value() &&
+                               (Util::DynamicParameters::AI::refbox::min_valid_x.value() > robot_detection.position.x() || Util::DynamicParameters::AI::refbox::max_valid_x.value() < robot_detection.position.x());
+            if(!ignore_robot) {
+                friendly_robot_detections.push_back(robot_detection);
+            }
         }
     }
 
@@ -209,7 +220,11 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
             robot_detection.confidence = enemy_robot_detection.confidence();
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
-            enemy_robot_detections.push_back(robot_detection);
+            bool ignore_robot = Util::DynamicParameters::AI::refbox::ignore_camera_data.value() &&
+                                (Util::DynamicParameters::AI::refbox::min_valid_x.value() > robot_detection.position.x() || Util::DynamicParameters::AI::refbox::max_valid_x.value() < robot_detection.position.x());
+            if(!ignore_robot) {
+                enemy_robot_detections.push_back(robot_detection);
+            }
         }
     }
 
@@ -223,7 +238,60 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
 thunderbots_msgs::RefboxData Backend::getRefboxDataMsg(const Referee &packet)
 {
     thunderbots_msgs::RefboxData refbox_data;
-    refbox_data.command.command = getTeamCommand(packet.command());
+    if (Util::DynamicParameters::AI::refbox::override_refbox_play.value())
+    {
+        auto refbox_override_play =
+            Util::DynamicParameters::AI::refbox::current_refbox_play.value();
+        if ("HALT" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::HALT;
+        if ("STOP" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::STOP;
+        if ("NORMAL_START" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::NORMAL_START;
+        if ("FORCE_START" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::FORCE_START;
+        if ("PREPARE_KICKOFF_US" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US;
+        if ("PREPARE_KICKOFF_THEM" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM;
+        if ("PREPARE_PENALTY_US" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US;
+        if ("PREPARE_PENALTY_THEM" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM;
+        if ("DIRECT_FREE_US" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::DIRECT_FREE_US;
+        if ("DIRECT_FREE_THEM" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM;
+        if ("INDIRECT_FREE_US" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US;
+        if ("INDIRECT_FREE_THEM" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM;
+        if ("TIMEOUT_US" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::TIMEOUT_US;
+        if ("TIMEOUT_THEM" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::TIMEOUT_THEM;
+        if ("GOAL_US" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::GOAL_US;
+        if ("GOAL_THEM" == refbox_override_play)
+            refbox_data.command.command = thunderbots_msgs::RefboxCommand::GOAL_THEM;
+        if ("BALL_PLACEMENT_US" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US;
+        if ("BALL_PLACEMENT_THEM" == refbox_override_play)
+            refbox_data.command.command =
+                thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM;
+    }
+    else
+    {
+        refbox_data.command.command = getTeamCommand(packet.command());
+    }
     setOurFieldSide(packet.blue_team_on_positive_half());
     auto designated_position = refboxGlobalToLocalPoint(packet.designated_position());
     refbox_data.ball_placement_point.x = designated_position.x();

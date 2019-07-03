@@ -36,10 +36,10 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     world.updateFieldGeometry(new_world.field());
     world.updateEnemyTeamState(new_world.enemyTeam());
     world.updateFriendlyTeamState(new_world.friendlyTeam());
-    world.updateTimestamp(new_world.getMostRecentTimestamp());
     RefboxGameState new_game_state =
         Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
     world.updateRefboxGameState(new_game_state);
+    world.updateTimestamp(new_world.getMostRecentTimestamp());
 
     if (Util::DynamicParameters::AI::run_ai.value())
     {

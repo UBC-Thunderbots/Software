@@ -26,4 +26,5 @@ enum class RefboxGameState
     REFBOX_GAME_STATE_COUNT
 };
 
+std::string name(const RefboxGameState& state);
 std::ostream& operator<<(std::ostream& os, const RefboxGameState& state);
