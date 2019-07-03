@@ -138,7 +138,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
         case AvoidArea::HALF_METER_AROUND_BALL:
             return Obstacle::createCircleObstacle(world.ball().position(), 0.5, 1.2);
         case AvoidArea::BALL:
-            return Obstacle::createBallObstacle(world.ball(), 0.06, 0);
+            return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
             rectangle =
                 Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());
