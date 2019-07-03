@@ -90,8 +90,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             ball.velocity().len() > BALL_SLOW_SPEED_THRESHOLD)
         {
             // the ball is heading towards the net. move to block the shot
-            Point goalie_pos         = closestPointOnSeg((*robot).position(),
-                                                 Segment(ball.position(), intersection1));
+            Point goalie_pos = closestPointOnSeg(
+                (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
