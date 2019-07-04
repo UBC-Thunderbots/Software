@@ -42,12 +42,13 @@ bool ShootOrChipPlay::isApplicable(const World &world) const
     bool b = world.gameState().isOurIndirectFree() && !world.gameState().isPlaying();
     bool c = world.gameState().isOurDirectFree() && !world.gameState().isPlaying();
     return a || b || c;
+
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
+           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
 }
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)

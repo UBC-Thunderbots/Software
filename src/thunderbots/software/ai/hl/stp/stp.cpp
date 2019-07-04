@@ -8,6 +8,8 @@
 #include <random>
 
 #include "ai/ai.h"
+#include "ai/hl/stp/evaluation/possession.h"
+#include "ai/hl/stp/evaluation/robot.h"
 #include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/play/play.h"
 #include "ai/hl/stp/tactic/tactic.h"
@@ -24,6 +26,18 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
+    for (const Robot& robot : world.friendlyTeam().getAllRobots()) {
+        if (Evaluation::robotHasPossession(world.ball(), robot, world.getMostRecentTimestamp())) {
+            LOG(WARNING) << "Friendly robot " << robot.id() << "has possession";
+        }
+    }
+
+    for (const Robot& robot : world.enemyTeam().getAllRobots()) {
+        if (Evaluation::robotHasPossession(world.ball(), robot, world.getMostRecentTimestamp())) {
+            LOG(WARNING) << "Enemy robot " << robot.id() << "has possession";
+        }
+    }
+
     current_game_state = world.gameState().game_state;
     previous_override_play = override_play;
     override_play          = Util::DynamicParameters::AI::override_ai_play.value();

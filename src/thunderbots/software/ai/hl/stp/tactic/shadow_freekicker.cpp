@@ -51,7 +51,7 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
                     .norm(FREE_KICK_MAX_PROXIMITY + ROBOT_MAX_RADIUS_METERS);
 
             Vector perpendicular_to_enemy_direction =
-                enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS * 1.2);
+                enemy_pointing_direction.perp().norm(ROBOT_MAX_RADIUS_METERS * 1.1);
 
             defend_position = free_kick_shadower == FreekickShadower::First
                                   ? ball.position() + enemy_pointing_direction +
