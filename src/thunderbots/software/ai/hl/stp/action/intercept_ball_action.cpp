@@ -72,12 +72,13 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                     dist(robot->position(),
                          Line(ball.position(), ball.position() + ball.velocity())) < 0.02;
 
-                if(ball.velocity().len() < 0.3) {
+                if (ball.velocity().len() < 0.3)
+                {
                     LOG(DEBUG) << "moving to ball slow" << std::endl;
                     yield(std::make_unique<MoveIntent>(
-                            robot->id(), ball.position(),
-                            (ball.position() - robot->position()).orientation(), 1.0, 0, true,
-                            NONE));
+                        robot->id(), ball.position(),
+                        (ball.position() - robot->position()).orientation(), 0.3, 0, true,
+                        NONE));
                 }
                 else if (robot_on_ball_line)
                 {

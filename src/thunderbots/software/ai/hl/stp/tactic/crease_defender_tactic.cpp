@@ -182,9 +182,8 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            yield(move_action.updateStateAndGetNextIntent(*robot, defender_position,
-                                                          defender_orientation, 0.0,
-                                                          false, AUTOCHIP));
+            yield(move_action.updateStateAndGetNextIntent(
+                *robot, defender_position, defender_orientation, 0.0, false, AUTOCHIP));
         }
         else
         {

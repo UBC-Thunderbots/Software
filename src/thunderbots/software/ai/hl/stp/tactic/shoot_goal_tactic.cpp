@@ -81,7 +81,6 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     for (const auto &enemy : enemy_team.getAllRobots())
     {
         if (baller_frontal_area.containsPoint(enemy.position()))
-            ;
         {
             return true;
         }

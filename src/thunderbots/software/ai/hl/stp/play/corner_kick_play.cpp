@@ -31,17 +31,15 @@ std::string CornerKickPlay::getName() const
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-        return (world.gameState().isOurDirectFree() ||
-        world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
-               Evaluation::ballInEnemyCorner(world.field(), world.ball(),
-                                             BALL_IN_CORNER_RADIUS);
+    return (world.gameState().isOurDirectFree() ||
+            world.gameState().isOurIndirectFree()) &&
+           !world.gameState().isPlaying() && world.ball().position().x() > 0;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
-    return (isApplicable(world) ||
-            (world.gameState().isPlaying() &&
-             Evaluation::teamHasPossession(world.enemyTeam(), world.ball()))) &&
+    return ((world.gameState().isPlaying() &&
+             !Evaluation::teamHasPossession(world.enemyTeam(), world.ball()))) &&
            !is_done;
 }
 

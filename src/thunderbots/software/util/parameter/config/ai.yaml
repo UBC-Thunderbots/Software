@@ -261,11 +261,11 @@ RobotCapabilities:
     type: "string"
     description: Comma-separated list of numbers of robots with broken dribblers
   broken_chippers:
-    default: ""
+    default: "5"
     type: "string"
     description: Comma-separated list of numbers of robots with broken chippers
   broken_kickers:
-    default: ""
+    default: "5"
     type: "string"
     description: Comma-separated list of numbers of robots with broken kickers
 

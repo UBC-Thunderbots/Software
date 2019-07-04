@@ -41,13 +41,13 @@ bool FreeKickPlay::isApplicable(const World &world) const
     // use this play if it's our indirect or if it's a goal kick (our direct on friendly
     // side
     return world.gameState().isOurIndirectFree() ||
-           (world.gameState().isOurDirectFree() && !Evaluation::ballInEnemyCorner(world.field(), world.ball(), 1.0));
+           (world.gameState().isOurDirectFree() && world.ball().position().x() <= 0);
 }
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
     return !world.gameState().isPlaying() ||
-           (world.gameState().isOurDirectFree() && !Evaluation::ballInEnemyCorner(world.field(), world.ball(), 1.0));
+           (world.gameState().isOurDirectFree() && world.ball().position().x() <= 0);
 }
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
