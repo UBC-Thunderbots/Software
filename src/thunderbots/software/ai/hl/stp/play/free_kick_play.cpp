@@ -109,10 +109,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
-        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
                crease_defender_tactics[0], crease_defender_tactics[1]});
     }
 
@@ -122,9 +124,13 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+
+
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
                crease_defender_tactics[0], crease_defender_tactics[1]});
     } while (!align_to_ball_tactic->done());
 
@@ -141,11 +147,14 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateShootGoalTactic(shoot_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
+        shoot_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        shoot_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
         LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.first;
         LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
 
-        yield({shoot_tactic, cherry_pick_tactic_neg_y, cherry_pick_tactic_pos_y,
+        yield({goalie_tactic, shoot_tactic, cherry_pick_tactic_neg_y, cherry_pick_tactic_pos_y,
                crease_defender_tactics[0], crease_defender_tactics[1]});
         // If there is a robot assigned to shoot, we assume this is the robot
         // that will be taking the shot
@@ -185,6 +194,15 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     cherry_pick_tactic_pos_y->~CherryPickTactic();
     cherry_pick_tactic_neg_y->~CherryPickTactic();
 
+    bool kick_from_pos_corner = world.ball().position().y() > 0;
+    Point opposite_corner_to_kick = kick_from_pos_corner ? world.field().enemyCornerNeg()
+                                                         : world.field().enemyCornerPos();
+    Point bait_move_tactic_1_pos =
+            opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().width() * 0.5,
+                                             copysign(0.5, opposite_corner_to_kick.y()));
+
+
+    auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     // If the shoot tactic has finished, we are done this play, otherwise we need to pass
     if (!shoot_tactic->hasShotAvailable())
     {
@@ -206,8 +224,12 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             passer->updateParams(pass, world.ball());
             receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
                                    world.ball());
-            yield({passer, receiver, crease_defender_tactics[0],
-                   crease_defender_tactics[1]});
+            bait_move_tactic_1->updateParams(
+                    bait_move_tactic_1_pos,
+                    (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+
+            yield({goalie_tactic, passer, receiver, crease_defender_tactics[0],
+                   crease_defender_tactics[1], bait_move_tactic_1});
         } while (!receiver->done());
     }
     else
