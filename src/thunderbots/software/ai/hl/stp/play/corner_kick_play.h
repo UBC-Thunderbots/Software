@@ -25,7 +25,7 @@ class CornerKickPlay : public Play
    private:
     // The maximum distance from the corner that the ball can be for it to be
     // considered a corner kick
-    static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
+    static constexpr double BALL_IN_CORNER_RADIUS = 1.0;
 
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;

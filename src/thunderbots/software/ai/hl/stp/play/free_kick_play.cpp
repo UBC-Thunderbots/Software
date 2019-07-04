@@ -2,6 +2,7 @@
 
 #include <g3log/g3log.hpp>
 
+#include "ai/hl/stp/evaluation/ball.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
@@ -38,16 +39,15 @@ std::string FreeKickPlay::getName() const
 bool FreeKickPlay::isApplicable(const World &world) const
 {
     // use this play if it's our indirect or if it's a goal kick (our direct on friendly
-    // side)
-    //    return world.gameState().isOurIndirectFree() ||
-    //           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
-    return false;
+    // side
+    return world.gameState().isOurIndirectFree() ||
+           (world.gameState().isOurDirectFree() && !Evaluation::ballInEnemyCorner(world.field(), world.ball(), 1.0));
 }
 
 bool FreeKickPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isOurIndirectFree() ||
-           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
+    return !world.gameState().isPlaying() ||
+           (world.gameState().isOurDirectFree() && !Evaluation::ballInEnemyCorner(world.field(), world.ball(), 1.0));
 }
 
 void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)

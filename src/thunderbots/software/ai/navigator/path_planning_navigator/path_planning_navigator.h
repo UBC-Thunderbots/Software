@@ -116,6 +116,9 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     static constexpr double ROBOT_OBSTACLE_INFLATION_FACTOR = 1.3;
     const double OBSTACLE_INFLATION_DIST = 1.3 * ROBOT_MAX_RADIUS_METERS;
 
+    // Transition between line segments
+    static constexpr double TRANSITION_SPEED_FACTOR = .75;
+
     // This navigators knowledge / state of the world
     World world;
 

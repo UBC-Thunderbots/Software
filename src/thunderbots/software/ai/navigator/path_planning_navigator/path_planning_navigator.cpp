@@ -3,6 +3,8 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include <util/parameter/dynamic_parameters.h>
+
 #include "ai/navigator/util.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 
@@ -66,7 +68,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                 move_intent.getRobotId(), current_destination,
                 move_intent.getFinalAngle(),
                 calculateTransitionSpeedBetweenSegments(
-                    (*path_points)[0], (*path_points)[1], (*path_points)[2], 0),
+                    (*path_points)[0], (*path_points)[1], (*path_points)[2], ROBOT_MAX_SPEED_METERS_PER_SECOND * Util::DynamicParameters::Navigator::transition_speed_factor.value()),
                 move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);

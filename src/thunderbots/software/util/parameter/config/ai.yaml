@@ -141,6 +141,12 @@ Navigator:
     default: 0.5
     type: "double"
     description: "TODO: Add description as part of #149"
+  transition_speed_factor:
+    min: 0
+    max: 1
+    default: 0.75
+    type: "double"
+    description: "Factor of max speed to use for transition speed calculations"
 robot_expiry_buffer_milliseconds:
   min: 0
   max: 100
