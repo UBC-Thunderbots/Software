@@ -20,6 +20,8 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       Tactic(true)
 {
     addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string GoalieTactic::getName() const
