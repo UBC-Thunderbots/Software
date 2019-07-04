@@ -207,13 +207,18 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     }
 
     if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
-        (start - closest_destination).len() <
-            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION) ||
         ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS))
     {
         // If the destination GridCell is within one grid size of start or
         // start and destination, or start and closest_destination, within threshold
         return std::make_optional<std::vector<Point>>({start, destination});
+    }
+
+
+    if((start - closest_destination).len() <
+            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
+    {
+        return std::make_optional<std::vector<Point>>({start, closest_destination});
     }
 
     // The source is blocked
