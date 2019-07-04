@@ -19,7 +19,7 @@ using namespace Passing;
 
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
-CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(5)) {}
+CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(5)) {is_done = false;}
 
 std::string CornerKickPlay::getName() const
 {
@@ -28,14 +28,15 @@ std::string CornerKickPlay::getName() const
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isOurDirectFree() || world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
-           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
-                                         BALL_IN_CORNER_RADIUS);
+//    return (world.gameState().isOurDirectFree() || world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
+//           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
+//                                         BALL_IN_CORNER_RADIUS);
+return false;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
-    return isApplicable(world) || (world.gameState().isPlaying() && Evaluation::teamHasPossession(world.enemyTeam(), world.ball()));
+    return (isApplicable(world) || (world.gameState().isPlaying() && Evaluation::teamHasPossession(world.enemyTeam(), world.ball()))) && !is_done;
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -216,6 +217,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         yield({goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
     } while (!receiver->done());
 
+    is_done = true;
     LOG(DEBUG) << "Finished";
 }
 

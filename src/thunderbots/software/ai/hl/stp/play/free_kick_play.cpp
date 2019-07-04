@@ -39,8 +39,9 @@ bool FreeKickPlay::isApplicable(const World &world) const
 {
     // use this play if it's our indirect or if it's a goal kick (our direct on friendly
     // side)
-    return world.gameState().isOurIndirectFree() ||
-           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
+//    return world.gameState().isOurIndirectFree() ||
+//           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
+    return false;
 }
 
 bool FreeKickPlay::invariantHolds(const World &world) const

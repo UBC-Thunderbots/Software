@@ -49,4 +49,6 @@ class CornerKickPlay : public Play
      * @param pass_generator
      */
     void updatePassGenerator(Passing::PassGenerator &pass_generator);
+
+    bool is_done;
 };
