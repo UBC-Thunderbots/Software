@@ -10,7 +10,7 @@
     <node name="rosbag_record_all" pkg="rosbag" type="record" args="-a -o $(find thunderbots)"/>
 
     <!-- Launch the network_input node -->
-    <node name="network_input" pkg="thunderbots" type="network_input" output="screen" respawn="true">
+    <node name="network_input" pkg="thunderbots" type="network_input" output="screen" respawn="true" respawn_delay="10">
     </node>
 
     <!-- Launch the ai logic node -->
