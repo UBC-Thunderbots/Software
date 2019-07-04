@@ -187,12 +187,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "LOOP END";
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
 
-    // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
-    // each) to save a significant number of CPU cycles
-    // TODO: stop the PassGenerators here instead of destructing them (Issue #636)
-    pass_generator.~PassGenerator();
-    cherry_pick_tactic_pos_y->~CherryPickTactic();
-    cherry_pick_tactic_neg_y->~CherryPickTactic();
+    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
+    //                    to save CPU cycles
 
     bool kick_from_pos_corner = world.ball().position().y() > 0;
     Point opposite_corner_to_kick = kick_from_pos_corner ? world.field().enemyCornerNeg()
