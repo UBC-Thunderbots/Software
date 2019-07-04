@@ -235,6 +235,13 @@ GoalieTactic:
       description: >-
         The block cone buffer is the extra distance to add on either side of the robot
         to allow to it be further back in the block cone
+  goalie_final_speed:
+      min: 0.0
+      max: 3.0
+      default: 0.0
+      type: "double"
+      description: >- 
+        Control the final speed of the goalie to be able to intercept shots better
 RobotCapabilities:
   broken_dribblers:
     default: ""
