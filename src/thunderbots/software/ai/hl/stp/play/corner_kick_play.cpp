@@ -28,10 +28,9 @@ std::string CornerKickPlay::getName() const
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-//    return (world.gameState().isOurDirectFree() || world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
-//           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
-//                                         BALL_IN_CORNER_RADIUS);
-return false;
+    // use this play for corner kicks (friendly direct on enemy field side)
+    return world.gameState().isOurDirectFree() &&
+            world.ball().position().x() > 0;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const

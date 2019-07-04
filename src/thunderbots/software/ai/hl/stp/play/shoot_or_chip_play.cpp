@@ -33,15 +33,8 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    bool a = world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
-//    bool b = world.gameState().isOurIndirectFree() ||
-//           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
-//    bool c = (world.gameState().isOurDirectFree() || world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
-//           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
-    bool b = world.gameState().isOurIndirectFree() && !world.gameState().isPlaying();
-    bool c = world.gameState().isOurDirectFree() && !world.gameState().isPlaying();
-    return a || b || c;
+    return world.gameState().isPlaying() &&
+           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
 
 }
 
