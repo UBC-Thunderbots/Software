@@ -28,6 +28,10 @@ std::unique_ptr<Intent> Action::getNextIntent()
     {
         // Run the coroutine. This will call the bound calculateNextIntent function
         intent_sequence();
+        // Testing stuff
+//        auto foonext_intent = intent_sequence.get();
+//        intent_sequence();
+//        next_intent = intent_sequence.get();
 
         // Check if the coroutine is still valid before getting the result. This makes
         // sure we don't try get the result after "running out the bottom" of the
