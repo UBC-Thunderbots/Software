@@ -41,6 +41,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     world.updateRefboxGameState(new_game_state);
     world.updateTimestamp(new_world.getMostRecentTimestamp());
 
+    world.mutableGameState().updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US, world.ball());
+
     if (Util::DynamicParameters::AI::run_ai.value())
     {
         // Get the Primitives the Robots should run from the AI
