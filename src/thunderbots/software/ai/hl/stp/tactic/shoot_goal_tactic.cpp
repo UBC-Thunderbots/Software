@@ -3,6 +3,7 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "ai/hl/stp/evaluation/intercept.h"
+#include "geom/rectangle.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
@@ -68,9 +69,15 @@ bool ShootGoalTactic::hasShotAvailable() const
 bool ShootGoalTactic::isEnemyAboutToStealBall() const
 {
     // TODO: replace with get all robots except goalie?
+
+    Vector front_of_robot_dir = Vector(robot->orientation().cos(), robot->orientation().sin());
+
+    Rectangle baller_frontal_area = Rectangle((robot->position() + front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS)),
+                                              robot->position() + front_of_robot_dir.norm(3*ROBOT_MAX_RADIUS_METERS) -g front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS));
+
     for (const auto &enemy : enemy_team.getAllRobots())
     {
-        if ((enemy.position() - ball.position()).len() < ENEMY_DANGER_DIST)
+        if (baller_frontal_area.containsPoint(enemy.position()));
         {
             return true;
         }
