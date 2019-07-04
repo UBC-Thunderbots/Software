@@ -33,6 +33,7 @@ bool ShootOrChipPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const

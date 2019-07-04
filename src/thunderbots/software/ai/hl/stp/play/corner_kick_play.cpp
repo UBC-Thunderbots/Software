@@ -10,6 +10,7 @@
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/passer_tactic.h"
 #include "ai/hl/stp/tactic/receiver_tactic.h"
+#include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/passing/pass_generator.h"
 #include "shared/constants.h"
 #include "util/logger/custom_logging_levels.h"
@@ -27,9 +28,9 @@ std::string CornerKickPlay::getName() const
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
+    // use this play for corner kicks (friendly direct on enemy field side)
     return world.gameState().isOurDirectFree() &&
-           Evaluation::ballInFriendlyCorner(world.field(), world.ball(),
-                                            BALL_IN_CORNER_RADIUS);
+            world.ball().position().x() > 0;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
@@ -182,12 +183,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.first;
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.second;
 
-    // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
-    // each) to save a significant number of CPU cycles
-    // TODO: stop the PassGenerators here instead of destructing them (Issue #636)
-    pass_generator.~PassGenerator();
-    cherry_pick_tactic_pos_y->~CherryPickTactic();
-    cherry_pick_tactic_neg_y->~CherryPickTactic();
+    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
+    //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
     auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
