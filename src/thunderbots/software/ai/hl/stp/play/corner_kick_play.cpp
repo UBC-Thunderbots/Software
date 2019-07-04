@@ -119,7 +119,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         bait_move_tactic_2_pos,
         (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
 
-    PassGenerator pass_generator(world, world.ball().position());
+    PassGenerator& pass_generator = PassGenerator::instance();
 
     std::pair<Pass, double> best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();

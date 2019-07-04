@@ -57,13 +57,7 @@ namespace Passing
         PassGenerator& operator=(const PassGenerator&) = delete;
         PassGenerator(const PassGenerator&)            = delete;
 
-        /**
-         * Create a PassGenerator with given parameters
-         *
-         * @param world The world we're passing int
-         * @param passer_point The point we're passing from
-         */
-        explicit PassGenerator(const World& world, const Point& passer_point);
+        static PassGenerator& instance();
 
         /**
          * Updates the world
@@ -133,6 +127,14 @@ namespace Passing
         static constexpr double PASS_SPEED_WEIGHT                          = 0.01;
         std::array<double, NUM_PARAMS_TO_OPTIMIZE> optimizer_param_weights = {
             PASS_SPACE_WEIGHT, PASS_SPACE_WEIGHT, PASS_TIME_WEIGHT, PASS_SPEED_WEIGHT};
+
+        /**
+         * Create a PassGenerator with given parameters
+         *
+         * @param world The world we're passing int
+         * @param passer_point The point we're passing from
+         */
+        explicit PassGenerator(const World& world, const Point& passer_point);
 
         /**
          * Continuously optimizes, prunes, and re-generates passes based on known info

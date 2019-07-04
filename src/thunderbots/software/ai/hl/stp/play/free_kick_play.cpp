@@ -87,7 +87,9 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Start a PassGenerator that will continuously optimize passes into roughly
     // the enemy half of the field
-    PassGenerator pass_generator(world, world.ball().position());
+    PassGenerator& pass_generator = PassGenerator::instance();
+    pass_generator.setWorld(world);
+    pass_generator.setPasserPoint(world.ball().position());
     pass_generator.setTargetRegion(
         Rectangle(Point(-(world.field().length() / 4), world.field().width() / 2),
                   world.field().enemyCornerNeg()));
@@ -187,10 +189,6 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "LOOP END";
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
 
-    // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
-    // each) to save a significant number of CPU cycles
-    // TODO: stop the PassGenerators here instead of destructing them (Issue #636)
-    pass_generator.~PassGenerator();
     cherry_pick_tactic_pos_y->~CherryPickTactic();
     cherry_pick_tactic_neg_y->~CherryPickTactic();
 

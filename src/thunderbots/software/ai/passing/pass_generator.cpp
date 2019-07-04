@@ -404,3 +404,8 @@ Pass PassGenerator::convertArrayToPass(
     return Pass(passer_point, Point(array.at(0), array.at(1)), array.at(2),
                 Timestamp::fromSeconds(time_offset_seconds));
 }
+
+PassGenerator &PassGenerator::instance() {
+    static PassGenerator pass_generator = PassGenerator(World(), Point());
+    return pass_generator;
+}

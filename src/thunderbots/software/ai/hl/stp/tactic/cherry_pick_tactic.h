@@ -50,9 +50,6 @@ class CherryPickTactic : public Tactic
     // The region in which we want to position the cherry picking robot
     Rectangle target_region;
 
-    // The pass optimizer being used to figure out the best position for the robot
-    Passing::PassGenerator pass_generator;
-
     // Tactic parameters
     // The current state of the world
     World world;
