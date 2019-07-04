@@ -72,7 +72,14 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                     dist(robot->position(),
                          Line(ball.position(), ball.position() + ball.velocity())) < 0.02;
 
-                if (robot_on_ball_line)
+                if(ball.velocity().len() < 0.3) {
+                    LOG(DEBUG) << "moving to ball slow" << std::endl;
+                    yield(std::make_unique<MoveIntent>(
+                            robot->id(), ball.position(),
+                            (ball.position() - robot->position()).orientation(), 1.0, 0, true,
+                            NONE));
+                }
+                else if (robot_on_ball_line)
                 {
                     Vector ball_to_robot     = robot->position() - ball.position();
                     double d                 = dist(robot->position(), ball.position());
@@ -99,12 +106,14 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         else if (blf)
         {
+            LOG(DEBUG) << "ball leaving field" << std::endl;
             yield(std::make_unique<MoveIntent>(
                 robot->id(), blf.value(),
                 (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
         }
         else
         {
+            LOG(DEBUG) << "moving to ball backup" << std::endl;
             yield(std::make_unique<MoveIntent>(
                 robot->id(), ball.position(),
                 (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));

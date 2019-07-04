@@ -39,6 +39,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Move the robots in a circle around the ball, facing the ball
         move_tactic_1->updateParams(world.field(), world.ball(), world.enemyTeam());
+        move_tactic_1->addWhitelistedAvoidArea(AvoidArea::BALL);
+        move_tactic_1->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         //        move_tactic_1->updateParams(
         //            world.ball().position() +
         //            Point::createFromAngle(angle_between_robots * 1),

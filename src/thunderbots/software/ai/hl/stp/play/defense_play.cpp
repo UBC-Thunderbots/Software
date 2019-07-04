@@ -80,6 +80,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
                                     world.enemyTeam());
         grab_ball_tactic->updateParams(world.field(), world.ball(), world.enemyTeam());
+        grab_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        grab_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, grab_ball_tactic};
 
