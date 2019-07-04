@@ -23,7 +23,9 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       ball_(ball),
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
-      game_state_()
+      game_state_(),
+      // this value is hardcoded do not make it smaller than 3
+      refbox_game_state_history(3)
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);
@@ -115,7 +117,14 @@ Team &World::mutableEnemyTeam()
 
 void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
-    game_state_.updateRefboxGameState(game_state, ball_);
+    refbox_game_state_history.push_back(game_state);
+    // take the consensus of the past 3 refbox messages
+    if (refbox_game_state_history[0] == refbox_game_state_history[1]
+        && refbox_game_state_history[0] == refbox_game_state_history[2]) {
+        game_state_.updateRefboxGameState(game_state, ball_);
+    } else {
+        game_state_.updateRefboxGameState(game_state_.getRefboxGameState(), ball_);
+    }
 }
 
 Timestamp World::getMostRecentTimestampFromMembers()
