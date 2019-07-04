@@ -53,16 +53,10 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         auto blf = getPointBallLeavesField(field, ball);
         if(intercept_pos) {
             while(point_in_front_of_ball) {
-                LOG(DEBUG) << "going to line" << std::endl;
-                if(!robot) {
-                    LOG(WARNING) << "NO ROBOT" << std::endl;
-                }
-
                 bool robot_on_ball_line = pointInFrontVector(ball.position(), ball.velocity(), robot->position()) && dist(robot->position(), Line(ball.position(), ball.position() + ball.velocity())) < 0.02;
                 LOG(INFO) << dist(robot->position(), Line(ball.position(), ball.position() + ball.velocity())) << std::endl;
 
                 if(robot_on_ball_line) {
-            LOG(DEBUG) << "robot on ball line" << std::endl;
             Vector ball_to_robot = robot->position() - ball.position();
             double d = dist(robot->position(), ball.position());
             double d2 = std::min<double>(d-1.0, 0.0);
@@ -81,11 +75,9 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             }
         }
         else if(blf){
-            LOG(DEBUG) << "BLF" << std::endl;
             yield(std::make_unique<MoveIntent>(robot->id(), blf.value(), (ball.position() - robot->position()).orientation(),
                                            0, 0, true, NONE));
         }else {
-            LOG(DEBUG) << "no intercept" << std::endl;
             yield(std::make_unique<MoveIntent>(robot->id(), ball.position(), (ball.position() - robot->position()).orientation(),
                                                0, 0, true, NONE));
         }
