@@ -178,7 +178,8 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
             this->velocity_obstacles.emplace_back(
                 Obstacle::createVelocityObstacleWithScalingParams(
                     this->current_robot->position(), this->current_destination,
-                    this->current_robot->velocity().len(), 1.2, .04));
+                    this->current_robot->velocity().len(), Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value()));
+
             this->current_robot = std::nullopt;
         }
         assigned_primitives.emplace_back(std::move(current_primitive));
@@ -193,7 +194,13 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
 std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
     const std::vector<AvoidArea> &avoid_areas, int robot_id)
 {
-    std::vector<Obstacle> obstacles;
+    std::vector<Obstacle> obstacles = velocity_obstacles;
+
+    for(auto obstacle : obstacles)
+    {
+        // draw the avoid area
+        drawObstacle(obstacle, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
+    }
 
     // Avoid obstacles specific to this MoveIntent
     for (auto area : avoid_areas)
@@ -209,10 +216,7 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        //@todo consider using velocity obstacles: Obstacle o =
-        // Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
-        Obstacle o =
-            Obstacle::createCircularRobotObstacle(robot, ROBOT_OBSTACLE_INFLATION_FACTOR);
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value());
         obstacles.push_back(o);
         drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
     }
