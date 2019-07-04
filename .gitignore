@@ -18,6 +18,7 @@
 
 # rosbag
 *.bag
+*.bag.active
 
 # Pycache
 *.pyc
