@@ -148,6 +148,13 @@ robot_expiry_buffer_milliseconds:
   type: "int"
   description: "TODO: Add description as part of #149"
 Evaluation:
+    Possession:
+      possession_dist:
+        min: 0.0
+        max: 1.0
+        default: 0.2
+        type: "double"
+        description: How close the ball has to be to the robot for the robot to have the ball
     Indirect_Chip:
       chip_target_fraction:
         min: 0.0
