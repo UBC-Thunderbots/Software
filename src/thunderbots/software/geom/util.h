@@ -376,7 +376,7 @@ Point reflect(const Point &v, const Point &n);
  * the line segment of overlap.
  */
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-        const Ray &ray, const Segment &segment);
+    const Ray &ray, const Segment &segment);
 
 /**
  * Calculates the intersection of a Ray and Rectangle
@@ -385,11 +385,11 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
  * @param rectangle The rectangle
  * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
  * Returns {Point, std::nullopt} if a single intersection exists.
- * Returns {Point, Point} if the ray overlaps a segment of the rectangle are overlapping, where the points define
- * the line segment of overlap.
+ * Returns {Point, Point} if the ray overlaps a segment of the rectangle are overlapping,
+ * where the points define the line segment of overlap.
  */
 std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
-        const Ray &ray, const Rectangle &rectangle);
+    const Ray &ray, const Rectangle &rectangle);
 
 
 /**

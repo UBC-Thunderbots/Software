@@ -215,8 +215,8 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     }
 
 
-    if((start - closest_destination).len() <
-            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
+    if ((start - closest_destination).len() <
+        (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
         return std::make_optional<std::vector<Point>>({start, closest_destination});
     }

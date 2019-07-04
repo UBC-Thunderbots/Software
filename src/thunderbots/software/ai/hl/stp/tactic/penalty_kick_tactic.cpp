@@ -158,9 +158,10 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         // If we haven't approached the ball yet, get close
 
-        while(!approach_ball_move_act.done()) {
+        while (!approach_ball_move_act.done())
+        {
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
-                    *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
         }
 
         if ((robot.value().position() - behind_ball).len() <=

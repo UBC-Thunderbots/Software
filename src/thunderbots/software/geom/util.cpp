@@ -806,7 +806,7 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
 }
 
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-        const Ray &ray, const Segment &segment)
+    const Ray &ray, const Segment &segment)
 {
     Point ray2 = ray.getRayStart() + ray.getDirection();
 
@@ -848,18 +848,23 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
 }
 
 std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
-        const Ray &ray, const Rectangle &rectangle) {
+    const Ray &ray, const Rectangle &rectangle)
+{
     std::vector<Segment> rectangle_segments = {
-            Segment(rectangle.neCorner(), rectangle.nwCorner()),
-            Segment(rectangle.nwCorner(), rectangle.swCorner()),
-            Segment(rectangle.swCorner(), rectangle.seCorner()),
-            Segment(rectangle.seCorner(), rectangle.neCorner()),
+        Segment(rectangle.neCorner(), rectangle.nwCorner()),
+        Segment(rectangle.nwCorner(), rectangle.swCorner()),
+        Segment(rectangle.swCorner(), rectangle.seCorner()),
+        Segment(rectangle.seCorner(), rectangle.neCorner()),
     };
-    std::pair<std::optional<Point>, std::optional<Point>> result =  std::make_pair(std::nullopt, std::nullopt);
-    for(const auto& seg : rectangle_segments) {
+    std::pair<std::optional<Point>, std::optional<Point>> result =
+        std::make_pair(std::nullopt, std::nullopt);
+    for (const auto &seg : rectangle_segments)
+    {
         auto intersection = raySegmentIntersection(ray, seg);
         // Always take the result with more non-nullopt values
-        if((intersection.first && !result.first) || (intersection.second && !result.second)) {
+        if ((intersection.first && !result.first) ||
+            (intersection.second && !result.second))
+        {
             result = intersection;
         }
     }

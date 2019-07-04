@@ -32,9 +32,9 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // while it happened to be crossing that point, we want to make sure we send the
     // Intent so we don't report the Action as done while still moving to a different
     // location
-    bool a = loop_forever;
+    bool a   = loop_forever;
     double d = (robot->position() - destination).len();
-    bool c = d > close_to_dest_threshold;
+    bool c   = d > close_to_dest_threshold;
     do
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, final_orientation,
@@ -44,7 +44,7 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         d = (robot->position() - destination).len();
         c = d > close_to_dest_threshold;
     } while (a || c);
-//    } while (loop_forever ||
-//             (robot->position() - destination).len() > close_to_dest_threshold);
+    //    } while (loop_forever ||
+    //             (robot->position() - destination).len() > close_to_dest_threshold);
     volatile int bar = 0;
 }

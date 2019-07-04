@@ -16,11 +16,12 @@ class InterceptBallAction : public Action
      * @param loop_forever Continue yielding new Move Intents, even after we have reached
      *                     our goal
      */
-    explicit InterceptBallAction(const Field& field, const Ball& ball, bool loop_forever              = false);
+    explicit InterceptBallAction(const Field& field, const Ball& ball,
+                                 bool loop_forever = false);
 
     /**
-     * Returns the next Intent this InterceptBallAction wants to run, given the parameters.
-     * Moves the robot to intercept and gain control of the ball
+     * Returns the next Intent this InterceptBallAction wants to run, given the
+     * parameters. Moves the robot to intercept and gain control of the ball
      *
      * @param robot The robot to move
      * @param field The field
@@ -29,13 +30,14 @@ class InterceptBallAction : public Action
      * @return A unique pointer to the Intent the InterceptBallAction wants to run. If the
      * InterceptBallAction is done, returns an empty/null pointer
      */
-    std::unique_ptr<Intent> updateStateAndGetNextIntent(
-        const Robot& robot, const Field& field, const Ball& ball);
+    std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
+                                                        const Field& field,
+                                                        const Ball& ball);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
-    std::optional<Point> getPointBallLeavesField(const Field &field, const Ball &ball);
+    std::optional<Point> getPointBallLeavesField(const Field& field, const Ball& ball);
 
     // Action parameters
     Field field;

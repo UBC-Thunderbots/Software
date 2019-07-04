@@ -117,7 +117,7 @@ void PassGenerator::continuouslyGeneratePasses()
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
-        //visualizePassesAndPassQualityGradient();
+        // visualizePassesAndPassQualityGradient();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core

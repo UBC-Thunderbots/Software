@@ -5,10 +5,10 @@
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
+#include "ai/hl/stp/tactic/grab_ball_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
-#include "ai/hl/stp/tactic/grab_ball_tactic.h"
 #include "ai/world/game_state.h"
 #include "shared/constants.h"
 #include "util/parameter/dynamic_parameters.h"
@@ -23,7 +23,7 @@ std::string DefensePlay::getName() const
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-            !Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           !Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
@@ -36,7 +36,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
-    auto grab_ball_tactic = std::make_shared<GrabBallTactic>(world.field(), world.ball(), world.enemyTeam(), true);
+    auto grab_ball_tactic = std::make_shared<GrabBallTactic>(world.field(), world.ball(),
+                                                             world.enemyTeam(), true);
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, true),

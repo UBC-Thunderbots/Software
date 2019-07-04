@@ -3,6 +3,7 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "ai/hl/stp/evaluation/ball.h"
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/evaluation/find_open_areas.h"
 #include "ai/hl/stp/evaluation/indirect_chip.h"
@@ -17,9 +18,6 @@
 #include "ai/world/game_state.h"
 #include "shared/constants.h"
 #include "util/parameter/dynamic_parameters.h"
-#include "ai/hl/stp/evaluation/possession.h"
-
-#include "ai/hl/stp/evaluation/ball.h"
 using namespace Evaluation;
 
 const std::string ShootOrChipPlay::name = "ShootOrChip Play";
@@ -34,15 +32,15 @@ std::string ShootOrChipPlay::getName() const
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
     bool a = world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
-//    bool b = world.gameState().isOurIndirectFree() ||
-//           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
-//    bool c = (world.gameState().isOurDirectFree() || world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
-//           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
+             !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
+    //    bool b = world.gameState().isOurIndirectFree() ||
+    //           (world.gameState().isOurDirectFree() && world.ball().position().x() < 0);
+    //    bool c = (world.gameState().isOurDirectFree() ||
+    //    world.gameState().isOurIndirectFree()) && !world.gameState().isPlaying() &&
+    //           Evaluation::ballInEnemyCorner(world.field(), world.ball(),
     bool b = world.gameState().isOurIndirectFree() && !world.gameState().isPlaying();
     bool c = world.gameState().isOurDirectFree() && !world.gameState().isPlaying();
     return a || b || c;
-
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
