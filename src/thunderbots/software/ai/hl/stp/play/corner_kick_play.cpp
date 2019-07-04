@@ -194,12 +194,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.first;
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.second;
 
-    // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
-    // each) to save a significant number of CPU cycles
-    // TODO: stop the PassGenerators here instead of destructing them (Issue #636)
-    pass_generator.~PassGenerator();
-    cherry_pick_tactic_pos_y->~CherryPickTactic();
-    cherry_pick_tactic_neg_y->~CherryPickTactic();
+    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
+    //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
     auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
