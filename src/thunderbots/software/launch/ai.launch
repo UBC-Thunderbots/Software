@@ -14,7 +14,7 @@
     </node>
 
     <!-- Launch the ai logic node -->
-    <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen" respawn="true">
+    <node name="ai_logic" pkg="thunderbots" type="ai_logic" output="screen" respawn="false">
     </node>
 
     <!-- Launch the dynamic parameters node -->

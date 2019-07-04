@@ -206,7 +206,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
                 our_restart    = false;
                 break;
             case RefboxGameState::DIRECT_FREE_US:
-                state          = PLAYING;
+                state          = READY;
                 restart_reason = DIRECT;
                 our_restart    = true;
                 break;
@@ -216,7 +216,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
                 our_restart    = false;
                 break;
             case RefboxGameState::INDIRECT_FREE_US:
-                state          = PLAYING;
+                state          = READY;
                 restart_reason = INDIRECT;
                 our_restart    = true;
                 break;

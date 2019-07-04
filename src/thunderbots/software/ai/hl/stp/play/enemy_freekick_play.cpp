@@ -28,7 +28,7 @@ bool EnemyFreekickPlay::isApplicable(const World &world) const
 
 bool EnemyFreekickPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isTheirFreeKick();
+    return world.gameState().isTheirFreeKick() && !world.gameState().isPlaying();
 
 }
 
