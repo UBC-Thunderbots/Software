@@ -97,7 +97,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, 0.0, false, AUTOCHIP);
+                *robot, goalie_pos, goalie_orientation, Util::DynamicParameters::GoalieTactic::goalie_final_speed.value(), false, AUTOCHIP);
         }
         // Case 2
         else if (ball.velocity().len() < BALL_SLOW_SPEED_THRESHOLD &&
@@ -111,10 +111,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // Case 3
         else
         {
+            // compute angle between two vectors, negative goal post to ball and positive goal  post to ball
+            Angle block_cone_angle = (-field.friendlyGoalpostNeg() + ball.position()).orientation().minDiff((-field.friendlyGoalpostPos() + ball.position()).orientation());
             // block the cone by default
-            float radius =
-                Util::DynamicParameters::GoalieTactic::block_cone_buffer.value() +
-                ROBOT_MAX_RADIUS_METERS;
+            float radius = ROBOT_MAX_RADIUS_METERS*block_cone_angle.toRadians() + Util::DynamicParameters::GoalieTactic::block_cone_buffer.value();
             Point goalie_pos =
                 calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),
                               ball.position(), radius);
@@ -122,7 +122,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // restrict the goalie to a semicircle inscribed inside the defense area
             auto goalie_pos_intersect = lineCircleIntersect(
                     field.friendlyGoal(),
-                    std::min(field.defenseAreaWidth() / 2 - ROBOT_MAX_RADIUS_METERS, field.defenseAreaLength() - ROBOT_MAX_RADIUS_METERS),
+                    field.defenseAreaLength() - ROBOT_MAX_RADIUS_METERS,
                     goalie_pos, field.friendlyGoal());
 
             Point goalie_restricted_pos = goalie_pos;
