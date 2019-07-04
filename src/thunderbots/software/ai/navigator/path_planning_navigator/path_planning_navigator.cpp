@@ -175,7 +175,8 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
             this->velocity_obstacles.emplace_back(
                 Obstacle::createVelocityObstacleWithScalingParams(
                     this->current_robot->position(), this->current_destination,
-                    this->current_robot->velocity().len(), ROBOT_OBSTACLE_INFLATION_FACTOR, VELOCITY_OBSTACLE_INFLATION_FACTOR));
+                    this->current_robot->velocity().len(), Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value()));
+
             this->current_robot = std::nullopt;
         }
         assigned_primitives.emplace_back(std::move(current_primitive));
@@ -212,7 +213,7 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, ROBOT_OBSTACLE_INFLATION_FACTOR, VELOCITY_OBSTACLE_INFLATION_FACTOR);
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value());
         obstacles.push_back(o);
         drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
     }
