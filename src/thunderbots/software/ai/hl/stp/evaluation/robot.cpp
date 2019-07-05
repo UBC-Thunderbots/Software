@@ -19,7 +19,7 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(const World& world, const Robot& robot, Timestamp timestamp)
+bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot, Timestamp timestamp)
 {
     // copied almost verbatim from legacy code
     Point robot_pos_at_time;
@@ -40,15 +40,15 @@ bool Evaluation::robotHasPossession(const World& world, const Robot& robot, Time
         robot_ori_at_time = robot.orientation();
     }
 
-    if (world.ball().getHistoryIndexFromTimestamp(timestamp))
+    if (ball.getHistoryIndexFromTimestamp(timestamp))
     {
         ball_pos_at_time =
-                world.ball().getPreviousPositions().at(
-                        *world.ball().getHistoryIndexFromTimestamp(timestamp));
+                ball.getPreviousPositions().at(
+                        *ball.getHistoryIndexFromTimestamp(timestamp));
     }
     else
     {
-        ball_pos_at_time = world.ball().position();
+        ball_pos_at_time = ball.position();
     }
 
 

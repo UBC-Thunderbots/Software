@@ -62,7 +62,7 @@ namespace Evaluation
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
                    Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
             {
-                if (robotHasPossession(world, robot, robot_history_timestamps[i]))
+                if (robotHasPossession(world.ball(), robot, robot_history_timestamps[i]))
                     return true;
                 i++;
             }

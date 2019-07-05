@@ -1,6 +1,4 @@
-#include "ai/world/ball.h"
-#include "ai/world/field.h"
-#include "ai/world/team.h"
+#include "ai/world/world.h"
 
 namespace Evaluation
 {
