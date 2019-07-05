@@ -19,7 +19,7 @@ using namespace Passing;
 
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
-CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(5))
+CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
     is_done = false;
 }
