@@ -2,6 +2,7 @@
 
 #include "ai/hl/stp/action/chip_action.h"
 #include "ai/hl/stp/action/move_action.h"
+#include "ai/hl/stp/action/stop_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "geom/point.h"
 #include "geom/ray.h"
@@ -59,6 +60,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     MoveAction move_action = MoveAction();
     ChipAction chip_action = ChipAction();
+    StopAction stop_action = StopAction();
     do
     {
         // Goalie Tactic
@@ -79,6 +81,11 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         //
         std::unique_ptr<Intent> next_intent;
 
+        // rectangle we do not chip the ball if its in as it would be unsafe to do so
+        auto dont_chip_rectangle = Rectangle(
+            field.friendlyGoalpostNeg(),
+            field.friendlyGoalpostPos() + Point(2 * ROBOT_MAX_RADIUS_METERS, 0));
+
         // compute intersection points from ball position and velocity
         Ray ball_ray = Ray(ball.position(), ball.velocity());
         Segment full_goal_segment =
@@ -87,9 +94,12 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         auto [intersection1, intersection2] =
             raySegmentIntersection(ball_ray, full_goal_segment);
 
+        // when should the goalie start panicking to move into place to stop the ball
+        auto ball_speed_panic =
+            Util::DynamicParameters::GoalieTactic::ball_speed_panic.value();
+
         // Case 1
-        if (intersection1.has_value() &&
-            ball.velocity().len() > BALL_SLOW_SPEED_THRESHOLD)
+        if (intersection1.has_value() && ball.velocity().len() > ball_speed_panic)
         {
             // the ball is heading towards the net. move to block the shot
             Point goalie_pos = closestPointOnSeg(
@@ -102,28 +112,37 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 AUTOCHIP);
         }
         // Case 2
-        else if (ball.velocity().len() < BALL_SLOW_SPEED_THRESHOLD &&
+        else if (ball.velocity().len() <= ball_speed_panic &&
                  field.pointInFriendlyDefenseArea(ball.position()))
         {
-            // if the ball is slow or stationary inside our defense area, chip it out
-            next_intent = chip_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(),
-                (ball.position() - field.friendlyGoal()).orientation(), 2);
+            // if the ball is slow but its not safe to chip it out, dont
+            // TODO finesse the ball out of the goal using the dribbler
+            // for now we just stop
+            if (dont_chip_rectangle.containsPoint(ball.position()) == true)
+            {
+                next_intent = stop_action.updateStateAndGetNextIntent(*robot, false);
+            }
+            // if the ball is slow or stationary inside our defense area, and is safe
+            // to do so, chip it out
+            else
+            {
+                next_intent = chip_action.updateStateAndGetNextIntent(
+                    *robot, ball, ball.position(),
+                    (ball.position() - field.friendlyGoal()).orientation(), 2);
+            }
         }
         // Case 3
         else
         {
             // compute angle between two vectors, negative goal post to ball and positive
-            // goal  post to ball
+            // goal post to ball
             Angle block_cone_angle =
-                (-field.friendlyGoalpostNeg() + ball.position())
+                (ball.position() - field.friendlyGoalpostNeg())
                     .orientation()
                     .minDiff(
-                        (-field.friendlyGoalpostPos() + ball.position()).orientation());
+                        (ball.position() - field.friendlyGoalpostPos()).orientation());
             // block the cone by default
-            float radius =
-                ROBOT_MAX_RADIUS_METERS * block_cone_angle.toRadians() +
-                Util::DynamicParameters::GoalieTactic::block_cone_buffer.value();
+            float radius = 2 * ROBOT_MAX_RADIUS_METERS * block_cone_angle.toRadians();
             Point goalie_pos =
                 calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),
                               ball.position(), radius);

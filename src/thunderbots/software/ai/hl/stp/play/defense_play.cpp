@@ -24,13 +24,13 @@ std::string DefensePlay::getName() const
 bool DefensePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           !Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 bool DefensePlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           !Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           !Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
