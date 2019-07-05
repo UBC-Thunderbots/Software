@@ -71,8 +71,8 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                     (*path_points)[0], (*path_points)[1], (*path_points)[2],
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value() * getCloseToEnemyObstacleFactor((*path_points)[1])),
-                move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
+                            .value()),
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(), move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
@@ -82,7 +82,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), 0, move_intent.isDribblerEnabled(),
+                move_intent.getFinalAngle(), move_intent.getFinalSpeed(), move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
@@ -251,7 +251,7 @@ void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
                                          const Util::CanvasMessenger::Color &color)
 {
     if (obstacle.getBoundaryPolygon())
-    {
+{
         Util::CanvasMessenger::getInstance()->drawPolygonOutline(
             Util::CanvasMessenger::Layer::NAVIGATOR, *obstacle.getBoundaryPolygon(),
             0.025, color);
