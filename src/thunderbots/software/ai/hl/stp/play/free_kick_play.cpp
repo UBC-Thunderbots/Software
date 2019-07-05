@@ -235,39 +235,62 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto chase_tactic = std::make_shared<MoveTactic>(false);
         auto chip_and_chase_shot =
             Evaluation::findTargetPointForIndirectChipAndChase(world);
-        if (chip_and_chase_shot)
-        { 
-            LOG(DEBUG) << "Chipping and chasing";
-            do
-            {
-                updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
-                double chip_power = (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
-                bait_move_tactic_1->updateParams(
+
+
+        LOG(DEBUG) << "Chipping and chasing";
+        if(!chip_and_chase_shot) {
+            chip_and_chase_shot = std::make_optional(Point(world.field().enemyGoal() + Vector(-1.6, 0)));
+        }
+        do
+        {
+            updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+            double chip_power = (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
+            bait_move_tactic_1->updateParams(
                     bait_move_tactic_1_pos,
                     (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
 
-                // welp all late night guesswork
-                chase_tactic->updateParams(*chip_and_chase_shot, 
-                    (world.field().enemyGoal() - *chip_and_chase_shot).orientation(),
-                    1.0);
-                yield({goalie_tactic, chip_tactic, chase_tactic,
-                    bait_move_tactic_1, crease_defender_tactics[0],
-                    crease_defender_tactics[1]});
-            } while (!chip_tactic->done()); // TODO can this be better?
+            // welp all late night guesswork
+            chase_tactic->updateParams(*chip_and_chase_shot,
+                                       (world.field().enemyGoal() - *chip_and_chase_shot).orientation(),
+                                       1.0);
+            yield({goalie_tactic, chip_tactic, chase_tactic,
+                   bait_move_tactic_1, crease_defender_tactics[0],
+                   crease_defender_tactics[1]});
+        } while (!chip_tactic->done()); // TODO can this be better?
 
-        }
-        else
-        {
-            // Just deflect off enemy if nothing else works
-            // TODO: too tired to figure this out, it's usually quite rare for
-            // chip and chase to fail
-            LOG(DEBUG) << "Shooting at enemy (well, not yet)";
-            // Point target = Evaluation::deflect_off_enemy_target(world);
-            // auto kick_action = std::make_shared<KickAction>()
-            // do
-            // {
-            // } while(!)
-        }
+//        if (chip_and_chase_shot)
+//        {
+//            LOG(DEBUG) << "Chipping and chasing";
+//            do
+//            {
+//                updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+//                double chip_power = (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
+//                bait_move_tactic_1->updateParams(
+//                    bait_move_tactic_1_pos,
+//                    (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+//
+//                // welp all late night guesswork
+//                chase_tactic->updateParams(*chip_and_chase_shot,
+//                    (world.field().enemyGoal() - *chip_and_chase_shot).orientation(),
+//                    1.0);
+//                yield({goalie_tactic, chip_tactic, chase_tactic,
+//                    bait_move_tactic_1, crease_defender_tactics[0],
+//                    crease_defender_tactics[1]});
+//            } while (!chip_tactic->done()); // TODO can this be better?
+//
+//        }
+//        else
+//        {
+//            // Just deflect off enemy if nothing else works
+//            // TODO: too tired to figure this out, it's usually quite rare for
+//            // chip and chase to fail
+//            LOG(DEBUG) << "Shooting at enemy (well, not yet)";
+//            // Point target = Evaluation::deflect_off_enemy_target(world);
+//            // auto kick_action = std::make_shared<KickAction>()
+//            // do
+//            // {
+//            // } while(!)
+//        }
 
     }
     // If the shoot tactic has finished, we are done this play, otherwise we need to pass
