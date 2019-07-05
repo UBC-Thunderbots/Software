@@ -26,7 +26,9 @@ std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& ro
 
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
+    // Compute final position, to know when the robot is done
     const double pivot_radius = BALL_MAX_RADIUS_METERS;
+
     do
     {
         // Compute collinear point (point_of_entry), radius with away,
@@ -53,5 +55,11 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<PivotIntent>(robot->id(), pivot_point, final_angle,
                                                 pivot_speed, enable_dribbler, 0));
         }
+
+        // if the robot is close enough to the final poision, call it a day
+        if(robot->orientation() == final_angle){
+            break;
+        }
+
     } while (true);
 }
