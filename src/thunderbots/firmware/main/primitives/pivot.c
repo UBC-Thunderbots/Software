@@ -145,7 +145,7 @@ static void pivot_tick(log_record_t *log) {
     float current_rot_vel = dot_product(tangential_dir,vel,2);
     float current_cor_vel = dot_product(radial_dir,vel,2);
 
-    float mag_accel_orbital = compute_acceleration(&rotation_profile, disp_to_final_dest, current_rot_vel, STOPPED, MAX_A, MAX_V);
+    float mag_accel_orbital = speed*compute_acceleration(&rotation_profile, disp_to_final_dest, current_rot_vel, STOPPED, MAX_A, MAX_V);
     float mag_accel_correction = compute_acceleration(&correction_profile, correction, current_cor_vel, STOPPED, MAX_A, MAX_V);
 
     //create the local vectors to the bot
