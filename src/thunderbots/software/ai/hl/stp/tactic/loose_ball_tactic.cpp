@@ -6,6 +6,7 @@
 #include "ai/hl/stp/evaluation/intercept.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "geom/rectangle.h"
+#include "util/logger/init.h"
 
 LooseBallTactic::LooseBallTactic(const Field &field, const Team &friendly_team,
         const Team &enemy_team, const Ball &ball,
@@ -54,13 +55,14 @@ void LooseBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     do{
         yield(pivot_action.updateStateAndGetNextIntent(*robot,
                     ball.position(), 
-                    ((*robot).position()-field.enemyGoal()).orientation(), 
+                    ((*robot).position()-field.friendlyGoal()).orientation(), 
                     AngularVelocity::ofDegrees(Util::DynamicParameters::PivotAction::arb_scaling.value()), true));
     } while(!pivot_action.done());
 
     do
     {
-        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, ball.position());
+        LOG(DEBUG) << "Entering calc best shot and kick";
+        auto shot_target = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, ball.position());
         if(shot_target){
             yield(kick_action.updateStateAndGetNextIntent(
                     *robot, ball, ball.position(), shot_target->first,
@@ -69,5 +71,5 @@ void LooseBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         else{
             break;
         }
-    } while (!kick_action.done());
+    } while (true);
 }
