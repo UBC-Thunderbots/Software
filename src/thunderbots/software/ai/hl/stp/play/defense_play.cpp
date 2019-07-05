@@ -4,6 +4,7 @@
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/grab_ball_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
@@ -38,6 +39,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     auto grab_ball_tactic = std::make_shared<GrabBallTactic>(world.field(), world.ball(),
                                                              world.enemyTeam(), true);
+    auto shoot_goal_tactic = std::make_shared<ShootGoalTactic>(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), Angle::ofDegrees(5), std::nullopt, true);
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
                                             world.enemyTeam(), true, true),
@@ -82,8 +84,11 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         grab_ball_tactic->updateParams(world.field(), world.ball(), world.enemyTeam());
         grab_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
         grab_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+        shoot_goal_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), std::nullopt);
+        shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
-        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, grab_ball_tactic};
+        std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, shoot_goal_tactic};
 
         // Update crease defenders
         for (auto crease_defender_tactic : crease_defender_tactics)
