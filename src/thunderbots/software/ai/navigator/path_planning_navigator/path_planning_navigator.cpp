@@ -71,7 +71,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                     (*path_points)[0], (*path_points)[1], (*path_points)[2],
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value()),
+                            .value()) * getCloseToEnemyObstacleFactor((*path_points)[1]),
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(), move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
@@ -82,7 +82,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), move_intent.getFinalSpeed(), move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getFinalAngle(), move_intent.getFinalSpeed() * getCloseToEnemyObstacleFactor((*path_points)[1]), move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
@@ -139,9 +139,9 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
             return Obstacle::createCircleObstacle(
-                world.field().centerPoint(), world.field().centreCircleRadius(), 1.2);
+                world.field().centerPoint(), world.field().centreCircleRadius(), Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
         case AvoidArea::HALF_METER_AROUND_BALL:
-            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, 1.2);
+            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
         case AvoidArea::BALL:
             return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
@@ -278,12 +278,12 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
         }
     }
 
-    if (closest_dist>1)
+    if (closest_dist>2)
     {
         return 1;
     }
     else
     {
-        return closest_dist;
+        return closest_dist/2;
     }
 }

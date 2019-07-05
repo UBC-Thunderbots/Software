@@ -32,14 +32,21 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
     thunderbots_msgs::World world_msg = *msg;
     World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
-    world.updateBallState(new_world.ball());
-    world.updateFieldGeometry(new_world.field());
-    world.updateEnemyTeamState(new_world.enemyTeam());
-    world.updateFriendlyTeamState(new_world.friendlyTeam());
-    RefboxGameState new_game_state =
-        Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
-    world.updateRefboxGameState(new_game_state);
-    world.updateTimestamp(new_world.getMostRecentTimestamp());
+    // competition hack - if our goalie is in their crease, ignore the frame
+    if (!Util::DynamicParameters::AI::vision_flipping_hack.value() ||
+            !(new_world.friendlyTeam().goalie() &&
+            new_world.field().enemyDefenseArea().containsPoint(new_world.friendlyTeam().goalie()->position())))
+    {
+        world.updateBallState(new_world.ball());
+        world.updateFieldGeometry(new_world.field());
+        world.updateEnemyTeamState(new_world.enemyTeam());
+        world.updateFriendlyTeamState(new_world.friendlyTeam());
+        RefboxGameState new_game_state =
+                Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
+        world.updateRefboxGameState(new_game_state);
+        world.updateTimestamp(new_world.getMostRecentTimestamp());
+        LOG(WARNING) << "We probably got a mirrored frame from network_input, ignoring it";
+    }
 
     if (Util::DynamicParameters::AI::run_ai.value())
     {
