@@ -15,7 +15,8 @@ std::string PenaltyKickPlay::getName() const
 
 bool PenaltyKickPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isOurPenalty();
+    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
+           world.gameState().isOurPenalty();
 }
 
 bool PenaltyKickPlay::invariantHolds(const World &world) const
@@ -40,17 +41,22 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     shooter_setup_move->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
+    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
+    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
+    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 
     do
     {
         std::vector<std::shared_ptr<Tactic>> tactics_to_run;
 
 
-        Vector behind_ball_direction = (world.ball().position() - world.field().enemyGoal()).norm();
+        Vector behind_ball_direction = (world.ball().position() - world.field().enemyGoalpostPos()).norm();
 
         Point behind_ball = world.ball().position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.04);
 
@@ -77,7 +83,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             tactics_to_run.emplace_back(penalty_shot_tactic);
         }
         // Move all non-shooter robots to the center of the field
-
 
         tactics_to_run.emplace_back(move_tactic_2);
         tactics_to_run.emplace_back(move_tactic_3);
