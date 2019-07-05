@@ -62,7 +62,8 @@ Obstacle Obstacle::createVelocityObstacleWithScalingParams(Point start, Point en
     Vector velocity_cushion_vector =
         (end - start)
             .norm((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 4 *
-                  length_scaling + 2 * ROBOT_MAX_RADIUS_METERS * width_scaling);
+                      length_scaling +
+                  2 * ROBOT_MAX_RADIUS_METERS * width_scaling);
 
     Vector velocity_direction_norm_radius = velocity_cushion_vector.norm(radius_cushion);
 
@@ -89,7 +90,8 @@ Obstacle Obstacle::createRobotObstacleWithScalingParams(const Robot& robot,
     // vector in the direction of the velocity and with the scaled size of the
     // velocity
     Vector velocity_cushion_vector =
-        robot.velocity().norm(robot.velocity().len() * velocity_cushion_scaling + 2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
+        robot.velocity().norm(robot.velocity().len() * velocity_cushion_scaling +
+                              2 * ROBOT_MAX_RADIUS_METERS * radius_cushion_scaling);
 
     return createRobotObstacleFromPositionAndRadiusAndVelocity(
         robot.position(), radius_cushion, velocity_cushion_vector,

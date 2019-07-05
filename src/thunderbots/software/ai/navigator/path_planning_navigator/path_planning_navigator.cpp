@@ -178,7 +178,11 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
             this->velocity_obstacles.emplace_back(
                 Obstacle::createVelocityObstacleWithScalingParams(
                     this->current_robot->position(), this->current_destination,
-                    this->current_robot->velocity().len(), Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value()));
+                    this->current_robot->velocity().len(),
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value(),
+                    Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                        .value()));
 
             this->current_robot = std::nullopt;
         }
@@ -196,7 +200,7 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
 
-    for(auto obstacle : obstacles)
+    for (auto obstacle : obstacles)
     {
         // draw the avoid area
         drawObstacle(obstacle, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
@@ -216,7 +220,11 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
 
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value());
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+            robot,
+            Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(),
+            Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                .value());
         obstacles.push_back(o);
         drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
     }

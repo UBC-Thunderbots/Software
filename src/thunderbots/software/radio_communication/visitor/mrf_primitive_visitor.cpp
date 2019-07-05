@@ -124,8 +124,8 @@ void MRFPrimitiveVisitor::visit(const PivotPrimitive &pivot_primitive)
         pivot_primitive.getPivotPoint().x() * MILLIMETERS_PER_METER,
         pivot_primitive.getPivotPoint().y() * MILLIMETERS_PER_METER,
         pivot_primitive.getFinalAngle().toRadians() * CENTIRADIANS_PER_RADIAN,
-        pivot_primitive.getPivotRadius() * MILLIMETERS_PER_METER};
-    radio_prim->extra_bits = 0;
+        pivot_primitive.getPivotSpeed().toRadians() * CENTIRADIANS_PER_RADIAN};
+    radio_prim->extra_bits = pivot_primitive.isDribblerEnabled();
 }
 
 void MRFPrimitiveVisitor::visit(const StopPrimitive &stop_primitive)
