@@ -155,12 +155,13 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             //// we want to restrict the block cone to the friendly crease
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
-            deflated_defense_area.expand(-ROBOT_MAX_RADIUS_METERS);
+            deflated_defense_area.expand(-5 * ROBOT_MAX_RADIUS_METERS);
 
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
                 next_intent             = move_action.updateStateAndGetNextIntent(
-                        *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_orientation, 0.0, false, AUTOCHIP);
+                        *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_orientation, Util::DynamicParameters::GoalieTactic::goalie_final_speed.value(), false, AUTOCHIP);
         }
+
 
         yield(std::move(next_intent));
     } while (!move_action.done());

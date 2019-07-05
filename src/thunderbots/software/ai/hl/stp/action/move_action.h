@@ -11,7 +11,7 @@ class MoveAction : public Action
     // We consider the robot close to a destination when it is within 2 cm.
     // The robot should be able to reach within 1cm of the destination even with
     // camera and positioning noise
-    static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.05;
+    static constexpr double ROBOT_CLOSE_TO_DEST_THRESHOLD = 0.02;
 
     /**
      * Creates a new MoveAction
