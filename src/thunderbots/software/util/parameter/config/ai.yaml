@@ -265,11 +265,11 @@ DefenderCreaseTactic:
       The distance between the ball and the defenders at which they will have their
       minimum seperation.
 PivotAction:
-  pivot_angular_velocity_deg_per_s:
-      min: 0
-      max: 360
-      type: "int"
-      default: 90
+  arb_scaling:
+      min: 0.0
+      max: 10.0
+      type: "double"
+      default: 1.0
       description: How quickly to pivot
 GoalieTactic:
   goalie_final_speed:

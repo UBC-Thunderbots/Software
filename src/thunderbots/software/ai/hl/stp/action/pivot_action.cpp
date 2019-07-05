@@ -35,7 +35,7 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         std::cerr<<"in pivot action ";
         if (!(robot->position()).isClose(pivot_point, ROBOT_MAX_RADIUS_METERS*1.25))
         {
-            yield(std::make_unique<MoveIntent>(robot->id(), pivot_point, (robot->position()-pivot_point).orientation(),
+            yield(std::make_unique<MoveIntent>(robot->id(), pivot_point, (pivot_point-robot->position()).orientation(),
                                                0.0, 0));
             std::cerr<<"returning move"<<std::endl;
         }
