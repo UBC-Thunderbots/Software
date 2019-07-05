@@ -24,7 +24,7 @@
 #define END_SPEED 1.5f
 #define WITHIN_THRESH(X) (X<=THRESH && X>=-THRESH)
 
-static float radius, angle, center[2], final_dest[2]; 
+static float radius, speed, angle, center[2], final_dest[2]; 
 static int dir = 1;
 /**
  * \brief Initializes the pivot primitive.
@@ -62,8 +62,11 @@ float compute_magnitude(float a[2]){
 static void pivot_start(const primitive_params_t *params) {
     center[0] = params->params[0] / 1000.0;
     center[1] = params->params[1] / 1000.0;
-    angle = params->params[2] /100.0;
-    radius = params->params[3] / 1000.0;
+    angle = params->params[2] / 100.0;
+    speed = params->params[3] / 100.0;
+
+    radius = 0.0215;  // ball radius taken from constants.h
+
 
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);

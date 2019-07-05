@@ -98,7 +98,7 @@ std::vector<double> MovePrimitive::getParameters() const
 
 std::vector<bool> MovePrimitive::getExtraBits() const
 {
-    return std::vector<bool>{autokick == AUTOKICK, autokick == AUTOCHIP};
+    return std::vector<bool>{autokick == AUTOKICK, enable_dribbler, autokick == AUTOCHIP};
 }
 
 void MovePrimitive::accept(PrimitiveVisitor &visitor) const

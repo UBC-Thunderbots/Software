@@ -23,7 +23,8 @@ class PivotPrimitive : public Primitive
      * @param pivot_radius  The distance from robot to pivot_point during movement
      */
     explicit PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                            const Angle &final_angle, const double pivot_radius);
+                            const Angle &final_angle, const Angle& pivot_speed, 
+                            bool enable_dribbler);
 
     /**
      * Create a new Pivot Primitive from a Primitive message
@@ -50,12 +51,21 @@ class PivotPrimitive : public Primitive
      */
     Angle getFinalAngle() const;
 
-    /**
-     * Get the robot's final orientation
-     *
-     * @return the radius the robot maintains during pivot (as double)
-     */
     double getPivotRadius() const;
+
+    /**
+     * Get the angular velocity for the pivot
+     *
+     * @return the angular velocity (rad/s) the robot maintains during pivot (as double)
+     */
+    Angle getPivotSpeed() const;
+
+    /**
+     * Check if the dribbler is enabled for this primitive
+     * 
+     * @return true if dribbler is enabled
+     */
+    bool isDribblerEnabled() const;
 
     /**
      * Returns the generic vector of parameters for this Primitive
@@ -96,5 +106,6 @@ class PivotPrimitive : public Primitive
     unsigned int robot_id;
     Point pivot_point;
     Angle final_angle;
-    double pivot_radius;
+    Angle pivot_speed;
+    bool enable_dribbler;
 };

@@ -223,8 +223,8 @@ static void move_tick(log_record_t *log) {
 	// TODO: try to make this less jittery
 //	choose_rotation_destination(&pb, current_states.angle);
 	// plan major axis movement
-	float max_major_a = 3.0;
-	float max_major_v = slow ? 1.25 : 3.0;
+	float max_major_a = 4.0;
+	float max_major_v = slow ? 1.25 : 4.0;
 	float major_params[3] = {end_speed, max_major_a, max_major_v};
 	plan_move(&pb.maj, major_params);
 	// plan minor axis movement

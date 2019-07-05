@@ -22,7 +22,7 @@ class PivotAction : public Action
      * @param robot the robot that should perform the pivot
      * @param pivot_point the point around which the robot pivots
      * @param final_angle the absolute, not relative, final angle
-     * @param pivot_radius the radius to maintain while pivoting
+     * @param pivot_speed angular speed to 
      *
      * @return A unique pointer to the Intent the PivotAction wants to run. If the
      * PivotAction is done, returns an empty/null pointer
@@ -30,7 +30,8 @@ class PivotAction : public Action
     std::unique_ptr<Intent> updateStateAndGetNextIntent(const Robot& robot,
                                                         Point pivot_point,
                                                         Angle final_angle,
-                                                        double pivot_radius);
+                                                        Angle pivot_speed,
+                                                        bool enable_dribbler);
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
@@ -38,5 +39,6 @@ class PivotAction : public Action
     // Action parameters
     Point pivot_point;
     Angle final_angle;
-    double pivot_radius;
+    Angle pivot_speed;
+    bool enable_dribbler;
 };
