@@ -1,7 +1,7 @@
-#include "ai/hl/stp/evaluation/robot.h"
-
 #include <shared/constants.h>
 
+#include "ai/world/world.h"
+#include "ai/hl/stp/evaluation/robot.h"
 #include "util/parameter/dynamic_parameters.h"
 
 
@@ -19,7 +19,7 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
+bool Evaluation::robotHasPossession(const World& world, const Robot& robot, Timestamp timestamp)
 {
     // copied almost verbatim from legacy code
     Point robot_pos_at_time;
@@ -40,14 +40,15 @@ bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
         robot_ori_at_time = robot.orientation();
     }
 
-    if (ball.getHistoryIndexFromTimestamp(timestamp))
+    if (world.ball().getHistoryIndexFromTimestamp(timestamp))
     {
         ball_pos_at_time =
-            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
+                world.ball().getPreviousPositions().at(
+                        *world.ball().getHistoryIndexFromTimestamp(timestamp));
     }
     else
     {
-        ball_pos_at_time = ball.position();
+        ball_pos_at_time = world.ball().position();
     }
 
 
@@ -66,4 +67,18 @@ bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
             (ball_pos_at_time - robot_pos_at_time).orientation());
         return ball_to_robot_angle < Angle::ofDegrees(45.0);
     }
+}
+
+bool Evaluation::robotBeingPassedTo(const World &world, const Robot &robot) {
+    auto ball_to_robot_vector = robot.position() - world.ball().position();
+    // angle deviation from the axis of the pass
+    auto ball_angle_deviation = ball_to_robot_vector.orientation().minDiff(
+                          world.ball().velocity().orientation());
+    // pass axis velocity
+    double pass_axis_speed= world.ball().velocity().project(
+            ball_to_robot_vector.norm()).len();
+    return (ball_angle_deviation < Angle::ofDegrees(
+            Util::DynamicParameters::Evaluation::Possession::passed_to_angle_tolerance.value()))
+            && pass_axis_speed >
+                Util::DynamicParameters::Evaluation::Possession::min_pass_speed.value();
 };

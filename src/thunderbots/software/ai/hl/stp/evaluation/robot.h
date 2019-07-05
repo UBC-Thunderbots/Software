@@ -48,7 +48,10 @@ namespace Evaluation
      * @param timestamp The time at which we want to know if the robot had the ball
      * @return True if the ball is close to the front dribbler and false otherwise
      */
-    bool robotHasPossession(Ball ball, Robot robot, Timestamp timestamp = Timestamp());
+    bool robotHasPossession(const World& world, const Robot& robot,
+                            Timestamp timestamp = Timestamp());
+
+    bool robotBeingPassedTo(const World& world, const Robot& robot);
 }  // namespace Evaluation
 
 
