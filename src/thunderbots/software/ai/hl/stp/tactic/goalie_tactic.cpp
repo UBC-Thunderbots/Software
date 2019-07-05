@@ -162,12 +162,13 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // we want to restrict the block cone to the friendly crease, also potentially scaled
             // by a a defense_area_deflation_parameter
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
-            deflated_defense_area.expand(defense_area_deflation);
+            deflated_defense_area.expand(-defense_area_deflation);
 
-            // TODO: Clip point is not great for when the ball is in the very edge
+            // TODO: clip point is not great for when the ball is in the very edge
+            // but its the easiest to use for robocup 2019, 
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-                next_intent             = move_action.updateStateAndGetNextIntent(
-                        *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_final_speed, AUTOCHIP
+            next_intent             = move_action.updateStateAndGetNextIntent(
+                    *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_orientation, goalie_final_speed, AUTOCHIP);
         }
 
 

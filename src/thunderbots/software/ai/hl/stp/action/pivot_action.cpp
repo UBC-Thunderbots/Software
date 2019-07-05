@@ -46,12 +46,16 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             // if the robot is close enough to the final poision, call it a day
             Angle threshold_angle = Angle::ofDegrees(Util::DynamicParameters::PivotAction::finish_angle_threshold.value()/2);
+
             if(robot->orientation() >= (final_angle - threshold_angle) && robot->orientation() < (final_angle + threshold_angle)){
                 break;
             }
 
             yield(std::make_unique<PivotIntent>(robot->id(), pivot_point, final_angle,
                                                 pivot_speed, enable_dribbler, 0));
+        }
+        else{
+            break;
         }
 
 
