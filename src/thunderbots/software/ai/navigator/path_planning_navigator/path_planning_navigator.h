@@ -113,7 +113,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
                       const Util::CanvasMessenger::Color &color);
 
     // How much to inflate obstacles by to prevent robot collision
-    static constexpr double ROBOT_OBSTACLE_INFLATION_FACTOR = 1.3;
+    static constexpr double ROBOT_OBSTACLE_INFLATION_FACTOR    = 1.3;
     static constexpr double VELOCITY_OBSTACLE_INFLATION_FACTOR = .04;
     const double OBSTACLE_INFLATION_DIST = 1.3 * ROBOT_MAX_RADIUS_METERS;
 

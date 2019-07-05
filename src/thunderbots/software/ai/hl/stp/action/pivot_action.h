@@ -22,7 +22,7 @@ class PivotAction : public Action
      * @param robot the robot that should perform the pivot
      * @param pivot_point the point around which the robot pivots
      * @param final_angle the absolute, not relative, final angle
-     * @param pivot_speed angular speed to 
+     * @param pivot_speed angular speed to
      *
      * @return A unique pointer to the Intent the PivotAction wants to run. If the
      * PivotAction is done, returns an empty/null pointer

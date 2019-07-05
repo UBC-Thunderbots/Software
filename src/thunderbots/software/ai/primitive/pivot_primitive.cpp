@@ -6,7 +6,7 @@
 const std::string PivotPrimitive::PRIMITIVE_NAME = "Pivot Primitive";
 
 PivotPrimitive::PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                               const Angle &final_angle, const Angle& pivot_speed,
+                               const Angle &final_angle, const Angle &pivot_speed,
                                bool enable_dribbler)
     : robot_id(robot_id),
       pivot_point(pivot_point),

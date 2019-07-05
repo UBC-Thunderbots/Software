@@ -23,7 +23,7 @@ class PivotPrimitive : public Primitive
      * @param pivot_radius  The distance from robot to pivot_point during movement
      */
     explicit PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                            const Angle &final_angle, const Angle& pivot_speed, 
+                            const Angle &final_angle, const Angle &pivot_speed,
                             bool enable_dribbler);
 
     /**
@@ -62,7 +62,7 @@ class PivotPrimitive : public Primitive
 
     /**
      * Check if the dribbler is enabled for this primitive
-     * 
+     *
      * @return true if dribbler is enabled
      */
     bool isDribblerEnabled() const;

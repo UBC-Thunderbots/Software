@@ -22,8 +22,7 @@ class PivotIntent : public Intent, public PivotPrimitive
      */
     explicit PivotIntent(unsigned int robot_id, const Point& pivot_point,
                          const Angle& final_angle, const Angle& pivot_radius,
-                         bool enable_dribbler,
-                         unsigned int priority);
+                         bool enable_dribbler, unsigned int priority);
 
     std::string getIntentName(void) const override;
 
