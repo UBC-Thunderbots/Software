@@ -75,8 +75,8 @@ void LooseBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         yield(pivot_action.updateStateAndGetNextIntent(*robot,
                     ball.position(), 
-                    (shot_target->first-(*robot).position()).orientation(), 
-                    AngularVelocity::ofDegrees(Util::DynamicParameters::PivotAction::pivot_angular_velocity_deg_per_s.value()), true));
+                    ((*robot).position()-shot_target->first).orientation(), 
+                    AngularVelocity::ofDegrees(Util::DynamicParameters::PivotAction::arb_scaling.value()), true));
     } while(!pivot_action.done());
 
     do
