@@ -58,7 +58,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         Vector behind_ball_direction = (world.ball().position() - world.field().enemyGoalpostPos()).norm();
 
-        Point behind_ball = world.ball().position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.04);
+        Point behind_ball = world.ball().position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.1);
 
         printf("\nX=%f", behind_ball.x());
         printf("\nY=%f", behind_ball.y());
