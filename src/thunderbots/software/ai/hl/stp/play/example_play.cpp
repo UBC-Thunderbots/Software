@@ -38,7 +38,6 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-    std::cerr<<"running"<<std::endl;
         loose_ball_tactic->updateParams(world.field(), world.friendlyTeam(),
                                            world.enemyTeam(), world.ball(), std::nullopt);
         goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),

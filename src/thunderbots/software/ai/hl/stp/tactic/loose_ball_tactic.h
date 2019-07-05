@@ -89,8 +89,7 @@ class LooseBallTactic : public Tactic
      * @param chip_action The chip action to run
      * @param yield The coroutine to yield
      */
-    void shootUntilShotBlocked(KickAction& kick_action, ChipAction& chip_action,
-                               IntentCoroutine::push_type& yield) const;
+    void shootUntilShotBlocked(KickAction& kick_action, IntentCoroutine::push_type& yield) const;
 
     // Tactic parameters
     // The field being played on
