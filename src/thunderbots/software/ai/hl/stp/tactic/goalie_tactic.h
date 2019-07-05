@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ai/hl/stp/evaluation/enemy_threat.h"
+#include <geom/segment.h>
 #include "ai/hl/stp/tactic/tactic.h"
 
 /**
@@ -37,6 +38,27 @@ class GoalieTactic : public Tactic
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+
+    /**
+     * Gets the segments that make up the path the Crease Defender should follow
+     * @param field
+     * @return The segments that make up the path the Crease Defender should follow
+     */
+    static std::vector<Segment> getPathSegments(Field field);
+
+    /**
+     * Gets a point on the defender crease path where a ray from the goalie at the given
+     * angle will intersect
+     *
+     * @param field The field the path is onAngle angle
+     * @param goalie The goalie the defenders are working with
+     * @param ball The ball
+     * @param offset The angle to offset ray formed from the goalie to the ball by
+     *
+     * @return The point on the path the ray from the goalie intersects, if
+     */
+    static std::optional<Point> getPointOnCreasePath(Field field, Robot goalie, Ball ball);
+
 
     // Tactic parameters
     Ball ball;
