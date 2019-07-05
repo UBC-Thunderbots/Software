@@ -13,10 +13,10 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), obstacles_(obstacles)
 {
-    // account for robot radius
-    numRows = (int)((field_.totalLength() - 2 * ROBOT_MAX_RADIUS_METERS) /
+    // account for robot radius with half radius buffer
+    numRows = (int)((field_.totalLength() - ROBOT_MAX_RADIUS_METERS) /
                     SIZE_OF_GRID_CELL_IN_METERS);
-    numCols = (int)((field_.totalWidth() - 2 * ROBOT_MAX_RADIUS_METERS) /
+    numCols = (int)((field_.totalWidth() - ROBOT_MAX_RADIUS_METERS) /
                     SIZE_OF_GRID_CELL_IN_METERS);
 }
 
