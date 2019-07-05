@@ -72,7 +72,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
                             .value()),
-                move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(), move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
@@ -82,7 +82,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), 0, move_intent.isDribblerEnabled(),
+                move_intent.getFinalAngle(), move_intent.getFinalSpeed(), move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
