@@ -65,9 +65,9 @@ static void pivot_start(const primitive_params_t *params) {
     angle = params->params[2] / 100.0;
     speed = params->params[3] / 100.0;
 
-    if(params->extra & 0x01) chicker_auto_arm(CHICKER_KICK, 5);
+    if(params->extra & 0x01) dribbler_set_speed(16000);
 
-    radius = 0.15; // ball radius + robot radius + buffer
+    radius = 0.16; // ball radius + robot radius + buffer
 
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);

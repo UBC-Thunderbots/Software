@@ -110,7 +110,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Start a PassGenerator that will continuously optimize passes into roughly
     // the enemy half of the field
-    PassGenerator pass_generator(world, world.ball().position());
+    PassGenerator pass_generator(world, world.ball().position(), PassType::RECEIVE_AND_DRIBBLE);
     pass_generator.setTargetRegion(
         Rectangle(Point(-(world.field().length() / 4), world.field().width() / 2),
                   world.field().enemyCornerNeg()));

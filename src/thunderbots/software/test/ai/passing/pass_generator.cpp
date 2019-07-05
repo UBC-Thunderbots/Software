@@ -24,7 +24,7 @@ class PassGeneratorTest : public testing::Test
     {
         world = ::Test::TestUtil::createBlankTestingWorld();
         world.updateFieldGeometry(::Test::TestUtil::createSSLDivBField());
-        pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0));
+        pass_generator = std::make_shared<PassGenerator>(world, Point(0, 0), PassType::ONE_TOUCH_SHOT);
     }
 
     /**
@@ -229,7 +229,7 @@ TEST_F(PassGeneratorTest, check_pass_does_not_converge_to_self_pass)
     auto converged_pass_and_score          = pass_generator->getBestPassSoFar();
     auto [converged_pass, converged_score] = converged_pass_and_score;
 
-    ::ratePass(world, converged_pass, std::nullopt, 0);
+    ::ratePass(world, converged_pass, std::nullopt, 0, PassType::ONE_TOUCH_SHOT);
 
     // We expect to have converged to a point near robot 2. The tolerance is fairly
     // generous here because the enemies on the field can "force" the point slightly
