@@ -1,8 +1,7 @@
 #ifndef AI_HL_STP_EVALUATION_ROBOT_H_
 #define AI_HL_STP_EVALUATION_ROBOT_H_
 
-#include <ai/world/ball.h>
-#include <ai/world/robot.h>
+#include "ai/world/world.h"
 
 #include "geom/point.h"
 
@@ -48,7 +47,11 @@ namespace Evaluation
      * @param timestamp The time at which we want to know if the robot had the ball
      * @return True if the ball is close to the front dribbler and false otherwise
      */
-    bool robotHasPossession(const Ball& ball, const Robot& robot, Timestamp timestamp = Timestamp());
+    bool robotHasPossession(const Ball& ball, const Robot& robot,
+                            Timestamp timestamp = Timestamp());
+
+    bool robotBeingPassedTo(const World& world, const Robot& robot,
+                            Timestamp timestamp = Timestamp());
 }  // namespace Evaluation
 
 

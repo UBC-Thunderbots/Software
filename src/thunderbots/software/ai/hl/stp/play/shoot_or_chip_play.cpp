@@ -3,6 +3,7 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "ai/hl/stp/evaluation/ball.h"
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include "ai/hl/stp/evaluation/find_open_areas.h"
 #include "ai/hl/stp/evaluation/indirect_chip.h"
@@ -32,14 +33,13 @@ std::string ShootOrChipPlay::getName() const
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
-
+           Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)

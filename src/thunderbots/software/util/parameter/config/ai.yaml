@@ -179,6 +179,19 @@ Evaluation:
         default: 0.2
         type: "double"
         description: How close the ball has to be to the robot for the robot to have the ball
+      passed_to_angle_tolerance:
+        min: 0.0
+        max: 90.0
+        default: 15.0
+        type: "double"
+        description: "angle in degrees that the ball velocity can deviate from the axis between
+                      the ball and the robot before it doesn't count as a pass"
+      min_pass_speed:
+        min: 0.0
+        max: 10.0
+        default: 1.0
+        type: "double"
+        description: minimum speed along the pass axis for it to count as a pass
     Indirect_Chip:
       chip_target_fraction:
         min: 0.0
