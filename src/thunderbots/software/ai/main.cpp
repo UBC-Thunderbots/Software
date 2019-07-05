@@ -33,9 +33,9 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     thunderbots_msgs::World world_msg = *msg;
     World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
     // competition hack - if our goalie is in their crease, ignore the frame
-    if (!Util::DynamicParameters::AI::vision_flipping_hack.value() &&
-            new_world.friendlyTeam().goalie() &&
-            !new_world.field().enemyDefenseArea().containsPoint(new_world.friendlyTeam().goalie()->position()))
+    if (!Util::DynamicParameters::AI::vision_flipping_hack.value() ||
+            !(new_world.friendlyTeam().goalie() &&
+            new_world.field().enemyDefenseArea().containsPoint(new_world.friendlyTeam().goalie()->position())))
     {
         world.updateBallState(new_world.ball());
         world.updateFieldGeometry(new_world.field());
