@@ -198,7 +198,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
         ready_to_pass = set_passer_robot_in_passgenerator &&
-                        best_pass_and_score_so_far.second < min_pass_score_threshold;
+                        best_pass_and_score_so_far.second > min_pass_score_threshold;
 
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
@@ -214,8 +214,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
 
         LOG(DEBUG) << "LOOP END";
-    } while ((!ready_to_pass || shoot_tactic->hasShotAvailable()) 
-                && best_pass_and_score_so_far.second < min_pass_score_threshold);
+    } while ((!ready_to_pass || shoot_tactic->hasShotAvailable()));
 
     // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
     //                    to save CPU cycles
