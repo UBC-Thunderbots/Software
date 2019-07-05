@@ -118,9 +118,9 @@ AngularVelocity MotionController::determineAngularVelocityFromPosition(
     double new_angular_velocity =
         robot.angularVelocity().toRadians() +
         std::copysign(max_additional_angular_velocity, angle_difference.toRadians());
-    new_angular_velocity =
-        std::clamp<double>(new_angular_velocity, -new_robot_angular_velocity_magnitude,
-                           new_robot_angular_velocity_magnitude);
+    //new_angular_velocity =
+        //std::clamp<double>(new_angular_velocity, -new_robot_angular_velocity_magnitude,
+                           //new_robot_angular_velocity_magnitude);
 
     return AngularVelocity::ofRadians(new_angular_velocity);
 }

@@ -1,7 +1,11 @@
 #include "ai/hl/stp/play/example_play.h"
-
+#include "ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/tactic/move_tactic.h"
+#include "ai/hl/stp/tactic/goalie_tactic.h"
+#include "shared/constants.h"
 #include "ai/hl/stp/tactic/grab_ball_tactic.h"
+#include "ai/hl/stp/tactic/loose_ball_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 
 const std::string ExamplePlay::name = "Example Play";
@@ -24,53 +28,22 @@ bool ExamplePlay::invariantHolds(const World &world) const
 void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     // Create MoveTactics that will loop forever
-    auto move_tactic_1 = std::make_shared<GrabBallTactic>(world.field(), world.ball(),
-                                                          world.enemyTeam(), true);
-    //    auto move_tactic_2 = std::make_shared<MoveTactic>(true);
-    //    auto move_tactic_3 = std::make_shared<MoveTactic>(true);
-    //    auto move_tactic_4 = std::make_shared<MoveTactic>(true);
-    //    auto move_tactic_5 = std::make_shared<MoveTactic>(true);
-    //    auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    auto loose_ball_tactic = std::make_shared<LooseBallTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), Angle::ofDegrees(4), std::nullopt, true);
+
+        loose_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        loose_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     do
     {
-        // The angle between each robot spaced out in a circle around the ball
-        Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
-
-        // Move the robots in a circle around the ball, facing the ball
-        move_tactic_1->updateParams(world.field(), world.ball(), world.enemyTeam());
-        move_tactic_1->addWhitelistedAvoidArea(AvoidArea::BALL);
-        move_tactic_1->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-        //        move_tactic_1->updateParams(
-        //            world.ball().position() +
-        //            Point::createFromAngle(angle_between_robots * 1),
-        //            (angle_between_robots * 1) + Angle::half(), 0);
-        //        move_tactic_2->updateParams(
-        //            world.ball().position() +
-        //            Point::createFromAngle(angle_between_robots * 2),
-        //            (angle_between_robots * 2) + Angle::half(), 0);
-        //        move_tactic_3->updateParams(
-        //            world.ball().position() +
-        //            Point::createFromAngle(angle_between_robots * 3),
-        //            (angle_between_robots * 3) + Angle::half(), 0);
-        //        move_tactic_4->updateParams(
-        //            world.ball().position() +
-        //            Point::createFromAngle(angle_between_robots * 4),
-        //            (angle_between_robots * 4) + Angle::half(), 0);
-        //        move_tactic_5->updateParams(
-        //            world.ball().position() +
-        //            Point::createFromAngle(angle_between_robots * 5),
-        //            (angle_between_robots * 5) + Angle::half(), 0);
-        //        move_tactic_6->updateParams(
-        //            world.ball().position() +
-        //            Point::createFromAngle(angle_between_robots * 6),
-        //            (angle_between_robots * 6) + Angle::half(), 0);
-
-        // yield the Tactics this Play wants to run, in order of priority
-        //        yield({move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4,
-        //        move_tactic_5,
-        //               move_tactic_6});
-        yield({move_tactic_1});
+    std::cerr<<"running"<<std::endl;
+        loose_ball_tactic->updateParams(world.field(), world.friendlyTeam(),
+                                           world.enemyTeam(), world.ball(), std::nullopt);
+        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
+                                    world.enemyTeam());
+        yield({goalie_tactic, loose_ball_tactic});
     } while (true);
 }
 
