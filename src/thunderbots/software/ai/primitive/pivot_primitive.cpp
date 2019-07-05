@@ -26,6 +26,7 @@ PivotPrimitive::PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
     pivot_point     = Point(center_x, center_y);
     final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
     pivot_speed     = Angle::ofRadians(primitive_msg.parameters.at(3));
+    enable_dribbler = static_cast<bool>(primitive_msg.extra_bits.at(0));
 }
 
 std::string PivotPrimitive::getPrimitiveName() const
