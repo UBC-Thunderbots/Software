@@ -4,10 +4,13 @@
 
 #include "ai/hl/stp/evaluation/ball.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
+#include "ai/hl/stp/evaluation/deflect_off_enemy_target.h"
+#include "ai/hl/stp/evaluation/indirect_chip.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
 #include "ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
+#include "ai/hl/stp/tactic/chip_tactic.h"
 #include "ai/hl/stp/tactic/passer_tactic.h"
 #include "ai/hl/stp/tactic/patrol_tactic.h"
 #include "ai/hl/stp/tactic/receiver_tactic.h"
@@ -22,8 +25,26 @@ const std::string FreeKickPlay::name = "Free Kick Play";
 
 namespace
 {
+    /**
+     * Minimum opening seen by robot for a shot on goal.
+     */
     const Angle MIN_OPEN_NET_ANGLE = Angle::ofDegrees(6);
-}
+
+    /**
+     * Scaling factor for the chip distance (ball - target)
+     */
+    const double CHIP_DISTANCE_SCALING_FACTOR = 0.8;
+
+    /**
+     * Max ball velocity for this tactic to be not done.
+     */
+    const double MAX_BALL_VELOCITY = 1.5;
+
+    /**
+     * Kick speed to use, slightly below BALL_MAX_SPEED for safety.
+     */
+    const double KICK_SPEED = BALL_MAX_SPEED_METERS_PER_SECOND - 0.5;
+}  // namespace
 
 FreeKickPlay::FreeKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(2.0)),
@@ -193,7 +214,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
 
         LOG(DEBUG) << "LOOP END";
-    } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
+    } while ((!ready_to_pass || shoot_tactic->hasShotAvailable()) 
+                && best_pass_and_score_so_far.second < min_pass_score_threshold);
 
     // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
     //                    to save CPU cycles
@@ -207,8 +229,50 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
 
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
+    if (best_pass_and_score_so_far.second > min_pass_score_threshold)
+    {
+        // Chip if pass timed out
+        auto chip_tactic = std::make_shared<ChipTactic>(world.ball());
+        auto chase_tactic = std::make_shared<MoveTactic>(false);
+        auto chip_and_chase_shot =
+            Evaluation::findTargetPointForIndirectChipAndChase(world);
+        if (chip_and_chase_shot)
+        { 
+            LOG(DEBUG) << "Chipping and chasing";
+            do
+            {
+                updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+                double chip_power = (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
+                bait_move_tactic_1->updateParams(
+                    bait_move_tactic_1_pos,
+                    (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+
+                // welp all late night guesswork
+                chase_tactic->updateParams(*chip_and_chase_shot, 
+                    (*chip_and_chase_shot - world.field().enemyGoal()).orientation(),
+                    1.0);
+                yield({goalie_tactic, chip_tactic, chase_tactic,
+                    bait_move_tactic_1, crease_defender_tactics[0],
+                    crease_defender_tactics[1]});
+            } while (!chip_tactic->done()); // TODO can this be better?
+
+        }
+        else
+        {
+            // Just deflect off enemy if nothing else works
+            // TODO: too tired to figure this out, it's usually quite rare for
+            // chip and chase to fail
+            LOG(DEBUG) << "Shooting at enemy (well, not yet)";
+            // Point target = Evaluation::deflect_off_enemy_target(world);
+            // auto kick_action = std::make_shared<KickAction>()
+            // do
+            // {
+            // } while(!)
+        }
+
+    }
     // If the shoot tactic has finished, we are done this play, otherwise we need to pass
-    if (!shoot_tactic->hasShotAvailable())
+    else if (!shoot_tactic->hasShotAvailable())
     {
         // Commit to a pass
         Pass pass = best_pass_and_score_so_far.first;
