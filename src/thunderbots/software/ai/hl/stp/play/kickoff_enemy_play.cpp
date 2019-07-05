@@ -23,7 +23,7 @@ bool KickoffEnemyPlay::isApplicable(const World &world) const
 
 bool KickoffEnemyPlay::invariantHolds(const World &world) const
 {
-    return !world.gameState().isTheirKickoff();
+    return world.gameState().isTheirKickoff();
 }
 
 void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
