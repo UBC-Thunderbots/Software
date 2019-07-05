@@ -73,7 +73,7 @@ std::vector<double> PivotPrimitive::getParameters() const
 
 std::vector<bool> PivotPrimitive::getExtraBits() const
 {
-    return std::vector<bool>();
+    return std::vector<bool>{enable_dribbler};
 }
 
 void PivotPrimitive::accept(PrimitiveVisitor &visitor) const
