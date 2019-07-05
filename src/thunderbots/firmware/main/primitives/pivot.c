@@ -65,8 +65,7 @@ static void pivot_start(const primitive_params_t *params) {
     angle = params->params[2] / 100.0;
     speed = params->params[3] / 100.0;
 
-    radius = 0.0215;  // ball radius taken from constants.h
-
+    radius = 0.15; // ball radius + robot radius + buffer
 
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);
