@@ -112,14 +112,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     void drawObstacle(const Obstacle &obstacle,
                       const Util::CanvasMessenger::Color &color);
 
-    // How much to inflate obstacles by to prevent robot collision
-    static constexpr double ROBOT_OBSTACLE_INFLATION_FACTOR = 1.3;
-    static constexpr double VELOCITY_OBSTACLE_INFLATION_FACTOR = .04;
-    const double OBSTACLE_INFLATION_DIST = 1.3 * ROBOT_MAX_RADIUS_METERS;
-
-    // Transition between line segments
-    static constexpr double TRANSITION_SPEED_FACTOR = .75;
-
     // This navigators knowledge / state of the world
     World world;
 
@@ -139,4 +131,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
 
     std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas,
                                               int robot_id);
+
+
+    double getCloseToEnemyObstacleFactor(Point &p);
 };
