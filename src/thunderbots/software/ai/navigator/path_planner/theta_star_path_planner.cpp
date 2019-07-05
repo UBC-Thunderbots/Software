@@ -391,7 +391,7 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
         int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
         int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
 
-        for (int r = 1; r < field_.totalWidth() * BLOCKED_DESTINATION_SEARCH_RESOLUTION;
+        for (int r = 1; r < field_.totalLength() * BLOCKED_DESTINATION_SEARCH_RESOLUTION;
              r++)
         {
             int x = 0, y = r;
