@@ -61,7 +61,7 @@ Obstacle Obstacle::createVelocityObstacleWithScalingParams(Point start, Point en
 
     Vector velocity_cushion_vector =
         (end - start)
-            .norm((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 2 *
+            .norm((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 4 *
                       length_scaling +
                   2 * ROBOT_MAX_RADIUS_METERS * width_scaling);
 
