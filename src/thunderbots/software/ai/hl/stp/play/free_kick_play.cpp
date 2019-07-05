@@ -249,7 +249,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
                 // welp all late night guesswork
                 chase_tactic->updateParams(*chip_and_chase_shot, 
-                    (*chip_and_chase_shot - world.field().enemyGoal()).orientation(),
+                    (world.field().enemyGoal() - *chip_and_chase_shot).orientation(),
                     1.0);
                 yield({goalie_tactic, chip_tactic, chase_tactic,
                     bait_move_tactic_1, crease_defender_tactics[0],
