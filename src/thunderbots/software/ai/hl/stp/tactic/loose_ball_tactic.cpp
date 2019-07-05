@@ -2,7 +2,6 @@
 
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/action/pivot_action.h"
-#include "ai/hl/stp/action/chip_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "ai/hl/stp/evaluation/intercept.h"
 #include "util/parameter/dynamic_parameters.h"
@@ -47,40 +46,28 @@ double LooseBallTactic::calculateRobotCost(const Robot &robot, const World &worl
     return std::clamp<double>(cost, 0, 1);
 }
 
-void LooseBallTactic::shootUntilShotBlocked(KickAction &kick_action,
-        ChipAction &chip_action,
-        IntentCoroutine::push_type &yield) const
-{
-    auto shot_target = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team,
-            enemy_team, ball.position());
-    while (shot_target)
-    {
-        yield(kick_action.updateStateAndGetNextIntent(
-                    *robot, ball, ball.position(), shot_target->first,
-                    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
-        shot_target = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team,
-                enemy_team, ball.position());
-    }
-}
-
 void LooseBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     KickAction kick_action = KickAction();
     PivotAction pivot_action = PivotAction();
-    ChipAction chip_action = ChipAction();
 
     do{
-        auto shot_target = Evaluation::calcBestShotOnFriendlyGoal(
-                field, friendly_team, enemy_team, ball.position());
-
         yield(pivot_action.updateStateAndGetNextIntent(*robot,
                     ball.position(), 
-                    ((*robot).position()-shot_target->first).orientation(), 
+                    ((*robot).position()-field.enemyGoal()).orientation(), 
                     AngularVelocity::ofDegrees(Util::DynamicParameters::PivotAction::arb_scaling.value()), true));
     } while(!pivot_action.done());
 
     do
     {
-        shootUntilShotBlocked(kick_action, chip_action, yield);
+        auto shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, ball.position());
+        if(shot_target){
+            yield(kick_action.updateStateAndGetNextIntent(
+                    *robot, ball, ball.position(), shot_target->first,
+                    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
+        }
+        else{
+            break;
+        }
     } while (!kick_action.done());
 }
