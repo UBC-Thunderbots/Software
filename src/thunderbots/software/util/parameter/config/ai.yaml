@@ -55,13 +55,13 @@ Passing:
   min_pass_speed_m_per_s:
     min: 0
     max: 5
-    default: 2.0
+    default: 3.5
     type: "double"
     description: "The minimum pass speed (in m/s)"
   max_pass_speed_m_per_s:
     min: 0
     max: 10
-    default: 5.0
+    default: 5.5
     type: "double"
     description: "The maximum pass speed (in m/s)"
   min_time_offset_for_pass_seconds:
