@@ -6,6 +6,7 @@
 #include "ai/hl/stp/evaluation/team.h"
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
+#include "ai/world/world.h"
 #include "robot.h"
 
 namespace Evaluation
@@ -48,9 +49,9 @@ namespace Evaluation
         }
     }
 
-    bool teamHasPossession(const Team &team, const Ball &ball)
+    bool teamHasPossession(const World& world, const Team &team)
     {
-        for (Robot robot : team.getAllRobots())
+        for (const Robot& robot : team.getAllRobots())
         {
             std::vector<Timestamp> robot_history_timestamps =
                 robot.getPreviousTimestamps();
@@ -61,12 +62,16 @@ namespace Evaluation
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
                    Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
             {
-                if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
+                if (robotHasPossession(world, robot, robot_history_timestamps[i]))
                     return true;
                 i++;
             }
         }
 
         return false;
+    }
+
+    bool teamPassInProgress(const World &world, const Team &team) {
+
     }
 }  // namespace Evaluation

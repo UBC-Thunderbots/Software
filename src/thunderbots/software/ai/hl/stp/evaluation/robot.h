@@ -51,7 +51,8 @@ namespace Evaluation
     bool robotHasPossession(const World& world, const Robot& robot,
                             Timestamp timestamp = Timestamp());
 
-    bool robotBeingPassedTo(const World& world, const Robot& robot);
+    bool robotBeingPassedTo(const World& world, const Robot& robot,
+                            Timestamp timestamp = Timestamp());
 }  // namespace Evaluation
 
 

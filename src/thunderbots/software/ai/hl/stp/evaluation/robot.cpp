@@ -69,13 +69,29 @@ bool Evaluation::robotHasPossession(const World& world, const Robot& robot, Time
     }
 }
 
-bool Evaluation::robotBeingPassedTo(const World &world, const Robot &robot) {
-    auto ball_to_robot_vector = robot.position() - world.ball().position();
+bool Evaluation::robotBeingPassedTo(const World &world, const Robot &robot,
+                                    Timestamp timestamp) {
+    Point robot_pos, ball_pos, ball_velocity;
+    if (robot.getHistoryIndexFromTimestamp(timestamp)
+        && world.ball().getHistoryIndexFromTimestamp(timestamp)) {
+        robot_pos = robot.getPreviousPositions().at(
+                *robot.getHistoryIndexFromTimestamp(timestamp));
+        ball_pos = world.ball().getPreviousPositions().at(
+                *world.ball().getHistoryIndexFromTimestamp(timestamp));
+        ball_velocity = world.ball().getPreviousVelocities().at(
+                *world.ball().getHistoryIndexFromTimestamp(timestamp));
+    } else {
+        robot_pos = robot.position();
+        ball_pos = world.ball().position();
+        ball_velocity = world.ball().velocity();
+    }
+
+    auto ball_to_robot_vector = robot_pos - ball_pos;
     // angle deviation from the axis of the pass
     auto ball_angle_deviation = ball_to_robot_vector.orientation().minDiff(
-                          world.ball().velocity().orientation());
+            ball_velocity.orientation());
     // pass axis velocity
-    double pass_axis_speed= world.ball().velocity().project(
+    double pass_axis_speed = ball_velocity.project(
             ball_to_robot_vector.norm()).len();
     return (ball_angle_deviation < Angle::ofDegrees(
             Util::DynamicParameters::Evaluation::Possession::passed_to_angle_tolerance.value()))
