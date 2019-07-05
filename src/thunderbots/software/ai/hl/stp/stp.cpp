@@ -26,22 +26,12 @@ STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
 
 std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
-    for (const Robot& robot : world.friendlyTeam().getAllRobots())
-    {
-        if (Evaluation::robotHasPossession(world.ball(), robot,
-                                           world.getMostRecentTimestamp()))
-        {
-            LOG(WARNING) << "Friendly robot " << robot.id() << "has possession";
-        }
+    if (Evaluation::teamPassInProgress(world, world.friendlyTeam())) {
+        LOG(DEBUG) << "Friendly pass in progress";
     }
 
-    for (const Robot& robot : world.enemyTeam().getAllRobots())
-    {
-        if (Evaluation::robotHasPossession(world.ball(), robot,
-                                           world.getMostRecentTimestamp()))
-        {
-            LOG(WARNING) << "Enemy robot " << robot.id() << "has possession";
-        }
+    if (Evaluation::teamPassInProgress(world, world.enemyTeam())) {
+        LOG(DEBUG) << "Enemy pass in progress";
     }
 
     current_game_state     = world.gameState().game_state;
