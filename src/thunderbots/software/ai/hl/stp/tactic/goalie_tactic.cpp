@@ -96,9 +96,19 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         auto [intersection1, intersection2] =
             raySegmentIntersection(ball_ray, full_goal_segment);
 
+        // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
         auto ball_speed_panic =
             Util::DynamicParameters::GoalieTactic::ball_speed_panic.value();
+        // what should the final goalie speed be, so that the goalie accelarates faster
+        auto goalie_final_speed = 
+            Util::DynamicParameters::GoalieTactic::goalie_final_speed.value();
+        // how far in should the goalie wedge itself into the block cone, to block balls
+        auto block_cone_radius = 
+            Util::DynamicParameters::GoalieTactic::block_cone_radius.value();
+        // by how much should the defense are be decreased so the goalie stays close towards the net
+        auto defense_area_deflation = 
+            Util::DynamicParameters::GoalieTactic::defense_area_deflation.value();
 
         // case 1: goalie should panic and stop the ball, its moving too fast towards the net
         if (intersection1.has_value() && ball.velocity().len() > ball_speed_panic)
@@ -110,11 +120,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Point goalie_pos = closestPointOnSeg(
                     (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-
             next_intent = move_action.updateStateAndGetNextIntent(
-                    *robot, goalie_pos, goalie_orientation,
-                    Util::DynamicParameters::GoalieTactic::goalie_final_speed.value(), false,
-                    AUTOCHIP);
+                    *robot, goalie_pos, goalie_orientation, goalie_final_speed, AUTOCHIP);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -122,7 +129,6 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 field.pointInFriendlyDefenseArea(ball.position()))
         {
             // if the ball is slow but its not safe to chip it out, dont.
-            //
             // TODO finesse the ball out of the goal using the dribbler.
             // for now we just stop
             if (dont_chip_rectangle.containsPoint(ball.position()) == true)
@@ -151,15 +157,17 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on either side
             Point goalie_pos =
                 calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),
-                        ball.position(), 4*ROBOT_MAX_RADIUS_METERS*block_cone_angle.toRadians());
+                        ball.position(), block_cone_radius*block_cone_angle.toRadians());
 
-            //// we want to restrict the block cone to the friendly crease
+            // we want to restrict the block cone to the friendly crease, also potentially scaled
+            // by a a defense_area_deflation_parameter
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
-            deflated_defense_area.expand(-5 * ROBOT_MAX_RADIUS_METERS);
+            deflated_defense_area.expand(defense_area_deflation);
 
+            // TODO: Clip point is not great for when the ball is in the very edge
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
                 next_intent             = move_action.updateStateAndGetNextIntent(
-                        *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_orientation, Util::DynamicParameters::GoalieTactic::goalie_final_speed.value(), false, AUTOCHIP);
+                        *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_final_speed, AUTOCHIP
         }
 
 
