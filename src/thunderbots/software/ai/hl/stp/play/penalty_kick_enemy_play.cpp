@@ -26,6 +26,9 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     auto goalie_tactic = std::make_shared<PenaltyGoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+    goalie_tactic->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    goalie_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+    goalie_tactic->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
     move_tactic_2->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);

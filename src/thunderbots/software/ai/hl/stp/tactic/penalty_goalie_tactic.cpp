@@ -159,7 +159,7 @@ void PenaltyGoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                         goalie_block_pos.setY( endline_intersection->y() < field.friendlyGoalpostNeg().y() + ROBOT_MAX_RADIUS_METERS ? field.friendlyGoalpostNeg().y() + ROBOT_MAX_RADIUS_METERS : endline_intersection->y());
                     }
 
-                    goalie_block_pos.setX(field.friendlyGoalpostNeg().x());
+                    goalie_block_pos.setX(field.friendlyGoalpostNeg().x() + 0.01);
 
                 }else {
                     // Keep our robot in the center
@@ -173,8 +173,6 @@ void PenaltyGoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - robot->position()).orientation();
-
-            goalie_block_pos.setX(goalie_block_pos.x() + -0.05);
 
             next_intent             = move_action.updateStateAndGetNextIntent(
                     *robot, goalie_block_pos, goalie_orientation, 0.0, false, AUTOCHIP);
