@@ -175,22 +175,16 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             auto side1xgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.neCorner(), deflated_defense_area.nwCorner());
             auto side2xgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.seCorner(), deflated_defense_area.swCorner());
 
-            LOG(DEBUG)<<"Checking intersection between: "<<goalie_pos<< field.friendlyGoal()<<" and "<<deflated_defense_area.neCorner()<< deflated_defense_area.seCorner();
-            LOG(DEBUG)<<"Checking intersection between: "<<goalie_pos<< field.friendlyGoal()<<" and "<<deflated_defense_area.neCorner()<< deflated_defense_area.nwCorner();
-            LOG(DEBUG)<<"Checking intersection between: "<<goalie_pos<< field.friendlyGoal()<<" and "<< deflated_defense_area.seCorner()<< deflated_defense_area.swCorner();
             if(widthxgoal && widthxgoal->y()<=deflated_defense_area.neCorner().y() && widthxgoal->y()>=deflated_defense_area.seCorner().y())
             {
-                LOG(DEBUG)<<"Picking width";
                 clamped_goalie_pos = *widthxgoal;
             }
             else if(side1xgoal && side1xgoal->x()<=deflated_defense_area.neCorner().x() && side1xgoal->x()>=deflated_defense_area.nwCorner().x())
             {
-                LOG(DEBUG)<<"Picking side 1";
                 clamped_goalie_pos = *side1xgoal;
             }
             else if(side2xgoal && side2xgoal->x()<=deflated_defense_area.seCorner().x() && side2xgoal->x()>=deflated_defense_area.swCorner().x())
             {
-                LOG(DEBUG)<<"Picking side 2";
                 clamped_goalie_pos = *side2xgoal;
             }
 
