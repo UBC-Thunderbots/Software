@@ -1,7 +1,7 @@
 #include "ai/hl/stp/play/penalty_kick_enemy_play.h"
 
 #include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/tactic/goalie_tactic.h"
+#include "ai/hl/stp/tactic/penalty_goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "shared/constants.h"
 
@@ -24,14 +24,27 @@ bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
-    auto goalie_tactic = std::make_shared<GoalieTactic>(
+    auto goalie_tactic = std::make_shared<PenaltyGoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+    goalie_tactic->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    goalie_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+    goalie_tactic->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
 
     auto move_tactic_2 = std::make_shared<MoveTactic>(true);
+    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    move_tactic_2->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_3 = std::make_shared<MoveTactic>(true);
+    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    move_tactic_3->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_4 = std::make_shared<MoveTactic>(true);
+    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    move_tactic_4->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
+    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    move_tactic_5->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
+    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
+    move_tactic_6->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
 
     do
     {

@@ -48,6 +48,7 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             Angle threshold_angle = Angle::ofDegrees(Util::DynamicParameters::PivotAction::finish_angle_threshold.value()/2);
 
             if(robot->orientation() >= (final_angle - threshold_angle) && robot->orientation() < (final_angle + threshold_angle)){
+                LOG(DEBUG) << "Pivot angle reached threshold";
                 break;
             }
 

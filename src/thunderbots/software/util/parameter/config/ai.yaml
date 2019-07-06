@@ -332,4 +332,12 @@ RobotCapabilities:
     default: ""
     type: "string"
     description: Comma-separated list of numbers of robots with broken kickers
-
+ShootOrChipPlay:
+  fallback_chip_target_enemy_goal_offset:
+    min: 0.0
+    max: 4.0
+    default: 1.5
+    type: double
+    description: >-
+      The x offset from the enemy goal for the fallback chip target, ie. where we will
+      chip if any enemy approches us before we have a good shot or a robot to chip to
