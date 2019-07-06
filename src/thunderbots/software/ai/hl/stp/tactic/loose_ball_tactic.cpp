@@ -53,23 +53,25 @@ void LooseBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     PivotAction pivot_action = PivotAction();
 
     do{
+        LOG(DEBUG) << "Entering pivot";
         yield(pivot_action.updateStateAndGetNextIntent(*robot,
                     ball.position(), 
-                    ((*robot).position()-field.friendlyGoal()).orientation(), 
+                    Angle::half(),
                     AngularVelocity::ofDegrees(Util::DynamicParameters::PivotAction::arb_scaling.value()), true));
     } while(!pivot_action.done());
 
-    do
-    {
-        LOG(DEBUG) << "Entering calc best shot and kick";
-        auto shot_target = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, ball.position());
-        if(shot_target){
-            yield(kick_action.updateStateAndGetNextIntent(
-                    *robot, ball, ball.position(), shot_target->first,
-                    BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
-        }
-        else{
-            break;
-        }
-    } while (true);
+        LOG(DEBUG) << "Exiting";
+  // do
+   // {
+   //     LOG(DEBUG) << "Entering calc best shot and kick";
+   //     auto shot_target = Evaluation::calcBestShotOnFriendlyGoal(field, friendly_team, enemy_team, ball.position());
+   //     if(shot_target){
+   //         yield(kick_action.updateStateAndGetNextIntent(
+   //                 *robot, ball, ball.position(), shot_target->first,
+   //                 BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
+   //     }
+   //     else{
+   //         break;
+   //     }
+   // } while (true);
 }

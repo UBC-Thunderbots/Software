@@ -34,7 +34,7 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         // If we're not in position to pivot, move to grab the ball
-        if (!(robot->position()).isClose(pivot_point, ROBOT_MAX_RADIUS_METERS*1.25))
+        if (!(robot->position()).isClose(pivot_point, 1.15))
         {
             yield(std::make_unique<MoveIntent>(robot->id(), pivot_point, (pivot_point-robot->position()).orientation(),
                                                0.0, 0, enable_dribbler));

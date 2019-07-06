@@ -67,7 +67,7 @@ static void pivot_start(const primitive_params_t *params) {
 
     if(params->extra & 0x01) dribbler_set_speed(16000);
 
-    radius = 0.16; // ball radius + robot radius + buffer
+    radius = 0.15; // ball radius + robot radius + buffer
 
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);
@@ -157,13 +157,13 @@ static void pivot_tick(log_record_t *log) {
     //add the 3 directions together
     float accel[3] = {0};
 
-    accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
-    accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
+    //accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
+    //accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
 
-    if(WITHIN_THRESH(correction)){
-        accel[0] += mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
-        accel[1] += mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
-    }
+//    if(WITHIN_THRESH(correction)){
+         accel[0] = mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
+         accel[1] = mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
+  //  }
 
     //find the angle between what the bot currently is at, and the angle to face the destination
     float angle = min_angle_delta(current_bot_state.angle, atan2f(rel_dest[1], rel_dest[0]));
