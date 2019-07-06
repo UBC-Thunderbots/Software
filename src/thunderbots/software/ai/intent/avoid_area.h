@@ -8,6 +8,8 @@
  */
 enum class AvoidArea
 {
+    // The enemy robots and their avoid obstacles
+    ENEMY_ROBOTS,
     // The box around the friendly goal
     FRIENDLY_DEFENSE_AREA,
     // The box around the enemy goal
