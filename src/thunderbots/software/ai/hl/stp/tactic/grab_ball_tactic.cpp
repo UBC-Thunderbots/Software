@@ -42,13 +42,16 @@ double GrabBallTactic::calculateRobotCost(const Robot &robot, const World &world
     auto intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
     if (intercept.has_value())
     {
-        cost = dist(intercept->first, ball.position()) / world.field().totalLength();
+        cost = std::pow(dist(intercept->first, ball.position()) / world.field().totalLength(), 10);
     }
     else
     {
-        cost = dist(robot.position(), ball.position()) / world.field().totalLength();
+        cost = std::pow(dist(robot.position(), ball.position()) / world.field().totalLength(), 10);
     }
-    return std::clamp<double>(cost, 0, 1);
+
+
+
+//    return std::clamp<double>(cost, 0, 1);
 }
 
 void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)

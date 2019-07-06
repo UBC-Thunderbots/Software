@@ -131,7 +131,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+//        align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
         align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
@@ -166,7 +166,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Have a robot keep trying to take a shot
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_NET_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
+        MIN_NET_OPEN_ANGLE_FOR_SHOT, world.field().enemyGoal() + Vector(-2, 0), false);
 
     do
     {
@@ -243,11 +243,15 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         do
         {
+            chip_tactic->updateParams(world.ball(), world.ball().position(), *chip_and_chase_shot, 1.5);
+//            goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
+//                                        world.enemyTeam());
             updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
             double chip_power = (*chip_and_chase_shot - world.ball().position()).len() * 0.8;
             bait_move_tactic_1->updateParams(
                     bait_move_tactic_1_pos,
                     (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
+            updateDefendersAndGoalie(crease_defender_tactics, goalie_tactic, world);
 
             // welp all late night guesswork
             chase_tactic->updateParams(*chip_and_chase_shot,
