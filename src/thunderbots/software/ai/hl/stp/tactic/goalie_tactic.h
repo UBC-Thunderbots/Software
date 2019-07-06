@@ -2,6 +2,8 @@
 
 #include "ai/hl/stp/evaluation/enemy_threat.h"
 #include <geom/segment.h>
+#include <geom/point.h>
+#include <geom/rectangle.h>
 #include "ai/hl/stp/tactic/tactic.h"
 
 /**
@@ -21,16 +23,17 @@ class GoalieTactic : public Tactic
     /**
      * Updates the parameters for this GoalieTactic.
      *
-// TODO: comment
+     * TODO: update this comment
      */
     void updateParams(const Ball &ball, const Field &field, const Team &friendly_team,
                       const Team &enemy_team);
 
     /**
-     * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
-     * closer to the destination
+     * Calculates the cost of assigning the given robot to this Tactic. The goalie
+     * assigned through the dynamic parameter will be prioritized by setting the cost
+     * very high, so only the robot assigned to be the goalie will be the cheapest to
+     * do so.
      *
-// TODO:
      * @return A cost in the range [0,1] indicating the cost of assigning the given robot
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
@@ -39,26 +42,18 @@ class GoalieTactic : public Tactic
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
-    /**
-     * Gets the segments that make up the path the Crease Defender should follow
-     * @param field
-     * @return The segments that make up the path the Crease Defender should follow
-     */
-    static std::vector<Segment> getPathSegments(Field field);
-
-    /**
-     * Gets a point on the defender crease path where a ray from the goalie at the given
-     * angle will intersect
+    /*
+     * Restrains the goalie to a rectangle, with the prefered point being the one
+     * that intersects the point the goalie wants to move to and the center of the
+     * goal
      *
-     * @param field The field the path is onAngle angle
-     * @param goalie The goalie the defenders are working with
-     * @param ball The ball
-     * @param offset The angle to offset ray formed from the goalie to the ball by
+     * TODO Fix this function name, it doesn't make sense
      *
-     * @return The point on the path the ray from the goalie intersects, if
+     * @param goalie_desired_position The point the goalie would like to go to
+     * @param goalie_restricted_area The rectangle that the goalie is to stay in
+     * @returns goalie_suggested_position That the goalie should go to
      */
-    static std::optional<Point> getPointOnCreasePath(Field field, Robot goalie, Ball ball);
-
+     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position, Rectangle goalie_restricted_area);
 
     // Tactic parameters
     Ball ball;
@@ -66,6 +61,4 @@ class GoalieTactic : public Tactic
     Team friendly_team;
     Team enemy_team;
 
-    // How slow the ball must be moving for us to clear it from the defense area
-    double BALL_SLOW_SPEED_THRESHOLD = 0.1;
 };

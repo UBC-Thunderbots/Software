@@ -1,7 +1,5 @@
 #include "ai/hl/stp/tactic/goalie_tactic.h"
 
-#include "util/logger/init.h"
-
 #include "ai/hl/stp/action/chip_action.h"
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/action/stop_action.h"
@@ -11,6 +9,7 @@
 #include "geom/segment.h"
 #include "geom/util.h"
 #include "shared/constants.h"
+#include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
 
 
@@ -58,6 +57,54 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
     }
 }
 
+std::optional<Point> GoalieTactic::restrainGoalieInRectangle(Point goalie_desired_position, Rectangle goalie_restricted_area){
+
+    Point clamped_goalie_pos;
+
+    // get the intersections to all 3 crease lines in question
+    auto width_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
+            goalie_restricted_area.neCorner(),
+            goalie_restricted_area.seCorner());
+    auto pos_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
+            goalie_restricted_area.neCorner(),
+            goalie_restricted_area.nwCorner());
+    auto neg_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
+            goalie_restricted_area.seCorner(),
+            goalie_restricted_area.swCorner());
+
+    // if the goalie restricted area already contains the point, then we are
+    // safe to move there.
+    if (goalie_restricted_area.containsPoint(goalie_desired_position)){
+        return std::make_optional<Point>(goalie_desired_position);
+    }
+    // if the goalie position to the block cone position intersects the 
+    // longest crease line which runs across the y axis, then intersect
+    else if (width_x_goal && width_x_goal->y() <= goalie_restricted_area.neCorner().y() &&
+            width_x_goal->y() >= goalie_restricted_area.seCorner().y())
+    {
+        return std::make_optional<Point>(*width_x_goal);
+    }
+
+    // if either two sides of the goal are intercepted, then use those positions
+    else if (pos_side_x_goal &&
+            pos_side_x_goal->x() <= goalie_restricted_area.neCorner().x() &&
+            pos_side_x_goal->x() >= goalie_restricted_area.nwCorner().x())
+    {
+        return std::make_optional<Point>(*pos_side_x_goal);
+    }
+    else if (neg_side_x_goal &&
+            neg_side_x_goal->x() <= goalie_restricted_area.seCorner().x() &&
+            neg_side_x_goal->x() >= goalie_restricted_area.swCorner().x())
+    {
+        return std::make_optional<Point>(*neg_side_x_goal);
+    }
+
+    // if there are no intersections, then we are out of luck
+    else {
+        return std::nullopt;
+    }
+}
+
 void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     MoveAction move_action = MoveAction();
@@ -77,18 +124,25 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // Case 2: The ball is moving at a slow speed and is inside the defense area
         //      Goalie moves to the ball and chips it out of the defense area
         //
+        // 		NOTE: If the ball is in the dont_chip_rectangle, then we prefer timeout, over
+        //			scoring on ourselfs
+        //
         // Case 3: Any other case
         //      Goalie blocks the cone to the net. (Cone being from the ball to either
-        //      goal post) The goalie also snaps to a semicircle inside the defense area,
+        //      goal post) The goalie also snaps to a rectangle inside the defense area,
         //      to avoid leaving the defense area
         //
         std::unique_ptr<Intent> next_intent;
 
-        // rectangle we do not chip the ball if its in as it would be unsafe to do so
-        // as we risk bumping the ball into our own net
-        auto dont_chip_rectangle = Rectangle(
-                field.friendlyGoalpostNeg(),
-                field.friendlyGoalpostPos() + Point(2 * ROBOT_MAX_RADIUS_METERS, 0));
+        // Create a segment along the goal line, slightly shortened to account for the
+        // robot radius so as we move along the segment we don't try run into the goal
+        // posts. This will be used in case3 as a fallback when we don't have an intersection
+        // with the crease lines
+        Point p1                        = Point(field.friendlyGoalpostNeg().x(),
+                field.friendlyGoalpostNeg().y() + ROBOT_MAX_RADIUS_METERS);
+        Point p2                        = Point(field.friendlyGoalpostPos().x(),
+                field.friendlyGoalpostPos().y() - ROBOT_MAX_RADIUS_METERS);
+        Segment goalie_movement_segment = Segment(p1, p2);
 
         // compute intersection points from ball position and velocity
         Ray ball_ray = Ray(ball.position(), ball.velocity());
@@ -103,16 +157,24 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         auto ball_speed_panic =
             Util::DynamicParameters::GoalieTactic::ball_speed_panic.value();
         // what should the final goalie speed be, so that the goalie accelarates faster
-        auto goalie_final_speed = 
+        auto goalie_final_speed =
             Util::DynamicParameters::GoalieTactic::goalie_final_speed.value();
         // how far in should the goalie wedge itself into the block cone, to block balls
-        auto block_cone_radius = 
+        auto block_cone_radius =
             Util::DynamicParameters::GoalieTactic::block_cone_radius.value();
-        // by how much should the defense are be decreased so the goalie stays close towards the net
-        auto defense_area_deflation = 
+        // by how much should the defense are be decreased so the goalie stays close
+        // towards the net
+        auto defense_area_deflation =
             Util::DynamicParameters::GoalieTactic::defense_area_deflation.value();
 
-        // case 1: goalie should panic and stop the ball, its moving too fast towards the net
+        // rectangle we do not chip the ball if its in as it would be unsafe to do so
+        // as we risk bumping the ball into our own net
+        auto dont_chip_rectangle = Rectangle(
+                field.friendlyGoalpostNeg(),
+                field.friendlyGoalpostPos() + Point(2 * ROBOT_MAX_RADIUS_METERS, 0));
+
+        // case 1: goalie should panic and stop the ball, its moving too fast towards the
+        // net
         if (intersection1.has_value() && ball.velocity().len() > ball_speed_panic)
         {
             // the ball is heading towards the net, move to intercept the shot
@@ -122,7 +184,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Point goalie_pos = closestPointOnSeg(
                     (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-            next_intent = move_action.updateStateAndGetNextIntent(
+            next_intent              = move_action.updateStateAndGetNextIntent(
                     *robot, goalie_pos, goalie_orientation, goalie_final_speed, AUTOCHIP);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
@@ -153,47 +215,34 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // compute angle between two vectors, negative goal post to ball and positive
             // goal post to ball
             Angle block_cone_angle =
-                (ball.position() - field.friendlyGoalpostNeg()).orientation()
-                .minDiff((ball.position() - field.friendlyGoalpostPos()).orientation());
+                (ball.position() - field.friendlyGoalpostNeg())
+                .orientation()
+                .minDiff(
+                        (ball.position() - field.friendlyGoalpostPos()).orientation());
 
-            // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on either side
-            Point goalie_pos =
-                calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),
-                        ball.position(), block_cone_radius*block_cone_angle.toRadians());
+            // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
+            // either side
+            Point goalie_pos = calcBlockCone(
+                    field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(), ball.position(),
+                    block_cone_radius * block_cone_angle.toRadians());
 
-            // we want to restrict the block cone to the friendly crease, also potentially scaled
-            // by a a defense_area_deflation_parameter
+            // we want to restrict the block cone to the friendly crease, also potentially
+            // scaled by a a defense_area_deflation_parameter
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
             deflated_defense_area.expand(-defense_area_deflation);
 
+            // restrain the goalie in the deflated defense area, if the goalie cannot be restrained
+            // or if there is no proper intersection, then we safely default to center of the goal
+            auto clamped_goalie_pos = restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
+
+            goalie_pos = (clamped_goalie_pos) ? *clamped_goalie_pos : field.friendlyGoal();
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
-            Point clamped_goalie_pos = goalie_pos;
-
-            // we assume goalie_pos is always outside the crease
-            auto widthxgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.neCorner(), deflated_defense_area.seCorner());
-            auto side1xgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.neCorner(), deflated_defense_area.nwCorner());
-            auto side2xgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.seCorner(), deflated_defense_area.swCorner());
-
-            if(widthxgoal && widthxgoal->y()<=deflated_defense_area.neCorner().y() && widthxgoal->y()>=deflated_defense_area.seCorner().y())
-            {
-                clamped_goalie_pos = *widthxgoal;
-            }
-            else if(side1xgoal && side1xgoal->x()<=deflated_defense_area.neCorner().x() && side1xgoal->x()>=deflated_defense_area.nwCorner().x())
-            {
-                clamped_goalie_pos = *side1xgoal;
-            }
-            else if(side2xgoal && side2xgoal->x()<=deflated_defense_area.seCorner().x() && side2xgoal->x()>=deflated_defense_area.swCorner().x())
-            {
-                clamped_goalie_pos = *side2xgoal;
-            }
-
-            set_next_intent:
-                next_intent = move_action.updateStateAndGetNextIntent(
-                    *robot, clamped_goalie_pos, goalie_orientation, goalie_final_speed, AUTOCHIP);
+            next_intent = move_action.updateStateAndGetNextIntent(
+                    *robot, goalie_pos, goalie_orientation, goalie_final_speed,
+                    AUTOCHIP);
         }
-
-
         yield(std::move(next_intent));
     } while (!move_action.done());
 }
+
