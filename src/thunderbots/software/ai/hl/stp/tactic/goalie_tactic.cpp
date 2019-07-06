@@ -235,7 +235,15 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // or if there is no proper intersection, then we safely default to center of the goal
             auto clamped_goalie_pos = restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
 
-            goalie_pos = (clamped_goalie_pos) ? *clamped_goalie_pos : field.friendlyGoal();
+            if (!clamped_goalie_pos){
+                if (ball.position().y() > 0){
+                    goalie_pos = field.friendlyGoalpostPos();
+                } else {
+                    goalie_pos = field.friendlyGoalpostNeg();
+                }
+            } else {
+                goalie_pos = *clamped_goalie_pos;
+            }
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
