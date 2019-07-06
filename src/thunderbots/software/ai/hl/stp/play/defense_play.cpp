@@ -98,6 +98,12 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_goal_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), std::nullopt);
         shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
         shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+        auto shoot_goal_robot = shoot_goal_tactic->getAssignedRobot();
+        if(shoot_goal_robot && (dist(shoot_goal_robot->position(), world.ball().position()) < 4 * ROBOT_MAX_RADIUS_METERS)
+         && shoot_goal_robot->velocity().len() < 0.75) {
+            shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_ROBOTS);
+            LOG(DEBUG) << "ignoring enemy" << std::endl;
+        }
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic, shoot_goal_tactic};
 
@@ -112,7 +118,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Assign ShadowEnemy tactics until we have every enemy covered. If there any
         // extra friendly robots, have them perform a reasonable default defensive tactic
         if (enemy_threats.size() > 0) {
-            defense_shadow_enemy_tactic->updateParams(enemy_threats.at(1), world.field(),
+            defense_shadow_enemy_tactic->updateParams(enemy_threats.at(0), world.field(),
                                                       world.friendlyTeam(), world.enemyTeam(),
                                                       ROBOT_MAX_RADIUS_METERS * 3, world.ball(), true);
             result.emplace_back(defense_shadow_enemy_tactic);
@@ -159,7 +165,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             Point block_point = nearest_enemy_robot.position() +
                                 Point::createFromAngle(nearest_enemy_robot.orientation()) *
                                 ROBOT_MAX_RADIUS_METERS * 3;
-            move_tactics[1]->updateParams(block_point, nearest_enemy_robot.orientation() + Angle::half(),
+            move_tactics[0]->updateParams(block_point, nearest_enemy_robot.orientation() + Angle::half(),
                                           0.0);
             result.emplace_back(move_tactics[0]);
         }

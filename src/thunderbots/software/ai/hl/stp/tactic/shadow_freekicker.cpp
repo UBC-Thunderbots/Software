@@ -58,6 +58,16 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
                                         perpendicular_to_enemy_direction
                                   : ball.position() + enemy_pointing_direction -
                                         perpendicular_to_enemy_direction;
+
+            // If the defend position is out of the field, reverse direction back into the field
+            if(!field.pointInEntireField(defend_position)) {
+
+                defend_position = free_kick_shadower == FreekickShadower::First
+                                  ? ball.position() - enemy_pointing_direction +
+                                    perpendicular_to_enemy_direction
+                                  : ball.position() - enemy_pointing_direction -
+                                    perpendicular_to_enemy_direction;
+            }
         }
         else
         {
