@@ -19,7 +19,7 @@ bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
 
 bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isTheirPenalty();
+    return world.gameState().isTheirPenalty() && !world.gameState().isStopped() && !world.gameState().isHalted();
 }
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
