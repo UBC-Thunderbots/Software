@@ -21,9 +21,6 @@ PenaltyGoalieTactic::PenaltyGoalieTactic(const Ball &ball, const Field &field,
           enemy_team(enemy_team),
           Tactic(true)
 {
-    addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
-    addWhitelistedAvoidArea(AvoidArea::BALL);
-    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string PenaltyGoalieTactic::getName() const
