@@ -1,4 +1,4 @@
-#include "ai/hl/stp/play/shoot_or_chip_play.h"
+#include "ai/hl/stp/play/offensive_play.h"
 
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
@@ -15,33 +15,37 @@
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
+#include "ai/hl/stp/tactic/passer_tactic.h"
+#include "ai/hl/stp/tactic/receiver_tactic.h"
 #include "ai/world/game_state.h"
 #include "shared/constants.h"
 #include "util/parameter/dynamic_parameters.h"
+#include "ai/passing/pass_generator.h"
+
 using namespace Evaluation;
 
-const std::string ShootOrChipPlay::name = "ShootOrChip Play";
+const std::string OffensivePlay::name = "ShootOrChip Play";
 
-ShootOrChipPlay::ShootOrChipPlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4)) {}
+OffensivePlay::OffensivePlay() : MIN_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4)) {}
 
-std::string ShootOrChipPlay::getName() const
+std::string OffensivePlay::getName() const
 {
-    return ShootOrChipPlay::name;
+    return OffensivePlay::name;
 }
 
-bool ShootOrChipPlay::isApplicable(const World &world) const
-{
-    return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
-}
-
-bool ShootOrChipPlay::invariantHolds(const World &world) const
+bool OffensivePlay::isApplicable(const World &world) const
 {
     return world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
-void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
+bool OffensivePlay::invariantHolds(const World &world) const
+{
+    return world.gameState().isPlaying() &&
+           Evaluation::teamHasPossession(world, world.friendlyTeam());
+}
+
+void OffensivePlay::getNextTactics(TacticCoroutine::push_type &yield)
 {
     /**
      * Our general strategy here is:
@@ -52,6 +56,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
      * - 1 robot trying to shoot on the goal. If an enemy gets too close to this
      *   robot, it will chip to right in front of the robot in the largest open free area
      */
+    using namespace Passing;
+    PassGenerator pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT);
 
     auto goalie_tactic = std::make_shared<GoalieTactic>(
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
@@ -80,8 +86,28 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
         MIN_OPEN_ANGLE_FOR_SHOT, fallback_chip_target, false);
 
+    auto best_pass = pass_generator.getBestPassSoFar();
+    bool pass_locked_in = false;
+    double pass_locked_in_quality = 0.0;
+    auto passer_tactic = std::make_shared<PasserTactic>(best_pass.first, world.ball(), true);
+    auto receiver_tactic = std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
+            world.enemyTeam(), best_pass.first, world.ball(), true);
+
     do
     {
+        Robot passer = *std::min_element(world.friendlyTeam().getAllRobots().begin(),
+                                         world.friendlyTeam().getAllRobots().end(),
+                                         [this](const Robot& r1, const Robot& r2) {
+                        return dist(world.ball().position(), r1.position()) <
+                               dist(world.ball().position(), r2.position());
+                        });
+        // update the pass generator
+        pass_generator.setWorld(world);
+        pass_generator.setPasserPoint(world.ball().position());
+        pass_generator.setPasserRobotId(passer.id());
+
+
+
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
@@ -106,6 +132,37 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             result.emplace_back(crease_defender_tactic);
         }
 
+        // lock in the pass if it's good enough
+        if (!pass_locked_in && (pass_generator.getBestPassSoFar().second >
+            Util::DynamicParameters::OffensivePlay::min_pass_score.value())) {
+            best_pass = pass_generator.getBestPassSoFar();
+            pass_locked_in_quality = best_pass.second;
+            pass_locked_in = true;
+        }
+
+        // abort the pass if it's gotten shittier
+        auto current_quality_of_locked_in_pass = ratePass(world, best_pass.first, std::nullopt,
+                                                          std::make_optional(passer.id()), PassType::ONE_TOUCH_SHOT);
+        if (pass_locked_in && (pass_locked_in_quality - current_quality_of_locked_in_pass) >
+                              Util::DynamicParameters::OffensivePlay::abort_pass_threshold.value())
+        {
+            pass_locked_in = false;
+            pass_locked_in_quality = 0.0;
+        }
+
+
+
+
+        // pass if we find a pass good enough. even if we abort, we still do the pass
+        if (pass_locked_in)
+        {
+            LOG(INFO) << "Pass " << best_pass.first << " locked in";
+            passer_tactic->updateParams(best_pass.first, world.ball());
+            receiver_tactic->updateParams(world.friendlyTeam(), world.enemyTeam(), best_pass.first,
+                                         world.ball());
+            result.insert(result.begin() + 1, passer_tactic);
+            result.insert(result.begin() + 2, receiver_tactic);
+        }
         // Update tactics moving to open areas
         std::vector<Point> enemy_robot_points;
         for (auto const &robot : world.enemyTeam().getAllRobots())
@@ -118,11 +175,11 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             // Face towards the ball
             Angle orientation =
-                (world.ball().position() - chip_targets[i].getOrigin()).orientation();
+                    (world.ball().position() - chip_targets[i].getOrigin()).orientation();
             // Move a bit backwards to make it more likely we'll receive the chip
             Point position =
-                chip_targets[i].getOrigin() -
-                Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
+                    chip_targets[i].getOrigin() -
+                    Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
             ;
             move_to_open_area_tactics[i]->updateParams(position, orientation, 0.0);
             result.emplace_back(move_to_open_area_tactics[i]);
@@ -140,12 +197,17 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
         // We want this second in priority only to the goalie
-        result.insert(result.begin() + 1, shoot_or_chip_tactic);
+        if(pass_locked_in) {
+            result.emplace_back(shoot_or_chip_tactic);
+        } else {
+            result.insert(result.begin() + 1, shoot_or_chip_tactic);
+        }
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);
 
+
     } while (!shoot_or_chip_tactic->done());
 }
 
-static TPlayFactory<ShootOrChipPlay> factory;
+static TPlayFactory<OffensivePlay> factory;

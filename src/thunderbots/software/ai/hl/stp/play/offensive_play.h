@@ -6,12 +6,12 @@
  * The Defense Play tries to grab the ball from the enemy that has it, and all other
  * robots shadow the enemy robots in order of how threatening they are.
  */
-class ShootOrChipPlay : public Play
+class OffensivePlay : public Play
 {
    public:
     static const std::string name;
 
-    ShootOrChipPlay();
+    OffensivePlay();
 
     std::string getName() const override;
 

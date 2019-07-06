@@ -43,6 +43,8 @@ endif()
 add_definitions(-Wno-deprecated) # Don't warn about including "old" headers
 add_definitions(-fno-common) # Do not allow multiple definitions of the same global variable
 add_definitions(-Werror) # Treat warnings as errors, so they don't build up
+add_definitions(-march=native)
+add_definitions(-O3)
 
 
 
