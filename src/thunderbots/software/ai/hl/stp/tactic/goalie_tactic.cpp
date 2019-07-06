@@ -54,7 +54,7 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
     }
     else
     {
-        return 1000000;
+        return std::numeric_limits<int>::max() - 10;
     }
 }
 

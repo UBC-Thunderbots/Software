@@ -46,7 +46,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // If we can intercept the ball, use the distance to the intercept point.
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
-        cost = (ball_intercept_opt->first - robot.position()).len() /
+        cost = std::pow((ball_intercept_opt->first - robot.position()).len(), 6) /
                world.field().totalLength();
     }
     else
@@ -54,11 +54,11 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // If we can't intercept the ball, just use the distance to the ball's current
         // position. We normalize with the total field length so that robots that are
         // within the field have a cost less than 1
-        cost = (world.ball().position() - robot.position()).len() /
+        cost = std::pow((world.ball().position() - robot.position()).len(), 6) /
                world.field().totalLength();
     }
 
-    return std::clamp<double>(cost, 0, 1);
+    return std::clamp<double>(cost, 0, 10);
 }
 
 bool ShootGoalTactic::hasShotAvailable() const

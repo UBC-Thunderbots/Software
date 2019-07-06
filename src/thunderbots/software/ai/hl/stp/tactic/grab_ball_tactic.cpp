@@ -42,11 +42,19 @@ double GrabBallTactic::calculateRobotCost(const Robot &robot, const World &world
     auto intercept = Evaluation::findBestInterceptForBall(ball, field, robot);
     if (intercept.has_value())
     {
+<<<<<<< Updated upstream
         cost = std::pow(dist(intercept->first, ball.position()) / world.field().totalLength(), 10);
     }
     else
     {
         cost = std::pow(dist(robot.position(), ball.position()) / world.field().totalLength(), 10);
+=======
+        cost = std::pow(dist(intercept->first, ball.position()), 6) / world.field().totalLength();
+    }
+    else
+    {
+        cost = std::pow(dist(robot.position(), ball.position()), 6) / world.field().totalLength();
+>>>>>>> Stashed changes
     }
 
 
