@@ -56,6 +56,4 @@ class IndirectFreeKickPlay : public Play
      * @param crease_defenders The defenders to update
      */
     void updateCreaseDefenderTactics(std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
-
-    bool is_done;
 };

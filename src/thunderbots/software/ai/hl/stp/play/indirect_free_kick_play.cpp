@@ -26,7 +26,6 @@ const std::string IndirectFreeKickPlay::name = "Indirect Free Kick Play";
 IndirectFreeKickPlay::IndirectFreeKickPlay()
     : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
-    is_done = false;
 }
 
 std::string IndirectFreeKickPlay::getName() const
@@ -49,7 +48,7 @@ bool IndirectFreeKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
            (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
-            Evaluation::teamPassInProgress(world, world.friendlyTeam())) && !is_done;
+            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
 void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -240,7 +239,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     }
 
 
-    is_done = true;
     LOG(DEBUG) << "Finished";
 }
 
