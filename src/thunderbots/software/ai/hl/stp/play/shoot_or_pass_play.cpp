@@ -39,7 +39,8 @@ bool ShootOrPassPlay::isApplicable(const World &world) const
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world, world.friendlyTeam());
+           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
