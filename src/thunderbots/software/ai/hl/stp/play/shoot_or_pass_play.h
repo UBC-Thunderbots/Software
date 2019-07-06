@@ -35,14 +35,8 @@ private:
     // The speed each patrolling robot should be moving through its control point
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
 
-    // The maximum time that we will wait before committing to a pass
-    const Duration MAX_TIME_TO_COMMIT_TO_PASS;
-
     // The minimum open net percentage we will try to shoot at
     const Angle MIN_NET_OPEN_ANGLE_FOR_SHOT;
-
-    // The absolute minimum pass quality we're willing to accept
-    static constexpr double ABS_MIN_PASS_QUALITY = 0.05;
 
     /**
      * Updates the given cherry-pick tactics

@@ -20,7 +20,7 @@ using namespace Passing;
 const std::string ShootOrPassPlay::name = "Shoot Or Pass Play";
 
 ShootOrPassPlay::ShootOrPassPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(2.0)),
+    :
       MIN_NET_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4))
 {
 }
@@ -122,6 +122,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
 
+    double abs_min_pass_score = Util::DynamicParameters::ShootOrPassPlay::abs_min_pass_score.value();
+    double pass_score_ramp_down_duration = Util::DynamicParameters::ShootOrPassPlay::pass_score_ramp_down_duration.value();
     do
     {
         updateCreaseDefenderTactics(crease_defender_tactics);
@@ -161,8 +163,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 world.getMostRecentTimestamp() - pass_optimization_start_time;
             min_pass_score_threshold =
                 1 - std::min(time_since_commit_stage_start.getSeconds() /
-                                 MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
-                             1.0 - ABS_MIN_PASS_QUALITY);
+                                 pass_score_ramp_down_duration,
+                             1.0 - abs_min_pass_score);
         }
     } while (!ready_to_pass || shoot_tactic->hasShotAvailable());
 
