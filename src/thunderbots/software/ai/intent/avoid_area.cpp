@@ -4,6 +4,7 @@
 #include <string>
 
 static const std::map<AvoidArea, std::string> avoid_area_names = {
+    {AvoidArea::ENEMY_ROBOTS, "ENEMY_ROBOTS"},
     {AvoidArea::FRIENDLY_DEFENSE_AREA, "FRIENDLY_DEFENSE_AREA"},
     {AvoidArea::ENEMY_DEFENSE_AREA, "ENEMY_DEFENSE_AREA"},
     {AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, "INFLATED_ENEMY_DEFENSE_AREA"},
