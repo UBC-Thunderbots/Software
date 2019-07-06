@@ -21,7 +21,7 @@ bool PenaltyKickPlay::isApplicable(const World &world) const
 
 bool PenaltyKickPlay::invariantHolds(const World &world) const
 {
-    return world.gameState().isOurPenalty();
+    return world.gameState().isOurPenalty() && !world.gameState().isStopped() && !world.gameState().isHalted();
 }
 
 void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
