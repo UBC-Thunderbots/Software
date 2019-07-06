@@ -40,13 +40,25 @@ class ShootGoalTactic : public Tactic
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
      * @param ball The ball
+     */
+    void updateParams(const Field& field, const Team& friendly_team,
+                      const Team& enemy_team, const Ball& ball);
+
+
+    /**
+     * Updates the parameters for this ShootGoalTactic
+     *
+     * @param field The field being played on
+     * @param friendly_team The friendly team
+     * @param enemy_team The enemy team
+     * @param ball The ball
      * @param chip_target An optional point that the robot will chip towards when it is
      * unable to shoot and is in danger of losing the ball to an enemy. If this value is
      * not provided, the point defaults to the enemy goal
      */
     void updateParams(const Field& field, const Team& friendly_team,
                       const Team& enemy_team, const Ball& ball,
-                      std::optional<Point> chip_target = std::nullopt);
+                      std::optional<Point> chip_target);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
