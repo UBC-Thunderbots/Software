@@ -76,19 +76,32 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
-    // field in the +x half.
-    Rectangle pos_y_cherry_pick_rectangle(world.field().centerPoint(),
+    // If the passing is coming from the friendly end, we split the cherry-pickers
+    // across the x-axis in the enemy half
+    Rectangle cherry_pick_1_target_region(world.field().centerPoint(),
                                           world.field().enemyCornerPos());
-    Rectangle neg_y_cherry_pick_rectangle(world.field().centerPoint(),
+    Rectangle cherry_pick_2_target_region(world.field().centerPoint(),
                                           world.field().enemyCornerNeg());
 
+    // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
+    // on the opposite side of the x-axis to wherever the pass is coming from
+    if (world.ball().position().x() > -1){
+        double y_offset = -std::copysign(world.field().width()/2, world.ball().position().y());
+        cherry_pick_1_target_region = Rectangle(
+                Point(0, world.field().length()/4),
+                Point(world.field().length()/2, y_offset)
+                );
+        cherry_pick_2_target_region = Rectangle(
+                Point(0, world.field().length()/4),
+                Point(0, y_offset)
+        );
+    }
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
-    auto cherry_pick_tactic_pos_y =
-        std::make_shared<CherryPickTactic>(world, pos_y_cherry_pick_rectangle);
-    auto cherry_pick_tactic_neg_y =
-        std::make_shared<CherryPickTactic>(world, neg_y_cherry_pick_rectangle);
+    auto cherry_pick_tactic_1 =
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
+    auto cherry_pick_tactic_2 =
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -109,14 +122,14 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
-        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
         goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
                                     world.enemyTeam());
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
-               cherry_pick_tactic_neg_y, std::get<0>(crease_defender_tactics),
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
     }
 
@@ -132,14 +145,14 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
-        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
         goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
                                     world.enemyTeam());
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
-               cherry_pick_tactic_neg_y, std::get<0>(crease_defender_tactics),
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
     } while (!align_to_ball_tactic->done());
 
@@ -154,14 +167,14 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         updateAlignToBallTactic(align_to_ball_tactic);
         align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
-        updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
+        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
         goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
                                     world.enemyTeam());
 
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
-               cherry_pick_tactic_neg_y, std::get<0>(crease_defender_tactics),
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
