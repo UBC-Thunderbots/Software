@@ -32,7 +32,11 @@ std::string ShootOrPassPlay::getName() const
 
 bool ShootOrPassPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
+    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+        Util::DynamicParameters::HighLevelStrategy::
+            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+
+    return use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
@@ -104,8 +108,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
     pass_generator.setTargetRegion(
-        Rectangle(Point(0, world.field().width() / 2),
-                  world.field().enemyCornerNeg()));
+        Rectangle(Point(0, world.field().width() / 2), world.field().enemyCornerNeg()));
     std::pair<Pass, double> best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();
 

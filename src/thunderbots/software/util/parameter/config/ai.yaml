@@ -348,3 +348,8 @@ ShootOrChipPlay:
     description: >-
       The x offset from the enemy goal for the fallback chip target, ie. where we will
       chip if any enemy approches us before we have a good shot or a robot to chip to
+HighLevelStrategy:
+  use_shoot_or_pass_instead_of_shoot_or_chip:
+    default: true
+    type: bool
+    description: Use the ShootOrPassPlay instead of the ShootOrChipPlay
