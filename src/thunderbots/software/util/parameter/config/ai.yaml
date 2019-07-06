@@ -332,6 +332,13 @@ RobotCapabilities:
     default: ""
     type: "string"
     description: Comma-separated list of numbers of robots with broken kickers
+DefenseShadowEnemyTactic:
+  ball_steal_speed:
+    default: 0.3
+    max: 1.0
+    min: 0.0
+    type: "double"
+    description: Try to steal the passee's ball below this ball speed
 ShootOrChipPlay:
   fallback_chip_target_enemy_goal_offset:
     min: 0.0
