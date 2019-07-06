@@ -45,6 +45,7 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
                 Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
         world.updateRefboxGameState(new_game_state);
         world.updateTimestamp(new_world.getMostRecentTimestamp());
+    } else {
         LOG(WARNING) << "We probably got a mirrored frame from network_input, ignoring it";
     }
 

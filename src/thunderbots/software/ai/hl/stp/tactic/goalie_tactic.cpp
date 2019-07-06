@@ -1,5 +1,7 @@
 #include "ai/hl/stp/tactic/goalie_tactic.h"
 
+#include "util/logger/init.h"
+
 #include "ai/hl/stp/action/chip_action.h"
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/action/stop_action.h"
@@ -164,11 +166,31 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
             deflated_defense_area.expand(-defense_area_deflation);
 
-            // TODO: clip point is not great for when the ball is in the very edge
-            // but its the easiest to use for robocup 2019, 
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-            next_intent             = move_action.updateStateAndGetNextIntent(
-                    *robot, clipPoint(goalie_pos, deflated_defense_area), goalie_orientation, goalie_final_speed, AUTOCHIP);
+
+            Point clamped_goalie_pos = goalie_pos;
+
+            // we assume goalie_pos is always outside the crease
+            auto widthxgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.neCorner(), deflated_defense_area.seCorner());
+            auto side1xgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.neCorner(), deflated_defense_area.nwCorner());
+            auto side2xgoal = lineIntersection(goalie_pos, field.friendlyGoal(), deflated_defense_area.seCorner(), deflated_defense_area.swCorner());
+
+            if(widthxgoal && widthxgoal->y()<=deflated_defense_area.neCorner().y() && widthxgoal->y()>=deflated_defense_area.seCorner().y())
+            {
+                clamped_goalie_pos = *widthxgoal;
+            }
+            else if(side1xgoal && side1xgoal->x()<=deflated_defense_area.neCorner().x() && side1xgoal->x()>=deflated_defense_area.nwCorner().x())
+            {
+                clamped_goalie_pos = *side1xgoal;
+            }
+            else if(side2xgoal && side2xgoal->x()<=deflated_defense_area.seCorner().x() && side2xgoal->x()>=deflated_defense_area.swCorner().x())
+            {
+                clamped_goalie_pos = *side2xgoal;
+            }
+
+            set_next_intent:
+                next_intent = move_action.updateStateAndGetNextIntent(
+                    *robot, clamped_goalie_pos, goalie_orientation, goalie_final_speed, AUTOCHIP);
         }
 
 
