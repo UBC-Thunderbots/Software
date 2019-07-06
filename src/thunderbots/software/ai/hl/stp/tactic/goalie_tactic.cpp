@@ -237,9 +237,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             if (!clamped_goalie_pos){
                 if (ball.position().y() > 0){
-                    goalie_pos = field.friendlyGoalpostPos();
+                    goalie_pos = field.friendlyGoalpostPos() + Point(-ROBOT_MAX_RADIUS_METERS, 0);
                 } else {
-                    goalie_pos = field.friendlyGoalpostNeg();
+                    goalie_pos = field.friendlyGoalpostNeg() + Point(ROBOT_MAX_RADIUS_METERS, 0);
                 }
             } else {
                 goalie_pos = *clamped_goalie_pos;

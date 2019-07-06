@@ -45,6 +45,9 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
                 Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
         world.updateRefboxGameState(new_game_state);
         world.updateTimestamp(new_world.getMostRecentTimestamp());
+        world.mutableFriendlyTeam().removeExpiredRobots(world.getMostRecentTimestamp());
+        world.mutableEnemyTeam().removeExpiredRobots(world.getMostRecentTimestamp());
+//        friendly_team.removeExpiredRobots(Timestamp::fromSeconds(detection.t_capture()));
     } else {
         LOG(WARNING) << "We probably got a mirrored frame from network_input, ignoring it";
     }

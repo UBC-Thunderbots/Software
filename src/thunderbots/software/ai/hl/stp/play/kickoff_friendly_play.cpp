@@ -16,7 +16,7 @@ std::string KickoffFriendlyPlay::getName() const
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
     return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isOurKickoff()) && !world.gameState().isHalted() && !world.gameState();
+           world.gameState().isOurKickoff()) && !world.gameState().isHalted() && !world.gameState().isStopped();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
