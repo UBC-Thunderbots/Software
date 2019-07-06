@@ -49,6 +49,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
         LOG(WARNING) << "We probably got a mirrored frame from network_input, ignoring it";
     }
 
+    world.mutableGameState().updateRefboxGameState(RefboxGameState::INDIRECT_FREE_US, world.ball());
+
     if (Util::DynamicParameters::AI::run_ai.value())
     {
         // Get the Primitives the Robots should run from the AI

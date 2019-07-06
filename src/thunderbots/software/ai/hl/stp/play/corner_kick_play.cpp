@@ -31,17 +31,19 @@ std::string CornerKickPlay::getName() const
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isOurDirectFree() ||
-            world.gameState().isOurIndirectFree()) &&
-           !world.gameState().isPlaying() && world.ball().position().x() > 0;
+    double min_dist_to_corner =
+        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).len());
+
+    return world.gameState().isOurFreeKick() &&
+           min_dist_to_corner <= BALL_IN_CORNER_RADIUS;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
-    return (world.gameState().isPlaying() &&
-            (!Evaluation::teamHasPossession(world, world.enemyTeam())
-            || Evaluation::teamPassInProgress(world, world.friendlyTeam()))) &&
-           !is_done;
+    return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
+    (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+                 Evaluation::teamPassInProgress(world, world.friendlyTeam())) && !is_done;
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -126,7 +128,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         bait_move_tactic_2_pos,
         (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
 
-    PassGenerator pass_generator(world, world.ball().position(), PassType::ONE_TOUCH_SHOT);
+    PassGenerator pass_generator(world, world.ball().position(),
+                                 PassType::ONE_TOUCH_SHOT);
 
     std::pair<Pass, double> best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();
