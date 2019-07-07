@@ -57,7 +57,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     move_tactic_6->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
 
     Timestamp start_of_shoot = world.getMostRecentTimestamp();
-
     do
     {
         std::vector<std::shared_ptr<Tactic>> tactics_to_run;

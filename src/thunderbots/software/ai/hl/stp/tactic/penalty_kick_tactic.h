@@ -62,7 +62,7 @@ class PenaltyKickTactic : public Tactic
 
     const bool ENABLE_DRIBBLER = true;
 
-    static constexpr double PENALTY_KICK_SHOT_SPEED     = 5.0;
+    static constexpr double PENALTY_KICK_SHOT_SPEED     = 6.0;
     static constexpr double PENALTY_KICK_GOALIE_MAX_ACC = 3.0;
     static constexpr double SSL_VISION_DELAY = 0.1;
 
