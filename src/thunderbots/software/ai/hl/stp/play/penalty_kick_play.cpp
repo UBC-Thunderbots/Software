@@ -61,8 +61,8 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::vector<std::shared_ptr<Tactic>> tactics_to_run;
 
 
-        Vector behind_ball_direction = (world.ball().position() - world.field().enemyGoalpostPos()).norm();
-        Angle shoot_angle = (world.field().enemyGoalpostPos() -  world.ball().position()).orientation();
+        Vector behind_ball_direction = (world.ball().position() - world.field().enemyGoal()).norm();
+        Angle shoot_angle = (world.field().enemyGoal() -  world.ball().position()).orientation();
 
         Point behind_ball = world.ball().position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.1);
 
