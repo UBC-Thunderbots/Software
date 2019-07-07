@@ -53,9 +53,9 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), true, true);
+        world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(), true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), true, true);
+        world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(), true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
@@ -114,7 +114,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             shadow_tactic_main->updateParams(
                 enemy_threats.at(1), world.field(), world.friendlyTeam(),
-                world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+                world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass, world.ball());
             move_tactic_main->updateParams(
                 world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
@@ -127,10 +127,10 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             shadow_tactic_main->updateParams(
                 enemy_threats.at(1), world.field(), world.friendlyTeam(),
-                world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+                world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass, world.ball());
             shadow_tactic_secondary->updateParams(
                 enemy_threats.at(2), world.field(), world.friendlyTeam(),
-                world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+                world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass, world.ball());
 
             tactics_to_run.emplace_back(shadow_tactic_main);
             tactics_to_run.emplace_back(shadow_tactic_secondary);

@@ -50,7 +50,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true);
+                                            world.enemyTeam(), true, world.ball(), true);
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -153,7 +153,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         if (enemy_threats.size() > 1) {
             shadow_enemy_tactic->updateParams(
                     enemy_threats.at(1), world.field(), world.friendlyTeam(),
-                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3,
+                    enemy_team_can_pass, world.ball());
             result.emplace_back(shadow_enemy_tactic);
         } else {
             Robot nearest_enemy_robot = *std::min_element(
