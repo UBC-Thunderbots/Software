@@ -130,6 +130,13 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::ONE_TOUCH_SHOT);
 
+    // Target any pass in the enemy half of the field, shifted up by 1 meter
+    // from the center line
+    pass_generator.setTargetRegion(Rectangle(
+            Point(1, world.field().width()/2),
+            world.field().enemyCornerNeg()
+            ));
+
     std::pair<Pass, double> best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();
 
