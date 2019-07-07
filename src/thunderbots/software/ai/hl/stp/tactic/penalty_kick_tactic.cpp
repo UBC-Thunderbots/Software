@@ -127,7 +127,7 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         Vector behind_ball_direction = (ball.position() - new_target).norm();
 
-        Point behind_ball = ball.position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.07);
+        Point behind_ball = ball.position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.05);
 
         Ray shot_ray = Ray(ball.position(), Vector( (ball.position() - robot->position())));
 
@@ -144,7 +144,7 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             YEET_SHOOTING = true;
 
-            yield(kick_ball_act.updateStateAndGetNextIntent(*robot, ball, ball.position(), (shot_location.value() - ball.position()).orientation(), PENALTY_KICK_SHOT_SPEED ));
+            yield(kick_ball_act.updateStateAndGetNextIntent(*robot, ball, ball.position(), shot_location.value(), PENALTY_KICK_SHOT_SPEED));
         }
 
     } while(true);
