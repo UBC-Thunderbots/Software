@@ -32,12 +32,21 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
+    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+            Util::DynamicParameters::HighLevelStrategy::
+            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+
+    return !use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
+
+//    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+//            Util::DynamicParameters::HighLevelStrategy::
+//            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+
     return world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
@@ -156,6 +165,11 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                            world.enemyTeam(), world.ball(), chip_target);
         shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
         shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+        auto shoot_goal_robot = shoot_or_chip_tactic->getAssignedRobot();
+        if(shoot_goal_robot && (dist(shoot_goal_robot->position(), world.ball().position()) < 4 * ROBOT_MAX_RADIUS_METERS)
+           && shoot_goal_robot->velocity().len() < 0.75) {
+            shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_ROBOTS);
+        }
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);

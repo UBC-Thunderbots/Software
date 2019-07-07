@@ -28,6 +28,7 @@ AI:
         - "KickoffEnemy Play"
         - "KickoffFriendly Play"
         - "Enemy Freekick Play"
+        - "Shoot Or Pass Play"
         - "Indirect Free Kick Play"
         - "Penalty Kick Play"
         - "Penalty Kick Enemy Play"

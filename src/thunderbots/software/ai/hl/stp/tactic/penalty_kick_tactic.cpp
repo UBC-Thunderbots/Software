@@ -7,6 +7,7 @@
 #include "ai/hl/stp/action/kick_action.h"
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
+#include "geom/circle.h"
 #include "geom/util.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
@@ -43,6 +44,72 @@ double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& wo
     return std::clamp<double>(cost, 0, 1);
 }
 
+// Evaluation function designed specifically for 1-on-1 penalty shots
+bool PenaltyKickTactic::evaluate_penalty_shot() {
+
+    Segment enemy_goal_line = Segment(field.enemyGoalpostNeg(), field.enemyGoalpostPos());
+    Ray robot_shot_ray = Ray( ball.position(), (ball.position() - robot->position()).norm() );
+    Point shot_origin = ball.position();
+
+    auto [goal_intersection, extra_intersect] = raySegmentIntersection(robot_shot_ray, enemy_goal_line);
+
+    // If there is no enemy goalie, just shoot and score
+    if(!enemy_goalie.has_value()) {
+        return true;
+    }
+
+    if(goal_intersection.has_value()){
+        // Check if we have a good shot
+
+        const Point enemy_goalie_distance_from_goal = (goal_intersection.value() - enemy_goalie->position());
+
+        const double time_to_score =  (goal_intersection.value() - ball.position()).len() / PENALTY_KICK_SHOT_SPEED;
+
+        const double vision_adjusted_time = time_to_score - SSL_VISION_DELAY;
+
+        const Circle enemy_goalie_area = Circle(enemy_goalie->position(), ROBOT_MAX_RADIUS_METERS*1.1);
+
+        // If we are aiming at the goalie don't shoot
+        if(contains(enemy_goalie_area, goal_intersection.value())) {
+            return false;
+        }
+        // We have seconds, we know current velocity and acc.
+        double enemy_goalie_acc = enemy_goalie_distance_from_goal.y() >= 0 ? PENALTY_KICK_GOALIE_MAX_ACC : -1*PENALTY_KICK_GOALIE_MAX_ACC;
+
+        // The only speed that matters is Y direction because the goalie is bound to the crease during penalty kicks
+        //d = v0*t + 0.5*a*t^2
+        const double max_distance_goalie_can_travel = enemy_goalie->velocity().y()*vision_adjusted_time+ 0.5*enemy_goalie_acc*(pow(vision_adjusted_time, 2));
+
+        // If the enemy goalie can't travel far enough to block our shot, shoot
+        if( fabs(max_distance_goalie_can_travel) < fabs(enemy_goalie_distance_from_goal.len())) {
+            return true;
+        }
+    }
+    else {
+        // If we cannot score in the current position, don't shoot
+        return false;
+    }
+
+    return false;
+}
+
+Point PenaltyKickTactic::evaluate_next_position() {
+
+    // If there is no enemy goalie, shoot at the center
+    if(!enemy_goalie.has_value()) {
+        return field.enemyGoal();
+    }
+
+
+    const Point close_to_neg_post = field.enemyGoalpostNeg() + Point(0,0.1);
+    const Point close_to_pos_post = field.enemyGoalpostPos() - Point(0,0.1);
+
+    const double goalie_dist_to_neg_shot = (close_to_neg_post - enemy_goalie->position()).len();
+    const double goalie_dist_to_pos_shot = (close_to_pos_post - enemy_goalie->position()).len();
+
+    return fabs(goalie_dist_to_neg_shot) > fabs(goalie_dist_to_pos_shot) ? close_to_neg_post : close_to_pos_post;
+}
+
 void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
     // Keep track if a shot has been taken
@@ -50,22 +117,34 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
     MoveAction get_behind_ball_act = MoveAction();
     KickAction kick_ball_act = KickAction();
+    Timestamp start_of_shot = robot->getMostRecentTimestamp();
 
     do {
 
-        Vector behind_ball_direction = (ball.position() - field.enemyGoal()).norm();
-        Point behind_ball = ball.position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.02);
-        Angle shot_orientation = (-1*behind_ball_direction).orientation();
+        Point new_target = evaluate_next_position();
+        printf("New target y=%f", new_target.y());
+        bool YEET_SHOOTING = false;
 
-        if( ( robot->position() - behind_ball ).len() >= MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD || (robot->orientation().minDiff(shot_orientation) > Angle::ofDegrees(2)) && !kick_ball_act.done()) {
-            yield(get_behind_ball_act.updateStateAndGetNextIntent(*robot, behind_ball, shot_orientation, 0, true, false, AutokickType::NONE));
+        Vector behind_ball_direction = (ball.position() - new_target).norm();
+
+        Point behind_ball = ball.position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.07);
+
+        Ray shot_ray = Ray(ball.position(), Vector( (ball.position() - robot->position())));
+
+        auto [shot_location, extra] = raySegmentIntersection(shot_ray, Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()));
+
+        if(!evaluate_penalty_shot() && !YEET_SHOOTING) {
+            printf("\nGetting to position");
+            yield(get_behind_ball_act.updateStateAndGetNextIntent(*robot, behind_ball, robot->orientation(), 0, true, false, AutokickType::NONE));
+            printf("evaluate shot %d", evaluate_penalty_shot());
         }
-        else if(!kick_ball_act.done()) {
-            Point shot_location = field.enemyGoal() + Point(0,-0.05);
-            yield(kick_ball_act.updateStateAndGetNextIntent(*robot, ball, ball.position(), shot_location, PENALTY_KICK_SHOT_SPEED ));
-        }
-        else {
-            while(true) {};
+        else if(evaluate_penalty_shot() && shot_location.has_value()) {
+            printf("\nYEET");
+            printf("Are we timing out?%d",(robot->getMostRecentTimestamp() - start_of_shot) >= Duration::fromSeconds(7) );
+
+            YEET_SHOOTING = true;
+
+            yield(kick_ball_act.updateStateAndGetNextIntent(*robot, ball, ball.position(), (shot_location.value() - ball.position()).orientation(), PENALTY_KICK_SHOT_SPEED ));
         }
 
     } while(true);
