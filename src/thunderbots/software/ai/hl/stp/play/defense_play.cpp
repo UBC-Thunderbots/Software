@@ -152,7 +152,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         if (enemy_threats.size() > 1) {
             shadow_enemy_tactic->updateParams(
-                    enemy_threats.at(0), world.field(), world.friendlyTeam(),
+                    enemy_threats.at(1), world.field(), world.friendlyTeam(),
                     world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
             result.emplace_back(shadow_enemy_tactic);
         } else {
