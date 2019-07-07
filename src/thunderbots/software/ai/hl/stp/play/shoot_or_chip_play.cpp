@@ -31,18 +31,22 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
+    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+            Util::DynamicParameters::HighLevelStrategy::
+            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+
+    return !use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
 
-    bool use_shoot_or_pass_instead_of_shoot_or_chip =
-            Util::DynamicParameters::HighLevelStrategy::
-            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+//    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+//            Util::DynamicParameters::HighLevelStrategy::
+//            use_shoot_or_pass_instead_of_shoot_or_chip.value();
 
-    return !use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
+    return world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
