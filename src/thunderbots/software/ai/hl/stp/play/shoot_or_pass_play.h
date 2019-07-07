@@ -35,9 +35,6 @@ private:
     // The speed each patrolling robot should be moving through its control point
     static constexpr double SPEED_AT_PATROL_POINTS = 0.0;
 
-    // The minimum open net percentage we will try to shoot at
-    const Angle MIN_NET_OPEN_ANGLE_FOR_SHOT;
-
     /**
      * Updates the given cherry-pick tactics
      * @param tactics

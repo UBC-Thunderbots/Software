@@ -19,11 +19,7 @@ using namespace Passing;
 
 const std::string ShootOrPassPlay::name = "Shoot Or Pass Play";
 
-ShootOrPassPlay::ShootOrPassPlay()
-    :
-      MIN_NET_OPEN_ANGLE_FOR_SHOT(Angle::ofDegrees(4))
-{
-}
+ShootOrPassPlay::ShootOrPassPlay() {}
 
 std::string ShootOrPassPlay::getName() const
 {
@@ -99,9 +95,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
 
     // Have a robot keep trying to take a shot
+    Angle min_open_angle_for_shot = Angle::ofDegrees(
+        Util::DynamicParameters::ShootOrPassPlay::min_open_angle_for_shot_deg.value());
+
     auto shoot_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_NET_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
+        min_open_angle_for_shot, std::nullopt, false);
 
     // Start a PassGenerator that will continuously optimize passes into the enemy half
     // of the field
@@ -122,8 +121,10 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Whether or not we've set the passer robot in the PassGenerator
     bool set_passer_robot_in_passgenerator = false;
 
-    double abs_min_pass_score = Util::DynamicParameters::ShootOrPassPlay::abs_min_pass_score.value();
-    double pass_score_ramp_down_duration = Util::DynamicParameters::ShootOrPassPlay::pass_score_ramp_down_duration.value();
+    double abs_min_pass_score =
+        Util::DynamicParameters::ShootOrPassPlay::abs_min_pass_score.value();
+    double pass_score_ramp_down_duration =
+        Util::DynamicParameters::ShootOrPassPlay::pass_score_ramp_down_duration.value();
     do
     {
         updateCreaseDefenderTactics(crease_defender_tactics);
