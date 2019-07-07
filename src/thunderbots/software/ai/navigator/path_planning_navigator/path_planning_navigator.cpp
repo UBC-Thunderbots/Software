@@ -175,14 +175,17 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         intent->accept(*this);
         if (this->current_robot)
         {
-            this->velocity_obstacles.emplace_back(
-                Obstacle::createVelocityObstacleWithScalingParams(
-                    this->current_robot->position(), this->current_destination,
-                    this->current_robot->velocity().len(),
-                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                        .value(),
-                    Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
-                        .value()));
+            if(this->current_robot->velocity().len()>0.3)
+            {
+                this->velocity_obstacles.emplace_back(
+                    Obstacle::createVelocityObstacleWithScalingParams(
+                        this->current_robot->position(), this->current_destination,
+                        this->current_robot->velocity().len(),
+                        Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                            .value(),
+                        Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                            .value()));
+            }
 
             this->current_robot = std::nullopt;
         }

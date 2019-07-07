@@ -146,8 +146,11 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         // compute intersection points from ball position and velocity
         Ray ball_ray = Ray(ball.position(), ball.velocity());
+
+        const Point neg_goal_line_inflated = field.friendlyGoalpostNeg() + Point(0,-0.05);
+        const Point pos_goal_line_inflated = field.friendlyGoalpostPos() + Point(0,0.05);
         Segment full_goal_segment =
-            Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos());
+            Segment(neg_goal_line_inflated, pos_goal_line_inflated);
 
         auto [intersection1, intersection2] =
             raySegmentIntersection(ball_ray, full_goal_segment);
