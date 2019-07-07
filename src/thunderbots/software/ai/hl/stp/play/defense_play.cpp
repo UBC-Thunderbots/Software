@@ -100,7 +100,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         auto shoot_goal_robot = shoot_goal_tactic->getAssignedRobot();
         if(shoot_goal_robot && (dist(shoot_goal_robot->position(), world.ball().position()) < 4 * ROBOT_MAX_RADIUS_METERS)
-         && shoot_goal_robot->velocity().len() < 0.75) {
+         && shoot_goal_robot->velocity().len() < 0.5) {
             shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_ROBOTS);
             LOG(DEBUG) << "ignoring enemy" << std::endl;
         }
