@@ -122,27 +122,29 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     do {
 
         Point new_target = evaluate_next_position();
-
+        printf("New target y=%f", new_target.y());
         bool YEET_SHOOTING = false;
 
         Vector behind_ball_direction = (ball.position() - new_target).norm();
 
-        Point behind_ball = ball.position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.04);
+        Point behind_ball = ball.position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.07);
 
-        Angle shot_orientation = behind_ball_direction.orientation() + Angle::half();
+        Ray shot_ray = Ray(ball.position(), Vector( (ball.position() - robot->position())));
 
-        if(!get_behind_ball_act.done() && !evaluate_penalty_shot() && !YEET_SHOOTING) {
+        auto [shot_location, extra] = raySegmentIntersection(shot_ray, Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()));
+
+        if(!evaluate_penalty_shot() && !YEET_SHOOTING) {
             printf("\nGetting to position");
             yield(get_behind_ball_act.updateStateAndGetNextIntent(*robot, behind_ball, robot->orientation(), 0, true, false, AutokickType::NONE));
             printf("evaluate shot %d", evaluate_penalty_shot());
         }
-        else if(evaluate_penalty_shot()) {
+        else if(evaluate_penalty_shot() && shot_location.has_value()) {
             printf("\nYEET");
             printf("Are we timing out?%d",(robot->getMostRecentTimestamp() - start_of_shot) >= Duration::fromSeconds(7) );
 
             YEET_SHOOTING = true;
 
-            yield(kick_ball_act.updateStateAndGetNextIntent(*robot, ball, ball.position(), shot_orientation, PENALTY_KICK_SHOT_SPEED ));
+            yield(kick_ball_act.updateStateAndGetNextIntent(*robot, ball, ball.position(), (shot_location.value() - ball.position()).orientation(), PENALTY_KICK_SHOT_SPEED ));
         }
 
     } while(true);
