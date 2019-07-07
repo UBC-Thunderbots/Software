@@ -27,11 +27,12 @@ std::string PenaltyKickTactic::getName() const
 
 void PenaltyKickTactic::updateParams(const Ball& updated_ball,
                                      const std::optional<Robot>& updated_enemy_goalie,
-                                     const Field& updated_field)
+                                     const Field& updated_field, const Timestamp start_of_shoot)
 {
     this->enemy_goalie = updated_enemy_goalie;
     this->ball         = updated_ball;
     this->field        = updated_field;
+    this->start_of_shoot = start_of_shoot;
 }
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world)
@@ -138,7 +139,7 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(get_behind_ball_act.updateStateAndGetNextIntent(*robot, behind_ball, robot->orientation(), 0, true, false, AutokickType::NONE));
             printf("evaluate shot %d", evaluate_penalty_shot());
         }
-        else if(evaluate_penalty_shot() && shot_location.has_value()) {
+        else if(evaluate_penalty_shot() && shot_location.has_value() || (robot->getMostRecentTimestamp() - start_of_shoot) > Duration::fromSeconds(7)) {
             printf("\nYEET");
             printf("Are we timing out?%d",(robot->getMostRecentTimestamp() - start_of_shot) >= Duration::fromSeconds(7) );
 

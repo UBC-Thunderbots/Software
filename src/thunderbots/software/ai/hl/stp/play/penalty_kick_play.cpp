@@ -56,6 +56,8 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     move_tactic_6->addWhitelistedAvoidArea(AvoidArea::ENEMY_HALF);
     move_tactic_6->addWhitelistedAvoidArea(AvoidArea::FRIENDLY_HALF);
 
+    Timestamp start_of_shoot = world.getMostRecentTimestamp();
+
     do
     {
         std::vector<std::shared_ptr<Tactic>> tactics_to_run;
@@ -66,8 +68,6 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         Point behind_ball = world.ball().position() + behind_ball_direction.norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS + 0.1);
 
-        printf("\nX=%f", behind_ball.x());
-        printf("\nY=%f", behind_ball.y());
         move_tactic_2->updateParams(Point(0, 0), world.field().enemyGoal().orientation(),
                                     0);
         move_tactic_3->updateParams(Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
@@ -78,7 +78,7 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                     world.field().enemyGoal().orientation(), 0);
         move_tactic_6->updateParams(Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
                                     world.field().enemyGoal().orientation(), 0);
-        penalty_shot_tactic->updateParams(world.ball(), world.enemyTeam().goalie(), world.field());
+        penalty_shot_tactic->updateParams(world.ball(), world.enemyTeam().goalie(), world.field(), start_of_shoot);
         shooter_setup_move->updateParams(behind_ball, shoot_angle, 0.0);
 
         // If we are setting up for penalty kick, move our robots to position

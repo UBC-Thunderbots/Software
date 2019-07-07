@@ -33,7 +33,7 @@ class PenaltyKickTactic : public Tactic
      * @param field : The Field we are playing on
      */
     void updateParams(const Ball &updated_ball, const std::optional<Robot> &enemy_goalie,
-                      const Field &field);
+                      const Field &field, const Timestamp start_of_shoot);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -67,4 +67,5 @@ class PenaltyKickTactic : public Tactic
     static constexpr double SSL_VISION_DELAY = 0.1;
 
     const Duration penalty_shot_timeout = Duration::fromSeconds(10);
+    Timestamp start_of_shoot;
 };
