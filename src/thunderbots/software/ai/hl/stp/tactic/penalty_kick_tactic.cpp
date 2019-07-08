@@ -134,7 +134,7 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
         auto [shot_location, extra] = raySegmentIntersection(shot_ray, Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg()));
 
-        if(!evaluate_penalty_shot() && !YEET_SHOOTING) {
+        if(!evaluate_penalty_shot() && !YEET_SHOOTING && !((robot->getMostRecentTimestamp() - start_of_shoot) > Duration::fromSeconds(7))) {
             printf("\nGetting to position");
             yield(get_behind_ball_act.updateStateAndGetNextIntent(*robot, behind_ball, robot->orientation(), 0, true, false, AutokickType::NONE));
             printf("evaluate shot %d", evaluate_penalty_shot());
