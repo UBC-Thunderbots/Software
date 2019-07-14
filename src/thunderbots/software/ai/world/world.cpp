@@ -23,7 +23,10 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
       ball_(ball),
       friendly_team_(friendly_team),
       enemy_team_(enemy_team),
-      game_state_()
+      game_state_(),
+      // Store a small buffer of previous refbox game states so we can filter out noise
+      // Do not make this value smaller than 3
+      refbox_game_state_history(3)
 {
     // Grab the most recent timestamp from all of the members used to update the world
     last_update_timestamps.set_capacity(buffer_size);
@@ -32,25 +35,25 @@ World::World(const Field &field, const Ball &ball, const Team &friendly_team,
 
 void World::updateFieldGeometry(const Field &new_field_data)
 {
-    field_.updateDimensions(new_field_data);
+    field_ = new_field_data;
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateBallState(const Ball &new_ball_data)
 {
-    ball_.updateState(new_ball_data);
+    ball_ = new_ball_data;
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateFriendlyTeamState(const Team &new_friendly_team_data)
 {
-    friendly_team_.updateState(new_friendly_team_data);
+    friendly_team_ = new_friendly_team_data;
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
 void World::updateEnemyTeamState(const Team &new_enemy_team_data)
 {
-    enemy_team_.updateState(new_enemy_team_data);
+    enemy_team_ = new_enemy_team_data;
     updateTimestamp(getMostRecentTimestampFromMembers());
 }
 
@@ -115,7 +118,17 @@ Team &World::mutableEnemyTeam()
 
 void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
-    game_state_.updateRefboxGameState(game_state, ball_);
+    refbox_game_state_history.push_back(game_state);
+    // Take the consensus of the past 3 refbox messages
+    if (refbox_game_state_history.size() >= 3 && refbox_game_state_history[0] == refbox_game_state_history[1] &&
+        refbox_game_state_history[0] == refbox_game_state_history[2])
+    {
+        game_state_.updateRefboxGameState(game_state, ball_);
+    }
+    else
+    {
+        game_state_.updateRefboxGameState(game_state_.getRefboxGameState(), ball_);
+    }
 }
 
 Timestamp World::getMostRecentTimestampFromMembers()
