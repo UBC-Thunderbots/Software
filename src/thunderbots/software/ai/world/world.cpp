@@ -120,7 +120,8 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
     refbox_game_state_history.push_back(game_state);
     // Take the consensus of the past 3 refbox messages
-    if (refbox_game_state_history.size() >= 3 && refbox_game_state_history[0] == refbox_game_state_history[1] &&
+    if (refbox_game_state_history.size() >= 3 &&
+        refbox_game_state_history[0] == refbox_game_state_history[1] &&
         refbox_game_state_history[0] == refbox_game_state_history[2])
     {
         game_state_.updateRefboxGameState(game_state, ball_);
