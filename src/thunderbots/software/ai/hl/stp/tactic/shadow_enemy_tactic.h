@@ -23,8 +23,8 @@ class ShadowEnemyTactic : public Tactic
      * tactic will be restarted every time it completes
      */
     explicit ShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                               const Team &enemy_team, bool ignore_goalie, const Ball& ball,
-                               bool loop_forever = false);
+                               const Team &enemy_team, bool ignore_goalie,
+                               const Ball &ball, bool loop_forever = false);
 
     std::string getName() const override;
 
@@ -44,8 +44,9 @@ class ShadowEnemyTactic : public Tactic
      * will block the net.
      */
     void updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field,
-                      const Team &friendly_team, const Team &enemy_team, double shadow_distance,
-                      bool enemy_team_can_pass, const Ball &ball, const double ball_steal_speed);
+                      const Team &friendly_team, const Team &enemy_team,
+                      double shadow_distance, bool enemy_team_can_pass, const Ball &ball,
+                      const double ball_steal_speed);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -79,8 +80,7 @@ class ShadowEnemyTactic : public Tactic
     bool ignore_goalie;
     // The ball being played with
     Ball ball;
-    // If the enemy robot has possession of the ball, and it is moving less than this speed, the
-    // shadowing robot will try steal the ball
+    // If the enemy robot has possession of the ball, and it is moving less than this
+    // speed, the shadowing robot will try steal the ball
     double ball_steal_speed;
-
 };

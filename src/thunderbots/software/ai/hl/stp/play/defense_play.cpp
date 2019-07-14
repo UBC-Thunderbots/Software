@@ -99,8 +99,11 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             if (i < enemy_threats.size())
             {
                 shadow_enemy_tactics.at(i)->updateParams(
-                        enemy_threats.at(i), world.field(), world.friendlyTeam(),
-                        world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass, world.ball(), Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value());
+                    enemy_threats.at(i), world.field(), world.friendlyTeam(),
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass,
+                    world.ball(),
+                    Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed
+                        .value());
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

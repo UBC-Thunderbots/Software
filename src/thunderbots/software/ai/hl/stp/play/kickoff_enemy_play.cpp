@@ -118,8 +118,10 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
                 shadow_enemy_tactics.at(i)->updateParams(
-                        enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        shadow_dist, false, world.ball(), Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value());
+                    enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
+                    shadow_dist, false, world.ball(),
+                    Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed
+                        .value());
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else
