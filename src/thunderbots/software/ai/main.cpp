@@ -36,21 +36,25 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     // mirrored. This filter checks if our goalie appears in the enemy defense area to
     // detect mirroring, and ignores the data if mirroring is detected
     if (!Util::DynamicParameters::AI::vision_flipping_filter.value() ||
-            !(new_world.friendlyTeam().goalie() &&
-            new_world.field().enemyDefenseArea().containsPoint(new_world.friendlyTeam().goalie()->position())))
+        !(new_world.friendlyTeam().goalie() &&
+          new_world.field().enemyDefenseArea().containsPoint(
+              new_world.friendlyTeam().goalie()->position())))
     {
         world.updateBallState(new_world.ball());
         world.updateFieldGeometry(new_world.field());
         world.updateEnemyTeamState(new_world.enemyTeam());
         world.updateFriendlyTeamState(new_world.friendlyTeam());
-        RefboxGameState new_game_state =
-                Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
+        RefboxGameState new_game_state = Util::ROSMessages::createGameStateFromROSMessage(
+            world_msg.refbox_data.command);
         world.updateRefboxGameState(new_game_state);
         world.updateTimestamp(new_world.getMostRecentTimestamp());
         world.mutableFriendlyTeam().removeExpiredRobots(world.getMostRecentTimestamp());
         world.mutableEnemyTeam().removeExpiredRobots(world.getMostRecentTimestamp());
-    } else {
-        LOG(WARNING) << "We probably got a mirrored frame from network_input, ignoring it";
+    }
+    else
+    {
+        LOG(WARNING)
+            << "We probably got a mirrored frame from network_input, ignoring it";
     }
 
     if (Util::DynamicParameters::AI::run_ai.value())
