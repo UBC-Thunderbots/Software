@@ -7,6 +7,7 @@
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "shared/constants.h"
+#include "util/parameter/dynamic_parameters.h"
 
 const std::string KickoffEnemyPlay::name = "KickoffEnemy Play";
 
@@ -35,11 +36,11 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true),
+                                            world.enemyTeam(), true, world.ball(), true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true),
+                                            world.enemyTeam(), true, world.ball(), true),
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true)};
+                                            world.enemyTeam(), true, world.ball(), true)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -117,8 +118,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
                 shadow_enemy_tactics.at(i)->updateParams(
-                    enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
-                    shadow_dist, false);
+                        enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
+                        shadow_dist, false, world.ball(), Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value());
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else
