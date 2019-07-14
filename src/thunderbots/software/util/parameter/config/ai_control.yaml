@@ -1,4 +1,8 @@
 AI:
+  vision_flipping_filter:
+    type: "bool"
+    default: true
+    description: Ignores frames if our goalie appears in the opponent crease
   run_ai:
     type: "bool"
     default: true
