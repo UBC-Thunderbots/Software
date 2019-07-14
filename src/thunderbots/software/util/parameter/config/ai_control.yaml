@@ -78,4 +78,23 @@ AI:
       default: 0
       description: >-
         The id of the enemy goalie
+    ignore_camera_data:
+      type: "bool"
+      default: false
+      description: >-
+        foo
+    min_valid_x:
+      type: "double"
+      min: -10.0
+      max: 10.0
+      default: -10.0
+      description: >-
+        foo
+    max_valid_x:
+      type: "double"
+      min: -10.0
+      max: 10.0
+      default: 10.0
+      description: >-
+        foo
 
