@@ -85,7 +85,7 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Rectangle area_in_front_of_rotated_baller(
         rotated_baller_position - Vector(0, 3 * ROBOT_MAX_RADIUS_METERS),
         rotated_baller_position +
-            Vector(4 * ROBOT_MAX_RADIUS_METERS, 2.5 * ROBOT_MAX_RADIUS_METERS));
+            Vector(5 * ROBOT_MAX_RADIUS_METERS, 3 * ROBOT_MAX_RADIUS_METERS));
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {

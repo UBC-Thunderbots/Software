@@ -12,6 +12,7 @@
 #include "ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
+#include "ai/hl/stp/tactic/patrol_tactic.h"
 #include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "ai/hl/stp/tactic/stop_tactic.h"
@@ -31,12 +32,21 @@ std::string ShootOrChipPlay::getName() const
 
 bool ShootOrChipPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isPlaying() &&
+    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+            Util::DynamicParameters::HighLevelStrategy::
+            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+
+    return !use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrChipPlay::invariantHolds(const World &world) const
 {
+
+//    bool use_shoot_or_pass_instead_of_shoot_or_chip =
+//            Util::DynamicParameters::HighLevelStrategy::
+//            use_shoot_or_pass_instead_of_shoot_or_chip.value();
+
     return world.gameState().isPlaying() &&
            Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
@@ -64,6 +74,23 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                world.friendlyTeam(), world.enemyTeam(),
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
+
+    std::array<std::shared_ptr<PatrolTactic>, 2> patrol_tactics = {
+        std::make_shared<PatrolTactic>(
+            std::vector<Point>(
+                {Point(world.field().enemyCornerPos().x() - 3 * ROBOT_MAX_RADIUS_METERS,
+                       world.field().enemyCornerPos().y() - 3 * ROBOT_MAX_RADIUS_METERS),
+                 Point(3 * ROBOT_MAX_RADIUS_METERS,
+                       world.field().width() / 2 - 3 * ROBOT_MAX_RADIUS_METERS)}),
+            .03, 0),
+        std::make_shared<PatrolTactic>(
+            std::vector<Point>(
+                {Point(3 * ROBOT_MAX_RADIUS_METERS,
+                       -world.field().width() / 2 + 3 * ROBOT_MAX_RADIUS_METERS),
+                 Point(
+                     world.field().enemyCornerNeg().x() - 3 * ROBOT_MAX_RADIUS_METERS,
+                     world.field().enemyCornerNeg().y() + 3 * ROBOT_MAX_RADIUS_METERS)}),
+            .03, 0)};
 
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
@@ -140,12 +167,18 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         auto shoot_goal_robot = shoot_or_chip_tactic->getAssignedRobot();
         if(shoot_goal_robot && (dist(shoot_goal_robot->position(), world.ball().position()) < 4 * ROBOT_MAX_RADIUS_METERS)
-           && shoot_goal_robot->velocity().len() < 0.75) {
+           && shoot_goal_robot->velocity().len() < 0.5) {
             shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_ROBOTS);
         }
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);
+
+        // If we can't do anything else then patrol?
+        for (auto &patrol_tactic : patrol_tactics)
+        {
+            result.emplace_back(patrol_tactic);
+        }
 
         // yield the Tactics this Play wants to run, in order of priority
         yield(result);

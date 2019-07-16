@@ -33,19 +33,6 @@ double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
     {
         return 0.0;
     }
-    else if (this->robot)
-    {
-        // If we already assigned a robot to this tactic, prefer reassigning
-        // that robot
-        if (this->robot.value() == robot)
-        {
-            return 0.0;
-        }
-        else
-        {
-            return 1.0;
-        }
-    }
     else
     {
         // Prefer robots that are close to the current patrol point

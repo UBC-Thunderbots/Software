@@ -4,15 +4,18 @@
 #include "ai/hl/stp/action/stop_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "shadow_enemy_tactic.h"
+#include "ai/hl/stp/evaluation/robot.h"
+#include "util/parameter/dynamic_parameters.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                                     const Team &enemy_team, bool ignore_goalie,
+                                     const Team &enemy_team, bool ignore_goalie, const Ball& ball,
                                      bool loop_forever)
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       shadow_distance(ROBOT_MAX_RADIUS_METERS * 3),
       ignore_goalie(ignore_goalie),
+      ball(ball),
       Tactic(loop_forever)
 {
 }
@@ -25,7 +28,7 @@ std::string ShadowEnemyTactic::getName() const
 void ShadowEnemyTactic::updateParams(const Evaluation::EnemyThreat &enemy_threat,
                                      const Field &field, const Team &friendly_team,
                                      const Team &enemy_team, double shadow_distance,
-                                     bool enemy_team_can_pass)
+                                     bool enemy_team_can_pass, const Ball& ball)
 {
     this->enemy_threat        = enemy_threat;
     this->field               = field;
@@ -33,6 +36,7 @@ void ShadowEnemyTactic::updateParams(const Evaluation::EnemyThreat &enemy_threat
     this->enemy_team          = enemy_team;
     this->shadow_distance     = shadow_distance;
     this->enemy_team_can_pass = enemy_team_can_pass;
+    this->ball = ball;
 }
 
 double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -94,11 +98,23 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             {
                 enemy_shot_vector = field.friendlyGoal() - enemy_robot.position();
             }
+
             Point position_to_block_shot =
-                enemy_robot.position() + enemy_shot_vector.norm(this->shadow_distance);
-            yield(move_action.updateStateAndGetNextIntent(
-                *robot, position_to_block_shot,
-                enemy_shot_vector.orientation() + Angle::half(), 0));
+                    enemy_robot.position() + enemy_shot_vector.norm(this->shadow_distance);
+
+            // try to steal the ball and yeet it away if the enemy robot has already
+            // received the pass
+            if (Evaluation::robotHasPossession(ball, enemy_robot) && ball.velocity().len() <
+                                                                     Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value()) {
+                yield(move_action.updateStateAndGetNextIntent(
+                        *robot, ball.position(),
+                        (ball.position() - robot->position()).orientation(), 0,
+                        true, false, AutokickType::AUTOCHIP));
+            } else {
+                yield(move_action.updateStateAndGetNextIntent(
+                        *robot, position_to_block_shot,
+                        enemy_shot_vector.orientation() + Angle::half(), 0));
+            }
         }
     } while (!move_action.done());
 }

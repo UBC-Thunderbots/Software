@@ -50,7 +50,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     std::shared_ptr<ShadowEnemyTactic> shadow_enemy_tactic =
         std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true);
+                                            world.enemyTeam(), true, world.ball(), true);
 
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -100,7 +100,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
         auto shoot_goal_robot = shoot_goal_tactic->getAssignedRobot();
         if(shoot_goal_robot && (dist(shoot_goal_robot->position(), world.ball().position()) < 4 * ROBOT_MAX_RADIUS_METERS)
-         && shoot_goal_robot->velocity().len() < 0.75) {
+         && shoot_goal_robot->velocity().len() < 0.5) {
             shoot_goal_tactic->addWhitelistedAvoidArea(AvoidArea::ENEMY_ROBOTS);
             LOG(DEBUG) << "ignoring enemy" << std::endl;
         }
@@ -152,8 +152,9 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         if (enemy_threats.size() > 1) {
             shadow_enemy_tactic->updateParams(
-                    enemy_threats.at(0), world.field(), world.friendlyTeam(),
-                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+                    enemy_threats.at(1), world.field(), world.friendlyTeam(),
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3,
+                    enemy_team_can_pass, world.ball());
             result.emplace_back(shadow_enemy_tactic);
         } else {
             Robot nearest_enemy_robot = *std::min_element(
