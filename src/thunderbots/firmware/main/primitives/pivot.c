@@ -24,7 +24,7 @@
 #define END_SPEED 1.5f
 #define WITHIN_THRESH(X) (X<=THRESH && X>=-THRESH)
 
-static float radius, angle, center[2], final_dest[2]; 
+static float radius, speed, angle, center[2], final_dest[2]; 
 static int dir = 1;
 /**
  * \brief Initializes the pivot primitive.
@@ -62,8 +62,12 @@ float compute_magnitude(float a[2]){
 static void pivot_start(const primitive_params_t *params) {
     center[0] = params->params[0] / 1000.0;
     center[1] = params->params[1] / 1000.0;
-    angle = params->params[2] /100.0;
-    radius = params->params[3] / 1000.0;
+    angle = params->params[2] / 100.0;
+    speed = params->params[3] / 100.0;
+
+    if(params->extra & 0x01) dribbler_set_speed(16000);
+
+    radius = 0.15; // ball radius + robot radius + buffer
 
     dr_data_t current_bot_state;
     dr_get(&current_bot_state);
@@ -143,7 +147,7 @@ static void pivot_tick(log_record_t *log) {
     float current_rot_vel = dot_product(tangential_dir,vel,2);
     float current_cor_vel = dot_product(radial_dir,vel,2);
 
-    float mag_accel_orbital = compute_acceleration(&rotation_profile, disp_to_final_dest, current_rot_vel, STOPPED, MAX_A, MAX_V);
+    float mag_accel_orbital = speed*compute_acceleration(&rotation_profile, disp_to_final_dest, current_rot_vel, STOPPED, MAX_A, MAX_V);
     float mag_accel_correction = compute_acceleration(&correction_profile, correction, current_cor_vel, STOPPED, MAX_A, MAX_V);
 
     //create the local vectors to the bot
@@ -153,13 +157,13 @@ static void pivot_tick(log_record_t *log) {
     //add the 3 directions together
     float accel[3] = {0};
 
-    accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
-    accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
+    //accel[0] = mag_accel_correction * dot_product(radial_dir, local_x_norm_vec, 2);
+    //accel[1] = mag_accel_correction * dot_product(radial_dir, local_y_norm_vec, 2);
 
-    if(WITHIN_THRESH(correction)){
-        accel[0] += mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
-        accel[1] += mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
-    }
+//    if(WITHIN_THRESH(correction)){
+         accel[0] = mag_accel_orbital * dot_product(tangential_dir, local_x_norm_vec, 2);
+         accel[1] = mag_accel_orbital * dot_product(tangential_dir, local_y_norm_vec, 2);
+  //  }
 
     //find the angle between what the bot currently is at, and the angle to face the destination
     float angle = min_angle_delta(current_bot_state.angle, atan2f(rel_dest[1], rel_dest[0]));
