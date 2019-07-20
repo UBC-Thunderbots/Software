@@ -71,6 +71,7 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 # Find boost components
 find_package(Boost REQUIRED COMPONENTS
         coroutine
+        program_options
         )
 
 # Find libusb
@@ -348,6 +349,17 @@ add_library(tbots_proto STATIC
 target_link_libraries(tbots_proto 
     ${PROTOBUF_LIBRARIES}
     )
+
+# Multithreading 
+#file(GLOB TBOTS_MULTITHREADING_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/multithreading/*.cpp
+#        )
+#add_library(tbots_multithreading STATIC
+#    ${TBOTS_MULTITHREADING_LIB_SRC}
+#    )
+#target_link_libraries(tbots_multithreading
+#    ${Boost_LIBRARIES}
+#    )
 
 # Shared
 file(GLOB TBOTS_SHARED_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -968,9 +980,16 @@ if (CATKIN_ENABLE_TESTING)
             tbots_math
             )
 
+    catkin_add_gtest(multithreading_test
+                    test/multithreading/thread_safe_buffer.cpp
+                    test/multithreading/main.cpp
+                    )
+    target_link_libraries(multithreading_test
+            ${Boost_LIBRARIES}
+            )
+
     catkin_add_gtest(ai_util_test
                     test/ai/test_util.cpp)
-
     target_link_libraries(ai_util_test
             ${catkin_LIBRARIES}
             ${G3LOG}
