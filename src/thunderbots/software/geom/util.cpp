@@ -70,6 +70,27 @@ double dist(const Segment &first, const Vector &second)
     return dist(second, first);
 }
 
+double dist(const Point &first, const Polygon &second)
+{
+    if (second.containsPoint(first))
+    {
+        return 0;
+    }
+
+    double min_dist = DBL_MAX;
+
+    // Calculate the distance from the point to each edge
+    for(auto &segment : second.getSegments())
+    {
+        double current_dist = dist(first, segment);
+        if(current_dist<min_dist)
+        {
+            min_dist = current_dist;
+        }
+    }
+    return min_dist;
+}
+
 double dist(const Point &first, const Rectangle &second)
 {
     if (second.containsPoint(first))

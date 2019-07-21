@@ -13,10 +13,10 @@ ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), obstacles_(obstacles)
 {
-    // account for robot radius
-    numRows = (int)((field_.totalLength() - 2 * ROBOT_MAX_RADIUS_METERS) /
+    // account for robot radius with half radius buffer
+    numRows = (int)((field_.totalLength() - ROBOT_MAX_RADIUS_METERS) /
                     SIZE_OF_GRID_CELL_IN_METERS);
-    numCols = (int)((field_.totalWidth() - 2 * ROBOT_MAX_RADIUS_METERS) /
+    numCols = (int)((field_.totalWidth() - ROBOT_MAX_RADIUS_METERS) /
                     SIZE_OF_GRID_CELL_IN_METERS);
 }
 
@@ -207,17 +207,18 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
     }
 
     if ((start - destination).len() < CLOSE_TO_DEST_THRESHOLD ||
-        (start - closest_destination).len() <
-            (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
+        ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS))
     {
+        // If the destination GridCell is within one grid size of start or
         // start and destination, or start and closest_destination, within threshold
-        return std::nullopt;
+        return std::make_optional<std::vector<Point>>({start, destination});
     }
 
-    // If the destination GridCell is within one grid size of start
-    if ((start - destination).len() < SIZE_OF_GRID_CELL_IN_METERS)
+
+    if ((start - closest_destination).len() <
+        (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
-        return std::make_optional<std::vector<Point>>({start, destination});
+        return std::make_optional<std::vector<Point>>({start, closest_destination});
     }
 
     // The source is blocked
@@ -390,7 +391,7 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
         int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
         int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
 
-        for (int r = 1; r < field_.totalWidth() * BLOCKED_DESTINATION_SEARCH_RESOLUTION;
+        for (int r = 1; r < field_.totalLength() * BLOCKED_DESTINATION_SEARCH_RESOLUTION;
              r++)
         {
             int x = 0, y = r;
@@ -466,8 +467,10 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 
 bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
 {
-    if (p.x() > -field_.totalLength() / 2.0 && p.x() < field_.totalLength() / 2.0 &&
-        p.y() > -field_.totalWidth() / 2.0 && p.y() < field_.totalWidth() / 2.0)
+    if (p.x() > -(field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
+        (p.x() < field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
+        p.y() > -(field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
+        (p.y() < field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS))
     {
         for (auto &obstacle : obstacles_)
         {

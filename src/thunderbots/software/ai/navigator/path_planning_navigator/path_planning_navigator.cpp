@@ -1,63 +1,14 @@
 #include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
+#include <util/parameter/dynamic_parameters.h>
+
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
 #include "ai/navigator/util.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 
-std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
-    const World &world, const std::vector<Obstacle> &additional_obstacles,
-    const std::vector<std::unique_ptr<Intent>> &assignedIntents)
-{
-    this->world                = world;
-    this->current_robot        = std::nullopt;
-    this->additional_obstacles = additional_obstacles;
-
-    auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
-    for (const auto &intent : assignedIntents)
-    {
-        intent->accept(*this);
-        if (this->current_robot)
-        {
-            this->additional_obstacles.emplace_back(
-                Obstacle::createVelocityObstacleWithScalingParams(
-                    this->current_robot->position(), this->current_destination,
-                    this->current_robot->velocity().len(), 1.2, .04));
-            this->current_robot = std::nullopt;
-        }
-        assigned_primitives.emplace_back(std::move(current_primitive));
-    }
-    Util::CanvasMessenger::getInstance()->publishAndClearLayer(
-        Util::CanvasMessenger::Layer::NAVIGATOR);
-    return assigned_primitives;
-}
-
-std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
-    const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
-{
-    this->world                = world;
-    this->current_robot        = std::nullopt;
-    this->additional_obstacles = {};
-
-    auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
-    for (const auto &intent : assignedIntents)
-    {
-        intent->accept(*this);
-        if (this->current_robot)
-        {
-            this->additional_obstacles.emplace_back(
-                Obstacle::createVelocityObstacleWithScalingParams(
-                    this->current_robot->position(), this->current_destination,
-                    this->current_robot->velocity().len(), 1.2, .04));
-            this->current_robot = std::nullopt;
-        }
-        assigned_primitives.emplace_back(std::move(current_primitive));
-    }
-
-    return assigned_primitives;
-}
-
+// visitors
 void PathPlanningNavigator::visit(const CatchIntent &catch_intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(catch_intent);
@@ -96,48 +47,12 @@ void PathPlanningNavigator::visit(const KickIntent &kick_intent)
 
 void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 {
-    auto p      = std::make_unique<MovePrimitive>(move_intent);
-    Point start = this->world.friendlyTeam().getRobotById(p->getRobotId())->position();
-    Point dest  = p->getDestination();
+    Point start =
+        this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
+    Point dest = move_intent.getDestination();
 
-    std::vector<Obstacle> obstacles;
-    // Avoid obstacles specific to this MoveIntent
-    for (auto area : move_intent.getAreasToAvoid())
-    {
-        auto obstacle_opt = obstacleFromAvoidArea(area);
-        if (obstacle_opt)
-        {
-            obstacles.emplace_back(*obstacle_opt);
-            // draw the avoid area
-            drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
-        }
-    }
-
-    for (auto &robot : world.enemyTeam().getAllRobots())
-    {
-        //@todo consider using velocity obstacles: Obstacle o =
-        // Obstacle::createRobotObstacleWithScalingParams(robot, 1.2, 0);
-        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
-        obstacles.push_back(o);
-        drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
-    }
-
-    for (auto &robot : world.friendlyTeam().getAllRobots())
-    {
-        if (robot.id() == move_intent.getRobotId())
-        {
-            // store current robot
-            this->current_robot = robot;
-            // skip current robot
-            continue;
-        }
-        Obstacle o = Obstacle::createCircularRobotObstacle(robot, 1.2);
-        obstacles.push_back(o);
-        drawObstacle(o, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
-    }
-
-    // TODO: should we be using velocity scaling here?
-    obstacles.push_back(Obstacle::createBallObstacle(world.ball(), 0.06, 0));
+    std::vector<Obstacle> obstacles =
+        getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
     auto path_planner =
         std::make_unique<ThetaStarPathPlanner>(this->world.field(), obstacles);
@@ -150,10 +65,14 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         {
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
-                p->getRobotId(), current_destination, move_intent.getFinalAngle(),
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(),
                 calculateTransitionSpeedBetweenSegments(
-                    (*path_points)[0], (*path_points)[1], (*path_points)[2], 0),
-                move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
+                    (*path_points)[0], (*path_points)[1], (*path_points)[2],
+                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                        Util::DynamicParameters::Navigator::transition_speed_factor
+                            .value()) * getCloseToEnemyObstacleFactor((*path_points)[1]),
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(), move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
@@ -162,14 +81,15 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         {
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
-                p->getRobotId(), current_destination, move_intent.getFinalAngle(), 0,
-                move_intent.isDribblerEnabled(), move_intent.getAutoKickType());
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(), move_intent.getFinalSpeed() * getCloseToEnemyObstacleFactor((*path_points)[1]), move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
         }
     }
-    auto stop         = std::make_unique<StopPrimitive>(p->getRobotId(), false);
+    auto stop         = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
     current_primitive = std::move(stop);
 }
 
@@ -191,6 +111,7 @@ void PathPlanningNavigator::visit(const StopIntent &stop_intent)
     current_primitive = std::move(p);
 }
 
+// helpers
 std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea avoid_area)
 {
     Rectangle rectangle({0, 0}, {0, 0});
@@ -202,7 +123,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             rectangle =
                 Rectangle(world.field().friendlyDefenseArea().neCorner(),
                           Point(-10, world.field().friendlyDefenseArea().seCorner().y()));
-            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::ENEMY_DEFENSE_AREA:
             // We extend the enemy defense area back by several meters to prevent
@@ -210,26 +131,28 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             rectangle =
                 Rectangle(world.field().enemyDefenseArea().nwCorner(),
                           Point(10, world.field().enemyDefenseArea().swCorner().y()));
-            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::INFLATED_ENEMY_DEFENSE_AREA:
             rectangle = world.field().enemyDefenseArea();
-            rectangle.expand(OBSTACLE_INFLATION_DIST + 0.2);
+            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS + 0.3);
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
             return Obstacle::createCircleObstacle(
-                world.field().centerPoint(), world.field().centreCircleRadius(), 1.2);
+                world.field().centerPoint(), world.field().centreCircleRadius(), Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
         case AvoidArea::HALF_METER_AROUND_BALL:
-            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, 1.2);
+            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
+        case AvoidArea::BALL:
+            return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
             rectangle =
-                Rectangle({0, world.field().width() / 2}, world.field().enemyCornerNeg());
-            rectangle.expand(OBSTACLE_INFLATION_DIST);
+                Rectangle({0, world.field().totalWidth() / 2}, world.field().enemyCornerNeg() - Point(0, world.field().boundaryWidth()));
+            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::FRIENDLY_HALF:
-            rectangle = Rectangle({0, world.field().width() / 2},
-                                  world.field().friendlyCornerNeg());
-            rectangle.expand(OBSTACLE_INFLATION_DIST);
+            rectangle = Rectangle({0, world.field().totalWidth() / 2},
+                                  world.field().friendlyCornerNeg() - Point(0, world.field().boundaryWidth()));
+            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         default:
             LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
@@ -239,11 +162,105 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
     return std::nullopt;
 }
 
+std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
+    const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
+{
+    this->world              = world;
+    this->current_robot      = std::nullopt;
+    this->velocity_obstacles = {};
+
+    auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
+    for (const auto &intent : assignedIntents)
+    {
+        intent->accept(*this);
+        if (this->current_robot)
+        {
+            if(this->current_robot->velocity().len()>0.3)
+            {
+                this->velocity_obstacles.emplace_back(
+                    Obstacle::createVelocityObstacleWithScalingParams(
+                        this->current_robot->position(), this->current_destination,
+                        this->current_robot->velocity().len(),
+                        Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                            .value(),
+                        Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                            .value()));
+            }
+
+            this->current_robot = std::nullopt;
+        }
+        assigned_primitives.emplace_back(std::move(current_primitive));
+    }
+
+    Util::CanvasMessenger::getInstance()->publishAndClearLayer(
+        Util::CanvasMessenger::Layer::NAVIGATOR);
+
+    return assigned_primitives;
+}
+
+std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
+    const std::vector<AvoidArea> &avoid_areas, int robot_id)
+{
+    std::vector<Obstacle> obstacles = velocity_obstacles;
+
+    for (auto obstacle : obstacles)
+    {
+        // draw the avoid area
+        drawObstacle(obstacle, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
+    }
+
+    // Avoid obstacles specific to this MoveIntent
+    for (auto area : avoid_areas)
+    {
+        if(area == AvoidArea::ENEMY_ROBOTS)
+        {
+            for (auto &robot : world.enemyTeam().getAllRobots())
+            {
+                Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+                    robot,
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(),
+                    Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                        .value());
+                obstacles.push_back(o);
+                // draw the avoid area
+                drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
+            }
+        }
+        else
+        {
+            auto obstacle_opt = obstacleFromAvoidArea(area);
+            if (obstacle_opt)
+            {
+                obstacles.emplace_back(*obstacle_opt);
+                // draw the avoid area
+                drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
+            }
+        }
+    }
+
+    for (auto &robot : world.friendlyTeam().getAllRobots())
+    {
+        if (robot.id() == robot_id)
+        {
+            // store current robot
+            this->current_robot = robot;
+            // skip current robot
+            continue;
+        }
+        Obstacle o =
+            Obstacle::createCircularRobotObstacle(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
+        obstacles.push_back(o);
+        drawObstacle(o, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
+    }
+
+    return obstacles;
+}
+
 void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
                                          const Util::CanvasMessenger::Color &color)
 {
     if (obstacle.getBoundaryPolygon())
-    {
+{
         Util::CanvasMessenger::getInstance()->drawPolygonOutline(
             Util::CanvasMessenger::Layer::NAVIGATOR, *obstacle.getBoundaryPolygon(),
             0.025, color);
@@ -253,5 +270,29 @@ void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
         Util::CanvasMessenger::getInstance()->drawPolygonOutline(
             Util::CanvasMessenger::Layer::NAVIGATOR,
             circleToPolygon(*obstacle.getBoundaryCircle(), 12), 0.025, color);
+    }
+}
+
+double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
+{
+    double closest_dist = DBL_MAX;
+    for (auto &robot : world.enemyTeam().getAllRobots())
+    {
+        //@todo clean up this duplicated obstacle instantiation
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value());
+        double current_dist = dist(p, (*o.getBoundaryPolygon()));
+        if (current_dist<closest_dist)
+        {
+            closest_dist = current_dist;
+        }
+    }
+
+    if (closest_dist>2)
+    {
+        return 1;
+    }
+    else
+    {
+        return closest_dist/2;
     }
 }

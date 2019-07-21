@@ -141,6 +141,30 @@ Navigator:
     default: 0.5
     type: "double"
     description: "TODO: Add description as part of #149"
+  transition_speed_factor:
+    min: 0
+    max: 1
+    default: 0.6
+    type: "double"
+    description: "Factor of max speed to use for transition speed calculations"
+  velocity_obstacle_inflation_factor:
+    min: 0
+    max: 1
+    default: 0.2
+    type: "double"
+    description: "Factor for velocity obstacle length scaling"
+  robot_obstacle_inflation_factor:
+    min: 0
+    max: 10
+    default: 1.3
+    type: "double"
+    description: "Factor for robot obstacle size"
+  ball_obstacle_inflation_factor:
+    min: 0
+    max: 10
+    default: 1.3
+    type: "double"
+    description: "Factor for ball obstacle size"
 robot_expiry_buffer_milliseconds:
   min: 0
   max: 100

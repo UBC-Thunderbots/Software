@@ -85,6 +85,7 @@ double dist(const Segment &first, const Point &second);
 
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
+double dist(const Point &first, const Polygon &second);
 
 /**
  * NOTE: the distance from a point to a rectangle is the closest distance from the point

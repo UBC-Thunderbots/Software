@@ -197,10 +197,10 @@ class ThetaStarPathPlanner : public PathPlanner
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;
 
     // increase in threshold to reduce oscillation
-    static constexpr int BLOCKED_DESINATION_OSCILLATION_MITIGATION = 3;
+    static constexpr int BLOCKED_DESINATION_OSCILLATION_MITIGATION = 2;
 
     // resolution for searching for unblocked point around a blocked destination
-    static constexpr double BLOCKED_DESTINATION_SEARCH_RESOLUTION = 10.0;
+    static constexpr double BLOCKED_DESTINATION_SEARCH_RESOLUTION = 50.0;
 
     // only change this value
     static constexpr int GRID_DIVISION_FACTOR = 1;  // the n in the O(n^2) algorithm :p

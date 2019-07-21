@@ -5,6 +5,7 @@
 #include "ai/hl/stp/play/halt_play.h"
 #include "ai/hl/stp/stp.h"
 #include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
+#include "ai/navigator/placeholder_navigator/placeholder_navigator.h"
 
 AI::AI()
     : navigator(std::make_unique<PathPlanningNavigator>()),
@@ -17,13 +18,10 @@ AI::AI()
 
 std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(const World &world) const
 {
-    //@TODO somehow get some additional obstacles here
-    std::vector<Obstacle> additional_obstacles = {};
-
     std::vector<std::unique_ptr<Intent>> assignedIntents = high_level->getIntents(world);
 
     std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-        navigator->getAssignedPrimitives(world, additional_obstacles, assignedIntents);
+        navigator->getAssignedPrimitives(world, assignedIntents);
 
     return assignedPrimitives;
 }
