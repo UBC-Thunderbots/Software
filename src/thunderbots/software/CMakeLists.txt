@@ -15,6 +15,18 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(PkgConfig REQUIRED)
 include(FindPkgConfig)
 
+# TODO: is this necessary?
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+
+# Find the QtWidgets library
+find_package(Qt5Widgets CONFIG REQUIRED)
+find_package(Qt5OpenGL CONFIG REQUIRED)
+find_package(Qt5Core CONFIG REQUIRED)
+find_package(Qt5Gui CONFIG REQUIRED)
+
+
 ####################
 ## Custom Options ##
 ####################
@@ -118,6 +130,8 @@ include_directories(SYSTEM
 
 include_directories(
         ${catkin_INCLUDE_DIRS}
+        ${QT_INCLUDE_DIR}
+        ${QT_INCLUDE_PATH}
         ${PROTOBUF_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
@@ -468,6 +482,39 @@ target_link_libraries(parameters
 file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
         )
+
+
+
+
+file(GLOB_RECURSE QT_FORMS LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/*.ui
+        )
+file(GLOB_RECURSE QT_RESOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/*.qrc
+        )
+file(GLOB_RECURSE GUI_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/*.cpp
+        )
+add_executable (ai_gui
+        ${GUI_SRC}
+        ${QT_FORMS}
+        ${QT_RESOURCES}
+        )
+# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+# This way the message headers are always generated before they are used in compilation here.
+add_dependencies(ai_gui ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ai_gui
+        ${catkin_LIBRARIES}
+        ${G3LOG}
+        Qt5::Widgets
+        Qt5::Core
+        Qt5::Gui
+        Qt5::OpenGL
+        tbots_world
+        tbots_geom
+        )
+
+
 
 #############
 ## Testing ##
