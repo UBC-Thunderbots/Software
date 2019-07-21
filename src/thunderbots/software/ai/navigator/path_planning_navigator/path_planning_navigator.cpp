@@ -71,8 +71,10 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                     (*path_points)[0], (*path_points)[1], (*path_points)[2],
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value()) * getCloseToEnemyObstacleFactor((*path_points)[1]),
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(), move_intent.getAutoKickType());
+                            .value()) *
+                    getCloseToEnemyObstacleFactor((*path_points)[1]),
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
@@ -82,7 +84,10 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
             current_destination = (*path_points)[1];
             auto move           = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), move_intent.getFinalSpeed() * getCloseToEnemyObstacleFactor((*path_points)[1]), move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getFinalAngle(),
+                move_intent.getFinalSpeed() *
+                    getCloseToEnemyObstacleFactor((*path_points)[1]),
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
             Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
@@ -123,7 +128,10 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             rectangle =
                 Rectangle(world.field().friendlyDefenseArea().neCorner(),
                           Point(-10, world.field().friendlyDefenseArea().seCorner().y()));
-            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
+            rectangle.expand(
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value() *
+                ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::ENEMY_DEFENSE_AREA:
             // We extend the enemy defense area back by several meters to prevent
@@ -131,28 +139,48 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             rectangle =
                 Rectangle(world.field().enemyDefenseArea().nwCorner(),
                           Point(10, world.field().enemyDefenseArea().swCorner().y()));
-            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
+            rectangle.expand(
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value() *
+                ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::INFLATED_ENEMY_DEFENSE_AREA:
             rectangle = world.field().enemyDefenseArea();
-            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS + 0.3);
+            rectangle.expand(
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value() *
+                    ROBOT_MAX_RADIUS_METERS +
+                0.3);
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
             return Obstacle::createCircleObstacle(
-                world.field().centerPoint(), world.field().centreCircleRadius(), Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
+                world.field().centerPoint(), world.field().centreCircleRadius(),
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value());
         case AvoidArea::HALF_METER_AROUND_BALL:
-            return Obstacle::createCircleObstacle(world.ball().position(), 0.5, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
+            return Obstacle::createCircleObstacle(
+                world.ball().position(), 0.5,
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value());
         case AvoidArea::BALL:
             return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
-            rectangle =
-                Rectangle({0, world.field().totalWidth() / 2}, world.field().enemyCornerNeg() - Point(0, world.field().boundaryWidth()));
-            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
+            rectangle = Rectangle(
+                {0, world.field().totalWidth() / 2},
+                world.field().enemyCornerNeg() - Point(0, world.field().boundaryWidth()));
+            rectangle.expand(
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value() *
+                ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::FRIENDLY_HALF:
             rectangle = Rectangle({0, world.field().totalWidth() / 2},
-                                  world.field().friendlyCornerNeg() - Point(0, world.field().boundaryWidth()));
-            rectangle.expand(Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value() * ROBOT_MAX_RADIUS_METERS);
+                                  world.field().friendlyCornerNeg() -
+                                      Point(0, world.field().boundaryWidth()));
+            rectangle.expand(
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value() *
+                ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         default:
             LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
@@ -175,16 +203,16 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         intent->accept(*this);
         if (this->current_robot)
         {
-            if(this->current_robot->velocity().len()>0.3)
+            if (this->current_robot->velocity().len() > 0.3)
             {
                 this->velocity_obstacles.emplace_back(
                     Obstacle::createVelocityObstacleWithScalingParams(
                         this->current_robot->position(), this->current_destination,
                         this->current_robot->velocity().len(),
-                        Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                            .value(),
-                        Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
-                            .value()));
+                        Util::DynamicParameters::Navigator::
+                            robot_obstacle_inflation_factor.value(),
+                        Util::DynamicParameters::Navigator::
+                            velocity_obstacle_inflation_factor.value()));
             }
 
             this->current_robot = std::nullopt;
@@ -212,13 +240,14 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
     // Avoid obstacles specific to this MoveIntent
     for (auto area : avoid_areas)
     {
-        if(area == AvoidArea::ENEMY_ROBOTS)
+        if (area == AvoidArea::ENEMY_ROBOTS)
         {
             for (auto &robot : world.enemyTeam().getAllRobots())
             {
                 Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
                     robot,
-                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(),
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value(),
                     Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
                         .value());
                 obstacles.push_back(o);
@@ -247,8 +276,9 @@ std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
             // skip current robot
             continue;
         }
-        Obstacle o =
-            Obstacle::createCircularRobotObstacle(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
+        Obstacle o = Obstacle::createCircularRobotObstacle(
+            robot,
+            Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
         obstacles.push_back(o);
         drawObstacle(o, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
     }
@@ -260,7 +290,7 @@ void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
                                          const Util::CanvasMessenger::Color &color)
 {
     if (obstacle.getBoundaryPolygon())
-{
+    {
         Util::CanvasMessenger::getInstance()->drawPolygonOutline(
             Util::CanvasMessenger::Layer::NAVIGATOR, *obstacle.getBoundaryPolygon(),
             0.025, color);
@@ -279,20 +309,24 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
         //@todo clean up this duplicated obstacle instantiation
-        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(robot, Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(), Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value());
+        Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+            robot,
+            Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(),
+            Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                .value());
         double current_dist = dist(p, (*o.getBoundaryPolygon()));
-        if (current_dist<closest_dist)
+        if (current_dist < closest_dist)
         {
             closest_dist = current_dist;
         }
     }
 
-    if (closest_dist>2)
+    if (closest_dist > 2)
     {
         return 1;
     }
     else
     {
-        return closest_dist/2;
+        return closest_dist / 2;
     }
 }

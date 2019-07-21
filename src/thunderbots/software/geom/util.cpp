@@ -80,10 +80,10 @@ double dist(const Point &first, const Polygon &second)
     double min_dist = DBL_MAX;
 
     // Calculate the distance from the point to each edge
-    for(auto &segment : second.getSegments())
+    for (auto &segment : second.getSegments())
     {
         double current_dist = dist(first, segment);
-        if(current_dist<min_dist)
+        if (current_dist < min_dist)
         {
             min_dist = current_dist;
         }
