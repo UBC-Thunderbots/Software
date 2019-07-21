@@ -15,6 +15,7 @@
 /devel
 /install
 /logs
+*.bag
 
 # Pycache
 *.pyc
