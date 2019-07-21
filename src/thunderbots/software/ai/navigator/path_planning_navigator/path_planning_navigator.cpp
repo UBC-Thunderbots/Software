@@ -308,7 +308,6 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
     double closest_dist = DBL_MAX;
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
-        //@todo clean up this duplicated obstacle instantiation
         Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
             robot,
             Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value(),
