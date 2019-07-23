@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QTimer>
 #include "software/gui/main_widget.h"
 
 /**
@@ -17,4 +18,5 @@ public:
 
 private:
     MainWidget* main_widget;
+    QTimer* draw_AI_timer;
 };
