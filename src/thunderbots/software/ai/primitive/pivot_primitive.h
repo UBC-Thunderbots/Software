@@ -11,8 +11,8 @@ class PivotPrimitive : public Primitive
     /**
      * Creates a new Pivot Primitive
      *
-     * Pivots the robot around the specified point, maintaining a constant
-     * distance from this point.
+     * Pivots the robot around the specified point (usually the ball) at a specified speed,
+     * maintaining a constant distance of (ball radius + robot radius) from this point.
      * 	   The robot will pivot in the direction of the shortest path
      * 	   Assume robot always faces the point around which it pivots
      *

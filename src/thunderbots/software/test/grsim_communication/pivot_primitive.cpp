@@ -65,7 +65,7 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
 
     // asked to pivot to zero degress from current point, with a radius of 1 which should
     // resolve to pivot point + (1,0)
-    PivotPrimitive primitive = PivotPrimitive(1, GetParam(), Angle::zero(), 1);
+    PivotPrimitive primitive = PivotPrimitive(1, GetParam(), Angle::zero(), Angle::zero(), false);
 
     auto motion_command = get_motion_command(robot, primitive);
 
@@ -83,7 +83,7 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest, visit_pivot_primtive_clock
     // (chosen far so all values pivot cw) which should result in a cw rotation on all
     // parameterized pivot points
     PivotPrimitive primitive =
-        PivotPrimitive(1, Point(10, -10), Angle::ofRadians(-1 / 4 * M_PI), 10);
+        PivotPrimitive(1, Point(10, -10), Angle::ofRadians(-1 / 4 * M_PI), Angle::ofRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
     Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::ofRadians(0.0),
@@ -116,7 +116,7 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
     // (chosen far so all values pivot ccw) which should result in a cw rotation on all
     // parameterized pivot points
     PivotPrimitive primitive =
-        PivotPrimitive(1, Point(-10, 10), Angle::ofRadians(3 / 4 * M_PI), 10);
+        PivotPrimitive(1, Point(-10, 10), Angle::ofRadians(3 / 4 * M_PI), Angle::ofRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
     Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::ofRadians(0.0),

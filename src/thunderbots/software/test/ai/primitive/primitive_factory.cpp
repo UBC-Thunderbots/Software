@@ -223,10 +223,11 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     const unsigned int robot_id = 2U;
     const Point pivot_point     = Point(2, -1);
     const Angle final_angle     = Angle::ofRadians(2.56);
-    const double pivot_radius   = .78;
+    const Angle pivot_speed     = Angle::ofRadians(3.14);
+    const bool  enable_dribbler = true;
 
     PivotPrimitive pivot_prim =
-        PivotPrimitive(robot_id, pivot_point, final_angle, pivot_radius);
+        PivotPrimitive(robot_id, pivot_point, final_angle, pivot_speed, enable_dribbler);
 
     thunderbots_msgs::Primitive prim_msg = pivot_prim.createMsg();
     std::unique_ptr<Primitive> new_prim =
@@ -238,8 +239,8 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     EXPECT_DOUBLE_EQ(pivot_point.x(), parameters[0]);
     EXPECT_DOUBLE_EQ(pivot_point.y(), parameters[1]);
     EXPECT_DOUBLE_EQ(final_angle.toRadians(), parameters[2]);
-    EXPECT_DOUBLE_EQ(pivot_radius, parameters[3]);
-    EXPECT_EQ(std::vector<bool>(), new_prim->getExtraBits());
+    EXPECT_DOUBLE_EQ(pivot_speed.toRadians(), parameters[3]);
+    EXPECT_EQ(std::vector<bool>{true}, new_prim->getExtraBits());
 }
 
 // Test that we can correctly translate a StopPrimitive like:

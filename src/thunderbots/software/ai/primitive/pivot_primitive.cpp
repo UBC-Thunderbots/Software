@@ -85,7 +85,8 @@ bool PivotPrimitive::operator==(const PivotPrimitive &other) const
 {
     return this->robot_id == other.robot_id && this->pivot_point == other.pivot_point &&
            this->final_angle == other.final_angle &&
-           this->pivot_speed == other.pivot_speed;
+           this->pivot_speed == other.pivot_speed &&
+           this->enable_dribbler == other.enable_dribbler;
 }
 
 bool PivotPrimitive::operator!=(const PivotPrimitive &other) const

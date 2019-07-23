@@ -6,7 +6,7 @@
 #include "ai/intent/pivot_intent.h"
 
 
-// PivotAction should be yeilding move_intents as the robot is too far away from orbit
+// PivotAction should be yielding move_intents as the robot is too far away from orbit
 TEST(PivotActionTest, robot_too_far_from_orbit)
 {
     Robot robot        = Robot(0, Point(10, 10), Vector(), Angle::zero(),
@@ -14,7 +14,7 @@ TEST(PivotActionTest, robot_too_far_from_orbit)
     PivotAction action = PivotAction();
 
     auto intent_ptr =
-        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 1.0);
+        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -32,7 +32,7 @@ TEST(PivotActionTest, robot_too_far_from_orbit)
     }
 }
 
-// PivotAction should be yeilding pivot_intents as the robot is in orbit
+// PivotAction should be yielding pivot_intents as the robot is in orbit
 TEST(PivotActionTest, robot_in_robit)
 {
     Robot robot = Robot(0, Point(1, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
@@ -40,7 +40,7 @@ TEST(PivotActionTest, robot_in_robit)
     PivotAction action = PivotAction();
 
     auto intent_ptr =
-        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), 1.0);
+        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
