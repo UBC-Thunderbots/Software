@@ -27,9 +27,10 @@ static const std::map<RefboxGameState, std::string> refbox_game_state_names = {
 
 std::string name(const RefboxGameState& state)
 {
-    if (refbox_game_state_names.find(state) != refbox_game_state_names.end())
+    auto find_name_result = refbox_game_state_names.find(state);
+    if (find_name_result != refbox_game_state_names.end())
     {
-        return refbox_game_state_names.find(state)->second;
+        return find_name_result->second;
     }
     else
     {
