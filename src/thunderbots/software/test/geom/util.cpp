@@ -1386,6 +1386,37 @@ TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle)
                      empty_circles[3].getRadius());
 }
 
+TEST(GeomUtilTest, test_point_polygon_dist_point_contained_in_polygon)
+{
+    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+    Point point     = Point(0.5, 0.5);
+
+    double result = dist(point, polygon);
+
+    EXPECT_DOUBLE_EQ(0.0, result);
+}
+
+TEST(GeomUtilTest, test_point_polygon_dist_point_close_to_polygon)
+{
+    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+    Point point     = Point(0.5, 1.1);
+
+    double result = dist(point, polygon);
+
+    EXPECT_NEAR(0.1, result, 1e-9);
+}
+
+TEST(GeomUtilTest, test_point_polygon_dist_point_far_from_polygon)
+{
+    Polygon polygon = Polygon({Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)});
+    Point point     = Point(-5, -5);
+
+    double result = dist(point, polygon);
+
+    EXPECT_DOUBLE_EQ(std::hypot(-5, -5), result);
+}
+
+
 int main(int argc, char **argv)
 {
     std::cout << argv[0] << std::endl;
