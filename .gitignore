@@ -16,6 +16,10 @@
 /install
 /logs
 
+# rosbag
+*.bag
+*.bag.active
+
 # Pycache
 *.pyc
 
