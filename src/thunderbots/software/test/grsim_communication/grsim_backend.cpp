@@ -1,4 +1,4 @@
-#include "grsim_communication/grsim_backend.h"
+#include "backend/output/grsim/grsim_output.h"
 
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>

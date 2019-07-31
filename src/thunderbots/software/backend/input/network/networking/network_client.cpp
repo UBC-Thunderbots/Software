@@ -1,4 +1,4 @@
-#include "network_input/networking/network_client.h"
+#include "backend/input/network/networking/network_client.h"
 
 #include <boost/bind.hpp>
 #include <limits>
@@ -8,28 +8,24 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 
-NetworkClient::NetworkClient(ros::NodeHandle& node_handle)
+NetworkClient::NetworkClient(
+        std::function<void(thunderbots_msgs::World)> received_world_callback)
     : backend(),
       io_service(),
       initial_packet_count(0),
       last_valid_t_capture(std::numeric_limits<double>::max())
 {
-    // Set up publishers
-    world_publisher = node_handle.advertise<thunderbots_msgs::World>(
-        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1);
-    gamecontroller_publisher = node_handle.advertise<thunderbots_msgs::RefboxData>(
-        Util::Constants::NETWORK_INPUT_GAMECONTROLLER_TOPIC, 1);
-
+    // TODO: get vision_multicast_address from paramters
     // Set up our connection over udp to receive vision packets
     try
     {
         std::string vision_multicast_address;
         node_handle.getParam("/vision_multicast_address", vision_multicast_address);
-
         ssl_vision_client = std::make_unique<SSLVisionClient>(
             io_service, vision_multicast_address,
             Util::Constants::SSL_VISION_MULTICAST_PORT,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
+
     }
     catch (const boost::exception& ex)
     {

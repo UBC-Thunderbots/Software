@@ -2,7 +2,7 @@
  * This file contains the unit tests for the implementation of RobotFilter class
  */
 
-#include "network_input/filter/robot_filter.h"
+#include "backend/input/network/filter/robot_filter.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

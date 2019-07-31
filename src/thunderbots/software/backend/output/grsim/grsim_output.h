@@ -12,7 +12,7 @@
 #include "proto/grSim_Packet.pb.h"
 
 
-class GrSimBackend
+class GrSimOutput
 {
    public:
     /**
@@ -21,9 +21,9 @@ class GrSimBackend
      * @param network_address The IP address to publish grSim commands to
      * @param port The port to publish commands to
      */
-    explicit GrSimBackend(std::string network_address, unsigned short port);
+    explicit GrSimOutput(std::string network_address, unsigned short port);
 
-    ~GrSimBackend();
+    ~GrSimOutput();
 
     /**
      * Sends the given primitives to be simulated in grSim

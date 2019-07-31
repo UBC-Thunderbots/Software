@@ -1,4 +1,4 @@
-/*
+of*
  * Specifies the root component of the application
  */
 

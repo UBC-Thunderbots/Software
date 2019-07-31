@@ -3,10 +3,10 @@
 #include <boost/exception/diagnostic_information.hpp>
 
 #include "geom/point.h"
-#include "network_input/backend.h"
-#include "network_input/networking/network_client.h"
-#include "network_input/networking/ssl_gamecontroller_client.h"
-#include "network_input/networking/ssl_vision_client.h"
+#include "backend/input/network/networking/network.h"
+#include "backend/input/network/networking/network_client.h"
+#include "backend/input/network/networking/ssl_gamecontroller_client.h"
+#include "backend/input/network/networking/ssl_vision_client.h"
 #include "thunderbots_msgs/Ball.h"
 #include "thunderbots_msgs/Field.h"
 #include "thunderbots_msgs/Team.h"
@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
 
     // Create and start our NetworkClient
-    NetworkClient client = NetworkClient(node_handle);
+    NetworkClient client = NetworkClient(std::function<(void) World>());
 
     // Initialize Dynamic Parameters
     auto update_subscribers =

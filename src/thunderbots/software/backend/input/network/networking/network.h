@@ -6,9 +6,9 @@
 #include "ai/world/ball.h"
 #include "ai/world/field.h"
 #include "ai/world/team.h"
-#include "network_input/filter/ball_filter.h"
-#include "network_input/filter/robot_filter.h"
-#include "network_input/filter/robot_team_filter.h"
+#include "backend/input/network/filter/ball_filter.h"
+#include "backend/input/network/filter/robot_filter.h"
+#include "backend/input/network/filter/robot_team_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_referee.pb.h"
 #include "thunderbots_msgs/Ball.h"
@@ -18,6 +18,7 @@
 #include "thunderbots_msgs/Team.h"
 #include "util/time/timestamp.h"
 
+// TODO: RENAME THIS CLASS
 class Backend
 {
    public:

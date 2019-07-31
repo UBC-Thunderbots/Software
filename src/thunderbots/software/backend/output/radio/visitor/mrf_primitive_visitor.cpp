@@ -1,4 +1,4 @@
-#include "radio_communication/visitor/mrf_primitive_visitor.h"
+#include "backend/output/radio/visitor/mrf_primitive_visitor.h"
 
 #include "shared/constants.h"
 

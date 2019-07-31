@@ -64,36 +64,36 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     backend_ptr->send_vision_packet(robots, ball);
 }
 
-int main(int argc, char** argv)
-{
-    // Init ROS node
-    ros::init(argc, argv, "radio_communication");
-    ros::NodeHandle node_handle;
-
-    // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
-
-    // Set radio configuration from cmdline, init backend
-    int config  = std::stoi(argv[MRF_CONFIG_ARGV_INDEX], nullptr, 0);
-    backend_ptr = std::make_unique<MRFBackend>(config, node_handle);
-
-    // Create subscribers to topics we care about
-    ros::Subscriber prim_array_sub = node_handle.subscribe(
-        Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
-    ros::Subscriber world_sub = node_handle.subscribe(
-        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
-
-    // Initialize variables
-    primitives = std::vector<std::unique_ptr<Primitive>>();
-
-    // Initialize Dynamic Parameters
-    auto update_subscribers =
-        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
-
-    // Services any ROS calls in a separate thread "behind the scenes". Does not return
-    // until the node is shutdown
-    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
-    ros::spin();
-
-    return 0;
-}
+//int main(int argc, char** argv)
+//{
+//    // Init ROS node
+//    ros::init(argc, argv, "radio_output");
+//    ros::NodeHandle node_handle;
+//
+//    // Initialize the logger
+//    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+//
+//    // Set radio configuration from cmdline, init backend
+//    int config  = std::stoi(argv[MRF_CONFIG_ARGV_INDEX], nullptr, 0);
+//    backend_ptr = std::make_unique<MRFBackend>(config, node_handle);
+//
+//    // Create subscribers to topics we care about
+//    ros::Subscriber prim_array_sub = node_handle.subscribe(
+//        Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+//    ros::Subscriber world_sub = node_handle.subscribe(
+//        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
+//
+//    // Initialize variables
+//    primitives = std::vector<std::unique_ptr<Primitive>>();
+//
+//    // Initialize Dynamic Parameters
+//    auto update_subscribers =
+//        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
+//
+//    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+//    // until the node is shutdown
+//    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
+//    ros::spin();
+//
+//    return 0;
+//}

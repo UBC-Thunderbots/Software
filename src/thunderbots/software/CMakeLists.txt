@@ -337,10 +337,21 @@ target_link_libraries(tbots_test_util
     tbots_world
     )
 
+# TODO: this should not all be in one lib
+file(GLOB_RECURSE TBOTS_BACKEND_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/*.cpp
+        )
+add_library(tbots_backend STATIC
+        ${TBOTS_BACKEND_SRC}
+        )
+target_link_libraries(tbots_backend
+             Eigen3::Eigen
+        )
+
 
 # Proto
 ## Call our CMake file to include and build protobuf
-include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
+#include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 ## Find the generated files
 file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 add_library(tbots_proto STATIC
@@ -350,7 +361,7 @@ target_link_libraries(tbots_proto
     ${PROTOBUF_LIBRARIES}
     )
 
-# Multithreading 
+# Multithreading (TODO: don't need this, it's header only)
 #file(GLOB TBOTS_MULTITHREADING_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 #        ${CMAKE_CURRENT_SOURCE_DIR}/multithreading/*.cpp
 #        )
@@ -375,29 +386,29 @@ add_library(tbots_shared STATIC
 ## Executables ##
 #################
 
-file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.h
-        )
-add_executable (network_input
-        ${NETWORK_INPUT_SRC}
-        )
-# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-# This way the message headers are always generated before they are used in compilation here.
-add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
-target_link_libraries(network_input
-        ${catkin_LIBRARIES}
-        ${G3LOG}
-        Eigen3::Eigen
-        tbots_geom
-        tbots_world
-        tbots_proto
-        tbots_parameter
-        tbots_ros_msg_util
-        tbots_math
-        )
+#file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.h
+#        )
+#add_executable (network_input
+#        ${NETWORK_INPUT_SRC}
+#        )
+## Depend on exported targets (other packages) so that the messages in our #thunderbots_msgs package are built first.
+## This way the message headers are always generated before they are used in #compilation here.
+#add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(network_input
+#        ${catkin_LIBRARIES}
+#        ${G3LOG}
+#        Eigen3::Eigen
+#        tbots_geom
+#        tbots_world
+#        tbots_proto
+#        tbots_parameter
+#        tbots_ros_msg_util
+#        tbots_math
+#        )
 
-file(GLOB AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+file(GLOB FULL_SYSTEM_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/*.cpp
         # We include all the plays here so that that the static variables in 
@@ -405,14 +416,15 @@ file(GLOB AI_LOGIC_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         # addresses the issue explained here:
         # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/full_system_main.cpp
         )
-add_executable (ai_logic
-        ${AI_LOGIC_SRC}
+add_executable (full_system
+        ${FULL_SYSTEM_SRC}
         )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(ai_logic ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ai_logic 
+add_dependencies(full_system ${catkin_EXPORTED_TARGETS})
+target_link_libraries(full_system
         ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
         ${G3LOG}
@@ -431,50 +443,51 @@ target_link_libraries(ai_logic
         tbots_parameter
         tbots_ros_msg_util
         tbots_canvas_messenger
+        tbots_backend
         )
 
-file(GLOB GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.h
-        )
-add_executable (grsim_communication
-        ${GRSIM_COMMUNICATION_SRC}
-        )
+#file(GLOB GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.h
+#        )
+#add_executable (grsim_communication
+#        ${GRSIM_COMMUNICATION_SRC}
+#        )
 
-# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-# This way the message headers are always generated before they are used in compilation here.
-add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
-target_link_libraries(grsim_communication ${catkin_LIBRARIES}
-        ${G3LOG}
-        tbots_primitive
-        tbots_world
-        tbots_geom
-        tbots_proto
-        tbots_parameter
-        tbots_ros_msg_util
-        )
+## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+## This way the message headers are always generated before they are used in compilation here.
+#add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(grsim_communication ${catkin_LIBRARIES}
+#        ${G3LOG}
+#        tbots_primitive
+#        tbots_world
+#        tbots_geom
+#        tbots_proto
+#        tbots_parameter
+#        tbots_ros_msg_util
+#        )
 
-file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.h
-        )
-add_executable (radio_communication
-        ${RADIO_COMMUNICATION_SRC}
-        )
-# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-# This way the message headers are always generated before they are used in compilation here.
-add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
-target_link_libraries(radio_communication
-        ${catkin_LIBRARIES}
-        ${G3LOG}
-        ${LIBUSB_1_LIBRARIES}
-        tbots_shared
-        tbots_primitive
-        tbots_world
-        tbots_time
-        tbots_parameter
-        tbots_ros_msg_util
-        )
+#file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.h
+#        )
+#add_executable (radio_communication
+#        ${RADIO_COMMUNICATION_SRC}
+#        )
+## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
+## This way the message headers are always generated before they are used in compilation here.
+#add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(radio_communication
+#        ${catkin_LIBRARIES}
+#        ${G3LOG}
+#        ${LIBUSB_1_LIBRARIES}
+#        tbots_shared
+#        tbots_primitive
+#        tbots_world
+#        tbots_time
+#        tbots_parameter
+#        tbots_ros_msg_util
+#        )
 
 file(GLOB DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
@@ -618,27 +631,28 @@ if (CATKIN_ENABLE_TESTING)
             tbots_test_util
             )
 
-    catkin_add_gtest(grsim_communication_test
-            grsim_communication/grsim_backend.cpp
-            grsim_communication/grsim_command_primitive_visitor.cpp
-            grsim_communication/motion_controller.cpp
-            test/grsim_communication/dribble_primitive.cpp
-            test/grsim_communication/grsim_backend.cpp
-            test/grsim_communication/catch_primitive.cpp
-            test/grsim_communication/pivot_primitive.cpp
-            test/grsim_communication/movespin_primitive.cpp
-            test/grsim_communication/main.cpp
-            test/grsim_communication/motion_controller.cpp
-            )
-    target_link_libraries(grsim_communication_test 
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            tbots_proto
-            tbots_geom
-            tbots_world
-            tbots_primitive
-            tbots_test_util
-            )
+        # TODO: Re-add and re-enable me!
+#    catkin_add_gtest(grsim_communication_test
+#            grsim_communication/grsim_backend.cpp
+#            grsim_communication/grsim_command_primitive_visitor.cpp
+#            grsim_communication/motion_controller.cpp
+#            test/grsim_communication/dribble_primitive.cpp
+#            test/grsim_communication/grsim_backend.cpp
+#            test/grsim_communication/catch_primitive.cpp
+#            test/grsim_communication/pivot_primitive.cpp
+#            test/grsim_communication/movespin_primitive.cpp
+#            test/grsim_communication/main.cpp
+#            test/grsim_communication/motion_controller.cpp
+#            )
+#    target_link_libraries(grsim_communication_test
+#            ${catkin_LIBRARIES}
+#            ${G3LOG}
+#            tbots_proto
+#            tbots_geom
+#            tbots_world
+#            tbots_primitive
+#            tbots_test_util
+#            )
 
     catkin_add_gtest(primitive_test
             test/ai/primitive/catch_primitive.cpp
@@ -663,15 +677,16 @@ if (CATKIN_ENABLE_TESTING)
         )
 
 
-    catkin_add_gtest(mrf_primitive_visitor_test
-            test/radio_communication/visitor/mrf_primitive_visitor.cpp
-            radio_communication/visitor/mrf_primitive_visitor.cpp
-            )
-    target_link_libraries(mrf_primitive_visitor_test 
-        ${catkin_LIBRARIES}
-        ${G3LOG}
-        tbots_primitive
-        )
+        # TODO: re-add and re-enable me
+#    catkin_add_gtest(mrf_primitive_visitor_test
+#            test/radio_communication/visitor/mrf_primitive_visitor.cpp
+#            radio_communication/visitor/mrf_primitive_visitor.cpp
+#            )
+#    target_link_libraries(mrf_primitive_visitor_test
+#        ${catkin_LIBRARIES}
+#        ${G3LOG}
+#        tbots_primitive
+#        )
 
     catkin_add_gtest(time_test
             test/util/time/duration.cpp
@@ -909,16 +924,17 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             )
 
-    catkin_add_gtest(robot_filter_test
-            test/network_input/filter/robot_filter.cpp
-            test/network_input/filter/main.cpp
-            network_input/filter/robot_filter.cpp
-            )
-    target_link_libraries(robot_filter_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            tbots_world
-            )
+        # TODO: re-add and re-enable me
+#    catkin_add_gtest(robot_filter_test
+#            test/network_input/filter/robot_filter.cpp
+#            test/network_input/filter/main.cpp
+#            network_input/filter/robot_filter.cpp
+#            )
+#    target_link_libraries(robot_filter_test
+#            ${catkin_LIBRARIES}
+#            ${G3LOG}
+#            tbots_world
+#            )
 
     catkin_add_gtest(game_state_play_selection_test
             ai/ai.cpp
@@ -965,20 +981,21 @@ if (CATKIN_ENABLE_TESTING)
             tbots_test_util
             )
 
-    catkin_add_gtest(network_input_test
-            test/network_input/filter/ball_filter.cpp
-            test/network_input/main.cpp
-            network_input/filter/ball_filter.cpp
-            )
-    target_link_libraries(network_input_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            Eigen3::Eigen
-            tbots_geom
-            tbots_world
-            tbots_test_util
-            tbots_math
-            )
+        # TODO: uncomment me and re-add!
+#    catkin_add_gtest(network_input_test
+#            test/network_input/filter/ball_filter.cpp
+#            test/network_input/main.cpp
+#            network_input/filter/ball_filter.cpp
+#            )
+#    target_link_libraries(network_input_test
+#            ${catkin_LIBRARIES}
+#            ${G3LOG}
+#            Eigen3::Eigen
+#            tbots_geom
+#            tbots_world
+#            tbots_test_util
+#            tbots_math
+#            )
 
     catkin_add_gtest(multithreading_test
                     test/multithreading/thread_safe_buffer.cpp

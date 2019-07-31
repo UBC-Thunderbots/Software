@@ -1,14 +1,14 @@
-#include "grsim_communication/grsim_backend.h"
+#include "backend/output/grsim/grsim_output.h"
 
 #include <chrono>
 #include <optional>
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "grsim_backend.h"
+#include "grsim_output.h"
 #include "grsim_command_primitive_visitor.h"
-#include "grsim_communication/grsim_command_primitive_visitor.h"
-#include "grsim_communication/motion_controller.h"
+#include "backend/output/grsim/grsim_command_primitive_visitor.h"
+#include "backend/output/grsim/motion_controller.h"
 #include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Replacement.pb.h"
@@ -31,19 +31,19 @@ struct overload : Ts...
 template <class... Ts>
 overload(Ts...)->overload<Ts...>;
 
-GrSimBackend::GrSimBackend(std::string network_address, unsigned short port)
+GrSimOutput::GrSimOutput(std::string network_address, unsigned short port)
     : network_address(network_address), port(port), socket(io_service)
 {
     socket.open(ip::udp::v4());
     remote_endpoint = ip::udp::endpoint(ip::address::from_string(network_address), port);
 }
 
-GrSimBackend::~GrSimBackend()
+GrSimOutput::~GrSimOutput()
 {
     socket.close();
 }
 
-void GrSimBackend::sendPrimitives(
+void GrSimOutput::sendPrimitives(
     const std::vector<std::unique_ptr<Primitive>>& primitives, const Team& friendly_team,
     const Ball& ball)
 {
@@ -120,7 +120,7 @@ void GrSimBackend::sendPrimitives(
     bangbang_timestamp = std::chrono::steady_clock::now();
 }
 
-grSim_Packet GrSimBackend::createGrSimPacketWithRobotVelocity(
+grSim_Packet GrSimOutput::createGrSimPacketWithRobotVelocity(
     unsigned int robot_id, bool is_yellow, Vector robot_velocity,
     AngularVelocity angular_velocity, double kick_speed_meters_per_second, bool chip,
     bool dribbler_on) const
@@ -152,12 +152,12 @@ grSim_Packet GrSimBackend::createGrSimPacketWithRobotVelocity(
     return packet;
 }
 
-void GrSimBackend::setBallState(Point destination, Vector velocity)
+void GrSimOutput::setBallState(Point destination, Vector velocity)
 {
     sendGrSimPacket(createGrSimReplacementWithBallState(destination, velocity));
 }
 
-grSim_Packet GrSimBackend::createGrSimReplacementWithBallState(Point destination,
+grSim_Packet GrSimOutput::createGrSimReplacementWithBallState(Point destination,
                                                                Vector velocity)
 {
     grSim_Packet packet;
@@ -174,7 +174,7 @@ grSim_Packet GrSimBackend::createGrSimReplacementWithBallState(Point destination
     return (packet);
 }
 
-void GrSimBackend::sendGrSimPacket(const grSim_Packet& packet)
+void GrSimOutput::sendGrSimPacket(const grSim_Packet& packet)
 {
     boost::system::error_code err;
     socket.send_to(

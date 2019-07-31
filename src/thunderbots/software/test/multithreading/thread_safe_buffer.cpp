@@ -87,3 +87,21 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_i
     EXPECT_EQ(84, result);
 }
 
+TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold){
+    ThreadSafeBuffer<int> buffer(3);
+
+    buffer.push(37);
+    buffer.push(38);
+    buffer.push(39);
+    buffer.push(40);
+
+    // We should have overwritten the least recently added value
+    EXPECT_EQ(38, buffer.pullLeastRecentlyAddedValue());
+    EXPECT_EQ(39, buffer.pullLeastRecentlyAddedValue());
+    EXPECT_EQ(40, buffer.pullLeastRecentlyAddedValue());
+}
+
+// TODO: test where we destruct a thread safe buffer once
+// TODO: test where we destruct a thread safe buffer multiple times
+// TODO: test where we put in and pull out an object that can't be copied, like a `unique_ptr`
+

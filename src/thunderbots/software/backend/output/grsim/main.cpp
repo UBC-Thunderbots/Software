@@ -6,7 +6,7 @@
 #include "ai/primitive/chip_primitive.h"
 #include "ai/primitive/primitive.h"
 #include "ai/primitive/primitive_factory.h"
-#include "grsim_communication/grsim_backend.h"
+#include "backend/output/grsim/grsim_output.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameter_utils.h"
@@ -18,13 +18,13 @@
 // file and are not created as global static variables.
 namespace
 {
-    // The GrSimBackend responsible for handling communication with grSim
-    GrSimBackend grsim_backend(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
+    // The GrSimOutput responsible for handling communication with grSim
+    GrSimOutput grsim_backend(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
                                Util::Constants::GRSIM_COMMAND_NETWORK_PORT);
     // The current state of the world
     World world;
 
-    // Cached primtive array
+    // Cached primitive array
     std::vector<std::unique_ptr<Primitive>> primitives;
     std::mutex update_primitives_vector_mutex;
 
@@ -55,29 +55,29 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr& msg)
     update_primitives_vector_mutex.unlock();
 }
 
-int main(int argc, char** argv)
-{
-    // Init ROS node
-    ros::init(argc, argv, "grsim_communication");
-    ros::NodeHandle node_handle;
-
-    // Create subscribers to topics we care about
-    ros::Subscriber primitive_subscriber = node_handle.subscribe(
-        Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
-    ros::Subscriber world_subscriber = node_handle.subscribe(
-        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
-
-    // Initialize the logger
-    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
-
-    // Initialize Dynamic Parameters
-    auto update_subscribers =
-        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
-
-    // Services any ROS calls in a separate thread "behind the scenes". Does not return
-    // until the node is shutdown
-    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
-    ros::spin();
-
-    return 0;
-}
+//int main(int argc, char** argv)
+//{
+//    // Init ROS node
+//    ros::init(argc, argv, "grsim_output");
+//    ros::NodeHandle node_handle;
+//
+//    // Create subscribers to topics we care about
+//    ros::Subscriber primitive_subscriber = node_handle.subscribe(
+//        Util::Constants::AI_PRIMITIVES_TOPIC, 1, primitiveUpdateCallback);
+//    ros::Subscriber world_subscriber = node_handle.subscribe(
+//        Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
+//
+//    // Initialize the logger
+//    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
+//
+//    // Initialize Dynamic Parameters
+//    auto update_subscribers =
+//        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
+//
+//    // Services any ROS calls in a separate thread "behind the scenes". Does not return
+//    // until the node is shutdown
+//    // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
+//    ros::spin();
+//
+//    return 0;
+//}
