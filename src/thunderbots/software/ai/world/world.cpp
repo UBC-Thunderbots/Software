@@ -119,7 +119,11 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
 {
     refbox_game_state_history.push_back(game_state);
     // Take the consensus of the previous refbox messages
-    if (!refbox_game_state_history.empty() && std::all_of(refbox_game_state_history.begin(), refbox_game_state_history.end(), [&](auto gamestate) {return gamestate == refbox_game_state_history.front();}))
+    if (!refbox_game_state_history.empty() &&
+        std::all_of(refbox_game_state_history.begin(), refbox_game_state_history.end(),
+                    [&](auto gamestate) {
+                        return gamestate == refbox_game_state_history.front();
+                    }))
     {
         game_state_.updateRefboxGameState(game_state, ball_);
     }
