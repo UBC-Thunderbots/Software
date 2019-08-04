@@ -17,6 +17,10 @@
 /logs
 *.bag
 
+# rosbag
+*.bag
+*.bag.active
+
 # Pycache
 *.pyc
 

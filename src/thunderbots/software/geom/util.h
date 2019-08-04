@@ -377,8 +377,7 @@ Point reflect(const Point &v, const Point &n);
  * the line segment of overlap.
  */
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-    Ray &ray, Segment &segment);
-
+    const Ray &ray, const Segment &segment);
 
 /**
  * Calculates the intersection of two Rays

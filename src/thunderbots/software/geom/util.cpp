@@ -827,7 +827,7 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
 }
 
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-    Ray &ray, Segment &segment)
+    const Ray &ray, const Segment &segment)
 {
     Point ray2 = ray.getRayStart() + ray.getDirection();
 
