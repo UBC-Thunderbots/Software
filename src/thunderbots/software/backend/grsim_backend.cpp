@@ -3,13 +3,15 @@
 #include "util/constants.h"
 #include "util/ros_messages.h"
 
-GrSimBackend::GrSimBackend(WorldBufferPtr world_buffer,
-                           PrimitiveVecBufferPtr primitive_vector_buffer)
-    : network_input(boost::bind(&GrSimBackend::receiveWorld, this, _1)),
+GrSimBackend::GrSimBackend()
+    : network_input(
+            Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+            Util::Constants::SSL_VISION_MULTICAST_PORT,
+            boost::bind(&GrSimBackend::receiveWorld, this, _1)),
       grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
                    Util::Constants::GRSIM_COMMAND_NETWORK_PORT),
-                   in_destructor(false),
-      Backend(world_buffer, primitive_vector_buffer)
+                   grsim_output_thread(boost::bind(&GrSimBackend::continuouslyUpdatePrimitivesFromBuffer, this)),
+                   in_destructor(false)
 {
 }
 
@@ -17,7 +19,7 @@ void GrSimBackend::continuouslyUpdatePrimitivesFromBuffer(){
     do {
         in_destructor_mutex.unlock();
 
-        receivePrimitives(getPrimitiveVecFromBuffer());
+        receivePrimitives(Observer<PrimitiveVecPtr>::getMostRecentValueFromBuffer());
 
         in_destructor_mutex.lock();
     } while (!in_destructor);
@@ -29,21 +31,20 @@ void GrSimBackend::setMostRecentlyReceivedWorld(Backend::World world) {
 }
 
 void GrSimBackend::setMostRecentlyReceivedPrimitives(
-        Backend::PrimitiveVec primitives) {
-    std::scoped_lock lock(most_recently_received_primitives);
-    most_recently_received_primitives = primitives;
+        Backend::PrimitiveVecPtr primitives) {
+    std::scoped_lock lock(most_recently_received_primitives_mutex);
+    most_recently_received_primitives = std::move(primitives);
 }
 
-void GrSimBackend::receivePrimitives(Backend::PrimitiveVec primitives){
-    setMostRecentlyReceivedPrimitives(primitives);
+void GrSimBackend::receivePrimitives(Backend::PrimitiveVecPtr primitives){
+    setMostRecentlyReceivedPrimitives(std::move(primitives));
     updateGrSim();
 }
 
 void GrSimBackend::receiveWorld(Backend::World world)
 {
     setMostRecentlyReceivedWorld(world);
-    addWorldToBuffer(world);
-
+    sendValueToObservers(world);
     updateGrSim();
 }
 

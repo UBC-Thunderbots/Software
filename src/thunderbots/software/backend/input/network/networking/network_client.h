@@ -7,9 +7,9 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <thread>
 
-#include "network.h"
 #include "backend/input/network/networking/ssl_gamecontroller_client.h"
 #include "backend/input/network/networking/ssl_vision_client.h"
+#include "network_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_referee.pb.h"
 
@@ -32,7 +32,8 @@ class NetworkClient
      *                                 vision system is running on
      */
     explicit NetworkClient(
-            std::function<void(thunderbots_msgs::World)> received_world_callback);
+        std::string vision_multicast_address, int vision_multicast_port,
+        std::function<void(thunderbots_msgs::World)> received_world_callback);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -41,8 +42,8 @@ class NetworkClient
     ~NetworkClient();
 
     // Delete the copy and assignment operators because this class really shouldn't need
-    // them and we don't want to risk doing anything nasty with the internal multithreading
-    // this class uses
+    // them and we don't want to risk doing anything nasty with the internal
+    // multithreading this class uses
     NetworkClient& operator=(const NetworkClient&) = delete;
     NetworkClient(const NetworkClient&)            = delete;
 
@@ -82,7 +83,7 @@ class NetworkClient
     void filterAndPublishGameControllerData(Referee packet);
 
     // The backend that handles data filtering and processing
-    Backend backend;
+    NetworkFilter network_filter;
 
     // The client that handles data reception, filtering, and publishing for vision data
     std::unique_ptr<SSLVisionClient> ssl_vision_client;
@@ -107,4 +108,7 @@ class NetworkClient
     // How many packets to analyze to find the true starting time of the vision system
     // before passing the packets on to the actual logic
     int initial_packet_count;
+
+    // The callback function that we pass newly received/filtered worlds to
+    std::function<void(thunderbots_msgs::World)> received_world_callback;
 };

@@ -1,6 +1,8 @@
 #include <ros/ros.h>
+#include <boost/program_options.hpp>
+#include <iostream>
 
-#include "ai/ai.h"
+#include "ai/ai_wrapper.h"
 #include "thunderbots_msgs/PlayInfo.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/World.h"
@@ -10,68 +12,63 @@
 #include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
+#include "backend/grsim_backend.h"
 #include "util/time/timestamp.h"
 
+using namespace boost::program_options;
 // Member variables we need to maintain state
 // They are kept in an anonymous namespace so they are not accessible outside this
 // file and are not created as global static variables.
 namespace
 {
-    // The publisher used to send new Primitive commands
-    ros::Publisher primitive_publisher;
-    ros::Publisher play_info_publisher;
-    // Our instance of the AI that decides what Primitives to run
-    AI ai;
-    World world;
+    // This is used to publish play info so it can be read by the visualizer
+
+    std::shared_ptr<AIWrapper> ai;
+
+    std::shared_ptr<Backend> backend;
 }  // namespace
 
 
-// Runs the AI and sends new Primitive commands every time we get new information
-// about the World
-void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
-{
-//    thunderbots_msgs::World world_msg = *msg;
-//    World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
-//    world.updateBallState(new_world.ball());
-//    world.updateFieldGeometry(new_world.field());
-//    world.updateEnemyTeamState(new_world.enemyTeam());
-//    world.updateFriendlyTeamState(new_world.friendlyTeam());
-//    world.updateTimestamp(new_world.getMostRecentTimestamp());
-//    RefboxGameState new_game_state =
-//        Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
-//    world.updateRefboxGameState(new_game_state);
-
-    if (Util::DynamicParameters::AI::run_ai.value())
-    {
-        // Get the Primitives the Robots should run from the AI
-        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-            ai.getPrimitives(world);
-
-        // Put these Primitives into a message and publish it
-        thunderbots_msgs::PrimitiveArray primitive_array_message;
-        for (auto const &prim : assignedPrimitives)
-        {
-            primitive_array_message.primitives.emplace_back(prim->createMsg());
-        }
-        primitive_publisher.publish(primitive_array_message);
-
-        // Publish play info so we can display it in the visualizer
-        auto play_info_msg =
-            Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
-        play_info_publisher.publish(play_info_msg);
-    }
-
-    // Draw the world
-    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
-        Util::CanvasMessenger::getInstance();
-    canvas_messenger->drawWorld(world);
-}
-
-
-#include <boost/program_options.hpp>
-#include <iostream>
-
-using namespace boost::program_options;
+//// Runs the AI and sends new Primitive commands every time we get new information
+//// about the World
+//void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
+//{
+////    thunderbots_msgs::World world_msg = *msg;
+////    World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+////    world.updateBallState(new_world.ball());
+////    world.updateFieldGeometry(new_world.field());
+////    world.updateEnemyTeamState(new_world.enemyTeam());
+////    world.updateFriendlyTeamState(new_world.friendlyTeam());
+////    world.updateTimestamp(new_world.getMostRecentTimestamp());
+////    RefboxGameState new_game_state =
+////        Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
+////    world.updateRefboxGameState(new_game_state);
+//
+//    if (Util::DynamicParameters::AI::run_ai.value())
+//    {
+//        // Get the Primitives the Robots should run from the AI
+//        std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
+//            ai.getPrimitives(world);
+//
+//        // Put these Primitives into a message and publish it
+//        thunderbots_msgs::PrimitiveArray primitive_array_message;
+//        for (auto const &prim : assignedPrimitives)
+//        {
+//            primitive_array_message.primitives.emplace_back(prim->createMsg());
+//        }
+//        primitive_publisher.publish(primitive_array_message);
+//
+//        // Publish play info so we can display it in the visualizer
+//        auto play_info_msg =
+//            Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
+//        play_info_publisher.publish(play_info_msg);
+//    }
+//
+//    // Draw the world
+//    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
+//        Util::CanvasMessenger::getInstance();
+//    canvas_messenger->drawWorld(world);
+//}
 
 void setBackendFromString(std::string backend_name){
     std::cout << "Got backend with name: " << backend_name << std::endl;
@@ -104,22 +101,18 @@ void parseCommandLineArgs(int argc, char **argv){
 }
 
 ros::NodeHandle initRos(int argc, char ** argv){
-    ros::init(argc, argv, "ai_logic");
+    ros::init(argc, argv, "full_system");
     return ros::NodeHandle();
 
 }
 
 void initPublishers(ros::NodeHandle node_handle){
-    primitive_publisher = node_handle.advertise<thunderbots_msgs::PrimitiveArray>(
-            Util::Constants::AI_PRIMITIVES_TOPIC, 1);
-    play_info_publisher = node_handle.advertise<thunderbots_msgs::PlayInfo>(
-            Util::Constants::PLAY_INFO_TOPIC, 1);
 }
 
-void initSubscribers(ros::NodeHandle node_handle){
-    ros::Subscriber world_subscriber = node_handle.subscribe(
-            Util::Constants::NETWORK_INPUT_WORLD_TOPIC, 1, worldUpdateCallback);
-
+// TODO: javadoc comment here
+void connectObservers(){
+    backend->registerObserver(ai);
+    ai->registerObserver(backend);
 }
 
 int main(int argc, char **argv){
@@ -127,8 +120,11 @@ int main(int argc, char **argv){
 
     ros::NodeHandle node_handle = initRos(argc, argv);
 
+    ai = std::make_shared<AIWrapper>(node_handle);
+    backend = std::make_shared<GrSimBackend>();
+
     initPublishers(node_handle);
-    initSubscribers(node_handle);
+    connectObservers();
 
     Util::Logger::LoggerSingleton::initializeLogger(node_handle);
     Util::CanvasMessenger::getInstance()->initializePublisher(node_handle);

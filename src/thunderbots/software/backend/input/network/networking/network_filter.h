@@ -18,14 +18,13 @@
 #include "thunderbots_msgs/Team.h"
 #include "util/time/timestamp.h"
 
-// TODO: RENAME THIS CLASS
-class Backend
+class NetworkFilter
 {
    public:
     /**
-     * Creates a new Backend for data input and filtering
+     * Creates a new NetworkFilter for data input and filtering
      */
-    explicit Backend();
+    explicit NetworkFilter();
 
     /**
      * Filters the ball data contained in the list of DetectionFrames and returns the most
@@ -58,7 +57,7 @@ class Backend
      * @return The most up to date state of the friendly team given the new DetectionFrame
      * information
      */
-    Team getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detections);
+    Team getFilteredFriendlyTeamData(const std::vector<SSL_DetectionFrame>& detections);
 
     /**
      * Filters the robot data for the enemy team contained in the list of DetectionFrames
@@ -73,7 +72,7 @@ class Backend
 
     thunderbots_msgs::RefboxData getRefboxDataMsg(const Referee &packet);
 
-    virtual ~Backend() = default;
+    virtual ~NetworkFilter() = default;
 
    private:
     /**

@@ -9,23 +9,20 @@
 #include "util/ros_messages.h"
 
 NetworkClient::NetworkClient(
-        std::function<void(thunderbots_msgs::World)> received_world_callback)
-    : backend(),
+    std::string vision_multicast_address, int vision_multicast_port,
+    std::function<void(thunderbots_msgs::World)> received_world_callback)
+    : network_filter(),
       io_service(),
       initial_packet_count(0),
-      last_valid_t_capture(std::numeric_limits<double>::max())
+      last_valid_t_capture(std::numeric_limits<double>::max()),
+      received_world_callback(received_world_callback)
 {
-    // TODO: get vision_multicast_address from paramters
     // Set up our connection over udp to receive vision packets
     try
     {
-        std::string vision_multicast_address;
-        node_handle.getParam("/vision_multicast_address", vision_multicast_address);
         ssl_vision_client = std::make_unique<SSLVisionClient>(
-            io_service, vision_multicast_address,
-            Util::Constants::SSL_VISION_MULTICAST_PORT,
+            io_service, vision_multicast_address, vision_multicast_port,
             boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
-
     }
     catch (const boost::exception& ex)
     {
@@ -107,7 +104,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     if (packet.has_geometry())
     {
         const auto& latest_geometry_data = packet.geometry();
-        Field field                      = backend.getFieldData(latest_geometry_data);
+        Field field = network_filter.getFieldData(latest_geometry_data);
         thunderbots_msgs::Field field_msg =
             Util::ROSMessages::convertFieldToROSMessage(field);
         world_msg.field = field_msg;
@@ -115,7 +112,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
     if (packet.has_detection())
     {
-        auto detection       = packet.detection();
+        const auto& detection       = packet.detection();
         bool camera_disabled = false;
 
         switch (detection.camera_id())
@@ -145,12 +142,12 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
         if (!camera_disabled)
         {
-            Ball ball = backend.getFilteredBallData({detection});
+            Ball ball = network_filter.getFilteredBallData({detection});
             thunderbots_msgs::Ball ball_msg =
                 Util::ROSMessages::convertBallToROSMessage(ball);
             world_msg.ball = ball_msg;
 
-            Team friendly_team = backend.getFilteredFriendlyTeamData({detection});
+            Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
             int friendly_goalie_id =
                 Util::DynamicParameters::AI::refbox::friendly_goalie_id.value();
             friendly_team.assignGoalie(friendly_goalie_id);
@@ -158,7 +155,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
                 Util::ROSMessages::convertTeamToROSMessage(friendly_team);
             world_msg.friendly_team = friendly_team_msg;
 
-            Team enemy_team = backend.getFilteredEnemyTeamData({detection});
+            Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
             int enemy_goalie_id =
                 Util::DynamicParameters::AI::refbox::enemy_goalie_id.value();
             enemy_team.assignGoalie(enemy_goalie_id);
@@ -177,12 +174,13 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         world_msg = Util::ROSMessages::invertMsgFieldSide(world_msg);
     }
 
-    world_publisher.publish(world_msg);
+    received_world_callback(world_msg);
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    auto gamecontroller_data_msg = backend.getRefboxDataMsg(packet);
+    auto gamecontroller_data_msg = network_filter.getRefboxDataMsg(packet);
     world_msg.refbox_data        = gamecontroller_data_msg;
-    world_publisher.publish(world_msg);
+
+    received_world_callback(world_msg);
 }

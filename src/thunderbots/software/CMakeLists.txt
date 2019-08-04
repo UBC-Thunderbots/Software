@@ -345,13 +345,14 @@ add_library(tbots_backend STATIC
         ${TBOTS_BACKEND_SRC}
         )
 target_link_libraries(tbots_backend
+        tbots_proto
              Eigen3::Eigen
         )
 
 
 # Proto
 ## Call our CMake file to include and build protobuf
-#include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
 ## Find the generated files
 file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
 add_library(tbots_proto STATIC

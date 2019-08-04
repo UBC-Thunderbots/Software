@@ -1,4 +1,4 @@
-#include "network.h"
+#include "network_filter.h"
 
 #include <util/parameter/dynamic_parameters.h>
 
@@ -10,7 +10,7 @@
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
 // get any field data which will update the state with the given protobuf data
-Backend::Backend()
+NetworkFilter::NetworkFilter()
     : field_state(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
       ball_state(Point(), Vector(), Timestamp::fromSeconds(0)),
       friendly_team_state(Duration::fromMilliseconds(
@@ -24,7 +24,7 @@ Backend::Backend()
 {
 }
 
-Field Backend::getFieldData(const SSL_GeometryData &geometry_packet)
+Field NetworkFilter::getFieldData(const SSL_GeometryData &geometry_packet)
 {
     if (geometry_packet.has_field())
     {
@@ -37,7 +37,7 @@ Field Backend::getFieldData(const SSL_GeometryData &geometry_packet)
     return field_state;
 }
 
-Field Backend::createFieldFromPacketGeometry(
+Field NetworkFilter::createFieldFromPacketGeometry(
     const SSL_GeometryFieldSize &packet_geometry) const
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
@@ -119,7 +119,7 @@ Field Backend::createFieldFromPacketGeometry(
     return field;
 }
 
-Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections)
+Ball NetworkFilter::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detections)
 {
     auto ball_detections = std::vector<SSLBallDetection>();
 
@@ -146,7 +146,7 @@ Ball Backend::getFilteredBallData(const std::vector<SSL_DetectionFrame> &detecti
     return ball_state;
 }
 
-Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detections)
+Team NetworkFilter::getFilteredFriendlyTeamData(const std::vector<SSL_DetectionFrame>& detections)
 {
     auto friendly_robot_detections = std::vector<SSLRobotDetection>();
 
@@ -183,7 +183,7 @@ Team Backend::getFilteredFriendlyTeamData(std::vector<SSL_DetectionFrame> detect
     return friendly_team_state;
 }
 
-Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections)
+Team NetworkFilter::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections)
 {
     auto enemy_robot_detections = std::vector<SSLRobotDetection>();
 
@@ -220,7 +220,7 @@ Team Backend::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &de
     return enemy_team_state;
 }
 
-thunderbots_msgs::RefboxData Backend::getRefboxDataMsg(const Referee &packet)
+thunderbots_msgs::RefboxData NetworkFilter::getRefboxDataMsg(const Referee &packet)
 {
     thunderbots_msgs::RefboxData refbox_data;
     refbox_data.command.command = getTeamCommand(packet.command());
@@ -309,7 +309,7 @@ const static std::unordered_map<Referee::Command, int> yellow_team_command_map =
     {Referee_Command_BALL_PLACEMENT_YELLOW,
      thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US}};
 
-int32_t Backend::getTeamCommand(const Referee::Command &command)
+int32_t NetworkFilter::getTeamCommand(const Referee::Command &command)
 {
     if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
     {
@@ -321,7 +321,7 @@ int32_t Backend::getTeamCommand(const Referee::Command &command)
     }
 }
 
-Point Backend::refboxGlobalToLocalPoint(const Referee::Point &point)
+Point NetworkFilter::refboxGlobalToLocalPoint(const Referee::Point &point)
 {
     if (our_field_side == FieldSide::WEST)
     {
@@ -333,7 +333,7 @@ Point Backend::refboxGlobalToLocalPoint(const Referee::Point &point)
     }
 }
 
-void Backend::setOurFieldSide(bool blue_team_on_positive_half)
+void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
     {
@@ -359,7 +359,7 @@ void Backend::setOurFieldSide(bool blue_team_on_positive_half)
     }
 }
 
-thunderbots_msgs::RefboxTeamInfo Backend::getTeamInfo(const Referee::TeamInfo &team_info)
+thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(const Referee::TeamInfo &team_info)
 {
     thunderbots_msgs::RefboxTeamInfo refbox_team_info;
     refbox_team_info.team_name = team_info.name();

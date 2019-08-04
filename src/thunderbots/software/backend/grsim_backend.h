@@ -7,10 +7,7 @@
 class GrSimBackend : public Backend
 {
    public:
-    GrSimBackend() = delete;
-
-    GrSimBackend(WorldBufferPtr world_buffer,
-                 PrimitiveVecBufferPtr primitive_vector_buffer);
+    GrSimBackend();
 
    private:
     // TODO: javadoc comments for all functions here
@@ -19,9 +16,10 @@ class GrSimBackend : public Backend
 
     void setMostRecentlyReceivedWorld(Backend::World world);
 
-    void setMostRecentlyReceivedPrimitives(Backend::PrimitiveVec primitives);
+    void setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr primitives);
 
-    void receivePrimitives(Backend::PrimitiveVec world);
+    void receivePrimitives(Backend::PrimitiveVecPtr world);
+
     void receiveWorld(Backend::World world);
 
     // TODO: Doc comment
@@ -46,6 +44,6 @@ class GrSimBackend : public Backend
     std::mutex most_recently_received_world_mutex;
 
     // TODO: doc comments for these?
-    std::optional<PrimitiveVec> most_recently_received_primitives;
+    PrimitiveVecPtr most_recently_received_primitives;
     std::mutex most_recently_received_primitives_mutex;
 };

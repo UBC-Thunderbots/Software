@@ -17,6 +17,9 @@
 template <typename T>
 class ThreadSafeBuffer {
 public:
+    // Force the user to specify a size
+    explicit ThreadSafeBuffer() = delete;
+
     explicit ThreadSafeBuffer(std::size_t buffer_size);
 
     // Copying this class is not permitted
@@ -67,6 +70,8 @@ private:
     std::mutex buffer_mutex;
     boost::circular_buffer<T> buffer;
 
+    std::condition_variable received_new_value;
+
     bool destructor_called;
 };
 
@@ -96,15 +101,13 @@ template<typename T>
 void ThreadSafeBuffer<T>::push(const T& value) {
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     buffer.push_back(value);
-
-    // TODO: need to notify condition variable here?
+    received_new_value.notify_all();
 }
 
 template<typename T>
 std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue() {
-    std::condition_variable cv;
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
-    cv.wait(buffer_lock, [this]{
+    received_new_value.wait(buffer_lock, [this]{
         return !buffer.empty() || destructor_called;
     });
 
