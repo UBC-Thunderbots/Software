@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QOpenGLWidget>
 #include <QGL>
+#include "gui/SceneView.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui {
@@ -30,4 +31,5 @@ private:
     QGraphicsScene* scene;
     QOpenGLWidget* glWidget;
     QGLWidget* qglWidget;
+    SceneView view;
 };

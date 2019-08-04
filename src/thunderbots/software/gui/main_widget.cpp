@@ -4,6 +4,7 @@
 #include <random>
 #include "software/gui/draw_world.h"
 
+
 MainWidget::MainWidget(QWidget *parent) :
         QWidget(parent),
         main_widget(new Ui::MainWidget()){
@@ -18,6 +19,7 @@ MainWidget::MainWidget(QWidget *parent) :
     main_widget->graphicsView->setViewport(qglWidget);
     // TODO: What does this do?
     main_widget->graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+//    main_widget->graphicsView->ev
 //    main_widget->graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 
     // Optimizations
