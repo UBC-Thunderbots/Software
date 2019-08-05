@@ -12,8 +12,6 @@ const double BALL_MAX_SPEED_METERS_PER_SECOND = 6.5;
 const double ROBOT_MAX_RADIUS_METERS = 0.09;
 // The distance from the center of the robot to the front face (the flat part), in meters
 const double DIST_TO_FRONT_OF_ROBOT_METERS = 0.07;
-// The total "span" angle between the edges of the flat face of the robot
-const double FRONT_OF_ROBOT_ANGLE_DEGREES = 77.92;
 // The distance from one end of the dribbler to the other
 const double DRIBBLER_WIDTH = 0.088;
 // The approximate radius of the ball according to the SSL rulebook
