@@ -1,15 +1,14 @@
-#include <firmware/main/shared_util/constants.h>
+#include "shared/constants.h"
 #include "gui/drawing/robot.h"
 #include <QGraphicsEllipseItem>
-#include <QGraphicsSimpleTextItem>
-#include <QPolygon>
 #include "gui/geometry_conversion.h"
-#include "geom/segment.h"
-
 
 void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor &color) {
     QPen pen(color);
     pen.setWidth(2);
+    // The cap style must be NOT be set to SquareCap. It can be set to anything else. Drawing a line of length 0
+    // with the SquareCap style causes a large line to be drawn
+    pen.setCapStyle(Qt::PenCapStyle::RoundCap);
     pen.setCosmetic(true);
 
     Segment robot_velocity(robot.position(), robot.position() + robot.velocity());
@@ -49,16 +48,29 @@ void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor &
 }
 
 void drawRobotId(QGraphicsScene* scene, const Robot& robot) {
-    // TODO: Draw robot id
-//    QGraphicsSimpleTextItem* robot_id = new QGraphicsSimpleTextItem(QString::number(robot.id()), robot_ellipse);
-//    QFont sansFont("Helvetica [Cronyx]", 1);
-//    robot_id->setFont(sansFont);
-//    robot_id->setBrush(QBrush(Qt::black));
-//    robot_id->setPos(robot.position().x(), robot.position().y());
-//    QTransform tr(1, 0, 0, 1, 0, 0);
-//    robot_id->setTransform(tr, false);
-//    robot_id->setRotation(180);
-//    scene->addItem(robot_id);
+    Point robot_bounding_box_top_left = robot.position() + Vector(-ROBOT_MAX_RADIUS_METERS, ROBOT_MAX_RADIUS_METERS);
+    Point robot_bounding_box_bottom_right = robot.position() + Vector(ROBOT_MAX_RADIUS_METERS, -ROBOT_MAX_RADIUS_METERS);
+    QRectF robot_bounding_box(createQPointF(robot_bounding_box_top_left), createQPointF(robot_bounding_box_bottom_right));
+
+    QGraphicsSimpleTextItem* robot_id = new QGraphicsSimpleTextItem(QString::number(robot.id()));
+    QFont sansFont("Helvetica [Cronyx]");
+    sansFont.setPointSizeF(1);
+    robot_id->setFont(sansFont);
+    robot_id->setBrush(QBrush(Qt::black));
+
+    // Scale the text down so it fits right below the robot being drawn. We use the width to calculate the scaling
+    // so that we can always ensure the text will fit within the width of the robot's bounding box, and won't overflow
+    // if the text gets too long. We care less about the height and just allow it to scale along with the width.
+    double scaling_factor = 1.0 / (robot_id->boundingRect().width() / robot_bounding_box.width());
+    // Flip the y-axis so the text show right-side-up. When we set up the GraphicsView that contains the scene
+    // we apply a transformation to the y-axis so that Qt's coordinate system matches ours and we can draw things
+    // without changing our convention. Unfortunately this flips all text by default, so we need to flip it back here.
+    QTransform scale_and_invert_y_transform(scaling_factor, 0, 0, -scaling_factor, 0, 0);
+    robot_id->setTransform(scale_and_invert_y_transform);
+
+    // Place the text right under the robot
+    robot_id->setPos(robot_bounding_box_top_left.x(), robot_bounding_box_bottom_right.y());
+    scene->addItem(robot_id);
 }
 
 void drawRobot(QGraphicsScene* scene, const Robot& robot, const QColor &color) {

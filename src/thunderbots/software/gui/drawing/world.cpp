@@ -5,7 +5,7 @@
 
 void drawWorld(QGraphicsScene* scene, const World& world) {
     drawField(scene, world.field());
-    drawBall(scene, world.ball());
     drawEnemyTeam(scene, world.enemyTeam());
     drawFriendlyTeam(scene, world.friendlyTeam());
+    drawBall(scene, world.ball());
 }
