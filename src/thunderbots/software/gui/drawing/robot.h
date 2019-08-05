@@ -10,6 +10,7 @@
  */
 
 // TODO: comment
-void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, QColor color);
-void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, QPen pen, QBrush brush);
-void drawRobot(QGraphicsScene* scene, const Robot& robot, QColor color);
+void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor &color);
+void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor &color);
+void drawRobotId(QGraphicsScene* scene, const Robot& robot);
+void drawRobot(QGraphicsScene* scene, const Robot& robot, const QColor &color);

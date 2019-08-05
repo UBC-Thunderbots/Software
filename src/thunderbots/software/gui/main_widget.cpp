@@ -37,7 +37,9 @@ MainWidget::MainWidget(QWidget *parent) :
     // * positive y = "down"
     // Our coordinate system defines positive y as being "up", so we invert the coordinate system so all our
     // draw calls can follow our coordinate convention
-    main_widget->graphicsView->scale(1, -1);
+    // TODO: comment about how this fixes rotation as well
+    QTransform view_transform(1, 0, 0, -1, 0, 0);
+    main_widget->graphicsView->setTransform(view_transform);
     main_widget->graphicsView->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
     main_widget->graphicsView->update();
 
