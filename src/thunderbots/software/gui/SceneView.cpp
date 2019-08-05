@@ -1,29 +1,33 @@
 #include "gui/SceneView.h"
 
-SceneView::SceneView(QWidget *parent) : QGraphicsView(parent)
+MySceneView::MySceneView(QWidget *parent) : QGraphicsView(parent)
 {
     setDragMode(QGraphicsView::ScrollHandDrag);
     setCacheMode(QGraphicsView::CacheBackground);
     setBackgroundBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
 
-    QGraphicsScene *scene = new QGraphicsScene();
+//    QGraphicsScene *scene = new QGraphicsScene();
 
+//    QPen pen(Qt::white);
+//    pen.setWidth(1);
+//    pen.setCosmetic(true);
+//    scene->addRect(-9, 6, 9, -6);
 
-    setScene(scene);
+//    setScene(scene);
 
-    fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
-    update()
+//    fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
+//    update();
 }
 
-void SceneView::wheelEvent(QWheelEvent *event)
+void MySceneView::wheelEvent(QWheelEvent *event)
     {
         if(event->delta() > 0)
-            scale(1.25, 1.25);
+            scale(1.1, 1.1);
         else
-            scale(0.8, 0.8);
+            scale(0.95, 0.95);
     }
 
-    void SceneView::keyPressEvent(QKeyEvent *event)
+    void MySceneView::keyPressEvent(QKeyEvent *event)
     {
         if(event->key() == Qt::Key_Left)
             rotate(1);

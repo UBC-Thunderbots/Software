@@ -4,6 +4,7 @@
 #include "geom/point.h"
 #include "geom/rectangle.h"
 #include "util/time/timestamp.h"
+#include "geom/circle.h"
 
 typedef enum
 {
@@ -100,7 +101,11 @@ class Field
      *
      * @return the radius of the centre circle in metres.
      */
+     // TODO: rename to center
     double centreCircleRadius() const;
+
+    // TODO: comment
+    Circle centerCircle() const;
 
     /**
      * Returns the center point of the field

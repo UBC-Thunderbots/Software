@@ -512,6 +512,7 @@ target_link_libraries(ai_gui
         Qt5::OpenGL
         tbots_world
         tbots_geom
+        tbots_test_util
         )
 
 

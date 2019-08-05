@@ -31,5 +31,5 @@ private:
     QGraphicsScene* scene;
     QOpenGLWidget* glWidget;
     QGLWidget* qglWidget;
-    SceneView view;
+    MySceneView* view;
 };

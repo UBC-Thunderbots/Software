@@ -107,6 +107,11 @@ double Field::centreCircleRadius() const
     return center_circle_radius_;
 }
 
+Circle Field::centerCircle() const
+{
+    return Circle(Point(0, 0), centreCircleRadius());
+}
+
 Point Field::centerPoint() const
 {
     return Point(0, 0);

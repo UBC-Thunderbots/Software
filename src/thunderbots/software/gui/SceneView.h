@@ -1,13 +1,15 @@
+#pragma once
+
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QWheelEvent>
 #include <QKeyEvent>
 
-class SceneView : public QGraphicsView {
+class MySceneView : public QGraphicsView {
 Q_OBJECT
 public:
-    explicit SceneView(QWidget *parent = 0);
+    explicit MySceneView(QWidget *parent = 0);
 
 protected slots:
 
