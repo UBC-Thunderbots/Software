@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGraphicsScene>
+
 #include "ai/world/ball.h"
 
 /**
@@ -32,4 +33,4 @@ void drawBallPosition(QGraphicsScene *scene, const Ball &ball, const QColor &col
  * @param scene The scene to draw on
  * @param ball The ball to draw
  */
-void drawBall(QGraphicsScene* scene, const Ball& ball);
+void drawBall(QGraphicsScene *scene, const Ball &ball);

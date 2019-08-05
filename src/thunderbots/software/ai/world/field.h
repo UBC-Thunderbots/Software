@@ -1,10 +1,10 @@
 #pragma once
 
 #include "boost/circular_buffer.hpp"
+#include "geom/circle.h"
 #include "geom/point.h"
 #include "geom/rectangle.h"
 #include "util/time/timestamp.h"
-#include "geom/circle.h"
 
 typedef enum
 {
@@ -101,7 +101,7 @@ class Field
      *
      * @return the radius of the centre circle in metres.
      */
-     // TODO: rename to center
+    // TODO: rename to center
     double centreCircleRadius() const;
 
     // TODO: comment

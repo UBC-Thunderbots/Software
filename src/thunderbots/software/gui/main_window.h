@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+
 #include "software/gui/main_widget.h"
 
 /**
@@ -12,11 +13,11 @@ class ThunderbotsVisualizer : public QMainWindow
 {
     Q_OBJECT
 
-public:
+   public:
     explicit ThunderbotsVisualizer();
     ~ThunderbotsVisualizer();
 
-private:
+   private:
     MainWidget* main_widget;
     QTimer* draw_AI_timer;
 };

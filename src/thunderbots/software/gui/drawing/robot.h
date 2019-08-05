@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QGraphicsScene>
 #include <QColor>
+#include <QGraphicsScene>
+
 #include "ai/world/robot.h"
 
 /**
@@ -16,7 +17,7 @@
  * @param robot The robot to draw
  * @param color The color to draw the robot's velocity
  */
-void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor &color);
+void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor& color);
 
 /**
  * Draws the robot's position on the given scene.
@@ -25,7 +26,7 @@ void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor &
  * @param robot The robot to draw
  * @param color The color to draw the robot's position
  */
-void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor &color);
+void drawRobotPosition(QGraphicsScene* scene, const Robot& robot, const QColor& color);
 
 /**
  * Draws the robot's ID on the given scene.
@@ -43,4 +44,4 @@ void drawRobotId(QGraphicsScene* scene, const Robot& robot);
  * @param robot The robot to draw
  * @param color The color to draw the robot
  */
-void drawRobot(QGraphicsScene* scene, const Robot& robot, const QColor &color);
+void drawRobot(QGraphicsScene* scene, const Robot& robot, const QColor& color);

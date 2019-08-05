@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGraphicsScene>
+
 #include "software/ai/world/world.h"
 
 /**

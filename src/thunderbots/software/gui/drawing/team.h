@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGraphicsScene>
+
 #include "ai/world/team.h"
 
 /**

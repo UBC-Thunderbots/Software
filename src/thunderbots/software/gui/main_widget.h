@@ -1,13 +1,15 @@
 #pragma once
 
-#include <QWidget>
+#include <QGL>
 #include <QGraphicsScene>
 #include <QOpenGLWidget>
-#include <QGL>
+#include <QWidget>
+
 #include "gui/SceneView.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
-namespace Ui {
+namespace Ui
+{
     class MainWidget;
 }
 
@@ -17,16 +19,16 @@ namespace Ui {
  */
 class MainWidget : public QWidget
 {
-Q_OBJECT
+    Q_OBJECT
 
-public:
-    explicit MainWidget(QWidget *parent = 0);
+   public:
+    explicit MainWidget(QWidget* parent = 0);
     ~MainWidget();
 
-public slots:
+   public slots:
     void drawAI();
 
-private:
+   private:
     Ui::MainWidget* main_widget;
     QGraphicsScene* scene;
     QOpenGLWidget* glWidget;
