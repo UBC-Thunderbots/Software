@@ -13,8 +13,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "messages.h"
 #include "backend/output/radio/visitor/mrf_primitive_visitor.h"
+#include "messages.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 

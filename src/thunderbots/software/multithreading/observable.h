@@ -13,8 +13,9 @@
  * @tparam T The type of object that is being provided to all registered Observers
  */
 template <typename T>
-class Observable {
-public:
+class Observable
+{
+   public:
     // TODO: better name for this function?
     /**
      * Register the given observer with this class to receive new values when
@@ -26,7 +27,7 @@ public:
 
     virtual ~Observable() = default;
 
-protected:
+   protected:
     /**
      * Sends the given value to all registered observers
      *
@@ -34,20 +35,22 @@ protected:
      */
     virtual void sendValueToObservers(T val) final;
 
-private:
+   private:
     // The observers that this class provides updates to
     std::vector<std::shared_ptr<Observer<T>>> observers;
 };
 
 template <typename T>
-void Observable<T>::registerObserver(std::shared_ptr <Observer<T>> observer) {
+void Observable<T>::registerObserver(std::shared_ptr<Observer<T>> observer)
+{
     observers.emplace_back(observer);
 }
 
 template <typename T>
-void Observable<T>::sendValueToObservers(T val) {
-    for (std::shared_ptr<Observer<T>>& observer : observers){
+void Observable<T>::sendValueToObservers(T val)
+{
+    for (std::shared_ptr<Observer<T>>& observer : observers)
+    {
         observer->receiveValue(val);
     }
 }
-

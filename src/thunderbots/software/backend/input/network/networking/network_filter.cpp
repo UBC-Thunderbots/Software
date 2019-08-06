@@ -146,7 +146,8 @@ Ball NetworkFilter::getFilteredBallData(const std::vector<SSL_DetectionFrame> &d
     return ball_state;
 }
 
-Team NetworkFilter::getFilteredFriendlyTeamData(const std::vector<SSL_DetectionFrame>& detections)
+Team NetworkFilter::getFilteredFriendlyTeamData(
+    const std::vector<SSL_DetectionFrame> &detections)
 {
     auto friendly_robot_detections = std::vector<SSLRobotDetection>();
 
@@ -183,7 +184,8 @@ Team NetworkFilter::getFilteredFriendlyTeamData(const std::vector<SSL_DetectionF
     return friendly_team_state;
 }
 
-Team NetworkFilter::getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections)
+Team NetworkFilter::getFilteredEnemyTeamData(
+    const std::vector<SSL_DetectionFrame> &detections)
 {
     auto enemy_robot_detections = std::vector<SSLRobotDetection>();
 
@@ -359,7 +361,8 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
     }
 }
 
-thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(const Referee::TeamInfo &team_info)
+thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(
+    const Referee::TeamInfo &team_info)
 {
     thunderbots_msgs::RefboxTeamInfo refbox_team_info;
     refbox_team_info.team_name = team_info.name();

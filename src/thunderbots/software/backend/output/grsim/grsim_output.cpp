@@ -5,10 +5,10 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/team.h"
-#include "grsim_output.h"
-#include "grsim_command_primitive_visitor.h"
 #include "backend/output/grsim/grsim_command_primitive_visitor.h"
 #include "backend/output/grsim/motion_controller.h"
+#include "grsim_command_primitive_visitor.h"
+#include "grsim_output.h"
 #include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Replacement.pb.h"
@@ -158,7 +158,7 @@ void GrSimOutput::setBallState(Point destination, Vector velocity)
 }
 
 grSim_Packet GrSimOutput::createGrSimReplacementWithBallState(Point destination,
-                                                               Vector velocity)
+                                                              Vector velocity)
 {
     grSim_Packet packet;
     // grSim_Replacement* replacement          = packet.mutable_replacement();

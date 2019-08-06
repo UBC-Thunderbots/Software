@@ -43,9 +43,12 @@ void AIWrapper::runAIAndSendPrimitives()
 {
     if (Util::DynamicParameters::AI::run_ai.value())
     {
-        std::vector<std::unique_ptr<Primitive>> new_primitives = ai.getPrimitives(currently_known_world);
+        std::vector<std::unique_ptr<Primitive>> new_primitives =
+            ai.getPrimitives(currently_known_world);
 
-        auto new_primitives_ptr = std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(std::move(new_primitives));
+        auto new_primitives_ptr =
+            std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
+                std::move(new_primitives));
         sendValueToObservers(new_primitives_ptr);
     }
 }

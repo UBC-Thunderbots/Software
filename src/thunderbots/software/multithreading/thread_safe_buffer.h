@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstddef>
-#include <mutex>
-#include <deque>
-#include <condition_variable>
 #include <boost/circular_buffer.hpp>
+#include <condition_variable>
+#include <cstddef>
+#include <deque>
+#include <mutex>
 
 /**
  * This class represents a buffer of objects
@@ -15,8 +15,9 @@
  * @tparam T The type of whatever is being buffered
  */
 template <typename T>
-class ThreadSafeBuffer {
-public:
+class ThreadSafeBuffer
+{
+   public:
     // Force the user to specify a size
     explicit ThreadSafeBuffer() = delete;
 
@@ -58,8 +59,7 @@ public:
 
     ~ThreadSafeBuffer();
 
-private:
-
+   private:
     /**
      * Waits for the buffer to have at least one value
      *
@@ -75,12 +75,15 @@ private:
     bool destructor_called;
 };
 
-template<typename T>
-ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size) : buffer(buffer_size), destructor_called(false) {
+template <typename T>
+ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size)
+    : buffer(buffer_size), destructor_called(false)
+{
 }
 
-template<typename T>
-T ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue() {
+template <typename T>
+T ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue()
+{
     auto buffer_lock = waitForBufferToHaveAValue();
 
     auto result = std::move(buffer.front());
@@ -88,8 +91,9 @@ T ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue() {
     return result;
 }
 
-template<typename T>
-T ThreadSafeBuffer<T>::pullMostRecentlyAddedValue() {
+template <typename T>
+T ThreadSafeBuffer<T>::pullMostRecentlyAddedValue()
+{
     auto buffer_lock = waitForBufferToHaveAValue();
 
     auto result = std::move(buffer.back());
@@ -97,27 +101,29 @@ T ThreadSafeBuffer<T>::pullMostRecentlyAddedValue() {
     return result;
 }
 
-template<typename T>
-void ThreadSafeBuffer<T>::push(const T& value) {
+template <typename T>
+void ThreadSafeBuffer<T>::push(const T& value)
+{
     std::scoped_lock<std::mutex> buffer_lock(buffer_mutex);
     buffer.push_back(value);
     received_new_value.notify_all();
 }
 
-template<typename T>
-std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue() {
+template <typename T>
+std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue()
+{
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
-    received_new_value.wait(buffer_lock, [this]{
-        return !buffer.empty() || destructor_called;
-    });
+    received_new_value.wait(buffer_lock,
+                            [this] { return !buffer.empty() || destructor_called; });
 
     // NOTE: We need to return this in order to prevent it being destructed and
     //       prevent it being written to before the value is read
     return buffer_lock;
 }
 
-template<typename T>
-ThreadSafeBuffer<T>::~ThreadSafeBuffer() {
+template <typename T>
+ThreadSafeBuffer<T>::~ThreadSafeBuffer()
+{
     // TODO: need to notify condition variable here?
     this->destructor_called = true;
 }

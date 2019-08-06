@@ -4,19 +4,21 @@
 #include "util/ros_messages.h"
 
 GrSimBackend::GrSimBackend()
-    : network_input(
-            Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
-            Util::Constants::SSL_VISION_MULTICAST_PORT,
-            boost::bind(&GrSimBackend::receiveWorld, this, _1)),
+    : network_input(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+                    Util::Constants::SSL_VISION_MULTICAST_PORT,
+                    boost::bind(&GrSimBackend::receiveWorld, this, _1)),
       grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
                    Util::Constants::GRSIM_COMMAND_NETWORK_PORT),
-                   grsim_output_thread(boost::bind(&GrSimBackend::continuouslyUpdatePrimitivesFromBuffer, this)),
-                   in_destructor(false)
+      grsim_output_thread(
+          boost::bind(&GrSimBackend::continuouslyUpdatePrimitivesFromBuffer, this)),
+      in_destructor(false)
 {
 }
 
-void GrSimBackend::continuouslyUpdatePrimitivesFromBuffer(){
-    do {
+void GrSimBackend::continuouslyUpdatePrimitivesFromBuffer()
+{
+    do
+    {
         in_destructor_mutex.unlock();
 
         receivePrimitives(Observer<PrimitiveVecPtr>::getMostRecentValueFromBuffer());
@@ -25,18 +27,20 @@ void GrSimBackend::continuouslyUpdatePrimitivesFromBuffer(){
     } while (!in_destructor);
 }
 
-void GrSimBackend::setMostRecentlyReceivedWorld(Backend::World world) {
+void GrSimBackend::setMostRecentlyReceivedWorld(Backend::World world)
+{
     std::scoped_lock lock(most_recently_received_world_mutex);
     most_recently_received_world = world;
 }
 
-void GrSimBackend::setMostRecentlyReceivedPrimitives(
-        Backend::PrimitiveVecPtr primitives) {
+void GrSimBackend::setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr primitives)
+{
     std::scoped_lock lock(most_recently_received_primitives_mutex);
     most_recently_received_primitives = std::move(primitives);
 }
 
-void GrSimBackend::receivePrimitives(Backend::PrimitiveVecPtr primitives){
+void GrSimBackend::receivePrimitives(Backend::PrimitiveVecPtr primitives)
+{
     setMostRecentlyReceivedPrimitives(std::move(primitives));
     updateGrSim();
 }
@@ -64,4 +68,3 @@ void GrSimBackend::updateGrSim()
                                     world.friendlyTeam(), world.ball());
     }
 }
-

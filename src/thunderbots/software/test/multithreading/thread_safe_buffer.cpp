@@ -1,9 +1,12 @@
 #include "multithreading/thread_safe_buffer.h"
 
 #include <gtest/gtest.h>
+
 #include <thread>
 
-TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_value_already_on_buffer_length_one){
+TEST(ThreadSafeBufferTest,
+     pullLeastRecentlyAddedValue_single_value_when_value_already_on_buffer_length_one)
+{
     ThreadSafeBuffer<int> buffer(1);
 
     buffer.push(7);
@@ -11,7 +14,10 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_value_a
     EXPECT_EQ(7, buffer.pullLeastRecentlyAddedValue());
 }
 
-TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_value_already_on_buffer_length_greater_then_one){
+TEST(
+    ThreadSafeBufferTest,
+    pullLeastRecentlyAddedValue_single_value_when_value_already_on_buffer_length_greater_then_one)
+{
     ThreadSafeBuffer<int> buffer(3);
 
     buffer.push(7);
@@ -19,7 +25,11 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_value_a
     EXPECT_EQ(7, buffer.pullLeastRecentlyAddedValue());
 }
 
-TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_multiple_value_when_value_already_on_buffer_length_greater_then_one){ ThreadSafeBuffer<int> buffer(3);
+TEST(
+    ThreadSafeBufferTest,
+    pullLeastRecentlyAddedValue_multiple_value_when_value_already_on_buffer_length_greater_then_one)
+{
+    ThreadSafeBuffer<int> buffer(3);
 
     buffer.push(7);
     buffer.push(8);
@@ -30,12 +40,14 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_multiple_value_when_value
     EXPECT_EQ(9, buffer.pullLeastRecentlyAddedValue());
 }
 
-TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_is_empty){       ThreadSafeBuffer<int> buffer(3);
+TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_is_empty)
+{
+    ThreadSafeBuffer<int> buffer(3);
 
     int result = 0;
 
     // This "pullLeastRecentlyAddedValue" call should block until something is "pushed"
-    std::thread puller_thread([&](){ result = buffer.pullLeastRecentlyAddedValue();});
+    std::thread puller_thread([&]() { result = buffer.pullLeastRecentlyAddedValue(); });
 
     buffer.push(84);
 
@@ -45,7 +57,9 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_
     EXPECT_EQ(84, result);
 }
 
-TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_value_already_on_buffer_length_one){
+TEST(ThreadSafeBufferTest,
+     pullMostRecentlyAddedValue_single_value_when_value_already_on_buffer_length_one)
+{
     ThreadSafeBuffer<int> buffer(1);
 
     buffer.push(7);
@@ -53,7 +67,10 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_value_al
     EXPECT_EQ(7, buffer.pullMostRecentlyAddedValue());
 }
 
-TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_value_already_on_buffer_length_greater_then_one){
+TEST(
+    ThreadSafeBufferTest,
+    pullMostRecentlyAddedValue_single_value_when_value_already_on_buffer_length_greater_then_one)
+{
     ThreadSafeBuffer<int> buffer(3);
 
     buffer.push(7);
@@ -61,7 +78,11 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_value_al
     EXPECT_EQ(7, buffer.pullMostRecentlyAddedValue());
 }
 
-TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_multiple_value_when_value_already_on_buffer_length_greater_then_one){ ThreadSafeBuffer<int> buffer(3);
+TEST(
+    ThreadSafeBufferTest,
+    pullMostRecentlyAddedValue_multiple_value_when_value_already_on_buffer_length_greater_then_one)
+{
+    ThreadSafeBuffer<int> buffer(3);
 
     buffer.push(7);
     buffer.push(8);
@@ -72,12 +93,14 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_multiple_value_when_value_
     EXPECT_EQ(7, buffer.pullMostRecentlyAddedValue());
 }
 
-TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_is_empty){       ThreadSafeBuffer<int> buffer(3);
+TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_is_empty)
+{
+    ThreadSafeBuffer<int> buffer(3);
 
     int result = 0;
 
     // This "pullMostRecentlyAddedValue" call should block until something is "pushed"
-    std::thread puller_thread([&](){ result = buffer.pullMostRecentlyAddedValue();});
+    std::thread puller_thread([&]() { result = buffer.pullMostRecentlyAddedValue(); });
 
     buffer.push(84);
 
@@ -87,7 +110,8 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_i
     EXPECT_EQ(84, result);
 }
 
-TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold){
+TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold)
+{
     ThreadSafeBuffer<int> buffer(3);
 
     buffer.push(37);
@@ -103,7 +127,7 @@ TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold){
 
 // TODO: test where we destruct a thread safe buffer once
 // TODO: test where we destruct a thread safe buffer multiple times
-// TODO: test where we put in and pull out an object that can't be copied, like a `unique_ptr`
+// TODO: test where we put in and pull out an object that can't be copied, like a
+// `unique_ptr`
 
 // TODO: test that exerts the need to exercise the condition variable
-

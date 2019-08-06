@@ -15,8 +15,9 @@
 // TODO: Better name for this class
 // TODO: javadoc comment here
 // TODO: explain shared_ptr->const vec->unique ptr
-class AIWrapper : public Observer<thunderbots_msgs::World>,
-public Observable<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+class AIWrapper
+    : public Observer<thunderbots_msgs::World>,
+      public Observable<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
     // TODO: javadoc comments for all these functions and members
    public:

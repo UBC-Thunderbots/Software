@@ -1,9 +1,9 @@
 #pragma once
 
 #include "ai/world/team.h"
+#include "backend/input/network/filter/robot_filter.h"
 #include "geom/angle.h"
 #include "geom/point.h"
-#include "backend/input/network/filter/robot_filter.h"
 
 class RobotTeamFilter
 {

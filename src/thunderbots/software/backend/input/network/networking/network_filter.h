@@ -57,7 +57,7 @@ class NetworkFilter
      * @return The most up to date state of the friendly team given the new DetectionFrame
      * information
      */
-    Team getFilteredFriendlyTeamData(const std::vector<SSL_DetectionFrame>& detections);
+    Team getFilteredFriendlyTeamData(const std::vector<SSL_DetectionFrame> &detections);
 
     /**
      * Filters the robot data for the enemy team contained in the list of DetectionFrames

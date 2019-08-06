@@ -112,8 +112,8 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
     if (packet.has_detection())
     {
-        const auto& detection       = packet.detection();
-        bool camera_disabled = false;
+        const auto& detection = packet.detection();
+        bool camera_disabled  = false;
 
         switch (detection.camera_id())
         {

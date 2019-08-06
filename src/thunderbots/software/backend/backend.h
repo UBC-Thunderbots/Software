@@ -2,7 +2,6 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
-
 #include "multithreading/observable.h"
 #include "multithreading/observer.h"
 
@@ -17,15 +16,18 @@
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Observable". Please see the the implementation of those classes for details.
  */
-class Backend : public Observable<thunderbots_msgs::World>, public Observer<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>> {
-public:
-
+class Backend
+    : public Observable<thunderbots_msgs::World>,
+      public Observer<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+{
+   public:
     // TODO: Eventually this should be a non-ROS type
     using World = thunderbots_msgs::World;
     // TODO: Eventually this should be a non-ROS type
-    using WorldBuffer = ThreadSafeBuffer<World>;
+    using WorldBuffer  = ThreadSafeBuffer<World>;
     using PrimitiveVec = std::vector<std::unique_ptr<Primitive>>;
-    using PrimitiveVecPtr = std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>;
+    using PrimitiveVecPtr =
+        std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>;
 
     Backend() = default;
 

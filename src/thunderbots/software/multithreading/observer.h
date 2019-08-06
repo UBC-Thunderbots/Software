@@ -10,8 +10,9 @@
  * @tparam T The type of object this class is observing
  */
 template <typename T>
-class Observer {
-public:
+class Observer
+{
+   public:
     Observer();
 
     /**
@@ -23,8 +24,7 @@ public:
 
     virtual ~Observer() = default;
 
-protected:
-
+   protected:
     /**
      * Get the most recent value from the buffer
      *
@@ -34,22 +34,25 @@ protected:
      */
     virtual T getMostRecentValueFromBuffer() final;
 
-private:
+   private:
     const size_t DEFAULT_BUFFER_SIZE = 1;
 
     ThreadSafeBuffer<T> buffer;
 };
 
 template <typename T>
-Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE) {
+Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE)
+{
 }
 
 template <typename T>
-void Observer<T>::receiveValue(T val) {
+void Observer<T>::receiveValue(T val)
+{
     buffer.push(std::move(val));
 }
 
 template <typename T>
-T Observer<T>::getMostRecentValueFromBuffer() {
+T Observer<T>::getMostRecentValueFromBuffer()
+{
     return std::move(buffer.pullMostRecentlyAddedValue());
 }
