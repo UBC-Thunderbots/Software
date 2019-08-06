@@ -10,7 +10,7 @@
 #include <limits>
 #include <random>
 
-#include "../shared/constants.h"
+#include "shared/constants.h"
 #include "geom/ray.h"
 #include "geom/segment.h"
 #include "geom/util.h"
