@@ -337,19 +337,6 @@ target_link_libraries(tbots_test_util
     tbots_world
     )
 
-# TODO: this should not all be in one lib
-file(GLOB_RECURSE TBOTS_BACKEND_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend/*.cpp
-        )
-add_library(tbots_backend STATIC
-        ${TBOTS_BACKEND_SRC}
-        )
-target_link_libraries(tbots_backend
-        tbots_proto
-             Eigen3::Eigen
-        )
-
-
 # Proto
 ## Call our CMake file to include and build protobuf
 include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
@@ -361,6 +348,20 @@ add_library(tbots_proto STATIC
 target_link_libraries(tbots_proto 
     ${PROTOBUF_LIBRARIES}
     )
+
+
+# TODO: this should not all be in one lib
+file(GLOB_RECURSE TBOTS_BACKEND_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/*.cpp
+        )
+add_library(tbots_backend STATIC
+        ${TBOTS_BACKEND_SRC}
+        )
+target_link_libraries(tbots_backend
+        tbots_proto
+        Eigen3::Eigen
+        )
+
 
 # Multithreading (TODO: don't need this, it's header only)
 #file(GLOB TBOTS_MULTITHREADING_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -429,6 +430,7 @@ target_link_libraries(full_system
         ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
         ${G3LOG}
+        ${PROTOBUF_LIBRARIES}
         tbots_geom
         tbots_world
         tbots_proto
@@ -442,6 +444,7 @@ target_link_libraries(full_system
         tbots_passing
         tbots_primitive
         tbots_parameter
+        tbots_proto
         tbots_ros_msg_util
         tbots_canvas_messenger
         tbots_backend
