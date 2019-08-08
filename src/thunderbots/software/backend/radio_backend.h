@@ -2,31 +2,23 @@
 
 #include "backend/backend.h"
 #include "backend/input/network/networking/network_client.h"
-#include "backend/output/radio/grsim_output.h"
+#include "backend/output/radio/radio_output.h"
 
 class RadioBackend : public Backend
 {
    public:
     RadioBackend() = delete;
 
-    RadioBackend(ros::NodeHandle node_handle);
+    explicit RadioBackend(ros::NodeHandle node_handle);
 
    private:
 
     static const int DEFAULT_RADIO_CONFIG = 0;
     // TODO: javadoc comments for all functions here
 
-    void continuouslyUpdatePrimitivesFromBuffer();
-
-    void setMostRecentlyReceivedWorld(Backend::World world);
-
-    void setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr primitives);
-
-    void receivePrimitives(Backend::PrimitiveVecPtr world);
+    void continuouslySendPrimitivesInBuffer();
 
     void receiveWorld(Backend::World world);
-
-    void updateRadio();
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;

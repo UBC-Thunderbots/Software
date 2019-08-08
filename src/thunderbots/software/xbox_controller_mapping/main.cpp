@@ -23,7 +23,7 @@ namespace
     // The publisher to send our custom Primitive commands based on the controller
     // information
     ros::Publisher primitive_publisher;
-    // Publishers to mock network_input data
+    // Publishers to mock network data
     ros::Publisher world_publisher;
 
     // Button mappings for a Microsoft Xbox 360 Wired Controller for Linux
@@ -135,7 +135,7 @@ void joystickUpdateCallback(const sensor_msgs::Joy::ConstPtr &msg)
     // We spoof the information about the state of the robot because it is unnecessary for
     // the XBox controller demos. These demos typically run where we have no vision, so we
     // just simply report the robot is always at Point(0, 0), and just set the velocities
-    // directly. The network_input node can't be used since there is no vision data
+    // directly. The network node can't be used since there is no vision data
     Robot robot =
         Robot(static_cast<unsigned int>(
                   Util::DynamicParameters::XBoxControllerDemo::robot_id.value()),

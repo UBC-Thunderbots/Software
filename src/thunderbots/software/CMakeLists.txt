@@ -360,6 +360,7 @@ add_library(tbots_backend STATIC
 target_link_libraries(tbots_backend
         tbots_proto
         Eigen3::Eigen
+        ${LIBUSB_1_LIBRARIES}
         )
 
 
@@ -389,16 +390,16 @@ add_library(tbots_shared STATIC
 #################
 
 #file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/network_input/*.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/network/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/network/*.h
 #        )
-#add_executable (network_input
+#add_executable (network
 #        ${NETWORK_INPUT_SRC}
 #        )
 ## Depend on exported targets (other packages) so that the messages in our #thunderbots_msgs package are built first.
 ## This way the message headers are always generated before they are used in #compilation here.
-#add_dependencies(network_input ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(network_input
+#add_dependencies(network ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(network
 #        ${catkin_LIBRARIES}
 #        ${G3LOG}
 #        Eigen3::Eigen
@@ -451,17 +452,17 @@ target_link_libraries(full_system
         )
 
 #file(GLOB GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim_communication/*.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim/*.h
 #        )
-#add_executable (grsim_communication
+#add_executable (grsim
 #        ${GRSIM_COMMUNICATION_SRC}
 #        )
 
 ## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 ## This way the message headers are always generated before they are used in compilation here.
-#add_dependencies(grsim_communication ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(grsim_communication ${catkin_LIBRARIES}
+#add_dependencies(grsim ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(grsim ${catkin_LIBRARIES}
 #        ${G3LOG}
 #        tbots_primitive
 #        tbots_world
@@ -472,16 +473,16 @@ target_link_libraries(full_system
 #        )
 
 #file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/radio_communication/*.h
+#        ${CMAKE_CURRENT_SOURCE_DIR}/radio/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/radio/*.h
 #        )
-#add_executable (radio_communication
+#add_executable (radio
 #        ${RADIO_COMMUNICATION_SRC}
 #        )
 ## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 ## This way the message headers are always generated before they are used in compilation here.
-#add_dependencies(radio_communication ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(radio_communication
+#add_dependencies(radio ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(radio
 #        ${catkin_LIBRARIES}
 #        ${G3LOG}
 #        ${LIBUSB_1_LIBRARIES}
@@ -637,16 +638,16 @@ if (CATKIN_ENABLE_TESTING)
 
         # TODO: Re-add and re-enable me!
 #    catkin_add_gtest(grsim_communication_test
-#            grsim_communication/grsim_backend.cpp
-#            grsim_communication/grsim_command_primitive_visitor.cpp
-#            grsim_communication/motion_controller.cpp
-#            test/grsim_communication/dribble_primitive.cpp
-#            test/grsim_communication/grsim_backend.cpp
-#            test/grsim_communication/catch_primitive.cpp
-#            test/grsim_communication/pivot_primitive.cpp
-#            test/grsim_communication/movespin_primitive.cpp
-#            test/grsim_communication/main.cpp
-#            test/grsim_communication/motion_controller.cpp
+#            grsim/grsim_backend.cpp
+#            grsim/grsim_command_primitive_visitor.cpp
+#            grsim/motion_controller.cpp
+#            test/grsim/dribble_primitive.cpp
+#            test/grsim/grsim_backend.cpp
+#            test/grsim/catch_primitive.cpp
+#            test/grsim/pivot_primitive.cpp
+#            test/grsim/movespin_primitive.cpp
+#            test/grsim/main.cpp
+#            test/grsim/motion_controller.cpp
 #            )
 #    target_link_libraries(grsim_communication_test
 #            ${catkin_LIBRARIES}
@@ -683,8 +684,8 @@ if (CATKIN_ENABLE_TESTING)
 
         # TODO: re-add and re-enable me
 #    catkin_add_gtest(mrf_primitive_visitor_test
-#            test/radio_communication/visitor/mrf_primitive_visitor.cpp
-#            radio_communication/visitor/mrf_primitive_visitor.cpp
+#            test/radio/visitor/mrf_primitive_visitor.cpp
+#            radio/visitor/mrf_primitive_visitor.cpp
 #            )
 #    target_link_libraries(mrf_primitive_visitor_test
 #        ${catkin_LIBRARIES}
@@ -930,9 +931,9 @@ if (CATKIN_ENABLE_TESTING)
 
         # TODO: re-add and re-enable me
 #    catkin_add_gtest(robot_filter_test
-#            test/network_input/filter/robot_filter.cpp
-#            test/network_input/filter/main.cpp
-#            network_input/filter/robot_filter.cpp
+#            test/network/filter/robot_filter.cpp
+#            test/network/filter/main.cpp
+#            network/filter/robot_filter.cpp
 #            )
 #    target_link_libraries(robot_filter_test
 #            ${catkin_LIBRARIES}
@@ -987,9 +988,9 @@ if (CATKIN_ENABLE_TESTING)
 
         # TODO: uncomment me and re-add!
 #    catkin_add_gtest(network_input_test
-#            test/network_input/filter/ball_filter.cpp
-#            test/network_input/main.cpp
-#            network_input/filter/ball_filter.cpp
+#            test/network/filter/ball_filter.cpp
+#            test/network/main.cpp
+#            network/filter/ball_filter.cpp
 #            )
 #    target_link_libraries(network_input_test
 #            ${catkin_LIBRARIES}

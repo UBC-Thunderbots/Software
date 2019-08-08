@@ -15,6 +15,7 @@
 #include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
+#include "backend/radio_backend.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -24,6 +25,8 @@ namespace
 {
     std::shared_ptr<AIWrapper> ai;
     std::shared_ptr<Backend> backend;
+
+    std::shared_ptr<ros::NodeHandle> node_handle;
 }  // namespace
 
 void setBackendFromString(std::string backend_name)
@@ -31,6 +34,8 @@ void setBackendFromString(std::string backend_name)
     if (backend_name == "grsim")
     {
         backend = std::make_shared<GrSimBackend>();
+    } else if (backend_name == "radio") {
+        backend = std::make_shared<RadioBackend>(*node_handle);
     }
     else
     {
@@ -64,10 +69,10 @@ void parseCommandLineArgs(int argc, char **argv)
     }
 }
 
-ros::NodeHandle initRos(int argc, char **argv)
+std::shared_ptr<ros::NodeHandle> initRos(int argc, char **argv)
 {
     ros::init(argc, argv, "full_system");
-    return ros::NodeHandle();
+    return std::make_shared<ros::NodeHandle>();
 }
 
 // TODO: javadoc comment here
@@ -79,19 +84,19 @@ void connectObservers()
 
 int main(int argc, char **argv)
 {
+    node_handle = initRos(argc, argv);
+
     parseCommandLineArgs(argc, argv);
 
-    ros::NodeHandle node_handle = initRos(argc, argv);
-
-    ai = std::make_shared<AIWrapper>(node_handle);
+    ai = std::make_shared<AIWrapper>(*node_handle);
 
     connectObservers();
 
-    Util::Logger::LoggerSingleton::initializeLogger(node_handle);
-    Util::CanvasMessenger::getInstance()->initializePublisher(node_handle);
+    Util::Logger::LoggerSingleton::initializeLogger(*node_handle);
+    Util::CanvasMessenger::getInstance()->initializePublisher(*node_handle);
 
     auto update_subscribers =
-        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
+        Util::DynamicParameters::initUpdateSubscriptions(*node_handle);
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown

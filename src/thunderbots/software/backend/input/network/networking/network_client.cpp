@@ -26,7 +26,7 @@ NetworkClient::NetworkClient(
     }
     catch (const boost::exception& ex)
     {
-        // LOG(FATAL) will terminate the network_input process
+        // LOG(FATAL) will terminate the network process
         LOG(FATAL) << "An error occured while setting up the SSL Vision Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
@@ -43,7 +43,7 @@ NetworkClient::NetworkClient(
     }
     catch (const boost::exception& ex)
     {
-        // LOG(FATAL) will terminate the network_input process
+        // LOG(FATAL) will terminate the network process
         LOG(FATAL) << "An error occured while setting up the SSL GameController Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;

@@ -1,24 +1,32 @@
-#include "mrf_backend.h"
+#include "radio_output.h"
 
 #include <chrono>
 
 #include "util/logger/init.h"
 
-MRFBackend::MRFBackend(unsigned int config, ros::NodeHandle &node_handle)
+RadioOutput::RadioOutput(unsigned int config, ros::NodeHandle &node_handle)
     : annunciator(Annunciator(node_handle)), dongle(MRFDongle(config, annunciator))
 {
 }
 
-MRFBackend::~MRFBackend() {}
+RadioOutput::~RadioOutput() {}
 
-void MRFBackend::sendPrimitives(const std::vector<std::unique_ptr<Primitive>> &primitives)
+void RadioOutput::sendPrimitives(const std::vector<std::unique_ptr<Primitive>> &primitives)
 {
     dongle.send_drive_packet(primitives);
 }
 
-void MRFBackend::send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
-                                    Ball ball)
+void RadioOutput::send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
+                                     Ball ball)
 {
     uint64_t timestamp = static_cast<uint64_t>(ball.lastUpdateTimestamp().getSeconds());
     dongle.send_camera_packet(robots, ball.position() * MILLIMETERS_PER_METER, timestamp);
+}
+
+void RadioOutput::send_vision_packet(const std::vector<Robot> &robots, Ball ball) {
+    std::vector<std::tuple<uint8_t, Point, Angle>> robot_tuples;
+    for (const Robot& robot : robots){
+        robot_tuples.emplace_back(std::make_tuple<uint8_t, Point, Angle>(robot.id(), robot.position(), robot.orientation()));
+    }
+    send_vision_packet(robot_tuples, ball);
 }

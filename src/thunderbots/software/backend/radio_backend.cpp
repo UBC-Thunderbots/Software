@@ -10,61 +10,38 @@ RadioBackend::RadioBackend(ros::NodeHandle node_handle)
       radio_output(DEFAULT_RADIO_CONFIG,
                    node_handle),
       radio_output_thread(
-          boost::bind(&RadioBackend::continuouslyUpdatePrimitivesFromBuffer, this)),
+          boost::bind(&RadioBackend::continuouslySendPrimitivesInBuffer, this)),
       in_destructor(false)
 {
 }
 
-void RadioBackend::continuouslyUpdatePrimitivesFromBuffer()
+void RadioBackend::continuouslySendPrimitivesInBuffer()
 {
     do
     {
         in_destructor_mutex.unlock();
 
-        receivePrimitives(Observer<PrimitiveVecPtr>::getMostRecentValueFromBuffer());
+        auto primitives_ptr = Observer<PrimitiveVecPtr>::getMostRecentValueFromBuffer();
+        radio_output.sendPrimitives(*primitives_ptr);
 
         in_destructor_mutex.lock();
     } while (!in_destructor);
 }
 
-void RadioBackend::setMostRecentlyReceivedWorld(Backend::World world)
-{
-    std::scoped_lock lock(most_recently_received_world_mutex);
-    most_recently_received_world = world;
-}
-
-void RadioBackend::setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr primitives)
-{
-    std::scoped_lock lock(most_recently_received_primitives_mutex);
-    most_recently_received_primitives = std::move(primitives);
-}
-
-void RadioBackend::receivePrimitives(Backend::PrimitiveVecPtr primitives)
-{
-    setMostRecentlyReceivedPrimitives(std::move(primitives));
-    updateRadio();
-}
-
 void RadioBackend::receiveWorld(Backend::World world)
 {
-    setMostRecentlyReceivedWorld(world);
-    sendValueToObservers(world);
-    updateRadio();
-}
-
-void RadioBackend::updateRadio()
-{
-    std::scoped_lock lock(most_recently_received_world_mutex,
-                          most_recently_received_primitives_mutex);
-
-    // Update Radio if we have all the information we need
-    if (most_recently_received_world && most_recently_received_primitives)
-    {
-        // TODO: we should stop passing ros msgs so we don't have to to this
-        auto world =
-            Util::ROSMessages::createWorldFromROSMessage(*most_recently_received_world);
-
-        radio_output.sendPrimitives(*most_recently_received_primitives,
-                                    world.friendlyTeam(), world.ball());
+    // TODO: We shouldn't have to do a lot of this work once we have a "real" world
+    //       as we can just have a "world.getAllRobots()" function
+    // TODO: put this hack in a function for now?
+    std::vector<Robot> robots;
+    for (auto& team : {world.friendly_team, world.enemy_team}){
+        for (auto& robot_msg : team.robots){
+            auto robot = Util::ROSMessages::createRobotFromROSMessage(robot_msg);
+            robots.emplace_back(robot);
+        }
     }
+    Ball ball = Util::ROSMessages::createBallFromROSMessage(world.ball);
+    radio_output.send_vision_packet(robots, ball);
+
+    sendValueToObservers(world);
 }

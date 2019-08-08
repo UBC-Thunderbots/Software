@@ -9,7 +9,7 @@
 #include "mrf/dongle.h"
 #include "thunderbots_msgs/RobotStatus.h"
 
-class MRFBackend
+class RadioOutput
 {
    public:
     /**
@@ -19,9 +19,9 @@ class MRFBackend
      * @param config MRF configuration to start dongle in
      * @param node_handle the ROS NodeHandle of the radio_communication node
      */
-    explicit MRFBackend(unsigned int config, ros::NodeHandle& node_handle);
+    explicit RadioOutput(unsigned int config, ros::NodeHandle& node_handle);
 
-    ~MRFBackend();
+    ~RadioOutput();
 
     /**
      * Sends the given primitives to the backend to control the robots
@@ -37,6 +37,15 @@ class MRFBackend
      * @param b new ball
      */
     void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
+                            Ball ball);
+
+    /**
+     * Sends a camera packet with the detected robots and ball.
+     *
+     * @param robots
+     * @param ball
+     */
+    void send_vision_packet(const std::vector<Robot>& robots,
                             Ball ball);
 
    private:
