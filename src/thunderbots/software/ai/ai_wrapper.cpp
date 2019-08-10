@@ -7,10 +7,17 @@
 #include "util/ros_messages.h"
 
 AIWrapper::AIWrapper(ros::NodeHandle node_handle)
-    : ai_thread(boost::bind(&AIWrapper::runAIContinuously, this)), in_destructor(false)
 {
     play_info_publisher = node_handle.advertise<thunderbots_msgs::PlayInfo>(
         Util::Constants::PLAY_INFO_TOPIC, 1);
+}
+
+void AIWrapper::newValueCallback(thunderbots_msgs::World world)
+{
+    updateKnownWorld(world);
+    runAIAndSendPrimitives();
+    publishPlayInfo();
+    drawWorld();
 }
 
 void AIWrapper::updateKnownWorld(thunderbots_msgs::World world_msg)
@@ -24,12 +31,6 @@ void AIWrapper::updateKnownWorld(thunderbots_msgs::World world_msg)
     RefboxGameState new_game_state =
         Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
     currently_known_world.updateRefboxGameState(new_game_state);
-}
-
-void AIWrapper::updateWorldFromBuffer()
-{
-    thunderbots_msgs::World new_world_msg = getMostRecentValueFromBuffer();
-    updateKnownWorld(new_world_msg);
 }
 
 void AIWrapper::publishPlayInfo()
@@ -58,30 +59,4 @@ void AIWrapper::drawWorld()
     std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
         Util::CanvasMessenger::getInstance();
     canvas_messenger->drawWorld(currently_known_world);
-}
-
-void AIWrapper::runAIContinuously()
-{
-    do
-    {
-        in_destructor_mutex.unlock();
-
-        updateWorldFromBuffer();
-        runAIAndSendPrimitives();
-        publishPlayInfo();
-        drawWorld();
-
-        in_destructor_mutex.lock();
-    } while (!in_destructor);
-}
-
-AIWrapper::~AIWrapper()
-{
-    in_destructor_mutex.lock();
-    in_destructor = true;
-    in_destructor_mutex.unlock();
-
-    // We must wait for the thread to stop, as if we destroy it while we're still
-    // running we will segfault
-    ai_thread.join();
 }

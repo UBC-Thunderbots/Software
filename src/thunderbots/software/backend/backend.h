@@ -3,7 +3,7 @@
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
 #include "multithreading/observable.h"
-#include "multithreading/observer.h"
+#include "multithreading/threaded_observer.h"
 
 // TODO: This should be removed eventually
 #include "thunderbots_msgs/World.h"
@@ -18,7 +18,7 @@
  */
 class Backend
     : public Observable<thunderbots_msgs::World>,
-      public Observer<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+      public ThreadedObserver<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
    public:
     // TODO: Eventually this should be a non-ROS type

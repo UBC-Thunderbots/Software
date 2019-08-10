@@ -84,7 +84,7 @@ void connectObservers()
 
 int main(int argc, char **argv)
 {
-    node_handle = initRos(argc, argv);
+   node_handle = initRos(argc, argv);
 
     parseCommandLineArgs(argc, argv);
 

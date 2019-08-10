@@ -2,6 +2,8 @@
 
 #include "multithreading/thread_safe_buffer.h"
 
+// TODO: Rename to "Subscriber" (and rename "Observable" to "Publisher"?)
+
 // TODO: TEST THIS CLASS
 /**
  * This class observes an "Observable<T>". That is, it can be registered with an
@@ -20,7 +22,7 @@ class Observer
      *
      * @param val The value to add to th internal buffer
      */
-    void receiveValue(T val);
+    virtual void receiveValue(T val) final;
 
     virtual ~Observer() = default;
 
@@ -39,6 +41,8 @@ class Observer
 
     ThreadSafeBuffer<T> buffer;
 };
+
+// TODO: all this implementation can probably be in a `.cpp` file...same for Observable
 
 template <typename T>
 Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE)

@@ -8,7 +8,7 @@
 #include "ai/ai.h"
 #include "ai/world/world.h"
 #include "multithreading/observable.h"
-#include "multithreading/observer.h"
+#include "multithreading/threaded_observer.h"
 #include "primitive/primitive.h"
 #include "thunderbots_msgs/World.h"
 
@@ -16,7 +16,7 @@
 // TODO: javadoc comment here
 // TODO: explain shared_ptr->const vec->unique ptr
 class AIWrapper
-    : public Observer<thunderbots_msgs::World>,
+    : public ThreadedObserver<thunderbots_msgs::World>,
       public Observable<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
     // TODO: javadoc comments for all these functions and members
@@ -25,27 +25,20 @@ class AIWrapper
 
     explicit AIWrapper(ros::NodeHandle node_handle);
 
-    ~AIWrapper() override;
 
    private:
+    void newValueCallback(thunderbots_msgs::World world) override;
+
     void updateKnownWorld(thunderbots_msgs::World world_msg);
 
-    void updateWorldFromBuffer();
-
     void publishPlayInfo();
-
-    void runAIContinuously();
 
     void runAIAndSendPrimitives();
     void drawWorld();
 
-    std::thread ai_thread;
     AI ai;
 
     World currently_known_world;
 
     ros::Publisher play_info_publisher;
-
-    std::mutex in_destructor_mutex;
-    bool in_destructor;
 };

@@ -10,6 +10,8 @@ class GrSimBackend : public Backend
     GrSimBackend();
 
    private:
+    void newValueCallback(Backend::PrimitiveVecPtr primitives) override;
+
     // TODO: javadoc comments for all functions here
 
     void continuouslyUpdatePrimitivesFromBuffer();
@@ -18,7 +20,6 @@ class GrSimBackend : public Backend
 
     void setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr primitives);
 
-    void receivePrimitives(Backend::PrimitiveVecPtr world);
 
     void receiveWorld(Backend::World world);
 
@@ -30,14 +31,6 @@ class GrSimBackend : public Backend
 
     // The interface that lets us send primitives to grsim
     GrSimOutput grsim_output;
-
-    // A thread that constantly pulls new primitive vectors from the buffer
-    // and sends them out
-    std::thread grsim_output_thread;
-
-    // A boolean indicating if we're in the destructor for this class
-    bool in_destructor;
-    std::mutex in_destructor_mutex;
 
     // TODO: doc comments for these?
     std::optional<Backend::World> most_recently_received_world;

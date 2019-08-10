@@ -8,23 +8,14 @@ GrSimBackend::GrSimBackend()
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
                     boost::bind(&GrSimBackend::receiveWorld, this, _1)),
       grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,
-                   Util::Constants::GRSIM_COMMAND_NETWORK_PORT),
-      grsim_output_thread(
-          boost::bind(&GrSimBackend::continuouslyUpdatePrimitivesFromBuffer, this)),
-      in_destructor(false)
+                   Util::Constants::GRSIM_COMMAND_NETWORK_PORT)
 {
 }
 
-void GrSimBackend::continuouslyUpdatePrimitivesFromBuffer()
+void GrSimBackend::newValueCallback(Backend::PrimitiveVecPtr primitives)
 {
-    do
-    {
-        in_destructor_mutex.unlock();
-
-        receivePrimitives(Observer<PrimitiveVecPtr>::getMostRecentValueFromBuffer());
-
-        in_destructor_mutex.lock();
-    } while (!in_destructor);
+    setMostRecentlyReceivedPrimitives(std::move(primitives));
+    updateGrSim();
 }
 
 void GrSimBackend::setMostRecentlyReceivedWorld(Backend::World world)
@@ -37,12 +28,6 @@ void GrSimBackend::setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr pr
 {
     std::scoped_lock lock(most_recently_received_primitives_mutex);
     most_recently_received_primitives = std::move(primitives);
-}
-
-void GrSimBackend::receivePrimitives(Backend::PrimitiveVecPtr primitives)
-{
-    setMostRecentlyReceivedPrimitives(std::move(primitives));
-    updateGrSim();
 }
 
 void GrSimBackend::receiveWorld(Backend::World world)
