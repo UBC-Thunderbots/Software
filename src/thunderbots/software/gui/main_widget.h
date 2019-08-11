@@ -2,6 +2,7 @@
 
 #include <QGL>
 #include <QGraphicsScene>
+#include <QTableWidget>
 #include <QOpenGLWidget>
 #include <QWidget>
 
@@ -27,11 +28,14 @@ class MainWidget : public QWidget
 
    public slots:
     void drawAI();
+    void updateRobotStatusMessages();
 
    private:
+    void setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget);
+    void setupStatusTable(QTableWidget* table);
+    void setRobotStatus(QTableWidget* table, std::vector<std::string> robot_status_messages);
+
     Ui::MainWidget* main_widget;
     QGraphicsScene* scene;
     QOpenGLWidget* glWidget;
-    QGLWidget* qglWidget;
-    MySceneView* view;
 };

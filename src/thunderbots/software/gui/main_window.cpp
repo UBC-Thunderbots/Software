@@ -6,6 +6,7 @@ ThunderbotsVisualizer::ThunderbotsVisualizer()
     setCentralWidget(main_widget);
 
     connect(draw_AI_timer, &QTimer::timeout, main_widget, &MainWidget::drawAI);
+    connect(draw_AI_timer, &QTimer::timeout, main_widget, &MainWidget::updateRobotStatusMessages);
     draw_AI_timer->start(33);
 }
 
