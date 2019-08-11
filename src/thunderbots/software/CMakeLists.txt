@@ -495,6 +495,7 @@ file(GLOB_RECURSE QT_RESOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS
 file(GLOB_RECURSE GUI_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/*.cpp
         )
+include_directories(SYSTEM "${Qt5Widgets_INCLUDE_DIRS}")
 add_executable (ai_gui
         ${GUI_SRC}
         ${QT_FORMS}

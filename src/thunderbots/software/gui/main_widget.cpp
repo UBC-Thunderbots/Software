@@ -1,6 +1,9 @@
 #include "software/gui/main_widget.h"
 
-#include <ai_gui_autogen/include/ai_gui_autogen/include/ui_main_widget.h>
+// Generated in cmake-build-*/ai_gui_autogen/include/
+// Sometimes this path gets nested (eg. ai_gui_autogen/include/ai_gui_autoen/...)
+// which is why we just include the file directly from the system include dirs
+#include <ui_main_widget.h>
 
 #include <iostream>
 
@@ -9,21 +12,57 @@
 #include <random>
 
 MainWidget::MainWidget(QWidget *parent)
-    : QWidget(parent), main_widget(new Ui::MainWidget())
+    : QWidget(parent), main_widget(new Ui::MainWidget()), first_draw_call(true)
 {
     // Handles all the setup of the generated UI components and adds the components
     // to this widget
     main_widget->setupUi(this);
 
-    scene = new QGraphicsScene(main_widget->graphicsView);
+    scene = new QGraphicsScene(main_widget->ai_visualization_graphics_view);
     glWidget = new QOpenGLWidget(this);
-    setupSceneView(main_widget->graphicsView, scene, glWidget);
+    setupSceneView(main_widget->ai_visualization_graphics_view, scene, glWidget);
 
-    setupStatusTable(main_widget->myTableWidget);
-    setRobotStatus(main_widget->myTableWidget, {"foo", "bar", "hallsensor"});
+    setupStatusTable(main_widget->robot_status_table_widget);
+    setupAIControls();
+}
 
-        // TODO: DO this only for the first draw call
-//    view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+void MainWidget::setupAIControls() {
+    setupAIStartAndStopButtons();
+    setupTeamColourComboBox();
+    setupDefendingSideComboBox();
+    setupGameStateOverrideComboBox();
+    setupPlayOverrideComboBox();
+}
+
+void MainWidget::setupAIStartAndStopButtons() {
+    connect(main_widget->start_ai_button, &QPushButton::clicked, []() {std::cout << "start ai" << std::endl;});
+    connect(main_widget->stop_ai_button, &QPushButton::clicked, []() {std::cout << "stop ai" << std::endl;});
+}
+
+void MainWidget::setupTeamColourComboBox() {
+    main_widget->team_colour_combo_box->insertItem(0, "Yellow");
+    main_widget->team_colour_combo_box->insertItem(1, "Blue");
+    connect(main_widget->team_colour_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "team colour changed " << text.toStdString() << std::endl;});
+}
+
+void MainWidget::setupGameStateOverrideComboBox() {
+    main_widget->gamestate_override_combo_box->insertItem(0, "use Refbox");
+    main_widget->gamestate_override_combo_box->insertItem(1, "Play");
+    main_widget->gamestate_override_combo_box->insertItem(2, "Halt");
+    main_widget->gamestate_override_combo_box->insertItem(3, "Stop");
+    connect(main_widget->gamestate_override_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "gamestate override changed " << text.toStdString() << std::endl;});
+}
+void MainWidget::setupPlayOverrideComboBox() {
+    main_widget->play_override_combo_box->insertItem(0, "None");
+    main_widget->play_override_combo_box->insertItem(0, "ExamplePlay");
+    main_widget->play_override_combo_box->insertItem(0, "Free Kick Friendly");
+    connect(main_widget->play_override_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "play override changed " << text.toStdString() << std::endl;});
+}
+
+void MainWidget::setupDefendingSideComboBox() {
+    main_widget->defending_side_combo_box->insertItem(0, "East");
+    main_widget->defending_side_combo_box->insertItem(1, "West");
+    connect(main_widget->defending_side_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "defending side changed " << text.toStdString() << std::endl;});
 }
 
 // TODO: Stop using pointers wherever possible, so I don't have to manually destruct stuff
@@ -56,7 +95,10 @@ void MainWidget::drawAI()
     world.mutableEnemyTeam().updateRobots({r1, r2, r3});
 
     drawWorld(scene, world);
-    main_widget->graphicsView->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    if(first_draw_call) {
+        main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+        first_draw_call = false;
+    }
 }
 
 void MainWidget::updateRobotStatusMessages() {
@@ -73,7 +115,7 @@ void MainWidget::updateRobotStatusMessages() {
         status_msgs.emplace_back(msg);
     }
 
-    setRobotStatus(main_widget->myTableWidget, status_msgs);
+    setRobotStatus(main_widget->robot_status_table_widget, status_msgs);
 }
 
 void MainWidget::setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget) {

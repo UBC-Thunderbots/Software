@@ -34,8 +34,15 @@ class MainWidget : public QWidget
     void setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget);
     void setupStatusTable(QTableWidget* table);
     void setRobotStatus(QTableWidget* table, std::vector<std::string> robot_status_messages);
+    void setupAIControls();
+    void setupAIStartAndStopButtons();
+    void setupTeamColourComboBox();
+    void setupDefendingSideComboBox();
+    void setupGameStateOverrideComboBox();
+    void setupPlayOverrideComboBox();
 
     Ui::MainWidget* main_widget;
     QGraphicsScene* scene;
     QOpenGLWidget* glWidget;
+    bool first_draw_call;
 };
