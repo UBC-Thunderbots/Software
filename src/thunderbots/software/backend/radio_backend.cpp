@@ -3,7 +3,7 @@
 #include "util/constants.h"
 
 RadioBackend::RadioBackend(ros::NodeHandle node_handle)
-    : network_input(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
                     boost::bind(&RadioBackend::receiveWorld, this, _1)),
       radio_output(DEFAULT_RADIO_CONFIG,

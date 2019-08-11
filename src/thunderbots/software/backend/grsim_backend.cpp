@@ -3,7 +3,7 @@
 #include "util/constants.h"
 
 GrSimBackend::GrSimBackend()
-    : network_input(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,
+    : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
                     boost::bind(&GrSimBackend::receiveWorld, this, _1)),
       grsim_output(Util::Constants::GRSIM_COMMAND_NETWORK_ADDRESS,

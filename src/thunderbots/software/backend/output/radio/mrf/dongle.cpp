@@ -31,10 +31,10 @@ namespace
     // different PANs and/or channels
     constexpr int NUM_DEFAULT_CONFIGS                      = 4;
     const RadioConfig DEFAULT_CONFIGS[NUM_DEFAULT_CONFIGS] = {
-        {23U, 250, 0x1846U},
-        {23U, 250, 0x1847U},
-        {23U, 250, 0x1848U},
-        {23U, 250, 0x1849U},
+        {24U, 250, 0x1846U},
+        {24U, 250, 0x1847U},
+        {24U, 250, 0x1848U},
+        {24U, 250, 0x1849U},
     };
 
     const unsigned int ANNUNCIATOR_BEEP_LENGTH_MILLISECONDS = 750;  // milliseconds
