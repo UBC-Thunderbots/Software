@@ -176,7 +176,6 @@ class World final
     void updateTimestamp(Timestamp timestamp);
 
    private:
-    // Private Variables
     Field field_;
     Ball ball_;
     Team friendly_team_;

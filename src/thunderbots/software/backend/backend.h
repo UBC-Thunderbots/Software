@@ -5,9 +5,6 @@
 #include "multithreading/observable.h"
 #include "multithreading/threaded_observer.h"
 
-// TODO: This should be removed eventually
-#include "thunderbots_msgs/World.h"
-
 /**
  * A Backend is an abstraction around all I/O operations that our system may need
  * to perform. It produces Worlds that may be used, and consumes primitives that
@@ -17,13 +14,10 @@
  * "Observable". Please see the the implementation of those classes for details.
  */
 class Backend
-    : public Observable<thunderbots_msgs::World>,
+    : public Observable<World>,
       public ThreadedObserver<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
    public:
-    // TODO: Eventually this should be a non-ROS type
-    using World = thunderbots_msgs::World;
-    // TODO: Eventually this should be a non-ROS type
     using WorldBuffer  = ThreadSafeBuffer<World>;
     using PrimitiveVec = std::vector<std::unique_ptr<Primitive>>;
     using PrimitiveVecPtr =

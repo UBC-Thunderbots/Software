@@ -10,7 +10,7 @@
 
 NetworkClient::NetworkClient(
     std::string vision_multicast_address, int vision_multicast_port,
-    std::function<void(thunderbots_msgs::World)> received_world_callback)
+    std::function<void(World)> received_world_callback)
     : network_filter(),
       io_service(),
       initial_packet_count(0),
@@ -105,9 +105,7 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
     {
         const auto& latest_geometry_data = packet.geometry();
         Field field = network_filter.getFieldData(latest_geometry_data);
-        thunderbots_msgs::Field field_msg =
-            Util::ROSMessages::convertFieldToROSMessage(field);
-        world_msg.field = field_msg;
+        world.updateFieldGeometry(field);
     }
 
     if (packet.has_detection())
@@ -143,44 +141,46 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         if (!camera_disabled)
         {
             Ball ball = network_filter.getFilteredBallData({detection});
-            thunderbots_msgs::Ball ball_msg =
-                Util::ROSMessages::convertBallToROSMessage(ball);
-            world_msg.ball = ball_msg;
+            world.updateBallState(ball);
 
             Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
             int friendly_goalie_id =
                 Util::DynamicParameters::AI::refbox::friendly_goalie_id.value();
             friendly_team.assignGoalie(friendly_goalie_id);
-            thunderbots_msgs::Team friendly_team_msg =
-                Util::ROSMessages::convertTeamToROSMessage(friendly_team);
-            world_msg.friendly_team = friendly_team_msg;
+            world.updateFriendlyTeamState(friendly_team);
 
             Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
             int enemy_goalie_id =
                 Util::DynamicParameters::AI::refbox::enemy_goalie_id.value();
             enemy_team.assignGoalie(enemy_goalie_id);
-            thunderbots_msgs::Team enemy_team_msg =
-                Util::ROSMessages::convertTeamToROSMessage(enemy_team);
-            world_msg.enemy_team = enemy_team_msg;
+            world.updateEnemyTeamState(enemy_team);
         }
     }
 
+    // TODO
     // We invert the field side if we explicitly choose to override the values provided by
     // refbox. The 'defending_positive_side' parameter dictates the side we are defending
     // if we are overriding the value
-    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
-        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
-    {
-        world_msg = Util::ROSMessages::invertMsgFieldSide(world_msg);
-    }
+//    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
+//        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+//    {
+//        // TODO: we should not be inverting the field side like this. Instead,
+//        //       every class under `World` should have a `State` equivalent struct
+//        //       that backs it, that we can mutate before we update the actual
+//        //       class itself......
+//        // TODO: invert the world here
+//        world = Util::ROSMessages::invertMsgFieldSide(world);
+//    }
 
-    received_world_callback(world_msg);
+    received_world_callback(world);
 }
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    auto gamecontroller_data_msg = network_filter.getRefboxDataMsg(packet);
-    world_msg.refbox_data        = gamecontroller_data_msg;
+    thunderbots_msgs::RefboxData gamecontroller_data_msg = network_filter.getRefboxDataMsg(packet);
+    RefboxGameState new_game_state =
+            Util::ROSMessages::createGameStateFromROSMessage(gamecontroller_data_msg.command);
+    world.updateRefboxGameState(new_game_state);
 
-    received_world_callback(world_msg);
+    received_world_callback(world);
 }

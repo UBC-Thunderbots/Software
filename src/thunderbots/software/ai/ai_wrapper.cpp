@@ -12,25 +12,12 @@ AIWrapper::AIWrapper(ros::NodeHandle node_handle)
         Util::Constants::PLAY_INFO_TOPIC, 1);
 }
 
-void AIWrapper::newValueCallback(thunderbots_msgs::World world)
+void AIWrapper::newValueCallback(World world)
 {
-    updateKnownWorld(world);
+    currently_known_world = world;
     runAIAndSendPrimitives();
     publishPlayInfo();
     drawWorld();
-}
-
-void AIWrapper::updateKnownWorld(thunderbots_msgs::World world_msg)
-{
-    World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
-    currently_known_world.updateBallState(new_world.ball());
-    currently_known_world.updateFieldGeometry(new_world.field());
-    currently_known_world.updateEnemyTeamState(new_world.enemyTeam());
-    currently_known_world.updateFriendlyTeamState(new_world.friendlyTeam());
-    currently_known_world.updateTimestamp(new_world.getMostRecentTimestamp());
-    RefboxGameState new_game_state =
-        Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
-    currently_known_world.updateRefboxGameState(new_game_state);
 }
 
 void AIWrapper::publishPlayInfo()

@@ -18,7 +18,14 @@ void GrSimBackend::newValueCallback(Backend::PrimitiveVecPtr primitives)
     updateGrSim();
 }
 
-void GrSimBackend::setMostRecentlyReceivedWorld(Backend::World world)
+void GrSimBackend::receiveWorld(World world)
+{
+    setMostRecentlyReceivedWorld(world);
+    sendValueToObservers(world);
+    updateGrSim();
+}
+
+void GrSimBackend::setMostRecentlyReceivedWorld(World world)
 {
     std::scoped_lock lock(most_recently_received_world_mutex);
     most_recently_received_world = world;
@@ -30,13 +37,6 @@ void GrSimBackend::setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr pr
     most_recently_received_primitives = std::move(primitives);
 }
 
-void GrSimBackend::receiveWorld(Backend::World world)
-{
-    setMostRecentlyReceivedWorld(world);
-    sendValueToObservers(world);
-    updateGrSim();
-}
-
 void GrSimBackend::updateGrSim()
 {
     std::scoped_lock lock(most_recently_received_world_mutex,
@@ -45,11 +45,8 @@ void GrSimBackend::updateGrSim()
     // Update GrSim if we have all the information we need
     if (most_recently_received_world && most_recently_received_primitives)
     {
-        // TODO: we should stop passing ros msgs so we don't have to to this
-        auto world =
-            Util::ROSMessages::createWorldFromROSMessage(*most_recently_received_world);
-
         grsim_output.sendPrimitives(*most_recently_received_primitives,
-                                    world.friendlyTeam(), world.ball());
+                                    most_recently_received_world->friendlyTeam(),
+                                    most_recently_received_world->ball());
     }
 }

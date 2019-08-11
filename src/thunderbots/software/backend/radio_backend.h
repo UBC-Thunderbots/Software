@@ -13,12 +13,14 @@ class RadioBackend : public Backend
 
    private:
 
+    // TODO: make this configurable?
     static const int DEFAULT_RADIO_CONFIG = 0;
+
     // TODO: javadoc comments for all functions here
 
-    void continuouslySendPrimitivesInBuffer();
+    void newValueCallback(Backend::PrimitiveVecPtr primitives) override;
 
-    void receiveWorld(Backend::World world);
+    void receiveWorld(World world);
 
     // The interface with the network that lets us get new information about the world
     NetworkClient network_input;
@@ -26,16 +28,8 @@ class RadioBackend : public Backend
     // The interface that lets us send primitives to the robots over radio
     RadioOutput radio_output;
 
-    // A thread that constantly pulls new primitive vectors from the buffer
-    // and sends them out
-    std::thread radio_output_thread;
-
-    // A boolean indicating if we're in the destructor for this class
-    bool in_destructor;
-    std::mutex in_destructor_mutex;
-
     // TODO: doc comments for these?
-    std::optional<Backend::World> most_recently_received_world;
+    std::optional<World> most_recently_received_world;
     std::mutex most_recently_received_world_mutex;
 
     // TODO: doc comments for these?

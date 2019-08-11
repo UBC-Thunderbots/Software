@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ros/ros.h>
-#include <thunderbots_msgs/World.h>
 
 #include <boost/asio.hpp>
 #include <boost/exception/diagnostic_information.hpp>
@@ -12,6 +11,7 @@
 #include "network_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_referee.pb.h"
+#include "ai/world/world.h"
 
 /**
  * This class encapsulates our SSLVisionClient and SSLGameController clients to abstract
@@ -33,7 +33,7 @@ class NetworkClient
      */
     explicit NetworkClient(
         std::string vision_multicast_address, int vision_multicast_port,
-        std::function<void(thunderbots_msgs::World)> received_world_callback);
+        std::function<void(World)> received_world_callback);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and
@@ -92,7 +92,7 @@ class NetworkClient
     std::unique_ptr<SSLGameControllerClient> ssl_gamecontroller_client;
 
     // The most up-to-date state of the world
-    thunderbots_msgs::World world_msg;
+    World world;
 
     // The io_service that will be used to serivce all network requests
     boost::asio::io_service io_service;
@@ -110,5 +110,5 @@ class NetworkClient
     int initial_packet_count;
 
     // The callback function that we pass newly received/filtered worlds to
-    std::function<void(thunderbots_msgs::World)> received_world_callback;
+    std::function<void(World)> received_world_callback;
 };

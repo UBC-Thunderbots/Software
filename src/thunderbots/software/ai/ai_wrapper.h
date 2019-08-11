@@ -14,9 +14,10 @@
 
 // TODO: Better name for this class
 // TODO: javadoc comment here
-// TODO: explain shared_ptr->const vec->unique ptr
+// TODO: explain shared_ptr->const_vec->unique ptr for primitives here
+//       (WHY NOT JUST CONST REFERENCE??)
 class AIWrapper
-    : public ThreadedObserver<thunderbots_msgs::World>,
+    : public ThreadedObserver<World>,
       public Observable<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
     // TODO: javadoc comments for all these functions and members
@@ -27,9 +28,7 @@ class AIWrapper
 
 
    private:
-    void newValueCallback(thunderbots_msgs::World world) override;
-
-    void updateKnownWorld(thunderbots_msgs::World world_msg);
+    void newValueCallback(World world) override;
 
     void publishPlayInfo();
 

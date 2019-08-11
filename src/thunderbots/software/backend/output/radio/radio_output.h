@@ -33,19 +33,20 @@ class RadioOutput
     /**
      * Sends a camera packet with the detected robots and ball.
      *
-     * @param robots a vector of tuples of {robot id, robot location, robot orientation}
-     * @param b new ball
+     * @param friendly_robots a vector of tuples of {robot id, robot location,
+     *                        robot orientation}
+     * @param ball
      */
-    void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> robots,
+    void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots,
                             Ball ball);
 
     /**
      * Sends a camera packet with the detected robots and ball.
      *
-     * @param robots
+     * @param friendly_team
      * @param ball
      */
-    void send_vision_packet(const std::vector<Robot>& robots,
+    void send_vision_packet(const Team& friendly_team,
                             Ball ball);
 
    private:
