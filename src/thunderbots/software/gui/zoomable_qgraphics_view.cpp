@@ -8,7 +8,7 @@ ZoomableQGraphicsView::ZoomableQGraphicsView(QWidget *parent) : QGraphicsView(pa
 void ZoomableQGraphicsView::wheelEvent(QWheelEvent *event)
 {
     if (event->delta() > 0)
-        scale(1.075, 1.075);
+        scale(1.02, 1.02);
     else
-        scale(0.95, 0.95);
+        scale(0.98, 0.98);
 }
