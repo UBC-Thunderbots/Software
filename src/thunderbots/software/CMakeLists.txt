@@ -494,6 +494,8 @@ file(GLOB_RECURSE QT_RESOURCES LIST_DIRECTORIES false CONFIGURE_DEPENDS
         )
 file(GLOB_RECURSE GUI_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/*.cpp
+        # This gets all the factory info for plays
+        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
         )
 include_directories(SYSTEM "${Qt5Widgets_INCLUDE_DIRS}")
 add_executable (ai_gui
@@ -514,6 +516,11 @@ target_link_libraries(ai_gui
         tbots_world
         tbots_geom
         tbots_test_util
+        tbots_action
+        tbots_play
+        tbots_tactic
+        tbots_intent
+        tbots_primitive
         )
 
 

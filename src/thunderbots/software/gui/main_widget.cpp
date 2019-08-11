@@ -6,6 +6,7 @@
 #include <ui_main_widget.h>
 
 #include <iostream>
+#include "software/ai/hl/stp/play/play_factory.h"
 
 #include "gui/drawing/world.h"
 #include "test/test_util/test_util.h"
@@ -46,16 +47,26 @@ void MainWidget::setupTeamColourComboBox() {
 }
 
 void MainWidget::setupGameStateOverrideComboBox() {
-    main_widget->gamestate_override_combo_box->insertItem(0, "use Refbox");
+    // TODO: Set this up using factory values like the play override once a factory of these values is available
+    main_widget->gamestate_override_combo_box->insertItem(0, "None");
     main_widget->gamestate_override_combo_box->insertItem(1, "Play");
     main_widget->gamestate_override_combo_box->insertItem(2, "Halt");
     main_widget->gamestate_override_combo_box->insertItem(3, "Stop");
     connect(main_widget->gamestate_override_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "gamestate override changed " << text.toStdString() << std::endl;});
 }
+
 void MainWidget::setupPlayOverrideComboBox() {
+    auto play_names = PlayFactory::getRegisteredPlayNames();
+    // Sort the entries in alphabetical order from a-z
+    std::sort(play_names.begin(), play_names.end());
+
+    // Create a new list with all the play names converted to QStrings
+    QList<QString> qt_play_names;
+    std::transform(play_names.begin(), play_names.end(), std::back_inserter(qt_play_names), [](std::string name) {return QString::fromStdString(name);});
+
     main_widget->play_override_combo_box->insertItem(0, "None");
-    main_widget->play_override_combo_box->insertItem(0, "ExamplePlay");
-    main_widget->play_override_combo_box->insertItem(0, "Free Kick Friendly");
+    main_widget->play_override_combo_box->insertItems(1, qt_play_names);
+
     connect(main_widget->play_override_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "play override changed " << text.toStdString() << std::endl;});
 }
 
