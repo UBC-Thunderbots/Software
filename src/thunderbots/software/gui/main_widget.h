@@ -6,7 +6,7 @@
 #include <QOpenGLWidget>
 #include <QWidget>
 
-#include "gui/SceneView.h"
+#include "gui/zoomable_qgraphics_view.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui

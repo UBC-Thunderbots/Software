@@ -132,6 +132,7 @@ void MainWidget::updateRobotStatusMessages() {
 void MainWidget::setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget) {
     view->setScene(scene);
     view->setDragMode(QGraphicsView::ScrollHandDrag);
+    view->setBackgroundBrush(QBrush(Qt::darkGreen, Qt::SolidPattern));
 
     // Performance optimizations
     // https://stackoverflow.com/questions/43826317/how-to-optimize-qgraphicsviews-performance

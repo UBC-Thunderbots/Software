@@ -31,12 +31,18 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <property name="movable">
         <bool>true</bool>
        </property>
        <widget class="QWidget" name="ai_tab">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <attribute name="title">
          <string>AI</string>
         </attribute>
@@ -146,6 +152,12 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
        <widget class="QWidget" name="params_tab">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <attribute name="title">
          <string>Params</string>
         </attribute>
@@ -170,7 +182,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="MySceneView" name="ai_visualization_graphics_view">
+      <widget class="ZoomableQGraphicsView" name="ai_visualization_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
@@ -186,9 +198,9 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>MySceneView</class>
+   <class>ZoomableQGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>gui/SceneView.h</header>
+   <header>gui/zoomable_qgraphics_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -6,15 +6,12 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 
-class MySceneView : public QGraphicsView
+class ZoomableQGraphicsView : public QGraphicsView
 {
     Q_OBJECT
    public:
-    explicit MySceneView(QWidget *parent = 0);
+    explicit ZoomableQGraphicsView(QWidget *parent = 0);
 
    protected slots:
-
     void wheelEvent(QWheelEvent *event);
-
-    void keyPressEvent(QKeyEvent *event);
 };
