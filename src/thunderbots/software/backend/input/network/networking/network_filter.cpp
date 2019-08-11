@@ -6,6 +6,7 @@
 #include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "shared/constants.h"
 #include "util/constants.h"
+#include "util/refbox_constants.h"
 
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
@@ -84,8 +85,6 @@ Field NetworkFilter::createFieldFromPacketGeometry(
         std::string line_name            = line.name();
         ssl_field_lines[line_name]       = line;
     }
-
-    thunderbots_msgs::Field field_msg;
 
     // Extract the data we care about and convert all units to meters
     double field_length   = packet_geometry.field_length() * METERS_PER_MILLIMETER;
@@ -222,96 +221,73 @@ Team NetworkFilter::getFilteredEnemyTeamData(
     return enemy_team_state;
 }
 
-thunderbots_msgs::RefboxData NetworkFilter::getRefboxDataMsg(const Referee &packet)
+RefboxGameState NetworkFilter::getRefboxGameState(const Referee &packet)
 {
-    thunderbots_msgs::RefboxData refbox_data;
-    refbox_data.command.command = getTeamCommand(packet.command());
-    setOurFieldSide(packet.blue_team_on_positive_half());
-    auto designated_position = refboxGlobalToLocalPoint(packet.designated_position());
-    refbox_data.ball_placement_point.x = designated_position.x();
-    refbox_data.ball_placement_point.y = designated_position.y();
-    refbox_data.packet_timestamp       = packet.packet_timestamp();
-    refbox_data.command_timestamp      = packet.command_timestamp();
-
-    thunderbots_msgs::RefboxTeamInfo blue   = getTeamInfo(packet.blue());
-    thunderbots_msgs::RefboxTeamInfo yellow = getTeamInfo(packet.yellow());
-
-    if (Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
-    {
-        refbox_data.us   = blue;
-        refbox_data.them = yellow;
-    }
-    else
-    {
-        refbox_data.us   = yellow;
-        refbox_data.them = blue;
-    }
-
-    return refbox_data;
+            return getTeamCommand(packet.command());
 }
 
 // this maps a protobuf Referee_Command enum to its ROS message equivalent
 // this map is used when we are on the blue team
-const static std::unordered_map<Referee::Command, int> blue_team_command_map = {
-    {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
-    {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
-    {Referee_Command_NORMAL_START, thunderbots_msgs::RefboxCommand::NORMAL_START},
-    {Referee_Command_FORCE_START, thunderbots_msgs::RefboxCommand::FORCE_START},
+const static std::unordered_map<Referee::Command, RefboxGameState> blue_team_command_map = {
+    {Referee_Command_HALT, RefboxGameState::HALT},
+    {Referee_Command_STOP, RefboxGameState::STOP},
+    {Referee_Command_NORMAL_START, RefboxGameState::NORMAL_START},
+    {Referee_Command_FORCE_START, RefboxGameState::FORCE_START},
     {Referee_Command_PREPARE_KICKOFF_BLUE,
-     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US},
+     RefboxGameState::PREPARE_KICKOFF_US},
     {Referee_Command_PREPARE_KICKOFF_YELLOW,
-     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM},
+     RefboxGameState::PREPARE_KICKOFF_THEM},
     {Referee_Command_PREPARE_PENALTY_BLUE,
-     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US},
+     RefboxGameState::PREPARE_PENALTY_US},
     {Referee_Command_PREPARE_PENALTY_YELLOW,
-     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM},
-    {Referee_Command_DIRECT_FREE_BLUE, thunderbots_msgs::RefboxCommand::DIRECT_FREE_US},
+     RefboxGameState::PREPARE_PENALTY_THEM},
+    {Referee_Command_DIRECT_FREE_BLUE, RefboxGameState::DIRECT_FREE_US},
     {Referee_Command_DIRECT_FREE_YELLOW,
-     thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM},
+     RefboxGameState::DIRECT_FREE_THEM},
     {Referee_Command_INDIRECT_FREE_BLUE,
-     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US},
+     RefboxGameState::INDIRECT_FREE_US},
     {Referee_Command_INDIRECT_FREE_YELLOW,
-     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM},
-    {Referee_Command_TIMEOUT_BLUE, thunderbots_msgs::RefboxCommand::TIMEOUT_US},
-    {Referee_Command_TIMEOUT_YELLOW, thunderbots_msgs::RefboxCommand::TIMEOUT_THEM},
-    {Referee_Command_GOAL_BLUE, thunderbots_msgs::RefboxCommand::GOAL_US},
-    {Referee_Command_GOAL_YELLOW, thunderbots_msgs::RefboxCommand::GOAL_THEM},
+     RefboxGameState::INDIRECT_FREE_THEM},
+    {Referee_Command_TIMEOUT_BLUE, RefboxGameState::TIMEOUT_US},
+    {Referee_Command_TIMEOUT_YELLOW, RefboxGameState::TIMEOUT_THEM},
+    {Referee_Command_GOAL_BLUE, RefboxGameState::GOAL_US},
+    {Referee_Command_GOAL_YELLOW, RefboxGameState::GOAL_THEM},
     {Referee_Command_BALL_PLACEMENT_BLUE,
-     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US},
+     RefboxGameState::BALL_PLACEMENT_US},
     {Referee_Command_BALL_PLACEMENT_YELLOW,
-     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM}};
+     RefboxGameState::BALL_PLACEMENT_THEM}};
 
 // this maps a protobuf Referee_Command enum to its ROS message equivalent
 // this map is used when we are on the yellow team
-const static std::unordered_map<Referee::Command, int> yellow_team_command_map = {
-    {Referee_Command_HALT, thunderbots_msgs::RefboxCommand::HALT},
-    {Referee_Command_STOP, thunderbots_msgs::RefboxCommand::STOP},
-    {Referee_Command_NORMAL_START, thunderbots_msgs::RefboxCommand::NORMAL_START},
-    {Referee_Command_FORCE_START, thunderbots_msgs::RefboxCommand::FORCE_START},
+const static std::unordered_map<Referee::Command, RefboxGameState> yellow_team_command_map = {
+    {Referee_Command_HALT, RefboxGameState::HALT},
+    {Referee_Command_STOP, RefboxGameState::STOP},
+    {Referee_Command_NORMAL_START, RefboxGameState::NORMAL_START},
+    {Referee_Command_FORCE_START, RefboxGameState::FORCE_START},
     {Referee_Command_PREPARE_KICKOFF_BLUE,
-     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_THEM},
+     RefboxGameState::PREPARE_KICKOFF_THEM},
     {Referee_Command_PREPARE_KICKOFF_YELLOW,
-     thunderbots_msgs::RefboxCommand::PREPARE_KICKOFF_US},
+     RefboxGameState::PREPARE_KICKOFF_US},
     {Referee_Command_PREPARE_PENALTY_BLUE,
-     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_THEM},
+     RefboxGameState::PREPARE_PENALTY_THEM},
     {Referee_Command_PREPARE_PENALTY_YELLOW,
-     thunderbots_msgs::RefboxCommand::PREPARE_PENALTY_US},
-    {Referee_Command_DIRECT_FREE_BLUE, thunderbots_msgs::RefboxCommand::DIRECT_FREE_THEM},
-    {Referee_Command_DIRECT_FREE_YELLOW, thunderbots_msgs::RefboxCommand::DIRECT_FREE_US},
+     RefboxGameState::PREPARE_PENALTY_US},
+    {Referee_Command_DIRECT_FREE_BLUE, RefboxGameState::DIRECT_FREE_THEM},
+    {Referee_Command_DIRECT_FREE_YELLOW, RefboxGameState::DIRECT_FREE_US},
     {Referee_Command_INDIRECT_FREE_BLUE,
-     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_THEM},
+     RefboxGameState::INDIRECT_FREE_THEM},
     {Referee_Command_INDIRECT_FREE_YELLOW,
-     thunderbots_msgs::RefboxCommand::INDIRECT_FREE_US},
-    {Referee_Command_TIMEOUT_BLUE, thunderbots_msgs::RefboxCommand::TIMEOUT_THEM},
-    {Referee_Command_TIMEOUT_YELLOW, thunderbots_msgs::RefboxCommand::TIMEOUT_US},
-    {Referee_Command_GOAL_BLUE, thunderbots_msgs::RefboxCommand::GOAL_THEM},
-    {Referee_Command_GOAL_YELLOW, thunderbots_msgs::RefboxCommand::GOAL_US},
+     RefboxGameState::INDIRECT_FREE_US},
+    {Referee_Command_TIMEOUT_BLUE, RefboxGameState::TIMEOUT_THEM},
+    {Referee_Command_TIMEOUT_YELLOW, RefboxGameState::TIMEOUT_US},
+    {Referee_Command_GOAL_BLUE, RefboxGameState::GOAL_THEM},
+    {Referee_Command_GOAL_YELLOW, RefboxGameState::GOAL_US},
     {Referee_Command_BALL_PLACEMENT_BLUE,
-     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_THEM},
+     RefboxGameState::BALL_PLACEMENT_THEM},
     {Referee_Command_BALL_PLACEMENT_YELLOW,
-     thunderbots_msgs::RefboxCommand::BALL_PLACEMENT_US}};
+     RefboxGameState::BALL_PLACEMENT_US}};
 
-int32_t NetworkFilter::getTeamCommand(const Referee::Command &command)
+RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
 {
     if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
     {
@@ -323,17 +299,17 @@ int32_t NetworkFilter::getTeamCommand(const Referee::Command &command)
     }
 }
 
-Point NetworkFilter::refboxGlobalToLocalPoint(const Referee::Point &point)
-{
-    if (our_field_side == FieldSide::WEST)
-    {
-        return Point(-point.x(), -point.y());
-    }
-    else
-    {
-        return Point(point.x(), point.y());
-    }
-}
+//Point NetworkFilter::refboxGlobalToLocalPoint(const Referee::Point &point)
+//{
+//    if (our_field_side == FieldSide::WEST)
+//    {
+//        return Point(-point.x(), -point.y());
+//    }
+//    else
+//    {
+//        return Point(point.x(), point.y());
+//    }
+//}
 
 void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
 {
@@ -360,20 +336,20 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
         }
     }
 }
-
-thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(
-    const Referee::TeamInfo &team_info)
-{
-    thunderbots_msgs::RefboxTeamInfo refbox_team_info;
-    refbox_team_info.team_name = team_info.name();
-    refbox_team_info.score     = team_info.score();
-    refbox_team_info.red_cards = team_info.red_cards();
-    for (auto card_time : team_info.yellow_card_times())
-    {
-        refbox_team_info.yellow_card_times.push_back(card_time);
-    }
-    refbox_team_info.timeouts     = team_info.timeouts();
-    refbox_team_info.timeout_time = team_info.timeout_time();
-    refbox_team_info.goalie       = team_info.goalkeeper();
-    return refbox_team_info;
-}
+//
+//thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(
+//    const Referee::TeamInfo &team_info)
+//{
+//    thunderbots_msgs::RefboxTeamInfo refbox_team_info;
+//    refbox_team_info.team_name = team_info.name();
+//    refbox_team_info.score     = team_info.score();
+//    refbox_team_info.red_cards = team_info.red_cards();
+//    for (auto card_time : team_info.yellow_card_times())
+//    {
+//        refbox_team_info.yellow_card_times.push_back(card_time);
+//    }
+//    refbox_team_info.timeouts     = team_info.timeouts();
+//    refbox_team_info.timeout_time = team_info.timeout_time();
+//    refbox_team_info.goalie       = team_info.goalkeeper();
+//    return refbox_team_info;
+//}

@@ -1,5 +1,3 @@
-#include "util/ros_messages.h"
-
 #include <gtest/gtest.h>
 
 TEST(ROSMessageUtilTest, create_ball_from_ros_message)

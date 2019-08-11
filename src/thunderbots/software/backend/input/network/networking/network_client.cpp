@@ -6,7 +6,6 @@
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameters.h"
-#include "util/ros_messages.h"
 
 NetworkClient::NetworkClient(
     std::string vision_multicast_address, int vision_multicast_port,
@@ -171,10 +170,8 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
 void NetworkClient::filterAndPublishGameControllerData(Referee packet)
 {
-    thunderbots_msgs::RefboxData gamecontroller_data_msg = network_filter.getRefboxDataMsg(packet);
-    RefboxGameState new_game_state =
-            Util::ROSMessages::createGameStateFromROSMessage(gamecontroller_data_msg.command);
-    world.updateRefboxGameState(new_game_state);
+    RefboxGameState game_state = network_filter.getRefboxGameState(packet);
+    world.updateRefboxGameState(game_state);
 
     received_world_callback(world);
 }

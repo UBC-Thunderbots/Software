@@ -10,7 +10,7 @@
 #include "multithreading/observable.h"
 #include "multithreading/threaded_observer.h"
 #include "primitive/primitive.h"
-#include "thunderbots_msgs/World.h"
+#include "thunderbots_msgs/PlayInfo.h"
 
 // TODO: Better name for this class
 // TODO: javadoc comment here
@@ -34,6 +34,9 @@ class AIWrapper
 
     void runAIAndSendPrimitives();
     void drawWorld();
+
+    thunderbots_msgs::PlayInfo convertPlayInfoToROSMessage(
+        const PlayInfo& play_info);
 
     AI ai;
 

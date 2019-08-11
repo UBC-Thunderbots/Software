@@ -1,7 +1,6 @@
 #include "backend/radio_backend.h"
 
 #include "util/constants.h"
-#include "util/ros_messages.h"
 
 RadioBackend::RadioBackend(ros::NodeHandle node_handle)
     : network_input(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,

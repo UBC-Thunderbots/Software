@@ -238,15 +238,6 @@ target_link_libraries(tbots_canvas_messenger
     )
 add_dependencies(tbots_canvas_messenger ${catkin_EXPORTED_TARGETS})
 
-# ROS Message Utils
-add_library(tbots_ros_msg_util STATIC
-        util/ros_messages.cpp
-        )
-add_dependencies(tbots_ros_msg_util ${catkin_EXPORTED_TARGETS})
-target_link_libraries(tbots_ros_msg_util
-    tbots_world
-    )
-
 # Math Utils
 add_library(tbots_math STATIC
         util/math_functions.cpp
@@ -407,7 +398,6 @@ add_library(tbots_shared STATIC
 #        tbots_world
 #        tbots_proto
 #        tbots_parameter
-#        tbots_ros_msg_util
 #        tbots_math
 #        )
 
@@ -446,7 +436,6 @@ target_link_libraries(full_system
         tbots_primitive
         tbots_parameter
         tbots_proto
-        tbots_ros_msg_util
         tbots_canvas_messenger
         tbots_backend
         )
@@ -469,7 +458,6 @@ target_link_libraries(full_system
 #        tbots_geom
 #        tbots_proto
 #        tbots_parameter
-#        tbots_ros_msg_util
 #        )
 
 #file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -491,7 +479,6 @@ target_link_libraries(full_system
 #        tbots_world
 #        tbots_time
 #        tbots_parameter
-#        tbots_ros_msg_util
 #        )
 
 file(GLOB DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -517,23 +504,6 @@ target_link_libraries(parameters
 file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
         )
-add_executable (xbox_controller_mapping
-        ${XBOX_CONTROLLER_MAPPING_SRC}
-        )
-# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-# This way the message headers are always generated before they are used in compilation here.
-add_dependencies(xbox_controller_mapping ${catkin_EXPORTED_TARGETS})
-target_link_libraries(xbox_controller_mapping
-        ${catkin_LIBRARIES}
-        ${G3LOG}
-        tbots_primitive
-        tbots_world
-        tbots_shared
-        tbots_time
-        tbots_parameter
-        tbots_ros_msg_util
-        )
-
 
 #############
 ## Testing ##
@@ -595,17 +565,6 @@ if (CATKIN_ENABLE_TESTING)
             ../shared/util.c
             ../shared/util.h)
     target_link_libraries(shared_util_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(ros_message_util_test
-            test/util/ros_messages.cpp
-            )
-    target_link_libraries(ros_message_util_test 
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            tbots_world
-            tbots_geom
-            tbots_ros_msg_util
-            )
 
     catkin_add_gtest(world_test
             test/ai/world/ball.cpp
@@ -1031,16 +990,6 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(logger_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_time
-        )
-
-    # The test node that verifies the rostest utils are working correctly
-    add_rostest_gtest(rostest_util_test 
-        test/test_util/rostest_util_test.test
-        test/test_util/rostest_util_test.cpp
-        )
-    target_link_libraries(rostest_util_test 
-        ${catkin_LIBRARIES}
         tbots_time
         )
 

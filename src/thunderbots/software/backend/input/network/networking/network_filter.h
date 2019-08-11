@@ -11,12 +11,8 @@
 #include "backend/input/network/filter/robot_team_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_referee.pb.h"
-#include "thunderbots_msgs/Ball.h"
-#include "thunderbots_msgs/Field.h"
-#include "thunderbots_msgs/RefboxData.h"
-#include "thunderbots_msgs/Robot.h"
-#include "thunderbots_msgs/Team.h"
 #include "util/time/timestamp.h"
+#include "util/refbox_constants.h"
 
 class NetworkFilter
 {
@@ -70,7 +66,7 @@ class NetworkFilter
      */
     Team getFilteredEnemyTeamData(const std::vector<SSL_DetectionFrame> &detections);
 
-    thunderbots_msgs::RefboxData getRefboxDataMsg(const Referee &packet);
+    RefboxGameState getRefboxGameState(const Referee &packet);
 
     virtual ~NetworkFilter() = default;
 
@@ -118,18 +114,20 @@ class NetworkFilter
      * @param command a referee command from the protobuf message
      * @return a ROS message RefboxCommand constant corresponding to the input command
      */
-    int32_t getTeamCommand(const Referee::Command &command);
-    /**
-     * Converts a protobuf point from global coordinates into a Point in local coordinates
-     * (+x as enemy side, -x as friendly side)
-     * @param point Protobuf point in global coordinates from the Refbox
-     * @return the same point, as a Point in local coordinates
-     */
-    Point refboxGlobalToLocalPoint(const Referee::Point &point);
-    /**
-     * Converts a protobuf TeamInfo message from Refbox into a RefboxTeamInfo ROS message.
-     * @param team_info protobuf TeamInfo message
-     * @return ROS message for team info
-     */
-    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo &team_info);
+    RefboxGameState getTeamCommand(const Referee::Command &command);
+
+//    /**
+//     * Converts a protobuf point from global coordinates into a Point in local coordinates
+//     * (+x as enemy side, -x as friendly side)
+//     * @param point Protobuf point in global coordinates from the Refbox
+//     * @return the same point, as a Point in local coordinates
+//     */
+//    Point refboxGlobalToLocalPoint(const Referee::Point &point);
+//
+//    /**
+//     * Converts a protobuf TeamInfo message from Refbox into a RefboxTeamInfo ROS message.
+//     * @param team_info protobuf TeamInfo message
+//     * @return ROS message for team info
+//     */
+//    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo &team_info);
 };

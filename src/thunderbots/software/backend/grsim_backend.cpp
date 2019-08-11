@@ -1,7 +1,6 @@
 #include "backend/grsim_backend.h"
 
 #include "util/constants.h"
-#include "util/ros_messages.h"
 
 GrSimBackend::GrSimBackend()
     : network_input(Util::Constants::SSL_VISION_MULTICAST_ADDRESS,

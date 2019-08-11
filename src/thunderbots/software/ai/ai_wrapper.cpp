@@ -2,9 +2,10 @@
 
 #include <boost/bind.hpp>
 
+#include "thunderbots_msgs/PlayInfo.h"
+
 #include "util/canvas_messenger/canvas_messenger.h"
 #include "util/parameter/dynamic_parameters.h"
-#include "util/ros_messages.h"
 
 AIWrapper::AIWrapper(ros::NodeHandle node_handle)
 {
@@ -24,7 +25,7 @@ void AIWrapper::newValueCallback(World world)
 void AIWrapper::publishPlayInfo()
 {
     auto play_info_msg =
-        Util::ROSMessages::convertPlayPlayInfoToROSMessage(ai.getPlayInfo());
+        convertPlayInfoToROSMessage(ai.getPlayInfo());
     play_info_publisher.publish(play_info_msg);
 }
 
@@ -48,3 +49,18 @@ void AIWrapper::drawWorld()
         Util::CanvasMessenger::getInstance();
     canvas_messenger->drawWorld(currently_known_world);
 }
+       thunderbots_msgs::PlayInfo AIWrapper::convertPlayInfoToROSMessage(
+            const PlayInfo& play_info)
+        {
+            thunderbots_msgs::PlayInfo msg;
+
+            msg.play_name = play_info.play_name;
+            msg.play_type = play_info.play_type;
+
+            for (const auto& tactic : play_info.robot_tactic_assignment)
+            {
+                msg.robot_tactic_assignment.emplace_back(tactic);
+            }
+
+            return msg;
+        }
