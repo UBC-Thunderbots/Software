@@ -110,8 +110,17 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
     if (packet.has_detection())
     {
-        const auto& detection = packet.detection();
+        SSL_DetectionFrame detection = *packet.mutable_detection();
         bool camera_disabled  = false;
+
+        // We invert the field side if we explicitly choose to override the values provided by
+        // refbox. The 'defending_positive_side' parameter dictates the side we are defending
+        // if we are overriding the value
+        if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
+            Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+        {
+            invertFieldSide(detection);
+        }
 
         switch (detection.camera_id())
         {
@@ -147,30 +156,15 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             int friendly_goalie_id =
                 Util::DynamicParameters::AI::refbox::friendly_goalie_id.value();
             friendly_team.assignGoalie(friendly_goalie_id);
-            world.updateFriendlyTeamState(friendly_team);
+            world.mutableFriendlyTeam() = friendly_team;
 
             Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
             int enemy_goalie_id =
                 Util::DynamicParameters::AI::refbox::enemy_goalie_id.value();
             enemy_team.assignGoalie(enemy_goalie_id);
-            world.updateEnemyTeamState(enemy_team);
+            world.mutableEnemyTeam() = enemy_team;
         }
     }
-
-    // TODO
-    // We invert the field side if we explicitly choose to override the values provided by
-    // refbox. The 'defending_positive_side' parameter dictates the side we are defending
-    // if we are overriding the value
-//    if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
-//        Util::DynamicParameters::AI::refbox::defending_positive_side.value())
-//    {
-//        // TODO: we should not be inverting the field side like this. Instead,
-//        //       every class under `World` should have a `State` equivalent struct
-//        //       that backs it, that we can mutate before we update the actual
-//        //       class itself......
-//        // TODO: invert the world here
-//        world = Util::ROSMessages::invertMsgFieldSide(world);
-//    }
 
     received_world_callback(world);
 }
@@ -183,4 +177,18 @@ void NetworkClient::filterAndPublishGameControllerData(Referee packet)
     world.updateRefboxGameState(new_game_state);
 
     received_world_callback(world);
+}
+
+void NetworkClient::invertFieldSide(SSL_DetectionFrame& frame) {
+    for (SSL_DetectionBall& ball : *frame.mutable_balls()){
+        ball.set_x(-ball.x());
+        ball.set_y(-ball.y());
+    }
+    for (const auto& team : {frame.mutable_robots_yellow(), frame.mutable_robots_blue()}){
+        for (SSL_DetectionRobot& robot : *team){
+            robot.set_x(-robot.x());
+            robot.set_y(-robot.y());
+            robot.set_orientation(robot.orientation() + M_PI);
+        }
+    }
 }

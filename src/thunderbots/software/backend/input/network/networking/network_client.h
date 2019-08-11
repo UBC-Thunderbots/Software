@@ -82,6 +82,13 @@ class NetworkClient
      */
     void filterAndPublishGameControllerData(Referee packet);
 
+    /**
+     * Inverts all positions and orientations across the y axis of the field
+     *
+     * @param frame The frame to invert. It will be mutated in-place
+     */
+    static void invertFieldSide(SSL_DetectionFrame& frame);
+
     // The backend that handles data filtering and processing
     NetworkFilter network_filter;
 

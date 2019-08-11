@@ -12,6 +12,7 @@ AIWrapper::AIWrapper(ros::NodeHandle node_handle)
         Util::Constants::PLAY_INFO_TOPIC, 1);
 }
 
+// TODO: rename to `onValueReceived` here and in ALL other instances (DON'T TRUST CLION)
 void AIWrapper::newValueCallback(World world)
 {
     currently_known_world = world;
