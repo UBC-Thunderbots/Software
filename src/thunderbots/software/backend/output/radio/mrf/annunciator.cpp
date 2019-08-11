@@ -7,6 +7,7 @@
 #include "messages.h"
 #include "shared/constants.h"
 #include "util/logger/init.h"
+#include "util/constants.h"
 
 namespace
 {

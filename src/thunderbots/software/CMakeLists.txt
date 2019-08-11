@@ -939,16 +939,6 @@ endif()
 if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
-    # The test node that verifies the logger is working correctly
-    add_rostest_gtest(logger_test test/util/logger_test.test
-            test/util/logger_test.cpp
-            )
-    target_link_libraries(logger_test 
-        ${catkin_LIBRARIES}
-        ${G3LOG}
-        tbots_time
-        )
-
     # The test node that verifies the dynamic_parameters are working
     add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
             test/util/test_dynamic_parameters.cpp

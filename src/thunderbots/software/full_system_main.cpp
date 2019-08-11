@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 
     connectObservers();
 
-    Util::Logger::LoggerSingleton::initializeLogger(*node_handle);
+    Util::Logger::LoggerSingleton::initializeLogger();
     Util::CanvasMessenger::getInstance()->initializePublisher(*node_handle);
 
     auto update_subscribers =
