@@ -7,7 +7,7 @@
 
 #include "ai/ai.h"
 #include "ai/world/world.h"
-#include "multithreading/observable.h"
+#include "multithreading/subject.h"
 #include "multithreading/threaded_observer.h"
 #include "primitive/primitive.h"
 #include "thunderbots_msgs/PlayInfo.h"
@@ -18,7 +18,7 @@
 //       (WHY NOT JUST CONST REFERENCE??)
 class AIWrapper
     : public ThreadedObserver<World>,
-      public Observable<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+      public Subject<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
     // TODO: javadoc comments for all these functions and members
    public:

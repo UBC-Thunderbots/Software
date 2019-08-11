@@ -7,9 +7,9 @@
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Packet.pb.h"
 
-TEST(GrSimBackendTest, create_grsim_packet_zero_vel)
+TEST(GrSimOutputTest, create_grsim_packet_zero_vel)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         0, true, Point(), Angle::zero(), 0.0, false, false);
@@ -39,9 +39,9 @@ TEST(GrSimBackendTest, create_grsim_packet_zero_vel)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_positive_vel)
+TEST(GrSimOutputTest, create_grsim_packet_positive_vel)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         6, false, Point(89.6, 0.1589), Angle::ofRadians(1.23), 0.0, false, false);
@@ -71,9 +71,9 @@ TEST(GrSimBackendTest, create_grsim_packet_positive_vel)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_negative_vel)
+TEST(GrSimOutputTest, create_grsim_packet_negative_vel)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         1, true, Point(-0.001, 2.49), Angle::ofRadians(-0.04), 0.0, false, false);
@@ -103,9 +103,9 @@ TEST(GrSimBackendTest, create_grsim_packet_negative_vel)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_at_numeric_limits)
+TEST(GrSimOutputTest, create_grsim_packet_at_numeric_limits)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -137,9 +137,9 @@ TEST(GrSimBackendTest, create_grsim_packet_at_numeric_limits)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_beyond_numeric_limits)
+TEST(GrSimOutputTest, create_grsim_packet_beyond_numeric_limits)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -171,9 +171,9 @@ TEST(GrSimBackendTest, create_grsim_packet_beyond_numeric_limits)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_with_kick)
+TEST(GrSimOutputTest, create_grsim_packet_with_kick)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         0, true, Point(), Angle::zero(), 4.0, false, false);
@@ -203,9 +203,9 @@ TEST(GrSimBackendTest, create_grsim_packet_with_kick)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_with_chip)
+TEST(GrSimOutputTest, create_grsim_packet_with_chip)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,
@@ -237,9 +237,9 @@ TEST(GrSimBackendTest, create_grsim_packet_with_chip)
     EXPECT_TRUE(messages_equal);
 }
 
-TEST(GrSimBackendTest, create_grsim_packet_with_dribbler_on)
+TEST(GrSimOutputTest, create_grsim_packet_with_dribbler_on)
 {
-    GrSimBackend backend = GrSimBackend("127.0.0.1", 20011);
+    GrSimOutput backend = GrSimOutput("127.0.0.1", 20011);
 
     grSim_Packet result = backend.createGrSimPacketWithRobotVelocity(
         2, true,

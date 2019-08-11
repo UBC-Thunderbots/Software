@@ -2,12 +2,10 @@
 
 #include "multithreading/thread_safe_buffer.h"
 
-// TODO: Rename to "Subscriber" (and rename "Observable" to "Publisher"?)
-
 // TODO: TEST THIS CLASS
 /**
- * This class observes an "Observable<T>". That is, it can be registered with an
- * "Observable<T>" to receive new instances of type T when they are available
+ * This class observes an "Subject<T>". That is, it can be registered with an
+ * "Subject<T>" to receive new instances of type T when they are available
  *
  * @tparam T The type of object this class is observing
  */
@@ -41,8 +39,6 @@ class Observer
 
     ThreadSafeBuffer<T> buffer;
 };
-
-// TODO: all this implementation can probably be in a `.cpp` file...same for Observable
 
 template <typename T>
 Observer<T>::Observer() : buffer(DEFAULT_BUFFER_SIZE)

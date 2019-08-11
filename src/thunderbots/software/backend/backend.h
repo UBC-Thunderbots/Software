@@ -2,7 +2,7 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
-#include "multithreading/observable.h"
+#include "multithreading/subject.h"
 #include "multithreading/threaded_observer.h"
 
 /**
@@ -11,10 +11,10 @@
  * need to be sent out (generally to the robots).
  *
  * This produce/consume pattern is performed by extending both "Observer" and
- * "Observable". Please see the the implementation of those classes for details.
+ * "Subject". Please see the the implementation of those classes for details.
  */
 class Backend
-    : public Observable<World>,
+    : public Subject<World>,
       public ThreadedObserver<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
    public:

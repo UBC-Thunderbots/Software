@@ -4,7 +4,7 @@
 
 // TODO: TEST THIS CLASS
 /**
- * This class represents something that can be observed.
+ * This class represents something that can be watched by an Observer.
  *
  * The general usage should be to pass "Observer<T>" objects into "registerObserver".
  * These "Observer<T>" objects will receive new data from this class when it is
@@ -13,10 +13,9 @@
  * @tparam T The type of object that is being provided to all registered Observers
  */
 template <typename T>
-class Observable
+class Subject
 {
    public:
-    // TODO: better name for this function?
     /**
      * Register the given observer with this class to receive new values when
      * they are available
@@ -25,7 +24,7 @@ class Observable
      */
     void registerObserver(std::shared_ptr<Observer<T>> observer);
 
-    virtual ~Observable() = default;
+    virtual ~Subject() = default;
 
    protected:
     /**
@@ -41,13 +40,13 @@ class Observable
 };
 
 template <typename T>
-void Observable<T>::registerObserver(std::shared_ptr<Observer<T>> observer)
+void Subject<T>::registerObserver(std::shared_ptr<Observer<T>> observer)
 {
     observers.emplace_back(observer);
 }
 
 template <typename T>
-void Observable<T>::sendValueToObservers(T val)
+void Subject<T>::sendValueToObservers(T val)
 {
     for (std::shared_ptr<Observer<T>>& observer : observers)
     {

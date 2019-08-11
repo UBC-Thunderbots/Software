@@ -319,6 +319,53 @@ target_link_libraries(tbots_navigator
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
+# Networking Input
+file(GLOB_RECURSE TBOTS_NETWORK_INPUT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/input/network/*.cpp
+        )
+add_library(tbots_network_input STATIC
+        ${TBOTS_NETWORK_INPUT_LIB_SRC}
+        )
+target_link_libraries(tbots_network_input
+        tbots_proto
+        Eigen3::Eigen
+        )
+
+# GrSim Output
+file(GLOB_RECURSE TBOTS_GRSIM_OUTPUT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/output/grsim/*.cpp
+        )
+add_library(tbots_grsim_output STATIC
+        ${TBOTS_GRSIM_OUTPUT_LIB_SRC}
+        )
+target_link_libraries(tbots_grsim_output
+        tbots_proto
+        )
+
+# Radio Output
+file(GLOB_RECURSE TBOTS_RADIO_OUTPUT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/output/radio/*.cpp
+        )
+add_library(tbots_radio_output STATIC
+        ${TBOTS_RADIO_OUTPUT_LIB_SRC}
+        )
+target_link_libraries(tbots_radio_output
+        ${LIBUSB_1_LIBRARIES}
+        )
+
+# Backends
+file(GLOB TBOTS_BACKEND_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend//*.cpp
+        )
+add_library(tbots_backend STATIC
+        ${TBOTS_BACKEND_LIB_SRC}
+        )
+target_link_libraries(tbots_backend
+        tbots_network_input
+        tbots_radio_output
+        tbots_grsim_output
+        )
+
 # Test Utils
 add_library(tbots_test_util STATIC
         test/test_util/test_util.cpp
@@ -340,32 +387,6 @@ target_link_libraries(tbots_proto
     ${PROTOBUF_LIBRARIES}
     )
 
-
-# TODO: this should not all be in one lib
-file(GLOB_RECURSE TBOTS_BACKEND_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend/*.cpp
-        )
-add_library(tbots_backend STATIC
-        ${TBOTS_BACKEND_SRC}
-        )
-target_link_libraries(tbots_backend
-        tbots_proto
-        Eigen3::Eigen
-        ${LIBUSB_1_LIBRARIES}
-        )
-
-
-# Multithreading (TODO: don't need this, it's header only)
-#file(GLOB TBOTS_MULTITHREADING_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/multithreading/*.cpp
-#        )
-#add_library(tbots_multithreading STATIC
-#    ${TBOTS_MULTITHREADING_LIB_SRC}
-#    )
-#target_link_libraries(tbots_multithreading
-#    ${Boost_LIBRARIES}
-#    )
-
 # Shared
 file(GLOB TBOTS_SHARED_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/../shared/*.cpp
@@ -379,27 +400,6 @@ add_library(tbots_shared STATIC
 #################
 ## Executables ##
 #################
-
-#file(GLOB_RECURSE NETWORK_INPUT_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/network/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/network/*.h
-#        )
-#add_executable (network
-#        ${NETWORK_INPUT_SRC}
-#        )
-## Depend on exported targets (other packages) so that the messages in our #thunderbots_msgs package are built first.
-## This way the message headers are always generated before they are used in #compilation here.
-#add_dependencies(network ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(network
-#        ${catkin_LIBRARIES}
-#        ${G3LOG}
-#        Eigen3::Eigen
-#        tbots_geom
-#        tbots_world
-#        tbots_proto
-#        tbots_parameter
-#        tbots_math
-#        )
 
 file(GLOB FULL_SYSTEM_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
@@ -439,47 +439,6 @@ target_link_libraries(full_system
         tbots_canvas_messenger
         tbots_backend
         )
-
-#file(GLOB GRSIM_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/grsim/*.h
-#        )
-#add_executable (grsim
-#        ${GRSIM_COMMUNICATION_SRC}
-#        )
-
-## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-## This way the message headers are always generated before they are used in compilation here.
-#add_dependencies(grsim ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(grsim ${catkin_LIBRARIES}
-#        ${G3LOG}
-#        tbots_primitive
-#        tbots_world
-#        tbots_geom
-#        tbots_proto
-#        tbots_parameter
-#        )
-
-#file(GLOB_RECURSE RADIO_COMMUNICATION_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/radio/*.cpp
-#        ${CMAKE_CURRENT_SOURCE_DIR}/radio/*.h
-#        )
-#add_executable (radio
-#        ${RADIO_COMMUNICATION_SRC}
-#        )
-## Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-## This way the message headers are always generated before they are used in compilation here.
-#add_dependencies(radio ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(radio
-#        ${catkin_LIBRARIES}
-#        ${G3LOG}
-#        ${LIBUSB_1_LIBRARIES}
-#        tbots_shared
-#        tbots_primitive
-#        tbots_world
-#        tbots_time
-#        tbots_parameter
-#        )
 
 file(GLOB DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
@@ -595,28 +554,27 @@ if (CATKIN_ENABLE_TESTING)
             tbots_test_util
             )
 
-        # TODO: Re-add and re-enable me!
-#    catkin_add_gtest(grsim_communication_test
-#            grsim/grsim_backend.cpp
-#            grsim/grsim_command_primitive_visitor.cpp
-#            grsim/motion_controller.cpp
-#            test/grsim/dribble_primitive.cpp
-#            test/grsim/grsim_backend.cpp
-#            test/grsim/catch_primitive.cpp
-#            test/grsim/pivot_primitive.cpp
-#            test/grsim/movespin_primitive.cpp
-#            test/grsim/main.cpp
-#            test/grsim/motion_controller.cpp
-#            )
-#    target_link_libraries(grsim_communication_test
-#            ${catkin_LIBRARIES}
-#            ${G3LOG}
-#            tbots_proto
-#            tbots_geom
-#            tbots_world
-#            tbots_primitive
-#            tbots_test_util
-#            )
+    catkin_add_gtest(grsim_output_test
+            backend/output/grsim/grsim_output.cpp
+            backend/output/grsim/grsim_command_primitive_visitor.cpp
+            backend/output/grsim/motion_controller.cpp
+            test/backend/output/grsim/dribble_primitive.cpp
+            test/backend/output/grsim/grsim_output.cpp
+            test/backend/output/grsim/catch_primitive.cpp
+            test/backend/output/grsim/pivot_primitive.cpp
+            test/backend/output/grsim/movespin_primitive.cpp
+            test/backend/output/grsim/main.cpp
+            test/backend/output/grsim/motion_controller.cpp
+            )
+    target_link_libraries(grsim_output_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            tbots_proto
+            tbots_geom
+            tbots_world
+            tbots_primitive
+            tbots_test_util
+            )
 
     catkin_add_gtest(primitive_test
             test/ai/primitive/catch_primitive.cpp
@@ -641,16 +599,15 @@ if (CATKIN_ENABLE_TESTING)
         )
 
 
-        # TODO: re-add and re-enable me
-#    catkin_add_gtest(mrf_primitive_visitor_test
-#            test/radio/visitor/mrf_primitive_visitor.cpp
-#            radio/visitor/mrf_primitive_visitor.cpp
-#            )
-#    target_link_libraries(mrf_primitive_visitor_test
-#        ${catkin_LIBRARIES}
-#        ${G3LOG}
-#        tbots_primitive
-#        )
+    catkin_add_gtest(mrf_primitive_visitor_test
+            test/backend/output/radio/visitor/mrf_primitive_visitor.cpp
+            backend/output/radio/visitor/mrf_primitive_visitor.cpp
+            )
+    target_link_libraries(mrf_primitive_visitor_test
+        ${catkin_LIBRARIES}
+        ${G3LOG}
+        tbots_primitive
+        )
 
     catkin_add_gtest(time_test
             test/util/time/duration.cpp
@@ -888,17 +845,16 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             )
 
-        # TODO: re-add and re-enable me
-#    catkin_add_gtest(robot_filter_test
-#            test/network/filter/robot_filter.cpp
-#            test/network/filter/main.cpp
-#            network/filter/robot_filter.cpp
-#            )
-#    target_link_libraries(robot_filter_test
-#            ${catkin_LIBRARIES}
-#            ${G3LOG}
-#            tbots_world
-#            )
+    catkin_add_gtest(robot_filter_test
+            test/backend/input/network/filter/robot_filter.cpp
+            test/backend/input/network/filter/main.cpp
+            backend/input/network/filter/robot_filter.cpp
+            )
+    target_link_libraries(robot_filter_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            tbots_world
+            )
 
     catkin_add_gtest(game_state_play_selection_test
             ai/ai.cpp
@@ -946,20 +902,20 @@ if (CATKIN_ENABLE_TESTING)
             )
 
         # TODO: uncomment me and re-add!
-#    catkin_add_gtest(network_input_test
-#            test/network/filter/ball_filter.cpp
-#            test/network/main.cpp
-#            network/filter/ball_filter.cpp
-#            )
-#    target_link_libraries(network_input_test
-#            ${catkin_LIBRARIES}
-#            ${G3LOG}
-#            Eigen3::Eigen
-#            tbots_geom
-#            tbots_world
-#            tbots_test_util
-#            tbots_math
-#            )
+    catkin_add_gtest(network_input_test
+            test/backend/input/network/filter/ball_filter.cpp
+            test/backend/input/network/main.cpp
+            backend/input/network/filter/ball_filter.cpp
+            )
+    target_link_libraries(network_input_test
+            ${catkin_LIBRARIES}
+            ${G3LOG}
+            Eigen3::Eigen
+            tbots_geom
+            tbots_world
+            tbots_test_util
+            tbots_math
+            )
 
     catkin_add_gtest(multithreading_test
                     test/multithreading/thread_safe_buffer.cpp

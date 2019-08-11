@@ -124,6 +124,6 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue()
 template <typename T>
 ThreadSafeBuffer<T>::~ThreadSafeBuffer()
 {
-    // TODO: need to notify condition variable here?
     this->destructor_called = true;
+    received_new_value.notify_all();
 }
