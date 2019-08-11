@@ -28,14 +28,14 @@ class AIWrapper
 
 
    private:
-    void newValueCallback(World world) override;
+    void onValueReceived(World world) override;
 
     void publishPlayInfo();
 
     void runAIAndSendPrimitives();
     void drawWorld();
 
-    thunderbots_msgs::PlayInfo convertPlayInfoToROSMessage(
+    static thunderbots_msgs::PlayInfo convertPlayInfoToROSMessage(
         const PlayInfo& play_info);
 
     AI ai;

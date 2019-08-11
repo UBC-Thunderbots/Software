@@ -13,7 +13,7 @@ class GrSimBackend : public Backend
    private:
     // TODO: jdoc comments!
 
-    void newValueCallback(Backend::PrimitiveVecPtr primitives) override;
+    void onValueReceived(Backend::PrimitiveVecPtr primitives) override;
 
     void setMostRecentlyReceivedWorld(World world);
 

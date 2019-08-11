@@ -11,7 +11,7 @@ GrSimBackend::GrSimBackend()
 {
 }
 
-void GrSimBackend::newValueCallback(Backend::PrimitiveVecPtr primitives)
+void GrSimBackend::onValueReceived(Backend::PrimitiveVecPtr primitives)
 {
     setMostRecentlyReceivedPrimitives(std::move(primitives));
     updateGrSim();

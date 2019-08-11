@@ -24,7 +24,7 @@ class ThreadedObserver : public Observer<T>
    private:
     // TODO: Better function name and value name here
     // TODO: jdoc comment here
-    virtual void newValueCallback(T val);
+    virtual void onValueReceived(T val);
 
     // TODO: jdoc comment here
     void continuouslyPullValuesFromBuffer();
@@ -47,7 +47,7 @@ pull_from_buffer_thread(boost::bind(&ThreadedObserver::continuouslyPullValuesFro
 }
 
 template <typename T>
-void ThreadedObserver<T>::newValueCallback(T val) {
+void ThreadedObserver<T>::onValueReceived(T val) {
     // TODO: this comment should be in the jdoc for this function?
     // Do nothing, this function should be overriden to enable custom behavior on
     // message reception.
@@ -60,7 +60,7 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
     {
         in_destructor_mutex.unlock();
 
-        newValueCallback(this->getMostRecentValueFromBuffer());
+        onValueReceived(this->getMostRecentValueFromBuffer());
 
         in_destructor_mutex.lock();
     } while (!in_destructor);

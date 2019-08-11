@@ -11,7 +11,7 @@ RadioBackend::RadioBackend(ros::NodeHandle node_handle)
 {
 }
 
-void RadioBackend::newValueCallback(Backend::PrimitiveVecPtr primitives_ptr){
+void RadioBackend::onValueReceived(Backend::PrimitiveVecPtr primitives_ptr){
     radio_output.sendPrimitives(*primitives_ptr);
 }
 

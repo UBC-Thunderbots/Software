@@ -18,7 +18,7 @@ class RadioBackend : public Backend
 
     // TODO: javadoc comments for all functions here
 
-    void newValueCallback(Backend::PrimitiveVecPtr primitives) override;
+    void onValueReceived(Backend::PrimitiveVecPtr primitives) override;
 
     void receiveWorld(World world);
 
