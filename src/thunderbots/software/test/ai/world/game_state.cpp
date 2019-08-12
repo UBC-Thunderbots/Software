@@ -168,8 +168,7 @@ PREDICATE_TEST(isStopped, RefboxGameState::STOP, RefboxGameState::GOAL_US,
                RefboxGameState::GOAL_THEM)
 // PLAYING state must be manually set after a transition from a restart state to
 // NORMAL_START
-PREDICATE_TEST(isPlaying, RefboxGameState::FORCE_START, RefboxGameState::DIRECT_FREE_US,
-               RefboxGameState::INDIRECT_FREE_US)
+PREDICATE_TEST(isPlaying, RefboxGameState::FORCE_START)
 PREDICATE_TEST(isKickoff, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::PREPARE_KICKOFF_THEM)
 PREDICATE_TEST(isPenalty, RefboxGameState::PREPARE_PENALTY_US,
@@ -206,7 +205,8 @@ PREDICATE_TEST(isSetupState, RefboxGameState::PREPARE_KICKOFF_US,
                RefboxGameState::BALL_PLACEMENT_THEM, RefboxGameState::PREPARE_PENALTY_US,
                RefboxGameState::PREPARE_PENALTY_THEM)
 PREDICATE_TEST(isReadyState, RefboxGameState::NORMAL_START,
-               RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_THEM)
+               RefboxGameState::DIRECT_FREE_THEM, RefboxGameState::INDIRECT_FREE_THEM,
+               RefboxGameState::DIRECT_FREE_US, RefboxGameState::INDIRECT_FREE_US)
 // canKick needs to be tested with a proper restart sequence
 PREDICATE_TEST(canKick, RefboxGameState::FORCE_START, RefboxGameState::DIRECT_FREE_US,
                RefboxGameState::INDIRECT_FREE_US)
