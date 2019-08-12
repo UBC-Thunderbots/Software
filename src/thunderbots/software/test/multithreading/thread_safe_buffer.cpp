@@ -125,9 +125,3 @@ TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold)
     EXPECT_EQ(40, buffer.pullLeastRecentlyAddedValue());
 }
 
-// TODO: test where we destruct a thread safe buffer once
-// TODO: test where we destruct a thread safe buffer multiple times
-// TODO: test where we put in and pull out an object that can't be copied, like a
-// `unique_ptr`
-
-// TODO: test that exerts the need to exercise the condition variable

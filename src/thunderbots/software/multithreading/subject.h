@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "multithreading/observer.h"
 
 // TODO: TEST THIS CLASS
@@ -20,7 +22,8 @@ class Subject
      * Register the given observer with this class to receive new values when
      * they are available
      *
-     * @param observer
+     * @param observer The observer to update with new values whenever they are
+     *                 available
      */
     void registerObserver(std::shared_ptr<Observer<T>> observer);
 

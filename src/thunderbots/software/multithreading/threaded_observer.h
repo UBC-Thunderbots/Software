@@ -1,10 +1,10 @@
 #pragma once
 
 #include <thread>
+#include <boost/bind.hpp>
 
 #include "multithreading/observer.h"
 
-// TODO: test me!
 /**
  * The general usage of this class should be to extend it, then override
  * `onValueReceived` with whatever custom functionality should occur when a new value
@@ -84,6 +84,8 @@ ThreadedObserver<T>::~ThreadedObserver()
     in_destructor_mutex.lock();
     in_destructor = true;
     in_destructor_mutex.unlock();
+
+    this->receiveValue((T)NULL);
 
     // We must wait for the thread to stop, as if we destroy it while it's still
     // running we will segfault

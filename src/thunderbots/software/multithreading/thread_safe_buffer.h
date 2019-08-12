@@ -2,6 +2,7 @@
 
 #include <boost/circular_buffer.hpp>
 #include <condition_variable>
+#include <optional>
 #include <cstddef>
 #include <deque>
 #include <mutex>
@@ -35,7 +36,7 @@ class ThreadSafeBuffer
      *
      * @return The least recently value added to the buffer and returns it
      */
-    T pullLeastRecentlyAddedValue();
+    std::optional<T> pullLeastRecentlyAddedValue();
 
     /**
      * Removes the most recently value added to the buffer and returns it
@@ -46,7 +47,7 @@ class ThreadSafeBuffer
      *
      * @return The most recently value added to the buffer and returns it
      */
-    T pullMostRecentlyAddedValue();
+    std::optional<T> pullMostRecentlyAddedValue();
 
     /**
      * Push the given value onto the buffer

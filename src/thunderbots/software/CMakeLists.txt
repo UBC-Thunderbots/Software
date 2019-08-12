@@ -918,8 +918,11 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(multithreading_test
-                    test/multithreading/thread_safe_buffer.cpp
                     test/multithreading/main.cpp
+                    test/multithreading/observer.cpp
+                    test/multithreading/subject.cpp
+                    test/multithreading/threaded_observer.cpp
+                    test/multithreading/thread_safe_buffer.cpp
                     )
     target_link_libraries(multithreading_test
             ${Boost_LIBRARIES}
