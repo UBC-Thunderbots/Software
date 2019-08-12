@@ -39,8 +39,8 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
         new_world.friendlyTeam().goalie() &&
         new_world.field().enemyDefenseArea().containsPoint(
             new_world.friendlyTeam().goalie()->position());
-    if (!Util::DynamicParameters::AI::vision_flipping_filter_enabled.value() ||
-        !friendly_goalie_in_enemy_defense_area)
+    if (Util::DynamicParameters::AI::vision_flipping_filter_enabled.value() &&
+        friendly_goalie_in_enemy_defense_area)
     {
         world.updateBallState(new_world.ball());
         world.updateFieldGeometry(new_world.field());
