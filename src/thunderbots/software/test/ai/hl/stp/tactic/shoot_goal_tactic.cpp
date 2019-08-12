@@ -210,10 +210,10 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
     world.updateBallState(ball);
 
     ShootGoalTactic tactic =
-            ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                            world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
 
-    double cost = tactic.calculateRobotCost(robot, world);
+    double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.0520833333;
     EXPECT_NEAR(cost, expected_cost, 1e-6);
 }
@@ -229,10 +229,10 @@ TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
     world.updateBallState(ball);
 
     ShootGoalTactic tactic =
-            ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                            world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
 
-    double cost = tactic.calculateRobotCost(robot, world);
+    double cost          = tactic.calculateRobotCost(robot, world);
     double expected_cost = 0.40678383728;
     EXPECT_NEAR(cost, expected_cost, 1e-6);
 }
