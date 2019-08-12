@@ -34,7 +34,8 @@ std::string name(const RefboxGameState& state)
     }
     else
     {
-        throw std::invalid_argument("Error: Tried to get the name of an invalid refbox gamestate");
+        throw std::invalid_argument(
+            "Error: Tried to get the name of an invalid refbox gamestate");
     }
 }
 
