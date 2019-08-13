@@ -125,11 +125,13 @@ void World::updateRefboxGameState(const RefboxGameState &game_state)
                         return gamestate == refbox_game_state_history.front();
                     }))
     {
-        game_state_.updateRefboxGameState(game_state, ball_);
+        game_state_.updateRefboxGameState(game_state);
+        game_state_.updateBall(ball_);
     }
     else
     {
-        game_state_.updateRefboxGameState(game_state_.getRefboxGameState(), ball_);
+        game_state_.updateRefboxGameState(game_state_.getRefboxGameState());
+        game_state_.updateBall(ball_);
     }
 }
 

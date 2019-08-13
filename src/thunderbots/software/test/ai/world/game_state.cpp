@@ -22,8 +22,9 @@ TEST_P(GameStateTransitionTest, test_state_transitions)
     Ball ball(Point(), Vector(), Timestamp::fromSeconds(0));
 
     GameState game_state;
-    game_state.updateRefboxGameState(start_state, ball);
-    game_state.updateRefboxGameState(update_state, ball);
+    game_state.updateRefboxGameState(start_state);
+    game_state.updateRefboxGameState(update_state);
+    game_state.updateBall(ball);
     EXPECT_EQ(game_state.getRefboxGameState(), end_state);
     EXPECT_EQ(game_state.isOurRestart(), our_restart);
     EXPECT_EQ(game_state.getRestartReason(), restart_reason);
@@ -146,7 +147,8 @@ class GameStatePredicateTest : public ::testing::Test
         for (auto refbox_game_state : allRefboxGameStates)                               \
         {                                                                                \
             GameState game_state;                                                        \
-            game_state.updateRefboxGameState(refbox_game_state, ball);                   \
+            game_state.updateRefboxGameState(refbox_game_state);                         \
+            game_state.updateBall(ball);                                                 \
             if (true_states.find(refbox_game_state) != true_states.end())                \
             {                                                                            \
                 EXPECT_TRUE(game_state.predicate())                                      \
@@ -226,8 +228,9 @@ TEST_F(GameStateRestartTest, kickoff_us_restart_test)
     RefboxGameState restart_type = RefboxGameState::PREPARE_KICKOFF_US;
 
     // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP, ball);
-    game_state.updateRefboxGameState(restart_type, ball);
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+    game_state.updateBall(ball);
 
     // verify game_state is in the correct state
     EXPECT_TRUE(game_state.isSetupState());
@@ -236,7 +239,8 @@ TEST_F(GameStateRestartTest, kickoff_us_restart_test)
     EXPECT_TRUE(game_state.isOurKickoff());
 
     // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START, ball);
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    game_state.updateBall(ball);
 
     // verify state again
     EXPECT_TRUE(game_state.isReadyState());
@@ -259,8 +263,9 @@ TEST_F(GameStateRestartTest, kickoff_them_restart_test)
     RefboxGameState restart_type = RefboxGameState::PREPARE_KICKOFF_THEM;
 
     // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP, ball);
-    game_state.updateRefboxGameState(restart_type, ball);
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+    game_state.updateBall(ball);
 
     // verify game_state is in the correct state
     EXPECT_TRUE(game_state.isSetupState());
@@ -269,7 +274,8 @@ TEST_F(GameStateRestartTest, kickoff_them_restart_test)
     EXPECT_TRUE(game_state.isTheirKickoff());
 
     // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START, ball);
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    game_state.updateBall(ball);
 
     // verify state again
     EXPECT_TRUE(game_state.isReadyState());
@@ -292,8 +298,9 @@ TEST_F(GameStateRestartTest, penalty_us_restart_test)
     RefboxGameState restart_type = RefboxGameState::PREPARE_PENALTY_US;
 
     // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP, ball);
-    game_state.updateRefboxGameState(restart_type, ball);
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+    game_state.updateBall(ball);
 
     // verify game_state is in the correct state
     EXPECT_TRUE(game_state.isSetupState());
@@ -302,7 +309,8 @@ TEST_F(GameStateRestartTest, penalty_us_restart_test)
     EXPECT_TRUE(game_state.isOurPenalty());
 
     // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START, ball);
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    game_state.updateBall(ball);
 
     // verify state again
     EXPECT_TRUE(game_state.isReadyState());
@@ -325,8 +333,9 @@ TEST_F(GameStateRestartTest, penalty_them_restart_test)
     RefboxGameState restart_type = RefboxGameState::PREPARE_PENALTY_THEM;
 
     // STOP -> restart_type is how restarts occur during games
-    game_state.updateRefboxGameState(RefboxGameState::STOP, ball);
-    game_state.updateRefboxGameState(restart_type, ball);
+    game_state.updateRefboxGameState(RefboxGameState::STOP);
+    game_state.updateRefboxGameState(restart_type);
+    game_state.updateBall(ball);
 
     // verify game_state is in the correct state
     EXPECT_TRUE(game_state.isSetupState());
@@ -335,7 +344,8 @@ TEST_F(GameStateRestartTest, penalty_them_restart_test)
     EXPECT_TRUE(game_state.isTheirPenalty());
 
     // restart_type -> NORMAL_START happens next
-    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START, ball);
+    game_state.updateRefboxGameState(RefboxGameState::NORMAL_START);
+    game_state.updateBall(ball);
 
     // verify state again
     EXPECT_TRUE(game_state.isReadyState());
