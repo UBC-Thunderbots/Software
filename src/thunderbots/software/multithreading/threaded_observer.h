@@ -72,9 +72,13 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
     {
         in_destructor_mutex.unlock();
 
-        onValueReceived(this->getMostRecentValueFromBuffer());
+        T new_val = this->getMostRecentValueFromBuffer();
 
         in_destructor_mutex.lock();
+        if (!in_destructor){
+            onValueReceived(new_val);
+        }
+
     } while (!in_destructor);
 }
 
@@ -85,6 +89,8 @@ ThreadedObserver<T>::~ThreadedObserver()
     in_destructor = true;
     in_destructor_mutex.unlock();
 
+    // We push a null value to the buffer to unblock the any calls in the thread
+    // waiting for a value in the buffer
     this->receiveValue((T)NULL);
 
     // We must wait for the thread to stop, as if we destroy it while it's still
