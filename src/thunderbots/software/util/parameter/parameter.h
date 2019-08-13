@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
 /**
  * This class defines a dynamic parameter, meaning the parameter
  * value can be changed during runtime.
@@ -28,11 +29,14 @@ class Parameter
     explicit Parameter<T>(const std::string& parameter_name,
                           const std::string& parameter_namespace, T default_value)
     {
+        std::cerr<<"registering"<<parameter_name<<std::endl;
         this->name_      = parameter_name;
         this->namespace_ = parameter_namespace;
         this->value_     = default_value;
 
+        std::cerr<<"registering"<<parameter_name<<std::endl;
         Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
+        std::cout<<"registed"<<parameter_name<<std::endl;
     }
 
     /**
@@ -43,22 +47,22 @@ class Parameter
     const T value() const
     {
         // get the value from the parameter in the registry
-        // NOTE we can not use std::atmoic as we need to support strings
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            param_in_registry->param_lock_->lock();
-            auto value = param_in_registry->value_;
-            param_in_registry->param_lock_->unlock();
+
+            param_in_registry.first->lock();
+            auto value = param_in_registry.second->value_;
+            param_in_registry.first->unlock();
 
             return value;
         }
-        // if the parameter hasn't been registered yet, return default value
-        this->param_lock_->lock();
-        auto value = this->value_;
-        this->param_lock_->unlock();
 
-        return value;
+        // raise as we should not be reading from params that are not
+        // in the registry
+        else {
+            throw std::out_of_range("Parameter requested not in registry");
+        }
     }
 
     /*
@@ -69,21 +73,18 @@ class Parameter
     void setValue(const T new_value)
     {
         // get the value from the parameter in the registry
-        // NOTE we can not use std::atmoic as we need to support strings
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            param_in_registry->param_lock_->lock();
+            param_in_registry.first->lock();
             param_in_registry->value_ = new_value;
-            param_in_registry->param_lock_->unlock();
+            param_in_registry.first->unlock();
         }
 
-        // if the parameter hasn't been registered yet, set current value
-        else
-        {
-            this->param_lock_->lock();
-            this->value_ = new_value;
-            this->param_lock_->unlock();
+        // if the parameter hasn't been registered yet, raise as we shouldn't be accessing
+        // params not in the registry
+        else {
+            throw std::out_of_range("Parameter requested not in registry");
         }
     }
 
@@ -103,7 +104,7 @@ class Parameter
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string, std::unique_ptr<Parameter<T>>>& getRegistry()
+    static const std::map<std::string, std::pair<std::mutex, std::unique_ptr<Parameter<T>>>>& getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
     }
@@ -119,8 +120,7 @@ class Parameter
     static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
     {
         Parameter<T>::getMutableRegistry().insert(
-            std::pair<std::string, std::unique_ptr<Parameter<T>>>(parameter->name(),
-                                                                  std::move(parameter)));
+            std::make_pair(parameter->name(), std::make_pair(std::make_unique<std::mutex>(), std::move(parameter))));
     }
 
    private:
@@ -132,16 +132,13 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::map<std::string, std::unique_ptr<Parameter<T>>>& getMutableRegistry()
+    static std::map<std::string, std::pair<std::unique_ptr<std::mutex>, std::unique_ptr<Parameter<T>>>>& getMutableRegistry()
     {
-        static std::map<std::string, std::unique_ptr<Parameter<T>>> instance;
+        // our registry needs to hold onto a unique mutex to access the parameters in the registry as mutexes
+        // cannot be moved or
+        static std::map<std::string, std::pair<std::unique_ptr<std::mutex>, std::unique_ptr<Parameter<T>>>> instance;
         return instance;
     }
-
-    // lock to read/write to param, we use a shared ptr to a mutex as the thread
-    // needs to use the parameters lock to access the parameter in the registry.
-    // If we don't use a pointer we cannot "std::move" a parameter into the registry.
-    std::shared_ptr<std::mutex> param_lock_ = std::make_shared<std::mutex>();
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
