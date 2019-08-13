@@ -31,10 +31,10 @@ namespace
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
     thunderbots_msgs::World world_msg = *msg;
-    World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
-    new_world.mutableBall() = new_world.ball();
+    World new_world          = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+    new_world.mutableBall()  = new_world.ball();
     new_world.mutableField() = new_world.field();
-    new_world.mutableEnemyTeam() = new_world.enemyTeam();
+    new_world.mutableEnemyTeam()    = new_world.enemyTeam();
     new_world.mutableFriendlyTeam() = new_world.friendlyTeam();
     world.updateTimestamp(new_world.getMostRecentTimestamp());
     RefboxGameState new_game_state =
