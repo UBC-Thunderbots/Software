@@ -229,7 +229,8 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
 {
     // TODO: replace the ball with real parameterized values
     world.mutableGameState().updateRefboxGameState(GetParam());
-    world.mutableGameState().updateBall(Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
+    world.mutableGameState().updateBall(
+        Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
 
     try
     {
