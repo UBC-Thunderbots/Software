@@ -20,12 +20,10 @@
 
 /**
  * This class defines a dynamic parameter, meaning the parameter
- * value can be changed during runtime. Although the class is templated, it is only meant
- * to support the types also supported by the ROS Parameter Server.
+ * value can be changed during runtime.
  *
- * See http://wiki.ros.org/Parameter%20Server for the list of types
+ * In our codebase, we currently support bool, int32_t, double, and strings
  *
- * In our codebase, we support bool, int32_t, double, and strings
  * */
 
 template <class T>
@@ -36,8 +34,7 @@ class Parameter
      * Constructs a new Parameter
      *
      * @param parameter_name The name of the parameter used by dynamic_reconfigure
-     * @param parameter_namespace The namespace of the parameter used by
-     * dynamic_reconfigure
+     * @param parameter_namespace The namespace of the parameter used to sort parameters
      * @param default_value The default value for this parameter
      */
     explicit Parameter<T>(const std::string& parameter_name,
@@ -51,16 +48,6 @@ class Parameter
     }
 
     /**
-     * Returns the global path in the ROS parameter server where this parameter is stored
-     *
-     * @return the global path in the ROS parameter sever where this parameter is stored
-     */
-    const std::string getROSParameterPath() const
-    {
-        return "/" + this->namespace_ + "/" + name();
-    }
-
-    /**
      * Returns the value of this parameter
      *
      * @return the value of this parameter
@@ -71,11 +58,41 @@ class Parameter
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            return param_in_registry->value_;
+            // we load the atomic value using memory_order_relaxed as we do not
+            // impose an order on memory accesses. This only garuntees atomicity and
+            // modification order consistency. Ref:
+            // https://en.cppreference.com/w/cpp/atomic/memory_order
+            return param_in_registry->value_.load(std::memory_order_relaxed);
         }
         // if the parameter hasn't been registered yet, return default value
-        return this->value_;
+        return this->value_.load(std::memory_order_relaxed);
     }
+
+    /*
+     * Given the value, sets the value of this parameter
+     *
+     * @param new_value The new value to set
+     */
+    void setValue(const T new_value)
+    {
+        // get the value from the parameter in the registry
+        if (Parameter<T>::getMutableRegistry().count(this->name_))
+        {
+            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
+            param_in_registry->value_.store(new_value, std::memory_order_relaxed);
+        }
+
+        // if the parameter hasn't been registered yet, set current value
+        // we update the atomic value using memory_order_relaxed as we do not need to
+        // impose an order on memory accesses. This only garuntees atomicity and
+        // modification order consistency. Ref:
+        // https://en.cppreference.com/w/cpp/atomic/memory_order
+        else
+        {
+            this->value_.store(new_value, std::memory_order_relaxed);
+        }
+    }
+
     /**
      * Returns the name of this parameter
      *
@@ -84,39 +101,6 @@ class Parameter
     const std::string name() const
     {
         return name_;
-    }
-
-    /**
-     * Checks if the parameter currently exists in the ros parameter server
-     *
-     * @return true if the parameter exists, false otherwise
-     *
-     */
-    const bool existsInParameterServer() const
-    {
-        return ros::param::has(this->getROSParameterPath());
-    }
-
-    /**
-     * Updates the value of this Parameter with the value from the ROS
-     * Parameter Server
-     */
-    void updateValueFromROSParameterServer()
-    {
-        ros::param::get(getROSParameterPath(), this->value_);
-    }
-
-    /**
-     * Updates the value of this Parameter with the value from a
-     * 'dynamic_reconfigure::Config' msg. The parameter fetches the update from the update
-     * msg and updates its value
-     *
-     */
-    void updateParameterFromConfigMsg(
-        const dynamic_reconfigure::Config::ConstPtr& updates)
-    {
-        dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
-                                                       this->value_);
     }
 
     /**
@@ -131,71 +115,18 @@ class Parameter
     }
 
     /**
-     * Returns a reference to the config msg. The config msg contains
-     * all the current configurations
-     *
-     * @return An immutable reference to the Config msg
-     */
-    static const dynamic_reconfigure::Config& getConfigMsg()
-    {
-        return Parameter<T>::getMutableConfigMsg();
-    }
-
-    /**
      * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
      * into the registry, the pointer may not be accessed by the caller after this
      * function has been called.
-     *
-     * Also registers params to the static configuration msg used to
-     * set parameters
      *
      * @param parameter A unique pointer to the Parameter to add. This pointer may not
      * be accessed by the caller after this function has been called.
      */
     static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
     {
-        try
-        {
-            dynamic_reconfigure::ConfigTools::appendParameter(
-                Parameter<T>::getMutableConfigMsg(), parameter->name(),
-                parameter->value());
-        }
-        catch (...)
-        {
-            // TODO (Issue #16): Replace with proper exception once exception handling is
-            // implemented
-            ROS_WARN("Attempting to configure with unkown type");
-        }
-
         Parameter<T>::getMutableRegistry().insert(
             std::pair<std::string, std::unique_ptr<Parameter<T>>>(parameter->name(),
                                                                   std::move(parameter)));
-    }
-
-    /**
-     * Updates all the Parameters of type T with the latest values from the ROS
-     * Parameter Server
-     */
-    static void updateAllParametersFromROSParameterServer()
-    {
-        for (const auto& pair : Parameter<T>::getRegistry())
-        {
-            pair.second->updateValueFromROSParameterServer();
-        }
-    }
-
-    /**
-     * Takes a list from the dynamic_reconfigure::Config msg and updates the parameters
-     * based on the information in that list.
-     *
-     */
-    static void updateAllParametersFromConfigMsg(
-        const dynamic_reconfigure::Config::ConstPtr& updates)
-    {
-        for (const auto& pair : Parameter<T>::getRegistry())
-        {
-            pair.second->updateParameterFromConfigMsg(updates);
-        }
     }
 
    private:
@@ -214,24 +145,11 @@ class Parameter
     }
 
     // Store the value so it can be retrieved without fetching from the server again
-    T value_;
+    std::atomic<T> value_;
 
     // Store the name of the parameter
     std::string name_;
 
     // Store the namespace of the parameter
     std::string namespace_;
-
-    /**
-     * Returns a mutable configuration msg that will hold all the
-     * information related to the parameters created
-     * msg contains bool,strs,ints,doubles vectors which are inherently mutable
-     *
-     * @return A mutable reference to the configuration msg
-     */
-    static dynamic_reconfigure::Config& getMutableConfigMsg()
-    {
-        static dynamic_reconfigure::Config config;
-        return config;
-    }
 };
