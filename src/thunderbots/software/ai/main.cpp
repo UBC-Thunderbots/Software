@@ -31,7 +31,7 @@ namespace
 void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
 {
     thunderbots_msgs::World world_msg = *msg;
-    World new_world          = Util::ROSMessages::createWorldFromROSMessage(world_msg);
+    World new_world = Util::ROSMessages::createWorldFromROSMessage(world_msg);
     // During RoboCup 2019, we saw weird cases where vision frames wold randomly appear
     // mirrored. This filter checks if our goalie appears in the enemy defense area to
     // detect mirroring, and ignores the data if mirroring is detected
@@ -42,13 +42,13 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     if (Util::DynamicParameters::AI::vision_flipping_filter_enabled.value() &&
         friendly_goalie_in_enemy_defense_area)
     {
-        new_world.mutableBall()  = new_world.ball();
-        new_world.mutableField() = new_world.field();
+        new_world.mutableBall()         = new_world.ball();
+        new_world.mutableField()        = new_world.field();
         new_world.mutableEnemyTeam()    = new_world.enemyTeam();
         new_world.mutableFriendlyTeam() = new_world.friendlyTeam();
         world.updateTimestamp(new_world.getMostRecentTimestamp());
-        RefboxGameState new_game_state =
-            Util::ROSMessages::createGameStateFromROSMessage(world_msg.refbox_data.command);
+        RefboxGameState new_game_state = Util::ROSMessages::createGameStateFromROSMessage(
+            world_msg.refbox_data.command);
         world.updateRefboxGameState(new_game_state);
         world.updateTimestamp(new_world.getMostRecentTimestamp());
         world.mutableFriendlyTeam().removeExpiredRobots(world.getMostRecentTimestamp());
