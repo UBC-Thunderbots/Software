@@ -13,8 +13,6 @@
 #include "thunderbots_msgs/World.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
-#include "util/parameter/dynamic_parameter_utils.h"
-#include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
 
@@ -29,10 +27,6 @@ int main(int argc, char** argv)
 
     // Create and start our NetworkClient
     NetworkClient client = NetworkClient(node_handle);
-
-    // Initialize Dynamic Parameters
-    auto update_subscribers =
-        Util::DynamicParameters::initUpdateSubscriptions(node_handle);
 
     // Services any ROS calls in a separate thread "behind the scenes". Does not return
     // until the node is shutdown

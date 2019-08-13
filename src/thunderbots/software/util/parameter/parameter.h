@@ -1,22 +1,10 @@
 #pragma once
 
-#include <ros/ros.h>
-
+#include <map>
 #include <memory>
+#include <mutex>
 #include <string>
-
-// messages for dynamic_reconfigure
-#include <dynamic_reconfigure/BoolParameter.h>
-#include <dynamic_reconfigure/DoubleParameter.h>
-#include <dynamic_reconfigure/IntParameter.h>
-#include <dynamic_reconfigure/StrParameter.h>
-
-// message that contains arrays of the xmlrpc types for reconf
-#include <dynamic_reconfigure/Config.h>
-
-// message for the reconfigure srv, takes a config msg
-#include <dynamic_reconfigure/Reconfigure.h>
-#include <dynamic_reconfigure/config_tools.h>
+#include <vector>
 
 /**
  * This class defines a dynamic parameter, meaning the parameter
@@ -55,17 +43,22 @@ class Parameter
     const T value() const
     {
         // get the value from the parameter in the registry
+        // NOTE we can not use std::atmoic as we need to support strings
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            // we load the atomic value using memory_order_relaxed as we do not
-            // impose an order on memory accesses. This only garuntees atomicity and
-            // modification order consistency. Ref:
-            // https://en.cppreference.com/w/cpp/atomic/memory_order
-            return param_in_registry->value_.load(std::memory_order_relaxed);
+            param_in_registry->param_lock_->lock();
+            auto value = param_in_registry->value_;
+            param_in_registry->param_lock_->unlock();
+
+            return value;
         }
         // if the parameter hasn't been registered yet, return default value
-        return this->value_.load(std::memory_order_relaxed);
+        this->param_lock_->lock();
+        auto value = this->value_;
+        this->param_lock_->unlock();
+
+        return value;
     }
 
     /*
@@ -76,20 +69,21 @@ class Parameter
     void setValue(const T new_value)
     {
         // get the value from the parameter in the registry
+        // NOTE we can not use std::atmoic as we need to support strings
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            param_in_registry->value_.store(new_value, std::memory_order_relaxed);
+            param_in_registry->param_lock_->lock();
+            param_in_registry->value_ = new_value;
+            param_in_registry->param_lock_->unlock();
         }
 
         // if the parameter hasn't been registered yet, set current value
-        // we update the atomic value using memory_order_relaxed as we do not need to
-        // impose an order on memory accesses. This only garuntees atomicity and
-        // modification order consistency. Ref:
-        // https://en.cppreference.com/w/cpp/atomic/memory_order
         else
         {
-            this->value_.store(new_value, std::memory_order_relaxed);
+            this->param_lock_->lock();
+            this->value_ = new_value;
+            this->param_lock_->unlock();
         }
     }
 
@@ -144,8 +138,13 @@ class Parameter
         return instance;
     }
 
+    // lock to read/write to param, we use a shared ptr to a mutex as the thread
+    // needs to use the parameters lock to access the parameter in the registry.
+    // If we don't use a pointer we cannot "std::move" a parameter into the registry.
+    std::shared_ptr<std::mutex> param_lock_ = std::make_shared<std::mutex>();
+
     // Store the value so it can be retrieved without fetching from the server again
-    std::atomic<T> value_;
+    T value_;
 
     // Store the name of the parameter
     std::string name_;
