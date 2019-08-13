@@ -13,6 +13,7 @@
 #include "thunderbots_msgs/World.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 #include "util/time/timestamp.h"
 

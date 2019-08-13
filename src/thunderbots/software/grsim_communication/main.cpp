@@ -9,6 +9,7 @@
 #include "grsim_communication/grsim_backend.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 #include "util/ros_messages.h"
 
 // Member variables we need to maintain state
