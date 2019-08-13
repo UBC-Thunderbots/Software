@@ -23,7 +23,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-            ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.5, false, ball);
 
@@ -67,7 +67,7 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-            ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.2, true, ball);
 
@@ -107,7 +107,7 @@ TEST(ShadowEnemyTacticTest,
               Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-            ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.5, true, ball);
 
@@ -148,7 +148,7 @@ TEST(
               Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-            ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.5, true, ball);
 

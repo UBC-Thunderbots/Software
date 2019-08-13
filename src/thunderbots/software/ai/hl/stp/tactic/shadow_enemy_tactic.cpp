@@ -6,9 +6,10 @@
 #include "ai/hl/stp/evaluation/robot.h"
 #include "shadow_enemy_tactic.h"
 
-ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team, const Team &enemy_team,
-                                     bool ignore_goalie,
-                                     const Ball &ball, const double ball_steal_speed, bool loop_forever)
+ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
+                                     const Team &enemy_team, bool ignore_goalie,
+                                     const Ball &ball, const double ball_steal_speed,
+                                     bool loop_forever)
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
@@ -24,10 +25,10 @@ std::string ShadowEnemyTactic::getName() const
     return "Shadow Enemy Tactic";
 }
 
-void ShadowEnemyTactic::updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field,
-                                     const Team &friendly_team,
-                                     const Team &enemy_team, double shadow_distance, bool enemy_team_can_pass,
-                                     const Ball &ball)
+void ShadowEnemyTactic::updateParams(const Evaluation::EnemyThreat &enemy_threat,
+                                     const Field &field, const Team &friendly_team,
+                                     const Team &enemy_team, double shadow_distance,
+                                     bool enemy_team_can_pass, const Ball &ball)
 {
     this->enemy_threat        = enemy_threat;
     this->field               = field;

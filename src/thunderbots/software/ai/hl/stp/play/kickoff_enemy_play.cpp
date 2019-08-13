@@ -35,18 +35,18 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // 3 robots assigned to shadow enemies. Other robots will be assigned positions
     // on the field to be evenly spread out
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, world.ball(),
-                                            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-                                            true),
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, world.ball(),
-                                            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-                                            true),
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, world.ball(),
-                                            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-                                            true)};
+        std::make_shared<ShadowEnemyTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
+            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            true),
+        std::make_shared<ShadowEnemyTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
+            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            true),
+        std::make_shared<ShadowEnemyTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
+            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            true)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -124,8 +124,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
                 shadow_enemy_tactics.at(i)->updateParams(
-                        enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        shadow_dist, false, world.ball());
+                    enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
+                    shadow_dist, false, world.ball());
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else
