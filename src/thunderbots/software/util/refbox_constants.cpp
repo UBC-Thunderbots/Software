@@ -25,6 +25,20 @@ static const std::map<RefboxGameState, std::string> refbox_game_state_names = {
     {RefboxGameState::BALL_PLACEMENT_THEM, "BALL_PLACEMENT_THEM"},
     {RefboxGameState::REFBOX_GAME_STATE_COUNT, "REFBOX_GAME_STATE_COUNT"}};
 
+std::string name(const RefboxGameState& state)
+{
+    auto find_name_result = refbox_game_state_names.find(state);
+    if (find_name_result != refbox_game_state_names.end())
+    {
+        return find_name_result->second;
+    }
+    else
+    {
+        throw std::invalid_argument(
+            "Error: Tried to get the name of an invalid refbox gamestate");
+    }
+}
+
 std::ostream& operator<<(std::ostream& os, const RefboxGameState& state)
 {
     if (refbox_game_state_names.find(state) != refbox_game_state_names.end())

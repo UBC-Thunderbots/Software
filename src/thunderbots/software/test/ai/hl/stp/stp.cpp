@@ -173,3 +173,24 @@ TEST_F(STPTest, test_fallback_play_assigned_when_no_new_plays_are_applicable)
     stp.getIntents(world);
     EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
 }
+
+TEST_F(STPTest, test_get_play_info)
+{
+    // Only the HaltTestPlay should be applicable
+    world =
+        ::Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
+    world = ::Test::TestUtil::setFriendlyRobotPositions(world, {Point(0, 0), Point(1, 0)},
+                                                        Timestamp::fromSeconds(0));
+    world.mutableGameState().game_state = RefboxGameState::HALT;
+    stp.getIntents(world);
+    EXPECT_EQ(*(stp.getCurrentPlayName()), HaltTestPlay::name);
+
+    auto play_info = stp.getPlayInfo();
+    PlayInfo expected_play_info;
+    expected_play_info.play_name               = "Halt Test Play";
+    expected_play_info.play_type               = "HALT";
+    expected_play_info.robot_tactic_assignment = {"Robot 0  -  Stop Test Tactic",
+                                                  "Robot 1  -  Stop Test Tactic"};
+
+    EXPECT_EQ(play_info, expected_play_info);
+}

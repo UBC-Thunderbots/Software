@@ -977,6 +977,13 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES})
 
+    catkin_add_gtest(refbox_constants_test
+            util/refbox_constants.cpp
+            test/util/refbox_constants.cpp)
+
+    target_link_libraries(ai_util_test
+            ${catkin_LIBRARIES})
+
 endif()
 
 ##### ROSTests / Integration Tests #####

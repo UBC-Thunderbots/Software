@@ -3,6 +3,7 @@
 #include "ai/hl/stp/action/move_action.h"
 #include "ai/hl/stp/evaluation/calc_best_shot.h"
 #include "ai/hl/stp/evaluation/intercept.h"
+#include "geom/rectangle.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
@@ -25,14 +26,20 @@ std::string ShootGoalTactic::getName() const
 }
 
 void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball,
-                                   std::optional<Point> chip_target)
+                                   const Team &enemy_team, const Ball &ball)
 {
     this->field         = field;
     this->friendly_team = friendly_team;
     this->enemy_team    = enemy_team;
     this->ball          = ball;
-    this->chip_target   = chip_target;
+}
+
+void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
+                                   const Team &enemy_team, const Ball &ball,
+                                   std::optional<Point> chip_target)
+{
+    this->chip_target = chip_target;
+    updateParams(field, friendly_team, enemy_team, ball);
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -67,14 +74,27 @@ bool ShootGoalTactic::hasShotAvailable() const
 
 bool ShootGoalTactic::isEnemyAboutToStealBall() const
 {
-    // TODO: replace with get all robots except goalie?
+    // Our rectangle class does not have the concept of rotation, so instead
+    // we rotate all the robot positions about the origin so we can construct
+    // a rectangle that is aligned with the axis
+    Angle theta = -robot->orientation();
+
+    Point rotated_baller_position = robot->position().rotate(theta);
+
+    Rectangle area_in_front_of_rotated_baller(
+        rotated_baller_position - Vector(0, 3 * ROBOT_MAX_RADIUS_METERS),
+        rotated_baller_position +
+            Vector(5 * ROBOT_MAX_RADIUS_METERS, 3 * ROBOT_MAX_RADIUS_METERS));
+
     for (const auto &enemy : enemy_team.getAllRobots())
     {
-        if ((enemy.position() - ball.position()).len() < ENEMY_DANGER_DIST)
+        Point rotated_enemy_position = enemy.position().rotate(theta);
+        if (area_in_front_of_rotated_baller.containsPoint(rotated_enemy_position))
         {
             return true;
         }
     }
+
     return false;
 }
 
