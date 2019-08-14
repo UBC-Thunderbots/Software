@@ -54,11 +54,12 @@ class Parameter
             return value;
         }
 
-        // raise as we should not be reading from params that are not
-        // in the registry
+        // TODO fix this on ROS removal to throw an exception, ideally we do not
+        // want to return a value here as params that aren't in the registry are not
+        // threadsafe
         else
         {
-            throw std::out_of_range("Parameter requested not in registry");
+            return this->value_;
         }
     }
 
@@ -78,11 +79,12 @@ class Parameter
             param_in_registry.first->unlock();
         }
 
-        // if the parameter hasn't been registered yet, raise as we shouldn't be accessing
-        // params not in the registry
+        // TODO fix this on ROS removal to throw an exception, ideally we do not
+        // want to store a value here as params that aren't in the registry are not
+        // threadsafe
         else
         {
-            throw std::out_of_range("Parameter requested not in registry");
+            this->value_ = new_value;
         }
     }
 
