@@ -28,14 +28,11 @@ class Parameter
     explicit Parameter<T>(const std::string& parameter_name,
                           const std::string& parameter_namespace, T default_value)
     {
-        std::cerr << "registering" << parameter_name << std::endl;
         this->name_      = parameter_name;
         this->namespace_ = parameter_namespace;
         this->value_     = default_value;
 
-        std::cerr << "registering" << parameter_name << std::endl;
         Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
-        std::cout << "registed" << parameter_name << std::endl;
     }
 
     /**
@@ -65,7 +62,7 @@ class Parameter
         }
     }
 
-    /*
+    /**
      * Given the value, sets the value of this parameter
      *
      * @param new_value The new value to set
@@ -122,8 +119,12 @@ class Parameter
      */
     static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
     {
+        // load the param name before hand, as the pointer will have moved at the
+        // time of inserting the mutex param pair into the map.
+        auto parameter_name = parameter->name();
+
         Parameter<T>::getMutableRegistry().insert(std::make_pair(
-            parameter->name(),
+            parameter_name,
             std::make_pair(std::make_unique<std::mutex>(), std::move(parameter))));
     }
 
