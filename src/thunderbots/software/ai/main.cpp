@@ -42,10 +42,11 @@ void worldUpdateCallback(const thunderbots_msgs::World::ConstPtr &msg)
     if (Util::DynamicParameters::AI::vision_flipping_filter_enabled.value() &&
         friendly_goalie_in_enemy_defense_area)
     {
-        world.updateBallState(new_world.ball());
-        world.updateFieldGeometry(new_world.field());
-        world.updateEnemyTeamState(new_world.enemyTeam());
-        world.updateFriendlyTeamState(new_world.friendlyTeam());
+        new_world.mutableBall()         = new_world.ball();
+        new_world.mutableField()        = new_world.field();
+        new_world.mutableEnemyTeam()    = new_world.enemyTeam();
+        new_world.mutableFriendlyTeam() = new_world.friendlyTeam();
+        world.updateTimestamp(new_world.getMostRecentTimestamp());
         RefboxGameState new_game_state = Util::ROSMessages::createGameStateFromROSMessage(
             world_msg.refbox_data.command);
         world.updateRefboxGameState(new_game_state);
