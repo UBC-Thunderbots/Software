@@ -73,14 +73,14 @@ class Parameter
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
 
-            param_in_registry.first->lock();
+            std::scoped_lock lock(*param_in_registry.first);
             auto value = param_in_registry.second->value_;
-            param_in_registry.first->unlock();
 
             return value;
         }
 
-        // TODO fix this on ROS removal to throw an exception, ideally we do not
+        // TODO https://github.com/UBC-Thunderbots/Software/issues/738
+        // fix this on ROS removal to throw an exception, ideally we do not
         // want to return a value here as params that aren't in the registry are not
         // threadsafe
         else
@@ -102,12 +102,11 @@ class Parameter
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            param_in_registry.first->lock();
+            std::scoped_lock lock(*param_in_registry.first);
             param_in_registry->value_ = new_value;
-            param_in_registry.first->unlock();
         }
 
-        // TODO fix this on ROS removal to throw an exception, ideally we do not
+        // TODO https://github.com/UBC-Thunderbots/Software/issues/738
         // want to store a value here as params that aren't in the registry are not
         // threadsafe
         else
@@ -224,9 +223,8 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            pair.second.first->lock();
+            std::scoped_lock lock(*pair.second.first);
             pair.second.second->updateValueFromROSParameterServer();
-            pair.second.first->unlock();
         }
     }
 
@@ -240,9 +238,8 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            pair.second.first->lock();
+            std::scoped_lock lock(*pair.second.first);
             pair.second.second->updateParameterFromConfigMsg(updates);
-            pair.second.first->unlock();
         }
     }
 
