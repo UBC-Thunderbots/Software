@@ -5,7 +5,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 
 // messages for dynamic_reconfigure
 #include <dynamic_reconfigure/BoolParameter.h>
@@ -261,7 +260,7 @@ class Parameter
     getMutableRegistry()
     {
         // our registry needs to hold onto a unique mutex to access the parameters in the
-        // registry as mutexes cannot be moved or
+        // registry as mutexes cannot be moved or copied
         static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
                                                std::unique_ptr<Parameter<T>>>>
             instance;
