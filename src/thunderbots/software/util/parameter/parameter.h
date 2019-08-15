@@ -165,8 +165,8 @@ class Parameter
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string,
-                          std::pair<std::unique_ptr<std::mutex>, std::unique_ptr<Parameter<T>>>>&
+    static const std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
+                                                 std::unique_ptr<Parameter<T>>>>&
     getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
