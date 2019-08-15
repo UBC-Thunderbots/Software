@@ -3,7 +3,9 @@
 #include <ros/ros.h>
 
 #include <memory>
+#include <mutex>
 #include <string>
+#include <vector>
 
 // messages for dynamic_reconfigure
 #include <dynamic_reconfigure/BoolParameter.h>
@@ -71,11 +73,50 @@ class Parameter
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            return param_in_registry->value_;
+
+            param_in_registry.first->lock();
+            auto value = param_in_registry.second->value_;
+            param_in_registry.first->unlock();
+
+            return value;
+        }
+
+        // TODO fix this on ROS removal to throw an exception, ideally we do not
+        // want to return a value here as params that aren't in the registry are not
+        // threadsafe
+        else
+        {
+            return this->value_;
         }
         // if the parameter hasn't been registered yet, return default value
         return this->value_;
     }
+
+    /**
+     * Given the value, sets the value of this parameter
+     *
+     * @param new_value The new value to set
+     */
+    void setValue(const T new_value)
+    {
+        // get the value from the parameter in the registry
+        if (Parameter<T>::getMutableRegistry().count(this->name_))
+        {
+            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
+            param_in_registry.first->lock();
+            param_in_registry->value_ = new_value;
+            param_in_registry.first->unlock();
+        }
+
+        // TODO fix this on ROS removal to throw an exception, ideally we do not
+        // want to store a value here as params that aren't in the registry are not
+        // threadsafe
+        else
+        {
+            this->value_ = new_value;
+        }
+    }
+
     /**
      * Returns the name of this parameter
      *
@@ -125,7 +166,9 @@ class Parameter
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string, std::unique_ptr<Parameter<T>>>& getRegistry()
+    static const std::map<std::string,
+                          std::pair<std::unique_ptr<std::mutex>, std::unique_ptr<Parameter<T>>>>&
+    getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
     }
@@ -167,9 +210,11 @@ class Parameter
             ROS_WARN("Attempting to configure with unkown type");
         }
 
-        Parameter<T>::getMutableRegistry().insert(
-            std::pair<std::string, std::unique_ptr<Parameter<T>>>(parameter->name(),
-                                                                  std::move(parameter)));
+        auto parameter_name = parameter->name();
+
+        Parameter<T>::getMutableRegistry().insert(std::make_pair(
+            parameter_name,
+            std::make_pair(std::make_unique<std::mutex>(), std::move(parameter))));
     }
 
     /**
@@ -180,7 +225,9 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            pair.second->updateValueFromROSParameterServer();
+            pair.second.first->lock();
+            pair.second.second->updateValueFromROSParameterServer();
+            pair.second.first->unlock();
         }
     }
 
@@ -194,7 +241,9 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            pair.second->updateParameterFromConfigMsg(updates);
+            pair.second.first->lock();
+            pair.second.second->updateParameterFromConfigMsg(updates);
+            pair.second.first->unlock();
         }
     }
 
@@ -207,9 +256,15 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::map<std::string, std::unique_ptr<Parameter<T>>>& getMutableRegistry()
+    static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
+                                           std::unique_ptr<Parameter<T>>>>&
+    getMutableRegistry()
     {
-        static std::map<std::string, std::unique_ptr<Parameter<T>>> instance;
+        // our registry needs to hold onto a unique mutex to access the parameters in the
+        // registry as mutexes cannot be moved or
+        static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
+                                               std::unique_ptr<Parameter<T>>>>
+            instance;
         return instance;
     }
 
