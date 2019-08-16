@@ -3,28 +3,28 @@
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 
-namespace Util::Logger {
+namespace Util::Logger
+{
+    /**
+     * This class acts as a Singleton that's responsible for initializing the logger.
+     * We use a singleton rather than a generic function in this namespace because
+     * the logWorker object must stay in scope, otherwise the logger is automatically
+     * destroyed. So if an "init" function is used, the logWorker goes out of scope as
+     * soon as the function returns, which destroys the logger right after creating it
+     *
+     * The Singleton class allows us to keep the logWorker in scope for the duration
+     * of the program while still providing a single function to initialize the logger
+     */
+    class LoggerSingleton
+    {
+       public:
         /**
-         * This class acts as a Singleton that's responsible for initializing the logger.
-         * We use a singleton rather than a generic function in this namespace because
-         * the logWorker object must stay in scope, otherwise the logger is automatically
-         * destroyed. So if an "init" function is used, the logWorker goes out of scope as
-         * soon as the function returns, which destroys the logger right after creating it
-         *
-         * The Singleton class allows us to keep the logWorker in scope for the duration
-         * of the program while still providing a single function to initialize the logger
+         * Initializes a g3log logger for the calling program. This should only be
+         * called once at the start of a program.
          */
-        class LoggerSingleton
+        static void initializeLogger()
         {
-           public:
-            /**
-             * Initializes a g3log logger for the calling program. This should only be
-             * called once at the start of a program.
-             */
-            static void initializeLogger()
-            {
-                static std::shared_ptr<LoggerSingleton> s(
-                    new LoggerSingleton());
-            }
-        };
-}  // namespace Util
+            static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton());
+        }
+    };
+}  // namespace Util::Logger

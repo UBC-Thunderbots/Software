@@ -48,7 +48,8 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_
 
     // This "pullLeastRecentlyAddedValue" call should block until something is "pushed"
     std::thread puller_thread([&]() {
-        while(!result){
+        while (!result)
+        {
             result = buffer.pullLeastRecentlyAddedValue(Duration::fromSeconds(0.1));
         }
     });
@@ -106,7 +107,8 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_i
 
     // This "pullLeastRecentlyAddedValue" call should block until something is "pushed"
     std::thread puller_thread([&]() {
-        while(!result){
+        while (!result)
+        {
             result = buffer.pullMostRecentlyAddedValue(Duration::fromSeconds(0.1));
         }
     });
@@ -134,4 +136,3 @@ TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold)
     EXPECT_EQ(39, buffer.pullLeastRecentlyAddedValue());
     EXPECT_EQ(40, buffer.pullLeastRecentlyAddedValue());
 }
-

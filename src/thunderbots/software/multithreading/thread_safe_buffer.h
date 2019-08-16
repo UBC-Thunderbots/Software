@@ -3,9 +3,9 @@
 #include <boost/circular_buffer.hpp>
 #include <condition_variable>
 #include <cstddef>
-#include <optional>
 #include <deque>
 #include <mutex>
+#include <optional>
 
 #include "util/time/duration.h"
 
@@ -43,7 +43,8 @@ class ThreadSafeBuffer
      * @return The most recently value added to the buffer, or std::nullopt if none is
      *         available
      */
-    std::optional<T> pullLeastRecentlyAddedValue(Duration max_wait_time = Duration::fromSeconds(0));
+    std::optional<T> pullLeastRecentlyAddedValue(
+        Duration max_wait_time = Duration::fromSeconds(0));
 
     /**
      * Removes the most recently value added to the buffer and returns it
@@ -59,7 +60,8 @@ class ThreadSafeBuffer
      * @return The most recently value added to the buffer, or std::nullopt if none is
      *         available
      */
-    std::optional<T> pullMostRecentlyAddedValue(Duration max_wait_time = Duration::fromSeconds(0));
+    std::optional<T> pullMostRecentlyAddedValue(
+        Duration max_wait_time = Duration::fromSeconds(0));
 
     /**
      * Push the given value onto the buffer
@@ -103,7 +105,8 @@ std::optional<T> ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue(Duration max_w
     auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
 
     std::optional<T> result = std::nullopt;
-    if (!buffer.empty()){
+    if (!buffer.empty())
+    {
         result = buffer.front();
         buffer.pop_front();
     }
@@ -116,7 +119,8 @@ std::optional<T> ThreadSafeBuffer<T>::pullMostRecentlyAddedValue(Duration max_wa
     auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
 
     std::optional<T> result = std::nullopt;
-    if (!buffer.empty()){
+    if (!buffer.empty())
+    {
         result = buffer.back();
         buffer.pop_back();
     }
@@ -132,12 +136,13 @@ void ThreadSafeBuffer<T>::push(const T& value)
 }
 
 template <typename T>
-std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(Duration max_wait_time)
+std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
+    Duration max_wait_time)
 {
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
     received_new_value.wait_for(buffer_lock,
-                            std::chrono::duration<float>(max_wait_time.getSeconds()),
-                            [this] { return !buffer.empty() || destructor_called; });
+                                std::chrono::duration<float>(max_wait_time.getSeconds()),
+                                [this] { return !buffer.empty() || destructor_called; });
 
     // NOTE: We need to return this in order to prevent it being destructed so
     //       the the lock is maintained until the value is read

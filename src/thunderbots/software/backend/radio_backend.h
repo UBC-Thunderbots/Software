@@ -12,7 +12,6 @@ class RadioBackend : public Backend
     explicit RadioBackend(ros::NodeHandle node_handle);
 
    private:
-
     // TODO: make this configurable?
     static const int DEFAULT_RADIO_CONFIG = 0;
 

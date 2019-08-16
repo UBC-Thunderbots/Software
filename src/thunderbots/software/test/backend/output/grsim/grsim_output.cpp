@@ -1,9 +1,10 @@
+#include "backend/output/grsim/grsim_output.h"
+
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 #include <limits>
 
-#include "backend/output/grsim/grsim_output.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Packet.pb.h"
 

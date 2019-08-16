@@ -13,9 +13,9 @@
  * This produce/consume pattern is performed by extending both "Observer" and
  * "Subject". Please see the the implementation of those classes for details.
  */
-class Backend
-    : public Subject<World>,
-      public ThreadedObserver<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+class Backend : public Subject<World>,
+                public ThreadedObserver<
+                    std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
 {
    public:
     using WorldBuffer  = ThreadSafeBuffer<World>;

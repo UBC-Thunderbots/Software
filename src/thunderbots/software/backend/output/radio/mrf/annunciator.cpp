@@ -6,8 +6,8 @@
 #include "dongle.h"
 #include "messages.h"
 #include "shared/constants.h"
-#include "util/logger/init.h"
 #include "util/constants.h"
+#include "util/logger/init.h"
 
 namespace
 {

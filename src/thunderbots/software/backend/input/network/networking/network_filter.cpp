@@ -258,69 +258,53 @@ Team NetworkFilter::getFilteredEnemyTeamData(
 
 RefboxGameState NetworkFilter::getRefboxGameState(const Referee &packet)
 {
-            return getTeamCommand(packet.command());
+    return getTeamCommand(packet.command());
 }
 
 // this maps a protobuf Referee_Command enum to its ROS message equivalent
 // this map is used when we are on the blue team
-const static std::unordered_map<Referee::Command, RefboxGameState> blue_team_command_map = {
-    {Referee_Command_HALT, RefboxGameState::HALT},
-    {Referee_Command_STOP, RefboxGameState::STOP},
-    {Referee_Command_NORMAL_START, RefboxGameState::NORMAL_START},
-    {Referee_Command_FORCE_START, RefboxGameState::FORCE_START},
-    {Referee_Command_PREPARE_KICKOFF_BLUE,
-     RefboxGameState::PREPARE_KICKOFF_US},
-    {Referee_Command_PREPARE_KICKOFF_YELLOW,
-     RefboxGameState::PREPARE_KICKOFF_THEM},
-    {Referee_Command_PREPARE_PENALTY_BLUE,
-     RefboxGameState::PREPARE_PENALTY_US},
-    {Referee_Command_PREPARE_PENALTY_YELLOW,
-     RefboxGameState::PREPARE_PENALTY_THEM},
-    {Referee_Command_DIRECT_FREE_BLUE, RefboxGameState::DIRECT_FREE_US},
-    {Referee_Command_DIRECT_FREE_YELLOW,
-     RefboxGameState::DIRECT_FREE_THEM},
-    {Referee_Command_INDIRECT_FREE_BLUE,
-     RefboxGameState::INDIRECT_FREE_US},
-    {Referee_Command_INDIRECT_FREE_YELLOW,
-     RefboxGameState::INDIRECT_FREE_THEM},
-    {Referee_Command_TIMEOUT_BLUE, RefboxGameState::TIMEOUT_US},
-    {Referee_Command_TIMEOUT_YELLOW, RefboxGameState::TIMEOUT_THEM},
-    {Referee_Command_GOAL_BLUE, RefboxGameState::GOAL_US},
-    {Referee_Command_GOAL_YELLOW, RefboxGameState::GOAL_THEM},
-    {Referee_Command_BALL_PLACEMENT_BLUE,
-     RefboxGameState::BALL_PLACEMENT_US},
-    {Referee_Command_BALL_PLACEMENT_YELLOW,
-     RefboxGameState::BALL_PLACEMENT_THEM}};
+const static std::unordered_map<Referee::Command, RefboxGameState> blue_team_command_map =
+    {{Referee_Command_HALT, RefboxGameState::HALT},
+     {Referee_Command_STOP, RefboxGameState::STOP},
+     {Referee_Command_NORMAL_START, RefboxGameState::NORMAL_START},
+     {Referee_Command_FORCE_START, RefboxGameState::FORCE_START},
+     {Referee_Command_PREPARE_KICKOFF_BLUE, RefboxGameState::PREPARE_KICKOFF_US},
+     {Referee_Command_PREPARE_KICKOFF_YELLOW, RefboxGameState::PREPARE_KICKOFF_THEM},
+     {Referee_Command_PREPARE_PENALTY_BLUE, RefboxGameState::PREPARE_PENALTY_US},
+     {Referee_Command_PREPARE_PENALTY_YELLOW, RefboxGameState::PREPARE_PENALTY_THEM},
+     {Referee_Command_DIRECT_FREE_BLUE, RefboxGameState::DIRECT_FREE_US},
+     {Referee_Command_DIRECT_FREE_YELLOW, RefboxGameState::DIRECT_FREE_THEM},
+     {Referee_Command_INDIRECT_FREE_BLUE, RefboxGameState::INDIRECT_FREE_US},
+     {Referee_Command_INDIRECT_FREE_YELLOW, RefboxGameState::INDIRECT_FREE_THEM},
+     {Referee_Command_TIMEOUT_BLUE, RefboxGameState::TIMEOUT_US},
+     {Referee_Command_TIMEOUT_YELLOW, RefboxGameState::TIMEOUT_THEM},
+     {Referee_Command_GOAL_BLUE, RefboxGameState::GOAL_US},
+     {Referee_Command_GOAL_YELLOW, RefboxGameState::GOAL_THEM},
+     {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_US},
+     {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_THEM}};
 
 // this maps a protobuf Referee_Command enum to its ROS message equivalent
 // this map is used when we are on the yellow team
-const static std::unordered_map<Referee::Command, RefboxGameState> yellow_team_command_map = {
-    {Referee_Command_HALT, RefboxGameState::HALT},
-    {Referee_Command_STOP, RefboxGameState::STOP},
-    {Referee_Command_NORMAL_START, RefboxGameState::NORMAL_START},
-    {Referee_Command_FORCE_START, RefboxGameState::FORCE_START},
-    {Referee_Command_PREPARE_KICKOFF_BLUE,
-     RefboxGameState::PREPARE_KICKOFF_THEM},
-    {Referee_Command_PREPARE_KICKOFF_YELLOW,
-     RefboxGameState::PREPARE_KICKOFF_US},
-    {Referee_Command_PREPARE_PENALTY_BLUE,
-     RefboxGameState::PREPARE_PENALTY_THEM},
-    {Referee_Command_PREPARE_PENALTY_YELLOW,
-     RefboxGameState::PREPARE_PENALTY_US},
-    {Referee_Command_DIRECT_FREE_BLUE, RefboxGameState::DIRECT_FREE_THEM},
-    {Referee_Command_DIRECT_FREE_YELLOW, RefboxGameState::DIRECT_FREE_US},
-    {Referee_Command_INDIRECT_FREE_BLUE,
-     RefboxGameState::INDIRECT_FREE_THEM},
-    {Referee_Command_INDIRECT_FREE_YELLOW,
-     RefboxGameState::INDIRECT_FREE_US},
-    {Referee_Command_TIMEOUT_BLUE, RefboxGameState::TIMEOUT_THEM},
-    {Referee_Command_TIMEOUT_YELLOW, RefboxGameState::TIMEOUT_US},
-    {Referee_Command_GOAL_BLUE, RefboxGameState::GOAL_THEM},
-    {Referee_Command_GOAL_YELLOW, RefboxGameState::GOAL_US},
-    {Referee_Command_BALL_PLACEMENT_BLUE,
-     RefboxGameState::BALL_PLACEMENT_THEM},
-    {Referee_Command_BALL_PLACEMENT_YELLOW,
-     RefboxGameState::BALL_PLACEMENT_US}};
+const static std::unordered_map<Referee::Command, RefboxGameState>
+    yellow_team_command_map = {
+        {Referee_Command_HALT, RefboxGameState::HALT},
+        {Referee_Command_STOP, RefboxGameState::STOP},
+        {Referee_Command_NORMAL_START, RefboxGameState::NORMAL_START},
+        {Referee_Command_FORCE_START, RefboxGameState::FORCE_START},
+        {Referee_Command_PREPARE_KICKOFF_BLUE, RefboxGameState::PREPARE_KICKOFF_THEM},
+        {Referee_Command_PREPARE_KICKOFF_YELLOW, RefboxGameState::PREPARE_KICKOFF_US},
+        {Referee_Command_PREPARE_PENALTY_BLUE, RefboxGameState::PREPARE_PENALTY_THEM},
+        {Referee_Command_PREPARE_PENALTY_YELLOW, RefboxGameState::PREPARE_PENALTY_US},
+        {Referee_Command_DIRECT_FREE_BLUE, RefboxGameState::DIRECT_FREE_THEM},
+        {Referee_Command_DIRECT_FREE_YELLOW, RefboxGameState::DIRECT_FREE_US},
+        {Referee_Command_INDIRECT_FREE_BLUE, RefboxGameState::INDIRECT_FREE_THEM},
+        {Referee_Command_INDIRECT_FREE_YELLOW, RefboxGameState::INDIRECT_FREE_US},
+        {Referee_Command_TIMEOUT_BLUE, RefboxGameState::TIMEOUT_THEM},
+        {Referee_Command_TIMEOUT_YELLOW, RefboxGameState::TIMEOUT_US},
+        {Referee_Command_GOAL_BLUE, RefboxGameState::GOAL_THEM},
+        {Referee_Command_GOAL_YELLOW, RefboxGameState::GOAL_US},
+        {Referee_Command_BALL_PLACEMENT_BLUE, RefboxGameState::BALL_PLACEMENT_THEM},
+        {Referee_Command_BALL_PLACEMENT_YELLOW, RefboxGameState::BALL_PLACEMENT_US}};
 
 RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
 {
@@ -334,7 +318,7 @@ RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
     }
 }
 
-//Point NetworkFilter::refboxGlobalToLocalPoint(const Referee::Point &point)
+// Point NetworkFilter::refboxGlobalToLocalPoint(const Referee::Point &point)
 //{
 //    if (our_field_side == FieldSide::WEST)
 //    {
@@ -372,7 +356,7 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
     }
 }
 //
-//thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(
+// thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(
 //    const Referee::TeamInfo &team_info)
 //{
 //    thunderbots_msgs::RefboxTeamInfo refbox_team_info;

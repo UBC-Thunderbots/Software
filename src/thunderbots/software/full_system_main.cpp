@@ -5,6 +5,7 @@
 
 #include "ai/ai_wrapper.h"
 #include "backend/grsim_backend.h"
+#include "backend/radio_backend.h"
 #include "thunderbots_msgs/PlayInfo.h"
 #include "thunderbots_msgs/PrimitiveArray.h"
 #include "thunderbots_msgs/World.h"
@@ -14,7 +15,6 @@
 #include "util/parameter/dynamic_parameter_utils.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/time/timestamp.h"
-#include "backend/radio_backend.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -33,7 +33,9 @@ void setBackendFromString(std::string backend_name)
     if (backend_name == "grsim")
     {
         backend = std::make_shared<GrSimBackend>();
-    } else if (backend_name == "radio") {
+    }
+    else if (backend_name == "radio")
+    {
         backend = std::make_shared<RadioBackend>(*node_handle);
     }
     else
@@ -83,7 +85,7 @@ void connectObservers()
 
 int main(int argc, char **argv)
 {
-   node_handle = initRos(argc, argv);
+    node_handle = initRos(argc, argv);
 
     parseCommandLineArgs(argc, argv);
 

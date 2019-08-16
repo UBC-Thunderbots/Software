@@ -6,12 +6,12 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <thread>
 
+#include "ai/world/world.h"
 #include "backend/input/network/networking/ssl_gamecontroller_client.h"
 #include "backend/input/network/networking/ssl_vision_client.h"
 #include "network_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_referee.pb.h"
-#include "ai/world/world.h"
 
 /**
  * This class encapsulates our SSLVisionClient and SSLGameController clients to abstract
@@ -31,9 +31,9 @@ class NetworkClient
      * @param vision_multicast_address A string representation of the ip address the
      *                                 vision system is running on
      */
-    explicit NetworkClient(
-        std::string vision_multicast_address, int vision_multicast_port,
-        std::function<void(World)> received_world_callback);
+    explicit NetworkClient(std::string vision_multicast_address,
+                           int vision_multicast_port,
+                           std::function<void(World)> received_world_callback);
 
     /**
      * Safely destructs this NetworkClient object. Stops any running IO services and

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <thread>
 #include <boost/bind.hpp>
+#include <thread>
 
 #include "multithreading/observer.h"
 
@@ -58,13 +58,16 @@ class ThreadedObserver : public Observer<T>
 };
 
 template <typename T>
-ThreadedObserver<T>::ThreadedObserver() : in_destructor(false), IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
+ThreadedObserver<T>::ThreadedObserver()
+    : in_destructor(false), IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
-    pull_from_buffer_thread =  std::thread(boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
+    pull_from_buffer_thread = std::thread(
+        boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
 template <typename T>
-void ThreadedObserver<T>::onValueReceived(T val) {
+void ThreadedObserver<T>::onValueReceived(T val)
+{
     // Do nothing, this function should be overriden to enable custom behavior on
     // message reception.
 }
@@ -77,10 +80,11 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
         in_destructor_mutex.unlock();
 
         // TODO: make the duration here a constant
-        std::optional<T> new_val = this->popMostRecentlyReceivedValue(
-                IN_DESTRUCTOR_CHECK_PERIOD);
+        std::optional<T> new_val =
+            this->popMostRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
 
-        if (new_val){
+        if (new_val)
+        {
             onValueReceived(*new_val);
         }
 

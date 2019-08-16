@@ -1,25 +1,31 @@
 #include "multithreading/subject.h"
-#include "multithreading/observer.h"
 
 #include <gtest/gtest.h>
 
 #include <thread>
 
-class MockObserver : public Observer<int> {
-public:
-    std::optional<int> getMostRecentValueFromBufferWrapper(){
+#include "multithreading/observer.h"
+
+class MockObserver : public Observer<int>
+{
+   public:
+    std::optional<int> getMostRecentValueFromBufferWrapper()
+    {
         return popMostRecentlyReceivedValue(Duration::fromSeconds(5));
     }
 };
 
-class TestSubject : public Subject<int> {
-public:
-    void sendValue(int i){
+class TestSubject : public Subject<int>
+{
+   public:
+    void sendValue(int i)
+    {
         sendValueToObservers(i);
     }
 };
 
-TEST(Subject, sendValueToObservers){
+TEST(Subject, sendValueToObservers)
+{
     TestSubject test_subject;
     auto mock_observer = std::make_shared<MockObserver>();
 
@@ -31,4 +37,3 @@ TEST(Subject, sendValueToObservers){
     ASSERT_TRUE(result);
     EXPECT_EQ(37, *result);
 }
-

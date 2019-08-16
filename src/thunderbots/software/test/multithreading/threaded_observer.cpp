@@ -6,16 +6,20 @@
 
 using namespace std::chrono_literals;
 
-class TestThreadedObserver : public ThreadedObserver<int> {
-public:
+class TestThreadedObserver : public ThreadedObserver<int>
+{
+   public:
     int received_value = 0;
-private:
-    void onValueReceived(int i) override {
+
+   private:
+    void onValueReceived(int i) override
+    {
         received_value = i;
     }
 };
 
-TEST(ThreadedObserver, receiveValue){
+TEST(ThreadedObserver, receiveValue)
+{
     TestThreadedObserver test_threaded_observer;
 
     test_threaded_observer.receiveValue(83);
@@ -27,7 +31,8 @@ TEST(ThreadedObserver, receiveValue){
     EXPECT_EQ(83, test_threaded_observer.received_value);
 }
 
-TEST(ThreadedObserver, destructor){
+TEST(ThreadedObserver, destructor)
+{
     // Because the destructor has to manage the internal thread to make sure it
     // finishes, this test ensures that it actually can succeed
 

@@ -37,8 +37,8 @@ class RadioOutput
      *                        robot orientation}
      * @param ball
      */
-    void send_vision_packet(std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots,
-                            Ball ball);
+    void send_vision_packet(
+        std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots, Ball ball);
 
     /**
      * Sends a camera packet with the detected robots and ball.
@@ -46,8 +46,7 @@ class RadioOutput
      * @param friendly_team
      * @param ball
      */
-    void send_vision_packet(const Team& friendly_team,
-                            Ball ball);
+    void send_vision_packet(const Team& friendly_team, Ball ball);
 
    private:
     MRFDongle dongle;
