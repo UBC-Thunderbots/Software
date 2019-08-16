@@ -92,4 +92,5 @@ class STP : public HL
     std::string previous_override_play_name;
     bool override_play;
     bool previous_override_play;
+    RefboxGameState current_game_state;
 };

@@ -131,7 +131,19 @@ Ball NetworkFilter::getFilteredBallData(const std::vector<SSL_DetectionFrame> &d
             ball_detection.position =
                 Point(ball.x() * METERS_PER_MILLIMETER, ball.y() * METERS_PER_MILLIMETER);
             ball_detection.timestamp = Timestamp::fromSeconds(detection.t_capture());
-            ball_detections.push_back(ball_detection);
+
+            bool ball_position_invalid =
+                Util::DynamicParameters::AI::refbox::min_valid_x.value() >
+                    ball_detection.position.x() ||
+                Util::DynamicParameters::AI::refbox::max_valid_x.value() <
+                    ball_detection.position.x();
+            bool ignore_ball =
+                Util::DynamicParameters::AI::refbox::ignore_invalid_camera_data.value() &&
+                ball_position_invalid;
+            if (!ignore_ball)
+            {
+                ball_detections.push_back(ball_detection);
+            }
         }
     }
 
@@ -172,7 +184,19 @@ Team NetworkFilter::getFilteredFriendlyTeamData(
             robot_detection.confidence = friendly_robot_detection.confidence();
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
-            friendly_robot_detections.push_back(robot_detection);
+
+            bool robot_position_invalid =
+                Util::DynamicParameters::AI::refbox::min_valid_x.value() >
+                    robot_detection.position.x() ||
+                Util::DynamicParameters::AI::refbox::max_valid_x.value() <
+                    robot_detection.position.x();
+            bool ignore_robot =
+                Util::DynamicParameters::AI::refbox::ignore_invalid_camera_data.value() &&
+                robot_position_invalid;
+            if (!ignore_robot)
+            {
+                friendly_robot_detections.push_back(robot_detection);
+            }
         }
     }
 
@@ -210,7 +234,18 @@ Team NetworkFilter::getFilteredEnemyTeamData(
             robot_detection.confidence = enemy_robot_detection.confidence();
             robot_detection.timestamp  = Timestamp::fromSeconds(detection.t_capture());
 
-            enemy_robot_detections.push_back(robot_detection);
+            bool robot_position_invalid =
+                Util::DynamicParameters::AI::refbox::min_valid_x.value() >
+                    robot_detection.position.x() ||
+                Util::DynamicParameters::AI::refbox::max_valid_x.value() <
+                    robot_detection.position.x();
+            bool ignore_robot =
+                Util::DynamicParameters::AI::refbox::ignore_invalid_camera_data.value() &&
+                robot_position_invalid;
+            if (!ignore_robot)
+            {
+                enemy_robot_detections.push_back(robot_detection);
+            }
         }
     }
 

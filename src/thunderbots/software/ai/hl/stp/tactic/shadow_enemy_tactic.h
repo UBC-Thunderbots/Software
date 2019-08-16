@@ -19,11 +19,14 @@ class ShadowEnemyTactic : public Tactic
      * @param enemy_team The enemy team
      * @param ignore_goalie Whether or not to ignore the friendly goalie when calculating
      * where to shadow the enemy
+     * @param ball_steal_speed If the enemy robot has possession of the ball, and it is
+     * moving less than this speed, the shadowing robot will try steal the ball
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
     explicit ShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                const Team &enemy_team, bool ignore_goalie,
+                               const Ball &ball, const double ball_steal_speed,
                                bool loop_forever = false);
 
     std::string getName() const override;
@@ -39,13 +42,10 @@ class ShadowEnemyTactic : public Tactic
      * @param shadow_distance How far from the enemy the robot will shadow. This is the
      * distance between the center of the enemy robot and the center of the robot
      * shadowing it
-     * @param enemy_team_can_pass Whether or not the enemy team can pass. If this value is
-     * true, the robot will try block passes to the robot being shadowed. Otherwise, it
-     * will block the net.
      */
     void updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field,
                       const Team &friendly_team, const Team &enemy_team,
-                      double shadow_distance, bool enemy_team_can_pass);
+                      double shadow_distance, bool enemy_team_can_pass, const Ball &ball);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -77,4 +77,9 @@ class ShadowEnemyTactic : public Tactic
     // Whether or not to ignore the friendly goalie when calculating the enemy's best shot
     // to shadow
     bool ignore_goalie;
+    // The ball being played with
+    Ball ball;
+    // If the enemy robot has possession of the ball, and it is moving less than this
+    // speed, the shadowing robot will try steal the ball
+    double ball_steal_speed;
 };

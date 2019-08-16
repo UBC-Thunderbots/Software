@@ -161,7 +161,7 @@ Point GameState::getBallPlacementPoint() const
 }
 
 // apologies for this monster switch statement
-void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &ball)
+void GameState::updateRefboxGameState(RefboxGameState gameState)
 {
     if (gameState != game_state)
     {
@@ -206,7 +206,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
                 our_restart    = false;
                 break;
             case RefboxGameState::DIRECT_FREE_US:
-                state          = PLAYING;
+                state          = READY;
                 restart_reason = DIRECT;
                 our_restart    = true;
                 break;
@@ -216,7 +216,7 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
                 our_restart    = false;
                 break;
             case RefboxGameState::INDIRECT_FREE_US:
-                state          = PLAYING;
+                state          = READY;
                 restart_reason = INDIRECT;
                 our_restart    = true;
                 break;
@@ -256,7 +256,10 @@ void GameState::updateRefboxGameState(RefboxGameState gameState, const Ball &bal
                 break;
         }
     }
+}
 
+void GameState::updateBall(const Ball &ball)
+{
     if (state == READY && restart_reason != PENALTY)
     {
         if (!ball_state)
