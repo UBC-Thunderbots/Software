@@ -6,8 +6,8 @@
 
 class TestObserver : public Observer<int> {
 public:
-    int getMostRecentValueFromBufferWrapper(){
-        return getMostRecentValueFromBuffer();
+    std::optional<int> getMostRecentValueFromBufferWrapper(){
+        return popMostRecentlyReceivedValue(Duration::fromSeconds(5));
     }
 };
 
@@ -18,7 +18,9 @@ TEST(Observer,
 
     test_observer.receiveValue(202);
 
-    EXPECT_EQ(202, test_observer.getMostRecentValueFromBufferWrapper());
+    std::optional<int> result = test_observer.getMostRecentValueFromBufferWrapper();
+    ASSERT_TRUE(result);
+    EXPECT_EQ(202, *result);
 }
 
 TEST(Observer,
@@ -27,9 +29,11 @@ TEST(Observer,
     TestObserver test_observer;
 
     // Create a seperate thread to grab the value for us
-    int actual = 0;
+    std::optional<int> result = std::nullopt;
     std::thread receive_value_thread([&](){
-        actual = test_observer.getMostRecentValueFromBufferWrapper();
+        while(!result){
+            result = test_observer.getMostRecentValueFromBufferWrapper();
+        }
     });
 
     // Send the value over
@@ -38,5 +42,6 @@ TEST(Observer,
     // Wait for the thread to successfully get the value
     receive_value_thread.join();
 
-    EXPECT_EQ(202, actual);
+    ASSERT_TRUE(result);
+    EXPECT_EQ(202, *result);
 }

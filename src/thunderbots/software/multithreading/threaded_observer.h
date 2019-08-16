@@ -44,6 +44,10 @@ class ThreadedObserver : public Observer<T>
      */
     void continuouslyPullValuesFromBuffer();
 
+    // The period for checking whether or not the destructor for this class has
+    // been called
+    const Duration IN_DESTRUCTOR_CHECK_PERIOD;
+
     // This indicates if the destructor of this class has been called
     std::mutex in_destructor_mutex;
     bool in_destructor;
@@ -54,9 +58,9 @@ class ThreadedObserver : public Observer<T>
 };
 
 template <typename T>
-ThreadedObserver<T>::ThreadedObserver() : in_destructor(false),
-pull_from_buffer_thread(boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this))
+ThreadedObserver<T>::ThreadedObserver() : in_destructor(false), IN_DESTRUCTOR_CHECK_PERIOD(Duration::fromSeconds(0.1))
 {
+    pull_from_buffer_thread =  std::thread(boost::bind(&ThreadedObserver::continuouslyPullValuesFromBuffer, this));
 }
 
 template <typename T>
@@ -72,13 +76,15 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
     {
         in_destructor_mutex.unlock();
 
-        T new_val = this->getMostRecentValueFromBuffer();
+        // TODO: make the duration here a constant
+        std::optional<T> new_val = this->popMostRecentlyReceivedValue(
+                IN_DESTRUCTOR_CHECK_PERIOD);
 
-        in_destructor_mutex.lock();
-        if (!in_destructor){
-            onValueReceived(new_val);
+        if (new_val){
+            onValueReceived(*new_val);
         }
 
+        in_destructor_mutex.lock();
     } while (!in_destructor);
 }
 
@@ -88,10 +94,6 @@ ThreadedObserver<T>::~ThreadedObserver()
     in_destructor_mutex.lock();
     in_destructor = true;
     in_destructor_mutex.unlock();
-
-    // We push a null value to the buffer to unblock the any calls in the thread
-    // waiting for a value in the buffer
-    this->receiveValue((T)NULL);
 
     // We must wait for the thread to stop, as if we destroy it while it's still
     // running we will segfault

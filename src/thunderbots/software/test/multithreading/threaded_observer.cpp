@@ -28,6 +28,9 @@ TEST(ThreadedObserver, receiveValue){
 }
 
 TEST(ThreadedObserver, destructor){
+    // Because the destructor has to manage the internal thread to make sure it
+    // finishes, this test ensures that it actually can succeed
+
     auto test_threaded_observer = std::make_shared<TestThreadedObserver>();
 
     test_threaded_observer->receiveValue(10);

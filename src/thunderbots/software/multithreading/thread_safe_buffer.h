@@ -3,8 +3,11 @@
 #include <boost/circular_buffer.hpp>
 #include <condition_variable>
 #include <cstddef>
+#include <optional>
 #include <deque>
 #include <mutex>
+
+#include "util/time/duration.h"
 
 /**
  * This class represents a buffer of objects
@@ -29,24 +32,34 @@ class ThreadSafeBuffer
     /**
      * Removes the least recently value added to the buffer and returns it
      *
-     * If the buffer is empty, this function will *block* until one becomes available,
-     * OR until the destructor is called. If the destructor is called, there is no
-     * guarantee about what value this will return.
+     * If the buffer is empty, this function will *block* until:
+     * - a value becomes available
+     * - the given amount of time is exceeded
+     * - the destructor of this class is called
      *
-     * @return The least recently value added to the buffer and returns it
+     * @param max_wait_time The maximum duration to wait for a new value before
+     *                      returning
+     *
+     * @return The most recently value added to the buffer, or std::nullopt if none is
+     *         available
      */
-    T pullLeastRecentlyAddedValue();
+    std::optional<T> pullLeastRecentlyAddedValue(Duration max_wait_time = Duration::fromSeconds(0));
 
     /**
      * Removes the most recently value added to the buffer and returns it
      *
-     * If the buffer is empty, this function will *block* until one becomes available,
-     * OR until the destructor is called. If the destructor is called, there is no
-     * guarantee about what value this will return.
+     * If the buffer is empty, this function will *block* until:
+     * - a value becomes available
+     * - the given amount of time is exceeded
+     * - the destructor of this class is called
      *
-     * @return The most recently value added to the buffer and returns it
+     * @param max_wait_time The maximum duration to wait for a new value before
+     *                      returning
+     *
+     * @return The most recently value added to the buffer, or std::nullopt if none is
+     *         available
      */
-    T pullMostRecentlyAddedValue();
+    std::optional<T> pullMostRecentlyAddedValue(Duration max_wait_time = Duration::fromSeconds(0));
 
     /**
      * Push the given value onto the buffer
@@ -63,9 +76,12 @@ class ThreadSafeBuffer
     /**
      * Waits for the buffer to have at least one value
      *
+     * @param max_wait_time The maximum duration to wait for a new value before
+     *                      returning
+     *
      * @return A unique_lock on the contents of the buffer
      */
-    std::unique_lock<std::mutex> waitForBufferToHaveAValue();
+    std::unique_lock<std::mutex> waitForBufferToHaveAValue(Duration max_wait_time);
 
     std::mutex buffer_mutex;
     boost::circular_buffer<T> buffer;
@@ -82,22 +98,28 @@ ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size)
 }
 
 template <typename T>
-T ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue()
+std::optional<T> ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue(Duration max_wait_time)
 {
-    auto buffer_lock = waitForBufferToHaveAValue();
+    auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
 
-    auto result = std::move(buffer.front());
-    buffer.pop_front();
+    std::optional<T> result = std::nullopt;
+    if (!buffer.empty()){
+        result = buffer.front();
+        buffer.pop_front();
+    }
     return result;
 }
 
 template <typename T>
-T ThreadSafeBuffer<T>::pullMostRecentlyAddedValue()
+std::optional<T> ThreadSafeBuffer<T>::pullMostRecentlyAddedValue(Duration max_wait_time)
 {
-    auto buffer_lock = waitForBufferToHaveAValue();
+    auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
 
-    auto result = std::move(buffer.back());
-    buffer.pop_back();
+    std::optional<T> result = std::nullopt;
+    if (!buffer.empty()){
+        result = buffer.back();
+        buffer.pop_back();
+    }
     return result;
 }
 
@@ -110,20 +132,21 @@ void ThreadSafeBuffer<T>::push(const T& value)
 }
 
 template <typename T>
-std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue()
+std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(Duration max_wait_time)
 {
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
-    received_new_value.wait(buffer_lock,
+    received_new_value.wait_for(buffer_lock,
+                            std::chrono::duration<float>(max_wait_time.getSeconds()),
                             [this] { return !buffer.empty() || destructor_called; });
 
-    // NOTE: We need to return this in order to prevent it being destructed and
-    //       prevent it being written to before the value is read
+    // NOTE: We need to return this in order to prevent it being destructed so
+    //       the the lock is maintained until the value is read
     return buffer_lock;
 }
 
 template <typename T>
 ThreadSafeBuffer<T>::~ThreadSafeBuffer()
 {
-    this->destructor_called = true;
+    destructor_called = true;
     received_new_value.notify_all();
 }

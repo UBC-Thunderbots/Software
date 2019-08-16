@@ -7,8 +7,8 @@
 
 class MockObserver : public Observer<int> {
 public:
-    int getMostRecentValueFromBufferWrapper(){
-        return getMostRecentValueFromBuffer();
+    std::optional<int> getMostRecentValueFromBufferWrapper(){
+        return popMostRecentlyReceivedValue(Duration::fromSeconds(5));
     }
 };
 
@@ -27,6 +27,8 @@ TEST(Subject, sendValueToObservers){
 
     test_subject.sendValue(37);
 
-    EXPECT_EQ(37, mock_observer->getMostRecentValueFromBufferWrapper());
+    std::optional<int> result = mock_observer->getMostRecentValueFromBufferWrapper();
+    ASSERT_TRUE(result);
+    EXPECT_EQ(37, *result);
 }
 

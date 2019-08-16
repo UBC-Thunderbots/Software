@@ -926,6 +926,7 @@ if (CATKIN_ENABLE_TESTING)
                     )
     target_link_libraries(multithreading_test
             ${Boost_LIBRARIES}
+            tbots_time
             )
 
     catkin_add_gtest(ai_util_test

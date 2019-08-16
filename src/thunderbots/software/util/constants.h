@@ -28,7 +28,7 @@ namespace Util
 
         // Networking and vision
         static const std::string SSL_VISION_DEFAULT_MULTICAST_ADDRESS = "224.5.23.2";
-        static const unsigned short SSL_VISION_MULTICAST_PORT = 10020;
+        static const unsigned short SSL_VISION_MULTICAST_PORT = 10006;
 
         // GrSim networking and communication
         // TODO: BETTER NAMES

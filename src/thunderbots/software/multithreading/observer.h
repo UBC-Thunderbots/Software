@@ -26,13 +26,20 @@ class Observer
 
    protected:
     /**
-     * Get the most recent value from the buffer
+     * Pops the most recently received value and returns it
      *
-     * If no value is available, this will block until a value is available.
+     * If no value is available, this will block until:
+     * - a value becomes available
+     * - the given amount of time is exceeded
+     * - the destructor of this class is called
      *
-     * @return The value most recently added to the buffer
+     * @param max_wait_time The maximum duration to wait for a new value before
+     *                      returning
+     *
+     * @return The value most recently added to the buffer or std::nullopt if none is
+     *         available
      */
-    virtual T getMostRecentValueFromBuffer() final;
+    virtual std::optional<T> popMostRecentlyReceivedValue(Duration max_wait_time) final;
 
    private:
     const size_t DEFAULT_BUFFER_SIZE = 1;
@@ -52,7 +59,7 @@ void Observer<T>::receiveValue(T val)
 }
 
 template <typename T>
-T Observer<T>::getMostRecentValueFromBuffer()
+std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
 {
-    return std::move(buffer.pullMostRecentlyAddedValue());
+    return buffer.pullMostRecentlyAddedValue(max_wait_time);
 }
