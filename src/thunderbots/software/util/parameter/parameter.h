@@ -73,7 +73,7 @@ class Parameter
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
 
-            std::scoped_lock lock(*param_in_registry.first);
+            std::scoped_lock lock(*(param_in_registry.first));
             auto value = param_in_registry.second->value_;
 
             return value;
@@ -102,7 +102,7 @@ class Parameter
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            std::scoped_lock lock(*param_in_registry.first);
+            std::scoped_lock lock(*(param_in_registry.first));
             param_in_registry->value_ = new_value;
         }
 
@@ -223,7 +223,7 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            std::scoped_lock lock(*pair.second.first);
+            std::scoped_lock lock(*(pair.second.first));
             pair.second.second->updateValueFromROSParameterServer();
         }
     }
@@ -238,7 +238,7 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            std::scoped_lock lock(*pair.second.first);
+            std::scoped_lock lock(*(pair.second.first));
             pair.second.second->updateParameterFromConfigMsg(updates);
         }
     }
