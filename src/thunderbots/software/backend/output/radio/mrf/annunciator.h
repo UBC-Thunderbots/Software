@@ -3,7 +3,7 @@
 
 #include <boost/signals2.hpp>
 
-#include "thunderbots_msgs/RobotStatus.h"
+#include "backend/robot_status.h"
 
 /**
  * This class publishes messages received from the dongle.
@@ -13,9 +13,11 @@ class Annunciator
    public:
     /**
      * Constructor.
-     * @param node_handle The node handle used to initialize the publisher.
+     *
+     * @param received_robot_status_callback The callback function to call with new
+     *                                       robot status messages
      */
-    explicit Annunciator(ros::NodeHandle& node_handle);
+    explicit Annunciator(std::function<void(RobotStatus)> received_robot_status_callback);
 
     /**
      * Updates detected robots from vision, used to determine dead bots.
@@ -37,7 +39,7 @@ class Annunciator
      *
      * @return latest status update
      */
-    thunderbots_msgs::RobotStatus handle_robot_message(int index, const void* data,
+    void handle_robot_message(int index, const void* data,
                                                        std::size_t len, uint8_t lqi,
                                                        uint8_t rssi);
 
@@ -58,6 +60,6 @@ class Annunciator
    private:
     void checkNewMessages(std::vector<std::string> new_msgs,
                           std::vector<std::string> old_msgs);
-    ros::Publisher robot_status_publisher;
+    std::function<void(RobotStatus)> received_robot_status_callback;
     std::vector<std::string> dongle_messages;
 };

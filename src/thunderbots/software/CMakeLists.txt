@@ -128,8 +128,6 @@ include_directories(
 ## Libraries ##
 ###############
 
-# TODO: Should plural libraries be plurally named?
-
 # Geom
 file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
@@ -902,7 +900,6 @@ if (CATKIN_ENABLE_TESTING)
             tbots_test_util
             )
 
-        # TODO: uncomment me and re-add!
     catkin_add_gtest(network_input_test
             test/backend/input/network/filter/ball_filter.cpp
             test/backend/input/network/main.cpp

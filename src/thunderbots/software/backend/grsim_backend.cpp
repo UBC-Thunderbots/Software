@@ -1,6 +1,9 @@
 #include "backend/grsim_backend.h"
 
 #include "util/constants.h"
+#include "backend/backend_factory.h"
+
+const std::string GrSimBackend::name = "GrSimBackend";
 
 GrSimBackend::GrSimBackend()
     : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
@@ -20,7 +23,7 @@ void GrSimBackend::onValueReceived(Backend::PrimitiveVecPtr primitives)
 void GrSimBackend::receiveWorld(World world)
 {
     setMostRecentlyReceivedWorld(world);
-    sendValueToObservers(world);
+    Subject<World>::sendValueToObservers(world);
     updateGrSim();
 }
 
@@ -49,3 +52,6 @@ void GrSimBackend::updateGrSim()
                                     most_recently_received_world->ball());
     }
 }
+
+// Register this backed in the BackendFactory
+static TBackendFactory<GrSimBackend> factory;

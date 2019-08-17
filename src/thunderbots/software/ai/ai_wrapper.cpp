@@ -14,7 +14,7 @@ AIWrapper::AIWrapper(ros::NodeHandle node_handle)
 
 void AIWrapper::onValueReceived(World world)
 {
-    currently_known_world = world;
+    most_recent_world = world;
     runAIAndSendPrimitives();
     publishPlayInfo();
     drawWorld();
@@ -31,7 +31,7 @@ void AIWrapper::runAIAndSendPrimitives()
     if (Util::DynamicParameters::AI::run_ai.value())
     {
         std::vector<std::unique_ptr<Primitive>> new_primitives =
-            ai.getPrimitives(currently_known_world);
+            ai.getPrimitives(most_recent_world);
 
         auto new_primitives_ptr =
             std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
@@ -44,7 +44,7 @@ void AIWrapper::drawWorld()
 {
     std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
         Util::CanvasMessenger::getInstance();
-    canvas_messenger->drawWorld(currently_known_world);
+    canvas_messenger->drawWorld(most_recent_world);
 }
 thunderbots_msgs::PlayInfo AIWrapper::convertPlayInfoToROSMessage(
     const PlayInfo& play_info)

@@ -6,15 +6,11 @@
 #include "ai/ai_wrapper.h"
 #include "backend/grsim_backend.h"
 #include "backend/radio_backend.h"
-#include "thunderbots_msgs/PlayInfo.h"
-#include "thunderbots_msgs/PrimitiveArray.h"
-#include "thunderbots_msgs/World.h"
+#include "backend/backend_factory.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
 #include "util/parameter/dynamic_parameter_utils.h"
-#include "util/parameter/dynamic_parameters.h"
-#include "util/time/timestamp.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -30,13 +26,14 @@ namespace
 
 void setBackendFromString(std::string backend_name)
 {
+    // TODO: USE FACTORY HERE
     if (backend_name == "grsim")
     {
         backend = std::make_shared<GrSimBackend>();
     }
     else if (backend_name == "radio")
     {
-        backend = std::make_shared<RadioBackend>(*node_handle);
+        backend = std::make_shared<RadioBackend>();
     }
     else
     {
@@ -46,6 +43,7 @@ void setBackendFromString(std::string backend_name)
 
 void parseCommandLineArgs(int argc, char **argv)
 {
+    std::vector<std::string> backend_names = BackendFactory().getRegisteredBackendNames();
     try
     {
         options_description desc{"Options"};
@@ -79,7 +77,7 @@ std::shared_ptr<ros::NodeHandle> initRos(int argc, char **argv)
 // TODO: javadoc comment here
 void connectObservers()
 {
-    backend->registerObserver(ai);
+    backend->Subject<World>::registerObserver(ai);
     ai->registerObserver(backend);
 }
 

@@ -318,18 +318,6 @@ RefboxGameState NetworkFilter::getTeamCommand(const Referee::Command &command)
     }
 }
 
-// Point NetworkFilter::refboxGlobalToLocalPoint(const Referee::Point &point)
-//{
-//    if (our_field_side == FieldSide::WEST)
-//    {
-//        return Point(-point.x(), -point.y());
-//    }
-//    else
-//    {
-//        return Point(point.x(), point.y());
-//    }
-//}
-
 void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
 {
     if (blue_team_on_positive_half)
@@ -355,20 +343,3 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
         }
     }
 }
-//
-// thunderbots_msgs::RefboxTeamInfo NetworkFilter::getTeamInfo(
-//    const Referee::TeamInfo &team_info)
-//{
-//    thunderbots_msgs::RefboxTeamInfo refbox_team_info;
-//    refbox_team_info.team_name = team_info.name();
-//    refbox_team_info.score     = team_info.score();
-//    refbox_team_info.red_cards = team_info.red_cards();
-//    for (auto card_time : team_info.yellow_card_times())
-//    {
-//        refbox_team_info.yellow_card_times.push_back(card_time);
-//    }
-//    refbox_team_info.timeouts     = team_info.timeouts();
-//    refbox_team_info.timeout_time = team_info.timeout_time();
-//    refbox_team_info.goalie       = team_info.goalkeeper();
-//    return refbox_team_info;
-//}

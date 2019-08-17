@@ -2,8 +2,10 @@
 
 #include "ai/primitive/primitive.h"
 #include "ai/world/world.h"
+#include "backend/robot_status.h"
 #include "multithreading/subject.h"
 #include "multithreading/threaded_observer.h"
+#include "typedefs.h"
 
 /**
  * A Backend is an abstraction around all I/O operations that our system may need
@@ -14,8 +16,8 @@
  * "Subject". Please see the the implementation of those classes for details.
  */
 class Backend : public Subject<World>,
-                public ThreadedObserver<
-                    std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+                public Subject<RobotStatus>,
+                public ThreadedObserver<ConstPrimitiveVectorPtr>
 {
    public:
     using WorldBuffer  = ThreadSafeBuffer<World>;

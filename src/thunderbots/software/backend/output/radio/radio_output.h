@@ -17,9 +17,10 @@ class RadioOutput
      * Automatically connects to the dongle upon initialization.
      *
      * @param config MRF configuration to start dongle in
-     * @param node_handle the ROS NodeHandle of the radio_communication node
+     * @param received_robot_status_callback The callback function to call with new
+     *                                       robot status messages
      */
-    explicit RadioOutput(unsigned int config, ros::NodeHandle& node_handle);
+    explicit RadioOutput(unsigned int config, std::function<void(RobotStatus)> received_robot_status_callback);
 
     ~RadioOutput();
 

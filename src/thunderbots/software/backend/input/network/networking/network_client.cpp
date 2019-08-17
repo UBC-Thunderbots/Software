@@ -25,7 +25,7 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
     }
     catch (const boost::exception& ex)
     {
-        // LOG(FATAL) will terminate the network process
+        // LOG(FATAL) will terminate this process
         LOG(FATAL) << "An error occured while setting up the SSL Vision Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
@@ -42,7 +42,7 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
     }
     catch (const boost::exception& ex)
     {
-        // LOG(FATAL) will terminate the network process
+        // LOG(FATAL) will terminate this process
         LOG(FATAL) << "An error occured while setting up the SSL GameController Client:"
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;

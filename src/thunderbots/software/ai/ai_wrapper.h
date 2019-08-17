@@ -2,7 +2,6 @@
 
 #include <ros/node_handle.h>
 #include <ros/publisher.h>
-
 #include <thread>
 
 #include "ai/ai.h"
@@ -11,36 +10,52 @@
 #include "multithreading/threaded_observer.h"
 #include "primitive/primitive.h"
 #include "thunderbots_msgs/PlayInfo.h"
+#include "typedefs.h"
 
-// TODO: Better name for this class
-// TODO: javadoc comment here
-// TODO: explain shared_ptr->const_vec->unique ptr for primitives here
-//       (WHY NOT JUST CONST REFERENCE??)
+/**
+ * This class wraps an `AI` object, performing all the work of receiving World
+ * objects, passing them to the `AI`, getting the primitives to send to the
+ * robots based on the World state, and sending them out.
+ */
 class AIWrapper
     : public ThreadedObserver<World>,
-      public Subject<std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>>
+      public Subject<ConstPrimitiveVectorPtr>
 {
-    // TODO: javadoc comments for all these functions and members
    public:
     AIWrapper() = delete;
 
     explicit AIWrapper(ros::NodeHandle node_handle);
 
-
    private:
     void onValueReceived(World world) override;
 
+    /**
+     * Publish the play info on a ROS topic
+     */
     void publishPlayInfo();
 
+    /**
+     * Get primitives for the currently known world from the AI and pass them to
+     * observers
+     */
     void runAIAndSendPrimitives();
+
+    /**
+     * Publish the requisite ROS messages to draw the current state of the world
+     */
     void drawWorld();
 
+    /**
+     * Convert the given PlayInfo into it's equivalent ROS type
+     *
+     * @param play_info The PlayInfo to convert
+     *
+     * @return The equivalent ROS message for the given PlayInfo
+     */
     static thunderbots_msgs::PlayInfo convertPlayInfoToROSMessage(
         const PlayInfo& play_info);
 
     AI ai;
-
-    World currently_known_world;
-
+    World most_recent_world;
     ros::Publisher play_info_publisher;
 };

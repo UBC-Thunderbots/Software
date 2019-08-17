@@ -115,22 +115,4 @@ class NetworkFilter
      * @return a ROS message RefboxCommand constant corresponding to the input command
      */
     RefboxGameState getTeamCommand(const Referee::Command &command);
-
-    //    /**
-    //     * Converts a protobuf point from global coordinates into a Point in local
-    //     coordinates
-    //     * (+x as enemy side, -x as friendly side)
-    //     * @param point Protobuf point in global coordinates from the Refbox
-    //     * @return the same point, as a Point in local coordinates
-    //     */
-    //    Point refboxGlobalToLocalPoint(const Referee::Point &point);
-    //
-    //    /**
-    //     * Converts a protobuf TeamInfo message from Refbox into a RefboxTeamInfo ROS
-    //     message.
-    //     * @param team_info protobuf TeamInfo message
-    //     * @return ROS message for team info
-    //     */
-    //    thunderbots_msgs::RefboxTeamInfo getTeamInfo(const Referee::TeamInfo
-    //    &team_info);
 };

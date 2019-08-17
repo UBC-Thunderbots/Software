@@ -86,7 +86,7 @@ namespace
         std::mutex bot_mutex = std::mutex();
 
         // Previously published status for this robot
-        thunderbots_msgs::RobotStatus previous_status;
+        RobotStatus previous_status;
 
         // Map of message to timestamp for edge-triggered messages
         std::map<std::string, time_t> et_messages;
@@ -101,11 +101,8 @@ namespace
 
 }  // namespace
 
-Annunciator::Annunciator(ros::NodeHandle &node_handle)
+Annunciator::Annunciator(std::function<void(RobotStatus)> received_robot_status_callback): received_robot_status_callback(received_robot_status_callback)
 {
-    robot_status_publisher = node_handle.advertise<thunderbots_msgs::RobotStatus>(
-        Util::Constants::ROBOT_STATUS_TOPIC, 1);
-
     // Initialize messages with the correct robot ID
     for (uint8_t bot = 0; bot < MAX_ROBOTS_OVER_RADIO; ++bot)
     {
@@ -115,13 +112,13 @@ Annunciator::Annunciator(ros::NodeHandle &node_handle)
     }
 }
 
-thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
-                                                                const void *data,
-                                                                std::size_t len,
-                                                                uint8_t lqi, uint8_t rssi)
+void Annunciator::handle_robot_message(int index,
+                                       const void *data,
+                                       std::size_t len,
+                                       uint8_t lqi, uint8_t rssi)
 {
     std::vector<std::string> new_msgs;
-    thunderbots_msgs::RobotStatus robot_status;
+    RobotStatus robot_status;
 
     // Guard robot status state for this bot
     std::lock_guard<std::mutex> lock(robot_status_states[index].bot_mutex);
@@ -396,9 +393,8 @@ thunderbots_msgs::RobotStatus Annunciator::handle_robot_message(int index,
     // Update last communicated time
     robot_status_states[index].last_status_update = time(nullptr);
 
-    // Publish robot status
-    robot_status_publisher.publish(robot_status);
-    return robot_status;
+    // Send out robot status
+    received_robot_status_callback(robot_status);
 }
 
 void Annunciator::checkNewMessages(std::vector<std::string> new_msgs,
@@ -456,7 +452,7 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
         if (difftime(time(nullptr), robot_status_states[bot].last_status_update) >
             ROBOT_DEAD_TIME)
         {
-            thunderbots_msgs::RobotStatus new_status =
+            RobotStatus new_status =
                 robot_status_states[bot].previous_status;
             new_status.robot_messages.clear();
             new_status.robot_messages.push_back(MRF::ROBOT_DEAD_MESSAGE);
@@ -467,7 +463,7 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
 
             // Update and publish latest status
             robot_status_states[bot].previous_status = new_status;
-            robot_status_publisher.publish(new_status);
+            received_robot_status_callback(new_status);
         }
 
         robot_status_states[bot].bot_mutex.unlock();
