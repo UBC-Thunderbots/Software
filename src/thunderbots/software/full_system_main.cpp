@@ -4,9 +4,9 @@
 #include <iostream>
 
 #include "ai/ai_wrapper.h"
+#include "backend/backend_factory.h"
 #include "backend/grsim_backend.h"
 #include "backend/radio_backend.h"
-#include "backend/backend_factory.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 #include "util/constants.h"
 #include "util/logger/init.h"

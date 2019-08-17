@@ -38,10 +38,11 @@ BackendFactory::getRegisteredBackendConstructors()
     return constructors;
 }
 
-void BackendFactory::registerBackend(std::string backend_name,
-                               std::function<std::unique_ptr<Backend>()> backend_creator)
+void BackendFactory::registerBackend(
+    std::string backend_name, std::function<std::unique_ptr<Backend>()> backend_creator)
 {
-    BackendFactory::getMutableRegistry().insert(std::make_pair(backend_name, backend_creator));
+    BackendFactory::getMutableRegistry().insert(
+        std::make_pair(backend_name, backend_creator));
 }
 
 std::unique_ptr<Backend> BackendFactory::createBackend(const std::string& backend_name)
@@ -54,9 +55,8 @@ std::unique_ptr<Backend> BackendFactory::createBackend(const std::string& backen
     }
     else
     {
-        std::string msg =
-                std::string("No constructor for " + backend_name + " found in the BackendFactory");
+        std::string msg = std::string("No constructor for " + backend_name +
+                                      " found in the BackendFactory");
         throw std::invalid_argument(msg);
     }
 }
-

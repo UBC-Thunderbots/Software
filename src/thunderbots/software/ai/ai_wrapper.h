@@ -2,6 +2,7 @@
 
 #include <ros/node_handle.h>
 #include <ros/publisher.h>
+
 #include <thread>
 
 #include "ai/ai.h"
@@ -17,9 +18,7 @@
  * objects, passing them to the `AI`, getting the primitives to send to the
  * robots based on the World state, and sending them out.
  */
-class AIWrapper
-    : public ThreadedObserver<World>,
-      public Subject<ConstPrimitiveVectorPtr>
+class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveVectorPtr>
 {
    public:
     AIWrapper() = delete;

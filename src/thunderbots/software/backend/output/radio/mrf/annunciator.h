@@ -39,9 +39,8 @@ class Annunciator
      *
      * @return latest status update
      */
-    void handle_robot_message(int index, const void* data,
-                                                       std::size_t len, uint8_t lqi,
-                                                       uint8_t rssi);
+    void handle_robot_message(int index, const void* data, std::size_t len, uint8_t lqi,
+                              uint8_t rssi);
 
     /**
      * Handles general dongle messages.

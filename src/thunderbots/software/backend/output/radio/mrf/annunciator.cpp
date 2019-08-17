@@ -101,7 +101,8 @@ namespace
 
 }  // namespace
 
-Annunciator::Annunciator(std::function<void(RobotStatus)> received_robot_status_callback): received_robot_status_callback(received_robot_status_callback)
+Annunciator::Annunciator(std::function<void(RobotStatus)> received_robot_status_callback)
+    : received_robot_status_callback(received_robot_status_callback)
 {
     // Initialize messages with the correct robot ID
     for (uint8_t bot = 0; bot < MAX_ROBOTS_OVER_RADIO; ++bot)
@@ -112,9 +113,7 @@ Annunciator::Annunciator(std::function<void(RobotStatus)> received_robot_status_
     }
 }
 
-void Annunciator::handle_robot_message(int index,
-                                       const void *data,
-                                       std::size_t len,
+void Annunciator::handle_robot_message(int index, const void *data, std::size_t len,
                                        uint8_t lqi, uint8_t rssi)
 {
     std::vector<std::string> new_msgs;
@@ -452,8 +451,7 @@ void Annunciator::update_vision_detections(std::vector<uint8_t> robots)
         if (difftime(time(nullptr), robot_status_states[bot].last_status_update) >
             ROBOT_DEAD_TIME)
         {
-            RobotStatus new_status =
-                robot_status_states[bot].previous_status;
+            RobotStatus new_status = robot_status_states[bot].previous_status;
             new_status.robot_messages.clear();
             new_status.robot_messages.push_back(MRF::ROBOT_DEAD_MESSAGE);
 

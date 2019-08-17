@@ -1,7 +1,7 @@
 #include "backend/radio_backend.h"
 
-#include "util/constants.h"
 #include "backend/backend_factory.h"
+#include "util/constants.h"
 
 const std::string RadioBackend::name = "RadioBackend";
 
@@ -9,7 +9,9 @@ RadioBackend::RadioBackend()
     : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
                     Util::Constants::SSL_VISION_MULTICAST_PORT,
                     boost::bind(&RadioBackend::receiveWorld, this, _1)),
-radio_output(DEFAULT_RADIO_CONFIG, [this](RobotStatus status){ Subject<RobotStatus>::sendValueToObservers(status);})
+      radio_output(DEFAULT_RADIO_CONFIG, [this](RobotStatus status) {
+          Subject<RobotStatus>::sendValueToObservers(status);
+      })
 {
 }
 

@@ -42,17 +42,11 @@ struct RobotStatus
     // Whether or not the ball is interrupting the robot’s laser beam.
     bool ball_in_beam;
 
-
-
     // Whether or not the robot’s capacitor is charged enough to kick the ball.
     bool capacitor_charged;
 
-
-
     // Indicates when autokick has been fired.
     bool autokick_fired;
-
-
 
     // The voltage on the robot’s battery, in volts.
     double battery_voltage;
@@ -64,34 +58,29 @@ struct RobotStatus
     double break_beam_reading;
 
     // The maximum full-scale deflection (maximum possible reading) of the laser sensor.
-       double break_beam_scale;
+    double break_beam_scale;
 
     // The temperature of the robot’s dribbler motor, in degrees Celsius.
     double dribbler_temperature;
 
-   // The speed of the robot’s dribbler motor, in revolutions per minute.
+    // The speed of the robot’s dribbler motor, in revolutions per minute.
     int32_t dribbler_speed;
 
     // The temperature of the robot’s mainboard, in degrees Celsius.
     double board_temperature;
 
-  // The link quality of the last received packet, from 0 (worst) to 1 (best).
+    // The link quality of the last received packet, from 0 (worst) to 1 (best).
     double link_quality;
 
-
-  // The received signal strength of the last received packet, in decibels.
+    // The received signal strength of the last received packet, in decibels.
     int32_t received_signal_strength_db;
 
-
-  // Whether or nott the build ID information is valid.
+    // Whether or nott the build ID information is valid.
     bool build_ids_valid;
 
-
-  // The microcontroller firmware build ID.
+    // The microcontroller firmware build ID.
     uint32_t fw_build_id;
 
-
-  // The FPGA bitstream build ID.
+    // The FPGA bitstream build ID.
     uint32_t fpga_build_id;
 };
-

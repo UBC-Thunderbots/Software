@@ -4,8 +4,10 @@
 
 #include "util/logger/init.h"
 
-RadioOutput::RadioOutput(unsigned int config,std::function<void(RobotStatus)> received_robot_status_callback)
-    : annunciator(Annunciator(received_robot_status_callback)), dongle(MRFDongle(config, annunciator))
+RadioOutput::RadioOutput(unsigned int config,
+                         std::function<void(RobotStatus)> received_robot_status_callback)
+    : annunciator(Annunciator(received_robot_status_callback)),
+      dongle(MRFDongle(config, annunciator))
 {
 }
 

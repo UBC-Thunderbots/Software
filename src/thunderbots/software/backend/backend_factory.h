@@ -7,16 +7,16 @@
 
 // A quality of life typedef to make things shorter and more readable
 typedef std::unordered_map<std::string, std::function<std::unique_ptr<Backend>()>>
-        BackendRegistry;
+    BackendRegistry;
 
 /**
- * The BackendFactory is an Abstract class that provides an interface for Backend Factories
- * to follow. This makes it easy to maintain a list of factories and get the corresponding
- * backends through the generic interface.
+ * The BackendFactory is an Abstract class that provides an interface for Backend
+ * Factories to follow. This makes it easy to maintain a list of factories and get the
+ * corresponding backends through the generic interface.
  */
 class BackendFactory
 {
-public:
+   public:
     /**
      * Returns a unique pointer to a newly constructed Backend of the given type/name
      *
@@ -30,9 +30,9 @@ public:
     static std::unique_ptr<Backend> createBackend(const std::string& backend_name);
 
     /**
-     * Returns a const reference to the Backend registry. The registry is a map of Backend names
-     * to a "create" function that will create and return a unique_ptr to a new concrete
-     * instance of the Backend.
+     * Returns a const reference to the Backend registry. The registry is a map of Backend
+     * names to a "create" function that will create and return a unique_ptr to a new
+     * concrete instance of the Backend.
      *
      * @return a const reference to the Backend registry
      */
@@ -53,7 +53,7 @@ public:
     static std::vector<std::function<std::unique_ptr<Backend>()>>
     getRegisteredBackendConstructors();
 
-protected:
+   protected:
     /**
      * Adds a Backend to the Backend Registry
      *
@@ -61,10 +61,11 @@ protected:
      * @param backend_creator A "create" function that takes no arguments and will return
      * a unique_ptr to a new instance of the specified Backend
      */
-    static void registerBackend(std::string backend_name,
-                             std::function<std::unique_ptr<Backend>()> backend_creator);
+    static void registerBackend(
+        std::string backend_name,
+        std::function<std::unique_ptr<Backend>()> backend_creator);
 
-private:
+   private:
     /**
      * Returns a reference to the Backend registry. The registry is a map of Backend names
      * to a "create" function that will create and return a unique_ptr to a new concrete
@@ -82,28 +83,29 @@ private:
 };
 
 /**
- * This templated backend factory class is used by Backends that are derived from the Abstract
- * Backend class. Its purpose is to create a Factory for the implemented Backend and
- * automatically register the backend in the BackendFactory registry.
+ * This templated backend factory class is used by Backends that are derived from the
+ * Abstract Backend class. Its purpose is to create a Factory for the implemented Backend
+ * and automatically register the backend in the BackendFactory registry.
  *
  * Declaring the static variable will also cause it to be initialized at the start of the
  * program (because it's static). This will immediately call the constructor, which adds
  * the backend T to the BackendFactory registry. From then on, the rest of the program
- * can use the registry to find all the Backends that are available (and register with this
- * templated class).
+ * can use the registry to find all the Backends that are available (and register with
+ * this templated class).
  *
  * @tparam T The class of the Backend to be added to the registry. For example, to add a
- * new class called MoveBackend that inherits from Backend, the following line should be added
- * to the end of the .cpp file (without the quotations):
- * "static TBackendFactory<MoveBackend> factory;"
+ * new class called MoveBackend that inherits from Backend, the following line should be
+ * added to the end of the .cpp file (without the quotations): "static
+ * TBackendFactory<MoveBackend> factory;"
  */
 template <class T>
 class TBackendFactory : public BackendFactory
 {
     // compile time type checking that T is derived class of Backend
-    static_assert(std::is_base_of<Backend, T>::value, "T must be derived class of Backend!");
+    static_assert(std::is_base_of<Backend, T>::value,
+                  "T must be derived class of Backend!");
 
-public:
+   public:
     TBackendFactory()
     {
         auto backend_creator = []() -> std::unique_ptr<Backend> {
