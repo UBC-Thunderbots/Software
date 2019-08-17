@@ -84,19 +84,19 @@ int main(int argc, char** argv)
     // grab parameters of each type from its respective registry
     for (const auto& pair : Parameter<int32_t>::getRegistry())
     {
-        int_parameters.push_back(*pair.second);
+        int_parameters.push_back(*pair.second.second);
     }
     for (const auto& pair : Parameter<double>::getRegistry())
     {
-        double_parameters.push_back(*pair.second);
+        double_parameters.push_back(*pair.second.second);
     }
     for (const auto& pair : Parameter<bool>::getRegistry())
     {
-        bool_parameters.push_back(*pair.second);
+        bool_parameters.push_back(*pair.second.second);
     }
     for (const auto& pair : Parameter<std::string>::getRegistry())
     {
-        string_parameters.push_back(*pair.second);
+        string_parameters.push_back(*pair.second.second);
     }
 
     // run tests

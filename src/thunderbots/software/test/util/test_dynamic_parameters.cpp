@@ -91,7 +91,7 @@ TYPED_TEST(RegistryTest, constructor_test)
     try
     {
         ASSERT_EQ(test_param.getRegistry().count("test_all_type_params"), 1);
-        ASSERT_EQ(test_param.getRegistry().at("test_all_type_params")->value(),
+        ASSERT_EQ(test_param.getRegistry().at("test_all_type_params").second->value(),
                   unique_value);
     }
     catch (...)
