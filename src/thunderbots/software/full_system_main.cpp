@@ -1,10 +1,10 @@
 #include <ros/ros.h>
 
-#include <numeric>
 #include <boost/program_options.hpp>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 #include <iostream>
+#include <numeric>
 
 #include "ai/ai_wrapper.h"
 #include "backend/backend_factory.h"
@@ -68,7 +68,8 @@ bool parseCommandLineArgs(int argc, char **argv)
     std::string all_backend_names =
         std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
                         [](std::string &ss, std::string &s) { return ss + s + ", "; });
-    std::string backend_help_str = "The backend that you would like to use, one of: " + all_backend_names;
+    std::string backend_help_str =
+        "The backend that you would like to use, one of: " + all_backend_names;
 
     try
     {
@@ -84,11 +85,12 @@ bool parseCommandLineArgs(int argc, char **argv)
         // avoid issues where required arguments are not required if "help" is given
         if (vm.count("help"))
         {
-                 std::cout << BANNER << std::endl << desc << std::endl;
-                 return false;
-        } else {
+            std::cout << BANNER << std::endl << desc << std::endl;
+            return false;
+        }
+        else
+        {
             notify(vm);
-
         }
     }
     catch (const error &ex)
@@ -121,17 +123,17 @@ int main(int argc, char **argv)
 
     ai = std::make_shared<AIWrapper>(*node_handle);
 
-    if(parseCommandLineArgs(argc, argv)){
+    if (parseCommandLineArgs(argc, argv))
+    {
         connectObservers();
 
         auto update_subscribers =
-                Util::DynamicParameters::initUpdateSubscriptions(*node_handle);
+            Util::DynamicParameters::initUpdateSubscriptions(*node_handle);
 
-        // Services any ROS calls in a separate thread "behind the scenes". Does not return
-        // until the node is shutdown
+        // Services any ROS calls in a separate thread "behind the scenes". Does not
+        // return until the node is shutdown
         // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
         ros::spin();
-
     }
     return 0;
 }

@@ -1,19 +1,21 @@
 #include "backend/backend_factory.h"
 
 #include <gtest/gtest.h>
-#include <iostream>
 
 #include <exception>
+#include <iostream>
 
 // Create and register two test backends with the factory here
-class BackendA : public Backend {
-public:
+class BackendA : public Backend
+{
+   public:
     static const std::string name;
 };
 const std::string BackendA::name = "A";
 static TBackendFactory<BackendA> factoryA;
-class BackendB : public Backend {
-public:
+class BackendB : public Backend
+{
+   public:
     static const std::string name;
 };
 const std::string BackendB::name = "B";
@@ -38,12 +40,8 @@ TEST(BackendFactoryTest, test_get_registered_backend_names)
     auto registered_names = BackendFactory::getRegisteredBackendNames();
     EXPECT_EQ(registered_names.size(), 2);
     // Make sure we get the names we are expecting
-    EXPECT_EQ(
-        std::count(registered_names.begin(), registered_names.end(), "A"),
-        1);
-    EXPECT_EQ(
-        std::count(registered_names.begin(), registered_names.end(), "B"),
-        1);
+    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "A"), 1);
+    EXPECT_EQ(std::count(registered_names.begin(), registered_names.end(), "B"), 1);
 }
 
 TEST(BackendFactoryTest, test_get_registered_backend_constructors)
