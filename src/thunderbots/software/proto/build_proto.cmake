@@ -18,16 +18,16 @@ file(GLOB "EXISTING_COMPILED_PROTO" "${PROTO_OUTPUT_DIR}/*.pb.cc" "${PROTO_OUTPU
 set(EXISTING_COMPILED_PROTO_LENGTH)
 list(LENGTH "EXISTING_COMPILED_PROTO" "EXISTING_COMPILED_PROTO_LENGTH")
 
-## Remove any already-compiled files so we regerenerate them completely
-#if ("${EXISTING_COMPILED_PROTO_LENGTH}" GREATER 0)
-#    execute_process(COMMAND rm ${EXISTING_COMPILED_PROTO})
-#endif()
-#
-## The proto source files that we need to compile
-#file(GLOB "ProtoFiles" "${PROTO_SOURCE_DIR}/*.proto")
-#
-## Compile the proto files
-#execute_process(
-#        COMMAND protoc ${ProtoFiles}
-#        --proto_path=${PROTO_SOURCE_DIR}
-#        --cpp_out=${PROTO_OUTPUT_DIR})
+# Remove any already-compiled files so we regerenerate them completely
+if ("${EXISTING_COMPILED_PROTO_LENGTH}" GREATER 0)
+    execute_process(COMMAND rm ${EXISTING_COMPILED_PROTO})
+endif()
+
+# The proto source files that we need to compile
+file(GLOB "ProtoFiles" "${PROTO_SOURCE_DIR}/*.proto")
+
+# Compile the proto files
+execute_process(
+        COMMAND protoc ${ProtoFiles}
+        --proto_path=${PROTO_SOURCE_DIR}
+        --cpp_out=${PROTO_OUTPUT_DIR})

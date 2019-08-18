@@ -13,7 +13,7 @@ class RadioOutput
 {
    public:
     /**
-     * Creates a new MRFBackend.
+     * Creates a new RadioOutput.
      * Automatically connects to the dongle upon initialization.
      *
      * @param config MRF configuration to start dongle in

@@ -2,7 +2,6 @@
 
 #include "multithreading/thread_safe_buffer.h"
 
-// TODO: TEST THIS CLASS
 /**
  * This class observes an "Subject<T>". That is, it can be registered with an
  * "Subject<T>" to receive new instances of type T when they are available

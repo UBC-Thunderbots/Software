@@ -4,7 +4,6 @@
 
 #include "multithreading/observer.h"
 
-// TODO: TEST THIS CLASS
 /**
  * This class represents something that can be watched by an Observer.
  *
