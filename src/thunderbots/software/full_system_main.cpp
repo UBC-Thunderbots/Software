@@ -2,6 +2,8 @@
 
 #include <boost/program_options.hpp>
 #include <iostream>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #include "ai/ai_wrapper.h"
 #include "backend/backend_factory.h"
@@ -26,18 +28,11 @@ namespace
 
 void setBackendFromString(std::string backend_name)
 {
-    // TODO: USE FACTORY HERE
-    if (backend_name == "grsim")
-    {
-        backend = std::make_shared<GrSimBackend>();
-    }
-    else if (backend_name == "radio")
-    {
-        backend = std::make_shared<RadioBackend>();
-    }
-    else
-    {
-        LOG(FATAL) << "'" << backend_name << "' is not a valid backend";
+    BackendFactory backend_factory;
+    try {
+        backend = backend_factory.createBackend(backend_name);
+    } catch (const std::invalid_argument& e) {
+        LOG(FATAL) << e.what();
     }
 }
 
@@ -83,16 +78,16 @@ void connectObservers()
 
 int main(int argc, char **argv)
 {
-    node_handle = initRos(argc, argv);
+    Util::Logger::LoggerSingleton::initializeLogger();
 
-    parseCommandLineArgs(argc, argv);
+    node_handle = initRos(argc, argv);
+    Util::CanvasMessenger::getInstance()->initializePublisher(*node_handle);
 
     ai = std::make_shared<AIWrapper>(*node_handle);
 
-    connectObservers();
+    parseCommandLineArgs(argc, argv);
 
-    Util::Logger::LoggerSingleton::initializeLogger();
-    Util::CanvasMessenger::getInstance()->initializePublisher(*node_handle);
+    connectObservers();
 
     auto update_subscribers =
         Util::DynamicParameters::initUpdateSubscriptions(*node_handle);

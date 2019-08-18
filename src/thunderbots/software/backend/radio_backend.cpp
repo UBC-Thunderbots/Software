@@ -3,7 +3,7 @@
 #include "backend/backend_factory.h"
 #include "util/constants.h"
 
-const std::string RadioBackend::name = "RadioBackend";
+const std::string RadioBackend::name = "radio";
 
 RadioBackend::RadioBackend()
     : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
@@ -28,5 +28,5 @@ void RadioBackend::receiveWorld(World world)
     Subject<World>::sendValueToObservers(world);
 }
 
-// Register this backed in the BackendFactory
+// Register this backend in the BackendFactory
 static TBackendFactory<RadioBackend> factory;

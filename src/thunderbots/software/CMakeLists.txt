@@ -326,6 +326,9 @@ add_library(tbots_network_input STATIC
         )
 target_link_libraries(tbots_network_input
         tbots_proto
+        tbots_geom
+        tbots_primitive
+        tbots_math
         Eigen3::Eigen
         )
 
@@ -338,6 +341,8 @@ add_library(tbots_grsim_output STATIC
         )
 target_link_libraries(tbots_grsim_output
         tbots_proto
+        tbots_geom
+        tbots_primitive
         )
 
 # Radio Output
@@ -362,6 +367,7 @@ target_link_libraries(tbots_backend
         tbots_network_input
         tbots_radio_output
         tbots_grsim_output
+        tbots_world
         )
 
 # Test Utils
@@ -402,11 +408,12 @@ add_library(tbots_shared STATIC
 file(GLOB FULL_SYSTEM_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/*.cpp
-        # We include all the plays here so that that the static variables in 
-        # the .cpp files that auto-register plays with the PlayFactory. This 
-        # addresses the issue explained here:
+        # We include all the plays and backends here so that that the static 
+        # variables in the .cpp files that auto-register plays with the 
+        # PlayFactory. This addresses the issue explained here:
         # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/*_backend.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/full_system_main.cpp
         )
 add_executable (full_system
@@ -551,6 +558,16 @@ if (CATKIN_ENABLE_TESTING)
             tbots_world
             tbots_test_util
             )
+
+
+    catkin_add_gtest(backend_factory_test
+            backend/backend_factory.cpp
+            test/backend/backend_factory.cpp
+            )
+    target_link_libraries(backend_factory_test
+            tbots_world
+            )
+
 
     catkin_add_gtest(grsim_output_test
             backend/output/grsim/grsim_output.cpp

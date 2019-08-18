@@ -26,5 +26,15 @@ namespace Util::Logger
         {
             static std::shared_ptr<LoggerSingleton> s(new LoggerSingleton());
         }
+
+
+           private:
+            LoggerSingleton()
+            {
+                logWorker = g3::LogWorker::createLogWorker();
+                g3::initializeLogging(logWorker.get());
+            }
+
+            std::unique_ptr<g3::LogWorker> logWorker;
     };
 }  // namespace Util::Logger

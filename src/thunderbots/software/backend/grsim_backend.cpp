@@ -3,7 +3,7 @@
 #include "backend/backend_factory.h"
 #include "util/constants.h"
 
-const std::string GrSimBackend::name = "GrSimBackend";
+const std::string GrSimBackend::name = "grsim";
 
 GrSimBackend::GrSimBackend()
     : network_input(Util::Constants::SSL_VISION_DEFAULT_MULTICAST_ADDRESS,
@@ -53,5 +53,5 @@ void GrSimBackend::updateGrSim()
     }
 }
 
-// Register this backed in the BackendFactory
+// Register this backend in the BackendFactory
 static TBackendFactory<GrSimBackend> factory;

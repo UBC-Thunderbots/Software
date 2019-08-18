@@ -55,7 +55,7 @@ std::unique_ptr<Play> PlayFactory::createPlay(const std::string& play_name)
     else
     {
         std::string msg =
-            std::string("No constructor for " + play_name + " found in the PlayFactory");
+            std::string("No constructor for '" + play_name + "' found in the PlayFactory");
         throw std::invalid_argument(msg);
     }
 }

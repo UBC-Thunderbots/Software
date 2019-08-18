@@ -55,8 +55,8 @@ std::unique_ptr<Backend> BackendFactory::createBackend(const std::string& backen
     }
     else
     {
-        std::string msg = std::string("No constructor for " + backend_name +
-                                      " found in the BackendFactory");
+        std::string msg = std::string("No constructor for '" + backend_name +
+                                      "' found in the BackendFactory");
         throw std::invalid_argument(msg);
     }
 }
