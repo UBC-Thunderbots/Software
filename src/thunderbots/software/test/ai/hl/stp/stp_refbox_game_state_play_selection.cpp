@@ -51,10 +51,10 @@ TEST_P(STPRefboxGameStatePlaySelectionTestWithPositions,
     world.mutableBall() = Ball(GetParam().ball_position, Vector(), Timestamp());
 
     // to set restart reason, etc. properly
-    world.mutableGameState().updateRefboxGameState(GetParam().first_game_state,
-                                                   world.ball());
-    world.mutableGameState().updateRefboxGameState(GetParam().second_game_state,
-                                                   world.ball());
+    world.mutableGameState().updateRefboxGameState(GetParam().first_game_state);
+    world.mutableGameState().updateBall(world.ball());
+    world.mutableGameState().updateRefboxGameState(GetParam().second_game_state);
+    world.mutableGameState().updateBall(world.ball());
     std::unique_ptr<Play> play;
     try
     {
@@ -228,8 +228,9 @@ TEST_P(STPRefboxGameStatePlaySelectionTest,
        test_play_selection_for_all_refbox_game_states)
 {
     // TODO: replace the ball with real parameterized values
-    world.mutableGameState().updateRefboxGameState(
-        GetParam(), Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
+    world.mutableGameState().updateRefboxGameState(GetParam());
+    world.mutableGameState().updateBall(
+        Ball(Point(), Vector(), Timestamp::fromSeconds(0)));
 
     try
     {

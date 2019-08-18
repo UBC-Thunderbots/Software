@@ -85,6 +85,7 @@ double dist(const Segment &first, const Point &second);
 
 double dist(const Line &first, const Point &second);
 double dist(const Point &first, const Line &second);
+double dist(const Point &first, const Polygon &second);
 
 /**
  * NOTE: the distance from a point to a rectangle is the closest distance from the point
@@ -376,8 +377,7 @@ Point reflect(const Point &v, const Point &n);
  * the line segment of overlap.
  */
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-    Ray &ray, Segment &segment);
-
+    const Ray &ray, const Segment &segment);
 
 /**
  * Calculates the intersection of two Rays

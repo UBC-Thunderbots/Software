@@ -197,6 +197,13 @@ Evaluation:
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
+DefenseShadowEnemyTactic:
+  ball_steal_speed:
+    default: 0.3
+    max: 1.0
+    min: 0.0
+    type: "double"
+    description: Try to steal the passee's ball below this ball speed
 DefenderCreaseTactic:
   max_defender_seperation_deg:
     min: 0.0

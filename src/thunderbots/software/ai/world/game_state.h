@@ -57,7 +57,14 @@ class GameState
      *
      * @param gameState the RefboxGameState from backend_input
      */
-    void updateRefboxGameState(RefboxGameState gameState, const Ball &ball);
+    void updateRefboxGameState(RefboxGameState gameState);
+
+    /**
+     * Updates the state of the ball used in calculating game state transitions
+     *
+     * @param ball The new ball
+     */
+    void updateBall(const Ball &ball);
 
     /**
      * Clears restart state and enters normal play. Should be

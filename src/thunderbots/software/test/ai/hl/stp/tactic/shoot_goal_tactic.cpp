@@ -198,3 +198,41 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
         ADD_FAILURE() << "ChipIntent was not returned by the ShootGoalTactic!";
     }
 }
+
+TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_close_to_ball)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    world.mutableFriendlyTeam().updateRobots({robot});
+
+    Ball ball(Point(0.5, 0), Vector(0, 0), Timestamp::fromSeconds(0));
+    world.updateBallState(ball);
+
+    ShootGoalTactic tactic =
+        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+
+    double cost          = tactic.calculateRobotCost(robot, world);
+    double expected_cost = 0.0520833333;
+    EXPECT_NEAR(cost, expected_cost, 1e-6);
+}
+
+TEST(ShootGoalTacticTest, test_calculate_robot_cost_when_robot_far_from_ball)
+{
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+    Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
+    world.mutableFriendlyTeam().updateRobots({robot});
+
+    Ball ball(Point(3, -2.5), Vector(0, 0), Timestamp::fromSeconds(0));
+    world.updateBallState(ball);
+
+    ShootGoalTactic tactic =
+        ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                        world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
+
+    double cost          = tactic.calculateRobotCost(robot, world);
+    double expected_cost = 0.40678383728;
+    EXPECT_NEAR(cost, expected_cost, 1e-6);
+}

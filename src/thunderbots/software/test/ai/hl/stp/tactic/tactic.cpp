@@ -166,7 +166,8 @@ TEST_P(TacticAvoidAreasTest, test_default_avoid_areas)
     for (auto refbox_and_ball_state : refbox_and_ball_states)
     {
         Ball ball(refbox_and_ball_state.second, Vector(0, 0), Timestamp::fromSeconds(0));
-        game_state.updateRefboxGameState(refbox_and_ball_state.first, ball);
+        game_state.updateRefboxGameState(refbox_and_ball_state.first);
+        game_state.updateBall(ball);
     }
 
     auto next_intent = tactic.getNextIntent(game_state);
@@ -448,9 +449,8 @@ TEST(TacticTest, test_whitelisted_areas_are_ignored)
     tactic.updateRobot(robot);
 
     GameState game_state;
-    game_state.updateRefboxGameState(
-        RefboxGameState::DIRECT_FREE_THEM,
-        Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
+    game_state.updateRefboxGameState(RefboxGameState::DIRECT_FREE_THEM);
+    game_state.updateBall(Ball(Point(0, 0), Vector(0, 0), Timestamp::fromSeconds(0)));
 
     tactic.addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
