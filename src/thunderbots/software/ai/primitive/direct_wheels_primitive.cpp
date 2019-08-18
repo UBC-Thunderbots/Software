@@ -43,17 +43,6 @@ DirectWheelsPrimitive::DirectWheelsPrimitive(
     }
 }
 
-DirectWheelsPrimitive::DirectWheelsPrimitive(
-    const thunderbots_msgs::Primitive &primitive_msg)
-    : DirectWheelsPrimitive(primitive_msg.robot_id,
-                            static_cast<int16_t>(primitive_msg.parameters.at(0)),
-                            static_cast<int16_t>(primitive_msg.parameters.at(1)),
-                            static_cast<int16_t>(primitive_msg.parameters.at(2)),
-                            static_cast<int16_t>(primitive_msg.parameters.at(3)),
-                            static_cast<double>(primitive_msg.parameters.at(4)))
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-}
 std::string DirectWheelsPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -87,22 +76,6 @@ int16_t DirectWheelsPrimitive::getWheel3Power() const
 double DirectWheelsPrimitive::getDribblerRPM() const
 {
     return dribbler_rpm;
-}
-
-std::vector<double> DirectWheelsPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {static_cast<double>(front_left_wheel_power),
-                                      static_cast<double>(back_left_wheel_power),
-                                      static_cast<double>(front_right_wheel_power),
-                                      static_cast<double>(back_right_wheel_power),
-                                      dribbler_rpm};
-
-    return parameters;
-}
-
-std::vector<bool> DirectWheelsPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
 }
 
 void DirectWheelsPrimitive::accept(PrimitiveVisitor &visitor) const

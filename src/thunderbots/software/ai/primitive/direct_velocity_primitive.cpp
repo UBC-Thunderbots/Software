@@ -16,19 +16,6 @@ DirectVelocityPrimitive::DirectVelocityPrimitive(unsigned int robot_id, double x
 {
 }
 
-DirectVelocityPrimitive::DirectVelocityPrimitive(
-    const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id         = primitive_msg.robot_id;
-    x_velocity       = primitive_msg.parameters.at(0);
-    y_velocity       = primitive_msg.parameters.at(1);
-    angular_velocity = primitive_msg.parameters.at(2);
-    dribbler_rpm     = primitive_msg.parameters.at(3);
-}
-
-
 std::string DirectVelocityPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -57,19 +44,6 @@ double DirectVelocityPrimitive::getAngularVelocity() const
 double DirectVelocityPrimitive::getDribblerRpm() const
 {
     return dribbler_rpm;
-}
-
-std::vector<double> DirectVelocityPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {x_velocity, y_velocity, angular_velocity,
-                                      dribbler_rpm};
-
-    return parameters;
-}
-
-std::vector<bool> DirectVelocityPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
 }
 
 void DirectVelocityPrimitive::accept(PrimitiveVisitor &visitor) const

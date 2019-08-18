@@ -26,13 +26,6 @@ class CatchPrimitive : public Primitive
     explicit CatchPrimitive(unsigned int robot_id, double velocity, double dribbler_rpm,
                             double ball_intercept_margin);
 
-    /**
-     * Creates a new Catch primative from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Catch Primitive
-     */
-    explicit CatchPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -42,21 +35,6 @@ class CatchPrimitive : public Primitive
     double getDribblerSpeed() const;
 
     double getMargin() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form
-     *         {velocity, dribbler_rpm, ball_intercept_margin}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor& visitor) const override;
 

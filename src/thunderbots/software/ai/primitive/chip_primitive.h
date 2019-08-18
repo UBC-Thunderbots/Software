@@ -27,13 +27,6 @@ class ChipPrimitive : public Primitive
     explicit ChipPrimitive(unsigned int robot_id, const Point &chip_origin,
                            const Angle &chip_direction, double chip_distance_meters);
 
-    /**
-     * Creates a new Chip Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Chip Primitive
-     */
-    explicit ChipPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -58,21 +51,6 @@ class ChipPrimitive : public Primitive
      * @return The chipping distance in metres
      */
     double getChipDistance() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {chip_origin.x(), chip_origin.y(),
-     *                               chip_direction.toRadians(), chip_distance_meters}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor &visitor) const override;
 

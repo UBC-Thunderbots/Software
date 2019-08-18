@@ -14,19 +14,6 @@ KickPrimitive::KickPrimitive(unsigned int robot_id, const Point &kick_origin,
 {
 }
 
-KickPrimitive::KickPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id                     = primitive_msg.robot_id;
-    double kick_origin_x         = primitive_msg.parameters.at(0);
-    double kick_origin_y         = primitive_msg.parameters.at(1);
-    kick_origin                  = Point(kick_origin_x, kick_origin_y);
-    kick_direction               = Angle::ofRadians(primitive_msg.parameters.at(2));
-    kick_speed_meters_per_second = primitive_msg.parameters.at(3);
-}
-
-
 std::string KickPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -50,20 +37,6 @@ Angle KickPrimitive::getKickDirection() const
 double KickPrimitive::getKickSpeed() const
 {
     return kick_speed_meters_per_second;
-}
-
-std::vector<double> KickPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {kick_origin.x(), kick_origin.y(),
-                                      kick_direction.toRadians(),
-                                      kick_speed_meters_per_second};
-
-    return parameters;
-}
-
-std::vector<bool> KickPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
 }
 
 void KickPrimitive::accept(PrimitiveVisitor &visitor) const

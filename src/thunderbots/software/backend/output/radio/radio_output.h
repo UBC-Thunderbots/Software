@@ -6,8 +6,8 @@
 
 #include "ai/world/ball.h"
 #include "ai/world/team.h"
+#include "backend/robot_status.h"
 #include "mrf/dongle.h"
-#include "thunderbots_msgs/RobotStatus.h"
 
 class RadioOutput
 {

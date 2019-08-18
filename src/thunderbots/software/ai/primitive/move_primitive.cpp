@@ -17,33 +17,6 @@ MovePrimitive::MovePrimitive(unsigned int robot_id, const Point &dest,
 {
 }
 
-MovePrimitive::MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id        = primitive_msg.robot_id;
-    double dest_x   = primitive_msg.parameters.at(0);
-    double dest_y   = primitive_msg.parameters.at(1);
-    dest            = Point(dest_x, dest_y);
-    final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
-    final_speed     = primitive_msg.parameters.at(3);
-    enable_dribbler = static_cast<bool>(primitive_msg.parameters.at(4));
-    slow            = static_cast<bool>(primitive_msg.parameters.at(5));
-    if (primitive_msg.extra_bits.empty())
-    {
-        autokick = NONE;
-    }
-    else if (primitive_msg.extra_bits.at(0))
-    {
-        autokick = AUTOKICK;
-    }
-    else if (primitive_msg.extra_bits.at(1))
-    {
-        autokick = AUTOCHIP;
-    }
-}
-
-
 std::string MovePrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -82,23 +55,6 @@ bool MovePrimitive::isDribblerEnabled() const
 bool MovePrimitive::isSlowEnabled() const
 {
     return slow;
-}
-
-std::vector<double> MovePrimitive::getParameters() const
-{
-    std::vector<double> parameters = {dest.x(),
-                                      dest.y(),
-                                      final_angle.toRadians(),
-                                      final_speed,
-                                      (double)enable_dribbler,
-                                      (double)slow};
-
-    return parameters;
-}
-
-std::vector<bool> MovePrimitive::getExtraBits() const
-{
-    return std::vector<bool>(autokick == AUTOKICK, autokick == AUTOCHIP);
 }
 
 void MovePrimitive::accept(PrimitiveVisitor &visitor) const
