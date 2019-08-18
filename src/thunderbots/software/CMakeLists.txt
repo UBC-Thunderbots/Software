@@ -953,10 +953,12 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(refbox_constants_test
             util/refbox_constants.cpp
-            test/util/refbox_constants.cpp)
+            test/util/refbox_constants.cpp
+            )
 
-    target_link_libraries(ai_util_test
-            ${catkin_LIBRARIES})
+    target_link_libraries(refbox_constants_test
+            ${catkin_LIBRARIES}
+            )
 
 endif()
 
