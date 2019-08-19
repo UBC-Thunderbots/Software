@@ -13,8 +13,8 @@ TEST(PivotActionTest, robot_too_far_from_orbit)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     PivotAction action = PivotAction();
 
-    auto intent_ptr =
-        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
+    auto intent_ptr = action.updateStateAndGetNextIntent(
+        robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -39,8 +39,8 @@ TEST(PivotActionTest, robot_in_robit)
                         Timestamp::fromSeconds(0));
     PivotAction action = PivotAction();
 
-    auto intent_ptr =
-        action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
+    auto intent_ptr = action.updateStateAndGetNextIntent(
+        robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

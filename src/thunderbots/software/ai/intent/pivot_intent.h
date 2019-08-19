@@ -16,7 +16,8 @@ class PivotIntent : public Intent, public PivotPrimitive
      * @param dest The destination of the Movement
      * @param final_angle The final angle the robot should have at the end of the movement
      * @param pivot_speed The angular speed the robot should have while it pivots
-     * @param enable_dribbler Whether or not the dribbler should be spinning to hold the ball
+     * @param enable_dribbler Whether or not the dribbler should be spinning to hold the
+     * ball
      * @param priority The priority of this Intent. A larger number indicates a higher
      * priority
      */

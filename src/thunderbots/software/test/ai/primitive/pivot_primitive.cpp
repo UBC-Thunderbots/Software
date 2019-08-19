@@ -88,7 +88,7 @@ TEST(PivotPrimTest, get_extra_bit_array_dribbler_on_test)
 
 TEST(PivotPrimTest, test_equality_operator_primitives_equal)
 {
-    PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle(), true);
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), Angle(), true);
     PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle(), Angle(), true);
 
     EXPECT_EQ(pivot_prim, pivot_prim_other);
@@ -96,7 +96,7 @@ TEST(PivotPrimTest, test_equality_operator_primitives_equal)
 
 TEST(PivotPrimTest, test_inequality_operator_with_mismatched_robot_id)
 {
-    PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle(), true);
+    PivotPrimitive pivot_prim       = PivotPrimitive(0, Point(), Angle(), Angle(), true);
     PivotPrimitive pivot_prim_other = PivotPrimitive(8, Point(), Angle(), Angle(), true);
 
     EXPECT_NE(pivot_prim, pivot_prim_other);
@@ -105,7 +105,8 @@ TEST(PivotPrimTest, test_inequality_operator_with_mismatched_robot_id)
 TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_point)
 {
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle(), true);
-    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(1, 1), Angle(), Angle(), true);
+    PivotPrimitive pivot_prim_other =
+        PivotPrimitive(0, Point(1, 1), Angle(), Angle(), true);
 
     EXPECT_NE(pivot_prim, pivot_prim_other);
 }
@@ -113,7 +114,8 @@ TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_point)
 TEST(PivotPrimTest, test_inequality_operator_with_mismatched_final_angle)
 {
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle(), true);
-    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle::threeQuarter(), Angle(), true);
+    PivotPrimitive pivot_prim_other =
+        PivotPrimitive(0, Point(), Angle::threeQuarter(), Angle(), true);
 
     EXPECT_NE(pivot_prim, pivot_prim_other);
 }
@@ -121,7 +123,8 @@ TEST(PivotPrimTest, test_inequality_operator_with_mismatched_final_angle)
 TEST(PivotPrimTest, test_inequality_operator_with_mismatched_pivot_speed)
 {
     PivotPrimitive pivot_prim = PivotPrimitive(0, Point(), Angle(), Angle(), true);
-    PivotPrimitive pivot_prim_other = PivotPrimitive(0, Point(), Angle(), Angle::threeQuarter(), true);
+    PivotPrimitive pivot_prim_other =
+        PivotPrimitive(0, Point(), Angle(), Angle::threeQuarter(), true);
 
     EXPECT_NE(pivot_prim, pivot_prim_other);
 }

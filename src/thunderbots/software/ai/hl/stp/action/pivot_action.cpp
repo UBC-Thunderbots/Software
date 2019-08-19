@@ -36,18 +36,22 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         // If we're not in position to pivot, move to grab the ball
         if (!(robot->position()).isClose(pivot_point, 1.15))
         {
-            yield(std::make_unique<MoveIntent>(robot->id(), pivot_point, (pivot_point-robot->position()).orientation(),
-                                               0.0, 0, enable_dribbler));
-            LOG(DEBUG)<<"obtaining ball, moving!";
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), pivot_point, (pivot_point - robot->position()).orientation(),
+                0.0, 0, enable_dribbler));
+            LOG(DEBUG) << "obtaining ball, moving!";
         }
         else if (Util::DynamicParameters::PivotAction::experimental.value())
         {
-            LOG(DEBUG)<<"EXPERIMENTAL ENABLED: ball has been obtainined, pivoting!";
+            LOG(DEBUG) << "EXPERIMENTAL ENABLED: ball has been obtainined, pivoting!";
 
             // if the robot is close enough to the final poision, call it a day
-            Angle threshold_angle = Angle::ofDegrees(Util::DynamicParameters::PivotAction::finish_angle_threshold.value()/2);
+            Angle threshold_angle = Angle::ofDegrees(
+                Util::DynamicParameters::PivotAction::finish_angle_threshold.value() / 2);
 
-            if(robot->orientation() >= (final_angle - threshold_angle) && robot->orientation() < (final_angle + threshold_angle)){
+            if (robot->orientation() >= (final_angle - threshold_angle) &&
+                robot->orientation() < (final_angle + threshold_angle))
+            {
                 LOG(DEBUG) << "Pivot angle reached threshold";
                 break;
             }
@@ -55,7 +59,8 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             yield(std::make_unique<PivotIntent>(robot->id(), pivot_point, final_angle,
                                                 pivot_speed, enable_dribbler, 0));
         }
-        else{
+        else
+        {
             break;
         }
 

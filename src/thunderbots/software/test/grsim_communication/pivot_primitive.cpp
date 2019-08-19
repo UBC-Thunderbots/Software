@@ -54,25 +54,6 @@ MotionController::PositionCommand get_motion_command(Robot& robot,
     return motionCommand;
 }
 
-// robot is already at the final position, and receives a pivot request to the same
-// position in this case, it should not do another rotation
-TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
-       visit_pivot_primtive_robot_should_not_move)
-{
-    // robot is at current pivot point + (1,0)
-    Robot robot = Robot(1, GetParam() + Point(1, 0), Vector(0, 0), Angle::ofRadians(0.0),
-                        AngularVelocity::ofRadians(0.0), Timestamp::fromSeconds(0));
-
-    // asked to pivot to zero degress from current point, with a radius of 1 which should
-    // resolve to pivot point + (1,0)
-    PivotPrimitive primitive = PivotPrimitive(1, GetParam(), Angle::zero(), Angle::zero(), false);
-
-    auto motion_command = get_motion_command(robot, primitive);
-
-    EXPECT_EQ(motion_command.global_destination.x(), robot.position().x());
-    EXPECT_EQ(motion_command.global_destination.y(), robot.position().y());
-}
-
 // robot needs to pick the shortest path to rotate, based on where it is and the magnitude
 // of of the vector from its next position to the final position.
 
@@ -83,7 +64,8 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest, visit_pivot_primtive_clock
     // (chosen far so all values pivot cw) which should result in a cw rotation on all
     // parameterized pivot points
     PivotPrimitive primitive =
-        PivotPrimitive(1, Point(10, -10), Angle::ofRadians(-1 / 4 * M_PI), Angle::ofRadians(1.24), false);
+        PivotPrimitive(1, Point(10, -10), Angle::ofRadians(-1 / 4 * M_PI),
+                       Angle::ofRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
     Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::ofRadians(0.0),
@@ -115,8 +97,8 @@ TEST_P(GrsimCommandPrimitiveVisitorParameterizedTest,
     // asked to pivot to 3/4 pi above x axis, with radius of 10, from point (-10, 10)
     // (chosen far so all values pivot ccw) which should result in a cw rotation on all
     // parameterized pivot points
-    PivotPrimitive primitive =
-        PivotPrimitive(1, Point(-10, 10), Angle::ofRadians(3 / 4 * M_PI), Angle::ofRadians(1.24), false);
+    PivotPrimitive primitive = PivotPrimitive(
+        1, Point(-10, 10), Angle::ofRadians(3 / 4 * M_PI), Angle::ofRadians(1.24), false);
 
     // place the robot in the first quadrant, should rotate CW
     Robot robot = Robot(1, GetParam(), Vector(0, 0), Angle::ofRadians(0.0),

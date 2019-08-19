@@ -224,7 +224,7 @@ TEST(PivotPrimTest, convert_PivotPrimitive_to_message_and_back_to_PivotPrimitive
     const Point pivot_point     = Point(2, -1);
     const Angle final_angle     = Angle::ofRadians(2.56);
     const Angle pivot_speed     = Angle::ofRadians(3.14);
-    const bool  enable_dribbler = true;
+    const bool enable_dribbler  = true;
 
     PivotPrimitive pivot_prim =
         PivotPrimitive(robot_id, pivot_point, final_angle, pivot_speed, enable_dribbler);
