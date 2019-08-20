@@ -103,7 +103,7 @@ class Parameter
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
             std::scoped_lock lock(*(param_in_registry.first));
-            param_in_registry->value_ = new_value;
+            param_in_registry.second->value_ = new_value;
         }
 
         // TODO https://github.com/UBC-Thunderbots/Software/issues/738

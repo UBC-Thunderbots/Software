@@ -12,6 +12,7 @@
 #include "gui/drawing/world.h"
 #include "test/test_util/test_util.h"
 #include <random>
+#include "util/parameter/dynamic_parameters.h"
 
 MainWidget::MainWidget(QWidget *parent)
     : QWidget(parent), main_widget(new Ui::MainWidget()), first_draw_call(true)
@@ -50,8 +51,16 @@ void MainWidget::setupAIControls() {
 }
 
 void MainWidget::setupAIStartAndStopButtons() {
-    connect(main_widget->start_ai_button, &QPushButton::clicked, []() {std::cout << "start ai" << std::endl;});
-    connect(main_widget->stop_ai_button, &QPushButton::clicked, []() {std::cout << "stop ai" << std::endl;});
+    auto start_ai_func = []() {
+        std::cout << "start" << std::endl;
+        Util::DynamicParameters::AI::run_ai.setValue(true);
+    };
+    connect(main_widget->start_ai_button, &QPushButton::clicked, start_ai_func);
+    auto stop_ai_func = []() {
+        std::cout << "stop" << std::endl;
+        Util::DynamicParameters::AI::run_ai.setValue(false);
+    };
+    connect(main_widget->stop_ai_button, &QPushButton::clicked, stop_ai_func);
 }
 
 void MainWidget::setupTeamColourComboBox() {
@@ -100,6 +109,7 @@ MainWidget::~MainWidget()
 
 void MainWidget::drawAI()
 {
+    std::cout << "Run AI: " << Util::DynamicParameters::AI::run_ai.value() << std::endl;
     scene->clear();
 
     World world = Test::TestUtil::createBlankTestingWorld();

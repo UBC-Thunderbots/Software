@@ -521,6 +521,7 @@ target_link_libraries(ai_gui
         tbots_tactic
         tbots_intent
         tbots_primitive
+        tbots_parameter
         )
 
 
