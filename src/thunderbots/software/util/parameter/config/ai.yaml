@@ -243,10 +243,6 @@ GoalieTactic:
         The block cone buffer is the extra distance to add on either side of the robot
         to allow to it be further back in the block cone
 PivotAction:
-  experimental:
-      type: "bool"
-      default: false
-      description: If toggled, then loose ball will attempt to pivot with bottom parameters
   arb_scaling:
       min: 0.0
       max: 10.0
