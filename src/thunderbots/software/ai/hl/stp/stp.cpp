@@ -26,8 +26,7 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
 {
     current_game_state     = world.gameState().game_state;
     previous_override_play = override_play;
-    //    override_play          = Util::DynamicParameters::AI::override_ai_play.value();
-    override_play                    = true;
+    override_play          = Util::DynamicParameters::AI::override_ai_play.value();
     bool override_play_value_changed = previous_override_play != override_play;
 
     previous_override_play_name = override_play_name;
@@ -45,16 +44,14 @@ std::vector<std::unique_ptr<Intent>> STP::getIntents(const World& world)
     {
         if (override_play)
         {
-            auto default_play = default_play_constructor();
             if (std::find(all_play_names.begin(), all_play_names.end(),
                           override_play_name) != all_play_names.end())
             {
-                //                current_play =
-                //                PlayFactory::createPlay(override_play_name);
-                current_play = std::move(default_play);
+                current_play = PlayFactory::createPlay(override_play_name);
             }
             else
             {
+                auto default_play = default_play_constructor();
                 LOG(WARNING) << "Error: The Play \"" << override_play_name
                              << "\" specified in the override is not valid." << std::endl;
                 LOG(WARNING) << "Falling back to the default Play - "

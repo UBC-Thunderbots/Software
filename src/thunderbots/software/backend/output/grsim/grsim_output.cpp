@@ -8,7 +8,6 @@
 #include "backend/output/grsim/grsim_command_primitive_visitor.h"
 #include "backend/output/grsim/motion_controller.h"
 #include "grsim_command_primitive_visitor.h"
-#include "grsim_output.h"
 #include "motion_controller.h"
 #include "proto/grSim_Commands.pb.h"
 #include "proto/grSim_Replacement.pb.h"

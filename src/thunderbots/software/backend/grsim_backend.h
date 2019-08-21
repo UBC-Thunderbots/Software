@@ -12,7 +12,7 @@ class GrSimBackend : public Backend
     GrSimBackend();
 
    private:
-    void onValueReceived(Backend::PrimitiveVecPtr primitives) override;
+    void onValueReceived(ConstPrimitiveVectorPtr primitives) override;
 
     /**
      * Set the most recently received world
@@ -26,7 +26,7 @@ class GrSimBackend : public Backend
      *
      * @param world The new most recently received primitives
      */
-    void setMostRecentlyReceivedPrimitives(Backend::PrimitiveVecPtr primitives);
+    void setMostRecentlyReceivedPrimitives(ConstPrimitiveVectorPtr primitives);
 
     /**
      * This is registered as an async callback function so that it is called
@@ -50,6 +50,6 @@ class GrSimBackend : public Backend
     std::optional<World> most_recently_received_world;
     std::mutex most_recently_received_world_mutex;
 
-    PrimitiveVecPtr most_recently_received_primitives;
+    ConstPrimitiveVectorPtr most_recently_received_primitives;
     std::mutex most_recently_received_primitives_mutex;
 };

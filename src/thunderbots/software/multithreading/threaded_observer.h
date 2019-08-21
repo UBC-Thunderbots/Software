@@ -27,10 +27,12 @@ class ThreadedObserver : public Observer<T>
      * If this function has not finished and a new value is received, then the next
      * value provided to it will be the newest value available *when this function
      * finishes*.
+     *
      * Any class that extends this one should override this function with it's own
      * implementation. The implementation in this class does nothing (it's solely there
      * to deal with issues where this function is called before class construction
-     * is fully complete, due to how we're using threads).
+     * is fully complete, as it is run in a thread that is constructed in this class,
+     * and so can start running before the subclass has been created).
      *
      * @param val The new value that has been received
      */
@@ -79,7 +81,6 @@ void ThreadedObserver<T>::continuouslyPullValuesFromBuffer()
     {
         in_destructor_mutex.unlock();
 
-        // TODO: make the duration here a constant
         std::optional<T> new_val =
             this->popMostRecentlyReceivedValue(IN_DESTRUCTOR_CHECK_PERIOD);
 

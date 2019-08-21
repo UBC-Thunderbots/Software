@@ -9,6 +9,8 @@
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,
                              int vision_multicast_port,
+                             std::string gamecontroller_multicast_address,
+                             int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback)
     : network_filter(),
       io_service(),
@@ -16,12 +18,20 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
       last_valid_t_capture(std::numeric_limits<double>::max()),
       received_world_callback(received_world_callback)
 {
+    setupVisionClient(vision_multicast_address, vision_multicast_port);
+
+    setupGameControllerClient(gamecontroller_multicast_address, gamecontroller_multicast_port);
+
+    startIoServiceThreadInBackground();
+}
+
+void NetworkClient::setupVisionClient(std::string vision_address, int vision_port) {
     // Set up our connection over udp to receive vision packets
     try
     {
         ssl_vision_client = std::make_unique<SSLVisionClient>(
-            io_service, vision_multicast_address, vision_multicast_port,
-            boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
+                io_service, vision_address, vision_port,
+                boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -31,14 +41,17 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                    << boost::diagnostic_information(ex) << std::endl;
     }
 
+}
 
+void NetworkClient::setupGameControllerClient(std::string gamecontroller_address,
+                                              int gamecontroller_port) {
     // Set up our connection over udp to receive gamecontroller packets
     try
     {
         ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
-            io_service, Util::Constants::SSL_GAMECONTROLLER_MULTICAST_ADDRESS,
-            Util::Constants::SSL_GAMECONTROLLER_MULTICAST_PORT,
-            boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
+                io_service, gamecontroller_address,
+                gamecontroller_port,
+                boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -48,6 +61,9 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                    << boost::diagnostic_information(ex) << std::endl;
     }
 
+}
+
+void NetworkClient::startIoServiceThreadInBackground() {
     // Start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
 }

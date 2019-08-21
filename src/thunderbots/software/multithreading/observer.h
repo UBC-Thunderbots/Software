@@ -17,7 +17,7 @@ class Observer
     /**
      * Add the given value to the internal buffer
      *
-     * @param val The value to add to th internal buffer
+     * @param val The value to add to the internal buffer
      */
     virtual void receiveValue(T val) final;
 

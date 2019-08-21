@@ -30,6 +30,7 @@ class GrSimOutput
      *
      * @param primitives the list of primitives to send
      * @param friendly_team A Team object containing the latest data for the friendly team
+     * @param ball The ball
      */
     void sendPrimitives(const std::vector<std::unique_ptr<Primitive>>& primitives,
                         const Team& friendly_team, const Ball& ball);

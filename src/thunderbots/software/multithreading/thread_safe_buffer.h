@@ -90,6 +90,7 @@ class ThreadSafeBuffer
 
     std::condition_variable received_new_value;
 
+    std::mutex destructor_called_mutex;
     bool destructor_called;
 };
 
@@ -102,6 +103,8 @@ ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size)
 template <typename T>
 std::optional<T> ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue(Duration max_wait_time)
 {
+    // We hold the returned lock in a variable here so that we hold the lock on the
+    // buffer mutex until the lock is destructed at the end of this function
     auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
 
     std::optional<T> result = std::nullopt;
@@ -116,6 +119,8 @@ std::optional<T> ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue(Duration max_w
 template <typename T>
 std::optional<T> ThreadSafeBuffer<T>::pullMostRecentlyAddedValue(Duration max_wait_time)
 {
+    // We hold the returned lock in a variable here so that we hold the lock on the
+    // buffer mutex until the lock is destructed at the end of this function
     auto buffer_lock = waitForBufferToHaveAValue(max_wait_time);
 
     std::optional<T> result = std::nullopt;
@@ -140,9 +145,11 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
     Duration max_wait_time)
 {
     std::unique_lock<std::mutex> buffer_lock(buffer_mutex);
-    received_new_value.wait_for(buffer_lock,
-                                std::chrono::duration<float>(max_wait_time.getSeconds()),
-                                [this] { return !buffer.empty() || destructor_called; });
+    received_new_value.wait_for(
+        buffer_lock, std::chrono::duration<float>(max_wait_time.getSeconds()), [this] {
+            std::scoped_lock destructor_called_lock(destructor_called_mutex);
+            return !buffer.empty() || destructor_called;
+        });
 
     // NOTE: We need to return this in order to prevent it being destructed so
     //       the the lock is maintained until the value is read
@@ -152,6 +159,9 @@ std::unique_lock<std::mutex> ThreadSafeBuffer<T>::waitForBufferToHaveAValue(
 template <typename T>
 ThreadSafeBuffer<T>::~ThreadSafeBuffer()
 {
+    destructor_called_mutex.lock();
     destructor_called = true;
+    destructor_called_mutex.unlock();
+
     received_new_value.notify_all();
 }

@@ -26,13 +26,19 @@ class NetworkClient
      * Creates a new NetworkClient for the given NodeHandle. This allows this class to
      * create and own its own publishers
      *
-     * @param received_world_callback This function will be called with a new world
-     *                                every time one is received
      * @param vision_multicast_address A string representation of the ip address the
      *                                 vision system is running on
+     * @param vision_multicast_port The port the vision system is running on
+     * @param gamecontroller_multicast_address A string representation of the ip address
+     *                                         the gamecontroller is running on
+     * @param gamecontroller_multicast_port The port the gamecontroller is running on
+     * @param received_world_callback This function will be called with a new world
+     *                                every time one is received
      */
     explicit NetworkClient(std::string vision_multicast_address,
                            int vision_multicast_port,
+                           std::string gamecontroller_multicast_address,
+                           int gamecontroller_multicast_port,
                            std::function<void(World)> received_world_callback);
 
     /**
@@ -48,6 +54,31 @@ class NetworkClient
     NetworkClient(const NetworkClient&)            = delete;
 
    private:
+
+    /**
+     * Sets up the vision client to the point where it will receive packets on the
+     * given address/port
+     *
+     * @param vision_address String representation of the vision IP address
+     * @param vision_port The port vision is running on
+     */
+    void setupVisionClient(std::string vision_address, int vision_port);
+
+    /**
+     * Sets up the gamecontroller client to the point where it will receive packets on the
+     * given address/port
+     *
+     * @param gamecontroller_address String representation of the gamecontroller IP address
+     * @param gamecontroller_port The port gamecontroller is running on
+     */
+    void setupGameControllerClient(std::string gamecontroller_address, int gamecontroller_port);
+
+    /**
+     * Starts up the IO service thread to run and service network requests in the
+     * background
+     */
+    void startIoServiceThreadInBackground();
+
     // TODO: Remove this wrapper function once we move to a better simulator
     // https://github.com/UBC-Thunderbots/Software/issues/609
     /**
@@ -83,7 +114,7 @@ class NetworkClient
     void filterAndPublishGameControllerData(Referee packet);
 
     /**
-     * Inverts all positions and orientations across the y axis of the field
+     * Inverts all positions and orientations across the x and y axis of the field
      *
      * @param frame The frame to invert. It will be mutated in-place
      */

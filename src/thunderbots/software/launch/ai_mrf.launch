@@ -1,12 +1,7 @@
 <launch>
 
-    <!-- Configuration of the radio; default is 0 -->
-    <arg name="mrf_config" default="0"/>
-
-    <!-- Run all the shared AI nodes -->
-    <include file="$(find thunderbots)/launch/ai.launch" />
-
-    <!-- Launch the radio_communication node -->
-    <node name="radio_communication" pkg="thunderbots" type="radio_communication" output="screen" args="$(arg mrf_config)" respawn="true"/>
+    <include file="$(find thunderbots)/launch/ai.launch">
+      <arg name="backend_type" value="radio" />
+    </include>
 
 </launch>

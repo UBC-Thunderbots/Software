@@ -23,8 +23,6 @@ class RadioOutput
     explicit RadioOutput(unsigned int config,
                          std::function<void(RobotStatus)> received_robot_status_callback);
 
-    ~RadioOutput();
-
     /**
      * Sends the given primitives to the backend to control the robots
      *
@@ -39,7 +37,7 @@ class RadioOutput
      *                        robot orientation}
      * @param ball
      */
-    void send_vision_packet(
+    void sendVisionPacket(
         std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots, Ball ball);
 
     /**
@@ -48,7 +46,7 @@ class RadioOutput
      * @param friendly_team
      * @param ball
      */
-    void send_vision_packet(const Team& friendly_team, Ball ball);
+    void sendVisionPacket(const Team& friendly_team, Ball ball);
 
    private:
     MRFDongle dongle;

@@ -43,7 +43,7 @@ struct RobotStatus
     bool ball_in_beam;
 
     // Whether or not the robot’s capacitor is charged enough to kick the ball.
-    bool capacitor_charged;
+    bool capacitor_charged_enough_to_kick_ball;
 
     // Indicates when autokick has been fired.
     bool autokick_fired;
@@ -54,7 +54,7 @@ struct RobotStatus
     // voltage on the robot’s kicking capacitor, in volts.
     double capacitor_voltage;
 
-    // heading of the robot’s laser sensor.
+    // The reading of the robot’s laser sensor.
     double break_beam_reading;
 
     // The maximum full-scale deflection (maximum possible reading) of the laser sensor.

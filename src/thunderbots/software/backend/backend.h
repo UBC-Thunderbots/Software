@@ -20,11 +20,6 @@ class Backend : public Subject<World>,
                 public ThreadedObserver<ConstPrimitiveVectorPtr>
 {
    public:
-    using WorldBuffer  = ThreadSafeBuffer<World>;
-    using PrimitiveVec = std::vector<std::unique_ptr<Primitive>>;
-    using PrimitiveVecPtr =
-        std::shared_ptr<const std::vector<std::unique_ptr<Primitive>>>;
-
     Backend() = default;
 
     virtual ~Backend() = default;

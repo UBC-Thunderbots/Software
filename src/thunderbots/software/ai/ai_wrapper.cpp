@@ -9,7 +9,7 @@
 AIWrapper::AIWrapper(ros::NodeHandle node_handle)
 {
     play_info_publisher = node_handle.advertise<thunderbots_msgs::PlayInfo>(
-        Util::Constants::PLAY_INFO_TOPIC, 1);
+        Util::Constants::PLAY_INFO_TOPIC, PLAY_INFO_QUEUE_SIZE);
 }
 
 void AIWrapper::onValueReceived(World world)
@@ -46,6 +46,7 @@ void AIWrapper::drawWorld()
         Util::CanvasMessenger::getInstance();
     canvas_messenger->drawWorld(most_recent_world);
 }
+
 thunderbots_msgs::PlayInfo AIWrapper::convertPlayInfoToROSMessage(
     const PlayInfo& play_info)
 {

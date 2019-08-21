@@ -358,7 +358,7 @@ target_link_libraries(tbots_radio_output
 
 # Backends
 file(GLOB TBOTS_BACKEND_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/backend//*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/backend/*.cpp
         )
 add_library(tbots_backend STATIC
         ${TBOTS_BACKEND_LIB_SRC}
