@@ -7,6 +7,7 @@
 #include <QWidget>
 
 #include "gui/zoomable_qgraphics_view.h"
+#include "util/parameter/parameter.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui
@@ -40,6 +41,9 @@ class MainWidget : public QWidget
     void setupDefendingSideComboBox();
     void setupGameStateOverrideComboBox();
     void setupPlayOverrideComboBox();
+    QWidget* createBooleanParameter(std::shared_ptr<Parameter<bool>> parameter);
+    QWidget* createIntegerParameter(std::shared_ptr<Parameter<int>> parameter);
+    QWidget* createDoubleParameter(std::shared_ptr<Parameter<double>> parameter);
 
     Ui::MainWidget* main_widget;
     QGraphicsScene* scene;

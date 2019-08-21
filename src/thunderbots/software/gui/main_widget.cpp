@@ -8,6 +8,10 @@
 #include <iostream>
 #include "software/ai/hl/stp/play/play_factory.h"
 #include <QList>
+#include <QCheckBox>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QSpinBox>
 
 #include "gui/drawing/world.h"
 #include "test/test_util/test_util.h"
@@ -40,6 +44,13 @@ MainWidget::MainWidget(QWidget *parent)
 
     setupStatusTable(main_widget->robot_status_table_widget);
     setupAIControls();
+    QVBoxLayout* param_layout = new QVBoxLayout(main_widget->params_tab);
+    QWidget* boolparam = createBooleanParameter(std::make_shared<Parameter<bool>>(Util::DynamicParameters::AI::run_ai));
+    boolparam->setParent(main_widget->params_tab);
+    param_layout->addWidget(boolparam);
+//    param_layout->addWidget(new QPushButton("Foobar", main_widget->params_tab));
+//    param_layout->addWidget(new QPushButton("baz", main_widget->params_tab));
+    main_widget->params_tab->setLayout(param_layout);
 }
 
 void MainWidget::setupAIControls() {
@@ -206,4 +217,75 @@ void MainWidget::setRobotStatus(QTableWidget* table, std::vector<std::string> ro
         auto message_data = QString::fromStdString(robot_status_messages.at(i));
         table->setItem(i, 1, new QTableWidgetItem(message_data));
     }
+}
+
+QWidget* MainWidget::createBooleanParameter(std::shared_ptr<Parameter<bool>> parameter) {
+    QWidget* widget = new QWidget();
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(QString::fromStdString(parameter->name()));
+    QCheckBox* checkbox = new QCheckBox(widget);
+    checkbox->setChecked(parameter->value());
+
+    layout->addWidget(label);
+    layout->addWidget(checkbox);
+
+    auto on_checkbox_value_changed = [parameter, checkbox]() {
+        // TODO: Change to LOG statement
+        std::cout << "Value for boolean param " << parameter->name() << " changed to " << checkbox->isChecked() << std::endl;
+        parameter->setValue(checkbox->isChecked());
+    };
+    connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
+
+    widget->setLayout(layout);
+
+    return widget;
+}
+
+QWidget* MainWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> parameter) {
+    QWidget* widget = new QWidget();
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(QString::fromStdString(parameter->name()));
+    // TODO: Try QSpinner or something?
+
+    layout->addWidget(label);
+    layout->addWidget(checkbox);
+
+    auto on_checkbox_value_changed = [parameter, checkbox]() {
+        // TODO: Change to LOG statement
+        std::cout << "Value for boolean param " << parameter->name() << " changed to " << checkbox->isChecked() << std::endl;
+        parameter->setValue(checkbox->isChecked());
+    };
+    connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
+
+    widget->setLayout(layout);
+
+    return widget;
+}
+
+QWidget* MainWidget::createDoubleParameter(std::shared_ptr<Parameter<double>> parameter) {
+//    QWidget* widget = new QWidget();
+//    QHBoxLayout* layout = new QHBoxLayout(widget);
+//
+//    QLabel* label = new QLabel(widget);
+//    label->setText(QString::fromStdString(parameter->name()));
+//    QCheckBox* checkbox = new QCheckBox(widget);
+//    checkbox->setChecked(parameter->value());
+//
+//    layout->addWidget(label);
+//    layout->addWidget(checkbox);
+//
+//    auto on_checkbox_value_changed = [parameter, checkbox]() {
+//        // TODO: Change to LOG statement
+//        std::cout << "Value for boolean param " << parameter->name() << " changed to " << checkbox->isChecked() << std::endl;
+//        parameter->setValue(checkbox->isChecked());
+//    };
+//    connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
+//
+//    widget->setLayout(layout);
+//
+//    return widget;
 }
