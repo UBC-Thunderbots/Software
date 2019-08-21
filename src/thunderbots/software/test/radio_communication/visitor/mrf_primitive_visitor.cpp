@@ -209,12 +209,14 @@ TEST(MRFPrimitiveVisitorTest, visit_movespin_primitive)
 
 TEST(MRFPrimitiveVisitorTest, visit_pivot_primitive)
 {
-    PivotPrimitive primitive(11, Point(22, 33.3), Angle::half(), 2.33);
+    PivotPrimitive primitive(11, Point(22, 33.3), Angle::half(), Angle::ofRadians(2.71),
+                             true);
     RadioPrimitive expected_radio_primitive;
     expected_radio_primitive.prim_type   = FirmwarePrimitiveType::PIVOT;
     expected_radio_primitive.param_array = {22 * 1000, 33.3 * 1000,
-                                            Angle::half().toRadians() * 100, 2.33 * 1000};
-    expected_radio_primitive.extra_bits  = 0;
+                                            Angle::half().toRadians() * 100,
+                                            Angle::ofRadians(2.71).toRadians() * 100};
+    expected_radio_primitive.extra_bits  = 1;
 
     MRFPrimitiveVisitor prim_visitor;
     primitive.accept(prim_visitor);
