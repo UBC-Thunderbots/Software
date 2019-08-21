@@ -20,6 +20,7 @@ add_message_files(
     PlayInfo.msg
     RefboxCommand.msg
     RefboxTeamInfo.msg
+    RobotStatus.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

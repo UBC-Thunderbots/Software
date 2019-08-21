@@ -4,9 +4,10 @@
 
     <param name="vision_multicast_address" value="$(optenv VISION_MULTICAST_ADDRESS 224.5.23.2)"/>
 
-    <node name="full_system" pkg="thunderbots" type="full_system"
-    args="--backend $(arg backend_type)"
-    output="screen" respawn="true" respawn_delay="10">
+    <!-- Startup the AI with the given backend -->
+    <node name="full_system" pkg="thunderbots" type="full_system" 
+    args="--backend $(arg backend_type)" 
+    output="screen" respawn="true" respawn_delay="10"/>
 
     <!-- Launch the dynamic parameters node -->
     <node name="parameters" pkg="thunderbots" type="parameters" output="screen" respawn="true"/>
