@@ -11,10 +11,10 @@ class PivotPrimitive : public Primitive
     /**
      * Creates a new Pivot Primitive
      *
-     * Pivots the robot around the specified point, maintaining a constant
-     * distance from this point.
-     * 	   The robot will pivot in the direction of the shortest path
-     * 	   Assume robot always faces the point around which it pivots
+     * Pivots the robot around the specified point (usually the ball) at a specified
+     * speed, maintaining a constant distance of (ball radius + robot radius) from this
+     * point. The robot will pivot in the direction of the shortest path Assume robot
+     * always faces the point around which it pivots
      *
      *
      * @param robot_id      The id of the robot to run this primitive
@@ -23,7 +23,8 @@ class PivotPrimitive : public Primitive
      * @param pivot_radius  The distance from robot to pivot_point during movement
      */
     explicit PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                            const Angle &final_angle, const double pivot_radius);
+                            const Angle &final_angle, const Angle &pivot_speed,
+                            bool enable_dribbler);
 
     std::string getPrimitiveName() const override;
 
@@ -43,12 +44,21 @@ class PivotPrimitive : public Primitive
      */
     Angle getFinalAngle() const;
 
-    /**
-     * Get the robot's final orientation
-     *
-     * @return the radius the robot maintains during pivot (as double)
-     */
     double getPivotRadius() const;
+
+    /**
+     * Get the angular velocity for the pivot
+     *
+     * @return the angular velocity (rad/s) the robot maintains during pivot (as double)
+     */
+    Angle getPivotSpeed() const;
+
+    /**
+     * Check if the dribbler is enabled for this primitive
+     *
+     * @return true if dribbler is enabled
+     */
+    bool isDribblerEnabled() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
 
@@ -73,5 +83,6 @@ class PivotPrimitive : public Primitive
     unsigned int robot_id;
     Point pivot_point;
     Angle final_angle;
-    double pivot_radius;
+    Angle pivot_speed;
+    bool enable_dribbler;
 };
