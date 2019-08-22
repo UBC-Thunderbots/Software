@@ -17,10 +17,10 @@ std::vector<std::string> BackendFactory::getRegisteredBackendNames()
 {
     std::vector<std::string> names;
 
-    for (auto it = BackendFactory::getRegistry().begin();
-         it != BackendFactory::getRegistry().end(); it++)
+    for (auto iter = BackendFactory::getRegistry().begin();
+         iter != BackendFactory::getRegistry().end(); iter++)
     {
-        names.emplace_back(it->first);
+        names.emplace_back(iter->first);
     }
     return names;
 }
@@ -30,10 +30,10 @@ BackendFactory::getRegisteredBackendConstructors()
 {
     std::vector<std::function<std::unique_ptr<Backend>()>> constructors;
 
-    for (auto it = BackendFactory::getRegistry().begin();
-         it != BackendFactory::getRegistry().end(); it++)
+    for (auto iter = BackendFactory::getRegistry().begin();
+         iter != BackendFactory::getRegistry().end(); iter++)
     {
-        constructors.emplace_back(it->second);
+        constructors.emplace_back(iter->second);
     }
     return constructors;
 }
@@ -48,10 +48,10 @@ void BackendFactory::registerBackend(
 std::unique_ptr<Backend> BackendFactory::createBackend(const std::string& backend_name)
 {
     auto registry = BackendFactory::getRegistry();
-    auto it       = registry.find(backend_name);
-    if (it != registry.end())
+    auto iter       = registry.find(backend_name);
+    if (iter != registry.end())
     {
-        return it->second();
+        return iter->second();
     }
     else
     {
