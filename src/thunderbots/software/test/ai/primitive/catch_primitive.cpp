@@ -23,23 +23,6 @@ TEST(CatchPrimTest, get_robot_id_test)
     EXPECT_EQ(robot_id, catch_prim.getRobotId());
 }
 
-TEST(CatchPrimTest, parameter_array_test)
-{
-    const unsigned int robot_id = 14;
-    const double velocity       = 3.24;
-    const double dribbler_speed = 4.20;
-    const double margin         = 17.38;
-
-    CatchPrimitive catch_prim =
-        CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
-
-    std::vector<double> param_array = catch_prim.getParameters();
-
-    EXPECT_EQ(velocity, param_array[0]);
-    EXPECT_EQ(dribbler_speed, param_array[1]);
-    EXPECT_EQ(margin, param_array[2]);
-}
-
 TEST(CatchPrimTest, get_velocity_test)
 {
     const double velocity = 3.24;
@@ -65,35 +48,6 @@ TEST(CatchPrimTest, get_margin_test)
     CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, margin);
 
     EXPECT_DOUBLE_EQ(margin, catch_prim.getMargin());
-}
-
-TEST(CatchPrimTest, get_extra_bit_array_test)
-{
-    CatchPrimitive catch_prim = CatchPrimitive(0, 0, 0, 0);
-
-    std::vector<bool> extra_bit_array = catch_prim.getExtraBits();
-
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
-}
-
-TEST(CatchPrimTest, create_primitive_from_message_test)
-{
-    const unsigned int robot_id = 14;
-    const double velocity       = 3.24;
-    const double dribbler_speed = 4.20;
-    const double margin         = 17.38;
-
-    CatchPrimitive catch_prim =
-        CatchPrimitive(robot_id, velocity, dribbler_speed, margin);
-
-    thunderbots_msgs::Primitive prim_message = catch_prim.createMsg();
-
-    CatchPrimitive new_prim = CatchPrimitive(prim_message);
-
-    std::vector<double> parameters = new_prim.getParameters();
-
-    EXPECT_EQ(CatchPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
-    EXPECT_EQ(new_prim, catch_prim);
 }
 
 TEST(CatchPrimTest, test_equality_operator_primitives_equal)

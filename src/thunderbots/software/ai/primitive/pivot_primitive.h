@@ -26,13 +26,6 @@ class PivotPrimitive : public Primitive
                             const Angle &final_angle, const Angle &pivot_speed,
                             bool enable_dribbler);
 
-    /**
-     * Create a new Pivot Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the primitive
-     */
-    explicit PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -66,22 +59,6 @@ class PivotPrimitive : public Primitive
      * @return true if dribbler is enabled
      */
     bool isDribblerEnabled() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {pivot_point.x(), pivot_point.y(),
-     *                               final_angle.toRadians(),
-     *                               pivot_radius}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor &visitor) const override;
 

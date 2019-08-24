@@ -34,12 +34,6 @@ class DribblePrimitive : public Primitive
                               bool small_kick_allowed);
 
     /**
-     * Creates a new Dribble Primitive from a Primitive message
-     *
-     * @param primtiive_msg The message from which to create the Move Primitive
-     */
-    explicit DribblePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
-    /**
      * Gets the primitive name
      *
      * @return The name of the primitive as a string
@@ -80,23 +74,12 @@ class DribblePrimitive : public Primitive
      * @return The rotation speed in RPM
      */
 
-    bool isSmallKickAllowed() const;
-
     /**
      * True if small kick is allowed, false otherwise
      *
      * @return Boolean small_kick_allowed
      */
-
-
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
+    bool isSmallKickAllowed() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
 

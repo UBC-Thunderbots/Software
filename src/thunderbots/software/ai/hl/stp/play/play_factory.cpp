@@ -17,10 +17,10 @@ std::vector<std::string> PlayFactory::getRegisteredPlayNames()
 {
     std::vector<std::string> names;
 
-    for (auto it = PlayFactory::getRegistry().begin();
-         it != PlayFactory::getRegistry().end(); it++)
+    for (auto iter = PlayFactory::getRegistry().begin();
+         iter != PlayFactory::getRegistry().end(); iter++)
     {
-        names.emplace_back(it->first);
+        names.emplace_back(iter->first);
     }
     return names;
 }
@@ -30,10 +30,10 @@ PlayFactory::getRegisteredPlayConstructors()
 {
     std::vector<std::function<std::unique_ptr<Play>()>> constructors;
 
-    for (auto it = PlayFactory::getRegistry().begin();
-         it != PlayFactory::getRegistry().end(); it++)
+    for (auto iter = PlayFactory::getRegistry().begin();
+         iter != PlayFactory::getRegistry().end(); iter++)
     {
-        constructors.emplace_back(it->second);
+        constructors.emplace_back(iter->second);
     }
     return constructors;
 }
@@ -47,15 +47,15 @@ void PlayFactory::registerPlay(std::string play_name,
 std::unique_ptr<Play> PlayFactory::createPlay(const std::string& play_name)
 {
     auto registry = PlayFactory::getRegistry();
-    auto it       = registry.find(play_name);
-    if (it != registry.end())
+    auto iter     = registry.find(play_name);
+    if (iter != registry.end())
     {
-        return it->second();
+        return iter->second();
     }
     else
     {
-        std::string msg =
-            std::string("No constructor for " + play_name + " found in the PlayFactory");
+        std::string msg = std::string("No constructor for '" + play_name +
+                                      "' found in the PlayFactory");
         throw std::invalid_argument(msg);
     }
 }

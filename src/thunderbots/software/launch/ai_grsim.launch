@@ -1,13 +1,8 @@
 <launch>
 
-    <!-- Run all the shared AI nodes -->
-    <include file="$(find thunderbots)/launch/ai.launch" />
-
-    <!-- Launch the grsim_communication node -->
-    <node name="grsim_communication" pkg="thunderbots" type="grsim_communication" output="screen">
-    </node>
-
-    <param name="vision_multicast_address" value="$(optenv VISION_MULTICAST_ADDRESS 224.5.23.2)"/>
+    <include file="$(find thunderbots)/launch/ai.launch">
+      <arg name="backend_type" value="grsim" />
+    </include>
 
 </launch>
 

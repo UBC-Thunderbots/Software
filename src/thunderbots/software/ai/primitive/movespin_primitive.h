@@ -20,13 +20,6 @@ class MoveSpinPrimitive : public Primitive
     explicit MoveSpinPrimitive(unsigned int robot_id, const Point &dest,
                                const AngularVelocity &angular_vel, double final_speed);
 
-    /**
-     * Creates a new MoveSpin Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Move Primitive
-     */
-    explicit MoveSpinPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -51,20 +44,6 @@ class MoveSpinPrimitive : public Primitive
      * @return The robots speed in m/s
      */
     double getFinalSpeed() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {dest.x(), dest.y(), angular_vel.toRadians()}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor &visitor) const override;
 

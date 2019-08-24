@@ -16,19 +16,6 @@ PivotPrimitive::PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
 {
 }
 
-PivotPrimitive::PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id        = primitive_msg.robot_id;
-    double center_x = primitive_msg.parameters.at(0);
-    double center_y = primitive_msg.parameters.at(1);
-    pivot_point     = Point(center_x, center_y);
-    final_angle     = Angle::ofRadians(primitive_msg.parameters.at(2));
-    pivot_speed     = Angle::ofRadians(primitive_msg.parameters.at(3));
-    enable_dribbler = static_cast<bool>(primitive_msg.extra_bits.at(0));
-}
-
 std::string PivotPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -62,18 +49,6 @@ double PivotPrimitive::getPivotRadius() const
 bool PivotPrimitive::isDribblerEnabled() const
 {
     return enable_dribbler;
-}
-
-std::vector<double> PivotPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {pivot_point.x(), pivot_point.y(),
-                                      final_angle.toRadians(), pivot_speed.toRadians()};
-    return parameters;
-}
-
-std::vector<bool> PivotPrimitive::getExtraBits() const
-{
-    return std::vector<bool>{enable_dribbler};
 }
 
 void PivotPrimitive::accept(PrimitiveVisitor &visitor) const

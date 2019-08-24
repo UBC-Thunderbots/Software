@@ -1,3 +1,0 @@
-<launch>
-    <test test-name="logger_test" pkg="thunderbots" type="logger_test" />
-</launch>

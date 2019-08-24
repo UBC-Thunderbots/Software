@@ -43,13 +43,6 @@ class MovePrimitive : public Primitive
                            AutokickType autokick = NONE);
 
     /**
-     * Creates a new Move Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Move Primitive
-     */
-    explicit MovePrimitive(const thunderbots_msgs::Primitive &primitive_msg);
-
-    /**
      * Gets the primitive name
      *
      * @return The name of the primitive as a string
@@ -103,21 +96,6 @@ class MovePrimitive : public Primitive
      * @return whether or not the robot should be moving slow
      */
     bool isSlowEnabled() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {dest.x(), dest.y(), final_angle.toRadians(),
-     *                               final_speed, enable_dribbler, slow}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor &visitor) const override;
 

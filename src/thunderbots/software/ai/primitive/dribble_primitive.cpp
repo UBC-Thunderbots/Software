@@ -15,19 +15,6 @@ DribblePrimitive::DribblePrimitive(unsigned int robot_id, const Point &dest,
 
 {
 }
-DribblePrimitive::DribblePrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id           = primitive_msg.robot_id;
-    double dest_x      = primitive_msg.parameters.at(0);
-    double dest_y      = primitive_msg.parameters.at(1);
-    dest               = Point(dest_x, dest_y);
-    final_angle        = Angle::ofRadians(primitive_msg.parameters.at(2));
-    rpm                = primitive_msg.parameters.at(3);
-    small_kick_allowed = primitive_msg.extra_bits.at(0);
-}
-
 
 std::string DribblePrimitive::getPrimitiveName() const
 {
@@ -57,21 +44,6 @@ double DribblePrimitive::getRpm() const
 bool DribblePrimitive::isSmallKickAllowed() const
 {
     return small_kick_allowed;
-}
-
-
-std::vector<double> DribblePrimitive::getParameters() const
-{
-    std::vector<double> parameters = {dest.x(), dest.y(), final_angle.toRadians(), rpm};
-
-    return parameters;
-}
-
-std::vector<bool> DribblePrimitive::getExtraBits() const
-{
-    std::vector<bool> extraBits = {small_kick_allowed};
-
-    return extraBits;
 }
 
 void DribblePrimitive::accept(PrimitiveVisitor &visitor) const

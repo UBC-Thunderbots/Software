@@ -53,7 +53,7 @@ namespace Passing
 
         // Delete the copy and assignment operators because this class really shouldn't
         // need them and we don't want to risk doing anything nasty with the internal
-        // threading this class uses
+        // multithreading this class uses
         PassGenerator& operator=(const PassGenerator&) = delete;
         PassGenerator(const PassGenerator&)            = delete;
 
