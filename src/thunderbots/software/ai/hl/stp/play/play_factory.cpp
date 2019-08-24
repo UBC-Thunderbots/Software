@@ -47,7 +47,7 @@ void PlayFactory::registerPlay(std::string play_name,
 std::unique_ptr<Play> PlayFactory::createPlay(const std::string& play_name)
 {
     auto registry = PlayFactory::getRegistry();
-    auto iter       = registry.find(play_name);
+    auto iter     = registry.find(play_name);
     if (iter != registry.end())
     {
         return iter->second();

@@ -20,18 +20,20 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
 {
     setupVisionClient(vision_multicast_address, vision_multicast_port);
 
-    setupGameControllerClient(gamecontroller_multicast_address, gamecontroller_multicast_port);
+    setupGameControllerClient(gamecontroller_multicast_address,
+                              gamecontroller_multicast_port);
 
     startIoServiceThreadInBackground();
 }
 
-void NetworkClient::setupVisionClient(std::string vision_address, int vision_port) {
+void NetworkClient::setupVisionClient(std::string vision_address, int vision_port)
+{
     // Set up our connection over udp to receive vision packets
     try
     {
         ssl_vision_client = std::make_unique<SSLVisionClient>(
-                io_service, vision_address, vision_port,
-                boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
+            io_service, vision_address, vision_port,
+            boost::bind(&NetworkClient::filterAndPublishVisionDataWrapper, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -40,18 +42,17 @@ void NetworkClient::setupVisionClient(std::string vision_address, int vision_por
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
     }
-
 }
 
 void NetworkClient::setupGameControllerClient(std::string gamecontroller_address,
-                                              int gamecontroller_port) {
+                                              int gamecontroller_port)
+{
     // Set up our connection over udp to receive gamecontroller packets
     try
     {
         ssl_gamecontroller_client = std::make_unique<SSLGameControllerClient>(
-                io_service, gamecontroller_address,
-                gamecontroller_port,
-                boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
+            io_service, gamecontroller_address, gamecontroller_port,
+            boost::bind(&NetworkClient::filterAndPublishGameControllerData, this, _1));
     }
     catch (const boost::exception& ex)
     {
@@ -60,10 +61,10 @@ void NetworkClient::setupGameControllerClient(std::string gamecontroller_address
                    << std::endl
                    << boost::diagnostic_information(ex) << std::endl;
     }
-
 }
 
-void NetworkClient::startIoServiceThreadInBackground() {
+void NetworkClient::startIoServiceThreadInBackground()
+{
     // Start the thread to run the io_service in the background
     io_service_thread = std::thread([this]() { io_service.run(); });
 }

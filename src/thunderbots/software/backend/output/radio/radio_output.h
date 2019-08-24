@@ -37,8 +37,8 @@ class RadioOutput
      *                        robot orientation}
      * @param ball
      */
-    void sendVisionPacket(
-        std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots, Ball ball);
+    void sendVisionPacket(std::vector<std::tuple<uint8_t, Point, Angle>> friendly_robots,
+                          Ball ball);
 
     /**
      * Sends a camera packet with the detected robots and ball.

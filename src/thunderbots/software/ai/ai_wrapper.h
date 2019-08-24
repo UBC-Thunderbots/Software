@@ -24,7 +24,6 @@ class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveV
     explicit AIWrapper(ros::NodeHandle node_handle);
 
    private:
-
     static const int PLAY_INFO_QUEUE_SIZE = 1;
 
     void onValueReceived(World world) override;

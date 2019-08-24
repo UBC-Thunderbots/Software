@@ -11,7 +11,7 @@ TEST(ThreadSafeBufferTest,
 
     buffer.push(7);
 
-    EXPECT_EQ(std::optional<int>(7), buffer.pullLeastRecentlyAddedValue());
+    EXPECT_EQ(std::optional<int>(7), buffer.popLeastRecentlyAddedValue());
 }
 
 TEST(
@@ -22,7 +22,7 @@ TEST(
 
     buffer.push(7);
 
-    EXPECT_EQ(7, buffer.pullLeastRecentlyAddedValue());
+    EXPECT_EQ(7, buffer.popLeastRecentlyAddedValue());
 }
 
 TEST(
@@ -35,9 +35,9 @@ TEST(
     buffer.push(8);
     buffer.push(9);
 
-    EXPECT_EQ(7, buffer.pullLeastRecentlyAddedValue());
-    EXPECT_EQ(8, buffer.pullLeastRecentlyAddedValue());
-    EXPECT_EQ(9, buffer.pullLeastRecentlyAddedValue());
+    EXPECT_EQ(7, buffer.popLeastRecentlyAddedValue());
+    EXPECT_EQ(8, buffer.popLeastRecentlyAddedValue());
+    EXPECT_EQ(9, buffer.popLeastRecentlyAddedValue());
 }
 
 TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_is_empty)
@@ -46,17 +46,17 @@ TEST(ThreadSafeBufferTest, pullLeastRecentlyAddedValue_single_value_when_buffer_
 
     std::optional<int> result = std::nullopt;
 
-    // This "pullLeastRecentlyAddedValue" call should block until something is "pushed"
+    // This "popLeastRecentlyAddedValue" call should block until something is "pushed"
     std::thread puller_thread([&]() {
         while (!result)
         {
-            result = buffer.pullLeastRecentlyAddedValue(Duration::fromSeconds(0.1));
+            result = buffer.popLeastRecentlyAddedValue(Duration::fromSeconds(0.1));
         }
     });
 
     buffer.push(84);
 
-    // Wait for the pullLeastRecentlyAddedValue to complete
+    // Wait for the popLeastRecentlyAddedValue to complete
     puller_thread.join();
 
     ASSERT_TRUE(result);
@@ -70,7 +70,7 @@ TEST(ThreadSafeBufferTest,
 
     buffer.push(7);
 
-    EXPECT_EQ(7, buffer.pullMostRecentlyAddedValue());
+    EXPECT_EQ(7, buffer.popMostRecentlyAddedValue());
 }
 
 TEST(
@@ -81,7 +81,7 @@ TEST(
 
     buffer.push(7);
 
-    EXPECT_EQ(7, buffer.pullMostRecentlyAddedValue());
+    EXPECT_EQ(7, buffer.popMostRecentlyAddedValue());
 }
 
 TEST(
@@ -94,9 +94,9 @@ TEST(
     buffer.push(8);
     buffer.push(9);
 
-    EXPECT_EQ(9, buffer.pullMostRecentlyAddedValue());
-    EXPECT_EQ(8, buffer.pullMostRecentlyAddedValue());
-    EXPECT_EQ(7, buffer.pullMostRecentlyAddedValue());
+    EXPECT_EQ(9, buffer.popMostRecentlyAddedValue());
+    EXPECT_EQ(8, buffer.popMostRecentlyAddedValue());
+    EXPECT_EQ(7, buffer.popMostRecentlyAddedValue());
 }
 
 TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_is_empty)
@@ -105,17 +105,17 @@ TEST(ThreadSafeBufferTest, pullMostRecentlyAddedValue_single_value_when_buffer_i
 
     std::optional<int> result = std::nullopt;
 
-    // This "pullLeastRecentlyAddedValue" call should block until something is "pushed"
+    // This "popLeastRecentlyAddedValue" call should block until something is "pushed"
     std::thread puller_thread([&]() {
         while (!result)
         {
-            result = buffer.pullMostRecentlyAddedValue(Duration::fromSeconds(0.1));
+            result = buffer.popMostRecentlyAddedValue(Duration::fromSeconds(0.1));
         }
     });
 
     buffer.push(84);
 
-    // Wait for the pullMostRecentlyAddedValue to complete
+    // Wait for the popMostRecentlyAddedValue to complete
     puller_thread.join();
 
     ASSERT_TRUE(result);
@@ -132,7 +132,7 @@ TEST(ThreadSafeBufferTest, push_more_values_then_buffer_can_hold)
     buffer.push(40);
 
     // We should have overwritten the least recently added value
-    EXPECT_EQ(38, buffer.pullLeastRecentlyAddedValue());
-    EXPECT_EQ(39, buffer.pullLeastRecentlyAddedValue());
-    EXPECT_EQ(40, buffer.pullLeastRecentlyAddedValue());
+    EXPECT_EQ(38, buffer.popLeastRecentlyAddedValue());
+    EXPECT_EQ(39, buffer.popLeastRecentlyAddedValue());
+    EXPECT_EQ(40, buffer.popLeastRecentlyAddedValue());
 }

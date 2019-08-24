@@ -54,7 +54,6 @@ class NetworkClient
     NetworkClient(const NetworkClient&)            = delete;
 
    private:
-
     /**
      * Sets up the vision client to the point where it will receive packets on the
      * given address/port
@@ -68,10 +67,12 @@ class NetworkClient
      * Sets up the gamecontroller client to the point where it will receive packets on the
      * given address/port
      *
-     * @param gamecontroller_address String representation of the gamecontroller IP address
+     * @param gamecontroller_address String representation of the gamecontroller IP
+     * address
      * @param gamecontroller_port The port gamecontroller is running on
      */
-    void setupGameControllerClient(std::string gamecontroller_address, int gamecontroller_port);
+    void setupGameControllerClient(std::string gamecontroller_address,
+                                   int gamecontroller_port);
 
     /**
      * Starts up the IO service thread to run and service network requests in the

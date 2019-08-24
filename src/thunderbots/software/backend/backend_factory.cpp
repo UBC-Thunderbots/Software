@@ -48,7 +48,7 @@ void BackendFactory::registerBackend(
 std::unique_ptr<Backend> BackendFactory::createBackend(const std::string& backend_name)
 {
     auto registry = BackendFactory::getRegistry();
-    auto iter       = registry.find(backend_name);
+    auto iter     = registry.find(backend_name);
     if (iter != registry.end())
     {
         return iter->second();

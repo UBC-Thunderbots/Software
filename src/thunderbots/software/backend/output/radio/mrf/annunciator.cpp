@@ -196,7 +196,7 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                     bptr += 2;
                     len -= 2;
 
-                    robot_status.ball_in_beam      = !!(*bptr & 0x80);
+                    robot_status.ball_in_beam                          = !!(*bptr & 0x80);
                     robot_status.capacitor_charged_enough_to_kick_ball = !!(*bptr & 0x40);
 
                     // Robot logger status

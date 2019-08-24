@@ -30,7 +30,9 @@ class ThreadSafeBuffer
     ThreadSafeBuffer(const ThreadSafeBuffer&) = delete;
 
     /**
-     * Removes the least recently value added to the buffer and returns it
+     * Removes the value least recently added to the buffer and returns it
+     *
+     * ex. if A,B,C were added to the buffer (in that order), this would return A
      *
      * If the buffer is empty, this function will *block* until:
      * - a value becomes available
@@ -40,14 +42,16 @@ class ThreadSafeBuffer
      * @param max_wait_time The maximum duration to wait for a new value before
      *                      returning
      *
-     * @return The most recently value added to the buffer, or std::nullopt if none is
+     * @return The most recently added value to the buffer, or std::nullopt if none is
      *         available
      */
-    std::optional<T> pullLeastRecentlyAddedValue(
+    std::optional<T> popLeastRecentlyAddedValue(
         Duration max_wait_time = Duration::fromSeconds(0));
 
     /**
-     * Removes the most recently value added to the buffer and returns it
+     * Removes the value most recently added to the buffer and returns it
+     *
+     * ex. if A,B,C were added to the buffer (in that order), this would return C
      *
      * If the buffer is empty, this function will *block* until:
      * - a value becomes available
@@ -57,10 +61,10 @@ class ThreadSafeBuffer
      * @param max_wait_time The maximum duration to wait for a new value before
      *                      returning
      *
-     * @return The most recently value added to the buffer, or std::nullopt if none is
+     * @return The most recently added value to the buffer, or std::nullopt if none is
      *         available
      */
-    std::optional<T> pullMostRecentlyAddedValue(
+    std::optional<T> popMostRecentlyAddedValue(
         Duration max_wait_time = Duration::fromSeconds(0));
 
     /**
@@ -101,7 +105,7 @@ ThreadSafeBuffer<T>::ThreadSafeBuffer(std::size_t buffer_size)
 }
 
 template <typename T>
-std::optional<T> ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue(Duration max_wait_time)
+std::optional<T> ThreadSafeBuffer<T>::popLeastRecentlyAddedValue(Duration max_wait_time)
 {
     // We hold the returned lock in a variable here so that we hold the lock on the
     // buffer mutex until the lock is destructed at the end of this function
@@ -117,7 +121,7 @@ std::optional<T> ThreadSafeBuffer<T>::pullLeastRecentlyAddedValue(Duration max_w
 }
 
 template <typename T>
-std::optional<T> ThreadSafeBuffer<T>::pullMostRecentlyAddedValue(Duration max_wait_time)
+std::optional<T> ThreadSafeBuffer<T>::popMostRecentlyAddedValue(Duration max_wait_time)
 {
     // We hold the returned lock in a variable here so that we hold the lock on the
     // buffer mutex until the lock is destructed at the end of this function

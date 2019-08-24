@@ -60,5 +60,5 @@ void Observer<T>::receiveValue(T val)
 template <typename T>
 std::optional<T> Observer<T>::popMostRecentlyReceivedValue(Duration max_wait_time)
 {
-    return buffer.pullMostRecentlyAddedValue(max_wait_time);
+    return buffer.popMostRecentlyAddedValue(max_wait_time);
 }
