@@ -250,16 +250,20 @@ QWidget* MainWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> para
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
     // TODO: Try QSpinner or something?
+    QSpinBox* spinbox = new QSpinBox(widget);
+    // TODO: Get range from Parameter
+    spinbox->setRange(0, 100);
+    spinbox->setValue(parameter->value());
 
     layout->addWidget(label);
-    layout->addWidget(checkbox);
+    layout->addWidget(spinbox);
 
-    auto on_checkbox_value_changed = [parameter, checkbox]() {
+    auto on_spinbox_value_changed = [parameter, spinbox](int new_value) {
         // TODO: Change to LOG statement
-        std::cout << "Value for boolean param " << parameter->name() << " changed to " << checkbox->isChecked() << std::endl;
-        parameter->setValue(checkbox->isChecked());
+        std::cout << "Value for integer param " << parameter->name() << " changed to " << spinbox->value() << std::endl;
+        parameter->setValue(spinbox->value());
     };
-    connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
+    connect(spinbox, &QSpinBox::valueChanged, on_spinbox_value_changed);
 
     widget->setLayout(layout);
 
