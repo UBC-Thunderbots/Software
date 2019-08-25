@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1253</width>
+    <width>1271</width>
     <height>789</height>
    </rect>
   </property>
@@ -38,6 +38,9 @@
        </property>
        <property name="currentIndex">
         <number>1</number>
+       </property>
+       <property name="usesScrollButtons">
+        <bool>false</bool>
        </property>
        <property name="movable">
         <bool>true</bool>
@@ -167,7 +170,11 @@ p, li { white-space: pre-wrap; }
         <attribute name="title">
          <string>Params</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3"/>
+        <layout class="QVBoxLayout" name="params_tab_vertical_layout">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetNoConstraint</enum>
+         </property>
+        </layout>
        </widget>
       </widget>
       <widget class="ZoomableQGraphicsView" name="ai_visualization_graphics_view">

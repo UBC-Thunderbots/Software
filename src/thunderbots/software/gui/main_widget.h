@@ -41,9 +41,11 @@ class MainWidget : public QWidget
     void setupDefendingSideComboBox();
     void setupGameStateOverrideComboBox();
     void setupPlayOverrideComboBox();
+    // TODO: value changed when leaves focus?
     QWidget* createBooleanParameter(std::shared_ptr<Parameter<bool>> parameter);
     QWidget* createIntegerParameter(std::shared_ptr<Parameter<int>> parameter);
     QWidget* createDoubleParameter(std::shared_ptr<Parameter<double>> parameter);
+    QWidget* createStringParameter(std::shared_ptr<Parameter<std::string>> parameter);
 
     Ui::MainWidget* main_widget;
     QGraphicsScene* scene;

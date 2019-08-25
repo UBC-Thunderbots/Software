@@ -12,6 +12,9 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QSpacerItem>
+#include <QLineEdit>
 
 #include "gui/drawing/world.h"
 #include "test/test_util/test_util.h"
@@ -24,6 +27,10 @@ MainWidget::MainWidget(QWidget *parent)
     // Handles all the setup of the generated UI components and adds the components
     // to this widget
     main_widget->setupUi(this);
+    // StrongFocus means that the MainWidget will more aggressively capture focus when clicked. Specifically, we do this
+    // so that when the user clicks outside of QLineEdits, the QLineEdit will lose focus.
+    // https://www.qtcentre.org/threads/41128-Need-to-implement-in-place-line-edit-unable-to-get-lose-focus-of-QLineEdit
+    setFocusPolicy(Qt::StrongFocus);
 
     scene = new QGraphicsScene(main_widget->ai_visualization_graphics_view);
     glWidget = new QOpenGLWidget(this);
@@ -44,13 +51,23 @@ MainWidget::MainWidget(QWidget *parent)
 
     setupStatusTable(main_widget->robot_status_table_widget);
     setupAIControls();
-    QVBoxLayout* param_layout = new QVBoxLayout(main_widget->params_tab);
+//    QHBoxLayout* param_layout = new QHBoxLayout(main_widget->params_tab);
+    auto param_layout = main_widget->params_tab_vertical_layout;
     QWidget* boolparam = createBooleanParameter(std::make_shared<Parameter<bool>>(Util::DynamicParameters::AI::run_ai));
     boolparam->setParent(main_widget->params_tab);
     param_layout->addWidget(boolparam);
-//    param_layout->addWidget(new QPushButton("Foobar", main_widget->params_tab));
-//    param_layout->addWidget(new QPushButton("baz", main_widget->params_tab));
-    main_widget->params_tab->setLayout(param_layout);
+    QWidget* intparam = createIntegerParameter(std::make_shared<Parameter<int>>(Util::DynamicParameters::AI::refbox::friendly_goalie_id));
+    intparam->setParent(main_widget->params_tab);
+    param_layout->addWidget(intparam);
+    QWidget* doubleparam = createDoubleParameter(std::make_shared<Parameter<double>>(Util::DynamicParameters::AI::refbox::min_valid_x));
+    doubleparam->setParent(main_widget->params_tab);
+    param_layout->addWidget(doubleparam);
+    QWidget* stringparam = createStringParameter(std::make_shared<Parameter<std::string>>(Util::DynamicParameters::AI::current_ai_play));
+    stringparam->setParent(main_widget->params_tab);
+    param_layout->addWidget(stringparam);
+
+    param_layout->addSpacerItem(new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    main_widget->params_tab->show();
 }
 
 void MainWidget::setupAIControls() {
@@ -120,7 +137,7 @@ MainWidget::~MainWidget()
 
 void MainWidget::drawAI()
 {
-    std::cout << "Run AI: " << Util::DynamicParameters::AI::run_ai.value() << std::endl;
+//    std::cout << "Run AI: " << Util::DynamicParameters::AI::run_ai.value() << std::endl;
     scene->clear();
 
     World world = Test::TestUtil::createBlankTestingWorld();
@@ -249,21 +266,22 @@ QWidget* MainWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> para
 
     QLabel* label = new QLabel(widget);
     label->setText(QString::fromStdString(parameter->name()));
-    // TODO: Try QSpinner or something?
     QSpinBox* spinbox = new QSpinBox(widget);
-    // TODO: Get range from Parameter
+    // TODO: Get range from parameter
     spinbox->setRange(0, 100);
     spinbox->setValue(parameter->value());
 
     layout->addWidget(label);
     layout->addWidget(spinbox);
 
-    auto on_spinbox_value_changed = [parameter, spinbox](int new_value) {
+    auto on_spinbox_value_changed = [parameter, spinbox]() {
         // TODO: Change to LOG statement
         std::cout << "Value for integer param " << parameter->name() << " changed to " << spinbox->value() << std::endl;
         parameter->setValue(spinbox->value());
     };
-    connect(spinbox, &QSpinBox::valueChanged, on_spinbox_value_changed);
+    // QSpinBox has 2 "valueChanged" signals that each provide different info (string vs int), so we
+    // need to static_cast to specify the integer version
+    connect(spinbox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), on_spinbox_value_changed);
 
     widget->setLayout(layout);
 
@@ -271,25 +289,57 @@ QWidget* MainWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> para
 }
 
 QWidget* MainWidget::createDoubleParameter(std::shared_ptr<Parameter<double>> parameter) {
-//    QWidget* widget = new QWidget();
-//    QHBoxLayout* layout = new QHBoxLayout(widget);
-//
-//    QLabel* label = new QLabel(widget);
-//    label->setText(QString::fromStdString(parameter->name()));
-//    QCheckBox* checkbox = new QCheckBox(widget);
-//    checkbox->setChecked(parameter->value());
-//
-//    layout->addWidget(label);
-//    layout->addWidget(checkbox);
-//
-//    auto on_checkbox_value_changed = [parameter, checkbox]() {
-//        // TODO: Change to LOG statement
-//        std::cout << "Value for boolean param " << parameter->name() << " changed to " << checkbox->isChecked() << std::endl;
-//        parameter->setValue(checkbox->isChecked());
-//    };
-//    connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
-//
-//    widget->setLayout(layout);
-//
-//    return widget;
+    QWidget* widget = new QWidget();
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(QString::fromStdString(parameter->name()));
+    QDoubleSpinBox* spinbox = new QDoubleSpinBox(widget);
+    // TODO: Get range from parameter
+    spinbox->setRange(0, 100);
+    spinbox->setValue(parameter->value());
+    spinbox->setSingleStep(0.05);
+
+    layout->addWidget(label);
+    layout->addWidget(spinbox);
+
+    auto on_spinbox_value_changed = [parameter, spinbox]() {
+        // TODO: Change to LOG statement
+        std::cout << "Value for double param " << parameter->name() << " changed to " << spinbox->value() << std::endl;
+        parameter->setValue(spinbox->value());
+    };
+    // QDoubleSpinBox has 2 "valueChanged" signals that each provide different info (string vs int), so we
+    // need to static_cast to specify the integer version
+    connect(spinbox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), on_spinbox_value_changed);
+
+    widget->setLayout(layout);
+
+    return widget;
+}
+
+QWidget* MainWidget::createStringParameter(std::shared_ptr<Parameter<std::string>> parameter) {
+    QWidget* widget = new QWidget();
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+
+    QLabel* label = new QLabel(widget);
+    label->setText(QString::fromStdString(parameter->name()));
+    QLineEdit* line_edit = new QLineEdit(widget);
+    line_edit->setText(QString::fromStdString(parameter->value()));
+
+    layout->addWidget(label);
+    layout->addWidget(line_edit);
+
+    auto on_line_edit_text_changed = [parameter, line_edit]() {
+        // TODO: Change to LOG statement
+        std::cout << "Value for string param " << parameter->name() << " changed to " << line_edit->text().toStdString() << std::endl;
+        parameter->setValue(line_edit->text().toStdString());
+    };
+    // This event will only fire when "Enter" is pressed or the LineEdit loses focus, rather than everytime a character
+    // changes in the LineEdit.
+    // https://doc.qt.io/archives/qt-4.8/qlineedit.html#editingFinished
+    connect(line_edit, &QLineEdit::editingFinished, on_line_edit_text_changed);
+
+    widget->setLayout(layout);
+
+    return widget;
 }
