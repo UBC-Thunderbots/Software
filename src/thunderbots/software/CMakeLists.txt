@@ -428,6 +428,7 @@ file(GLOB FULL_SYSTEM_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/backend/*_backend.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/gui/*_wrapper.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/full_system_main.cpp
         )
 add_executable (full_system
@@ -442,6 +443,11 @@ target_link_libraries(full_system
         ${G3LOG}
         ${PROTOBUF_LIBRARIES}
         tbots_geom
+        ai_gui_lib
+#        Qt5::Widgets
+#        Qt5::Core
+#        Qt5::Gui
+#        Qt5::OpenGL
         tbots_world
         tbots_proto
         tbots_shared
@@ -498,21 +504,27 @@ file(GLOB_RECURSE GUI_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
         )
 include_directories(SYSTEM "${Qt5Widgets_INCLUDE_DIRS}")
-add_executable (ai_gui
+add_library(ai_gui_lib STATIC
         ${GUI_SRC}
         ${QT_FORMS}
         ${QT_RESOURCES}
         )
+#add_executable (ai_gui
+#        ${GUI_SRC}
+#        ${QT_FORMS}
+#        ${QT_RESOURCES}
+#        )
 # Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
 # This way the message headers are always generated before they are used in compilation here.
-add_dependencies(ai_gui ${catkin_EXPORTED_TARGETS})
-target_link_libraries(ai_gui
+#add_dependencies(ai_gui ${catkin_EXPORTED_TARGETS})
+target_link_libraries(ai_gui_lib
         ${catkin_LIBRARIES}
         ${G3LOG}
         Qt5::Widgets
         Qt5::Core
         Qt5::Gui
         Qt5::OpenGL
+        tbots_proto
         tbots_world
         tbots_geom
         tbots_test_util
@@ -523,6 +535,23 @@ target_link_libraries(ai_gui
         tbots_primitive
         tbots_parameter
         )
+#target_link_libraries(ai_gui
+#        ${catkin_LIBRARIES}
+#        ${G3LOG}
+#        Qt5::Widgets
+#        Qt5::Core
+#        Qt5::Gui
+#        Qt5::OpenGL
+#        tbots_world
+#        tbots_geom
+#        tbots_test_util
+#        tbots_action
+#        tbots_play
+#        tbots_tactic
+#        tbots_intent
+#        tbots_primitive
+#        tbots_parameter
+#        )
 
 
 

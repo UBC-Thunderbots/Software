@@ -119,27 +119,27 @@ MainWidget::~MainWidget()
     delete glWidget;
 }
 
-void MainWidget::drawAI()
+void MainWidget::drawAI(World world)
 {
 //    std::cout << "Run AI: " << Util::DynamicParameters::AI::run_ai.value() << std::endl;
     scene->clear();
 
-    World world = Test::TestUtil::createBlankTestingWorld();
-    world =
-        Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
-    world = Test::TestUtil::setBallVelocity(world, Vector(1, -1.5),
-                                            Timestamp::fromSeconds(0));
-    world = Test::TestUtil::setFriendlyRobotPositions(
-        world, {Point(-4, 1), Point(0, -3), Point(-2, -0.5)}, Timestamp::fromSeconds(0));
-    world = Test::TestUtil::setEnemyRobotPositions(
-        world, {Point(4, 3), Point(0.5, -1.5), Point(2, 0)}, Timestamp::fromSeconds(0));
-    Robot r1(17, Point(2, -1), Vector(0, 0), Angle::ofDegrees(25),
-             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot r2(18, Point(2, -2), Vector(1, -1), Angle::ofDegrees(160),
-             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    Robot r3(19, Point(2, -3), Vector(-1, 1), Angle::ofDegrees(200),
-             AngularVelocity::zero(), Timestamp::fromSeconds(0));
-    world.mutableEnemyTeam().updateRobots({r1, r2, r3});
+//    World world = Test::TestUtil::createBlankTestingWorld();
+//    world =
+//        Test::TestUtil::setBallPosition(world, Point(-1, 1), Timestamp::fromSeconds(0));
+//    world = Test::TestUtil::setBallVelocity(world, Vector(1, -1.5),
+//                                            Timestamp::fromSeconds(0));
+//    world = Test::TestUtil::setFriendlyRobotPositions(
+//        world, {Point(-4, 1), Point(0, -3), Point(-2, -0.5)}, Timestamp::fromSeconds(0));
+//    world = Test::TestUtil::setEnemyRobotPositions(
+//        world, {Point(4, 3), Point(0.5, -1.5), Point(2, 0)}, Timestamp::fromSeconds(0));
+//    Robot r1(17, Point(2, -1), Vector(0, 0), Angle::ofDegrees(25),
+//             AngularVelocity::zero(), Timestamp::fromSeconds(0));
+//    Robot r2(18, Point(2, -2), Vector(1, -1), Angle::ofDegrees(160),
+//             AngularVelocity::zero(), Timestamp::fromSeconds(0));
+//    Robot r3(19, Point(2, -3), Vector(-1, 1), Angle::ofDegrees(200),
+//             AngularVelocity::zero(), Timestamp::fromSeconds(0));
+//    world.mutableEnemyTeam().updateRobots({r1, r2, r3});
 
     drawWorld(scene, world);
     if(first_draw_call) {

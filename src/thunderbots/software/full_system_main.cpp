@@ -10,6 +10,7 @@
 #include "backend/backend_factory.h"
 #include "backend/grsim_backend.h"
 #include "backend/radio_backend.h"
+#include "gui/visualizer_wrapper.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 #include "util/constants.h"
 #include "util/logger/init.h"
@@ -23,6 +24,7 @@ namespace
 {
     std::shared_ptr<AIWrapper> ai;
     std::shared_ptr<Backend> backend;
+    std::shared_ptr<VisualizerWrapper> visualizer;
 
     std::shared_ptr<ros::NodeHandle> node_handle;
 }  // namespace
@@ -113,6 +115,7 @@ std::shared_ptr<ros::NodeHandle> initRos(int argc, char **argv)
 void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
+    backend->Subject<World>::registerObserver(visualizer);
     ai->registerObserver(backend);
 }
 
@@ -124,6 +127,7 @@ int main(int argc, char **argv)
     Util::CanvasMessenger::getInstance()->initializePublisher(*node_handle);
 
     ai = std::make_shared<AIWrapper>(*node_handle);
+    visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
 
     if (parseCommandLineArgs(argc, argv))
     {

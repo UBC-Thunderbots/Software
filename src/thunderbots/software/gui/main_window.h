@@ -4,6 +4,7 @@
 #include <QTimer>
 
 #include "software/gui/main_widget.h"
+#include "ai/world/world.h"
 
 /**
  * This is the main window / application object for the thunderbots visualizer
@@ -16,6 +17,7 @@ class ThunderbotsVisualizer : public QMainWindow
    public:
     explicit ThunderbotsVisualizer();
     ~ThunderbotsVisualizer();
+    void drawAI(World world);
 
    private:
     MainWidget* main_widget;

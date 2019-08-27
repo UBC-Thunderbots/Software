@@ -8,6 +8,7 @@
 
 #include "gui/zoomable_qgraphics_view.h"
 #include "util/parameter/parameter.h"
+#include "ai/world/world.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui
@@ -28,7 +29,7 @@ class MainWidget : public QWidget
     ~MainWidget();
 
    public slots:
-    void drawAI();
+    void drawAI(World world);
     void updateRobotStatusMessages();
 
    private:
