@@ -51,23 +51,7 @@ MainWidget::MainWidget(QWidget *parent)
 
     setupStatusTable(main_widget->robot_status_table_widget);
     setupAIControls();
-//    QHBoxLayout* param_layout = new QHBoxLayout(main_widget->params_tab);
-    auto param_layout = main_widget->params_tab_vertical_layout;
-    QWidget* boolparam = createBooleanParameter(std::make_shared<Parameter<bool>>(Util::DynamicParameters::AI::run_ai));
-    boolparam->setParent(main_widget->params_tab);
-    param_layout->addWidget(boolparam);
-    QWidget* intparam = createIntegerParameter(std::make_shared<Parameter<int>>(Util::DynamicParameters::AI::refbox::friendly_goalie_id));
-    intparam->setParent(main_widget->params_tab);
-    param_layout->addWidget(intparam);
-    QWidget* doubleparam = createDoubleParameter(std::make_shared<Parameter<double>>(Util::DynamicParameters::AI::refbox::min_valid_x));
-    doubleparam->setParent(main_widget->params_tab);
-    param_layout->addWidget(doubleparam);
-    QWidget* stringparam = createStringParameter(std::make_shared<Parameter<std::string>>(Util::DynamicParameters::AI::current_ai_play));
-    stringparam->setParent(main_widget->params_tab);
-    param_layout->addWidget(stringparam);
-
-    param_layout->addSpacerItem(new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    main_widget->params_tab->show();
+    setupParametersTab();
 }
 
 void MainWidget::setupAIControls() {
@@ -342,4 +326,41 @@ QWidget* MainWidget::createStringParameter(std::shared_ptr<Parameter<std::string
     widget->setLayout(layout);
 
     return widget;
+}
+
+void MainWidget::setupParametersTab() {
+//    auto tab = main_widget->params_tab;
+//    auto tab_layout = main_widget->params_tab_vertical_layout;
+//
+//    auto s = Parameter<bool>::getRegistry().begin();
+//    auto e = Parameter<bool>::getRegistry().end();
+////   auto bool_param_map = std::move(Parameter<bool>::getRegistry());
+//   for(auto iter = s; iter != e; iter++) {
+//       auto bool_param = std::move(iter->second);
+//       // TODO: THIS IS A HACK CONVERTING A UNIQUE TO SHARED PTR
+////       std::shared_ptr<Parameter<bool>> p = std::shared_ptr<Parameter<bool>>(bool_param.get());
+////       QWidget* boolparamwidget = createBooleanParameter(p);
+////       boolparamwidget->setParent(tab);
+////       tab_layout->addWidget(boolparamwidget);
+//   }
+
+
+   //    QHBoxLayout* param_layout = new QHBoxLayout(main_widget->params_tab);
+//    auto param_layout = main_widget->params_tab_vertical_layout;
+//    QWidget* boolparam = createBooleanParameter(std::make_shared<Parameter<bool>>(Util::DynamicParameters::AI::run_ai));
+//    boolparam->setParent(main_widget->params_tab);
+//    param_layout->addWidget(boolparam);
+//    QWidget* intparam = createIntegerParameter(std::make_shared<Parameter<int>>(Util::DynamicParameters::AI::refbox::friendly_goalie_id));
+//    intparam->setParent(main_widget->params_tab);
+//    param_layout->addWidget(intparam);
+//    QWidget* doubleparam = createDoubleParameter(std::make_shared<Parameter<double>>(Util::DynamicParameters::AI::refbox::min_valid_x));
+//    doubleparam->setParent(main_widget->params_tab);
+//    param_layout->addWidget(doubleparam);
+//    QWidget* stringparam = createStringParameter(std::make_shared<Parameter<std::string>>(Util::DynamicParameters::AI::current_ai_play));
+//    stringparam->setParent(main_widget->params_tab);
+//    param_layout->addWidget(stringparam);
+
+//    tab_layout->addSpacerItem(new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::Expanding));
+//    main_widget->params_tab->show();
+
 }
