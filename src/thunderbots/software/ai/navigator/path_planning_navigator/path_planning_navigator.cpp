@@ -52,7 +52,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     Point dest = move_intent.getDestination();
 
     std::vector<Obstacle> obstacles =
-        getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
+        createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
     auto path_planner =
         std::make_unique<ThetaStarPathPlanner>(this->world.field(), obstacles);
@@ -64,15 +64,17 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
         if ((*path_points).size() > 2)
         {
             current_destination = (*path_points)[1];
-            auto move           = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(),
+            double segment_final_vel =
+                getCloseToEnemyObstacleFactor((*path_points)[1]) *
                 calculateTransitionSpeedBetweenSegments(
                     (*path_points)[0], (*path_points)[1], (*path_points)[2],
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value()) *
-                    getCloseToEnemyObstacleFactor((*path_points)[1]),
+                            .value());
+
+            auto move = std::make_unique<MovePrimitive>(
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(), segment_final_vel,
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
@@ -150,7 +152,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                         .value() *
                     ROBOT_MAX_RADIUS_METERS +
-                0.3);
+                0.3);  // 0.3 is by definition what inflated means
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
             return Obstacle::createCircleObstacle(
@@ -159,7 +161,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
                     .value());
         case AvoidArea::HALF_METER_AROUND_BALL:
             return Obstacle::createCircleObstacle(
-                world.ball().position(), 0.5,
+                world.ball().position(), 0.5,  // 0.5 represents half a metre radius
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value());
         case AvoidArea::BALL:
@@ -226,7 +228,7 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
     return assigned_primitives;
 }
 
-std::vector<Obstacle> PathPlanningNavigator::getCurrentObstacles(
+std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
     const std::vector<AvoidArea> &avoid_areas, int robot_id)
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
@@ -320,6 +322,8 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
         }
     }
 
+    // linear mapping of 0 to 1 onto 0 to 2 and return 1 when closest_dist is greater than
+    // 2
     if (closest_dist > 2)
     {
         return 1;

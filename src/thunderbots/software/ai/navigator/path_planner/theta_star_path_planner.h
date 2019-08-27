@@ -194,13 +194,15 @@ class ThetaStarPathPlanner : public PathPlanner
     CellCoordinate convertPointToCell(Point p);
 
     // if close to destination then return no path
-    static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;
+    static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
 
     // increase in threshold to reduce oscillation
-    static constexpr int BLOCKED_DESINATION_OSCILLATION_MITIGATION = 2;
+    static constexpr int BLOCKED_DESINATION_OSCILLATION_MITIGATION =
+        2;  // multiples of CLOSE_TO_DEST_THRESHOLD to ignore to control oscillation
 
     // resolution for searching for unblocked point around a blocked destination
-    static constexpr double BLOCKED_DESTINATION_SEARCH_RESOLUTION = 50.0;
+    static constexpr double BLOCKED_DESTINATION_SEARCH_RESOLUTION =
+        50.0;  // number of fractions to divide 1m
 
     // only change this value
     static constexpr int GRID_DIVISION_FACTOR = 1;  // the n in the O(n^2) algorithm :p

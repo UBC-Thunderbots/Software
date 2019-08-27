@@ -59,6 +59,9 @@ Obstacle Obstacle::createVelocityObstacleWithScalingParams(Point start, Point en
     double radius_cushion =
         getRadiusCushionForHexagon(ROBOT_MAX_RADIUS_METERS * width_scaling);
 
+    // velocity_cushion_vector should be at least as long as a robot width
+    // with an additional factor that is half of the average of intial speed and
+    // ROBOT_MAX_SPEED_METERS_PER_SECOND times the length_scaling
     Vector velocity_cushion_vector =
         (end - start)
             .norm((initial_speed + ROBOT_MAX_SPEED_METERS_PER_SECOND) / 4 *

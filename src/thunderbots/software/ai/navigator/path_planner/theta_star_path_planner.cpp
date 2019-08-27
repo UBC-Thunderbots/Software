@@ -467,10 +467,11 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 
 bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
 {
-    if (p.x() > -(field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
-        (p.x() < field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
-        p.y() > -(field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS) &&
-        (p.y() < field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS))
+    double x_limit = field_.totalLength() / 2.0 + ROBOT_MAX_RADIUS_METERS;
+    double y_limit = field_.totalWidth() / 2.0 + ROBOT_MAX_RADIUS_METERS;
+
+    if ((p.x() > -x_limit) && (p.x() < x_limit) && (p.y() > -y_limit) &&
+        (p.y() < y_limit))
     {
         for (auto &obstacle : obstacles_)
         {

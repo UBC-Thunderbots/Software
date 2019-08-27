@@ -129,9 +129,27 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
 
     std::vector<Obstacle> velocity_obstacles;
 
-    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas,
-                                              int robot_id);
+    /**
+     * Creates a list of obstacles to avoid based on avoid areas,
+     * enemy team, and friendly team, while excluding the robot attached to robot_id
+     *
+     * @param avoid_areas specifies areas to create obstacles for
+     * @param robot_id current robot that is not an obstacle
+     *
+     * @returns list of obstacles
+     */
+    std::vector<Obstacle> createCurrentObstacles(
+        const std::vector<AvoidArea> &avoid_areas, int robot_id);
 
-
+    /**
+     * Calculates a factor for how close p is to an enemy obstacle.
+     * 0 = touching or inside
+     * 1 = greater than/equal to 2m away
+     * scaled linearly between these values
+     *
+     * @param p point to evaluate
+     *
+     * @return A factor from 0 to 1 for how close p is to an enemy obstacle
+     */
     double getCloseToEnemyObstacleFactor(Point &p);
 };

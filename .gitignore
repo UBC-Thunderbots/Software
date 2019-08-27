@@ -15,7 +15,6 @@
 /devel
 /install
 /logs
-*.bag
 
 # rosbag
 *.bag
