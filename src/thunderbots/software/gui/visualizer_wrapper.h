@@ -12,12 +12,11 @@ public:
     ~VisualizerWrapper();
 
 private:
-    void createAndRunVisualizer();
+    void createAndRunVisualizer(int argc, char**argv, std::shared_ptr<ThunderbotsVisualizer>& visualizer_ref);
     void onValueReceived(World world) override;
     void drawAI();
     World most_recent_world;
     std::thread run_visualizer_thread;
-    QApplication application;
-    ThunderbotsVisualizer visualizer;
+    std::shared_ptr<ThunderbotsVisualizer> visualizer;
 };
 

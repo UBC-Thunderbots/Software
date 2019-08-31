@@ -17,5 +17,6 @@ ThunderbotsVisualizer::~ThunderbotsVisualizer()
 }
 
 void ThunderbotsVisualizer::drawAI(World world) {
+    std::cout << "got draw call in viz" << std::endl;
     main_widget->drawAI(world);
 }

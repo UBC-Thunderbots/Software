@@ -114,7 +114,7 @@ std::shared_ptr<ros::NodeHandle> initRos(int argc, char **argv)
  */
 void connectObservers()
 {
-    backend->Subject<World>::registerObserver(ai);
+//    backend->Subject<World>::registerObserver(ai);
     backend->Subject<World>::registerObserver(visualizer);
     ai->registerObserver(backend);
 }

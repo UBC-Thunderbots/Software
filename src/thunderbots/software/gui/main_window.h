@@ -17,6 +17,7 @@ class ThunderbotsVisualizer : public QMainWindow
    public:
     explicit ThunderbotsVisualizer();
     ~ThunderbotsVisualizer();
+   public slots:
     void drawAI(World world);
 
    private:

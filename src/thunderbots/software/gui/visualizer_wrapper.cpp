@@ -2,12 +2,9 @@
 #include <QApplication>
 #include "software/gui/main_window.h"
 
-VisualizerWrapper::VisualizerWrapper(int argc, char **argv) : ThreadedObserver<World>(), application(argc, argv) {
-//    QApplication app(argc, argv);
-//    application = std::make_shared<QApplication>(app);
-//    application = std::make_shared<QApplication>(argc, argv);
-    visualizer.show();
-    run_visualizer_thread = std::thread(&VisualizerWrapper::createAndRunVisualizer, this);
+VisualizerWrapper::VisualizerWrapper(int argc, char **argv) : ThreadedObserver<World>() {
+    // TODO: Is there a way to make sure passing by reference is safe?
+    run_visualizer_thread = std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv, std::ref(visualizer));
 }
 
 VisualizerWrapper::~VisualizerWrapper() {
@@ -15,17 +12,22 @@ VisualizerWrapper::~VisualizerWrapper() {
 }
 
 void VisualizerWrapper::onValueReceived(World world) {
-    std::cout << "Visualizer received world" << std::endl;
     most_recent_world = world;
     drawAI();
 }
 
 void VisualizerWrapper::drawAI() {
-    visualizer.drawAI(most_recent_world);
+    if(visualizer) {
+        std::cout << "invoking method" << std::endl;
+        QMetaObject::invokeMethod(visualizer.get(), "drawAI", Qt::ConnectionType::BlockingQueuedConnection, Q_ARG(World, most_recent_world));
+    }
 }
 
-void VisualizerWrapper::createAndRunVisualizer() {
+void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv, std::shared_ptr<ThunderbotsVisualizer>& visualizer_ref) {
     // TODO: Figure out how to handle signals. How does closing the visualizer shut down
     // AI, and how does shutting down AI close the visualizer
+    QApplication application(argc, argv);
+    visualizer_ref = std::make_shared<ThunderbotsVisualizer>();
+    visualizer_ref->show();
     application.exec();
 }
