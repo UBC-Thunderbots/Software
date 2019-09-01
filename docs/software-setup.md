@@ -1,7 +1,38 @@
+# Software Setup
+
+## Table Of Contents
+<!-- 
+    NOTE: when creating or re-creating a table of contents like this, you can
+    save a LOT of time by using this tool: 
+    https://github.com/ekalinin/github-markdown-toc
+-->
+* [Table Of Contents](#table-of-contents)
+* [Introduction](#introduction)
+* [Installation and Setup](#installation-and-setup)
+* [Operating Systems](#operating-systems)
+* [Getting the Code](#getting-the-code)
+* [Running the setup scripts](#running-the-setup-scripts)
+   * [Installing Software Dependencies](#installing-software-dependencies)
+   * [Installing Firmware Dependencies](#installing-firmware-dependencies)
+   * [Setting Up USB Permissions](#setting-up-usb-permissions)
+   * [Installing grSim](#installing-grsim)
+   * [Installing CLion](#installing-clion)
+      * [Getting your Student License](#getting-your-student-license)
+      * [Installing CLion](#installing-clion-1)
+* [Building the Code](#building-the-code)
+   * [With CLion](#with-clion)
+   * [From the command-line](#from-the-command-line)
+* [Running the Code](#running-the-code)
+   * [With CLion](#with-clion-1)
+   * [From the Command Line](#from-the-command-line-1)
+      * [Running Nodes Individually](#running-nodes-individually)
+      * [Running Nodes Together (Running a group of Nodes)](#running-nodes-together-running-a-group-of-nodes)
+* [Debugging](#debugging)
+
 ## Introduction
 These instructions assume that you have the following accounts setup:
-- **github**
-- **slack**
+- Github
+- Slack
 
 These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
 
@@ -29,7 +60,7 @@ We currently only support Linux, specifically Ubuntu 18.04 LTS. You are welcome 
       1. Open a terminal and navigate to the folder you cloned (your fork): `cd path/to/the/repository/Software`
       2. Navigate to our main Software repository in your browser and copy the url from the "Clone or Download" button. Copy the HTTPS url if you originally cloned with HTTPS, and use the SSH url if you previously cloned with SSH
       3. From your terminal, add the new remote by running `git remote add upstream <the url>` (without the angle brackets)
-         1. Eg. `git remote add upstream` [`https://github.com/UBC-Thunderbots/Software.git`](https://github.com/UBC-Thunderbots/Software.git)
+         1. Eg. `git remote add upstream https://github.com/UBC-Thunderbots/Software.git`
       4. That's it. If you want to double check your remotes are set up correctly, run `git remote -v` from your terminal (at the base of the repository folder again). You should see two entries: `origin` with the url for your fork of the repository, and `upstream` with the url for the main repository
 
 ## Running the setup scripts
@@ -43,7 +74,7 @@ We have several setup scripts to help you easily install the necessary dependenc
   * You will be prompted for your admin password
   * This script will install everything necessary in order to build and run our main `AI` software 
 
-### Installing FIrmware Dependencies
+### Installing Firmware Dependencies
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./setup_firmware.sh`
