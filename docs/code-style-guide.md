@@ -1,4 +1,4 @@
-# Coding Styles
+# Code Style Guide
 
 ## Coding Style and Conventions
 
