@@ -1,7 +1,3 @@
----
-description: A compilation of commonly asked questions and miscellaneous knowledge
----
-
 # FAQ
 
 | Question | Solution |
