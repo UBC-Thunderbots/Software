@@ -22,7 +22,6 @@ GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
       Tactic(true)
 {
     addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
-    addWhitelistedAvoidArea(AvoidArea::BALL);
     addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
@@ -127,9 +126,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // Case 2: The ball is moving at a slow speed and is inside the defense area
         //      Goalie moves to the ball and chips it out of the defense area
         //
-        // 		NOTE: If the ball is in the dont_chip_rectangle, then we prefer timeout,
-        // over
-        //			scoring on ourselfs
+        // NOTE: If the ball is in the dont_chip_rectangle, then we prefer timeout,
+        // over scoring on ourselves
         //
         // Case 3: Any other case
         //      Goalie blocks the cone to the net. (Cone being from the ball to either
@@ -175,8 +173,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         auto defense_area_deflation =
             Util::DynamicParameters::GoalieTactic::defense_area_deflation.value();
 
-        // rectangle we do not chip the ball if its in as it would be unsafe to do so
-        // as we risk bumping the ball into our own net
+        // if the ball is in the don't chip rectangle we do not chip the ball
+        // as we risk bumping the ball into our own net trying to move behind
+        // the ball
         auto dont_chip_rectangle = Rectangle(
             field.friendlyGoalpostNeg(),
             field.friendlyGoalpostPos() + Point(2 * ROBOT_MAX_RADIUS_METERS, 0));
