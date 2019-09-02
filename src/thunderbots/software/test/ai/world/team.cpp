@@ -232,8 +232,6 @@ TEST_F(TeamTest, remove_expired_robots_in_past_so_no_robots_expire)
 
     team.updateRobots({robot_0, robot_1});
 
-    EXPECT_THROW(team.removeExpiredRobots(one_second_past), std::invalid_argument);
-
     EXPECT_EQ(2, team.numRobots());
     EXPECT_EQ(robot_0, team.getRobotById(0));
     EXPECT_EQ(robot_1, team.getRobotById(1));

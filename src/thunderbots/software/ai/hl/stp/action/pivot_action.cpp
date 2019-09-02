@@ -5,50 +5,57 @@
 #include "geom/angle.h"
 #include "geom/util.h"
 #include "shared/constants.h"
+#include "util/logger/init.h"
+#include "util/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action() {}
 
 std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& robot,
                                                                  Point pivot_point,
                                                                  Angle final_angle,
-                                                                 double pivot_radius)
+                                                                 Angle pivot_speed,
+                                                                 bool enable_dribbler)
 {
     // update the parameters stored by this action
-    this->robot        = robot;
-    this->pivot_point  = pivot_point;
-    this->final_angle  = final_angle;
-    this->pivot_radius = pivot_radius;
+    this->robot           = robot;
+    this->pivot_point     = pivot_point;
+    this->final_angle     = final_angle;
+    this->pivot_speed     = pivot_speed;
+    this->enable_dribbler = enable_dribbler;
 
     return getNextIntent();
 }
 
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
+    // Compute final position, to know when the robot is done
+    const double pivot_radius = BALL_MAX_RADIUS_METERS;
+
     do
     {
-        // Compute collinear point (point_of_entry), radius with away,
-        // between the robot and the pivot point. To move there before
-        // attempting to pivot
-        //
-        //                             |---radius---|
-        // (__) ---------------------- o -----------X
-        // robot                 point_of_entry
-
-        Vector unit_pivot_point_to_robot_pos =
-            (robot->position() - this->pivot_point).norm();
-        Point point_of_entry =
-            this->pivot_point + this->pivot_radius * unit_pivot_point_to_robot_pos;
-
-        // If we're not in position to pivot, move into position
-        if ((robot->position() - point_of_entry).len() > ROBOT_MAX_RADIUS_METERS)
+        // If we're not in position to pivot, move to grab the ball
+        if (!(robot->position()).isClose(pivot_point, 1.15))
         {
-            yield(std::make_unique<MoveIntent>(robot->id(), point_of_entry, Angle::zero(),
-                                               0.0, 0));
+            yield(std::make_unique<MoveIntent>(
+                robot->id(), pivot_point, (pivot_point - robot->position()).orientation(),
+                0.0, 0, enable_dribbler));
+            LOG(DEBUG) << "obtaining ball, moving!";
         }
         else
         {
+            // if the robot is close enough to the final position, call it a day
+            Angle threshold_angle = Angle::ofDegrees(
+                Util::DynamicParameters::PivotAction::finish_angle_threshold.value() / 2);
+
+            if (robot->orientation() >= (final_angle - threshold_angle) &&
+                robot->orientation() < (final_angle + threshold_angle))
+            {
+                LOG(DEBUG) << "Pivot angle reached threshold";
+                break;
+            }
+
             yield(std::make_unique<PivotIntent>(robot->id(), pivot_point, final_angle,
-                                                pivot_radius, 0));
+                                                pivot_speed, enable_dribbler, 0));
         }
     } while (true);
 }

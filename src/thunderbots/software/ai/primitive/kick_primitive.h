@@ -27,13 +27,6 @@ class KickPrimitive : public Primitive
                            const Angle &kick_direction,
                            double kick_speed_meters_per_second);
 
-    /**
-     * Creates a new Kick Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Kick Primitive
-     */
-    explicit KickPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -57,21 +50,6 @@ class KickPrimitive : public Primitive
      * @return The robot's kicking speed in m/s
      */
     double getKickSpeed() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form: {kick_origin.x(), kick_origin.y(),
-     *                      kick_direction.toRadians(), kick_speed_meters_per_second};
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor &visitor) const override;
 

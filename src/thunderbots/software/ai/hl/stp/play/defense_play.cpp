@@ -37,12 +37,18 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     // TODO: Robot to try steal the ball from most threatening enemy
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true),
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true),
-        std::make_shared<ShadowEnemyTactic>(world.field(), world.friendlyTeam(),
-                                            world.enemyTeam(), true, true)};
+        std::make_shared<ShadowEnemyTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
+            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            true),
+        std::make_shared<ShadowEnemyTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
+            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            true),
+        std::make_shared<ShadowEnemyTactic>(
+            world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
+            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            true)};
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
@@ -69,6 +75,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
         Team friendly_team_for_goalie = world.friendlyTeam();
+
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
             if (crease_defender_tactic->getAssignedRobot())
@@ -99,7 +106,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             {
                 shadow_enemy_tactics.at(i)->updateParams(
                     enemy_threats.at(i), world.field(), world.friendlyTeam(),
-                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass);
+                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass,
+                    world.ball());
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

@@ -197,6 +197,13 @@ Evaluation:
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
+DefenseShadowEnemyTactic:
+  ball_steal_speed:
+    default: 0.3
+    max: 1.0
+    min: 0.0
+    type: "double"
+    description: Try to steal the passee's ball below this ball speed
 DefenderCreaseTactic:
   max_defender_seperation_deg:
     min: 0.0
@@ -226,6 +233,30 @@ DefenderCreaseTactic:
     description: >-
       The distance between the ball and the defenders at which they will have their
       minimum seperation.
+GoalieTactic:
+  block_cone_buffer:
+      min: 0.0
+      max: 2.0
+      default: 0.0
+      type: "double"
+      description: >-
+        The block cone buffer is the extra distance to add on either side of the robot
+        to allow to it be further back in the block cone
+PivotAction:
+  arb_scaling:
+      min: 0.0
+      max: 10.0
+      type: "double"
+      default: 1.0
+      description: How quickly to pivot
+  finish_angle_threshold:
+      min: 0.0
+      max: 360.0
+      type: "double"
+      default: 5.0
+      description: >-
+          How much tolerance in degrees we allow for the final angle before annoucing
+          pivot has finished
 RobotCapabilities:
   broken_dribblers:
     default: ""
@@ -239,3 +270,4 @@ RobotCapabilities:
     default: ""
     type: "string"
     description: Comma-separated list of numbers of robots with broken kickers
+

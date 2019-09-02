@@ -13,16 +13,6 @@ CatchPrimitive::CatchPrimitive(unsigned int robot_id, double velocity,
 {
 }
 
-CatchPrimitive::CatchPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id       = primitive_msg.robot_id;
-    velocity       = primitive_msg.parameters.at(0);
-    dribbler_speed = primitive_msg.parameters.at(1);
-    margin         = primitive_msg.parameters.at(2);
-}
-
 std::string CatchPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -46,17 +36,6 @@ double CatchPrimitive::getDribblerSpeed() const
 double CatchPrimitive::getMargin() const
 {
     return margin;
-}
-
-std::vector<double> CatchPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {velocity, dribbler_speed, margin};
-    return parameters;
-}
-
-std::vector<bool> CatchPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
 }
 
 void CatchPrimitive::accept(PrimitiveVisitor &visitor) const

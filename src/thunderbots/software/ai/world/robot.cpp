@@ -2,6 +2,9 @@
 
 #include <shared/constants.h>
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 Robot::Robot(unsigned int id, const Point &position, const Vector &velocity,
              const Angle &orientation, const AngularVelocity &angular_velocity,
              const Timestamp &timestamp, unsigned int history_duration,

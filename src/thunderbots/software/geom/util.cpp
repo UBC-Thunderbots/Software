@@ -70,6 +70,27 @@ double dist(const Segment &first, const Vector &second)
     return dist(second, first);
 }
 
+double dist(const Point &first, const Polygon &second)
+{
+    if (second.containsPoint(first))
+    {
+        return 0;
+    }
+
+    double min_dist = DBL_MAX;
+
+    // Calculate the distance from the point to each edge
+    for (auto &segment : second.getSegments())
+    {
+        double current_dist = dist(first, segment);
+        if (current_dist < min_dist)
+        {
+            min_dist = current_dist;
+        }
+    }
+    return min_dist;
+}
+
 double dist(const Point &first, const Rectangle &second)
 {
     if (second.containsPoint(first))
@@ -806,7 +827,7 @@ std::optional<Point> lineIntersection(const Vector &a, const Vector &b, const Ve
 }
 
 std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
-    Ray &ray, Segment &segment)
+    const Ray &ray, const Segment &segment)
 {
     Point ray2 = ray.getRayStart() + ray.getDirection();
 
@@ -1398,4 +1419,17 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
               [](auto c1, auto c2) { return c1.getRadius() > c2.getRadius(); });
 
     return empty_circles;
+}
+
+Polygon circleToPolygon(const Circle &circle, size_t num_points)
+{
+    std::vector<Point> points;
+    for (auto i = 0; i < num_points; i++)
+    {
+        Point p =
+            circle.getOrigin() + Point(circle.getRadius(), 0)
+                                     .rotate(Angle::ofDegrees((360.0 / num_points) * i));
+        points.emplace_back(p);
+    }
+    return Polygon(points);
 }

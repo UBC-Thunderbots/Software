@@ -9,7 +9,8 @@
 
 TEST(PivotIntentTest, intent_name_test)
 {
-    PivotIntent pivot_intent = PivotIntent(0, Point(), Angle::zero(), 0, 0);
+    PivotIntent pivot_intent =
+        PivotIntent(0, Point(), Angle::zero(), Angle::half(), true, 0);
 
     EXPECT_EQ("Pivot Intent", pivot_intent.getIntentName());
 }
@@ -18,16 +19,20 @@ TEST(PivotIntentTest, intent_name_test)
 // since Intents inherit from Primitives
 TEST(PivotIntentTest, test_equality_operator_intents_equal)
 {
-    PivotIntent pivot_intent       = PivotIntent(0, Point(), Angle::zero(), 0, 0);
-    PivotIntent pivot_intent_other = PivotIntent(0, Point(), Angle::zero(), 0, 0);
+    PivotIntent pivot_intent =
+        PivotIntent(0, Point(), Angle::zero(), Angle::half(), true, 0);
+    PivotIntent pivot_intent_other =
+        PivotIntent(0, Point(), Angle::zero(), Angle::half(), true, 0);
 
     EXPECT_EQ(pivot_intent, pivot_intent_other);
 }
 
 TEST(PivotIntentTest, test_inequality_operator_with_mismatched_priorities)
 {
-    PivotIntent pivot_intent       = PivotIntent(0, Point(), Angle::zero(), 0, 1);
-    PivotIntent pivot_intent_other = PivotIntent(0, Point(), Angle::zero(), 0, 3);
+    PivotIntent pivot_intent =
+        PivotIntent(0, Point(), Angle::zero(), Angle::half(), true, 1);
+    PivotIntent pivot_intent_other =
+        PivotIntent(0, Point(), Angle::zero(), Angle::half(), true, 3);
 
     EXPECT_NE(pivot_intent, pivot_intent_other);
 }

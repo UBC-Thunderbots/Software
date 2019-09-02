@@ -203,15 +203,15 @@ void CanvasMessenger::drawPoint(Layer layer, const Point& p, double radius, Colo
 void CanvasMessenger::drawWorld(const World& world)
 {
     // Draw the new layer
-    drawBall(world.ball());
-    publishAndClearLayer(Layer::BALL);
-
     drawField(world.field());
     publishAndClearLayer(Layer::STATIC_FEATURES);
 
     drawTeam(world.friendlyTeam(), FRIENDLY_TEAM_COLOR);
     drawTeam(world.enemyTeam(), ENEMY_TEAM_COLOR);
     publishAndClearLayer(Layer::ROBOTS);
+
+    drawBall(world.ball());
+    publishAndClearLayer(Layer::BALL);
 }
 
 void CanvasMessenger::drawBall(const Ball& ball)
@@ -264,7 +264,16 @@ void CanvasMessenger::drawRobotPath(std::vector<Point> path_points)
     {
         Point p1 = path_points[i];
         Point p2 = path_points[i + 1];
-        drawLine(Layer::ROBOTS, p1, p2, 0.05, FRIENDLY_TEAM_COLOR);
+        drawLine(Layer::NAVIGATOR, p1, p2, 0.05, FRIENDLY_TEAM_COLOR);
+    }
+}
+
+void CanvasMessenger::drawPolygonOutline(Layer layer, const Polygon& poly,
+                                         double line_thickness, const Color& color)
+{
+    for (const Segment& seg : poly.getSegments())
+    {
+        drawLine(layer, seg.getSegStart(), seg.getEnd(), line_thickness, color);
     }
 }
 

@@ -176,7 +176,6 @@ class World final
     void updateTimestamp(Timestamp timestamp);
 
    private:
-    // Private Variables
     Field field_;
     Ball ball_;
     Team friendly_team_;
@@ -185,4 +184,6 @@ class World final
     // All previous timestamps of when the field was updated, with the most recent
     // timestamp at the front of the queue,
     boost::circular_buffer<Timestamp> last_update_timestamps;
+    // A small buffer that stores previous refbox game state
+    boost::circular_buffer<RefboxGameState> refbox_game_state_history;
 };

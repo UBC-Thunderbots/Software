@@ -24,24 +24,6 @@ TEST(DribblePrimTest, get_robot_id_test)
     EXPECT_EQ(robot_id, dribble_prim.getRobotId());
 }
 
-TEST(DribblePrimTest, parameter_array_test)
-{
-    const Point destination     = Point(-1, 2);
-    const Angle final_angle     = Angle::ofRadians(3.15);
-    const unsigned int robot_id = 2U;
-    const double rpm            = 3.14;
-
-    DribblePrimitive dribble_prim =
-        DribblePrimitive(robot_id, destination, final_angle, rpm, false);
-
-    std::vector<double> param_array = dribble_prim.getParameters();
-
-    EXPECT_DOUBLE_EQ(destination.x(), param_array[0]);
-    EXPECT_DOUBLE_EQ(destination.y(), param_array[1]);
-    EXPECT_DOUBLE_EQ(final_angle.toRadians(), param_array[2]);
-    EXPECT_DOUBLE_EQ(rpm, param_array[3]);
-}
-
 TEST(DribblePrimTest, get_final_orientation_test)
 {
     const Angle final_angle = Angle::ofRadians(3.15);
@@ -69,18 +51,6 @@ TEST(DribblePrimTest, get_rpm_test)
     EXPECT_EQ(dribble_prim.getRpm(), rpm);
 }
 
-TEST(DribblePrimTest, get_extra_bit_array_test)
-{
-    const bool small_kick_allowed = true;
-
-    DribblePrimitive dribble_prim =
-        DribblePrimitive(0, Point(), Angle(), 0.0, small_kick_allowed);
-
-    std::vector<bool> extra_bit_array = dribble_prim.getExtraBits();
-
-    EXPECT_TRUE(extra_bit_array[0]);
-}
-
 TEST(DribblePrimTest, is_small_kick_allowed_test)
 {
     const bool small_kick_allowed = false;
@@ -89,29 +59,6 @@ TEST(DribblePrimTest, is_small_kick_allowed_test)
         DribblePrimitive(0, Point(), Angle(), 0.0, small_kick_allowed);
 
     EXPECT_FALSE(dribble_prim.isSmallKickAllowed());
-}
-
-TEST(DribblePrimTest, create_primitive_from_message_test)
-{
-    const Point destination       = Point(2, -3);
-    const Angle final_angle       = Angle::ofRadians(3.55);
-    const unsigned int robot_id   = 3U;
-    const double rpm              = 30.5;
-    const bool small_kick_allowed = true;
-
-    DribblePrimitive dribble_prim =
-        DribblePrimitive(robot_id, destination, final_angle, rpm, small_kick_allowed);
-
-    thunderbots_msgs::Primitive prim_message = dribble_prim.createMsg();
-
-    DribblePrimitive new_prim = DribblePrimitive(prim_message);
-
-    std::vector<double> parameters = new_prim.getParameters();
-
-    std::vector<bool> extraBits = new_prim.getExtraBits();
-
-    EXPECT_EQ(DribblePrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
-    EXPECT_EQ(new_prim, dribble_prim);
 }
 
 TEST(DribblePrimTest, test_equality_operator_primitives_equal)

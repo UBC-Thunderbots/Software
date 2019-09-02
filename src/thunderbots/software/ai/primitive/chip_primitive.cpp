@@ -13,19 +13,6 @@ ChipPrimitive::ChipPrimitive(unsigned int robot_id, const Point &chip_origin,
 {
 }
 
-ChipPrimitive::ChipPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id             = primitive_msg.robot_id;
-    double chip_origin_x = primitive_msg.parameters.at(0);
-    double chip_origin_y = primitive_msg.parameters.at(1);
-    chip_origin          = Point(chip_origin_x, chip_origin_y);
-    chip_direction       = Angle::ofRadians(primitive_msg.parameters.at(2));
-    chip_distance_meters = primitive_msg.parameters.at(3);
-}
-
-
 std::string ChipPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -49,19 +36,6 @@ Angle ChipPrimitive::getChipDirection() const
 double ChipPrimitive::getChipDistance() const
 {
     return chip_distance_meters;
-}
-
-std::vector<double> ChipPrimitive::getParameters() const
-{
-    std::vector<double> parameters = {chip_origin.x(), chip_origin.y(),
-                                      chip_direction.toRadians(), chip_distance_meters};
-
-    return parameters;
-}
-
-std::vector<bool> ChipPrimitive::getExtraBits() const
-{
-    return std::vector<bool>();
 }
 
 void ChipPrimitive::accept(PrimitiveVisitor &visitor) const

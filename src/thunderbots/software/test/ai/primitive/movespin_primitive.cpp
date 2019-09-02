@@ -25,24 +25,6 @@ TEST(MoveSpinPrimTest, get_robot_id_test)
     EXPECT_EQ(robot_id, movespin_prim.getRobotId());
 }
 
-TEST(MoveSpinPrimTest, parameter_array_test)
-{
-    const Point destination           = Point(1, -2);
-    const AngularVelocity angular_vel = AngularVelocity::ofRadians(2.5);
-    const unsigned int robot_id       = 1U;
-    const double final_speed          = 1.0;
-
-    MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(robot_id, destination, angular_vel, final_speed);
-
-    std::vector<double> param_array = movespin_prim.getParameters();
-
-    EXPECT_DOUBLE_EQ(destination.x(), param_array[0]);
-    EXPECT_DOUBLE_EQ(destination.y(), param_array[1]);
-    EXPECT_DOUBLE_EQ(angular_vel.toRadians(), param_array[2]);
-    EXPECT_DOUBLE_EQ(final_speed, param_array[3]);
-}
-
 TEST(MoveSpinPrimTest, get_angular_vel_test)
 {
     const AngularVelocity angular_vel = AngularVelocity::ofRadians(2.5);
@@ -70,35 +52,6 @@ TEST(MoveSpinPrimTest, get_final_speed_test)
         MoveSpinPrimitive(0, Point(), AngularVelocity(), final_speed);
 
     EXPECT_DOUBLE_EQ(movespin_prim.getFinalSpeed(), final_speed);
-}
-TEST(MoveSpinPrimTest, get_extra_bit_array_test)
-{
-    MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(0, Point(), AngularVelocity(), 1.0);
-
-    std::vector<bool> extra_bit_array = movespin_prim.getExtraBits();
-
-    EXPECT_EQ(extra_bit_array, std::vector<bool>());
-}
-
-TEST(MoveSpinPrimTest, create_primitive_from_message_test)
-{
-    const Point destination     = Point(-2, 3);
-    const Angle angular_vel     = AngularVelocity::ofRadians(1.45);
-    const unsigned int robot_id = 2U;
-    const double final_speed    = 2.0;
-
-    MoveSpinPrimitive movespin_prim =
-        MoveSpinPrimitive(robot_id, destination, angular_vel, final_speed);
-
-    thunderbots_msgs::Primitive prim_message = movespin_prim.createMsg();
-
-    MoveSpinPrimitive new_prim = MoveSpinPrimitive(prim_message);
-
-    std::vector<double> parameters = new_prim.getParameters();
-
-    EXPECT_EQ(MoveSpinPrimitive::PRIMITIVE_NAME, new_prim.getPrimitiveName());
-    EXPECT_EQ(new_prim, movespin_prim);
 }
 
 TEST(MoveSpinPrimTest, test_equality_operator_primitives_equal)

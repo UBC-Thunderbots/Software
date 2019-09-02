@@ -1,3 +1,0 @@
-<launch>
-    <test test-name="rostest_util_test" pkg="thunderbots" type="rostest_util_test" />
-</launch>

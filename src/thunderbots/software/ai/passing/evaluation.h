@@ -82,7 +82,7 @@ namespace Passing
      *         be intercepted, and 0 indicating it's impossible for the pass to be
      *         intercepted
      */
-    double calculateInterceptRisk(Robot enemy_robot, const Pass& pass);
+    double calculateInterceptRisk(const Robot& enemy_robot, const Pass& pass);
 
 
     /**

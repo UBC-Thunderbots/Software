@@ -31,13 +31,6 @@ class DirectWheelsPrimitive : public Primitive
                                    int16_t front_right_wheel_power,
                                    int16_t back_right_wheel_power, double dribbler_rpm);
 
-    /**
-     * Creates a new Move Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Move Primitive
-     */
-    explicit DirectWheelsPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -76,22 +69,6 @@ class DirectWheelsPrimitive : public Primitive
      * @return the RPM of the dribbler
      */
     double getDribblerRPM() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {front_left_wheel_power, back_left_wheel_power,
-     *                               front_right_wheel_power, back_right_wheel_power,
-     *                               dribbler_rpm}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor& visitor) const override;
 

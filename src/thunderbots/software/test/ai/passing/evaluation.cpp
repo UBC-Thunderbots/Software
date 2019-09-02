@@ -14,11 +14,14 @@
 #include "ai/passing/evaluation.h"
 
 #include <gtest/gtest.h>
-#include <util/math_functions.h>
-#include <util/parameter/dynamic_parameters.h>
+
+#include <chrono>
+#include <random>
 
 #include "../shared/constants.h"
 #include "test/test_util/test_util.h"
+#include "util/math_functions.h"
+#include "util/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 
@@ -47,6 +50,112 @@ class PassingEvaluationTest : public testing::Test
         Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
     double avg_time_offset_for_pass_seconds;
 };
+
+TEST_F(PassingEvaluationTest, ratePass_speed_test)
+{
+    // This test does not assert anything. Rather, It can be used to guage how
+    // fast ratePass is running, and can be profiled in order to find areas
+    // of improvement for ratePass
+
+    const int num_passes_to_gen = 1000;
+
+    World world = ::Test::TestUtil::createBlankTestingWorld();
+
+    world.updateEnemyTeamState(
+        Team(Duration::fromSeconds(10),
+             {
+                 Robot(0, {0, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(1, {1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(3, {1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(4, {0, 2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(5, {2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(6, {3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+             }));
+    world.updateFriendlyTeamState(
+        Team(Duration::fromSeconds(10),
+             {
+                 Robot(0, {-0.2, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(1, {-1, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(2, {0, 1}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(3, {-1.5, 0}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(4, {0, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(5, {-2.5, -2}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+                 Robot(6, {-3, -3}, {0, 0}, Angle::zero(), AngularVelocity::zero(),
+                       Timestamp::fromSeconds(0)),
+             }));
+
+    std::uniform_real_distribution x_distribution(-world.field().length() / 2,
+                                                  world.field().length() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().width() / 2,
+                                                  world.field().width() / 2);
+
+    double curr_time = world.getMostRecentTimestamp().getSeconds();
+    double min_start_time_offset =
+        Util::DynamicParameters::Passing::min_time_offset_for_pass_seconds.value();
+    double max_start_time_offset =
+        Util::DynamicParameters::Passing::max_time_offset_for_pass_seconds.value();
+    std::uniform_real_distribution start_time_distribution(
+        curr_time + min_start_time_offset, curr_time + max_start_time_offset);
+    std::uniform_real_distribution speed_distribution(
+        Util::DynamicParameters::Passing::min_pass_speed_m_per_s.value(),
+        Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
+
+    std::vector<Pass> passes;
+
+    std::mt19937 random_num_gen;
+    for (int i = 0; i < num_passes_to_gen; i++)
+    {
+        Point passer_point(x_distribution(random_num_gen),
+                           y_distribution(random_num_gen));
+        Point receiver_point(x_distribution(random_num_gen),
+                             y_distribution(random_num_gen));
+        Timestamp start_time =
+            Timestamp::fromSeconds(start_time_distribution(random_num_gen));
+        double pass_speed = speed_distribution(random_num_gen);
+
+        Pass p(passer_point, receiver_point, pass_speed, start_time);
+        passes.emplace_back(p);
+    }
+
+    auto start_time = std::chrono::system_clock::now();
+    for (auto pass : passes)
+    {
+        ratePass(world, pass, std::nullopt, std::nullopt);
+    }
+
+    auto end_time = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> duration = end_time - start_time;
+
+    std::chrono::duration<double> avg = duration / (double)num_passes_to_gen;
+
+    // At the time of this tests creation, ratePass ran at an average 0.105ms
+    // in debug on an i7
+    //    std::cout << "Took "
+    //              <<
+    //              std::chrono::duration_cast<std::chrono::microseconds>(duration).count()
+    //              /
+    //                     1000.0
+    //              << "ms to run, average time of "
+    //              << std::chrono::duration_cast<std::chrono::microseconds>(avg).count()
+    //              /
+    //                     1000.0
+    //              << "ms" << std::endl;
+}
 
 TEST_F(PassingEvaluationTest, ratePass_enemy_directly_on_pass_trajectory)
 {

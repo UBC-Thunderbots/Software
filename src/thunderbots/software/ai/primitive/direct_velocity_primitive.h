@@ -26,13 +26,6 @@ class DirectVelocityPrimitive : public Primitive
                                      double y_velocity, double angular_velocity,
                                      double dribbler_rpm);
 
-    /**
-     * Creates a new Direct Velocity Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the Direct Velocity Primitive
-     */
-    explicit DirectVelocityPrimitive(const thunderbots_msgs::Primitive& primitive_msg);
-
     std::string getPrimitiveName() const override;
 
     unsigned int getRobotId() const override;
@@ -44,21 +37,6 @@ class DirectVelocityPrimitive : public Primitive
     double getAngularVelocity() const;
 
     double getDribblerRpm() const;
-
-    /**
-     * Returns the generic vector of parameters for this Primitive
-     *
-     * @return A vector of the form {x_velocity, y_velocity, angular_velocity,
-     *                                dribbler_rpm}
-     */
-    std::vector<double> getParameters() const override;
-
-    /**
-     * This primitive has no extra bits
-     *
-     * @return an empty vector
-     */
-    std::vector<bool> getExtraBits() const override;
 
     void accept(PrimitiveVisitor& visitor) const override;
 

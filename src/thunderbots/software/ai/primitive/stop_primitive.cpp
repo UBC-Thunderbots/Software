@@ -9,14 +9,6 @@ StopPrimitive::StopPrimitive(unsigned int robot_id, bool coast)
 {
 }
 
-StopPrimitive::StopPrimitive(const thunderbots_msgs::Primitive &primitive_msg)
-{
-    validatePrimitiveMessage(primitive_msg, getPrimitiveName());
-
-    robot_id = primitive_msg.robot_id;
-    coast    = primitive_msg.extra_bits.at(0);
-}
-
 std::string StopPrimitive::getPrimitiveName() const
 {
     return PRIMITIVE_NAME;
@@ -31,18 +23,6 @@ unsigned int StopPrimitive::getRobotId() const
 bool StopPrimitive::robotShouldCoast() const
 {
     return coast;
-}
-
-std::vector<double> StopPrimitive::getParameters() const
-{
-    return std::vector<double>();
-}
-
-std::vector<bool> StopPrimitive::getExtraBits() const
-{
-    std::vector<bool> parameter = {coast};
-
-    return parameter;
 }
 
 void StopPrimitive::accept(PrimitiveVisitor &visitor) const

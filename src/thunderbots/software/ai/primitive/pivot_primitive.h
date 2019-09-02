@@ -11,10 +11,10 @@ class PivotPrimitive : public Primitive
     /**
      * Creates a new Pivot Primitive
      *
-     * Pivots the robot around the specified point, maintaining a constant
-     * distance from this point.
-     * 	   The robot will pivot in the direction of the shortest path
-     * 	   Assume robot always faces the point around which it pivots
+     * Pivots the robot around the specified point (usually the ball) at a specified
+     * speed, maintaining a constant distance of (ball radius + robot radius) from this
+     * point. The robot will pivot in the direction of the shortest path Assume robot
+     * always faces the point around which it pivots
      *
      *
      * @param robot_id      The id of the robot to run this primitive
@@ -23,14 +23,8 @@ class PivotPrimitive : public Primitive
      * @param pivot_radius  The distance from robot to pivot_point during movement
      */
     explicit PivotPrimitive(unsigned int robot_id, const Point &pivot_point,
-                            const Angle &final_angle, const double pivot_radius);
-
-    /**
-     * Create a new Pivot Primitive from a Primitive message
-     *
-     * @param primitive_msg The message from which to create the primitive
-     */
-    explicit PivotPrimitive(const thunderbots_msgs::Primitive &primitive_msg);
+                            const Angle &final_angle, const Angle &pivot_speed,
+                            bool enable_dribbler);
 
     std::string getPrimitiveName() const override;
 
@@ -50,28 +44,21 @@ class PivotPrimitive : public Primitive
      */
     Angle getFinalAngle() const;
 
-    /**
-     * Get the robot's final orientation
-     *
-     * @return the radius the robot maintains during pivot (as double)
-     */
     double getPivotRadius() const;
 
     /**
-     * Returns the generic vector of parameters for this Primitive
+     * Get the angular velocity for the pivot
      *
-     * @return A vector of the form {pivot_point.x(), pivot_point.y(),
-     *                               final_angle.toRadians(),
-     *                               pivot_radius}
+     * @return the angular velocity (rad/s) the robot maintains during pivot (as double)
      */
-    std::vector<double> getParameters() const override;
+    Angle getPivotSpeed() const;
 
     /**
-     * This primitive has no extra bits
+     * Check if the dribbler is enabled for this primitive
      *
-     * @return an empty vector
+     * @return true if dribbler is enabled
      */
-    std::vector<bool> getExtraBits() const override;
+    bool isDribblerEnabled() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
 
@@ -96,5 +83,6 @@ class PivotPrimitive : public Primitive
     unsigned int robot_id;
     Point pivot_point;
     Angle final_angle;
-    double pivot_radius;
+    Angle pivot_speed;
+    bool enable_dribbler;
 };
