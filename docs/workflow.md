@@ -1,5 +1,23 @@
 # Workflow
 
+## Table of Contents
+* [Table of Contents](#table-of-contents)
+* [Issue and Project Tracking](#issue-and-project-tracking)
+    * [Issues](#issues)
+    * [Milestones](#milestones)
+* [Git Workflow](#git-workflow)
+    * [Forking and Branching](#forking-and-branching)
+    * [Creating a new Branch](#creating-a-new-branch)
+        * [Why should you only create branches from "upstream/master"?](#why-should-you-only-create-branches-from-upstreammaster)
+    * [Making Commits](#making-commits)
+    * [Pull Requests](#pull-requests)
+    * [Reviewing Pull Requests](#reviewing-pull-requests)
+* [Example Workflow](#example-workflow)
+* [Testing](#testing)
+    * [Unit Testing](#unit-testing)
+        * [For C   Code](#for-c-code)
+        * [For C Code](#for-c-code-1)
+
 ## Issue and Project Tracking
 
 We try keep our issue and project tracking fairly simple, to reduce the overhead associated with tracking all the information and to make it easier to follow. If you are unfamiliar with GitHub issues, [this article](https://guides.github.com/features/issues/) gives a good overview. Similarly, you can read about GitHub's milestones [here](https://help.github.com/articles/about-milestones/).

@@ -1,5 +1,15 @@
 # Code Style Guide
 
+## Table of Contents
+* [Table of Contents](#table-of-contents)
+* [Coding Style and Conventions](#coding-style-and-conventions)
+    * [Names and Variables](#names-and-variables)
+    * [Comments](#comments)
+    * [Headers](#headers)
+    * [Includes](#includes)
+    * [Spelling](#spelling)
+    * [Miscellaneous](#miscellaneous)
+
 ## Coding Style and Conventions
 
 Our C++ coding style is based off of [Google's C++ Style Guide](https://google.github.io/styleguide/cppguide.html). We use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to enforce most of the nit-picky parts of the style, such as brackets and alignment, so this document highlights the important rules to follow that clang-format cannot enforce.
