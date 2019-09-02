@@ -78,7 +78,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
-    // if the goalie position to the block cone position intersects the
+    // if the goalies desired position intersects the
     // longest crease line which runs across the y axis, then intersect
     else if (width_x_goal && width_x_goal->y() <= goalie_restricted_area.neCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.seCorner().y())
@@ -100,7 +100,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
         return std::make_optional<Point>(*neg_side_x_goal);
     }
 
-    // if there are no intersections, then we are out of luck
+    // if there are no intersections (ex. ball behind net), then we are out of luck.
     else
     {
         return std::nullopt;
@@ -150,8 +150,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         Ray ball_ray = Ray(ball.position(), ball.velocity());
 
         const Point neg_goal_line_inflated =
-            field.friendlyGoalpostNeg() + Point(0, -0.05);
-        const Point pos_goal_line_inflated = field.friendlyGoalpostPos() + Point(0, 0.05);
+            field.friendlyGoalpostNeg() + Point(0, -ROBOT_MAX_RADIUS_METERS);
+        const Point pos_goal_line_inflated =
+            field.friendlyGoalpostPos() + Point(0, ROBOT_MAX_RADIUS_METERS);
         Segment full_goal_segment =
             Segment(neg_goal_line_inflated, pos_goal_line_inflated);
 
@@ -200,8 +201,6 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                  field.pointInFriendlyDefenseArea(ball.position()))
         {
             // if the ball is slow but its not safe to chip it out, dont.
-            // TODO finesse the ball out of the goal using the dribbler.
-            // for now we just stop
             if (dont_chip_rectangle.containsPoint(ball.position()) == true)
             {
                 next_intent = stop_action.updateStateAndGetNextIntent(*robot, false);
