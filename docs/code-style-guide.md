@@ -75,7 +75,7 @@ Make sure to comment both the interface for a function or class, as well as the 
 
 As much code documentation as possible should live with the code itself \(in the form of comments\). This makes it easier for people working on the code to find the information, and because the code and comments are version-controlled together if we ever go back to an older version of the code, we will have the corresponding older documentation as well.
 
-*Code comments are very important. Be sure to comment your code well enough so that another member of the team would be able to quickly get an understanding of what your code is doing, **and why**. Try not to make your comments too unnecessarily verbose, but include as much detail you feel is necessary to get the necessary points across. We realize that sounds contradictory, but use your best judgement as to what you think is clear and readable.*
+*Code comments are very important. Be sure to comment your code well enough so that another member of the team would be able to quickly get an understanding of what your code is doing, **and why**. Try not to make your comments unnecessarily verbose, but include as much detail you feel is necessary adequately explain the code. We realize that sounds contradictory, but use your best judgement as to what you think is clear and readable.*
 
 If you think some ASCII art will help explain something better, go for it! [asciiflow](http://asciiflow.com/) is a good online tool for creating this.
 
