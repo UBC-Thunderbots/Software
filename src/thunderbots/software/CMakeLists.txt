@@ -693,6 +693,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/tactic/passer_tactic.cpp
             test/ai/hl/stp/tactic/receiver_tactic.cpp
             test/ai/hl/stp/tactic/stop_tactic.cpp
+            test/ai/hl/stp/tactic/goalie_tactic.cpp
             test/ai/hl/stp/tactic/shoot_goal_tactic.cpp
             test/ai/hl/stp/tactic/shadow_enemy_tactic.cpp
             test/ai/hl/stp/tactic/tactic.cpp

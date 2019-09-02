@@ -8,7 +8,15 @@
 #include "ai/hl/stp/tactic/tactic.h"
 
 /**
-// TODO: commment
+ * This tactic is used to defend the ball from going into the goal. The tactic
+ * is assigned to the robot that is selected using a DynamicParameter, and stays
+ * that way throughout all the plays that require a goalie.
+ *
+ * If the ball is moving faster than a threshold torwards the net, moves to intercept
+ * the ball. If not, returns intents that position the robot in a cone between the ball
+ * and the two goal posts, in such a way that the robot would have to move a minimal
+ * distance either way to intercept a potential straight shot into the net.
+ *
  */
 class GoalieTactic : public Tactic
 {
@@ -43,15 +51,10 @@ class GoalieTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
-   private:
-    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
-
     /*
      * Restrains the goalie to a rectangle, with the prefered point being the one
      * that intersects the point the goalie wants to move to and the center of the
      * goal
-     *
-     * TODO Fix this function name, it doesn't make sense
      *
      * @param goalie_desired_position The point the goalie would like to go to
      * @param goalie_restricted_area The rectangle that the goalie is to stay in
@@ -59,6 +62,9 @@ class GoalieTactic : public Tactic
      */
     std::optional<Point> restrainGoalieInRectangle(Point goalie_desired_position,
                                                    Rectangle goalie_restricted_area);
+
+   private:
+    void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
     // Tactic parameters
     Ball ball;

@@ -28,13 +28,13 @@ namespace Util::Logger
         }
 
 
-           private:
-            LoggerSingleton()
-            {
-                logWorker = g3::LogWorker::createLogWorker();
-                g3::initializeLogging(logWorker.get());
-            }
+       private:
+        LoggerSingleton()
+        {
+            logWorker = g3::LogWorker::createLogWorker();
+            g3::initializeLogging(logWorker.get());
+        }
 
-            std::unique_ptr<g3::LogWorker> logWorker;
+        std::unique_ptr<g3::LogWorker> logWorker;
     };
 }  // namespace Util::Logger
