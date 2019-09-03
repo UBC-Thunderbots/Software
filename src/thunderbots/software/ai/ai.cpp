@@ -17,13 +17,10 @@ AI::AI()
 
 std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(const World &world) const
 {
-    //@TODO somehow get some additional obstacles here
-    std::vector<Obstacle> additional_obstacles = {};
-
     std::vector<std::unique_ptr<Intent>> assignedIntents = high_level->getIntents(world);
 
     std::vector<std::unique_ptr<Primitive>> assignedPrimitives =
-        navigator->getAssignedPrimitives(world, additional_obstacles, assignedIntents);
+        navigator->getAssignedPrimitives(world, assignedIntents);
 
     return assignedPrimitives;
 }

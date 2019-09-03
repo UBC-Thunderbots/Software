@@ -8,6 +8,8 @@
  */
 enum class AvoidArea
 {
+    // The enemy robots and their avoid obstacles
+    ENEMY_ROBOTS,
     // The box around the friendly goal
     FRIENDLY_DEFENSE_AREA,
     // The box around the enemy goal
@@ -18,6 +20,8 @@ enum class AvoidArea
     CENTER_CIRCLE,
     // A half meter radius around the ball
     HALF_METER_AROUND_BALL,
+    // The ball itself
+    BALL,
     // The enemy half of the field
     ENEMY_HALF,
     // The friendly half of the field
