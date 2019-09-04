@@ -59,9 +59,29 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
 std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     Point goalie_desired_position, Rectangle goalie_restricted_area)
 {
-    Point clamped_goalie_pos;
-
-    // get the intersections to all 3 crease lines in question
+    //           NW    pos_side   NE
+    //            +---------------+
+    //            |               |
+    //            |               |
+    //            |               |
+    //       +----+               |
+    //       |    |               |
+    //       |    |               |
+    // goal  |    |               | width
+    //       |    |               |
+    //       |    |               |
+    //       |    |               |
+    //       +----+               |
+    //            |               |
+    //            |               |
+    //            |               |
+    //           ++---------------+
+    //           SW    neg_side   SE
+    //
+    // Given the goalies desired position and the restricted area,
+    // first find the 3 intersections with each side of the restricted area
+    // (width, pos_side, neg_side) and the line from the desired position to the
+    // center of the friendly goal
     auto width_x_goal    = lineIntersection(goalie_desired_position, field.friendlyGoal(),
                                          goalie_restricted_area.neCorner(),
                                          goalie_restricted_area.seCorner());
@@ -78,8 +98,9 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     {
         return std::make_optional<Point>(goalie_desired_position);
     }
-    // if the goalies desired position intersects the
-    // longest crease line which runs across the y axis, then intersect
+    // Due to the nature of the line intersection, its important to make sure the
+    // corners are included, if the goalies desired position intersects with width (see
+    // above), use those positions
     else if (width_x_goal && width_x_goal->y() <= goalie_restricted_area.neCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.seCorner().y())
     {
@@ -100,7 +121,7 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
         return std::make_optional<Point>(*neg_side_x_goal);
     }
 
-    // if there are no intersections (ex. ball behind net), then we are out of luck.
+    // if there are no intersections (ex. ball behind net), then we are out of luck
     else
     {
         return std::nullopt;
@@ -163,7 +184,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // when should the goalie start panicking to move into place to stop the ball
         auto ball_speed_panic =
             Util::DynamicParameters::GoalieTactic::ball_speed_panic.value();
-        // what should the final goalie speed be, so that the goalie accelarates faster
+        // what should the final goalie speed be, so that the goalie accelerates faster
         auto goalie_final_speed =
             Util::DynamicParameters::GoalieTactic::goalie_final_speed.value();
         // how far in should the goalie wedge itself into the block cone, to block balls
@@ -200,7 +221,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         else if (ball.velocity().len() <= ball_speed_panic &&
                  field.pointInFriendlyDefenseArea(ball.position()))
         {
-            // if the ball is slow but its not safe to chip it out, dont.
+            // if the ball is slow but its not safe to chip it out, don't.
+            // TODO finesse the ball out of the goal using the dribbler.
+            // for now we just stop https://github.com/UBC-Thunderbots/Software/issues/744
             if (dont_chip_rectangle.containsPoint(ball.position()) == true)
             {
                 next_intent = stop_action.updateStateAndGetNextIntent(*robot, false);
@@ -233,7 +256,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 block_cone_radius * block_cone_angle.toRadians());
 
             // we want to restrict the block cone to the friendly crease, also potentially
-            // scaled by a a defense_area_deflation_parameter
+            // scaled by a defense_area_deflation_parameter
             Rectangle deflated_defense_area = field.friendlyDefenseArea();
             deflated_defense_area.expand(-defense_area_deflation);
 
