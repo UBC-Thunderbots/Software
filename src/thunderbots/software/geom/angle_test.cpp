@@ -81,10 +81,3 @@ TEST(AngleTest, asin)
     EXPECT_NEAR(-2.865983983, Angle::asin(-0.05).toDegrees(), 1e-7);
     EXPECT_NEAR(57.14011962, Angle::asin(0.84).toDegrees(), 1e-7);
 }
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

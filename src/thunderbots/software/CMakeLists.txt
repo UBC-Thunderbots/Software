@@ -80,7 +80,6 @@ include_directories(SYSTEM "${LIBUSB_1_INCLUDE_DIRS}")
 link_directories("${LIBUSB_1_LIBRARY_DIRS}")
 add_definitions("${LIBUSB_1_DEFINITIONS}")
 
-
 ## Find catkin macros and libraries
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -118,7 +117,6 @@ include_directories(SYSTEM
 
 include_directories(
         ${catkin_INCLUDE_DIRS}
-        ${PROTOBUF_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/..
@@ -128,17 +126,18 @@ include_directories(
 ## Libraries ##
 ###############
 
-# Geom
-file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
-        )
-add_library(tbots_geom STATIC
-    ${TBOTS_GEOM_LIB_SRC}
-    )
-add_dependencies(tbots_geom ${catkin_EXPORTED_TARGETS})
-target_link_libraries(tbots_geom
-    ${G3LOG}
-    )
+## Geom
+#file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
+#        )
+#add_library(tbots_geom STATIC
+#    ${TBOTS_GEOM_LIB_SRC}
+#    )
+#add_dependencies(tbots_geom ${catkin_EXPORTED_TARGETS})
+#target_link_libraries(tbots_geom
+#    ${G3LOG}
+#    )
+add_subdirectory(geom)
 
 # Time
 file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -379,17 +378,7 @@ target_link_libraries(tbots_test_util
     tbots_world
     )
 
-# Proto
-## Call our CMake file to include and build protobuf
-include("${CMAKE_CURRENT_SOURCE_DIR}/proto/build_proto.cmake")
-## Find the generated files
-file(GLOB TBOTS_PROTO_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/proto/*.pb.cc")
-add_library(tbots_proto STATIC
-    ${TBOTS_PROTO_SRCS}
-    )
-target_link_libraries(tbots_proto 
-    ${PROTOBUF_LIBRARIES}
-    )
+add_subdirectory(proto)
 
 # Shared
 file(GLOB TBOTS_SHARED_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -426,7 +415,6 @@ target_link_libraries(full_system
         ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
         ${G3LOG}
-        ${PROTOBUF_LIBRARIES}
         tbots_geom
         tbots_world
         tbots_proto
@@ -490,28 +478,30 @@ file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 
 ##### Unit Tests #####
 
+add_subdirectory(test)
+
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
-    #gtest
-    catkin_add_gtest(geom_angle_test
-            test/geom/angle.cpp
-            geom/angle.h
-            )
-    target_link_libraries(geom_angle_test ${catkin_LIBRARIES})
+    ##gtest
+    #catkin_add_gtest(geom_angle_test
+    #        test/geom/angle.cpp
+    #        geom/angle.h
+    #        )
+    #target_link_libraries(geom_angle_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(geom_point_test
-            test/geom/point.cpp
-            geom/point.h
-            )
-    target_link_libraries(geom_point_test ${catkin_LIBRARIES})
+    #catkin_add_gtest(geom_point_test
+    #        test/geom/point.cpp
+    #        geom/point.h
+    #        )
+    #target_link_libraries(geom_point_test ${catkin_LIBRARIES})
 
-    catkin_add_gtest(geom_util_test
-            test/geom/util.cpp
-            )
-    target_link_libraries(geom_util_test
-            ${catkin_LIBRARIES}
-            tbots_geom
-            )
+    #catkin_add_gtest(geom_util_test
+    #        test/geom/util.cpp
+    #        )
+    #target_link_libraries(geom_util_test
+    #        ${catkin_LIBRARIES}
+    #        tbots_geom
+    #        )
 
     catkin_add_gtest(nav_util_test
             test/ai/navigator/util.cpp
@@ -847,15 +837,6 @@ if (CATKIN_ENABLE_TESTING)
             tbots_intent
             tbots_primitive
             tbots_test_util
-            )
-
-    catkin_add_gtest(polygon_test
-            test/geom/polygon.cpp
-            geom/polygon.cpp
-            geom/util.cpp)
-    target_link_libraries(polygon_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
             )
 
     catkin_add_gtest(robot_filter_test

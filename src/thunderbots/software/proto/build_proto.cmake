@@ -7,7 +7,7 @@ else()
 endif()
 
 # The folder where we put our compiled proto files
-set("PROTO_OUTPUT_DIR" "${CMAKE_CURRENT_SOURCE_DIR}/proto")
+set("PROTO_OUTPUT_DIR" "${CMAKE_CURRENT_SOURCE_DIR}")
 # The source directory containing the uncompiled .proto files
 set("PROTO_SOURCE_DIR" "${PROTO_OUTPUT_DIR}/src")
 

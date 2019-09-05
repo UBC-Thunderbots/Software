@@ -231,10 +231,3 @@ TEST(PolygonTest, test_polygon_triangle_contains_point_with_point_on_vertex)
     bool result = polygon.containsPoint(point);
     EXPECT_TRUE(result);
 }
-
-int main(int argc, char** argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

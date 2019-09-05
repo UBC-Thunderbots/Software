@@ -1415,11 +1415,3 @@ TEST(GeomUtilTest, test_point_polygon_dist_point_far_from_polygon)
 
     EXPECT_DOUBLE_EQ(std::hypot(-5, -5), result);
 }
-
-
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
