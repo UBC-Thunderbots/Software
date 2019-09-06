@@ -52,7 +52,9 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
 
 void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-    MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD, true);
+    MoveAction move_action =
+        MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD,
+                   MoveAction::ROBOT_CLOSE_TO_ORIENTATION_THRESHOLD, true);
 
     // Setup for the pass. We want to use any free time before the pass starts putting
     // ourselves in the best position possible to take the pass
