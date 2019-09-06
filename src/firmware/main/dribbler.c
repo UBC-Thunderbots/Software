@@ -1,9 +1,5 @@
 /**
- * \defgroup DRIBBLER Dribbler Functions
- *
- * \brief These functions handle overall operation of the dribbler, including PWM selection, torque limiting, and thermal modelling.
- *
- * @{
+ * These functions handle overall operation of the dribbler, including PWM selection, torque limiting, and thermal modelling.
  */
 #include "dribbler.h"
 #include "adc.h"
@@ -14,6 +10,10 @@
 #include "physics.h"
 #include <stdio.h>
 
+/**
+ * The following constants use values from this datasheet:
+ * https://www.maxongroup.com/medias/sys_master/root/8833419509790/19-EN-177.pdf
+ */
 #define NOMINAL_SPEED_RPM 50800
 #define NOMINAL_VOLTAGE 18.0f
 #define SPEED_CONSTANT (NOMINAL_SPEED_RPM / NOMINAL_VOLTAGE) // rpm per volt
@@ -41,7 +41,7 @@
 
 #define DRIBBLER_SPEED_BUFFER_ZONE 250 // RPM
 
-#define MAX_DRIBBLER_CURRENT 4.0 // Limit the max current the dribbler can draw when stalled
+#define MAX_DRIBBLER_CURRENT 4.0f // Limit the max current the dribbler can draw when stalled
 #define MAX_DELTA_VOLTAGE (MAX_DRIBBLER_CURRENT * (PHASE_RESISTANCE + SWITCH_RESISTANCE + MIN_RESISTANCE_UNDER_PWM70)) // Limit the current by limiting the max delta voltage we can apply
 #define MIN_RESISTANCE_UNDER_PWM70 1.5f
 
