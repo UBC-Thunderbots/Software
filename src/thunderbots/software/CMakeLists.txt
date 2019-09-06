@@ -380,6 +380,9 @@ add_library(tbots_shared STATIC
     ${TBOTS_SHARED_LIB_SRC}
     )
 
+# Multithreading
+add_subdirectory(multithreading)
+
 #################
 ## Executables ##
 #################
@@ -898,18 +901,6 @@ if (CATKIN_ENABLE_TESTING)
             tbots_world
             tbots_test_util
             tbots_math
-            )
-
-    catkin_add_gtest(multithreading_test
-                    test/multithreading/main.cpp
-                    test/multithreading/observer.cpp
-                    test/multithreading/subject.cpp
-                    test/multithreading/threaded_observer.cpp
-                    test/multithreading/thread_safe_buffer.cpp
-                    )
-    target_link_libraries(multithreading_test
-            ${Boost_LIBRARIES}
-            time
             )
 
     catkin_add_gtest(ai_util_test

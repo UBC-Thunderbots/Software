@@ -1,6 +1,6 @@
 add_library(time
     duration.cpp
-    time.cpp
+    tbots_time.cpp
     timestamp.cpp
     )
 target_include_directories(time
@@ -11,12 +11,10 @@ target_link_libraries(time
     ${G3LOG}
     )
 
-catkin_add_gtest(time_test
+tbots_add_gtest(time_test
     duration_test.cpp
     timestamp_test.cpp
     )
 target_link_libraries(time_test
     time
-    pthread
-    gtest_main
     )

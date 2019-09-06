@@ -1,9 +1,14 @@
 #pragma once
 
+#include <time.h>
+
 /**
  * A simple Time class that represents some amount of Time
  *
  * This class should not be used directly, rather, you should use one of it's subclasses
+ *
+ * NOTE: This file is called `tbots_time.h` because having a file called 
+ *       `time.h` conflicts with system libraries
  */
 class Time
 {

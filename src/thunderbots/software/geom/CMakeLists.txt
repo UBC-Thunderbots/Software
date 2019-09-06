@@ -13,7 +13,7 @@ target_link_libraries(geom
     ${G3LOG}
     )
 
-tbots_add_test(geom_test
+tbots_add_gtest(geom_test
     angle_test.cpp
     point_test.cpp
     polygon_test.cpp

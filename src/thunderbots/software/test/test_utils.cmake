@@ -1,7 +1,7 @@
 # Creates a gtest executable
 # Example:
 # ```
-#   tbots_add_test(geom_test
+#   tbots_add_gtest(geom_test
 #       angle_test.cpp
 #       point_test.cpp
 #       polygon_test.cpp
@@ -12,7 +12,7 @@
 #       )
 # ```
 # Note: this will provide a `main` function
-function(tbots_add_test [test_name ..])
+function(tbots_add_gtest [test_name ..])
     add_executable(${ARGV0} ${ARGN})
     target_link_libraries(${ARGV0}
         gtest
