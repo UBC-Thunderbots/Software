@@ -126,30 +126,20 @@ include_directories(
 ## Libraries ##
 ###############
 
-## Geom
-#file(GLOB_RECURSE TBOTS_GEOM_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-#        ${CMAKE_CURRENT_SOURCE_DIR}/geom/*.cpp
-#        )
-#add_library(tbots_geom STATIC
-#    ${TBOTS_GEOM_LIB_SRC}
-#    )
-#add_dependencies(tbots_geom ${catkin_EXPORTED_TARGETS})
-#target_link_libraries(tbots_geom
-#    ${G3LOG}
-#    )
 add_subdirectory(geom)
 
 # Time
-file(GLOB_RECURSE TBOTS_TIME_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
-        )
-add_library(tbots_time STATIC 
-    ${TBOTS_TIME_LIB_SRC}
-    )
-target_link_libraries(tbots_time
-    ${G3LOG}
-    )
-add_dependencies(tbots_time ${catkin_EXPORTED_TARGETS})
+#file(GLOB_RECURSE time_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/util/time/*.cpp
+#        )
+#add_library(time STATIC 
+#    ${time_LIB_SRC}
+#    )
+#target_link_libraries(time
+#    ${G3LOG}
+#    )
+#add_dependencies(time ${catkin_EXPORTED_TARGETS})
+add_subdirectory(util)
 
 # Parameter
 file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -216,7 +206,7 @@ add_library(tbots_world STATIC
     )
 target_link_libraries(tbots_world
     ${G3LOG}
-    tbots_time
+    time
     tbots_parameter
     tbots_refbox_util
     )
@@ -249,9 +239,9 @@ add_library(tbots_evaluation STATIC
     ${TBOTS_EVALUATION_LIB_SRC}
     )
 target_link_libraries(tbots_evaluation
-    tbots_geom
+    geom
     tbots_parameter
-    tbots_time
+    time
     tbots_world
     )
 
@@ -264,7 +254,7 @@ add_library(tbots_passing STATIC
     )
 target_link_libraries(tbots_passing
     tbots_evaluation
-    tbots_geom
+    geom
     tbots_canvas_messenger
     tbots_math
     tbots_world
@@ -280,7 +270,7 @@ add_library(tbots_tactic STATIC
 target_link_libraries(tbots_tactic
     ${Boost_LIBRARIES}
     tbots_action
-    tbots_geom
+    geom
     tbots_passing
     tbots_evaluation
     )
@@ -309,7 +299,7 @@ add_library(tbots_navigator STATIC
     ${TBOTS_NAVIGATOR_LIB_SRC}
     )
 target_link_libraries(tbots_navigator
-    tbots_geom
+    geom
     tbots_math
     tbots_world
     tbots_canvas_messenger
@@ -325,7 +315,7 @@ add_library(tbots_network_input STATIC
         )
 target_link_libraries(tbots_network_input
         tbots_proto
-        tbots_geom
+        geom
         tbots_primitive
         tbots_math
         Eigen3::Eigen
@@ -340,7 +330,7 @@ add_library(tbots_grsim_output STATIC
         )
 target_link_libraries(tbots_grsim_output
         tbots_proto
-        tbots_geom
+        geom
         tbots_primitive
         )
 
@@ -374,7 +364,7 @@ add_library(tbots_test_util STATIC
         test/test_util/test_util.cpp
         )
 target_link_libraries(tbots_test_util
-    tbots_time
+    time
     tbots_world
     )
 
@@ -415,7 +405,7 @@ target_link_libraries(full_system
         ${catkin_LIBRARIES}
         ${Boost_LIBRARIES}
         ${G3LOG}
-        tbots_geom
+        geom
         tbots_world
         tbots_proto
         tbots_shared
@@ -478,7 +468,7 @@ file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
 
 ##### Unit Tests #####
 
-add_subdirectory(test)
+#add_subdirectory(test)
 
 ## Add gtest based cpp test target and link libraries
 if (CATKIN_ENABLE_TESTING)
@@ -500,7 +490,7 @@ if (CATKIN_ENABLE_TESTING)
     #        )
     #target_link_libraries(geom_util_test
     #        ${catkin_LIBRARIES}
-    #        tbots_geom
+    #        geom
     #        )
 
     catkin_add_gtest(nav_util_test
@@ -574,7 +564,7 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             tbots_proto
-            tbots_geom
+            geom
             tbots_world
             tbots_primitive
             tbots_test_util
@@ -611,15 +601,15 @@ if (CATKIN_ENABLE_TESTING)
         tbots_primitive
         )
 
-    catkin_add_gtest(time_test
-            test/util/time/duration.cpp
-            test/util/time/main.cpp
-            test/util/time/timestamp.cpp
-            )
-    target_link_libraries(time_test
-        ${catkin_LIBRARIES}
-        tbots_time
-        )
+    #catkin_add_gtest(time_test
+    #        test/util/time/duration.cpp
+    #        test/util/time/main.cpp
+    #        test/util/time/timestamp.cpp
+    #        )
+    #target_link_libraries(time_test
+    #    ${catkin_LIBRARIES}
+    #    time
+    #    )
 
     catkin_add_gtest(shared_evaluation_test
             ai/world/robot.cpp
@@ -648,7 +638,7 @@ if (CATKIN_ENABLE_TESTING)
         ${G3LOG}
         tbots_evaluation
         tbots_world
-        tbots_geom
+        geom
         tbots_test_util
         )
 
@@ -671,7 +661,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_world
             tbots_action
             tbots_intent
-            tbots_geom
+            geom
             tbots_primitive
             )
 
@@ -694,7 +684,7 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES}
             tbots_tactic
             tbots_world
-            tbots_geom
+            geom
             tbots_primitive
             tbots_passing
             tbots_intent
@@ -720,7 +710,7 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES}
             tbots_tactic
             tbots_world
-            tbots_geom
+            geom
             tbots_primitive
             tbots_passing
             tbots_intent
@@ -749,7 +739,7 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES}
             tbots_tactic
             tbots_world
-            tbots_geom
+            geom
             tbots_primitive
             tbots_passing
             tbots_intent
@@ -812,7 +802,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(evaluation_detect_threat_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_geom
+        geom
         tbots_world
         tbots_evaluation
         tbots_test_util
@@ -832,7 +822,7 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             tbots_navigator
             tbots_shared
-            tbots_geom
+            geom
             tbots_world
             tbots_intent
             tbots_primitive
@@ -864,7 +854,7 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES}
             ${Threads_LIBRARIES}
-            tbots_geom
+            geom
             tbots_world
             tbots_navigator
             tbots_primitive
@@ -885,7 +875,7 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES}
             tbots_world
-            tbots_geom
+            geom
             tbots_primitive
             tbots_navigator
             tbots_intent
@@ -904,7 +894,7 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             Eigen3::Eigen
-            tbots_geom
+            geom
             tbots_world
             tbots_test_util
             tbots_math
@@ -919,7 +909,7 @@ if (CATKIN_ENABLE_TESTING)
                     )
     target_link_libraries(multithreading_test
             ${Boost_LIBRARIES}
-            tbots_time
+            time
             )
 
     catkin_add_gtest(ai_util_test

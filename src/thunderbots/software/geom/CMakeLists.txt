@@ -1,3 +1,5 @@
+include(${PROJECT_SOURCE_DIR}/test/test_utils.cmake)
+
 add_library(geom STATIC
     polygon.cpp
     rectangle.cpp
@@ -11,7 +13,7 @@ target_link_libraries(geom
     ${G3LOG}
     )
 
-catkin_add_gtest(geom_test
+tbots_add_test(geom_test
     angle_test.cpp
     point_test.cpp
     polygon_test.cpp
@@ -19,6 +21,4 @@ catkin_add_gtest(geom_test
     )
 target_link_libraries(geom_test
     geom
-    pthread
-    gtest_main
     )
