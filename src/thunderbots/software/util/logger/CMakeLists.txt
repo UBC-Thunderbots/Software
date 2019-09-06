@@ -1,7 +1,5 @@
-add_library(
-    canvas_messenger.cpp
-    )
-target_include_directories(canvas_messenger
-    PUBLIC
+add_library(logger INTERFACE)
+target_include_directories(logger
+    INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}
     )

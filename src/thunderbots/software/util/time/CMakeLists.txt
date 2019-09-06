@@ -1,4 +1,4 @@
-add_library(time
+add_library(time STATIC
     duration.cpp
     tbots_time.cpp
     timestamp.cpp

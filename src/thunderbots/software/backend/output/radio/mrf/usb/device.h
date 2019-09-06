@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <string>
 
-#include "util/noncopyable.h"
+#include "backend/output/radio/mrf/noncopyable.h"
 
 namespace USB
 {

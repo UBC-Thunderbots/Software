@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "util/gradient_descent.h"
+#include "util/optimization/gradient_descent.h"
 
 using namespace Util;
 

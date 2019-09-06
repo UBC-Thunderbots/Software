@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../ai/world/team.h"
+#include "ai/world/team.h"
 
 namespace Util
 {

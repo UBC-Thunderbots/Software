@@ -9,6 +9,7 @@
 
 namespace Util
 {
+    // TODO: class name should be consistent with file name
     /**
      * This class implements a version of Stochastic Gradient Descent (SGD), namely Adam
      * (see links below for details). It provides functionality for both maximizing
@@ -188,4 +189,4 @@ namespace Util
 
 }  // namespace Util
 
-#include "util/gradient_descent.tpp"
+#include "util/optimization/gradient_descent.tpp"

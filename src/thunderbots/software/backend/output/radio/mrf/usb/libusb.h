@@ -22,7 +22,7 @@
 #include "misc.h"
 #include "transfer.h"
 #include "util/async_operation.h"
-#include "util/noncopyable.h"
+#include "backend/output/radio/mrf/noncopyable.h"
 
 namespace USB
 {

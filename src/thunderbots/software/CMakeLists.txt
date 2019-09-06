@@ -141,18 +141,6 @@ add_subdirectory(geom)
 #add_dependencies(time ${catkin_EXPORTED_TARGETS})
 add_subdirectory(util)
 
-# Parameter
-file(GLOB_RECURSE TBOTS_PARAMETER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/parameter/*.cpp
-        )
-add_library(tbots_parameter STATIC 
-    ${TBOTS_PARAMETER_LIB_SRC}
-    )
-target_link_libraries(tbots_parameter
-    ${catkin_LIBRARIES}
-    )
-add_dependencies(tbots_parameter ${catkin_EXPORTED_TARGETS})
-
 # Primitive 
 file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
@@ -192,8 +180,7 @@ add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
 
 
 # Refbox Utils
-add_library(tbots_refbox_util STATIC
-        util/refbox_constants.cpp
+add_library(tbots_refbox_util INTERFACE
         )
 add_dependencies(tbots_refbox_util ${catkin_EXPORTED_TARGETS})
 
@@ -207,28 +194,10 @@ add_library(tbots_world STATIC
 target_link_libraries(tbots_world
     ${G3LOG}
     time
-    tbots_parameter
+    parameter
     tbots_refbox_util
     )
 add_dependencies(tbots_world ${catkin_EXPORTED_TARGETS})
-
-# Canvas Messenger 
-file(GLOB_RECURSE TBOTS_CANVAS_MESSENGER_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/util/canvas_messenger/*.cpp
-        )
-add_library(tbots_canvas_messenger STATIC
-    ${TBOTS_CANVAS_MESSENGER_LIB_SRC}
-    )
-target_link_libraries(tbots_canvas_messenger
-    ${catkin_LIBRARIES}
-    ${G3LOG}
-    )
-add_dependencies(tbots_canvas_messenger ${catkin_EXPORTED_TARGETS})
-
-# Math Utils
-add_library(tbots_math STATIC
-        util/math_functions.cpp
-        )
 
 # Evaluation
 file(GLOB TBOTS_EVALUATION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -240,7 +209,7 @@ add_library(tbots_evaluation STATIC
     )
 target_link_libraries(tbots_evaluation
     geom
-    tbots_parameter
+    parameter
     time
     tbots_world
     )
@@ -255,8 +224,8 @@ add_library(tbots_passing STATIC
 target_link_libraries(tbots_passing
     tbots_evaluation
     geom
-    tbots_canvas_messenger
-    tbots_math
+    canvas_messenger
+    math
     tbots_world
     )
 
@@ -300,9 +269,9 @@ add_library(tbots_navigator STATIC
     )
 target_link_libraries(tbots_navigator
     geom
-    tbots_math
+    math
     tbots_world
-    tbots_canvas_messenger
+    canvas_messenger
     )
 add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
 
@@ -317,7 +286,7 @@ target_link_libraries(tbots_network_input
         tbots_proto
         geom
         tbots_primitive
-        tbots_math
+        math
         Eigen3::Eigen
         )
 
@@ -420,9 +389,9 @@ target_link_libraries(full_system
         tbots_navigator
         tbots_passing
         tbots_primitive
-        tbots_parameter
+        parameter
         tbots_proto
-        tbots_canvas_messenger
+        canvas_messenger
         tbots_backend
         )
 
@@ -443,7 +412,7 @@ target_link_libraries(parameters
         ${catkin_LIBRARIES}
         tbots_proto
         tbots_shared
-        tbots_parameter
+        parameter
         )
 
 file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
@@ -788,17 +757,6 @@ if (CATKIN_ENABLE_TESTING)
         tbots_test_util
         )
 
-    catkin_add_gtest(gradient_descent_optimizer_test
-            test/util/gradient_descent_optimizer.cpp
-            )
-    target_link_libraries(gradient_descent_optimizer_test ${catkin_LIBRARIES})
-
-    catkin_add_gtest(math_functions_test
-            test/util/math_functions.cpp
-            util/math_functions.cpp
-            )
-    target_link_libraries(math_functions_test ${catkin_LIBRARIES})
-
     catkin_add_gtest(evaluation_detect_threat_test
             test/ai/hl/stp/evaluation/detect_threat.cpp
             )
@@ -900,7 +858,7 @@ if (CATKIN_ENABLE_TESTING)
             geom
             tbots_world
             tbots_test_util
-            tbots_math
+            math
             )
 
     catkin_add_gtest(ai_util_test
@@ -911,7 +869,7 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES})
 
     catkin_add_gtest(refbox_constants_test
-            util/refbox_constants.cpp
+            ai/world/refbox_constants.h
             test/util/refbox_constants.cpp
             )
 
@@ -921,28 +879,3 @@ if (CATKIN_ENABLE_TESTING)
 
 endif()
 
-##### ROSTests / Integration Tests #####
-
-if (CATKIN_ENABLE_TESTING)
-    find_package(rostest REQUIRED)
-
-    # The test node that verifies the dynamic_parameters are working
-    add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
-            test/util/test_dynamic_parameters.cpp
-            )
-    target_link_libraries(dynamic_parameters_test 
-        ${catkin_LIBRARIES}
-        tbots_parameter
-        )
-
-    # The test node that verifies the dynamic_parameters exist in the parameter server
-    add_rostest_gtest(check_parameter_existance_test 
-        test/util/rostest_parameter_exists.test
-        test/util/test_parameter_exists.cpp
-        )
-    target_link_libraries(check_parameter_existance_test 
-        ${catkin_LIBRARIES}
-        tbots_parameter
-        )
-
-endif()
