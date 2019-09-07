@@ -52,6 +52,8 @@ double GoalieTactic::calculateRobotCost(const Robot &robot, const World &world)
     }
     else
     {
+        // TODO perform proper goalie assignment using plays
+        // https://github.com/UBC-Thunderbots/Software/issues/745
         return std::numeric_limits<int>::max() - 10;
     }
 }
