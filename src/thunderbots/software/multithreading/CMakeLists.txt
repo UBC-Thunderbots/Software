@@ -11,7 +11,6 @@ target_link_libraries(multithreading
         time
     )
 
-
 tbots_add_gtest(multithreading_test
     observer_test.cpp
     subject_test.cpp

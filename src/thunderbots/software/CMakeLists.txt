@@ -395,29 +395,7 @@ target_link_libraries(full_system
         tbots_backend
         )
 
-file(GLOB DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/dynamic_reconfigure_manager/*.cpp
-        )
-add_executable (parameters
-        ${DYNAMIC_RECONFIGURE_SERVER_HOST_NODE_SRC}
-        )
-# Depend on exported targets (other packages) so that the messages in our thunderbots_msgs package are built first.
-# This way the message headers are always generated before they are used in compilation here.
-# We also make sure we've generated parameters before building this target
-add_dependencies(parameters 
-    thunderbots_gencfg 
-    ${catkin_EXPORTED_TARGETS}
-    )
-target_link_libraries(parameters  
-        ${catkin_LIBRARIES}
-        tbots_proto
-        tbots_shared
-        parameter
-        )
-
-file(GLOB XBOX_CONTROLLER_MAPPING_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/xbox_controller_mapping/*.cpp
-        )
+add_subdirectory(dynamic_reconfigure_manager)
 
 #############
 ## Testing ##
