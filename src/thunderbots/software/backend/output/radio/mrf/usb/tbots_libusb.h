@@ -21,8 +21,8 @@
 #include "interrupttransfer.h"
 #include "misc.h"
 #include "transfer.h"
-#include "backend/output/radio/mrf/async_operation.h"
-#include "backend/output/radio/mrf/noncopyable.h"
+#include "backend/output/radio/mrf/util/async_operation.h"
+#include "backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {

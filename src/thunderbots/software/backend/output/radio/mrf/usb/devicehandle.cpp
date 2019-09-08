@@ -1,6 +1,6 @@
 #include "devicehandle.h"
 
-#include "libusb.h"
+#include "tbots_libusb.h"
 #include "misc.h"
 #include "util/logger/init.h"
 

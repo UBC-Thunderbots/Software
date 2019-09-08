@@ -1,4 +1,4 @@
-#include "libusb.h"
+#include "tbots_libusb.h"
 
 #include <poll.h>
 

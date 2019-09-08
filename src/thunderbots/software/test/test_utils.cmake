@@ -13,8 +13,6 @@
 # ```
 # Note: this will provide a `main` function
 function(tbots_add_gtest [test_name])
-    message(ARGV0 ${ARGV0})
-    message(ARGVN ${ARGN})
     add_executable(${ARGV0} ${ARGN})
     target_link_libraries(${ARGV0}
         gtest

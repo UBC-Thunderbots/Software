@@ -21,9 +21,9 @@
 #include "geom/point.h"
 #include "send_reliable_message_operation.h"
 #include "shared/constants.h"
-#include "usb/libusb.h"
-#include "async_operation.h"
-#include "noncopyable.h"
+#include "usb/tbots_libusb.h"
+#include "backend/output/radio/mrf/util/async_operation.h"
+#include "backend/output/radio/mrf/util/noncopyable.h"
 
 /**
  * An operation to send a reliable message.

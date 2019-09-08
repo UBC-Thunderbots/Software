@@ -5,12 +5,15 @@
 #include <cstdint>
 #include <string>
 
-#include "backend/output/radio/mrf/noncopyable.h"
+#include "backend/output/radio/mrf/usb/devicehandle.h"
+#include "backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {
     /* Forward declaration of the libusb context */
     class Context;
+
+    class DeviceHandle;
 
     /**
      * A collection of information about a USB device.

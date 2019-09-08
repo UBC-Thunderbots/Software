@@ -9,8 +9,8 @@
 #include <string>
 #include <vector>
 
-#include "device.h"
-#include "backend/output/radio/mrf/noncopyable.h"
+//#include "device.h"
+#include "backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {
@@ -18,6 +18,9 @@ namespace USB
     class Context;
     extern "C" void usb_transfer_handle_completed_transfer_trampoline(
         libusb_transfer *transfer);
+
+    /* Forward declaration of Device to prevent circular includes */
+    class Device;
 
     /**
      * A libusb device handle which can be used to communicate with a device.

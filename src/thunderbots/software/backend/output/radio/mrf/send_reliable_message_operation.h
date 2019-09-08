@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dongle.h"
-#include "usb/libusb.h"
+#include "usb/tbots_libusb.h"
 #include "async_operation.h"
 
 class MRFDongle;

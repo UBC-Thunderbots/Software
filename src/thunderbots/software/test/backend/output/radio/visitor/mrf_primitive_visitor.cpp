@@ -1,4 +1,4 @@
-#include "backend/output/radio/visitor/mrf_primitive_visitor.h"
+#include "backend/output/radio/mrf/primitive_visitor.h"
 
 #include <gtest/gtest.h>
 
