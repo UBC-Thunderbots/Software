@@ -4,7 +4,7 @@
 #include <boost/signals2.hpp>
 #include <memory>
 
-#include "util/noncopyable.h"
+#include "backend/output/radio/mrf/noncopyable.h"
 
 /**
  * An asynchronous operation which is currently in progress.

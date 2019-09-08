@@ -2,7 +2,7 @@
 
 #include "ai/world/ball.h"
 #include "geom/point.h"
-#include "util/refbox_constants.h"
+#include "ai/world/refbox_constants.h"
 
 /**
  * @brief Holds the state of the game according to the referee

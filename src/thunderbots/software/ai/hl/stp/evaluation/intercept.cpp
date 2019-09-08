@@ -5,7 +5,7 @@
 
 #include "ai/evaluation/pass.h"
 #include "shared/constants.h"
-#include "util/gradient_descent.h"
+#include "util/optimization/gradient_descent.h"
 
 namespace Evaluation
 {

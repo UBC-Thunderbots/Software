@@ -10,7 +10,7 @@
 #include "ai/world/field.h"
 #include "ai/world/team.h"
 #include "ai/world/world.h"
-#include "util/math_functions.h"
+#include "util/math/math_functions.h"
 
 namespace Passing
 {

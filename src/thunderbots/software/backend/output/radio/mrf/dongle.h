@@ -23,7 +23,7 @@
 #include "shared/constants.h"
 #include "usb/libusb.h"
 #include "async_operation.h"
-#include "util/noncopyable.h"
+#include "noncopyable.h"
 
 /**
  * An operation to send a reliable message.

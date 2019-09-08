@@ -5,7 +5,7 @@
 #include "ai/world/game_state.h"
 #include "ai/world/team.h"
 #include "boost/circular_buffer.hpp"
-#include "util/refbox_constants.h"
+#include "ai/world/refbox_constants.h"
 
 /**
  * The world object describes the entire state of the world, which for us is all the

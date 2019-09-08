@@ -6,7 +6,7 @@
 #include "proto/messages_robocup_ssl_geometry.pb.h"
 #include "shared/constants.h"
 #include "util/constants.h"
-#include "util/refbox_constants.h"
+#include "ai/world/refbox_constants.h"
 
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to

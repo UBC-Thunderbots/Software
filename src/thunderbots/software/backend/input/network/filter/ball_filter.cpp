@@ -7,7 +7,7 @@
 #include <limits>
 
 #include "geom/util.h"
-#include "util/math_functions.h"
+#include "util/math/math_functions.h"
 
 BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size)
     : _min_buffer_size(min_buffer_size),

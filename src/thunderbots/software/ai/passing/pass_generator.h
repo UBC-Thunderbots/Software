@@ -6,7 +6,7 @@
 
 #include "ai/passing/pass.h"
 #include "ai/world/world.h"
-#include "util/gradient_descent.h"
+#include "util/optimization/gradient_descent.h"
 #include "util/parameter/dynamic_parameters.h"
 #include "util/time/timestamp.h"
 

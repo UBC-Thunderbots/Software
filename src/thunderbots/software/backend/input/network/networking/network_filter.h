@@ -11,7 +11,7 @@
 #include "backend/input/network/filter/robot_team_filter.h"
 #include "proto/messages_robocup_ssl_wrapper.pb.h"
 #include "proto/ssl_referee.pb.h"
-#include "util/refbox_constants.h"
+#include "ai/world/refbox_constants.h"
 #include "util/time/timestamp.h"
 
 class NetworkFilter
