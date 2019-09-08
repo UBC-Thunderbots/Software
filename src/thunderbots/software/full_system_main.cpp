@@ -114,7 +114,7 @@ std::shared_ptr<ros::NodeHandle> initRos(int argc, char **argv)
  */
 void connectObservers()
 {
-//    backend->Subject<World>::registerObserver(ai);
+    backend->Subject<World>::registerObserver(ai);
     backend->Subject<World>::registerObserver(visualizer);
     ai->registerObserver(backend);
 }
@@ -140,6 +140,8 @@ int main(int argc, char **argv)
         // return until the node is shutdown
         // http://wiki.ros.org/roscpp/Overview/Callbacks%20and%20Spinning
         ros::spin();
+
+        // TODO: Shut down the AI when the Visualizer is shut down
     }
     return 0;
 }

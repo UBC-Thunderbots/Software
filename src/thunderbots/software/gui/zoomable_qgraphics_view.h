@@ -6,6 +6,9 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 
+/**
+ * A custom QGraphicsView that allows zooming with the mousewheel
+ */
 class ZoomableQGraphicsView : public QGraphicsView
 {
     Q_OBJECT
