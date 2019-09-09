@@ -100,25 +100,25 @@ catkin_package(
         DEPENDS message_runtime
         )
 
-# Find libusb
-pkg_search_module("LIBUSB_1" REQUIRED "libusb-1.0")
-include_directories(SYSTEM ${LIBUSB_1_INCLUDE_DIRS})
+    ## Find libusb
+    #pkg_search_module("LIBUSB_1" REQUIRED "libusb-1.0")
+    #include_directories(SYSTEM ${LIBUSB_1_INCLUDE_DIRS})
 
 #########################
 ## Include Directories ##
 #########################
 
-# Specify additional locations of header files
-include_directories(SYSTEM
-    ${catkin_INCLUDE_DIRS}
-    )
-
-include_directories(
-        ${catkin_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/..
-        )
+## Specify additional locations of header files
+#include_directories(SYSTEM
+#    ${catkin_INCLUDE_DIRS}
+#    )
+#
+#include_directories(
+#        ${catkin_INCLUDE_DIRS}
+#        ${Boost_INCLUDE_DIRS}
+#        ${CMAKE_CURRENT_SOURCE_DIR}
+#        ${CMAKE_CURRENT_SOURCE_DIR}/..
+#        )
 
 ###############
 ## Libraries ##
@@ -139,139 +139,141 @@ add_subdirectory(geom)
 #add_dependencies(time ${catkin_EXPORTED_TARGETS})
 add_subdirectory(util)
 
-# Primitive 
-file(GLOB_RECURSE TBOTS_PRIMITIVE_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
-        )
-add_library(tbots_primitive STATIC 
-    ${TBOTS_PRIMITIVE_LIB_SRC}
-    )
-target_link_libraries(tbots_primitive
-    ${G3LOG}
-    )
-add_dependencies(tbots_primitive ${catkin_EXPORTED_TARGETS})
+add_subdirectory(ai)
 
-# Intent
-file(GLOB TBOTS_INTENT_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/intent/*.cpp
-        )
-add_library(tbots_intent STATIC
-    ${TBOTS_INTENT_LIB_SRC}
-    )
-target_link_libraries(tbots_intent
-    tbots_primitive
-    )
-add_dependencies(tbots_intent ${catkin_EXPORTED_TARGETS})
+## Primitive 
+#file(GLOB_RECURSE primitive_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/primitive/*.cpp
+#        )
+#add_library(primitive STATIC 
+#    ${primitive_LIB_SRC}
+#    )
+#target_link_libraries(primitive
+#    ${G3LOG}
+#    )
+#add_dependencies(primitive ${catkin_EXPORTED_TARGETS})
 
-# Action
-file(GLOB TBOTS_ACTION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
-        )
-add_library(tbots_action STATIC
-    ${TBOTS_ACTION_LIB_SRC}
-    )
-target_link_libraries(tbots_action
-    ${Boost_LIBRARIES}
-    tbots_intent
-    )
-add_dependencies(tbots_action ${catkin_EXPORTED_TARGETS})
+## Intent
+#file(GLOB intent_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/intent/*.cpp
+#        )
+#add_library(intent STATIC
+#    ${intent_LIB_SRC}
+#    )
+#target_link_libraries(intent
+#    primitive
+#    )
+#add_dependencies(intent ${catkin_EXPORTED_TARGETS})
+
+## Action
+#file(GLOB action_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/action/*.cpp
+#        )
+#add_library(action STATIC
+#    ${action_LIB_SRC}
+#    )
+#target_link_libraries(action
+#    ${Boost_LIBRARIES}
+#    intent
+#    )
+#add_dependencies(action ${catkin_EXPORTED_TARGETS})
 
 
-# Refbox Utils
-add_library(tbots_refbox_util INTERFACE
-        )
-add_dependencies(tbots_refbox_util ${catkin_EXPORTED_TARGETS})
+## Refbox Utils
+#add_library(tbots_refbox_util INTERFACE
+#        )
+#add_dependencies(tbots_refbox_util ${catkin_EXPORTED_TARGETS})
 
-# World
-file(GLOB_RECURSE world_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
-        )
-add_library(world STATIC 
-    ${world_LIB_SRC}
-    )
-target_link_libraries(world
-    ${G3LOG}
-    time
-    parameter
-    tbots_refbox_util
-    )
-add_dependencies(world ${catkin_EXPORTED_TARGETS})
+## World
+#file(GLOB_RECURSE world_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/world/*.cpp
+#        )
+#add_library(world STATIC 
+#    ${world_LIB_SRC}
+#    )
+#target_link_libraries(world
+#    ${G3LOG}
+#    time
+#    parameter
+#    tbots_refbox_util
+#    )
+#add_dependencies(world ${catkin_EXPORTED_TARGETS})
 
-# Evaluation
-file(GLOB TBOTS_EVALUATION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/evaluation/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/evaluation/*.cpp
-        )
-add_library(tbots_evaluation STATIC
-    ${TBOTS_EVALUATION_LIB_SRC}
-    )
-target_link_libraries(tbots_evaluation
-    geom
-    parameter
-    time
-    world
-    )
+## Evaluation
+#file(GLOB TBOTS_EVALUATION_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/evaluation/*.cpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/evaluation/*.cpp
+#        )
+#add_library(tbots_evaluation STATIC
+#    ${TBOTS_EVALUATION_LIB_SRC}
+#    )
+#target_link_libraries(tbots_evaluation
+#    geom
+#    parameter
+#    time
+#    world
+#    )
 
-# Passing
-file(GLOB_RECURSE TBOTS_PASSING_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/passing/*.cpp
-        )
-add_library(tbots_passing STATIC
-    ${TBOTS_PASSING_LIB_SRC}
-    )
-target_link_libraries(tbots_passing
-    tbots_evaluation
-    geom
-    canvas_messenger
-    math
-    world
-    )
+## Passing
+#file(GLOB_RECURSE passing_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/passing/*.cpp
+#        )
+#add_library(passing STATIC
+#    ${passing_LIB_SRC}
+#    )
+#target_link_libraries(passing
+#    tbots_evaluation
+#    geom
+#    canvas_messenger
+#    math
+#    world
+#    )
 
-# Tactic
-file(GLOB TBOTS_TACTIC_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/tactic/*.cpp
-        )
-add_library(tbots_tactic STATIC 
-    ${TBOTS_TACTIC_LIB_SRC}
-    )
-target_link_libraries(tbots_tactic
-    ${Boost_LIBRARIES}
-    tbots_action
-    geom
-    tbots_passing
-    tbots_evaluation
-    )
-add_dependencies(tbots_tactic ${catkin_EXPORTED_TARGETS})
+## Tactic
+#file(GLOB tactic_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/tactic/*.cpp
+#        )
+#add_library(tactic STATIC 
+#    ${tactic_LIB_SRC}
+#    )
+#target_link_libraries(tactic
+#    ${Boost_LIBRARIES}
+#    action
+#    geom
+#    passing
+#    tbots_evaluation
+#    )
+#add_dependencies(tactic ${catkin_EXPORTED_TARGETS})
 
-# Play
-file(GLOB TBOTS_PLAYS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
-        )
-add_library(tbots_play STATIC 
-    ${TBOTS_PLAYS_LIB_SRC}
-    )
-target_link_libraries(tbots_play
-    ${Boost_LIBRARIES}
-    tbots_tactic
-    tbots_evaluation
-    tbots_passing
-    )
-add_dependencies(tbots_play ${catkin_EXPORTED_TARGETS})
+## Play
+#file(GLOB playS_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/hl/stp/play/*.cpp
+#        )
+#add_library(play STATIC 
+#    ${playS_LIB_SRC}
+#    )
+#target_link_libraries(play
+#    ${Boost_LIBRARIES}
+#    tactic
+#    tbots_evaluation
+#    passing
+#    )
+#add_dependencies(play ${catkin_EXPORTED_TARGETS})
 
-# Navigator
-file(GLOB_RECURSE TBOTS_NAVIGATOR_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/ai/navigator/*.cpp
-        )
-add_library(tbots_navigator STATIC 
-    ${TBOTS_NAVIGATOR_LIB_SRC}
-    )
-target_link_libraries(tbots_navigator
-    geom
-    math
-    world
-    canvas_messenger
-    )
-add_dependencies(tbots_navigator ${catkin_EXPORTED_TARGETS})
+## Navigator
+#file(GLOB_RECURSE navigator_LIB_SRC LIST_DIRECTORIES false CONFIGURE_DEPENDS
+#        ${CMAKE_CURRENT_SOURCE_DIR}/ai/navigator/*.cpp
+#        )
+#add_library(navigator STATIC 
+#    ${navigator_LIB_SRC}
+#    )
+#target_link_libraries(navigator
+#    geom
+#    math
+#    world
+#    canvas_messenger
+#    )
+#add_dependencies(navigator ${catkin_EXPORTED_TARGETS})
 
 add_subdirectory(backend)
 
@@ -329,13 +331,13 @@ target_link_libraries(full_system
         tbots_proto
         tbots_shared
         tbots_evaluation
-        tbots_action
-        tbots_play
-        tbots_tactic
-        tbots_intent
-        tbots_navigator
-        tbots_passing
-        tbots_primitive
+        action
+        play
+        tactic
+        intent
+        navigator
+        passing
+        primitive
         parameter
         tbots_proto
         canvas_messenger
@@ -392,12 +394,9 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(nav_util_test
             test/ai/navigator/util.cpp
-            ai/navigator/util.cpp
-            ai/navigator/util.h
-            ai/primitive/move_primitive.h
+            ai/navigator/path_planning_navigator/util.cpp
             ai/primitive/move_primitive.cpp
-            ai/primitive/primitive.h
-            geom/point.h)
+            )
     target_link_libraries(nav_util_test ${catkin_LIBRARIES})
 
     catkin_add_gtest(shared_util_test
@@ -463,7 +462,7 @@ if (CATKIN_ENABLE_TESTING)
             tbots_proto
             geom
             world
-            tbots_primitive
+            primitive
             tbots_test_util
             )
 
@@ -484,7 +483,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(primitive_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_primitive
+        primitive
         )
 
 
@@ -495,7 +494,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(mrf_primitive_visitor_test
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_primitive
+        primitive
         )
 
     #catkin_add_gtest(time_test
@@ -556,10 +555,10 @@ if (CATKIN_ENABLE_TESTING)
             ${G3LOG}
             ${Boost_LIBRARIES}
             world
-            tbots_action
-            tbots_intent
+            action
+            intent
             geom
-            tbots_primitive
+            primitive
             )
 
     catkin_add_gtest(tactic_test
@@ -579,14 +578,14 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_tactic
+            tactic
             world
             geom
-            tbots_primitive
-            tbots_passing
-            tbots_intent
-            tbots_tactic
-            tbots_action
+            primitive
+            passing
+            intent
+            tactic
+            action
             tbots_evaluation
             tbots_test_util
             )
@@ -605,16 +604,16 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_tactic
+            tactic
             world
             geom
-            tbots_primitive
-            tbots_passing
-            tbots_intent
-            tbots_tactic
-            tbots_action
+            primitive
+            passing
+            intent
+            tactic
+            action
             tbots_evaluation
-            tbots_play
+            play
             tbots_test_util
             )
 
@@ -634,16 +633,16 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${G3LOG}
             ${Boost_LIBRARIES}
-            tbots_tactic
+            tactic
             world
             geom
-            tbots_primitive
-            tbots_passing
-            tbots_intent
-            tbots_tactic
-            tbots_action
+            primitive
+            passing
+            intent
+            tactic
+            action
             tbots_evaluation
-            tbots_navigator
+            navigator
             tbots_test_util
             )
 
@@ -664,8 +663,8 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(intent_test
             ${G3LOG}
             ${catkin_LIBRARIES}
-            tbots_primitive
-            tbots_intent
+            primitive
+            intent
             )
 
     catkin_add_gtest(passing_test
@@ -678,7 +677,7 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(passing_test 
         ${catkin_LIBRARIES}
         ${G3LOG}
-        tbots_passing
+        passing
         tbots_test_util
         )
 
@@ -706,12 +705,12 @@ if (CATKIN_ENABLE_TESTING)
     target_link_libraries(navigator_test
             ${catkin_LIBRARIES}
             ${G3LOG}
-            tbots_navigator
+            navigator
             tbots_shared
             geom
             world
-            tbots_intent
-            tbots_primitive
+            intent
+            primitive
             tbots_test_util
             )
 
@@ -742,12 +741,12 @@ if (CATKIN_ENABLE_TESTING)
             ${Threads_LIBRARIES}
             geom
             world
-            tbots_navigator
-            tbots_primitive
-            tbots_intent
-            tbots_action
-            tbots_play
-            tbots_tactic
+            navigator
+            primitive
+            intent
+            action
+            play
+            tactic
             tbots_test_util
             )
 
@@ -762,12 +761,12 @@ if (CATKIN_ENABLE_TESTING)
             ${Boost_LIBRARIES}
             world
             geom
-            tbots_primitive
-            tbots_navigator
-            tbots_intent
-            tbots_tactic
-            tbots_action
-            tbots_play
+            primitive
+            navigator
+            intent
+            tactic
+            action
+            play
             tbots_test_util
             )
 

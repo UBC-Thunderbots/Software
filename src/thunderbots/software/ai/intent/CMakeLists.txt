@@ -1,0 +1,21 @@
+add_library(intent STATIC
+    avoid_area.cpp
+    catch_intent.cpp
+    chip_intent.cpp
+    direct_velocity_intent.cpp
+    direct_wheels_intent.cpp
+    dribble_intent.cpp
+    intent.cpp
+    kick_intent.cpp
+    move_intent.cpp
+    movespin_intent.cpp
+    pivot_intent.cpp
+    stop_intent.cpp
+    )
+target_include_directories(intent
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+target_link_libraries(intent
+    world
+    )

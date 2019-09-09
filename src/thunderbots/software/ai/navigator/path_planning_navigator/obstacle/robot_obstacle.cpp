@@ -1,4 +1,4 @@
-#include "RobotObstacle.h"
+#include "robot_obstacle.cpp"
 
 #include "shared/constants.h"
 
