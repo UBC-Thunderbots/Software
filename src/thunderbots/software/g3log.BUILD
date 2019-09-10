@@ -1,5 +1,5 @@
 cc_library(
-    name = "main",
+    name = "all",
     srcs = glob(
         ["src/*.cpp", "src/*.ipp"],
         exclude = [

@@ -1,5 +1,5 @@
 cc_library(
-    name = "geom",
+    name = "all",
     srcs = [
         "polygon.cpp",
         "rectangle.cpp",
@@ -16,8 +16,12 @@ cc_library(
         "segment.h",
         "util.h",
     ],
-    copts = ["-std=c++17"],
-    deps = [],
+    copts = [
+        "-std=c++17",
+    ],
+    deps = [
+        "@g3log//:all",
+    ],
 )
 
 cc_test(
@@ -26,8 +30,40 @@ cc_test(
         "angle_test.cpp",
     ],
     deps = [
-        ":geom",
-        "@g3log//:main",
+        ":all",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "point_test",
+    srcs = [
+        "point_test.cpp",
+    ],
+    deps = [
+        ":all",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "polygon_test",
+    srcs = [
+        "polygon_test.cpp",
+    ],
+    deps = [
+        ":all",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "util_test",
+    srcs = [
+        "util_test.cpp",
+    ],
+    deps = [
+        ":all",
         "@gtest//:gtest_main",
     ],
 )
