@@ -2,10 +2,10 @@
 
 #include <random>
 
-#include "ai/hl/hl.h"
-#include "ai/hl/stp/play/play.h"
-#include "ai/hl/stp/play_info.h"
-#include "ai/intent/intent.h"
+#include "software/ai/hl/hl.h"
+#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play_info.h"
+#include "software/ai/intent/intent.h"
 
 /**
  * The STP module is an implementation of the high-level logic Abstract class, that

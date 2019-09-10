@@ -7,8 +7,8 @@
 
 #include <optional>
 
-#include "ai/world/field.h"
-#include "software/ai/world/ball.h"
+#include "software/ai/world/field.h"
+#include "software/software/ai/world/ball.h"
 
 namespace Evaluation
 {

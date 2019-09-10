@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ai/primitive/primitive.h"
-#include "ai/world/world.h"
-#include "backend/robot_status.h"
-#include "multithreading/subject.h"
-#include "multithreading/threaded_observer.h"
-#include "typedefs.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/ai/world/world.h"
+#include "software/backend/robot_status.h"
+#include "software/multithreading/subject.h"
+#include "software/multithreading/threaded_observer.h"
+#include "software/typedefs.h"
 
 /**
  * A Backend is an abstraction around all I/O operations that our system may need

@@ -1,4 +1,4 @@
-#include "geom/util.h"
+#include "software/geom/util.h"
 
 #include <gtest/gtest.h>
 
@@ -8,8 +8,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "geom/angle.h"
-#include "geom/point.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 // Set this to 1 to enable debug output.
 #define DEBUG 0

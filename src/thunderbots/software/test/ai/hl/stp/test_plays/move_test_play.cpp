@@ -1,7 +1,7 @@
-#include "test/ai/hl/stp/test_plays/move_test_play.h"
+#include "software/test/ai/hl/stp/test_plays/move_test_play.h"
 
-#include "ai/hl/stp/play/play_factory.h"
-#include "test/ai/hl/stp/test_tactics/move_test_tactic.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/test/ai/hl/stp/test_tactics/move_test_tactic.h"
 
 const std::string MoveTestPlay::name = "Move Test Play";
 

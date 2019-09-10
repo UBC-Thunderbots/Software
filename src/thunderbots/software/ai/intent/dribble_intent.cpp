@@ -1,6 +1,6 @@
-#include "ai/intent/dribble_intent.h"
+#include "software/ai/intent/dribble_intent.h"
 
-#include "ai/intent/visitor/intent_visitor.h"
+#include "software/ai/intent/visitor/intent_visitor.h"
 
 const std::string DribbleIntent::INTENT_NAME = "Dribble Intent";
 

@@ -1,9 +1,9 @@
-#include "ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/play/halt_play.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/hl/stp/tactic/stop_tactic.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(StopPlayTest, test_example_play_invariant_always_holds)
 {

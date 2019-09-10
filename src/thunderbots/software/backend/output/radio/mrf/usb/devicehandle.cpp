@@ -1,8 +1,8 @@
-#include "devicehandle.h"
+#include "software/devicehandle.h"
 
-#include "tbots_libusb.h"
-#include "misc.h"
-#include "util/logger/init.h"
+#include "software/tbots_libusb.h"
+#include "software/misc.h"
+#include "software/util/logger/init.h"
 
 namespace
 {

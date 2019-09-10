@@ -2,7 +2,7 @@
  * This file contains unit tests for the Catch Intent class
  */
 
-#include "ai/intent/catch_intent.h"
+#include "software/ai/intent/catch_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

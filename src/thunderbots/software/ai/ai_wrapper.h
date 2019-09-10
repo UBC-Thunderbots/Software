@@ -3,13 +3,13 @@
 #include <ros/node_handle.h>
 #include <ros/publisher.h>
 
-#include "ai/ai.h"
-#include "ai/world/world.h"
-#include "multithreading/subject.h"
-#include "multithreading/threaded_observer.h"
-#include "primitive/primitive.h"
-#include "thunderbots_msgs/PlayInfo.h"
-#include "typedefs.h"
+#include "software/ai/ai.h"
+#include "software/ai/world/world.h"
+#include "software/multithreading/subject.h"
+#include "software/multithreading/threaded_observer.h"
+#include "software/primitive/primitive.h"
+#include "software/thunderbots_msgs/PlayInfo.h"
+#include "software/typedefs.h"
 
 /**
  * This class wraps an `AI` object, performing all the work of receiving World

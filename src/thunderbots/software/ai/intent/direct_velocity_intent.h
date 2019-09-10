@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/intent/intent.h"
-#include "ai/primitive/direct_velocity_primitive.h"
-#include "geom/angle.h"
-#include "geom/point.h"
+#include "software/ai/intent/intent.h"
+#include "software/ai/primitive/direct_velocity_primitive.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 class DirectVelocityIntent : public Intent, public DirectVelocityPrimitive
 {

@@ -1,9 +1,9 @@
-#include "ai/hl/stp/evaluation/deflect_off_enemy_target.h"
+#include "software/ai/hl/stp/evaluation/deflect_off_enemy_target.h"
 
 #include <gtest/gtest.h>
 
-#include "geom/util.h"
-#include "test/test_util/test_util.h"
+#include "software/geom/util.h"
+#include "software/test/test_util/test_util.h"
 
 
 TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)

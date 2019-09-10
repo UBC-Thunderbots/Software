@@ -1,6 +1,6 @@
-#include "ai/intent/movespin_intent.h"
+#include "software/ai/intent/movespin_intent.h"
 
-#include "ai/intent/visitor/intent_visitor.h"
+#include "software/ai/intent/visitor/intent_visitor.h"
 
 const std::string MoveSpinIntent::INTENT_NAME = "MoveSpin Intent";
 

@@ -1,10 +1,10 @@
-#include "ai/ai_wrapper.h"
+#include "software/ai/ai_wrapper.h"
 
 #include <boost/bind.hpp>
 
-#include "thunderbots_msgs/PlayInfo.h"
-#include "util/canvas_messenger/canvas_messenger.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/thunderbots_msgs/PlayInfo.h"
+#include "software/util/canvas_messenger/canvas_messenger.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 AIWrapper::AIWrapper(ros::NodeHandle node_handle)
 {

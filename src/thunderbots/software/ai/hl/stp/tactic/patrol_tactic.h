@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The PatrolTactic will make the robot continuously patrol through the positions it's

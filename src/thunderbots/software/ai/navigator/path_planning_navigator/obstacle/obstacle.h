@@ -5,14 +5,14 @@
 
 #include <ai/primitive/primitive.h>
 
-#include "ai/world/ball.h"
-#include "ai/world/robot.h"
-#include "geom/angle.h"
-#include "geom/circle.h"
-#include "geom/point.h"
-#include "geom/polygon.h"
-#include "geom/util.h"
-#include "shared/constants.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/robot.h"
+#include "software/geom/angle.h"
+#include "software/geom/circle.h"
+#include "software/geom/point.h"
+#include "software/geom/polygon.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
 
 class Obstacle
 {

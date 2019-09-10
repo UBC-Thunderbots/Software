@@ -1,4 +1,4 @@
-#include "ai/navigator/util.h"
+#include "software/ai/navigator/util.h"
 
 #include <gtest/gtest.h>
 #include <math.h>
@@ -8,8 +8,8 @@
 #include <ctime>
 #include <sstream>
 
-#include "geom/point.h"
-#include "geom/util.h"
+#include "software/geom/point.h"
+#include "software/geom/util.h"
 
 TEST(NavUtilTest, calculateTransitionSpeedBetweenSegments_tests_parallel_segments)
 {

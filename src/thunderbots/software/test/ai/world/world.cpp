@@ -1,9 +1,9 @@
-#include "ai/world/world.h"
+#include "software/ai/world/world.h"
 
 #include <gtest/gtest.h>
 
-#include "test/test_util/test_util.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/test/test_util/test_util.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 class WorldTest : public ::testing::Test
 {

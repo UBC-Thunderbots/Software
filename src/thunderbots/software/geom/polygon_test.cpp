@@ -1,10 +1,10 @@
-#include "geom/polygon.h"
+#include "software/geom/polygon.h"
 
 #include <gtest/gtest.h>
 
 #include <unordered_set>
 
-#include "geom/point.h"
+#include "software/geom/point.h"
 
 TEST(PolygonTest, test_construct_from_vector)
 {

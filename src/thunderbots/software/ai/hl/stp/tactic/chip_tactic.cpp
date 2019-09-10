@@ -1,8 +1,8 @@
-#include "ai/hl/stp/tactic/chip_tactic.h"
+#include "software/ai/hl/stp/tactic/chip_tactic.h"
 
 #include <algorithm>
 
-#include "ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/chip_action.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
     : ball(ball), Tactic(loop_forever, {RobotCapabilityFlags::Chip})

@@ -1,22 +1,22 @@
-#include "grsim_command_primitive_visitor.h"
+#include "software/grsim_command_primitive_visitor.h"
 
 #include <shared/constants.h>
 
-#include "ai/primitive/catch_primitive.h"
-#include "ai/primitive/chip_primitive.h"
-#include "ai/primitive/direct_velocity_primitive.h"
-#include "ai/primitive/direct_wheels_primitive.h"
-#include "ai/primitive/dribble_primitive.h"
-#include "ai/primitive/kick_primitive.h"
-#include "ai/primitive/move_primitive.h"
-#include "ai/primitive/movespin_primitive.h"
-#include "ai/primitive/pivot_primitive.h"
-#include "ai/primitive/stop_primitive.h"
-#include "geom/angle.h"
-#include "geom/point.h"
-#include "geom/util.h"
-#include "shared/constants.h"
-#include "util/logger/init.h"
+#include "software/ai/primitive/catch_primitive.h"
+#include "software/ai/primitive/chip_primitive.h"
+#include "software/ai/primitive/direct_velocity_primitive.h"
+#include "software/ai/primitive/direct_wheels_primitive.h"
+#include "software/ai/primitive/dribble_primitive.h"
+#include "software/ai/primitive/kick_primitive.h"
+#include "software/ai/primitive/move_primitive.h"
+#include "software/ai/primitive/movespin_primitive.h"
+#include "software/ai/primitive/pivot_primitive.h"
+#include "software/ai/primitive/stop_primitive.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
+#include "software/util/logger/init.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)

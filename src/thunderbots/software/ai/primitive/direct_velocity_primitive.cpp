@@ -1,6 +1,6 @@
-#include "ai/primitive/direct_velocity_primitive.h"
+#include "software/ai/primitive/direct_velocity_primitive.h"
 
-#include "ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/visitor/primitive_visitor.h"
 
 const std::string DirectVelocityPrimitive::PRIMITIVE_NAME = "Direct Velocity Primitive";
 

@@ -1,9 +1,9 @@
-#include "ai/hl/stp/play/example_play.h"
+#include "software/ai/hl/stp/play/example_play.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/hl/stp/tactic/move_tactic.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(ExamplePlayTest, test_example_play_always_applicable)
 {

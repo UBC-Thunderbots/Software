@@ -1,10 +1,10 @@
-#include "transfer.h"
+#include "software/transfer.h"
 
 #include <iostream>
 
-#include "errors.h"
-#include "misc.h"
-#include "util/logger/init.h"
+#include "software/errors.h"
+#include "software/misc.h"
+#include "software/util/logger/init.h"
 
 USB::Transfer::~Transfer()
 {

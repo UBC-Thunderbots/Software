@@ -1,6 +1,6 @@
-#include "ai/navigator/trespass.h"
+#include "software/ai/navigator/trespass.h"
 
-#include "util/math/math_functions.h"
+#include "software/util/math/math_functions.h"
 
 using namespace Util;
 

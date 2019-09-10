@@ -5,9 +5,9 @@
 #include <optional>
 #include <vector>
 
-#include "ai/world/robot.h"
-#include "boost/circular_buffer.hpp"
-#include "util/time/timestamp.h"
+#include "software/ai/world/robot.h"
+#include "software/boost/circular_buffer.hpp"
+#include "software/util/time/timestamp.h"
 
 /**
  * A team of robots

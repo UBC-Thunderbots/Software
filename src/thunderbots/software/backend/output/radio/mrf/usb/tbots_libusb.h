@@ -13,16 +13,16 @@
 #include <unordered_map>
 #include <vector>
 
-#include "bulktransfer.h"
-#include "controltransfer.h"
-#include "device.h"
-#include "devicehandle.h"
-#include "errors.h"
-#include "interrupttransfer.h"
-#include "misc.h"
-#include "transfer.h"
-#include "backend/output/radio/mrf/util/async_operation.h"
-#include "backend/output/radio/mrf/util/noncopyable.h"
+#include "software/bulktransfer.h"
+#include "software/controltransfer.h"
+#include "software/device.h"
+#include "software/devicehandle.h"
+#include "software/errors.h"
+#include "software/interrupttransfer.h"
+#include "software/misc.h"
+#include "software/transfer.h"
+#include "software/backend/output/radio/mrf/util/async_operation.h"
+#include "software/backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {

@@ -15,15 +15,15 @@
 #include <utility>
 #include <vector>
 
-#include "ai/primitive/primitive.h"
-#include "annunciator.h"
-#include "geom/angle.h"
-#include "geom/point.h"
-#include "send_reliable_message_operation.h"
-#include "shared/constants.h"
-#include "usb/tbots_libusb.h"
-#include "backend/output/radio/mrf/util/async_operation.h"
-#include "backend/output/radio/mrf/util/noncopyable.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/annunciator.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/send_reliable_message_operation.h"
+#include "software/shared/constants.h"
+#include "software/usb/tbots_libusb.h"
+#include "software/backend/output/radio/mrf/util/async_operation.h"
+#include "software/backend/output/radio/mrf/util/noncopyable.h"
 
 /**
  * An operation to send a reliable message.

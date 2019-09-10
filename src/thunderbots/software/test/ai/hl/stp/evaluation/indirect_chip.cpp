@@ -2,15 +2,15 @@
  * Unit tests for indirect_chip_and_chase_target evaluation function and its related
  * functions.
  */
-#include "ai/hl/stp/evaluation/indirect_chip.h"
+#include "software/ai/hl/stp/evaluation/indirect_chip.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/world/world.h"
-#include "geom/angle.h"
-#include "geom/point.h"
-#include "geom/util.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/world/world.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/geom/util.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(findTargetPointForIndirectChipAndChaseTest,
      triangle_not_empty_and_target_within_reach_test)

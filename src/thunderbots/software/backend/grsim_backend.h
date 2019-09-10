@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/world/world.h"
-#include "backend/backend.h"
-#include "backend/input/network/networking/network_client.h"
-#include "backend/output/grsim/grsim_output.h"
+#include "software/ai/world/world.h"
+#include "software/backend/backend.h"
+#include "software/backend/input/network/networking/network_client.h"
+#include "software/backend/output/grsim/grsim_output.h"
 
 class GrSimBackend : public Backend
 {

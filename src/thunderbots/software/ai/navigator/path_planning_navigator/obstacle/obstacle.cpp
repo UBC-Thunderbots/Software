@@ -1,5 +1,5 @@
 
-#include "obstacle.h"
+#include "software/obstacle.h"
 
 const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {

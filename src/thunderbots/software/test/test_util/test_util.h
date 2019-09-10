@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/world/ball.h"
-#include "ai/world/field.h"
-#include "ai/world/team.h"
-#include "ai/world/world.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/team.h"
+#include "software/ai/world/world.h"
 
 namespace Test
 {

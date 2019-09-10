@@ -2,9 +2,9 @@
  * Implementation of the "Pass" class
  */
 
-#include "ai/passing/pass.h"
+#include "software/ai/passing/pass.h"
 
-#include "geom/util.h"
+#include "software/geom/util.h"
 
 using namespace Passing;
 

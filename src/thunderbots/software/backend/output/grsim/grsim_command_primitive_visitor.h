@@ -4,9 +4,9 @@
 
 #include <variant>
 
-#include "ai/primitive/visitor/primitive_visitor.h"
-#include "ai/world/robot.h"
-#include "motion_controller.h"
+#include "software/ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/world/robot.h"
+#include "software/motion_controller.h"
 
 using MotionControllerCommand =
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;

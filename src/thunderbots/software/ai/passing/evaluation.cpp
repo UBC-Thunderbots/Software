@@ -3,15 +3,15 @@
  */
 
 
-#include "ai/passing/evaluation.h"
+#include "software/ai/passing/evaluation.h"
 
 #include <numeric>
 
-#include "../shared/constants.h"
-#include "ai/evaluation/pass.h"
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
-#include "geom/util.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/../shared/constants.h"
+#include "software/ai/evaluation/pass.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/geom/util.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 using namespace AI::Evaluation;

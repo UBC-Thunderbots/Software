@@ -2,11 +2,11 @@
  * Tests for the pass evaluation functions
  */
 
-#include "ai/evaluation/pass.h"
+#include "software/ai/evaluation/pass.h"
 
 #include <gtest/gtest.h>
 
-#include "../shared/constants.h"
+#include "software/../shared/constants.h"
 
 using namespace AI::Evaluation;
 

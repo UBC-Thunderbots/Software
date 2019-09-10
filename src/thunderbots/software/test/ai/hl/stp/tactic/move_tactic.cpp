@@ -1,9 +1,9 @@
-#include "ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(MoveTacticTest, robot_far_from_destination)
 {

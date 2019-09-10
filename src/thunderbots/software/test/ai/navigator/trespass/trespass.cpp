@@ -2,12 +2,12 @@
  * Test file for trespass functions
  */
 
-#include "ai/navigator/trespass.h"
+#include "software/ai/navigator/trespass.h"
 
 #include <gtest/gtest.h>
 
-#include "geom/point.h"
-#include "geom/rectangle.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 TEST(TrespassTest, calcLinearTrespassScore_rectangle_test)
 {

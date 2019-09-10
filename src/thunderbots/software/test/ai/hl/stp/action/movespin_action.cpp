@@ -1,8 +1,8 @@
-#include "ai/hl/stp/action/movespin_action.h"
+#include "software/ai/hl/stp/action/movespin_action.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/movespin_intent.h"
+#include "software/ai/intent/movespin_intent.h"
 
 TEST(MoveSpinActionTest, robot_far_from_destination)
 {

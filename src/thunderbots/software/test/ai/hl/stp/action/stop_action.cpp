@@ -1,8 +1,8 @@
-#include "ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/stop_intent.h"
+#include "software/ai/intent/stop_intent.h"
 
 
 TEST(StopActionTest, robot_stopping_without_coasting_while_already_moving)

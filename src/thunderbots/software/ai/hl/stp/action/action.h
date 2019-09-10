@@ -3,8 +3,8 @@
 #include <boost/bind.hpp>
 #include <boost/coroutine2/all.hpp>
 
-#include "ai/intent/intent.h"
-#include "ai/world/robot.h"
+#include "software/ai/intent/intent.h"
+#include "software/ai/world/robot.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with

@@ -1,6 +1,6 @@
-#include "test/ai/hl/stp/test_actions/move_test_action.h"
+#include "software/test/ai/hl/stp/test_actions/move_test_action.h"
 
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/move_intent.h"
 
 MoveTestAction::MoveTestAction(double close_to_dest_threshold)
     : Action(), close_to_dest_threshold(close_to_dest_threshold)

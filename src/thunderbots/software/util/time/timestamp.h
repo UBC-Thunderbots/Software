@@ -1,7 +1,7 @@
 #pragma once
 
-#include "util/time/duration.h"
-#include "util/time/time.h"
+#include "software/util/time/duration.h"
+#include "software/util/time/time.h"
 
 /**
  * A simple Timestamp class built around doubles. This Timestamp is intended to represent

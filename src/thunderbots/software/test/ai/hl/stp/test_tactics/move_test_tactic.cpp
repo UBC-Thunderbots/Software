@@ -1,8 +1,8 @@
-#include "test/ai/hl/stp/test_tactics/move_test_tactic.h"
+#include "software/test/ai/hl/stp/test_tactics/move_test_tactic.h"
 
 #include <algorithm>
 
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/move_intent.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
     : Tactic(loop_forever, {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,

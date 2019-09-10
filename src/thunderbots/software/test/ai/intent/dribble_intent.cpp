@@ -2,7 +2,7 @@
  * This file contains unit tests for the Dribble Intent class
  */
 
-#include "ai/intent/dribble_intent.h"
+#include "software/ai/intent/dribble_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

@@ -5,8 +5,8 @@
 
 #include <algorithm>
 
-#include "ai/hl/stp/stp.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/hl/stp/stp.h"
+#include "software/test/test_util/test_util.h"
 
 /**
  * This file contains unit tests for the assignRobotsToTactics function

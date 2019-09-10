@@ -4,8 +4,8 @@
 #include <chrono>
 #include <thread>
 
-#include "util/parameter/dynamic_parameters.h"
-#include "util/parameter/parameter.h"
+#include "software/util/parameter/dynamic_parameters.h"
+#include "software/util/parameter/parameter.h"
 
 namespace
 {

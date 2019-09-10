@@ -1,6 +1,6 @@
-#include "ai/hl/stp/action/action.h"
+#include "software/ai/hl/stp/action/action.h"
 
-#include "util/logger/init.h"
+#include "software/util/logger/init.h"
 
 Action::Action()
     : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))

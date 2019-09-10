@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "ai/util.h"
+#include "software/ai/util.h"
 
 TEST(comma_separated_list_to_set_1, CommaSeparatedListToSetTest)
 {

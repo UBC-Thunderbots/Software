@@ -1,13 +1,13 @@
 /**
  * Implementation of the PasserTactic
  */
-#include "ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/passer_tactic.h"
 
-#include "ai/hl/stp/action/kick_action.h"
-#include "ai/hl/stp/action/move_action.h"
-#include "geom/util.h"
-#include "shared/constants.h"
-#include "util/logger/init.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
+#include "software/util/logger/init.h"
 
 using namespace Passing;
 

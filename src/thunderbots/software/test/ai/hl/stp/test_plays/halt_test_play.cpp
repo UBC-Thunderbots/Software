@@ -1,8 +1,8 @@
-#include "test/ai/hl/stp/test_plays/halt_test_play.h"
+#include "software/test/ai/hl/stp/test_plays/halt_test_play.h"
 
-#include "ai/hl/stp/play/play_factory.h"
-#include "geom/util.h"
-#include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/geom/util.h"
+#include "software/test/ai/hl/stp/test_tactics/stop_test_tactic.h"
 
 const std::string HaltTestPlay::name = "Halt Test Play";
 

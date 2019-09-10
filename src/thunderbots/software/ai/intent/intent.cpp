@@ -1,8 +1,8 @@
-#include "intent.h"
+#include "software/intent.h"
 
 #include <algorithm>
 
-#include "util/logger/init.h"
+#include "software/util/logger/init.h"
 
 // Implement concrete functions shared by all intents
 

@@ -1,10 +1,10 @@
-#include "multithreading/subject.h"
+#include "software/multithreading/subject.h"
 
 #include <gtest/gtest.h>
 
 #include <thread>
 
-#include "multithreading/observer.h"
+#include "software/multithreading/observer.h"
 
 class MockObserver : public Observer<int>
 {

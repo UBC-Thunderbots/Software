@@ -1,12 +1,12 @@
-#include "backend/output/grsim/grsim_output.h"
+#include "software/backend/output/grsim/grsim_output.h"
 
 #include <google/protobuf/util/message_differencer.h>
 #include <gtest/gtest.h>
 
 #include <limits>
 
-#include "proto/grSim_Commands.pb.h"
-#include "proto/grSim_Packet.pb.h"
+#include "software/proto/grSim_Commands.pb.h"
+#include "software/proto/grSim_Packet.pb.h"
 
 TEST(GrSimOutputTest, create_grsim_packet_zero_vel)
 {

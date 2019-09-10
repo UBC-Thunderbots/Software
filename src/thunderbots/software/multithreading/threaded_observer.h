@@ -3,7 +3,7 @@
 #include <boost/bind.hpp>
 #include <thread>
 
-#include "multithreading/observer.h"
+#include "software/multithreading/observer.h"
 
 /**
  * The general usage of this class should be to extend it, then override

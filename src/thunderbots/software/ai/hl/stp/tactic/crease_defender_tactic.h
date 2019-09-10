@@ -2,8 +2,8 @@
 
 #include <geom/segment.h>
 
-#include "ai/hl/stp/evaluation/enemy_threat.h"
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * A crease defender moves around the exterior of our defense box to help shadow

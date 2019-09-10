@@ -2,7 +2,7 @@
  * This file contains unit tests for the Chip Intent class
  */
 
-#include "ai/intent/chip_intent.h"
+#include "software/ai/intent/chip_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The BlockShotPathTactic will move the robot to block the entire friendly net from

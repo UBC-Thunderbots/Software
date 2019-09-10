@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ai/hl/stp/action/action.h"
-#include "geom/angle.h"
-#include "geom/point.h"
+#include "software/ai/hl/stp/action/action.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 /**
  * A test Action used for unit tests

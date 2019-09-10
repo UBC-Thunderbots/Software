@@ -1,10 +1,10 @@
-#include "ai/hl/stp/play/penalty_kick_play.h"
+#include "software/ai/hl/stp/play/penalty_kick_play.h"
 
-#include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/tactic/move_tactic.h"
-#include "ai/hl/stp/tactic/penalty_kick_tactic.h"
-#include "ai/hl/stp/tactic/stop_tactic.h"
-#include "shared/constants.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/stop_tactic.h"
+#include "software/shared/constants.h"
 
 const std::string PenaltyKickPlay::name = "Penalty Kick Play";
 

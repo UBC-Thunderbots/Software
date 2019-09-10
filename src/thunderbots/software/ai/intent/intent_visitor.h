@@ -1,15 +1,15 @@
 #pragma once
 
-#include "ai/intent/catch_intent.h"
-#include "ai/intent/chip_intent.h"
-#include "ai/intent/direct_velocity_intent.h"
-#include "ai/intent/direct_wheels_intent.h"
-#include "ai/intent/dribble_intent.h"
-#include "ai/intent/kick_intent.h"
-#include "ai/intent/move_intent.h"
-#include "ai/intent/movespin_intent.h"
-#include "ai/intent/pivot_intent.h"
-#include "ai/intent/stop_intent.h"
+#include "software/ai/intent/catch_intent.h"
+#include "software/ai/intent/chip_intent.h"
+#include "software/ai/intent/direct_velocity_intent.h"
+#include "software/ai/intent/direct_wheels_intent.h"
+#include "software/ai/intent/dribble_intent.h"
+#include "software/ai/intent/kick_intent.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/ai/intent/movespin_intent.h"
+#include "software/ai/intent/pivot_intent.h"
+#include "software/ai/intent/stop_intent.h"
 
 /**
  * This class provides an interface for all Intent Visitors. The Visitor design pattern

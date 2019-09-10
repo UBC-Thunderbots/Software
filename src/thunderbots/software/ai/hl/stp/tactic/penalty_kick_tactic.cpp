@@ -1,15 +1,15 @@
 /**
  * Implementation of the PenaltyKickTactic
  */
-#include "penalty_kick_tactic.h"
+#include "software/penalty_kick_tactic.h"
 
-#include "ai/hl/stp/action/dribble_action.h"
-#include "ai/hl/stp/action/kick_action.h"
-#include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
-#include "geom/util.h"
-#include "shared/constants.h"
-#include "util/logger/init.h"
+#include "software/ai/hl/stp/action/dribble_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
+#include "software/util/logger/init.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,

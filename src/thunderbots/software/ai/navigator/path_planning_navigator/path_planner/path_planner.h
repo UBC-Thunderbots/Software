@@ -2,8 +2,8 @@
 #include <optional>
 #include <vector>
 
-#include "ai/navigator/obstacle/obstacle.h"
-#include "geom/point.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/geom/point.h"
 
 /**
  * PathPlanner is an interface for a path planner that,

@@ -1,9 +1,9 @@
-#include "ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/kick_intent.h"
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/kick_intent.h"
+#include "software/ai/intent/move_intent.h"
 
 TEST(KickActionTest, robot_behind_ball_kicking_towards_positive_x_positive_y)
 {

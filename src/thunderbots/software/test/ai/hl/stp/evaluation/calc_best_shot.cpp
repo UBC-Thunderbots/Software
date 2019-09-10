@@ -3,13 +3,13 @@
  * in calc_best_shot.cpp
  */
 
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 
 #include <gtest/gtest.h>
 
-#include "geom/util.h"
-#include "shared/constants.h"
-#include "test/test_util/test_util.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
 {

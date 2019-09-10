@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * A test Tactic used for unit tests

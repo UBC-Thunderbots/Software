@@ -1,12 +1,12 @@
-#include "backend/output/grsim/motion_controller.h"
+#include "software/backend/output/grsim/motion_controller.h"
 
 #include <chrono>
 
-#include "ai/primitive/move_primitive.h"
-#include "ai/world/robot.h"
-#include "geom/angle.h"
-#include "gtest/gtest.h"
-#include "shared/constants.h"
+#include "software/ai/primitive/move_primitive.h"
+#include "software/ai/world/robot.h"
+#include "software/geom/angle.h"
+#include "software/gtest/gtest.h"
+#include "software/shared/constants.h"
 
 
 using namespace std::chrono;

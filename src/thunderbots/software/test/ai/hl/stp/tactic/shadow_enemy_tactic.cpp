@@ -1,12 +1,12 @@
-#include "ai/hl/stp/tactic/shadow_enemy_tactic.h"
+#include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 
 #include <ai/hl/stp/evaluation/enemy_threat.h>
 #include <firmware/main/shared_util/constants.h>
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
-#include "shared/util.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/shared/util.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
 {

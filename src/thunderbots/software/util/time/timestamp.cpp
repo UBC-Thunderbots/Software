@@ -1,9 +1,9 @@
-#include "timestamp.h"
+#include "software/timestamp.h"
 
 #include <cmath>
 #include <stdexcept>
 
-#include "shared/constants.h"
+#include "software/shared/constants.h"
 
 Timestamp::Timestamp() : Timestamp(0) {}
 

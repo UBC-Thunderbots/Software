@@ -4,11 +4,11 @@
  * class)
  */
 
-#include "ai/intent/intent.h"
+#include "software/ai/intent/intent.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/move_intent.h"
 
 
 TEST(IntentTest, test_get_priority)

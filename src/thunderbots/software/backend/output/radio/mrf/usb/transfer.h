@@ -2,9 +2,9 @@
 
 #include <libusb.h>
 //
-#include "devicehandle.h"
-#include "backend/output/radio/mrf/util/async_operation.h"
-#include "backend/output/radio/mrf/util/noncopyable.h"
+#include "software/devicehandle.h"
+#include "software/backend/output/radio/mrf/util/async_operation.h"
+#include "software/backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {

@@ -1,6 +1,6 @@
-#include "ai/navigator/path_planner/theta_star_path_planner.h"
+#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
-#include "util/logger/init.h"
+#include "software/util/logger/init.h"
 
 /**
  * This file contains the implementation of a theta star path planner

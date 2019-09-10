@@ -1,4 +1,4 @@
-#include "multithreading/threaded_observer.h"
+#include "software/multithreading/threaded_observer.h"
 
 #include <gtest/gtest.h>
 

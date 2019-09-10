@@ -2,9 +2,9 @@
 
 #include <functional>
 
-#include "geom/line.h"
-#include "geom/point.h"
-#include "geom/segment.h"
+#include "software/geom/line.h"
+#include "software/geom/point.h"
+#include "software/geom/segment.h"
 
 class Ray final
 {

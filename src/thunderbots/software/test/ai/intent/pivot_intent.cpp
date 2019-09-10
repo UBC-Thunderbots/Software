@@ -2,7 +2,7 @@
  * This file contains unit tests for the Pivot Intent class
  */
 
-#include "ai/intent/pivot_intent.h"
+#include "software/ai/intent/pivot_intent.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

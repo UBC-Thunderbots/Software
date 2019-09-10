@@ -6,11 +6,11 @@
 
 #include <functional>
 
-#include "ai/passing/pass.h"
-#include "ai/world/field.h"
-#include "ai/world/team.h"
-#include "ai/world/world.h"
-#include "util/math/math_functions.h"
+#include "software/ai/passing/pass.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/team.h"
+#include "software/ai/world/world.h"
+#include "software/util/math/math_functions.h"
 
 namespace Passing
 {

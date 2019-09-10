@@ -1,4 +1,4 @@
-#include "multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.h"
 
 #include <gtest/gtest.h>
 

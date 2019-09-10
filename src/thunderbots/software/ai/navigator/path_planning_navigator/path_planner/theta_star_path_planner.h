@@ -2,9 +2,9 @@
 #include <bits/stdc++.h>
 #include <unistd.h>
 
-#include "ai/navigator/path_planner/path_planner.h"
-#include "ai/world/ball.h"
-#include "ai/world/field.h"
+#include "software/ai/navigator/path_planner/path_planner.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/field.h"
 
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement

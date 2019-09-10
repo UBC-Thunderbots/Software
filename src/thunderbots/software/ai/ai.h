@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ai/hl/hl.h"
-#include "ai/hl/stp/play_info.h"
-#include "ai/navigator/navigator.h"
-#include "ai/primitive/primitive.h"
-#include "ai/world/world.h"
-#include "util/time/timestamp.h"
+#include "software/ai/hl/hl.h"
+#include "software/ai/hl/stp/play_info.h"
+#include "software/ai/navigator/navigator.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/ai/world/world.h"
+#include "software/util/time/timestamp.h"
 
 /**
  * This class wraps all our AI logic and decision making to help separate our

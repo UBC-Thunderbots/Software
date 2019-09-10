@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "test/ai/hl/stp/test_tactics/move_test_tactic.h"
+#include "software/test/ai/hl/stp/test_tactics/move_test_tactic.h"
 
 /**
  * This file contains the unit tests for the Tactic class (NOTE: `Tactic` is virtual, so

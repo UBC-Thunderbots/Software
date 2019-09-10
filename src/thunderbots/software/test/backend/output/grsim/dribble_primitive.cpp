@@ -6,9 +6,9 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "ai/world/robot.h"
-#include "backend/output/grsim/grsim_command_primitive_visitor.h"
-#include "shared/constants.h"
+#include "software/ai/world/robot.h"
+#include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
+#include "software/shared/constants.h"
 
 using MotionControllerCommand =
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;

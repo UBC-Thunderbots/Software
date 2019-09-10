@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "ai/intent/avoid_area.h"
+#include "software/ai/intent/avoid_area.h"
 
 // We forward-declare the IntentVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the

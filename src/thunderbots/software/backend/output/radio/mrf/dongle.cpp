@@ -1,4 +1,4 @@
-#include "dongle.h"
+#include "software/dongle.h"
 
 #include <unistd.h>
 
@@ -13,10 +13,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "messages.h"
-#include "util/constants.h"
-#include "util/logger/init.h"
+#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
+#include "software/messages.h"
+#include "software/util/constants.h"
+#include "software/util/logger/init.h"
 
 namespace
 {

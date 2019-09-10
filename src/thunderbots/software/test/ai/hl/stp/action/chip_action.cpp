@@ -1,9 +1,9 @@
-#include "ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/chip_action.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/chip_intent.h"
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/chip_intent.h"
+#include "software/ai/intent/move_intent.h"
 
 TEST(ChipActionTest, robot_behind_ball_chipping_towards_positive_x_positive_y)
 {

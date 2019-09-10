@@ -1,4 +1,4 @@
-#include "tbots_libusb.h"
+#include "software/tbots_libusb.h"
 
 #include <poll.h>
 
@@ -13,7 +13,7 @@
 #include <string>
 #include <thread>
 
-#include "util/logger/init.h"
+#include "software/util/logger/init.h"
 
 #define STALL_RETRIES 3
 

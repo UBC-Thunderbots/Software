@@ -1,8 +1,8 @@
-#include "ai/navigator/path_planner/straight_line_path_planner.h"
+#include "software/ai/navigator/path_planner/straight_line_path_planner.h"
 
 #include <gtest/gtest.h>
 
-#include "geom/point.h"
+#include "software/geom/point.h"
 
 TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 {

@@ -1,12 +1,12 @@
-#include "free_kick_tactic.h"
+#include "software/free_kick_tactic.h"
 
-#include "ai/hl/stp/action/chip_action.h"
-#include "ai/hl/stp/action/kick_action.h"
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
-#include "ai/hl/stp/evaluation/deflect_off_enemy_target.h"
-#include "ai/hl/stp/evaluation/indirect_chip.h"
-#include "shared/constants.h"
-#include "util/logger/init.h"
+#include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/deflect_off_enemy_target.h"
+#include "software/ai/hl/stp/evaluation/indirect_chip.h"
+#include "software/shared/constants.h"
+#include "software/util/logger/init.h"
 
 namespace
 {

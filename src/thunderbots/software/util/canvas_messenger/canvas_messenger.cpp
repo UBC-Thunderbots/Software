@@ -1,8 +1,8 @@
-#include "canvas_messenger.h"
+#include "software/canvas_messenger.h"
 
 #include <firmware/main/shared_util/constants.h>
 
-#include "util/constants.h"
+#include "software/util/constants.h"
 
 using namespace Util;
 

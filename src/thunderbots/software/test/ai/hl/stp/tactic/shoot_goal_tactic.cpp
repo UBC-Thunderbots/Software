@@ -1,11 +1,11 @@
-#include "ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/chip_intent.h"
-#include "ai/intent/kick_intent.h"
-#include "ai/intent/move_intent.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/chip_intent.h"
+#include "software/ai/intent/kick_intent.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
 {

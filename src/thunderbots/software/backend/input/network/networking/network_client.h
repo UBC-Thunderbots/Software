@@ -6,12 +6,12 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <thread>
 
-#include "ai/world/world.h"
-#include "backend/input/network/networking/ssl_gamecontroller_client.h"
-#include "backend/input/network/networking/ssl_vision_client.h"
-#include "network_filter.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
-#include "proto/ssl_referee.pb.h"
+#include "software/ai/world/world.h"
+#include "software/backend/input/network/networking/ssl_gamecontroller_client.h"
+#include "software/backend/input/network/networking/ssl_vision_client.h"
+#include "software/network_filter.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/proto/ssl_referee.pb.h"
 
 /**
  * This class encapsulates our SSLVisionClient and SSLGameController clients to abstract

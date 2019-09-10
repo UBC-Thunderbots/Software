@@ -1,4 +1,4 @@
-#include "ai/hl/stp/stp.h"
+#include "software/ai/hl/stp/stp.h"
 
 #include <gtest/gtest.h>
 #include <test/ai/hl/stp/test_tactics/move_test_tactic.h>
@@ -6,10 +6,10 @@
 #include <algorithm>
 #include <exception>
 
-#include "ai/hl/stp/play/play_factory.h"
-#include "test/ai/hl/stp/test_plays/halt_test_play.h"
-#include "test/ai/hl/stp/test_plays/move_test_play.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/test/ai/hl/stp/test_plays/halt_test_play.h"
+#include "software/test/ai/hl/stp/test_plays/move_test_play.h"
+#include "software/test/test_util/test_util.h"
 
 class STPTest : public ::testing::Test
 {

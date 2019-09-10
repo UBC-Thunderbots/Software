@@ -1,15 +1,15 @@
 /**
  * Tests for the Reciever Tactic
  */
-#include "ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/kick_intent.h"
-#include "ai/intent/move_intent.h"
-#include "geom/util.h"
-#include "shared/constants.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/kick_intent.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
+#include "software/test/test_util/test_util.h"
 
 using namespace Passing;
 

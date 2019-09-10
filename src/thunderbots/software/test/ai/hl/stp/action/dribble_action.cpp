@@ -1,8 +1,8 @@
-#include "ai/hl/stp/action/dribble_action.h"
+#include "software/ai/hl/stp/action/dribble_action.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/dribble_intent.h"
+#include "software/ai/intent/dribble_intent.h"
 
 TEST(DribbleActionTest, robot_far_from_destination)
 {

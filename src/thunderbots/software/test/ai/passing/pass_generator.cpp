@@ -6,13 +6,13 @@
  *       by `ratePass`
  */
 
-#include "ai/passing/pass_generator.h"
+#include "software/ai/passing/pass_generator.h"
 
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "ai/passing/evaluation.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/passing/evaluation.h"
+#include "software/test/test_util/test_util.h"
 
 using namespace Passing;
 using namespace std::chrono_literals;

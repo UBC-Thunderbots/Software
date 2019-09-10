@@ -3,8 +3,8 @@
 
 #include <random>
 
-#include "util/parameter/dynamic_parameter_utils.h"
-#include "util/parameter/parameter.h"
+#include "software/util/parameter/dynamic_parameter_utils.h"
+#include "software/util/parameter/parameter.h"
 
 /* * Registry Test Fixutre:
  *      This fixture is used everywhere to return a unique_value value

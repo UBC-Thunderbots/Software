@@ -1,10 +1,10 @@
-#include "ai/world/ball.h"
-#include "backend/output/grsim/grsim_command_primitive_visitor.h"
-#include "backend/output/grsim/motion_controller.h"
-#include "geom/angle.h"
-#include "gtest/gtest.h"
-#include "shared/constants.h"
-#include "software/ai/world/robot.h"
+#include "software/ai/world/ball.h"
+#include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
+#include "software/backend/output/grsim/motion_controller.h"
+#include "software/geom/angle.h"
+#include "software/gtest/gtest.h"
+#include "software/shared/constants.h"
+#include "software/software/ai/world/robot.h"
 
 #define POSITION_TOLERANCE 0.01
 #define VELOCITY_BASE_TOLERANCE 0.015

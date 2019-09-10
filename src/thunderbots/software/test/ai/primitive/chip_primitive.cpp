@@ -2,7 +2,7 @@
  * This file contains the unit tests for the ChipPrimitive class
  */
 
-#include "ai/primitive/chip_primitive.h"
+#include "software/ai/primitive/chip_primitive.h"
 
 #include <gtest/gtest.h>
 #include <string.h>

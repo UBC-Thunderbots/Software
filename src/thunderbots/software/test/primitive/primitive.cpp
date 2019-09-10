@@ -2,17 +2,17 @@
  * This file contains the unit tests for the Primitive class
  */
 
-#include "ai/primitive/primitive.h"
+#include "software/ai/primitive/primitive.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/primitive/catch_primitive.h"
-#include "ai/primitive/chip_primitive.h"
-#include "ai/primitive/direct_velocity_primitive.h"
-#include "ai/primitive/kick_primitive.h"
-#include "ai/primitive/move_primitive.h"
-#include "ai/primitive/pivot_primitive.h"
-#include "ai/primitive/stop_primitive.h"
+#include "software/ai/primitive/catch_primitive.h"
+#include "software/ai/primitive/chip_primitive.h"
+#include "software/ai/primitive/direct_velocity_primitive.h"
+#include "software/ai/primitive/kick_primitive.h"
+#include "software/ai/primitive/move_primitive.h"
+#include "software/ai/primitive/pivot_primitive.h"
+#include "software/ai/primitive/stop_primitive.h"
 
 TEST(PrimitiveTest, create_message_from_primitive_test)
 {

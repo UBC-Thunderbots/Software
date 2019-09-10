@@ -1,8 +1,8 @@
-#include "ai/hl/stp/evaluation/ball.h"
+#include "software/ai/hl/stp/evaluation/ball.h"
 
 #include <gtest/gtest.h>
 
-#include "test/test_util/test_util.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(BallInFriendlyHalfTest, ball_barely_in_friendly_half)
 {

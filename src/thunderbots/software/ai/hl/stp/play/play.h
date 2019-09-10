@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "ai/hl/stp/tactic/tactic.h"
-#include "ai/world/world.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/world/world.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with.

@@ -1,12 +1,12 @@
-#include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
+#include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 #include <util/parameter/dynamic_parameters.h>
 
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
-#include "ai/navigator/util.h"
-#include "util/canvas_messenger/canvas_messenger.h"
+#include "software/ai/navigator/util.h"
+#include "software/util/canvas_messenger/canvas_messenger.h"
 
 // visitors
 void PathPlanningNavigator::visit(const CatchIntent &catch_intent)

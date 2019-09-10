@@ -14,7 +14,7 @@
 
 #include <cmath>
 
-#include "util/optimization/gradient_descent.h"
+#include "software/util/optimization/gradient_descent.h"
 
 template <size_t NUM_PARAMS>
 Util::GradientDescentOptimizer<NUM_PARAMS>::GradientDescentOptimizer()

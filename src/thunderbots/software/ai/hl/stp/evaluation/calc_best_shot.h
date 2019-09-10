@@ -1,10 +1,10 @@
 #pragma once
 
-#include "ai/world/field.h"
-#include "ai/world/robot.h"
-#include "ai/world/world.h"
-#include "geom/point.h"
-#include "shared/constants.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/robot.h"
+#include "software/ai/world/world.h"
+#include "software/geom/point.h"
+#include "software/shared/constants.h"
 
 namespace Evaluation
 {

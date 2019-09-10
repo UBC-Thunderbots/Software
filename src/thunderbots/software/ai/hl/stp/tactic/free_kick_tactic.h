@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * This tactic is used when performing a free kick, and no pass is available.

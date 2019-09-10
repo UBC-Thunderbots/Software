@@ -6,14 +6,14 @@
 #include <iostream>
 #include <numeric>
 
-#include "ai/ai_wrapper.h"
-#include "backend/backend_factory.h"
-#include "backend/grsim_backend.h"
-#include "backend/radio_backend.h"
-#include "util/canvas_messenger/canvas_messenger.h"
-#include "util/constants.h"
-#include "util/logger/init.h"
-#include "util/parameter/dynamic_parameter_utils.h"
+#include "software/ai/ai_wrapper.h"
+#include "software/backend/backend_factory.h"
+#include "software/backend/grsim_backend.h"
+#include "software/backend/radio_backend.h"
+#include "software/util/canvas_messenger/canvas_messenger.h"
+#include "software/util/constants.h"
+#include "software/util/logger/init.h"
+#include "software/util/parameter/dynamic_parameter_utils.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state

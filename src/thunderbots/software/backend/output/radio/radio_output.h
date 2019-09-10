@@ -4,10 +4,10 @@
 
 #include <limits>
 
-#include "ai/world/ball.h"
-#include "ai/world/team.h"
-#include "backend/robot_status.h"
-#include "mrf/dongle.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/team.h"
+#include "software/backend/robot_status.h"
+#include "software/mrf/dongle.h"
 
 class RadioOutput
 {

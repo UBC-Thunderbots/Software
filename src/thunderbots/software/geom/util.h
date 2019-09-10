@@ -3,13 +3,13 @@
 #include <cstddef>
 #include <vector>
 
-#include "geom/circle.h"
-#include "geom/line.h"
-#include "geom/point.h"
-#include "geom/polygon.h"
-#include "geom/ray.h"
-#include "geom/rectangle.h"
-#include "geom/segment.h"
+#include "software/geom/circle.h"
+#include "software/geom/line.h"
+#include "software/geom/point.h"
+#include "software/geom/polygon.h"
+#include "software/geom/ray.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 template <size_t N>
 using LegacyPolygon       = std::array<Vector, N>;

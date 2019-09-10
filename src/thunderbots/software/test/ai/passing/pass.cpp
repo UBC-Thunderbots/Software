@@ -2,7 +2,7 @@
  * Tests for the "Pass" class
  */
 
-#include "ai/passing/pass.h"
+#include "software/ai/passing/pass.h"
 
 #include <gtest/gtest.h>
 

@@ -1,19 +1,19 @@
-#include "backend/output/grsim/grsim_output.h"
+#include "software/backend/output/grsim/grsim_output.h"
 
 #include <chrono>
 #include <optional>
 
-#include "ai/primitive/primitive.h"
-#include "ai/world/team.h"
-#include "backend/output/grsim/grsim_command_primitive_visitor.h"
-#include "backend/output/grsim/motion_controller.h"
-#include "grsim_command_primitive_visitor.h"
-#include "motion_controller.h"
-#include "proto/grSim_Commands.pb.h"
-#include "proto/grSim_Replacement.pb.h"
-#include "shared/constants.h"
-#include "util/logger/init.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/ai/world/team.h"
+#include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
+#include "software/backend/output/grsim/motion_controller.h"
+#include "software/grsim_command_primitive_visitor.h"
+#include "software/motion_controller.h"
+#include "software/proto/grSim_Commands.pb.h"
+#include "software/proto/grSim_Replacement.pb.h"
+#include "software/shared/constants.h"
+#include "software/util/logger/init.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 
 using namespace boost::asio;

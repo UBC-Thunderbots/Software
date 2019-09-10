@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/world/robot.h"
-#include "ai/world/team.h"
+#include "software/ai/world/robot.h"
+#include "software/ai/world/team.h"
 
 namespace Evaluation
 {

@@ -1,4 +1,4 @@
-#include "ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/obstacle/obstacle.h"
 
 #include <gtest/gtest.h>
 #include <math.h>
@@ -9,8 +9,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "geom/point.h"
-#include "shared/constants.h"
+#include "software/geom/point.h"
+#include "software/shared/constants.h"
 
 // obstacle with robot radius factor = 1, velocity projection factor = 1
 // centred at (0,0) and with (0,0) velocity

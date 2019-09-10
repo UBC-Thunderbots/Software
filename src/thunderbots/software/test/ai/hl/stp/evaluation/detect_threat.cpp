@@ -3,13 +3,13 @@
  * in detect_threat.cpp
  */
 
-#include "ai/hl/stp/evaluation/detect_threat.h"
+#include "software/ai/hl/stp/evaluation/detect_threat.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/world/ball.h"
-#include "software/util/time/timestamp.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/world/ball.h"
+#include "software/software/util/time/timestamp.h"
+#include "software/test/test_util/test_util.h"
 
 // Test where the ball will intersect the friendly net
 TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)

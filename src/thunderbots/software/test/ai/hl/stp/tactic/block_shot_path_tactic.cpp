@@ -1,10 +1,10 @@
-#include "ai/hl/stp/tactic/block_shot_path_tactic.h"
+#include "software/ai/hl/stp/tactic/block_shot_path_tactic.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
-#include "geom/util.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/geom/util.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(BlockShotPathTacticTest, shot_starts_close_to_net)
 {

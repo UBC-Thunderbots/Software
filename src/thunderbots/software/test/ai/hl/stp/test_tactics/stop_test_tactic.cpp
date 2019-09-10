@@ -1,8 +1,8 @@
-#include "test/ai/hl/stp/test_tactics/stop_test_tactic.h"
+#include "software/test/ai/hl/stp/test_tactics/stop_test_tactic.h"
 
 #include <algorithm>
 
-#include "ai/intent/stop_intent.h"
+#include "software/ai/intent/stop_intent.h"
 
 StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
 

@@ -2,13 +2,13 @@
  * Tests for the free kick tactic
  */
 
-#include "ai/hl/stp/tactic/free_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/free_kick_tactic.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/chip_intent.h"
-#include "ai/intent/kick_intent.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/chip_intent.h"
+#include "software/ai/intent/kick_intent.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(FreeKickTacticTest, shoot_on_open_net)
 {

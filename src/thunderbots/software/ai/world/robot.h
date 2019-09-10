@@ -3,11 +3,11 @@
 #include <optional>
 #include <vector>
 
-#include "ai/world/robot_capabilities.h"
-#include "boost/circular_buffer.hpp"
-#include "geom/angle.h"
-#include "geom/point.h"
-#include "util/time/timestamp.h"
+#include "software/ai/world/robot_capabilities.h"
+#include "software/boost/circular_buffer.hpp"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/util/time/timestamp.h"
 
 /**
  * Defines an SSL robot

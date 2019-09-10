@@ -1,8 +1,8 @@
-#include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
+#include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 #include <gtest/gtest.h>
 
-#include "test/test_util/test_util.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(PathPlanningNavigatorTest, convert_catch_intent_to_catch_primitive)
 {

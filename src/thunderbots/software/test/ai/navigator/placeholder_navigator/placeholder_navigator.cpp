@@ -1,8 +1,8 @@
-#include "ai/navigator/placeholder_navigator/placeholder_navigator.h"
+#include "software/ai/navigator/placeholder_navigator/placeholder_navigator.h"
 
 #include <gtest/gtest.h>
 
-#include "test/test_util/test_util.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(PlaceholderNavigatorTest, convert_catch_intent_to_catch_primitive)
 {

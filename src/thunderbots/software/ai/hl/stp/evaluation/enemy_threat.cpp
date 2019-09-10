@@ -1,15 +1,15 @@
-#include "ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/evaluation/enemy_threat.h"
 
 #include <deque>
 
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
-#include "ai/hl/stp/evaluation/intercept.h"
-#include "ai/hl/stp/evaluation/possession.h"
-#include "ai/hl/stp/evaluation/robot.h"
-#include "ai/hl/stp/evaluation/team.h"
-#include "ai/world/world.h"
-#include "geom/util.h"
-#include "shared/constants.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/intercept.h"
+#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/hl/stp/evaluation/robot.h"
+#include "software/ai/hl/stp/evaluation/team.h"
+#include "software/ai/world/world.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>
 Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passers,

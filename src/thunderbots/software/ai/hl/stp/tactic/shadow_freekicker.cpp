@@ -1,9 +1,9 @@
-#include "ai/hl/stp/tactic/shadow_freekicker.h"
+#include "software/ai/hl/stp/tactic/shadow_freekicker.h"
 
 #include <algorithm>
 
-#include "ai/hl/stp/evaluation/possession.h"
-#include "shared/constants.h"
+#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/shared/constants.h"
 
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,

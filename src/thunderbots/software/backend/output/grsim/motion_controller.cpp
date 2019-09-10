@@ -11,11 +11,11 @@
  * See https://en.wikipedia.org/wiki/Bang%E2%80%93bang_control for more info
  */
 
-#include "motion_controller.h"
+#include "software/motion_controller.h"
 
 #include <algorithm>
 
-#include "util/logger/init.h"
+#include "software/util/logger/init.h"
 
 // Creates a struct which inherits all lambda function given to it and uses their
 // Ts::operator(). This can be passed to std::visit to easily write multiple different

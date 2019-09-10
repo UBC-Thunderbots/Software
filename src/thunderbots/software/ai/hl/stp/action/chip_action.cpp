@@ -1,10 +1,10 @@
-#include "ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/chip_action.h"
 
-#include "ai/intent/chip_intent.h"
-#include "ai/intent/move_intent.h"
-#include "geom/polygon.h"
-#include "geom/util.h"
-#include "shared/constants.h"
+#include "software/ai/intent/chip_intent.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/geom/polygon.h"
+#include "software/geom/util.h"
+#include "software/shared/constants.h"
 
 ChipAction::ChipAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 

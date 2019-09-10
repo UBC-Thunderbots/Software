@@ -1,8 +1,8 @@
-#include "ai/world/game_state.h"
+#include "software/ai/world/game_state.h"
 
-#include "ball.h"
-#include "game_state.h"
-#include "util/logger/init.h"
+#include "software/ball.h"
+#include "software/game_state.h"
+#include "software/util/logger/init.h"
 
 
 bool GameState::isHalted() const

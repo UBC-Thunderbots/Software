@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
-#include "test/ai/hl/stp/test_actions/move_test_action.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/test/ai/hl/stp/test_actions/move_test_action.h"
 
 /**
  * This file contains the unit tests for the Action class (NOTE: `Action` is virtual, so

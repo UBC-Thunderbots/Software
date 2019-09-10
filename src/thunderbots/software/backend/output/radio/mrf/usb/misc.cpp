@@ -1,7 +1,7 @@
-#include "misc.h"
+#include "software/misc.h"
 
-#include "errors.h"
-#include "transfer.h"
+#include "software/errors.h"
+#include "software/transfer.h"
 
 long USB::check_fn(const char *call, long err, unsigned int endpoint)
 {

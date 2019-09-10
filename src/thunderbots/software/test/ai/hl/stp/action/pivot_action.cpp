@@ -1,9 +1,9 @@
-#include "ai/hl/stp/action/pivot_action.h"
+#include "software/ai/hl/stp/action/pivot_action.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
-#include "ai/intent/pivot_intent.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/ai/intent/pivot_intent.h"
 
 
 // PivotAction should be yielding move_intents as the robot is too far away from orbit

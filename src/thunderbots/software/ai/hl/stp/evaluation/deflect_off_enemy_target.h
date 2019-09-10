@@ -6,10 +6,10 @@
 #ifndef THUNDERBOTS_ALL_DEFLECT_OFF_ENEMY_TARGET_H
 #define THUNDERBOTS_ALL_DEFLECT_OFF_ENEMY_TARGET_H
 
-#include "ai/world/field.h"
-#include "ai/world/world.h"
-#include "software/geom/line.h"
-#include "software/geom/util.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/world.h"
+#include "software/software/geom/line.h"
+#include "software/software/geom/util.h"
 
 namespace Evaluation
 {

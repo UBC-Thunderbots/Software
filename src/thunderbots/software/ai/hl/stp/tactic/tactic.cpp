@@ -1,6 +1,6 @@
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
-#include "util/logger/init.h"
+#include "software/util/logger/init.h"
 
 Tactic::Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_)
     : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),

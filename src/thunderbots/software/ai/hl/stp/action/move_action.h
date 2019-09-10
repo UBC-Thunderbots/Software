@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/hl/stp/action/action.h"
-#include "ai/primitive/move_primitive.h"
-#include "geom/angle.h"
-#include "geom/point.h"
+#include "software/ai/hl/stp/action/action.h"
+#include "software/ai/primitive/move_primitive.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 class MoveAction : public Action
 {

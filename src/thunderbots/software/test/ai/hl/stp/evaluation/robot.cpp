@@ -3,7 +3,7 @@
  * in robot.cpp
  */
 
-#include "ai/hl/stp/evaluation/robot.h"
+#include "software/ai/hl/stp/evaluation/robot.h"
 
 #include <gtest/gtest.h>
 

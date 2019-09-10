@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <string>
 
-#include "backend/output/radio/mrf/usb/devicehandle.h"
-#include "backend/output/radio/mrf/util/noncopyable.h"
+#include "software/backend/output/radio/mrf/usb/devicehandle.h"
+#include "software/backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {

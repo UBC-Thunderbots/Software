@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The ShadowFreekicker tactic uses two robots to block the majority of an enemy robots

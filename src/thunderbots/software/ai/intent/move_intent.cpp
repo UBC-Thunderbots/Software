@@ -1,7 +1,7 @@
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/move_intent.h"
 
-#include "ai/intent/visitor/intent_visitor.h"
-#include "util/logger/init.h"
+#include "software/ai/intent/visitor/intent_visitor.h"
+#include "software/util/logger/init.h"
 
 const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
