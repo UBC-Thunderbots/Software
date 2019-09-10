@@ -28,7 +28,8 @@ host_software_packages=(
     git
     build-essential
     cmake
-    libqt4-dev
+    qt5-default
+    libqt5opengl5-dev
     libgl1-mesa-dev
     libglu1-mesa-dev
     libprotobuf-dev
@@ -48,38 +49,6 @@ if [ $? -ne 0 ]; then
     echo "##############################################################"
     exit 1
 fi
-
-
-# Install vartypes. These are required by grSim
-echo "================================================================"
-echo "Installing Vartypes"
-echo "================================================================"
-
-# Clone and install vartypes.
-# Instructions taken from the grsim installation guide
-# https://github.com/RoboCup-SSL/grSim/blob/master/INSTALL.md
-
-# Remove old vartypes if it exists
-vartypes_location="/tmp"
-vartypes_path="$vartypes_location/vartypes"
-
-if [ -d $vartypes_path ]; then
-    echo "Removing old vartypes..."
-    sudo rm -rf $vartypes_path
-fi
-
-cd $vartypes_location
-git clone https://github.com/jpfeltracco/vartypes.git 
-cd vartypes
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
-
-# Return to the parent directory of the script so commands are relative to here
-cd $CURR_DIR
-
 
 # Install grSim
 echo "================================================================"
@@ -110,7 +79,7 @@ sudo make
 
 # Create a symlink so that the grsim executable will be in the PATH
 # /usr/local/bin is one of the default locations included by the PATH
-sudo ln -sf $grSim_path/bin/grsim /usr/local/bin/grsim
+sudo ln -sf $grSim_path/bin/grSim /usr/local/bin/grsim
 
 
 # Report done
