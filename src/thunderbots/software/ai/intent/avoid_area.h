@@ -11,7 +11,7 @@
 enum class AvoidArea
 {
     // Used for iterating over avoid areas
-    FIRST_AVOID_AREA = 1 << 8,
+    FIRST_AVOID_AREA = 1 << 0,
     // The box around the friendly goal
     FRIENDLY_DEFENSE_AREA = 1 << 0,
     // The box around the enemy goal

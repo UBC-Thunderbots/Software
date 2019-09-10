@@ -32,7 +32,9 @@ avoid_area_mask_t getAvoidAreasFromGameState(const GameState& game_state)
 {
     avoid_area_mask_t areas_to_avoid = 0;
 
+    // default avoid areas regardless of game state
     MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::FRIENDLY_DEFENSE_AREA);
+    MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::ENEMY_ROBOTS);
 
     if (game_state.stayAwayFromBall())
     {

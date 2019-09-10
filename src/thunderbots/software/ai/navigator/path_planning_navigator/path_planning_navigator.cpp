@@ -256,19 +256,15 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
             drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
         }
     }
-    else
+    for (avoid_area_mask_t area = (avoid_area_mask_t)AvoidArea::FIRST_AVOID_AREA;
+         area <= (avoid_area_mask_t)AvoidArea::LAST_AVOID_AREA_BEFORE_ROBOTS; area *= 2)
     {
-        for (avoid_area_mask_t area = (avoid_area_mask_t)AvoidArea::FIRST_AVOID_AREA;
-             area <= (avoid_area_mask_t)AvoidArea::LAST_AVOID_AREA_BEFORE_ROBOTS;
-             area *= 2)
+        auto obstacle_opt = getObstacleFromAvoidArea((AvoidArea)area);
+        if (obstacle_opt && CONTAIN_AVOID_AREAS(avoid_areas, area))
         {
-            auto obstacle_opt = getObstacleFromAvoidArea((AvoidArea)area);
-            if (obstacle_opt && CONTAIN_AVOID_AREAS(avoid_areas, area))
-            {
-                obstacles.emplace_back(*obstacle_opt);
-                // draw the avoid area
-                drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
-            }
+            obstacles.emplace_back(*obstacle_opt);
+            // draw the avoid area
+            drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
         }
     }
 
