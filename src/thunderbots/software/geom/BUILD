@@ -26,6 +26,8 @@ cc_test(
         "angle_test.cpp",
     ],
     deps = [
-        "@gtest//:main",
+        ":geom",
+        "@g3log//:main",
+        "@gtest//:gtest_main",
     ],
 )
