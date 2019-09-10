@@ -1,6 +1,6 @@
 add_library(time STATIC
     duration.cpp
-    tbots_time.cpp
+        time.cpp
     timestamp.cpp
     )
 target_include_directories(time

@@ -1,4 +1,4 @@
-#include "util/time/tbots_time.h"
+#include "util/time/time.h"
 
 #include <cmath>
 #include <stdexcept>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util/time/tbots_time.h"
+#include "util/time/time.h"
 
 /**
  * A simple Duration class built around doubles. It is meant to represent some duration

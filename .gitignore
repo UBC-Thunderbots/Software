@@ -114,5 +114,8 @@ Makefile
 *~
 .*
 
+#bazel
+**/bazel-*
+
 #cscope
 cscope*

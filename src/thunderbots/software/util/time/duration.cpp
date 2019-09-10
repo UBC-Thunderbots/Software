@@ -4,7 +4,7 @@
 
 #include "duration.h"
 
-#include "shared/constants.h"
+#include "../shared/constants.h"
 
 Duration::Duration() : Duration(0) {}
 
