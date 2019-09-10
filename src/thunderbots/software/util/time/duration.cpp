@@ -2,9 +2,9 @@
  * Implementation for the Duration class
  */
 
-#include "software/duration.h"
+#include "software/util/time/duration.h"
 
-#include "software/../shared/constants.h"
+#include "shared/constants.h"
 
 Duration::Duration() : Duration(0) {}
 

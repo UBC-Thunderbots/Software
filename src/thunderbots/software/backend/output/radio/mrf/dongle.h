@@ -20,7 +20,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/send_reliable_message_operation.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/usb/tbots_libusb.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"

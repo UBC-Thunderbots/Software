@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/tactic/block_shot_path_tactic.h"
 
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)

@@ -13,7 +13,7 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/test/test_util/test_util.h"
 
 class BallFilterTest : public ::testing::Test

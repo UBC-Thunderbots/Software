@@ -4,7 +4,7 @@
 #include "software/ai/intent/pivot_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 

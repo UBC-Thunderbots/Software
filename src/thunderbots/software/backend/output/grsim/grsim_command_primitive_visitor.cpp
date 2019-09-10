@@ -15,7 +15,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,

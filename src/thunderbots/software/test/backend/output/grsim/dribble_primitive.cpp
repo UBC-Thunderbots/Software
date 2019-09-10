@@ -8,7 +8,7 @@
 
 #include "software/ai/world/robot.h"
 #include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 using MotionControllerCommand =
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;

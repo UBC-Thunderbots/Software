@@ -4,7 +4,7 @@
 #include "software/intercept.h"
 
 #include "software/ai/evaluation/pass.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/optimization/gradient_descent.h"
 
 namespace Evaluation

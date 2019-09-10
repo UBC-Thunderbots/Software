@@ -9,7 +9,7 @@
 
 #include "software/ai/world/field.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 namespace Evaluation
 {

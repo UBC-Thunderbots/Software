@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "observer",
     hdrs = ["observer.h"],
@@ -15,7 +17,7 @@ cc_library(
 cc_library(
     name = "thread_safe_buffer",
     hdrs = ["thread_safe_buffer.h"],
-    deps = [],
+    deps = ["//software/util/time:duration"],
 )
 
 cc_library(
@@ -24,29 +26,42 @@ cc_library(
     deps = [
         ":observer",
         ":thread_safe_buffer",
+        "//software/util/time:duration",
     ],
 )
 
 cc_test(
     name = "observer_test",
     srcs = ["observer_test.cpp"],
-    deps = [":observer"],
+    deps = [
+        ":observer",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_test(
     name = "subject_test",
     srcs = ["subject_test.cpp"],
-    deps = [":subject"],
+    deps = [
+        ":subject",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_test(
     name = "thread_safe_buffer_test",
     srcs = ["thread_safe_buffer_test.cpp"],
-    deps = [":thread_safe_buffer"],
+    deps = [
+        ":thread_safe_buffer",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_test(
     name = "threaded_observer_test",
     srcs = ["threaded_observer_test.cpp"],
-    deps = [":threaded_observer"],
+    deps = [
+        ":threaded_observer",
+        "@gtest//:gtest_main",
+    ],
 )

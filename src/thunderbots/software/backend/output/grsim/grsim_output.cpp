@@ -11,7 +11,7 @@
 #include "software/motion_controller.h"
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 

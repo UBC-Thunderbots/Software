@@ -4,7 +4,7 @@
 
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/constants.h"
 #include "software/ai/world/refbox_constants.h"
 

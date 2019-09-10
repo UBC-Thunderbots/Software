@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/deflect_off_enemy_target.h"
 #include "software/ai/hl/stp/evaluation/indirect_chip.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 
 namespace

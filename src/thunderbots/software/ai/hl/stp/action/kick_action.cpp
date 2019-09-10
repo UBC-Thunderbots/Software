@@ -6,7 +6,7 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 KickAction::KickAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 

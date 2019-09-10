@@ -12,7 +12,7 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,

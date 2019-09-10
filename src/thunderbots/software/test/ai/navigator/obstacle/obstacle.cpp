@@ -10,7 +10,7 @@
 #include <sstream>
 
 #include "software/geom/point.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 // obstacle with robot radius factor = 1, velocity projection factor = 1
 // centred at (0,0) and with (0,0) velocity

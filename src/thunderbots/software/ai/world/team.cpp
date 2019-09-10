@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 
 Team::Team(const Duration& robot_expiry_buffer_duration, unsigned int buffer_size)

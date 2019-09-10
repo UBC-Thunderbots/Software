@@ -5,7 +5,7 @@
 
 #include "software/dongle.h"
 #include "software/messages.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 

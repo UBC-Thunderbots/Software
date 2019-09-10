@@ -9,7 +9,7 @@
 #include "software/ai/hl/stp/evaluation/team.h"
 #include "software/ai/world/world.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>
 Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passers,

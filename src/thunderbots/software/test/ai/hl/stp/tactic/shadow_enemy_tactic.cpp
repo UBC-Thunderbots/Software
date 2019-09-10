@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
-#include "software/shared/util.h"
+#include "software//util.h"
 #include "software/test/test_util/test_util.h"
 
 TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)

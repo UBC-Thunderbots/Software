@@ -8,7 +8,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/geom/util.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/init.h"
 
 

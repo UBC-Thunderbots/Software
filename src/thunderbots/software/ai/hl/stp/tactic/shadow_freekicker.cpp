@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/evaluation/possession.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,

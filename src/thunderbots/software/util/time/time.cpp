@@ -3,7 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#include "software/shared/constants.h"
+#include "shared/constants.h"
 
 Time::Time() : time_in_seconds(0) {}
 

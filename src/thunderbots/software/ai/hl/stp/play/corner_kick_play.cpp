@@ -11,7 +11,7 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/util/logger/custom_logging_levels.h"
 
 using namespace Passing;

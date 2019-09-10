@@ -4,7 +4,7 @@
 
 #include "software/ai/world/field.h"
 #include "software/ai/world/world.h"
-#include "software/shared/constants.h"
+#include "software//constants.h"
 #include "software/software/geom/line.h"
 #include "software/software/geom/util.h"
 
