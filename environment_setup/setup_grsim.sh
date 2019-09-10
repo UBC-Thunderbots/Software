@@ -69,7 +69,7 @@ if [ -d $vartypes_path ]; then
 fi
 
 cd $vartypes_location
-git clone https://github.com/szi/vartypes.git 
+git clone https://github.com/jpfeltracco/vartypes.git 
 cd vartypes
 mkdir build
 cd build
