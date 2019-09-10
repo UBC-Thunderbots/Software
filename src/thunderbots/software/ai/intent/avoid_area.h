@@ -39,11 +39,13 @@ enum class AvoidArea
 typedef uint32_t avoid_area_mask_t;
 
 // Adds avoid areas together
-#define ADD_AVOID_AREA(a, b) (avoid_area_mask_t) a | (avoid_area_mask_t)b
+#define ADD_AVOID_AREA(a, b) ((avoid_area_mask_t)a) | ((avoid_area_mask_t)b)
 // sets a = a + b
 #define MERGE_AVOID_AREAS(a, b) a |= (avoid_area_mask_t)b
 // sets a = a - b
 #define REMOVE_AVOID_AREAS(a, b) a &= (~((avoid_area_mask_t)b))
+// true if a contains at least one bit of b
+#define CONTAIN_AVOID_AREAS(a, b) ((avoid_area_mask_t)a) & ((avoid_area_mask_t)b)
 
 std::ostream& operator<<(std::ostream& os, const AvoidArea& state);
 

@@ -241,7 +241,7 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
     }
 
     // Avoid obstacles specific to this MoveIntent
-    if (avoid_areas & (avoid_area_mask_t)AvoidArea::ENEMY_ROBOTS)
+    if (CONTAIN_AVOID_AREAS(avoid_areas, AvoidArea::ENEMY_ROBOTS))
     {
         for (auto &robot : world.enemyTeam().getAllRobots())
         {
@@ -263,7 +263,7 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
              area *= 2)
         {
             auto obstacle_opt = getObstacleFromAvoidArea((AvoidArea)area);
-            if (obstacle_opt && (avoid_areas & area))
+            if (obstacle_opt && CONTAIN_AVOID_AREAS(avoid_areas, area))
             {
                 obstacles.emplace_back(*obstacle_opt);
                 // draw the avoid area
