@@ -88,14 +88,14 @@ class Intent
      *
      * @return The areas this intent should avoid moving into
      */
-    std::vector<AvoidArea> getAreasToAvoid() const;
+    avoid_area_mask_t getAreasToAvoid() const;
 
     /**
      * Set the areas this intent should avoid moving into
      *
      * @param areas_to_avoid The areas this intent should avoid moving into
      */
-    void setAreasToAvoid(const std::vector<AvoidArea>& areas_to_avoid);
+    void setAreasToAvoid(avoid_area_mask_t areas_to_avoid);
 
     virtual ~Intent() = default;
 
@@ -110,5 +110,5 @@ class Intent
      * The areas this intent should avoid moving into. These are enforced by
      * the navigator
      */
-    std::vector<AvoidArea> areas_to_avoid;
+    avoid_area_mask_t areas_to_avoid;
 };

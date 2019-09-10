@@ -6,7 +6,9 @@ Tactic::Tactic(bool loop_forever, RobotCapabilityFlags capability_reqs_)
     : intent_sequence(boost::bind(&Tactic::calculateNextIntentWrapper, this, _1)),
       done_(false),
       loop_forever(loop_forever),
-      capability_reqs(capability_reqs_)
+      capability_reqs(capability_reqs_),
+      blacklisted_avoid_areas(0),
+      whitelisted_avoid_areas(0)
 {
 }
 
@@ -54,14 +56,13 @@ std::unique_ptr<Intent> Tactic::getNextIntent(
     {
         // Figure out where this intent should and should not move to, based on the
         // world state, whitelisted avoid areas, and blacklisted avoid areas
-        std::vector<AvoidArea> avoid_areas;
+        avoid_area_mask_t avoid_areas = 0;
         if (game_state_opt)
         {
-            avoid_areas = getAreasToAvoid(*game_state_opt);
+            MERGE_AVOID_AREAS(avoid_areas, getAvoidAreasFromGameState(*game_state_opt));
         }
-        avoid_areas.insert(avoid_areas.end(), blacklisted_avoid_areas.begin(),
-                           blacklisted_avoid_areas.end());
-
+        REMOVE_AVOID_AREAS(avoid_areas, whitelisted_avoid_areas);
+        MERGE_AVOID_AREAS(avoid_areas, blacklisted_avoid_areas);
         next_intent->setAreasToAvoid(avoid_areas);
     }
 
@@ -122,86 +123,15 @@ RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements()
 
 void Tactic::addWhitelistedAvoidArea(AvoidArea area)
 {
-    whitelisted_avoid_areas.emplace_back(area);
+    MERGE_AVOID_AREAS(whitelisted_avoid_areas, area);
 }
 
 void Tactic::addBlacklistedAvoidArea(AvoidArea area)
 {
-    // Only add this area to our list if it's not already present
-    if (std::find(blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end(), area) ==
-        blacklisted_avoid_areas.end())
-    {
-        blacklisted_avoid_areas.emplace_back(area);
-    }
+    MERGE_AVOID_AREAS(blacklisted_avoid_areas, area);
 }
 
 void Tactic::removeBlacklistedAvoidArea(AvoidArea area)
 {
-    blacklisted_avoid_areas.erase(
-        std::remove(blacklisted_avoid_areas.begin(), blacklisted_avoid_areas.end(), area),
-        blacklisted_avoid_areas.end());
-}
-
-std::vector<AvoidArea> Tactic::getAreasToAvoid(const GameState &game_state)
-{
-    std::vector<AvoidArea> areas_to_avoid;
-
-    // Checks if the given area is in the whitelist and adds it to
-    // the list to return if not
-    auto addAreaIfNotInWhitelist = [&](AvoidArea area) {
-        bool area_is_whitelisted =
-            std::find(whitelisted_avoid_areas.begin(), whitelisted_avoid_areas.end(),
-                      area) != whitelisted_avoid_areas.end();
-        bool area_is_already_added =
-            std::find(areas_to_avoid.begin(), areas_to_avoid.end(), area) !=
-            areas_to_avoid.end();
-        if (!area_is_whitelisted && !area_is_already_added)
-        {
-            areas_to_avoid.emplace_back(area);
-        }
-    };
-
-    if (game_state.stayAwayFromBall())
-    {
-        addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
-    }
-
-    if (game_state.isPenalty())
-    {
-        if (game_state.isOurPenalty())
-        {
-            addAreaIfNotInWhitelist(AvoidArea::ENEMY_HALF);
-        }
-        else
-        {
-            // Is their penalty
-            addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_HALF);
-        }
-    }
-    else if (game_state.isKickoff())
-    {
-        addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
-        addAreaIfNotInWhitelist(AvoidArea::CENTER_CIRCLE);
-        addAreaIfNotInWhitelist(AvoidArea::ENEMY_HALF);
-    }
-    else
-    {
-        if (game_state.stayAwayFromBall() || game_state.isOurKickoff())
-        {
-            addAreaIfNotInWhitelist(AvoidArea::HALF_METER_AROUND_BALL);
-        }
-
-        if (game_state.isOurPenalty())
-        {
-            addAreaIfNotInWhitelist(AvoidArea::ENEMY_DEFENSE_AREA);
-        }
-        else
-        {
-            addAreaIfNotInWhitelist(AvoidArea::INFLATED_ENEMY_DEFENSE_AREA);
-        }
-    }
-
-    addAreaIfNotInWhitelist(AvoidArea::FRIENDLY_DEFENSE_AREA);
-
-    return areas_to_avoid;
+    REMOVE_AVOID_AREAS(blacklisted_avoid_areas, area);
 }

@@ -183,16 +183,6 @@ class Tactic
     virtual void calculateNextIntent(IntentCoroutine::push_type &yield) = 0;
 
     /**
-     * Get all the areas that this tactic should not be allowed to move into based on
-     * game state and the current whitelist for this tactic
-     *
-     * @param game_state The current game state
-     *
-     * @return a vector of areas this tactic should avoid
-     */
-    std::vector<AvoidArea> getAreasToAvoid(const GameState &game_state);
-
-    /**
      * A helper function that runs the intent_sequence coroutine and returns the result
      * of the coroutine. The done_ member variable is also updated to reflect whether
      * or not the Tactic is done. If the Tactic is done, a nullptr is returned.
@@ -211,16 +201,20 @@ class Tactic
     // Whether or not this tactic should loop forever by restarting each time it is done
     bool loop_forever;
 
+    /* NOTE: blacklist take priority over whitelists */
+
     // These are areas that the intents yielded by this tactic should be permitted
     // to move in, even if they would normally be in this game state. These are used
     // when one Tactic, such as GoalieTactic, is permitted in an area of the field
     // that the rest of the robots are not (in the case of the goalie, the friendly
     // defense area)
-    std::vector<AvoidArea> whitelisted_avoid_areas;
+    // set bits mean that the corresponding avoid area is whitelisted
+    avoid_area_mask_t whitelisted_avoid_areas;
 
     // These are areas that will be added to all intents yielded by this function,
     // regardless of whitelisted areas or game state
-    std::vector<AvoidArea> blacklisted_avoid_areas;
+    // set bits mean that the corresponding avoid area is whitelisted
+    avoid_area_mask_t blacklisted_avoid_areas;
 
     // robot capability requirements
     RobotCapabilityFlags capability_reqs;

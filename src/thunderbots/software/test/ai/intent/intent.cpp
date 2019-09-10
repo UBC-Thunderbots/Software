@@ -30,8 +30,8 @@ TEST(IntentTest, test_set_and_get_avoid_areas)
 {
     MoveIntent move_intent = MoveIntent(0, Point(), Angle(), 0.0, 0);
 
-    std::vector<AvoidArea> areas_to_avoid = {AvoidArea::FRIENDLY_DEFENSE_AREA,
-                                             AvoidArea::CENTER_CIRCLE};
+    avoid_area_mask_t areas_to_avoid =
+        ADD_AVOID_AREA(AvoidArea::FRIENDLY_DEFENSE_AREA, AvoidArea::CENTER_CIRCLE);
     move_intent.setAreasToAvoid(areas_to_avoid);
 
     EXPECT_EQ(areas_to_avoid, move_intent.getAreasToAvoid());

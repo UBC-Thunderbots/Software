@@ -119,7 +119,8 @@ void PathPlanningNavigator::visit(const StopIntent &stop_intent)
 }
 
 // helpers
-std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea avoid_area)
+std::optional<Obstacle> PathPlanningNavigator::getObstacleFromAvoidArea(
+    AvoidArea avoid_area)
 {
     Rectangle rectangle({0, 0}, {0, 0});
     switch (avoid_area)
@@ -229,7 +230,7 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
 }
 
 std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
-    const std::vector<AvoidArea> &avoid_areas, int robot_id)
+    avoid_area_mask_t avoid_areas, int robot_id)
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
 
@@ -240,27 +241,29 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
     }
 
     // Avoid obstacles specific to this MoveIntent
-    for (auto area : avoid_areas)
+    if (avoid_areas & (avoid_area_mask_t)AvoidArea::ENEMY_ROBOTS)
     {
-        if (area == AvoidArea::ENEMY_ROBOTS)
+        for (auto &robot : world.enemyTeam().getAllRobots())
         {
-            for (auto &robot : world.enemyTeam().getAllRobots())
-            {
-                Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
-                    robot,
-                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                        .value(),
-                    Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
-                        .value());
-                obstacles.push_back(o);
-                // draw the avoid area
-                drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
-            }
+            Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+                robot,
+                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                    .value(),
+                Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
+                    .value());
+            obstacles.push_back(o);
+            // draw the avoid area
+            drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
         }
-        else
+    }
+    else
+    {
+        for (avoid_area_mask_t area = (avoid_area_mask_t)AvoidArea::FIRST_AVOID_AREA;
+             area <= (avoid_area_mask_t)AvoidArea::LAST_AVOID_AREA_BEFORE_ROBOTS;
+             area *= 2)
         {
-            auto obstacle_opt = obstacleFromAvoidArea(area);
-            if (obstacle_opt)
+            auto obstacle_opt = getObstacleFromAvoidArea((AvoidArea)area);
+            if (obstacle_opt && (avoid_areas & area))
             {
                 obstacles.emplace_back(*obstacle_opt);
                 // draw the avoid area

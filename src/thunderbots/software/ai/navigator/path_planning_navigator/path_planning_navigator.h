@@ -107,7 +107,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
      *
      * @return A obstacle representing the given area
      */
-    std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
+    std::optional<Obstacle> getObstacleFromAvoidArea(AvoidArea avoid_area);
 
     void drawObstacle(const Obstacle &obstacle,
                       const Util::CanvasMessenger::Color &color);
@@ -138,8 +138,8 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
      *
      * @returns list of obstacles
      */
-    std::vector<Obstacle> createCurrentObstacles(
-        const std::vector<AvoidArea> &avoid_areas, int robot_id);
+    std::vector<Obstacle> createCurrentObstacles(avoid_area_mask_t avoid_areas,
+                                                 int robot_id);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
