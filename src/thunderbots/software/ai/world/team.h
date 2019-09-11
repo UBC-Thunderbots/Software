@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "software/ai/world/robot.h"
-#include "software/boost/circular_buffer.hpp"
+#include "boost/circular_buffer.hpp"
 #include "software/util/time/timestamp.h"
 
 /**

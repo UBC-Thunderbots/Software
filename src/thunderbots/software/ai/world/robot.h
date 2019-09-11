@@ -3,8 +3,9 @@
 #include <optional>
 #include <vector>
 
+#include "boost/circular_buffer.hpp"
+
 #include "software/ai/world/robot_capabilities.h"
-#include "software/boost/circular_buffer.hpp"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/util/time/timestamp.h"

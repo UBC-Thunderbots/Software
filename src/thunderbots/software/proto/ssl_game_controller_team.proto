@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-import "ssl_game_controller_common.proto";
+import "software/proto/ssl_game_controller_common.proto";
 
 // a registration that must be send by teams and autoRefs to the controller as the very first message
 message TeamRegistration {

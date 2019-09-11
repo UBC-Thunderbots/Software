@@ -1,5 +1,5 @@
 syntax = "proto2";
-import "messages_robocup_ssl_geometry.proto";
+import "software/proto/messages_robocup_ssl_geometry.proto";
 package RoboCup2014Legacy.Geometry;
 
 message SSL_GeometryFieldSize {

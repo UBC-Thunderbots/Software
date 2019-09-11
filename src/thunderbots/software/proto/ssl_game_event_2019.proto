@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-import "ssl_game_controller_common.proto";
+import "software/proto/ssl_game_controller_common.proto";
 
 // GameEvent contains exactly one game event
 // Each game event has optional and required fields. The required fields are mandatory to process the event.

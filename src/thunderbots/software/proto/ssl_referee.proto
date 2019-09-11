@@ -1,7 +1,7 @@
 syntax = "proto2";
 
-import "ssl_game_event.proto";
-import "ssl_game_event_2019.proto";
+import "software/proto/ssl_game_event.proto";
+import "software/proto/ssl_game_event_2019.proto";
 
 // Each UDP packet contains one of these messages.
 message Referee {
