@@ -11,11 +11,12 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/messages.h"
-#include "software/util/constants.h"
-#include "software/util/logger/init.h"
+#include "software/backend/output/radio/mrf/messages.h"
+#include "shared/constants.h"
 
 namespace
 {

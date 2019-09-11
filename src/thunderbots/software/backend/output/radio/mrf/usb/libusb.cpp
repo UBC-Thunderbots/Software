@@ -1,4 +1,4 @@
-#include "software/tbots_libusb.h"
+#include "software/backend/output/radio/mrf/usb/libusb.h"
 
 #include <poll.h>
 
@@ -13,7 +13,8 @@
 #include <string>
 #include <thread>
 
-#include "software/util/logger/init.h"
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #define STALL_RETRIES 3
 

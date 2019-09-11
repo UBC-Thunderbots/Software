@@ -1,7 +1,7 @@
-#include "software/misc.h"
+#include "software/backend/output/radio/mrf/usb/misc.h"
 
-#include "software/errors.h"
-#include "software/transfer.h"
+#include "software/backend/output/radio/mrf/usb/errors.h"
+#include "software/backend/output/radio/mrf/usb/transfer.h"
 
 long USB::check_fn(const char *call, long err, unsigned int endpoint)
 {

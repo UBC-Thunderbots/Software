@@ -1,5 +1,5 @@
 #pragma once
-#include <libusb.h>
+#include <libusb/libusb.h>
 
 #include <cstddef>
 #include <cstdint>

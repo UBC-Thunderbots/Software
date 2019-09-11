@@ -1,21 +1,12 @@
 cc_library(
-    name = "annunciator",
-    srcs = ["annunciator.cpp"],
-    hdrs = ["annunciator.h"],
+    name = "mrf_primitive_visitor",
+    srcs = ["mrf_primitive_visitor.cpp"],
+    hdrs = ["mrf_primitive_visitor.h"],
     deps = [
-        ":messages",
-        "//software/backend:robot_status",
-        "//software/util:constants",
-    ],
-)
-
-cc_library(
-    name = "send_reliable_message_operation",
-    srcs = ["send_reliable_message_operation.cpp"],
-    hdrs = ["send_reliable_message_operation.h"],
-    deps = [
-        ":messages",
-        "//software/backend/output/radio/mrf/usb:libusb",
+        "//shared:constants",
+        "//shared:firmware_primitive_type",
+        "//software/ai/primitive:all_primitives",
+        "//software/ai/primitive:primitive_visitor",
     ],
 )
 
@@ -27,13 +18,25 @@ cc_library(
 
 cc_library(
     name = "dongle",
-    srcs = ["dongle.cpp"],
-    hdrs = ["dongle.h"],
+    srcs = [
+        "annunciator.cpp",
+        "dongle.cpp",
+        "send_reliable_message_operation.cpp",
+    ],
+    hdrs = [
+        "annunciator.h",
+        "dongle.h",
+        "send_reliable_message_operation.h",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":annunciator",
-        ":send_reliable_message_operation",
+        ":messages",
+        ":mrf_primitive_visitor",
+        "//shared:constants",
         "//software/ai/primitive",
+        "//software/backend:robot_status",
+        "//software/backend/output/radio/mrf/usb:libusb",
         "//software/geom:all",
+        "//software/util:constants",
     ],
 )

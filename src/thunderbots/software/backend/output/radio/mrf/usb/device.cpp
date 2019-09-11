@@ -1,7 +1,7 @@
-#include "software/device.h"
+#include "software/backend/output/radio/mrf/usb/device.h"
 
-#include "software/tbots_libusb.h"
-#include "software/misc.h"
+#include "software/backend/output/radio/mrf/usb/libusb.h"
+#include "software/backend/output/radio/mrf/usb/misc.h"
 
 USB::Device::Device(const Device &copyref) : device(libusb_ref_device(copyref.device))
 {

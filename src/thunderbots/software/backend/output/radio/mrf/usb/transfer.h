@@ -1,8 +1,8 @@
 #pragma once
 
-#include <libusb.h>
-//
-#include "software/devicehandle.h"
+#include <libusb/libusb.h>
+
+#include "software/backend/output/radio/mrf/usb/devicehandle.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"
 

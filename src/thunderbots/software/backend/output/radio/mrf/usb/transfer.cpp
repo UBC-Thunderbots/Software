@@ -1,10 +1,11 @@
-#include "software/transfer.h"
+#include "software/backend/output/radio/mrf/usb/transfer.h"
 
 #include <iostream>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
-#include "software/errors.h"
-#include "software/misc.h"
-#include "software/util/logger/init.h"
+#include "software/backend/output/radio/mrf/usb/errors.h"
+#include "software/backend/output/radio/mrf/usb/misc.h"
 
 USB::Transfer::~Transfer()
 {

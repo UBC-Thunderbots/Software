@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libusb.h>
+#include <libusb/libusb.h>
 
 #include <cassert>
 #include <cstddef>

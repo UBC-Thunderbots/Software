@@ -26,6 +26,7 @@ cc_library(
     hdrs = ["grsim_backend.h"],
     deps = [
         ":backend",
+        ":backend_factory",
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/grsim:grsim_output",
     ],
@@ -37,6 +38,7 @@ cc_library(
     hdrs = ["radio_backend.h"],
     deps = [
         ":backend",
+        ":backend_factory",
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/radio:radio_output",
     ],

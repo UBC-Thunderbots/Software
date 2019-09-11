@@ -2,7 +2,7 @@
 
 //#include "software/dongle.h"
 #include "software/backend/output/radio/mrf/usb/libusb.h"
-#include "software/backend/output/radio/mrf/async_operation.h"
+#include "software/backend/output/radio/mrf/util/async_operation.h"
 
 class MRFDongle;
 

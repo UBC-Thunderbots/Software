@@ -12,7 +12,8 @@ cc_library(
         ["src/g3log/*.hpp"],
         exclude = ["src/g3log/stacktrace_windows.hpp"],
     ),
-    copts = ["-Iexternal/g3log/src"],
+    includes = ["./src"],
+    #    copts = ["-Iexternal/g3log/src"],
     #    linkopts = ["-pthread"],
     visibility = ["//visibility:public"],
 )

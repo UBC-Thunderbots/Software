@@ -1,7 +1,7 @@
 #ifndef UTIL_LIBUSB_H
 #define UTIL_LIBUSB_H
 
-#include <libusb.h>
+#include <libusb/libusb.h>
 
 #include <cassert>
 #include <cstddef>
@@ -13,14 +13,14 @@
 #include <unordered_map>
 #include <vector>
 
-#include "software/bulktransfer.h"
-#include "software/controltransfer.h"
-#include "software/device.h"
-#include "software/devicehandle.h"
-#include "software/errors.h"
-#include "software/interrupttransfer.h"
-#include "software/misc.h"
-#include "software/transfer.h"
+#include "software/backend/output/radio/mrf/usb/bulktransfer.h"
+#include "software/backend/output/radio/mrf/usb/controltransfer.h"
+#include "software/backend/output/radio/mrf/usb/device.h"
+#include "software/backend/output/radio/mrf/usb/devicehandle.h"
+#include "software/backend/output/radio/mrf/usb/errors.h"
+#include "software/backend/output/radio/mrf/usb/interrupttransfer.h"
+#include "software/backend/output/radio/mrf/usb/misc.h"
+#include "software/backend/output/radio/mrf/usb/transfer.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"
 
