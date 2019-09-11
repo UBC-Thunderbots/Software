@@ -48,7 +48,7 @@ class Parameter
         this->namespace_ = parameter_namespace;
         this->value_     = default_value;
 
-        Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
+        Parameter<T>::registerParameter(this);
     }
 
     /**
@@ -66,28 +66,9 @@ class Parameter
      *
      * @return the value of this parameter
      */
-    const T value() const
+    T value()
     {
-        // get the value from the parameter in the registry
-        if (Parameter<T>::getMutableRegistry().count(this->name_))
-        {
-            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-
-            std::scoped_lock lock(*(param_in_registry.first));
-            auto value = param_in_registry.second->value_;
-
-            return value;
-        }
-
-        // TODO https://github.com/UBC-Thunderbots/Software/issues/738
-        // fix this on ROS removal to throw an exception, ideally we do not
-        // want to return a value here as params that aren't in the registry are not
-        // threadsafe
-        else
-        {
-            return this->value_;
-        }
-        // if the parameter hasn't been registered yet, return default value
+        std::scoped_lock lock(this->value_mutex_);
         return this->value_;
     }
 
@@ -98,21 +79,8 @@ class Parameter
      */
     void setValue(const T new_value)
     {
-        // get the value from the parameter in the registry
-        if (Parameter<T>::getMutableRegistry().count(this->name_))
-        {
-            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            std::scoped_lock lock(*(param_in_registry.first));
-            param_in_registry->value_ = new_value;
-        }
-
-        // TODO https://github.com/UBC-Thunderbots/Software/issues/738
-        // want to store a value here as params that aren't in the registry are not
-        // threadsafe
-        else
-        {
-            this->value_ = new_value;
-        }
+        std::scoped_lock lock(this->value_mutex_);
+        this->value_ = new_value;
     }
 
     /**
@@ -164,9 +132,7 @@ class Parameter
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
-                                                 std::unique_ptr<Parameter<T>>>>&
-    getRegistry()
+    static const std::map<std::string, Parameter<T>*>& getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
     }
@@ -193,7 +159,7 @@ class Parameter
      * @param parameter A unique pointer to the Parameter to add. This pointer may not
      * be accessed by the caller after this function has been called.
      */
-    static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
+    static void registerParameter(Parameter<T>* parameter)
     {
         try
         {
@@ -210,9 +176,8 @@ class Parameter
 
         auto parameter_name = parameter->name();
 
-        Parameter<T>::getMutableRegistry().insert(std::make_pair(
-            parameter_name,
-            std::make_pair(std::make_unique<std::mutex>(), std::move(parameter))));
+        Parameter<T>::getMutableRegistry().insert(
+            std::make_pair(parameter_name, parameter));
     }
 
     /**
@@ -223,8 +188,8 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            std::scoped_lock lock(*(pair.second.first));
-            pair.second.second->updateValueFromROSParameterServer();
+            std::scoped_lock lock(pair.second->value_mutex_);
+            pair.second->updateValueFromROSParameterServer();
         }
     }
 
@@ -238,8 +203,8 @@ class Parameter
     {
         for (const auto& pair : Parameter<T>::getRegistry())
         {
-            std::scoped_lock lock(*(pair.second.first));
-            pair.second.second->updateParameterFromConfigMsg(updates);
+            std::scoped_lock lock(pair.second->value_mutex_);
+            pair.second->updateParameterFromConfigMsg(updates);
         }
     }
 
@@ -252,17 +217,15 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
-                                           std::unique_ptr<Parameter<T>>>>&
-    getMutableRegistry()
+    static std::map<std::string, Parameter<T>*>& getMutableRegistry()
     {
         // our registry needs to hold onto a unique mutex to access the parameters in the
         // registry as mutexes cannot be moved or copied
-        static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
-                                               std::unique_ptr<Parameter<T>>>>
-            instance;
+        static std::map<std::string, Parameter<T>*> instance;
         return instance;
     }
+
+    std::mutex value_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
