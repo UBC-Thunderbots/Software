@@ -35,10 +35,8 @@ rules_proto_toolchains()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    #    commit = "82ae1790cef07f3fd618592ad227fe2d66fe0b31",
-    #    remote = "https://github.com/nelhage/rules_boost",
-    commit = "2b48e22",
-    remote = "https://github.com/garethellis0/rules_boost",
+    commit = "82ae1790cef07f3fd618592ad227fe2d66fe0b31",
+    remote = "https://github.com/nelhage/rules_boost",
 )
 
 # TODO: put init stuff here in it's own file?
