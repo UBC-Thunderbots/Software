@@ -24,14 +24,22 @@ cc_library(
     name = "grsim_backend",
     srcs = ["grsim_backend.cpp"],
     hdrs = ["grsim_backend.h"],
-    deps = [":backend"],
+    deps = [
+        ":backend",
+        "//software/backend/input/network/networking:network_client",
+        "//software/backend/output/grsim:grsim_output",
+    ],
 )
 
 cc_library(
     name = "radio_backend",
     srcs = ["radio_backend.cpp"],
     hdrs = ["radio_backend.h"],
-    deps = [":backend"],
+    deps = [
+        ":backend",
+        "//software/backend/input/network/networking:network_client",
+        "//software/backend/output/radio:radio_output",
+    ],
 )
 
 cc_library(

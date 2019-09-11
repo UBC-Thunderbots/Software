@@ -35,11 +35,21 @@ rules_proto_toolchains()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    commit = "82ae1790cef07f3fd618592ad227fe2d66fe0b31",
-    remote = "https://github.com/nelhage/rules_boost",
+    #    commit = "82ae1790cef07f3fd618592ad227fe2d66fe0b31",
+    #    remote = "https://github.com/nelhage/rules_boost",
+    commit = "2b48e22",
+    remote = "https://github.com/garethellis0/rules_boost",
 )
 
 # TODO: put init stuff here in it's own file?
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
+
+http_archive(
+    name = "eigen",
+    build_file = "//:eigen.BUILD",
+    sha256 = "3a66f9bfce85aff39bc255d5a341f87336ec6f5911e8d816dd4a3fdc500f8acf",
+    strip_prefix = "eigen-eigen-c5e90d9e764e",
+    url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
+)

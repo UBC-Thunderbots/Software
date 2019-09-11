@@ -1,11 +1,10 @@
-#include "software/ball_filter.h"
-
-#include <shared/constants.h>
+#include "software/backend/input/network/filter/ball_filter.h"
 
 #include <Eigen/Dense>
 #include <algorithm>
 #include <limits>
 
+#include "shared/constants.h"
 #include "software/geom/util.h"
 #include "software/util/math/math_functions.h"
 

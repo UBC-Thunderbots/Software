@@ -1,20 +1,19 @@
 #pragma once
-​
+
 #include <iostream>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
-
 /**
  * This class defines a dynamic parameter, meaning the parameter
  * value can be changed during runtime.
  *
  * In our codebase, we currently support bool, int32_t, double, and strings
  *
- **/
-​
+ * */
+
 template <class T>
 class Parameter
 {
@@ -32,10 +31,10 @@ class Parameter
         this->name_      = parameter_name;
         this->namespace_ = parameter_namespace;
         this->value_     = default_value;
-​
+
         Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
     }
-​
+
     /**
      * Returns the value of this parameter
      *
@@ -47,13 +46,13 @@ class Parameter
         if (Parameter<T>::getMutableRegistry().count(this->name_))
         {
             auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-​
+
             std::scoped_lock lock(*(param_in_registry.first));
             auto value = param_in_registry.second->value_;
-​
+
             return value;
         }
-​
+
         // TODO https://github.com/UBC-Thunderbots/Software/issues/738
         // fix this on ROS removal to throw an exception, ideally we do not
         // want to return a value here as params that aren't in the registry are not
@@ -63,7 +62,7 @@ class Parameter
             return this->value_;
         }
     }
-​
+
     /**
      * Given the value, sets the value of this parameter
      *
@@ -78,7 +77,7 @@ class Parameter
             std::scoped_lock lock(*(param_in_registry.first));
             param_in_registry->value_ = new_value;
         }
-​
+
         // TODO https://github.com/UBC-Thunderbots/Software/issues/738
         // want to store a value here as params that aren't in the registry are not
         // threadsafe
@@ -87,7 +86,7 @@ class Parameter
             this->value_ = new_value;
         }
     }
-​
+
     /**
      * Returns the name of this parameter
      *
@@ -97,7 +96,7 @@ class Parameter
     {
         return name_;
     }
-​
+
     /**
      * Returns a reference to the Parameter registry. The registry is a list of
      * pointers to all the existing Parameters.
@@ -110,7 +109,7 @@ class Parameter
     {
         return Parameter<T>::getMutableRegistry();
     }
-​
+
     /**
      * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
      * into the registry, the pointer may not be accessed by the caller after this
@@ -124,12 +123,12 @@ class Parameter
         // load the param name before hand, as the pointer will have moved at the
         // time of inserting the mutex param pair into the map.
         auto parameter_name = parameter->name();
-​
+
         Parameter<T>::getMutableRegistry().insert(std::make_pair(
             parameter_name,
             std::make_pair(std::make_unique<std::mutex>(), std::move(parameter))));
     }
-​
+
    private:
     /**
      * Returns a mutable reference to the Parameter registry. This is the same as the
@@ -150,14 +149,13 @@ class Parameter
             instance;
         return instance;
     }
-​
+
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
-​
+
     // Store the name of the parameter
     std::string name_;
-​
+
     // Store the namespace of the parameter
     std::string namespace_;
 };
-

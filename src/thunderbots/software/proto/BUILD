@@ -37,5 +37,5 @@ cc_proto_library(
 
 cc_proto_library(
     name = "grsim_cc_proto",
-    deps = [":ssl_proto"],
+    deps = [":grsim_proto"],
 )

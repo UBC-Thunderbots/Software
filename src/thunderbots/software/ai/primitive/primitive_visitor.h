@@ -1,15 +1,17 @@
 #pragma once
 
-#include "software/ai/primitive/catch_primitive.h"
-#include "software/ai/primitive/chip_primitive.h"
-#include "software/ai/primitive/direct_velocity_primitive.h"
-#include "software/ai/primitive/direct_wheels_primitive.h"
-#include "software/ai/primitive/dribble_primitive.h"
-#include "software/ai/primitive/kick_primitive.h"
-#include "software/ai/primitive/move_primitive.h"
-#include "software/ai/primitive/movespin_primitive.h"
-#include "software/ai/primitive/pivot_primitive.h"
-#include "software/ai/primitive/stop_primitive.h"
+// We pre-declare these here to avoid a circular dependency between the visitor and each
+// individual primitive
+class CatchPrimitive;
+class ChipPrimitive;
+class DirectVelocityPrimitive;
+class DirectWheelsPrimitive;
+class DribblePrimitive;
+class KickPrimitive;
+class MovePrimitive;
+class MoveSpinPrimitive;
+class PivotPrimitive;
+class StopPrimitive;
 
 /**
  * This class provides an interface for all Primitive Visitors. The Visitor design pattern

@@ -1,5 +1,4 @@
 #pragma once
-#include <ros/ros.h>
 
 #include <boost/signals2.hpp>
 

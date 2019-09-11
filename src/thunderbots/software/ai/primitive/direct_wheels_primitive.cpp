@@ -1,9 +1,10 @@
 #include "software/ai/primitive/direct_wheels_primitive.h"
 
 #include <cstdint>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
-#include "software/ai/primitive/visitor/primitive_visitor.h"
-#include "software/util/logger/init.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 const std::string DirectWheelsPrimitive::PRIMITIVE_NAME = "Direct Wheels Primitive";
 

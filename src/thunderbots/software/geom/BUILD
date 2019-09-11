@@ -22,6 +22,7 @@ cc_library(
         "-std=c++17",
     ],
     deps = [
+        "@boost//:geometry",
         "@g3log//:all",
     ],
 )

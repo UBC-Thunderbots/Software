@@ -1,0 +1,34 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "ball_filter",
+    srcs = ["ball_filter.cpp"],
+    hdrs = ["ball_filter.h"],
+    deps = [
+        "//software/ai/world:ball",
+        "//software/ai/world:field",
+        "//software/geom:all",
+        "//software/util/math:math_functions",
+        "@eigen",
+    ],
+)
+
+cc_library(
+    name = "robot_filter",
+    srcs = ["robot_filter.cpp"],
+    hdrs = ["robot_filter.h"],
+    deps = [
+        "//software/ai/world:robot",
+    ],
+)
+
+cc_library(
+    name = "robot_team_filter",
+    srcs = ["robot_team_filter.cpp"],
+    hdrs = ["robot_team_filter.h"],
+    deps = [
+        ":robot_filter",
+        "//software/ai/world:team",
+        "//software/util:constants",
+    ],
+)

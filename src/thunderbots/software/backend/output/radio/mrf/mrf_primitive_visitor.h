@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "software/ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/primitive_visitor.h"
 #include "software//firmware_primitive_type.h"
 
 /**

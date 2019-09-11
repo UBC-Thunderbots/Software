@@ -2,9 +2,10 @@
 
 #include <boost/bind.hpp>
 #include <limits>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #include "software/util/constants.h"
-#include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,

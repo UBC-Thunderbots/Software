@@ -1,6 +1,9 @@
-#include "software/grsim_command_primitive_visitor.h"
+#include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
 
-#include <shared/constants.h>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
+#include "shared/constants.h"
 
 #include "software/ai/primitive/catch_primitive.h"
 #include "software/ai/primitive/chip_primitive.h"
@@ -15,8 +18,6 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
-#include "software/util/logger/init.h"
 
 GrsimCommandPrimitiveVisitor::GrsimCommandPrimitiveVisitor(const Robot &robot,
                                                            const Ball &ball)

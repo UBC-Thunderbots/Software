@@ -1,7 +1,5 @@
 #pragma once
 
-#include <ros/ros.h>
-
 #include <limits>
 
 #include "software/ai/world/ball.h"

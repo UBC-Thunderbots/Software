@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//software/geom:all",
         "//software/util/time:timestamp",
+        "@boost//:circular_buffer",
     ],
 )
 
@@ -28,6 +29,7 @@ cc_library(
     deps = [
         ":ball",
         ":refbox_constants",
+        "@g3log//:all",
     ],
 )
 
@@ -46,6 +48,7 @@ cc_library(
         ":robot_capabilities",
         "//software/geom:all",
         "//software/util/time:timestamp",
+        "@boost//:circular_buffer",
     ],
 )
 

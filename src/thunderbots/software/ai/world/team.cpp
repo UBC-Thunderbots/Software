@@ -1,6 +1,8 @@
 #include "software/ai/world/team.h"
 
 #include <set>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #include "shared/constants.h"
 

@@ -1,6 +1,6 @@
 #include "software/ai/primitive/move_primitive.h"
 
-#include "software/ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 const std::string MovePrimitive::PRIMITIVE_NAME = "Move Primitive";
 

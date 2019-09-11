@@ -1,6 +1,6 @@
 #include "software/ai/primitive/chip_primitive.h"
 
-#include "software/ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 const std::string ChipPrimitive::PRIMITIVE_NAME = "Chip Primitive";
 
