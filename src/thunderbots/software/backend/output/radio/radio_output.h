@@ -5,7 +5,7 @@
 #include "software/ai/world/ball.h"
 #include "software/ai/world/team.h"
 #include "software/backend/robot_status.h"
-#include "software/mrf/dongle.h"
+#include "software/backend/output/radio/mrf/dongle.h"
 
 class RadioOutput
 {

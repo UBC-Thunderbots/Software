@@ -8,7 +8,7 @@ add_library(backend_radio_output_mrf_usb STATIC
     devicehandle.cpp
     errors.cpp
     interrupttransfer.cpp
-    tbots_libusb.cpp
+        libusb.cpp
     misc.cpp
     transfer.cpp
     )

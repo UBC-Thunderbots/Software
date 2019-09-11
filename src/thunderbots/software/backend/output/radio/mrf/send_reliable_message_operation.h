@@ -1,8 +1,8 @@
 #pragma once
 
-#include "software/dongle.h"
-#include "software/usb/tbots_libusb.h"
-#include "software/async_operation.h"
+//#include "software/dongle.h"
+#include "software/backend/output/radio/mrf/usb/libusb.h"
+#include "software/backend/output/radio/mrf/async_operation.h"
 
 class MRFDongle;
 

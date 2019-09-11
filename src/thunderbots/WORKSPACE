@@ -51,3 +51,11 @@ http_archive(
     strip_prefix = "eigen-eigen-c5e90d9e764e",
     url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
 )
+
+http_archive(
+    name = "libusb",
+    build_file = "//:libusb.BUILD",
+    sha256 = "a5fc7c3c8ecfaca3e149ffb5a422f358fc5276fe56d851f46a4023d1e061bc00",
+    strip_prefix = "eigen-eigen-c5e90d9e764e",
+    url = "https://github.com/libusb/libusb/archive/v1.0.23.zip",
+)
