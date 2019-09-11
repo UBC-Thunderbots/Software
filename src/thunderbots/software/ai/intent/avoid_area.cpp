@@ -33,46 +33,46 @@ avoid_area_mask_t getAvoidAreasFromGameState(const GameState& game_state)
     avoid_area_mask_t areas_to_avoid = 0;
 
     // default avoid areas regardless of game state
-    MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::FRIENDLY_DEFENSE_AREA);
-    MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::ENEMY_ROBOTS);
+    areas_to_avoid.set((uint32_t)AvoidArea::FRIENDLY_DEFENSE_AREA, true);
+    areas_to_avoid.set((uint32_t)AvoidArea::ENEMY_ROBOTS, true);
 
     if (game_state.stayAwayFromBall())
     {
-        MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::HALF_METER_AROUND_BALL);
+        areas_to_avoid.set((uint32_t)AvoidArea::HALF_METER_AROUND_BALL, true);
     }
 
     if (game_state.isPenalty())
     {
         if (game_state.isOurPenalty())
         {
-            MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::ENEMY_HALF);
+            areas_to_avoid.set((uint32_t)AvoidArea::ENEMY_HALF, true);
         }
         else
         {
             // Is their penalty
-            MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::FRIENDLY_HALF);
+            areas_to_avoid.set((uint32_t)AvoidArea::FRIENDLY_HALF, true);
         }
     }
     else if (game_state.isKickoff())
     {
-        MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::HALF_METER_AROUND_BALL);
-        MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::CENTER_CIRCLE);
-        MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::ENEMY_HALF);
+        areas_to_avoid.set((uint32_t)AvoidArea::HALF_METER_AROUND_BALL, true);
+        areas_to_avoid.set((uint32_t)AvoidArea::CENTER_CIRCLE, true);
+        areas_to_avoid.set((uint32_t)AvoidArea::ENEMY_HALF, true);
     }
     else
     {
         if (game_state.stayAwayFromBall() || game_state.isOurKickoff())
         {
-            MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::HALF_METER_AROUND_BALL);
+            areas_to_avoid.set((uint32_t)AvoidArea::HALF_METER_AROUND_BALL, true);
         }
 
         if (game_state.isOurPenalty())
         {
-            MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::ENEMY_DEFENSE_AREA);
+            areas_to_avoid.set((uint32_t)AvoidArea::ENEMY_DEFENSE_AREA, true);
         }
         else
         {
-            MERGE_AVOID_AREAS(areas_to_avoid, AvoidArea::INFLATED_ENEMY_DEFENSE_AREA);
+            areas_to_avoid.set((uint32_t)AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, true);
         }
     }
 

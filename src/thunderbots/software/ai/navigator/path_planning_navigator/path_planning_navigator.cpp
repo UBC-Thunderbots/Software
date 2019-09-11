@@ -241,7 +241,7 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
     }
 
     // Avoid obstacles specific to this MoveIntent
-    if (CONTAIN_AVOID_AREAS(avoid_areas, AvoidArea::ENEMY_ROBOTS))
+    if (avoid_areas.test((uint32_t)AvoidArea::ENEMY_ROBOTS))
     {
         for (auto &robot : world.enemyTeam().getAllRobots())
         {
@@ -256,11 +256,11 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
             drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
         }
     }
-    for (avoid_area_mask_t area = (avoid_area_mask_t)AvoidArea::FIRST_AVOID_AREA;
-         area <= (avoid_area_mask_t)AvoidArea::LAST_AVOID_AREA_BEFORE_ROBOTS; area *= 2)
+    for (unsigned area = (unsigned)AvoidArea::FIRST_AVOID_AREA;
+         area <= (unsigned)AvoidArea::LAST_AVOID_AREA_BEFORE_ROBOTS; area++)
     {
         auto obstacle_opt = getObstacleFromAvoidArea((AvoidArea)area);
-        if (obstacle_opt && CONTAIN_AVOID_AREAS(avoid_areas, area))
+        if (obstacle_opt && avoid_areas.test(area))
         {
             obstacles.emplace_back(*obstacle_opt);
             // draw the avoid area

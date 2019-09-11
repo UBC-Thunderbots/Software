@@ -59,10 +59,10 @@ std::unique_ptr<Intent> Tactic::getNextIntent(
         avoid_area_mask_t avoid_areas = 0;
         if (game_state_opt)
         {
-            MERGE_AVOID_AREAS(avoid_areas, getAvoidAreasFromGameState(*game_state_opt));
+            avoid_areas |= getAvoidAreasFromGameState(*game_state_opt);
         }
-        REMOVE_AVOID_AREAS(avoid_areas, whitelisted_avoid_areas);
-        MERGE_AVOID_AREAS(avoid_areas, blacklisted_avoid_areas);
+        avoid_areas &= (~whitelisted_avoid_areas);
+        avoid_areas |= blacklisted_avoid_areas;
         next_intent->setAreasToAvoid(avoid_areas);
     }
 
@@ -123,15 +123,15 @@ RobotCapabilityFlags &Tactic::mutableRobotCapabilityRequirements()
 
 void Tactic::addWhitelistedAvoidArea(AvoidArea area)
 {
-    MERGE_AVOID_AREAS(whitelisted_avoid_areas, area);
+    whitelisted_avoid_areas.set((uint32_t)area, true);
 }
 
 void Tactic::addBlacklistedAvoidArea(AvoidArea area)
 {
-    MERGE_AVOID_AREAS(blacklisted_avoid_areas, area);
+    blacklisted_avoid_areas.set((uint32_t)area, true);
 }
 
 void Tactic::removeBlacklistedAvoidArea(AvoidArea area)
 {
-    REMOVE_AVOID_AREAS(blacklisted_avoid_areas, area);
+    blacklisted_avoid_areas.set((uint32_t)area, false);
 }

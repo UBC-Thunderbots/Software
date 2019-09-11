@@ -11,41 +11,32 @@
 enum class AvoidArea
 {
     // Used for iterating over avoid areas
-    FIRST_AVOID_AREA = 1 << 0,
+    FIRST_AVOID_AREA = 0,
     // The box around the friendly goal
-    FRIENDLY_DEFENSE_AREA = 1 << 0,
+    FRIENDLY_DEFENSE_AREA = 0,
     // The box around the enemy goal
-    ENEMY_DEFENSE_AREA = 1 << 1,
+    ENEMY_DEFENSE_AREA = 1,
     // The box around the enemy goal, inflated by 0.2 meters for certain situations
-    INFLATED_ENEMY_DEFENSE_AREA = 1 << 2,
+    INFLATED_ENEMY_DEFENSE_AREA = 2,
     // The center circle
-    CENTER_CIRCLE = 1 << 3,
+    CENTER_CIRCLE = 3,
     // A half meter radius around the ball
-    HALF_METER_AROUND_BALL = 1 << 4,
+    HALF_METER_AROUND_BALL = 4,
     // The ball itself
-    BALL = 1 << 5,
+    BALL = 5,
     // The enemy half of the field
-    ENEMY_HALF = 1 << 6,
+    ENEMY_HALF = 6,
     // The friendly half of the field
-    FRIENDLY_HALF = 1 << 7,
+    FRIENDLY_HALF = 7,
     // Used for iterating over avoid areas
-    LAST_AVOID_AREA_BEFORE_ROBOTS = 1 << 7,
+    LAST_AVOID_AREA_BEFORE_ROBOTS = 7,
     // The enemy robots and their avoid obstacles
-    ENEMY_ROBOTS = 1 << 8,
+    ENEMY_ROBOTS = 8,
     // Used for iterating over avoid areas
-    LAST_AVOID_AREA = 1 << 8,
+    LAST_AVOID_AREA = 8,
 };
 
-typedef uint32_t avoid_area_mask_t;
-
-// Adds avoid areas together
-#define ADD_AVOID_AREA(a, b) ((avoid_area_mask_t)a) | ((avoid_area_mask_t)b)
-// sets a = a + b
-#define MERGE_AVOID_AREAS(a, b) a |= (avoid_area_mask_t)b
-// sets a = a - b
-#define REMOVE_AVOID_AREAS(a, b) a &= (~((avoid_area_mask_t)b))
-// true if a contains at least one bit of b
-#define CONTAIN_AVOID_AREAS(a, b) ((avoid_area_mask_t)a) & ((avoid_area_mask_t)b)
+typedef std::bitset<32> avoid_area_mask_t;
 
 std::ostream& operator<<(std::ostream& os, const AvoidArea& state);
 
