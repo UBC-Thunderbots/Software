@@ -4,7 +4,7 @@
 #include <numeric>
 
 #include "software/ai/passing/evaluation.h"
-#include "software/pass_generator.h"
+#include "software/ai/passing/pass_generator.h"
 #include "software/util/canvas_messenger/canvas_messenger.h"
 
 using namespace Passing;
