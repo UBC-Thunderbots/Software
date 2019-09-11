@@ -72,5 +72,6 @@ cc_library(
         ":game_state",
         ":robot",
         ":team",
+        "//software/util/parameter:dynamic_parameters",
     ],
 )
