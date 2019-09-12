@@ -1,6 +1,6 @@
 #include "software/ai/intent/stop_intent.h"
 
-#include "software/ai/intent/visitor/intent_visitor.h"
+#include "software/ai/intent/intent_visitor.h"
 
 const std::string StopIntent::INTENT_NAME = "Stop Intent";
 

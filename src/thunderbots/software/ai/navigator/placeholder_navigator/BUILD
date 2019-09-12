@@ -4,5 +4,11 @@ cc_library(
     name = "placeholder_navigator",
     srcs = ["placeholder_navigator.cpp"],
     hdrs = ["placeholder_navigator.h"],
-    deps = ["//software/ai/navigator"],
+    deps = [
+        "//software/ai/intent",
+        "//software/ai/intent:all_intents",
+        "//software/ai/intent:intent_visitor",
+        "//software/ai/navigator",
+        "//software/ai/world",
+    ],
 )

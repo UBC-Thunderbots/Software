@@ -10,7 +10,7 @@
 // accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
 //
-// This class can be found in ai/intent/visitor/intent_visitor.h
+// This class can be found in ai/intent/intent_visitor.h
 class IntentVisitor;
 
 /**

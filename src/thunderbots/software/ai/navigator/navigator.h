@@ -1,7 +1,6 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/ai/world/world.h"
 

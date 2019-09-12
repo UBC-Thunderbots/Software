@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/intent/visitor/intent_visitor.h"
+#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/primitive/primitive.h"
 

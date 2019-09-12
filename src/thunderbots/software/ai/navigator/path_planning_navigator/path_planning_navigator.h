@@ -3,7 +3,7 @@
 #include <util/canvas_messenger/canvas_messenger.h>
 
 #include "software/ai/intent/intent.h"
-#include "software/ai/intent/visitor/intent_visitor.h"
+#include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/ai/navigator/path_planner/straight_line_path_planner.h"
