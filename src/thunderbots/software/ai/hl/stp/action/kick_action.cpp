@@ -1,12 +1,11 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 
-#include <ai/world/ball.h>
-
+#include "software/ai/world/ball.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 
 KickAction::KickAction() : Action(), ball({0, 0}, {0, 0}, Timestamp::fromSeconds(0)) {}
 

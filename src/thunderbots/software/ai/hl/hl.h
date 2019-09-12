@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 
-#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/world/world.h"
 
