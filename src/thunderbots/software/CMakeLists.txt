@@ -752,6 +752,7 @@ if (CATKIN_ENABLE_TESTING)
             test/ai/hl/stp/main.cpp
             test/ai/hl/stp/stp.cpp
             test/ai/hl/stp/stp_tactic_assignment.cpp
+            test/ai/intent/avoid_area.cpp
             )
     target_link_libraries(stp_test
             ${catkin_LIBRARIES}
