@@ -4,9 +4,9 @@
 
 #include "software/ai/world/field.h"
 #include "software/ai/world/world.h"
-#include "software//constants.h"
-#include "software/software/geom/line.h"
-#include "software/software/geom/util.h"
+#include "shared/constants.h"
+#include "software/geom/line.h"
+#include "software/geom/util.h"
 
 namespace Evaluation
 {

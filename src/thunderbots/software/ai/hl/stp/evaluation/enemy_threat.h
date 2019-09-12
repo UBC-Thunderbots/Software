@@ -5,7 +5,6 @@
 
 #include "software/ai/world/world.h"
 
-
 namespace Evaluation
 {
     // This struct stores the concept of an Enemy Threat. It contains all the necessary
