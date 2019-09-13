@@ -1,5 +1,6 @@
 #include "software/ai/navigator/placeholder_navigator/placeholder_navigator.h"
 
+
 std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
