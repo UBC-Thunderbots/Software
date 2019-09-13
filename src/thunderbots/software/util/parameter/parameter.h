@@ -132,7 +132,7 @@ class Parameter
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string, Parameter<T>*>& getRegistry()
+    static const std::vector<Parameter<T>*>& getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
     }
@@ -174,10 +174,7 @@ class Parameter
             ROS_WARN("Attempting to configure with unkown type");
         }
 
-        auto parameter_name = parameter->name();
-
-        Parameter<T>::getMutableRegistry().insert(
-            std::make_pair(parameter_name, parameter));
+        Parameter<T>::getMutableRegistry().emplace_back(parameter);
     }
 
     /**
@@ -186,10 +183,10 @@ class Parameter
      */
     static void updateAllParametersFromROSParameterServer()
     {
-        for (const auto& pair : Parameter<T>::getRegistry())
+        for (const auto& param : Parameter<T>::getRegistry())
         {
-            std::scoped_lock lock(pair.second->value_mutex_);
-            pair.second->updateValueFromROSParameterServer();
+            std::scoped_lock lock(param->value_mutex_);
+            param->updateValueFromROSParameterServer();
         }
     }
 
@@ -201,10 +198,10 @@ class Parameter
     static void updateAllParametersFromConfigMsg(
         const dynamic_reconfigure::Config::ConstPtr& updates)
     {
-        for (const auto& pair : Parameter<T>::getRegistry())
+        for (const auto& param : Parameter<T>::getRegistry())
         {
-            std::scoped_lock lock(pair.second->value_mutex_);
-            pair.second->updateParameterFromConfigMsg(updates);
+            std::scoped_lock lock(param->value_mutex_);
+            param->updateParameterFromConfigMsg(updates);
         }
     }
 
@@ -217,11 +214,11 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::map<std::string, Parameter<T>*>& getMutableRegistry()
+    static std::vector<Parameter<T>*>& getMutableRegistry()
     {
         // our registry needs to hold onto a unique mutex to access the parameters in the
         // registry as mutexes cannot be moved or copied
-        static std::map<std::string, Parameter<T>*> instance;
+        static std::vector<Parameter<T>*> instance;
         return instance;
     }
 
