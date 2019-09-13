@@ -7,9 +7,8 @@
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
-#include "software/ai/world/world.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>
 Evaluation::findAllReceiverPasserPairs(const std::vector<Robot> &possible_passers,
