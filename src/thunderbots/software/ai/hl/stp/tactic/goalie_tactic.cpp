@@ -7,7 +7,7 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 

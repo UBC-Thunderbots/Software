@@ -12,7 +12,7 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 
 class Obstacle
 {

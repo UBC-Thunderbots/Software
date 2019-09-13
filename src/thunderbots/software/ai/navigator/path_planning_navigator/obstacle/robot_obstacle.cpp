@@ -1,6 +1,6 @@
 #include "software/robot_obstacle.cpp"
 
-#include "software//constants.h"
+#include "shared/constants.h"
 
 using namespace Util::DynamicParameters::Navigator;
 

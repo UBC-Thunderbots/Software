@@ -1,6 +1,6 @@
 #pragma once
 
-#include <geom/segment.h>
+#include "software/geom/segment.h"
 
 #include "software/ai/hl/stp/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/tactic/tactic.h"

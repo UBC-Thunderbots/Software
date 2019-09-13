@@ -11,7 +11,7 @@ add_library(tactic STATIC
     penalty_kick_tactic.cpp
     receiver_tactic.cpp
     shadow_enemy_tactic.cpp
-    shadow_freekicker.cpp
+        shadow_freekicker_tactic.cpp
     shoot_goal_tactic.cpp
     stop_tactic.cpp
     tactic.cpp

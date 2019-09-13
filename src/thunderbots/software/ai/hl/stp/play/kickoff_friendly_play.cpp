@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 
 const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
 

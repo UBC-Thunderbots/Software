@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 
 const std::string PenaltyKickPlay::name = "Penalty Kick Play";
 

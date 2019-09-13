@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/evaluation/robot.h"
 
-#include <shared/constants.h>
-
+#include "shared/constants.h"
 
 
 bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,

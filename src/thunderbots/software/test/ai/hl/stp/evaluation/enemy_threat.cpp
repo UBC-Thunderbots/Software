@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software//constants.h"
+#include "shared/constants.h"
 #include "software/test/test_util/test_util.h"
 
 TEST(FindAllPasserReceiverPairsTest, robot_passing_to_itself)

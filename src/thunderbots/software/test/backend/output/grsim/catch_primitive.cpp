@@ -3,7 +3,7 @@
 #include "software/backend/output/grsim/motion_controller.h"
 #include "software/geom/angle.h"
 #include "software/gtest/gtest.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 #include "software/software/ai/world/robot.h"
 
 #define POSITION_TOLERANCE 0.01

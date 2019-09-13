@@ -1,10 +1,9 @@
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 
-#include <util/parameter/dynamic_parameters.h>
-
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "software/util/parameter/dynamic_parameters.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
@@ -12,7 +11,7 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,

@@ -38,6 +38,11 @@ cc_library(
     srcs = ["enemy_threat.cpp"],
     hdrs = ["enemy_threat.h"],
     deps = [
+        ":calc_best_shot",
+        ":intercept",
+        ":possession",
+        ":robot",
+        ":team",
         "//shared:constants",
         "//software/ai/world",
         "//software/geom:all",
@@ -65,5 +70,57 @@ cc_library(
         "//software/ai/world",
         "//software/geom:all",
         "//software/util/parameter:dynamic_parameters",
+    ],
+)
+
+cc_library(
+    name = "intercept",
+    srcs = ["intercept.cpp"],
+    hdrs = ["intercept.h"],
+    deps = [
+        "//shared:constants",
+        "//software/ai/evaluation:pass",
+        "//software/ai/world:ball",
+        "//software/ai/world:field",
+        "//software/ai/world:robot",
+        "//software/geom:all",
+        "//software/util/optimization:gradient_descent",
+    ],
+)
+
+cc_library(
+    name = "possession",
+    srcs = ["possession.cpp"],
+    hdrs = ["possession.h"],
+    deps = [
+        ":intercept",
+        ":robot",
+        ":team",
+        "//shared:constants",
+        "//software/ai/world:ball",
+        "//software/ai/world:field",
+        "//software/ai/world:robot",
+    ],
+)
+
+cc_library(
+    name = "robot",
+    srcs = ["robot.cpp"],
+    hdrs = ["robot.h"],
+    deps = [
+        "//shared:constants",
+        "//software/ai/world:ball",
+        "//software/ai/world:robot",
+        "//software/geom:all",
+    ],
+)
+
+cc_library(
+    name = "team",
+    srcs = ["team.cpp"],
+    hdrs = ["team.h"],
+    deps = [
+        "//software/ai/world:robot",
+        "//software/ai/world:team",
     ],
 )

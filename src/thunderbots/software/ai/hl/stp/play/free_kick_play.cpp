@@ -13,7 +13,7 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 #include "software/util/logger/custom_logging_levels.h"
 
 using namespace Passing;

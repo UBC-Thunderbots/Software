@@ -1,6 +1,5 @@
 #pragma once
 
-#include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 
 /**

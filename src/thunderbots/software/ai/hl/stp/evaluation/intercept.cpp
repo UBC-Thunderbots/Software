@@ -1,10 +1,10 @@
 /**
  * Implementation for STP intercept-related evaluation functions
  */
-#include "software/intercept.h"
+#include "software/ai/hl/stp/evaluation/intercept.h"
 
 #include "software/ai/evaluation/pass.h"
-#include "software//constants.h"
+#include "shared/constants.h"
 #include "software/util/optimization/gradient_descent.h"
 
 namespace Evaluation

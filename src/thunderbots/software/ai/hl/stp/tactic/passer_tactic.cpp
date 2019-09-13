@@ -3,11 +3,13 @@
  */
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
-#include "software//constants.h"
-#include "software/util/logger/init.h"
+#include "shared/constants.h"
 
 using namespace Passing;
 
