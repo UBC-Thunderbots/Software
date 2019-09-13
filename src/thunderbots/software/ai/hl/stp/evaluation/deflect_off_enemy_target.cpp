@@ -1,7 +1,3 @@
-//
-// Created by roark on 02/02/19.
-//
-
 #include "software/ai/world/field.h"
 #include "software/ai/world/world.h"
 #include "shared/constants.h"

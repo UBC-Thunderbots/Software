@@ -1,7 +1,7 @@
 /**
  * Implementation of the PenaltyKickTactic
  */
-#include "software/penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
@@ -35,7 +35,6 @@ void PenaltyKickTactic::updateParams(const Ball& updated_ball,
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
-    // Prefer robots closer to the pass start position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
