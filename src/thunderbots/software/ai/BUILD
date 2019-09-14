@@ -15,3 +15,19 @@ cc_library(
         "//software/util/time:timestamp",
     ],
 )
+
+cc_library(
+    name = "ai_wrapper",
+    srcs = ["ai_wrapper.cpp"],
+    hdrs = ["ai_wrapper.h"],
+    deps = [
+        "//software:typedefs",
+        "//software/ai",
+        "//software/ai/world",
+        "//software/multithreading:subject",
+        "//software/multithreading:threaded_observer",
+        "//software/util/canvas_messenger",
+        "//software/util/parameter:dynamic_parameters",
+        "@boost//:bind",
+    ],
+)
