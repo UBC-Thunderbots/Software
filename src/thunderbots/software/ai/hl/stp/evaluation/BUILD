@@ -11,6 +11,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ball_test",
+    srcs = ["ball_test.cpp"],
+    deps = [
+        ":ball",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "calc_best_shot",
     srcs = ["calc_best_shot.cpp"],
@@ -19,6 +29,18 @@ cc_library(
         "//shared:constants",
         "//software/ai/world",
         "//software/geom:all",
+    ],
+)
+
+cc_test(
+    name = "calc_best_shot_test",
+    srcs = ["calc_best_shot_test.cpp"],
+    deps = [
+        ":calc_best_shot",
+        "//shared:constants",
+        "//software/geom:all",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -33,6 +55,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "deflect_off_enemy_target_test",
+    srcs = ["deflect_off_enemy_target_test.cpp"],
+    deps = [
+        ":deflect_off_enemy_target",
+        "//software/geom:all",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "detect_threat",
     srcs = ["detect_threat.cpp"],
@@ -42,6 +75,19 @@ cc_library(
         "//software/ai/world:ball",
         "//software/ai/world:field",
         "//software/geom:all",
+    ],
+)
+
+cc_test(
+    name = "detect_threat_test",
+    srcs = ["detect_threat_test.cpp"],
+    deps = [
+        ":detect_threat",
+        "//software/ai/world:ball",
+        "//software/geom:all",
+        "//software/test/test_util",
+        "//software/util/time:timestamp",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -58,6 +104,17 @@ cc_library(
         "//shared:constants",
         "//software/ai/world",
         "//software/geom:all",
+    ],
+)
+
+cc_test(
+    name = "enemy_threat_test",
+    srcs = ["enemy_threat_test.cpp"],
+    deps = [
+        ":enemy_threat",
+        "//software/ai/world:ball",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -85,6 +142,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "indirect_chip_test",
+    srcs = ["indirect_chip_test.cpp"],
+    deps = [
+        ":indirect_chip",
+        "//software/ai/world",
+        "//software/geom:all",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "intercept",
     srcs = ["intercept.cpp"],
@@ -97,6 +166,16 @@ cc_library(
         "//software/ai/world:robot",
         "//software/geom:all",
         "//software/util/optimization:gradient_descent",
+    ],
+)
+
+cc_test(
+    name = "intercept_test",
+    srcs = ["intercept_test.cpp"],
+    deps = [
+        ":intercept",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -116,6 +195,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "possession_test",
+    srcs = ["possession_test.cpp"],
+    deps = [
+        ":possession",
+        "//shared:constants",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "robot",
     srcs = ["robot.cpp"],
@@ -128,6 +218,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "robot_test",
+    srcs = ["robot_test.cpp"],
+    deps = [
+        ":robot",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "team",
     srcs = ["team.cpp"],
@@ -135,5 +234,14 @@ cc_library(
     deps = [
         "//software/ai/world:robot",
         "//software/ai/world:team",
+    ],
+)
+
+cc_test(
+    name = "team_test",
+    srcs = ["team_test.cpp"],
+    deps = [
+        ":team",
+        "@gtest//:gtest_main",
     ],
 )

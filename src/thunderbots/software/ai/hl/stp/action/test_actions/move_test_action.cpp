@@ -1,4 +1,4 @@
-#include "software/test/ai/hl/stp/test_actions/move_test_action.h"
+#include "software/ai/hl/stp/action/test_actions/move_test_action.h"
 
 #include "software/ai/intent/move_intent.h"
 

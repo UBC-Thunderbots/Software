@@ -1,8 +1,5 @@
 #include "software/test/test_util/test_util.h"
 
-#include "software/test_util.h"
-
-
 namespace Test
 {
     Field TestUtil::createSSLDivBField()

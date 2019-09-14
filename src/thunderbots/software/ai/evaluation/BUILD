@@ -9,3 +9,12 @@ cc_library(
         "//software/ai/world:robot",
     ],
 )
+
+cc_test(
+    name = "pass_test",
+    srcs = ["pass_test.cpp"],
+    deps = [
+        ":pass",
+        "@gtest//:gtest_main",
+    ],
+)

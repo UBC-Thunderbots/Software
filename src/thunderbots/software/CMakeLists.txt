@@ -540,7 +540,7 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(action_test
             test/ai/hl/stp/action/main.cpp
-            test/ai/hl/stp/test_actions/move_test_action.cpp
+            ai/hl/stp/action/test_actions/move_test_action.cpp
             test/ai/hl/stp/action/action.cpp
             test/ai/hl/stp/action/chip_action.cpp
             test/ai/hl/stp/action/dribble_action.cpp
