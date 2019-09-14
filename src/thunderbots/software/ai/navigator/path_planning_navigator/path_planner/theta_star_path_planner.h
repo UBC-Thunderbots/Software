@@ -2,7 +2,7 @@
 #include <bits/stdc++.h>
 #include <unistd.h>
 
-#include "software/ai/navigator/path_planner/path_planner.h"
+#include "software/ai/navigator/path_planning_navigator/path_planner/path_planner.h"
 #include "software/ai/world/ball.h"
 #include "software/ai/world/field.h"
 

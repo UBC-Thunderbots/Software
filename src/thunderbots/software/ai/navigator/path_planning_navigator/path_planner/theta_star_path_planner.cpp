@@ -1,14 +1,13 @@
-#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
-
-#include "software/util/logger/init.h"
-
 /**
  * This file contains the implementation of a theta star path planner
  * which returns an optimal path that avoids obstacles
  */
 
+#include "software/ai/navigator/path_planning_navigator/path_planner/theta_star_path_planner.h"
 
-// constructor
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
     : field_(field), obstacles_(obstacles)

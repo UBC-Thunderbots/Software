@@ -1,12 +1,12 @@
 #include "software/ai/hl/stp/play/kickoff_enemy_play.h"
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
-#include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 const std::string KickoffEnemyPlay::name = "KickoffEnemy Play";

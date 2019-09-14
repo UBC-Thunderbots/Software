@@ -1,4 +1,4 @@
-#include "software/robot_obstacle.cpp"
+#include "software/ai/navigator/path_planning_navigator/obstacle/robot_obstacle.h"
 
 #include "shared/constants.h"
 

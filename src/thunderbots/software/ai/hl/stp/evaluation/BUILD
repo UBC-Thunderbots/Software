@@ -1,6 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "ball",
+    srcs = ["ball.cpp"],
+    hdrs = ["ball.h"],
+    deps = [
+        "//shared:constants",
+        "//software/ai/world",
+        "//software/geom:all",
+    ],
+)
+
+cc_library(
     name = "calc_best_shot",
     srcs = ["calc_best_shot.cpp"],
     hdrs = ["calc_best_shot.h"],

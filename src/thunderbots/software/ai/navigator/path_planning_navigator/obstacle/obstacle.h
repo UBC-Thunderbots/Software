@@ -3,7 +3,6 @@
  */
 #pragma once
 
-#include <ai/primitive/primitive.h>
 
 #include "software/ai/world/ball.h"
 #include "software/ai/world/robot.h"

@@ -1,14 +1,13 @@
 #include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
-#include <util/parameter/dynamic_parameters.h>
-
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
-#include "software/ai/navigator/util.h"
-#include "software/util/canvas_messenger/canvas_messenger.h"
+#include "software/ai/navigator/path_planning_navigator/util.h"
 
-// visitors
+#include "software/ai/primitive/all_primitives.h"
+#include "software/ai/intent/all_intents.h"
+
 void PathPlanningNavigator::visit(const CatchIntent &catch_intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(catch_intent);

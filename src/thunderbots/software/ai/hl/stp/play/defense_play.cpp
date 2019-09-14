@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/play/defense_play.h"
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
@@ -9,7 +10,6 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/ai/world/game_state.h"
-#include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 const std::string DefensePlay::name = "Defense Play";

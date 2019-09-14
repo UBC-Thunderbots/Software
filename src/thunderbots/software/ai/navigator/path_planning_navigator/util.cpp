@@ -1,4 +1,4 @@
-#include "software/ai/navigator/util.h"
+#include "software/ai/navigator/path_planning_navigator/util.h"
 
 #include "software/geom/point.h"
 #include "software/geom/util.h"

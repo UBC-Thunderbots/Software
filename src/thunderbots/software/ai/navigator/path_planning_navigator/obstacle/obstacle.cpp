@@ -1,5 +1,5 @@
 
-#include "software/obstacle.h"
+#include "software/ai/navigator/path_planning_navigator/obstacle/obstacle.h"
 
 const std::optional<Polygon> Obstacle::getBoundaryPolygon() const
 {

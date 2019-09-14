@@ -1,4 +1,4 @@
-#include "software/ai/navigator/trespass.h"
+#include "software/ai/navigator/path_planning_navigator/trespass.h"
 
 #include "software/util/math/math_functions.h"
 

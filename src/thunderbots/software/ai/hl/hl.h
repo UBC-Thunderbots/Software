@@ -5,6 +5,7 @@
 
 #include "software/ai/intent/intent.h"
 #include "software/ai/world/world.h"
+#include "software/ai/hl/stp/play_info.h"
 
 /**
  * An abstraction for the high-level logic of our AI. The high-level logic is responsible

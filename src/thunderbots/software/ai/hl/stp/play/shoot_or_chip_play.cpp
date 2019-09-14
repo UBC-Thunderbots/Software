@@ -3,6 +3,7 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/evaluation/find_open_areas.h"
 #include "software/ai/hl/stp/evaluation/indirect_chip.h"
@@ -15,7 +16,6 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/ai/world/game_state.h"
-#include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Evaluation;

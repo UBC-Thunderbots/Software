@@ -119,6 +119,7 @@ cc_library(
 
 cc_library(
     name = "all_intents",
+    hdrs = ["all_intents.h"],
     deps = [
         ":catch_intent",
         ":chip_intent",

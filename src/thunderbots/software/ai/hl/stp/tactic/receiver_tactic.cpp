@@ -1,13 +1,12 @@
-/**
- * Implementation of the ReceiverTactic
- */
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
+
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/geom/util.h"
 #include "shared/constants.h"
-#include "software/util/logger/init.h"
 
 using namespace Passing;
 using namespace Evaluation;

@@ -2,7 +2,7 @@
 #include <optional>
 #include <vector>
 
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/path_planning_navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
 
 /**

@@ -141,6 +141,7 @@ cc_library(
         "//software/ai/hl/stp/action:dribble_action",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/evaluation:calc_best_shot",
         "//software/geom:all",
         "@g3log//:all",
     ],

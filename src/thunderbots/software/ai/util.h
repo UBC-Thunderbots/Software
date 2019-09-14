@@ -2,7 +2,8 @@
 #include <sstream>
 #include <unordered_set>
 
-#include "software/util/logger/init.h"
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 
 /**
  * Macro used to define bitwise operations for a class.

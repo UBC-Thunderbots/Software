@@ -4,7 +4,6 @@
 
 #include "software/ai/hl/hl.h"
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/intent/intent.h"
 
 /**

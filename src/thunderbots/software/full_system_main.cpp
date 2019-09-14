@@ -12,7 +12,6 @@
 #include "software/backend/radio_backend.h"
 #include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/constants.h"
-#include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameter_utils.h"
 
 using namespace boost::program_options;

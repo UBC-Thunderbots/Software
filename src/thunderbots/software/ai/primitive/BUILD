@@ -113,6 +113,7 @@ cc_library(
 
 cc_library(
     name = "all_primitives",
+    hdrs = ["all_primitives.h"],
     deps = [
         ":catch_primitive",
         ":chip_primitive",
