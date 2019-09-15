@@ -941,13 +941,6 @@ if (CATKIN_ENABLE_TESTING)
             tbots_time
             )
 
-    catkin_add_gtest(ai_util_test
-                    test/ai/test_util.cpp)
-    target_link_libraries(ai_util_test
-            ${catkin_LIBRARIES}
-            ${G3LOG}
-            ${Boost_LIBRARIES})
-
     catkin_add_gtest(refbox_constants_test
             util/refbox_constants.cpp
             test/util/refbox_constants.cpp
