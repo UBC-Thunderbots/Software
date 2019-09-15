@@ -97,28 +97,28 @@ class MainWidget : public QWidget
      * @param parameter The boolean parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createBooleanParameter(std::shared_ptr<Parameter<bool>> parameter);
+    QWidget* createBooleanParameter(Parameter<bool> *parameter);
 
     /**
      * Creates a widget that contains the components necessary to display and control an integer Parameter for the AI
      * @param parameter The integer parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createIntegerParameter(std::shared_ptr<Parameter<int>> parameter);
+    QWidget* createIntegerParameter(Parameter<int> *parameter);
 
     /**
      * Creates a widget that contains the components necessary to display and control a double Parameter for the AI
      * @param parameter The double parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createDoubleParameter(std::shared_ptr<Parameter<double>> parameter);
+    QWidget* createDoubleParameter(Parameter<double> *parameter);
 
     /**
      * Creates a widget that contains the components necessary to display and control a string Parameter for the AI
      * @param parameter The string parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createStringParameter(std::shared_ptr<Parameter<std::string>> parameter);
+    QWidget* createStringParameter(Parameter<std::string> *parameter);
 
     // TODO: comment
     void setRobotStatus(QTableWidget* table, std::vector<std::string> robot_status_messages);

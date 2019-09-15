@@ -201,7 +201,7 @@ void MainWidget::setRobotStatus(QTableWidget* table, std::vector<std::string> ro
     }
 }
 
-QWidget* MainWidget::createBooleanParameter(std::shared_ptr<Parameter<bool>> parameter) {
+QWidget* MainWidget::createBooleanParameter(Parameter<bool> *parameter) {
     QWidget* widget = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
 
@@ -224,7 +224,7 @@ QWidget* MainWidget::createBooleanParameter(std::shared_ptr<Parameter<bool>> par
     return widget;
 }
 
-QWidget* MainWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> parameter) {
+QWidget* MainWidget::createIntegerParameter(Parameter<int> *parameter) {
     QWidget* widget = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
 
@@ -251,7 +251,7 @@ QWidget* MainWidget::createIntegerParameter(std::shared_ptr<Parameter<int>> para
     return widget;
 }
 
-QWidget* MainWidget::createDoubleParameter(std::shared_ptr<Parameter<double>> parameter) {
+QWidget* MainWidget::createDoubleParameter(Parameter<double> *parameter) {
     QWidget* widget = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
 
@@ -279,7 +279,7 @@ QWidget* MainWidget::createDoubleParameter(std::shared_ptr<Parameter<double>> pa
     return widget;
 }
 
-QWidget* MainWidget::createStringParameter(std::shared_ptr<Parameter<std::string>> parameter) {
+QWidget* MainWidget::createStringParameter(Parameter<std::string> *parameter) {
     QWidget* widget = new QWidget();
     QHBoxLayout* layout = new QHBoxLayout(widget);
 
@@ -306,38 +306,37 @@ QWidget* MainWidget::createStringParameter(std::shared_ptr<Parameter<std::string
 }
 
 void MainWidget::setupParametersTab() {
-//    auto tab = main_widget->params_tab;
-//    auto tab_layout = main_widget->params_tab_vertical_layout;
-//
-//    auto s = Parameter<bool>::getRegistry().begin();
-//    auto e = Parameter<bool>::getRegistry().end();
-////   auto bool_param_map = std::move(Parameter<bool>::getRegistry());
-//   for(auto iter = s; iter != e; iter++) {
-//       auto bool_param = std::move(iter->second);
-//       // TODO: THIS IS A HACK CONVERTING A UNIQUE TO SHARED PTR
-////       std::shared_ptr<Parameter<bool>> p = std::shared_ptr<Parameter<bool>>(bool_param.get());
-////       QWidget* boolparamwidget = createBooleanParameter(p);
-////       boolparamwidget->setParent(tab);
-////       tab_layout->addWidget(boolparamwidget);
-//   }
+    auto tab = main_widget->params_tab;
+    auto params_scroll_area = main_widget->params_tab_scroll_area;
+    QWidget* widget = new QWidget(tab);
+    QVBoxLayout* layout = new QVBoxLayout(widget);
+    params_scroll_area->setWidget(widget);
+    params_scroll_area->setWidgetResizable(true);
 
+    for(auto param : Parameter<bool>::getRegistry()) {
+       QWidget* bool_param_widget = createBooleanParameter(param);
+       bool_param_widget->setParent(widget);
+       layout->addWidget(bool_param_widget);
+    }
 
-   //    QHBoxLayout* param_layout = new QHBoxLayout(main_widget->params_tab);
-//    auto param_layout = main_widget->params_tab_vertical_layout;
-//    QWidget* boolparam = createBooleanParameter(std::make_shared<Parameter<bool>>(Util::DynamicParameters::AI::run_ai));
-//    boolparam->setParent(main_widget->params_tab);
-//    param_layout->addWidget(boolparam);
-//    QWidget* intparam = createIntegerParameter(std::make_shared<Parameter<int>>(Util::DynamicParameters::AI::refbox::friendly_goalie_id));
-//    intparam->setParent(main_widget->params_tab);
-//    param_layout->addWidget(intparam);
-//    QWidget* doubleparam = createDoubleParameter(std::make_shared<Parameter<double>>(Util::DynamicParameters::AI::refbox::min_valid_x));
-//    doubleparam->setParent(main_widget->params_tab);
-//    param_layout->addWidget(doubleparam);
-//    QWidget* stringparam = createStringParameter(std::make_shared<Parameter<std::string>>(Util::DynamicParameters::AI::current_ai_play));
-//    stringparam->setParent(main_widget->params_tab);
-//    param_layout->addWidget(stringparam);
+    for(auto param : Parameter<int>::getRegistry()) {
+        QWidget* int_param_widget = createIntegerParameter(param);
+        int_param_widget->setParent(widget);
+        layout->addWidget(int_param_widget);
+    }
 
-//    tab_layout->addSpacerItem(new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::Expanding));
-//    main_widget->params_tab->show();
+    for(auto param : Parameter<double>::getRegistry()) {
+        QWidget* double_param_widget = createDoubleParameter(param);
+        double_param_widget->setParent(widget);
+        layout->addWidget(double_param_widget);
+    }
 
+    for(auto param : Parameter<std::string>::getRegistry()) {
+        QWidget* string_param_widget = createStringParameter(param);
+        string_param_widget->setParent(widget);
+        layout->addWidget(string_param_widget);
+    }
+
+    layout->addSpacerItem(new QSpacerItem(20, 40, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    main_widget->params_tab->show();
 }
