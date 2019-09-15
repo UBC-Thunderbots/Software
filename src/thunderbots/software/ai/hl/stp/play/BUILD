@@ -75,6 +75,19 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "example_play_test",
+    srcs = [
+        "example_play_test.cpp",
+    ],
+    deps = [
+        ":example_play",
+        "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "free_kick_play",
     srcs = ["free_kick_play.cpp"],
@@ -108,6 +121,17 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic:stop_tactic",
         "@g3log//:all",
+    ],
+)
+
+cc_test(
+    name = "halt_play_test",
+    srcs = ["halt_play_test.cpp"],
+    deps = [
+        ":halt_play",
+        "//software/ai/hl/stp/tactic:stop_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -222,4 +246,15 @@ cc_library(
     srcs = ["play_factory.cpp"],
     hdrs = ["play_factory.h"],
     deps = [":play"],
+)
+
+cc_test(
+    name = "play_factory_test",
+    srcs = ["play_factory_test.cpp"],
+    deps = [
+        ":play_factory",
+        "//software/ai/hl/stp/play/test_plays:halt_test_play",
+        "//software/ai/hl/stp/play/test_plays:move_test_play",
+        "@gtest//:gtest_main",
+    ],
 )

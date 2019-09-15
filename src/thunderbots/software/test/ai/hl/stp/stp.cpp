@@ -7,8 +7,8 @@
 #include <exception>
 
 #include "software/ai/hl/stp/play/play_factory.h"
-#include "software/test/ai/hl/stp/test_plays/halt_test_play.h"
-#include "software/test/ai/hl/stp/test_plays/move_test_play.h"
+#include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
+#include "software/ai/hl/stp/play/test_plays/move_test_play.h"
 #include "software/test/test_util/test_util.h"
 
 class STPTest : public ::testing::Test
