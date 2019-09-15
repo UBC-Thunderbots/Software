@@ -8,7 +8,7 @@ TEST(MoveActionTest, robot_far_from_destination)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05);
+    MoveAction action = MoveAction(0.05, Angle(), false);
 
     auto intent_ptr =
         action.updateStateAndGetNextIntent(robot, Point(1, 0), Angle::quarter(), 1.0);
@@ -30,7 +30,7 @@ TEST(MoveActionTest, robot_at_destination)
 {
     Robot robot = Robot(0, Point(), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.02);
+    MoveAction action = MoveAction(0.02, Angle(), false);
 
     // We call the action twice. The first time the Intent will always be returned to
     // ensure the Robot is doing the right thing. In all future calls, the action will be
@@ -47,7 +47,7 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05);
+    MoveAction action = MoveAction(0.05, Angle(), false);
 
     // Run the Action several times
     auto intent_ptr = std::unique_ptr<Intent>{};
@@ -62,11 +62,48 @@ TEST(MoveActionTest, test_action_does_not_prematurely_report_done)
     EXPECT_FALSE(action.done());
 }
 
+TEST(MoveActionTest, test_action_does_not_prematurely_report_done_angle_threshold)
+{
+    Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(0.05, Angle::ofDegrees(0.01), false);
+
+    // Run the Action several times
+    auto intent_ptr = std::unique_ptr<Intent>{};
+    for (int i = 0; i < 10; i++)
+    {
+        intent_ptr =
+            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::quarter(), 1.0);
+    }
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_TRUE(intent_ptr);
+    EXPECT_FALSE(action.done());
+}
+TEST(MoveActionTest, test_action_finishes_within_orientation_threshold)
+{
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+    MoveAction action = MoveAction(0.05, Angle::ofDegrees(359), false);
+
+    // Run the Action several times
+    auto intent_ptr = std::unique_ptr<Intent>{};
+    for (int i = 0; i < 10; i++)
+    {
+        intent_ptr =
+            action.updateStateAndGetNextIntent(robot, Point(0, 0), Angle::quarter(), 1.0);
+    }
+
+    // Check an intent was returned (the pointer is not null)
+    EXPECT_FALSE(intent_ptr);
+    EXPECT_TRUE(action.done());
+}
+
 TEST(MoveActionTest, robot_far_from_destination_autokick_turned_on)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05);
+    MoveAction action = MoveAction(0.05, Angle(), false);
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
         robot, Point(1, 0), Angle::quarter(), 1.0, false, false, AUTOKICK);
@@ -88,7 +125,7 @@ TEST(MoveActionTest, robot_far_from_destination_dribble_turned_on)
 {
     Robot robot = Robot(0, Point(), Vector(), Angle::zero(), AngularVelocity::zero(),
                         Timestamp::fromSeconds(0));
-    MoveAction action = MoveAction(0.05);
+    MoveAction action = MoveAction(0.05, Angle(), false);
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
         robot, Point(1, 0), Angle::quarter(), 1.0, true, NONE);

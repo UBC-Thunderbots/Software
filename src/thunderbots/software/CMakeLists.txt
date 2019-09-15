@@ -1050,23 +1050,23 @@ endif()
 if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
 
-    # The test node that verifies the dynamic_parameters are working
-    add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
-            test/util/test_dynamic_parameters.cpp
-            )
-    target_link_libraries(dynamic_parameters_test 
-        ${catkin_LIBRARIES}
-        tbots_parameter
-        )
+    ## The test node that verifies the dynamic_parameters are working
+    #add_rostest_gtest(dynamic_parameters_test test/util/rostest_dynamic_parameters.test
+            #test/util/test_dynamic_parameters.cpp
+            #)
+    #target_link_libraries(dynamic_parameters_test 
+        #${catkin_LIBRARIES}
+        #tbots_parameter
+        #)
 
-    # The test node that verifies the dynamic_parameters exist in the parameter server
-    add_rostest_gtest(check_parameter_existance_test 
-        test/util/rostest_parameter_exists.test
-        test/util/test_parameter_exists.cpp
-        )
-    target_link_libraries(check_parameter_existance_test 
-        ${catkin_LIBRARIES}
-        tbots_parameter
-        )
+    ## The test node that verifies the dynamic_parameters exist in the parameter server
+    #add_rostest_gtest(check_parameter_existance_test 
+        #test/util/rostest_parameter_exists.test
+        #test/util/test_parameter_exists.cpp
+        #)
+    #target_link_libraries(check_parameter_existance_test 
+        #${catkin_LIBRARIES}
+        #tbots_parameter
+        #)
 
 endif()

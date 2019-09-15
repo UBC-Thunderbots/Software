@@ -29,7 +29,7 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
 
 void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
-    MoveAction move_action = MoveAction();
+    MoveAction move_action = MoveAction(0, Angle(), false);
     do
     {
         yield(move_action.updateStateAndGetNextIntent(*robot, destination,

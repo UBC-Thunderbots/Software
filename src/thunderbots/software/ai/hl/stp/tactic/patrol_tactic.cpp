@@ -67,7 +67,7 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         } while (true);
     }
 
-    MoveAction move_action = MoveAction(this->at_patrol_point_tolerance);
+    MoveAction move_action = MoveAction(this->at_patrol_point_tolerance, Angle(), false);
     do
     {
         auto next_intent = move_action.updateStateAndGetNextIntent(

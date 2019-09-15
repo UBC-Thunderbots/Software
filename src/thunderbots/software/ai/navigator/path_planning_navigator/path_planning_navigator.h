@@ -20,15 +20,9 @@
 class PathPlanningNavigator : public Navigator, public IntentVisitor
 {
    public:
-    explicit PathPlanningNavigator()
-        : OBSTACLE_INFLATION_DIST(1.5 * ROBOT_MAX_RADIUS_METERS),
-          NUM_POINTS_IN_CIRCLE_POLY(16){
+    explicit PathPlanningNavigator(){
 
-          };
-
-    std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
-        const World &world, const std::vector<Obstacle> &additional_obstacles,
-        const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
+    };
 
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world,
@@ -118,11 +112,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     void drawObstacle(const Obstacle &obstacle,
                       const Util::CanvasMessenger::Color &color);
 
-    // How much to inflate obstacles by to prevent robot collision
-    const double OBSTACLE_INFLATION_DIST;
-
-    const unsigned int NUM_POINTS_IN_CIRCLE_POLY;
-
     // This navigators knowledge / state of the world
     World world;
 
@@ -138,5 +127,29 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     // This variable is set by each `visit` function
     Point current_destination;
 
-    std::vector<Obstacle> additional_obstacles;
+    std::vector<Obstacle> velocity_obstacles;
+
+    /**
+     * Creates a list of obstacles to avoid based on avoid areas,
+     * enemy team, and friendly team, while excluding the robot attached to robot_id
+     *
+     * @param avoid_areas specifies areas to create obstacles for
+     * @param robot_id current robot that is not an obstacle
+     *
+     * @returns list of obstacles
+     */
+    std::vector<Obstacle> createCurrentObstacles(
+        const std::vector<AvoidArea> &avoid_areas, int robot_id);
+
+    /**
+     * Calculates a factor for how close p is to an enemy obstacle.
+     * 0 = touching or inside
+     * 1 = greater than/equal to 2m away
+     * scaled linearly between these values
+     *
+     * @param p point to evaluate
+     *
+     * @return A factor from 0 to 1 for how close p is to an enemy obstacle
+     */
+    double getCloseToEnemyObstacleFactor(Point &p);
 };

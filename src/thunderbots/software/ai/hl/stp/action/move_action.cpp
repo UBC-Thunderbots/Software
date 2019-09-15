@@ -2,9 +2,11 @@
 
 #include "ai/intent/move_intent.h"
 
-MoveAction::MoveAction(double close_to_dest_threshold, bool loop_forever)
+MoveAction::MoveAction(double close_to_dest_threshold,
+                       Angle close_to_orientation_threshold, bool loop_forever)
     : Action(),
       close_to_dest_threshold(close_to_dest_threshold),
+      close_to_orientation_threshold(close_to_orientation_threshold),
       loop_forever(loop_forever)
 {
 }
@@ -38,5 +40,7 @@ void MoveAction::calculateNextIntent(IntentCoroutine::push_type& yield)
                                            final_speed, 0, enable_dribbler, slow,
                                            autokick));
     } while (loop_forever ||
-             (robot->position() - destination).len() > close_to_dest_threshold);
+             (robot->position() - destination).len() > close_to_dest_threshold ||
+             (robot->orientation().minDiff(final_orientation) >
+              close_to_orientation_threshold));
 }

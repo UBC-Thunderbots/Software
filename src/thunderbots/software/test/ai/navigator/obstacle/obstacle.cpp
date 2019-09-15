@@ -72,8 +72,8 @@ TEST(NavigatorObstacleTest, shifted_scaling_velocity_obstacle_polygon)
         Point pt1 = Point(.793, 1.987);
         Point pt2 = Point(.908, 1.814);
         Point pt3 = Point(1.115, 1.827);
-        Point pt4 = Point(4.115, 3.827);
-        Point pt5 = Point(3.885, 4.173);
+        Point pt4 = Point(4.265, 3.927);
+        Point pt5 = Point(4.034, 4.273);
         EXPECT_DOUBLE_EQ(pg.getPoints().size(), 6);
         EXPECT_NEAR(pg.getPoints()[0].x(), pt0.x(), TEST_EPSILON);
         EXPECT_NEAR(pg.getPoints()[0].y(), pt0.y(), TEST_EPSILON);
@@ -111,8 +111,8 @@ TEST(NavigatorObstacleTest, shifted_scaled_up_velocity_obstacle_polygon)
         Point pt1 = Point(-.889, -2.224);
         Point pt2 = Point(-0.751, -2.016);
         Point pt3 = Point(-0.862, -1.792);
-        Point pt4 = Point(-5.062, 1.008);
-        Point pt5 = Point(-5.338, 0.592);
+        Point pt4 = Point(-5.241, 1.127);
+        Point pt5 = Point(-5.518, 0.712);
         EXPECT_DOUBLE_EQ(pg.getPoints().size(), 6);
         EXPECT_NEAR(pg.getPoints()[0].x(), pt0.x(), TEST_EPSILON);
         EXPECT_NEAR(pg.getPoints()[0].y(), pt0.y(), TEST_EPSILON);
