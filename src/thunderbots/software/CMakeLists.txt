@@ -950,6 +950,13 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             )
 
+    catkin_add_gtest(parameter_test
+            test/util/parameter_test.cpp)
+    target_link_libraries(parameter_test
+            ${catkin_LIBRARIES}
+            tbots_parameter
+            )
+
 endif()
 
 ##### ROSTests / Integration Tests #####
