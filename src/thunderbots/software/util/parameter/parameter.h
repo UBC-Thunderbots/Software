@@ -82,7 +82,8 @@ class Parameter
         std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
         std::scoped_lock callback_lock(this->callback_mutex_);
-        for(auto callback_func : callback_functions) {
+        for (auto callback_func : callback_functions)
+        {
             callback_func(new_value);
         }
     }
@@ -130,7 +131,8 @@ class Parameter
                                                        this->value_);
     }
 
-    void registerCallbackFunction(std::function<void(T)> callback) {
+    void registerCallbackFunction(std::function<void(T)> callback)
+    {
         std::scoped_lock callback_lock(this->callback_mutex_);
         callback_functions.emplace_back(callback);
     }
