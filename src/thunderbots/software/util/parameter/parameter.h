@@ -79,8 +79,12 @@ class Parameter
      */
     void setValue(const T new_value)
     {
-        std::scoped_lock lock(this->value_mutex_);
+        std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
+        std::scoped_lock callback_lock(this->callback_mutex_);
+        for(auto callback_func : callback_functions) {
+            callback_func(new_value);
+        }
     }
 
     /**
@@ -124,6 +128,11 @@ class Parameter
     {
         dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
                                                        this->value_);
+    }
+
+    void registerCallbackFunction(std::function<void(T)> callback) {
+        std::scoped_lock callback_lock(this->callback_mutex_);
+        callback_functions.emplace_back(callback);
     }
 
     /**
@@ -232,6 +241,10 @@ class Parameter
 
     // Store the namespace of the parameter
     std::string namespace_;
+
+    std::mutex callback_mutex_;
+    // A list of functions to call when a new parameter value is set
+    std::vector<std::function<void(T)>> callback_functions;
 
     /**
      * Returns a mutable configuration msg that will hold all the
