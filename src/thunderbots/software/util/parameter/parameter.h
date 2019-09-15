@@ -241,6 +241,7 @@ class Parameter
     }
 
     std::mutex value_mutex_;
+    std::mutex callback_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
@@ -251,7 +252,6 @@ class Parameter
     // Store the namespace of the parameter
     std::string namespace_;
 
-    std::mutex callback_mutex_;
     // A list of functions to call when a new parameter value is set
     std::vector<std::function<void(T)>> callback_functions;
 
