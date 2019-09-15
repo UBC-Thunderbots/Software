@@ -73,7 +73,8 @@ class Parameter
     }
 
     /**
-     * Given the value, sets the value of this parameter
+     * Given the value, sets the value of this parameter and calls all registered
+     * callback functions with the new value
      *
      * @param new_value The new value to set
      */
@@ -131,6 +132,12 @@ class Parameter
                                                        this->value_);
     }
 
+    /**
+     * Registers a callback function to be called when the value of this parameter is
+     * changed with setValue
+     *
+     * @param callback The function to call when this parameter's value is changed
+     */
     void registerCallbackFunction(std::function<void(T)> callback)
     {
         std::scoped_lock callback_lock(this->callback_mutex_);
