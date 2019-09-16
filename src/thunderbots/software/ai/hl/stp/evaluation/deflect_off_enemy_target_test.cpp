@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/geom/util.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 
 TEST(DeflectOffEnemyTargetTest, deflect_off_enemy_target_test)

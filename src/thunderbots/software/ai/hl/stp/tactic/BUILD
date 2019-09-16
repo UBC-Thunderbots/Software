@@ -18,7 +18,7 @@ cc_test(
     srcs = ["block_shot_path_tactic_test.cpp"],
     deps = [
         ":block_shot_path_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -43,7 +43,7 @@ cc_test(
     srcs = ["cherry_pick_tactic_test.cpp"],
     deps = [
         ":cherry_pick_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -99,7 +99,7 @@ cc_test(
     srcs = ["free_kick_tactic_test.cpp"],
     deps = [
         ":free_kick_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -137,7 +137,7 @@ cc_test(
     srcs = ["move_tactic_test.cpp"],
     deps = [
         ":move_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -162,7 +162,7 @@ cc_test(
     srcs = ["passer_tactic_test.cpp"],
     deps = [
         ":passer_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -218,7 +218,7 @@ cc_test(
     deps = [
         ":receiver_tactic",
         "//software/ai/intent:kick_intent",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -243,7 +243,7 @@ cc_test(
     srcs = ["shadow_enemy_tactic_test.cpp"],
     deps = [
         ":shadow_enemy_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -284,7 +284,7 @@ cc_test(
     srcs = ["shoot_goal_tactic_test.cpp"],
     deps = [
         ":shoot_goal_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -308,7 +308,7 @@ cc_test(
     srcs = ["stop_tactic_test.cpp"],
     deps = [
         ":stop_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -329,7 +329,7 @@ cc_test(
     deps = [
         ":tactic",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

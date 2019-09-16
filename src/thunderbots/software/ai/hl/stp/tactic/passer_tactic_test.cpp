@@ -8,7 +8,7 @@
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
 #include "shared/constants.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 using namespace Passing;
 

@@ -372,7 +372,7 @@ target_link_libraries(tbots_backend
 
 # Test Utils
 add_library(tbots_test_util STATIC
-        test/test_util/test_util.cpp
+        test_util/test_util.cpp
         )
 target_link_libraries(tbots_test_util
     tbots_time
@@ -548,7 +548,7 @@ if (CATKIN_ENABLE_TESTING)
 
 
     catkin_add_gtest(test_util_test
-            test/test_util/test_util_test.cpp
+            test_util/test_util_test.cpp
             )
 
     target_link_libraries(test_util_test 

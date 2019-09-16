@@ -83,7 +83,7 @@ cc_test(
     deps = [
         ":example_play",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -130,7 +130,7 @@ cc_test(
     deps = [
         ":halt_play",
         "//software/ai/hl/stp/tactic:stop_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

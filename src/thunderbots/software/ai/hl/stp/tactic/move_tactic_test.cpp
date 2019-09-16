@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/intent/move_intent.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 TEST(MoveTacticTest, robot_far_from_destination)
 {

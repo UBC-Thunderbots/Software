@@ -38,7 +38,7 @@ cc_test(
     deps = [
         "//software/ai",
         "//software/ai/world",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

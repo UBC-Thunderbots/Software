@@ -56,7 +56,7 @@ cc_test(
     srcs = ["game_state_test.cpp"],
     deps = [
         ":game_state",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -148,7 +148,7 @@ cc_test(
     srcs = ["world_test.cpp"],
     deps = [
         ":world",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

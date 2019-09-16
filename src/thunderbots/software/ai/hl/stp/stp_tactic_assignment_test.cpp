@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/play/test_plays/halt_test_play.h"
 #include "software/ai/hl/stp/tactic/test_tactics/move_test_tactic.h"
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 /**
  * This file contains unit tests for the assignRobotsToTactics function

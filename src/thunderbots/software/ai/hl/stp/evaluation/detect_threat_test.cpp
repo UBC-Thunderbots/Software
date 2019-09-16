@@ -9,7 +9,7 @@
 
 #include "software/ai/world/ball.h"
 #include "software/util/time/timestamp.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 // Test where the ball will intersect the friendly net
 TEST(evaluation_detect_threat_test, ball_threat_ball_intersect_friendly_net)

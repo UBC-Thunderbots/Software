@@ -8,7 +8,7 @@
 
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/kick_intent.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 TEST(FreeKickTacticTest, shoot_on_open_net)
 {

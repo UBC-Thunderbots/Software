@@ -26,7 +26,7 @@ cc_test(
     srcs = ["path_planning_navigator_test.cpp"],
     deps = [
         ":path_planning_navigator",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

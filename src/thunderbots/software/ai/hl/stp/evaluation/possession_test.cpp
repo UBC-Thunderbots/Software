@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
 {

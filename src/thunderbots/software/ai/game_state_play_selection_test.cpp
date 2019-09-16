@@ -2,7 +2,7 @@
 
 #include "software/ai/ai.h"
 #include "software/ai/world/world.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 class GameStatePlaySelectionTest : public ::testing::Test,
                                    public ::testing::WithParamInterface<RefboxGameState>
