@@ -3,8 +3,8 @@
  */
 #include "software/ai/hl/stp/evaluation/intercept.h"
 
-#include "software/ai/evaluation/pass.h"
 #include "shared/constants.h"
+#include "software/ai/evaluation/pass.h"
 #include "software/util/optimization/gradient_descent.h"
 
 namespace Evaluation

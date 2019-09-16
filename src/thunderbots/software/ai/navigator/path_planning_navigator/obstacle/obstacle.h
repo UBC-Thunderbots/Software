@@ -4,6 +4,7 @@
 #pragma once
 
 
+#include "shared/constants.h"
 #include "software/ai/world/ball.h"
 #include "software/ai/world/robot.h"
 #include "software/geom/angle.h"
@@ -11,7 +12,6 @@
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
-#include "shared/constants.h"
 
 class Obstacle
 {

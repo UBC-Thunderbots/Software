@@ -1,9 +1,8 @@
 #pragma once
-#include <sstream>
-#include <unordered_set>
-
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
+#include <sstream>
+#include <unordered_set>
 
 /**
  * Macro used to define bitwise operations for a class.

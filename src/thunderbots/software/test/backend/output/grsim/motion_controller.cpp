@@ -2,11 +2,11 @@
 
 #include <chrono>
 
+#include "shared/constants.h"
 #include "software/ai/primitive/move_primitive.h"
 #include "software/ai/world/robot.h"
 #include "software/geom/angle.h"
 #include "software/gtest/gtest.h"
-#include "shared/constants.h"
 
 
 using namespace std::chrono;

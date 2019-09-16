@@ -10,10 +10,10 @@
 #include <limits>
 #include <random>
 
+#include "shared/constants.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
-#include "shared/constants.h"
 #include "software/test/test_util/test_util.h"
 
 class BallFilterTest : public ::testing::Test

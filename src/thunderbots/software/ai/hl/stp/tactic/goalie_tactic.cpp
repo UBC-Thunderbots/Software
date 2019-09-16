@@ -1,5 +1,6 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
@@ -7,7 +8,6 @@
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
-#include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 

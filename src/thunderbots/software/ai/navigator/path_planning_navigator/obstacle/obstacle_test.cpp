@@ -2,14 +2,15 @@
 
 #include <gtest/gtest.h>
 #include <math.h>
+
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <sstream>
 
-#include "software/geom/point.h"
 #include "shared/constants.h"
+#include "software/geom/point.h"
 
 // obstacle with robot radius factor = 1, velocity projection factor = 1
 // centred at (0,0) and with (0,0) velocity

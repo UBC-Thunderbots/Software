@@ -1,13 +1,14 @@
 #include "software/backend/output/radio/mrf/annunciator.h"
 
 #include <time.h>
+
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 #include <mutex>
 
+#include "shared/constants.h"
 #include "software/backend/output/radio/mrf/dongle.h"
 #include "software/backend/output/radio/mrf/messages.h"
-#include "shared/constants.h"
 
 namespace
 {

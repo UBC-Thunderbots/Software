@@ -1,8 +1,7 @@
 #include "software/ai/world/world.h"
 
-#include "software/util/parameter/dynamic_parameters.h"
-
 #include "boost/circular_buffer.hpp"
+#include "software/util/parameter/dynamic_parameters.h"
 
 World::World()
     : World(Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),

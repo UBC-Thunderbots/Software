@@ -1,11 +1,11 @@
 #include "software/ai/hl/stp/evaluation/indirect_chip.h"
 
+#include "shared/constants.h"
 #include "software/ai/world/world.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
-#include "shared/constants.h"
 
 std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
     const World &world)

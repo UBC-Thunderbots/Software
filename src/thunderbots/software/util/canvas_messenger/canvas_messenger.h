@@ -129,7 +129,7 @@ namespace Util
          */
         static std::shared_ptr<CanvasMessenger> getInstance();
 
-//        void initializePublisher(ros::NodeHandle node_handle);
+        //        void initializePublisher(ros::NodeHandle node_handle);
 
         /**
          * Uses ROS publishers to publish sprite data for each layer and
@@ -289,7 +289,7 @@ namespace Util
          */
         void clearAllLayers();
 
-//        std::optional<ros::Publisher> publisher;
+        //        std::optional<ros::Publisher> publisher;
 
         // Period in nanoseconds
         const double DESIRED_PERIOD_MS =

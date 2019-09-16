@@ -7,8 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include "software/geom/util.h"
 #include "shared/constants.h"
+#include "software/geom/util.h"
 #include "software/test/test_util/test_util.h"
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)

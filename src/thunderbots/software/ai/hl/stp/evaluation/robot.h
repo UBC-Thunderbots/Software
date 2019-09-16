@@ -3,7 +3,6 @@
 
 #include "software/ai/world/ball.h"
 #include "software/ai/world/robot.h"
-
 #include "software/geom/point.h"
 
 /**

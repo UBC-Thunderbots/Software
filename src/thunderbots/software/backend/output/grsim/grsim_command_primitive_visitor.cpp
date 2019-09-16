@@ -4,7 +4,6 @@
 #include <g3log/loglevels.hpp>
 
 #include "shared/constants.h"
-
 #include "software/ai/primitive/catch_primitive.h"
 #include "software/ai/primitive/chip_primitive.h"
 #include "software/ai/primitive/direct_velocity_primitive.h"

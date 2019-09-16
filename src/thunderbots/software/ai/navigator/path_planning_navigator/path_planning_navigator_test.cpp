@@ -2,9 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test/test_util/test_util.h"
-#include "software/ai/primitive/all_primitives.h"
 #include "software/ai/intent/all_intents.h"
+#include "software/ai/primitive/all_primitives.h"
+#include "software/test/test_util/test_util.h"
 
 TEST(PathPlanningNavigatorTest, convert_catch_intent_to_catch_primitive)
 {

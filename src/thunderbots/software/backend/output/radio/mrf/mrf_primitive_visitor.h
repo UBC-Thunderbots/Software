@@ -1,10 +1,10 @@
 #pragma once
 
-#include <optional>
 #include <array>
+#include <optional>
 
-#include "software/ai/primitive/primitive_visitor.h"
 #include "shared/firmware_primitive_type.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 /**
  * This struct stores the components of a translated primitive to be sent over radio.

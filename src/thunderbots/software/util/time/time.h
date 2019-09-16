@@ -7,7 +7,7 @@
  *
  * This class should not be used directly, rather, you should use one of it's subclasses
  *
- * NOTE: This file is called `tbots_time.h` because having a file called 
+ * NOTE: This file is called `tbots_time.h` because having a file called
  *       `time.h` conflicts with system libraries
  */
 class Time

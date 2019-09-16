@@ -1,12 +1,11 @@
 #include "software/ai/hl/stp/evaluation/possession.h"
 
 #include "shared/constants.h"
-
 #include "software/ai/hl/stp/evaluation/intercept.h"
+#include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
 #include "software/ai/world/ball.h"
 #include "software/ai/world/field.h"
-#include "software/ai/hl/stp/evaluation/robot.h"
 
 namespace Evaluation
 {

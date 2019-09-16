@@ -1,8 +1,8 @@
 #include "software/backend/output/radio/mrf/usb/transfer.h"
 
-#include <iostream>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
+#include <iostream>
 
 #include "software/backend/output/radio/mrf/usb/errors.h"
 #include "software/backend/output/radio/mrf/usb/misc.h"

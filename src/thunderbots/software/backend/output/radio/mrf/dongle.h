@@ -17,12 +17,12 @@
 
 #include "software/ai/primitive/primitive.h"
 #include "software/backend/output/radio/mrf/annunciator.h"
-#include "software/geom/angle.h"
-#include "software/geom/point.h"
 #include "software/backend/output/radio/mrf/send_reliable_message_operation.h"
 #include "software/backend/output/radio/mrf/usb/libusb.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 /**
  * An operation to send a reliable message.

@@ -1,6 +1,6 @@
-#include "software/backend/output/radio/mrf/primitive_visitor.h"
-
 #include <gtest/gtest.h>
+
+#include "software/backend/output/radio/mrf/primitive_visitor.h"
 
 /**
  * Check whether the two given radio primitives are equal

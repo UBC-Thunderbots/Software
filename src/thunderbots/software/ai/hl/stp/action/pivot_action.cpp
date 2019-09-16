@@ -3,11 +3,11 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "shared/constants.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/ai/intent/pivot_intent.h"
 #include "software/geom/angle.h"
 #include "software/geom/util.h"
-#include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action() {}

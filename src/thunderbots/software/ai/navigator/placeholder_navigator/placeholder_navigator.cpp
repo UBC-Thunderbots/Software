@@ -1,16 +1,5 @@
 #include "software/ai/navigator/placeholder_navigator/placeholder_navigator.h"
 
-#include "software/ai/primitive/catch_primitive.h"
-#include "software/ai/primitive/chip_primitive.h"
-#include "software/ai/primitive/direct_velocity_primitive.h"
-#include "software/ai/primitive/direct_wheels_primitive.h"
-#include "software/ai/primitive/dribble_primitive.h"
-#include "software/ai/primitive/kick_primitive.h"
-#include "software/ai/primitive/move_primitive.h"
-#include "software/ai/primitive/movespin_primitive.h"
-#include "software/ai/primitive/pivot_primitive.h"
-#include "software/ai/primitive/stop_primitive.h"
-
 #include "software/ai/intent/catch_intent.h"
 #include "software/ai/intent/chip_intent.h"
 #include "software/ai/intent/direct_velocity_intent.h"
@@ -21,6 +10,16 @@
 #include "software/ai/intent/movespin_intent.h"
 #include "software/ai/intent/pivot_intent.h"
 #include "software/ai/intent/stop_intent.h"
+#include "software/ai/primitive/catch_primitive.h"
+#include "software/ai/primitive/chip_primitive.h"
+#include "software/ai/primitive/direct_velocity_primitive.h"
+#include "software/ai/primitive/direct_wheels_primitive.h"
+#include "software/ai/primitive/dribble_primitive.h"
+#include "software/ai/primitive/kick_primitive.h"
+#include "software/ai/primitive/move_primitive.h"
+#include "software/ai/primitive/movespin_primitive.h"
+#include "software/ai/primitive/pivot_primitive.h"
+#include "software/ai/primitive/stop_primitive.h"
 
 std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)

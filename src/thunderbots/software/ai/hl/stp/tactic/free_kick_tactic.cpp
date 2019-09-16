@@ -3,12 +3,12 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/deflect_off_enemy_target.h"
 #include "software/ai/hl/stp/evaluation/indirect_chip.h"
-#include "shared/constants.h"
 
 namespace
 {

@@ -5,13 +5,13 @@
 
 #include "software/ai/world/ball.h"
 #include "software/ai/world/field.h"
+#include "software/ai/world/refbox_constants.h"
 #include "software/ai/world/team.h"
 #include "software/backend/input/network/filter/ball_filter.h"
 #include "software/backend/input/network/filter/robot_filter.h"
 #include "software/backend/input/network/filter/robot_team_filter.h"
 #include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 #include "software/proto/ssl_referee.pb.h"
-#include "software/ai/world/refbox_constants.h"
 #include "software/util/time/timestamp.h"
 
 class NetworkFilter

@@ -4,16 +4,16 @@
 
 #include <chrono>
 #include <exception>
-#include <random>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
+#include <random>
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/intent/stop_intent.h"
-#include "software/ai/hl/stp/play_info.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,

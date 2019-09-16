@@ -1,9 +1,9 @@
+#include "shared/constants.h"
 #include "software/ai/world/ball.h"
 #include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/motion_controller.h"
 #include "software/geom/angle.h"
 #include "software/gtest/gtest.h"
-#include "shared/constants.h"
 #include "software/software/ai/world/robot.h"
 
 /*

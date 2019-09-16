@@ -1,10 +1,10 @@
 #include "software/ai/hl/stp/play/kickoff_friendly_play.h"
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/chip_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
-#include "shared/constants.h"
 
 const std::string KickoffFriendlyPlay::name = "KickoffFriendly Play";
 

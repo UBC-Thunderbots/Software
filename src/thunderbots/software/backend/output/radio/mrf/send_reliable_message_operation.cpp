@@ -1,9 +1,8 @@
 #include "software/backend/output/radio/mrf/send_reliable_message_operation.h"
 
-#include "software/backend/output/radio/mrf/dongle.h"
-
-#include "software/backend/output/radio/mrf/messages.h"
 #include "shared/constants.h"
+#include "software/backend/output/radio/mrf/dongle.h"
+#include "software/backend/output/radio/mrf/messages.h"
 
 namespace
 {
