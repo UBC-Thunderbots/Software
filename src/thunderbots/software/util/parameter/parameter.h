@@ -1,17 +1,32 @@
 #pragma once
 
-#include <iostream>
-#include <map>
+#include <ros/ros.h>
+
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
+
+// messages for dynamic_reconfigure
+#include <dynamic_reconfigure/BoolParameter.h>
+#include <dynamic_reconfigure/DoubleParameter.h>
+#include <dynamic_reconfigure/IntParameter.h>
+#include <dynamic_reconfigure/StrParameter.h>
+
+// message that contains arrays of the xmlrpc types for reconf
+#include <dynamic_reconfigure/Config.h>
+
+// message for the reconfigure srv, takes a config msg
+#include <dynamic_reconfigure/Reconfigure.h>
+#include <dynamic_reconfigure/config_tools.h>
+
 /**
  * This class defines a dynamic parameter, meaning the parameter
- * value can be changed during runtime.
+ * value can be changed during runtime. Although the class is templated, it is only meant
+ * to support the types also supported by the ROS Parameter Server.
  *
- * In our codebase, we currently support bool, int32_t, double, and strings
+ * See http://wiki.ros.org/Parameter%20Server for the list of types
  *
+ * In our codebase, we support bool, int32_t, double, and strings
  * */
 
 template <class T>
@@ -22,7 +37,8 @@ class Parameter
      * Constructs a new Parameter
      *
      * @param parameter_name The name of the parameter used by dynamic_reconfigure
-     * @param parameter_namespace The namespace of the parameter used to sort parameters
+     * @param parameter_namespace The namespace of the parameter used by
+     * dynamic_reconfigure
      * @param default_value The default value for this parameter
      */
     explicit Parameter<T>(const std::string& parameter_name,
@@ -32,7 +48,17 @@ class Parameter
         this->namespace_ = parameter_namespace;
         this->value_     = default_value;
 
-        Parameter<T>::registerParameter(std::make_unique<Parameter<T>>(*this));
+        Parameter<T>::registerParameter(this);
+    }
+
+    /**
+     * Returns the global path in the ROS parameter server where this parameter is stored
+     *
+     * @return the global path in the ROS parameter sever where this parameter is stored
+     */
+    const std::string getROSParameterPath() const
+    {
+        return "/" + this->namespace_ + "/" + name();
     }
 
     /**
@@ -40,50 +66,26 @@ class Parameter
      *
      * @return the value of this parameter
      */
-    const T value() const
+    T value()
     {
-        // get the value from the parameter in the registry
-        if (Parameter<T>::getMutableRegistry().count(this->name_))
-        {
-            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-
-            std::scoped_lock lock(*(param_in_registry.first));
-            auto value = param_in_registry.second->value_;
-
-            return value;
-        }
-
-        // TODO https://github.com/UBC-Thunderbots/Software/issues/738
-        // fix this on ROS removal to throw an exception, ideally we do not
-        // want to return a value here as params that aren't in the registry are not
-        // threadsafe
-        else
-        {
-            return this->value_;
-        }
+        std::scoped_lock lock(this->value_mutex_);
+        return this->value_;
     }
 
     /**
-     * Given the value, sets the value of this parameter
+     * Given the value, sets the value of this parameter and calls all registered
+     * callback functions with the new value
      *
      * @param new_value The new value to set
      */
     void setValue(const T new_value)
     {
-        // get the value from the parameter in the registry
-        if (Parameter<T>::getMutableRegistry().count(this->name_))
+        std::scoped_lock value_lock(this->value_mutex_);
+        this->value_ = new_value;
+        std::scoped_lock callback_lock(this->callback_mutex_);
+        for (auto callback_func : callback_functions)
         {
-            auto& param_in_registry = Parameter<T>::getMutableRegistry().at(this->name_);
-            std::scoped_lock lock(*(param_in_registry.first));
-            param_in_registry->value_ = new_value;
-        }
-
-        // TODO https://github.com/UBC-Thunderbots/Software/issues/738
-        // want to store a value here as params that aren't in the registry are not
-        // threadsafe
-        else
-        {
-            this->value_ = new_value;
+            callback_func(new_value);
         }
     }
 
@@ -98,16 +100,70 @@ class Parameter
     }
 
     /**
+     * Checks if the parameter currently exists in the ros parameter server
+     *
+     * @return true if the parameter exists, false otherwise
+     *
+     */
+    const bool existsInParameterServer() const
+    {
+        return ros::param::has(this->getROSParameterPath());
+    }
+
+    /**
+     * Updates the value of this Parameter with the value from the ROS
+     * Parameter Server
+     */
+    void updateValueFromROSParameterServer()
+    {
+        ros::param::get(getROSParameterPath(), this->value_);
+    }
+
+    /**
+     * Updates the value of this Parameter with the value from a
+     * 'dynamic_reconfigure::Config' msg. The parameter fetches the update from the update
+     * msg and updates its value
+     *
+     */
+    void updateParameterFromConfigMsg(
+        const dynamic_reconfigure::Config::ConstPtr& updates)
+    {
+        dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
+                                                       this->value_);
+    }
+
+    /**
+     * Registers a callback function to be called when the value of this parameter is
+     * changed with setValue
+     *
+     * @param callback The function to call when this parameter's value is changed
+     */
+    void registerCallbackFunction(std::function<void(T)> callback)
+    {
+        std::scoped_lock callback_lock(this->callback_mutex_);
+        callback_functions.emplace_back(callback);
+    }
+
+    /**
      * Returns a reference to the Parameter registry. The registry is a list of
      * pointers to all the existing Parameters.
      *
      * @return An immutable reference to the Parameter registry
      */
-    static const std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
-                                                 std::unique_ptr<Parameter<T>>>>&
-    getRegistry()
+    static const std::vector<Parameter<T>*>& getRegistry()
     {
         return Parameter<T>::getMutableRegistry();
+    }
+
+    /**
+     * Returns a reference to the config msg. The config msg contains
+     * all the current configurations
+     *
+     * @return An immutable reference to the Config msg
+     */
+    static const dynamic_reconfigure::Config& getConfigMsg()
+    {
+        return Parameter<T>::getMutableConfigMsg();
     }
 
     /**
@@ -115,18 +171,56 @@ class Parameter
      * into the registry, the pointer may not be accessed by the caller after this
      * function has been called.
      *
+     * Also registers params to the static configuration msg used to
+     * set parameters
+     *
      * @param parameter A unique pointer to the Parameter to add. This pointer may not
      * be accessed by the caller after this function has been called.
      */
-    static void registerParameter(std::unique_ptr<Parameter<T>> parameter)
+    static void registerParameter(Parameter<T>* parameter)
     {
-        // load the param name before hand, as the pointer will have moved at the
-        // time of inserting the mutex param pair into the map.
-        auto parameter_name = parameter->name();
+        try
+        {
+            dynamic_reconfigure::ConfigTools::appendParameter(
+                Parameter<T>::getMutableConfigMsg(), parameter->name(),
+                parameter->value());
+        }
+        catch (...)
+        {
+            // TODO (Issue #16): Replace with proper exception once exception handling is
+            // implemented
+            ROS_WARN("Attempting to configure with unkown type");
+        }
 
-        Parameter<T>::getMutableRegistry().insert(std::make_pair(
-            parameter_name,
-            std::make_pair(std::make_unique<std::mutex>(), std::move(parameter))));
+        Parameter<T>::getMutableRegistry().emplace_back(parameter);
+    }
+
+    /**
+     * Updates all the Parameters of type T with the latest values from the ROS
+     * Parameter Server
+     */
+    static void updateAllParametersFromROSParameterServer()
+    {
+        for (const auto& param : Parameter<T>::getRegistry())
+        {
+            std::scoped_lock lock(param->value_mutex_);
+            param->updateValueFromROSParameterServer();
+        }
+    }
+
+    /**
+     * Takes a list from the dynamic_reconfigure::Config msg and updates the parameters
+     * based on the information in that list.
+     *
+     */
+    static void updateAllParametersFromConfigMsg(
+        const dynamic_reconfigure::Config::ConstPtr& updates)
+    {
+        for (const auto& param : Parameter<T>::getRegistry())
+        {
+            std::scoped_lock lock(param->value_mutex_);
+            param->updateParameterFromConfigMsg(updates);
+        }
     }
 
    private:
@@ -138,17 +232,16 @@ class Parameter
      *
      * @return A mutable reference to the Parameter registry
      */
-    static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
-                                           std::unique_ptr<Parameter<T>>>>&
-    getMutableRegistry()
+    static std::vector<Parameter<T>*>& getMutableRegistry()
     {
         // our registry needs to hold onto a unique mutex to access the parameters in the
         // registry as mutexes cannot be moved or copied
-        static std::map<std::string, std::pair<std::unique_ptr<std::mutex>,
-                                               std::unique_ptr<Parameter<T>>>>
-            instance;
+        static std::vector<Parameter<T>*> instance;
         return instance;
     }
+
+    std::mutex value_mutex_;
+    std::mutex callback_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
@@ -158,4 +251,20 @@ class Parameter
 
     // Store the namespace of the parameter
     std::string namespace_;
+
+    // A list of functions to call when a new parameter value is set
+    std::vector<std::function<void(T)>> callback_functions;
+
+    /**
+     * Returns a mutable configuration msg that will hold all the
+     * information related to the parameters created
+     * msg contains bool,strs,ints,doubles vectors which are inherently mutable
+     *
+     * @return A mutable reference to the configuration msg
+     */
+    static dynamic_reconfigure::Config& getMutableConfigMsg()
+    {
+        static dynamic_reconfigure::Config config;
+        return config;
+    }
 };
