@@ -11,6 +11,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ball_test",
+    srcs = ["ball_test.cpp"],
+    deps = [
+        ":ball",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "field",
     srcs = ["field.cpp"],
@@ -22,6 +31,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "field_test",
+    srcs = ["field_test.cpp"],
+    deps = [
+        ":field",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "game_state",
     srcs = ["game_state.cpp"],
@@ -30,6 +48,16 @@ cc_library(
         ":ball",
         ":refbox_constants",
         "@g3log//:all",
+    ],
+)
+
+cc_test(
+    name = "game_state_test",
+    srcs = ["game_state_test.cpp"],
+    deps = [
+        ":game_state",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -52,10 +80,28 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "robot_test",
+    srcs = ["robot_test.cpp"],
+    deps = [
+        ":robot",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "robot_capabilities",
     hdrs = ["robot_capabilities.h"],
     deps = [],
+)
+
+cc_test(
+    name = "robot_capabilities_test",
+    srcs = ["robot_capabilities_test.cpp"],
+    deps = [
+        ":robot_capabilities",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
@@ -63,6 +109,15 @@ cc_library(
     srcs = ["team.cpp"],
     hdrs = ["team.h"],
     deps = [":robot"],
+)
+
+cc_test(
+    name = "team_test",
+    srcs = ["team_test.cpp"],
+    deps = [
+        ":team",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
@@ -76,5 +131,15 @@ cc_library(
         ":robot",
         ":team",
         "//software/util/parameter:dynamic_parameters",
+    ],
+)
+
+cc_test(
+    name = "world_test",
+    srcs = ["world_test.cpp"],
+    deps = [
+        ":world",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )

@@ -1,8 +1,8 @@
 #include "software/ai/world/ball.h"
 
-#include <firmware/main/shared_util/constants.h>
 #include <gtest/gtest.h>
-#include <shared/constants.h>
+
+#include "shared/constants.h"
 
 
 class BallTest : public ::testing::Test
