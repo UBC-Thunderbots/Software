@@ -359,7 +359,8 @@ TEST_F(STPTacticAssignmentTest,
     Team friendly_team(Duration::fromSeconds(0));
     // this robot has no capabilities
     Robot robot_0(0, Point(0.1, 0.1), Point(), Angle::zero(), AngularVelocity::zero(),
-                  Timestamp::fromSeconds(0), 10, RobotCapabilityFlags{});
+                  Timestamp::fromSeconds(0), 10,
+                  std::set<RobotCapabilities::Capability>{});
     // default is all capabilities, if not specified otherwise
     Robot robot_1(1, Point(-10, -10), Point(), Angle::zero(), AngularVelocity::zero(),
                   Timestamp::fromSeconds(0));

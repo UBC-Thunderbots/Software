@@ -9,6 +9,8 @@ Tactic::Tactic(bool loop_forever,
       loop_forever(loop_forever),
       capability_reqs(capability_reqs_)
 {
+    // require movement capability by default
+    capability_reqs.emplace(RobotCapabilities::Capability::Move);
 }
 
 bool Tactic::done() const
