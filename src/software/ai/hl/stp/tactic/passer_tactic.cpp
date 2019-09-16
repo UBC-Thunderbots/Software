@@ -14,9 +14,9 @@
 using namespace Passing;
 
 PasserTactic::PasserTactic(Passing::Pass pass, const Ball& ball, bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilityFlags::Kick}),
-      pass(std::move(pass)),
-      ball(ball)
+    : pass(std::move(pass)),
+      ball(ball),
+      Tactic(loop_forever, {RobotCapabilities::Capability::Kick})
 {
 }
 

@@ -5,8 +5,9 @@
 #include "software/ai/intent/move_intent.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
-    : Tactic(loop_forever, {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
-                            RobotCapabilityFlags::Chip})
+    : Tactic(loop_forever,
+             {RobotCapabilities::Capability::Dribble, RobotCapabilities::Capability::Kick,
+              RobotCapabilities::Capability::Chip})
 {
 }
 

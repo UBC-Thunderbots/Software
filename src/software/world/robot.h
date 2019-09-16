@@ -3,6 +3,7 @@
 #include <optional>
 #include <vector>
 
+#include "ai/world/robot_capability.h"
 #include "boost/circular_buffer.hpp"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
@@ -31,8 +32,8 @@ class Robot
     explicit Robot(unsigned int id, const Point &position, const Vector &velocity,
                    const Angle &orientation, const AngularVelocity &angular_velocity,
                    const Timestamp &timestamp, unsigned int history_duration = 20,
-                   const RobotCapabilityFlags &capabilities =
-                       RobotCapabilityFlags::allCapabilities());
+                   const std::set<RobotCapabilities::Capability> &capabilities =
+                       RobotCapabilities::allCapabilities());
 
     /**
      * Updates the state of the robot.
@@ -249,14 +250,14 @@ class Robot
      *
      * @return the hardware capabilities of the robot
      */
-    const RobotCapabilityFlags &getRobotCapabilities() const;
+    const std::set<RobotCapabilities::Capability> &getRobotCapabilities() const;
 
     /**
      * Returns the mutable hardware capabilities of the robot
      *
      * @return the mutable hardware capabilities of the robot
      */
-    RobotCapabilityFlags &getMutableRobotCapabilities();
+    std::set<RobotCapabilities::Capability> &getMutableRobotCapabilities();
 
     /**
      * Defines the equality operator for a Robot. Robots are equal if their IDs and
@@ -331,5 +332,5 @@ class Robot
     boost::circular_buffer<Timestamp> last_update_timestamps;
     // The hardware capabilities of the robot, generated from
     // RobotCapabilityFlags::broken_dribblers/chippers/kickers dynamic parameters
-    RobotCapabilityFlags capabilities_;
+    std::set<RobotCapabilities::Capability> capabilities_;
 };
