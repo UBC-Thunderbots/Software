@@ -10,6 +10,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "mrf_primitive_visitor_test",
+    srcs = ["mrf_primitive_visitor_test.cpp"],
+    deps = [
+        ":mrf_primitive_visitor",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "messages",
     hdrs = ["messages.h"],

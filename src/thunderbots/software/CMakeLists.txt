@@ -570,8 +570,8 @@ if (CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(grsim_output_test
             backend/output/grsim/grsim_output.cpp
-            backend/output/grsim/grsim_command_primitive_visitor.cpp
-            backend/output/grsim/motion_controller.cpp
+            backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.cpp
+            backend/output/grsim/command_primitive_visitor/motion_controller.cpp
             test/backend/output/grsim/dribble_primitive.cpp
             test/backend/output/grsim/grsim_output.cpp
             test/backend/output/grsim/catch_primitive.cpp
@@ -872,7 +872,7 @@ if (CATKIN_ENABLE_TESTING)
     catkin_add_gtest(game_state_play_selection_test
             ai/ai.cpp
             ai/hl/stp/stp.cpp
-            test/ai/game_state_play_selection.cpp
+            ai/game_state_play_selection_test.cpp
             test/ai/hl/stp/test_plays/halt_test_play.cpp
             test/ai/hl/stp/test_plays/move_test_play.cpp
             test/ai/hl/stp/test_tactics/move_test_tactic.cpp
@@ -951,7 +951,7 @@ if (CATKIN_ENABLE_TESTING)
             )
 
     catkin_add_gtest(parameter_test
-            test/util/parameter_test.cpp)
+            util/parameter/parameter_test.cpp)
     target_link_libraries(parameter_test
             ${catkin_LIBRARIES}
             tbots_parameter

@@ -1,4 +1,4 @@
-#include "software/backend/output/grsim/grsim_command_primitive_visitor.h"
+#include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>

@@ -49,9 +49,3 @@ class GameStatePlaySelectionTest : public ::testing::Test,
 //                        ::testing::ValuesIn(all_refbox_game_states.begin(),
 //                                            all_refbox_game_states.end()));
 
-int main(int argc, char **argv)
-{
-    std::cout << argv[0] << std::endl;
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

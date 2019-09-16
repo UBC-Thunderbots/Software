@@ -23,11 +23,25 @@ genrule(
 )
 
 cc_library(
+    name = "parameter",
+    hdrs = ["parameter.h"],
+    deps = [],
+)
+
+cc_test(
+    name = "parameter_test",
+    srcs = ["parameter_test.cpp"],
+    deps = [
+        ":parameter",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "dynamic_parameters",
     srcs = ["dynamic_parameters.cpp"],
     hdrs = [
         "dynamic_parameters.h",
-        "parameter.h",
     ],
-    deps = [],
+    deps = [":parameter"],
 )

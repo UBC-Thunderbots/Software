@@ -20,6 +20,15 @@ cc_library(
     deps = [":backend"],
 )
 
+cc_test(
+    name = "backend_factory_test",
+    srcs = ["backend_factory_test.cpp"],
+    deps = [
+        ":backend_factory",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "grsim_backend",
     srcs = ["grsim_backend.cpp"],

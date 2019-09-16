@@ -1,7 +1,7 @@
 add_library(backend_grsim_output STATIC
-    grsim_command_primitive_visitor.cpp
+        command_primitive_visitor/grsim_command_primitive_visitor.cpp
     grsim_output.cpp
-    motion_controller.cpp
+        command_primitive_visitor/motion_controller.cpp
     )
 target_include_directories(backend_grsim_output
     PUBLIC

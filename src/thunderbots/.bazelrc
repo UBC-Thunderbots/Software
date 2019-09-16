@@ -1,1 +1,1 @@
-build --cxxopt='-std=c++17' --compilation_mode=fastbuild
+build --cxxopt='-std=c++17'

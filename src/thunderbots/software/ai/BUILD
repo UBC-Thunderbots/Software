@@ -31,3 +31,14 @@ cc_library(
         "@boost//:bind",
     ],
 )
+
+cc_test(
+    name = "game_state_play_selection_test",
+    srcs = ["game_state_play_selection_test.cpp"],
+    deps = [
+        "//software/ai",
+        "//software/ai/world",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

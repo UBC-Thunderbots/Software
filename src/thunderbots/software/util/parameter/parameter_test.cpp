@@ -56,9 +56,3 @@ TEST(ParameterTest, register_duplicate_callbacks_test)
     EXPECT_EQ(test_value, 2);
 }
 
-int main(int argc, char **argv)
-{
-    ros::init(argc, argv, "dynamic_parameters_ros_test");
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

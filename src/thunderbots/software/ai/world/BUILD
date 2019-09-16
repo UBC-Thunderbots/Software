@@ -68,6 +68,15 @@ cc_library(
     deps = [],
 )
 
+cc_test(
+    name = "refbox_constants_test",
+    srcs = ["refbox_constants_test.cpp"],
+    deps = [
+        ":refbox_constants",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "robot",
     srcs = ["robot.cpp"],
