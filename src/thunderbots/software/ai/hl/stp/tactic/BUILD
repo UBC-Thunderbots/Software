@@ -13,6 +13,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "block_shot_path_tactic_test",
+    srcs = ["block_shot_path_tactic_test.cpp"],
+    deps = [
+        ":block_shot_path_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "cherry_pick_tactic",
     srcs = ["cherry_pick_tactic.cpp"],
@@ -25,6 +35,16 @@ cc_library(
         "//software/ai/world",
         "//software/geom:all",
         "@g3log//:all",
+    ],
+)
+
+cc_test(
+    name = "cherry_pick_tactic_test",
+    srcs = ["cherry_pick_tactic_test.cpp"],
+    deps = [
+        ":cherry_pick_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -74,6 +94,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "free_kick_tactic_test",
+    srcs = ["free_kick_tactic_test.cpp"],
+    deps = [
+        ":free_kick_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
@@ -102,6 +132,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "move_tactic_test",
+    srcs = ["move_tactic_test.cpp"],
+    deps = [
+        ":move_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "passer_tactic",
     srcs = ["passer_tactic.cpp"],
@@ -114,6 +154,16 @@ cc_library(
         "//software/ai/passing:pass",
         "//software/geom:all",
         "@g3log//:all",
+    ],
+)
+
+cc_test(
+    name = "passer_tactic_test",
+    srcs = ["passer_tactic_test.cpp"],
+    deps = [
+        ":passer_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -162,6 +212,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "receiver_tactic_test",
+    srcs = ["receiver_tactic_test.cpp"],
+    deps = [
+        ":receiver_tactic",
+        "//software/ai/intent:kick_intent",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "shadow_enemy_tactic",
     srcs = ["shadow_enemy_tactic.cpp"],
@@ -174,6 +235,16 @@ cc_library(
         "//software/ai/hl/stp/evaluation:enemy_threat",
         "//software/geom:all",
         "@g3log//:all",
+    ],
+)
+
+cc_test(
+    name = "shadow_enemy_tactic_test",
+    srcs = ["shadow_enemy_tactic_test.cpp"],
+    deps = [
+        ":shadow_enemy_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -208,6 +279,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "shoot_goal_tactic_test",
+    srcs = ["shoot_goal_tactic_test.cpp"],
+    deps = [
+        ":shoot_goal_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "stop_tactic",
     srcs = ["stop_tactic.cpp"],
@@ -222,6 +303,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "stop_tactic_test",
+    srcs = ["stop_tactic_test.cpp"],
+    deps = [
+        ":stop_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "tactic",
     srcs = ["tactic.cpp"],
@@ -229,5 +320,16 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/action",
         "//software/ai/world",
+    ],
+)
+
+cc_test(
+    name = "tactic_test",
+    srcs = ["tactic_test.cpp"],
+    deps = [
+        ":tactic",
+        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )
