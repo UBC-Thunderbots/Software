@@ -20,7 +20,7 @@
 
 #include "software/../shared/constants.h"
 #include "software/test/test_util/test_util.h"
-#include "software/util/math_functions.h"
+#include "software/util/math/math_functions.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Passing;

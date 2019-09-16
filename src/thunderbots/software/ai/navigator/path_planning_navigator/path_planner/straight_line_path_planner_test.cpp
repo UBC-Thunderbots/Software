@@ -1,4 +1,4 @@
-#include "software/ai/navigator/path_planner/straight_line_path_planner.h"
+#include "software/ai/navigator/path_planning_navigator/path_planner/straight_line_path_planner.h"
 
 #include <gtest/gtest.h>
 

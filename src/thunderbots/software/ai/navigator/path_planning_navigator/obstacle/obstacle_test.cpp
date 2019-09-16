@@ -1,8 +1,7 @@
-#include "software/ai/navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/path_planning_navigator/obstacle/obstacle.h"
 
 #include <gtest/gtest.h>
 #include <math.h>
-
 #include <cmath>
 #include <cstdlib>
 #include <ctime>

@@ -1,8 +1,8 @@
-#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
+#include "software/ai/navigator/path_planning_navigator/path_planner/theta_star_path_planner.h"
 
 #include <gtest/gtest.h>
 
-#include "software/../shared/constants.h"
+#include "shared/constants.h"
 #include "software/geom/point.h"
 #include "software/test/test_util/test_util.h"
 

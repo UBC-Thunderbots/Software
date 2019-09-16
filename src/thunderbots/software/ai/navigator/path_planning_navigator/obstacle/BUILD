@@ -12,6 +12,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "obstacle_test",
+    srcs = ["obstacle_test.cpp"],
+    deps = [
+        ":obstacle",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "robot_obstacle",
     srcs = ["robot_obstacle.cpp"],

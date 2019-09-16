@@ -16,6 +16,15 @@ cc_library(
     deps = [":path_planner"],
 )
 
+cc_test(
+    name = "straight_line_path_planner_test",
+    srcs = ["straight_line_path_planner_test.cpp"],
+    deps = [
+        ":straight_line_path_planner",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "theta_star_path_planner",
     srcs = ["theta_star_path_planner.cpp"],
@@ -24,5 +33,15 @@ cc_library(
         ":path_planner",
         "//software/ai/world:ball",
         "//software/ai/world:field",
+    ],
+)
+
+cc_test(
+    name = "theta_star_path_planner_test",
+    srcs = ["theta_star_path_planner_test.cpp"],
+    deps = [
+        ":theta_star_path_planner",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
     ],
 )

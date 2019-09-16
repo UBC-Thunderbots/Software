@@ -13,3 +13,13 @@ cc_library(
         "//software/ai/world",
     ],
 )
+
+cc_test(
+    name = "placeholder_navigator_test",
+    srcs = ["placeholder_navigator_test.cpp"],
+    deps = [
+        ":placeholder_navigator",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

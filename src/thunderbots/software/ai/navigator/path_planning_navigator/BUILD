@@ -21,6 +21,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "path_planning_navigator_test",
+    srcs = ["path_planning_navigator_test.cpp"],
+    deps = [
+        ":path_planning_navigator",
+        "//software/test/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "util",
     srcs = ["util.cpp"],
@@ -31,6 +41,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "util_test",
+    srcs = ["util_test.cpp"],
+    deps = [
+        ":util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "trespass",
     srcs = ["trespass.cpp"],
@@ -38,5 +57,14 @@ cc_library(
     deps = [
         "//software/geom:all",
         "//software/util/math:math_functions",
+    ],
+)
+
+cc_test(
+    name = "trespass_test",
+    srcs = ["trespass_test.cpp"],
+    deps = [
+        ":trespass",
+        "@gtest//:gtest_main",
     ],
 )
