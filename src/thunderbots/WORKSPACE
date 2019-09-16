@@ -10,7 +10,7 @@ http_archive(
 
 http_archive(
     name = "g3log",
-    build_file = "@//:g3log.BUILD",
+    build_file = "@//external:g3log.BUILD",
     sha256 = "1c141aa62c30985e8fd8c56bddbf2e32f080bf839a48f53c9593ecdebfb8a175",
     strip_prefix = "g3log-1.3.2",
     url = "https://github.com/KjellKod/g3log/archive/1.3.2.zip",
@@ -26,7 +26,6 @@ http_archive(
     ],
 )
 
-# TODO: put init stuff here in it's own file?
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
 
 rules_proto_dependencies()
@@ -35,20 +34,17 @@ rules_proto_toolchains()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    #    commit = "82ae1790cef07f3fd618592ad227fe2d66fe0b31",
-    #    remote = "https://github.com/nelhage/rules_boost",
-    commit = "a493667",
-    remote = "https://github.com/garethellis0/rules_boost.git",
+    commit = "a1dd05e7e9178f8aad86e39f3a5b377902eae5b2",
+    remote = "https://github.com/nelhage/rules_boost",
 )
 
-# TODO: put init stuff here in it's own file?
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
 
 boost_deps()
 
 http_archive(
     name = "eigen",
-    build_file = "//:eigen.BUILD",
+    build_file = "@//external:eigen.BUILD",
     sha256 = "3a66f9bfce85aff39bc255d5a341f87336ec6f5911e8d816dd4a3fdc500f8acf",
     strip_prefix = "eigen-eigen-c5e90d9e764e",
     url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
@@ -56,7 +52,7 @@ http_archive(
 
 http_archive(
     name = "libusb",
-    build_file = "//:libusb.BUILD",
+    build_file = "@//external:libusb.BUILD",
     sha256 = "a5fc7c3c8ecfaca3e149ffb5a422f358fc5276fe56d851f46a4023d1e061bc00",
     strip_prefix = "libusb-1.0.23",
     url = "https://github.com/libusb/libusb/archive/v1.0.23.zip",

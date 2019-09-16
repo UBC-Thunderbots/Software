@@ -1,10 +1,12 @@
 #pragma once
 
+
+#include <boost/circular_buffer.hpp>
+
 #include "software/ai/world/ball.h"
 #include "software/ai/world/field.h"
 #include "software/ai/world/game_state.h"
 #include "software/ai/world/team.h"
-#include "boost/circular_buffer.hpp"
 #include "software/ai/world/refbox_constants.h"
 
 /**

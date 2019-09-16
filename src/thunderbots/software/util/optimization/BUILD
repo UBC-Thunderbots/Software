@@ -3,8 +3,8 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "gradient_descent",
     hdrs = [
-        "gradient_descent.h",
-        "gradient_descent.tpp",
+        "gradient_descent_optimizer.h",
+        "gradient_descent_optimizer.tpp",
     ],
 )
 

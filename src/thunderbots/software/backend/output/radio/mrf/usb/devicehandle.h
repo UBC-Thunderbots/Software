@@ -9,7 +9,6 @@
 #include <string>
 #include <vector>
 
-//#include "software/device.h"
 #include "software/backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB

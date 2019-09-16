@@ -1,6 +1,7 @@
 #include "software/ai/world/field.h"
 
-#include "boost/circular_buffer.hpp"
+#include <boost/circular_buffer.hpp>
+
 #include "software/geom/rectangle.h"
 #include "software/util/time/timestamp.h"
 

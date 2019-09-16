@@ -4,9 +4,9 @@
 #include <map>
 #include <optional>
 #include <vector>
+#include <boost/circular_buffer.hpp>
 
 #include "software/ai/world/robot.h"
-#include "boost/circular_buffer.hpp"
 #include "software/util/time/timestamp.h"
 
 /**
