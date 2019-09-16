@@ -38,27 +38,22 @@ if [ "$RUN_BUILD" == "true" ] || \
     travis_run ./environment_setup/setup_software.sh
 
     # Build the codebase
-    travis_run catkin_make
+    travis_run bazel build //...
 fi
 
 # Note that we must run tests to get coverage
 if [ "$RUN_TESTS" == "true" ] || \
     [ "$RUN_COVERAGE" == "true" ]; then
     
+    travis_run bazel test //...
+
     if [ "$RUN_COVERAGE" == "true" ]; then
         # Run tests for AI with coverage
-        travis_run catkin_make run_tests -DENABLE_COVERAGE=ON
-    else
-        # Run tests for AI normally
-        travis_run catkin_make run_tests
+        travis_run bazel coverage //...
     fi
 
     # Run tests for Corner Kick
     travis_run ./src/corner_kick/scripts/start_test.sh
-
-    # Report the results of the tests
-    # (which tests failed and why)
-    travis_run catkin_test_results --verbose
 
     if [ "$RUN_COVERAGE" == "true" ]; then
         # Upload coverage reports
