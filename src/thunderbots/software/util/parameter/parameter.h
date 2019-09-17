@@ -2,11 +2,11 @@
 
 //#include <ros/ros.h>
 
+#include <functional>
 #include <memory>
 #include <mutex>
-#include <vector>
 #include <string>
-#include <functional>
+#include <vector>
 
 /**
  * This class defines a dynamic parameter, meaning the parameter
@@ -88,38 +88,39 @@ class Parameter
         return name_;
     }
 
-//    /**
-//     * Checks if the parameter currently exists in the ros parameter server
-//     *
-//     * @return true if the parameter exists, false otherwise
-//     *
-//     */
-//    const bool existsInParameterServer() const
-//    {
-//        return ros::param::has(this->getROSParameterPath());
-//    }
+    //    /**
+    //     * Checks if the parameter currently exists in the ros parameter server
+    //     *
+    //     * @return true if the parameter exists, false otherwise
+    //     *
+    //     */
+    //    const bool existsInParameterServer() const
+    //    {
+    //        return ros::param::has(this->getROSParameterPath());
+    //    }
 
-//    /**
-//     * Updates the value of this Parameter with the value from the ROS
-//     * Parameter Server
-//     */
-//    void updateValueFromROSParameterServer()
-//    {
-//        ros::param::get(getROSParameterPath(), this->value_);
-//    }
+    //    /**
+    //     * Updates the value of this Parameter with the value from the ROS
+    //     * Parameter Server
+    //     */
+    //    void updateValueFromROSParameterServer()
+    //    {
+    //        ros::param::get(getROSParameterPath(), this->value_);
+    //    }
 
-//    /**
-//     * Updates the value of this Parameter with the value from a
-//     * 'dynamic_reconfigure::Config' msg. The parameter fetches the update from the update
-//     * msg and updates its value
-//     *
-//     */
-//    void updateParameterFromConfigMsg(
-//        const dynamic_reconfigure::Config::ConstPtr& updates)
-//    {
-//        dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
-//                                                       this->value_);
-//    }
+    //    /**
+    //     * Updates the value of this Parameter with the value from a
+    //     * 'dynamic_reconfigure::Config' msg. The parameter fetches the update from the
+    //     update
+    //     * msg and updates its value
+    //     *
+    //     */
+    //    void updateParameterFromConfigMsg(
+    //        const dynamic_reconfigure::Config::ConstPtr& updates)
+    //    {
+    //        dynamic_reconfigure::ConfigTools::getParameter(*updates, this->name_,
+    //                                                       this->value_);
+    //    }
 
     /**
      * Registers a callback function to be called when the value of this parameter is
@@ -144,16 +145,16 @@ class Parameter
         return Parameter<T>::getMutableRegistry();
     }
 
-//    /**
-//     * Returns a reference to the config msg. The config msg contains
-//     * all the current configurations
-//     *
-//     * @return An immutable reference to the Config msg
-//     */
-//    static const dynamic_reconfigure::Config& getConfigMsg()
-//    {
-//        return Parameter<T>::getMutableConfigMsg();
-//    }
+    //    /**
+    //     * Returns a reference to the config msg. The config msg contains
+    //     * all the current configurations
+    //     *
+    //     * @return An immutable reference to the Config msg
+    //     */
+    //    static const dynamic_reconfigure::Config& getConfigMsg()
+    //    {
+    //        return Parameter<T>::getMutableConfigMsg();
+    //    }
 
     /**
      * Registers (adds) a Parameter to the registry. Since the unique pointer is moved
@@ -168,18 +169,19 @@ class Parameter
      */
     static void registerParameter(Parameter<T>* parameter)
     {
-//        try
-//        {
-//            dynamic_reconfigure::ConfigTools::appendParameter(
-//                Parameter<T>::getMutableConfigMsg(), parameter->name(),
-//                parameter->value());
-//        }
-//        catch (...)
-//        {
-//            // TODO (Issue #16): Replace with proper exception once exception handling is
-//            // implemented
-//            ROS_WARN("Attempting to configure with unkown type");
-//        }
+        //        try
+        //        {
+        //            dynamic_reconfigure::ConfigTools::appendParameter(
+        //                Parameter<T>::getMutableConfigMsg(), parameter->name(),
+        //                parameter->value());
+        //        }
+        //        catch (...)
+        //        {
+        //            // TODO (Issue #16): Replace with proper exception once exception
+        //            handling is
+        //            // implemented
+        //            ROS_WARN("Attempting to configure with unkown type");
+        //        }
 
         Parameter<T>::getMutableRegistry().emplace_back(parameter);
     }
@@ -197,20 +199,21 @@ class Parameter
         }
     }
 
-//    /**
-//     * Takes a list from the dynamic_reconfigure::Config msg and updates the parameters
-//     * based on the information in that list.
-//     *
-//     */
-//    static void updateAllParametersFromConfigMsg(
-//        const dynamic_reconfigure::Config::ConstPtr& updates)
-//    {
-//        for (const auto& param : Parameter<T>::getRegistry())
-//        {
-//            std::scoped_lock lock(param->value_mutex_);
-//            param->updateParameterFromConfigMsg(updates);
-//        }
-//    }
+    //    /**
+    //     * Takes a list from the dynamic_reconfigure::Config msg and updates the
+    //     parameters
+    //     * based on the information in that list.
+    //     *
+    //     */
+    //    static void updateAllParametersFromConfigMsg(
+    //        const dynamic_reconfigure::Config::ConstPtr& updates)
+    //    {
+    //        for (const auto& param : Parameter<T>::getRegistry())
+    //        {
+    //            std::scoped_lock lock(param->value_mutex_);
+    //            param->updateParameterFromConfigMsg(updates);
+    //        }
+    //    }
 
    private:
     /**
@@ -244,16 +247,16 @@ class Parameter
     // A list of functions to call when a new parameter value is set
     std::vector<std::function<void(T)>> callback_functions;
 
-//    /**
-//     * Returns a mutable configuration msg that will hold all the
-//     * information related to the parameters created
-//     * msg contains bool,strs,ints,doubles vectors which are inherently mutable
-//     *
-//     * @return A mutable reference to the configuration msg
-//     */
-//    static dynamic_reconfigure::Config& getMutableConfigMsg()
-//    {
-//        static dynamic_reconfigure::Config config;
-//        return config;
-//    }
+    //    /**
+    //     * Returns a mutable configuration msg that will hold all the
+    //     * information related to the parameters created
+    //     * msg contains bool,strs,ints,doubles vectors which are inherently mutable
+    //     *
+    //     * @return A mutable reference to the configuration msg
+    //     */
+    //    static dynamic_reconfigure::Config& getMutableConfigMsg()
+    //    {
+    //        static dynamic_reconfigure::Config config;
+    //        return config;
+    //    }
 };
