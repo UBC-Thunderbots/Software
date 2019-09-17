@@ -1,10 +1,11 @@
 #include "software/backend/output/grsim/grsim_output.h"
 
 #include <chrono>
-#include <optional>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
+#include <optional>
 
+#include "shared/constants.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/ai/world/team.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
@@ -12,7 +13,6 @@
 #include "software/proto/grSim_Commands.pb.h"
 #include "software/proto/grSim_Replacement.pb.h"
 #include "software/util/parameter/dynamic_parameters.h"
-#include "shared/constants.h"
 
 
 using namespace boost::asio;

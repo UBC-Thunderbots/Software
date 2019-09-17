@@ -3,10 +3,9 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
-#include "software/ai/navigator/path_planning_navigator/util.h"
-
-#include "software/ai/primitive/all_primitives.h"
 #include "software/ai/intent/all_intents.h"
+#include "software/ai/navigator/path_planning_navigator/util.h"
+#include "software/ai/primitive/all_primitives.h"
 
 void PathPlanningNavigator::visit(const CatchIntent &catch_intent)
 {

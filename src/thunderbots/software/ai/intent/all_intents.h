@@ -10,4 +10,3 @@
 #include "software/ai/intent/movespin_intent.h"
 #include "software/ai/intent/pivot_intent.h"
 #include "software/ai/intent/stop_intent.h"
-

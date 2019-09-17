@@ -6,12 +6,12 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/geom/util.h"
-#include "shared/constants.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,

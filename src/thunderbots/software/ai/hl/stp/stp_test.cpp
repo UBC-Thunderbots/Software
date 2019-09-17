@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/stp.h"
 
 #include <gtest/gtest.h>
+
 #include <algorithm>
 #include <exception>
 

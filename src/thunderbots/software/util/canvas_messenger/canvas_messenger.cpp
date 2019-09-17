@@ -1,7 +1,7 @@
 #include "software/util/canvas_messenger/canvas_messenger.h"
 
-#include "software/util/constants.h"
 #include "shared/constants.h"
+#include "software/util/constants.h"
 
 using namespace Util;
 
@@ -11,7 +11,7 @@ std::shared_ptr<CanvasMessenger> CanvasMessenger::getInstance()
     return canvas_messenger;
 }
 
-//void CanvasMessenger::initializePublisher(ros::NodeHandle node_handle)
+// void CanvasMessenger::initializePublisher(ros::NodeHandle node_handle)
 //{
 //    this->publisher = node_handle.advertise<thunderbots_msgs::CanvasLayer>(
 //        Util::Constants::VISUALIZER_DRAW_LAYER_TOPIC, BUFFER_SIZE);
@@ -59,29 +59,30 @@ void CanvasMessenger::publishAndClearLayer(Layer layer)
 
 void CanvasMessenger::publishPayload(uint8_t layer, std::vector<Sprite> sprites)
 {
-//    std::vector<uint8_t> payload;
-//
-//    // Add the layer number at the begining of the binary message
-//    payload.insert(payload.end(), layer);
-//
-//    // Convert each sprite into a binary message
-//    for (Sprite& sprite : sprites)
-//    {
-//        std::vector<uint8_t> sprite_payload = sprite.serialize(PIXELS_PER_METER);
-//        payload.insert(payload.end(), sprite_payload.begin(), sprite_payload.end());
-//    }
-//
-//    // Create a new layer message, add the binary data
-//    thunderbots_msgs::CanvasLayer new_layer;
-//    new_layer.data = payload;
-//
-//    // and publish if we have a valid ROS publisher.
-//    // This check is important for cases where we're running this without running ROS,
-//    // such as in unit tests.
-//    if (publisher)
-//    {
-//        publisher->publish(new_layer);
-//    }
+    //    std::vector<uint8_t> payload;
+    //
+    //    // Add the layer number at the begining of the binary message
+    //    payload.insert(payload.end(), layer);
+    //
+    //    // Convert each sprite into a binary message
+    //    for (Sprite& sprite : sprites)
+    //    {
+    //        std::vector<uint8_t> sprite_payload = sprite.serialize(PIXELS_PER_METER);
+    //        payload.insert(payload.end(), sprite_payload.begin(), sprite_payload.end());
+    //    }
+    //
+    //    // Create a new layer message, add the binary data
+    //    thunderbots_msgs::CanvasLayer new_layer;
+    //    new_layer.data = payload;
+    //
+    //    // and publish if we have a valid ROS publisher.
+    //    // This check is important for cases where we're running this without running
+    //    ROS,
+    //    // such as in unit tests.
+    //    if (publisher)
+    //    {
+    //        publisher->publish(new_layer);
+    //    }
 }
 
 void CanvasMessenger::clearAllLayers()

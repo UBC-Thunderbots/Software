@@ -14,7 +14,6 @@
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 
 #include <algorithm>
-
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 

@@ -55,4 +55,3 @@ TEST(ParameterTest, register_duplicate_callbacks_test)
     test_param.setValue(1);
     EXPECT_EQ(test_value, 2);
 }
-

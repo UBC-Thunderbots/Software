@@ -8,13 +8,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
 #include <thread>
-
-#include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 #define STALL_RETRIES 3
 

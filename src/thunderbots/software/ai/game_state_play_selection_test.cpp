@@ -48,4 +48,3 @@ class GameStatePlaySelectionTest : public ::testing::Test,
 // INSTANTIATE_TEST_CASE_P(AllRefboxGameStates, GameStatePlaySelectionTest,
 //                        ::testing::ValuesIn(all_refbox_game_states.begin(),
 //                                            all_refbox_game_states.end()));
-

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/geom/point.h"
 #include "software/geom/line.h"
+#include "software/geom/point.h"
 
 class Segment final
 {

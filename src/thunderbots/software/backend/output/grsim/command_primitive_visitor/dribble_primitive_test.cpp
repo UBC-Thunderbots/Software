@@ -3,13 +3,14 @@
  * of the DribblePrimitive class
  */
 
+#include "software/ai/primitive/dribble_primitive.h"
+
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "software/ai/world/robot.h"
-#include "software/ai/primitive/dribble_primitive.h"
-#include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "shared/constants.h"
+#include "software/ai/world/robot.h"
+#include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 
 using MotionControllerCommand =
     std::variant<MotionController::PositionCommand, MotionController::VelocityCommand>;

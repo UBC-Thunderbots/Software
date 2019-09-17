@@ -1,10 +1,10 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <mutex>
-#include <vector>
 #include <string>
-#include <functional>
+#include <vector>
 
 /**
  * This class defines a dynamic parameter, meaning the parameter

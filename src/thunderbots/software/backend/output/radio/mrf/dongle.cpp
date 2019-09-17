@@ -1,22 +1,23 @@
 #include "software/backend/output/radio/mrf/dongle.h"
 
 #include <unistd.h>
+
 #include <algorithm>
 #include <bitset>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
-#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
-#include "software/backend/output/radio/mrf/messages.h"
 #include "shared/constants.h"
+#include "software/backend/output/radio/mrf/messages.h"
+#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 
 namespace
 {

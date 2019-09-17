@@ -1,9 +1,9 @@
 #include "software/backend/input/network/networking/network_client.h"
 
 #include <boost/bind.hpp>
-#include <limits>
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
+#include <limits>
 
 #include "software/util/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"

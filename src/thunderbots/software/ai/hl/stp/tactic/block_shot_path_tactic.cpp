@@ -3,9 +3,9 @@
 #include <g3log/g3log.hpp>
 #include <g3log/loglevels.hpp>
 
-#include "software/geom/util.h"
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/geom/util.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
     : field(field), Tactic(loop_forever)

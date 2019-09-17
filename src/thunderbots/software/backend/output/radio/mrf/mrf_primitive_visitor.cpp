@@ -1,8 +1,7 @@
 #include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 
-#include "software/ai/primitive/all_primitives.h"
-
 #include "shared/constants.h"
+#include "software/ai/primitive/all_primitives.h"
 
 RadioPrimitive MRFPrimitiveVisitor::getSerializedRadioPacket()
 {
