@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 TEST(InterceptEvaluationTest, findBestInterceptForBall_robot_on_ball_path_ball_3_m_per_s)
 {

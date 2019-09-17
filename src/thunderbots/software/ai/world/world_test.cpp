@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 class WorldTest : public ::testing::Test

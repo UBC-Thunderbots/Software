@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include "software/ai/passing/evaluation.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 using namespace Passing;
 using namespace std::chrono_literals;

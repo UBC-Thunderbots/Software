@@ -33,7 +33,7 @@ cc_test(
         ":stp",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/world",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -46,7 +46,7 @@ cc_test(
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -59,7 +59,7 @@ cc_test(
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/play/test_plays:halt_test_play",
         "//software/ai/hl/stp/play/test_plays:move_test_play",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

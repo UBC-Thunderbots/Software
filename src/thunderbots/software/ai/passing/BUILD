@@ -18,7 +18,7 @@ cc_test(
     srcs = ["evaluation_test.cpp"],
     deps = [
         ":evaluation",
-        "//software/test/test_util",
+        "//software/test_util",
         "//software/util/math:math_functions",
         "@gtest//:gtest_main",
     ],
@@ -40,7 +40,7 @@ cc_test(
     srcs = ["pass_test.cpp"],
     deps = [
         ":pass",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -64,7 +64,7 @@ cc_library(
 #    srcs = ["pass_generator_test.cpp"],
 #    deps = [
 #        ":pass_generator",
-#        "//software/test/test_util",
+#        "//software/test_util",
 #        "@gtest//:gtest_main",
 #    ],
 #)

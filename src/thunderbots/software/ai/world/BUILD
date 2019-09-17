@@ -56,7 +56,7 @@ cc_test(
     srcs = ["game_state_test.cpp"],
     deps = [
         ":game_state",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -66,6 +66,15 @@ cc_library(
     srcs = ["refbox_constants.cpp"],
     hdrs = ["refbox_constants.h"],
     deps = [],
+)
+
+cc_test(
+    name = "refbox_constants_test",
+    srcs = ["refbox_constants_test.cpp"],
+    deps = [
+        ":refbox_constants",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
@@ -139,7 +148,7 @@ cc_test(
     srcs = ["world_test.cpp"],
     deps = [
         ":world",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

@@ -13,12 +13,31 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "ball_filter_test",
+    srcs = ["ball_filter_test.cpp"],
+    deps = [
+        ":ball_filter",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "robot_filter",
     srcs = ["robot_filter.cpp"],
     hdrs = ["robot_filter.h"],
     deps = [
         "//software/ai/world:robot",
+    ],
+)
+
+cc_test(
+    name = "robot_filter_test",
+    srcs = ["robot_filter_test.cpp"],
+    deps = [
+        ":robot_filter",
+        "@gtest//:gtest_main",
     ],
 )
 

@@ -19,7 +19,7 @@ cc_test(
     srcs = ["placeholder_navigator_test.cpp"],
     deps = [
         ":placeholder_navigator",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

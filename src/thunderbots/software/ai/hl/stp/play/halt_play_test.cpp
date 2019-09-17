@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/test/test_util/test_util.h"
+#include "software/test_util/test_util.h"
 
 TEST(StopPlayTest, test_example_play_invariant_always_holds)
 {

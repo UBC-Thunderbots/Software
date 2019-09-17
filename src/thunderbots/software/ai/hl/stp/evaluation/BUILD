@@ -16,7 +16,7 @@ cc_test(
     srcs = ["ball_test.cpp"],
     deps = [
         ":ball",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -39,7 +39,7 @@ cc_test(
         ":calc_best_shot",
         "//shared:constants",
         "//software/geom:all",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -61,7 +61,7 @@ cc_test(
     deps = [
         ":deflect_off_enemy_target",
         "//software/geom:all",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -85,7 +85,7 @@ cc_test(
         ":detect_threat",
         "//software/ai/world:ball",
         "//software/geom:all",
-        "//software/test/test_util",
+        "//software/test_util",
         "//software/util/time:timestamp",
         "@gtest//:gtest_main",
     ],
@@ -113,7 +113,7 @@ cc_test(
     deps = [
         ":enemy_threat",
         "//software/ai/world:ball",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -149,7 +149,7 @@ cc_test(
         ":indirect_chip",
         "//software/ai/world",
         "//software/geom:all",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -174,7 +174,7 @@ cc_test(
     srcs = ["intercept_test.cpp"],
     deps = [
         ":intercept",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
@@ -201,7 +201,7 @@ cc_test(
     deps = [
         ":possession",
         "//shared:constants",
-        "//software/test/test_util",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
