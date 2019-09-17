@@ -50,7 +50,7 @@ if [ "$RUN_TESTS" == "true" ] || \
     if [ "$RUN_COVERAGE" == "true" ]; then
         # Run tests for AI with coverage
         pushd src/thunderbots/
-        travis_run bazel test //... --compilation_mode=fastbuild --collect_code_coverage --verbose_test_summary
+        travis_run bazel coverage //... --compilation_mode=fastbuild --verbose_test_summary
         popd
     else
         pushd src/thunderbots/
