@@ -1,2 +1,1 @@
-build --cxxopt='-std=c++17'
-
+build --cxxopt='-std=c++17' --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache --google_credentials="/home/gareth/Downloads/tbots-bazel-cache-key.json"
