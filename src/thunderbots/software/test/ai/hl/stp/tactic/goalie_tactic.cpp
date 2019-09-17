@@ -64,5 +64,4 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
 }
 
 INSTANTIATE_TEST_CASE_P(Positions, GoalieRestrainTest,
-                        ::testing::Values(Point(2, 0), Point(0, 2), Point(2, 3),
-                                          Point(2, 2), Point(3, 3), Point(4, 2)));
+                        ::testing::Values(Point(2, 1), Point(1, 2), Point(2, 3)));
