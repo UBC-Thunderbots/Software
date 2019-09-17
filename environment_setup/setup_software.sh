@@ -29,8 +29,7 @@ echo "================================================================"
 echo "Setting up your shell config files"
 echo "================================================================"
 # Shell config files that various shells source when they run.
-# This is where we want to add aliases, source ROS environment
-# variables, etc.
+# This is where we want to add aliases, etc.
 SHELL_CONFIG_FILES=(
     "$HOME/.bashrc"\
     "$HOME/.zshrc"
@@ -38,11 +37,7 @@ SHELL_CONFIG_FILES=(
 
 # All lines listed here will be added to the shell config files
 # listed above, if they are not present already
-# These automatically perform functions outlined in the ROS setup tutorial
-# http://wiki.ros.org/melodic/Installation/Ubuntu
 declare -a new_shell_config_lines=(
-    # Source the ROS Environment Variables Automatically
-    "source /opt/ros/melodic/setup.sh"\
     # Source the setup script for our workspace. This normally needs to
     # be done manually each session before you can work on the workspace,
     # so we put it here for convenience.
@@ -50,8 +45,7 @@ declare -a new_shell_config_lines=(
     # Aliases to make development easier
     # You need to source the setup.sh script before launching CLion so it can
     # find catkin packages
-    "alias clion=\"source /opt/ros/melodic/setup.sh \
-        && source $GIT_ROOT/devel/setup.sh \
+    "alias clion=\"source $GIT_ROOT/devel/setup.sh \
         && clion & disown \
         && exit\""\
     "alias rviz=\"rviz & disown && exit\""\
@@ -75,7 +69,7 @@ do
     fi
 done
 
-# Install ROS
+# Install Bazel
 echo "================================================================" 
 echo "Installing Bazel"
 echo "================================================================"
@@ -93,49 +87,6 @@ if [ $? -ne 0 ]; then
     echo "##############################################################"
     exit 1
 fi
-
-# Install ROS
-echo "================================================================" 
-echo "Installing ROS Melodic"
-echo "================================================================"
-
-# See http://wiki.ros.org/melodic/Installation/Ubuntu for instructions
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros-latest.list'
-sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-sudo apt-get update
-sudo apt-get install ros-melodic-desktop -y
-if [ $? -ne 0 ]; then
-    echo "##############################################################"
-    echo "Error: Installing ROS failed"
-    echo "##############################################################"
-    exit 1
-fi
-sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
-
-
-echo "================================================================"
-echo "Installing other ROS dependencies specified by our packages"
-echo "================================================================"
-
-# Update Rosdeps
-# rosdep init only needs to be called once after installation.
-# Check if the sources.list already exists to determing if rosdep has
-# been installed already
-if [ ! -f "/etc/ros/rosdep/sources.list.d/20-default.list" ]
-then
-    sudo rosdep init
-fi
-
-rosdep update
-# Install all required dependencies to build this repo
-rosdep install --from-paths $CURR_DIR/../src --ignore-src --rosdistro melodic -y --os=ubuntu:bionic
-if [ $? -ne 0 ]; then
-    echo "##############################################################"
-    echo "Error: Installing ROS dependencies failed"
-    echo "##############################################################"
-    exit 1
-fi
-
 
 echo "================================================================"
 echo "Installing Misc. Utilities"
@@ -156,13 +107,10 @@ sudo apt-get update
 
 host_software_packages=(
     g++-7 # We need g++ 7 or greater to support the C++17 standard
-    python-rosinstall
     protobuf-compiler
     libprotobuf-dev
     libusb-1.0-0-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
-    nodejs # Installed directly instead of using rosdep due to the lack of a default PPA
-    yarn # Installed directly instead of using rosdep due to the lack of a default PPA 
 )
 sudo apt-get install ${host_software_packages[@]} -y
 
