@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 http_archive(
     name = "gtest",
@@ -58,10 +59,9 @@ http_archive(
     url = "https://github.com/libusb/libusb/archive/v1.0.23.zip",
 )
 
-http_archive(
+new_git_repository(
     name = "munkres_cpp",
     build_file = "@//external:munkres_cpp.BUILD",
-    sha256 = "5b69a2b24aadd6dcbec5508baf1a9888cba25635730f13b0c41a2135b7ff125a",
-    strip_prefix = "munkres-cpp-1.0.0",
-    url = "https://github.com/saebyn/munkres-cpp/archive/v1.0.0.zip",
+    commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
+    remote = "https://github.com/saebyn/munkres-cpp.git",
 )
