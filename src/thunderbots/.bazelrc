@@ -1,1 +1,1 @@
-build --cxxopt='-std=c++17' --compilation_mode=fastbuild
+build --cxxopt='-std=c++17' --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache
