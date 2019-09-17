@@ -38,18 +38,24 @@ if [ "$RUN_BUILD" == "true" ] || \
     travis_run ./environment_setup/setup_software.sh
 
     # Build the codebase
-    travis_run bazel build //...
+    pushd src/thunderbots/
+    travis_run bazel build //... --compilation_mode=fastbuild
+    popd
 fi
 
 # Note that we must run tests to get coverage
 if [ "$RUN_TESTS" == "true" ] || \
     [ "$RUN_COVERAGE" == "true" ]; then
     
-    travis_run bazel test //...
-
     if [ "$RUN_COVERAGE" == "true" ]; then
         # Run tests for AI with coverage
-        travis_run bazel coverage //...
+        pushd src/thunderbots/
+        travis_run bazel test //... --compilation_mode=fastbuild --collect_code_coverage --verbose_test_summary
+        popd
+    else
+        pushd src/thunderbots/
+        travis_run bazel test //... --compilation_mode=fastbuild --verbose_test_summary
+        popd
     fi
 
     # Run tests for Corner Kick
