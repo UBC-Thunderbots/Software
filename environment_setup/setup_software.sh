@@ -38,7 +38,6 @@ SHELL_CONFIG_FILES=(
 # All lines listed here will be added to the shell config files
 # listed above, if they are not present already
 declare -a new_shell_config_lines=(
-    "alias clion=\"clion & disown && exit\""\
     "alias rviz=\"rviz & disown && exit\""\
     "alias rqt=\"rqt & disown && exit\""
 )
