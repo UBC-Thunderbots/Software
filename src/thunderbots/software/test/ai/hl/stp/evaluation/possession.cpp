@@ -166,10 +166,10 @@ TEST(PossessionEvaluationTest, team_does_not_have_posession)
     EXPECT_FALSE(Evaluation::teamHasPossession(team, ball));
 }
 
-TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
+TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
 {
     Team team = Team(Duration::fromSeconds(1));
-    Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(2));
+    Ball ball({-0.9, 3}, {0, 10}, Timestamp::fromSeconds(2));
 
     Robot robot0 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
@@ -178,14 +178,15 @@ TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
     Robot robot2 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
-    ball.updateState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(3));
+    ball.updateState({0.1, 2.5}, {0, 10},
+            Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
 
     robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(3));
+                       Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
     robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(3));
+                       Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
     robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(3));
+                       Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
 
     team.updateRobots({robot0, robot1, robot2});
 

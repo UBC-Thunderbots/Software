@@ -18,7 +18,7 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
+bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot, Timestamp timestamp)
 {
     // copied almost verbatim from legacy code
     Point robot_pos_at_time;

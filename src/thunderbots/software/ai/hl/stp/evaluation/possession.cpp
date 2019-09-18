@@ -50,7 +50,7 @@ namespace Evaluation
 
     bool teamHasPossession(const Team &team, const Ball &ball)
     {
-        for (Robot robot : team.getAllRobots())
+        for (const Robot &robot : team.getAllRobots())
         {
             std::vector<Timestamp> robot_history_timestamps =
                 robot.getPreviousTimestamps();
@@ -59,7 +59,7 @@ namespace Evaluation
 
             // Check that the robot has had possession of the ball recently.
             while (i < robot_history_timestamps.size() &&
-                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
                        Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
             {
                 if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
