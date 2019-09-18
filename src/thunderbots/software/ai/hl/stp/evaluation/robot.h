@@ -2,7 +2,6 @@
 #define AI_HL_STP_EVALUATION_ROBOT_H_
 
 #include "ai/world/world.h"
-
 #include "geom/point.h"
 
 /**

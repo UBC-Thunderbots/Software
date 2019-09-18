@@ -49,9 +49,9 @@ namespace Evaluation
         }
     }
 
-    bool teamHasPossession(const World& world, const Team &team)
+    bool teamHasPossession(const World &world, const Team &team)
     {
-        for (const Robot& robot : team.getAllRobots())
+        for (const Robot &robot : team.getAllRobots())
         {
             std::vector<Timestamp> robot_history_timestamps =
                 robot.getPreviousTimestamps();
@@ -72,11 +72,12 @@ namespace Evaluation
         return false;
     }
 
-    bool teamPassInProgress(const World &world, const Team &team) {
-        for (const Robot& robot : team.getAllRobots())
+    bool teamPassInProgress(const World &world, const Team &team)
+    {
+        for (const Robot &robot : team.getAllRobots())
         {
             std::vector<Timestamp> robot_history_timestamps =
-                    robot.getPreviousTimestamps();
+                robot.getPreviousTimestamps();
 
             int i = 0;
 

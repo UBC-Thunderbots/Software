@@ -7,10 +7,10 @@
 #include "ai/hl/stp/evaluation/ball.h"
 #include "ai/hl/stp/evaluation/possession.h"
 #include "ai/hl/stp/play/play_factory.h"
+#include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/hl/stp/tactic/move_tactic.h"
 #include "ai/hl/stp/tactic/passer_tactic.h"
 #include "ai/hl/stp/tactic/receiver_tactic.h"
-#include "ai/hl/stp/tactic/goalie_tactic.h"
 #include "ai/passing/pass_generator.h"
 #include "shared/constants.h"
 #include "util/logger/custom_logging_levels.h"
@@ -29,15 +29,14 @@ std::string CornerKickPlay::getName() const
 bool CornerKickPlay::isApplicable(const World &world) const
 {
     // use this play for corner kicks (friendly direct on enemy field side)
-    return world.gameState().isOurDirectFree() &&
-            world.ball().position().x() > 0;
+    return world.gameState().isOurDirectFree() && world.ball().position().x() > 0;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() &&
-            (!Evaluation::teamHasPossession(world, world.enemyTeam())
-            || Evaluation::teamPassInProgress(world, world.friendlyTeam())));
+            (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+             Evaluation::teamPassInProgress(world, world.friendlyTeam())));
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
