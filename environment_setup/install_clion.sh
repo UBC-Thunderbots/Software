@@ -5,21 +5,22 @@ echo "Installing CLion"
 echo "================================================================"
 
 clion_version="2019.2.2"
-usr_location="/usr/local/bin/clion"
+clion_executable_path="/usr/local/bin/${clion_version}"
 
-if [ -e ${usr_location} ]
+#if [ -e ${clion_executable_path} ]
+if [ -e "/opt/clion-${clion_version}/bin/clion.sh" ]
 then
         echo "================================================================"
         echo "CLion is already installed"
         echo "================================================================"
 else
 	# Download clion
-        wget -O ~/Downloads/CLion-${clion_version}.tar.gz "https://download-cf.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
+        wget -O /tmp/CLion-${clion_version}.tar.gz "https://download-cf.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
 
 	# Unzip and symlink to usr location
         sudo mkdir -p /opt/clion
-        sudo tar xfz ~/Downloads/CLion-${clion_version}.tar.gz -C /opt/clion
-        sudo ln -s /opt/clion/clion-${clion_version}/bin/clion.sh /usr/local/bin/clion
+        sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
+        sudo ln -s /opt/clion-${clion_version}/bin/clion.sh $clion_executable_path
 fi
 
 echo "================================================================"
@@ -37,12 +38,12 @@ then
 	echo "================================================================"
 else
 	# Download bazel plugin
-	wget -O ~/Downloads/bazelbuild.tar.gz "https://github.com/bazelbuild/intellij/archive/${bazel_plugin_version}.tar.gz"
+	wget -O /tmp/bazelbuild.tar.gz "https://github.com/bazelbuild/intellij/archive/${bazel_plugin_version}.tar.gz"
 
 	# Unpack and build the plugin from the source
-	mkdir -p bazelbuild
-	tar xfz ~/Downloads/bazelbuild.tar.gz -C bazelbuild
-	cd bazelbuild/intellij*
+	mkdir -p /tmp/bazelbuild
+	tar xfz /tmp/bazelbuild.tar.gz -C /tmp/bazelbuild
+	cd /tmp/bazelbuild/intellij*
 	sudo bazel build //clwb:clwb_bazel_zip --define=ij_product=clion-${clion_major_version}
 
 	# Copy the compiled plugin to the CLion directory
@@ -50,7 +51,7 @@ else
 	unzip bazel-bin/clwb/clwb_bazel.zip -d $clion_plugin_dir
 
 	# Cleanup
-	rm -rf ../../bazelbuild
+	rm -rf /tmp/bazelbuild
 fi
 
 
