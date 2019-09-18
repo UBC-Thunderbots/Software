@@ -33,6 +33,7 @@ class STPTest : public ::testing::Test
 TEST_F(STPTest, test_only_test_plays_are_registered_in_play_factory)
 {
     auto play_names = PlayFactory::getRegisteredPlayNames();
+    EXPECT_EQ(std::vector<std::string>(), play_names);
     EXPECT_EQ(2, play_names.size());
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), MoveTestPlay::name), 1);
     EXPECT_EQ(std::count(play_names.begin(), play_names.end(), HaltTestPlay::name), 1);

@@ -258,3 +258,20 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "all_plays",
+    deps = [
+        ":corner_kick_play",
+        ":defense_play",
+        ":enemy_freekick_play",
+        ":free_kick_play",
+        ":halt_play",
+        ":kickoff_enemy_play",
+        ":kickoff_friendly_play",
+        ":penalty_kick_enemy_play",
+        ":penalty_kick_play",
+        ":shoot_or_chip_play",
+        ":stop_play",
+    ],
+)

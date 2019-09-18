@@ -77,34 +77,6 @@ cc_library(
 )
 
 cc_library(
-    name = "free_kick_tactic",
-    srcs = ["free_kick_tactic.cpp"],
-    hdrs = ["free_kick_tactic.h"],
-    deps = [
-        ":tactic",
-        "//shared:constants",
-        "//software/ai/hl/stp/action:chip_action",
-        "//software/ai/hl/stp/action:kick_action",
-        "//software/ai/hl/stp/action:move_action",
-        "//software/ai/hl/stp/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/evaluation:deflect_off_enemy_target",
-        "//software/ai/hl/stp/evaluation:indirect_chip",
-        "//software/geom:all",
-        "@g3log//:all",
-    ],
-)
-
-cc_test(
-    name = "free_kick_tactic_test",
-    srcs = ["free_kick_tactic_test.cpp"],
-    deps = [
-        ":free_kick_tactic",
-        "//software/test_util",
-        "@gtest//:gtest_main",
-    ],
-)
-
-cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
     hdrs = ["goalie_tactic.h"],
