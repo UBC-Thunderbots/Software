@@ -38,16 +38,7 @@ SHELL_CONFIG_FILES=(
 # All lines listed here will be added to the shell config files
 # listed above, if they are not present already
 declare -a new_shell_config_lines=(
-    # Source the setup script for our workspace. This normally needs to
-    # be done manually each session before you can work on the workspace,
-    # so we put it here for convenience.
-    "source $GIT_ROOT/devel/setup.sh"\
-    # Aliases to make development easier
-    # You need to source the setup.sh script before launching CLion so it can
-    # find catkin packages
-    "alias clion=\"source $GIT_ROOT/devel/setup.sh \
-        && clion & disown \
-        && exit\""\
+    "alias clion=\"clion & disown && exit\""\
     "alias rviz=\"rviz & disown && exit\""\
     "alias rqt=\"rqt & disown && exit\""
 )
