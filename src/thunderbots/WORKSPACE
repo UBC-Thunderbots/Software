@@ -59,14 +59,6 @@ http_archive(
     url = "https://github.com/libusb/libusb/archive/v1.0.23.zip",
 )
 
-#http_archive(
-#    name = "libudev",
-#    build_file = "@//external:libudev.BUILD",
-#    sha256 = "ab462c046189db86edb325c5c1976e17a33a0d6bef40a6dbbec8c07ceb2a40ff",
-#    strip_prefix = "udev-182",
-#    url = "https://git.kernel.org/pub/scm/linux/hotplug/udev.git/snapshot/udev-182.tar.gz",
-#)
-
 new_local_repository(
     name = "libudev",
     build_file = "@//external:libudev.BUILD",
@@ -79,3 +71,4 @@ new_git_repository(
     commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
     remote = "https://github.com/saebyn/munkres-cpp.git",
 )
+
