@@ -7,8 +7,8 @@ echo "================================================================"
 clion_version="2019.2.2"
 clion_executable_path="/usr/local/bin/clion"
 
-#if [ -e ${clion_executable_path} ]
-if [ -e "/opt/clion-${clion_version}/bin/clion.sh" ]
+# Check the correct clion version is installed
+if [ -e "/opt/clion-${clion_version}/bin/clion.sh" ] && [ -e ${clion_executable_path}-${clion_version} ]
 then
         echo "================================================================"
         echo "CLion is already installed"
@@ -19,7 +19,8 @@ else
 
 	# Unzip and symlink to usr location
         sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
-        sudo ln -s /opt/clion-${clion_version}/bin/clion.sh $clion_executable_path
+        sudo ln -s /opt/clion-${clion_version}/bin/clion.sh ${clion_executable_path}-${clion_version}
+        sudo ln -s ${clion_executable_path}-${clion_version} $clion_executable_path
 fi
 
 echo "================================================================"
