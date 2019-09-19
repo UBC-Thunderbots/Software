@@ -1,9 +1,12 @@
-## Use C++ 17
+# Use C++ 17
 build --cxxopt='-std=c++17'
 
-## Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
+# Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
 build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache
 
-## Credentials for Uploading Build Results To Our Remote Cache
+# Credentials for Uploading Build Results To Our Remote Cache
 #build --google_credentials="/home/gareth/Downloads/tbots-bazel-cache-key.json"
 
+# We rely on all symbols being included when linking for our implementation of
+# the "factory" design pattern.
+build --incompatible_remove_legacy_whole_archive=False
