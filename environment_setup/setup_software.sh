@@ -102,6 +102,7 @@ host_software_packages=(
     libusb-1.0-0-dev
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
+    yarn
 )
 sudo apt-get install ${host_software_packages[@]} -y
 
