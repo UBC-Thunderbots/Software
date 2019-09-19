@@ -1,5 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
+# We force linking for all plays so that the static variables required for the
+# "factory" design pattern to work are linked in
+# https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+
 cc_library(
     name = "corner_kick_play",
     srcs = ["corner_kick_play.cpp"],
@@ -17,6 +21,7 @@ cc_library(
         "//software/ai/passing:pass_generator",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -38,6 +43,7 @@ cc_library(
         "//software/util/parameter:dynamic_parameters",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -60,6 +66,7 @@ cc_library(
         "//software/util/parameter:dynamic_parameters",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -73,6 +80,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_test(
@@ -109,6 +117,7 @@ cc_library(
         "//software/util/logger",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -122,6 +131,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:stop_tactic",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_test(
@@ -151,6 +161,7 @@ cc_library(
         "//software/util/logger",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -166,6 +177,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -180,6 +192,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -194,6 +207,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -218,6 +232,7 @@ cc_library(
         "//software/util/parameter:dynamic_parameters",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(
@@ -232,6 +247,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "@g3log//:all",
     ],
+    alwayslink = True,
 )
 
 cc_library(

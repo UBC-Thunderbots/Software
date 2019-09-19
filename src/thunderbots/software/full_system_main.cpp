@@ -115,7 +115,9 @@ int main(int argc, char **argv)
     {
         connectObservers();
 
-        // TODO: we need to wait infinitely here? Or at least on all the threads??
+        // This blocks forever without using the CPU
+        std::promise<void>().get_future().wait();
     }
+
     return 0;
 }

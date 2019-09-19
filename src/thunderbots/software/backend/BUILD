@@ -39,6 +39,10 @@ cc_library(
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/grsim:grsim_output",
     ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
 )
 
 cc_library(
@@ -51,6 +55,9 @@ cc_library(
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/radio:radio_output",
     ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
     alwayslink = True,
 )
 
