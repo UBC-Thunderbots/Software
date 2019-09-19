@@ -1,1 +1,9 @@
-build --cxxopt='-std=c++17' --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache --remote_upload_local_results=false --spawn_strategy=standalone
+## Use C++ 17
+build --cxxopt='-std=c++17'
+
+## Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
+#build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache
+
+## Credentials for Uploading Build Results To Our Remote Cache
+#build --google_credentials="/home/gareth/Downloads/tbots-bazel-cache-key.json"
+
