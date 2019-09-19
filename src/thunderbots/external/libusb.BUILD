@@ -17,5 +17,8 @@ cc_library(
         "libusb",
         "libusb/os",
     ],
+    deps = [
+        "@libudev//:all",
+    ],
     visibility = ["//visibility:public"],
 )
