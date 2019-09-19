@@ -9,7 +9,6 @@
 #include <g3log/loglevels.hpp>
 #include <random>
 
-#include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/play_info.h"

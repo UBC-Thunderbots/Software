@@ -7,7 +7,6 @@ cc_library(
     deps = [
         "//software/ai/hl",
         "//software/ai/hl/stp/play",
-        "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:stop_intent",

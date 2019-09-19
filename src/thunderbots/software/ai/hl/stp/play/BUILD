@@ -265,6 +265,7 @@ cc_library(
         ":corner_kick_play",
         ":defense_play",
         ":enemy_freekick_play",
+        ":example_play",
         ":free_kick_play",
         ":halt_play",
         ":kickoff_enemy_play",
