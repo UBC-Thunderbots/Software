@@ -5,7 +5,7 @@ echo "Installing CLion"
 echo "================================================================"
 
 clion_version="2019.2.2"
-clion_executable_path="/usr/local/bin/${clion_version}"
+clion_executable_path="/usr/local/bin/clion"
 
 #if [ -e ${clion_executable_path} ]
 if [ -e "/opt/clion-${clion_version}/bin/clion.sh" ]
@@ -18,7 +18,6 @@ else
         wget -O /tmp/CLion-${clion_version}.tar.gz "https://download-cf.jetbrains.com/cpp/CLion-${clion_version}.tar.gz"
 
 	# Unzip and symlink to usr location
-        sudo mkdir -p /opt/clion
         sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
         sudo ln -s /opt/clion-${clion_version}/bin/clion.sh $clion_executable_path
 fi
