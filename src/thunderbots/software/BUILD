@@ -5,7 +5,7 @@ cc_library(
     hdrs = ["typedefs.h"],
 )
 
-cc_library(
+cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [

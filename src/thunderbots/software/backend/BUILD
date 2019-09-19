@@ -51,6 +51,7 @@ cc_library(
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/radio:radio_output",
     ],
+    alwayslink = True,
 )
 
 cc_library(
