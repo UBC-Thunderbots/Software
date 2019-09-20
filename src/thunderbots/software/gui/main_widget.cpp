@@ -83,8 +83,21 @@ void MainWidget::setupAIStartAndStopButtons() {
 void MainWidget::setupTeamColourComboBox() {
     main_widget->team_colour_combo_box->insertItem(0, "Yellow");
     main_widget->team_colour_combo_box->insertItem(1, "Blue");
-    // TODO: connect to a real parameter
-    connect(main_widget->team_colour_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "team colour changed " << text.toStdString() << std::endl;});
+    main_widget->team_colour_combo_box->insertItem(2, "Use Refbox");
+    auto on_team_colour_changed = [](const QString& text) {
+        if(text == "Yellow") {
+            Util::DynamicParameters::AI::refbox::override_refbox_friendly_team_color.setValue(true);
+            Util::DynamicParameters::AI::refbox::friendly_color_yellow.setValue(true);
+        }else if(text == "Blue") {
+            Util::DynamicParameters::AI::refbox::override_refbox_friendly_team_color.setValue(true);
+            Util::DynamicParameters::AI::refbox::friendly_color_yellow.setValue(false);
+        }else if(text == "Use Refbox") {
+            Util::DynamicParameters::AI::refbox::override_refbox_friendly_team_color.setValue(false);
+        }else {
+            LOG(FATAL) << "Tried to set the team colour with an invalid value: '" << text.toStdString() << "'" << std::endl;
+        }
+    };
+    connect(main_widget->team_colour_combo_box, &QComboBox::currentTextChanged, on_team_colour_changed);
 }
 
 void MainWidget::setupGameStateOverrideComboBox() {
@@ -93,8 +106,16 @@ void MainWidget::setupGameStateOverrideComboBox() {
     main_widget->gamestate_override_combo_box->insertItem(1, "Play");
     main_widget->gamestate_override_combo_box->insertItem(2, "Halt");
     main_widget->gamestate_override_combo_box->insertItem(3, "Stop");
-    // TODO: connect to a real parameter
-    connect(main_widget->gamestate_override_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "gamestate override changed " << text.toStdString() << std::endl;});
+
+    auto on_gamestate_changed = [](const QString& text) {
+        if(text == "Use Refbox") {
+            Util::DynamicParameters::AI::refbox::override_refbox_play.setValue(false);
+        }else {
+            Util::DynamicParameters::AI::refbox::override_refbox_play.setValue(true);
+            Util::DynamicParameters::AI::refbox::current_refbox_play.setValue(text.toStdString());
+        }
+    };
+    connect(main_widget->gamestate_override_combo_box, &QComboBox::currentTextChanged, on_gamestate_changed);
 }
 
 void MainWidget::setupPlayOverrideComboBox() {
@@ -106,18 +127,42 @@ void MainWidget::setupPlayOverrideComboBox() {
     QList<QString> qt_play_names;
     std::transform(play_names.begin(), play_names.end(), std::back_inserter(qt_play_names), [](std::string name) {return QString::fromStdString(name);});
 
-    main_widget->play_override_combo_box->insertItem(0, "None");
+    main_widget->play_override_combo_box->insertItem(0, "Use AI Selection");
     main_widget->play_override_combo_box->insertItems(1, qt_play_names);
 
-    // TODO: connect to a real parameter
-    connect(main_widget->play_override_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "play override changed " << text.toStdString() << std::endl;});
+    auto on_play_changed = [](const QString& text) {
+        if(text == "Use AI Selection") {
+            Util::DynamicParameters::AI::override_ai_play.setValue(false);
+        }else {
+            Util::DynamicParameters::AI::override_ai_play.setValue(false);
+            Util::DynamicParameters::AI::current_ai_play.setValue(text.toStdString());
+        }
+    };
+    connect(main_widget->play_override_combo_box, &QComboBox::currentTextChanged, on_play_changed);
 }
 
 void MainWidget::setupDefendingSideComboBox() {
-    main_widget->defending_side_combo_box->insertItem(0, "East");
-    main_widget->defending_side_combo_box->insertItem(1, "West");
-    // TODO: connect to a real parameter
-    connect(main_widget->defending_side_combo_box, &QComboBox::currentTextChanged, [](const QString& text) {std::cout << "defending side changed " << text.toStdString() << std::endl;});
+    main_widget->defending_side_combo_box->insertItem(0, "Use Refbox");
+    main_widget->defending_side_combo_box->insertItem(1, "East");
+    main_widget->defending_side_combo_box->insertItem(2, "West");
+
+    auto on_defending_side_changed = [](const QString& text) {
+        if(text == "Use Refbox") {
+            Util::DynamicParameters::AI::refbox::override_refbox_defending_side.setValue(false);
+        }
+        else if(text == "East") {
+            Util::DynamicParameters::AI::refbox::override_refbox_defending_side.setValue(true);
+            // TODO: Confirm how East and West map to positive and negative sides
+            Util::DynamicParameters::AI::refbox::defending_positive_side.setValue(false);
+        }else if(text == "West"){
+            Util::DynamicParameters::AI::override_ai_play.setValue(false);
+            // TODO: Confirm how East and West map to positive and negative sides
+            Util::DynamicParameters::AI::refbox::defending_positive_side.setValue(true);
+        }else {
+            LOG(FATAL) << "Tried to set the defending side with an invalid value: '" << text.toStdString() << "'" << std::endl;
+        }
+    };
+    connect(main_widget->defending_side_combo_box, &QComboBox::currentTextChanged, on_defending_side_changed);
 }
 
 void MainWidget::drawAI(World world)
@@ -219,6 +264,11 @@ QWidget* MainWidget::createBooleanParameter(Parameter<bool> *parameter) {
     };
     connect(checkbox, &QCheckBox::stateChanged, on_checkbox_value_changed);
 
+    auto on_parameter_value_changed = [checkbox](bool new_value) {
+        checkbox->setChecked(new_value);
+    };
+    parameter->registerCallbackFunction(on_parameter_value_changed);
+
     widget->setLayout(layout);
 
     return widget;
@@ -245,6 +295,11 @@ QWidget* MainWidget::createIntegerParameter(Parameter<int> *parameter) {
     // QSpinBox has 2 "valueChanged" signals that each provide different info (string vs int), so we
     // need to static_cast to specify the integer version
     connect(spinbox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), on_spinbox_value_changed);
+
+    auto on_parameter_value_changed = [spinbox](int new_value) {
+        spinbox->setValue(new_value);
+    };
+    parameter->registerCallbackFunction(on_parameter_value_changed);
 
     widget->setLayout(layout);
 
@@ -274,6 +329,11 @@ QWidget* MainWidget::createDoubleParameter(Parameter<double> *parameter) {
     // need to static_cast to specify the integer version
     connect(spinbox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), on_spinbox_value_changed);
 
+    auto on_parameter_value_changed = [spinbox](int new_value) {
+        spinbox->setValue(new_value);
+    };
+    parameter->registerCallbackFunction(on_parameter_value_changed);
+
     widget->setLayout(layout);
 
     return widget;
@@ -295,10 +355,15 @@ QWidget* MainWidget::createStringParameter(Parameter<std::string> *parameter) {
         LOG(INFO) << "Value for string param " << parameter->name() << " changed to " << line_edit->text().toStdString() << std::endl;
         parameter->setValue(line_edit->text().toStdString());
     };
-    // This event will only fire when "Enter" is pressed or the LineEdit loses focus, rather than everytime a character
+    // This event will only fire when "Enter" is pressed or the LineEdit loses focus, rather than every time a character
     // changes in the LineEdit.
     // https://doc.qt.io/archives/qt-4.8/qlineedit.html#editingFinished
     connect(line_edit, &QLineEdit::editingFinished, on_line_edit_text_changed);
+
+    auto on_parameter_value_changed = [line_edit](std::string new_value) {
+        line_edit->setText(QString::fromStdString(new_value));
+    };
+    parameter->registerCallbackFunction(on_parameter_value_changed);
 
     widget->setLayout(layout);
 
