@@ -18,6 +18,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "catch_intent_test",
+    srcs = ["catch_intent_test.cpp"],
+    deps = [
+        ":catch_intent",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "chip_intent",
     srcs = ["chip_intent.cpp"],
@@ -26,6 +35,15 @@ cc_library(
         ":intent",
         ":intent_visitor",
         "//software/ai/primitive:chip_primitive",
+    ],
+)
+
+cc_test(
+    name = "chip_intent_test",
+    srcs = ["chip_intent_test.cpp"],
+    deps = [
+        ":chip_intent",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -40,6 +58,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "direct_velocity_intent_test",
+    srcs = ["direct_velocity_intent_test.cpp"],
+    deps = [
+        ":direct_velocity_intent",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "direct_wheels_intent",
     srcs = ["direct_wheels_intent.cpp"],
@@ -48,6 +75,15 @@ cc_library(
         ":intent",
         ":intent_visitor",
         "//software/ai/primitive:direct_wheels_primitive",
+    ],
+)
+
+cc_test(
+    name = "direct_wheels_intent_test",
+    srcs = ["direct_wheels_intent_test.cpp"],
+    deps = [
+        ":direct_wheels_intent",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -62,6 +98,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "dribble_intent_test",
+    srcs = ["dribble_intent_test.cpp"],
+    deps = [
+        ":dribble_intent",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "kick_intent",
     srcs = ["kick_intent.cpp"],
@@ -70,6 +115,15 @@ cc_library(
         ":intent",
         ":intent_visitor",
         "//software/ai/primitive:kick_primitive",
+    ],
+)
+
+cc_test(
+    name = "kick_intent_test",
+    srcs = ["kick_intent_test.cpp"],
+    deps = [
+        ":kick_intent",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -84,6 +138,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "move_intent_test",
+    srcs = ["move_intent_test.cpp"],
+    deps = [
+        ":move_intent",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "movespin_intent",
     srcs = ["movespin_intent.cpp"],
@@ -92,6 +155,15 @@ cc_library(
         ":intent",
         ":intent_visitor",
         "//software/ai/primitive:movespin_primitive",
+    ],
+)
+
+cc_test(
+    name = "movespin_intent_test",
+    srcs = ["movespin_intent_test.cpp"],
+    deps = [
+        ":movespin_intent",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -106,6 +178,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "pivot_intent_test",
+    srcs = ["pivot_intent_test.cpp"],
+    deps = [
+        ":pivot_intent",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "stop_intent",
     srcs = ["stop_intent.cpp"],
@@ -114,6 +195,15 @@ cc_library(
         ":intent",
         ":intent_visitor",
         "//software/ai/primitive:stop_primitive",
+    ],
+)
+
+cc_test(
+    name = "stop_intent_test",
+    srcs = ["stop_intent_test.cpp"],
+    deps = [
+        ":stop_intent",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -139,6 +229,16 @@ cc_library(
     srcs = ["intent.cpp"],
     hdrs = ["intent.h"],
     deps = [":avoid_area"],
+)
+
+cc_test(
+    name = "intent_test",
+    srcs = ["intent_test.cpp"],
+    deps = [
+        ":intent",
+        ":move_intent",
+        "@gtest//:gtest_main",
+    ],
 )
 
 cc_library(
