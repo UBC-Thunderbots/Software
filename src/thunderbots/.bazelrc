@@ -5,7 +5,7 @@ build --cxxopt='-std=c++17'
 build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache
 
 # Don't Try to Upload Results (since CI does not currently have required credentials)
-build --remote_upload_local_results=false --spawn_strategy=standalone
+build --remote_upload_local_results=false
 
 # Credentials for Uploading Build Results To Our Remote Cache
 #build --google_credentials="/home/gareth/Downloads/tbots-bazel-cache-key.json"
