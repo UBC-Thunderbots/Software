@@ -39,7 +39,7 @@ if [ "$RUN_BUILD" == "true" ] || \
 
     # Build the codebase
     pushd src/thunderbots/
-    travis_run bazel build //... --compilation_mode=fastbuild
+    #travis_run bazel build //... --compilation_mode=fastbuild
     popd
 fi
 
