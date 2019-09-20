@@ -58,10 +58,12 @@ TEST_P(GoalieRestrainTest, goalie_position_safe)
     restrained_position =
         tactic.restrainGoalieInRectangle(requested_position, big_rectangle);
 
-    EXPECT_EQ(*restrained_position, requested_position);
+    EXPECT_NEAR((*restrained_position).x(), requested_position.x(), 0.001);
+    EXPECT_NEAR((*restrained_position).y(), requested_position.y(), 0.001);
     EXPECT_TRUE(big_rectangle.containsPoint(requested_position));
     EXPECT_TRUE(big_rectangle.containsPoint(*restrained_position));
 }
 
 INSTANTIATE_TEST_CASE_P(Positions, GoalieRestrainTest,
-                        ::testing::Values(Point(2, 1), Point(1, 2), Point(2, 3)));
+                        ::testing::Values(Point(2, 0), Point(0, 2), Point(2, 3),
+                                          Point(2, 2), Point(3, 3), Point(4, 2)));
