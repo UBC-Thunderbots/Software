@@ -67,6 +67,7 @@ sudo apt-get update
 
 dependencies=(
     curl
+    cmake
 )
 sudo apt-get install ${dependencies[@]} -y
 
