@@ -1,3 +1,7 @@
+# Description:
+#   G3log is a logging library that allows us to publish at multiple logging levels,
+#   log to custom sinks, etc.
+
 cc_library(
     name = "all",
     srcs = glob(

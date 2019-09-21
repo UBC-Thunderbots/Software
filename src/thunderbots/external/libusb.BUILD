@@ -1,3 +1,6 @@
+# Description:
+#   This library provides us with abstractions for working with USB devices
+
 cc_library(
     name = "all",
     srcs = glob([
