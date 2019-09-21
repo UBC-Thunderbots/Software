@@ -59,6 +59,25 @@ do
     fi
 done
 
+echo "================================================================"
+echo "Installing Dependecies"
+echo "================================================================"
+
+sudo apt-get update
+
+dependencies=(
+    curl
+)
+sudo apt-get install ${dependencies[@]} -y
+
+if [ $? -ne 0 ]; then
+    echo "##############################################################"
+    echo "Error: Installing dependencies failed"
+    echo "##############################################################"
+    exit 1
+fi
+
+
 # Install Bazel
 echo "================================================================" 
 echo "Installing Bazel"
