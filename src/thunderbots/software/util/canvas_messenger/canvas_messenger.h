@@ -129,8 +129,6 @@ namespace Util
          */
         static std::shared_ptr<CanvasMessenger> getInstance();
 
-        //        void initializePublisher(ros::NodeHandle node_handle);
-
         /**
          * Uses ROS publishers to publish sprite data for each layer and
          * then clears all layer data.
