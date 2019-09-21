@@ -5,7 +5,7 @@
 #include <chrono>
 #include <exception>
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
+
 #include <random>
 
 #include "software/ai/hl/stp/play/play.h"

@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 // Implement concrete functions shared by all intents
 

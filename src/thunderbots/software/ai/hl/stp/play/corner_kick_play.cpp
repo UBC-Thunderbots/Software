@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/ball.h"

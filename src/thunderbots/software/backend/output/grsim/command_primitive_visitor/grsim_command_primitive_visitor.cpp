@@ -1,7 +1,6 @@
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 #include "shared/constants.h"
 #include "software/ai/primitive/catch_primitive.h"

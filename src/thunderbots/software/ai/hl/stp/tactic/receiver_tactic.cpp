@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"

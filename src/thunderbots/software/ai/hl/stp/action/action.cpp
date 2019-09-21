@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/action/action.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 Action::Action()
     : intent_sequence(boost::bind(&Action::calculateNextIntentWrapper, this, _1))

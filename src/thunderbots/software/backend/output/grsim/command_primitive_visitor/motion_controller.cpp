@@ -15,7 +15,6 @@
 
 #include <algorithm>
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 // Creates a struct which inherits all lambda function given to it and uses their
 // Ts::operator(). This can be passed to std::visit to easily write multiple different

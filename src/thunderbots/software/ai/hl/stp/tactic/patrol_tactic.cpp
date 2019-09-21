@@ -1,7 +1,6 @@
 #include "software/ai/hl/stp/tactic/patrol_tactic.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"

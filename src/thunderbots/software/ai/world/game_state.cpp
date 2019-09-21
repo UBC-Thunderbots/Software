@@ -1,7 +1,6 @@
 #include "software/ai/world/game_state.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 bool GameState::isHalted() const
 {

@@ -6,7 +6,6 @@
 #include "software/ai/navigator/path_planning_navigator/path_planner/theta_star_path_planner.h"
 
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
 
 ThetaStarPathPlanner::ThetaStarPathPlanner(Field field,
                                            const std::vector<Obstacle> &obstacles)
