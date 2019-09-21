@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/intent/intent.h"
-#include "ai/intent/visitor/intent_visitor.h"
-#include "ai/navigator/navigator.h"
-#include "ai/primitive/primitive.h"
+#include "software/ai/intent/intent.h"
+#include "software/ai/intent/intent_visitor.h"
+#include "software/ai/navigator/navigator.h"
+#include "software/ai/primitive/primitive.h"
 
 /**
  * This PlaceholderNavigator is a simple navigator that will convert the given Intents

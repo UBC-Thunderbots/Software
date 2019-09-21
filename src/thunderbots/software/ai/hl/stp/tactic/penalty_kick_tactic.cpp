@@ -1,15 +1,17 @@
 /**
  * Implementation of the PenaltyKickTactic
  */
-#include "penalty_kick_tactic.h"
+#include "software/ai/hl/stp/tactic/penalty_kick_tactic.h"
 
-#include "ai/hl/stp/action/dribble_action.h"
-#include "ai/hl/stp/action/kick_action.h"
-#include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
-#include "geom/util.h"
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 #include "shared/constants.h"
-#include "util/logger/init.h"
+#include "software/ai/hl/stp/action/dribble_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/geom/util.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
@@ -35,7 +37,6 @@ void PenaltyKickTactic::updateParams(const Ball& updated_ball,
 
 double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& world)
 {
-    // Prefer robots closer to the pass start position
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =

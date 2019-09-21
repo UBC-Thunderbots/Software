@@ -1,12 +1,14 @@
-#include "ai/hl/stp/action/pivot_action.h"
+#include "software/ai/hl/stp/action/pivot_action.h"
 
-#include "ai/intent/move_intent.h"
-#include "ai/intent/pivot_intent.h"
-#include "geom/angle.h"
-#include "geom/util.h"
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 #include "shared/constants.h"
-#include "util/logger/init.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/ai/intent/pivot_intent.h"
+#include "software/geom/angle.h"
+#include "software/geom/util.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 PivotAction::PivotAction() : Action() {}
 

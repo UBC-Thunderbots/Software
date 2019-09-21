@@ -2,10 +2,10 @@
  * Definition for the CherryPickTactic class
  */
 
-#include "ai/hl/stp/tactic/cherry_pick_tactic.h"
+#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
-#include "ai/hl/stp/action/move_action.h"
-#include "geom/util.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/geom/util.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : pass_generator(world, world.ball().position()),

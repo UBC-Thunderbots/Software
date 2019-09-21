@@ -1,19 +1,19 @@
-#include "ai/hl/stp/stp.h"
+#include "software/ai/hl/stp/stp.h"
 
-#include <ai/hl/stp/play/play_factory.h>
 #include <munkres/munkres.h>
 
 #include <chrono>
 #include <exception>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include <random>
 
-#include "ai/ai.h"
-#include "ai/hl/stp/play/halt_play.h"
-#include "ai/hl/stp/play/play.h"
-#include "ai/hl/stp/tactic/tactic.h"
-#include "ai/intent/stop_intent.h"
-#include "util/logger/init.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/ai/hl/stp/play/play.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/hl/stp/play_info.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/intent/stop_intent.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 STP::STP(std::function<std::unique_ptr<Play>()> default_play_constructor,
          long random_seed)

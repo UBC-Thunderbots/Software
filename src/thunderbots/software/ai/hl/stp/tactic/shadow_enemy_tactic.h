@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/hl/stp/evaluation/enemy_threat.h"
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The ShadowEnemyTactic will shadow and mark the robot specified in the given

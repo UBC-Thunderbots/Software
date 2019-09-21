@@ -1,7 +1,5 @@
 #pragma once
 
-#include <ros/ros.h>
-
 #include <string>
 #include <vector>
 
@@ -10,7 +8,7 @@
 // accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
 //
-// This class can be found in ai/primitive/visitor/primitive_visitor.h
+// This class can be found in ai/primitive/primitive_visitor.h
 class PrimitiveVisitor;
 
 /**

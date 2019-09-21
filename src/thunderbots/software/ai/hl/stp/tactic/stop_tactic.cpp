@@ -1,8 +1,8 @@
-#include "ai/hl/stp/tactic/stop_tactic.h"
+#include "software/ai/hl/stp/tactic/stop_tactic.h"
 
 #include <algorithm>
 
-#include "ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 
 StopTactic::StopTactic(bool coast, bool loop_forever) : coast(coast), Tactic(loop_forever)
 {

@@ -1,9 +1,8 @@
 #pragma once
-#include <ros/ros.h>
 
 #include <boost/signals2.hpp>
 
-#include "backend/robot_status.h"
+#include "software/backend/robot_status.h"
 
 /**
  * This class publishes messages received from the dongle.

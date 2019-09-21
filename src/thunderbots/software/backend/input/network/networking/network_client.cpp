@@ -1,11 +1,12 @@
-#include "backend/input/network/networking/network_client.h"
+#include "software/backend/input/network/networking/network_client.h"
 
 #include <boost/bind.hpp>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include <limits>
 
-#include "util/constants.h"
-#include "util/logger/init.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/util/constants.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 NetworkClient::NetworkClient(std::string vision_multicast_address,
                              int vision_multicast_port,

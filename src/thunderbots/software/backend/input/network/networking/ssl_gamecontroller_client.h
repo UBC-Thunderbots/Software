@@ -4,7 +4,7 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "proto/ssl_referee.pb.h"
+#include "software/proto/ssl_referee.pb.h"
 
 class SSLGameControllerClient
 {

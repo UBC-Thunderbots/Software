@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <ros/ros.h>
-
 #include <chrono>
 #include <map>
 #include <memory>
@@ -18,13 +16,12 @@
 #include <string>
 #include <vector>
 
-#include "ai/world/ball.h"
-#include "ai/world/field.h"
-#include "ai/world/robot.h"
-#include "ai/world/world.h"
-#include "geom/polygon.h"
-#include "thunderbots_msgs/CanvasLayer.h"
-#include "util/constants.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/robot.h"
+#include "software/ai/world/world.h"
+#include "software/geom/polygon.h"
+#include "software/util/constants.h"
 
 namespace Util
 {
@@ -132,7 +129,7 @@ namespace Util
          */
         static std::shared_ptr<CanvasMessenger> getInstance();
 
-        void initializePublisher(ros::NodeHandle node_handle);
+        //        void initializePublisher(ros::NodeHandle node_handle);
 
         /**
          * Uses ROS publishers to publish sprite data for each layer and
@@ -268,7 +265,7 @@ namespace Util
         /**
          * Constructor; initializes an empty layers map then populates it
          */
-        explicit CanvasMessenger() : layers_map(), publisher() {}
+        explicit CanvasMessenger() : layers_map() /*, publisher()*/ {}
 
         void publishPayload(uint8_t layer, std::vector<Sprite> shapes);
 
@@ -292,7 +289,7 @@ namespace Util
          */
         void clearAllLayers();
 
-        std::optional<ros::Publisher> publisher;
+        //        std::optional<ros::Publisher> publisher;
 
         // Period in nanoseconds
         const double DESIRED_PERIOD_MS =

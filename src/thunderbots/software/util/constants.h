@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "../ai/world/team.h"
-
 namespace Util
 {
     namespace Constants

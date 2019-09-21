@@ -1,5 +1,7 @@
 #pragma once
 
+#include <time.h>
+
 /**
  * A simple Time class that represents some amount of Time
  *

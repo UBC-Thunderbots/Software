@@ -1,10 +1,10 @@
-#include "ai/ai.h"
+#include "software/ai/ai.h"
 
 #include <chrono>
 
-#include "ai/hl/stp/play/halt_play.h"
-#include "ai/hl/stp/stp.h"
-#include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
+#include "software/ai/hl/stp/play/halt_play.h"
+#include "software/ai/hl/stp/stp.h"
+#include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 AI::AI()
     : navigator(std::make_unique<PathPlanningNavigator>()),

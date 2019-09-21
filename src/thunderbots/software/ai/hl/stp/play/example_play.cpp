@@ -1,7 +1,7 @@
-#include "ai/hl/stp/play/example_play.h"
+#include "software/ai/hl/stp/play/example_play.h"
 
-#include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
 
 const std::string ExamplePlay::name = "Example Play";
 

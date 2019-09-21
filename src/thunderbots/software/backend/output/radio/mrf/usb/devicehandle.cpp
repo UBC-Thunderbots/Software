@@ -1,8 +1,10 @@
-#include "devicehandle.h"
+#include "software/backend/output/radio/mrf/usb/devicehandle.h"
 
-#include "libusb.h"
-#include "misc.h"
-#include "util/logger/init.h"
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
+#include "software/backend/output/radio/mrf/usb/libusb.h"
+#include "software/backend/output/radio/mrf/usb/misc.h"
 
 namespace
 {

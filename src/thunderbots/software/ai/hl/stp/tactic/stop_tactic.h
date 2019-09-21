@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The StopTactic will stop the robot from moving. The robot will actively try and brake

@@ -2,9 +2,9 @@
 
 #include <cstdint>
 
-#include "ai/primitive/primitive.h"
-#include "geom/angle.h"
-#include "geom/point.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
 
 class DirectWheelsPrimitive : public Primitive
 {

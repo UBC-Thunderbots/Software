@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
-#include "ai/intent/avoid_area.h"
+#include "software/ai/intent/avoid_area.h"
 
 // We forward-declare the IntentVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the
 // accept() function. We cannot use an #include statement because this creates a cyclic
 // dependency
 //
-// This class can be found in ai/intent/visitor/intent_visitor.h
+// This class can be found in ai/intent/intent_visitor.h
 class IntentVisitor;
 
 /**

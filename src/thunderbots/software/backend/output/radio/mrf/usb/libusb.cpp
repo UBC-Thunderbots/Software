@@ -1,4 +1,4 @@
-#include "libusb.h"
+#include "software/backend/output/radio/mrf/usb/libusb.h"
 
 #include <poll.h>
 
@@ -8,12 +8,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
 #include <iostream>
 #include <limits>
 #include <string>
 #include <thread>
-
-#include "util/logger/init.h"
 
 #define STALL_RETRIES 3
 

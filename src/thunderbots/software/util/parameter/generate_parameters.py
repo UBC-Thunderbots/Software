@@ -10,6 +10,7 @@ import time
 import sys
 import constants
 
+# TODO: removed unused bits here
 
 #######################################################################
 #                              Load Yaml                              #
@@ -233,7 +234,7 @@ def __cfg_gen(param_info: dict, file_pointer, group_name=None, namespace=None):
 #######################################################################
 
 
-def generate_header_and_cpp(param_info: dict, output_path: str):
+def generate_header_and_cpp(param_info: dict, dynamic_params_header_path: str, dynamic_params_cpp_path: str):
     """Takes the input dictionary from the parsed yaml
     and generates the respective cfg files needed
 
@@ -245,9 +246,9 @@ def generate_header_and_cpp(param_info: dict, output_path: str):
     """
     # open files
     dynamic_parameters_h = open(
-        output_path+constants.DYNAMIC_PARMETERS_HEADER, 'w')
+        dynamic_parameters_header_path, 'w')
     dynamic_parameters_cpp = open(
-        output_path+constants.DYNAMIC_PARMETERS_CPP, 'w')
+        dynamic_parameters_cpp_path, 'w')
 
     # write the header to .h .cpp file
     dynamic_parameters_h.write(constants.H_HEADER)
@@ -382,16 +383,19 @@ def generate_server_node(param_info: dict, output_path: str):
 #                                MAIN                                 #
 #######################################################################
 if __name__ == '__main__':
+    # Get command line args
+    assert(len(sys.argv) == 3)
+    dynamic_parameters_header_path = sys.argv[1]
+    dynamic_parameters_cpp_path = sys.argv[2]
+
     # get config
     config = load_configuration(constants.PATH_TO_YAML)
 
     # create folders
     if not os.path.exists(constants.PATH_TO_AUTOGEN_CPP):
         os.mkdir(constants.PATH_TO_AUTOGEN_CPP)
-    if not os.path.exists(constants.PATH_TO_AUTOGEN_CFG):
-        os.mkdir(constants.PATH_TO_AUTOGEN_CFG)
 
     # generate files
-    generate_cfg(config, constants.PATH_TO_AUTOGEN_CFG)
-    generate_header_and_cpp(config, constants.PATH_TO_AUTOGEN_CPP)
-    generate_server_node(config, constants.PATH_TO_AUTOGEN_NODE)
+    # generate_cfg(config, constants.PATH_TO_AUTOGEN_CFG)
+    generate_header_and_cpp(config, dynamic_parameters_header_path, dynamic_parameters_cpp_path)
+    # generate_server_node(config, constants.PATH_TO_AUTOGEN_NODE)

@@ -3,8 +3,8 @@
 
 #include <random>
 
-#include "geom/point.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/geom/point.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 /**
  * Finds and filters the "real" ball from the received data

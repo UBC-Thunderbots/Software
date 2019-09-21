@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
-#include "ai/passing/pass.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * This tactic is for a robot performing a penalty kick.
@@ -28,7 +27,7 @@ class PenaltyKickTactic : public Tactic
     /**
      * Updates the parameters for this PenaltyKickTactic.
      *
-     * @param updated_ball : The ball we're passing
+     * @param updated_ball : The ball
      * @param enemy_goalie : Optional variable for the enemy goalie robot
      * @param field : The Field we are playing on
      */

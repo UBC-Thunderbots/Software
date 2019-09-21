@@ -1,9 +1,9 @@
-#include "geom/rectangle.h"
+#include "software/geom/rectangle.h"
 
 #include <algorithm>
 #include <cmath>
 
-#include "geom/util.h"
+#include "software/geom/util.h"
 
 bool Rectangle::expand(double amount)
 {

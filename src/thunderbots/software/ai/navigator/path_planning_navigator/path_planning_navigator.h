@@ -1,15 +1,15 @@
 #pragma once
 
-#include <util/canvas_messenger/canvas_messenger.h>
-
-#include "ai/intent/intent.h"
-#include "ai/intent/visitor/intent_visitor.h"
-#include "ai/navigator/navigator.h"
-#include "ai/navigator/obstacle/obstacle.h"
-#include "ai/navigator/path_planner/straight_line_path_planner.h"
-#include "ai/navigator/path_planner/theta_star_path_planner.h"
-#include "ai/navigator/path_planning_navigator/path_planning_navigator.h"
-#include "ai/primitive/primitive.h"
+#include "software/ai/intent/intent.h"
+#include "software/ai/intent/intent_visitor.h"
+#include "software/ai/navigator/navigator.h"
+#include "software/ai/navigator/path_planning_navigator/obstacle/obstacle.h"
+#include "software/ai/navigator/path_planning_navigator/path_planner/straight_line_path_planner.h"
+#include "software/ai/navigator/path_planning_navigator/path_planner/theta_star_path_planner.h"
+#include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/util/canvas_messenger/canvas_messenger.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 /**
  * This PathPlanningNavigator is a simple navigator that will convert the given Intents

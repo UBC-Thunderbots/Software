@@ -4,8 +4,8 @@
 #include <optional>
 #include <vector>
 
-#include "geom/point.h"
-#include "util/time/timestamp.h"
+#include "software/geom/point.h"
+#include "software/util/time/timestamp.h"
 
 class Ball final
 {

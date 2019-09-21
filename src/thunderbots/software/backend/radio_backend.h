@@ -1,8 +1,8 @@
 #pragma once
 
-#include "backend/backend.h"
-#include "backend/input/network/networking/network_client.h"
-#include "backend/output/radio/radio_output.h"
+#include "software/backend/backend.h"
+#include "software/backend/input/network/networking/network_client.h"
+#include "software/backend/output/radio/radio_output.h"
 
 class RadioBackend : public Backend
 {

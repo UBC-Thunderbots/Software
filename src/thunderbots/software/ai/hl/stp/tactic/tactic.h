@@ -3,9 +3,9 @@
 #include <boost/coroutine2/all.hpp>
 #include <optional>
 
-#include "ai/hl/stp/action/action.h"
-#include "ai/intent/intent.h"
-#include "ai/world/world.h"
+#include "software/ai/hl/stp/action/action.h"
+#include "software/ai/intent/intent.h"
+#include "software/ai/world/world.h"
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot. For

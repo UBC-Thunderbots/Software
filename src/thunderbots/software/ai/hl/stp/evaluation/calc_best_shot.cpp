@@ -1,6 +1,6 @@
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 
-#include "geom/util.h"
+#include "software/geom/util.h"
 
 namespace Evaluation
 {

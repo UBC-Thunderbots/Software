@@ -1,15 +1,14 @@
 #pragma once
 
-#include <ai/world/ball.h>
-
 #include <boost/asio.hpp>
 #include <string>
 
-#include "ai/primitive/primitive.h"
-#include "ai/world/team.h"
-#include "geom/angle.h"
-#include "geom/point.h"
-#include "proto/grSim_Packet.pb.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/team.h"
+#include "software/geom/angle.h"
+#include "software/geom/point.h"
+#include "software/proto/grSim_Packet.pb.h"
 
 
 class GrSimOutput

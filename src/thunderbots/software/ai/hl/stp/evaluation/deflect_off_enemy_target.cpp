@@ -1,10 +1,6 @@
-//
-// Created by roark on 02/02/19.
-//
-
-#include "ai/world/field.h"
-#include "ai/world/world.h"
 #include "shared/constants.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/world.h"
 #include "software/geom/line.h"
 #include "software/geom/util.h"
 

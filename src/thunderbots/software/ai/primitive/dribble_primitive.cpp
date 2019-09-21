@@ -1,6 +1,6 @@
-#include "ai/primitive/dribble_primitive.h"
+#include "software/ai/primitive/dribble_primitive.h"
 
-#include "ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 const std::string DribblePrimitive::PRIMITIVE_NAME = "Dribble Primitive";
 

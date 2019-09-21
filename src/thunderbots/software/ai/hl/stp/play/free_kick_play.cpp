@@ -1,20 +1,20 @@
-#include "ai/hl/stp/play/free_kick_play.h"
+#include "software/ai/hl/stp/play/free_kick_play.h"
 
 #include <g3log/g3log.hpp>
 
-#include "ai/hl/stp/evaluation/calc_best_shot.h"
-#include "ai/hl/stp/evaluation/possession.h"
-#include "ai/hl/stp/play/play_factory.h"
-#include "ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "ai/hl/stp/tactic/crease_defender_tactic.h"
-#include "ai/hl/stp/tactic/move_tactic.h"
-#include "ai/hl/stp/tactic/passer_tactic.h"
-#include "ai/hl/stp/tactic/patrol_tactic.h"
-#include "ai/hl/stp/tactic/receiver_tactic.h"
-#include "ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "ai/passing/pass_generator.h"
 #include "shared/constants.h"
-#include "util/logger/custom_logging_levels.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/passer_tactic.h"
+#include "software/ai/hl/stp/tactic/patrol_tactic.h"
+#include "software/ai/hl/stp/tactic/receiver_tactic.h"
+#include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
+#include "software/ai/passing/pass_generator.h"
+#include "software/util/logger/custom_logging_levels.h"
 
 using namespace Passing;
 

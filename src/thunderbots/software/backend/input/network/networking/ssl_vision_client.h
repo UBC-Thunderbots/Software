@@ -4,7 +4,7 @@
 #include <boost/bind.hpp>
 #include <string>
 
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
 
 class SSLVisionClient
 {

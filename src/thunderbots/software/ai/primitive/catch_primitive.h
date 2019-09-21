@@ -1,8 +1,7 @@
 #pragma once
 
-#include <geom/angle.h>
-
-#include "ai/primitive/primitive.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/geom/angle.h"
 
 class CatchPrimitive : public Primitive
 {
