@@ -7,5 +7,6 @@ cc_library(
     deps = [
         "//software/backend/output/radio/mrf/util",
         "@libusb//:all",
+        "@g3log//:all",
     ],
 )
