@@ -7,6 +7,7 @@ echo "================================================================"
 clion_version="2019.2.2"
 clion_executable_path="/usr/local/bin/clion"
 
+
 # Check the correct clion version is installed
 if [ -e "/opt/clion-${clion_version}/bin/clion.sh" ] && [ -e ${clion_executable_path}-${clion_version} ]
 then
@@ -21,6 +22,14 @@ else
         sudo tar xfz /tmp/CLion-${clion_version}.tar.gz -C /opt
         sudo ln -s /opt/clion-${clion_version}/bin/clion.sh ${clion_executable_path}-${clion_version}
         sudo ln -s ${clion_executable_path}-${clion_version} $clion_executable_path
+	
+	wget -O ~/.local/share/applications/jetbrains-clion.desktop "https://raw.githubusercontent.com/pld-linux/clion/master/clion.desktop"
+	echo "Icon=/opt/CLion-${clion_version}/bin/clion.png" > ~/.local/share/applications/jetbrains-clion.desktop
+	
+	# Install clion desktop entry
+	wget -O ~/.local/share/applications/jetbrains-clion.desktop "https://raw.githubusercontent.com/pld-linux/clion/master/clion.desktop"
+	echo "Icon=/opt/clion-${clion_version}/bin/clion.png" >> ~/.local/share/applications/jetbrains-clion.desktop
+		
 fi
 
 echo "================================================================"
