@@ -117,22 +117,6 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
                          --slave /usr/bin/g++ g++ /usr/bin/g++-7 
 sudo update-alternatives --config gcc
 
-# Clone, build, and install munkres-cpp (Our Hungarian library algorithm)
-hungarian_path="/tmp/hungarian-cpp"
-if [ -d $hungarian_path ]; then
-    echo "Removing old hungarian-cpp library..."
-    sudo rm -r $hungarian_path
-fi
-
-git clone https://github.com/saebyn/munkres-cpp.git $hungarian_path
-cd $hungarian_path
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-sudo make install
-cd $CURR_DIR
-
 # yaml for cfg generation (Dynamic Parameters)
 sudo apt-get install python3-yaml -y
 
