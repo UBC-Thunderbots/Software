@@ -117,23 +117,6 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
                          --slave /usr/bin/g++ g++ /usr/bin/g++-7 
 sudo update-alternatives --config gcc
 
-# Clone, build, and install g3log. Adapted from instructions at:
-# https://github.com/KjellKod/g3log
-g3log_path="/tmp/g3log"
-if [ -d $g3log_path ]; then
-    echo "Removing old g3log..."
-    sudo rm -r $g3log_path
-fi
-
-git clone https://github.com/KjellKod/g3log.git $g3log_path
-cd $g3log_path
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make
-sudo make install
-cd $CURR_DIR
-
 # Clone, build, and install munkres-cpp (Our Hungarian library algorithm)
 hungarian_path="/tmp/hungarian-cpp"
 if [ -d $hungarian_path ]; then
