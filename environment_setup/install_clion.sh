@@ -23,9 +23,6 @@ else
         sudo ln -s /opt/clion-${clion_version}/bin/clion.sh ${clion_executable_path}-${clion_version}
         sudo ln -s ${clion_executable_path}-${clion_version} $clion_executable_path
 	
-	wget -O ~/.local/share/applications/jetbrains-clion.desktop "https://raw.githubusercontent.com/pld-linux/clion/master/clion.desktop"
-	echo "Icon=/opt/CLion-${clion_version}/bin/clion.png" > ~/.local/share/applications/jetbrains-clion.desktop
-	
 	# Install clion desktop entry
 	wget -O ~/.local/share/applications/jetbrains-clion.desktop "https://raw.githubusercontent.com/pld-linux/clion/master/clion.desktop"
 	echo "Icon=/opt/clion-${clion_version}/bin/clion.png" >> ~/.local/share/applications/jetbrains-clion.desktop
