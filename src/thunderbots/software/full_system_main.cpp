@@ -1,6 +1,5 @@
 #include <boost/program_options.hpp>
 #include <g3log/g3log.hpp>
-
 #include <iostream>
 #include <numeric>
 

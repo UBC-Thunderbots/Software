@@ -7,7 +7,6 @@
 #include <cassert>
 #include <cmath>
 #include <g3log/g3log.hpp>
-
 #include <iostream>
 #include <limits>
 #include <tuple>
