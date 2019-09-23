@@ -59,6 +59,36 @@ do
     fi
 done
 
+echo "================================================================"
+echo "Installing Utilities and Dependencies"
+echo "================================================================"
+
+sudo apt-get update
+sudo apt-get install -y software-properties-common # required for add-apt-repository
+# Required to make sure we install protobuf version 3.0.0 or greater
+sudo add-apt-repository ppa:maarten-fonville/protobuf -y
+
+sudo apt-get update
+
+host_software_packages=(
+    curl
+    cmake
+    g++-7 # We need g++ 7 or greater to support the C++17 standard
+    protobuf-compiler
+    libprotobuf-dev
+    libusb-1.0-0-dev
+    libudev-dev
+    libeigen3-dev # A math / numerical library used for things like linear regression
+)
+sudo apt-get install ${host_software_packages[@]} -y
+
+if [ $? -ne 0 ]; then
+    echo "##############################################################"
+    echo "Error: Installing utilities and dependencies failed"
+    echo "##############################################################"
+    exit 1
+fi
+
 # Install Bazel
 echo "================================================================" 
 echo "Installing Bazel"
@@ -74,41 +104,6 @@ sudo apt-get install bazel -y
 if [ $? -ne 0 ]; then
     echo "##############################################################"
     echo "Error: Installing Bazel failed"
-    echo "##############################################################"
-    exit 1
-fi
-
-echo "================================================================"
-echo "Installing Misc. Utilities"
-echo "================================================================"
-
-sudo apt-get update
-sudo apt-get install -y software-properties-common # required for add-apt-repository
-# Required to make sure we install protobuf version 3.0.0 or greater
-sudo add-apt-repository ppa:maarten-fonville/protobuf -y
-
-# Running a PPA setup script to give us access to the correct node and yarn version
-# on non-Ubuntu 18.04 systems. 
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-
-sudo apt-get update
-
-host_software_packages=(
-    g++-7 # We need g++ 7 or greater to support the C++17 standard
-    protobuf-compiler
-    libprotobuf-dev
-    libusb-1.0-0-dev
-    libudev-dev
-    libeigen3-dev # A math / numerical library used for things like linear regression
-    yarn
-)
-sudo apt-get install ${host_software_packages[@]} -y
-
-if [ $? -ne 0 ]; then
-    echo "##############################################################"
-    echo "Error: Installing utilities failed"
     echo "##############################################################"
     exit 1
 fi
