@@ -10,7 +10,9 @@ genrule(
     srcs = glob(["**/*"]),
     cmd = "\n".join([
         # Run cmake, silencing both stdout (">") and stderr ("2>")
-        "cmake external/g3log > /dev/null 2> /dev/null",
+        # Note that we also use G3log's option of changing `#define DEBUG` to
+        # `#define DBUG`
+        "cmake -DCHANGE_G3LOG_DEBUG_TO_DBUG=True external/g3log > /dev/null 2> /dev/null",
         # Copy the generated header to the location bazel expects it
         "mv include/g3log/generated_definitions.hpp $@",
     ]),
