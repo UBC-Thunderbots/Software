@@ -32,5 +32,8 @@ class Navigator
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) = 0;
 
+    virtual std::vector<std::vector<Point>> getPlannedPaths() const = 0;
+//    virtual std::vector<Obstacle> getObstacles() = 0;
+
     virtual ~Navigator() = default;
 };

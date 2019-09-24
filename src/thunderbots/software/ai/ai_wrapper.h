@@ -10,13 +10,14 @@
 #include "primitive/primitive.h"
 #include "thunderbots_msgs/PlayInfo.h"
 #include "typedefs.h"
+#include <QGraphicsScene>
 
 /**
  * This class wraps an `AI` object, performing all the work of receiving World
  * objects, passing them to the `AI`, getting the primitives to send to the
  * robots based on the World state, and sending them out.
  */
-class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveVectorPtr>
+class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveVectorPtr>, public Subject<std::shared_ptr<QGraphicsScene>>
 {
    public:
     AIWrapper() = delete;
@@ -38,6 +39,9 @@ class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveV
      * observers
      */
     void runAIAndSendPrimitives();
+
+    // TODO: comment
+    void drawAI();
 
     /**
      * Publish the requisite ROS messages to draw the current state of the world

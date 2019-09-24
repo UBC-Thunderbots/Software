@@ -61,6 +61,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 
     if (path_points)
     {
+        planned_paths.emplace_back(path_points.value());
         if ((*path_points).size() > 2)
         {
             current_destination = (*path_points)[1];
@@ -198,6 +199,7 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
     this->world              = world;
     this->current_robot      = std::nullopt;
     this->velocity_obstacles = {};
+    this->planned_paths.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -226,6 +228,10 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         Util::CanvasMessenger::Layer::NAVIGATOR);
 
     return assigned_primitives;
+}
+
+std::vector<std::vector<Point>> PathPlanningNavigator::getPlannedPaths() const {
+    return planned_paths;
 }
 
 std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(

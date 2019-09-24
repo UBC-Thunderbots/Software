@@ -165,10 +165,20 @@ void MainWidget::setupDefendingSideComboBox() {
     connect(main_widget->defending_side_combo_box, &QComboBox::currentTextChanged, on_defending_side_changed);
 }
 
-void MainWidget::drawAI(World world)
+void MainWidget::drawAI(World world, QGraphicsScene* s)
 {
     scene->clear();
     drawWorld(scene, world);
+    if(s) {
+        std::cout << "DOING DRAW AI CALL" << std::endl;
+        s->clear();
+        for(auto item : s->items()) {
+//            s.removeItem(item);
+//            std::cout << "num s items: " << s->items().size() << std::endl;
+//            item->setParentItem(scene);
+//            scene->addItem(item);
+        }
+    }
     if(first_draw_call) {
         main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
         first_draw_call = false;

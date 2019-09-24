@@ -24,10 +24,21 @@ void VisualizerWrapper::onValueReceived(World world) {
     drawAI();
 }
 
+void VisualizerWrapper::onValueReceived(std::shared_ptr<QGraphicsScene> scene) {
+    most_recent_scene = scene;
+    drawAI();
+}
+
 void VisualizerWrapper::drawAI() {
     // Call the ThunderbotsVisualizer to draw the AI in a threadsafe manner
     // See https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-    QMetaObject::invokeMethod(visualizer.get(), "drawAI", Qt::ConnectionType::BlockingQueuedConnection, Q_ARG(World, most_recent_world));
+//    QMetaObject::invokeMethod(visualizer.get(), "drawAI", Qt::ConnectionType::BlockingQueuedConnection, Q_ARG(World, most_recent_world), Q_ARG(std::shared_ptr<QGraphicsScene>, most_recent_scene));
+//    QMetaObject::invokeMethod(visualizer.get(), "drawAI", Qt::ConnectionType::BlockingQueuedConnection, Q_ARG(World, most_recent_world), Q_ARG(std::shared_ptr<QGraphicsScene>, nullptr));
+//    QMetaObject::invokeMethod(visualizer.get(), "drawAI", Qt::ConnectionType::QueuedConnection, Q_ARG(World, most_recent_world), Q_ARG(std::shared_ptr<QGraphicsScene>, most_recent_scene));
+    if(most_recent_scene) {
+        std::cout << "most recent scene NOT null" << std::endl;
+        QMetaObject::invokeMethod(visualizer.get(), "drawAI", Qt::ConnectionType::DirectConnection, Q_ARG(World, most_recent_world), Q_ARG(QGraphicsScene*, most_recent_scene.get()));
+    }
 }
 
 void VisualizerWrapper::createAndRunVisualizer(int argc, char** argv,

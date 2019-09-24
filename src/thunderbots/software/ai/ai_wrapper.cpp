@@ -5,6 +5,7 @@
 #include "thunderbots_msgs/PlayInfo.h"
 #include "util/canvas_messenger/canvas_messenger.h"
 #include "util/parameter/dynamic_parameters.h"
+#include "gui/drawing/navigator.h"
 
 AIWrapper::AIWrapper(ros::NodeHandle node_handle)
 {
@@ -16,6 +17,7 @@ void AIWrapper::onValueReceived(World world)
 {
     most_recent_world = world;
     runAIAndSendPrimitives();
+    drawAI();
     publishPlayInfo();
     drawWorld();
 }
@@ -36,8 +38,16 @@ void AIWrapper::runAIAndSendPrimitives()
         auto new_primitives_ptr =
             std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
                 std::move(new_primitives));
-        sendValueToObservers(new_primitives_ptr);
+        Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(new_primitives_ptr);
     }
+}
+
+void AIWrapper::drawAI() {
+    auto paths = ai.getNavigator()->getPlannedPaths();
+    auto scene = std::make_shared<QGraphicsScene>();
+    drawRobotPaths(&(*scene), paths);
+    std::cout << "sending paths" << std::endl;
+    Subject<std::shared_ptr<QGraphicsScene>>::sendValueToObservers(scene);
 }
 
 void AIWrapper::drawWorld()

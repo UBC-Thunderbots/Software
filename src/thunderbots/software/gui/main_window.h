@@ -23,7 +23,8 @@ class ThunderbotsVisualizer : public QMainWindow
      *
      * @param world The world to draw
      */
-    void drawAI(World world);
+    void drawAI(World world, QGraphicsScene* scene);
+
 
    private:
     // Unfortunately Qt uses raw pointers

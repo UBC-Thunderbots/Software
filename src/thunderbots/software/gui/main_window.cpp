@@ -10,6 +10,7 @@ ThunderbotsVisualizer::~ThunderbotsVisualizer()
     delete main_widget;
 }
 
-void ThunderbotsVisualizer::drawAI(World world) {
-    main_widget->drawAI(world);
+void ThunderbotsVisualizer::drawAI(World world, QGraphicsScene* scene) {
+    std::cout << "got scene reference" << std::endl;
+    main_widget->drawAI(world, scene);
 }

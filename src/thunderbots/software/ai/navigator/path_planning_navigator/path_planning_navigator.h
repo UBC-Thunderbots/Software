@@ -28,6 +28,8 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
+    std::vector<std::vector<Point>> getPlannedPaths() const override;
+
     /**
      * Visits a CatchIntent to perform an operation.
      *
@@ -128,6 +130,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
     Point current_destination;
 
     std::vector<Obstacle> velocity_obstacles;
+    std::vector<std::vector<Point>> planned_paths;
 
     /**
      * Creates a list of obstacles to avoid based on avoid areas,

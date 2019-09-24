@@ -15,6 +15,10 @@ std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimiti
     return assigned_primitives;
 }
 
+std::vector<std::vector<Point>> PlaceholderNavigator::getPlannedPaths() const {
+    return {};
+}
+
 void PlaceholderNavigator::visit(const CatchIntent &catch_intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(catch_intent);

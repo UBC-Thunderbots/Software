@@ -11,7 +11,7 @@
  * This class wraps our 'ThunderbotsVisualizer' object which is responsible for visualizing information about our AI,
  * and allowing users to control it.
  */
-class VisualizerWrapper : public ThreadedObserver<World> {
+class VisualizerWrapper : public ThreadedObserver<World>, public ThreadedObserver<std::shared_ptr<QGraphicsScene>> {
 public:
     VisualizerWrapper() = delete;
 
@@ -43,6 +43,7 @@ private:
             std::shared_ptr<std::promise<std::shared_ptr<ThunderbotsVisualizer>>> visualizer_promise_ptr);
 
     void onValueReceived(World world) override;
+    void onValueReceived(std::shared_ptr<QGraphicsScene> scene) override;
 
     /**
      * Draws all the AI information in the Visualizer. This includes visualizing the state of the world
@@ -51,6 +52,7 @@ private:
     void drawAI();
 
     World most_recent_world;
+    std::shared_ptr<QGraphicsScene> most_recent_scene;
     std::thread run_visualizer_thread;
     std::shared_ptr<ThunderbotsVisualizer> visualizer;
     std::shared_ptr<QApplication> application;

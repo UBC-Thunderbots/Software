@@ -116,7 +116,8 @@ void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
     backend->Subject<World>::registerObserver(visualizer);
-    ai->registerObserver(backend);
+    ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+    ai->Subject<std::shared_ptr<QGraphicsScene>>::registerObserver(visualizer);
 }
 
 int main(int argc, char **argv)

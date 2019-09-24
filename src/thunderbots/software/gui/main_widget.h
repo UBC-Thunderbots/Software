@@ -36,7 +36,7 @@ class MainWidget : public QWidget
      *
      * @param world The world to draw
      */
-    void drawAI(World world);
+    void drawAI(World world, QGraphicsScene* s);
 
     // TODO: comment
     void updateRobotStatusMessages();
