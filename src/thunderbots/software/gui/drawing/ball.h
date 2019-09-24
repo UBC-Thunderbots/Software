@@ -3,6 +3,7 @@
 #include <QtWidgets/QGraphicsScene>
 
 #include "software/ai/world/ball.h"
+#include "software/gui/drawing/typedefs.h"
 
 /**
  * This file contains all the functions that allow us to draw a Ball in a
@@ -34,3 +35,6 @@ void drawBallPosition(QGraphicsScene *scene, const Ball &ball, const QColor &col
  * @param ball The ball to draw
  */
 void drawBall(QGraphicsScene *scene, const Ball &ball);
+
+// TODO: comment
+DrawFunction drawBallTest(const Ball& ball);

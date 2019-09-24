@@ -34,6 +34,10 @@ void VisualizerWrapper::onValueReceived(World world)
     drawAI();
 }
 
+void VisualizerWrapper::onValueReceived(DrawFunction draw_function) {
+    std::cout << "\nFOOBAR\n" << std::endl;
+}
+
 void VisualizerWrapper::drawAI()
 {
     // Call the ThunderbotsVisualizer to draw the AI in a threadsafe manner

@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "software/ai/world/world.h"
+#include "software/gui/drawing/typedefs.h"
 #include "software/gui/widgets/main_window.h"
 #include "software/multithreading/threaded_observer.h"
 
@@ -12,7 +13,7 @@
  * This class wraps our 'ThunderbotsVisualizer' object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class VisualizerWrapper : public ThreadedObserver<World>
+class VisualizerWrapper : public ThreadedObserver<World>, public ThreadedObserver<DrawFunction>
 {
    public:
     VisualizerWrapper() = delete;
@@ -52,6 +53,8 @@ class VisualizerWrapper : public ThreadedObserver<World>
             visualizer_promise_ptr);
 
     void onValueReceived(World world) override;
+
+    void onValueReceived(DrawFunction draw_function) override;
 
     /**
      * Draws all the AI information in the Visualizer. This includes visualizing the state

@@ -18,6 +18,7 @@ cc_library(
         "world.h",
     ],
     deps = [
+        "typedefs",
         "//software/ai/world",
         "//software/ai/world:ball",
         "//software/ai/world:field",
@@ -28,6 +29,15 @@ cc_library(
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_opengl",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "typedefs",
+    srcs = [],
+    hdrs = ["typedefs.h"],
+    deps = [
         "@qt//:qt_widgets",
     ],
 )

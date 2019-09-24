@@ -9,6 +9,7 @@ cc_binary(
     name = "full_system",
     srcs = ["full_system_main.cpp"],
     deps = [
+        ":typedefs",
         "//software/ai:ai_wrapper",
         "//software/backend:backend_factory",
         "//software/backend:grsim_backend",

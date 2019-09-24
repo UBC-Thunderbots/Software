@@ -10,6 +10,8 @@
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 #include "software/gui/visualizer_wrapper.h"
+#include "software/gui/drawing/typedefs.h"
+#include "software/typedefs.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -103,7 +105,8 @@ void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
     backend->Subject<World>::registerObserver(visualizer);
-    ai->registerObserver(backend);
+    ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+    ai->Subject<DrawFunction>::registerObserver(visualizer);
 }
 
 int main(int argc, char **argv)

@@ -5,13 +5,14 @@
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/typedefs.h"
+#include "software/gui/drawing/typedefs.h"
 
 /**
  * This class wraps an `AI` object, performing all the work of receiving World
  * objects, passing them to the `AI`, getting the primitives to send to the
  * robots based on the World state, and sending them out.
  */
-class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveVectorPtr>
+class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveVectorPtr>, public Subject<DrawFunction>
 {
    public:
     AIWrapper() = default;
