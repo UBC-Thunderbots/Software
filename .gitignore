@@ -34,6 +34,7 @@ CMakeFiles
 cmake_install.cmake
 Makefile
 *.cbp
+.clwb
 
 # Eclipse
 .project
@@ -112,7 +113,9 @@ Makefile
 
 #vim
 *~
-.*
+
+#bazel
+**/bazel-*
 
 #cscope
 cscope*

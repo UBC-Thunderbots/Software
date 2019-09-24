@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ai/hl/stp/action/chip_action.h"
-#include "ai/hl/stp/action/kick_action.h"
-#include "ai/hl/stp/tactic/tactic.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/action/kick_action.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The ShootGoalTactic will make the assigned robot shoot on the enemy net

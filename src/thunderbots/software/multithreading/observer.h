@@ -1,6 +1,6 @@
 #pragma once
 
-#include "multithreading/thread_safe_buffer.h"
+#include "software/multithreading/thread_safe_buffer.h"
 
 /**
  * This class observes an "Subject<T>". That is, it can be registered with an

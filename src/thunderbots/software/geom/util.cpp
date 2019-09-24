@@ -1,4 +1,4 @@
-#include "geom/util.h"
+#include "software/geom/util.h"
 
 #include <algorithm>
 #include <boost/geometry/algorithms/intersection.hpp>
@@ -7,14 +7,14 @@
 #include <cassert>
 #include <cmath>
 #include <g3log/g3log.hpp>
-#include <g3log/loglevels.hpp>
+
 #include <iostream>
 #include <limits>
 #include <tuple>
 
-#include "geom/angle.h"
-#include "geom/rectangle.h"
-#include "geom/segment.h"
+#include "software/geom/angle.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;

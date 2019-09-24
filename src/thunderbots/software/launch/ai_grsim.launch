@@ -1,8 +1,0 @@
-<launch>
-
-    <include file="$(find thunderbots)/launch/ai.launch">
-      <arg name="backend_type" value="grsim" />
-    </include>
-
-</launch>
-

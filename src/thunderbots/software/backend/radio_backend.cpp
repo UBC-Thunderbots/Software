@@ -1,7 +1,7 @@
-#include "backend/radio_backend.h"
+#include "software/backend/radio_backend.h"
 
-#include "backend/backend_factory.h"
-#include "util/constants.h"
+#include "software/backend/backend_factory.h"
+#include "software/util/constants.h"
 
 const std::string RadioBackend::name = "radio";
 

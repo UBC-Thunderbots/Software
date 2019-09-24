@@ -1,6 +1,6 @@
-#include "ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/move_action.h"
 
-#include "ai/intent/move_intent.h"
+#include "software/ai/intent/move_intent.h"
 
 MoveAction::MoveAction(double close_to_dest_threshold,
                        Angle close_to_orientation_threshold, bool loop_forever)

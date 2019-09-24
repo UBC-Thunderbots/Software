@@ -1,6 +1,6 @@
-#include "ball.h"
+#include "software/ai/world/ball.h"
 
-#include <shared/constants.h>
+#include "shared/constants.h"
 
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
            unsigned int history_duration)

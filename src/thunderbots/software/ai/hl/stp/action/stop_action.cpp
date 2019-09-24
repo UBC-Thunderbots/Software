@@ -1,6 +1,6 @@
-#include "ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 
-#include "ai/intent/stop_intent.h"
+#include "software/ai/intent/stop_intent.h"
 
 StopAction::StopAction(double stopped_speed_threshold, bool loop_forever)
     : Action(),

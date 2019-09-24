@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The ChipTactic will move the assigned robot to the given chip origin and then

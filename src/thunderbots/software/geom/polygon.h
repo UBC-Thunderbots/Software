@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "geom/ray.h"
-#include "geom/segment.h"
+#include "software/geom/ray.h"
+#include "software/geom/segment.h"
 
 class Polygon
 {

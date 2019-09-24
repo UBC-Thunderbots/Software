@@ -1,6 +1,6 @@
-#include "ai/hl/stp/action/movespin_action.h"
+#include "software/ai/hl/stp/action/movespin_action.h"
 
-#include "ai/intent/movespin_intent.h"
+#include "software/ai/intent/movespin_intent.h"
 
 MoveSpinAction::MoveSpinAction(double close_to_dest_threshold)
     : Action(), close_to_dest_threshold(close_to_dest_threshold)

@@ -3,13 +3,13 @@
  * team on the playing field
  */
 
-#include "detect_threat.h"
+#include "software/ai/hl/stp/evaluation/detect_threat.h"
 
 #include <optional>
 
-#include "ai/world/field.h"
-#include "geom/util.h"
 #include "shared/constants.h"
+#include "software/ai/world/field.h"
+#include "software/geom/util.h"
 
 namespace Evaluation
 {

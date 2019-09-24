@@ -1,6 +1,6 @@
-#include "ai/hl/stp/action/dribble_action.h"
+#include "software/ai/hl/stp/action/dribble_action.h"
 
-#include "ai/intent/dribble_intent.h"
+#include "software/ai/intent/dribble_intent.h"
 
 DribbleAction::DribbleAction(double close_to_dest_threshold, bool loop_forever)
     : Action(),

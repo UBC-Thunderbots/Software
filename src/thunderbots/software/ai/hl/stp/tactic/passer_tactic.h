@@ -3,8 +3,8 @@
  */
 #pragma once
 
-#include "ai/hl/stp/tactic/tactic.h"
-#include "ai/passing/pass.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
+#include "software/ai/passing/pass.h"
 
 /**
  * This tactic is for a robot performing a pass. It should be used in conjunction with

@@ -1,13 +1,12 @@
-#include "ball_filter.h"
-
-#include <shared/constants.h>
+#include "software/backend/input/network/filter/ball_filter.h"
 
 #include <Eigen/Dense>
 #include <algorithm>
 #include <limits>
 
-#include "geom/util.h"
-#include "util/math_functions.h"
+#include "shared/constants.h"
+#include "software/geom/util.h"
+#include "software/util/math/math_functions.h"
 
 BallFilter::BallFilter(unsigned int min_buffer_size, unsigned int max_buffer_size)
     : _min_buffer_size(min_buffer_size),

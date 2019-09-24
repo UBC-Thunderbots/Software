@@ -1,7 +1,7 @@
-#include "ai/hl/stp/evaluation/find_open_areas.h"
+#include "software/ai/hl/stp/evaluation/find_open_areas.h"
 
-#include "ai/hl/stp/evaluation/indirect_chip.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/ai/hl/stp/evaluation/indirect_chip.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
 {

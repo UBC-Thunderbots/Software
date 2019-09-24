@@ -2,7 +2,7 @@
  * Implementation for the Duration class
  */
 
-#include "duration.h"
+#include "software/util/time/duration.h"
 
 #include "shared/constants.h"
 

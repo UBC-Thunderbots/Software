@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "multithreading/observer.h"
+#include "software/multithreading/observer.h"
 
 /**
  * This class represents something that can be watched by an Observer.

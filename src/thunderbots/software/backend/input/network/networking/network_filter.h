@@ -3,16 +3,16 @@
 #include <optional>
 #include <queue>
 
-#include "ai/world/ball.h"
-#include "ai/world/field.h"
-#include "ai/world/team.h"
-#include "backend/input/network/filter/ball_filter.h"
-#include "backend/input/network/filter/robot_filter.h"
-#include "backend/input/network/filter/robot_team_filter.h"
-#include "proto/messages_robocup_ssl_wrapper.pb.h"
-#include "proto/ssl_referee.pb.h"
-#include "util/refbox_constants.h"
-#include "util/time/timestamp.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/field.h"
+#include "software/ai/world/refbox_constants.h"
+#include "software/ai/world/team.h"
+#include "software/backend/input/network/filter/ball_filter.h"
+#include "software/backend/input/network/filter/robot_filter.h"
+#include "software/backend/input/network/filter/robot_team_filter.h"
+#include "software/proto/messages_robocup_ssl_wrapper.pb.h"
+#include "software/proto/ssl_referee.pb.h"
+#include "software/util/time/timestamp.h"
 
 class NetworkFilter
 {

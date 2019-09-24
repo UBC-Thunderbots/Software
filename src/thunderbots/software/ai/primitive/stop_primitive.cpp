@@ -1,6 +1,6 @@
-#include "ai/primitive/stop_primitive.h"
+#include "software/ai/primitive/stop_primitive.h"
 
-#include "ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 const std::string StopPrimitive::PRIMITIVE_NAME = "Stop Primitive";
 

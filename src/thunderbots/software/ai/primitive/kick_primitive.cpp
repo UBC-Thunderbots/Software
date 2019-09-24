@@ -1,6 +1,6 @@
-#include "ai/primitive/kick_primitive.h"
+#include "software/ai/primitive/kick_primitive.h"
 
-#include "ai/primitive/visitor/primitive_visitor.h"
+#include "software/ai/primitive/primitive_visitor.h"
 
 const std::string KickPrimitive::PRIMITIVE_NAME = "Kick Primitive";
 

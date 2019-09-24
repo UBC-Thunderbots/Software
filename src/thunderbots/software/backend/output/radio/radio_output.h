@@ -1,13 +1,11 @@
 #pragma once
 
-#include <ros/ros.h>
-
 #include <limits>
 
-#include "ai/world/ball.h"
-#include "ai/world/team.h"
-#include "backend/robot_status.h"
-#include "mrf/dongle.h"
+#include "software/ai/world/ball.h"
+#include "software/ai/world/team.h"
+#include "software/backend/output/radio/mrf/dongle.h"
+#include "software/backend/robot_status.h"
 
 class RadioOutput
 {

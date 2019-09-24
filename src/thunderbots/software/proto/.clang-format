@@ -1,4 +1,0 @@
-# This prevents clang-format from applying formatting to this folder.
-# We don't want to bother formatting auto-generated protobuf files
-BasedOnStyle: None
-

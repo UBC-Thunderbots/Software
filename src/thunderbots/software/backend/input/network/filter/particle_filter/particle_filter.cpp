@@ -1,7 +1,7 @@
-#include "particle_filter.h"
+#include "software/particle_filter.h"
 
-#include "geom/util.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "software/geom/util.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 /* Notes on the weights and evaluation:
  * - PREDICTION_WEIGHT should always be greater than PREVIOUS_BALL_WEIGHT

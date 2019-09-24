@@ -1,8 +1,9 @@
-#include "ai/hl/stp/tactic/patrol_tactic.h"
+#include "software/ai/hl/stp/tactic/patrol_tactic.h"
 
-#include "ai/hl/stp/action/move_action.h"
-#include "ai/hl/stp/action/stop_action.h"
-#include "util/logger/init.h"
+#include <g3log/g3log.hpp>
+
+#include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
                            double at_patrol_point_tolerance,

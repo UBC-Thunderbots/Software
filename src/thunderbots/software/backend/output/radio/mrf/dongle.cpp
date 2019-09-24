@@ -1,4 +1,4 @@
-#include "dongle.h"
+#include "software/backend/output/radio/mrf/dongle.h"
 
 #include <unistd.h>
 
@@ -8,15 +8,16 @@
 #include <cstdlib>
 #include <cstring>
 #include <exception>
+#include <g3log/g3log.hpp>
+
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
 
-#include "backend/output/radio/visitor/mrf_primitive_visitor.h"
-#include "messages.h"
-#include "util/constants.h"
-#include "util/logger/init.h"
+#include "shared/constants.h"
+#include "software/backend/output/radio/mrf/messages.h"
+#include "software/backend/output/radio/mrf/mrf_primitive_visitor.h"
 
 namespace
 {

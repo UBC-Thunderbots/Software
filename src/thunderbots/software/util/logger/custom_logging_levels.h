@@ -1,6 +1,5 @@
 #pragma once
 
-#include <g3log/loglevels.hpp>
 
 // See https://github.com/KjellKod/g3log/blob/master/API.markdown#custom-logging-levels
 // for adding custom log levels

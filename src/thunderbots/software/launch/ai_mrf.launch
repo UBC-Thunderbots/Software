@@ -1,7 +1,0 @@
-<launch>
-
-    <include file="$(find thunderbots)/launch/ai.launch">
-      <arg name="backend_type" value="radio" />
-    </include>
-
-</launch>

@@ -1,9 +1,8 @@
 #pragma once
 
-#include "ai/intent/intent.h"
-#include "ai/navigator/obstacle/obstacle.h"
-#include "ai/primitive/primitive.h"
-#include "ai/world/world.h"
+#include "software/ai/intent/intent.h"
+#include "software/ai/primitive/primitive.h"
+#include "software/ai/world/world.h"
 
 /**
  * An abstraction for all navigation operations performed by our AI. The navigator is

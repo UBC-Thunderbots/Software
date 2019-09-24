@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ai/world/world.h"
-#include "geom/circle.h"
+#include "software/ai/world/world.h"
+#include "software/geom/circle.h"
 
 // TODO: doc comment here
 

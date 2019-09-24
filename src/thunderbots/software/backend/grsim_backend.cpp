@@ -1,7 +1,7 @@
-#include "backend/grsim_backend.h"
+#include "software/backend/grsim_backend.h"
 
-#include "backend/backend_factory.h"
-#include "util/constants.h"
+#include "software/backend/backend_factory.h"
+#include "software/util/constants.h"
 
 const std::string GrSimBackend::name = "grsim";
 

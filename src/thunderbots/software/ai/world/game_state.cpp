@@ -1,9 +1,6 @@
-#include "ai/world/game_state.h"
+#include "software/ai/world/game_state.h"
 
-#include "ball.h"
-#include "game_state.h"
-#include "util/logger/init.h"
-
+#include <g3log/g3log.hpp>
 
 bool GameState::isHalted() const
 {

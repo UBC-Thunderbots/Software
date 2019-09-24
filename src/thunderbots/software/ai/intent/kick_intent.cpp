@@ -1,6 +1,6 @@
-#include "ai/intent/kick_intent.h"
+#include "software/ai/intent/kick_intent.h"
 
-#include "ai/intent/visitor/intent_visitor.h"
+#include "software/ai/intent/intent_visitor.h"
 
 const std::string KickIntent::INTENT_NAME = "Kick Intent";
 

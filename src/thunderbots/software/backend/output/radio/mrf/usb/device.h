@@ -1,16 +1,19 @@
 #pragma once
-#include <libusb.h>
+#include <libusb/libusb.h>
 
 #include <cstddef>
 #include <cstdint>
 #include <string>
 
-#include "util/noncopyable.h"
+#include "software/backend/output/radio/mrf/usb/devicehandle.h"
+#include "software/backend/output/radio/mrf/util/noncopyable.h"
 
 namespace USB
 {
     /* Forward declaration of the libusb context */
     class Context;
+
+    class DeviceHandle;
 
     /**
      * A collection of information about a USB device.
