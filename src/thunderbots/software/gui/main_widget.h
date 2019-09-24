@@ -2,13 +2,13 @@
 
 #include <QGL>
 #include <QGraphicsScene>
-#include <QTableWidget>
 #include <QOpenGLWidget>
+#include <QTableWidget>
 #include <QWidget>
 
+#include "ai/world/world.h"
 #include "gui/zoomable_qgraphics_view.h"
 #include "util/parameter/parameter.h"
-#include "ai/world/world.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui
@@ -31,8 +31,9 @@ class MainWidget : public QWidget
    public slots:
 
     /**
-     * Draws all the AI information we want to display in the Visualizer. This includes visualizing the state of
-     * the world as well as drawing the AI state we want to show, like planned navigator paths.
+     * Draws all the AI information we want to display in the Visualizer. This includes
+     * visualizing the state of the world as well as drawing the AI state we want to show,
+     * like planned navigator paths.
      *
      * @param world The world to draw
      */
@@ -43,12 +44,14 @@ class MainWidget : public QWidget
 
    private:
     /**
-     * Sets up the SceneView which draws the AI's view of the world, such as robot positions, ball velocity, etc.
+     * Sets up the SceneView which draws the AI's view of the world, such as robot
+     * positions, ball velocity, etc.
      * @param view The view to display the QGraphicsScene with
      * @param scene The QGraphicsScene that will be dislpayed by the view
      * @param gl_widget A QOpenGLWidget that can be used to help display items in the view
      */
-    void setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget);
+    void setupSceneView(QGraphicsView* view, QGraphicsScene* scene,
+                        QOpenGLWidget* gl_widget);
 
     /**
      * Sets up the status table that displays robot status
@@ -57,8 +60,8 @@ class MainWidget : public QWidget
     void setupStatusTable(QTableWidget* table);
 
     /**
-     * Sets up all the widgets that will be used to control the AI, such as starting or stopping it, or choosing
-     * the colour of the friendly team
+     * Sets up all the widgets that will be used to control the AI, such as starting or
+     * stopping it, or choosing the colour of the friendly team
      */
     void setupAIControls();
 
@@ -73,7 +76,8 @@ class MainWidget : public QWidget
     void setupTeamColourComboBox();
 
     /**
-     * Sets up the ComboBox widget that will be used to select the side the friendly team is defending
+     * Sets up the ComboBox widget that will be used to select the side the friendly team
+     * is defending
      */
     void setupDefendingSideComboBox();
 
@@ -93,35 +97,40 @@ class MainWidget : public QWidget
     void setupParametersTab();
 
     /**
-     * Creates a widget that contains the components necessary to display and control a boolean Parameter for the AI
+     * Creates a widget that contains the components necessary to display and control a
+     * boolean Parameter for the AI
      * @param parameter The boolean parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createBooleanParameter(Parameter<bool> *parameter);
+    QWidget* createBooleanParameter(Parameter<bool>* parameter);
 
     /**
-     * Creates a widget that contains the components necessary to display and control an integer Parameter for the AI
+     * Creates a widget that contains the components necessary to display and control an
+     * integer Parameter for the AI
      * @param parameter The integer parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createIntegerParameter(Parameter<int> *parameter);
+    QWidget* createIntegerParameter(Parameter<int>* parameter);
 
     /**
-     * Creates a widget that contains the components necessary to display and control a double Parameter for the AI
+     * Creates a widget that contains the components necessary to display and control a
+     * double Parameter for the AI
      * @param parameter The double parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createDoubleParameter(Parameter<double> *parameter);
+    QWidget* createDoubleParameter(Parameter<double>* parameter);
 
     /**
-     * Creates a widget that contains the components necessary to display and control a string Parameter for the AI
+     * Creates a widget that contains the components necessary to display and control a
+     * string Parameter for the AI
      * @param parameter The string parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
-    QWidget* createStringParameter(Parameter<std::string> *parameter);
+    QWidget* createStringParameter(Parameter<std::string>* parameter);
 
     // TODO: comment
-    void setRobotStatus(QTableWidget* table, std::vector<std::string> robot_status_messages);
+    void setRobotStatus(QTableWidget* table,
+                        std::vector<std::string> robot_status_messages);
 
     bool first_draw_call;
     // Unfortunately Qt uses raw pointers

@@ -2,8 +2,7 @@
 
 // No special behaviour beyond the regular QGraphicsView. All configuration should
 // be done by the caller that owns instances of this object
-ZoomableQGraphicsView::ZoomableQGraphicsView(QWidget *parent) : QGraphicsView(parent)
-{}
+ZoomableQGraphicsView::ZoomableQGraphicsView(QWidget *parent) : QGraphicsView(parent) {}
 
 void ZoomableQGraphicsView::wheelEvent(QWheelEvent *event)
 {

@@ -2,8 +2,8 @@
 
 #include <QMainWindow>
 
-#include "gui/main_widget.h"
 #include "ai/world/world.h"
+#include "gui/main_widget.h"
 
 /**
  * This is the main window / application object for the thunderbots visualizer
@@ -18,8 +18,9 @@ class ThunderbotsVisualizer : public QMainWindow
     ~ThunderbotsVisualizer();
    public slots:
     /**
-     * Draws all the AI information we want to display in the Visualizer. This includes visualizing the state of
-     * the world as well as drawing the AI state we want to show, like planned navigator paths.
+     * Draws all the AI information we want to display in the Visualizer. This includes
+     * visualizing the state of the world as well as drawing the AI state we want to show,
+     * like planned navigator paths.
      *
      * @param world The world to draw
      */
