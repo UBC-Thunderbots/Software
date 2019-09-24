@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 #include <future>
 #include <thread>
 
-#include "ai/world/world.h"
-#include "gui/main_window.h"
-#include "multithreading/threaded_observer.h"
+#include "software/ai/world/world.h"
+#include "software/gui/widgets/main_window.h"
+#include "software/multithreading/threaded_observer.h"
 
 /**
  * This class wraps our 'ThunderbotsVisualizer' object which is responsible for

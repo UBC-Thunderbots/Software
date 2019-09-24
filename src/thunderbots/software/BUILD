@@ -13,6 +13,7 @@ cc_binary(
         "//software/backend:backend_factory",
         "//software/backend:grsim_backend",
         "//software/backend:radio_backend",
+        "//software/gui:visualizer_wrapper",
         "//software/util:constants",
         "//software/util/canvas_messenger",
         "//software/util/logger",

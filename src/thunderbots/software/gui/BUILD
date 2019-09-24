@@ -1,0 +1,15 @@
+load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "visualizer_wrapper",
+    srcs = ["visualizer_wrapper.cpp"],
+    hdrs = ["visualizer_wrapper.h"],
+    deps = [
+        "//software/ai/world",
+        "//software/gui/widgets:main_window",
+        "//software/multithreading:threaded_observer",
+        "@qt//:qt_widgets",
+    ],
+)

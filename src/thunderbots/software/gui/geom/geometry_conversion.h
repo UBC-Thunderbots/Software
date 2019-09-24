@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QLine>
-#include <QPoint>
-#include <QRect>
+#include <QtCore/QLine>
+#include <QtCore/QPoint>
+#include <QtCore/QRect>
 
-#include "geom/point.h"
-#include "geom/rectangle.h"
-#include "geom/segment.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
+#include "software/geom/segment.h"
 
 /**
  * Converts our Point class to a QPointF

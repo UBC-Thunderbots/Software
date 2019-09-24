@@ -1,14 +1,13 @@
 #pragma once
 
-#include <QGL>
-#include <QGraphicsScene>
-#include <QOpenGLWidget>
-#include <QTableWidget>
-#include <QWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QOpenGLWidget>
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QWidget>
 
-#include "ai/world/world.h"
-#include "gui/zoomable_qgraphics_view.h"
-#include "util/parameter/parameter.h"
+#include "software/ai/world/world.h"
+#include "software/gui/widgets/zoomable_qgraphics_view.h"
+#include "software/util/parameter/parameter.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui

@@ -6,11 +6,10 @@
 
 #include "software/ai/ai_wrapper.h"
 #include "software/backend/backend_factory.h"
-#include "software/backend/grsim_backend.h"
-#include "software/backend/radio_backend.h"
 #include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
+#include "software/gui/visualizer_wrapper.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -20,7 +19,7 @@ namespace
 {
     std::shared_ptr<AIWrapper> ai;
     std::shared_ptr<Backend> backend;
-//    std::shared_ptr<VisualizerWrapper> visualizer;
+    std::shared_ptr<VisualizerWrapper> visualizer;
 }  // namespace
 
 // clang-format off
@@ -103,7 +102,7 @@ bool parseCommandLineArgs(int argc, char **argv)
 void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
-//    backend->Subject<World>::registerObserver(visualizer);
+    backend->Subject<World>::registerObserver(visualizer);
     ai->registerObserver(backend);
 }
 
@@ -111,7 +110,7 @@ int main(int argc, char **argv)
 {
     Util::Logger::LoggerSingleton::initializeLogger();
 
-//    visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
+    visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
     ai = std::make_shared<AIWrapper>();
 
     if (parseCommandLineArgs(argc, argv))

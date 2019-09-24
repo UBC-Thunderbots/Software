@@ -1,7 +1,7 @@
 #include "software/gui/drawing/field.h"
 
 #include "shared/constants.h"
-#include "software/gui/geometry_conversion.h"
+#include "software/gui/geom/geometry_conversion.h"
 
 void drawOuterFieldLines(QGraphicsScene* scene, const Field& field, QPen pen)
 {

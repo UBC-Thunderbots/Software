@@ -72,3 +72,17 @@ new_git_repository(
     remote = "https://github.com/saebyn/munkres-cpp.git",
 )
 
+# Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
+git_repository(
+    name = "bazel_rules_qt",
+    commit = "3f949bf4b5dcae2941ba3b71b3ddeb5d39637907",
+    remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
+)
+
+# Right now qt5 is installed on the system using the setup_software.sh script
+# We assume we can find the headers in the "standard" path used in this rule
+new_local_repository(
+    name = "qt",
+    build_file = "@bazel_rules_qt//:qt.BUILD",
+    path = "/usr/include/x86_64-linux-gnu/qt5/",
+)

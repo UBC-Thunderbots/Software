@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
-#include "ai/world/team.h"
+#include "software/ai/world/team.h"
 
 /**
  * This file contains all the functions that allow us to draw a Team in a

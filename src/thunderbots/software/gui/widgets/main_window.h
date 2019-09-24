@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 
-#include "ai/world/world.h"
-#include "gui/main_widget.h"
+#include "software/ai/world/world.h"
+#include "software/gui/widgets/main_widget.h"
 
 /**
  * This is the main window / application object for the thunderbots visualizer

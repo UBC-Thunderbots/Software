@@ -1,0 +1,40 @@
+load("@bazel_rules_qt//:qt.bzl", "qt_cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+qt_cc_library(
+    name = "main_widget",
+    src = "main_widget.cpp",
+    hdr = "main_widget.h",
+    deps = [
+        ":zoomable_qgraphics_view",
+        "//software/ai/hl/stp/play:play_factory",
+        "//software/ai/world",
+        "//software/gui/drawing",
+        "//software/gui/ui:main_widget",
+        "//software/util/parameter",
+        "@g3log//:all",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "main_window",
+    src = "main_window.cpp",
+    hdr = "main_window.h",
+    deps = [
+        ":main_widget",
+        "//software/ai/world",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "zoomable_qgraphics_view",
+    src = "zoomable_qgraphics_view.cpp",
+    hdr = "zoomable_qgraphics_view.h",
+    deps = [
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)

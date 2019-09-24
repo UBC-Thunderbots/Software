@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QColor>
-#include <QGraphicsScene>
+#include <QtGui/QColor>
+#include <QtWidgets/QGraphicsScene>
 
-#include "ai/world/robot.h"
+#include "software/ai/world/robot.h"
 
 /**
  * This file contains all the functions that allow us to draw a Robot in a

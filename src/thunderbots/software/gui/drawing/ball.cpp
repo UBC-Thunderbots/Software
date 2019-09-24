@@ -1,7 +1,7 @@
-#include "gui/drawing/ball.h"
+#include "software/gui/drawing/ball.h"
 
-#include "geom/segment.h"
-#include "gui/geometry_conversion.h"
+#include "software/geom/segment.h"
+#include "software/gui/geom/geometry_conversion.h"
 #include "shared/constants.h"
 
 void drawBallVelocity(QGraphicsScene *scene, const Ball &ball, const QColor &color)

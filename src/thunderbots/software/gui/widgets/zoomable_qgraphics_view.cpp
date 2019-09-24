@@ -1,4 +1,4 @@
-#include "gui/zoomable_qgraphics_view.h"
+#include "software/gui/widgets/zoomable_qgraphics_view.h"
 
 // No special behaviour beyond the regular QGraphicsView. All configuration should
 // be done by the caller that owns instances of this object

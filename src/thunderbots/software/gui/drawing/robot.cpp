@@ -1,9 +1,10 @@
-#include "gui/drawing/robot.h"
+#include "software/gui/drawing/robot.h"
 
-#include <QGraphicsEllipseItem>
+#include <QtWidgets/QGraphicsEllipseItem>
 
-#include "gui/geometry_conversion.h"
+#include "software/gui/geom/geometry_conversion.h"
 #include "shared/constants.h"
+#include "software/geom/segment.h"
 
 void drawRobotVelocity(QGraphicsScene* scene, const Robot& robot, const QColor& color)
 {

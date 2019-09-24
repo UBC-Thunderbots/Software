@@ -184,8 +184,8 @@ p, li { white-space: pre-wrap; }
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>225</width>
-              <height>509</height>
+              <width>234</width>
+              <height>505</height>
              </rect>
             </property>
            </widget>
@@ -194,7 +194,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="ZoomableQGraphicsView" name="ai_visualization_graphics_view">
+      <widget class="QGraphicsView" name="ai_visualization_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
@@ -214,13 +214,6 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>ZoomableQGraphicsView</class>
-   <extends>QGraphicsView</extends>
-   <header>gui/zoomable_qgraphics_view.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

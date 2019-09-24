@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
-#include "ai/world/field.h"
+#include "software/ai/world/field.h"
 
 /**
  * This file contains all the functions that allow us to draw the Field in a

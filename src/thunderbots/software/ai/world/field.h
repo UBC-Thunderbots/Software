@@ -3,6 +3,7 @@
 #include "boost/circular_buffer.hpp"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/circle.h"
 #include "software/util/time/timestamp.h"
 
 typedef enum

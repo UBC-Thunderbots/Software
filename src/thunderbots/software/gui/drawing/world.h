@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
 #include "software/ai/world/world.h"
 

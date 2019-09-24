@@ -1,4 +1,4 @@
-#include "gui/visualizer_wrapper.h"
+#include "software/gui/visualizer_wrapper.h"
 
 VisualizerWrapper::VisualizerWrapper(int argc, char** argv) : ThreadedObserver<World>()
 {

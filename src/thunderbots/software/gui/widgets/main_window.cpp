@@ -1,4 +1,4 @@
-#include "software/gui/main_window.h"
+#include "software/gui/widgets/main_window.h"
 
 ThunderbotsVisualizer::ThunderbotsVisualizer()
     : QMainWindow(), main_widget(new MainWidget(this))

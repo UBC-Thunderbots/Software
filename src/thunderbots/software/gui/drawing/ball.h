@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QGraphicsScene>
+#include <QtWidgets/QGraphicsScene>
 
-#include "ai/world/ball.h"
+#include "software/ai/world/ball.h"
 
 /**
  * This file contains all the functions that allow us to draw a Ball in a
