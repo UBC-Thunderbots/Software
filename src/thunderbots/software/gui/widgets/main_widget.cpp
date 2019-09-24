@@ -221,6 +221,17 @@ void MainWidget::drawAI(World world)
     }
 }
 
+void MainWidget::drawAITest(DrawFunction draw_function) {
+    scene->clear();
+    draw_function(scene);
+    if (first_draw_call)
+    {
+        main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),
+                                                               Qt::KeepAspectRatio);
+        first_draw_call = false;
+    }
+}
+
 void MainWidget::updateRobotStatusMessages()
 {
     std::random_device dev;

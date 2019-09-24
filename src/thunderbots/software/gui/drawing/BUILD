@@ -6,6 +6,7 @@ cc_library(
     srcs = [
         "ball.cpp",
         "field.cpp",
+        "navigator.cpp",
         "robot.cpp",
         "team.cpp",
         "world.cpp",
@@ -13,12 +14,14 @@ cc_library(
     hdrs = [
         "ball.h",
         "field.h",
+        "navigator.h",
         "robot.h",
         "team.h",
         "world.h",
     ],
     deps = [
-        "typedefs",
+        ":typedefs",
+        "//software/ai/navigator",
         "//software/ai/world",
         "//software/ai/world:ball",
         "//software/ai/world:field",

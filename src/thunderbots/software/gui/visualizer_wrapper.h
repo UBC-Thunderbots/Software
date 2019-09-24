@@ -62,7 +62,9 @@ class VisualizerWrapper : public ThreadedObserver<World>, public ThreadedObserve
      * navigator paths.
      */
     void drawAI();
+    void drawAITest();
 
+    DrawFunction most_recent_draw_function;
     World most_recent_world;
     std::thread run_visualizer_thread;
     std::shared_ptr<ThunderbotsVisualizer> visualizer;

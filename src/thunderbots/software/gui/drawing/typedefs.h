@@ -1,5 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QGraphicsScene>
+#include <functional>
 
-typedef std::function<void(QGraphicsScene* scene)> DrawFunction;
+// TODO: comment
+using DrawFunction = std::function<void(QGraphicsScene* scene)>;

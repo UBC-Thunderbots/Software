@@ -31,11 +31,13 @@ VisualizerWrapper::~VisualizerWrapper()
 void VisualizerWrapper::onValueReceived(World world)
 {
     most_recent_world = world;
-    drawAI();
+//    drawAI();
 }
 
 void VisualizerWrapper::onValueReceived(DrawFunction draw_function) {
     std::cout << "\nFOOBAR\n" << std::endl;
+    most_recent_draw_function = draw_function;
+    drawAITest();
 }
 
 void VisualizerWrapper::drawAI()
@@ -46,6 +48,13 @@ void VisualizerWrapper::drawAI()
     QMetaObject::invokeMethod(visualizer.get(), "drawAI",
                               Qt::ConnectionType::BlockingQueuedConnection,
                               Q_ARG(World, most_recent_world));
+}
+
+void VisualizerWrapper::drawAITest()
+{
+    QMetaObject::invokeMethod(visualizer.get(), "drawAITest",
+                              Qt::ConnectionType::BlockingQueuedConnection,
+                              Q_ARG(DrawFunction, most_recent_draw_function));
 }
 
 void VisualizerWrapper::createAndRunVisualizer(

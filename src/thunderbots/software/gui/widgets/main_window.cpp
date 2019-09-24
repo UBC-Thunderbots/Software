@@ -15,3 +15,7 @@ void ThunderbotsVisualizer::drawAI(World world)
 {
     main_widget->drawAI(world);
 }
+
+void ThunderbotsVisualizer::drawAITest(DrawFunction draw_function) {
+    main_widget->drawAITest(draw_function);
+}
