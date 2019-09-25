@@ -44,7 +44,7 @@ else
 	mkdir -p /tmp/bazelbuild
 	tar xfz /tmp/bazelbuild.tar.gz -C /tmp/bazelbuild
 	cd /tmp/bazelbuild/intellij*
-	bazel build //clwb:clwb_bazel_zip --define=ij_product=clion-${clion_major_version}
+	sudo bazel build //clwb:clwb_bazel_zip --define=ij_product=clion-${clion_major_version}
 
 	# Copy the compiled plugin to the CLion directory
 	mkdir -p $clion_plugin_dir
