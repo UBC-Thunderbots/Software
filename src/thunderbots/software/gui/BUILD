@@ -8,6 +8,8 @@ cc_library(
     hdrs = ["visualizer_wrapper.h"],
     deps = [
         "//software/ai/world",
+        "//software/gui/drawing:draw_functions",
+        "//software/gui/drawing:world",
         "//software/gui/widgets:main_window",
         "//software/multithreading:threaded_observer",
         "@qt//:qt_widgets",

@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "software/ai/world/world.h"
-#include "software/gui/drawing/typedefs.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/main_window.h"
 #include "software/multithreading/threaded_observer.h"
 #include <unordered_set>
@@ -15,7 +15,7 @@
  * visualizing information about our AI, and allowing users to control it.
  */
 class VisualizerWrapper : public ThreadedObserver<World>,
-        public ThreadedObserver<DrawFunction>,
+        public ThreadedObserver<WorldDrawFunction>,
         public ThreadedObserver<AIDrawFunction>
 {
    public:
@@ -29,7 +29,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      */
     explicit VisualizerWrapper(int argc, char** argv);
 
-    ~VisualizerWrapper();
+    ~VisualizerWrapper() override;
 
    private:
     /**
@@ -57,19 +57,18 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     void onValueReceived(World world) override;
 
-    void onValueReceived(DrawFunction draw_function) override;
+    void onValueReceived(AIDrawFunction draw_function) override;
+    void onValueReceived(WorldDrawFunction draw_function) override;
 
     /**
      * Draws all the AI information in the Visualizer. This includes visualizing the state
      * of the world as well as drawing the AI state we want to show, like planned
      * navigator paths.
      */
-    void drawAI();
-    void drawAITest();
+    void draw();
 
-    std::vector<DrawFunction> current_draw_functions;
-    DrawFunction most_recent_draw_function;
-    World most_recent_world;
+    AIDrawFunction most_recent_ai_draw_function;
+    WorldDrawFunction most_recent_world_draw_function;
     std::thread run_visualizer_thread;
     std::shared_ptr<ThunderbotsVisualizer> visualizer;
     std::shared_ptr<QApplication> application;

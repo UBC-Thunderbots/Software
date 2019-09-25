@@ -10,7 +10,7 @@
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 #include "software/gui/visualizer_wrapper.h"
-#include "software/gui/drawing/typedefs.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/typedefs.h"
 
 using namespace boost::program_options;
@@ -106,7 +106,7 @@ void connectObservers()
     backend->Subject<World>::registerObserver(ai);
     backend->Subject<World>::registerObserver(visualizer);
     ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
-    ai->Subject<DrawFunction>::registerObserver(visualizer);
+    ai->Subject<AIDrawFunction>::registerObserver(visualizer);
 }
 
 int main(int argc, char **argv)

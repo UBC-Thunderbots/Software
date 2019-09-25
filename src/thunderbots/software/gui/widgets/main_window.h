@@ -2,9 +2,8 @@
 
 #include <QtWidgets/QMainWindow>
 
-#include "software/ai/world/world.h"
 #include "software/gui/widgets/main_widget.h"
-#include "software/gui/drawing/typedefs.h"
+#include "software/gui/drawing/draw_functions.h"
 
 /**
  * This is the main window / application object for the thunderbots visualizer
@@ -25,8 +24,7 @@ class ThunderbotsVisualizer : public QMainWindow
      *
      * @param world The world to draw
      */
-    void drawAI(World world);
-    void drawAITest(DrawFunction draw_function);
+    void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
 
    private:
     // Unfortunately Qt uses raw pointers

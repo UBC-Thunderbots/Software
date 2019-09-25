@@ -13,7 +13,6 @@
 #include <iostream>
 #include <random>
 
-#include "software/gui/drawing/world.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include <g3log/g3log.hpp>
 #include "software/util/parameter/dynamic_parameters.h"
@@ -209,21 +208,10 @@ void MainWidget::setupDefendingSideComboBox()
             on_defending_side_changed);
 }
 
-void MainWidget::drawAI(World world)
-{
-//    scene->clear();
-//    drawWorld(scene, world);
-    if (first_draw_call)
-    {
-        main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),
-                                                               Qt::KeepAspectRatio);
-        first_draw_call = false;
-    }
-}
-
-void MainWidget::drawAITest(DrawFunction draw_function) {
+void MainWidget::draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function) {
     scene->clear();
-    draw_function(scene);
+    world_draw_function.execute(scene);
+    ai_draw_function.execute(scene);
     if (first_draw_call)
     {
         main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),

@@ -1,7 +1,7 @@
 #include "software/gui/visualizer_wrapper.h"
-#include "software/gui/drawing/ball.h"
+#include "software/gui/drawing/world.h"
 
-VisualizerWrapper::VisualizerWrapper(int argc, char** argv) : ThreadedObserver<World>(), ThreadedObserver<DrawFunction>()
+VisualizerWrapper::VisualizerWrapper(int argc, char** argv) : ThreadedObserver<World>(), ThreadedObserver<WorldDrawFunction>(), ThreadedObserver<AIDrawFunction>()
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -31,48 +31,28 @@ VisualizerWrapper::~VisualizerWrapper()
 
 void VisualizerWrapper::onValueReceived(World world)
 {
-    most_recent_world = world;
-//    drawAI();
-    auto draw_func = drawBallTest(most_recent_world.ball());
-    auto result = std::find(current_draw_functions.begin(), current_draw_functions.end(), draw_func);
-    if(result == current_draw_functions.end()) {
-        current_draw_functions.emplace_back(draw_func);
-    }else {
-        *result = draw_func;
-    }
-    std::cout << current_draw_functions.size() << std::endl;
+    most_recent_world_draw_function = getDrawWorldFunction(world);
+    draw();
 }
 
-void VisualizerWrapper::onValueReceived(DrawFunction draw_function) {
-//    std::cout << "\nFOOBAR\n" << std::endl;
-    most_recent_draw_function = draw_function;
-//    drawAITest();
-
-    auto draw_func = draw_function;
-    auto result = std::find(current_draw_functions.begin(), current_draw_functions.end(), draw_func);
-    if(result == current_draw_functions.end()) {
-        current_draw_functions.emplace_back(draw_func);
-    }else {
-        *result = draw_func;
-    }
-    std::cout << current_draw_functions.size() << std::endl;
+void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function) {
+    most_recent_ai_draw_function = draw_function;
+    draw();
 }
 
-void VisualizerWrapper::drawAI()
+void VisualizerWrapper::onValueReceived(WorldDrawFunction draw_function) {
+    // TODO: implement
+}
+
+void VisualizerWrapper::draw()
 {
     // Call the ThunderbotsVisualizer to draw the AI in a threadsafe manner
     // See
     // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-    QMetaObject::invokeMethod(visualizer.get(), "drawAI",
+    QMetaObject::invokeMethod(visualizer.get(), "draw",
                               Qt::ConnectionType::BlockingQueuedConnection,
-                              Q_ARG(World, most_recent_world));
-}
-
-void VisualizerWrapper::drawAITest()
-{
-    QMetaObject::invokeMethod(visualizer.get(), "drawAITest",
-                              Qt::ConnectionType::BlockingQueuedConnection,
-                              Q_ARG(DrawFunction, most_recent_draw_function));
+                              Q_ARG(WorldDrawFunction, most_recent_world_draw_function),
+                              Q_ARG(AIDrawFunction, most_recent_ai_draw_function));
 }
 
 void VisualizerWrapper::createAndRunVisualizer(

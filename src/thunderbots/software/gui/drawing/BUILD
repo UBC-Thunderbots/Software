@@ -1,45 +1,86 @@
 package(default_visibility = ["//visibility:public"])
 
-# TODO: Break this up
 cc_library(
-    name = "drawing",
-    srcs = [
-        "ball.cpp",
-        "field.cpp",
-        "navigator.cpp",
-        "robot.cpp",
-        "team.cpp",
-        "world.cpp",
-    ],
-    hdrs = [
-        "ball.h",
-        "field.h",
-        "navigator.h",
-        "robot.h",
-        "team.h",
-        "world.h",
-    ],
+    name = "ball",
+    srcs = ["ball.cpp"],
+    hdrs = ["ball.h"],
     deps = [
-        ":typedefs",
-        "//software/ai/navigator",
-        "//software/ai/world",
+        "//shared:constants",
         "//software/ai/world:ball",
-        "//software/ai/world:field",
-        "//software/ai/world:robot",
-        "//software/ai/world:team",
         "//software/geom:all",
         "//software/gui/geom:geometry_conversion",
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_opengl",
         "@qt//:qt_widgets",
     ],
 )
 
 cc_library(
-    name = "typedefs",
+    name = "field",
+    srcs = ["field.cpp"],
+    hdrs = ["field.h"],
+    deps = [
+        "//shared:constants",
+        "//software/ai/world:field",
+        "//software/gui/geom:geometry_conversion",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "robot",
+    srcs = ["robot.cpp"],
+    hdrs = ["robot.h"],
+    deps = [
+        "//shared:constants",
+        "//software/ai/world:robot",
+        "//software/geom:all",
+        "//software/gui/geom:geometry_conversion",
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "team",
+    srcs = ["team.cpp"],
+    hdrs = ["team.h"],
+    deps = [
+        ":robot",
+        "//software/ai/world:team",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "world",
+    srcs = ["world.cpp"],
+    hdrs = ["world.h"],
+    deps = [
+        ":ball",
+        ":draw_functions",
+        ":field",
+        ":team",
+        "//software/ai/world",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "navigator",
+    srcs = ["navigator.cpp"],
+    hdrs = ["navigator.h"],
+    deps = [
+        ":draw_functions",
+        "//software/ai/navigator",
+        "//software/geom:all",
+        "//software/gui/geom:geometry_conversion",
+        "@qt//:qt_widgets",
+    ],
+)
+
+cc_library(
+    name = "draw_functions",
     srcs = [],
-    hdrs = ["typedefs.h"],
+    hdrs = ["draw_functions.h"],
     deps = [
         "@qt//:qt_widgets",
     ],

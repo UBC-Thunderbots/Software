@@ -10,7 +10,7 @@ qt_cc_library(
         ":zoomable_qgraphics_view",
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/world",
-        "//software/gui/drawing",
+        "//software/gui/drawing:draw_functions",
         "//software/gui/ui:main_widget",
         "//software/util/parameter",
         "@g3log//:all",
@@ -25,6 +25,7 @@ qt_cc_library(
     deps = [
         ":main_widget",
         "//software/ai/world",
+        "//software/gui/drawing:draw_functions",
         "@qt//:qt_widgets",
     ],
 )

@@ -11,3 +11,10 @@ void drawWorld(QGraphicsScene* scene, const World& world)
     drawFriendlyTeam(scene, world.friendlyTeam());
     drawBall(scene, world.ball());
 }
+
+WorldDrawFunction getDrawWorldFunction(const World& world) {
+    auto draw_function = [world](QGraphicsScene* scene) {
+        drawWorld(scene, world);
+    };
+    return WorldDrawFunction(draw_function);
+}

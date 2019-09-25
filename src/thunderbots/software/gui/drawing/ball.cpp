@@ -42,13 +42,3 @@ void drawBall(QGraphicsScene *scene, const Ball &ball)
     drawBallPosition(scene, ball, ball_color);
     drawBallVelocity(scene, ball, ball_color);
 }
-
-
-std::function<void(QGraphicsScene* scene)> drawBallTest(const Ball& ball) {
-    return [ball](QGraphicsScene* scene) {
-        QColor ball_color = QColor(255, 100, 0, 255);
-
-        drawBallPosition(scene, ball, ball_color);
-        drawBallVelocity(scene, ball, ball_color);
-    };
-}

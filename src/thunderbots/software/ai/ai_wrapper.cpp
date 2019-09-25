@@ -37,6 +37,8 @@ void AIWrapper::drawWorld()
 
 void AIWrapper::drawAI()
 {
-    auto draw_function = drawNavigator(ai.getNavigator());
-    Subject<DrawFunction>::sendValueToObservers(draw_function);
+    if(ai.getNavigator()) {
+        auto draw_function = drawNavigator(ai.getNavigator());
+        Subject<AIDrawFunction>::sendValueToObservers(draw_function);
+    }
 }
