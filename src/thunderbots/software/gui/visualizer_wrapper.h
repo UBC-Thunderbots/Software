@@ -8,12 +8,15 @@
 #include "software/gui/drawing/typedefs.h"
 #include "software/gui/widgets/main_window.h"
 #include "software/multithreading/threaded_observer.h"
+#include <unordered_set>
 
 /**
  * This class wraps our 'ThunderbotsVisualizer' object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
-class VisualizerWrapper : public ThreadedObserver<World>, public ThreadedObserver<DrawFunction>
+class VisualizerWrapper : public ThreadedObserver<World>,
+        public ThreadedObserver<DrawFunction>,
+        public ThreadedObserver<AIDrawFunction>
 {
    public:
     VisualizerWrapper() = delete;
@@ -64,6 +67,7 @@ class VisualizerWrapper : public ThreadedObserver<World>, public ThreadedObserve
     void drawAI();
     void drawAITest();
 
+    std::vector<DrawFunction> current_draw_functions;
     DrawFunction most_recent_draw_function;
     World most_recent_world;
     std::thread run_visualizer_thread;

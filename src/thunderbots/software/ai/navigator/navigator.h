@@ -32,4 +32,7 @@ class Navigator
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) = 0;
 
     virtual ~Navigator() = default;
+
+    // TODO: comment
+    virtual std::vector<std::vector<Point>> getPlannedPaths() = 0;
 };

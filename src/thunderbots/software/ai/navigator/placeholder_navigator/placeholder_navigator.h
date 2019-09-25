@@ -20,6 +20,8 @@ class PlaceholderNavigator : public Navigator, public IntentVisitor
         const World &world,
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) override;
 
+    std::vector<std::vector<Point>> getPlannedPaths() override;
+
     /**
      * Visits a CatchIntent to perform an operation.
      *

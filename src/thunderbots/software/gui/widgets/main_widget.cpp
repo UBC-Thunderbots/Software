@@ -211,8 +211,8 @@ void MainWidget::setupDefendingSideComboBox()
 
 void MainWidget::drawAI(World world)
 {
-    scene->clear();
-    drawWorld(scene, world);
+//    scene->clear();
+//    drawWorld(scene, world);
     if (first_draw_call)
     {
         main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),

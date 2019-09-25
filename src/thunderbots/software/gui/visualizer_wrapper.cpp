@@ -1,6 +1,7 @@
 #include "software/gui/visualizer_wrapper.h"
+#include "software/gui/drawing/ball.h"
 
-VisualizerWrapper::VisualizerWrapper(int argc, char** argv) : ThreadedObserver<World>()
+VisualizerWrapper::VisualizerWrapper(int argc, char** argv) : ThreadedObserver<World>(), ThreadedObserver<DrawFunction>()
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -32,12 +33,29 @@ void VisualizerWrapper::onValueReceived(World world)
 {
     most_recent_world = world;
 //    drawAI();
+    auto draw_func = drawBallTest(most_recent_world.ball());
+    auto result = std::find(current_draw_functions.begin(), current_draw_functions.end(), draw_func);
+    if(result == current_draw_functions.end()) {
+        current_draw_functions.emplace_back(draw_func);
+    }else {
+        *result = draw_func;
+    }
+    std::cout << current_draw_functions.size() << std::endl;
 }
 
 void VisualizerWrapper::onValueReceived(DrawFunction draw_function) {
-    std::cout << "\nFOOBAR\n" << std::endl;
+//    std::cout << "\nFOOBAR\n" << std::endl;
     most_recent_draw_function = draw_function;
-    drawAITest();
+//    drawAITest();
+
+    auto draw_func = draw_function;
+    auto result = std::find(current_draw_functions.begin(), current_draw_functions.end(), draw_func);
+    if(result == current_draw_functions.end()) {
+        current_draw_functions.emplace_back(draw_func);
+    }else {
+        *result = draw_func;
+    }
+    std::cout << current_draw_functions.size() << std::endl;
 }
 
 void VisualizerWrapper::drawAI()

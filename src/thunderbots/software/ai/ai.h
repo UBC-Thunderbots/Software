@@ -38,7 +38,9 @@ class AI final
      */
     PlayInfo getPlayInfo() const;
 
+    std::shared_ptr<Navigator> getNavigator() const;
+
    private:
     std::unique_ptr<HL> high_level;
-    std::unique_ptr<Navigator> navigator;
+    std::shared_ptr<Navigator> navigator;
 };

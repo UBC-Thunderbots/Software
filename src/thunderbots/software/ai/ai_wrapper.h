@@ -30,6 +30,7 @@ class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveV
      * Publish the requisite ROS messages to draw the current state of the world
      */
     void drawWorld();
+    void drawAI();
 
     AI ai;
     World most_recent_world;

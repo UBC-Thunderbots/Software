@@ -4,7 +4,7 @@
 
 #include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/parameter/dynamic_parameters.h"
-#include "software/gui/drawing/ball.h"
+#include "software/gui/drawing/navigator.h"
 
 void AIWrapper::onValueReceived(World world)
 {
@@ -25,12 +25,18 @@ void AIWrapper::runAIAndSendPrimitives()
                 std::move(new_primitives));
         Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(new_primitives_ptr);
     }
+    drawAI();
 }
 
 void AIWrapper::drawWorld()
 {
-//    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
-//        Util::CanvasMessenger::getInstance();
-//    canvas_messenger->drawWorld(most_recent_world);
-    Subject<DrawFunction>::sendValueToObservers(drawBallTest(most_recent_world.ball()));
+    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
+        Util::CanvasMessenger::getInstance();
+    canvas_messenger->drawWorld(most_recent_world);
+}
+
+void AIWrapper::drawAI()
+{
+    auto draw_function = drawNavigator(ai.getNavigator());
+    Subject<DrawFunction>::sendValueToObservers(draw_function);
 }
