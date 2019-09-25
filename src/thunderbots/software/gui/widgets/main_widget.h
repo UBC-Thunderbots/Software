@@ -9,6 +9,7 @@
 #include "software/gui/widgets/zoomable_qgraphics_view.h"
 #include "software/util/parameter/parameter.h"
 #include "software/gui/drawing/draw_functions.h"
+#include "software/ai/hl/stp/play_info.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui
@@ -38,6 +39,8 @@ class MainWidget : public QWidget
      * @param world The world to draw
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
+    // TODO: comment
+    void updatePlayInfo(PlayInfo play_info);
 
     // TODO: comment
     void updateRobotStatusMessages();

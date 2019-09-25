@@ -11,6 +11,7 @@ cc_binary(
     deps = [
         ":typedefs",
         "//software/ai:ai_wrapper",
+        "//software/ai/hl/stp:play_info",
         "//software/backend:backend_factory",
         "//software/backend:grsim_backend",
         "//software/backend:radio_backend",

@@ -14,3 +14,7 @@ ThunderbotsVisualizer::~ThunderbotsVisualizer()
 void ThunderbotsVisualizer::draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function) {
     main_widget->draw(world_draw_function, ai_draw_function);
 }
+
+void ThunderbotsVisualizer::updatePlayInfo(PlayInfo play_info) {
+    main_widget->updatePlayInfo(play_info);
+}

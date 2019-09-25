@@ -12,6 +12,7 @@
 #include "software/gui/visualizer_wrapper.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/typedefs.h"
+#include "software/ai/hl/stp/play_info.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -107,6 +108,7 @@ void connectObservers()
     backend->Subject<World>::registerObserver(visualizer);
     ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
     ai->Subject<AIDrawFunction>::registerObserver(visualizer);
+    ai->Subject<PlayInfo>::registerObserver(visualizer);
 }
 
 int main(int argc, char **argv)

@@ -68,6 +68,19 @@ MainWidget::~MainWidget()
     delete glWidget;
 }
 
+void MainWidget::updatePlayInfo(PlayInfo play_info) {
+    QString play_type_string = QString("Play Type: %1\n").arg(QString::fromStdString(play_info.play_type));
+    QString play_name_string = QString("Play Name: %1\n").arg(QString::fromStdString(play_info.play_name));
+    QString tactics_string = QString("Tactics:\n");
+    for(const auto& tactic_string : play_info.robot_tactic_assignment) {
+        tactics_string.append(QString::fromStdString(tactic_string)).append("\n");
+    }
+
+    QString play_info_string = QString("%1\n%2\n%3").arg(play_type_string, play_name_string, tactics_string);
+
+    main_widget->play_and_tactic_info_text_edit->setText(play_info_string);
+}
+
 void MainWidget::setupAIControls()
 {
     setupAIStartAndStopButtons();

@@ -8,6 +8,7 @@ qt_cc_library(
     hdr = "main_widget.h",
     deps = [
         ":zoomable_qgraphics_view",
+        "//software/ai/hl/stp:play_info",
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/world",
         "//software/gui/drawing:draw_functions",
@@ -24,6 +25,7 @@ qt_cc_library(
     hdr = "main_window.h",
     deps = [
         ":main_widget",
+        "//software/ai/hl/stp:play_info",
         "//software/ai/world",
         "//software/gui/drawing:draw_functions",
         "@qt//:qt_widgets",

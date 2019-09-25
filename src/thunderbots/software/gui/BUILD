@@ -7,6 +7,7 @@ cc_library(
     srcs = ["visualizer_wrapper.cpp"],
     hdrs = ["visualizer_wrapper.h"],
     deps = [
+        "//software/ai/hl/stp:play_info",
         "//software/ai/world",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",

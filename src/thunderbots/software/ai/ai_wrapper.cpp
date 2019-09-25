@@ -20,6 +20,9 @@ void AIWrapper::runAIAndSendPrimitives()
         std::vector<std::unique_ptr<Primitive>> new_primitives =
             ai.getPrimitives(most_recent_world);
 
+        PlayInfo play_info = ai.getPlayInfo();
+        Subject<PlayInfo>::sendValueToObservers(play_info);
+
         auto new_primitives_ptr =
             std::make_shared<const std::vector<std::unique_ptr<Primitive>>>(
                 std::move(new_primitives));

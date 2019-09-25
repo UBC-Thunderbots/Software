@@ -1,7 +1,11 @@
 #include "software/gui/visualizer_wrapper.h"
 #include "software/gui/drawing/world.h"
 
-VisualizerWrapper::VisualizerWrapper(int argc, char** argv) : ThreadedObserver<World>(), ThreadedObserver<WorldDrawFunction>(), ThreadedObserver<AIDrawFunction>()
+VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
+            ThreadedObserver<World>(),
+            ThreadedObserver<WorldDrawFunction>(),
+            ThreadedObserver<AIDrawFunction>(),
+            ThreadedObserver<PlayInfo>()
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -33,6 +37,11 @@ void VisualizerWrapper::onValueReceived(World world)
 {
     most_recent_world_draw_function = getDrawWorldFunction(world);
     draw();
+}
+
+void VisualizerWrapper::onValueReceived(PlayInfo play_info) {
+    most_recent_play_info = play_info;
+    updatePlayInfo();
 }
 
 void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function) {
@@ -67,4 +76,13 @@ void VisualizerWrapper::createAndRunVisualizer(
     viz->show();
     visualizer_promise_ptr->set_value(viz);
     app->exec();
+}
+
+void VisualizerWrapper::updatePlayInfo() {
+    // Call the ThunderbotsVisualizer to update the Play Info in a threadsafe manner
+    // See
+    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
+    QMetaObject::invokeMethod(visualizer.get(), "updatePlayInfo",
+                              Qt::ConnectionType::BlockingQueuedConnection,
+                              Q_ARG(PlayInfo, most_recent_play_info));
 }

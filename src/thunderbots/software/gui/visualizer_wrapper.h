@@ -8,6 +8,7 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/main_window.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/ai/hl/stp/play_info.h"
 #include <unordered_set>
 
 /**
@@ -16,7 +17,8 @@
  */
 class VisualizerWrapper : public ThreadedObserver<World>,
         public ThreadedObserver<WorldDrawFunction>,
-        public ThreadedObserver<AIDrawFunction>
+        public ThreadedObserver<AIDrawFunction>,
+        public ThreadedObserver<PlayInfo>
 {
    public:
     VisualizerWrapper() = delete;
@@ -59,6 +61,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(WorldDrawFunction draw_function) override;
+    void onValueReceived(PlayInfo play_info) override;
 
     /**
      * Draws all the AI information in the Visualizer. This includes visualizing the state
@@ -66,7 +69,9 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      * navigator paths.
      */
     void draw();
+    void updatePlayInfo();
 
+    PlayInfo most_recent_play_info;
     AIDrawFunction most_recent_ai_draw_function;
     WorldDrawFunction most_recent_world_draw_function;
     std::thread run_visualizer_thread;
