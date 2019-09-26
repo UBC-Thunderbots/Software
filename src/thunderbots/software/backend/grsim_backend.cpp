@@ -39,6 +39,12 @@ void GrSimBackend::setMostRecentlyReceivedPrimitives(ConstPrimitiveVectorPtr pri
 {
     std::scoped_lock lock(most_recently_received_primitives_mutex);
     most_recently_received_primitives = std::move(primitives);
+
+    // TODO: tempfor testing
+    RobotStatus status;
+    status.robot_messages = {"test 1", "test 2", "test3"};
+    status.robot = 0;
+    Subject<RobotStatus>::sendValueToObservers(status);
 }
 
 void GrSimBackend::updateGrSim()

@@ -106,6 +106,7 @@ void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
     backend->Subject<World>::registerObserver(visualizer);
+    backend->Subject<RobotStatus>::registerObserver(visualizer);
     ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
     ai->Subject<AIDrawFunction>::registerObserver(visualizer);
     ai->Subject<PlayInfo>::registerObserver(visualizer);

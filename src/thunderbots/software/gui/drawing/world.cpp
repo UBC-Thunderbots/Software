@@ -13,6 +13,7 @@ void drawWorld(QGraphicsScene* scene, const World& world)
 }
 
 WorldDrawFunction getDrawWorldFunction(const World& world) {
+//    World foo = World();
     auto draw_function = [world](QGraphicsScene* scene) {
         drawWorld(scene, world);
     };

@@ -9,7 +9,8 @@
 #include "software/gui/widgets/main_window.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/ai/hl/stp/play_info.h"
-#include <unordered_set>
+#include "software/backend/robot_status.h"
+#include <set>
 
 /**
  * This class wraps our 'ThunderbotsVisualizer' object which is responsible for
@@ -18,7 +19,8 @@
 class VisualizerWrapper : public ThreadedObserver<World>,
         public ThreadedObserver<WorldDrawFunction>,
         public ThreadedObserver<AIDrawFunction>,
-        public ThreadedObserver<PlayInfo>
+        public ThreadedObserver<PlayInfo>,
+        public ThreadedObserver<RobotStatus>
 {
    public:
     VisualizerWrapper() = delete;
@@ -58,10 +60,10 @@ class VisualizerWrapper : public ThreadedObserver<World>,
             visualizer_promise_ptr);
 
     void onValueReceived(World world) override;
-
     void onValueReceived(AIDrawFunction draw_function) override;
     void onValueReceived(WorldDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
+    void onValueReceived(RobotStatus robot_status) override;
 
     /**
      * Draws all the AI information in the Visualizer. This includes visualizing the state
@@ -71,6 +73,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     void draw();
     void updatePlayInfo();
 
+    std::chrono::time_point<std::chrono::steady_clock> last_status_message_update_timestamp;
+    std::map<std::string, Duration> status_messages;
     PlayInfo most_recent_play_info;
     AIDrawFunction most_recent_ai_draw_function;
     WorldDrawFunction most_recent_world_draw_function;

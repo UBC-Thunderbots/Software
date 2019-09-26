@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//software/ai/hl/stp:play_info",
         "//software/ai/world",
+        "//software/backend:robot_status",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",
         "//software/gui/widgets:main_window",

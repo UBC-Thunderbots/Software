@@ -302,18 +302,19 @@ void MainWidget::setupStatusTable(QTableWidget* table)
 }
 
 void MainWidget::setRobotStatus(QTableWidget* table,
-                                std::vector<std::string> robot_status_messages)
+                                std::set<std::pair<std::string, Duration>> robot_status_messages)
 {
     // Resize the number of rows to only have as many rows as we have messages. This will
     // automatically delete any extra rows / messages for us, and then we overwrite the
     // existing rows with new messages
-    table->setRowCount(robot_status_messages.size());
-    for (int i = 0; i < robot_status_messages.size(); i++)
-    {
-        table->setItem(i, 0, new QTableWidgetItem("some age placeholder"));
-        auto message_data = QString::fromStdString(robot_status_messages.at(i));
-        table->setItem(i, 1, new QTableWidgetItem(message_data));
-    }
+//    table->setRowCount(robot_status_messages.size());
+//    for (int i = 0; i < robot_status_messages.size(); i++)
+//    {
+//        auto [message, age_in_seconds] = robot_status_messages[i];
+//        QString age = QString::number(std::floor(age_in_seconds));
+//        table->setItem(i, 0, new QTableWidgetItem(age));
+//        table->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(message)));
+//    }
 }
 
 QWidget* MainWidget::createBooleanParameter(Parameter<bool>* parameter)

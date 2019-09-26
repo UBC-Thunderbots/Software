@@ -1,11 +1,13 @@
 #include "software/gui/visualizer_wrapper.h"
 #include "software/gui/drawing/world.h"
+#include <chrono>
 
 VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
             ThreadedObserver<World>(),
             ThreadedObserver<WorldDrawFunction>(),
             ThreadedObserver<AIDrawFunction>(),
-            ThreadedObserver<PlayInfo>()
+            ThreadedObserver<PlayInfo>(),
+            ThreadedObserver<RobotStatus>()
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -19,8 +21,9 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
         std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv,
                     application_promise, visualizer_promise);
     application = application_future.get();
-    std::cout << "got application future" << std::endl;
     visualizer = visualizer_future.get();
+
+    last_status_message_update_timestamp = std::chrono::steady_clock::now();
 }
 
 VisualizerWrapper::~VisualizerWrapper()
@@ -37,6 +40,28 @@ void VisualizerWrapper::onValueReceived(World world)
 {
     most_recent_world_draw_function = getDrawWorldFunction(world);
     draw();
+}
+
+void VisualizerWrapper::onValueReceived(RobotStatus robot_status) {
+//    std::cout << "got robot status" << std::endl;
+    auto current_timestamp = std::chrono::steady_clock::now();
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(current_timestamp - last_status_message_update_timestamp);
+    last_status_message_update_timestamp = current_timestamp;
+    for(const auto& message : robot_status.robot_messages) {
+        auto iter = status_messages.find(message);
+        if(iter == status_messages.end()) {
+            status_messages.insert(std::make_pair(message, Duration::fromSeconds(0)));
+        }else {
+            iter->second = iter->second + Duration::fromMilliseconds(milliseconds.count());
+        }
+    }
+
+    auto sort_by_duration_comparator = [](const std::pair<std::string, Duration>& a, const std::pair<std::string, Duration>& b) {
+        return a.second < b.second;
+    };
+
+    std::set<std::pair<std::string, Duration>> message_set(status_messages.begin(), status_messages.end());
+    std::sort(message_set.begin(), message_set.end(), sort_by_duration_comparator);
 }
 
 void VisualizerWrapper::onValueReceived(PlayInfo play_info) {

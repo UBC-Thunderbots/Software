@@ -26,6 +26,7 @@ class ThunderbotsVisualizer : public QMainWindow
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
     void updatePlayInfo(PlayInfo play_info);
+//    void updateRobotStatus(std::set<std::pair<std::string, Duration>> robot_status);
 
    private:
     // Unfortunately Qt uses raw pointers

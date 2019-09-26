@@ -133,7 +133,7 @@ class MainWidget : public QWidget
 
     // TODO: comment
     void setRobotStatus(QTableWidget* table,
-                        std::vector<std::string> robot_status_messages);
+                        std::set<std::pair<std::string, Duration>> robot_status_messages);
 
     bool first_draw_call;
     // Unfortunately Qt uses raw pointers
