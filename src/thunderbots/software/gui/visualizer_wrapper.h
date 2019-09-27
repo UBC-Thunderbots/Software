@@ -73,11 +73,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      */
     void draw();
     void updatePlayInfo();
-    void updateRobotStatus();
 
     std::vector<std::pair<std::string, Duration>> most_recent_robot_status;
-    std::chrono::time_point<std::chrono::steady_clock> last_status_message_update_timestamp;
-    std::map<std::string, Duration> status_messages;
     PlayInfo most_recent_play_info;
     AIDrawFunction most_recent_ai_draw_function;
     WorldDrawFunction most_recent_world_draw_function;

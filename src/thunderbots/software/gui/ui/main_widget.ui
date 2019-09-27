@@ -179,8 +179,8 @@ p, li { white-space: pre-wrap; }
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>225</width>
-              <height>509</height>
+              <width>98</width>
+              <height>28</height>
              </rect>
             </property>
            </widget>
@@ -204,11 +204,18 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </widget>
-     <widget class="QTableWidget" name="robot_status_table_widget"/>
+     <widget class="RobotStatusTable" name="robot_status_table_widget"/>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RobotStatusTable</class>
+   <extends>QTableWidget</extends>
+   <header>software/gui/widgets/robot_status_table.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -4,8 +4,8 @@
 
 #include "software/gui/widgets/main_widget.h"
 #include "software/gui/drawing/draw_functions.h"
+#include "software/backend/robot_status.h"
 
-using FOOBAR = std::vector<std::pair<std::string, Duration>>;
 /**
  * This is the main window / application object for the thunderbots visualizer
  * It combines a menu with our "main widget"
@@ -27,7 +27,7 @@ class ThunderbotsVisualizer : public QMainWindow
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
     void updatePlayInfo(PlayInfo play_info);
-    void updateRobotStatus(FOOBAR robot_status);
+    void updateRobotStatus(const RobotStatus& robot_status);
 
    private:
     // Unfortunately Qt uses raw pointers

@@ -22,8 +22,6 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
                     application_promise, visualizer_promise);
     application = application_future.get();
     visualizer = visualizer_future.get();
-
-    last_status_message_update_timestamp = std::chrono::steady_clock::now();
 }
 
 VisualizerWrapper::~VisualizerWrapper()
@@ -43,27 +41,13 @@ void VisualizerWrapper::onValueReceived(World world)
 }
 
 void VisualizerWrapper::onValueReceived(RobotStatus robot_status) {
-//    std::cout << "got robot status" << std::endl;
-    auto current_timestamp = std::chrono::steady_clock::now();
-    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(current_timestamp - last_status_message_update_timestamp);
-    last_status_message_update_timestamp = current_timestamp;
-    for(const auto& message : robot_status.robot_messages) {
-        auto iter = status_messages.find(message);
-        if(iter == status_messages.end()) {
-            status_messages.insert(std::make_pair(message, Duration::fromSeconds(0)));
-        }else {
-            iter->second = iter->second + Duration::fromMilliseconds(milliseconds.count());
-        }
-    }
-
-    auto sort_by_duration_comparator = [](const std::pair<std::string, Duration>& a, const std::pair<std::string, Duration>& b) {
-        return a.second < b.second;
-    };
-
-    std::vector<std::pair<std::string, Duration>> message_vec(status_messages.begin(), status_messages.end());
-    std::sort(message_vec.begin(), message_vec.end(), sort_by_duration_comparator);
-    most_recent_robot_status = message_vec;
-    updateRobotStatus();
+    // Call the ThunderbotsVisualizer to update the Play Info in a threadsafe manner
+    // See
+    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
+    std::cout << "sending status" << std::endl;
+    QMetaObject::invokeMethod(visualizer.get(), "updateRobotStatus",
+                              Qt::ConnectionType::BlockingQueuedConnection,
+                              Q_ARG(RobotStatus, robot_status));
 }
 
 void VisualizerWrapper::onValueReceived(PlayInfo play_info) {
@@ -112,19 +96,4 @@ void VisualizerWrapper::updatePlayInfo() {
     QMetaObject::invokeMethod(visualizer.get(), "updatePlayInfo",
                               Qt::ConnectionType::BlockingQueuedConnection,
                               Q_ARG(PlayInfo, most_recent_play_info));
-}
-
-void VisualizerWrapper::updateRobotStatus() {
-    // Call the ThunderbotsVisualizer to update the Play Info in a threadsafe manner
-    // See
-    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
-//    QMetaObject::invokeMethod(visualizer.get(), "updateRobotStatus",
-//                              Qt::ConnectionType::BlockingQueuedConnection,
-//                              Q_ARG(std::set<std::pair<std::string, Duration>>, most_recent_robot_status));
-    // I hate macros
-    using FOOBAR = std::vector<std::pair<std::string, Duration>>;
-    QMetaObject::invokeMethod(visualizer.get(), "updateRobotStatus",
-                              Qt::ConnectionType::BlockingQueuedConnection,
-//                              Q_ARG(std::set<std::pair<std::string, Duration>>, most_recent_robot_status));
-                              Q_ARG(FOOBAR, most_recent_robot_status));
 }

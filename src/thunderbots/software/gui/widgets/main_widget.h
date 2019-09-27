@@ -11,6 +11,7 @@
 #include "software/gui/drawing/draw_functions.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/util/time/duration.h"
+#include "software/backend/robot_status.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui
@@ -43,11 +44,7 @@ class MainWidget : public QWidget
     // TODO: comment
     void updatePlayInfo(PlayInfo play_info);
 
-    void updateRobotStatus(std::vector<std::pair<std::string, Duration>> robot_status_messages);
-        // TODO: comment
-
-    // TODO: comment
-    void updateRobotStatusMessages();
+    void updateRobotStatus(const RobotStatus& robot_status);
 
    private:
     /**
@@ -134,10 +131,6 @@ class MainWidget : public QWidget
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
     QWidget* createStringParameter(Parameter<std::string>* parameter);
-
-    // TODO: comment
-    void setRobotStatus(QTableWidget* table,
-                    std::vector<std::pair<std::string, Duration>> robot_status_messages);
 
     bool first_draw_call;
     // Unfortunately Qt uses raw pointers
