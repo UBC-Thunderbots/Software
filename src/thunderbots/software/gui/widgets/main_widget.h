@@ -38,30 +38,43 @@ class MainWidget : public QWidget
      * visualizing the state of the world as well as drawing the AI state we want to show,
      * like planned navigator paths.
      *
-     * @param world The world to draw
+     * @param world_draw_function The function that tells the Visualizer how to draw the World state
+     * @param ai_draw_function The function that tells the Visualizer how to draw the AI state
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
-    // TODO: comment
+
+    /**
+     * Updates and displays newly provided PlayInfo
+     *
+     * @param play_info The new PlayInfo to display
+     */
     void updatePlayInfo(PlayInfo play_info);
 
+    /**
+     * Updates and displays the newly provided RobotStatus.
+     *
+     * @param robot_status The new robot status to display
+     */
     void updateRobotStatus(const RobotStatus& robot_status);
 
    private:
     /**
      * Sets up the SceneView which draws the AI's view of the world, such as robot
      * positions, ball velocity, etc.
+     *
      * @param view The view to display the QGraphicsScene with
-     * @param scene The QGraphicsScene that will be dislpayed by the view
+     * @param scene The QGraphicsScene that will be displayed by the view
      * @param gl_widget A QOpenGLWidget that can be used to help display items in the view
      */
     void setupSceneView(QGraphicsView* view, QGraphicsScene* scene,
                         QOpenGLWidget* gl_widget);
 
     /**
-     * Sets up the status table that displays robot status
+     * Sets up the table that displays robot status
+     *
      * @param table The QTableWidget that will contain the status information
      */
-    void setupStatusTable(QTableWidget* table);
+    void setupRobotStatusTable(QTableWidget* table);
 
     /**
      * Sets up all the widgets that will be used to control the AI, such as starting or
@@ -96,13 +109,9 @@ class MainWidget : public QWidget
     void setupPlayOverrideComboBox();
 
     /**
-     * Sets up the Parameters tab that contains all the tuneable parameters for the AI
-     */
-    void setupParametersTab();
-
-    /**
      * Creates a widget that contains the components necessary to display and control a
      * boolean Parameter for the AI
+     *
      * @param parameter The boolean parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
@@ -111,6 +120,7 @@ class MainWidget : public QWidget
     /**
      * Creates a widget that contains the components necessary to display and control an
      * integer Parameter for the AI
+     *
      * @param parameter The integer parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
@@ -119,6 +129,7 @@ class MainWidget : public QWidget
     /**
      * Creates a widget that contains the components necessary to display and control a
      * double Parameter for the AI
+     *
      * @param parameter The double parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
@@ -127,10 +138,16 @@ class MainWidget : public QWidget
     /**
      * Creates a widget that contains the components necessary to display and control a
      * string Parameter for the AI
+     *
      * @param parameter The string parameter to create a widget for
      * @return A pointer to the QWidget that will be used to control the given parameter
      */
     QWidget* createStringParameter(Parameter<std::string>* parameter);
+
+    /**
+     * Sets up the Parameters tab that contains all the tuneable parameters for the AI
+     */
+    void setupParametersTab();
 
     bool first_draw_call;
     // Unfortunately Qt uses raw pointers
