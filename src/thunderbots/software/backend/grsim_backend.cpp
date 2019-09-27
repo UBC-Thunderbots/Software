@@ -43,7 +43,7 @@ void GrSimBackend::setMostRecentlyReceivedPrimitives(ConstPrimitiveVectorPtr pri
     // TODO: tempfor testing
     RobotStatus status;
     status.robot_messages = {"test 1", "test 2", "test3"};
-    status.robot = 0;
+    status.robot          = 0;
     Subject<RobotStatus>::sendValueToObservers(status);
 }
 

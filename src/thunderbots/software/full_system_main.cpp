@@ -1,18 +1,17 @@
 #include <boost/program_options.hpp>
 #include <g3log/g3log.hpp>
-
 #include <iostream>
 #include <numeric>
 
 #include "software/ai/ai_wrapper.h"
+#include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
+#include "software/gui/drawing/draw_functions.h"
+#include "software/gui/visualizer_wrapper.h"
+#include "software/typedefs.h"
 #include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
-#include "software/gui/visualizer_wrapper.h"
-#include "software/gui/drawing/draw_functions.h"
-#include "software/typedefs.h"
-#include "software/ai/hl/stp/play_info.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state
@@ -117,7 +116,7 @@ int main(int argc, char **argv)
     Util::Logger::LoggerSingleton::initializeLogger();
 
     visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
-    ai = std::make_shared<AIWrapper>();
+    ai         = std::make_shared<AIWrapper>();
 
     if (parseCommandLineArgs(argc, argv))
     {

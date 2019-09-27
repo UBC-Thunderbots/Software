@@ -333,6 +333,7 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
     }
 }
 
-std::vector<std::vector<Point>> PathPlanningNavigator::getPlannedPaths() {
+std::vector<std::vector<Point>> PathPlanningNavigator::getPlannedPaths()
+{
     return planned_paths;
 }

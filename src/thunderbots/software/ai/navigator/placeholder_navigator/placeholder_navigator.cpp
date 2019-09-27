@@ -18,7 +18,8 @@ std::vector<std::unique_ptr<Primitive>> PlaceholderNavigator::getAssignedPrimiti
     return assigned_primitives;
 }
 
-std::vector<std::vector<Point>> PlaceholderNavigator::getPlannedPaths() {
+std::vector<std::vector<Point>> PlaceholderNavigator::getPlannedPaths()
+{
     return {};
 }
 

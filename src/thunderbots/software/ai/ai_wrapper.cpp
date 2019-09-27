@@ -2,9 +2,9 @@
 
 #include <boost/bind.hpp>
 
+#include "software/gui/drawing/navigator.h"
 #include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/parameter/dynamic_parameters.h"
-#include "software/gui/drawing/navigator.h"
 
 void AIWrapper::onValueReceived(World world)
 {
@@ -40,7 +40,8 @@ void AIWrapper::drawWorld()
 
 void AIWrapper::drawAI()
 {
-    if(ai.getNavigator()) {
+    if (ai.getNavigator())
+    {
         auto draw_function = drawNavigator(ai.getNavigator());
         Subject<AIDrawFunction>::sendValueToObservers(draw_function);
     }

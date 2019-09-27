@@ -2,7 +2,6 @@
 
 #include <boost/bind.hpp>
 #include <g3log/g3log.hpp>
-
 #include <limits>
 
 #include "software/util/constants.h"

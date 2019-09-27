@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtWidgets/QGraphicsView>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QWheelEvent>
+#include <QtWidgets/QGraphicsView>
 
 /**
  * A custom QGraphicsView that allows zooming with the mousewheel

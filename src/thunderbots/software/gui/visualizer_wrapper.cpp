@@ -1,13 +1,15 @@
 #include "software/gui/visualizer_wrapper.h"
-#include "software/gui/drawing/world.h"
+
 #include <chrono>
 
-VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
-            ThreadedObserver<World>(),
-            ThreadedObserver<WorldDrawFunction>(),
-            ThreadedObserver<AIDrawFunction>(),
-            ThreadedObserver<PlayInfo>(),
-            ThreadedObserver<RobotStatus>()
+#include "software/gui/drawing/world.h"
+
+VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
+    : ThreadedObserver<World>(),
+      ThreadedObserver<WorldDrawFunction>(),
+      ThreadedObserver<AIDrawFunction>(),
+      ThreadedObserver<PlayInfo>(),
+      ThreadedObserver<RobotStatus>()
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -21,7 +23,7 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
         std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv,
                     application_promise, visualizer_promise);
     application = application_future.get();
-    visualizer = visualizer_future.get();
+    visualizer  = visualizer_future.get();
 }
 
 VisualizerWrapper::~VisualizerWrapper()
@@ -40,7 +42,8 @@ void VisualizerWrapper::onValueReceived(World world)
     draw();
 }
 
-void VisualizerWrapper::onValueReceived(RobotStatus robot_status) {
+void VisualizerWrapper::onValueReceived(RobotStatus robot_status)
+{
     // Call the ThunderbotsVisualizer to update the Play Info in a threadsafe manner
     // See
     // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
@@ -50,17 +53,20 @@ void VisualizerWrapper::onValueReceived(RobotStatus robot_status) {
                               Q_ARG(RobotStatus, robot_status));
 }
 
-void VisualizerWrapper::onValueReceived(PlayInfo play_info) {
+void VisualizerWrapper::onValueReceived(PlayInfo play_info)
+{
     most_recent_play_info = play_info;
     updatePlayInfo();
 }
 
-void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function) {
+void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function)
+{
     most_recent_ai_draw_function = draw_function;
     draw();
 }
 
-void VisualizerWrapper::onValueReceived(WorldDrawFunction draw_function) {
+void VisualizerWrapper::onValueReceived(WorldDrawFunction draw_function)
+{
     // TODO: implement
 }
 
@@ -89,7 +95,8 @@ void VisualizerWrapper::createAndRunVisualizer(
     app->exec();
 }
 
-void VisualizerWrapper::updatePlayInfo() {
+void VisualizerWrapper::updatePlayInfo()
+{
     // Call the ThunderbotsVisualizer to update the Play Info in a threadsafe manner
     // See
     // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705

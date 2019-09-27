@@ -1,14 +1,15 @@
 #pragma once
 
+#include <QtCore/QTimer>
 #include <QtWidgets/QTableWidget>
+#include <chrono>
+
 #include "software/backend/robot_status.h"
 #include "software/util/time/duration.h"
-#include <chrono>
-#include <QtCore/QTimer>
 
 /**
- * A custom TableWidget designed to display robot status. This class manages the ordering and age
- * of the provided statuses while displaying them
+ * A custom TableWidget designed to display robot status. This class manages the ordering
+ * and age of the provided statuses while displaying them
  */
 class RobotStatusTable : public QTableWidget
 {
@@ -17,18 +18,22 @@ class RobotStatusTable : public QTableWidget
     /**
      * Creates a new RobotStatusTable
      *
-     * NOTE: The reason the message_expiry_age is the second parameter with a default argument is because
-     * this RobotStatusTable is being used as a "promoted custom widget" in the qtcreator editor (which is what
-     * makes the .ui file that autogenerates GUI code). You cannot define extra arguments to be passed to the
-     * generated code, so the promoted widget will always be constructed with the parent_ptr as the only
-     * parameter. Therefore the expiry age has to be the second parameter to not interfere with the parent
-     * argument, and the default value is used so our code can define what the value is in a somewhat reasonable
-     * way (slightly better than hardcoding inside the implementation).
+     * NOTE: The reason the message_expiry_age is the second parameter with a default
+     * argument is because this RobotStatusTable is being used as a "promoted custom
+     * widget" in the qtcreator editor (which is what makes the .ui file that
+     * autogenerates GUI code). You cannot define extra arguments to be passed to the
+     * generated code, so the promoted widget will always be constructed with the
+     * parent_ptr as the only parameter. Therefore the expiry age has to be the second
+     * parameter to not interfere with the parent argument, and the default value is used
+     * so our code can define what the value is in a somewhat reasonable way (slightly
+     * better than hardcoding inside the implementation).
      *
      * @param parent A pointer to the parent widget for this RobotStatusTable
-     * @param message_expiry_age How old messages must be before they are automatically removed from the table
+     * @param message_expiry_age How old messages must be before they are automatically
+     * removed from the table
      */
-    explicit RobotStatusTable(QWidget *parent = nullptr, Duration message_expiry_age = Duration::fromSeconds(30));
+    explicit RobotStatusTable(QWidget* parent             = nullptr,
+                              Duration message_expiry_age = Duration::fromSeconds(30));
 
     /**
      * Returns a map of the status messages and ages stored in this table
@@ -37,16 +42,17 @@ class RobotStatusTable : public QTableWidget
      */
     std::map<std::string, Duration> getStatusMessages() const;
 
-public slots:
+   public slots:
     /**
-     * Updates the table with a new robot status. If the status message already exists, the message
-     * age is refreshed to 0. Othewise, a new message is added with an age of 0.
+     * Updates the table with a new robot status. If the status message already exists,
+     * the message age is refreshed to 0. Othewise, a new message is added with an age of
+     * 0.
      *
      * @param robot_status The status to add to the table
      */
     void updateRobotStatus(const RobotStatus& robot_status);
 
-private:
+   private:
     /**
      * Updates the ages for all status messages in the table
      */
@@ -58,8 +64,8 @@ private:
     void removeOldStatusMessages();
 
     /**
-     * Updates the table view (the actual rendered table the user sees) with the latest values
-     * stored in the status_messages
+     * Updates the table view (the actual rendered table the user sees) with the latest
+     * values stored in the status_messages
      */
     void updateTableView();
 

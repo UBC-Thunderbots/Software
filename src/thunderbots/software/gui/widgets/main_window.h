@@ -2,9 +2,9 @@
 
 #include <QtWidgets/QMainWindow>
 
-#include "software/gui/widgets/main_widget.h"
-#include "software/gui/drawing/draw_functions.h"
 #include "software/backend/robot_status.h"
+#include "software/gui/drawing/draw_functions.h"
+#include "software/gui/widgets/main_widget.h"
 
 /**
  * This is the main window / application object for the thunderbots visualizer

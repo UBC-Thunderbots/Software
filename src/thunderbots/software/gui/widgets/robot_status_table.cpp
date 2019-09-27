@@ -1,53 +1,76 @@
 #include "software/gui/widgets/robot_status_table.h"
+
 #include <math.h>
 
-RobotStatusTable::RobotStatusTable(QWidget *parent, Duration message_expiry_age) : QTableWidget(parent), message_expiry_age(message_expiry_age), age_update_timer(this) {
-    connect(&age_update_timer, &QTimer::timeout, this, &RobotStatusTable::updateStatusAge);
-    connect(&age_update_timer, &QTimer::timeout, this, &RobotStatusTable::removeOldStatusMessages);
+RobotStatusTable::RobotStatusTable(QWidget* parent, Duration message_expiry_age)
+    : QTableWidget(parent), message_expiry_age(message_expiry_age), age_update_timer(this)
+{
+    connect(&age_update_timer, &QTimer::timeout, this,
+            &RobotStatusTable::updateStatusAge);
+    connect(&age_update_timer, &QTimer::timeout, this,
+            &RobotStatusTable::removeOldStatusMessages);
     unsigned int timer_interval_milliseconds = 100;
     age_update_timer.start(timer_interval_milliseconds);
 }
 
-void RobotStatusTable::updateRobotStatus(const RobotStatus &robot_status) {
-    for(const auto& message : robot_status.robot_messages) {
+void RobotStatusTable::updateRobotStatus(const RobotStatus& robot_status)
+{
+    for (const auto& message : robot_status.robot_messages)
+    {
         auto iter = status_messages.find(message);
-        if(iter == status_messages.end()) {
+        if (iter == status_messages.end())
+        {
             status_messages.insert(std::make_pair(message, Duration::fromSeconds(0)));
-        }else {
+        }
+        else
+        {
             iter->second = Duration::fromMilliseconds(0);
         }
     }
     updateTableView();
 }
 
-void RobotStatusTable::updateStatusAge() {
+void RobotStatusTable::updateStatusAge()
+{
     auto current_timestamp = std::chrono::steady_clock::now();
-    auto milliseconds_since_last_update = std::chrono::duration_cast<std::chrono::milliseconds>(current_timestamp - last_age_update_timestamp);
+    auto milliseconds_since_last_update =
+        std::chrono::duration_cast<std::chrono::milliseconds>(current_timestamp -
+                                                              last_age_update_timestamp);
     last_age_update_timestamp = current_timestamp;
 
-    for(auto iter = status_messages.begin(); iter != status_messages.end(); iter++) {
-        iter->second = iter->second + Duration::fromMilliseconds(milliseconds_since_last_update.count());
+    for (auto iter = status_messages.begin(); iter != status_messages.end(); iter++)
+    {
+        iter->second = iter->second +
+                       Duration::fromMilliseconds(milliseconds_since_last_update.count());
     }
     updateTableView();
 }
 
-void RobotStatusTable::removeOldStatusMessages() {
-    for(auto iter = status_messages.begin(); iter != status_messages.end(); /* no increment */) {
+void RobotStatusTable::removeOldStatusMessages()
+{
+    for (auto iter = status_messages.begin(); iter != status_messages.end();
+         /* no increment */)
+    {
         auto age = iter->second;
-        if(age > message_expiry_age) {
+        if (age > message_expiry_age)
+        {
             status_messages.erase(iter);
-        }else {
+        }
+        else
+        {
             iter++;
         }
     }
     updateTableView();
 }
 
-std::map<std::string, Duration> RobotStatusTable::getStatusMessages() const {
+std::map<std::string, Duration> RobotStatusTable::getStatusMessages() const
+{
     return status_messages;
 }
 
-void RobotStatusTable::updateTableView() {
+void RobotStatusTable::updateTableView()
+{
     // Resize the number of rows to only have as many rows as we have messages. This will
     // automatically delete any extra rows / messages for us, and then we overwrite the
     // existing rows with new messages

@@ -5,13 +5,13 @@
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QWidget>
 
+#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/world/world.h"
+#include "software/backend/robot_status.h"
+#include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/zoomable_qgraphics_view.h"
 #include "software/util/parameter/parameter.h"
-#include "software/gui/drawing/draw_functions.h"
-#include "software/ai/hl/stp/play_info.h"
 #include "software/util/time/duration.h"
-#include "software/backend/robot_status.h"
 
 // Forward declare the name of the top-level GUI class defined in main_widget.ui
 namespace Ui

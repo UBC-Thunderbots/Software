@@ -1,27 +1,27 @@
 #pragma once
 
-#include <QtWidgets/QApplication>
 #include <QtCore/QGenericArgument>
+#include <QtWidgets/QApplication>
 #include <future>
+#include <set>
 #include <thread>
 
+#include "software/ai/hl/stp/play_info.h"
 #include "software/ai/world/world.h"
+#include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/main_window.h"
 #include "software/multithreading/threaded_observer.h"
-#include "software/ai/hl/stp/play_info.h"
-#include "software/backend/robot_status.h"
-#include <set>
 
 /**
  * This class wraps our 'ThunderbotsVisualizer' object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
 class VisualizerWrapper : public ThreadedObserver<World>,
-        public ThreadedObserver<WorldDrawFunction>,
-        public ThreadedObserver<AIDrawFunction>,
-        public ThreadedObserver<PlayInfo>,
-        public ThreadedObserver<RobotStatus>
+                          public ThreadedObserver<WorldDrawFunction>,
+                          public ThreadedObserver<AIDrawFunction>,
+                          public ThreadedObserver<PlayInfo>,
+                          public ThreadedObserver<RobotStatus>
 {
    public:
     VisualizerWrapper() = delete;

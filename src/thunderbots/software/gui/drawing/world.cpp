@@ -12,10 +12,9 @@ void drawWorld(QGraphicsScene* scene, const World& world)
     drawBall(scene, world.ball());
 }
 
-WorldDrawFunction getDrawWorldFunction(const World& world) {
-//    World foo = World();
-    auto draw_function = [world](QGraphicsScene* scene) {
-        drawWorld(scene, world);
-    };
+WorldDrawFunction getDrawWorldFunction(const World& world)
+{
+    //    World foo = World();
+    auto draw_function = [world](QGraphicsScene* scene) { drawWorld(scene, world); };
     return WorldDrawFunction(draw_function);
 }

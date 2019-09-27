@@ -30,6 +30,7 @@ PlayInfo AI::getPlayInfo() const
     return high_level->getPlayInfo();
 }
 
-std::shared_ptr<Navigator> AI::getNavigator() const {
+std::shared_ptr<Navigator> AI::getNavigator() const
+{
     return navigator;
 }
