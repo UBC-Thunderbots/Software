@@ -1,8 +1,9 @@
 #include "software/gui/visualizer_wrapper.h"
+
 #include "software/gui/drawing/world.h"
 
-VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
-      ThreadedObserver<World>(),
+VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
+    : ThreadedObserver<World>(),
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
       ThreadedObserver<RobotStatus>()
@@ -19,10 +20,11 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv) :
         std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv,
                     application_promise, visualizer_promise);
 
-    // We use futures and promises here to force the constructor to wait for the newly spawned
-    // thread to fully create the application and visualizer objects before we take pointers to
-    // them. If we do not make this guarantee, we could get invalid references to the application
-    // or visualizer objects which will cause the system to fail when we try interact with them
+    // We use futures and promises here to force the constructor to wait for the newly
+    // spawned thread to fully create the application and visualizer objects before we
+    // take pointers to them. If we do not make this guarantee, we could get invalid
+    // references to the application or visualizer objects which will cause the system to
+    // fail when we try interact with them
     application = application_future.get();
     visualizer  = visualizer_future.get();
 }

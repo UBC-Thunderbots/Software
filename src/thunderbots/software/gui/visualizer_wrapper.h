@@ -71,8 +71,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     void draw();
 
     /**
-     * Updates the PlayInfo being displayed in the Visualizer. This shows what Play and Tactics
-     * the AI is using.
+     * Updates the PlayInfo being displayed in the Visualizer. This shows what Play and
+     * Tactics the AI is using.
      */
     void updatePlayInfo();
 

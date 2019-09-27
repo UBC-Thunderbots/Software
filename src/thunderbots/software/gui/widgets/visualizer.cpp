@@ -1,7 +1,6 @@
 #include "software/gui/widgets/visualizer.h"
 
-Visualizer::Visualizer()
-    : QMainWindow(), main_widget(new MainWidget(this))
+Visualizer::Visualizer() : QMainWindow(), main_widget(new MainWidget(this))
 {
     setCentralWidget(main_widget);
 }

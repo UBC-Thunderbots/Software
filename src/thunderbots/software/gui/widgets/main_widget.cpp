@@ -69,7 +69,8 @@ void MainWidget::draw(WorldDrawFunction world_draw_function,
     ai_draw_function.execute(scene);
     if (first_draw_call)
     {
-        main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),Qt::KeepAspectRatio);
+        main_widget->ai_visualization_graphics_view->fitInView(scene->sceneRect(),
+                                                               Qt::KeepAspectRatio);
         first_draw_call = false;
     }
 }
@@ -97,7 +98,8 @@ void MainWidget::updateRobotStatus(const RobotStatus& robot_status)
     main_widget->robot_status_table_widget->updateRobotStatus(robot_status);
 }
 
-void MainWidget::setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget)
+void MainWidget::setupSceneView(QGraphicsView* view, QGraphicsScene* scene,
+                                QOpenGLWidget* gl_widget)
 {
     view->setScene(scene);
     view->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -228,11 +230,13 @@ void MainWidget::setupDefendingSideComboBox()
     auto on_defending_side_changed = [](const QString& text) {
         if (text == "Use Refbox")
         {
-            Util::DynamicParameters::AI::refbox::override_refbox_defending_side.setValue(false);
+            Util::DynamicParameters::AI::refbox::override_refbox_defending_side.setValue(
+                false);
         }
         else if (text == "East")
         {
-            Util::DynamicParameters::AI::refbox::override_refbox_defending_side.setValue(true);
+            Util::DynamicParameters::AI::refbox::override_refbox_defending_side.setValue(
+                true);
             // TODO: Confirm how East and West map to positive and negative sides
             Util::DynamicParameters::AI::refbox::defending_positive_side.setValue(false);
         }
@@ -260,7 +264,9 @@ void MainWidget::setupPlayOverrideComboBox()
 
     // Create a new list with all the play names converted to QStrings
     QList<QString> qt_play_names;
-    std::transform(play_names.begin(), play_names.end(), std::back_inserter(qt_play_names), [](std::string name) { return QString::fromStdString(name); });
+    std::transform(play_names.begin(), play_names.end(),
+                   std::back_inserter(qt_play_names),
+                   [](std::string name) { return QString::fromStdString(name); });
 
     main_widget->play_override_combo_box->insertItem(0, "Use AI Selection");
     main_widget->play_override_combo_box->insertItems(1, qt_play_names);
@@ -276,7 +282,8 @@ void MainWidget::setupPlayOverrideComboBox()
             Util::DynamicParameters::AI::current_ai_play.setValue(text.toStdString());
         }
     };
-    connect(main_widget->play_override_combo_box, &QComboBox::currentTextChanged, on_play_changed);
+    connect(main_widget->play_override_combo_box, &QComboBox::currentTextChanged,
+            on_play_changed);
 }
 
 QWidget* MainWidget::createBooleanParameter(Parameter<bool>* parameter)

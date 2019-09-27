@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QMainWindow>
 
-#include "software/backend/robot_status.h"
 #include "software/ai/hl/stp/play_info.h"
+#include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/main_widget.h"
 
@@ -26,8 +26,10 @@ class Visualizer : public QMainWindow
      * visualizing the state of the world as well as drawing the AI state we want to show,
      * like planned navigator paths.
      *
-     * @param world_draw_function The function that tells the Visualizer how to draw the World state
-     * @param ai_draw_function The function that tells the Visualizer how to draw the AI state
+     * @param world_draw_function The function that tells the Visualizer how to draw the
+     * World state
+     * @param ai_draw_function The function that tells the Visualizer how to draw the AI
+     * state
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
 

@@ -38,8 +38,10 @@ class MainWidget : public QWidget
      * visualizing the state of the world as well as drawing the AI state we want to show,
      * like planned navigator paths.
      *
-     * @param world_draw_function The function that tells the Visualizer how to draw the World state
-     * @param ai_draw_function The function that tells the Visualizer how to draw the AI state
+     * @param world_draw_function The function that tells the Visualizer how to draw the
+     * World state
+     * @param ai_draw_function The function that tells the Visualizer how to draw the AI
+     * state
      */
     void draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_draw_function);
 
