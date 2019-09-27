@@ -189,7 +189,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QGraphicsView" name="ai_visualization_graphics_view">
+      <widget class="ZoomableQGraphicsView" name="ai_visualization_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
@@ -214,6 +214,11 @@ p, li { white-space: pre-wrap; }
    <class>RobotStatusTable</class>
    <extends>QTableWidget</extends>
    <header>software/gui/widgets/robot_status_table.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ZoomableQGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>software/gui/widgets/zoomable_qgraphics_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
