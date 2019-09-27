@@ -10,7 +10,7 @@
 #include "software/ai/world/world.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
-#include "software/gui/widgets/main_window.h"
+#include "software/gui/widgets/visualizer.h"
 #include "software/multithreading/threaded_observer.h"
 
 /**

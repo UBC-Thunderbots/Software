@@ -24,8 +24,8 @@ qt_cc_library(
 
 qt_cc_library(
     name = "visualizer",
-    src = "main_window.cpp",
-    hdr = "main_window.h",
+    src = "visualizer.cpp",
+    hdr = "visualizer.h",
     deps = [
         ":main_widget",
         "//software/ai/hl/stp:play_info",
