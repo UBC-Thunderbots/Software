@@ -23,7 +23,7 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "main_window",
+    name = "visualizer",
     src = "main_window.cpp",
     hdr = "main_window.h",
     deps = [

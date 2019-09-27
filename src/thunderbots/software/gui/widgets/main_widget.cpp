@@ -74,7 +74,7 @@ void MainWidget::draw(WorldDrawFunction world_draw_function,
     }
 }
 
-void MainWidget::updatePlayInfo(PlayInfo play_info)
+void MainWidget::updatePlayInfo(const PlayInfo& play_info)
 {
     QString play_type_string =
         QString("Play Type: %1\n").arg(QString::fromStdString(play_info.play_type));

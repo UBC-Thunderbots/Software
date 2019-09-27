@@ -48,7 +48,7 @@ class MainWidget : public QWidget
      *
      * @param play_info The new PlayInfo to display
      */
-    void updatePlayInfo(PlayInfo play_info);
+    void updatePlayInfo(const PlayInfo& play_info);
 
     /**
      * Updates and displays the newly provided RobotStatus.

@@ -57,7 +57,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
         int argc, char** argv,
         std::shared_ptr<std::promise<std::shared_ptr<QApplication>>>
             application_promise_ptr,
-        std::shared_ptr<std::promise<std::shared_ptr<ThunderbotsVisualizer>>>
+        std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>>
             visualizer_promise_ptr);
 
     void onValueReceived(World world) override;
@@ -79,6 +79,6 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     AIDrawFunction most_recent_ai_draw_function;
     WorldDrawFunction most_recent_world_draw_function;
     std::thread run_visualizer_thread;
-    std::shared_ptr<ThunderbotsVisualizer> visualizer;
+    std::shared_ptr<Visualizer> visualizer;
     std::shared_ptr<QApplication> application;
 };

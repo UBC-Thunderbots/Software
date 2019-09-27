@@ -12,7 +12,7 @@ cc_library(
         "//software/backend:robot_status",
         "//software/gui/drawing:draw_functions",
         "//software/gui/drawing:world",
-        "//software/gui/widgets:main_window",
+        "//software/gui/widgets:visualizer",
         "//software/multithreading:threaded_observer",
         "@qt//:qt_widgets",
     ],
