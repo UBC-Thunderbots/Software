@@ -19,7 +19,7 @@
    * [Installing CLion](#installing-clion)
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
-* [Building the Code](#building-the-code)
+* [Building and Running the Code](#building-and-running-the-code)
    * [With CLion](#with-clion)
    * [From the command-line](#from-the-command-line)
 * [Debugging](#debugging)
