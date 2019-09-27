@@ -10,7 +10,7 @@ cc_library(
         "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
         "//software/geom:all",
     ],
-    alwaysLink = True,
+    alwayslink = True,
 )
 
 cc_library(
@@ -22,5 +22,5 @@ cc_library(
         "//software/ai/hl/stp/play:play_factory",
         "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
     ],
-    alwaysLink = True,
+    alwayslink = True,
 )
