@@ -3,22 +3,19 @@
 #include <QtCore/QGenericArgument>
 #include <QtWidgets/QApplication>
 #include <future>
-#include <set>
 #include <thread>
 
 #include "software/ai/hl/stp/play_info.h"
-#include "software/ai/world/world.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/visualizer.h"
 #include "software/multithreading/threaded_observer.h"
 
 /**
- * This class wraps our 'ThunderbotsVisualizer' object which is responsible for
+ * This class wraps our Visualizer object which is responsible for
  * visualizing information about our AI, and allowing users to control it.
  */
 class VisualizerWrapper : public ThreadedObserver<World>,
-                          public ThreadedObserver<WorldDrawFunction>,
                           public ThreadedObserver<AIDrawFunction>,
                           public ThreadedObserver<PlayInfo>,
                           public ThreadedObserver<RobotStatus>
@@ -27,7 +24,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     VisualizerWrapper() = delete;
 
     /**
-     * Create a new Visualizer wrapper
+     * Create a new Visualizer wrapper. The argc and argv arguments are required
+     * to create a QApplication
      *
      * @param argc The number of arguments being passed
      * @param argv Keyword arguments
@@ -38,11 +36,11 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
    private:
     /**
-     * Creates a new ThunderbotsVisualizer in a new thread and starts running it. We use
+     * Creates a new Visualizer in a new thread and starts running it. We use
      * promises in order for this object to still get pointers to the newly created
-     * QApplication and ThunderbotsVisualizer objects so we can control them. These
+     * QApplication and Visualizer objects so we can control them. These
      * objects must be created in the new thread because the QApplication must be
-     * constructed in the thread is will run in, and the ThunderbotsVisualizer must be
+     * constructed in the thread is will run in, and the Visualizer must be
      * created in the same context as the QApplication (which in this case is the new
      * thread).
      *
@@ -62,7 +60,6 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
-    void onValueReceived(WorldDrawFunction draw_function) override;
     void onValueReceived(PlayInfo play_info) override;
     void onValueReceived(RobotStatus robot_status) override;
 
@@ -72,9 +69,13 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      * navigator paths.
      */
     void draw();
+
+    /**
+     * Updates the PlayInfo being displayed in the Visualizer. This shows what Play and Tactics
+     * the AI is using.
+     */
     void updatePlayInfo();
 
-    std::vector<std::pair<std::string, Duration>> most_recent_robot_status;
     PlayInfo most_recent_play_info;
     AIDrawFunction most_recent_ai_draw_function;
     WorldDrawFunction most_recent_world_draw_function;

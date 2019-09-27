@@ -94,7 +94,6 @@ void MainWidget::updatePlayInfo(const PlayInfo& play_info)
 
 void MainWidget::updateRobotStatus(const RobotStatus& robot_status)
 {
-    std::cout << "updating status" << std::endl;
     main_widget->robot_status_table_widget->updateRobotStatus(robot_status);
 }
 

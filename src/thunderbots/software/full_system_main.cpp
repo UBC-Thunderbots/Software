@@ -122,6 +122,8 @@ int main(int argc, char **argv)
     {
         connectObservers();
 
+        // TODO: close AI when visualizer closes
+
         // This blocks forever without using the CPU
         std::promise<void>().get_future().wait();
     }
