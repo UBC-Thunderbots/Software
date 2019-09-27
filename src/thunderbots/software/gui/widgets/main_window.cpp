@@ -18,3 +18,7 @@ void ThunderbotsVisualizer::draw(WorldDrawFunction world_draw_function, AIDrawFu
 void ThunderbotsVisualizer::updatePlayInfo(PlayInfo play_info) {
     main_widget->updatePlayInfo(play_info);
 }
+
+void ThunderbotsVisualizer::updateRobotStatus(std::vector<std::pair<std::string, Duration>> robot_status) {
+    main_widget->updateRobotStatus(robot_status);
+}

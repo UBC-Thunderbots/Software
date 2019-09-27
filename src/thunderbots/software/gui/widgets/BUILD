@@ -14,6 +14,7 @@ qt_cc_library(
         "//software/gui/drawing:draw_functions",
         "//software/gui/ui:main_widget",
         "//software/util/parameter",
+        "//software/util/time:duration",
         "@g3log//:all",
         "@qt//:qt_widgets",
     ],

@@ -60,8 +60,10 @@ void VisualizerWrapper::onValueReceived(RobotStatus robot_status) {
         return a.second < b.second;
     };
 
-    std::set<std::pair<std::string, Duration>> message_set(status_messages.begin(), status_messages.end());
-    std::sort(message_set.begin(), message_set.end(), sort_by_duration_comparator);
+    std::vector<std::pair<std::string, Duration>> message_vec(status_messages.begin(), status_messages.end());
+    std::sort(message_vec.begin(), message_vec.end(), sort_by_duration_comparator);
+    most_recent_robot_status = message_vec;
+    updateRobotStatus();
 }
 
 void VisualizerWrapper::onValueReceived(PlayInfo play_info) {
@@ -110,4 +112,19 @@ void VisualizerWrapper::updatePlayInfo() {
     QMetaObject::invokeMethod(visualizer.get(), "updatePlayInfo",
                               Qt::ConnectionType::BlockingQueuedConnection,
                               Q_ARG(PlayInfo, most_recent_play_info));
+}
+
+void VisualizerWrapper::updateRobotStatus() {
+    // Call the ThunderbotsVisualizer to update the Play Info in a threadsafe manner
+    // See
+    // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705
+//    QMetaObject::invokeMethod(visualizer.get(), "updateRobotStatus",
+//                              Qt::ConnectionType::BlockingQueuedConnection,
+//                              Q_ARG(std::set<std::pair<std::string, Duration>>, most_recent_robot_status));
+    // I hate macros
+    using FOOBAR = std::vector<std::pair<std::string, Duration>>;
+    QMetaObject::invokeMethod(visualizer.get(), "updateRobotStatus",
+                              Qt::ConnectionType::BlockingQueuedConnection,
+//                              Q_ARG(std::set<std::pair<std::string, Duration>>, most_recent_robot_status));
+                              Q_ARG(FOOBAR, most_recent_robot_status));
 }

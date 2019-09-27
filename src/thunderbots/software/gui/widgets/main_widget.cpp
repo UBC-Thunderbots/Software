@@ -81,6 +81,10 @@ void MainWidget::updatePlayInfo(PlayInfo play_info) {
     main_widget->play_and_tactic_info_text_edit->setText(play_info_string);
 }
 
+void MainWidget::updateRobotStatus(std::vector<std::pair<std::string, Duration>> robot_status_messages) {
+    setRobotStatus(main_widget->robot_status_table_widget, robot_status_messages);
+}
+
 void MainWidget::setupAIControls()
 {
     setupAIStartAndStopButtons();
@@ -235,22 +239,22 @@ void MainWidget::draw(WorldDrawFunction world_draw_function, AIDrawFunction ai_d
 
 void MainWidget::updateRobotStatusMessages()
 {
-    std::random_device dev;
-    std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 10);
+//    std::random_device dev;
+//    std::mt19937 rng(dev());
+//    std::uniform_int_distribution<std::mt19937::result_type> dist(0, 10);
+//
+//    int num_entries = dist(rng);
+//
+//    std::vector<std::string> status_msgs;
+//    for (int i = 0; i < num_entries; i++)
+//    {
+//        int age         = dist(rng);
+//        std::string msg = "Robot " + std::to_string(age) +
+//                          "  --  some error oh no. Number " + std::to_string(age);
+//        status_msgs.emplace_back(msg);
+//    }
 
-    int num_entries = dist(rng);
-
-    std::vector<std::string> status_msgs;
-    for (int i = 0; i < num_entries; i++)
-    {
-        int age         = dist(rng);
-        std::string msg = "Robot " + std::to_string(age) +
-                          "  --  some error oh no. Number " + std::to_string(age);
-        status_msgs.emplace_back(msg);
-    }
-
-    setRobotStatus(main_widget->robot_status_table_widget, status_msgs);
+//    setRobotStatus(main_widget->robot_status_table_widget, status_msgs);
 }
 
 void MainWidget::setupSceneView(QGraphicsView* view, QGraphicsScene* scene,
@@ -302,19 +306,21 @@ void MainWidget::setupStatusTable(QTableWidget* table)
 }
 
 void MainWidget::setRobotStatus(QTableWidget* table,
-                                std::set<std::pair<std::string, Duration>> robot_status_messages)
+                                std::vector<std::pair<std::string, Duration>> robot_status_messages)
 {
     // Resize the number of rows to only have as many rows as we have messages. This will
     // automatically delete any extra rows / messages for us, and then we overwrite the
     // existing rows with new messages
-//    table->setRowCount(robot_status_messages.size());
-//    for (int i = 0; i < robot_status_messages.size(); i++)
-//    {
-//        auto [message, age_in_seconds] = robot_status_messages[i];
-//        QString age = QString::number(std::floor(age_in_seconds));
-//        table->setItem(i, 0, new QTableWidgetItem(age));
-//        table->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(message)));
-//    }
+    table->setRowCount(robot_status_messages.size());
+    int row = 0;
+    for (const auto& status_message : robot_status_messages)
+    {
+        auto [message, age_duration] = status_message;
+        QString age = QString::number(std::floor(age_duration.getSeconds()));
+        table->setItem(row, 0, new QTableWidgetItem(age));
+        table->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(message)));
+        row++;
+    }
 }
 
 QWidget* MainWidget::createBooleanParameter(Parameter<bool>* parameter)
