@@ -1,13 +1,11 @@
 #include "software/gui/widgets/zoomable_qgraphics_view.h"
 
-// No special behaviour beyond the regular QGraphicsView. All configuration should
-// be done by the caller that owns instances of this object
 ZoomableQGraphicsView::ZoomableQGraphicsView(QWidget *parent) : QGraphicsView(parent) {}
 
 void ZoomableQGraphicsView::wheelEvent(QWheelEvent *event)
 {
     if (event->delta() > 0)
-        scale(1.03, 1.03);
+        scale(zoom_in_scaling_factor, zoom_in_scaling_factor);
     else
-        scale(0.97, 0.97);
+        scale(zoom_out_scaling_factor, zoom_out_scaling_factor);
 }
