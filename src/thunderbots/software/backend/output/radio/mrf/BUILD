@@ -45,7 +45,7 @@ cc_library(
         "//software/ai/primitive",
         "//software/backend:robot_status",
         "//software/backend/output/radio/mrf/usb:libusb",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util:constants",
     ],
 )

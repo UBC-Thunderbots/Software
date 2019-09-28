@@ -2,7 +2,7 @@
 #   This library provides us with abstractions for working with USB devices
 
 cc_library(
-    name = "all",
+    name = "libusb",
     srcs = glob([
         "libusb/*.c",
         "libusb/os/linux_*.c",
@@ -21,7 +21,7 @@ cc_library(
         "libusb/os",
     ],
     deps = [
-        "@libudev//:all",
+        "@libudev",
     ],
     visibility = ["//visibility:public"],
 )

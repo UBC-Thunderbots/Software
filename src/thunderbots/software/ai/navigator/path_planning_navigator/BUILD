@@ -37,7 +37,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//software/ai/primitive:move_primitive",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -55,7 +55,7 @@ cc_library(
     srcs = ["trespass.cpp"],
     hdrs = ["trespass.h"],
     deps = [
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/math:math_functions",
     ],
 )

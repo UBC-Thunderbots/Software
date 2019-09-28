@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "all",
+    name = "geom",
     srcs = [
         "polygon.cpp",
         "rectangle.cpp",
@@ -23,7 +23,7 @@ cc_library(
     ],
     deps = [
         "@boost//:geometry",
-        "@g3log//:all",
+        "@g3log",
     ],
 )
 
@@ -33,7 +33,7 @@ cc_test(
         "angle_test.cpp",
     ],
     deps = [
-        ":all",
+        ":geom",
         "@gtest//:gtest_main",
     ],
 )
@@ -44,7 +44,7 @@ cc_test(
         "point_test.cpp",
     ],
     deps = [
-        ":all",
+        ":geom",
         "@gtest//:gtest_main",
     ],
 )
@@ -55,7 +55,7 @@ cc_test(
         "polygon_test.cpp",
     ],
     deps = [
-        ":all",
+        ":geom",
         "@gtest//:gtest_main",
     ],
 )
@@ -66,7 +66,7 @@ cc_test(
         "util_test.cpp",
     ],
     deps = [
-        ":all",
+        ":geom",
         "@gtest//:gtest_main",
     ],
 )

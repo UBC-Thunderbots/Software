@@ -229,9 +229,9 @@ cc_library(
     srcs = ["intent.cpp"],
     hdrs = ["intent.h"],
     deps = [
-            ":avoid_area",
-            "@g3log//:all"
-            ],
+        ":avoid_area",
+        "@g3log",
+    ],
 )
 
 cc_test(

@@ -106,7 +106,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
 * Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
-* When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account. (*if you choose this option, you'll need to install the bazel plugin yourself*)
+* When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
 ## Building and Running the Code
 

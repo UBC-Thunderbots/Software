@@ -39,7 +39,6 @@ sudo apt-get update
 host_software_packages=(
     curl
     cmake
-    g++-7 # We need g++ 7 or greater to support the C++17 standard
     protobuf-compiler
     libprotobuf-dev
     libusb-1.0-0-dev
@@ -73,10 +72,6 @@ if [ $? -ne 0 ]; then
     echo "##############################################################"
     exit 1
 fi
-
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
-                         --slave /usr/bin/g++ g++ /usr/bin/g++-7 
-sudo update-alternatives --config gcc
 
 # yaml for cfg generation (Dynamic Parameters)
 sudo apt-get install python3-yaml -y

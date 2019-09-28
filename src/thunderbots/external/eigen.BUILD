@@ -1,6 +1,7 @@
 # Description:
 #   Eigen is a C++ template library for linear algebra: vectors,
 #   matrices, and related algorithms.
+#   http://eigen.tuxfamily.org/index.php?title=Main_Page
 
 licenses([
     # Note: Eigen is an MPL2 library that includes GPL v3 and LGPL v2.1+ code.

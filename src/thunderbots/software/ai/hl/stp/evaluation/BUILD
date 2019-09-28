@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -28,7 +28,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -38,7 +38,7 @@ cc_test(
     deps = [
         ":calc_best_shot",
         "//shared:constants",
-        "//software/geom:all",
+        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -51,7 +51,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -60,7 +60,7 @@ cc_test(
     srcs = ["deflect_off_enemy_target_test.cpp"],
     deps = [
         ":deflect_off_enemy_target",
-        "//software/geom:all",
+        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -74,7 +74,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/world:ball",
         "//software/ai/world:field",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -84,7 +84,7 @@ cc_test(
     deps = [
         ":detect_threat",
         "//software/ai/world:ball",
-        "//software/geom:all",
+        "//software/geom",
         "//software/test_util",
         "//software/util/time:timestamp",
         "@gtest//:gtest_main",
@@ -103,7 +103,7 @@ cc_library(
         ":team",
         "//shared:constants",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -125,7 +125,7 @@ cc_library(
     deps = [
         ":indirect_chip",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/parameter:dynamic_parameters",
     ],
 )
@@ -137,7 +137,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/parameter:dynamic_parameters",
     ],
 )
@@ -148,7 +148,7 @@ cc_test(
     deps = [
         ":indirect_chip",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
@@ -164,7 +164,7 @@ cc_library(
         "//software/ai/world:ball",
         "//software/ai/world:field",
         "//software/ai/world:robot",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/optimization:gradient_descent",
     ],
 )
@@ -191,7 +191,7 @@ cc_library(
         "//software/ai/world:ball",
         "//software/ai/world:field",
         "//software/ai/world:robot",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -214,7 +214,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/world:ball",
         "//software/ai/world:robot",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 

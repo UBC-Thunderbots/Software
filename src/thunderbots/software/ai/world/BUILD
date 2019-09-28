@@ -5,7 +5,7 @@ cc_library(
     srcs = ["ball.cpp"],
     hdrs = ["ball.h"],
     deps = [
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -25,7 +25,7 @@ cc_library(
     srcs = ["field.cpp"],
     hdrs = ["field.h"],
     deps = [
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
     ],
@@ -47,7 +47,7 @@ cc_library(
     deps = [
         ":ball",
         ":refbox_constants",
-        "@g3log//:all",
+        "@g3log",
     ],
 )
 
@@ -83,7 +83,7 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         ":robot_capabilities",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/time:timestamp",
         "@boost//:circular_buffer",
     ],

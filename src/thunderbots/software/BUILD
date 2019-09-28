@@ -18,6 +18,6 @@ cc_binary(
         "//software/util/logger",
         "//software/util/parameter:dynamic_parameters",
         "@boost//:program_options",
-        "@g3log//:all",
+        "@g3log",
     ],
 )

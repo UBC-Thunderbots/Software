@@ -8,7 +8,7 @@ cc_library(
         ":pass",
         "//software/ai/evaluation:pass",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/math:math_functions",
     ],
 )
@@ -30,7 +30,7 @@ cc_library(
     hdrs = ["pass.h"],
     deps = [
         "//software/ai/world:field",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/time:timestamp",
     ],
 )

@@ -5,7 +5,7 @@ cc_library(
     srcs = ["math_functions.cpp"],
     hdrs = ["math_functions.h"],
     deps = [
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 

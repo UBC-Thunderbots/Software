@@ -11,7 +11,7 @@ cc_library(
         "//software/ai/hl/stp/tactic",
         "//software/ai/intent:stop_intent",
         "//software/util/parameter:dynamic_parameters",
-        "@munkres_cpp//:all",
+        "@munkres_cpp",
     ],
 )
 

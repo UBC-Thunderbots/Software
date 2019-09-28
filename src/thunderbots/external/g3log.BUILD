@@ -1,6 +1,7 @@
 # Description:
 #   G3log is a logging library that allows us to publish at multiple logging levels,
 #   log to custom sinks, etc.
+#   https://github.com/KjellKod/g3log
 
 # G3log uses cmake to generate some files, so we need to run it
 # before we build
@@ -17,7 +18,7 @@ genrule(
 )
 
 cc_library(
-    name = "all",
+    name = "g3log",
     srcs = glob(
         ["src/*.cpp", "src/*.ipp"],
         exclude = [
