@@ -29,47 +29,38 @@ function travis_run() {
 
 # Change to the directory this script is in
 cd $CURR_DIR
-
-# Note that we must build the codebase in order to run tests and/or get coverage
-if [ "$RUN_BUILD" == "true" ] || \
-    [ "$RUN_TESTS" == "true" ] || \
-    [ "$RUN_COVERAGE" == "true" ]; then
+if [ "$RUN_BUILD" == "true" ]; then
     # Install all required dependecies
     travis_run ./environment_setup/setup_software.sh
 
-    # Build the codebase
-    travis_run catkin_make
-fi
-
-# Note that we must run tests to get coverage
-if [ "$RUN_TESTS" == "true" ] || \
-    [ "$RUN_COVERAGE" == "true" ]; then
-    
-    if [ "$RUN_COVERAGE" == "true" ]; then
-        # Run tests for AI with coverage
-        travis_run catkin_make run_tests -DENABLE_COVERAGE=ON
+    pushd src/
+    if [ "$RUN_TESTS" == "true" ]; then
+        if [ "$RUN_COVERAGE" == "true" ]; then
+            # Run tests + coverage
+            travis_run bazel coverage //... --compilation_mode=fastbuild --verbose_test_summary --instrumentation_filter=//...
+        else
+            # Run tests
+            travis_run bazel test //... --compilation_mode=fastbuild --verbose_test_summary
+        fi
     else
-        # Run tests for AI normally
-        travis_run catkin_make run_tests
+        # Build everything as fast as possible
+        travis_run bazel build //... --compilation_mode=fastbuild
     fi
-
-    # Run tests for Corner Kick
-    travis_run ./src/corner_kick/scripts/start_test.sh
-
-    # Report the results of the tests
-    # (which tests failed and why)
-    travis_run catkin_test_results --verbose
-
-    if [ "$RUN_COVERAGE" == "true" ]; then
-        # Upload coverage reports
-        # Note that we only grab a certain number of lines from the head
-        # and tail (start and end) of the command to prevent this generating
-        # a massive log in CI
-        travis_run bash <(curl -s https://codecov.io/bash) | (head -n100 && tail -n100)
-    fi
+    popd
 fi
 
-# We need to run tests in order to get coverage
+
+if [ "$RUN_COVERAGE" == "true" ]; then
+    # Upload coverage reports
+    # Note: we only grab a certain number of lines from the head
+    #       and tail (start and end) of the command to prevent this 
+    #       generating a massive log in CI
+    # Note: we specifically grab the bazel output because `bazel-testlogs`
+    #       is a symlink and it seems like the codecov script won't follow
+    #       those
+    travis_run bash <(curl -s https://codecov.io/bash) -s src/bazel-testlogs/ | (head -n100 && tail -n100)
+fi
+
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then    
     CLANG_VERSION="7.0"
 

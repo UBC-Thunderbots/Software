@@ -19,14 +19,9 @@
    * [Installing CLion](#installing-clion)
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
-* [Building the Code](#building-the-code)
+* [Building and Running the Code](#building-and-running-the-code)
    * [With CLion](#with-clion)
    * [From the command-line](#from-the-command-line)
-* [Running the Code](#running-the-code)
-   * [With CLion](#with-clion-1)
-   * [From the Command Line](#from-the-command-line-1)
-      * [Running Nodes Individually](#running-nodes-individually)
-      * [Running Nodes Together (Running a group of Nodes)](#running-nodes-together-running-a-group-of-nodes)
 * [Debugging](#debugging)
 
 ## Introduction
@@ -110,83 +105,41 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 #### Installing CLion
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./install_clion.sh`
-* **Or** you can manually download and install CLion from the [JetBrains website](https://www.jetbrains.com/clion/download/)
+* Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
 * When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
-## Building the Code
-
-### With CLion
-
-Our code can be built from within the CLion project just like any other project. 
-
-1. Select the target you want to build from the dropdown list in the top right
-   1. For example you could choose `ai_logic` or `backend_input`
-2. Press the build button just to the left of the target dropdown list.
-
-**NOTE:** CLion and the command line build in two seperate locations. So if you build something from the command line it will still need to build in CLion, and vice-versa
-
-*Building in CLion is a quick and easy way to make sure parts of your code compile, but you will still need to build using `catkin_make` from the command-line if you want to run the full system. CLion builds code into `cmake-build-debug` or `cmake-build-release` folders relative to where the project was opened. ROS commands such as `roslaunch` do not look in these `cmake-build` folders for the executables to run, so if you built new code using CLion and then tried running it with `roslaunch`, your new code would not be running!*
+## Building and Running the Code
 
 ### From the command-line
 
-Our code can be built from the command-line by running `catkin_make` from the base of the repository. catkin_make is basically just cmake with a few extra macros. The ROS wiki has a more detailed usage guide [here](http://wiki.ros.org/catkin/commands/catkin_make).  
-  
-For the explanations below we assume the Software repository was cloned into the user's home directory (`~/Software`).
-
-1. Open a terminal
-2. Navigate to the base of the folder where you cloned your Software repository: cd `~/Software`
-3. Simply run catkin_make: `catkin_make`
-
-*Remember, you must build using `catkin_make` from the command line if you want to actually run the full system! Trying to run `rosrun` or `roslaunch` after building in CLion will **NOT** run the new code*
-
-*Running `catkin_make` is what generates the `build` and `devel` folders in the Software folder. The `devel` folder is required to source the setup file (`source devel/setup.sh`), so remember to run catkin_make if those folders don't exist.*
-
-## Running the Code
+1) Navigate to the root of this repository (wherever you have it cloned on your computer)
+2) Navigate to `src/thunderbots`.
+3) Build a specific target for running (for example): `bazel build //software/geom:angle_test`
+4) Run a specific target by running (for example): `bazel run //software/geom:angle_test`
+4) Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
+3) Build everything by running `bazel build //...`
+4) Run all the tests by running `bazel test //...`
+*See the bazel [command-line docs](https://docs.bazel.build/versions/master/command-line-reference.html) for more info.*
 
 ### With CLion
 
-CLion is only able to run 1 node at a time. This node can either be standalone, or work as part of a larger group of nodes.
+First we need to setup CLion
+1. Open CLion
+2. Select `Import Bazel Project`
+3. Set `Workspace` to wherever you cloned the repository + `/src/thunderbots`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src/thunderbots`.
+4. Select `Create from scratch` 
+5. For "Project View", leave everything as default.
+6. You're good to go! Give CLion some time to find everything in your repo.
 
-1. Make sure you have built the code for the node in CLion. See [the above instructions](software-setup.md#with-clion). You can either `build_all` or build the target for only the node you care about (for example, `backend_input`)
-2. Make sure the selected target is the name of the node you want to run, eg. `backend_input`
-3. Press the button in the top right that looks like a "Play" button to run the code (it should be right next to where you selected the target to build/run)
-4. Any console output will be displayed in CLion's window
 
-If you want to run the node alongside other nodes, run them using `rosrun` from the command line. [See below for running noes via command line](software-setup.md#running-nodes-individually).
-
-### From the Command Line
-
-#### Running Nodes Individually
-
-ROS nodes can be run individually using [rosrun](http://wiki.ros.org/rosbash#rosrun). The syntax is typically `rosrun PACKAGE_NAME NODE_NAME`. 
-
-1. Open a new terminal. Navigate to the `Software` folder and source `devel/setup.sh`
-   1. We will call this _terminal A_
-2. Run `roscore`
-   1. This runs the ROS Master, which is the service that contains all the IP lookup tables and other networking information that allows the ROS nodes to "find" each other and communicate
-3. Open a new terminal. Navigate to the `Software` folder and source `devel/setup.sh`
-   1. We will call this _terminal B_
-4. Lets say you want to run the `network_input` node. We know this node is in the `thunderbots` package, so using the syntax mentioned above we can run: `rosrun thunderbots network_input`
-5. _terminal B_ will now be running the network_input node. You will see any print statements the node has.
-
-#### Running Nodes Together (Running a group of Nodes)
-
-[roslaunch](http://wiki.ros.org/roslaunch/Commandline%20Tools#roslaunch) is the ROS command to run a group of nodes. This group of nodes is defined in a launch file, which is file that uses XML syntax to list the nodes (and their parameters) that should be run, and has a   
-`.launch` extension. For example, we have `ai_grsim.launch`.  
-  
-The typical syntax for `roslaunch` is `roslaunch <packagename> <name of launch file>`. To run a launch file:
-
-1. Open a new terminal. Navigate to the `Software` folder and source `devel/setup.sh`
-2. Lets assume we want to run our main AI for grSim. This means we will want to run the `ai_grsim.launch` launch file, which we know is in the `thunderbots` package. Then using the syntax above, we can run: `roslaunch thunderbots ai.launch`
-3. Your terminal will now be running all the nodes defined in the ai.launch file, and will be displaying any print statements from all of the nodes
-
-*Note that we don't need to run `roscore` in this case. `roslaunch` takes care of that for us*
-
-*Note that there is no way to run a launch file or a group of nodes from CLion (without perhaps using custom targets and arguments). Using `roslaunch` from the command-line is the recommended way of running multiple nodes, and is the way our programs should be run if you are trying do some field tests or run the full system to play a game.*
+Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
+1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/thunderbots/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
+2. Add a custom build configuration (more powerful, so make sure you understand this!)
+    1. Select `Add Configuration` from the drop-down in the top-right of CLion
+    2. Under `Templates`, choose `Bazel Command`.
+    3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
+    4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
+    5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!
 
 ## Debugging
-
-The easiest way to debug the code is running it with CLion. The steps are exactly the same as [running a node with CLion](software-setup.md#with-clion-1), except you press the Debug button rather than the Run button to run the code in debug mode. You will then be able to set breakpoints, step through the code, and use all the functionality of the CLion debugger.
-
-*Remember that you can only debug one node at a time. Be sure to run the node that contains the code you are trying to debug.*
+Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow! Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). If you insist on using the command line for everything, or if you have CLion issues, see [here](https://stackoverflow.com/questions/45812725/c-debugging-with-gdb-bazel-emacs).
