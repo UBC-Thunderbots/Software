@@ -131,7 +131,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
 
     std::vector<Obstacle> velocity_obstacles;
 
-    // TODO: comment
     std::vector<std::vector<Point>> planned_paths;
 
     /**

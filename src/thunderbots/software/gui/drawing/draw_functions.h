@@ -3,8 +3,9 @@
 #include <QtWidgets/QGraphicsScene>
 #include <functional>
 
-// An abstract base class of a DrawFunction that is used to draw objects
-// in the Visualizer. All functionality is implemented in this class so
+// This class is used to represent a "draw function", which is a function
+// provided to the visualizer that tells is how to draw things.
+// All functionality is implemented in this class so
 // subclasses only need to call the superconstructor.
 //
 // This class is made abstract by making the desctructor pure virtual,

@@ -85,9 +85,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         Point(world.field().friendlyGoal().x() + world.field().defenseAreaLength() +
                   2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoal().y()),
-        Point(-(world.field().centreCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
               world.field().defenseAreaWidth() / 2.0),
-        Point(-(world.field().centreCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
+        Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
               -world.field().defenseAreaWidth() / 2.0),
     };
     // these move tactics will be used to go to those positions

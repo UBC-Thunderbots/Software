@@ -7,10 +7,6 @@
 
 AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 {
-    // capturing the planned_paths causes wild memory failures
-    // from bad_alloc to corrupted double-linked list, to segfault
-    // The segfault is from copying the planned paths, seems like it's
-    // actually uninitialized
     auto planned_paths = navigator->getPlannedPaths();
     auto draw_function = [planned_paths](QGraphicsScene* scene) {
         QPen pen(Qt::darkBlue);

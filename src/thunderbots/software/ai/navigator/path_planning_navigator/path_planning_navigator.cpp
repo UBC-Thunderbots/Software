@@ -154,7 +154,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
             return Obstacle::createCircleObstacle(
-                world.field().centerPoint(), world.field().centreCircleRadius(),
+                world.field().centerPoint(), world.field().centerCircleRadius(),
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value());
         case AvoidArea::HALF_METER_AROUND_BALL:

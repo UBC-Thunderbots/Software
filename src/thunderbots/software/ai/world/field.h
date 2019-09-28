@@ -101,10 +101,13 @@ class Field
      *
      * @return the radius of the centre circle in metres.
      */
-    // TODO: rename to center
-    double centreCircleRadius() const;
+    double centerCircleRadius() const;
 
-    // TODO: comment
+    /**
+     * Returns the center circle at the middle of the field
+     *
+     * @return the center circle at the middle of the field
+     */
     Circle centerCircle() const;
 
     /**

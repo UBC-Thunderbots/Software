@@ -18,5 +18,11 @@
  */
 void drawWorld(QGraphicsScene* scene, const World& world);
 
-// TODO: comment
+/**
+ * Returns a function that represents how to draw the provided world. Consumers
+ * may call this returned function to draw the provided world onto a QGraphicsScene.
+ *
+ * @param world The world to create a DrawFunction for
+ * @return A function that represents how to draw the provided world.
+ */
 WorldDrawFunction getDrawWorldFunction(const World& world);

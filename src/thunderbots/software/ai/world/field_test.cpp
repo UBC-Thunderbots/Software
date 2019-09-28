@@ -37,7 +37,7 @@ TEST_F(FieldTest, construct_with_parameters)
     EXPECT_DOUBLE_EQ(length, field.length());
     EXPECT_DOUBLE_EQ(width, field.width());
     EXPECT_DOUBLE_EQ(goal_width, field.goalWidth());
-    EXPECT_DOUBLE_EQ(center_circle_radius, field.centreCircleRadius());
+    EXPECT_DOUBLE_EQ(center_circle_radius, field.centerCircleRadius());
     EXPECT_DOUBLE_EQ(defense_width, field.defenseAreaWidth());
     EXPECT_DOUBLE_EQ(defense_length, field.defenseAreaLength());
     EXPECT_EQ(default_time_stamp, field.getMostRecentTimestamp());
