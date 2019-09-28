@@ -19,7 +19,7 @@
    * [Installing CLion](#installing-clion)
       * [Getting your Student License](#getting-your-student-license)
       * [Installing CLion](#installing-clion-1)
-* [Building the Code](#building-the-code)
+* [Building and Running the Code](#building-and-running-the-code)
    * [With CLion](#with-clion)
    * [From the command-line](#from-the-command-line)
 * [Debugging](#debugging)
@@ -105,9 +105,8 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 #### Installing CLion
 
 * Inside a terminal, navigate to the environment_setup folder. Eg. `cd path/to/the/repository/Software/environment_setup`
-* Run `./install_clion.sh`
-* **Or** you can manually download and install CLion from the [JetBrains website](https://www.jetbrains.com/clion/download/)
-* When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account. (*if you choose this option, you'll need to install the bazel plugin yourself*)
+* Run `./install_clion.sh` (* **DO NOT** download CLion yourself unless you know what you're doing. The `install_clion.sh` script will grab the correct version of CLion and the Bazel plugin to ensure everything is compatible *).
+* When you run CLion for the first time you will be prompted to enter your JetBrains account or License credentials. Use your student account.
 
 ## Building and Running the Code
 
@@ -127,7 +126,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 First we need to setup CLion
 1. Open CLion
 2. Select `Import Bazel Project`
-3. Set `Workspace` to wherever you cloned the repository + `/src/thunderbots`. So if I cloned the repo to `/home/gareth/Downloads/Software`, my workspace would be `/home/gareth/Downloads/Software/src/thunderbots`.
+3. Set `Workspace` to wherever you cloned the repository + `/src/thunderbots`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src/thunderbots`.
 4. Select `Create from scratch` 
 5. For "Project View", leave everything as default.
 6. You're good to go! Give CLion some time to find everything in your repo.

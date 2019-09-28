@@ -110,7 +110,7 @@ cc_library(
         "//software/ai/intent:move_intent",
         "//software/ai/intent:pivot_intent",
         "//software/util/parameter:dynamic_parameters",
-        "@g3log//:all",
+        "@g3log",
     ],
 )
 

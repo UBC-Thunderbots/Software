@@ -8,8 +8,8 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -33,8 +33,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
         "//software/ai/world",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -56,8 +56,8 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -71,8 +71,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/evaluation:enemy_threat",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -86,8 +86,8 @@ cc_library(
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:enemy_threat",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -99,8 +99,8 @@ cc_library(
         ":tactic",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -124,8 +124,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -148,8 +148,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -164,8 +164,8 @@ cc_library(
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:calc_best_shot",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -179,8 +179,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:calc_best_shot",
         "//software/ai/passing:pass",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -205,8 +205,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/evaluation:enemy_threat",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -229,8 +229,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:possession",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -246,8 +246,8 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:calc_best_shot",
         "//software/ai/hl/stp/evaluation:intercept",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 
@@ -270,8 +270,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
-        "//software/geom:all",
-        "@g3log//:all",
+        "//software/geom",
+        "@g3log",
     ],
 )
 

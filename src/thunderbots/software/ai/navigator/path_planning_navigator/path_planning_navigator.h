@@ -8,7 +8,6 @@
 #include "software/ai/navigator/path_planning_navigator/path_planner/theta_star_path_planner.h"
 #include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 /**
@@ -110,9 +109,6 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
      * @return A obstacle representing the given area
      */
     std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
-
-    void drawObstacle(const Obstacle &obstacle,
-                      const Util::CanvasMessenger::Color &color);
 
     // This navigators knowledge / state of the world
     World world;

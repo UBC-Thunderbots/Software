@@ -76,7 +76,6 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
-            Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
         }
         if ((*path_points).size() == 2)
@@ -90,7 +89,6 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
-            Util::CanvasMessenger::getInstance()->drawRobotPath(*path_points);
             return;
         }
     }
@@ -221,9 +219,6 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
         assigned_primitives.emplace_back(std::move(current_primitive));
     }
 
-    Util::CanvasMessenger::getInstance()->publishAndClearLayer(
-        Util::CanvasMessenger::Layer::NAVIGATOR);
-
     return assigned_primitives;
 }
 
@@ -231,12 +226,6 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
     const std::vector<AvoidArea> &avoid_areas, int robot_id)
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
-
-    for (auto obstacle : obstacles)
-    {
-        // draw the avoid area
-        drawObstacle(obstacle, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
-    }
 
     // Avoid obstacles specific to this MoveIntent
     for (auto area : avoid_areas)
@@ -252,8 +241,6 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
                     Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
                         .value());
                 obstacles.push_back(o);
-                // draw the avoid area
-                drawObstacle(o, Util::CanvasMessenger::ENEMY_TEAM_COLOR);
             }
         }
         else
@@ -262,8 +249,6 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
             if (obstacle_opt)
             {
                 obstacles.emplace_back(*obstacle_opt);
-                // draw the avoid area
-                drawObstacle(*obstacle_opt, Util::CanvasMessenger::AVOID_AREA_COLOR);
             }
         }
     }
@@ -281,27 +266,9 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
             robot,
             Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
         obstacles.push_back(o);
-        drawObstacle(o, Util::CanvasMessenger::FRIENDLY_TEAM_COLOR);
     }
 
     return obstacles;
-}
-
-void PathPlanningNavigator::drawObstacle(const Obstacle &obstacle,
-                                         const Util::CanvasMessenger::Color &color)
-{
-    if (obstacle.getBoundaryPolygon())
-    {
-        Util::CanvasMessenger::getInstance()->drawPolygonOutline(
-            Util::CanvasMessenger::Layer::NAVIGATOR, *obstacle.getBoundaryPolygon(),
-            0.025, color);
-    }
-    else if (obstacle.getBoundaryCircle())
-    {
-        Util::CanvasMessenger::getInstance()->drawPolygonOutline(
-            Util::CanvasMessenger::Layer::NAVIGATOR,
-            circleToPolygon(*obstacle.getBoundaryCircle(), 12), 0.025, color);
-    }
 }
 
 double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)

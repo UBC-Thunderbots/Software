@@ -6,10 +6,8 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
-#include "software/gui/drawing/draw_functions.h"
-#include "software/gui/visualizer_wrapper.h"
-#include "software/typedefs.h"
-#include "software/util/canvas_messenger/canvas_messenger.h"
+#include "software/backend/grsim_backend.h"
+#include "software/backend/radio_backend.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 
@@ -85,7 +83,7 @@ bool parseCommandLineArgs(int argc, char **argv)
         // avoid issues where required arguments are not required if "help" is given
         if (vm.count("help"))
         {
-            std::cout << BANNER << std::endl << desc << std::endl;
+            std::cout << desc << std::endl;
             return false;
         }
         else
@@ -120,6 +118,8 @@ void connectObservers()
 
 int main(int argc, char **argv)
 {
+    std::cout << BANNER << std::endl;
+
     Util::Logger::LoggerSingleton::initializeLogger();
 
     ai = std::make_shared<AIWrapper>();

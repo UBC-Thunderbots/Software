@@ -19,7 +19,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:passer_tactic",
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/passing:pass_generator",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -41,7 +41,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/ai/world:game_state",
         "//software/util/parameter:dynamic_parameters",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -64,7 +64,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/ai/world:game_state",
         "//software/util/parameter:dynamic_parameters",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -78,7 +78,7 @@ cc_library(
         ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -115,7 +115,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:shoot_goal_tactic",
         "//software/ai/passing:pass_generator",
         "//software/util/logger",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -129,7 +129,7 @@ cc_library(
         ":play_factory",
         "//shared:constants",
         "//software/ai/hl/stp/tactic:stop_tactic",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -159,7 +159,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
         "//software/util/logger",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -175,7 +175,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:chip_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -190,7 +190,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -205,7 +205,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic:move_tactic",
         "//software/ai/hl/stp/tactic:penalty_kick_tactic",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -230,7 +230,7 @@ cc_library(
         "//software/ai/hl/stp/tactic:stop_tactic",
         "//software/ai/world:game_state",
         "//software/util/parameter:dynamic_parameters",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )
@@ -245,7 +245,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
-        "@g3log//:all",
+        "@g3log",
     ],
     alwayslink = True,
 )

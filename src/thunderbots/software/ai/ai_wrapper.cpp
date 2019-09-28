@@ -1,16 +1,12 @@
 #include "software/ai/ai_wrapper.h"
 
 #include <boost/bind.hpp>
-
-#include "software/gui/drawing/navigator.h"
-#include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 void AIWrapper::onValueReceived(World world)
 {
     most_recent_world = world;
     runAIAndSendPrimitives();
-    drawWorld();
 }
 
 void AIWrapper::runAIAndSendPrimitives()
@@ -29,20 +25,4 @@ void AIWrapper::runAIAndSendPrimitives()
         Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(new_primitives_ptr);
     }
     drawAI();
-}
-
-void AIWrapper::drawWorld()
-{
-    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
-        Util::CanvasMessenger::getInstance();
-    canvas_messenger->drawWorld(most_recent_world);
-}
-
-void AIWrapper::drawAI()
-{
-    if (ai.getNavigator())
-    {
-        auto draw_function = drawNavigator(ai.getNavigator());
-        Subject<AIDrawFunction>::sendValueToObservers(draw_function);
-    }
 }

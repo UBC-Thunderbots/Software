@@ -17,10 +17,9 @@ cc_binary(
         "//software/backend:radio_backend",
         "//software/gui:visualizer_wrapper",
         "//software/util:constants",
-        "//software/util/canvas_messenger",
         "//software/util/logger",
         "//software/util/parameter:dynamic_parameters",
         "@boost//:program_options",
-        "@g3log//:all",
+        "@g3log",
     ],
 )

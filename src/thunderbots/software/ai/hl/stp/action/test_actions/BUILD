@@ -8,6 +8,6 @@ cc_library(
     deps = [
         "//software/ai/hl/stp/action",
         "//software/ai/intent:move_intent",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )

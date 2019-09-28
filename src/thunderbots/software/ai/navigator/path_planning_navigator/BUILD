@@ -16,7 +16,6 @@ cc_library(
         "//software/ai/navigator/path_planning_navigator/path_planner:theta_star_path_planner",
         "//software/ai/primitive:all_primitives",
         "//software/ai/world",
-        "//software/util/canvas_messenger",
         "//software/util/parameter:dynamic_parameters",
     ],
 )
@@ -37,7 +36,7 @@ cc_library(
     hdrs = ["util.h"],
     deps = [
         "//software/ai/primitive:move_primitive",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -55,7 +54,7 @@ cc_library(
     srcs = ["trespass.cpp"],
     hdrs = ["trespass.h"],
     deps = [
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/math:math_functions",
     ],
 )

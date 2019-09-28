@@ -157,12 +157,6 @@ namespace Passing
         void saveBestPass();
 
         /**
-         * Draws all the passes we are currently optimizing and the gradient of pass
-         * receive position quality over the field
-         */
-        void visualizePassesAndPassQualityGradient();
-
-        /**
          * Get the number of passes to keep after pruning
          *
          * @return the number of passes to keep after pruning
