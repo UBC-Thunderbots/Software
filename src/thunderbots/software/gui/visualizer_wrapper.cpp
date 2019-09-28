@@ -112,6 +112,7 @@ void VisualizerWrapper::updatePlayInfo()
                               Q_ARG(PlayInfo, most_recent_play_info));
 }
 
-std::shared_ptr<std::promise<void>> VisualizerWrapper::getTerminationPromise() {
+std::shared_ptr<std::promise<void>> VisualizerWrapper::getTerminationPromise()
+{
     return termination_promise_ptr;
 }

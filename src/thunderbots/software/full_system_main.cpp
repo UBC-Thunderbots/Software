@@ -137,12 +137,15 @@ int main(int argc, char **argv)
 
         connectObservers();
 
-        if(!headless) {
+        if (!headless)
+        {
             // This blocks forever without using the CPU
             // Wait for the visualizer to shut down before shutting
             // down the rest of the system
             visualizer->getTerminationPromise()->get_future().wait();
-        }else {
+        }
+        else
+        {
             // This blocks forever without using the CPU
             std::promise<void>().get_future().wait();
         }

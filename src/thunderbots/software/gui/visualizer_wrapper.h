@@ -65,8 +65,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
         int argc, char** argv,
         std::shared_ptr<std::promise<std::shared_ptr<QApplication>>>
             application_promise_ptr,
-        std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>>
-            visualizer_promise_ptr,
+        std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>> visualizer_promise_ptr,
         std::shared_ptr<std::promise<void>> termination_promise_ptr);
 
     void onValueReceived(World world) override;
