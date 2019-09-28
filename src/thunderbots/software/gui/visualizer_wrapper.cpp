@@ -54,13 +54,17 @@ void VisualizerWrapper::createAndRunVisualizer(
 
 void VisualizerWrapper::onValueReceived(World world)
 {
+    world_lock.lock();
     most_recent_world_draw_function = getDrawWorldFunction(world);
+    world_lock.unlock();
     draw();
 }
 
 void VisualizerWrapper::onValueReceived(AIDrawFunction draw_function)
 {
+    ai_lock.lock();
     most_recent_ai_draw_function = draw_function;
+    ai_lock.unlock();
     draw();
 }
 
@@ -82,6 +86,8 @@ void VisualizerWrapper::onValueReceived(RobotStatus robot_status)
 
 void VisualizerWrapper::draw()
 {
+    std::scoped_lock ai_world_lock(ai_lock, world_lock);
+
     // Call the Visualizer to draw the AI in a threadsafe manner
     // See
     // https://stackoverflow.com/questions/10868946/am-i-forced-to-use-pthread-cond-broadcast-over-pthread-cond-signal-in-order-to/10882705#10882705

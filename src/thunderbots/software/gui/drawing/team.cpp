@@ -4,7 +4,7 @@
 
 void drawTeam(QGraphicsScene* scene, const Team& team, QColor color)
 {
-    for (const auto& robot : team.getAllRobots())
+    for (const Robot& robot : team.getAllRobots())
     {
         drawRobot(scene, robot, color);
     }

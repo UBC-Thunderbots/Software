@@ -4,6 +4,7 @@
 #include <QtWidgets/QApplication>
 #include <future>
 #include <thread>
+#include <mutex>
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
@@ -76,10 +77,15 @@ class VisualizerWrapper : public ThreadedObserver<World>,
      */
     void updatePlayInfo();
 
+    std::mutex world_lock;
+    std::mutex ai_lock;
+
     PlayInfo most_recent_play_info;
-    AIDrawFunction most_recent_ai_draw_function;
     WorldDrawFunction most_recent_world_draw_function;
+    AIDrawFunction most_recent_ai_draw_function;
+
     std::thread run_visualizer_thread;
+
     std::shared_ptr<Visualizer> visualizer;
     std::shared_ptr<QApplication> application;
 };
