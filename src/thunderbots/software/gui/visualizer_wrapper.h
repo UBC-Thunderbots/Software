@@ -35,6 +35,15 @@ class VisualizerWrapper : public ThreadedObserver<World>,
 
     ~VisualizerWrapper() override;
 
+    /**
+     * Returns a shared_ptr to a promise that can be waited on, and that will
+     * be notified once the Visualizer has shut down
+     *
+     * @return a shared_ptr to a promise that can be waited on, and that will
+     * be notified once the Visualizer has been shut down
+     */
+    std::shared_ptr<std::promise<void>> getTerminationPromise();
+
    private:
     /**
      * Creates a new Visualizer in a new thread and starts running it. We use
@@ -57,7 +66,8 @@ class VisualizerWrapper : public ThreadedObserver<World>,
         std::shared_ptr<std::promise<std::shared_ptr<QApplication>>>
             application_promise_ptr,
         std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>>
-            visualizer_promise_ptr);
+            visualizer_promise_ptr,
+        std::shared_ptr<std::promise<void>> termination_promise_ptr);
 
     void onValueReceived(World world) override;
     void onValueReceived(AIDrawFunction draw_function) override;
@@ -85,6 +95,7 @@ class VisualizerWrapper : public ThreadedObserver<World>,
     AIDrawFunction most_recent_ai_draw_function;
 
     std::thread run_visualizer_thread;
+    std::shared_ptr<std::promise<void>> termination_promise_ptr;
 
     std::shared_ptr<Visualizer> visualizer;
     std::shared_ptr<QApplication> application;

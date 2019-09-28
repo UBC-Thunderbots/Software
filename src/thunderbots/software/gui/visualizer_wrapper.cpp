@@ -6,7 +6,8 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
     : ThreadedObserver<World>(),
       ThreadedObserver<AIDrawFunction>(),
       ThreadedObserver<PlayInfo>(),
-      ThreadedObserver<RobotStatus>()
+      ThreadedObserver<RobotStatus>(),
+      termination_promise_ptr(std::make_shared<std::promise<void>>())
 {
     auto application_promise =
         std::make_shared<std::promise<std::shared_ptr<QApplication>>>();
@@ -18,7 +19,7 @@ VisualizerWrapper::VisualizerWrapper(int argc, char** argv)
         visualizer_promise->get_future();
     run_visualizer_thread =
         std::thread(&VisualizerWrapper::createAndRunVisualizer, this, argc, argv,
-                    application_promise, visualizer_promise);
+                    application_promise, visualizer_promise, termination_promise_ptr);
 
     // We use futures and promises here to force the constructor to wait for the newly
     // spawned thread to fully create the application and visualizer objects before we
@@ -42,7 +43,8 @@ VisualizerWrapper::~VisualizerWrapper()
 void VisualizerWrapper::createAndRunVisualizer(
     int argc, char** argv,
     std::shared_ptr<std::promise<std::shared_ptr<QApplication>>> application_promise_ptr,
-    std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>> visualizer_promise_ptr)
+    std::shared_ptr<std::promise<std::shared_ptr<Visualizer>>> visualizer_promise_ptr,
+    std::shared_ptr<std::promise<void>> termination_promise_ptr)
 {
     auto app = std::make_shared<QApplication>(argc, argv);
     application_promise_ptr->set_value(app);
@@ -50,6 +52,9 @@ void VisualizerWrapper::createAndRunVisualizer(
     viz->show();
     visualizer_promise_ptr->set_value(viz);
     app->exec();
+    // Let the system know the visualizer has shut down once the application has
+    // stopped running
+    termination_promise_ptr->set_value();
 }
 
 void VisualizerWrapper::onValueReceived(World world)
@@ -105,4 +110,8 @@ void VisualizerWrapper::updatePlayInfo()
     QMetaObject::invokeMethod(visualizer.get(), "updatePlayInfo",
                               Qt::ConnectionType::BlockingQueuedConnection,
                               Q_ARG(PlayInfo, most_recent_play_info));
+}
+
+std::shared_ptr<std::promise<void>> VisualizerWrapper::getTerminationPromise() {
+    return termination_promise_ptr;
 }

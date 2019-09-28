@@ -129,6 +129,7 @@ int main(int argc, char **argv)
         // The ai has to be initialized after the backend (which is started in
         // parseCommandLineArgs) This is a bug. See #834
         ai = std::make_shared<AIWrapper>();
+
         if (!headless)
         {
             visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
@@ -136,10 +137,15 @@ int main(int argc, char **argv)
 
         connectObservers();
 
-        // TODO: close AI when visualizer closes
-
-        // This blocks forever without using the CPU
-        std::promise<void>().get_future().wait();
+        if(!headless) {
+            // This blocks forever without using the CPU
+            // Wait for the visualizer to shut down before shutting
+            // down the rest of the system
+            visualizer->getTerminationPromise()->get_future().wait();
+        }else {
+            // This blocks forever without using the CPU
+            std::promise<void>().get_future().wait();
+        }
     }
 
     return 0;
