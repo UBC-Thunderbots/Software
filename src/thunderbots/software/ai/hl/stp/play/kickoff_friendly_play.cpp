@@ -57,16 +57,16 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::vector<Point> kickoff_setup_positions = {
         // Robot 1
         Point(world.field().centerPoint() +
-              Point(-world.field().centreCircleRadius(), 0)),
+              Point(-world.field().centerCircleRadius(), 0)),
         // Robot 2
         // Goalie positions will be handled by the goalie tactic
         // Robot 3
         Point(world.field().centerPoint() +
-              Point(-world.field().centreCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+              Point(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
                     -1.0 / 3.0 * world.field().width())),
         // Robot 4
         Point(world.field().centerPoint() +
-              Point(-world.field().centreCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
+              Point(-world.field().centerCircleRadius() - 4 * ROBOT_MAX_RADIUS_METERS,
                     1.0 / 3.0 * world.field().width())),
         // Robot 5
         Point(world.field().friendlyGoalpostPos().x() +

@@ -58,6 +58,7 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
 
     if (path_points)
     {
+        planned_paths.emplace_back(*path_points);
         if ((*path_points).size() > 2)
         {
             current_destination = (*path_points)[1];
@@ -151,7 +152,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
             return Obstacle(rectangle);
         case AvoidArea::CENTER_CIRCLE:
             return Obstacle::createCircleObstacle(
-                world.field().centerPoint(), world.field().centreCircleRadius(),
+                world.field().centerPoint(), world.field().centerCircleRadius(),
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value());
         case AvoidArea::HALF_METER_AROUND_BALL:
@@ -193,6 +194,7 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
     this->world              = world;
     this->current_robot      = std::nullopt;
     this->velocity_obstacles = {};
+    planned_paths.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -296,4 +298,9 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
     {
         return closest_dist / 2;
     }
+}
+
+std::vector<std::vector<Point>> PathPlanningNavigator::getPlannedPaths()
+{
+    return planned_paths;
 }

@@ -29,6 +29,8 @@ cc_library(
         "//software:typedefs",
         "//software/ai",
         "//software/ai/world",
+        "//software/gui/drawing:draw_functions",
+        "//software/gui/drawing:navigator",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
         "//software/util/parameter:dynamic_parameters",
@@ -42,6 +44,7 @@ cc_test(
     deps = [
         "//software/ai",
         "//software/ai/world",
+        "//software/gui/drawing:draw_functions",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "boost/circular_buffer.hpp"
+#include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/util/time/timestamp.h"
@@ -100,7 +101,14 @@ class Field
      *
      * @return the radius of the centre circle in metres.
      */
-    double centreCircleRadius() const;
+    double centerCircleRadius() const;
+
+    /**
+     * Returns the center circle at the middle of the field
+     *
+     * @return the center circle at the middle of the field
+     */
+    Circle centerCircle() const;
 
     /**
      * Returns the center point of the field

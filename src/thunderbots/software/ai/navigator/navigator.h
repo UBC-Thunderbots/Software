@@ -32,4 +32,11 @@ class Navigator
         const std::vector<std::unique_ptr<Intent>> &assignedIntents) = 0;
 
     virtual ~Navigator() = default;
+
+    /**
+     * Returns the paths planned for each robot by the navigator
+     *
+     * @return the paths planned for each robot by the navigator
+     */
+    virtual std::vector<std::vector<Point>> getPlannedPaths() = 0;
 };

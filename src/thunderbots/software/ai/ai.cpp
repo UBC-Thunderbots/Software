@@ -7,7 +7,7 @@
 #include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 AI::AI()
-    : navigator(std::make_unique<PathPlanningNavigator>()),
+    : navigator(std::make_shared<PathPlanningNavigator>()),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
           []() { return std::make_unique<HaltPlay>(); },
@@ -28,4 +28,9 @@ std::vector<std::unique_ptr<Primitive>> AI::getPrimitives(const World &world) co
 PlayInfo AI::getPlayInfo() const
 {
     return high_level->getPlayInfo();
+}
+
+std::shared_ptr<Navigator> AI::getNavigator() const
+{
+    return navigator;
 }

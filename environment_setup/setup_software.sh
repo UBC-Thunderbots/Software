@@ -42,6 +42,7 @@ host_software_packages=(
     protobuf-compiler
     libprotobuf-dev
     libusb-1.0-0-dev
+    qt5-default # The GUI library for our visualizer
     libudev-dev
     libeigen3-dev # A math / numerical library used for things like linear regression
 )

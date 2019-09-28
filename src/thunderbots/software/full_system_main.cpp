@@ -4,9 +4,9 @@
 #include <numeric>
 
 #include "software/ai/ai_wrapper.h"
+#include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
-#include "software/backend/grsim_backend.h"
-#include "software/backend/radio_backend.h"
+#include "software/gui/visualizer_wrapper.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 
@@ -18,6 +18,8 @@ namespace
 {
     std::shared_ptr<AIWrapper> ai;
     std::shared_ptr<Backend> backend;
+    std::shared_ptr<VisualizerWrapper> visualizer;
+    bool headless = false;
 }  // namespace
 
 // clang-format off
@@ -69,7 +71,9 @@ bool parseCommandLineArgs(int argc, char **argv)
         options_description desc{"Options"};
         desc.add_options()("help,h", "Help screen")(
             "backend", value<std::string>()->notifier(setBackendFromString)->required(),
-            backend_help_str.c_str());
+            backend_help_str.c_str())("headless",
+                                      boost::program_options::bool_switch(&headless),
+                                      "Run without the Visualizer");
 
         variables_map vm;
         store(parse_command_line(argc, argv, desc), vm);
@@ -89,6 +93,7 @@ bool parseCommandLineArgs(int argc, char **argv)
     catch (const error &ex)
     {
         std::cerr << ex.what() << '\n';
+        return false;
     }
 
     return true;
@@ -100,7 +105,14 @@ bool parseCommandLineArgs(int argc, char **argv)
 void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
-    ai->registerObserver(backend);
+    ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
+    if (!headless)
+    {
+        backend->Subject<World>::registerObserver(visualizer);
+        ai->Subject<AIDrawFunction>::registerObserver(visualizer);
+        ai->Subject<PlayInfo>::registerObserver(visualizer);
+        backend->Subject<RobotStatus>::registerObserver(visualizer);
+    }
 }
 
 int main(int argc, char **argv)
@@ -113,10 +125,29 @@ int main(int argc, char **argv)
 
     if (parseCommandLineArgs(argc, argv))
     {
+        // The ai has to be initialized after the backend (which is started in
+        // parseCommandLineArgs) This is a bug. See #834
+        ai = std::make_shared<AIWrapper>();
+
+        if (!headless)
+        {
+            visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
+        }
+
         connectObservers();
 
-        // This blocks forever without using the CPU
-        std::promise<void>().get_future().wait();
+        if (!headless)
+        {
+            // This blocks forever without using the CPU
+            // Wait for the visualizer to shut down before shutting
+            // down the rest of the system
+            visualizer->getTerminationPromise()->get_future().wait();
+        }
+        else
+        {
+            // This blocks forever without using the CPU
+            std::promise<void>().get_future().wait();
+        }
     }
 
     return 0;

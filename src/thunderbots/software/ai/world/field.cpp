@@ -31,7 +31,7 @@ void Field::updateDimensions(const Field &new_field_data)
     defense_length_        = new_field_data.defenseAreaLength();
     goal_width_            = new_field_data.goalWidth();
     boundary_width_        = new_field_data.boundaryWidth();
-    center_circle_radius_  = new_field_data.centreCircleRadius();
+    center_circle_radius_  = new_field_data.centerCircleRadius();
     last_update_timestamps = new_field_data.getTimestampHistory();
 }
 
@@ -103,9 +103,14 @@ Rectangle Field::fieldLines() const
     return Rectangle(friendlyCornerNeg(), enemyCornerPos());
 }
 
-double Field::centreCircleRadius() const
+double Field::centerCircleRadius() const
 {
     return center_circle_radius_;
+}
+
+Circle Field::centerCircle() const
+{
+    return Circle(Point(0, 0), centerCircleRadius());
 }
 
 Point Field::centerPoint() const
