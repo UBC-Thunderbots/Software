@@ -7,16 +7,14 @@ qt_cc_library(
     src = "main_widget.cpp",
     hdr = "main_widget.h",
     deps = [
-        ":robot_status_table",
-        ":zoomable_qgraphics_view",
+        ":ai_control",
+        ":parameters",
+        ":robot_status",
+        ":world_view",
         "//software/ai/hl/stp:play_info",
-        "//software/ai/hl/stp/play:play_factory",
-        "//software/ai/world",
         "//software/backend:robot_status",
         "//software/gui/drawing:draw_functions",
         "//software/gui/ui:main_widget",
-        "//software/util/parameter",
-        "//software/util/time:duration",
         "@g3log",
         "@qt//:qt_widgets",
     ],
@@ -32,6 +30,54 @@ qt_cc_library(
         "//software/ai/world",
         "//software/backend:robot_status",
         "//software/gui/drawing:draw_functions",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "world_view",
+    src = "world_view.cpp",
+    hdr = "world_view.h",
+    deps = [
+        ":zoomable_qgraphics_view",
+        "@qt//:qt_core",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "robot_status",
+    src = "robot_status.cpp",
+    hdr = "robot_status.h",
+    deps = [
+        "@qt//:qt_core",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "parameters",
+    src = "parameters.cpp",
+    hdr = "parameters.h",
+    deps = [
+        ":robot_status_table",
+        ":zoomable_qgraphics_view",
+        "//software/gui/ui:main_widget",
+        "//software/util/parameter",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "ai_control",
+    src = "ai_control.cpp",
+    hdr = "ai_control.h",
+    deps = [
+        ":robot_status_table",
+        ":zoomable_qgraphics_view",
+        "//software/ai/hl/stp/play:play_factory",
+        "//software/gui/ui:main_widget",
+        "//software/util/parameter:dynamic_parameters",
         "@qt//:qt_widgets",
     ],
 )
