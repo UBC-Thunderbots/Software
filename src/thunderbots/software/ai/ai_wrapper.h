@@ -29,7 +29,9 @@ class AIWrapper : public ThreadedObserver<World>,
      * observers
      */
     void runAIAndSendPrimitives();
+    void drawAI();
 
     AI ai;
     World most_recent_world;
 };
+

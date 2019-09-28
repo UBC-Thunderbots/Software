@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world:ball",
-        "//software/geom:all",
+        "//software/geom",
         "//software/gui/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],
@@ -32,7 +32,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world:robot",
-        "//software/geom:all",
+        "//software/geom",
         "//software/gui/geom:geometry_conversion",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
@@ -71,7 +71,7 @@ cc_library(
     deps = [
         ":draw_functions",
         "//software/ai/navigator",
-        "//software/geom:all",
+        "//software/geom",
         "//software/gui/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],

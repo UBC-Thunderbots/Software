@@ -5,7 +5,7 @@ cc_library(
     srcs = ["geometry_conversion.cpp"],
     hdrs = ["geometry_conversion.h"],
     deps = [
-        "//software/geom:all",
+        "//software/geom",
         "@qt//:qt_core",
     ],
 )

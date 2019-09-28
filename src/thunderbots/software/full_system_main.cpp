@@ -6,10 +6,9 @@
 #include "software/ai/ai_wrapper.h"
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/backend_factory.h"
-#include "software/backend/grsim_backend.h"
-#include "software/backend/radio_backend.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
+#include "software/gui/visualizer_wrapper.h"
 
 using namespace boost::program_options;
 // Member variables we need to maintain state

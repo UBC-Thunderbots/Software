@@ -2,6 +2,7 @@
 
 #include <boost/bind.hpp>
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/gui/drawing/navigator.h"
 
 void AIWrapper::onValueReceived(World world)
 {
@@ -25,4 +26,13 @@ void AIWrapper::runAIAndSendPrimitives()
         Subject<ConstPrimitiveVectorPtr>::sendValueToObservers(new_primitives_ptr);
     }
     drawAI();
+}
+
+void AIWrapper::drawAI()
+{
+    if (ai.getNavigator())
+    {
+        auto draw_function = drawNavigator(ai.getNavigator());
+        Subject<AIDrawFunction>::sendValueToObservers(draw_function);
+    }
 }

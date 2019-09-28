@@ -17,7 +17,7 @@ qt_cc_library(
         "//software/gui/ui:main_widget",
         "//software/util/parameter",
         "//software/util/time:duration",
-        "@g3log//:all",
+        "@g3log",
         "@qt//:qt_widgets",
     ],
 )
