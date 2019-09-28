@@ -177,7 +177,7 @@ Some general guidelines when writing tests are:
 #### For C++ Code
 
 * We use [gtest](https://github.com/google/googletest/blob/master/googletest/docs/primer.md) for our C++ unit testing. 
-* For examples, please look in the `test` folder (currently under `src/software`, though this path may changea.
+* For examples, please look in the `test` folder (currently under `src/software`, though this path may change.
 * To add a test to the build system you'll need to add something like following to the bottom of the `src/software/CMakeLists.txt` file , under the block marked `if (CATKIN_ENABLE_TESTING)`
 
 ```text
