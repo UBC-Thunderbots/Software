@@ -22,13 +22,13 @@ class Rectangle final
     /**
      * Creates a new Rectangle from a corner and a size
      *
-     * @param sw_corner The south-west corner of the rectangle
+     * @param neg_x_neg_y_corner The <-x,-y> corner of the rectangle
      *
      * @param width The width of the rectangle
      *
      * @param height The height of the rectangle
      */
-    explicit constexpr Rectangle(const Point &sw_corner, double width, double height);
+    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double width, double height);
 
     /**
      * Returns the width of the rectangle
@@ -59,36 +59,36 @@ class Rectangle final
     constexpr Point centre() const;
 
     /**
-     * Returns the north-east corner of the rectangle
+     * Returns the positive x, positive y corner of the rectangle
      *
-     * @return The north-east corner of the rectangle
+     * @return The <+x,+y> corner of the rectangle
      */
-    constexpr Point neCorner() const;
+    constexpr Point posXPosYCorner() const;
 
     /**
-     * Returns the north-west corner of the rectangle
+     * Returns the <-x,+y> corner of the rectangle
      *
-     * @return The north-west corner of the rectangle
+     * @return The <-x,+y> corner of the rectangle
      */
-    constexpr Point nwCorner() const;
+    constexpr Point negXPosYCorner() const;
 
     /**
-     * Returns the south-west corner of the rectangle
+     * Returns the <-x,-y> corner of the rectangle
      *
-     * @return The south-west corner of the rectangle
+     * @return The <-x,-y> corner of the rectangle
      */
-    constexpr Point swCorner() const;
+    constexpr Point negXNegYCorner() const;
 
     /**
-     * Returns the south-east corner of the rectangle
+     * Returns the <+x,-y> corner of the rectangle
      *
-     * @return The south-east corner of the rectangle
+     * @return The <+x,-y> corner of the rectangle
      */
-    constexpr Point seCorner() const;
+    constexpr Point posXNegYCorner() const;
 
     /**
-     * Returns a digit corresponding to a specific corner for pos%4. (0 for south-west, 1
-     * for north-west, 2 for north-east and 3 for south-east)
+     * Returns a digit corresponding to a specific corner for pos%4. (0 for <-x,-y>, 1
+     * for <-x,+y>, 2 for <+x,+y> and 3 for <+x,-y>)
      *
      * @param pos The position of the corner wanted
      *
@@ -154,8 +154,8 @@ inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-inline constexpr Rectangle::Rectangle(const Point &sw_corner, double width, double height)
-    : min_corner(sw_corner), diagonal(width, height)
+inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double width, double height)
+    : min_corner(neg_x_neg_y_corner), diagonal(width, height)
 {
 }
 
@@ -179,22 +179,22 @@ inline constexpr Point Rectangle::centre() const
     return min_corner + diagonal / 2;
 }
 
-inline constexpr Point Rectangle::neCorner() const
+inline constexpr Point Rectangle::posXPosYCorner() const
 {
     return min_corner + diagonal;
 }
 
-inline constexpr Point Rectangle::nwCorner() const
+inline constexpr Point Rectangle::negXPosYCorner() const
 {
     return min_corner + Point(0, diagonal.y());
 }
 
-inline constexpr Point Rectangle::swCorner() const
+inline constexpr Point Rectangle::negXNegYCorner() const
 {
     return min_corner;
 }
 
-inline constexpr Point Rectangle::seCorner() const
+inline constexpr Point Rectangle::posXNegYCorner() const
 {
     return min_corner + Point(diagonal.x(), 0);
 }
@@ -204,13 +204,13 @@ inline constexpr Point Rectangle::operator[](unsigned int pos) const
     switch (pos)
     {
         case 0:
-            return swCorner();
+            return negXNegYCorner();
         case 1:
-            return nwCorner();
+            return negXPosYCorner();
         case 2:
-            return neCorner();
+            return posXPosYCorner();
         case 3:
-            return seCorner();
+            return posXNegYCorner();
         default:
             throw std::out_of_range("Rectangle only has 4 points!!!!!!");
     }

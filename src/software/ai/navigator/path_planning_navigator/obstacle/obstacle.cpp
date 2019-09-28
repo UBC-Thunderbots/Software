@@ -14,8 +14,8 @@ const std::optional<Circle> Obstacle::getBoundaryCircle() const
 Obstacle::Obstacle(Polygon polygon) : _polygon(std::make_optional<Polygon>(polygon)) {}
 
 Obstacle::Obstacle(Rectangle rectangle)
-    : Obstacle({rectangle.swCorner(), rectangle.nwCorner(), rectangle.neCorner(),
-                rectangle.seCorner()})
+    : Obstacle({rectangle.negXNegYCorner(), rectangle.negXPosYCorner(), rectangle.posXPosYCorner(),
+                rectangle.posXNegYCorner()})
 {
 }
 

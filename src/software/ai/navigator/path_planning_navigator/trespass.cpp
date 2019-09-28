@@ -10,18 +10,18 @@ namespace Navigator
     {
         double calcLinearTrespassScore(Rectangle r, Point p)
         {
-            if (p.x() == r.swCorner().x() || p.x() == r.neCorner().x() ||
-                p.y() == r.swCorner().y() || p.y() == r.neCorner().y() ||
+            if (p.x() == r.negXNegYCorner().x() || p.x() == r.posXPosYCorner().x() ||
+                p.y() == r.negXNegYCorner().y() || p.y() == r.posXPosYCorner().y() ||
                 !r.containsPoint(p))
                 // return 0 if p is on the edge of r or not inside r
                 return 0.0;
             else
             {
                 // distances to each edge
-                double width_w  = p.x() - r.swCorner().x();
-                double width_e  = r.neCorner().x() - p.x();
-                double height_s = p.y() - r.swCorner().y();
-                double height_n = r.neCorner().y() - p.y();
+                double width_w  = p.x() - r.negXNegYCorner().x();
+                double width_e  = r.posXPosYCorner().x() - p.x();
+                double height_s = p.y() - r.negXNegYCorner().y();
+                double height_n = r.posXPosYCorner().y() - p.y();
 
                 /* Util::linear returns 0 if the point is on the edge of the rectangle,
                  * i.e. if the distance from the nearest edge to p is 0 and returns 1 if
