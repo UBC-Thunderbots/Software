@@ -33,7 +33,7 @@ if [ "$RUN_BUILD" == "true" ]; then
     # Install all required dependecies
     travis_run ./environment_setup/setup_software.sh
 
-    pushd src/thunderbots/
+    pushd src/
     if [ "$RUN_TESTS" == "true" ]; then
         if [ "$RUN_COVERAGE" == "true" ]; then
             # Run tests + coverage
@@ -58,7 +58,7 @@ if [ "$RUN_COVERAGE" == "true" ]; then
     # Note: we specifically grab the bazel output because `bazel-testlogs`
     #       is a symlink and it seems like the codecov script won't follow
     #       those
-    travis_run bash <(curl -s https://codecov.io/bash) -s src/thunderbots/bazel-testlogs/ | (head -n100 && tail -n100)
+    travis_run bash <(curl -s https://codecov.io/bash) -s src/bazel-testlogs/ | (head -n100 && tail -n100)
 fi
 
 if [ "$RUN_FORMATTING_CHECKS" == "true" ]; then    
