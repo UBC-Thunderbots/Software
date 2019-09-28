@@ -7,7 +7,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -27,7 +27,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -67,7 +67,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -87,7 +87,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -107,7 +107,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -127,7 +127,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -147,7 +147,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -168,7 +168,7 @@ cc_library(
         ":primitive",
         ":primitive_visitor",
         "//shared:constants",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -188,7 +188,7 @@ cc_library(
     deps = [
         ":primitive",
         ":primitive_visitor",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 

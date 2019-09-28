@@ -228,7 +228,10 @@ cc_library(
     name = "intent",
     srcs = ["intent.cpp"],
     hdrs = ["intent.h"],
-    deps = [":avoid_area"],
+    deps = [
+        ":avoid_area",
+        "@g3log",
+    ],
 )
 
 cc_test(

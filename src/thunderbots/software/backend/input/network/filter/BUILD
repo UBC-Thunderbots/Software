@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//software/ai/world:ball",
         "//software/ai/world:field",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/math:math_functions",
         "@eigen",
     ],

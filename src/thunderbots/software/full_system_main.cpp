@@ -1,6 +1,5 @@
 #include <boost/program_options.hpp>
 #include <g3log/g3log.hpp>
-
 #include <iostream>
 #include <numeric>
 
@@ -80,7 +79,7 @@ bool parseCommandLineArgs(int argc, char **argv)
         // avoid issues where required arguments are not required if "help" is given
         if (vm.count("help"))
         {
-            std::cout << BANNER << std::endl << desc << std::endl;
+            std::cout << desc << std::endl;
             return false;
         }
         else
@@ -107,6 +106,8 @@ void connectObservers()
 
 int main(int argc, char **argv)
 {
+    std::cout << BANNER << std::endl;
+
     Util::Logger::LoggerSingleton::initializeLogger();
 
     ai = std::make_shared<AIWrapper>();

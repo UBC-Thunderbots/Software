@@ -8,7 +8,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/world:ball",
         "//software/ai/world:robot",
-        "//software/geom:all",
+        "//software/geom",
     ],
 )
 
@@ -28,7 +28,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/world",
-        "//software/geom:all",
+        "//software/geom",
         "//software/util/parameter:dynamic_parameters",
     ],
 )

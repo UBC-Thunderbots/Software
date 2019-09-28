@@ -3,7 +3,6 @@
 #include <time.h>
 
 #include <g3log/g3log.hpp>
-
 #include <mutex>
 
 #include "shared/constants.h"

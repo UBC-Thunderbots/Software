@@ -1,5 +1,4 @@
-#ifndef AI_HL_STP_EVALUATION_ROBOT_H_
-#define AI_HL_STP_EVALUATION_ROBOT_H_
+#pragma once
 
 #include "software/ai/world/ball.h"
 #include "software/ai/world/robot.h"
@@ -50,5 +49,3 @@ namespace Evaluation
     bool robotHasPossession(Ball ball, Robot robot, Timestamp timestamp = Timestamp());
 }  // namespace Evaluation
 
-
-#endif

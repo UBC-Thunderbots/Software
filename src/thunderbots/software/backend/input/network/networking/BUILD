@@ -7,7 +7,7 @@ cc_library(
     #    visibility = ["//visibility:private"],
     deps = [
         "//software/proto:ssl_cc_proto",
-        "@g3log//:all",
+        "@g3log",
     ],
 )
 
@@ -18,7 +18,7 @@ cc_library(
     #    visibility = ["//visibility:private"],
     deps = [
         "//software/proto:ssl_cc_proto",
-        "@g3log//:all",
+        "@g3log",
     ],
 )
 
@@ -45,8 +45,8 @@ cc_library(
         "network_client.cpp",
         # TODO: We shouldn't have to have the *_client.cpp files here, but full_system
         #       fails to link if we don't.......
-        "ssl_vision_client.cpp",
-        "ssl_gamecontroller_client.cpp",
+        #        "ssl_vision_client.cpp",
+        #        "ssl_gamecontroller_client.cpp",
     ],
     hdrs = ["network_client.h"],
     deps = [
@@ -58,6 +58,6 @@ cc_library(
         "//software/backend/input/network/filter:robot_filter",
         "//software/backend/input/network/filter:robot_team_filter",
         "//software/proto:ssl_cc_proto",
-        "@g3log//:all",
+        "@g3log",
     ],
 )
