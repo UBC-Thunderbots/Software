@@ -60,7 +60,7 @@ class Rectangle final
     constexpr Point centre() const;
 
     /**
-     * Returns the positive x, positive y corner of the rectangle
+     * Returns the <+x,+y> corner of the rectangle
      *
      * @return The <+x,+y> corner of the rectangle
      */
