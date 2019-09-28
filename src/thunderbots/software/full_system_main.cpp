@@ -7,7 +7,6 @@
 #include "software/backend/backend_factory.h"
 #include "software/backend/grsim_backend.h"
 #include "software/backend/radio_backend.h"
-#include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/constants.h"
 #include "software/util/logger/init.h"
 

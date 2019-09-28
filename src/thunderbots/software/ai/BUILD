@@ -31,7 +31,6 @@ cc_library(
         "//software/ai/world",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
-        "//software/util/canvas_messenger",
         "//software/util/parameter:dynamic_parameters",
         "@boost//:bind",
     ],

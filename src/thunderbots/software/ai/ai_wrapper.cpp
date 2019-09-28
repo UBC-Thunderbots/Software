@@ -2,14 +2,12 @@
 
 #include <boost/bind.hpp>
 
-#include "software/util/canvas_messenger/canvas_messenger.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 void AIWrapper::onValueReceived(World world)
 {
     most_recent_world = world;
     runAIAndSendPrimitives();
-    drawWorld();
 }
 
 void AIWrapper::runAIAndSendPrimitives()
@@ -26,9 +24,3 @@ void AIWrapper::runAIAndSendPrimitives()
     }
 }
 
-void AIWrapper::drawWorld()
-{
-    std::shared_ptr<Util::CanvasMessenger> canvas_messenger =
-        Util::CanvasMessenger::getInstance();
-    canvas_messenger->drawWorld(most_recent_world);
-}

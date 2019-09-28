@@ -53,7 +53,6 @@ cc_library(
         ":evaluation",
         ":pass",
         "//software/ai/world",
-        "//software/util/canvas_messenger",
         "//software/util/optimization:gradient_descent",
     ],
 )

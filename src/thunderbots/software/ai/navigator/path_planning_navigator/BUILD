@@ -16,7 +16,6 @@ cc_library(
         "//software/ai/navigator/path_planning_navigator/path_planner:theta_star_path_planner",
         "//software/ai/primitive:all_primitives",
         "//software/ai/world",
-        "//software/util/canvas_messenger",
         "//software/util/parameter:dynamic_parameters",
     ],
 )

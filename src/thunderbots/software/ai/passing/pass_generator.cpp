@@ -5,7 +5,6 @@
 
 #include "software/ai/passing/evaluation.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/util/canvas_messenger/canvas_messenger.h"
 
 using namespace Passing;
 using namespace Util::DynamicParameters::Passing;
@@ -117,7 +116,6 @@ void PassGenerator::continuouslyGeneratePasses()
         optimizePasses();
         pruneAndReplacePasses();
         saveBestPass();
-        visualizePassesAndPassQualityGradient();
 
         // Yield to allow other threads to run. This is particularly important if we
         // have this thread and another running on one core
@@ -127,49 +125,6 @@ void PassGenerator::continuouslyGeneratePasses()
         // check
         in_destructor_mutex.lock();
     }
-}
-
-void PassGenerator::visualizePassesAndPassQualityGradient()
-{
-    // Take ownership of the passer point for the duration of this function
-    std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);
-
-    // Draw all the points we have so far
-    auto canvas_messenger = Util::CanvasMessenger::getInstance();
-
-    // Get field characteristics and the current time
-    world_mutex.lock();
-    Rectangle field_area(world.field().enemyCornerNeg(),
-                         world.field().friendlyCornerPos());
-    double field_length = world.field().length();
-    double field_width  = world.field().width();
-    world_mutex.unlock();
-
-    auto best_pass_and_score      = getBestPassSoFar();
-    auto [best_pass, best_score]  = best_pass_and_score;
-    const auto objective_function = [&](Point p) {
-        try
-        {
-            Pass pass(passer_point, p, best_pass.speed(), best_pass.startTime());
-            return ratePass(pass);
-        }
-        catch (std::invalid_argument& e)
-        {
-            return 0.0;
-        }
-    };
-    canvas_messenger->drawGradient(Util::CanvasMessenger::Layer::PASS_GENERATION,
-                                   objective_function, field_area, 0, 1, {0, 0, 255, 160},
-                                   {255, 0, 0, 160}, 4);
-    canvas_messenger->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION,
-                                best_pass.receiverPoint(), 0.05, {0, 255, 0, 255});
-    for (const Pass& pass : passes_to_optimize)
-    {
-        canvas_messenger->drawPoint(Util::CanvasMessenger::Layer::PASS_GENERATION,
-                                    pass.receiverPoint(), 0.03, {0, 255, 0, 150});
-    }
-
-    canvas_messenger->publishAndClearLayer(Util::CanvasMessenger::Layer::PASS_GENERATION);
 }
 
 void PassGenerator::optimizePasses()
