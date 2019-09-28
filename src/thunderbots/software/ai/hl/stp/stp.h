@@ -18,7 +18,7 @@ class STP : public HL
      * decision-making.
      *
      * @param default_play_constructor A function that constructs and returns a unique ptr
-     * to a Play. This constructor will be used to return a Play if no other Play is;
+     * to a Play. This constructor will be used to return a Play if no other Play is
      * applicable during gameplay.
      * @param random_seed The random seed used for STP's internal random number generator.
      * The default value is 0
