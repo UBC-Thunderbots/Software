@@ -33,6 +33,10 @@ class Navigator
 
     virtual ~Navigator() = default;
 
-    // TODO: comment
+    /**
+     * Returns the paths planned for each robot by the navigator
+     *
+     * @return the paths planned for each robot by the navigator
+     */
     virtual std::vector<std::vector<Point>> getPlannedPaths() = 0;
 };
