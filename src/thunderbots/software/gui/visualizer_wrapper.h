@@ -3,8 +3,8 @@
 #include <QtCore/QGenericArgument>
 #include <QtWidgets/QApplication>
 #include <future>
-#include <thread>
 #include <mutex>
+#include <thread>
 
 #include "software/ai/hl/stp/play_info.h"
 #include "software/backend/robot_status.h"
