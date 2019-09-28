@@ -25,11 +25,6 @@ class AIWrapper : public ThreadedObserver<World>, public Subject<ConstPrimitiveV
      */
     void runAIAndSendPrimitives();
 
-    /**
-     * Publish the requisite ROS messages to draw the current state of the world
-     */
-    void drawWorld();
-
     AI ai;
     World most_recent_world;
 };

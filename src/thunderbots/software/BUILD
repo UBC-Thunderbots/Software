@@ -14,7 +14,6 @@ cc_binary(
         "//software/backend:grsim_backend",
         "//software/backend:radio_backend",
         "//software/util:constants",
-        "//software/util/canvas_messenger",
         "//software/util/logger",
         "//software/util/parameter:dynamic_parameters",
         "@boost//:program_options",
