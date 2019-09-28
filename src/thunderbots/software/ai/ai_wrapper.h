@@ -34,4 +34,3 @@ class AIWrapper : public ThreadedObserver<World>,
     AI ai;
     World most_recent_world;
 };
-

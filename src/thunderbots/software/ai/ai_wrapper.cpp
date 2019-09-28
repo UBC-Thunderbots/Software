@@ -1,8 +1,9 @@
 #include "software/ai/ai_wrapper.h"
 
 #include <boost/bind.hpp>
-#include "software/util/parameter/dynamic_parameters.h"
+
 #include "software/gui/drawing/navigator.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 void AIWrapper::onValueReceived(World world)
 {
