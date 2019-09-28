@@ -28,7 +28,8 @@ class Rectangle final
      *
      * @param height The height of the rectangle
      */
-    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double width, double height);
+    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double width,
+                                 double height);
 
     /**
      * Returns the width of the rectangle
@@ -154,7 +155,8 @@ inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double width, double height)
+inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double width,
+                                      double height)
     : min_corner(neg_x_neg_y_corner), diagonal(width, height)
 {
 }

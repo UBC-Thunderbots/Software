@@ -201,11 +201,14 @@ std::vector<Segment> CreaseDefenderTactic::getPathSegments(Field field)
 
     return {
         // +x segment
-        Segment(inflated_defense_area.posXPosYCorner(), inflated_defense_area.posXNegYCorner()),
+        Segment(inflated_defense_area.posXPosYCorner(),
+                inflated_defense_area.posXNegYCorner()),
         // +y segment
-        Segment(inflated_defense_area.posXPosYCorner(), inflated_defense_area.negXPosYCorner()),
+        Segment(inflated_defense_area.posXPosYCorner(),
+                inflated_defense_area.negXPosYCorner()),
         // -y segment
-        Segment(inflated_defense_area.posXNegYCorner(), inflated_defense_area.negXNegYCorner()),
+        Segment(inflated_defense_area.posXNegYCorner(),
+                inflated_defense_area.negXNegYCorner()),
     };
 }
 

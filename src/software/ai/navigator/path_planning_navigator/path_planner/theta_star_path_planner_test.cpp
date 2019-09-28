@@ -27,8 +27,9 @@ void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
     for (auto const& path_point : path_points)
     {
         EXPECT_TRUE(bounding_box.containsPoint(path_point))
-                            << "Path point " << path_point << " not in bounding box {"
-                            << bounding_box.negXNegYCorner() << "," << bounding_box.posXPosYCorner() << "}";
+            << "Path point " << path_point << " not in bounding box {"
+            << bounding_box.negXNegYCorner() << "," << bounding_box.posXPosYCorner()
+            << "}";
     }
 }
 
