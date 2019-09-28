@@ -48,4 +48,3 @@ namespace Evaluation
      */
     bool robotHasPossession(Ball ball, Robot robot, Timestamp timestamp = Timestamp());
 }  // namespace Evaluation
-
