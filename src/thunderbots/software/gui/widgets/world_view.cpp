@@ -1,7 +1,6 @@
 #include "software/gui/widgets/world_view.h"
 
-void setupSceneView(QGraphicsView* view, QGraphicsScene* scene,
-                                QOpenGLWidget* gl_widget)
+void setupSceneView(QGraphicsView* view, QGraphicsScene* scene, QOpenGLWidget* gl_widget)
 {
     view->setScene(scene);
     view->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -31,4 +30,3 @@ void setupSceneView(QGraphicsView* view, QGraphicsScene* scene,
 
     view->update();
 }
-

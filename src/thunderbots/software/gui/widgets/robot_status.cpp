@@ -1,4 +1,5 @@
 #include "software/gui/widgets/robot_status.h"
+
 #include <QtCore/QList>
 #include <QtWidgets/QHeaderView>
 
