@@ -64,6 +64,7 @@ qt_cc_library(
         ":zoomable_qgraphics_view",
         "//software/gui/ui:main_widget",
         "//software/util/parameter",
+        "@g3log",
         "@qt//:qt_widgets",
     ],
 )
