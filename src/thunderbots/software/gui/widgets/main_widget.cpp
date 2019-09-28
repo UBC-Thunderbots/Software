@@ -223,6 +223,7 @@ void MainWidget::setupGameStateOverrideComboBox()
 
 void MainWidget::setupDefendingSideComboBox()
 {
+    // See issue #811 for getting these value from an enum / factory
     main_widget->defending_side_combo_box->insertItem(0, "Use Refbox");
     main_widget->defending_side_combo_box->insertItem(1, "East");
     main_widget->defending_side_combo_box->insertItem(2, "West");
