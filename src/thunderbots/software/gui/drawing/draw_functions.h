@@ -11,7 +11,7 @@
 // This class is made abstract by making the desctructor pure virtual,
 // but providing an implementation. The subclasses will have a default
 // destructor automatically generated which will implement the virtual
-// destructor. Alltogether this lets the base class be pure virtual
+// destructor. All together this lets the base class be pure virtual
 // without needing an extra pure-virtual "dummy" function
 // See https://stackoverflow.com/a/4641108
 class DrawFunction
