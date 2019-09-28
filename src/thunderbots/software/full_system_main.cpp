@@ -74,7 +74,9 @@ bool parseCommandLineArgs(int argc, char **argv)
         options_description desc{"Options"};
         desc.add_options()("help,h", "Help screen")(
             "backend", value<std::string>()->notifier(setBackendFromString)->required(),
-            backend_help_str.c_str())("headless", boost::program_options::bool_switch(&headless), "Run without the Visualizer");
+            backend_help_str.c_str())("headless",
+                                      boost::program_options::bool_switch(&headless),
+                                      "Run without the Visualizer");
 
         variables_map vm;
         store(parse_command_line(argc, argv, desc), vm);
@@ -107,7 +109,8 @@ void connectObservers()
 {
     backend->Subject<World>::registerObserver(ai);
     ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
-    if(!headless) {
+    if (!headless)
+    {
         backend->Subject<World>::registerObserver(visualizer);
         ai->Subject<AIDrawFunction>::registerObserver(visualizer);
         ai->Subject<PlayInfo>::registerObserver(visualizer);
@@ -123,10 +126,11 @@ int main(int argc, char **argv)
 
     if (parseCommandLineArgs(argc, argv))
     {
-        // The ai has to be initialized after the backend (which is started in parseCommandLineArgs)
-        // This is a bug. See #834
+        // The ai has to be initialized after the backend (which is started in
+        // parseCommandLineArgs) This is a bug. See #834
         ai = std::make_shared<AIWrapper>();
-        if(!headless) {
+        if (!headless)
+        {
             visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
         }
 
