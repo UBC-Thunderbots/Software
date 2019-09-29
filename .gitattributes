@@ -6,3 +6,6 @@
 # See https://help.github.com/articles/dealing-with-line-endings/ for more details
 * text=auto
 
+# Our clang-format executable is a binary
+clang_format/clang-format-*    binary
+
