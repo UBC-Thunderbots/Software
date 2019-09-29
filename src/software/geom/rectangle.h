@@ -24,25 +24,25 @@ class Rectangle final
      *
      * @param sw_corner The south-west corner of the rectangle
      *
-     * @param width The width of the rectangle
+     * @param xLength The xLength of the rectangle
      *
-     * @param height The height of the rectangle
+     * @param yLength The yLength of the rectangle
      */
-    explicit constexpr Rectangle(const Point &sw_corner, double width, double height);
+    explicit constexpr Rectangle(const Point &sw_corner, double xLength, double yLength);
 
     /**
-     * Returns the width of the rectangle
+     * Returns the horizontal length of the rectangle
      *
-     * @return The width of the rectangle
+     * @return The horizontal length of the rectangle
      */
-    constexpr double width() const;
+    constexpr double xLength() const;
 
     /**
-     * Returns the height of the rectangle
+     * Returns the vertical length of the rectangle
      *
-     * @return The height of the rectangle
+     * @return The vertical length of the rectangle
      */
-    constexpr double height() const;
+    constexpr double yLength() const;
 
     /**
      * Returns the area of the rectangle
@@ -154,17 +154,17 @@ inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-inline constexpr Rectangle::Rectangle(const Point &sw_corner, double width, double height)
-    : min_corner(sw_corner), diagonal(width, height)
+inline constexpr Rectangle::Rectangle(const Point &sw_corner, double xLength, double yLength)
+    : min_corner(sw_corner), diagonal(xLength, yLength)
 {
 }
 
-inline constexpr double Rectangle::width() const
+inline constexpr double Rectangle::xLength() const
 {
     return diagonal.x();
 }
 
-inline constexpr double Rectangle::height() const
+inline constexpr double Rectangle::yLength() const
 {
     return diagonal.y();
 }
