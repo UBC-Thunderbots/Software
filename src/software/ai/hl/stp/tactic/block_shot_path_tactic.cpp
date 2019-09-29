@@ -33,7 +33,7 @@ double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& 
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     Point block_position = getBlockPosition();
-    double cost = (robot.position() - block_position).len() / world.field().totalLength();
+    double cost = (robot.position() - block_position).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 

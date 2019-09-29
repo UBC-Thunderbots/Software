@@ -82,7 +82,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // the enemy half of the field
     PassGenerator pass_generator(world, world.ball().position());
     pass_generator.setTargetRegion(
-        Rectangle(Point(-(world.field().length() / 4), world.field().width() / 2),
+        Rectangle(Point(-(world.field().xLength() / 4), world.field().yLength() / 2),
                   world.field().enemyCornerNeg()));
     std::pair<Pass, double> best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();

@@ -44,7 +44,7 @@ double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - pass.receiverPoint()).len() / world.field().totalLength();
+        (robot.position() - pass.receiverPoint()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 

@@ -51,7 +51,7 @@ double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
     {
         // Prefer robots that are close to the current patrol point
         double dist = (robot.position() - patrol_points.at(patrol_point_index)).len();
-        double cost = dist / world.field().totalLength();
+        double cost = dist / world.field().totalXLength();
         return std::clamp<double>(cost, 0, 1);
     }
 }

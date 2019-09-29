@@ -53,7 +53,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
         cost = (ball_intercept_opt->first - robot.position()).len() /
-               world.field().totalLength();
+               world.field().totalXLength();
     }
     else
     {
@@ -61,7 +61,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // position. We normalize with the total field length so that robots that are
         // within the field have a cost less than 1
         cost = (world.ball().position() - robot.position()).len() /
-               world.field().totalLength();
+               world.field().totalXLength();
     }
 
     return std::clamp<double>(cost, 0, 1);

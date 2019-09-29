@@ -31,7 +31,7 @@ void ShadowFreekickerTactic::updateParams(Team enemy_team, Ball ball)
 double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yield)

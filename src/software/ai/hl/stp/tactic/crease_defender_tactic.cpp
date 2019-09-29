@@ -49,7 +49,7 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World 
     if (desired_state)
     {
         cost = (robot.position() - calculateDesiredState(robot)->first).len() /
-               world.field().totalLength();
+               world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
 }
