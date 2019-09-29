@@ -34,12 +34,12 @@ TEST_F(FieldTest, construct_with_parameters)
 {
     // The field was already constructed in the test setup, so we only need to check
     // values here
-    EXPECT_DOUBLE_EQ(length, field.length());
-    EXPECT_DOUBLE_EQ(width, field.width());
-    EXPECT_DOUBLE_EQ(goal_width, field.goalWidth());
+    EXPECT_DOUBLE_EQ(length, field.xLength());
+    EXPECT_DOUBLE_EQ(width, field.yLength());
+    EXPECT_DOUBLE_EQ(goal_width, field.goalYLength());
     EXPECT_DOUBLE_EQ(center_circle_radius, field.centerCircleRadius());
-    EXPECT_DOUBLE_EQ(defense_width, field.defenseAreaWidth());
-    EXPECT_DOUBLE_EQ(defense_length, field.defenseAreaLength());
+    EXPECT_DOUBLE_EQ(defense_width, field.defenseAreaYLength());
+    EXPECT_DOUBLE_EQ(defense_length, field.defenseAreaXLength());
     EXPECT_EQ(default_time_stamp, field.getMostRecentTimestamp());
 }
 
@@ -51,9 +51,9 @@ TEST_F(FieldTest, update_with_all_parameters)
                                      goal_width, boundary_width, center_circle_radius,
                                      default_time_stamp);
 
-    EXPECT_DOUBLE_EQ(9.6, field_to_update.totalLength());
-    EXPECT_DOUBLE_EQ(6.6, field_to_update.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryWidth());
+    EXPECT_DOUBLE_EQ(9.6, field_to_update.totalXLength());
+    EXPECT_DOUBLE_EQ(6.6, field_to_update.totalYLength());
+    EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryYLength());
 
     EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoal());
     EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoal());
@@ -88,9 +88,9 @@ TEST_F(FieldTest, update_with_new_field)
 
     field_to_update.updateDimensions(field);
 
-    EXPECT_DOUBLE_EQ(9.6, field_to_update.totalLength());
-    EXPECT_DOUBLE_EQ(6.6, field_to_update.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryWidth());
+    EXPECT_DOUBLE_EQ(9.6, field_to_update.totalXLength());
+    EXPECT_DOUBLE_EQ(6.6, field_to_update.totalYLength());
+    EXPECT_DOUBLE_EQ(0.3, field_to_update.boundaryYLength());
 
     EXPECT_EQ(Point(-4.5, 0.0), field_to_update.friendlyGoal());
     EXPECT_EQ(Point(4.5, 0.0), field_to_update.enemyGoal());

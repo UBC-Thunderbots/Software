@@ -5,16 +5,16 @@
 #include "software/geom/rectangle.h"
 #include "software/util/time/timestamp.h"
 
-Field::Field(double field_length, double field_width, double defense_length,
-             double defense_width, double goal_width, double boundary_width,
+Field::Field(double field_x_length, double field_y_length, double defense_x_length,
+             double defense_y_length, double goal_y_length, double boundary_y_length,
              double center_circle_radius, const Timestamp &timestamp,
              unsigned int buffer_size)
-    : field_length_(field_length),
-      field_width_(field_width),
-      defense_length_(defense_length),
-      defense_width_(defense_width),
-      goal_width_(goal_width),
-      boundary_width_(boundary_width),
+    : field_x_length_(field_x_length),
+      field_y_length_(field_y_length),
+      defense_x_length_(defense_x_length),
+      defense_y_length_(defense_y_length),
+      goal_y_length_(goal_y_length),
+      boundary_y_length_(boundary_y_length),
       center_circle_radius_(center_circle_radius)
 {
     // Set the size of the Timestamp history buffer
@@ -25,77 +25,77 @@ Field::Field(double field_length, double field_width, double defense_length,
 
 void Field::updateDimensions(const Field &new_field_data)
 {
-    field_length_          = new_field_data.length();
-    field_width_           = new_field_data.width();
-    defense_width_         = new_field_data.defenseAreaWidth();
-    defense_length_        = new_field_data.defenseAreaLength();
-    goal_width_            = new_field_data.goalWidth();
-    boundary_width_        = new_field_data.boundaryWidth();
+    field_x_length_          = new_field_data.xLength();
+    field_y_length_           = new_field_data.yLength();
+    defense_y_length_         = new_field_data.defenseAreaYLength();
+    defense_x_length_        = new_field_data.defenseAreaXLength();
+    goal_y_length_            = new_field_data.goalYLength();
+    boundary_y_length_        = new_field_data.boundaryYLength();
     center_circle_radius_  = new_field_data.centerCircleRadius();
     last_update_timestamps = new_field_data.getTimestampHistory();
 }
 
-void Field::updateDimensions(double field_length, double field_width,
-                             double defense_length, double defense_width,
-                             double goal_width, double boundary_width,
+void Field::updateDimensions(double field_x_length, double field_y_length,
+                             double defense_x_length, double defense_y_length,
+                             double goal_y_length, double boundary_y_length,
                              double center_circle_radius, const Timestamp &timestamp)
 {
-    field_length_         = field_length;
-    field_width_          = field_width;
-    defense_width_        = defense_width;
-    defense_length_       = defense_length;
-    goal_width_           = goal_width;
-    boundary_width_       = boundary_width;
+    field_x_length_         = field_x_length;
+    field_y_length_          = field_y_length;
+    defense_y_length_        = defense_y_length;
+    defense_x_length_       = defense_x_length;
+    goal_y_length_           = goal_y_length;
+    boundary_y_length_       = boundary_y_length;
     center_circle_radius_ = center_circle_radius;
     updateTimestamp(timestamp);
 }
 
-double Field::length() const
+double Field::xLength() const
 {
-    return field_length_;
+    return field_x_length_;
 }
 
-double Field::width() const
+double Field::yLength() const
 {
-    return field_width_;
+    return field_y_length_;
 }
 
-double Field::totalLength() const
+double Field::totalXLength() const
 {
-    return field_length_ + (2 * boundary_width_);
+    return field_x_length_ + (2 * boundary_y_length_);
 }
 
-double Field::totalWidth() const
+double Field::totalYLength() const
 {
-    return field_width_ + (2 * boundary_width_);
+    return field_y_length_ + (2 * boundary_y_length_);
 }
 
-double Field::goalWidth() const
+double Field::goalYLength() const
 {
-    return goal_width_;
+    return goal_y_length_;
 }
 
-double Field::defenseAreaWidth() const
+double Field::defenseAreaYLength() const
 {
-    return defense_width_;
+    return defense_y_length_;
 }
 
-double Field::defenseAreaLength() const
+double Field::defenseAreaXLength() const
 {
-    return defense_length_;
+    return defense_x_length_;
 }
 
 Rectangle Field::friendlyDefenseArea() const
 {
     return Rectangle(
-        Point(-field_length_ * 0.5, defense_width_ / 2.0),
-        Point(-field_length_ * 0.5 + defense_length_, -defense_width_ / 2.0));
+        Point(-field_x_length_ * 0.5, defense_y_length_ / 2.0),
+        Point(-field_x_length_ * 0.5 + defense_x_length_, -defense_y_length_ / 2.0));
 }
 
 Rectangle Field::enemyDefenseArea() const
 {
-    return Rectangle(Point(field_length_ * 0.5, defense_width_ / 2.0),
-                     Point(field_length_ * 0.5 - defense_length_, -defense_width_ / 2.0));
+    return Rectangle(Point(field_x_length_ * 0.5, defense_y_length_ / 2.0),
+                     Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
 }
 
 Rectangle Field::fieldLines() const
@@ -120,67 +120,67 @@ Point Field::centerPoint() const
 
 Point Field::friendlyGoal() const
 {
-    return Point(-length() / 2.0, 0.0);
+    return Point(-xLength() / 2.0, 0.0);
 }
 
 Point Field::enemyGoal() const
 {
-    return Point(length() / 2.0, 0.0);
+    return Point(xLength() / 2.0, 0.0);
 }
 
 Point Field::penaltyEnemy() const
 {
-    return Point(enemyGoal().x() - defenseAreaLength(), enemyGoal().y());
+    return Point(enemyGoal().x() - defenseAreaXLength(), enemyGoal().y());
 }
 
 Point Field::penaltyFriendly() const
 {
-    return Point(friendlyGoal().x() + defenseAreaLength(), friendlyGoal().y());
+    return Point(friendlyGoal().x() + defenseAreaXLength(), friendlyGoal().y());
 }
 
 Point Field::friendlyCornerPos() const
 {
-    return Point(friendlyGoal().x(), width() / 2.0);
+    return Point(friendlyGoal().x(), yLength() / 2.0);
 }
 
 Point Field::friendlyCornerNeg() const
 {
-    return Point(friendlyGoal().x(), -width() / 2.0);
+    return Point(friendlyGoal().x(), -yLength() / 2.0);
 }
 
 Point Field::enemyCornerPos() const
 {
-    return Point(enemyGoal().x(), width() / 2);
+    return Point(enemyGoal().x(), yLength() / 2);
 }
 
 Point Field::enemyCornerNeg() const
 {
-    return Point(enemyGoal().x(), -width() / 2);
+    return Point(enemyGoal().x(), -yLength() / 2);
 }
 
 Point Field::friendlyGoalpostPos() const
 {
-    return Point(friendlyGoal().x(), goalWidth() / 2.0);
+    return Point(friendlyGoal().x(), goalYLength() / 2.0);
 }
 
 Point Field::friendlyGoalpostNeg() const
 {
-    return Point(friendlyGoal().x(), -goalWidth() / 2.0);
+    return Point(friendlyGoal().x(), -goalYLength() / 2.0);
 }
 
 Point Field::enemyGoalpostPos() const
 {
-    return Point(enemyGoal().x(), goalWidth() / 2.0);
+    return Point(enemyGoal().x(), goalYLength() / 2.0);
 }
 
 Point Field::enemyGoalpostNeg() const
 {
-    return Point(enemyGoal().x(), -goalWidth() / 2.0);
+    return Point(enemyGoal().x(), -goalYLength() / 2.0);
 }
 
-double Field::boundaryWidth() const
+double Field::boundaryYLength() const
 {
-    return boundary_width_;
+    return boundary_y_length_;
 }
 
 bool Field::pointInFriendlyDefenseArea(const Point p) const
@@ -229,19 +229,19 @@ void Field::updateTimestamp(Timestamp time_stamp)
 
 bool Field::pointInEntireField(const Point &p) const
 {
-    Rectangle entire_field = Rectangle(Point(-totalLength() / 2, -totalWidth() / 2),
-                                       Point(totalLength() / 2, totalWidth() / 2));
+    Rectangle entire_field = Rectangle(Point(-totalXLength() / 2, -totalYLength() / 2),
+                                       Point(totalXLength() / 2, totalYLength() / 2));
     return entire_field.containsPoint(p);
 }
 
 bool Field::operator==(const Field &other) const
 {
-    return this->field_width_ == other.field_width_ &&
-           this->field_length_ == other.field_length_ &&
-           this->goal_width_ == other.goal_width_ &&
-           this->defense_width_ == other.defense_width_ &&
-           this->defense_length_ == other.defense_length_ &&
-           this->boundary_width_ == other.boundary_width_ &&
+    return this->field_y_length_ == other.field_y_length_ &&
+           this->field_x_length_ == other.field_x_length_ &&
+           this->goal_y_length_ == other.goal_y_length_ &&
+           this->defense_y_length_ == other.defense_y_length_ &&
+           this->defense_x_length_ == other.defense_x_length_ &&
+           this->boundary_y_length_ == other.boundary_y_length_ &&
            this->center_circle_radius_ == other.center_circle_radius_;
 }
 
