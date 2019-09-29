@@ -12,11 +12,11 @@ class FieldTest : public ::testing::Test
         defense_x_length       = 1.0;
         defense_y_length        = 2.0;
         goal_y_length           = 1.0;
-        boundary_y_length       = 0.3;
+        boundary_buffer_size       = 0.3;
         center_circle_radius = 0.5;
 
         field = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                      boundary_y_length, center_circle_radius, default_time_stamp);
+                      boundary_buffer_size, center_circle_radius, default_time_stamp);
     }
 
     Field field = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
@@ -25,7 +25,7 @@ class FieldTest : public ::testing::Test
     double defense_x_length;
     double defense_y_length;
     double goal_y_length;
-    double boundary_y_length;
+    double boundary_buffer_size;
     double center_circle_radius;
     Timestamp default_time_stamp = Timestamp::fromSeconds(0);
 };
@@ -48,7 +48,7 @@ TEST_F(FieldTest, update_with_all_parameters)
     Field field_to_update = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
 
     field_to_update.updateDimensions(x_length, y_length, defense_x_length, defense_y_length,
-                                     goal_y_length, boundary_y_length, center_circle_radius,
+                                     goal_y_length, boundary_buffer_size, center_circle_radius,
                                      default_time_stamp);
 
     EXPECT_DOUBLE_EQ(9.6, field_to_update.totalXLength());
@@ -122,20 +122,20 @@ TEST_F(FieldTest, update_with_new_field)
 TEST_F(FieldTest, equality_operator_fields_with_different_x_lengths)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length / 2, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
 TEST_F(FieldTest, equality_operator_fields_with_different_y_lengths)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length, y_length * 2, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
@@ -143,10 +143,10 @@ TEST_F(FieldTest, equality_operator_fields_with_different_y_lengths)
 TEST_F(FieldTest, equality_operator_fields_with_different_defense_x_length)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length, y_length, defense_x_length * 2, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
@@ -154,10 +154,10 @@ TEST_F(FieldTest, equality_operator_fields_with_different_defense_x_length)
 TEST_F(FieldTest, equality_operator_fields_with_different_defense_y_length)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length / 2, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
@@ -165,21 +165,21 @@ TEST_F(FieldTest, equality_operator_fields_with_different_defense_y_length)
 TEST_F(FieldTest, equality_operator_fields_with_different_goal_y_length)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
-    Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, 0, boundary_y_length,
+    Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, 0, boundary_buffer_size,
                           center_circle_radius, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
 
-TEST_F(FieldTest, equality_operator_fields_with_different_boundary_y_length)
+TEST_F(FieldTest, equality_operator_fields_with_different_boundary_buffer_size)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length * 1.1, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size * 1.1, center_circle_radius, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
@@ -187,10 +187,10 @@ TEST_F(FieldTest, equality_operator_fields_with_different_boundary_y_length)
 TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                          boundary_y_length, center_circle_radius * 10, default_time_stamp);
+                          boundary_buffer_size, center_circle_radius * 10, default_time_stamp);
 
     EXPECT_NE(field_1, field_2);
 }
@@ -199,14 +199,14 @@ TEST_F(FieldTest, equality_operator_fields_with_different_center_circle_radius)
 TEST_F(FieldTest, field_timestamp_history_is_saved)
 {
     Field field = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                        boundary_y_length, center_circle_radius, default_time_stamp);
+                        boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     field.updateDimensions(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                           boundary_y_length, center_circle_radius,
+                           boundary_buffer_size, center_circle_radius,
                            Timestamp::fromSeconds(default_time_stamp.getSeconds() + 1));
 
     field.updateDimensions(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                           boundary_y_length, center_circle_radius,
+                           boundary_buffer_size, center_circle_radius,
                            Timestamp::fromSeconds(default_time_stamp.getSeconds() + 2));
 
     EXPECT_EQ(field.getTimestampHistory().size(), 3);
@@ -225,7 +225,7 @@ TEST_F(FieldTest, exception_thrown_when_older_timestamp_is_used)
 {
     ASSERT_THROW(
         Field field = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
-                            boundary_y_length, center_circle_radius,
+                            boundary_buffer_size, center_circle_radius,
                             Timestamp::fromSeconds(default_time_stamp.getSeconds() - 1)),
         std::invalid_argument);
 }

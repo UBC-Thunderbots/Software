@@ -6,7 +6,7 @@
 #include "software/util/time/timestamp.h"
 
 Field::Field(double field_x_length, double field_y_length, double defense_x_length,
-             double defense_y_length, double goal_y_length, double boundary_y_length,
+             double defense_y_length, double goal_y_length, double boundary_buffer_size,
              double center_circle_radius, const Timestamp &timestamp,
              unsigned int buffer_size)
     : field_x_length_(field_x_length),
@@ -14,7 +14,7 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
       defense_x_length_(defense_x_length),
       defense_y_length_(defense_y_length),
       goal_y_length_(goal_y_length),
-      boundary_y_length_(boundary_y_length),
+      boundary_buffer_size_(boundary_buffer_size),
       center_circle_radius_(center_circle_radius)
 {
     // Set the size of the Timestamp history buffer
@@ -30,14 +30,14 @@ void Field::updateDimensions(const Field &new_field_data)
     defense_y_length_         = new_field_data.defenseAreaYLength();
     defense_x_length_        = new_field_data.defenseAreaXLength();
     goal_y_length_            = new_field_data.goalYLength();
-    boundary_y_length_        = new_field_data.boundaryYLength();
+    boundary_buffer_size_        = new_field_data.boundaryYLength();
     center_circle_radius_  = new_field_data.centerCircleRadius();
     last_update_timestamps = new_field_data.getTimestampHistory();
 }
 
 void Field::updateDimensions(double field_x_length, double field_y_length,
                              double defense_x_length, double defense_y_length,
-                             double goal_y_length, double boundary_y_length,
+                             double goal_y_length, double boundary_buffer_size,
                              double center_circle_radius, const Timestamp &timestamp)
 {
     field_x_length_         = field_x_length;
@@ -45,7 +45,7 @@ void Field::updateDimensions(double field_x_length, double field_y_length,
     defense_y_length_        = defense_y_length;
     defense_x_length_       = defense_x_length;
     goal_y_length_           = goal_y_length;
-    boundary_y_length_       = boundary_y_length;
+    boundary_buffer_size_       = boundary_buffer_size;
     center_circle_radius_ = center_circle_radius;
     updateTimestamp(timestamp);
 }
@@ -62,12 +62,12 @@ double Field::yLength() const
 
 double Field::totalXLength() const
 {
-    return field_x_length_ + (2 * boundary_y_length_);
+    return field_x_length_ + (2 * boundary_buffer_size_);
 }
 
 double Field::totalYLength() const
 {
-    return field_y_length_ + (2 * boundary_y_length_);
+    return field_y_length_ + (2 * boundary_buffer_size_);
 }
 
 double Field::goalYLength() const
@@ -180,7 +180,7 @@ Point Field::enemyGoalpostNeg() const
 
 double Field::boundaryYLength() const
 {
-    return boundary_y_length_;
+    return boundary_buffer_size_;
 }
 
 bool Field::pointInFriendlyDefenseArea(const Point p) const
@@ -241,7 +241,7 @@ bool Field::operator==(const Field &other) const
            this->goal_y_length_ == other.goal_y_length_ &&
            this->defense_y_length_ == other.defense_y_length_ &&
            this->defense_x_length_ == other.defense_x_length_ &&
-           this->boundary_y_length_ == other.boundary_y_length_ &&
+           this->boundary_buffer_size_ == other.boundary_buffer_size_ &&
            this->center_circle_radius_ == other.center_circle_radius_;
 }
 
