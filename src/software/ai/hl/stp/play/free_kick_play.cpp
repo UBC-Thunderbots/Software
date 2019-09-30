@@ -84,8 +84,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     pass_generator.setTargetRegion(
         Rectangle(Point(-(world.field().length() / 4), world.field().width() / 2),
                   world.field().enemyCornerNeg()));
-    std::pair<Pass, double> best_pass_and_score_so_far =
-        pass_generator.getBestPassSoFar();
+    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time
@@ -136,8 +135,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
 
-        LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.first;
-        LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
+        LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
         yield({shoot_tactic, cherry_pick_tactic_neg_y, cherry_pick_tactic_pos_y,
                crease_defender_left, crease_defender_right});
@@ -155,7 +154,7 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
         ready_to_pass = set_passer_robot_in_passgenerator &&
-                        best_pass_and_score_so_far.second < min_pass_score_threshold;
+                        best_pass_and_score_so_far.rating < min_pass_score_threshold;
 
         // If we've assigned a robot as the passer in the PassGenerator, we lower
         // our threshold based on how long the PassGenerator as been running since
@@ -184,11 +183,11 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     if (!shoot_tactic->hasShotAvailable())
     {
         // Commit to a pass
-        Pass pass = best_pass_and_score_so_far.first;
+        Pass pass = best_pass_and_score_so_far.pass;
 
-        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.first;
+        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "Score of pass we committed to: "
-                   << best_pass_and_score_so_far.second;
+                   << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
         auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
