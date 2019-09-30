@@ -126,7 +126,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 First we need to setup CLion
 1. Open CLion
 2. Select `Import Bazel Project`
-3. Set `Workspace` to wherever you cloned the repository + `/src/thunderbots`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src/thunderbots`.
+3. Set `Workspace` to wherever you cloned the repository + `/src`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src`.
 4. Select `Create from scratch` 
 5. For "Project View", leave everything as default.
 6. You're good to go! Give CLion some time to find everything in your repo.
