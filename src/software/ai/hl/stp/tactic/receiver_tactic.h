@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass.h"
 #include "software/geom/ray.h"
+#include "software/geom/shot.h"
 
 /**
  * This tactic is for a robot receiving a pass. It should be used in conjunction with
@@ -75,11 +76,11 @@ class ReceiverTactic : public Tactic
      * @param robot The receiver robot
      * @param ball The ball
      * @param best_shot_target The point the receiver robot should shoot at
-     * @return A pair containing the position and orientation the receiver robot should
-     * have in order to perform a one-time shot
+     * @return A Shot object containing the position and orientation the receiver robot
+     * should have in order to perform a one-time shot
      */
-    static std::pair<Point, Angle> getOneTimeShotPositionAndOrientation(
-        const Robot& robot, const Ball& ball, const Point& best_shot_target);
+    static Shot getOneTimeShotPositionAndOrientation(const Robot& robot, const Ball& ball,
+                                                     const Point& best_shot_target);
 
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net
@@ -98,10 +99,10 @@ class ReceiverTactic : public Tactic
      * A feasible shot is one where the robot does not have to rotate to much to
      * take the shot, and there is a sufficient percentage of the net open for the shot.
      *
-     * @return A pair of a Point to shoot at and the open angle the shot could
+     * @return A Shot object with a Point to shoot at and the open angle the shot could
      *         go through, or std::nullopt if there is no feasible shot
      */
-    std::optional<std::pair<Point, Angle>> findFeasibleShot();
+    std::optional<Shot> findFeasibleShot();
 
     // The field the pass is occuring on
     Field field;

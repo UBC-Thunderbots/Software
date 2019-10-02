@@ -88,7 +88,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
     Point shot_target        = field.enemyGoal();
     if (shot_opt)
     {
-        open_angle_to_goal = shot_opt->second;
+        open_angle_to_goal = shot_opt->angle;
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
