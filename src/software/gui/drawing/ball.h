@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/ai/world/ball.h"
+#include "software/world/ball.h"
 
 /**
  * This file contains all the functions that allow us to draw a Ball in a

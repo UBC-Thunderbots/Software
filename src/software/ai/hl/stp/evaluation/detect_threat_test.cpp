@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/world/ball.h"
+#include "software/world/ball.h"
 #include "software/test_util/test_util.h"
 #include "software/util/time/timestamp.h"
 

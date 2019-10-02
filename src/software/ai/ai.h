@@ -4,7 +4,7 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/util/time/timestamp.h"
 
 /**

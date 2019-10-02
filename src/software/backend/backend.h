@@ -1,7 +1,7 @@
 #pragma once
 
 #include "software/ai/primitive/primitive.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/backend/robot_status.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"

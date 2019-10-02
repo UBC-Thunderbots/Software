@@ -7,9 +7,9 @@ cc_library(
         ":robot_status",
         "//software:typedefs",
         "//software/ai/primitive",
-        "//software/ai/world",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/world",
     ],
 )
 

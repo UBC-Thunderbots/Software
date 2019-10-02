@@ -1,6 +1,6 @@
 #include "shared/constants.h"
-#include "software/ai/world/field.h"
-#include "software/ai/world/world.h"
+#include "software/world/field.h"
+#include "software/world/world.h"
 #include "software/geom/line.h"
 #include "software/geom/util.h"
 

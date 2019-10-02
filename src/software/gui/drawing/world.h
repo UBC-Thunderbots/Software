@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/gui/drawing/draw_functions.h"
 
 /**

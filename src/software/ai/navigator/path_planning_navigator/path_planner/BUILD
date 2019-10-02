@@ -31,8 +31,8 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
+        "//software/world:ball",
+        "//software/world:field",
     ],
 )
 

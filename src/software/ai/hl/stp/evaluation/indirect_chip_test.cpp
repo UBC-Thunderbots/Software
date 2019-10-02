@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/util.h"

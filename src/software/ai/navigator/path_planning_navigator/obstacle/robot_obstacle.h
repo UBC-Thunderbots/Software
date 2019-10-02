@@ -1,6 +1,6 @@
 #pragma once
 
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
 

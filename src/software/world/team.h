@@ -6,7 +6,7 @@
 #include <optional>
 #include <vector>
 
-#include "software/ai/world/robot.h"
+#include "software/world/robot.h"
 #include "software/util/time/timestamp.h"
 
 /**

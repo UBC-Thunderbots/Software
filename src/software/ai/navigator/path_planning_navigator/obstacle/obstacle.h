@@ -5,8 +5,8 @@
 
 
 #include "shared/constants.h"
-#include "software/ai/world/ball.h"
-#include "software/ai/world/robot.h"
+#include "software/world/ball.h"
+#include "software/world/robot.h"
 #include "software/geom/angle.h"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"

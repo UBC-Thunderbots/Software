@@ -4,9 +4,9 @@
 
 #include <optional>
 
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
-#include "software/ai/world/robot.h"
+#include "software/world/ball.h"
+#include "software/world/field.h"
+#include "software/world/robot.h"
 #include "software/geom/point.h"
 
 namespace Evaluation

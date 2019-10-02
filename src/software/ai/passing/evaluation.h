@@ -7,9 +7,9 @@
 #include <functional>
 
 #include "software/ai/passing/pass.h"
-#include "software/ai/world/field.h"
-#include "software/ai/world/team.h"
-#include "software/ai/world/world.h"
+#include "software/world/field.h"
+#include "software/world/team.h"
+#include "software/world/world.h"
 #include "software/util/math/math_functions.h"
 
 namespace Passing

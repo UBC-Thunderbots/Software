@@ -4,7 +4,7 @@
 #include <boost/exception/diagnostic_information.hpp>
 #include <thread>
 
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/backend/input/network/networking/network_filter.h"
 #include "software/backend/input/network/networking/ssl_gamecontroller_client.h"
 #include "software/backend/input/network/networking/ssl_vision_client.h"

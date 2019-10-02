@@ -4,7 +4,7 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/test_util/test_util.h"
 
 

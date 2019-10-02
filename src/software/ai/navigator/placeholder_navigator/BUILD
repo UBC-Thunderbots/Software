@@ -10,7 +10,7 @@ cc_library(
         "//software/ai/intent:intent_visitor",
         "//software/ai/navigator",
         "//software/ai/primitive:all_primitives",
-        "//software/ai/world",
+        "//software/world",
     ],
 )
 

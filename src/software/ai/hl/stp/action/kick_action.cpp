@@ -3,7 +3,7 @@
 #include "shared/constants.h"
 #include "software/ai/intent/kick_intent.h"
 #include "software/ai/intent/move_intent.h"
-#include "software/ai/world/ball.h"
+#include "software/world/ball.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
 

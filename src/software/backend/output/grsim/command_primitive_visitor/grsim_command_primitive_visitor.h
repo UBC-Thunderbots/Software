@@ -3,8 +3,8 @@
 #include <variant>
 
 #include "software/ai/primitive/primitive_visitor.h"
-#include "software/ai/world/ball.h"
-#include "software/ai/world/robot.h"
+#include "software/world/ball.h"
+#include "software/world/robot.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 
 using MotionControllerCommand =

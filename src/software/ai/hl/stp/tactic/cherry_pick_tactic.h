@@ -5,7 +5,7 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/geom/rectangle.h"
 
 /**

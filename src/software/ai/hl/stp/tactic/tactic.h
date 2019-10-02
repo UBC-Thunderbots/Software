@@ -5,7 +5,7 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/intent/intent.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot. For

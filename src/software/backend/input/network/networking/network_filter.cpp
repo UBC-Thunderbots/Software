@@ -1,7 +1,7 @@
 #include "software/backend/input/network/networking/network_filter.h"
 
 #include "shared/constants.h"
-#include "software/ai/world/refbox_constants.h"
+#include "software/world/refbox_constants.h"
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/util/constants.h"

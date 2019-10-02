@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 #include <string.h>
 
-#include "software/ai/world/robot.h"
+#include "software/world/robot.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 
 TEST(GrsimCommandPrimitiveVisitorTest, visit_move_spin_primitive)

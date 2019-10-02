@@ -7,7 +7,7 @@
 #include <thread>
 
 #include "software/ai/hl/stp/play_info.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/visualizer.h"

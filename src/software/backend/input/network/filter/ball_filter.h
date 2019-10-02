@@ -3,8 +3,8 @@
 #include <boost/circular_buffer.hpp>
 #include <optional>
 
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
+#include "software/world/ball.h"
+#include "software/world/field.h"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
 #include "software/util/time/timestamp.h"
