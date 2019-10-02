@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "software/ai/passing/pass.h"
+#include "software/ai/passing/pass_with_rating.h"
 #include "software/util/optimization/gradient_descent_optimizer.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/util/time/timestamp.h"
@@ -108,7 +109,7 @@ namespace Passing
          *
          * @return The best currently known pass and the rating of that pass (in [0-1])
          */
-        std::pair<Pass, double> getBestPassSoFar();
+        PassWithRating getBestPassSoFar();
 
         /**
          * Destructs this PassGenerator
