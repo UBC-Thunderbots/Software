@@ -323,22 +323,22 @@ void NetworkFilter::setOurFieldSide(bool blue_team_on_positive_half)
     {
         if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
-            our_field_side = FieldSide::WEST;
+            our_field_side = FieldSide::NEG_X;
         }
         else
         {
-            our_field_side = FieldSide::EAST;
+            our_field_side = FieldSide::POS_X;
         }
     }
     else
     {
         if (!Util::DynamicParameters::AI::refbox::friendly_color_yellow.value())
         {
-            our_field_side = FieldSide::EAST;
+            our_field_side = FieldSide::POS_X;
         }
         else
         {
-            our_field_side = FieldSide::WEST;
+            our_field_side = FieldSide::NEG_X;
         }
     }
 }

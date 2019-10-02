@@ -288,23 +288,15 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         /*
             Generating all the 8 successor of this GridCell
 
-                N.W N N.E
-                \ | /
-                \ | /
-                W----Cell----E
-                    / | \
-                / | \
-                S.W S S.E
-
-            Cell-->Popped Cell (i, j)
-            N --> North	 (i-1, j)
-            S --> South	 (i+1, j)
-            E --> East	 (i, j+1)
-            W --> West		 (i, j-1)
-            N.E--> North-East (i-1, j+1)
-            N.W--> North-West (i-1, j-1)
-            S.E--> South-East (i+1, j+1)
-            S.W--> South-West (i+1, j-1)*/
+            Popped Cell --> (i, j)
+            <0,+y>      --> (i-1, j)
+            <0,-y>      --> (i+1, j)
+            <+x,0>      --> (i, j+1)
+            <-x,0>      --> (i, j-1)
+            <+x,+y>     --> (i-1, j+1)
+            <-x,+y>     --> (i-1, j-1)
+            <+x,-y>     --> (i+1, j+1)
+            <-x,-y>     --> (i+1, j-1)*/
 
         // To store the 'g', 'h' and 'f' of the 8 successors
         double gNew, hNew, fNew;
