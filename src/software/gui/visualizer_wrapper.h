@@ -7,11 +7,11 @@
 #include <thread>
 
 #include "software/ai/hl/stp/play_info.h"
-#include "software/world/world.h"
 #include "software/backend/robot_status.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/gui/widgets/visualizer.h"
 #include "software/multithreading/threaded_observer.h"
+#include "software/world/world.h"
 
 /**
  * This class wraps our Visualizer object which is responsible for

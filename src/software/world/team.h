@@ -6,8 +6,8 @@
 #include <optional>
 #include <vector>
 
-#include "software/world/robot.h"
 #include "software/util/time/timestamp.h"
+#include "software/world/robot.h"
 
 /**
  * A team of robots

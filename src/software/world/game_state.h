@@ -1,8 +1,8 @@
 #pragma once
 
+#include "software/geom/point.h"
 #include "software/world/ball.h"
 #include "software/world/refbox_constants.h"
-#include "software/geom/point.h"
 
 /**
  * @brief Holds the state of the game according to the referee

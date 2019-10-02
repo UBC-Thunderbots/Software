@@ -6,8 +6,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/world/robot.h"
 #include "software/geom/angle.h"
+#include "software/world/robot.h"
 
 
 using namespace std::chrono;

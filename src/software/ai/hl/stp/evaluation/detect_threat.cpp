@@ -8,8 +8,8 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/world/field.h"
 #include "software/geom/util.h"
+#include "software/world/field.h"
 
 namespace Evaluation
 {

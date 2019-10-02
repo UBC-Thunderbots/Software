@@ -5,8 +5,8 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/world/world.h"
 #include "software/geom/rectangle.h"
+#include "software/world/world.h"
 
 /**
  * This tactic is intended to place a robot in a given region, and have the robot

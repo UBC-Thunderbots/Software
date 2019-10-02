@@ -1,9 +1,9 @@
-#include "software/world/world.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/world.h"
 
 /**
  * The indirect chip and chase target evaluation function returns a target point for the

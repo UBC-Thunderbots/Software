@@ -1,8 +1,8 @@
 #pragma once
 
-#include "software/world/world.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/world.h"
 
 class RobotObstacle
 {

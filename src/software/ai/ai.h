@@ -4,8 +4,8 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/world/world.h"
 #include "software/util/time/timestamp.h"
+#include "software/world/world.h"
 
 /**
  * This class wraps all our AI logic and decision making to help separate our

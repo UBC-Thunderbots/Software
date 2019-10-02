@@ -1,11 +1,11 @@
 #include "software/backend/input/network/networking/network_filter.h"
 
 #include "shared/constants.h"
-#include "software/world/refbox_constants.h"
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/util/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/refbox_constants.h"
 
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to

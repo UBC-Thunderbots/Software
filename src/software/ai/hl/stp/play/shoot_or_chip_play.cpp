@@ -14,8 +14,8 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/world/game_state.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/game_state.h"
 
 using namespace Evaluation;
 

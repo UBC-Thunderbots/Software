@@ -4,9 +4,9 @@
  */
 #pragma once
 
-#include "software/world/robot.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
+#include "software/world/robot.h"
 
 namespace AI::Evaluation
 {

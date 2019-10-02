@@ -4,10 +4,10 @@
 
 #include <optional>
 
+#include "software/geom/point.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
-#include "software/geom/point.h"
 
 namespace Evaluation
 {
