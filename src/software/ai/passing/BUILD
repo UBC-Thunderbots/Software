@@ -46,12 +46,21 @@ cc_test(
 )
 
 cc_library(
+    name = "pass_with_rating",
+    hdrs = ["pass_with_rating.h"],
+    deps = [
+        ":pass",
+    ],
+)
+
+cc_library(
     name = "pass_generator",
     srcs = ["pass_generator.cpp"],
     hdrs = ["pass_generator.h"],
     deps = [
         ":evaluation",
         ":pass",
+        ":pass_with_rating",
         "//software/ai/world",
         "//software/util/optimization:gradient_descent",
     ],
