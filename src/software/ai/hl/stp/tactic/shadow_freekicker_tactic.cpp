@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,

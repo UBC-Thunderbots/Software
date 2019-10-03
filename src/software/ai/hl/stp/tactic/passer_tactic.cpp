@@ -9,6 +9,7 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 using namespace Passing;
 

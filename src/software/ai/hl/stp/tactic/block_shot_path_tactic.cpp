@@ -5,6 +5,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
     : field(field), Tactic(loop_forever)

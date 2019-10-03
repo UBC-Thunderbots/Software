@@ -11,6 +11,7 @@
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,

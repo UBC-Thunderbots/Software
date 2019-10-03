@@ -11,6 +11,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/geom/util.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,

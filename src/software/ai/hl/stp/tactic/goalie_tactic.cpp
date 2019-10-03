@@ -9,6 +9,7 @@
 #include "software/geom/segment.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,

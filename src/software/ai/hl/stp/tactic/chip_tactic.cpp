@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
     : ball(ball), Tactic(loop_forever, {RobotCapabilityFlags::Chip})

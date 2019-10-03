@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/geom/rectangle.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,

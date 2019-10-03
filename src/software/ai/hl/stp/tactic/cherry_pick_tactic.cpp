@@ -6,6 +6,7 @@
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/geom/util.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : pass_generator(world, world.ball().position()),

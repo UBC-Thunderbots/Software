@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 
 #include <algorithm>
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
 
