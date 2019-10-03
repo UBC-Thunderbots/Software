@@ -26,7 +26,6 @@ load(
     "tool_path",
     "variable_with_value",
 )
-
 load(
     "@bazel_tools//tools/build_defs/cc:action_names.bzl",
     "ASSEMBLE_ACTION_NAME",
@@ -105,11 +104,12 @@ ALL_CPP_ACTIONS = [
 def _make_common_features(ctx):
     result = {}
 
-    result['static_link_cpp_runtimes'] = feature(
+    result["static_link_cpp_runtimes"] = feature(
         name = "static_link_cpp_runtimes",
-        implies = ["no-unused-command-line-argument"])
+        implies = ["no-unused-command-line-argument"],
+    )
 
-    result['unfiltered_compile_flags_feature'] = feature(
+    result["unfiltered_compile_flags_feature"] = feature(
         name = "unfiltered_compile_flags",
         flag_sets = ([
             flag_set(
@@ -130,7 +130,7 @@ def _make_common_features(ctx):
         ] if ctx.attr.host_unfiltered_compile_flags else []),
     )
 
-    result['determinism_feature'] = feature(
+    result["determinism_feature"] = feature(
         name = "determinism",
         flag_sets = [
             flag_set(
@@ -149,7 +149,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['hardening_feature'] = feature(
+    result["hardening_feature"] = feature(
         name = "hardening",
         flag_sets = [
             flag_set(
@@ -177,10 +177,12 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['supports_dynamic_linker_feature'] = feature(
-        name = "supports_dynamic_linker", enabled = True)
+    result["supports_dynamic_linker_feature"] = feature(
+        name = "supports_dynamic_linker",
+        enabled = True,
+    )
 
-    result['warnings_feature'] = feature(
+    result["warnings_feature"] = feature(
         name = "warnings",
         flag_sets = [
             flag_set(
@@ -194,7 +196,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['dbg_feature'] = feature(
+    result["dbg_feature"] = feature(
         name = "dbg",
         flag_sets = [
             flag_set(
@@ -208,7 +210,7 @@ def _make_common_features(ctx):
         implies = ["common"],
     )
 
-    result['disable_assertions_feature'] = feature(
+    result["disable_assertions_feature"] = feature(
         name = "disable-assertions",
         flag_sets = [
             flag_set(
@@ -218,9 +220,9 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['fastbuild_feature'] = feature(name = "fastbuild", implies = ["dbg"])
+    result["fastbuild_feature"] = feature(name = "fastbuild", implies = ["dbg"])
 
-    result['user_compile_flags_feature'] = feature(
+    result["user_compile_flags_feature"] = feature(
         name = "user_compile_flags",
         flag_sets = [
             flag_set(
@@ -243,7 +245,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['frame_pointer_feature'] = feature(
+    result["frame_pointer_feature"] = feature(
         name = "frame-pointer",
         flag_sets = [
             flag_set(
@@ -253,7 +255,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['build_id_feature'] = feature(
+    result["build_id_feature"] = feature(
         name = "build-id",
         flag_sets = [
             flag_set(
@@ -267,9 +269,9 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['no_stripping_feature'] = feature(name = "no_stripping")
+    result["no_stripping_feature"] = feature(name = "no_stripping")
 
-    result['no_canonical_prefixes_feature'] = feature(
+    result["no_canonical_prefixes_feature"] = feature(
         name = "no-canonical-prefixes",
         flag_sets = [
             flag_set(
@@ -288,7 +290,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['no_canonical_system_headers'] = feature(
+    result["no_canonical_system_headers"] = feature(
         name = "no-canonical-system-headers",
         flag_sets = [
             flag_set(
@@ -307,11 +309,11 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['has_configured_linker_path_feature'] = feature(name = "has_configured_linker_path")
+    result["has_configured_linker_path_feature"] = feature(name = "has_configured_linker_path")
 
-    result['copy_dynamic_libraries_to_binary_feature'] = feature(name = "copy_dynamic_libraries_to_binary")
+    result["copy_dynamic_libraries_to_binary_feature"] = feature(name = "copy_dynamic_libraries_to_binary")
 
-    result['user_link_flags_feature'] = feature(
+    result["user_link_flags_feature"] = feature(
         name = "user_link_flags",
         flag_sets = [
             flag_set(
@@ -327,7 +329,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['cpp17_feature'] = feature(
+    result["cpp17_feature"] = feature(
         name = "c++17",
         flag_sets = [
             flag_set(
@@ -337,7 +339,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['no-rtti'] = feature(
+    result["no-rtti"] = feature(
         name = "no-rtti",
         flag_sets = [
             flag_set(
@@ -347,7 +349,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['no-exceptions'] = feature(
+    result["no-exceptions"] = feature(
         name = "no-exceptions",
         flag_sets = [
             flag_set(
@@ -357,7 +359,7 @@ def _make_common_features(ctx):
         ],
     )
 
-    result['no-unused-command-line-argument'] = feature(
+    result["no-unused-command-line-argument"] = feature(
         name = "no-unused-command-line-argument",
         flag_sets = [
             flag_set(
@@ -368,7 +370,6 @@ def _make_common_features(ctx):
     )
 
     return result
-
 
 def _impl(ctx):
     host_system_name = "k8"
@@ -453,7 +454,7 @@ def _impl(ctx):
         flag_sets = [
             flag_set(
                 actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags= [
+                flag_groups = [flag_group(flags = [
                     "-fuse-ld=lld",
                     "-rtlib=compiler-rt",
                 ])],
@@ -468,10 +469,12 @@ def _impl(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-ggdb",
-                                 "-O2",
-                                 "-ffunction-sections",
-                                 "-fdata-sections"],
+                        flags = [
+                            "-ggdb",
+                            "-O2",
+                            "-ffunction-sections",
+                            "-fdata-sections",
+                        ],
                     ),
                 ],
             ),
@@ -500,7 +503,7 @@ def _impl(ctx):
             "lld",
             "frame-pointer",
             "static_link_cpp_runtimes",
-        ]
+        ],
     )
 
     features = common.values() + [
@@ -559,7 +562,7 @@ def _impl(ctx):
     ]
 
 cc_toolchain_config = rule(
-        implementation = _impl,
+    implementation = _impl,
     attrs = {
         "cpu": attr.string(mandatory = True, values = ["k8"]),
         "builtin_include_directories": attr.string_list(),
@@ -610,10 +613,12 @@ def _stm32_impl(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-g",
-                                 "-Os",
-                                 "-ffunction-sections",
-                                 "-fdata-sections"],
+                        flags = [
+                            "-g",
+                            "-Os",
+                            "-ffunction-sections",
+                            "-fdata-sections",
+                        ],
                     ),
                 ],
             ),
@@ -634,7 +639,7 @@ def _stm32_impl(ctx):
         flag_sets = [
             flag_set(
                 actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags= [
+                flag_groups = [flag_group(flags = [
                     "-mthumb",
                     "-mfloat-abi=softfp",
                 ])],
@@ -688,6 +693,20 @@ def _stm32_impl(ctx):
         implies = ["stm32"],
     )
 
+    stm32h7_feature = feature(
+        name = "stm32h7",
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = [
+                    "-mcpu=cortex-m7",
+                    "-mfpu=fpv5-d16",
+                ])],
+            ),
+        ],
+        implies = ["stm32"],
+    )
+
     common_feature = feature(
         name = "common",
         implies = [
@@ -696,9 +715,12 @@ def _stm32_impl(ctx):
             "determinism",
             "warnings",
             "no-canonical-prefixes",
-        ] + (["stm32f0"] if ctx.attr.cpu == "stm32f0" else []) + (
-             ["stm32f4"] if ctx.attr.cpu == "stm32f4" else []) + (
-             ["stm32g4"] if ctx.attr.cpu == "stm32g4" else [])
+        ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
+            "stm32f0",
+            "stm32f4",
+            "stm32g4",
+            "stm32h7",
+        ] else []),
     )
 
     features = common.values() + [
@@ -709,6 +731,7 @@ def _stm32_impl(ctx):
         stm32f0_feature,
         stm32f4_feature,
         stm32g4_feature,
+        stm32h7_feature,
     ]
 
     cxx_builtin_include_directories = ctx.attr.builtin_include_directories
@@ -718,7 +741,7 @@ def _stm32_impl(ctx):
         tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-ar"),
         tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-ld"),
         tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-cpp"),
-#        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
+        #        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
         tool_path(name = "gcov", path = "/arm-none-eabi-gcov"),
         tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-ld"),
         tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-nm"),
@@ -762,6 +785,7 @@ cc_toolchain_config_stm32 = rule(
             "stm32f0",
             "stm32f4",
             "stm32g4",
+            "stm32h7",
         ]),
         "builtin_include_directories": attr.string_list(),
         "extra_no_canonical_prefixes_flags": attr.string_list(),

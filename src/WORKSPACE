@@ -83,3 +83,8 @@ new_local_repository(
     build_file = "@bazel_rules_qt//:qt.BUILD",
     path = "/usr/include/x86_64-linux-gnu/qt5/",
 )
+
+#TODO: make this consistent with our other external deps
+load("//tools/workspace:default.bzl", "add_default_repositories")
+
+add_default_repositories()

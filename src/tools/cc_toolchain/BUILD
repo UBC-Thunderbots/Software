@@ -25,6 +25,7 @@ cc_toolchain_suite(
         "stm32g4": "cc_toolchain_stm32g4",
         "stm32f4": "cc_toolchain_stm32f4",
         "stm32f0": "cc_toolchain_stm32f0",
+        "stm32h7": "cc_toolchain_stm32h7",
     },
 )
 
@@ -161,4 +162,29 @@ cc_toolchain(
     supports_param_files = 0,
     toolchain_config = ":gcc-stm32g4",
     toolchain_identifier = "gcc-stm32g4",
+)
+
+cc_toolchain_config_stm32(
+    name = "gcc-stm32h7",
+    builtin_include_directories = [
+        "external/com_arm_developer_gcc/arm-none-eabi/include/",
+        "external/com_arm_developer_gcc/arm-none-eabi/include/sys/",
+    ],
+    cpu = "stm32h7",
+    host_compiler_path = "wrapper/arm-none-eabi-g++",
+    host_compiler_prefix = "wrapper",
+    toolchain_identifier = "gcc-stm32h7",
+)
+
+cc_toolchain(
+    name = "cc_toolchain_stm32h7",
+    all_files = ":arm_everything",
+    compiler_files = ":arm_everything",
+    dwp_files = ":empty",
+    linker_files = ":arm_everything",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 0,
+    toolchain_config = ":gcc-stm32h7",
+    toolchain_identifier = "gcc-stm32h7",
 )
