@@ -1,5 +1,6 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
+# TODO: Do we need this?
 MyCCompileInfo = provider(doc = "", fields = ["object"])
 
 # TODO: comment here
@@ -14,6 +15,11 @@ SUPPORTED_PROCESSORS = [
     "STM32H757xx",
 ]
 
+# We got this URL by running wireshark and watching what STM32CubeMX tried to download
+STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL = \
+    "http://www.ebuc23.com/s3/stm_test/software/firmware/stm32cube_fw_h7_v150.zip"
+
+# TODO: comment here
 def _filter_none(input_list):
     filtered_list = []
     for element in input_list:
@@ -27,7 +33,19 @@ def _cc_stm32h7_hal_library_impl(ctx):
     # Begin by copying all the requested files into the current directory
     # TODO: better comment here
 
-    external_deps_folder = ctx.actions.declare_directory("external_deps")
+    # TODO: rename "fw" to firmware..........
+
+    fw_zip_name = "fw.zip"
+    fw_zip = ctx.actions.declare_file(fw_zip_name)
+    ctx.actions.run_shell(
+        outputs = [fw_zip],
+        command = """
+        curl -L {} -o {}
+        """.format(STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL, fw_zip.path),
+        progress_message = "Downloading firmware",
+    )
+
+    # TODO: the whole "external_deps" thing is a _bit_ convoluted, we can maybe simplify things a bit?
     drivers_and_middleware_hdrs = [
         ctx.actions.declare_file("external_deps/{}".format(filename))
         for filename in ctx.attr.drivers_and_middleware_hdrs
@@ -36,25 +54,39 @@ def _cc_stm32h7_hal_library_impl(ctx):
         ctx.actions.declare_file("external_deps/{}".format(filename))
         for filename in ctx.attr.drivers_and_middleware_srcs
     ]
+
+    external_deps_folder = ctx.actions.declare_directory("external_deps")
+    print(external_deps_folder.path)
     ctx.actions.run_shell(
-        outputs =
-            drivers_and_middleware_hdrs +
-            drivers_and_middleware_srcs +
-            [external_deps_folder],
-        arguments = ctx.attr.drivers_and_middleware_srcs + ctx.attr.drivers_and_middleware_hdrs,
+        inputs = [fw_zip],
+        outputs = [external_deps_folder] + drivers_and_middleware_hdrs + drivers_and_middleware_srcs,
         command = """
-        external_deps_folder='%s'
-        mkdir -p $external_deps_folder
-        for file in "$@"
-        do
-            echo $external_deps_folder/$file
-            mkdir -p $(dirname $external_deps_folder/$file)
-            cp ~/STM32Cube/Repository/STM32Cube_FW_H7_V1.5.0/$file $external_deps_folder/$file
-        done
-        """ % external_deps_folder.path,
-        # TODO: better progress message
-        progress_message = "Getting requested driver and middleware files....",
+        unzip -qo {} 'STM32Cube_FW_H7_V1.5.0/Drivers/*' 'STM32Cube_FW_H7_V1.5.0/Middlewares/*'
+        rm -rf {external_deps_path}
+        mv STM32Cube_FW_H7_V1.5.0 {external_deps_path}
+        """.format(fw_zip.path, external_deps_path = external_deps_folder.path),
+        progress_message = "Unzipping firmware",
     )
+
+    #    ctx.actions.run_shell(
+    #        outputs =
+    #            drivers_and_middleware_hdrs +
+    #            drivers_and_middleware_srcs +
+    #            [external_deps_folder],
+    #        arguments = ctx.attr.drivers_and_middleware_srcs + ctx.attr.drivers_and_middleware_hdrs,
+    #        command = """
+    #        external_deps_folder='%s'
+    #        mkdir -p $external_deps_folder
+    #        for file in "$@"
+    #        do
+    #            echo $external_deps_folder/$file
+    #            mkdir -p $(dirname $external_deps_folder/$file)
+    #            cp ~/STM32Cube/Repository/STM32Cube_FW_H7_V1.5.0/$file $external_deps_folder/$file
+    #        done
+    #        """ % external_deps_folder.path,
+    #        # TODO: better progress message
+    #        progress_message = "Getting requested driver and middleware files....",
+    #    )
 
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
@@ -65,10 +97,6 @@ def _cc_stm32h7_hal_library_impl(ctx):
     )
     compilation_contexts = []
     linking_contexts = []
-    for dep in ctx.attr.deps:
-        if CcInfo in dep:
-            compilation_contexts.append(dep[CcInfo].compilation_context)
-            linking_contexts.append(dep[CcInfo].linking_context)
 
     print("drivers_and_middleware_srcs:{}".format(drivers_and_middleware_srcs))
 
@@ -80,16 +108,10 @@ def _cc_stm32h7_hal_library_impl(ctx):
         actions = ctx.actions,
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
-        public_hdrs = ctx.files.public_hdrs +
-                      drivers_and_middleware_hdrs + ctx.files.hal_config_hdrs,
-        private_hdrs = ctx.files.private_hdrs,
-        srcs = ctx.files.srcs + drivers_and_middleware_srcs,
-        includes =
-            ctx.attr.includes + drivers_and_middleware_includes + hal_config_hdr_includes,
-        quote_includes = ctx.attr.quote_includes,
-        system_includes = ctx.attr.system_includes,
-        defines = ctx.attr.defines,
-        user_compile_flags = ctx.attr.user_compile_flags + ["-D{}".format(ctx.attr.processor), "-DUSE_HAL_DRIVER"],
+        public_hdrs = drivers_and_middleware_hdrs + ctx.files.hal_config_hdrs,
+        srcs = drivers_and_middleware_srcs,
+        includes = drivers_and_middleware_includes + hal_config_hdr_includes,
+        user_compile_flags = ["-D{}".format(ctx.attr.processor), "-DUSE_HAL_DRIVER"],
         compilation_contexts = compilation_contexts,
     )
     print("compilation_outputs.objects:{}".format(compilation_outputs.objects))
@@ -119,8 +141,6 @@ def _cc_stm32h7_hal_library_impl(ctx):
             linking_context = linking_context,
         ),
     ]
-
-#    return [DefaultInfo(files = depset([external_deps_folder]))]
 
 cc_stm32h7_hal_library = rule(
     implementation = _cc_stm32h7_hal_library_impl,

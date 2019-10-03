@@ -471,7 +471,7 @@ def _impl(ctx):
                     flag_group(
                         flags = [
                             "-ggdb",
-                            "-O2",
+                            "-O3",
                             "-ffunction-sections",
                             "-fdata-sections",
                         ],
@@ -485,6 +485,24 @@ def _impl(ctx):
                     ACTION_NAMES.cpp_link_executable,
                 ],
                 flag_groups = [flag_group(flags = ["-Wl,--gc-sections"])],
+            ),
+        ],
+        implies = ["common"],
+    )
+
+    # TODO: We should NOT have "-Winvalid-constexpr" disabled
+    warning_feature = feature(
+        name = "warning",
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
+                flag_groups = [
+                    flag_group(
+                        flags = [
+                            "-Wno-error=invalid-constexpr",
+                        ],
+                    ),
+                ],
             ),
         ],
         implies = ["common"],
@@ -515,6 +533,7 @@ def _impl(ctx):
         lld_feature,
         opt_feature,
         runtime_library_search_directories,
+        warning_feature,
     ]
 
     cxx_builtin_include_directories = ctx.attr.builtin_include_directories
