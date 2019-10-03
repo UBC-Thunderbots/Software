@@ -1,0 +1,63 @@
+#!/usr/bin/python3 -B
+
+# Copyright 2018 Josh Pieper, jjp@pobox.com.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import sys
+
+"""Delegate to the C compiler and strip C++ specific options if
+necessary."""
+
+
+def is_cpp_arg(x):
+    if x.startswith("-stdc++="):
+        return True
+    if x == "-Wno-register":
+        return True
+    if x == "-Wno-sized-deallocation":
+        return True
+
+    return False
+
+
+def strip_cpp_args(input_args):
+    return [x for x in input_args if not is_cpp_arg(x)]
+
+
+def run(path, args):
+    os.execv(path, [path] + args[1:])
+
+
+def main():
+    args = sys.argv[:]
+
+    # The ARM GCC has -isystem busted, and forces all headers found
+    # through that path to be C only.  Bazel passes all includes as
+    # "-isystem", which doesn't interact very well with gcc.  Lets
+    # just fix that here.
+    args = [(x if x != "-isystem" else "-I") for x in args]
+
+    is_a_c_file_present = len(
+        [x for x in args
+         if x.endswith(".c") or x.endswith(".S")]) > 0
+
+    if not is_a_c_file_present:
+        run("external/com_arm_developer_gcc/bin/arm-none-eabi-g++", args)
+    else:
+        run("external/com_arm_developer_gcc/bin/arm-none-eabi-gcc", strip_cpp_args(args))
+
+
+if __name__ == '__main__':
+    main()
