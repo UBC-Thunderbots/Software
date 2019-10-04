@@ -47,6 +47,8 @@ class PasserTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
+    void accept(TacticVisitor& visitor) const override;
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 

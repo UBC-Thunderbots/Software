@@ -48,3 +48,9 @@ void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                                                       pass.receiverOrientation(), 0));
     } while (true);
 }
+
+void CherryPickTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

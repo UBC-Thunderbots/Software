@@ -133,3 +133,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
     } while (!move_action.done());
 }
+
+void GoalieTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

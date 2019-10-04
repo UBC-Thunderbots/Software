@@ -227,3 +227,9 @@ std::pair<Point, Angle> ReceiverTactic::getOneTimeShotPositionAndOrientation(
 
     return std::make_pair(ideal_position, ideal_orientation);
 }
+
+void ReceiverTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

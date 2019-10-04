@@ -37,3 +37,9 @@ void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                                       final_orientation, final_speed));
     } while (!move_action.done());
 }
+
+void MoveTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

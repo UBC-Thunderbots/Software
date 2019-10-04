@@ -172,3 +172,9 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         }
     } while (!(kick_action.done() || chip_action.done()));
 }
+
+void ShootGoalTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

@@ -189,3 +189,9 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         !(kick_action.done() ||
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
 }
+
+void PenaltyKickTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

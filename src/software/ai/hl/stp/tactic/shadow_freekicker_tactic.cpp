@@ -81,3 +81,9 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
             0, false));
     } while (true);
 }
+
+void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

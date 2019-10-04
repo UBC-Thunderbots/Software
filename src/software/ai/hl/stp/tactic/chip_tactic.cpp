@@ -42,3 +42,9 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                                                       chip_target, chip_distance_meters));
     } while (!chip_action.done());
 }
+
+void ChipTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

@@ -34,3 +34,9 @@ void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));
     } while (!stop_action.done());
 }
+
+void StopTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+

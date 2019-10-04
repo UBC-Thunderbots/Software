@@ -58,3 +58,9 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                                                       block_orientation, 0.0));
     } while (!move_action.done());
 }
+
+void BlockShotPathTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
+}
+
