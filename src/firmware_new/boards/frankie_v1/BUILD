@@ -9,6 +9,14 @@ load("//firmware_new:rules.bzl", "cc_stm32h7_hal_library")
 #    hal_config_files = glob(["*.h"]),
 #)
 
+#cc_stm32h7_binary(
+#    name = "frankie_v1_main",
+#    deps = [
+#        ":frankie_v1_hal",
+#    ],
+#)
+
+# TODO: rename this, it encompasses middlewares as well now
 cc_stm32h7_hal_library(
     name = "frankie_v1_hal",
     drivers_and_middleware_hdrs = [
@@ -40,6 +48,20 @@ cc_stm32h7_hal_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc_ex.h",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/system_stm32h7xx.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/projdefs.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/portable.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/mpu_wrappers.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/croutine.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/list.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/queue.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/stream_buffer.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/timers.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/task.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/stack_macros.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h",
     ],
     drivers_and_middleware_srcs = [
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c",
@@ -60,6 +82,16 @@ cc_stm32h7_hal_library(
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/croutine.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/event_groups.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/list.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/queue.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/tasks.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
+    ],
+    free_rtos_config_hdrs = [
+        "FreeRTOSConfig.h",
     ],
     hal_config_hdrs = [
         "stm32h7xx_hal_conf.h",
