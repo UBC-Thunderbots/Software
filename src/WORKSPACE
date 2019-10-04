@@ -33,7 +33,7 @@ rules_proto_toolchains()
 git_repository(
     name = "com_github_nelhage_rules_boost",
     remote = "https://github.com/nelhage/rules_boost",
-    branch = "master",
+    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
 )
 
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
