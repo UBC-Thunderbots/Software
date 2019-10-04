@@ -80,10 +80,12 @@ cc_stm32h7_hal_library(
         "Middlewares/Third_Party/FreeRTOS/Source/include/stream_buffer.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/timers.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/task.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/semphr.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/stack_macros.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h",
         "Drivers/CMSIS/RTOS2/Template/cmsis_os.h",
+        "Drivers/CMSIS/Include/cmsis_gcc.h",
         "Drivers/CMSIS/RTOS2/Include/cmsis_os2.h",
     ],
     drivers_and_middleware_srcs = [
@@ -113,6 +115,10 @@ cc_stm32h7_hal_library(
         "Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c",
         "Middlewares/Third_Party/FreeRTOS/Source/tasks.c",
         "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
+        #        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
     ],
     free_rtos_config_hdrs = [
         "FreeRTOSConfig.h",
