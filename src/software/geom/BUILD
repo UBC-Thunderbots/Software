@@ -67,6 +67,8 @@ cc_test(
     ],
     deps = [
         ":geom",
+        "//software/ai/world:field",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )

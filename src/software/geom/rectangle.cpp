@@ -28,3 +28,17 @@ double Rectangle::distToBoundary(Point p)
     }
     return inf;
 }
+
+Point Rectangle::furthestCorner(Point p)
+{
+    Point furthestPoint = operator[](0);
+    double furthestDist = dist(p, operator[](0));
+
+    for (int i = 1; i < 4; i++) {
+        if (dist(p, operator[](i)) > furthestDist) {
+            furthestPoint = operator[](i);
+            furthestDist = (p - operator[](i)).len();
+        }
+    }
+    return furthestPoint;
+}

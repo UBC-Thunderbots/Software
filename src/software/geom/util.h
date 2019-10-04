@@ -251,7 +251,7 @@ std::vector<Point> lineCircleIntersect(const Point &centre, double radius,
                                        const Point &segA, const Point &segB);
 
 /**
- * Finds the points of intersection between a circle and a line.
+ * Finds the points of intersection between a rectangle and a line.
  * There may be zero, one, or two such points.
  *
  * @param r the rectangle.

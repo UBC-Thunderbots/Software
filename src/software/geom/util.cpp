@@ -1344,21 +1344,73 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
     // on the field, and the size of the circle is the distance to the closest vertex
     // on the triangle that this vertex was created from
 
-    // TODO: instead of just adding the 4 corners of the rectangle here, the proper
-    //       thing to do is to generate the voronoi with just the points given, then
-    //       also treat all intersections of the voronoi diagram with the edge of the
-    //       rectangle as vertices
-    //       https://stackoverflow.com/questions/34093602/efficient-algorithm-to-determine-largest-open-space
+    std::vector<Circle> empty_circles;
 
-    // Add the 4 corners of the rectangle to the list of points
-    points.emplace_back(rectangle.posXPosYCorner());
-    points.emplace_back(rectangle.negXPosYCorner());
-    points.emplace_back(rectangle.posXNegYCorner());
-    points.emplace_back(rectangle.negXNegYCorner());
+    // Creating the Voronoi diagram with 2 or less points will produce no edges no we need to handle these cases manually
+    if (points.empty())
+    {
+        // If there are no points, return a circle encompassing the entire rectangle
+        empty_circles.emplace_back(Circle(rectangle.centre(), (rectangle.negXNegYCorner()-rectangle.centre()).len()));
+        return empty_circles;
+    }
+    else if (points.size() == 1)
+    {
+        // If there is only 1 point, return a circle centered at the corner furthest from the provided point
+        Point furthestPoint = rectangle.furthestCorner(points.front());
+        empty_circles.emplace_back(Circle(furthestPoint, (points.front()-furthestPoint).len()));
+        return empty_circles;
+    }
+    else if (points.size() == 2)
+    {
+        // If there are 2 point, split the points with a vector perpendicular to the vector connecting the two points.
+        // Return 2 circles that are centered at the points where the splitting vector intercepts the rectangle.
+        Point connectedVec = points[1] - points[0];
+        Point halfPoint = points[0] + (connectedVec*0.5);
+        Point perpVec = Point(connectedVec.y(), -connectedVec.x()).norm();
+        std::vector<Point> intersects = lineRectIntersect(rectangle, halfPoint+(perpVec*dist(rectangle.furthestCorner(halfPoint), halfPoint)),
+                                                          halfPoint-(perpVec*dist(rectangle.furthestCorner(halfPoint), halfPoint)));
+        for (const Point& intersect : intersects) {
+            double radius = std::max((intersect-points[0]).len(), (intersect-points[1]).len());
+            empty_circles.emplace_back(Circle(intersect, radius));
+        }
+        return empty_circles;
+    }
 
     // Construct the voronoi diagram
     voronoi_diagram<double> vd;
     construct_voronoi(points.begin(), points.end(), &vd);
+
+    // Find any edges that intercept the outer rectangle and treat the interception point as v\Voronoi vertices (points
+    // where a circle is centered)
+    for (auto edge : vd.edges()) {
+
+        // Edges extending outside the rectangle will be infinite edges
+        if (!edge.is_finite() && edge.is_primary()) {
+            auto start = edge.vertex0();
+            if (start) {
+
+                // The direction of the infinite vector will be perpendicular to the vector connecting the two points
+                // which own the two half edges. We can use this to calculate another point on the infinite edge.
+                Point p1 = points[edge.cell()->source_index()];
+                Point p2 = points[edge.twin()->cell()->source_index()];
+                double endX = (p1.y() - p2.y());
+                double endY = (p1.x() - p2.x()) * -1;
+                // Extend the edge out to beyond the rectangle to ensure interception functions work.
+                Point end = Point(endX, endY) * dist(rectangle.furthestCorner(p2), p2);
+
+                std::vector<Point> intersects = lineRectIntersect(rectangle, Point(start->x(), start->y()), end);
+
+                // Radius of the circle will be the distance from the interception point to the nearest input point.
+                for (const Point& p : intersects) {
+                    double radius = (points[0]-p).len();
+                    for (const Point& inputP : points) {
+                        radius = std::min(radius, (inputP-p).len());
+                    }
+                    empty_circles.emplace_back(Circle(p, radius));
+                }
+            }
+        }
+    }
 
     // For each vertex, construct it's delauney triangle and then compute the largest
     // empty circle around it
@@ -1370,7 +1422,6 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
     // https://www.boost.org/doc/libs/1_60_0/libs/polygon/doc/voronoi_diagram.htm
     // Code is a derivative of the answer to this:
     // https://stackoverflow.com/questions/34342038/how-to-triangulate-polygons-in-boost
-    std::vector<Circle> empty_circles;
     for (auto vertex : vd.vertices())
     {
         // We only want to consider vertices within our rectangle
