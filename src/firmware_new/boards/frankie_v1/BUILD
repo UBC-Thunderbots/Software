@@ -22,8 +22,13 @@ load("//firmware_new:rules.bzl", "cc_stm32h7_hal_library")
 cc_binary(
     name = "frankie_v1_main",
     srcs = [
+        "freertos.c",
         "main.c",
         "main.h",
+        "stm32h7xx_hal_msp.c",
+        "stm32h7xx_it.c",
+        "stm32h7xx_it.h",
+        "system_stm32h7xx.c",
     ],
     copts = [
         "-DSTM32H743xx",
@@ -37,7 +42,6 @@ cc_binary(
 cc_stm32h7_hal_library(
     name = "frankie_v1_hal",
     drivers_and_middleware_hdrs = [
-        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h",
         "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h",
         "Drivers/CMSIS/Include/cmsis_version.h",
@@ -83,6 +87,7 @@ cc_stm32h7_hal_library(
         "Drivers/CMSIS/RTOS2/Include/cmsis_os2.h",
     ],
     drivers_and_middleware_srcs = [
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c",
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c",
