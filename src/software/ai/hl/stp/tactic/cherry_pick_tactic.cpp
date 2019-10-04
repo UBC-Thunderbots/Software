@@ -5,8 +5,8 @@
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/geom/util.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
     : pass_generator(world, world.ball().position()),
@@ -49,8 +49,7 @@ void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (true);
 }
 
-void CherryPickTactic::accept(TacticVisitor &visitor) const
+void CherryPickTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
-

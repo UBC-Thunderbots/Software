@@ -5,8 +5,8 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/geom/util.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/geom/util.h"
 
 using namespace Passing;
 using namespace Evaluation;
@@ -228,8 +228,7 @@ std::pair<Point, Angle> ReceiverTactic::getOneTimeShotPositionAndOrientation(
     return std::make_pair(ideal_position, ideal_orientation);
 }
 
-void ReceiverTactic::accept(TacticVisitor &visitor) const
+void ReceiverTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
-

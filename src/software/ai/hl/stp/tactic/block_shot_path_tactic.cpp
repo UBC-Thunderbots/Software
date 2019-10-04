@@ -4,8 +4,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/geom/util.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
     : field(field), Tactic(loop_forever)
@@ -59,8 +59,7 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (!move_action.done());
 }
 
-void BlockShotPathTactic::accept(TacticVisitor &visitor) const
+void BlockShotPathTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
-

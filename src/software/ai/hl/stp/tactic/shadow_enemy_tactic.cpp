@@ -126,4 +126,3 @@ void ShadowEnemyTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
-

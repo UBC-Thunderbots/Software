@@ -86,4 +86,3 @@ void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
-

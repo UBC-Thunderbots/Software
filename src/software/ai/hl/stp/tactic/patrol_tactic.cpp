@@ -91,4 +91,3 @@ void PatrolTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
-

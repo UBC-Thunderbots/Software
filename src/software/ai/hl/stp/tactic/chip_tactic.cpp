@@ -47,4 +47,3 @@ void ChipTactic::accept(TacticVisitor &visitor) const
 {
     visitor.visit(*this);
 }
-

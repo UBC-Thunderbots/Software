@@ -8,8 +8,8 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/geom/util.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/geom/util.h"
 
 using namespace Passing;
 
@@ -82,8 +82,7 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
              ball.velocity().len() < 0.5);
 }
 
-void PasserTactic::accept(TacticVisitor &visitor) const
+void PasserTactic::accept(TacticVisitor& visitor) const
 {
     visitor.visit(*this);
 }
-

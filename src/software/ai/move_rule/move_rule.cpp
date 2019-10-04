@@ -14,7 +14,7 @@ std::ostream& operator<<(std::ostream& os, const MoveRule& rule)
         {MoveRule::HALF_METER_AROUND_BALL, "HALF_METER_AROUND_BALL"},
         {MoveRule::ENEMY_HALF, "ENEMY_HALF"},
         {MoveRule::FRIENDLY_HALF, "FRIENDLY_HALF"}};
-    
+
     auto iter = move_rule_names.find(rule);
     if (iter != move_rule_names.end())
     {
@@ -26,4 +26,3 @@ std::ostream& operator<<(std::ostream& os, const MoveRule& rule)
     }
     return os;
 }
-

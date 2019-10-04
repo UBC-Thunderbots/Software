@@ -3,68 +3,41 @@
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 
 
-std::set<MoveRule> MoveRuleManager::getMoveRules(const GameState &game_state, const Tactic &tactic)
+std::set<MoveRule> MoveRuleManager::getMoveRules(const GameState &game_state,
+                                                 const Tactic &tactic)
 {
     setCurrentMoveRulesFromGameState(game_state);
     tactic.accept(*this);
     return current_move_rules;
 }
 
-void MoveRuleManager::visit(const CherryPickTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const CherryPickTactic &tactic) {}
 
-void MoveRuleManager::visit(const ShadowFreekickerTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const ShadowFreekickerTactic &tactic) {}
 
-void MoveRuleManager::visit(const GoalieTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const GoalieTactic &tactic) {}
 
-void MoveRuleManager::visit(const CreaseDefenderTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const CreaseDefenderTactic &tactic) {}
 
-void MoveRuleManager::visit(const ShadowEnemyTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const ShadowEnemyTactic &tactic) {}
 
-void MoveRuleManager::visit(const BlockShotPathTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const BlockShotPathTactic &tactic) {}
 
-void MoveRuleManager::visit(const MoveTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const MoveTactic &tactic) {}
 
-void MoveRuleManager::visit(const ChipTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const ChipTactic &tactic) {}
 
-void MoveRuleManager::visit(const StopTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const StopTactic &tactic) {}
 
-void MoveRuleManager::visit(const PenaltyKickTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const PenaltyKickTactic &tactic) {}
 
-void MoveRuleManager::visit(const ReceiverTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const ReceiverTactic &tactic) {}
 
-void MoveRuleManager::visit(const PatrolTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const PatrolTactic &tactic) {}
 
-void MoveRuleManager::visit(const ShootGoalTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const ShootGoalTactic &tactic) {}
 
-void MoveRuleManager::visit(const PasserTactic &tactic)
-{
-}
+void MoveRuleManager::visit(const PasserTactic &tactic) {}
 
 void MoveRuleManager::setCurrentMoveRulesFromGameState(const GameState &game_state)
 {
