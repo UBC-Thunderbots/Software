@@ -16,6 +16,23 @@ load("//firmware_new:rules.bzl", "cc_stm32h7_hal_library")
 #    ],
 #)
 
+# TODO: do we need custom flags for this?
+# TODO: how to enforce compiler???
+# TODO: probably want a custom rule, or at least a macro for this
+cc_binary(
+    name = "frankie_v1_main",
+    srcs = [
+        "main.c",
+        "main.h",
+    ],
+    copts = [
+        "-DSTM32H743xx",
+    ],
+    deps = [
+        ":frankie_v1_hal",
+    ],
+)
+
 # TODO: rename this, it encompasses middlewares as well now
 cc_stm32h7_hal_library(
     name = "frankie_v1_hal",
@@ -62,6 +79,8 @@ cc_stm32h7_hal_library(
         "Middlewares/Third_Party/FreeRTOS/Source/include/stack_macros.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/deprecated_definitions.h",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h",
+        "Drivers/CMSIS/RTOS2/Template/cmsis_os.h",
+        "Drivers/CMSIS/RTOS2/Include/cmsis_os2.h",
     ],
     drivers_and_middleware_srcs = [
         "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c",
