@@ -8,6 +8,7 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "@g3log",
+        "@boost//:asio",  
     ],
 )
 
@@ -19,7 +20,8 @@ cc_library(
     deps = [
         "//software/proto:ssl_cc_proto",
         "@g3log",
-    ],
+        "@boost//:asio",  
+    ]
 )
 
 cc_library(
