@@ -39,6 +39,10 @@ void MoveRuleManager::visit(const ShootGoalTactic &tactic) {}
 
 void MoveRuleManager::visit(const PasserTactic &tactic) {}
 
+void MoveRuleManager::visit(const MoveTestTactic &tactic) {}
+
+void MoveRuleManager::visit(const StopTestTactic &tactic) {}
+
 void MoveRuleManager::setCurrentMoveRulesFromGameState(const GameState &game_state)
 {
     current_move_rules.clear();

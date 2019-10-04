@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "software/ai/intent/move_intent.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
     : Tactic(loop_forever, {RobotCapabilityFlags::Dribble, RobotCapabilityFlags::Kick,
@@ -37,4 +38,9 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
                                            Angle::zero(), 0.0, 0));
     } while ((this->robot->position() - this->destination).len() > 0.01);
+}
+
+void MoveTestTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }

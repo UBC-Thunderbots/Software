@@ -120,6 +120,20 @@ class MoveRuleManager : public TacticVisitor
      */
     void visit(const PasserTactic &tactic) override;
 
+    /**
+     * Visits a MoveTestTactic to perform an operation.
+     *
+     * @param tactic The MoveTestTactic to visit
+     */
+    void visit(const MoveTestTactic &tactic) override;
+
+    /**
+     * Visits a StopTestTactic to perform an operation.
+     *
+     * @param tactic The StopTestTactic to visit
+     */
+    void visit(const StopTestTactic &tactic) override;
+
    private:
     std::set<MoveRule> current_move_rules;
 

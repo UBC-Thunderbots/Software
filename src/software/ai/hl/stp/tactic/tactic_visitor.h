@@ -18,6 +18,8 @@ class ReceiverTactic;
 class PatrolTactic;
 class ShootGoalTactic;
 class PasserTactic;
+class MoveTestTactic;
+class StopTestTactic;
 
 /**
  * This class provides an interface for all Tactic Visitors. The Visitor design pattern
@@ -129,4 +131,18 @@ class TacticVisitor
      * @param tactic The PasserTactic to visit
      */
     virtual void visit(const PasserTactic &tactic) = 0;
+
+    /**
+     * Visits a MoveTestTactic to perform an operation.
+     *
+     * @param tactic The MoveTestTactic to visit
+     */
+    virtual void visit(const MoveTestTactic &tactic) = 0;
+
+    /**
+     * Visits a StopTestTactic to perform an operation.
+     *
+     * @param tactic The StopTestTactic to visit
+     */
+    virtual void visit(const StopTestTactic &tactic) = 0;
 };

@@ -316,8 +316,10 @@ cc_library(
         ":receiver_tactic",
         ":patrol_tactic",
         ":shoot_goal_tactic",
-        ":tactic",
         ":passer_tactic",
+        "//software/ai/hl/stp/tactic/test_tactics:move_test_tactic",
+        "//software/ai/hl/stp/tactic/test_tactics:stop_test_tactic",
+        ":tactic",
     ],
 )
 

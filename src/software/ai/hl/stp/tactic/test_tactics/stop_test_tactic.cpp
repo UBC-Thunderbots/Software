@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
 
 #include "software/ai/intent/stop_intent.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
 
@@ -23,4 +24,9 @@ void StopTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         yield(std::make_unique<StopIntent>(this->robot->id(), false, 0));
     } while (this->robot->velocity().len() > 0.05);
+}
+
+void StopTestTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }
