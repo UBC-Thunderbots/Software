@@ -21,7 +21,7 @@ cc_library(
         "//software/proto:ssl_cc_proto",
         "@g3log",
         "@boost//:asio",  
-    ]
+    ],
 )
 
 cc_library(
