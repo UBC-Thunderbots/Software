@@ -33,6 +33,18 @@ cc_binary(
     copts = [
         "-DSTM32H743xx",
     ],
+    data = [
+        "STM32H742XGHx_FLASH.ld",
+    ],
+    # TODO: why do we need  "-specs=nano.specs"?
+    linkopts = [
+        "-specs=nano.specs",
+        # TODO: put this back in (linker can't find it for now)
+        #        "-TSTM32H742XGHx_FLASH.ld",
+        "-lc",
+        "-lm",
+        "-lnosys",
+    ],
     deps = [
         ":frankie_v1_hal",
     ],
