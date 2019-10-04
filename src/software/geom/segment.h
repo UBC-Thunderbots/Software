@@ -1,8 +1,5 @@
 #pragma once
 
-#include <boost/polygon/segment_concept.hpp>
-#include <boost/geometry/geometries/register/segment.hpp>
-
 #include "software/geom/line.h"
 #include "software/geom/point.h"
 
