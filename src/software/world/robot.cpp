@@ -228,7 +228,7 @@ void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (int i = 0; i < timestamp_history.size(); i++)
+    for (auto i = 0U; i < timestamp_history.size(); i++)
     {
         double timestamp_diff =
             fabs((timestamp - timestamp_history[i]).getMilliseconds());

@@ -19,8 +19,7 @@ namespace Evaluation
         Segment friendlyNetSegment =
             Segment(field.friendlyGoalpostPos(), field.friendlyGoalpostNeg());
 
-        auto [intersection1, intersection2] =
-            raySegmentIntersection(ballRay, friendlyNetSegment);
+        auto intersection1 = raySegmentIntersection(ballRay, friendlyNetSegment).first;
 
         return intersection1;
     }
@@ -31,8 +30,8 @@ namespace Evaluation
         Segment enemyNetSegment =
             Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
 
-        auto [intersection1, intersection2] =
-            raySegmentIntersection(ballRay, enemyNetSegment);
+        auto intersection1 = raySegmentIntersection(ballRay, enemyNetSegment).first;
+
         return intersection1;
     }
 

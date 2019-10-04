@@ -292,7 +292,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
         Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
 
     std::vector<Pass> passes;
-    for (int i = 0; i < num_passes_to_gen; i++)
+    for (auto i = 0U; i < num_passes_to_gen; i++)
     {
         Point receiver_point(x_distribution(random_num_gen),
                              y_distribution(random_num_gen));

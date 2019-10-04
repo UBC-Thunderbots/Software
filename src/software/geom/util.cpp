@@ -431,6 +431,7 @@ std::vector<Shot> angleSweepCirclesAll(const Vector &src, const Vector &p1,
     {
         events_collapsed.emplace_back(std::make_pair(end_angle - start_angle, -1));
     }
+
     std::vector<Shot> result;
     for (int i = 0; i < events_collapsed.size() - 1; i += 2)
     {
@@ -695,29 +696,6 @@ Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vecto
     }
     return lineB;
 }
-
-namespace
-{
-    std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
-                                                 const Vector &segA, const Vector &segB)
-    {
-        std::vector<Vector> ans;
-        std::vector<Vector> poss = lineCircleIntersect(centre, radius, segA, segB);
-
-        for (Vector i : poss)
-        {
-            bool x_ok = i.x() <= std::max(segA.x(), segB.x()) + EPS &&
-                        i.x() >= std::min(segA.x(), segB.x()) - EPS;
-            bool y_ok = i.y() <= std::max(segA.y(), segB.y()) + EPS &&
-                        i.y() >= std::min(segA.y(), segB.y()) - EPS;
-            if (x_ok && y_ok)
-            {
-                ans.push_back(i);
-            }
-        }
-        return ans;
-    }
-}  // namespace
 
 bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
                           const Vector &d)
@@ -1426,7 +1404,7 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
 Polygon circleToPolygon(const Circle &circle, size_t num_points)
 {
     std::vector<Point> points;
-    for (auto i = 0; i < num_points; i++)
+    for (auto i = 0U; i < num_points; i++)
     {
         Point p =
             circle.getOrigin() + Point(circle.getRadius(), 0)

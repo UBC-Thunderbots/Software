@@ -104,9 +104,9 @@ std::optional<BallVelocityEstimate> BallFilter::estimateBallVelocity(
 
     std::vector<Vector> ball_velocities;
     std::vector<double> ball_velocity_magnitudes;
-    for (int i = 0; i < ball_detections.size() - 1; i++)
+    for (auto i = 0U; i < ball_detections.size() - 1; i++)
     {
-        for (int j = i + 1; j < ball_detections.size(); j++)
+        for (auto j = i + 1; j < ball_detections.size(); j++)
         {
             SSLBallDetection previous_detection = ball_detections.at(i);
             SSLBallDetection current_detection  = ball_detections.at(j);
@@ -228,7 +228,7 @@ LinearRegressionResults BallFilter::getLinearRegressionLine(
     // ball. Vector b contains the y coordinates of the ball.
     Eigen::MatrixXf A(ball_detections.size(), 2);
     Eigen::VectorXf b(ball_detections.size());
-    for (int i = 0; i < ball_detections.size(); i++)
+    for (auto i = 0U; i < ball_detections.size(); i++)
     {
         // This extra column of 1's is the bias variable, so that we can regress with a
         // y-intercept

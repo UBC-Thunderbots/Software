@@ -14,8 +14,8 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              std::function<void(World)> received_world_callback)
     : network_filter(),
       io_service(),
-      initial_packet_count(0),
       last_valid_t_capture(std::numeric_limits<double>::max()),
+      initial_packet_count(0),
       received_world_callback(received_world_callback)
 {
     setupVisionClient(vision_multicast_address, vision_multicast_port);

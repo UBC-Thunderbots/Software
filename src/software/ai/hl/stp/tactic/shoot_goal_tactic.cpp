@@ -10,14 +10,14 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
                                  Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
-    : field(field),
+    : Tactic(loop_forever, {RobotCapabilityFlags::Kick}),
+      field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       ball(ball),
       min_net_open_angle(min_net_open_angle),
       chip_target(chip_target),
-      has_shot_available(false),
-      Tactic(loop_forever, {RobotCapabilityFlags::Kick})
+      has_shot_available(false)
 {
 }
 
