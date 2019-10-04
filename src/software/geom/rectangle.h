@@ -137,7 +137,8 @@ class Rectangle final
     double distToBoundary(Point p);
 
     /**
-     * Returns the corner point of the rectangle that is the furthest from the input point.
+     * Returns the corner point of the rectangle that is the furthest from the input
+     * point.
      *
      * @param p The point to test
      * @return The corner point that is furthest from the test point

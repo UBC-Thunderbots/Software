@@ -8,11 +8,11 @@
 #include <iostream>
 #include <sstream>
 
+#include "software/ai/world/field.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
-#include "software/ai/world/field.h"
-#include "software/util/time/timestamp.h"
 #include "software/test_util/test_util.h"
+#include "software/util/time/timestamp.h"
 
 // Set this to 1 to enable debug output.
 #define DEBUG 0
@@ -1397,24 +1397,25 @@ TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
                      empty_circles[1].getRadius());
 }
 
-TEST(GeomUtilTest, test_find_open_circle_three_in_rectangle) {
+TEST(GeomUtilTest, test_find_open_circle_three_in_rectangle)
+{
     Rectangle rectangle = ::Test::TestUtil::createSSLDivBField().fieldLines();
 
-    std::vector<Point> points = {Point(-1, -1), Point(1, -1), Point(0, 1)};
+    std::vector<Point> points         = {Point(-1, -1), Point(1, -1), Point(0, 1)};
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
     ASSERT_EQ(4, empty_circles.size());
 
     EXPECT_EQ(-4.5, empty_circles[0].getOrigin().x());
     EXPECT_NEAR(2.09, empty_circles[0].getOrigin().y(), 0.05);
-    EXPECT_NEAR(4.628,empty_circles[0].getRadius(), 0.005);
+    EXPECT_NEAR(4.628, empty_circles[0].getRadius(), 0.005);
 
     EXPECT_EQ(4.5, empty_circles[1].getOrigin().x());
     EXPECT_NEAR(2.09, empty_circles[1].getOrigin().y(), 0.05);
-    EXPECT_NEAR(4.628,empty_circles[1].getRadius(), 0.005);
+    EXPECT_NEAR(4.628, empty_circles[1].getRadius(), 0.005);
 
     EXPECT_EQ(Point(0, -3), empty_circles[2].getOrigin());
-    EXPECT_NEAR(2.236,empty_circles[2].getRadius(), 0.005);
+    EXPECT_NEAR(2.236, empty_circles[2].getRadius(), 0.005);
 
     EXPECT_EQ(Point(0, -0.25), empty_circles[3].getOrigin());
     EXPECT_NEAR(1.25, empty_circles[3].getRadius(), 0.005);
