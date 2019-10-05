@@ -26,7 +26,7 @@ class Field
      * @param defense_x_length the length of the defense area (along the x-axis)
      * @param defense_y_length the length of the defense area (along the y-axis)
      * @param goal_y_length the length of the goal (along the y-axis)
-     * @param boundary_y_length the width/size of the boundary area between the edge of the
+     * @param boundary_y_length the length/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      * @param timestamp the Timestamp associated with the creation of the Field object
@@ -40,11 +40,11 @@ class Field
      * Updates the dimensions of the field. All units should be in metres.
      *
      * @param field_x_length the length of the playing area (along the x-axis)
-     * @param field_y_length the width of the playing area (along the y-axis)
+     * @param field_y_length the length of the playing area (along the y-axis)
      * @param defense_x_length the length of the defense area (along the x-axis)
-     * @param defense_y_length the width of the defense area (along the y-axis)
-     * @param goal_y_length the width of the goal (along the y-axis)
-     * @param boundary_y_length the width/size of the boundary area between the edge of the
+     * @param defense_y_length the length of the defense area (along the y-axis)
+     * @param goal_y_length the length of the goal (along the y-axis)
+     * @param boundary_y_length the length/size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      * @param timestamp the Timestamp corresponding to any updates to the Field object
@@ -61,23 +61,23 @@ class Field
     void updateDimensions(const Field &new_field_data);
 
     /**
-     * Gets the x-axis Length of the field from goal-line to goal-line in metres.
+     * Gets the x-axis length of the field from goal-line to goal-line in metres.
      *
-     * @return the x-axis Length of the field in metres.
+     * @return the x-axis length of the field in metres.
      */
     double xLength() const;
 
     /**
-     * Gets the x-axis Length of the field including the boundary area in metres.
+     * Gets the x-axis length of the field including the boundary area in metres.
      *
-     * @return the total x-axis Length of the field in metres, including the boundary area.
+     * @return the total x-axis length of the field in metres, including the boundary area.
      */
     double totalXLength() const;
 
     /**
-     * Gets the y-axis Length of the field from sideline to sideline in metres.
+     * Gets the y-axis length of the field from sideline to sideline in metres.
      *
-     * @return the y-axis Length of the field in metres.
+     * @return the y-axis length of the field in metres.
      */
     double yLength() const;
 
