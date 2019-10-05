@@ -42,7 +42,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
-    // consistantly
+    // consistently
     std::map<std::string, SSL_FieldCicularArc> ssl_circular_arcs;
     std::map<std::string, SSL_FieldLineSegment> ssl_field_lines;
 
