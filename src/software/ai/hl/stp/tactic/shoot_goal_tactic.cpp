@@ -118,8 +118,8 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            yield(chip_action.updateStateAndGetNextIntent(*robot, ball, ball.position(),
-                                                          shot_target->getPoint(), CHIP_DIST));
+            yield(chip_action.updateStateAndGetNextIntent(
+                *robot, ball, ball.position(), shot_target->getPoint(), CHIP_DIST));
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,

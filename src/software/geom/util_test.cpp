@@ -277,7 +277,8 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
 
     testshot = *testshot_opt;
 
-    EXPECT_TRUE((testshot.getPoint().norm() - Point(-0.0805897, 0.996747)).len() < 0.0001);
+    EXPECT_TRUE((testshot.getPoint().norm() - Point(-0.0805897, 0.996747)).len() <
+                0.0001);
     EXPECT_NEAR(42.1928, testshot.getAngle().toDegrees(), 1e-4);
 }
 

@@ -103,8 +103,9 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // (or moving slowly because we can't be certain of the velocity vector if it is)
         while (ball_robot_angle.abs() < Angle::ofDegrees(90) || ball_velocity.len() < 0.5)
         {
-            Shot shot = getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
-            Point ideal_position = shot.getPoint();
+            Shot shot =
+                getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
+            Point ideal_position    = shot.getPoint();
             Angle ideal_orientation = shot.getAngle();
 
             yield(move_action.updateStateAndGetNextIntent(
