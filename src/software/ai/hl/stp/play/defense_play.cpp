@@ -112,7 +112,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
             }
             else
             {
-                stop_tactics.at(i)->updateParams();
                 result.emplace_back(stop_tactics.at(i));
             }
         }

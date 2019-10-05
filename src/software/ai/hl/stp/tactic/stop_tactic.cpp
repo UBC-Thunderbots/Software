@@ -13,11 +13,6 @@ std::string StopTactic::getName() const
     return "Stop Tactic";
 }
 
-void StopTactic::updateParams()
-{
-    // The Stop Tactic has no parameters to update
-}
-
 double StopTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // Prefer all robots equally

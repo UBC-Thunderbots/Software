@@ -21,11 +21,6 @@ class StopTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this StopTactic.
-     */
-    void updateParams();
-
-    /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally
      *
