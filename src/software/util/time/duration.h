@@ -2,8 +2,6 @@
 
 #include "software/util/time/time.h"
 
-#include <iostream>
-
 /**
  * A simple Duration class built around doubles. It is meant to represent some duration
  * of time

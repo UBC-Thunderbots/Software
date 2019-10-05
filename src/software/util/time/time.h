@@ -2,6 +2,10 @@
 
 #include <time.h>
 
+#include <iostream>
+
+#include <cstdlib>
+
 /**
  * A simple Time class that represents some amount of Time
  *
