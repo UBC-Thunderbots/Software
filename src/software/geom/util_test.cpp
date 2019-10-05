@@ -261,8 +261,8 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
 
     Shot testshot = *testshot_opt;
 
-    EXPECT_TRUE((testshot.point.norm() - Point(0, 1)).len() < 0.0001);
-    EXPECT_NEAR(75.449, testshot.angle.toDegrees(), 1e-4);
+    EXPECT_TRUE((testshot.getPoint().norm() - Point(0, 1)).len() < 0.0001);
+    EXPECT_NEAR(75.449, testshot.getAngle().toDegrees(), 1e-4);
 
     obs.clear();
     obs.push_back(Point(-4, 6));
@@ -277,8 +277,8 @@ TEST(GeomUtilTest, test_angle_sweep_circles)
 
     testshot = *testshot_opt;
 
-    EXPECT_TRUE((testshot.point.norm() - Point(-0.0805897, 0.996747)).len() < 0.0001);
-    EXPECT_NEAR(42.1928, testshot.angle.toDegrees(), 1e-4);
+    EXPECT_TRUE((testshot.getPoint().norm() - Point(-0.0805897, 0.996747)).len() < 0.0001);
+    EXPECT_NEAR(42.1928, testshot.getAngle().toDegrees(), 1e-4);
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_no_obstacles)
@@ -286,8 +286,8 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_no_obstacles)
     std::vector<Shot> result = angleSweepCirclesAll({0, 0}, {1, 1}, {-1, 1}, {}, 0.1);
 
     ASSERT_EQ(1, result.size());
-    EXPECT_EQ(Point(0, 1), result[0].point);
-    EXPECT_EQ(90, result[0].angle.toDegrees());
+    EXPECT_EQ(Point(0, 1), result[0].getPoint());
+    EXPECT_EQ(90, result[0].getAngle().toDegrees());
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_pos_y_to_neg_y)
@@ -301,12 +301,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_pos_y_to_neg_y)
     ASSERT_EQ(2, result.size());
 
     std::sort(result.begin(), result.end(),
-              [](auto shot1, auto shot2) { return shot1.angle < shot2.angle; });
+              [](auto shot1, auto shot2) { return shot1.getAngle() < shot2.getAngle(); });
 
-    EXPECT_EQ(1, result[0].point.x());
-    EXPECT_NEAR(-0.40, result[0].point.y(), 0.05);
-    EXPECT_EQ(1, result[1].point.x());
-    EXPECT_NEAR(0.40, result[1].point.y(), 0.05);
+    EXPECT_EQ(1, result[0].getPoint().x());
+    EXPECT_NEAR(-0.40, result[0].getPoint().y(), 0.05);
+    EXPECT_EQ(1, result[1].getPoint().x());
+    EXPECT_NEAR(0.40, result[1].getPoint().y(), 0.05);
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_neg_y_to_pos_y)
@@ -320,12 +320,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_neg_y_to_pos_y)
     ASSERT_EQ(2, result.size());
 
     std::sort(result.begin(), result.end(),
-              [](auto shot1, auto shot2) { return shot1.angle < shot2.angle; });
+              [](auto shot1, auto shot2) { return shot1.getAngle() < shot2.getAngle(); });
 
-    EXPECT_EQ(1, result[0].point.x());
-    EXPECT_NEAR(-0.40, result[0].point.y(), 0.05);
-    EXPECT_EQ(1, result[1].point.x());
-    EXPECT_NEAR(0.40, result[1].point.y(), 0.05);
+    EXPECT_EQ(1, result[0].getPoint().x());
+    EXPECT_NEAR(-0.40, result[0].getPoint().y(), 0.05);
+    EXPECT_EQ(1, result[1].getPoint().x());
+    EXPECT_NEAR(0.40, result[1].getPoint().y(), 0.05);
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_x_axis)
@@ -339,12 +339,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_x
     ASSERT_EQ(2, result.size());
 
     std::sort(result.begin(), result.end(),
-              [](auto shot1, auto shot2) { return shot1.angle < shot2.angle; });
+              [](auto shot1, auto shot2) { return shot1.getAngle() < shot2.getAngle(); });
 
-    EXPECT_EQ(-1, result[0].point.x());
-    EXPECT_NEAR(0.40, result[0].point.y(), 0.05);
-    EXPECT_EQ(-1, result[1].point.x());
-    EXPECT_NEAR(-0.40, result[1].point.y(), 0.05);
+    EXPECT_EQ(-1, result[0].getPoint().x());
+    EXPECT_NEAR(0.40, result[0].getPoint().y(), 0.05);
+    EXPECT_EQ(-1, result[1].getPoint().x());
+    EXPECT_NEAR(-0.40, result[1].getPoint().y(), 0.05);
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_pos_y_axis)
@@ -358,12 +358,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_pos_y
     ASSERT_EQ(2, result.size());
 
     std::sort(result.begin(), result.end(),
-              [](auto shot1, auto shot2) { return shot1.angle < shot2.angle; });
+              [](auto shot1, auto shot2) { return shot1.getAngle() < shot2.getAngle(); });
 
-    EXPECT_EQ(1, result[0].point.y());
-    EXPECT_NEAR(0.40, result[0].point.x(), 0.05);
-    EXPECT_EQ(1, result[1].point.y());
-    EXPECT_NEAR(-0.40, result[1].point.x(), 0.05);
+    EXPECT_EQ(1, result[0].getPoint().y());
+    EXPECT_NEAR(0.40, result[0].getPoint().x(), 0.05);
+    EXPECT_EQ(1, result[1].getPoint().y());
+    EXPECT_NEAR(-0.40, result[1].getPoint().x(), 0.05);
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_y_axis)
@@ -377,12 +377,12 @@ TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacles_line_over_neg_y
     ASSERT_EQ(2, result.size());
 
     std::sort(result.begin(), result.end(),
-              [](auto shot1, auto shot2) { return shot1.angle < shot2.angle; });
+              [](auto shot1, auto shot2) { return shot1.getAngle() < shot2.getAngle(); });
 
-    EXPECT_EQ(-1, result[0].point.y());
-    EXPECT_NEAR(-0.40, result[0].point.x(), 0.05);
-    EXPECT_EQ(-1, result[1].point.y());
-    EXPECT_NEAR(0.40, result[1].point.x(), 0.05);
+    EXPECT_EQ(-1, result[0].getPoint().y());
+    EXPECT_NEAR(-0.40, result[0].getPoint().x(), 0.05);
+    EXPECT_EQ(-1, result[1].getPoint().y());
+    EXPECT_NEAR(0.40, result[1].getPoint().x(), 0.05);
 }
 
 TEST(GeomUtilTest, test_angle_sweep_circles_all_single_obstacle_blocks_whole_range)

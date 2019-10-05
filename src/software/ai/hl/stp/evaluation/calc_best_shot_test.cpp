@@ -26,8 +26,8 @@ TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->point.isClose(world.field().enemyGoal(), 0.05));
-    EXPECT_NEAR(result->angle.toDegrees(), 12, 5);
+    EXPECT_TRUE(result->getPoint().isClose(world.field().enemyGoal(), 0.05));
+    EXPECT_NEAR(result->getAngle().toDegrees(), 12, 5);
 }
 
 TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
@@ -45,8 +45,8 @@ TEST(CalcBestShotTest, calc_best_shot_on_friendly_goal_with_no_obstacles)
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->point.isClose(world.field().friendlyGoal(), 0.05));
-    EXPECT_NEAR(result->angle.toDegrees(), 12, 5);
+    EXPECT_TRUE(result->getPoint().isClose(world.field().friendlyGoal(), 0.05));
+    EXPECT_NEAR(result->getAngle().toDegrees(), 12, 5);
 }
 
 TEST(CalcBestShotTest,
@@ -70,8 +70,8 @@ TEST(CalcBestShotTest,
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->point.isClose(Point(world.field().enemyGoal().x(), -0.3), 0.05));
-    EXPECT_NEAR(result->angle.toDegrees(), 6, 5);
+    EXPECT_TRUE(result->getPoint().isClose(Point(world.field().enemyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result->getAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest,
@@ -96,8 +96,8 @@ TEST(CalcBestShotTest,
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(
-        result->point.isClose(Point(world.field().friendlyGoal().x(), -0.3), 0.05));
-    EXPECT_NEAR(result->angle.toDegrees(), 6, 5);
+        result->getPoint().isClose(Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result->getAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest,
@@ -124,8 +124,8 @@ TEST(CalcBestShotTest,
     // We expect to be able to find a shot
     ASSERT_TRUE(result);
 
-    EXPECT_TRUE(result->point.isClose(Point(world.field().enemyGoal().x(), -0.3), 0.05));
-    EXPECT_NEAR(result->angle.toDegrees(), 6, 5);
+    EXPECT_TRUE(result->getPoint().isClose(Point(world.field().enemyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result->getAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest,
@@ -153,8 +153,8 @@ TEST(CalcBestShotTest,
     ASSERT_TRUE(result);
 
     EXPECT_TRUE(
-        result->point.isClose(Point(world.field().friendlyGoal().x(), -0.3), 0.05));
-    EXPECT_NEAR(result->angle.toDegrees(), 6, 5);
+        result->getPoint().isClose(Point(world.field().friendlyGoal().x(), -0.3), 0.05));
+    EXPECT_NEAR(result->getAngle().toDegrees(), 6, 5);
 }
 
 TEST(CalcBestShotTest, calc_best_shot_on_enemy_goal_with_all_shots_blocked_by_obstacles)
