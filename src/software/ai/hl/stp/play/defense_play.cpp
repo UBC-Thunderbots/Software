@@ -99,8 +99,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there any
         // extra friendly robots, have them perform a reasonable default defensive tactic
-        for (unsigned i = 0; i < std::min(stop_tactics.size(), shadow_enemy_tactics.size());
-             i++)
+        for (unsigned i = 0;
+             i < std::min(stop_tactics.size(), shadow_enemy_tactics.size()); i++)
         {
             if (i < enemy_threats.size())
             {
