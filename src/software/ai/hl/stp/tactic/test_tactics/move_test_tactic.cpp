@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/intent/move_intent.h"
 
 MoveTestTactic::MoveTestTactic(bool loop_forever)
@@ -42,5 +41,6 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
 void MoveTestTactic::accept(TacticVisitor &visitor) const
 {
-    visitor.visit(*this);
+    // WARNING: Tactic Vistor does not implement visiting this Tactic
+    assert(false);
 }

@@ -1,6 +1,5 @@
 #include "software/ai/hl/stp/tactic/test_tactics/stop_test_tactic.h"
 
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/intent/stop_intent.h"
 
 StopTestTactic::StopTestTactic(bool loop_forever) : Tactic(loop_forever) {}
@@ -28,5 +27,6 @@ void StopTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
 void StopTestTactic::accept(TacticVisitor &visitor) const
 {
-    visitor.visit(*this);
+    // WARNING: Tactic Vistor does not implement visiting this Tactic
+    assert(false);
 }

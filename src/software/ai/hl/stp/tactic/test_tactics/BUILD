@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["move_test_tactic.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic:tactic_visitor",
         "//software/ai/intent:move_intent",
     ],
 )
@@ -17,7 +16,6 @@ cc_library(
     hdrs = ["stop_test_tactic.h"],
     deps = [
         "//software/ai/hl/stp/tactic",
-        "//software/ai/hl/stp/tactic:tactic_visitor",
         "//software/ai/intent:stop_intent",
     ],
 )
