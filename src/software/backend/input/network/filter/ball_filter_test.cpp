@@ -164,7 +164,7 @@ class BallFilterTest : public ::testing::Test
         std::normal_distribution<double> time_step_noise_distribution(0,
                                                                       time_step_variance);
 
-        for (auto i = 0U; i < num_iterations; i++)
+        for (unsigned i = 0; i < num_iterations; i++)
         {
             // Generate the noise that will be added to the position and time step to
             // simulate imperfect data

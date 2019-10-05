@@ -86,7 +86,7 @@ std::array<double, NUM_PARAMS> Util::GradientDescentOptimizer<NUM_PARAMS>::follo
     ParamArray past_gradient_averages         = {0};
     ParamArray past_squared_gradient_averages = {0};
 
-    for (auto iter = 0U; iter < num_iters; iter++)
+    for (unsigned iter = 0; iter < num_iters; iter++)
     {
         ParamArray gradient = approximateGradient(params, objective_function);
 
@@ -145,7 +145,7 @@ Util::GradientDescentOptimizer<NUM_PARAMS>::approximateGradient(
     ParamArray gradient        = {0};
     double curr_function_value = objective_function(params);
 
-    for (auto i = 0U; i < NUM_PARAMS; i++)
+    for (unsigned i = 0; i < NUM_PARAMS; i++)
     {
         auto test_params = params;
         test_params.at(i) += gradient_approx_step_size * param_weights.at(i);

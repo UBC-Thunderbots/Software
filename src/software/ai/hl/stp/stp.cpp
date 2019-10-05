@@ -148,9 +148,9 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     Matrix<double> matrix(num_rows, num_cols);
 
     // Initialize the matrix with the cost of assigning each Robot to each Tactic
-    for (auto row = 0U; row < num_rows; row++)
+    for (unsigned row = 0; row < num_rows; row++)
     {
-        for (auto col = 0U; col < num_cols; col++)
+        for (unsigned col = 0; col < num_cols; col++)
         {
             if (!friendly_team_robots.at(row).getRobotCapabilities().hasAllCapabilities(
                     tactics.at(col)->robotCapabilityRequirements()))
@@ -181,9 +181,9 @@ std::vector<std::shared_ptr<Tactic>> STP::assignRobotsToTactics(
     //        -1, 0,-1,         and            0,-1,
     //         0,-1,-1,                       -1, 0,
     //        -1,-1, 0,
-    for (auto row = 0U; row < num_rows; row++)
+    for (unsigned row = 0; row < num_rows; row++)
     {
-        for (auto col = 0U; col < num_cols; col++)
+        for (unsigned col = 0; col < num_cols; col++)
         {
             auto val = matrix(row, col);
             if (val == 0)

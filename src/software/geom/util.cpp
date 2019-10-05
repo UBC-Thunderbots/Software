@@ -1404,7 +1404,7 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
 Polygon circleToPolygon(const Circle &circle, size_t num_points)
 {
     std::vector<Point> points;
-    for (auto i = 0U; i < num_points; i++)
+    for (unsigned i = 0; i < num_points; i++)
     {
         Point p =
             circle.getOrigin() + Point(circle.getRadius(), 0)

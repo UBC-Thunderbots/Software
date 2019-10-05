@@ -127,7 +127,7 @@ void Ball::addStateToBallHistory(const Point &position, const Vector &velocity,
 std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (auto i = 0U; i < timestamp_history.size(); i++)
+    for (unsigned i = 0; i < timestamp_history.size(); i++)
     {
         double timestamp_diff =
             fabs((timestamp - timestamp_history[i]).getMilliseconds());

@@ -115,7 +115,7 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     // the case, 0 passes would be required. Since that case is already checked, when we
     // start the loop we are checking for the possibility of the receiver getting the ball
     // in 1 pass. This is why pass_num starts at 1.
-    for (auto pass_num = 1U; pass_num < passing_team.numRobots() &&
+    for (unsigned pass_num = 1; pass_num < passing_team.numRobots() &&
                              !current_passers.empty() && !unvisited_robots.empty();
          pass_num++)
     {

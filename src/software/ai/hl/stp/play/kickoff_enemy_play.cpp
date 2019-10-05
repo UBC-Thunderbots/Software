@@ -109,7 +109,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // keeps track of the next defense position to assign
         int defense_position_index = 0;
-        for (auto i = 0U; i < defense_positions.size(); ++i)
+        for (unsigned i = 0; i < defense_positions.size(); ++i)
         {
             if (i < 3 && i < enemy_threats.size())
             {
