@@ -62,7 +62,7 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
     Ray shot_ray = Ray(ball.position(), Point(robot.value().orientation().cos(),
                                               robot.value().orientation().sin()));
 
-    auto intersect_1 = raySegmentIntersection(shot_ray, goal_line).first;
+    std::optional<Point> intersect_1 = raySegmentIntersection(shot_ray, goal_line).first;
 
     if (intersect_1.has_value())
     {

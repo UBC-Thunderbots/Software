@@ -83,7 +83,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         Segment full_goal_segment =
             Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos());
 
-        auto intersection1 = raySegmentIntersection(ball_ray, full_goal_segment).first;
+        std::optional<Point> intersection1 =
+            raySegmentIntersection(ball_ray, full_goal_segment).first;
 
         // Case 1
         if (intersection1.has_value() &&

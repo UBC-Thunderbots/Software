@@ -82,7 +82,6 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
                                                       desired_angle, 0));
     }
-
     // Check if we can shoot on the enemy goal from the receiver position
     std::optional<Shot> best_shot_opt =
         calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
