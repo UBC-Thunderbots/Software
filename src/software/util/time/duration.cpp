@@ -59,10 +59,3 @@ Duration Duration::operator-(const Duration &duration) const
 {
     return Duration::fromSeconds(getSeconds() - duration.getSeconds());
 }
-
-std::ostream& operator<<(std::ostream& output_stream, const Duration& duration)
-{
-        output_stream << "Duration: " << duration.getSeconds() << 's';
-
-        return output_stream;
-}

@@ -107,15 +107,6 @@ class Duration : public Time
      */
     Duration operator-(const Duration& duration) const;
 
-    /**
-         * Implement the "<<" operator for printing
-         *
-         * @param output_stream The stream to print to
-         * @param duration The duration to print
-         * @return The output stream with the string representation of the class appended
-         */
-        friend std::ostream& operator<<(std::ostream& output_stream, const Duration& duration);
-
    private:
     /**
      * Constructs a Duration value from a value in seconds.

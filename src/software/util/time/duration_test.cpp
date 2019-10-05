@@ -133,9 +133,3 @@ TEST(DurationTest, test_subtraction_operator_with_negative_result)
     Duration expected_result = Duration::fromMilliseconds(-1);
     EXPECT_EQ(result, expected_result);
 }
-
-TEST(DurationTest, test_print_operation)
-{
-    Duration d1 = Duration::fromSeconds(0.4);
-    EXPECT_TRUE();
-}

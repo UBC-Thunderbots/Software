@@ -22,4 +22,11 @@ double Time::getMilliseconds() const
     return time_in_seconds * MILLISECONDS_PER_SECOND;
 }
 
+std::ostream& operator<<(std::ostream& output_stream, const Time& time)
+{
+        output_stream << time.getSeconds() << 's';
+
+        return output_stream;
+}
+
 Time::~Time() {}
