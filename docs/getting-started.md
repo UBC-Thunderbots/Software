@@ -113,7 +113,7 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 ### From the command-line
 
 1) Navigate to the root of this repository (wherever you have it cloned on your computer)
-2) Navigate to `src/thunderbots`.
+2) Navigate to `src`.
 3) Build a specific target for running (for example): `bazel build //software/geom:angle_test`
 4) Run a specific target by running (for example): `bazel run //software/geom:angle_test`
 4) Run a specific *test* by running (for example): `bazel test //software/geom:angle_test`
@@ -126,14 +126,14 @@ CLion is free for students, and you can use your UBC alumni email address to cre
 First we need to setup CLion
 1. Open CLion
 2. Select `Import Bazel Project`
-3. Set `Workspace` to wherever you cloned the repository + `/src/thunderbots`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src/thunderbots`.
+3. Set `Workspace` to wherever you cloned the repository + `/src`. So if I cloned the repo to `/home/my_username/Downloads/Software`, my workspace would be `/home/my_username/Downloads/Software/src`.
 4. Select `Create from scratch` 
 5. For "Project View", leave everything as default.
 6. You're good to go! Give CLion some time to find everything in your repo.
 
 
 Now that you're setup, if you can run it on the command line, you can run it in clion. There are two main ways of doing so.
-1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/thunderbots/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
+1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
     1. Select `Add Configuration` from the drop-down in the top-right of CLion
     2. Under `Templates`, choose `Bazel Command`.
