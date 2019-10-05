@@ -20,7 +20,7 @@ namespace Evaluation
      * @param obstacles The locations of any obstacles on the field that may obstruct the
      * shot. These are treated as circular obstacles, and are usually used to represent
      * robots on the field.
-     * @param radius The radius of the given obstacles>
+     * @param radius The radius of the given obstacles
      *
      * @return the best target to shoot at and the largest open angle interval for the
      * shot (this is the total angle between the obstacles on either side of the shot

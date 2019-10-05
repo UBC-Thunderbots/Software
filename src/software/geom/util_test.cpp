@@ -144,7 +144,7 @@ TEST(GeomUtilTest, test_proj_len)
 
 TEST(GeomUtilTest, test_contains_triangle_point)
 {
-    // this triangle lies in the point quatren of the field, we can rota
+    // this triangle lies in the first quatren of the field, we can rota
     Point p1(0, 0);
     Point p2((std::rand() % 100) / 100, 0);
     Point p3((std::rand() % 100) / 100, (std::rand() % 100) / 100);
