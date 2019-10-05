@@ -21,14 +21,15 @@ class MoveTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this MoveTactic.
+     * Updates the control parameters for this MoveTactic.
      *
      * @param destination The destination to move to (in global coordinates)
      * @param final_orientation The final orientation the robot should have at
      * the destination
      * @param final_speed The final speed the robot should have at the destination
      */
-    void updateParams(Point destination, Angle final_orientation, double final_speed);
+    void updateControlParams(Point destination, Angle final_orientation,
+                             double final_speed);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

@@ -134,8 +134,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // enemies, we move the rest of the robots to the defense positions
                 // listed above
                 move_tactics.at(defense_position_index)
-                    ->updateParams(defense_positions.at(defense_position_index),
-                                   Angle::zero(), 0);
+                    ->updateControlParams(defense_positions.at(defense_position_index),
+                                          Angle::zero(), 0);
                 result.emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }

@@ -116,11 +116,11 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // enough threats to shadow, move our robots to block the friendly net
         if (enemy_threats.size() == 0)
         {
-            move_tactic_main->updateParams(
+            move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
                 0);
-            move_tactic_main->updateParams(
+            move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, -2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
                 0);
@@ -134,7 +134,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                              world.friendlyTeam(), world.enemyTeam(),
                                              ROBOT_MAX_RADIUS_METERS * 3,
                                              enemy_team_can_pass, world.ball());
-            move_tactic_main->updateParams(
+            move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
                 0);

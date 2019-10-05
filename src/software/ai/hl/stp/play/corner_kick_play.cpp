@@ -105,10 +105,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                          copysign(0.5, opposite_corner_to_kick.y()));
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
-    bait_move_tactic_1->updateParams(
+    bait_move_tactic_1->updateControlParams(
         bait_move_tactic_1_pos,
         (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
-    bait_move_tactic_2->updateParams(
+    bait_move_tactic_2->updateControlParams(
         bait_move_tactic_2_pos,
         (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
 
@@ -216,7 +216,7 @@ void CornerKickPlay::updateAlignToBallTactic(
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
-    align_to_ball_tactic->updateParams(
+    align_to_ball_tactic->updateControlParams(
         world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }

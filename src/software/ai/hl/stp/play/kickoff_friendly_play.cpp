@@ -106,8 +106,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // setup 5 kickoff positions in order of priority
         for (int i = 0; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
-                                             0);
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::half(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 
@@ -137,8 +137,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // 1 will be assigned to the rest of the robots
         for (int i = 1; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
-                                             0);
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::half(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 

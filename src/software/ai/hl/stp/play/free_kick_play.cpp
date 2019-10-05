@@ -229,7 +229,7 @@ void FreeKickPlay::updateAlignToBallTactic(
     // We want to the robot to face the enemy net to minimize the amount of motion
     // required to turn and shoot
     Vector ball_to_enemy_net_vec = world.field().enemyGoal() - world.ball().position();
-    align_to_ball_tactic->updateParams(
+    align_to_ball_tactic->updateControlParams(
         world.ball().position() - ball_to_enemy_net_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_enemy_net_vec.orientation(), 0);
 }

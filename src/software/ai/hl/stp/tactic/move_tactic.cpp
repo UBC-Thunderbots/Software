@@ -9,10 +9,10 @@ std::string MoveTactic::getName() const
     return "Move Tactic";
 }
 
-void MoveTactic::updateParams(Point destination, Angle final_orientation,
-                              double final_speed)
+void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
+                                     double final_speed)
 {
-    // Update the parameters stored by this Tactic
+    // Update the control parameters stored by this Tactic
     this->destination       = destination;
     this->final_orientation = final_orientation;
     this->final_speed       = final_speed;
