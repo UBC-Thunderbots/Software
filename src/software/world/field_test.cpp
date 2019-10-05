@@ -17,6 +17,7 @@ class FieldTest : public ::testing::Test
 
         field = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
                       boundary_buffer_size, center_circle_radius, default_time_stamp);
+
     }
 
     Field field = Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0));
@@ -159,12 +160,14 @@ TEST_F(FieldTest, equality_operator_fields_with_different_defense_y_length)
     Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length / 2, goal_y_length,
                           boundary_buffer_size, center_circle_radius, default_time_stamp);
 
+
     EXPECT_NE(field_1, field_2);
 }
 
 TEST_F(FieldTest, equality_operator_fields_with_different_goal_y_length)
 {
     Field field_1 = Field(x_length, y_length, defense_x_length, defense_y_length, goal_y_length,
+
                           boundary_buffer_size, center_circle_radius, default_time_stamp);
 
     Field field_2 = Field(x_length, y_length, defense_x_length, defense_y_length, 0, boundary_buffer_size,
