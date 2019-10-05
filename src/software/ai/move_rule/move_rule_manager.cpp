@@ -2,11 +2,11 @@
 
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 
-
 std::set<MoveRule> MoveRuleManager::getMoveRules(const GameState &game_state,
                                                  const Tactic &tactic)
 {
-    setCurrentMoveRulesFromGameState(game_state);
+    current_move_rules.clear();
+    addCurrentMoveRulesFromGameState(game_state);
     tactic.accept(*this);
     return current_move_rules;
 }
@@ -43,10 +43,8 @@ void MoveRuleManager::visit(const MoveTestTactic &tactic) {}
 
 void MoveRuleManager::visit(const StopTestTactic &tactic) {}
 
-void MoveRuleManager::setCurrentMoveRulesFromGameState(const GameState &game_state)
+void MoveRuleManager::addCurrentMoveRulesFromGameState(const GameState &game_state)
 {
-    current_move_rules.clear();
-
     current_move_rules.insert(MoveRule::FRIENDLY_DEFENSE_AREA);
     current_move_rules.insert(MoveRule::ENEMY_ROBOTS_COLLISION);
 
