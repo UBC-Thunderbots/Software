@@ -36,10 +36,11 @@ Point Rectangle::furthestCorner(Point p)
 
     for (int i = 1; i < 4; i++)
     {
-        if (dist(p, operator[](i)) > furthestDist)
+        double newDist = dist(p, operator[](i));
+        if (newDist > furthestDist)
         {
             furthestPoint = operator[](i);
-            furthestDist  = (p - operator[](i)).len();
+            furthestDist  = newDist;
         }
     }
     return furthestPoint;

@@ -6,6 +6,7 @@ cc_library(
         "polygon.cpp",
         "rectangle.cpp",
         "util.cpp",
+        "voronoi_util.cpp",
     ],
     hdrs = [
         "angle.h",
@@ -17,6 +18,7 @@ cc_library(
         "rectangle.h",
         "segment.h",
         "util.h",
+        "voronoi_util.h",
     ],
     copts = [
         "-std=c++17",

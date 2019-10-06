@@ -636,3 +636,13 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
 std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points);
 
 Polygon circleToPolygon(const Circle &circle, size_t num_points);
+
+/**
+ *
+ * Finds the point in the testPoints vector that is closest to the originPoint.
+ *
+ * @param originPoint
+ * @param testPoints
+ * @return The point in testPoints closest to testPoints.
+ */
+Point findClosestPoint(const Point& originPoint, std::vector<Point> testPoints);

@@ -1359,10 +1359,7 @@ TEST(GeomUtilTest, test_find_open_circles_no_points_in_rectangle)
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, {});
 
-    ASSERT_EQ(1, empty_circles.size());
-    EXPECT_DOUBLE_EQ(0, empty_circles[0].getOrigin().x());
-    EXPECT_DOUBLE_EQ(0, empty_circles[0].getOrigin().y());
-    EXPECT_DOUBLE_EQ(std::sqrt(2), empty_circles[0].getRadius());
+    ASSERT_EQ(0, empty_circles.size());
 }
 
 TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle)
@@ -1372,11 +1369,23 @@ TEST(GeomUtilTest, test_find_open_circles_one_point_in_rectangle)
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
-    ASSERT_EQ(1, empty_circles.size());
+    ASSERT_EQ(4, empty_circles.size());
 
     EXPECT_EQ(Point(-1, -1), empty_circles[0].getOrigin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(1.9, 2)),
                      empty_circles[0].getRadius());
+
+    EXPECT_EQ(Point(-1, 1), empty_circles[1].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(1.9, 2)),
+                     empty_circles[1].getRadius());
+
+    EXPECT_EQ(Point(1, 1), empty_circles[2].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(1.9, 2)),
+                     empty_circles[2].getRadius());
+
+    EXPECT_EQ(Point(1, -1), empty_circles[3].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(1.9, 2)),
+                     empty_circles[3].getRadius());
 }
 
 TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
@@ -1386,7 +1395,7 @@ TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
 
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
-    ASSERT_EQ(2, empty_circles.size());
+    ASSERT_EQ(6, empty_circles.size());
 
     EXPECT_EQ(Point(0, 1), empty_circles[0].getOrigin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.9, 2)),
@@ -1395,6 +1404,22 @@ TEST(GeomUtilTest, test_find_open_circles_two_points_in_rectangle)
     EXPECT_EQ(Point(0, -1), empty_circles[1].getOrigin());
     EXPECT_DOUBLE_EQ(std::sqrt(std::pow(1.9, 2) + std::pow(0.9, 2)),
                      empty_circles[1].getRadius());
+
+    EXPECT_EQ(Point(-1, -1), empty_circles[2].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)),
+                     empty_circles[2].getRadius());
+
+    EXPECT_EQ(Point(-1, 1), empty_circles[3].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2)),
+                     empty_circles[3].getRadius());
+
+    EXPECT_EQ(Point(1, 1), empty_circles[4].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(0.1, 2)),
+                     empty_circles[4].getRadius());
+
+    EXPECT_EQ(Point(1, -1), empty_circles[5].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(0.1, 2) + std::pow(1.9, 2)),
+                     empty_circles[5].getRadius());
 }
 
 TEST(GeomUtilTest, test_find_open_circle_three_in_rectangle)
@@ -1404,21 +1429,39 @@ TEST(GeomUtilTest, test_find_open_circle_three_in_rectangle)
     std::vector<Point> points         = {Point(-1, -1), Point(1, -1), Point(0, 1)};
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
-    ASSERT_EQ(4, empty_circles.size());
+    ASSERT_EQ(8, empty_circles.size());
 
-    EXPECT_EQ(-4.5, empty_circles[0].getOrigin().x());
-    EXPECT_NEAR(2.09, empty_circles[0].getOrigin().y(), 0.05);
-    EXPECT_NEAR(4.628, empty_circles[0].getRadius(), 0.005);
+    // Calculated from Voronoi diagram
+    EXPECT_EQ(-4.5, empty_circles[2].getOrigin().x());
+    EXPECT_NEAR(2.09, empty_circles[2].getOrigin().y(), 0.05);
+    EXPECT_NEAR(4.628, empty_circles[2].getRadius(), 0.005);
 
-    EXPECT_EQ(4.5, empty_circles[1].getOrigin().x());
-    EXPECT_NEAR(2.09, empty_circles[1].getOrigin().y(), 0.05);
-    EXPECT_NEAR(4.628, empty_circles[1].getRadius(), 0.005);
+    EXPECT_EQ(4.5, empty_circles[3].getOrigin().x());
+    EXPECT_NEAR(2.09, empty_circles[3].getOrigin().y(), 0.05);
+    EXPECT_NEAR(4.628, empty_circles[3].getRadius(), 0.005);
 
-    EXPECT_EQ(Point(0, -3), empty_circles[2].getOrigin());
-    EXPECT_NEAR(2.236, empty_circles[2].getRadius(), 0.005);
+    EXPECT_EQ(Point(0, -3), empty_circles[6].getOrigin());
+    EXPECT_NEAR(2.236, empty_circles[6].getRadius(), 0.005);
 
-    EXPECT_EQ(Point(0, -0.25), empty_circles[3].getOrigin());
-    EXPECT_NEAR(1.25, empty_circles[3].getRadius(), 0.005);
+    EXPECT_EQ(Point(0, -0.25), empty_circles[7].getOrigin());
+    EXPECT_NEAR(1.25, empty_circles[7].getRadius(), 0.005);
+
+    // Corner Points
+    EXPECT_EQ(Point(-4.5, 3), empty_circles[0].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(4.5, 2) + std::pow(2, 2)),
+                     empty_circles[0].getRadius());
+
+    EXPECT_EQ(Point(4.5, 3), empty_circles[1].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(4.5, 2) + std::pow(2, 2)),
+                     empty_circles[1].getRadius());
+
+    EXPECT_EQ(Point(-4.5, -3), empty_circles[4].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(3.5, 2) + std::pow(2, 2)),
+                     empty_circles[4].getRadius());
+
+    EXPECT_EQ(Point(4.5, -3), empty_circles[5].getOrigin());
+    EXPECT_DOUBLE_EQ(std::sqrt(std::pow(3.5, 2) + std::pow(2, 2)),
+                     empty_circles[5].getRadius());
 }
 
 TEST(GeomUtilTest, test_point_polygon_dist_point_contained_in_polygon)
