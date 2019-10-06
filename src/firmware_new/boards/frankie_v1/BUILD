@@ -1,4 +1,4 @@
-load("//firmware_new:rules.bzl", "cc_stm32h7_hal_library")
+load("//firmware_new:rules.bzl", "cc_stm32h7_binary", "cc_stm32h7_hal_library")
 
 #cc_stm32_h7_binary(
 #    name = "frankie_v1",
@@ -19,35 +19,42 @@ load("//firmware_new:rules.bzl", "cc_stm32h7_hal_library")
 # TODO: do we need custom flags for this?
 # TODO: how to enforce compiler???
 # TODO: probably want a custom rule, or at least a macro for this
-cc_binary(
+cc_stm32h7_binary(
     name = "frankie_v1_main",
     srcs = [
         "freertos.c",
         "main.c",
-        "main.h",
         "stm32h7xx_hal_msp.c",
         "stm32h7xx_it.c",
-        "stm32h7xx_it.h",
         "system_stm32h7xx.c",
+    ],
+    hdrs = [
+        "main.h",
+        "stm32h7xx_it.h",
     ],
     copts = [
         "-DSTM32H743xx",
     ],
-    data = [
-        "STM32H742XGHx_FLASH.ld",
-    ],
-    # TODO: why do we need  "-specs=nano.specs"?
+    linker_script = "STM32H742XGHx_FLASH.ld",
+    # TODO: why do we need  "-specs=nano.specs"? What does it do?
     linkopts = [
         "-specs=nano.specs",
         # TODO: put this back in (linker can't find it for now)
-        #        "-TSTM32H742XGHx_FLASH.ld",
+        "-TSTM32H742XGHx_FLASH.ld",
         "-lc",
         "-lm",
         "-lnosys",
     ],
     deps = [
+        ":devices_vector_table",
         ":frankie_v1_hal",
     ],
+)
+
+cc_library(
+    name = "devices_vector_table",
+    srcs = ["startup_stm32h742xx.s"],
+    deps = [],
 )
 
 # TODO: rename this, it encompasses middlewares as well now
