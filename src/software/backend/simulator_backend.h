@@ -1,8 +1,9 @@
 #pragma once
 
+#include <mutex>
+
 #include "software/ai/world/world.h"
 #include "software/backend/backend.h"
-#include <mutex>
 
 class SimulatorBackend : public Backend
 {
@@ -12,17 +13,21 @@ class SimulatorBackend : public Backend
     /**
      * Creates a new SimulatorBackend
      *
-     * The SimulatorBackend will run a physics simulation to simulate and publish the World, and simulate
-     * the primitives given to it. The SimulatorBackend will only advance the simulation by a fixed amount
-     * each time primitives are received, rather than running at full-speed or in real-time. This is because
-     * we want the simulator to be deterministic and always provide the World at a "fixed" rate from the
+     * The SimulatorBackend will run a physics simulation to simulate and publish the
+     * World, and simulate the primitives given to it. The SimulatorBackend will only
+     * advance the simulation by a fixed amount each time primitives are received, rather
+     * than running at full-speed or in real-time. This is because we want the simulator
+     * to be deterministic and always provide the World at a "fixed" rate from the
      * perspective of any consumers.
      *
-     * @param simulation_time_step How far to step the simulation in time each time the simulation is advanced
-     * @param num_steps_per_primitive_update How many times to advance the simulation each time new primitives
-     * are received
+     * @param simulation_time_step How far to step the simulation in time each time the
+     * simulation is advanced
+     * @param num_steps_per_primitive_update How many times to advance the simulation each
+     * time new primitives are received
      */
-    explicit SimulatorBackend(const Duration& simulation_time_step = Duration::fromSeconds(1.0 / 60.0), unsigned int num_steps_per_primitive_update = 2);
+    explicit SimulatorBackend(
+        const Duration& simulation_time_step        = Duration::fromSeconds(1.0 / 60.0),
+        unsigned int num_steps_per_primitive_update = 2);
 
     /**
      * Returns the current state of the World in the simulated backend
@@ -32,8 +37,8 @@ class SimulatorBackend : public Backend
     World getWorld();
 
     /**
-     * Sets the state of the World in the simulated backend. All following simulation will follow
-     * from this newly provided world.
+     * Sets the state of the World in the simulated backend. All following simulation will
+     * follow from this newly provided world.
      *
      * @param new_world A new state of the World to set in the simulated backend
      */
@@ -43,9 +48,10 @@ class SimulatorBackend : public Backend
     /**
      * Updates the simulation.
      *
-     * This will advance the simulation by "simulation_time_step", "num_steps_per_primitive_update" times.
-     * We take several smaller steps if necessary to maintain the accuracy of the simulation. This will
-     * update the state of the World in the backend and send the updated values to all observers.
+     * This will advance the simulation by "simulation_time_step",
+     * "num_steps_per_primitive_update" times. We take several smaller steps if necessary
+     * to maintain the accuracy of the simulation. This will update the state of the World
+     * in the backend and send the updated values to all observers.
      */
     void updateSimulation();
 

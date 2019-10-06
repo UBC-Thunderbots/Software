@@ -1,10 +1,13 @@
 #include "software/backend/simulator_backend.h"
+
 #include "software/backend/backend_factory.h"
 
 const std::string SimulatorBackend::name = "simulator";
 
-SimulatorBackend::SimulatorBackend(const Duration &simulation_time_step, unsigned int num_steps_per_primitive_update) :
-        simulation_time_step(simulation_time_step), num_steps_per_primitive_update(num_steps_per_primitive_update)
+SimulatorBackend::SimulatorBackend(const Duration &simulation_time_step,
+                                   unsigned int num_steps_per_primitive_update)
+    : simulation_time_step(simulation_time_step),
+      num_steps_per_primitive_update(num_steps_per_primitive_update)
 {
 }
 
@@ -16,7 +19,8 @@ void SimulatorBackend::onValueReceived(ConstPrimitiveVectorPtr primitives)
     updateSimulation();
 }
 
-void SimulatorBackend::setWorld(const World &new_world) {
+void SimulatorBackend::setWorld(const World &new_world)
+{
     // TODO: Set up simulation world (#768)
 
     // We need to update the simulation (which sends the World to observers)
@@ -26,13 +30,16 @@ void SimulatorBackend::setWorld(const World &new_world) {
     updateSimulation();
 }
 
-World SimulatorBackend::getWorld() {
+World SimulatorBackend::getWorld()
+{
     std::scoped_lock world_lock(world_mutex);
     return world;
 }
 
-void SimulatorBackend::updateSimulation() {
-    for(unsigned int i = 0; i < num_steps_per_primitive_update; i++) {
+void SimulatorBackend::updateSimulation()
+{
+    for (unsigned int i = 0; i < num_steps_per_primitive_update; i++)
+    {
         // TODO: update sim with time_step (#768)
     }
 
@@ -41,7 +48,8 @@ void SimulatorBackend::updateSimulation() {
     sendWorldToObservers();
 }
 
-void SimulatorBackend::sendWorldToObservers() {
+void SimulatorBackend::sendWorldToObservers()
+{
     std::scoped_lock world_lock(world_mutex);
     Subject<World>::sendValueToObservers(world);
 }
