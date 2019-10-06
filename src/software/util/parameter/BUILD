@@ -28,6 +28,12 @@ cc_library(
     deps = [],
 )
 
+cc_library(
+    name = "config",
+    hdrs = ["config.hpp"],
+    deps = [],
+)
+
 cc_test(
     name = "parameter_test",
     srcs = ["parameter_test.cpp"],
@@ -44,4 +50,15 @@ cc_library(
         "dynamic_parameters.h",
     ],
     deps = [":parameter"],
+)
+
+cc_test(
+    name = "config_test",
+    srcs = ["config_test.cpp"],
+    deps = [
+        ":config",
+        ":parameter",
+        "@g3log//:all",
+        "@gtest//:gtest_main",
+    ],
 )
