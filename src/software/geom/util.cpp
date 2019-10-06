@@ -459,7 +459,7 @@ std::optional<Shot> angleSweepCircles(const Vector &src, const Vector &p1,
 
     // Sort by the interval angle (ie. the open angle the shot is going through)
     std::sort(possible_shots.begin(), possible_shots.end(),
-              [](auto s1, auto s2) { return s1.getAngle() > s2.getAngle(); });
+              [](auto s1, auto s2) { return s1.getOpenAngle() > s2.getOpenAngle(); });
 
     // Return the shot through the largest open interval if there are any
     if (possible_shots.empty())
