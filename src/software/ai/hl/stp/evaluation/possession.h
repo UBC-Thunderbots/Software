@@ -1,6 +1,5 @@
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
-#include "software/ai/world/team.h"
+#pragma once
+#include "software/ai/world/world.h"
 
 namespace Evaluation
 {
@@ -27,5 +26,7 @@ namespace Evaluation
      * @param ball The ball
      * @return True if the team has possession, false otherwise
      */
-    bool teamHasPossession(const Team &team, const Ball &ball);
+    bool teamHasPossession(const World& world, const Team& team);
+
+    bool teamPassInProgress(const World& world, const Team& team);
 }  // namespace Evaluation

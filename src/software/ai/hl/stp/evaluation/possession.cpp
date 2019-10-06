@@ -47,9 +47,9 @@ namespace Evaluation
         }
     }
 
-    bool teamHasPossession(const Team &team, const Ball &ball)
+    bool teamHasPossession(const World& world, const Team &team)
     {
-        for (Robot robot : team.getAllRobots())
+        for (const Robot& robot : team.getAllRobots())
         {
             std::vector<Timestamp> robot_history_timestamps =
                 robot.getPreviousTimestamps();
@@ -57,11 +57,31 @@ namespace Evaluation
             int i = 0;
 
             // Check that the robot has had possession of the ball recently.
-            while (i < robot_history_timestamps.size() &&
-                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                       Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
+            while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                   Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
             {
-                if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
+                if (robotHasPossession(world.ball(), robot, robot_history_timestamps[i]))
+                    return true;
+                i++;
+            }
+        }
+
+        return false;
+    }
+
+    bool teamPassInProgress(const World &world, const Team &team) {
+        for (const Robot& robot : team.getAllRobots())
+        {
+            std::vector<Timestamp> robot_history_timestamps =
+                    robot.getPreviousTimestamps();
+
+            int i = 0;
+
+            // Check that the robot has had possession of the ball recently.
+            while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                   Duration::fromSeconds(PASS_BUFFER_TIME_IN_SECONDS))
+            {
+                if (robotBeingPassedTo(world, robot, robot_history_timestamps[i]))
                     return true;
                 i++;
             }

@@ -7,6 +7,7 @@
 
 #include <numeric>
 
+#include <g3log/g3log.hpp>
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
@@ -17,8 +18,9 @@ using namespace Passing;
 using namespace AI::Evaluation;
 
 double Passing::ratePass(const World& world, const Passing::Pass& pass,
-                         const std::optional<Rectangle>& target_region,
-                         std::optional<unsigned int> passer_robot_id)
+                             const std::optional<Rectangle>& target_region,
+                             std::optional<unsigned int> passer_robot_id,
+                             PassType pass_type)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
@@ -58,9 +60,24 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-                          shoot_pass_rating * in_region_quality *
-                          pass_time_offset_quality * pass_speed_quality;
+    // We ignore shoot pass quality if we're rating for a "RECEIVE_AND_DRIBBLE" pass
+    double pass_quality = 0;
+    switch (pass_type)
+    {
+        case RECEIVE_AND_DRIBBLE:
+            pass_quality = static_pass_quality * friendly_pass_rating *
+                           enemy_pass_rating * in_region_quality *
+                           pass_time_offset_quality * pass_speed_quality;
+            break;
+        case ONE_TOUCH_SHOT:
+            pass_quality = static_pass_quality * friendly_pass_rating *
+                           enemy_pass_rating * shoot_pass_rating * in_region_quality *
+                           pass_time_offset_quality * pass_speed_quality;
+            break;
+        default:
+            LOG(FATAL) << "Unhandled pass type given to `ratePass`";
+    }
+
     return pass_quality;
 }
 

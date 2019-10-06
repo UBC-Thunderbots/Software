@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "software/ai/passing/pass.h"
+#include "software/ai/passing/evaluation.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/ai/world/world.h"
 #include "software/util/optimization/gradient_descent_optimizer.h"
@@ -54,7 +55,7 @@ namespace Passing
 
         // Delete the copy and assignment operators because this class really shouldn't
         // need them and we don't want to risk doing anything nasty with the internal
-        // multithreading this class uses
+        // threading this class uses
         PassGenerator& operator=(const PassGenerator&) = delete;
         PassGenerator(const PassGenerator&)            = delete;
 
@@ -63,8 +64,12 @@ namespace Passing
          *
          * @param world The world we're passing int
          * @param passer_point The point we're passing from
+         * @param pass_type The type of pass we would like to perform.
+         *                  NOTE: this will _try_ to generate a pass of the type given,
+         *                  but it is not guaranteed, and can change during pass
+         *                  execution because of Passer/Receiver decisions
          */
-        explicit PassGenerator(const World& world, const Point& passer_point);
+        explicit PassGenerator(const World& world, const Point& passer_point, const PassType& pass_type);
 
         /**
          * Updates the world
@@ -109,7 +114,7 @@ namespace Passing
          *
          * @return The best currently known pass and the rating of that pass (in [0-1])
          */
-        PassWithRating getBestPassSoFar();
+        std::pair<Pass, double> getBestPassSoFar();
 
         /**
          * Destructs this PassGenerator
@@ -158,6 +163,12 @@ namespace Passing
         void saveBestPass();
 
         /**
+         * Draws all the passes we are currently optimizing and the gradient of pass
+         * receive position quality over the field
+         */
+        void visualizePassesAndPassQualityGradient();
+
+        /**
          * Get the number of passes to keep after pruning
          *
          * @return the number of passes to keep after pruning
@@ -180,7 +191,7 @@ namespace Passing
          *         form: {receiver_point.x, receiver_point.y, pass_speed_m_per_s
          *                pass_start_time}
          */
-        std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(Pass pass);
+        std::array<double, NUM_PARAMS_TO_OPTIMIZE> convertPassToArray(const Pass& pass);
 
         /**
          * Convert a given array to a Pass
@@ -192,7 +203,7 @@ namespace Passing
          * @return The pass represented by the given array, with the passer point being
          *         the current `passer_point` we're optimizing for
          */
-        Pass convertArrayToPass(std::array<double, NUM_PARAMS_TO_OPTIMIZE> array);
+        Pass convertArrayToPass(const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& array);
 
         /**
          * Calculate the quality of a given pass
@@ -200,7 +211,7 @@ namespace Passing
          * @return A value in [0,1] representing the quality of the pass with 1 being the
          *         best pass and 0 being the worst pass
          */
-        double ratePass(Pass pass);
+        double ratePass(const Pass &pass);
 
         /**
          * Updates the passer point of all passes that we're currently optimizing
@@ -303,6 +314,9 @@ namespace Passing
         // A random number generator for use across the class
         std::random_device random_device;
         std::mt19937 random_num_gen;
+
+        // What type of pass we're trying to generate
+        PassType pass_type;
     };
 
 

@@ -10,6 +10,7 @@ cc_library(
         "//software/ai/world",
         "//software/geom",
         "//software/util/math:math_functions",
+        "@g3log",
     ],
 )
 

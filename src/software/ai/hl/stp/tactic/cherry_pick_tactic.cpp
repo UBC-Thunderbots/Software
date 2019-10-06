@@ -8,7 +8,7 @@
 #include "software/geom/util.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
-    : pass_generator(world, world.ball().position()),
+    : pass_generator(world, world.ball().position(), Passing::PassType::ONE_TOUCH_SHOT),
       world(world),
       target_region(target_region),
       Tactic(true)

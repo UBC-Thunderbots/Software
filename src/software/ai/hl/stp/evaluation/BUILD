@@ -188,9 +188,7 @@ cc_library(
         ":robot",
         ":team",
         "//shared:constants",
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
-        "//software/ai/world:robot",
+        "//software/ai/world:world",
         "//software/geom",
     ],
 )
@@ -212,9 +210,9 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:ball",
-        "//software/ai/world:robot",
+        "//software/ai/world:world",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
     ],
 )
 
