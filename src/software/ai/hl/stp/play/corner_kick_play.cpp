@@ -206,7 +206,7 @@ void CornerKickPlay::updateCherryPickTactics(
 {
     for (auto &tactic : tactics)
     {
-        tactic->updateParams(world);
+        tactic->updateWorldParams(world);
     }
 }
 

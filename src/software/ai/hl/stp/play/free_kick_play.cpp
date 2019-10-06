@@ -219,7 +219,7 @@ void FreeKickPlay::updateCherryPickTactics(
 {
     for (auto &tactic : tactics)
     {
-        tactic->updateParams(world);
+        tactic->updateWorldParams(world);
     }
 }
 
