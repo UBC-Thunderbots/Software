@@ -112,6 +112,7 @@ class FriendlyEvalConfig : public MutableConfig
         return we_suck_param;
     }
 
+
     const std::shared_ptr<Parameter<bool>> weHaveNoChill()
     {
         return we_have_no_chill_param;
@@ -127,7 +128,7 @@ class FriendlyEvalConfig : public MutableConfig
         return internal_param_list;
     }
 
-    const ParameterList& getParamList()
+    const ParameterList& getParameterList()
     {
         return internal_param_list;
     }
@@ -175,7 +176,7 @@ class EnemyEvalConfig : public MutableConfig
         return internal_param_list;
     }
 
-    const ParameterList& getParamList()
+    const ParameterList& getParameterList()
     {
         return internal_param_list;
     }
@@ -228,7 +229,7 @@ class GlobalQualityConfig : public MutableConfig
         return internal_param_list;
     }
 
-    const ParameterList& getParamList()
+    const ParameterList& getParameterList()
     {
         return internal_param_list;
     }

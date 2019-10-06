@@ -58,7 +58,6 @@ cc_test(
     deps = [
         ":config",
         ":parameter",
-        "@g3log//:all",
         "@gtest//:gtest_main",
     ],
 )

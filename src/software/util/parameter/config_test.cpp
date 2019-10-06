@@ -75,6 +75,8 @@ TEST(ConfigTest, TestAutogen)
     onlyNeedParametersFromFriendlyEvalConfig(
         DynamicParametersV2->getFriendlyEvalConfig());
 
+    // Check visitor function above, is is how the visualizer could visit
+    // and set each of the values
     for (auto& v : DynamicParametersV2->getMutableParameterList())
     {
         visit_parameters(v);
