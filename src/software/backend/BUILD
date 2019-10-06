@@ -62,6 +62,20 @@ cc_library(
 )
 
 cc_library(
+    name = "simulator_backend",
+    srcs = ["simulator_backend.cpp"],
+    hdrs = ["simulator_backend.h"],
+    deps = [
+        ":backend",
+        ":backend_factory",
+    ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
+)
+
+cc_library(
     name = "robot_status",
     hdrs = ["robot_status.h"],
     deps = [],
