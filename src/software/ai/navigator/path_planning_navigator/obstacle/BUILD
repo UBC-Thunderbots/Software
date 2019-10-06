@@ -6,9 +6,9 @@ cc_library(
     hdrs = ["obstacle.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:ball",
-        "//software/ai/world:robot",
         "//software/geom",
+        "//software/world:ball",
+        "//software/world:robot",
     ],
 )
 
@@ -27,8 +27,8 @@ cc_library(
     hdrs = ["robot_obstacle.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world",
         "//software/geom",
         "//software/util/parameter:dynamic_parameters",
+        "//software/world",
     ],
 )
