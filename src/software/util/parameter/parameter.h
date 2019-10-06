@@ -7,6 +7,7 @@
 #include <vector>
 
 /**
+ * TODO update this comment
  * This class defines a dynamic parameter, meaning the parameter
  * value can be changed during runtime. Although the class is templated, it is only meant
  * to support the types also supported by the ROS Parameter Server.
@@ -22,6 +23,7 @@ class Parameter
    public:
     /**
      * Constructs a new Parameter
+     * TODO Maybe remove namespaces
      *
      * @param parameter_name The name of the parameter used by dynamic_reconfigure
      * @param parameter_namespace The namespace of the parameter used by
@@ -35,17 +37,8 @@ class Parameter
         this->namespace_ = parameter_namespace;
         this->value_     = default_value;
 
+        // TODO remove registry once Visuzlier uses new structure
         Parameter<T>::registerParameter(this);
-    }
-
-    /**
-     * Returns the global path in the ROS parameter server where this parameter is stored
-     *
-     * @return the global path in the ROS parameter sever where this parameter is stored
-     */
-    const std::string getROSParameterPath() const
-    {
-        return "/" + this->namespace_ + "/" + name();
     }
 
     /**
@@ -67,9 +60,9 @@ class Parameter
      */
     void setValue(const T new_value)
     {
-        std::scoped_lock value_lock(this->value_mutex_);
+        // std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
-        std::scoped_lock callback_lock(this->callback_mutex_);
+        // std::scoped_lock callback_lock(this->callback_mutex_);
         for (auto callback_func : callback_functions)
         {
             callback_func(new_value);
@@ -123,19 +116,6 @@ class Parameter
     static void registerParameter(Parameter<T>* parameter)
     {
         Parameter<T>::getMutableRegistry().emplace_back(parameter);
-    }
-
-    /**
-     * Updates all the Parameters of type T with the latest values from the ROS
-     * Parameter Server
-     */
-    static void updateAllParametersFromROSParameterServer()
-    {
-        for (const auto& param : Parameter<T>::getRegistry())
-        {
-            std::scoped_lock lock(param->value_mutex_);
-            param->updateValueFromROSParameterServer();
-        }
     }
 
    private:
