@@ -60,9 +60,9 @@ class Parameter
      */
     void setValue(const T new_value)
     {
-        // std::scoped_lock value_lock(this->value_mutex_);
+        std::scoped_lock value_lock(this->value_mutex_);
         this->value_ = new_value;
-        // std::scoped_lock callback_lock(this->callback_mutex_);
+        std::scoped_lock callback_lock(this->callback_mutex_);
         for (auto callback_func : callback_functions)
         {
             callback_func(new_value);
