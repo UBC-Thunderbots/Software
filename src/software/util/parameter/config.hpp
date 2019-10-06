@@ -121,10 +121,7 @@ class FriendlyEvalConfig : public MutableConfig
     {
         return "TestConfigA";
     }
-    const ParameterList& getParameterList()
-    {
-        return internal_param_list;
-    }
+
     ParameterList& getMutableParameterList()
     {
         return internal_param_list;
