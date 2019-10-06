@@ -171,9 +171,15 @@ def _cc_stm32h7_binary_impl(ctx):
         user_compile_flags = ctx.attr.copts,
     )
     output_type = "dynamic_library" if ctx.attr.linkshared else "executable"
+
     linkopts = []
     for linkopt in ctx.attr.linkopts:
         linkopts.append(ctx.expand_location(linkopt, targets = [ctx.attr.linker_script]))
+
+    print(ctx.attr)
+
+    print(linkopts)
+    print(ctx.attr.linker_script)
 
     linking_outputs = cc_common.link(
         name = ctx.label.name,
@@ -185,8 +191,7 @@ def _cc_stm32h7_binary_impl(ctx):
         linking_contexts = linking_contexts,
         user_link_flags = linkopts,
         link_deps_statically = ctx.attr.linkstatic,
-        # TODO: uncomment this
-        #additional_inputs = [ctx.attr.linker_script],
+        additional_inputs = [ctx.file.linker_script],
         output_type = output_type,
     )
     files = []
@@ -209,7 +214,11 @@ cc_stm32h7_binary = rule(
         "srcs": attr.label_list(allow_files = [".c"]),
         # TODO: Should not allow headers here
         "hdrs": attr.label_list(allow_files = [".h"]),
-        "linker_script": attr.label(mandatory = True, allow_files = [".ld"]),
+        "linker_script": attr.label(
+            mandatory = True,
+            allow_single_file = True,
+            #allow_files = [".ld"],
+        ),
         "deps": attr.label_list(
             allow_empty = True,
             providers = [CcInfo],
@@ -232,5 +241,4 @@ cc_stm32h7_binary = rule(
     fragments = ["cpp"],
 )
 
-# TODO: linker script? How does that work?
 # TODO: startup_stm32h742xx.s?

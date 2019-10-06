@@ -39,8 +39,7 @@ cc_stm32h7_binary(
     # TODO: why do we need  "-specs=nano.specs"? What does it do?
     linkopts = [
         "-specs=nano.specs",
-        # TODO: put this back in (linker can't find it for now)
-        "-TSTM32H742XGHx_FLASH.ld",
+        "-T$(location //firmware_new/boards/frankie_v1:STM32H742XGHx_FLASH.ld)",
         "-lc",
         "-lm",
         "-lnosys",
