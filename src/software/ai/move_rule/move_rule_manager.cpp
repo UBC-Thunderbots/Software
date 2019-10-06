@@ -7,8 +7,9 @@ std::set<MoveRule> MoveRuleManager::getMoveRules(const GameState &game_state,
 {
     std::set<MoveRule> current_move_rules = getMoveRulesFromGameState(game_state);
     current_whitelisted_rules.clear();
-    tactic.accept(*this); // updates current_whitelisted_rules
-    for (const auto& rule : current_whitelisted_rules){
+    tactic.accept(*this);  // updates current_whitelisted_rules
+    for (const auto &rule : current_whitelisted_rules)
+    {
         current_move_rules.erase(rule);
     }
     return current_move_rules;
