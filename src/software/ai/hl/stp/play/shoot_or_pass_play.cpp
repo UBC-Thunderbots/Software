@@ -33,13 +33,13 @@ bool ShootOrPassPlay::isApplicable(const World &world) const
             use_shoot_or_pass_instead_of_shoot_or_chip.value();
 
     return use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world.ball(), world.friendlyTeam());
+           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (!Evaluation::teamHasPossession(world.ball(), world.enemyTeam()) ||
+           (!Evaluation::teamHasPossession(world.enemyTeam(), world.ball()) ||
             Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 

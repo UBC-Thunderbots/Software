@@ -47,7 +47,7 @@ namespace Evaluation
         }
     }
 
-    bool teamHasPossession(const Ball &ball, const Team &team)
+    bool teamHasPossession(const Team &team, const Ball &ball)
     {
         for (const Robot &robot : team.getAllRobots())
         {
