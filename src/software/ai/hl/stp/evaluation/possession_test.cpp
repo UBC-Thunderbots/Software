@@ -134,8 +134,7 @@ TEST(PossessionEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of
 TEST(PossessionEvaluationTest, team_has_possession_robot_in_control)
 {
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
-    World world = World();
-    Team team   = Team(Duration::fromSeconds(1));
+    Team team = Team(Duration::fromSeconds(1));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -145,16 +144,14 @@ TEST(PossessionEvaluationTest, team_has_possession_robot_in_control)
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     team.updateRobots({robot0, robot1, robot2});
-    world.updateBallState(ball);
 
-    EXPECT_TRUE(Evaluation::teamHasPossession(world, team));
+    EXPECT_TRUE(Evaluation::teamHasPossession(team, ball));
 }
 
 TEST(PossessionEvaluationTest, team_does_not_have_posession)
 {
     Ball ball({-2, 3}, {0, 10}, Timestamp::fromSeconds(0));
-    World world = World();
-    Team team   = Team(Duration::fromSeconds(1));
+    Team team = Team(Duration::fromSeconds(1));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -164,15 +161,14 @@ TEST(PossessionEvaluationTest, team_does_not_have_posession)
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     team.updateRobots({robot0, robot1, robot2});
-    world.updateBallState(ball);
 
-    EXPECT_FALSE(Evaluation::teamHasPossession(world, team));
+
+    EXPECT_FALSE(Evaluation::teamHasPossession(team, ball));
 }
 
 TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
 {
-    Team team   = Team(Duration::fromSeconds(1));
-    World world = World();
+    Team team = Team(Duration::fromSeconds(1));
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(2));
 
     Robot robot0 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
@@ -192,15 +188,13 @@ TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
                        Timestamp::fromSeconds(3));
 
     team.updateRobots({robot0, robot1, robot2});
-    world.updateBallState(ball);
 
-    EXPECT_TRUE(Evaluation::teamHasPossession(world, team));
+    EXPECT_TRUE(Evaluation::teamHasPossession(team, ball));
 }
 
 TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 {
-    Team team   = Team(Duration::fromSeconds(1));
-    World world = World();
+    Team team = Team(Duration::fromSeconds(1));
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
@@ -221,7 +215,6 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 
 
     team.updateRobots({robot0, robot1, robot2});
-    world.updateBallState(ball);
 
-    EXPECT_FALSE(Evaluation::teamHasPossession(world, team));
+    EXPECT_FALSE(Evaluation::teamHasPossession(team, ball));
 }

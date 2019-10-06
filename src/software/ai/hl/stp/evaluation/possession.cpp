@@ -47,7 +47,7 @@ namespace Evaluation
         }
     }
 
-    bool teamHasPossession(const World &world, const Team &team)
+    bool teamHasPossession(const Ball &ball, const Team &team)
     {
         for (const Robot &robot : team.getAllRobots())
         {
@@ -60,7 +60,7 @@ namespace Evaluation
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
                    Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
             {
-                if (robotHasPossession(world.ball(), robot, robot_history_timestamps[i]))
+                if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
                     return true;
                 i++;
             }

@@ -36,7 +36,7 @@ bool CornerKickPlay::isApplicable(const World &world) const
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+           (!Evaluation::teamHasPossession(world.ball(), world.enemyTeam()) ||
             Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
