@@ -135,7 +135,6 @@ class MoveRuleManager : public TacticVisitor
     void visit(const StopTestTactic &tactic) override;
 
    private:
-
     std::function<void(MoveRule)> remove_move_rule;
 
     /**
@@ -144,5 +143,6 @@ class MoveRuleManager : public TacticVisitor
      * @param game_state GameState to generate move rules from
      * @param add_move_rule function used to add rules
      */
-    void addCurrentMoveRulesFromGameState(const GameState &game_state, std::function<void(MoveRule)> add_move_rule);
+    void addCurrentMoveRulesFromGameState(const GameState &game_state,
+                                          std::function<void(MoveRule)> add_move_rule);
 };

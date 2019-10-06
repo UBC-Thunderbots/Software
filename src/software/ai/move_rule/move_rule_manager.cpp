@@ -14,9 +14,7 @@ std::set<MoveRule> MoveRuleManager::getMoveRules(const GameState &game_state,
     addCurrentMoveRulesFromGameState(game_state, add_move_rule);
 
     // only expose removing rules to accept
-    remove_move_rule = [&](MoveRule rule) {
-        current_move_rules.erase(rule);
-    };
+    remove_move_rule = [&](MoveRule rule) { current_move_rules.erase(rule); };
 
     tactic.accept(*this);
     return current_move_rules;
@@ -26,7 +24,8 @@ void MoveRuleManager::visit(const CherryPickTactic &tactic) {}
 
 void MoveRuleManager::visit(const ShadowFreekickerTactic &tactic) {}
 
-void MoveRuleManager::visit(const GoalieTactic &tactic) {
+void MoveRuleManager::visit(const GoalieTactic &tactic)
+{
     remove_move_rule(MoveRule::FRIENDLY_DEFENSE_AREA);
 }
 
@@ -56,7 +55,8 @@ void MoveRuleManager::visit(const MoveTestTactic &tactic) {}
 
 void MoveRuleManager::visit(const StopTestTactic &tactic) {}
 
-void MoveRuleManager::addCurrentMoveRulesFromGameState(const GameState &game_state, std::function<void(MoveRule)> add_move_rule)
+void MoveRuleManager::addCurrentMoveRulesFromGameState(
+    const GameState &game_state, std::function<void(MoveRule)> add_move_rule)
 {
     add_move_rule(MoveRule::FRIENDLY_DEFENSE_AREA);
     add_move_rule(MoveRule::ENEMY_ROBOTS_COLLISION);
