@@ -18,3 +18,12 @@ cc_library(
         "//software/ai/world:game_state",
     ],
 )
+
+cc_test(
+    name = "move_rule_manager_test",
+    srcs = ["move_rule_manager_test.cpp"],
+    deps = [
+        ":move_rule_manager",
+        "@gtest//:gtest_main",
+    ],
+)

@@ -26,6 +26,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a CherryPickTactic to perform an operation.
      *
      * @param tactic The CherryPickTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const CherryPickTactic &tactic) override;
 
@@ -33,6 +35,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a ShadowFreekickerTactic to perform an operation.
      *
      * @param tactic The ShadowFreekickerTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const ShadowFreekickerTactic &tactic) override;
 
@@ -40,6 +44,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a GoalieTactic to perform an operation.
      *
      * @param tactic The GoalieTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const GoalieTactic &tactic) override;
 
@@ -47,6 +53,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a CreaseDefenderTactic to perform an operation.
      *
      * @param tactic The CreaseDefenderTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const CreaseDefenderTactic &tactic) override;
 
@@ -54,6 +62,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a ShadowEnemyTactic to perform an operation.
      *
      * @param tactic The ShadowEnemyTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const ShadowEnemyTactic &tactic) override;
 
@@ -61,6 +71,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a BlockShotPathTactic to perform an operation.
      *
      * @param tactic The BlockShotPathTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const BlockShotPathTactic &tactic) override;
 
@@ -68,6 +80,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a MoveTactic to perform an operation.
      *
      * @param tactic The MoveTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const MoveTactic &tactic) override;
 
@@ -75,6 +89,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a ChipTactic to perform an operation.
      *
      * @param tactic The ChipTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const ChipTactic &tactic) override;
 
@@ -82,6 +98,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a StopTactic to perform an operation.
      *
      * @param tactic The StopTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const StopTactic &tactic) override;
 
@@ -89,6 +107,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a PenaltyKickTactic to perform an operation.
      *
      * @param tactic The PenaltyKickTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const PenaltyKickTactic &tactic) override;
 
@@ -96,6 +116,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a ReceiverTactic to perform an operation.
      *
      * @param tactic The ReceiverTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const ReceiverTactic &tactic) override;
 
@@ -103,6 +125,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a PatrolTactic to perform an operation.
      *
      * @param tactic The PatrolTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const PatrolTactic &tactic) override;
 
@@ -110,6 +134,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a ShootGoalTactic to perform an operation.
      *
      * @param tactic The ShootGoalTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const ShootGoalTactic &tactic) override;
 
@@ -117,6 +143,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a PasserTactic to perform an operation.
      *
      * @param tactic The PasserTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const PasserTactic &tactic) override;
 
@@ -124,6 +152,8 @@ class MoveRuleManager : public TacticVisitor
      * Visits a MoveTestTactic to perform an operation.
      *
      * @param tactic The MoveTestTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const MoveTestTactic &tactic) override;
 
@@ -131,18 +161,18 @@ class MoveRuleManager : public TacticVisitor
      * Visits a StopTestTactic to perform an operation.
      *
      * @param tactic The StopTestTactic to visit
+     *
+     * @modifies current_whitelisted_rules
      */
     void visit(const StopTestTactic &tactic) override;
 
    private:
-    std::function<void(MoveRule)> remove_move_rule;
+    std::set<MoveRule> current_whitelisted_rules;
 
     /**
      * Adds move rules determined from gamestate to current_move_rules
      *
      * @param game_state GameState to generate move rules from
-     * @param add_move_rule function used to add rules
      */
-    void addCurrentMoveRulesFromGameState(const GameState &game_state,
-                                          std::function<void(MoveRule)> add_move_rule);
+    std::set<MoveRule> getMoveRulesFromGameState(const GameState &game_state);
 };

@@ -5,18 +5,12 @@
 std::set<MoveRule> MoveRuleManager::getMoveRules(const GameState &game_state,
                                                  const Tactic &tactic)
 {
-    std::set<MoveRule> current_move_rules;
-
-    // function for adding move rules
-    std::function<void(MoveRule)> add_move_rule = [&](MoveRule rule) {
+    std::set<MoveRule> current_move_rules = getMoveRulesFromGameState(game_state);
+    current_whitelisted_rules.clear();
+    tactic.accept(*this); // updates current_whitelisted_rules
+    for (const auto& rule : current_whitelisted_rules){
         current_move_rules.erase(rule);
-    };
-    addCurrentMoveRulesFromGameState(game_state, add_move_rule);
-
-    // only expose removing rules to accept
-    remove_move_rule = [&](MoveRule rule) { current_move_rules.erase(rule); };
-
-    tactic.accept(*this);
+    }
     return current_move_rules;
 }
 
@@ -26,7 +20,7 @@ void MoveRuleManager::visit(const ShadowFreekickerTactic &tactic) {}
 
 void MoveRuleManager::visit(const GoalieTactic &tactic)
 {
-    remove_move_rule(MoveRule::FRIENDLY_DEFENSE_AREA);
+    current_whitelisted_rules.insert(MoveRule::FRIENDLY_DEFENSE_AREA);
 }
 
 void MoveRuleManager::visit(const CreaseDefenderTactic &tactic) {}
@@ -55,49 +49,51 @@ void MoveRuleManager::visit(const MoveTestTactic &tactic) {}
 
 void MoveRuleManager::visit(const StopTestTactic &tactic) {}
 
-void MoveRuleManager::addCurrentMoveRulesFromGameState(
-    const GameState &game_state, std::function<void(MoveRule)> add_move_rule)
+std::set<MoveRule> MoveRuleManager::getMoveRulesFromGameState(const GameState &game_state)
 {
-    add_move_rule(MoveRule::FRIENDLY_DEFENSE_AREA);
-    add_move_rule(MoveRule::ENEMY_ROBOTS_COLLISION);
+    std::set<MoveRule> move_rules;
+    move_rules.insert(MoveRule::FRIENDLY_DEFENSE_AREA);
+    move_rules.insert(MoveRule::ENEMY_ROBOTS_COLLISION);
 
     if (game_state.stayAwayFromBall())
     {
-        add_move_rule(MoveRule::HALF_METER_AROUND_BALL);
+        move_rules.insert(MoveRule::HALF_METER_AROUND_BALL);
     }
 
     if (game_state.isPenalty())
     {
         if (game_state.isOurPenalty())
         {
-            add_move_rule(MoveRule::ENEMY_HALF);
+            move_rules.insert(MoveRule::ENEMY_HALF);
         }
         else
         {
             // Is their penalty
-            add_move_rule(MoveRule::FRIENDLY_HALF);
+            move_rules.insert(MoveRule::FRIENDLY_HALF);
         }
     }
     else if (game_state.isKickoff())
     {
-        add_move_rule(MoveRule::HALF_METER_AROUND_BALL);
-        add_move_rule(MoveRule::CENTER_CIRCLE);
-        add_move_rule(MoveRule::ENEMY_HALF);
+        move_rules.insert(MoveRule::HALF_METER_AROUND_BALL);
+        move_rules.insert(MoveRule::CENTER_CIRCLE);
+        move_rules.insert(MoveRule::ENEMY_HALF);
     }
     else
     {
         if (game_state.stayAwayFromBall() || game_state.isOurKickoff())
         {
-            add_move_rule(MoveRule::HALF_METER_AROUND_BALL);
+            move_rules.insert(MoveRule::HALF_METER_AROUND_BALL);
         }
 
         if (game_state.isOurPenalty())
         {
-            add_move_rule(MoveRule::ENEMY_DEFENSE_AREA);
+            move_rules.insert(MoveRule::ENEMY_DEFENSE_AREA);
         }
         else
         {
-            add_move_rule(MoveRule::INFLATED_ENEMY_DEFENSE_AREA);
+            move_rules.insert(MoveRule::INFLATED_ENEMY_DEFENSE_AREA);
         }
     }
+
+    return move_rules;
 }
