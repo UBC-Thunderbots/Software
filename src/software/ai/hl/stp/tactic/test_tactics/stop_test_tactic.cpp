@@ -27,6 +27,6 @@ void StopTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
 void StopTestTactic::accept(TacticVisitor &visitor) const
 {
-    // WARNING: Tactic Vistor does not implement visiting this Tactic
-    assert(false);
+    throw std::invalid_argument(
+        "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
 }

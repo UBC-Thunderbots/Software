@@ -147,9 +147,9 @@ class Tactic
     void removeBlacklistedAvoidArea(AvoidArea area);
 
     /**
-     * Accepts an Tactic Visitor and calls the visit function
+     * Accepts a Tactic Visitor and calls the visit function on itself
      *
-     * @param visitor An Tactic Visitor
+     * @param visitor A Tactic Visitor
      */
     virtual void accept(TacticVisitor &visitor) const = 0;
 

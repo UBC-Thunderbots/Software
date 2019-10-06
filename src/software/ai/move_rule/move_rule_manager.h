@@ -25,16 +25,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a CherryPickTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The CherryPickTactic to visit
      */
     void visit(const CherryPickTactic &tactic) override;
 
     /**
      * Visits a ShadowFreekickerTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The ShadowFreekickerTactic to visit
      */
@@ -43,16 +39,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a GoalieTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The GoalieTactic to visit
      */
     void visit(const GoalieTactic &tactic) override;
 
     /**
      * Visits a CreaseDefenderTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The CreaseDefenderTactic to visit
      */
@@ -61,16 +53,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a ShadowEnemyTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The ShadowEnemyTactic to visit
      */
     void visit(const ShadowEnemyTactic &tactic) override;
 
     /**
      * Visits a BlockShotPathTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The BlockShotPathTactic to visit
      */
@@ -79,16 +67,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a MoveTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The MoveTactic to visit
      */
     void visit(const MoveTactic &tactic) override;
 
     /**
      * Visits a ChipTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The ChipTactic to visit
      */
@@ -97,16 +81,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a StopTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The StopTactic to visit
      */
     void visit(const StopTactic &tactic) override;
 
     /**
      * Visits a PenaltyKickTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The PenaltyKickTactic to visit
      */
@@ -115,16 +95,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a ReceiverTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The ReceiverTactic to visit
      */
     void visit(const ReceiverTactic &tactic) override;
 
     /**
      * Visits a PatrolTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The PatrolTactic to visit
      */
@@ -133,16 +109,12 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a ShootGoalTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The ShootGoalTactic to visit
      */
     void visit(const ShootGoalTactic &tactic) override;
 
     /**
      * Visits a PasserTactic to perform an operation.
-     *
-     * @modifies current_move_rules
      *
      * @param tactic The PasserTactic to visit
      */
@@ -151,8 +123,6 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a MoveTestTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The MoveTestTactic to visit
      */
     void visit(const MoveTestTactic &tactic) override;
@@ -160,21 +130,19 @@ class MoveRuleManager : public TacticVisitor
     /**
      * Visits a StopTestTactic to perform an operation.
      *
-     * @modifies current_move_rules
-     *
      * @param tactic The StopTestTactic to visit
      */
     void visit(const StopTestTactic &tactic) override;
 
    private:
-    std::set<MoveRule> current_move_rules;
+
+    std::function<void(MoveRule)> remove_move_rule;
 
     /**
      * Adds move rules determined from gamestate to current_move_rules
      *
-     * @modifies current_move_rules
-     *
-     * @param tactic The StopTestTactic to visit
+     * @param game_state GameState to generate move rules from
+     * @param add_move_rule function used to add rules
      */
-    void addCurrentMoveRulesFromGameState(const GameState &game_state);
+    void addCurrentMoveRulesFromGameState(const GameState &game_state, std::function<void(MoveRule)> add_move_rule);
 };

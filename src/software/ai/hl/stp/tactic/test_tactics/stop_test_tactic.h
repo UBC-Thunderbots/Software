@@ -36,6 +36,13 @@ class StopTestTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
+    /*
+     * Throws std::invalid_argument always
+     *
+     * @param a visitor that is ignored
+     *
+     * @throws std::invalid_argument always
+     */
     void accept(TacticVisitor& visitor) const override;
 
    private:
