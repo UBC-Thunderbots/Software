@@ -161,9 +161,7 @@ bool collinear(const Point &a, const Point &b, const Point &c);
  *
  * @param radius the radii of the obstacles.
  *
- * @return The Shot with the best point to aim for in the target area and the size of the
- * open interval through which a shot from the current point to the best point would go.
- * If no shot could be found, returns std::nullopt
+ * @return A feasible shot or std::nullopt if there is no feasible shot
  */
 std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const Point &p2,
                                       const std::vector<Point> &obstacles,
@@ -187,12 +185,9 @@ std::optional<Shot> angleSweepCircles(const Point &src, const Point &p1, const P
  *
  * @param radius the radii of the obstacles.
  *
- * @return A vector of possible (ie. not blocked) Shots, each with a point to shoot to in
- * the target area,  and the size of the open interval for that point. ie. for a return
- * point `p` and angle `a`, if `v` is a vector from `src` to `p`, then the open interval
- * through which we are shooting is from `angle(v) - a/2` to `angle(v) + a/2` If lines src
+ * @return A vector of possible (ie. not blocked) Shots. If lines src
  * -> p1 and src -> p2 are collinear and src -> p1 is not blocked by an obstacle, the
- * result will contain a single pair of the direction of src -> p1 and zero angle if the
+ * result will contain a single Shot of the direction of src -> p1 and zero angle if the
  * line is not blocked by an obstacle. An empty vector is returned if the preconditions
  * aren't satisfied.
  */

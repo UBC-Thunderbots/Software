@@ -93,7 +93,7 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             if (best_enemy_shot_opt)
             {
                 enemy_shot_vector =
-                    best_enemy_shot_opt->getPoint() - enemy_robot.position();
+                    best_enemy_shot_opt->getPointToShootAt() - enemy_robot.position();
             }
             else
             {

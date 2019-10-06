@@ -103,7 +103,7 @@ namespace Evaluation
         Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), shot_origin,
                                             field.friendlyGoalpostNeg())
                                .abs();
-        return shot.getAngle().toDegrees() / goal_angle.toDegrees();
+        return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 
     double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_origin,
@@ -112,6 +112,6 @@ namespace Evaluation
         Angle goal_angle = acuteVertexAngle(field.enemyGoalpostPos(), shot_origin,
                                             field.enemyGoalpostNeg())
                                .abs();
-        return shot.getAngle().toDegrees() / goal_angle.toDegrees();
+        return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 }  // namespace Evaluation

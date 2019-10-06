@@ -109,7 +109,7 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
         if (!isEnemyAboutToStealBall())
         {
             yield(kick_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->getPoint(),
+                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
                 BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
         }
         else
@@ -119,7 +119,8 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
             yield(chip_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->getPoint(), CHIP_DIST));
+                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
+                CHIP_DIST));
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
@@ -138,7 +139,7 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
             field, friendly_team, enemy_team, ball.position());
-        if (shot_target && shot_target->getAngle() > min_net_open_angle)
+        if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
             // shot is entirely blocked

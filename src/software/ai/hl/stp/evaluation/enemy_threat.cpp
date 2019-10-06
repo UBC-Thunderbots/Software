@@ -250,8 +250,8 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
                                                                      enemy_team, robot);
         if (best_shot_data)
         {
-            best_shot_angle  = best_shot_data->getAngle();
-            best_shot_target = best_shot_data->getPoint();
+            best_shot_angle  = best_shot_data->getOpenAngle();
+            best_shot_target = best_shot_data->getPointToShootAt();
         }
 
         // Set default values. If the robot can't be passed to we set the number of passes

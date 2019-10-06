@@ -2,12 +2,12 @@
 
 Shot::Shot(Point point, Angle angle) : point(point), angle(angle) {}
 
-Point Shot::getPoint() const
+Point Shot::getPointToShootAt() const
 {
     return point;
 }
 
-Angle Shot::getAngle() const
+Angle Shot::getOpenAngle() const
 {
     return angle;
 }
