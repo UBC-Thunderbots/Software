@@ -21,18 +21,18 @@ class BlockShotPathTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this BlockShotPathTactic.
+     * Updates the world parameters for this BlockShotPathTactic.
      *
      * @param enemy_robot The enemy robot to block from shooting on the friendly net
      */
-    void updateParams(const Robot& enemy_robot);
+    void updateWorldParams(const Robot& enemy_robot);
 
     /**
-     * Updates the parameters for this BlockShotPathTactic.
+     * Updates the world parameters for this BlockShotPathTactic.
      *
      * @param shot_origin The origin of the shot to block
      */
-    void updateParams(const Point& shot_origin);
+    void updateWorldParams(const Point& shot_origin);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
