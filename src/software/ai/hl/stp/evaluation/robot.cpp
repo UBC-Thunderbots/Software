@@ -17,7 +17,8 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot, Timestamp timestamp)
+bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
+                                    Timestamp timestamp)
 {
     // copied almost verbatim from legacy code
     Point robot_pos_at_time;
@@ -41,8 +42,7 @@ bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot, Timest
     if (ball.getHistoryIndexFromTimestamp(timestamp))
     {
         ball_pos_at_time =
-                ball.getPreviousPositions().at(
-                        *ball.getHistoryIndexFromTimestamp(timestamp));
+            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
     }
     else
     {
@@ -67,32 +67,37 @@ bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot, Timest
     }
 }
 
-bool Evaluation::robotBeingPassedTo(const World &world, const Robot &robot,
-                                    Timestamp timestamp) {
+bool Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
+                                    Timestamp timestamp)
+{
     Point robot_pos, ball_pos, ball_velocity;
-    if (robot.getHistoryIndexFromTimestamp(timestamp)
-        && world.ball().getHistoryIndexFromTimestamp(timestamp)) {
+    if (robot.getHistoryIndexFromTimestamp(timestamp) &&
+        world.ball().getHistoryIndexFromTimestamp(timestamp))
+    {
         robot_pos = robot.getPreviousPositions().at(
-                *robot.getHistoryIndexFromTimestamp(timestamp));
+            *robot.getHistoryIndexFromTimestamp(timestamp));
         ball_pos = world.ball().getPreviousPositions().at(
-                *world.ball().getHistoryIndexFromTimestamp(timestamp));
+            *world.ball().getHistoryIndexFromTimestamp(timestamp));
         ball_velocity = world.ball().getPreviousVelocities().at(
-                *world.ball().getHistoryIndexFromTimestamp(timestamp));
-    } else {
-        robot_pos = robot.position();
-        ball_pos = world.ball().position();
+            *world.ball().getHistoryIndexFromTimestamp(timestamp));
+    }
+    else
+    {
+        robot_pos     = robot.position();
+        ball_pos      = world.ball().position();
         ball_velocity = world.ball().velocity();
     }
 
     auto ball_to_robot_vector = robot_pos - ball_pos;
     // angle deviation from the axis of the pass
-    auto ball_angle_deviation = ball_to_robot_vector.orientation().minDiff(
-            ball_velocity.orientation());
+    auto ball_angle_deviation =
+        ball_to_robot_vector.orientation().minDiff(ball_velocity.orientation());
     // pass axis velocity
-    double pass_axis_speed = ball_velocity.project(
-            ball_to_robot_vector.norm()).len();
-    return (ball_angle_deviation < Angle::ofDegrees(
-            Util::DynamicParameters::Evaluation::Possession::passed_to_angle_tolerance.value()))
-            && pass_axis_speed >
-                Util::DynamicParameters::Evaluation::Possession::min_pass_speed.value();
+    double pass_axis_speed = ball_velocity.project(ball_to_robot_vector.norm()).len();
+    return (ball_angle_deviation <
+            Angle::ofDegrees(
+                Util::DynamicParameters::Evaluation::Possession::passed_to_angle_tolerance
+                    .value())) &&
+           pass_axis_speed >
+               Util::DynamicParameters::Evaluation::Possession::min_pass_speed.value();
 };

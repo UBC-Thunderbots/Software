@@ -13,9 +13,9 @@ namespace Evaluation
      * @return the robot that either has the ball, or is the closest to having it. If the
      * team has no robots, std::nullopt is returned
      */
-    std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
-                                                             const Ball &ball,
-                                                             const Field &field);
+    std::optional<Robot> getRobotWithEffectiveBallPossession(const Team& team,
+                                                             const Ball& ball,
+                                                             const Field& field);
     /**
      * Return true if the provided team has possession of the ball. A team is considered
      * to have possession if any robot on the team has had possession within the last

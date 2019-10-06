@@ -15,7 +15,8 @@
 namespace Passing
 {
     // The types of passes we can perform
-    enum PassType {
+    enum PassType
+    {
         // Receive the pass and keep posession by just dribbling it
         RECEIVE_AND_DRIBBLE,
         // One-touch shot where the receiving robot immediately takes a shot on net

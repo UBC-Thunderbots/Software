@@ -135,7 +135,7 @@ TEST(PossessionEvaluationTest, team_has_possession_robot_in_control)
 {
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
     World world = World();
-    Team team = Team(Duration::fromSeconds(1));
+    Team team   = Team(Duration::fromSeconds(1));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -154,7 +154,7 @@ TEST(PossessionEvaluationTest, team_does_not_have_posession)
 {
     Ball ball({-2, 3}, {0, 10}, Timestamp::fromSeconds(0));
     World world = World();
-    Team team = Team(Duration::fromSeconds(1));
+    Team team   = Team(Duration::fromSeconds(1));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -171,7 +171,7 @@ TEST(PossessionEvaluationTest, team_does_not_have_posession)
 
 TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
 {
-    Team team = Team(Duration::fromSeconds(1));
+    Team team   = Team(Duration::fromSeconds(1));
     World world = World();
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(2));
 
@@ -199,7 +199,7 @@ TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
 
 TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 {
-    Team team = Team(Duration::fromSeconds(1));
+    Team team   = Team(Duration::fromSeconds(1));
     World world = World();
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
 

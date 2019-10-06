@@ -4,8 +4,8 @@
 #include <random>
 #include <thread>
 
-#include "software/ai/passing/pass.h"
 #include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/ai/world/world.h"
 #include "software/util/optimization/gradient_descent_optimizer.h"
@@ -69,7 +69,8 @@ namespace Passing
          *                  but it is not guaranteed, and can change during pass
          *                  execution because of Passer/Receiver decisions
          */
-        explicit PassGenerator(const World& world, const Point& passer_point, const PassType& pass_type);
+        explicit PassGenerator(const World& world, const Point& passer_point,
+                               const PassType& pass_type);
 
         /**
          * Updates the world
@@ -211,7 +212,7 @@ namespace Passing
          * @return A value in [0,1] representing the quality of the pass with 1 being the
          *         best pass and 0 being the worst pass
          */
-        double ratePass(const Pass &pass);
+        double ratePass(const Pass& pass);
 
         /**
          * Updates the passer point of all passes that we're currently optimizing

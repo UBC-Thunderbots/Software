@@ -2,6 +2,7 @@
 
 #include <g3log/g3log.hpp>
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
@@ -13,7 +14,6 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/util/parameter/dynamic_parameters.h"
-#include "shared/constants.h"
 
 using namespace Passing;
 

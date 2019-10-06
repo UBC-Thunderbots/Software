@@ -5,9 +5,9 @@
 
 #include "software/ai/passing/evaluation.h"
 
+#include <g3log/g3log.hpp>
 #include <numeric>
 
-#include <g3log/g3log.hpp>
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/pass.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
@@ -18,9 +18,8 @@ using namespace Passing;
 using namespace AI::Evaluation;
 
 double Passing::ratePass(const World& world, const Passing::Pass& pass,
-                             const std::optional<Rectangle>& target_region,
-                             std::optional<unsigned int> passer_robot_id,
-                             PassType pass_type)
+                         const std::optional<Rectangle>& target_region,
+                         std::optional<unsigned int> passer_robot_id, PassType pass_type)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());

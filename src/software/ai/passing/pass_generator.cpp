@@ -9,7 +9,8 @@
 using namespace Passing;
 using namespace Util::DynamicParameters::Passing;
 
-PassGenerator::PassGenerator(const World& world, const Point& passer_point, const PassType& pass_type)
+PassGenerator::PassGenerator(const World& world, const Point& passer_point,
+                             const PassType& pass_type)
     : updated_world(world),
       world(world),
       passer_robot_id(std::nullopt),
@@ -249,7 +250,7 @@ void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
     }
 }
 
-double PassGenerator::ratePass(const Pass &pass)
+double PassGenerator::ratePass(const Pass& pass)
 {
     // Take ownership of world, target_region, passer_robot_id for the duration of this
     // function

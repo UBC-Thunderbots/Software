@@ -1,11 +1,11 @@
 #pragma once
 
 #include "software/ai/hl/stp/play/play.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/patrol_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/patrol_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 
@@ -27,7 +27,7 @@ class ShootOrPassPlay : public Play
 
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 
-private:
+   private:
     // How close each of our patrol tactics must be to each of the points in their
     // route before progressing on the next one
     static constexpr double AT_PATROL_POINT_TOLERANCE = 0.3;
@@ -40,7 +40,7 @@ private:
      * @param tactics
      */
     void updateCherryPickTactics(
-            std::array<std::shared_ptr<CherryPickTactic>, 2> tactics);
+        std::array<std::shared_ptr<CherryPickTactic>, 2> tactics);
 
     /**
      * Update the given shoot goal tactic
@@ -61,7 +61,8 @@ private:
      *
      * @param crease_defenders The defenders to update
      */
-    void updateCreaseDefenderTactics(std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
+    void updateCreaseDefenderTactics(
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
 
     /**
      * Updates the given goalie tactics

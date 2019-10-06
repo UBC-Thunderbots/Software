@@ -6,8 +6,8 @@
 #include "software/ai/hl/stp/evaluation/ball.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/passing/pass_generator.h"
@@ -16,9 +16,7 @@ using namespace Passing;
 
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
-CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
-{
-}
+CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
 
 std::string CornerKickPlay::getName() const
 {
@@ -38,8 +36,8 @@ bool CornerKickPlay::isApplicable(const World &world) const
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-    (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
-                 Evaluation::teamPassInProgress(world, world.friendlyTeam()));
+           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -129,10 +127,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Target any pass in the enemy half of the field, shifted up by 1 meter
     // from the center line
-    pass_generator.setTargetRegion(Rectangle(
-            Point(1, world.field().width()/2),
-            world.field().enemyCornerNeg()
-            ));
+    pass_generator.setTargetRegion(
+        Rectangle(Point(1, world.field().width() / 2), world.field().enemyCornerNeg()));
 
     std::pair<Pass, double> best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();
