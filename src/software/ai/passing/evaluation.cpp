@@ -74,7 +74,7 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
                            pass_time_offset_quality * pass_speed_quality;
             break;
         default:
-            LOG(FATAL) << "Unhandled pass type given to `ratePass`";
+            throw std::invalid_argument("Unhandled pass type given to `ratePass`");
     }
 
     return pass_quality;

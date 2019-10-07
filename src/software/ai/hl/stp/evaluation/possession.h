@@ -28,5 +28,14 @@ namespace Evaluation
      */
     bool teamHasPossession(const Team& team, const Ball& ball);
 
+    /**
+     * Return true if the provided team is the process of passing to another robot.
+     * This is determined by checking the angle deviation of the ball velocity vector
+     * off of the robot the ball is headed towards, and the speed of the ball.
+     *
+     * @param world The world
+     * @param team The team containing the robots to check for passes
+     * @return true if the team is in the process of passing, false otherwise
+     */
     bool teamPassInProgress(const World& world, const Team& team);
 }  // namespace Evaluation

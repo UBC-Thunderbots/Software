@@ -10,7 +10,7 @@
 #include "software/ai/passing/pass_generator.h"
 
 /**
- * An example Play that moves the robots in a circle around the ball
+ * Play that tries to find a shot on net, passes if it couldn't.
  */
 class ShootOrPassPlay : public Play
 {
