@@ -127,9 +127,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
-        chip_tactic->updateWorldParams(world.ball());
-        chip_tactic->updateControlParams(
-            world.field().centerPoint(),
+        chip_tactic->updateWorldParams(
+            world.ball(), world.field().centerPoint(),
             world.field().centerPoint() + Point(world.field().length() / 4, 0),
             world.field().length() / 2);
         result.emplace_back(chip_tactic);
