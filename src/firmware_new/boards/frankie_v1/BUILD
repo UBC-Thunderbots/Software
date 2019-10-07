@@ -1,21 +1,5 @@
 load("//firmware_new:rules.bzl", "cc_stm32h7_binary", "cc_stm32h7_hal_library")
 
-#cc_stm32_h7_binary(
-#    name = "frankie_v1",
-#    srcs = glob([
-#        "*.c",
-#        "*.h",
-#    ]),
-#    hal_config_files = glob(["*.h"]),
-#)
-
-#cc_stm32h7_binary(
-#    name = "frankie_v1_main",
-#    deps = [
-#        ":frankie_v1_hal",
-#    ],
-#)
-
 # TODO: do we need custom flags for this?
 # TODO: how to enforce compiler???
 # TODO: probably want a custom rule, or at least a macro for this
@@ -32,22 +16,22 @@ cc_stm32h7_binary(
         "main.h",
         "stm32h7xx_it.h",
     ],
-    copts = [
-        "-DSTM32H743xx",
-    ],
     linker_script = "STM32H742XGHx_FLASH.ld",
-    # TODO: why do we need  "-specs=nano.specs"? What does it do?
-    linkopts = [
-        "-specs=nano.specs",
-        "-T$(location //firmware_new/boards/frankie_v1:STM32H742XGHx_FLASH.ld)",
-        "-lc",
-        "-lm",
-        "-lnosys",
-    ],
+    processor = "STM32H743xx",
     deps = [
         ":devices_vector_table",
         ":frankie_v1_hal",
     ],
+)
+
+# TODO: need to move this into the custom rule, we need a ".bin" to flash
+genrule(
+    name = "asdf",
+    srcs = ["frankie_v1_main"],
+    outs = ["frankie_v1_main.bin"],
+    cmd = "$(location @com_arm_developer_gcc//:objcopy) -O binary $< $@",
+    output_to_bindir = True,
+    tools = ["@com_arm_developer_gcc//:objcopy"],
 )
 
 cc_library(

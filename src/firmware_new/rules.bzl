@@ -1,5 +1,7 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
+# TODO: remove all debug print statements
+
 # TODO: Do we need this?
 MyCCompileInfo = provider(doc = "", fields = ["object"])
 
@@ -134,6 +136,7 @@ cc_stm32h7_hal_library = rule(
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
         "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
         # TODO: check if using this means we don't need to specify a cpu/toolchain on the command line
+        # TODO: is this doing anything?
         "_compiler": attr.label(
             default = Label("//tools/cc_toolchain:gcc-stm32h7"),
             allow_single_file = True,
@@ -168,9 +171,8 @@ def _cc_stm32h7_binary_impl(ctx):
         srcs = ctx.files.srcs,
         private_hdrs = ctx.files.hdrs,
         compilation_contexts = compilation_contexts,
-        user_compile_flags = ctx.attr.copts,
+        user_compile_flags = ctx.attr.copts + ["-D{}".format(ctx.attr.processor), "-DUSE_HAL_DRIVER"],
     )
-    output_type = "dynamic_library" if ctx.attr.linkshared else "executable"
 
     linkopts = []
     for linkopt in ctx.attr.linkopts:
@@ -181,8 +183,17 @@ def _cc_stm32h7_binary_impl(ctx):
     print(linkopts)
     print(ctx.attr.linker_script)
 
+    linkopts += [
+        "-T{}".format(ctx.file.linker_script.path),
+        # TODO: why do we need  "-specs=nano.specs"? What does it do?
+        "-specs=nano.specs",
+        "-lc",
+        "-lm",
+        "-lnosys",
+    ]
+
     linking_outputs = cc_common.link(
-        name = ctx.label.name,
+        name = "{}.elf".format(ctx.label.name),
         actions = ctx.actions,
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
@@ -190,21 +201,25 @@ def _cc_stm32h7_binary_impl(ctx):
         compilation_outputs = compilation_outputs,
         linking_contexts = linking_contexts,
         user_link_flags = linkopts,
-        link_deps_statically = ctx.attr.linkstatic,
+        link_deps_statically = True,
         additional_inputs = [ctx.file.linker_script],
-        output_type = output_type,
+        output_type = "executable",
     )
-    files = []
-    if output_type == "executable":
-        files.append(linking_outputs.executable)
-    elif output_type == "dynamic_library":
-        files.append(linking_outputs.library_to_link.dynamic_library)
-        files.append(linking_outputs.library_to_link.resolved_symlink_dynamic_library)
+
+    elf_file = linking_outputs.executable
+
+    #    bin_file = ctx.actions.declare_file("{}.bin".format(ctx.label.name))
+    #
+    #    ctx.actions.run_shell(
+    #        inputs = [elf_file],
+    #        outputs = [bin_file],
+    #        tools = [@com_arm_developer_gcc//:objcopy],
+    #        command = "$(location @com_arm_developer_gcc//:objcopy) -O binary $< $@",
+    #    )
 
     return [
         DefaultInfo(
-            files = depset(_filter_none(files)),
-            runfiles = ctx.runfiles(files = ctx.files.data),
+            files = depset(_filter_none([elf_file])),
         ),
     ]
 
@@ -217,7 +232,6 @@ cc_stm32h7_binary = rule(
         "linker_script": attr.label(
             mandatory = True,
             allow_single_file = True,
-            #allow_files = [".ld"],
         ),
         "deps": attr.label_list(
             allow_empty = True,
@@ -229,9 +243,9 @@ cc_stm32h7_binary = rule(
         ),
         "linkopts": attr.string_list(),
         "copts": attr.string_list(),
-        "linkstatic": attr.bool(default = True),
-        "linkshared": attr.bool(default = False),
         "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
+        "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
+        # TODO: is this doing anything?
         "_compiler": attr.label(
             default = Label("//tools/cc_toolchain:gcc-stm32h7"),
             allow_single_file = True,
@@ -240,5 +254,3 @@ cc_stm32h7_binary = rule(
     },
     fragments = ["cpp"],
 )
-
-# TODO: startup_stm32h742xx.s?
