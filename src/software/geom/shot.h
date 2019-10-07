@@ -9,7 +9,7 @@ class Shot
      * Creates a shot with the given target and angle
      *
      * @param point The target to shoot at
-     * @param angle The angle between the obstacles on either side of the shot vector
+     * @param angle The angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
      *
      */
     Shot(Point point, Angle angle);
@@ -21,8 +21,8 @@ class Shot
     Point getPointToShootAt() const;
 
     /**
-     * Returns an angle between the obstacles on either side of the shot vector.
-     * @return an angle between the obstacles on either side of the shot vector.
+     * Returns the angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
+     * @return the angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
      */
     Angle getOpenAngle() const;
 
@@ -34,7 +34,20 @@ class Shot
     Point point;
 
     /**
-     * The angle between the obstacles on either side of the shot vector
+     * The angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
+     *
+                             XXXXO - Obstacle
+                         XXXX    |
+                     XXXX        |
+                 XXXX            |
+        Robot - R ============== T - Target
+                 XXXX            |
+                     XXXX        |
+                         XXXX    |
+                             XXXXO - Obstacle
+
+        The angle formed by '|' in between the obstacles
+        '=' represents the shot vector
      *
      */
     Angle angle;
