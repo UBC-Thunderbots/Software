@@ -22,9 +22,9 @@ std::string PatrolTactic::getName() const
     return "Patrol Tactic";
 }
 
-void PatrolTactic::updateParams(Angle orientation_at_patrol_points)
+void PatrolTactic::updateWorldParams(Angle orientation_at_patrol_points)
 {
-    // Update the parameters stored by this Tactic
+    // Update world the parameters stored by this Tactic
     this->orientation_at_patrol_points = orientation_at_patrol_points;
 }
 

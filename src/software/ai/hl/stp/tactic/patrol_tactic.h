@@ -25,12 +25,12 @@ class PatrolTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this PatrolTactic.
+     * Updates the world parameters for this PatrolTactic.
      *
      * @param orientation_at_patrol_points The orientation the robot
      * should have while patrolling
      */
-    void updateParams(Angle orientation_at_patrol_points);
+    void updateWorldParams(Angle orientation_at_patrol_points);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
