@@ -69,7 +69,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
     // we're at the target position
     for (int i = 0; i < 5; i++)
     {
-        tactic.updateParams(friendly_team, enemy_team, pass, ball);
+        tactic.updateWorldParams(friendly_team, enemy_team, pass, ball);
 
         Angle shot_dir = (field.enemyGoal() - receiver.position()).orientation();
 
@@ -233,7 +233,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_received)
                      Vector(receiver.orientation().cos(), receiver.orientation().sin())
                          .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS);
     ball = Ball(ball_pos, {-1, 1}, Timestamp::fromSeconds(5));
-    tactic.updateParams(friendly_team, enemy_team, pass, ball);
+    tactic.updateWorldParams(friendly_team, enemy_team, pass, ball);
 
     // Since we've received the ball, we shouldn't yield anything
     EXPECT_FALSE(tactic.getNextIntent());

@@ -27,10 +27,10 @@ std::string ReceiverTactic::getName() const
     return "Receiver Tactic";
 }
 
-void ReceiverTactic::updateParams(const Team& updated_friendly_team,
-                                  const Team& updated_enemy_team,
-                                  const Passing::Pass& updated_pass,
-                                  const Ball& updated_ball)
+void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
+                                       const Team& updated_enemy_team,
+                                       const Passing::Pass& updated_pass,
+                                       const Ball& updated_ball)
 {
     this->friendly_team = updated_friendly_team;
     this->enemy_team    = updated_enemy_team;

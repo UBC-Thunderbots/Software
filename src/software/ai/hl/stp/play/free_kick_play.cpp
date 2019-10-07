@@ -201,8 +201,8 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             crease_defender_right->updateWorldParams(
                 world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             passer->updateWorldParams(pass, world.ball());
-            receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
-                                   world.ball());
+            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(), pass,
+                                        world.ball());
             yield({passer, receiver, crease_defender_left, crease_defender_right});
         } while (!receiver->done());
     }
