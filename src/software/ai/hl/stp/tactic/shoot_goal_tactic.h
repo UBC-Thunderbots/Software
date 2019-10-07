@@ -34,19 +34,19 @@ class ShootGoalTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this ShootGoalTactic
+     * Updates the world parameters for this ShootGoalTactic
      *
      * @param field The field being played on
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
      * @param ball The ball
      */
-    void updateParams(const Field& field, const Team& friendly_team,
-                      const Team& enemy_team, const Ball& ball);
+    void updateWorldParams(const Field& field, const Team& friendly_team,
+                           const Team& enemy_team, const Ball& ball);
 
 
     /**
-     * Updates the parameters for this ShootGoalTactic
+     * Updates the world parameters for this ShootGoalTactic
      *
      * @param field The field being played on
      * @param friendly_team The friendly team
@@ -56,9 +56,9 @@ class ShootGoalTactic : public Tactic
      * unable to shoot and is in danger of losing the ball to an enemy. If this value is
      * not provided, the point defaults to the enemy goal
      */
-    void updateParams(const Field& field, const Team& friendly_team,
-                      const Team& enemy_team, const Ball& ball,
-                      std::optional<Point> chip_target);
+    void updateWorldParams(const Field& field, const Team& friendly_team,
+                           const Team& enemy_team, const Ball& ball,
+                           std::optional<Point> chip_target);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

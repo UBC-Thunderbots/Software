@@ -236,8 +236,8 @@ void FreeKickPlay::updateAlignToBallTactic(
 
 void FreeKickPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
 {
-    shoot_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                               world.ball());
+    shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
+                                    world.enemyTeam(), world.ball());
 }
 
 void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
