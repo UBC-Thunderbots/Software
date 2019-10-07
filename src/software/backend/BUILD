@@ -68,6 +68,7 @@ cc_library(
     deps = [
         ":backend",
         ":backend_factory",
+        "//software/world",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in

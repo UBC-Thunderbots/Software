@@ -2,7 +2,7 @@
 
 #include <mutex>
 
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 #include "software/backend/backend.h"
 
 class SimulatorBackend : public Backend
