@@ -151,7 +151,7 @@ TEST(PasserTacticTest, passer_in_position_to_kick_pass_started)
 
     // Ball starts moving as if we've kicked it
     ball = Ball({0, 0}, {0, -2}, Timestamp::fromSeconds(5.1));
-    tactic.updateParams(pass, ball);
+    tactic.updateWorldParams(pass, ball);
 
     // We need to try to get the next the intent to make the tactic finish
     tactic.getNextIntent();

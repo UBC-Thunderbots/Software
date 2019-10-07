@@ -24,7 +24,7 @@ std::string PasserTactic::getName() const
     return "Passer Tactic";
 }
 
-void PasserTactic::updateParams(const Pass& updated_pass, const Ball& updated_ball)
+void PasserTactic::updateWorldParams(const Pass& updated_pass, const Ball& updated_ball)
 {
     this->pass = updated_pass;
     this->ball = updated_ball;
