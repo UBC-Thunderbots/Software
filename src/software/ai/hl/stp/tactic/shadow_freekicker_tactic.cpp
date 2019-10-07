@@ -22,7 +22,7 @@ std::string ShadowFreekickerTactic::getName() const
     return "Shadow Freekick Tactic";
 }
 
-void ShadowFreekickerTactic::updateParams(Team enemy_team, Ball ball)
+void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
 {
     this->enemy_team = enemy_team;
     this->ball       = ball;
