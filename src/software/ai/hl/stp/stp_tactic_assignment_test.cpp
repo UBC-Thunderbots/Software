@@ -48,8 +48,8 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -70,8 +70,8 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -93,7 +93,7 @@ TEST_F(STPTacticAssignmentTest,
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -110,7 +110,7 @@ TEST_F(STPTacticAssignmentTest, test_0_tactics_returned_when_there_are_no_robots
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -149,7 +149,7 @@ TEST_F(STPTacticAssignmentTest,
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto stop_tactic_1 = std::make_shared<StopTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
     stop_tactic_1->updateParams();
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, stop_tactic_1};
@@ -178,7 +178,7 @@ TEST_F(STPTacticAssignmentTest, test_assigning_1_tactic_to_1_robot)
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(2, -3.2));
+    move_tactic_1->updateControlParams(Point(2, -3.2));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 
@@ -205,8 +205,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_no_overlap)
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -243,8 +243,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_2_robots_to_2_tactics_with_overla
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -275,8 +275,8 @@ TEST_F(STPTacticAssignmentTest, test_assigning_3_robots_to_2_tactics)
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
     auto move_tactic_2 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(-1, 0));
-    move_tactic_2->updateParams(Point(1, 0));
+    move_tactic_1->updateControlParams(Point(-1, 0));
+    move_tactic_2->updateControlParams(Point(1, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1, move_tactic_2};
 
@@ -344,7 +344,7 @@ TEST_F(STPTacticAssignmentTest,
     // the cost of assigning any robot to the move_tactic should be less than the
     // stop_tactics
     stop_tactic_1->updateParams();
-    move_tactic_1->updateParams(Point(0, 0));
+    move_tactic_1->updateControlParams(Point(0, 0));
     stop_tactic_2->updateParams();
 
     std::vector<std::shared_ptr<Tactic>> tactics = {stop_tactic_1, move_tactic_1,
@@ -375,7 +375,7 @@ TEST_F(STPTacticAssignmentTest,
 
     auto move_tactic_1 = std::make_shared<MoveTestTactic>();
 
-    move_tactic_1->updateParams(Point(0, 0));
+    move_tactic_1->updateControlParams(Point(0, 0));
 
     std::vector<std::shared_ptr<Tactic>> tactics = {move_tactic_1};
 

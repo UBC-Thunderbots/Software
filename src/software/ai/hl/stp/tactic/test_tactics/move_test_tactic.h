@@ -25,7 +25,7 @@ class MoveTestTactic : public Tactic
      *
      * @param destination_ The destination to move to (in global coordinates)
      */
-    void updateParams(Point destination_);
+    void updateControlParams(Point destination_);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

@@ -19,7 +19,7 @@ TEST(TacticTest, test_get_assigned_robot_with_no_robot_and_no_params)
 TEST(TacticTest, test_get_assigned_robot_with_no_robot)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
     auto robot = tactic.getAssignedRobot();
 
     EXPECT_EQ(robot, std::nullopt);
@@ -39,7 +39,7 @@ TEST(TacticTest, test_get_assigned_robot_with_a_robot_assigned)
 TEST(TacticTest, test_nullptr_returned_when_no_robot_assigned)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     EXPECT_FALSE(tactic.getNextIntent());
 }
@@ -47,7 +47,7 @@ TEST(TacticTest, test_nullptr_returned_when_no_robot_assigned)
 TEST(TacticTest, test_tactic_not_done_after_run_with_no_robot_assigned)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     // Run the tactic several times
     for (int i = 0; i < 5; i++)
@@ -70,7 +70,7 @@ TEST(TacticTest, test_tactic_does_not_prematurely_report_done)
     // currently is, so that we know the tactic should not report done
     MoveTestTactic tactic = MoveTestTactic();
     tactic.updateRobot(robot);
-    tactic.updateParams(Point(3, 4));
+    tactic.updateControlParams(Point(3, 4));
 
     // Run the Tactic several times, leaving the robot and parameters as is so the
     // tactic should not approach a "done" state
@@ -94,7 +94,7 @@ TEST(TacticTest, test_tactic_reports_done_at_same_time_nullptr_returned)
     // Therefore we expect the tactic to be done
     MoveTestTactic tactic = MoveTestTactic();
     tactic.updateRobot(robot);
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     // The tactic should always return an Intent the first time it is run to make sure we
     // are doing the right thing (and just don't happen to be in the "done state" at the
@@ -119,7 +119,7 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
     // Therefore we expect the tactic to be done
     MoveTestTactic tactic = MoveTestTactic(true);
     tactic.updateRobot(robot);
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     // Even though the Tactic should be done, we expect it to continue returning valid
     // Intents because it will be constantly restarting
