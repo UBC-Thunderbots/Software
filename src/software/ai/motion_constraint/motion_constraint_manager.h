@@ -4,30 +4,30 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
-#include "software/ai/move_rule/move_rule.h"
+#include "software/ai/motion_constraint/motion_constraint.h"
 #include "software/ai/world/game_state.h"
 
-class MoveRuleManager : public TacticVisitor
+class MotionConstraintManager : public TacticVisitor
 {
    public:
-    explicit MoveRuleManager(){};
+    explicit MotionConstraintManager(){};
 
     /**
-     * Gets Move Rules based on gamestate and tactic
+     * Gets Motion Constraint based on gamestate and tactic
      *
      * @param gamestate Current GameState to process
      * @param tactic Current Tactic to process
      *
-     * @return set of MoveRules
+     * @return set of MotionConstraints
      */
-    std::set<MoveRule> getMoveRules(const GameState &game_state, const Tactic &tactic);
+    std::set<MotionConstraint> getMotionConstraints(const GameState &game_state, const Tactic &tactic);
 
     /**
      * Visits a CherryPickTactic to perform an operation.
      *
      * @param tactic The CherryPickTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const CherryPickTactic &tactic) override;
 
@@ -36,7 +36,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The ShadowFreekickerTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const ShadowFreekickerTactic &tactic) override;
 
@@ -45,7 +45,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The GoalieTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const GoalieTactic &tactic) override;
 
@@ -54,7 +54,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The CreaseDefenderTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const CreaseDefenderTactic &tactic) override;
 
@@ -63,7 +63,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The ShadowEnemyTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const ShadowEnemyTactic &tactic) override;
 
@@ -72,7 +72,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The BlockShotPathTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const BlockShotPathTactic &tactic) override;
 
@@ -81,7 +81,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The MoveTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const MoveTactic &tactic) override;
 
@@ -90,7 +90,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The ChipTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const ChipTactic &tactic) override;
 
@@ -99,7 +99,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The StopTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const StopTactic &tactic) override;
 
@@ -108,7 +108,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The PenaltyKickTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const PenaltyKickTactic &tactic) override;
 
@@ -117,7 +117,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The ReceiverTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const ReceiverTactic &tactic) override;
 
@@ -126,7 +126,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The PatrolTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const PatrolTactic &tactic) override;
 
@@ -135,7 +135,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The ShootGoalTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const ShootGoalTactic &tactic) override;
 
@@ -144,7 +144,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The PasserTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const PasserTactic &tactic) override;
 
@@ -153,7 +153,7 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The MoveTestTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const MoveTestTactic &tactic) override;
 
@@ -162,17 +162,17 @@ class MoveRuleManager : public TacticVisitor
      *
      * @param tactic The StopTestTactic to visit
      *
-     * @modifies current_whitelisted_rules
+     * @modifies current_whitelisted_constraints
      */
     void visit(const StopTestTactic &tactic) override;
 
    private:
-    std::set<MoveRule> current_whitelisted_rules;
+    std::set<MotionConstraint> current_whitelisted_constraints;
 
     /**
-     * Adds move rules determined from gamestate to current_move_rules
+     * Adds move constraints determined from gamestate to current_motion_constraints
      *
-     * @param game_state GameState to generate move rules from
+     * @param game_state GameState to generate move constraints from
      */
-    std::set<MoveRule> getMoveRulesFromGameState(const GameState &game_state);
+    std::set<MotionConstraint> getMotionConstraintsFromGameState(const GameState &game_state);
 };

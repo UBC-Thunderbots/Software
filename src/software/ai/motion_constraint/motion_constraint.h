@@ -3,10 +3,10 @@
 #include <ostream>
 
 /**
- * This enum describes the rules that robot movement must respect. They serve
- * as an indicator to the navigator when it interprets the intents
+ * This enum describes the constraints robot movement. They are
+ * used for constraining navigation
  */
-enum class MoveRule
+enum class MotionConstraint
 {
     // Avoid collision with enemy robots above a certain speed
     ENEMY_ROBOTS_COLLISION,
@@ -26,4 +26,4 @@ enum class MoveRule
     FRIENDLY_HALF
 };
 
-std::ostream& operator<<(std::ostream& os, const MoveRule& state);
+std::ostream& operator<<(std::ostream& os, const MotionConstraint& state);
