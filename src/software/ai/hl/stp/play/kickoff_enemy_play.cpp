@@ -123,9 +123,10 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // We shadow assuming the robots do not pass so we do not try block passes
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
-                shadow_enemy_tactics.at(i)->updateParams(
+                shadow_enemy_tactics.at(i)->updateWorldParams(
                     enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
-                    shadow_dist, false, world.ball());
+                    shadow_dist, world.ball());
+                shadow_enemy_tactics.at(i)->updateControlParams(false);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

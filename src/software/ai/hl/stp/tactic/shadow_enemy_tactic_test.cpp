@@ -24,7 +24,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.5, false, ball);
+    tactic.updateWorldParams(enemy_threat, field, friendly_team, enemy_team, 0.5, ball);
+    tactic.updateControlParams(false);
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -68,7 +69,8 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.2, true, ball);
+    tactic.updateWorldParams(enemy_threat, field, friendly_team, enemy_team, 0.2, ball);
+    tactic.updateControlParams(true);
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -108,7 +110,8 @@ TEST(ShadowEnemyTacticTest,
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.5, true, ball);
+    tactic.updateWorldParams(enemy_threat, field, friendly_team, enemy_team, 0.5, ball);
+    tactic.updateControlParams(true);
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -149,7 +152,8 @@ TEST(
     ShadowEnemyTactic tactic =
         ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
     tactic.updateRobot(friendly_robot);
-    tactic.updateParams(enemy_threat, field, friendly_team, enemy_team, 0.5, true, ball);
+    tactic.updateWorldParams(enemy_threat, field, friendly_team, enemy_team, 0.5, ball);
+    tactic.updateControlParams(true);
 
     auto intent_ptr = tactic.getNextIntent();
 
