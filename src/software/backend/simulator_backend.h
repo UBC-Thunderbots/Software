@@ -20,6 +20,17 @@ class SimulatorBackend : public Backend
      * to be deterministic and always provide the World at a "fixed" rate from the
      * perspective of any consumers.
      *
+     * The reason we don't want to run in real-time is because the simulation can likely run
+     * much faster than real life. This is a problem because if the simulation can run at
+     * 300Hz (for example), but the AI can only run at 30Hz, the buffers between the Observers
+     * will overflow and data will be lost. This is not realistic because generally the input
+     * runs at 60Hz (roughly the same rate as the camera fps) and the AI runs at about 30Hz.
+     *
+     * This means that in real life each time the AI is ready for more data, about 2 * 1/60 seconds
+     * have passed in real-time (and therefore World time). But if the simulation is running way
+     * faster then 10 * 1/60 seconds will have passed each time the AI is ready for more data. This
+     * is the scenario we are trying to avoid.
+     *
      * @param simulation_time_step How far to step the simulation in time each time the
      * simulation is advanced
      * @param num_steps_per_primitive_update How many times to advance the simulation each
