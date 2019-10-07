@@ -127,10 +127,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        crease_defender_left->updateParams(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
-        crease_defender_right->updateParams(world.ball(), world.field(),
-                                            world.friendlyTeam(), world.enemyTeam());
+        crease_defender_left->updateWorldParams(world.ball(), world.field(),
+                                                world.friendlyTeam(), world.enemyTeam());
+        crease_defender_right->updateWorldParams(world.ball(), world.field(),
+                                                 world.friendlyTeam(), world.enemyTeam());
         updateShootGoalTactic(shoot_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
@@ -196,10 +196,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             false);
         do
         {
-            crease_defender_left->updateParams(world.ball(), world.field(),
-                                               world.friendlyTeam(), world.enemyTeam());
-            crease_defender_right->updateParams(world.ball(), world.field(),
-                                                world.friendlyTeam(), world.enemyTeam());
+            crease_defender_left->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+            crease_defender_right->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             passer->updateParams(pass, world.ball());
             receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
                                    world.ball());

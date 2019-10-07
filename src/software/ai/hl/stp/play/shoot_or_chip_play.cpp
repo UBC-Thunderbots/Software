@@ -92,8 +92,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateParams(world.ball(), world.field(),
-                                                 world.friendlyTeam(), world.enemyTeam());
+            crease_defender_tactic->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 

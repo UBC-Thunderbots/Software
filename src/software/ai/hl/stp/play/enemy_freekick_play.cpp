@@ -102,8 +102,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         shadow_freekicker_2->updateParams(world.enemyTeam(), world.ball());
 
         // Update crease defenders
-        crease_defender_tactic->updateParams(world.ball(), world.field(),
-                                             world.friendlyTeam(), world.enemyTeam());
+        crease_defender_tactic->updateWorldParams(
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
         // Add Freekick shadower tactics
         tactics_to_run.emplace_back(shadow_freekicker_1);
