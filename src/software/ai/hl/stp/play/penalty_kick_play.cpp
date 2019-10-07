@@ -50,8 +50,8 @@ void PenaltyKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         // Assign one robot to be the penalty shooter
-        penalty_shot_tactic->updateParams(world.ball(), world.enemyTeam().goalie(),
-                                          world.field());
+        penalty_shot_tactic->updateWorldParams(world.ball(), world.enemyTeam().goalie(),
+                                               world.field());
 
         // Move all non-shooter robots to the center of the field
         move_tactic_2->updateControlParams(Point(0, 0),

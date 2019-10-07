@@ -25,9 +25,9 @@ std::string PenaltyKickTactic::getName() const
     return "Penalty Kick Tactic";
 }
 
-void PenaltyKickTactic::updateParams(const Ball& updated_ball,
-                                     const std::optional<Robot>& updated_enemy_goalie,
-                                     const Field& updated_field)
+void PenaltyKickTactic::updateWorldParams(
+    const Ball& updated_ball, const std::optional<Robot>& updated_enemy_goalie,
+    const Field& updated_field)
 {
     this->enemy_goalie = updated_enemy_goalie;
     this->ball         = updated_ball;
