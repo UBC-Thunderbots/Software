@@ -36,8 +36,8 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         // goalie
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 

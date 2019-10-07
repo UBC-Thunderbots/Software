@@ -86,8 +86,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         friendly_team_for_goalie, world.enemyTeam());
 
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)

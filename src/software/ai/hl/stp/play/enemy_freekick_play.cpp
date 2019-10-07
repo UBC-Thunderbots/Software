@@ -94,8 +94,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
 
         // Update goalie tactic
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         // Update free kicke shadowers
         shadow_freekicker_1->updateParams(world.enemyTeam(), world.ball());

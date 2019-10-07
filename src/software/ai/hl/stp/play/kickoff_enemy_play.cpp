@@ -103,8 +103,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // keeps track of the next defense position to assign

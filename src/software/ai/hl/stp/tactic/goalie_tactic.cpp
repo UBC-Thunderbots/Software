@@ -27,10 +27,10 @@ std::string GoalieTactic::getName() const
     return "Goalie Tactic";
 }
 
-void GoalieTactic::updateParams(const Ball &ball, const Field &field,
-                                const Team &friendly_team, const Team &enemy_team)
+void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
+                                     const Team &friendly_team, const Team &enemy_team)
 {
-    // Update the parameters stored by this Tactic
+    // Update the world parameters stored by this Tactic
     this->ball          = ball;
     this->field         = field;
     this->friendly_team = friendly_team;
