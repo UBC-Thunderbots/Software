@@ -9,7 +9,8 @@ class Shot
      * Creates a shot with the given target and angle
      *
      * @param point The target to shoot at
-     * @param angle The angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
+     * @param angle The angle formed by the shot origin, and the edges of the two
+     * obstacles closest to the shot path
      *
      */
     Shot(Point point, Angle angle);
@@ -21,8 +22,10 @@ class Shot
     Point getPointToShootAt() const;
 
     /**
-     * Returns the angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
-     * @return the angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
+     * Returns the angle formed by the shot origin, and the edges of the two obstacles
+     * closest to the shot path
+     * @return the angle formed by the shot origin, and the edges of the two obstacles
+     * closest to the shot path
      */
     Angle getOpenAngle() const;
 
@@ -34,7 +37,8 @@ class Shot
     Point point;
 
     /**
-     * The angle formed by the shot origin, and the edges of the two obstacles closest to the shot path
+     * The angle formed by the shot origin, and the edges of the two obstacles closest to
+     the shot path
      *
                              XXXXO - Obstacle
                          XXXX    |
