@@ -5,13 +5,13 @@
 
 
 #include "shared/constants.h"
-#include "software/ai/world/ball.h"
-#include "software/ai/world/robot.h"
 #include "software/geom/angle.h"
 #include "software/geom/circle.h"
 #include "software/geom/point.h"
 #include "software/geom/polygon.h"
 #include "software/geom/util.h"
+#include "software/world/ball.h"
+#include "software/world/robot.h"
 
 class Obstacle
 {

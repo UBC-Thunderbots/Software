@@ -5,7 +5,7 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/intent/intent.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 
 // We forward-declare the TacticVisitor interface (pure virtual class) because we need
 // to know about the existence of this class in order to accept visitors with the

@@ -34,8 +34,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
-        "//software/ai/world",
         "//software/geom",
+        "//software/world",
         "@g3log",
     ],
 )
@@ -327,7 +327,7 @@ cc_library(
     hdrs = ["tactic.h"],
     deps = [
         "//software/ai/hl/stp/action",
-        "//software/ai/world",
+        "//software/world",
     ],
 )
 

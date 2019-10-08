@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "software/ai/world/refbox_constants.h"
 #include "software/test_util/test_util.h"
+#include "software/world/refbox_constants.h"
 
 // tuple of start state, update state, end state, our_restart, restart reason
 typedef std::tuple<RefboxGameState, RefboxGameState, RefboxGameState, bool,
