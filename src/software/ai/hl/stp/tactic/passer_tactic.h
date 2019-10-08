@@ -31,10 +31,16 @@ class PasserTactic : public Tactic
     /**
      * Updates the world parameters for this PasserTactic.
      *
-     * @param pass The pass to perform
      * @param updated_ball The ball we're passing
      */
-    void updateWorldParams(const Passing::Pass& updated_pass, const Ball& updated_ball);
+    void updateWorldParams(const Ball& updated_ball);
+
+    /**
+     * Updates the control parameters for this PasserTactic.
+     *
+     * @param updated_pass The pass to perform
+     */
+    void updateControlParams(const Passing::Pass& updated_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
