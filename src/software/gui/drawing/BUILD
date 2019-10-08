@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["ball.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:ball",
+        "//software/world:ball",
         "//software/geom",
         "//software/gui/geom:geometry_conversion",
         "@qt//:qt_widgets",
@@ -19,7 +19,7 @@ cc_library(
     hdrs = ["field.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:field",
+        "//software/world:field",
         "//software/gui/geom:geometry_conversion",
         "@qt//:qt_widgets",
     ],
@@ -31,7 +31,7 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:robot",
+        "//software/world:robot",
         "//software/geom",
         "//software/gui/geom:geometry_conversion",
         "@qt//:qt_gui",
@@ -45,7 +45,7 @@ cc_library(
     hdrs = ["team.h"],
     deps = [
         ":robot",
-        "//software/ai/world:team",
+        "//software/world:team",
         "@qt//:qt_widgets",
     ],
 )
@@ -59,7 +59,7 @@ cc_library(
         ":draw_functions",
         ":field",
         ":team",
-        "//software/ai/world",
+        "//software/world",
         "@qt//:qt_widgets",
     ],
 )

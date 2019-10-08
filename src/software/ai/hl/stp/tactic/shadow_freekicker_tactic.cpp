@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -79,4 +80,9 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
             0, false));
     } while (true);
+}
+
+void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
