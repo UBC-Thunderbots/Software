@@ -30,6 +30,7 @@ class Rectangle final
      */
     explicit constexpr Rectangle(const Point &sw_corner, double x_length, double y_length);
 
+
     /**
      * Returns the horizontal length of the rectangle
      *
