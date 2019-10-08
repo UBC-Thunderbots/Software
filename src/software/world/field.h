@@ -44,7 +44,7 @@ class Field
      * @param defense_x_length the length of the defense area (along the x-axis)
      * @param defense_y_length the length of the defense area (along the y-axis)
      * @param goal_y_length the length of the goal (along the y-axis)
-     * @param boundary_buffer_size the size of the boundary area between the edge of the
+     * @param boundary_buffer_size the size of the boundary area between the edge of thet
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      * @param timestamp the Timestamp corresponding to any updates to the Field object
@@ -351,7 +351,11 @@ class Field
     double defense_x_length_;
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
+<<<<<<< HEAD
     double boundary_buffer_size_;
+=======
+    double boundary_y_length_;
+>>>>>>> moved world folder to resolve merge conflict
     // The radius of the center circle in metres
     double center_circle_radius_;
     // All previous timestamps of when the field was updated, with the most recent

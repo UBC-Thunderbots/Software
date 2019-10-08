@@ -1,5 +1,4 @@
 #include "software/world/ball.h"
-
 #include "shared/constants.h"
 
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
