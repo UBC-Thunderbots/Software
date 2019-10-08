@@ -5,7 +5,7 @@ cc_library(
     testonly = True,
     srcs = ["test_util.cpp"],
     hdrs = ["test_util.h"],
-    deps = ["//software/ai/world"],
+    deps = ["//software/world"],
 )
 
 cc_test(

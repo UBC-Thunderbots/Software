@@ -2,7 +2,7 @@
 
 #include "software/ai/intent/intent.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 
 /**
  * An abstraction for all navigation operations performed by our AI. The navigator is

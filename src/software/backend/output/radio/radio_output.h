@@ -2,10 +2,10 @@
 
 #include <limits>
 
-#include "software/ai/world/ball.h"
-#include "software/ai/world/team.h"
 #include "software/backend/output/radio/mrf/dongle.h"
 #include "software/backend/robot_status.h"
+#include "software/world/ball.h"
+#include "software/world/team.h"
 
 class RadioOutput
 {

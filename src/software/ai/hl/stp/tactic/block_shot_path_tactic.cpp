@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
@@ -56,4 +57,9 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(move_action.updateStateAndGetNextIntent(*robot, block_position,
                                                       block_orientation, 0.0));
     } while (!move_action.done());
+}
+
+void BlockShotPathTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }

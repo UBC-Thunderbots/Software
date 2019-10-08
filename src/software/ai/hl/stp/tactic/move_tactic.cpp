@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
+
 MoveTactic::MoveTactic(bool loop_forever) : Tactic(loop_forever) {}
 
 std::string MoveTactic::getName() const
@@ -35,4 +37,9 @@ void MoveTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(move_action.updateStateAndGetNextIntent(*robot, destination,
                                                       final_orientation, final_speed));
     } while (!move_action.done());
+}
+
+void MoveTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
