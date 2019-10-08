@@ -64,11 +64,11 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
         // for a one-time shot
-        std::optional<std::pair<Point, Angle>> shot = findFeasibleShot();
+        std::optional<Shot> shot                    = findFeasibleShot();
         Angle desired_angle                         = pass.receiverOrientation();
         if (shot)
         {
-            auto [target_position, _] = *shot;
+            auto target_position = shot->getPointToShootAt();
             Angle shot_angle = (target_position - robot->position()).orientation();
             // If we do have a valid shot on net, orient the robot to face in between
             // the pass vector and shot vector, so the robot can quickly orient itself
@@ -83,16 +83,16 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     }
 
     // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<std::pair<Point, Angle>> best_shot_opt =
+    std::optional<Shot> best_shot_opt =
         calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
 
     // Vector from the ball to the robot
     Vector ball_to_robot_vector = ball.position() - robot->position();
-    std::optional<std::pair<Point, Angle>> best_shot = findFeasibleShot();
+    std::optional<Shot> best_shot = findFeasibleShot();
     if (best_shot)
     {
         LOG(DEBUG) << "Taking one-touch shot";
-        auto [best_shot_target, _] = *best_shot;
+        auto best_shot_target = best_shot->getPointToShootAt();
 
         // The angle between the ball velocity and a vector from the ball to the robot
         Vector ball_velocity = ball.velocity();
@@ -104,8 +104,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // (or moving slowly because we can't be certain of the velocity vector if it is)
         while (ball_robot_angle.abs() < Angle::ofDegrees(90) || ball_velocity.len() < 0.5)
         {
-            auto [ideal_position, ideal_orientation] =
+            Shot shot =
                 getOneTimeShotPositionAndOrientation(*robot, ball, best_shot_target);
+            Point ideal_position    = shot.getPointToShootAt();
+            Angle ideal_orientation = shot.getOpenAngle();
 
             yield(move_action.updateStateAndGetNextIntent(
                 *robot, ideal_position, ideal_orientation, 0, false, false, AUTOKICK));
@@ -164,10 +166,10 @@ Angle ReceiverTactic::getOneTimeShotDirection(const Ray& shot, const Ball& ball)
     return shot_dir + shot_offset;
 }
 
-std::optional<std::pair<Point, Angle>> ReceiverTactic::findFeasibleShot()
+std::optional<Shot> ReceiverTactic::findFeasibleShot()
 {
     // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<std::pair<Point, Angle>> best_shot_opt =
+    std::optional<Shot> best_shot_opt =
         calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
 
     // Vector from the ball to the robot
@@ -179,7 +181,8 @@ std::optional<std::pair<Point, Angle>> ReceiverTactic::findFeasibleShot()
     double net_percent_open;
     if (best_shot_opt)
     {
-        Vector robot_to_shot_target = best_shot_opt->first - robot->position();
+        Vector robot_to_shot_target =
+            best_shot_opt->getPointToShootAt() - robot->position();
         abs_angle_between_pass_and_shot_vectors =
             (robot_to_ball.orientation() - robot_to_shot_target.orientation())
                 .angleMod()
@@ -189,7 +192,8 @@ std::optional<std::pair<Point, Angle>> ReceiverTactic::findFeasibleShot()
             acuteVertexAngle(field.friendlyGoalpostPos(), robot->position(),
                              field.friendlyGoalpostNeg())
                 .abs();
-        net_percent_open = best_shot_opt->second.toDegrees() / goal_angle.toDegrees();
+        net_percent_open =
+            best_shot_opt->getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 
     // If we have a shot with a sufficiently large enough opening, and the deflection
@@ -202,8 +206,9 @@ std::optional<std::pair<Point, Angle>> ReceiverTactic::findFeasibleShot()
     return std::nullopt;
 }
 
-std::pair<Point, Angle> ReceiverTactic::getOneTimeShotPositionAndOrientation(
-    const Robot& robot, const Ball& ball, const Point& best_shot_target)
+Shot ReceiverTactic::getOneTimeShotPositionAndOrientation(const Robot& robot,
+                                                          const Ball& ball,
+                                                          const Point& best_shot_target)
 {
     double dist_to_ball_in_dribbler =
         DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS;
@@ -225,7 +230,7 @@ std::pair<Point, Angle> ReceiverTactic::getOneTimeShotPositionAndOrientation(
     Point ideal_position =
         closest_ball_pos - ideal_orientation_vec.norm(dist_to_ball_in_dribbler);
 
-    return std::make_pair(ideal_position, ideal_orientation);
+    return Shot(ideal_position, ideal_orientation);
 }
 
 void ReceiverTactic::accept(TacticVisitor& visitor) const

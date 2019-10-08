@@ -2,6 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/geom/point.h"
+#include "software/geom/shot.h"
 #include "software/world/field.h"
 #include "software/world/robot.h"
 #include "software/world/world.h"
@@ -25,9 +26,10 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot is possible, returns `std::nullopt`
      */
-    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
-        const Point &goal_post_neg, const Point &goal_post_pos, const Point &p,
-        const std::vector<Point> &obstacles, double radius);
+    std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
+                                           const Point &goal_post_pos, const Point &p,
+                                           const std::vector<Point> &obstacles,
+                                           double radius);
 
     /**
      * Finds the best shot on the specified goal, and returns the best target to shoot at
@@ -51,7 +53,7 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
+    std::optional<Shot> calcBestShotOnGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &point, bool shoot_at_enemy_goal,
         double radius                              = ROBOT_MAX_RADIUS_METERS,
@@ -76,7 +78,7 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>> calcBestShotOnEnemyGoal(
+    std::optional<Shot> calcBestShotOnEnemyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Robot &robot, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
@@ -100,7 +102,7 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>> calcBestShotOnEnemyGoal(
+    std::optional<Shot> calcBestShotOnEnemyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
@@ -124,7 +126,7 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>> calcBestShotOnFriendlyGoal(
+    std::optional<Shot> calcBestShotOnFriendlyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Robot &robot, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
@@ -148,7 +150,7 @@ namespace Evaluation
      * shot (this is the total angle between the obstacles on either side of the shot
      * vector). If no shot can be found, returns std::nullopt
      */
-    std::optional<std::pair<Point, Angle>> calcBestShotOnFriendlyGoal(
+    std::optional<Shot> calcBestShotOnFriendlyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &shot_origin, double radius = ROBOT_MAX_RADIUS_METERS,
         const std::vector<Robot> &robots_to_ignore = {});
@@ -164,7 +166,7 @@ namespace Evaluation
      *         being taken on. Larger numbers mean a larger percentage of the net is open
      */
     double calcShotOpenFriendlyNetPercentage(const Field &field, const Point &shot_origin,
-                                             const std::pair<Point, Angle> &shot);
+                                             const Shot &shot);
 
     /**
      * Calculates the percentage of the enemy net that a given shot is aiming for
@@ -177,6 +179,6 @@ namespace Evaluation
      *         being taken on. Larger numbers mean a larger percentage of the net is open
      */
     double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_origin,
-                                          const std::pair<Point, Angle> &shot);
+                                          const Shot &shot);
 
 }  // namespace Evaluation
