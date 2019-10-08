@@ -22,10 +22,10 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pass)
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
-    tactic.updateControlParams(enemy_threat, 0.5, false);
+    tactic.updateControlParams(enemy_threat, 0.5);
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -67,10 +67,10 @@ TEST(ShadowEnemyTacticTest, test_shadower_blocks_pass_when_enemy_can_pass)
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
-    tactic.updateControlParams(enemy_threat, 0.2, true);
+    tactic.updateControlParams(enemy_threat, 0.2);
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -108,10 +108,10 @@ TEST(ShadowEnemyTacticTest,
               Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0, true, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
-    tactic.updateControlParams(enemy_threat, 0.5, true);
+    tactic.updateControlParams(enemy_threat, 0.5);
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -150,10 +150,10 @@ TEST(
               Timestamp::fromSeconds(0));
 
     ShadowEnemyTactic tactic =
-        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true);
+        ShadowEnemyTactic(field, friendly_team, enemy_team, true, ball, 0.5, true, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
-    tactic.updateControlParams(enemy_threat, 0.5, true);
+    tactic.updateControlParams(enemy_threat, 0.5);
 
     auto intent_ptr = tactic.getNextIntent();
 

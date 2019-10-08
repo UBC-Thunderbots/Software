@@ -8,11 +8,12 @@
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                      const Team &enemy_team, bool ignore_goalie,
                                      const Ball &ball, const double ball_steal_speed,
-                                     bool loop_forever)
+                                     bool enemy_team_can_pass, bool loop_forever)
     : field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       shadow_distance(ROBOT_MAX_RADIUS_METERS * 3),
+      enemy_team_can_pass(enemy_team_can_pass),
       ignore_goalie(ignore_goalie),
       ball(ball),
       Tactic(loop_forever)
@@ -34,12 +35,10 @@ void ShadowEnemyTactic::updateWorldParams(const Field &field, const Team &friend
 }
 
 void ShadowEnemyTactic::updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
-                                            double shadow_distance,
-                                            bool enemy_team_can_pass)
+                                            double shadow_distance)
 {
     this->enemy_threat        = enemy_threat;
     this->shadow_distance     = shadow_distance;
-    this->enemy_team_can_pass = enemy_team_can_pass;
 }
 
 double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world)

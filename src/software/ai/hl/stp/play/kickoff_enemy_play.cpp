@@ -38,15 +38,15 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true),
+            false, true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true),
+            false, true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true)};
+            false, true)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -125,8 +125,7 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // anyway
                 shadow_enemy_tactics.at(i)->updateWorldParams(
                     world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
-                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat, shadow_dist,
-                                                                false);
+                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat, shadow_dist);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else
