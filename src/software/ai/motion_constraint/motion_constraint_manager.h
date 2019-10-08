@@ -5,7 +5,7 @@
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/ai/motion_constraint/motion_constraint.h"
-#include "software/ai/world/game_state.h"
+#include "software/world/game_state.h"
 
 class MotionConstraintManager : public TacticVisitor
 {

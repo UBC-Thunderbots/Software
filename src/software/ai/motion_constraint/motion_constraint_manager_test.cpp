@@ -9,7 +9,7 @@
 #include <set>
 
 #include "software/ai/hl/stp/tactic/all_tactics.h"
-#include "software/ai/world/game_state.h"
+#include "software/world/game_state.h"
 
 // This namespace contains all the test parameters
 namespace
