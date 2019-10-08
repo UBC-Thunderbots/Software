@@ -18,8 +18,10 @@
  * HOW THIS CLASS IS USED:
  * Plays will construct and return the Tactics they want to be running. Every time a play
  * is run, it will update the parameters of each tactic with the updateWorldParams(...)
- * and updateControlParams(...) function (see the concrete implementations of this class
- * for examples). This is done every time in order for the Tactics to have the most up to
+ * and the updateControlParams(...) function (see the concrete implementations of this
+ * class for examples). The updateWorldParams(...) updates any parameters that are derived
+ * from the World independent of play, and the updateControlParams(...) updates all other
+ * parameters. This is done every time in order for the Tactics to have the most up to
  * date information when they calculate the next Intent they want to run (for example if
  * we were following a moving robot, we need to constantly update our destination).
  *
