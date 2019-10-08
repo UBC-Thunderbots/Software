@@ -44,7 +44,10 @@ class CreaseDefenderTactic : public Tactic
     /**
      * Updates the world parameters for this CreaseDefenderTactic.
      *
-// TODO: comment
+    * @param ball
+    * @param field
+    * @param friendly_team
+    * @param enemy_team
      */
     void updateWorldParams(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team);
