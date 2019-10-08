@@ -11,6 +11,7 @@
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 #include "software/ai/world/game_state.h"
 
+// This namespace contains all the test parameters
 namespace
 {
     // vector of pairs of Tactic and whitelists
