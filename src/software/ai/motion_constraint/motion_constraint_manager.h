@@ -20,7 +20,8 @@ class MotionConstraintManager : public TacticVisitor
      *
      * @return set of MotionConstraints
      */
-    std::set<MotionConstraint> getMotionConstraints(const GameState &game_state, const Tactic &tactic);
+    std::set<MotionConstraint> getMotionConstraints(const GameState &game_state,
+                                                    const Tactic &tactic);
 
     /**
      * Visits a CherryPickTactic to perform an operation.
@@ -174,5 +175,6 @@ class MotionConstraintManager : public TacticVisitor
      *
      * @param game_state GameState to generate move constraints from
      */
-    std::set<MotionConstraint> getMotionConstraintsFromGameState(const GameState &game_state);
+    std::set<MotionConstraint> getMotionConstraintsFromGameState(
+        const GameState &game_state);
 };

@@ -2,10 +2,11 @@
 
 #include "software/ai/hl/stp/tactic/all_tactics.h"
 
-std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(const GameState &game_state,
-                                                 const Tactic &tactic)
+std::set<MotionConstraint> MotionConstraintManager::getMotionConstraints(
+    const GameState &game_state, const Tactic &tactic)
 {
-    std::set<MotionConstraint> current_motion_constraints = getMotionConstraintsFromGameState(game_state);
+    std::set<MotionConstraint> current_motion_constraints =
+        getMotionConstraintsFromGameState(game_state);
     current_whitelisted_constraints.clear();
     tactic.accept(*this);  // updates current_whitelisted_constraints
     for (const auto &constraint : current_whitelisted_constraints)
@@ -50,7 +51,8 @@ void MotionConstraintManager::visit(const MoveTestTactic &tactic) {}
 
 void MotionConstraintManager::visit(const StopTestTactic &tactic) {}
 
-std::set<MotionConstraint> MotionConstraintManager::getMotionConstraintsFromGameState(const GameState &game_state)
+std::set<MotionConstraint> MotionConstraintManager::getMotionConstraintsFromGameState(
+    const GameState &game_state)
 {
     std::set<MotionConstraint> motion_constraints;
     motion_constraints.insert(MotionConstraint::FRIENDLY_DEFENSE_AREA);

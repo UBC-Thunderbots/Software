@@ -22,7 +22,8 @@ std::ostream& operator<<(std::ostream& os, const MotionConstraint& constraint)
     }
     else
     {
-        os << "No String Representation For MotionConstraint: " << static_cast<int>(constraint);
+        os << "No String Representation For MotionConstraint: "
+           << static_cast<int>(constraint);
     }
     return os;
 }
