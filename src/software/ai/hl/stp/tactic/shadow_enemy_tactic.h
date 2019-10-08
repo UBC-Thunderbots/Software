@@ -34,25 +34,24 @@ class ShadowEnemyTactic : public Tactic
     /**
      * Updates the world parameters for this ShadowEnemyTactic.
      *
-     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
      * @param field The field being played on
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
-     * @param shadow_distance How far from the enemy the robot will shadow. This is the
-     * distance between the center of the enemy robot and the center of the robot
-     * shadowing it
      */
-    void updateWorldParams(const Evaluation::EnemyThreat &enemy_threat,
-                           const Field &field, const Team &friendly_team,
-                           const Team &enemy_team, double shadow_distance,
-                           const Ball &ball);
+    void updateWorldParams(const Field &field, const Team &friendly_team,
+                           const Team &enemy_team, const Ball &ball);
 
     /**
      * Updates the control parameters for this ShadowEnemyTactic
      *
+     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
+     * @param shadow_distance How far from the enemy the robot will shadow. This is the
+     * distance between the center of the enemy robot and the center of the robot
+     * shadowing it
      * @param enemy_team_can_pass Whether or not we think the enemy team can pass the ball
      */
-    void updateControlParams(bool enemy_team_can_pass);
+    void updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
+                             double shadow_distance, bool enemy_team_can_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

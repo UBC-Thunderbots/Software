@@ -124,9 +124,9 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
                 shadow_enemy_tactics.at(i)->updateWorldParams(
-                    enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
-                    shadow_dist, world.ball());
-                shadow_enemy_tactics.at(i)->updateControlParams(false);
+                    world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
+                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat, shadow_dist,
+                                                                false);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

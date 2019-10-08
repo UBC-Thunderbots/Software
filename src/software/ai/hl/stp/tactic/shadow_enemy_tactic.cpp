@@ -24,22 +24,21 @@ std::string ShadowEnemyTactic::getName() const
     return "Shadow Enemy Tactic";
 }
 
-void ShadowEnemyTactic::updateWorldParams(const Evaluation::EnemyThreat &enemy_threat,
-                                          const Field &field, const Team &friendly_team,
-                                          const Team &enemy_team, double shadow_distance,
-                                          const Ball &ball)
+void ShadowEnemyTactic::updateWorldParams(const Field &field, const Team &friendly_team,
+                                          const Team &enemy_team, const Ball &ball)
 {
-    this->enemy_threat     = enemy_threat;
-    this->field            = field;
-    this->friendly_team    = friendly_team;
-    this->enemy_team       = enemy_team;
-    this->shadow_distance  = shadow_distance;
-    this->ball             = ball;
-    this->ball_steal_speed = ball_steal_speed;
+    this->field         = field;
+    this->friendly_team = friendly_team;
+    this->enemy_team    = enemy_team;
+    this->ball          = ball;
 }
 
-void ShadowEnemyTactic::updateControlParams(bool enemy_team_can_pass)
+void ShadowEnemyTactic::updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
+                                            double shadow_distance,
+                                            bool enemy_team_can_pass)
 {
+    this->enemy_threat        = enemy_threat;
+    this->shadow_distance     = shadow_distance;
     this->enemy_team_can_pass = enemy_team_can_pass;
 }
 
