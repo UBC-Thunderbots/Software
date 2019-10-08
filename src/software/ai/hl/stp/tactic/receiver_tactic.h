@@ -81,6 +81,13 @@ class ReceiverTactic : public Tactic
     static std::pair<Point, Angle> getOneTimeShotPositionAndOrientation(
         const Robot& robot, const Ball& ball, const Point& best_shot_target);
 
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
+
    private:
     // The minimum proportion of open net we're shooting on vs the entire size of the net
     // that we require before attempting a shot

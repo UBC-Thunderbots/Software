@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                      const Team &enemy_team, bool ignore_goalie,
@@ -119,4 +120,9 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             }
         }
     } while (!move_action.done());
+}
+
+void ShadowEnemyTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

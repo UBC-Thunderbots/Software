@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
                            double at_patrol_point_tolerance,
@@ -84,4 +85,9 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         yield(std::move(next_intent));
     } while (true);
+}
+
+void PatrolTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

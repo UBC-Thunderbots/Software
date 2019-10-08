@@ -3,6 +3,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
@@ -170,4 +171,9 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
         }
     } while (!(kick_action.done() || chip_action.done()));
+}
+
+void ShootGoalTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

@@ -5,6 +5,7 @@
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 using namespace Passing;
@@ -225,4 +226,9 @@ std::pair<Point, Angle> ReceiverTactic::getOneTimeShotPositionAndOrientation(
         closest_ball_pos - ideal_orientation_vec.norm(dist_to_ball_in_dribbler);
 
     return std::make_pair(ideal_position, ideal_orientation);
+}
+
+void ReceiverTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }
