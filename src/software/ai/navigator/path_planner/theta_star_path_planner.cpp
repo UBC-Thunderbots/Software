@@ -3,7 +3,7 @@
  * which returns an optimal path that avoids obstacles
  */
 
-#include "software/ai/navigator/path_planning_navigator/path_planner/theta_star_path_planner.h"
+#include "software/ai/navigator/path_planner/theta_star_path_planner.h"
 
 #include <g3log/g3log.hpp>
 
