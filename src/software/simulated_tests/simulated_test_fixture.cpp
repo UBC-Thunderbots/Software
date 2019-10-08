@@ -6,7 +6,7 @@
 #include "software/typedefs.h"
 #include "software/util/logger/init.h"
 
-class IntegrationTest : public ::testing::Test
+class SimulatedTest : public ::testing::Test
 {
    public:
     void enableVisualizer()
@@ -41,7 +41,7 @@ class IntegrationTest : public ::testing::Test
     std::shared_ptr<VisualizerWrapper> visualizer;
 };
 
-TEST_F(IntegrationTest, sample_integration_test)
+TEST_F(SimulatedTest, sample_integration_test)
 {
     // TODO: Implement this (#768)
 }

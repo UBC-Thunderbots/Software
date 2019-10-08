@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_test(
     name = "integration_tests",
-    srcs = ["integration_test_fixture.cpp"],
+    srcs = ["simulated_test_fixture.cpp"],
     deps = [
         "//software:typedefs",
         "//software/ai:ai_wrapper",
