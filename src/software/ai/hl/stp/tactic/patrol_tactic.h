@@ -30,7 +30,7 @@ class PatrolTactic : public Tactic
      * @param orientation_at_patrol_points The orientation the robot
      * should have while patrolling
      */
-    void updateWorldParams(Angle orientation_at_patrol_points);
+    void updateControlParams(Angle orientation_at_patrol_points);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
