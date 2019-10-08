@@ -15,7 +15,6 @@ cc_library(
         ":motion_constraint",
         "//software/ai/hl/stp/tactic:all_tactics",
         "//software/ai/hl/stp/tactic:tactic_visitor",
-        "//software/ai/world:game_state",
     ],
 )
 

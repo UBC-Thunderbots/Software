@@ -19,7 +19,7 @@ namespace
                                                        std::set<MotionConstraint>({}))};
 
     // TODO: When all the tactics are merged in, add these tactics to test vector
-    // Note that tactics currently don't obey the whitelist only rule that 
+    // Note that tactics currently don't obey the whitelist only rule that
     // motion constraints must follow
 
     /*
