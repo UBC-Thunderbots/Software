@@ -16,14 +16,14 @@ std::string BlockShotPathTactic::getName() const
     return "Block Shot Path Tactic";
 }
 
-void BlockShotPathTactic::updateWorldParams(const Robot& enemy_robot)
+void BlockShotPathTactic::updateControlParams(const Robot& enemy_robot)
 {
-    updateWorldParams(enemy_robot.position());
+    updateControlParams(enemy_robot.position());
 }
 
-void BlockShotPathTactic::updateWorldParams(const Point& shot_origin)
+void BlockShotPathTactic::updateControlParams(const Point& shot_origin)
 {
-    // Update the parameters stored by this Tactic
+    // Update the control parameters stored by this Tactic
     this->shot_origin = shot_origin;
 }
 
