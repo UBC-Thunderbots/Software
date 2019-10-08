@@ -34,12 +34,9 @@ void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly
     this->ball          = ball;
 }
 
-void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
-                                        const Team &enemy_team, const Ball &ball,
-                                        std::optional<Point> chip_target)
+void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
 {
     this->chip_target = chip_target;
-    updateWorldParams(field, friendly_team, enemy_team, ball);
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)

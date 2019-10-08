@@ -126,8 +126,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             chip_target = chip_targets[0].getOrigin();
         }
         shoot_or_chip_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
-                                                world.enemyTeam(), world.ball(),
-                                                chip_target);
+                                                world.enemyTeam(), world.ball());
+        shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);
