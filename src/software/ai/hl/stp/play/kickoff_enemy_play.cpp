@@ -125,7 +125,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // anyway
                 shadow_enemy_tactics.at(i)->updateWorldParams(
                     world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
-                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat, shadow_dist);
+                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
+                                                                shadow_dist);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else

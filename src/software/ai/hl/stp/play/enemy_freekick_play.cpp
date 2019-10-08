@@ -132,8 +132,8 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             shadow_tactic_main->updateWorldParams(world.field(), world.friendlyTeam(),
                                                   world.enemyTeam(), world.ball());
-            shadow_tactic_main->updateControlParams(
-                enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
+            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
+                                                    ROBOT_MAX_RADIUS_METERS * 3);
             move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
@@ -146,12 +146,12 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             shadow_tactic_main->updateWorldParams(world.field(), world.friendlyTeam(),
                                                   world.enemyTeam(), world.ball());
-            shadow_tactic_main->updateControlParams(
-                enemy_threats.at(1), ROBOT_MAX_RADIUS_METERS * 3);
+            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
+                                                    ROBOT_MAX_RADIUS_METERS * 3);
             shadow_tactic_secondary->updateWorldParams(
                 world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
-            shadow_tactic_secondary->updateControlParams(
-                enemy_threats.at(2), ROBOT_MAX_RADIUS_METERS * 3);
+            shadow_tactic_secondary->updateControlParams(enemy_threats.at(2),
+                                                         ROBOT_MAX_RADIUS_METERS * 3);
 
             tactics_to_run.emplace_back(shadow_tactic_main);
             tactics_to_run.emplace_back(shadow_tactic_secondary);

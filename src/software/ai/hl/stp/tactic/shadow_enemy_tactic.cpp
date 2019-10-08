@@ -37,8 +37,8 @@ void ShadowEnemyTactic::updateWorldParams(const Field &field, const Team &friend
 void ShadowEnemyTactic::updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
                                             double shadow_distance)
 {
-    this->enemy_threat        = enemy_threat;
-    this->shadow_distance     = shadow_distance;
+    this->enemy_threat    = enemy_threat;
+    this->shadow_distance = shadow_distance;
 }
 
 double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &world)

@@ -20,10 +20,10 @@ class GoalieTactic : public Tactic
     /**
      * Updates the world parameters for this GoalieTactic.
      *
-    * @param ball
-    * @param field
-    * @param friendly_team
-    * @param enemy_team
+     * @param ball
+     * @param field
+     * @param friendly_team
+     * @param enemy_team
      */
     void updateWorldParams(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team);
