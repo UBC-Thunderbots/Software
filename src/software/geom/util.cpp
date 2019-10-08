@@ -99,10 +99,10 @@ double dist(const Point &first, const Rectangle &second)
 
     // Calculate the distance from the point to each edge of the rectangle
     std::array<double, 4> distances = {
-        dist(first, Segment(second.neCorner(), second.seCorner())),
-        dist(first, Segment(second.seCorner(), second.swCorner())),
-        dist(first, Segment(second.swCorner(), second.nwCorner())),
-        dist(first, Segment(second.nwCorner(), second.neCorner()))};
+        dist(first, Segment(second.posXPosYCorner(), second.posXNegYCorner())),
+        dist(first, Segment(second.posXNegYCorner(), second.negXNegYCorner())),
+        dist(first, Segment(second.negXNegYCorner(), second.negXPosYCorner())),
+        dist(first, Segment(second.negXPosYCorner(), second.posXPosYCorner()))};
     return *std::min_element(distances.begin(), distances.end());
 }
 
@@ -517,10 +517,10 @@ Vector clipPoint(const Vector &p, const Vector &bound1, const Vector &bound2)
 
 Vector clipPoint(const Vector &p, const Rectangle &r)
 {
-    const double minx = r.swCorner().x();
-    const double miny = r.swCorner().y();
-    const double maxx = r.neCorner().x();
-    const double maxy = r.neCorner().y();
+    const double minx = r.negXNegYCorner().x();
+    const double miny = r.negXNegYCorner().y();
+    const double maxx = r.posXPosYCorner().x();
+    const double maxy = r.posXPosYCorner().y();
     Vector ret        = p;
     if (p.x() < minx)
     {
@@ -1351,10 +1351,10 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
     //       https://stackoverflow.com/questions/34093602/efficient-algorithm-to-determine-largest-open-space
 
     // Add the 4 corners of the rectangle to the list of points
-    points.emplace_back(rectangle.neCorner());
-    points.emplace_back(rectangle.nwCorner());
-    points.emplace_back(rectangle.seCorner());
-    points.emplace_back(rectangle.swCorner());
+    points.emplace_back(rectangle.posXPosYCorner());
+    points.emplace_back(rectangle.negXPosYCorner());
+    points.emplace_back(rectangle.posXNegYCorner());
+    points.emplace_back(rectangle.negXNegYCorner());
 
     // Construct the voronoi diagram
     voronoi_diagram<double> vd;

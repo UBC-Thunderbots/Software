@@ -8,8 +8,8 @@
 
 typedef enum
 {
-    EAST,  // positive X side according to vision
-    WEST   // negative X side
+    POS_X,  // positive X side according to vision
+    NEG_X   // negative X side
 } FieldSide;
 
 /**

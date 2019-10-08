@@ -123,9 +123,9 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
         case AvoidArea::FRIENDLY_DEFENSE_AREA:
             // We extend the friendly defense area back by several meters to prevent
             // robots going around the back of the goal
-            rectangle =
-                Rectangle(world.field().friendlyDefenseArea().neCorner(),
-                          Point(-10, world.field().friendlyDefenseArea().seCorner().y()));
+            rectangle = Rectangle(
+                world.field().friendlyDefenseArea().posXPosYCorner(),
+                Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *
@@ -134,9 +134,9 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
         case AvoidArea::ENEMY_DEFENSE_AREA:
             // We extend the enemy defense area back by several meters to prevent
             // robots going around the back of the goal
-            rectangle =
-                Rectangle(world.field().enemyDefenseArea().nwCorner(),
-                          Point(10, world.field().enemyDefenseArea().swCorner().y()));
+            rectangle = Rectangle(
+                world.field().enemyDefenseArea().negXPosYCorner(),
+                Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *
