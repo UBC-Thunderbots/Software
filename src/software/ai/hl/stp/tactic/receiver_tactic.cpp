@@ -71,7 +71,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             Point target_position = shot->getPointToShootAt();
 
             Angle shot_angle = (target_position - robot->position()).orientation();
-          
+
             // If we do have a valid shot on net, orient the robot to face in between
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
