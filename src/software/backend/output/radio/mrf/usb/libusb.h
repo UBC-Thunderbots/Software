@@ -1,7 +1,7 @@
 #ifndef UTIL_LIBUSB_H
 #define UTIL_LIBUSB_H
 
-#include <libusb/libusb.h>
+#include <libusb.h>
 
 #include <cassert>
 #include <cstddef>

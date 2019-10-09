@@ -10,6 +10,7 @@ cc_library(
         "//software/backend/output/grsim/command_primitive_visitor:grsim_command_primitive_visitor",
         "//software/proto:grsim_cc_proto",
         "//software/util/parameter:dynamic_parameters",
+        "@boost//:asio"
     ],
 )
 
