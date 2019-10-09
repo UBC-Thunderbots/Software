@@ -77,18 +77,18 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     std::vector<Point> defense_positions = {
         Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              -world.field().defenseAreaWidth() / 2.0),
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              -world.field().defenseAreaYLength() / 2.0),
         Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().defenseAreaWidth() / 2.0),
-        Point(world.field().friendlyGoal().x() + world.field().defenseAreaLength() +
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world.field().defenseAreaYLength() / 2.0),
+        Point(world.field().friendlyGoal().x() + world.field().defenseAreaXLength() +
                   2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoal().y()),
         Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              world.field().defenseAreaWidth() / 2.0),
+              world.field().defenseAreaYLength() / 2.0),
         Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              -world.field().defenseAreaWidth() / 2.0),
+              -world.field().defenseAreaYLength() / 2.0),
     };
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {

@@ -21,36 +21,37 @@ class Field
     /**
      * Constructs a new field with the given dimensions
      *
-     * @param field_length the length of the playing area (along the x-axis)
-     * @param field_width the width of the playing area (along the y-axis)
-     * @param defense_length the length of the defense area (along the x-axis)
-     * @param defense_width the width of the defense area (along the y-axis)
-     * @param goal_width the width of the goal (along the y-axis)
-     * @param boundary_width the width/size of the boundary area between the edge of the
+     * @param field_x_length the length of the playing area (along the x-axis)
+     * @param field_y_length the length of the playing area (along the y-axis)
+     * @param defense_x_length the length of the defense area (along the x-axis)
+     * @param defense_y_length the length of the defense area (along the y-axis)
+     * @param goal_y_length the length of the goal (along the y-axis)
+     * @param boundary_buffer_size the size of the boundary area between the edge of the
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      * @param timestamp the Timestamp associated with the creation of the Field object
      */
-    explicit Field(double field_length, double field_width, double defense_length,
-                   double defense_width, double goal_width, double boundary_width,
-                   double center_circle_radius, const Timestamp &timestamp,
-                   unsigned int buffer_size = 20);
+    explicit Field(double field_x_length, double field_y_length, double defense_x_length,
+                   double defense_y_length, double goal_y_length,
+                   double boundary_buffer_size, double center_circle_radius,
+                   const Timestamp &timestamp, unsigned int buffer_size = 20);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
      *
-     * @param field_length the length of the playing area (along the x-axis)
-     * @param field_width the width of the playing area (along the y-axis)
-     * @param defense_length the length of the defense area (along the x-axis)
-     * @param defense_width the width of the defense area (along the y-axis)
-     * @param goal_width the width of the goal (along the y-axis)
-     * @param boundary_width the width/size of the boundary area between the edge of the
+     * @param field_x_length the length of the playing area (along the x-axis)
+     * @param field_y_length the length of the playing area (along the y-axis)
+     * @param defense_x_length the length of the defense area (along the x-axis)
+     * @param defense_y_length the length of the defense area (along the y-axis)
+     * @param goal_y_length the length of the goal (along the y-axis)
+     * @param boundary_buffer_size the size of the boundary area between the edge of thet
      * playing area and the physical border/perimeter of the field
      * @param center_circle_radius the radius of the center circle
      * @param timestamp the Timestamp corresponding to any updates to the Field object
      */
-    void updateDimensions(double field_length, double field_width, double defense_length,
-                          double defense_width, double goal_width, double boundary_width,
+    void updateDimensions(double field_x_length, double field_y_length,
+                          double defense_x_length, double defense_y_length,
+                          double goal_y_length, double boundary_buffer_size,
                           double center_circle_radius, const Timestamp &timestamp);
 
     /**
@@ -61,40 +62,42 @@ class Field
     void updateDimensions(const Field &new_field_data);
 
     /**
-     * Gets the length of the field from goal-line to goal-line in metres.
+     * Gets the x-axis length of the field from goal-line to goal-line in metres.
      *
-     * @return the length of the field in metres.
+     * @return the x-axis length of the field in metres.
      */
-    double length() const;
+    double xLength() const;
 
     /**
-     * Gets the length of the field including the boundary area in metres.
+     * Gets the x-axis length of the field including the boundary area in metres.
      *
-     * @return the total length of the field in metres, including the boundary area.
+     * @return the total x-axis length of the field in metres, including the boundary
+     * area.
      */
-    double totalLength() const;
+    double totalXLength() const;
 
     /**
-     * Gets the width of the field from sideline to sideline in metres.
+     * Gets the y-axis length of the field from sideline to sideline in metres.
      *
-     * @return the width of the field in metres.
+     * @return the y-axis length of the field in metres.
      */
-    double width() const;
+    double yLength() const;
 
     /**
-     * Gets the width of the field including the boundary area in metres.
+     * Gets the y-axis length of the field including the boundary area in metres.
      *
-     * @return the total width of the field in metres, including the boundary area.
+     * @return the total y-axis length of the field in metres, including the boundary
+     * area.
      */
-    double totalWidth() const;
+    double totalYLength() const;
 
     /**
-     * Gets the width of the goal, symmetric above and below the centreline,
+     * Gets the y-axis length of the goal, symmetric above and below the centreline,
      * from goalpost to goalpost in metres.
      *
-     * @return the width of the goal in metres.
+     * @return the y-axis length of the goal in metres.
      */
-    double goalWidth() const;
+    double goalYLength() const;
 
     /**
      * Gets the radius of the centre circle in metres.
@@ -124,7 +127,7 @@ class Field
      *
      * @return the width of the defense area
      */
-    double defenseAreaWidth() const;
+    double defenseAreaYLength() const;
 
     /**
      * Gets the length of the defense area in metres, which runs along the x-axis. This
@@ -132,7 +135,7 @@ class Field
      *
      * @return the width of the straight parts in metres.
      */
-    double defenseAreaLength() const;
+    double defenseAreaXLength() const;
 
     /**
      * Gets the friendly defense area as a Rectangle.
@@ -260,7 +263,7 @@ class Field
      *
      * @return the size of the margin/bounds around the field
      */
-    double boundaryWidth() const;
+    double boundaryYLength() const;
 
     /**
      * Returns whether p is in the friendly defense area
@@ -340,18 +343,19 @@ class Field
     void updateTimestamp(Timestamp time_stamp);
 
     // The length of the playable field (between the goal lines) in metres
-    double field_length_;
+    double field_x_length_;
     // The width of the playable field (between the sidelines) in metres
-    double field_width_;
-    // The length of the defense area in metres
-    double defense_length_;
-    // The width of the defense area in metres
-    double defense_width_;
+    double field_y_length_;
     // The width of the goal (between the goalposts) in metres
-    double goal_width_;
+    double goal_y_length_;
+    // The width of the defense area in metres
+    double defense_y_length_;
+    // The length of the defense area in metres
+    double defense_x_length_;
+
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
-    double boundary_width_;
+    double boundary_buffer_size_;
     // The radius of the center circle in metres
     double center_circle_radius_;
     // All previous timestamps of when the field was updated, with the most recent
