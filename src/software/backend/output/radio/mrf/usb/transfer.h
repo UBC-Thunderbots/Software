@@ -1,6 +1,6 @@
 #pragma once
 
-#include <libusb/libusb.h>
+#include <libusb.h>
 
 #include "software/backend/output/radio/mrf/usb/devicehandle.h"
 #include "software/backend/output/radio/mrf/util/async_operation.h"

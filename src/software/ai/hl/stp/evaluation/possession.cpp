@@ -4,8 +4,8 @@
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
+#include "software/world/ball.h"
+#include "software/world/field.h"
 
 namespace Evaluation
 {

@@ -5,8 +5,8 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/ai/world/world.h"
 #include "software/geom/rectangle.h"
+#include "software/world/world.h"
 
 /**
  * This tactic is intended to place a robot in a given region, and have the robot
@@ -42,6 +42,13 @@ class CherryPickTactic : public Tactic
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
+
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -7,9 +7,9 @@ cc_library(
         ":robot_status",
         "//software:typedefs",
         "//software/ai/primitive",
-        "//software/ai/world",
         "//software/multithreading:subject",
         "//software/multithreading:threaded_observer",
+        "//software/world",
     ],
 )
 
@@ -54,6 +54,21 @@ cc_library(
         ":backend_factory",
         "//software/backend/input/network/networking:network_client",
         "//software/backend/output/radio:radio_output",
+    ],
+    # We force linking so that the static variables required for the "factory"
+    # design pattern to work are linked in
+    # https://www.bfilipek.com/2018/02/static-vars-static-lib.html
+    alwayslink = True,
+)
+
+cc_library(
+    name = "simulator_backend",
+    srcs = ["simulator_backend.cpp"],
+    hdrs = ["simulator_backend.h"],
+    deps = [
+        ":backend",
+        ":backend_factory",
+        "//software/world",
     ],
     # We force linking so that the static variables required for the "factory"
     # design pattern to work are linked in

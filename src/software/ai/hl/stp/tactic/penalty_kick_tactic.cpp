@@ -10,6 +10,7 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 
@@ -187,4 +188,9 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (
         !(kick_action.done() ||
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
+}
+
+void PenaltyKickTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }
