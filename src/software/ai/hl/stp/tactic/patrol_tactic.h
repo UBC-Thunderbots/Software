@@ -17,20 +17,15 @@ class PatrolTactic : public Tactic
      * patrol sequence the robot must be before it moves on to the next point
      * @param linear_speed_at_patrol_points The desired linear speed
      * of the robot at each patrol point
-     */
-    explicit PatrolTactic(const std::vector<Point>& points,
-                          double at_patrol_point_tolerance,
-                          double linear_speed_at_patrol_points);
-
-    std::string getName() const override;
-
-    /**
-     * Updates the world parameters for this PatrolTactic.
-     *
      * @param orientation_at_patrol_points The orientation the robot
      * should have while patrolling
      */
-    void updateControlParams(Angle orientation_at_patrol_points);
+    explicit PatrolTactic(const std::vector<Point>& points,
+                          double at_patrol_point_tolerance,
+                          Angle orientation_at_patrol_points,
+                          double linear_speed_at_patrol_points);
+
+    std::string getName() const override;
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. If a robot is
