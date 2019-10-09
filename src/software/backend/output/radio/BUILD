@@ -5,8 +5,8 @@ cc_library(
     srcs = ["radio_output.cpp"],
     hdrs = ["radio_output.h"],
     deps = [
-        "//software/ai/world:ball",
-        "//software/ai/world:team",
+        "//software/world:ball",
+        "//software/world:team",
         "//software/backend:robot_status",
         "//software/backend/output/radio/mrf:dongle"
     ],

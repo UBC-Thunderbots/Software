@@ -6,5 +6,5 @@ cc_library(
         "async_operation.h",
         "noncopyable.h",
     ],
-    deps = [],
+    deps = ["@boost//:signals2"],
 )

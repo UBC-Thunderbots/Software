@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
@@ -119,7 +120,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the goalie to a semicircle inscribed inside the defense area
             Point goalie_restricted_pos =
-                field.friendlyGoal() - (field.friendlyDefenseArea().width() *
+                field.friendlyGoal() - (field.friendlyDefenseArea().yLength() *
                                         (field.friendlyGoal() - goalie_pos).norm());
 
             // restrict the point to be within the defense area
@@ -131,4 +132,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(std::move(next_intent));
 
     } while (!move_action.done());
+}
+
+void GoalieTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

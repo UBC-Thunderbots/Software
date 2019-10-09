@@ -349,9 +349,10 @@ TEST_P(OneTimeShotPositionTest, test_receiver_moves_to_correct_one_time_shot_pos
     // Create a best shot towards the center of the enemy goal
     Point best_shot_target = Point(4.5, 0);
 
-    auto [ideal_position, ideal_orientation] =
-        ReceiverTactic::getOneTimeShotPositionAndOrientation(robot, ball,
-                                                             best_shot_target);
+    Shot shot = ReceiverTactic::getOneTimeShotPositionAndOrientation(robot, ball,
+                                                                     best_shot_target);
+    Point ideal_position    = shot.getPointToShootAt();
+    Angle ideal_orientation = shot.getOpenAngle();
 
     // The position where the ball should make contact with the receiver robot
     Point ball_contact_position =

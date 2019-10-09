@@ -65,7 +65,7 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
     //
     // http://www.stumblingrobot.com/2015/10/06/
     // find-the-largest-rectangle-that-can-be-inscribed-in-a-semicircle/
-    float semicircle_radius = sqrt(2) * world.field().friendlyDefenseArea().width();
+    float semicircle_radius = sqrt(2) * world.field().friendlyDefenseArea().yLength();
 
     do
     {

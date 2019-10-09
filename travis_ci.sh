@@ -37,10 +37,10 @@ if [ "$RUN_BUILD" == "true" ]; then
     if [ "$RUN_TESTS" == "true" ]; then
         if [ "$RUN_COVERAGE" == "true" ]; then
             # Run tests + coverage
-            travis_run bazel coverage //... --compilation_mode=fastbuild --verbose_test_summary --instrumentation_filter=//...
+            travis_run bazel coverage //... --compilation_mode=fastbuild --verbose_test_summary --instrumentation_filter=//... --test_output=errors
         else
             # Run tests
-            travis_run bazel test //... --compilation_mode=fastbuild --verbose_test_summary
+            travis_run bazel test //... --compilation_mode=fastbuild --verbose_test_summary --test_output=errors
         fi
     else
         # Build everything as fast as possible

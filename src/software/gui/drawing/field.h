@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/ai/world/field.h"
+#include "software/world/field.h"
 
 /**
  * This file contains all the functions that allow us to draw the Field in a

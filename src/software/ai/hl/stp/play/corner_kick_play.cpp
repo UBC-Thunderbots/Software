@@ -64,16 +64,16 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
-    Vector pos_y_goalline_x_offset(world.field().enemyDefenseArea().width(), 0);
-    Vector neg_y_goalline_x_offset(world.field().enemyDefenseArea().width(), 0);
+    Vector pos_y_goalline_x_offset(world.field().enemyDefenseArea().yLength(), 0);
+    Vector neg_y_goalline_x_offset(world.field().enemyDefenseArea().yLength(), 0);
     if (kick_from_pos_corner)
     {
-        pos_y_goalline_x_offset += {world.field().enemyDefenseArea().width(), 0};
+        pos_y_goalline_x_offset += {world.field().enemyDefenseArea().yLength(), 0};
     }
     else
     {
         // kick from neg corner
-        neg_y_goalline_x_offset += {world.field().enemyDefenseArea().width(), 0};
+        neg_y_goalline_x_offset += {world.field().enemyDefenseArea().yLength(), 0};
     }
     Vector center_line_x_offset(1, 0);
     Rectangle pos_y_cherry_pick_rectangle(
@@ -98,10 +98,10 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     Point opposite_corner_to_kick = kick_from_pos_corner ? world.field().enemyCornerNeg()
                                                          : world.field().enemyCornerPos();
     Point bait_move_tactic_1_pos =
-        opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().width() * 0.5,
+        opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().yLength() * 0.5,
                                          copysign(0.5, opposite_corner_to_kick.y()));
     Point bait_move_tactic_2_pos =
-        opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().width() * 1.5,
+        opposite_corner_to_kick - Vector(world.field().enemyDefenseArea().yLength() * 1.5,
                                          copysign(0.5, opposite_corner_to_kick.y()));
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);

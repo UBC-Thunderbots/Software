@@ -3,11 +3,11 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/world/ball.h"
-#include "software/ai/world/robot.h"
 #include "software/backend/output/grsim/command_primitive_visitor/grsim_command_primitive_visitor.h"
 #include "software/backend/output/grsim/command_primitive_visitor/motion_controller.h"
 #include "software/geom/angle.h"
+#include "software/world/ball.h"
+#include "software/world/robot.h"
 
 #define POSITION_TOLERANCE 0.01
 #define VELOCITY_BASE_TOLERANCE 0.015

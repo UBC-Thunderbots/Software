@@ -3,6 +3,7 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
@@ -50,7 +51,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // We normalize with the total field length so that robots that are within the
         // field have a cost less than 1
         cost = (ball_intercept_opt->first - robot.position()).len() /
-               world.field().totalLength();
+               world.field().totalXLength();
     }
     else
     {
@@ -58,7 +59,7 @@ double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &worl
         // position. We normalize with the total field length so that robots that are
         // within the field have a cost less than 1
         cost = (world.ball().position() - robot.position()).len() /
-               world.field().totalLength();
+               world.field().totalXLength();
     }
 
     return std::clamp<double>(cost, 0, 1);
@@ -106,7 +107,7 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
         if (!isEnemyAboutToStealBall())
         {
             yield(kick_action.updateStateAndGetNextIntent(
-                *robot, ball, ball.position(), shot_target->first,
+                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
                 BALL_MAX_SPEED_METERS_PER_SECOND - 0.5));
         }
         else
@@ -115,8 +116,9 @@ void ShootGoalTactic::shootUntilShotBlocked(KickAction &kick_action,
             // steal the ball we chip instead to just get over the enemy. We do not adjust
             // the point we are targeting since that may take more time to realign to, and
             // we need to be very quick so the enemy doesn't get the ball
-            yield(chip_action.updateStateAndGetNextIntent(*robot, ball, ball.position(),
-                                                          shot_target->first, CHIP_DIST));
+            yield(chip_action.updateStateAndGetNextIntent(
+                *robot, ball, ball.position(), shot_target->getPointToShootAt(),
+                CHIP_DIST));
         }
 
         shot_target = Evaluation::calcBestShotOnEnemyGoal(field, friendly_team,
@@ -135,7 +137,7 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         auto shot_target = Evaluation::calcBestShotOnEnemyGoal(
             field, friendly_team, enemy_team, ball.position());
-        if (shot_target && shot_target->second > min_net_open_angle)
+        if (shot_target && shot_target->getOpenAngle() > min_net_open_angle)
         {
             // Once we have determined we can take a shot, continue to try shoot until the
             // shot is entirely blocked
@@ -167,4 +169,9 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
         }
     } while (!(kick_action.done() || chip_action.done()));
+}
+
+void ShootGoalTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
