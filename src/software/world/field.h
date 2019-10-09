@@ -351,11 +351,7 @@ class Field
     double defense_x_length_;
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
-<<<<<<< HEAD
     double boundary_buffer_size_;
-=======
-    double boundary_y_length_;
->>>>>>> moved world folder to resolve merge conflict
     // The radius of the center circle in metres
     double center_circle_radius_;
     // All previous timestamps of when the field was updated, with the most recent

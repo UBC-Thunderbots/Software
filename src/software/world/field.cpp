@@ -241,11 +241,7 @@ bool Field::operator==(const Field &other) const
            this->goal_y_length_ == other.goal_y_length_ &&
            this->defense_y_length_ == other.defense_y_length_ &&
            this->defense_x_length_ == other.defense_x_length_ &&
-<<<<<<< HEAD
            this->boundary_buffer_size_ == other.boundary_buffer_size_ &&
-=======
-           this->boundary_y_length_ == other.boundary_y_length_ &&
->>>>>>> moved world folder to resolve merge conflict
            this->center_circle_radius_ == other.center_circle_radius_;
 }
 
