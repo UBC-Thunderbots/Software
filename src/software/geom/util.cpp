@@ -433,7 +433,7 @@ std::vector<Shot> angleSweepCirclesAll(const Vector &src, const Vector &p1,
     }
 
     std::vector<Shot> result;
-    for (int i = 0; i < events_collapsed.size() - 1; i += 2)
+    for (unsigned i = 0; i < events_collapsed.size() - 1; i += 2)
     {
         // Calculate the center of this range on the target line segement
         Angle range_start = events_collapsed[i].first + start_angle;
