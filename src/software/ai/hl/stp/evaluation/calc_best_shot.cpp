@@ -4,18 +4,19 @@
 
 namespace Evaluation
 {
-    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
-        const Point &goal_post_neg, const Point &goal_post_pos, const Point &p,
-        const std::vector<Point> &obstacles, double radius)
+    std::optional<Shot> calcBestShotOnGoal(const Point &goal_post_neg,
+                                           const Point &goal_post_pos, const Point &p,
+                                           const std::vector<Point> &obstacles,
+                                           double radius)
     {
         // Use angleSweepCircle function to get the pair
         return angleSweepCircles(p, goal_post_neg, goal_post_pos, obstacles, radius);
     }
 
-    std::optional<std::pair<Point, Angle>> calcBestShotOnGoal(
-        const Field &field, const Team &friendly_team, const Team &enemy_team,
-        const Point &point, bool shoot_on_enemy_goal, double radius,
-        const std::vector<Robot> &robots_to_ignore)
+    std::optional<Shot> calcBestShotOnGoal(const Field &field, const Team &friendly_team,
+                                           const Team &enemy_team, const Point &point,
+                                           bool shoot_on_enemy_goal, double radius,
+                                           const std::vector<Robot> &robots_to_ignore)
     {
         std::vector<Point> obstacles;
         for (const Robot &enemy_robot : enemy_team.getAllRobots())
@@ -37,7 +38,7 @@ namespace Evaluation
             }
         }
 
-        std::optional<std::pair<Point, Angle>> best_shot;
+        std::optional<Shot> best_shot;
 
         // Calculate the best_shot based on what goal we're shooting at
         if (shoot_on_enemy_goal)
@@ -56,7 +57,7 @@ namespace Evaluation
         return best_shot;
     }
 
-    std::optional<std::pair<Point, Angle>> calcBestShotOnEnemyGoal(
+    std::optional<Shot> calcBestShotOnEnemyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Robot &robot, double radius, const std::vector<Robot> &robots_to_ignore)
     {
@@ -67,7 +68,7 @@ namespace Evaluation
                                        radius, all_robots_to_ignore);
     }
 
-    std::optional<std::pair<Point, Angle>> calcBestShotOnEnemyGoal(
+    std::optional<Shot> calcBestShotOnEnemyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &shot_origin, double radius,
         const std::vector<Robot> &robots_to_ignore)
@@ -76,7 +77,7 @@ namespace Evaluation
                                   radius, robots_to_ignore);
     }
 
-    std::optional<std::pair<Point, Angle>> calcBestShotOnFriendlyGoal(
+    std::optional<Shot> calcBestShotOnFriendlyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Robot &robot, double radius, const std::vector<Robot> &robots_to_ignore)
     {
@@ -87,7 +88,7 @@ namespace Evaluation
                                           robot.position(), radius, all_robots_to_ignore);
     }
 
-    std::optional<std::pair<Point, Angle>> calcBestShotOnFriendlyGoal(
+    std::optional<Shot> calcBestShotOnFriendlyGoal(
         const Field &field, const Team &friendly_team, const Team &enemy_team,
         const Point &shot_origin, double radius,
         const std::vector<Robot> &robots_to_ignore)
@@ -97,20 +98,20 @@ namespace Evaluation
     }
 
     double calcShotOpenFriendlyNetPercentage(const Field &field, const Point &shot_origin,
-                                             const std::pair<Point, Angle> &shot)
+                                             const Shot &shot)
     {
         Angle goal_angle = acuteVertexAngle(field.friendlyGoalpostPos(), shot_origin,
                                             field.friendlyGoalpostNeg())
                                .abs();
-        return shot.second.toDegrees() / goal_angle.toDegrees();
+        return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 
     double calcShotOpenEnemyNetPercentage(const Field &field, const Point &shot_origin,
-                                          const std::pair<Point, Angle> &shot)
+                                          const Shot &shot)
     {
         Angle goal_angle = acuteVertexAngle(field.enemyGoalpostPos(), shot_origin,
                                             field.enemyGoalpostNeg())
                                .abs();
-        return shot.second.toDegrees() / goal_angle.toDegrees();
+        return shot.getOpenAngle().toDegrees() / goal_angle.toDegrees();
     }
 }  // namespace Evaluation

@@ -27,7 +27,7 @@ qt_cc_library(
     deps = [
         ":main_widget",
         "//software/ai/hl/stp:play_info",
-        "//software/ai/world",
+        "//software/world",
         "//software/backend:robot_status",
         "//software/gui/drawing:draw_functions",
         "@qt//:qt_widgets",

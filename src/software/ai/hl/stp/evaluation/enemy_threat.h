@@ -3,7 +3,7 @@
 #include <optional>
 #include <vector>
 
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 
 namespace Evaluation
 {

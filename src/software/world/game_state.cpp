@@ -1,4 +1,4 @@
-#include "software/ai/world/game_state.h"
+#include "software/world/game_state.h"
 
 #include <g3log/g3log.hpp>
 

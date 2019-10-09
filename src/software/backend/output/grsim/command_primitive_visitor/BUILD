@@ -9,8 +9,8 @@ cc_library(
         "//shared:constants",
         "//software/ai/primitive:all_primitives",
         "//software/ai/primitive:primitive_visitor",
-        "//software/ai/world:ball",
-        "//software/ai/world:robot",
+        "//software/world:ball",
+        "//software/world:robot",
     ],
 )
 
@@ -19,7 +19,7 @@ cc_library(
     srcs = ["motion_controller.cpp"],
     hdrs = ["motion_controller.h"],
     deps = [
-        "//software/ai/world:robot",
+        "//software/world:robot",
     ],
 )
 

@@ -5,7 +5,15 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/intent/intent.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
+
+// We forward-declare the TacticVisitor interface (pure virtual class) because we need
+// to know about the existence of this class in order to accept visitors with the
+// accept() function. We cannot use an #include statement because this creates a cyclic
+// dependency
+//
+// This class can be found in ai/hl/stp/tactic/tactic_visitor.h
+class TacticVisitor;
 
 /**
  * In the STP framework, a Tactic represents a role or objective for a single robot. For
@@ -139,6 +147,13 @@ class Tactic
      * @param area The area to remove from the blacklist of areas to avoid
      */
     void removeBlacklistedAvoidArea(AvoidArea area);
+
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    virtual void accept(TacticVisitor &visitor) const = 0;
 
     virtual ~Tactic() = default;
 

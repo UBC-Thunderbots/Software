@@ -4,6 +4,7 @@
 
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
                            double at_patrol_point_tolerance,
@@ -46,7 +47,7 @@ double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)
     {
         // Prefer robots that are close to the current patrol point
         double dist = (robot.position() - patrol_points.at(patrol_point_index)).len();
-        double cost = dist / world.field().totalLength();
+        double cost = dist / world.field().totalXLength();
         return std::clamp<double>(cost, 0, 1);
     }
 }
@@ -79,4 +80,9 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         yield(std::move(next_intent));
     } while (true);
+}
+
+void PatrolTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }
