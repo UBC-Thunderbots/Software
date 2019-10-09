@@ -75,3 +75,11 @@ new_local_repository(
     build_file = "@bazel_rules_qt//:qt.BUILD",
     path = "external/qt", # This directory is symlinked in the setup script
 )
+
+new_git_repository(
+    name = "box2d",
+    build_file = "@//external:box2d.BUILD",
+    commit = "ef96a4f17f1c5527d20993b586b400c2617d6ae1",
+    remote = "https://github.com/erincatto/Box2D.git",
+    shallow_since = "1561963347 +0200",
+)
