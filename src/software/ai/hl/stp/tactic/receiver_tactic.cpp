@@ -29,13 +29,16 @@ std::string ReceiverTactic::getName() const
 
 void ReceiverTactic::updateWorldParams(const Team& updated_friendly_team,
                                        const Team& updated_enemy_team,
-                                       const Passing::Pass& updated_pass,
                                        const Ball& updated_ball)
 {
     this->friendly_team = updated_friendly_team;
     this->enemy_team    = updated_enemy_team;
     this->ball          = updated_ball;
-    this->pass          = updated_pass;
+}
+
+void ReceiverTactic::updateControlParams(const Passing::Pass& updated_pass)
+{
+    this->pass = updated_pass;
 }
 
 double ReceiverTactic::calculateRobotCost(const Robot& robot, const World& world)

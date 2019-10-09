@@ -39,12 +39,17 @@ class ReceiverTactic : public Tactic
      *
      * @param updated_friendly_team The current state of the friendly team
      * @param updated_enemy_team The current state of the enemy team
-     * @param updated_pass The pass this tactic should try to receive
      * @param updated_ball The ball being passed
      */
     void updateWorldParams(const Team& updated_friendly_team,
-                           const Team& updated_enemy_team,
-                           const Passing::Pass& updated_pass, const Ball& updated_ball);
+                           const Team& updated_enemy_team, const Ball& updated_ball);
+
+    /**
+     * Updates the control parameters for this ReceiverTactic.
+     *
+     * @param updated_pass The pass this tactic should try to receive
+     */
+    void updateControlParams(const Passing::Pass& updated_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

@@ -194,8 +194,9 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         passer->updateWorldParams(world.ball());
         passer->updateControlParams(pass);
-        receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(), pass,
+        receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
                                     world.ball());
+        receiver->updateControlParams(pass);
         yield({passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
     } while (!receiver->done());
 
