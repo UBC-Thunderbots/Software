@@ -163,18 +163,18 @@ std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
         case AvoidArea::BALL:
             return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
-            rectangle = Rectangle(
-                {0, world.field().totalWidth() / 2},
-                world.field().enemyCornerNeg() - Point(0, world.field().boundaryWidth()));
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                  world.field().enemyCornerNeg() -
+                                      Point(0, world.field().boundaryYLength()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *
                 ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::FRIENDLY_HALF:
-            rectangle = Rectangle({0, world.field().totalWidth() / 2},
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                   world.field().friendlyCornerNeg() -
-                                      Point(0, world.field().boundaryWidth()));
+                                      Point(0, world.field().boundaryYLength()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *

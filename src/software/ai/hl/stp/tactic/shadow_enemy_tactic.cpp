@@ -50,7 +50,7 @@ double ShadowEnemyTactic::calculateRobotCost(const Robot &robot, const World &wo
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost = (robot.position() - enemy_threat->robot.position()).len() /
-                  world.field().totalLength();
+                  world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -93,7 +93,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Vector enemy_shot_vector = Vector(0, 0);
             if (best_enemy_shot_opt)
             {
-                enemy_shot_vector = best_enemy_shot_opt->first - enemy_robot.position();
+                enemy_shot_vector =
+                    best_enemy_shot_opt->getPointToShootAt() - enemy_robot.position();
             }
             else
             {

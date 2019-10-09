@@ -120,7 +120,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the goalie to a semicircle inscribed inside the defense area
             Point goalie_restricted_pos =
-                field.friendlyGoal() - (field.friendlyDefenseArea().width() *
+                field.friendlyGoal() - (field.friendlyDefenseArea().yLength() *
                                         (field.friendlyGoal() - goalie_pos).norm());
 
             // restrict the point to be within the defense area

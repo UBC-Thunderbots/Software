@@ -50,7 +50,7 @@ double CreaseDefenderTactic::calculateRobotCost(const Robot &robot, const World 
     if (desired_state)
     {
         cost = (robot.position() - calculateDesiredState(robot)->first).len() /
-               world.field().totalLength();
+               world.field().totalXLength();
     }
     return std::clamp<double>(cost, 0, 1);
 }
@@ -138,7 +138,7 @@ std::optional<std::pair<Point, Angle>> CreaseDefenderTactic::calculateDesiredSta
         auto best_shot = Evaluation::calcBestShotOnFriendlyGoal(
             field, friendly_team, enemy_team, ball.position(), ROBOT_MAX_RADIUS_METERS,
             {robot});
-        Vector shot_vector = best_shot->first - ball.position();
+        Vector shot_vector = best_shot->getPointToShootAt() - ball.position();
         Ray shot_ray       = Ray(ball.position(), shot_vector);
 
         // Figure out where the best shot intersects the path the

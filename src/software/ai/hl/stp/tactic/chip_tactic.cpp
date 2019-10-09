@@ -29,7 +29,7 @@ double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // the closer the robot is to a ball, the cheaper it is to perform the chip
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
