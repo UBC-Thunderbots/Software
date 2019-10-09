@@ -5,6 +5,9 @@
 #include "software/backend/backend.h"
 #include "software/world/world.h"
 
+// Box2D tutorials and documentation used as reference
+// TODO: Move these somewhere more appropriate
+// https://github.com/libgdx/libgdx/wiki/Box2d
 class SimulatorBackend : public Backend
 {
    public:
