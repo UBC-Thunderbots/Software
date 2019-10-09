@@ -44,7 +44,6 @@ class ShootGoalTactic : public Tactic
     void updateWorldParams(const Field& field, const Team& friendly_team,
                            const Team& enemy_team, const Ball& ball);
 
-
     /**
      * Updates the control parameters for this ShootGoalTactic
      *
