@@ -346,12 +346,12 @@ class Field
     double field_x_length_;
     // The width of the playable field (between the sidelines) in metres
     double field_y_length_;
-    // The width of the goal (between the goalposts) in metres
-    double goal_y_length_;
-    // The width of the defense area in metres
-    double defense_y_length_;
     // The length of the defense area in metres
     double defense_x_length_;
+    // The width of the defense area in metres
+    double defense_y_length_;
+    // The width of the goal (between the goalposts) in metres
+    double goal_y_length_;
 
     // The width of the boundary (between the edge of the marked field lines and the
     // physical border around the field) in metres
