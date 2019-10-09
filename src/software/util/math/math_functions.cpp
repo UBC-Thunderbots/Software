@@ -21,8 +21,8 @@ double rectangleSigmoid(const Rectangle& rect, const Point& point,
 {
     double x_offset = rect.centre().x();
     double y_offset = rect.centre().y();
-    double x_size   = rect.width() / 2;
-    double y_size   = rect.height() / 2;
+    double x_size   = rect.xLength() / 2;
+    double y_size   = rect.yLength() / 2;
     double x        = point.x();
     double y        = point.y();
 
