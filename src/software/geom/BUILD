@@ -26,6 +26,7 @@ cc_library(
     deps = [
         "@boost//:geometry",
         "@g3log",
+        "@boost//:polygon",
     ],
 )
 
