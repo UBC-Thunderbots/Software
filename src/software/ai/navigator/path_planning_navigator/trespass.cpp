@@ -42,8 +42,8 @@ namespace Navigator
                  */
 
                 return fmax(
-                    linear(fmin(width_w, width_e), r.width() / 4.0, r.width() / 2.0),
-                    linear(fmin(height_s, height_n), r.height() / 4.0, r.height() / 2.0));
+                    linear(fmin(width_w, width_e), r.xLength() / 4.0, r.xLength() / 2.0),
+                    linear(fmin(height_s, height_n), r.yLength() / 4.0, r.yLength() / 2.0));
             }
         }
 
