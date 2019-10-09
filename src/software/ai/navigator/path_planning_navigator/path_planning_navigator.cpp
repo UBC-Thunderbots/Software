@@ -163,9 +163,9 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
         case AvoidArea::BALL:
             return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
-            rectangle = Rectangle(
-                {0, world.field().totalYLength() / 2},
-                world.field().enemyCornerNeg() - Point(0, world.field().boundaryYLength()));
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                  world.field().enemyCornerNeg() -
+                                      Point(0, world.field().boundaryYLength()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *

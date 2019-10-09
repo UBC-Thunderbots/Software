@@ -1,6 +1,5 @@
 #include "software/world/team.h"
 
-
 #include <gtest/gtest.h>
 
 #include <stdexcept>

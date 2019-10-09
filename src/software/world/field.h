@@ -32,9 +32,9 @@ class Field
      * @param timestamp the Timestamp associated with the creation of the Field object
      */
     explicit Field(double field_x_length, double field_y_length, double defense_x_length,
-                   double defense_y_length, double goal_y_length, double boundary_buffer_size,
-                   double center_circle_radius, const Timestamp &timestamp,
-                   unsigned int buffer_size = 20);
+                   double defense_y_length, double goal_y_length,
+                   double boundary_buffer_size, double center_circle_radius,
+                   const Timestamp &timestamp, unsigned int buffer_size = 20);
 
     /**
      * Updates the dimensions of the field. All units should be in metres.
@@ -49,8 +49,9 @@ class Field
      * @param center_circle_radius the radius of the center circle
      * @param timestamp the Timestamp corresponding to any updates to the Field object
      */
-    void updateDimensions(double field_x_length, double field_y_length, double defense_x_length,
-                          double defense_y_length, double goal_y_length, double boundary_buffer_size,
+    void updateDimensions(double field_x_length, double field_y_length,
+                          double defense_x_length, double defense_y_length,
+                          double goal_y_length, double boundary_buffer_size,
                           double center_circle_radius, const Timestamp &timestamp);
 
     /**
@@ -70,7 +71,8 @@ class Field
     /**
      * Gets the x-axis length of the field including the boundary area in metres.
      *
-     * @return the total x-axis length of the field in metres, including the boundary area.
+     * @return the total x-axis length of the field in metres, including the boundary
+     * area.
      */
     double totalXLength() const;
 
@@ -84,7 +86,8 @@ class Field
     /**
      * Gets the y-axis length of the field including the boundary area in metres.
      *
-     * @return the total y-axis length of the field in metres, including the boundary area.
+     * @return the total y-axis length of the field in metres, including the boundary
+     * area.
      */
     double totalYLength() const;
 

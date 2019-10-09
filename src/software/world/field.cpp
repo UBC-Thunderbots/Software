@@ -25,12 +25,12 @@ Field::Field(double field_x_length, double field_y_length, double defense_x_leng
 
 void Field::updateDimensions(const Field &new_field_data)
 {
-    field_x_length_          = new_field_data.xLength();
-    field_y_length_           = new_field_data.yLength();
-    defense_y_length_         = new_field_data.defenseAreaYLength();
-    defense_x_length_        = new_field_data.defenseAreaXLength();
-    goal_y_length_            = new_field_data.goalYLength();
-    boundary_buffer_size_        = new_field_data.boundaryYLength();
+    field_x_length_        = new_field_data.xLength();
+    field_y_length_        = new_field_data.yLength();
+    defense_y_length_      = new_field_data.defenseAreaYLength();
+    defense_x_length_      = new_field_data.defenseAreaXLength();
+    goal_y_length_         = new_field_data.goalYLength();
+    boundary_buffer_size_  = new_field_data.boundaryYLength();
     center_circle_radius_  = new_field_data.centerCircleRadius();
     last_update_timestamps = new_field_data.getTimestampHistory();
 }
@@ -40,12 +40,12 @@ void Field::updateDimensions(double field_x_length, double field_y_length,
                              double goal_y_length, double boundary_buffer_size,
                              double center_circle_radius, const Timestamp &timestamp)
 {
-    field_x_length_         = field_x_length;
-    field_y_length_          = field_y_length;
-    defense_y_length_        = defense_y_length;
-    defense_x_length_       = defense_x_length;
-    goal_y_length_           = goal_y_length;
-    boundary_buffer_size_       = boundary_buffer_size;
+    field_x_length_       = field_x_length;
+    field_y_length_       = field_y_length;
+    defense_y_length_     = defense_y_length;
+    defense_x_length_     = defense_x_length;
+    goal_y_length_        = goal_y_length;
+    boundary_buffer_size_ = boundary_buffer_size;
     center_circle_radius_ = center_circle_radius;
     updateTimestamp(timestamp);
 }
@@ -94,8 +94,9 @@ Rectangle Field::friendlyDefenseArea() const
 
 Rectangle Field::enemyDefenseArea() const
 {
-    return Rectangle(Point(field_x_length_ * 0.5, defense_y_length_ / 2.0),
-                     Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
+    return Rectangle(
+        Point(field_x_length_ * 0.5, defense_y_length_ / 2.0),
+        Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
 }
 
 Rectangle Field::fieldLines() const

@@ -28,7 +28,8 @@ class Rectangle final
      *
      * @param yLength The yLength of the rectangle
      */
-    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double x_length, double y_length);
+    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double x_length,
+                                 double y_length);
 
     /**
      * Returns the length along the x-axis of the rectangle
@@ -154,7 +155,8 @@ inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double x_length, double y_length)
+inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double x_length,
+                                      double y_length)
     : min_corner(neg_x_neg_y_corner), diagonal(x_length, y_length)
 
 {

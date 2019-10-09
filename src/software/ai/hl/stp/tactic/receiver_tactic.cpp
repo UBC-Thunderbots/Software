@@ -64,12 +64,12 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // If there is a feasible shot we can take, we want to wait for the pass at the
         // halfway point between the angle required to receive the ball and the angle
         // for a one-time shot
-        std::optional<Shot> shot                    = findFeasibleShot();
-        Angle desired_angle                         = pass.receiverOrientation();
+        std::optional<Shot> shot = findFeasibleShot();
+        Angle desired_angle      = pass.receiverOrientation();
         if (shot)
         {
             auto target_position = shot->getPointToShootAt();
-            Angle shot_angle = (target_position - robot->position()).orientation();
+            Angle shot_angle     = (target_position - robot->position()).orientation();
             // If we do have a valid shot on net, orient the robot to face in between
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
@@ -87,7 +87,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
 
     // Vector from the ball to the robot
-    Vector ball_to_robot_vector = ball.position() - robot->position();
+    Vector ball_to_robot_vector   = ball.position() - robot->position();
     std::optional<Shot> best_shot = findFeasibleShot();
     if (best_shot)
     {
