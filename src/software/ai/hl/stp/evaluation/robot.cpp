@@ -20,7 +20,6 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
 bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
                                     Timestamp timestamp)
 {
-    // copied almost verbatim from legacy code
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
     Point ball_pos_at_time;
@@ -67,25 +66,25 @@ bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
     }
 }
 
-bool Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
+bool Evaluation::robotBeingPassedTo(const Ball& ball, const Robot& robot,
                                     Timestamp timestamp)
 {
     Point robot_pos, ball_pos, ball_velocity;
     if (robot.getHistoryIndexFromTimestamp(timestamp) &&
-        world.ball().getHistoryIndexFromTimestamp(timestamp))
+        ball.getHistoryIndexFromTimestamp(timestamp))
     {
         robot_pos = robot.getPreviousPositions().at(
             *robot.getHistoryIndexFromTimestamp(timestamp));
-        ball_pos = world.ball().getPreviousPositions().at(
-            *world.ball().getHistoryIndexFromTimestamp(timestamp));
-        ball_velocity = world.ball().getPreviousVelocities().at(
-            *world.ball().getHistoryIndexFromTimestamp(timestamp));
+        ball_pos = ball.getPreviousPositions().at(
+            *ball.getHistoryIndexFromTimestamp(timestamp));
+        ball_velocity = ball.getPreviousVelocities().at(
+            *ball.getHistoryIndexFromTimestamp(timestamp));
     }
     else
     {
         robot_pos     = robot.position();
-        ball_pos      = world.ball().position();
-        ball_velocity = world.ball().velocity();
+        ball_pos      = ball.position();
+        ball_velocity = ball.velocity();
     }
 
     auto ball_to_robot_vector = robot_pos - ball_pos;

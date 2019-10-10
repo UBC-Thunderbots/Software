@@ -33,9 +33,9 @@ namespace Evaluation
      * This is determined by checking the angle deviation of the ball velocity vector
      * off of the robot the ball is headed towards, and the speed of the ball.
      *
-     * @param world The world
+     * @param world The ball
      * @param team The team containing the robots to check for passes
      * @return true if the team is in the process of passing, false otherwise
      */
-    bool teamPassInProgress(const World& world, const Team& team);
+    bool teamPassInProgress(const Ball& ball, const Team& team);
 }  // namespace Evaluation

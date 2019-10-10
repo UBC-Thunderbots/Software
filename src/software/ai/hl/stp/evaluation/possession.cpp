@@ -70,7 +70,7 @@ namespace Evaluation
         return false;
     }
 
-    bool teamPassInProgress(const World &world, const Team &team)
+    bool teamPassInProgress(const Ball &ball, const Team &team)
     {
         for (const Robot &robot : team.getAllRobots())
         {
@@ -84,7 +84,7 @@ namespace Evaluation
                    robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
                    Duration::fromSeconds(PASS_BUFFER_TIME_IN_SECONDS))
             {
-                if (robotBeingPassedTo(world, robot, robot_history_timestamps[i]))
+                if (robotBeingPassedTo(ball, robot, robot_history_timestamps[i]))
                     return true;
                 i++;
             }

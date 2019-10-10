@@ -37,7 +37,7 @@ bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
            (!Evaluation::teamHasPossession(world.enemyTeam(), world.ball()) ||
-            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
+            Evaluation::teamPassInProgress(world.ball(), world.friendlyTeam()));
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
