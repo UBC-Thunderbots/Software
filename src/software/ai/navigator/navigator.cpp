@@ -223,7 +223,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
 }
 
 std::vector<Obstacle> Navigator::createCurrentObstacles(
-    const std::vector<AvoidArea> &avoid_areas, int robot_id)
+    const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id)
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
 

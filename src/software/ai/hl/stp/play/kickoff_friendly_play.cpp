@@ -104,7 +104,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
             RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip};
 
         // setup 5 kickoff positions in order of priority
-        for (int i = 0; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
                                              0);
@@ -135,7 +135,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // the robot at position 0 will be closest to the ball, so positions starting from
         // 1 will be assigned to the rest of the robots
-        for (int i = 1; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
                                              0);

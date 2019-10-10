@@ -17,7 +17,7 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
     std::vector<MovePrimitive> movePrimitives;
     movePrimitives.reserve(points.size());
 
-    for (int index = 0; index < points.size(); index++)
+    for (unsigned index = 0; index < points.size(); index++)
     {
         const Point &point = points.at(index);
 
