@@ -3,7 +3,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/primitive/stop_primitive.h"
 
-class StopIntent : public Intent, public StopPrimitive
+class StopIntent : public StopPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

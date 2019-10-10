@@ -8,7 +8,7 @@
 Polygon::Polygon(const std::vector<Point>& _points)
     : segments(_points.size()), points(_points)
 {
-    for (auto i = 0; i < _points.size(); i++)
+    for (unsigned i = 0; i < _points.size(); i++)
     {
         // add a segment between consecutive points, but wrap index
         // to draw a segment from the last point to first point.
@@ -19,7 +19,7 @@ Polygon::Polygon(const std::vector<Point>& _points)
 Polygon::Polygon(const std::initializer_list<Point>& _points)
     : segments(_points.size()), points(_points)
 {
-    for (auto i = 0; i < _points.size(); i++)
+    for (unsigned i = 0; i < _points.size(); i++)
     {
         // add a segment between consecutive points, but wrap index
         // to draw a segment from the last point to first point.
@@ -44,7 +44,7 @@ bool Polygon::containsPoint(const Point& point) const
     // should two distinct polygons share an edge, any point along this edge will be
     // located in one and only one polygon.
     bool point_is_contained = false;
-    int i                   = 0;
+    unsigned i              = 0;
     int j                   = points.size() - 1;
     while (i < points.size())
     {

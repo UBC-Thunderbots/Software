@@ -119,15 +119,15 @@ class ReceiverTactic : public Tactic
     // The field the pass is occuring on
     Field field;
 
-    // The friendly team
-    Team friendly_team;
-
-    // The enemy team
-    Team enemy_team;
-
     // The pass this tactic is executing
     Passing::Pass pass;
 
     // The ball being passed
     Ball ball;
+
+    // The friendly team
+    Team friendly_team;
+
+    // The enemy team
+    Team enemy_team;
 };

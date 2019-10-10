@@ -62,9 +62,9 @@ class PenaltyKickTactic : public Tactic
     Point evaluate_next_position();
 
     // Tactic parameters
-    std::optional<Robot> enemy_goalie;
     Ball ball;
     Field field;
+    std::optional<Robot> enemy_goalie;
 
     const bool ENABLE_DRIBBLER = true;
 

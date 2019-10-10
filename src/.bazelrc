@@ -19,5 +19,8 @@ build --remote_upload_local_results=false
 # the "factory" design pattern.
 build --incompatible_remove_legacy_whole_archive=False
 
+# Every warning is treated as an error
+build --cxxopt=-Werror
+
 # We want bazel to output the results of our gtests
 test --test_output=all

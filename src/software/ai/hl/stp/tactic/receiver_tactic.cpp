@@ -14,12 +14,12 @@ using namespace Evaluation;
 ReceiverTactic::ReceiverTactic(const Field& field, const Team& friendly_team,
                                const Team& enemy_team, const Passing::Pass pass,
                                const Ball& ball, bool loop_forever)
-    : field(field),
+    : Tactic(loop_forever),
+      field(field),
       pass(pass),
       ball(ball),
       friendly_team(friendly_team),
-      enemy_team(enemy_team),
-      Tactic(loop_forever)
+      enemy_team(enemy_team)
 {
 }
 
@@ -71,8 +71,10 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         Angle desired_angle      = pass.receiverOrientation();
         if (shot)
         {
-            auto target_position = shot->getPointToShootAt();
-            Angle shot_angle     = (target_position - robot->position()).orientation();
+            Point target_position = shot->getPointToShootAt();
+
+            Angle shot_angle = (target_position - robot->position()).orientation();
+
             // If we do have a valid shot on net, orient the robot to face in between
             // the pass vector and shot vector, so the robot can quickly orient itself
             // to either receive the pass, or take the shot. Also, not directly facing
@@ -84,10 +86,6 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
                                                       desired_angle, 0));
     }
-
-    // Check if we can shoot on the enemy goal from the receiver position
-    std::optional<Shot> best_shot_opt =
-        calcBestShotOnEnemyGoal(field, friendly_team, enemy_team, *robot);
 
     // Vector from the ball to the robot
     Vector ball_to_robot_vector   = ball.position() - robot->position();

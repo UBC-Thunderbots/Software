@@ -184,7 +184,6 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
 std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &start,
                                                                  const Point &destination)
 {
-    bool blocked_dest = false;
     CellCoordinate src, dest;
 
     Point closest_destination = findClosestFreePoint(destination);
@@ -240,7 +239,6 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
         if (tmp_dest)
         {
             dest         = *tmp_dest;
-            blocked_dest = true;
         }
         else
         {
@@ -298,8 +296,6 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
             <+x,-y>     --> (i+1, j+1)
             <-x,-y>     --> (i+1, j-1)*/
 
-        // To store the 'g', 'h' and 'f' of the 8 successors
-        double gNew, hNew, fNew;
         CellCoordinate pCurr, pNew;
         pCurr = std::make_pair(i, j);
 
@@ -310,7 +306,8 @@ std::optional<std::vector<Point>> ThetaStarPathPlanner::findPath(const Point &st
                 double dist_to_neighbour =
                     std::sqrt(std::pow(x_offset, 2) + std::pow(y_offset, 2));
                 pNew = std::make_pair(i + x_offset, j + y_offset);
-                if (foundDest = updateVertex(pCurr, pNew, dest, dist_to_neighbour))
+                foundDest = updateVertex(pCurr, pNew, dest, dist_to_neighbour);
+                if (foundDest)
                 {
                     goto loop_end;
                 }

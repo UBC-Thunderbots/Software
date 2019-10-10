@@ -9,10 +9,10 @@
 #include "software/geom/util.h"
 
 CherryPickTactic::CherryPickTactic(const World& world, const Rectangle& target_region)
-    : pass_generator(world, world.ball().position()),
+    : Tactic(true),
+      pass_generator(world, world.ball().position()),
       world(world),
-      target_region(target_region),
-      Tactic(true)
+      target_region(target_region)
 {
     pass_generator.setTargetRegion(target_region);
 }
@@ -43,7 +43,7 @@ void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         pass_generator.setWorld(world);
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
-        auto [pass, score] = pass_generator.getBestPassSoFar();
+        Pass pass = pass_generator.getBestPassSoFar().pass;
         yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
                                                       pass.receiverOrientation(), 0));
     } while (true);

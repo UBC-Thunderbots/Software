@@ -8,7 +8,7 @@
 #include "software/geom/util.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
-    : field(field), Tactic(loop_forever)
+    : Tactic(loop_forever), field(field)
 {
 }
 

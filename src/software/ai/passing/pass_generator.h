@@ -248,20 +248,6 @@ namespace Passing
         // background. This thread will run for the entire lifetime of the class
         std::thread pass_generation_thread;
 
-        // The mutex for the in_destructor flag
-        std::mutex in_destructor_mutex;
-
-        // This flag is used to indicate that we are in the destructor. We use this to
-        // communicate with pass_generation_thread that it is
-        // time to stop
-        bool in_destructor;
-
-        // The mutex for the world
-        std::mutex world_mutex;
-
-        // This world is what is used in the optimization loop
-        World world;
-
         // The mutex for the updated world
         std::mutex updated_world_mutex;
 
@@ -270,11 +256,11 @@ namespace Passing
         // entirety of each optimization loop, which makes things easier to reason about
         World updated_world;
 
-        // The mutex for the passer_point
-        std::mutex passer_point_mutex;
+        // The mutex for the world
+        std::mutex world_mutex;
 
-        // The point we are passing from
-        Point passer_point;
+        // This world is what is used in the optimization loop
+        World world;
 
         // The mutex for the passer robot ID
         std::mutex passer_robot_id_mutex;
@@ -282,11 +268,17 @@ namespace Passing
         // The id of the robot that is performing the pass. We want to ignore this robot
         std::optional<unsigned int> passer_robot_id;
 
-        // The mutex for the target region
-        std::mutex target_region_mutex;
+        // All the passes that we are currently trying to optimize in gradient descent
+        std::vector<Pass> passes_to_optimize;
 
-        // The area that we want to pass to
-        std::optional<Rectangle> target_region;
+        // The optimizer we're using to find passes
+        Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+
+        // The mutex for the passer_point
+        std::mutex passer_point_mutex;
+
+        // The point we are passing from
+        Point passer_point;
 
         // The mutex for the passer_point
         std::mutex best_known_pass_mutex;
@@ -294,15 +286,23 @@ namespace Passing
         // The best pass we currently know about
         Pass best_known_pass;
 
-        // All the passes that we are currently trying to optimize in gradient descent
-        std::vector<Pass> passes_to_optimize;
+        // The mutex for the target region
+        std::mutex target_region_mutex;
 
-        // The optimizer we're using to find passes
-        Util::GradientDescentOptimizer<NUM_PARAMS_TO_OPTIMIZE> optimizer;
+        // The area that we want to pass to
+        std::optional<Rectangle> target_region;
 
         // A random number generator for use across the class
         std::random_device random_device;
         std::mt19937 random_num_gen;
+
+        // The mutex for the in_destructor flag
+        std::mutex in_destructor_mutex;
+
+        // This flag is used to indicate that we are in the destructor. We use this to
+        // communicate with pass_generation_thread that it is
+        // time to stop
+        bool in_destructor;
     };
 
 

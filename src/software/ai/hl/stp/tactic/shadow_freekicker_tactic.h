@@ -61,9 +61,9 @@ class ShadowFreekickerTactic : public Tactic
 
     // Used for defining whether this robot is a left/right Freekick Shadower
     FreekickShadower free_kick_shadower;
+    Team enemy_team;
     Ball ball;
     Field field;
-    Team enemy_team;
 
     const double FREE_KICK_MAX_PROXIMITY =
         0.50;  // Robots cannot be closer than 50cm from the ball during a freekick

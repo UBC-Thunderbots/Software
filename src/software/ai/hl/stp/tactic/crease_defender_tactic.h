@@ -101,8 +101,8 @@ class CreaseDefenderTactic : public Tactic
                                                      Angle offset);
 
     // Tactic parameters
-    Ball ball;
     Field field;
+    Ball ball;
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;
