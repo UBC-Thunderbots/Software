@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class CatchIntent : public Intent, public CatchPrimitive
+class CatchIntent : public CatchPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

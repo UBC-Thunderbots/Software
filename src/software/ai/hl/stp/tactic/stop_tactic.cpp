@@ -3,8 +3,9 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/stop_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
-StopTactic::StopTactic(bool coast, bool loop_forever) : coast(coast), Tactic(loop_forever)
+StopTactic::StopTactic(bool coast, bool loop_forever) : Tactic(loop_forever), coast(coast)
 {
 }
 
@@ -32,4 +33,9 @@ void StopTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         yield(stop_action.updateStateAndGetNextIntent(*robot, this->coast));
     } while (!stop_action.done());
+}
+
+void StopTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

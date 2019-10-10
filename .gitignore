@@ -119,3 +119,6 @@ Makefile
 
 #cscope
 cscope*
+
+# Explicitly un-ignore the .bazelproject file
+!/src/.clwb/.bazelproject

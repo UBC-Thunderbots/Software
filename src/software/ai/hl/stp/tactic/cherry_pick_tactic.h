@@ -5,8 +5,8 @@
 
 #include "software/ai/hl/stp/tactic/tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "software/ai/world/world.h"
 #include "software/geom/rectangle.h"
+#include "software/world/world.h"
 
 /**
  * This tactic is intended to place a robot in a given region, and have the robot
@@ -43,11 +43,15 @@ class CherryPickTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
-
-    // The region in which we want to position the cherry picking robot
-    Rectangle target_region;
 
     // The pass optimizer being used to figure out the best position for the robot
     Passing::PassGenerator pass_generator;
@@ -55,4 +59,7 @@ class CherryPickTactic : public Tactic
     // Tactic parameters
     // The current state of the world
     World world;
+
+    // The region in which we want to position the cherry picking robot
+    Rectangle target_region;
 };

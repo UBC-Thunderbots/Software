@@ -1,4 +1,4 @@
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 
 #include <gtest/gtest.h>
 
@@ -49,8 +49,8 @@ class WorldTest : public ::testing::Test
     Timestamp current_time;
     Field field;
     Ball ball;
-    Team enemy_team;
     Team friendly_team;
+    Team enemy_team;
     World world;
 };
 

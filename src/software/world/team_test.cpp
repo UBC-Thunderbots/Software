@@ -1,4 +1,4 @@
-#include "software/ai/world/team.h"
+#include "software/world/team.h"
 
 #include <gtest/gtest.h>
 

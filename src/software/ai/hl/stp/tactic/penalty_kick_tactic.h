@@ -45,6 +45,13 @@ class PenaltyKickTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor &visitor) const override;
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
@@ -55,9 +62,9 @@ class PenaltyKickTactic : public Tactic
     Point evaluate_next_position();
 
     // Tactic parameters
-    std::optional<Robot> enemy_goalie;
     Ball ball;
     Field field;
+    std::optional<Robot> enemy_goalie;
 
     const bool ENABLE_DRIBBLER = true;
 

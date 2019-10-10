@@ -4,8 +4,8 @@
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
+#include "software/world/ball.h"
+#include "software/world/field.h"
 
 namespace Evaluation
 {
@@ -54,7 +54,7 @@ namespace Evaluation
             std::vector<Timestamp> robot_history_timestamps =
                 robot.getPreviousTimestamps();
 
-            int i = 0;
+            unsigned i = 0;
 
             // Check that the robot has had possession of the ball recently.
             while (i < robot_history_timestamps.size() && 

@@ -54,5 +54,5 @@ TEST(MoveTacticTest, test_calculate_robot_cost)
     MoveTactic tactic = MoveTactic();
     tactic.updateParams(Point(3, -4), Angle::zero(), 0.0);
 
-    EXPECT_EQ(5 / world.field().totalLength(), tactic.calculateRobotCost(robot, world));
+    EXPECT_EQ(5 / world.field().totalXLength(), tactic.calculateRobotCost(robot, world));
 }

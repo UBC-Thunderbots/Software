@@ -3,9 +3,10 @@
 #include <algorithm>
 
 #include "software/ai/hl/stp/action/chip_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
-    : ball(ball), Tactic(loop_forever, {RobotCapabilityFlags::Chip})
+    : Tactic(loop_forever, {RobotCapabilityFlags::Chip}), ball(ball)
 {
 }
 
@@ -28,7 +29,7 @@ double ChipTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     // the closer the robot is to a ball, the cheaper it is to perform the chip
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -40,4 +41,9 @@ void ChipTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(chip_action.updateStateAndGetNextIntent(*robot, ball, chip_origin,
                                                       chip_target, chip_distance_meters));
     } while (!chip_action.done());
+}
+
+void ChipTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

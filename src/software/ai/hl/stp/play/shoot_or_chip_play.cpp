@@ -14,8 +14,8 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/ai/world/game_state.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/game_state.h"
 
 using namespace Evaluation;
 
@@ -104,8 +104,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             enemy_robot_points.emplace_back(robot.position());
         }
         std::vector<Circle> chip_targets = findGoodChipTargets(world);
-        for (int i = 0; i < chip_targets.size() && i < move_to_open_area_tactics.size();
-             i++)
+        for (unsigned i = 0;
+             i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
         {
             // Face towards the ball
             Angle orientation =

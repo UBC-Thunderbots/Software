@@ -4,6 +4,7 @@
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
 #include "software/geom/segment.h"
@@ -13,11 +14,11 @@
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)
-    : ball(ball),
+    : Tactic(true),
+      ball(ball),
       field(field),
       friendly_team(friendly_team),
-      enemy_team(enemy_team),
-      Tactic(true)
+      enemy_team(enemy_team)
 {
     addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
 }
@@ -82,8 +83,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         Segment full_goal_segment =
             Segment(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos());
 
-        auto [intersection1, intersection2] =
-            raySegmentIntersection(ball_ray, full_goal_segment);
+        std::optional<Point> intersection1 =
+            raySegmentIntersection(ball_ray, full_goal_segment).first;
 
         // Case 1
         if (intersection1.has_value() &&
@@ -95,7 +96,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, 0.0, false, AUTOCHIP);
+                *robot, goalie_pos, goalie_orientation, 0.0, false, false, AUTOCHIP);
         }
         // Case 2
         else if (ball.velocity().len() < BALL_SLOW_SPEED_THRESHOLD &&
@@ -119,16 +120,22 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // restrict the goalie to a semicircle inscribed inside the defense area
             Point goalie_restricted_pos =
-                field.friendlyGoal() - (field.friendlyDefenseArea().width() *
+                field.friendlyGoal() - (field.friendlyDefenseArea().yLength() *
                                         (field.friendlyGoal() - goalie_pos).norm());
 
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
             next_intent             = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_restricted_pos, goalie_orientation, 0.0, false, AUTOCHIP);
+                *robot, goalie_restricted_pos, goalie_orientation, 0.0, false, false,
+                AUTOCHIP);
         }
 
         yield(std::move(next_intent));
 
     } while (!move_action.done());
+}
+
+void GoalieTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

@@ -80,6 +80,13 @@ class ShootGoalTactic : public Tactic
      */
     bool hasShotAvailable() const;
 
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
@@ -114,12 +121,12 @@ class ShootGoalTactic : public Tactic
     Ball ball;
     // The minimum open angle we must be able to see of the goal in order to shoot
     Angle min_net_open_angle;
-    // Whether or not there is currently a shot available with at least the minimum
-    // percentage of the net open
-    bool has_shot_available;
     // The point the robot will chip towards if it is unable to shoot and is in danger or
     // losing the ball to an enemy
     std::optional<Point> chip_target;
+    // Whether or not there is currently a shot available with at least the minimum
+    // percentage of the net open
+    bool has_shot_available;
 
     // How far from the ball an enemy must be to be considered a danger that may steal the
     // ball

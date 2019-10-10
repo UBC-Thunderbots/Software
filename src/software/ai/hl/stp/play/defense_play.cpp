@@ -9,8 +9,8 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/ai/world/game_state.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/game_state.h"
 
 const std::string DefensePlay::name = "Defense Play";
 
@@ -99,8 +99,8 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there any
         // extra friendly robots, have them perform a reasonable default defensive tactic
-        for (int i = 0; i < std::min(stop_tactics.size(), shadow_enemy_tactics.size());
-             i++)
+        for (unsigned i = 0;
+             i < std::min(stop_tactics.size(), shadow_enemy_tactics.size()); i++)
         {
             if (i < enemy_threats.size())
             {

@@ -1,4 +1,4 @@
-#include "software/ai/world/robot.h"
+#include "software/world/robot.h"
 
 #include <g3log/g3log.hpp>
 
@@ -228,7 +228,7 @@ void Robot::addStateToRobotHistory(const Point &position, const Vector &velocity
 std::optional<int> Robot::getHistoryIndexFromTimestamp(Timestamp &timestamp) const
 {
     std::vector<Timestamp> timestamp_history = getPreviousTimestamps();
-    for (int i = 0; i < timestamp_history.size(); i++)
+    for (unsigned i = 0; i < timestamp_history.size(); i++)
     {
         double timestamp_diff =
             fabs((timestamp - timestamp_history[i]).getMilliseconds());

@@ -55,14 +55,14 @@ namespace
 }  // namespace
 
 MRFDongle::MRFDongle(unsigned int config, Annunciator &annunciator)
-    : context(),
+    : estop_state(EStopState::STOP),
+      context(),
       device(context, MRF::VENDOR_ID, MRF::PRODUCT_ID, std::getenv("MRF_SERIAL")),
       radio_interface(-1),
       configuration_altsetting(-1),
       normal_altsetting(-1),
       status_transfer(device, 3, 1, true, 0),
       pending_beep_length(0),
-      estop_state(EStopState::STOP),
       annunciator(annunciator)
 {
     // Sanity-check the dongle by looking for an interface with the appropriate

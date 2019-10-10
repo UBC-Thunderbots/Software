@@ -58,6 +58,13 @@ class CreaseDefenderTactic : public Tactic
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
 
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor &visitor) const override;
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
@@ -91,8 +98,8 @@ class CreaseDefenderTactic : public Tactic
                                                      Angle offset);
 
     // Tactic parameters
-    Ball ball;
     Field field;
+    Ball ball;
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;

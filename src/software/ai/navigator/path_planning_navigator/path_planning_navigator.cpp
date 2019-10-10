@@ -163,18 +163,18 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
         case AvoidArea::BALL:
             return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
         case AvoidArea::ENEMY_HALF:
-            rectangle = Rectangle(
-                {0, world.field().totalWidth() / 2},
-                world.field().enemyCornerNeg() - Point(0, world.field().boundaryWidth()));
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                  world.field().enemyCornerNeg() -
+                                      Point(0, world.field().boundaryYLength()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *
                 ROBOT_MAX_RADIUS_METERS);
             return Obstacle(rectangle);
         case AvoidArea::FRIENDLY_HALF:
-            rectangle = Rectangle({0, world.field().totalWidth() / 2},
+            rectangle = Rectangle({0, world.field().totalYLength() / 2},
                                   world.field().friendlyCornerNeg() -
-                                      Point(0, world.field().boundaryWidth()));
+                                      Point(0, world.field().boundaryYLength()));
             rectangle.expand(
                 Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
                     .value() *
@@ -223,7 +223,7 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
 }
 
 std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
-    const std::vector<AvoidArea> &avoid_areas, int robot_id)
+    const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id)
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
 

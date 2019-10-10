@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class ChipIntent : public Intent, public ChipPrimitive
+class ChipIntent : public ChipPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

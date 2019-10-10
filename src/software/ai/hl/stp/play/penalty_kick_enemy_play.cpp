@@ -14,12 +14,12 @@ std::string PenaltyKickEnemyPlay::getName() const
 
 bool PenaltyKickEnemyPlay::isApplicable(const World &world) const
 {
-    world.gameState().isTheirPenalty();
+    return world.gameState().isTheirPenalty();
 }
 
 bool PenaltyKickEnemyPlay::invariantHolds(const World &world) const
 {
-    world.gameState().isTheirPenalty();
+    return world.gameState().isTheirPenalty();
 }
 
 void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)

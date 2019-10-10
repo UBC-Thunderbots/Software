@@ -49,14 +49,21 @@ class ShadowFreekickerTactic : public Tactic
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
 
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
+
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     // Used for defining whether this robot is a left/right Freekick Shadower
     FreekickShadower free_kick_shadower;
+    Team enemy_team;
     Ball ball;
     Field field;
-    Team enemy_team;
 
     const double FREE_KICK_MAX_PROXIMITY =
         0.50;  // Robots cannot be closer than 50cm from the ball during a freekick

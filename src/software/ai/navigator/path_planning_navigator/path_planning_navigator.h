@@ -139,7 +139,7 @@ class PathPlanningNavigator : public Navigator, public IntentVisitor
      * @returns list of obstacles
      */
     std::vector<Obstacle> createCurrentObstacles(
-        const std::vector<AvoidArea> &avoid_areas, int robot_id);
+        const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.

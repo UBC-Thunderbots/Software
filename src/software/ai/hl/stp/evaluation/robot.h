@@ -1,7 +1,8 @@
 #pragma once
 
-#include "software/ai/world/world.h"
 #include "software/geom/point.h"
+#include "software/world/ball.h"
+#include "software/world/robot.h"
 
 /**
  * This file contains independent Evaluation function to evaluate whether robot
