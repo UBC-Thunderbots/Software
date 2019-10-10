@@ -26,8 +26,8 @@ std::string ShootGoalTactic::getName() const
     return "Shoot Goal Tactic";
 }
 
-void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball)
+void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
+                                        const Team &enemy_team, const Ball &ball)
 {
     this->field         = field;
     this->friendly_team = friendly_team;
@@ -35,12 +35,9 @@ void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team
     this->ball          = ball;
 }
 
-void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball,
-                                   std::optional<Point> chip_target)
+void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
 {
     this->chip_target = chip_target;
-    updateParams(field, friendly_team, enemy_team, ball);
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)

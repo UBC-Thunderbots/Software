@@ -36,22 +36,22 @@ void PenaltyKickEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         // goalie
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // Move all non-shooter robots to the center of the field
-        move_tactic_2->updateParams(Point(0, 0), world.field().enemyGoal().orientation(),
-                                    0);
-        move_tactic_3->updateParams(Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
-                                    world.field().enemyGoal().orientation(), 0);
-        move_tactic_4->updateParams(Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
-                                    world.field().enemyGoal().orientation(), 0);
-        move_tactic_5->updateParams(Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
-                                    world.field().enemyGoal().orientation(), 0);
-        move_tactic_6->updateParams(Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
-                                    world.field().enemyGoal().orientation(), 0);
+        move_tactic_2->updateControlParams(Point(0, 0),
+                                           world.field().enemyGoal().orientation(), 0);
+        move_tactic_3->updateControlParams(Point(0, 4 * ROBOT_MAX_RADIUS_METERS),
+                                           world.field().enemyGoal().orientation(), 0);
+        move_tactic_4->updateControlParams(Point(0, -4 * ROBOT_MAX_RADIUS_METERS),
+                                           world.field().enemyGoal().orientation(), 0);
+        move_tactic_5->updateControlParams(Point(0, 8 * ROBOT_MAX_RADIUS_METERS),
+                                           world.field().enemyGoal().orientation(), 0);
+        move_tactic_6->updateControlParams(Point(0, -8 * ROBOT_MAX_RADIUS_METERS),
+                                           world.field().enemyGoal().orientation(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
         yield({goalie_tactic, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,

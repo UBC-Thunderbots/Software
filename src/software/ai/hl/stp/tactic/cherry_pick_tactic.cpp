@@ -22,7 +22,7 @@ std::string CherryPickTactic::getName() const
     return "Cherry Pick Tactic";
 }
 
-void CherryPickTactic::updateParams(const World& world)
+void CherryPickTactic::updateWorldParams(const World& world)
 {
     this->world = world;
 }

@@ -73,8 +73,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // a unit vector from the center of the goal to the ball, this vector will be used
@@ -97,10 +97,10 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
             goal_defense_point_center -
             robot_positioning_unit_vector * 2 * ROBOT_MAX_RADIUS_METERS;
 
-        move_tactics.at(0)->updateParams(
+        move_tactics.at(0)->updateControlParams(
             goal_defense_point_left,
             (world.ball().position() - goal_defense_point_left).orientation(), 0);
-        move_tactics.at(1)->updateParams(
+        move_tactics.at(1)->updateControlParams(
             goal_defense_point_right,
             (world.ball().position() - goal_defense_point_right).orientation(), 0);
 
@@ -116,13 +116,13 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
             ball_defense_point_center +
             robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
 
-        move_tactics.at(2)->updateParams(
+        move_tactics.at(2)->updateControlParams(
             ball_defense_point_center,
             (world.ball().position() - ball_defense_point_center).orientation(), 0);
-        move_tactics.at(3)->updateParams(
+        move_tactics.at(3)->updateControlParams(
             ball_defense_point_left,
             (world.ball().position() - ball_defense_point_left).orientation(), 0);
-        move_tactics.at(4)->updateParams(
+        move_tactics.at(4)->updateControlParams(
             ball_defense_point_right,
             (world.ball().position() - ball_defense_point_right).orientation(), 0);
 

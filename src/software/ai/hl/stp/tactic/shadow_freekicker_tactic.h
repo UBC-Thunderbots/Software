@@ -31,12 +31,12 @@ class ShadowFreekickerTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this ShadowFreekicker tactic
+     * Updates the world parameters for this ShadowFreekicker tactic
      *
      * @param enemy_team : The enemy team of robots.
      * @param ball  : The Ball being played with
      */
-    void updateParams(Team enemy_team, Ball ball);
+    void updateWorldParams(Team enemy_team, Ball ball);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots

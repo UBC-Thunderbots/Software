@@ -15,7 +15,7 @@ std::string MoveTestTactic::getName() const
     return "Move Test Tactic";
 }
 
-void MoveTestTactic::updateParams(Point destination_)
+void MoveTestTactic::updateControlParams(Point destination_)
 {
     // Update the parameters stored by this Tactic
     this->destination = destination_;

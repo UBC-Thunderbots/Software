@@ -127,10 +127,10 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        crease_defender_left->updateParams(world.ball(), world.field(),
-                                           world.friendlyTeam(), world.enemyTeam());
-        crease_defender_right->updateParams(world.ball(), world.field(),
-                                            world.friendlyTeam(), world.enemyTeam());
+        crease_defender_left->updateWorldParams(world.ball(), world.field(),
+                                                world.friendlyTeam(), world.enemyTeam());
+        crease_defender_right->updateWorldParams(world.ball(), world.field(),
+                                                 world.friendlyTeam(), world.enemyTeam());
         updateShootGoalTactic(shoot_tactic);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
@@ -196,13 +196,15 @@ void FreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             false);
         do
         {
-            crease_defender_left->updateParams(world.ball(), world.field(),
-                                               world.friendlyTeam(), world.enemyTeam());
-            crease_defender_right->updateParams(world.ball(), world.field(),
-                                                world.friendlyTeam(), world.enemyTeam());
-            passer->updateParams(pass, world.ball());
-            receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
-                                   world.ball());
+            crease_defender_left->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+            crease_defender_right->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+            passer->updateWorldParams(world.ball());
+            passer->updateControlParams(pass);
+            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
+                                        world.ball());
+            receiver->updateControlParams(pass);
             yield({passer, receiver, crease_defender_left, crease_defender_right});
         } while (!receiver->done());
     }
@@ -219,7 +221,7 @@ void FreeKickPlay::updateCherryPickTactics(
 {
     for (auto &tactic : tactics)
     {
-        tactic->updateParams(world);
+        tactic->updateWorldParams(world);
     }
 }
 
@@ -229,15 +231,15 @@ void FreeKickPlay::updateAlignToBallTactic(
     // We want to the robot to face the enemy net to minimize the amount of motion
     // required to turn and shoot
     Vector ball_to_enemy_net_vec = world.field().enemyGoal() - world.ball().position();
-    align_to_ball_tactic->updateParams(
+    align_to_ball_tactic->updateControlParams(
         world.ball().position() - ball_to_enemy_net_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_enemy_net_vec.orientation(), 0);
 }
 
 void FreeKickPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
 {
-    shoot_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                               world.ball());
+    shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
+                                    world.enemyTeam(), world.ball());
 }
 
 void FreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
