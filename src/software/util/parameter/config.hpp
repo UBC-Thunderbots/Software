@@ -118,7 +118,7 @@ class FriendlyEvalConfig : public MutableConfig
         return std::const_pointer_cast<const Parameter<bool>>(we_have_no_chill_param);
     }
 
-    const std::shared_ptr <Parameter<bool>> weSuckMutableMutable()
+    const std::shared_ptr<Parameter<bool>> weSuckMutable()
     {
         return we_suck_param;
     }
@@ -173,7 +173,8 @@ class EnemyEvalConfig : public MutableConfig
 
     const std::shared_ptr<const Parameter<bool>> enemyTeamHasNoChill() const
     {
-        return std::const_pointer_cast<const Parameter<bool>>(enemy_team_has_no_chill_param);
+        return std::const_pointer_cast<const Parameter<bool>>(
+            enemy_team_has_no_chill_param);
     }
 
     const std::shared_ptr<Parameter<bool>> enemyTeamSucksMutable()
