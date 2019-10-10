@@ -12,12 +12,18 @@ PhysicsBall::PhysicsBall(std::shared_ptr<b2World> world, const Ball &ball)
     ball_body_def.linearVelocity.Set(ball.velocity().x(), ball.velocity().y());
     // The ball can potentially move relatively quickly, so treating it as a "bullet"
     // helps prevent tunneling and other collision problems
+    // See the "Breakdown of a collision" section of:
+    // https://www.iforce2d.net/b2dtut/collision-anatomy
     ball_body_def.bullet = true;
     ball_body            = world->CreateBody(&ball_body_def);
 
     ball_shape.m_radius = BALL_MAX_RADIUS_METERS;
 
     ball_fixture_def.shape       = &ball_shape;
+    // These values do not reflect the ball in real life and may still need some tuning.
+    // For now, they are "ideal" values that give the ball perfectly elastic collision
+    // and no friction
+    // TODO: tune values if necessary (#768)
     ball_fixture_def.density     = 1.0;
     ball_fixture_def.restitution = 1.0;
     ball_fixture_def.friction    = 0.0;

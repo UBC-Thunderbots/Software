@@ -5,9 +5,17 @@
 #include "software/backend/backend.h"
 #include "software/world/world.h"
 
-// Box2D tutorials and documentation used as reference
-// TODO: Move these somewhere more appropriate
-// https://github.com/libgdx/libgdx/wiki/Box2d
+/**
+ * This class implements the Backend interface using a physics simulation to
+ * execute received commands and provide new data to the system.
+ *
+ * The simulation uses Box2D as the physics engine, and the abstractions can be found
+ * in the `simulation` folder. For more information and examples of how to use Box2D
+ * see the following:
+ * - https://box2d.org/documentation/
+ * - https://github.com/libgdx/libgdx/wiki/Box2d
+ * - https://www.iforce2d.net/b2dtut/
+ */
 class SimulatorBackend : public Backend
 {
    public:
