@@ -38,6 +38,7 @@ class ShadowEnemyTactic : public Tactic
      * @param field The field being played on
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
+     * @param ball The ball
      */
     void updateWorldParams(const Field &field, const Team &friendly_team,
                            const Team &enemy_team, const Ball &ball);
@@ -49,7 +50,6 @@ class ShadowEnemyTactic : public Tactic
      * @param shadow_distance How far from the enemy the robot will shadow. This is the
      * distance between the center of the enemy robot and the center of the robot
      * shadowing it
-     * @param enemy_team_can_pass Whether or not we think the enemy team can pass the ball
      */
     void updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
                              double shadow_distance);
