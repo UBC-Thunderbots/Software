@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/evaluation/robot.h"
 
 #include "shared/constants.h"
+#include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/ball.h"
 #include "software/world/robot.h"
-#include "software/util/parameter/dynamic_parameters.h"
 
 bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,
                                                               const Angle orientation,
@@ -76,8 +76,8 @@ bool Evaluation::robotBeingPassedTo(const Ball& ball, const Robot& robot,
     {
         robot_pos = robot.getPreviousPositions().at(
             *robot.getHistoryIndexFromTimestamp(timestamp));
-        ball_pos = ball.getPreviousPositions().at(
-            *ball.getHistoryIndexFromTimestamp(timestamp));
+        ball_pos =
+            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
         ball_velocity = ball.getPreviousVelocities().at(
             *ball.getHistoryIndexFromTimestamp(timestamp));
     }

@@ -108,8 +108,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                  PassType::RECEIVE_AND_DRIBBLE);
     pass_generator.setTargetRegion(
         Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
-    PassWithRating best_pass_and_score_so_far =
-        pass_generator.getBestPassSoFar();
+    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
     // score of 1) and decreasing this threshold over time

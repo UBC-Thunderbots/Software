@@ -130,8 +130,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     pass_generator.setTargetRegion(
         Rectangle(Point(1, world.field().yLength() / 2), world.field().enemyCornerNeg()));
 
-    PassWithRating best_pass_and_score_so_far =
-        pass_generator.getBestPassSoFar();
+    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
     // Wait for a robot to be assigned to align to take the corner
     while (!align_to_ball_tactic->getAssignedRobot())
