@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class PivotIntent : public Intent, public PivotPrimitive
+class PivotIntent : public PivotPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

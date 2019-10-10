@@ -10,13 +10,13 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
                                      const Team &enemy_team, bool ignore_goalie,
                                      const Ball &ball, const double ball_steal_speed,
                                      bool loop_forever)
-    : field(field),
+    : Tactic(loop_forever),
+      field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       shadow_distance(ROBOT_MAX_RADIUS_METERS * 3),
       ignore_goalie(ignore_goalie),
-      ball(ball),
-      Tactic(loop_forever)
+      ball(ball)
 {
 }
 

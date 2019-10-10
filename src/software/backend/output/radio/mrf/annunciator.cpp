@@ -232,7 +232,6 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                     robot_status.dribbler_temperature = *bptr++;
                     --len;
 
-                    bool has_error_extension = false;
                     while (len)
                     {
                         // Decode extensions.
@@ -243,8 +242,6 @@ void Annunciator::handle_robot_message(int index, const void *data, std::size_t 
                                 --len;
                                 if (len >= MRF::ERROR_BYTES)
                                 {
-                                    has_error_extension = true;
-
                                     // Handling of level-triggered messages.
                                     for (unsigned int i = 0; i < MRF::ERROR_LT_COUNT; ++i)
                                     {

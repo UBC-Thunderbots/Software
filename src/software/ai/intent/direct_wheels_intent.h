@@ -3,7 +3,7 @@
 #include "software/ai/intent/intent.h"
 #include "software/ai/primitive/direct_wheels_primitive.h"
 
-class DirectWheelsIntent : public Intent, public DirectWheelsPrimitive
+class DirectWheelsIntent : public DirectWheelsPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;
