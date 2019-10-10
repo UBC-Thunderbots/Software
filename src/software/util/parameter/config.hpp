@@ -107,13 +107,23 @@ class FriendlyEvalConfig : public MutableConfig
 
     ~FriendlyEvalConfig() {}
 
-    const std::shared_ptr<Parameter<bool>> weSuck()
+    const std::shared_ptr<const Parameter<bool>> weSuck() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(we_suck_param);
+    }
+
+
+    const std::shared_ptr<const Parameter<bool>> weHaveNoChill() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(we_have_no_chill_param);
+    }
+
+    const std::shared_ptr <Parameter<bool>> weSuckMutableMutable()
     {
         return we_suck_param;
     }
 
-
-    const std::shared_ptr<Parameter<bool>> weHaveNoChill()
+    const std::shared_ptr<Parameter<bool>> weHaveNoChillMutable()
     {
         return we_have_no_chill_param;
     }
@@ -156,12 +166,22 @@ class EnemyEvalConfig : public MutableConfig
 
     ~EnemyEvalConfig() {}
 
-    const std::shared_ptr<Parameter<bool>> enemyTeamSucks()
+    const std::shared_ptr<const Parameter<bool>> enemyTeamSucks() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(enemy_team_sucks_param);
+    }
+
+    const std::shared_ptr<const Parameter<bool>> enemyTeamHasNoChill() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(enemy_team_has_no_chill_param);
+    }
+
+    const std::shared_ptr<Parameter<bool>> enemyTeamSucksMutable()
     {
         return enemy_team_sucks_param;
     }
 
-    const std::shared_ptr<Parameter<bool>> enemyTeamHasNoChill()
+    const std::shared_ptr<Parameter<bool>> enemyTeamHasNoChillMutable()
     {
         return enemy_team_has_no_chill_param;
     }
@@ -204,19 +224,35 @@ class GlobalQualityConfig : public MutableConfig
                                enemy_eval_config};
     }
 
-    const std::shared_ptr<Parameter<bool>> everyoneSucks()
+    // IMMUTABLE
+    const std::shared_ptr<const Parameter<bool>> everyoneSucks() const
+    {
+        return std::const_pointer_cast<const Parameter<bool>>(everyone_sucks_param);
+    }
+
+    const std::shared_ptr<Parameter<bool>> everyoneSucksMutable()
     {
         return everyone_sucks_param;
     }
 
-    const std::shared_ptr<FriendlyEvalConfig> getFriendlyEvalConfig()
+    const std::shared_ptr<FriendlyEvalConfig> getFriendlyEvalConfigMutable()
     {
         return friendly_eval_config;
     }
 
-    const std::shared_ptr<EnemyEvalConfig> getEnemyEvalConfig()
+    const std::shared_ptr<const FriendlyEvalConfig> getFriendlyEvalConfig() const
+    {
+        return std::const_pointer_cast<const FriendlyEvalConfig>(friendly_eval_config);
+    }
+
+    const std::shared_ptr<EnemyEvalConfig> getEnemyEvalConfigMutable()
     {
         return enemy_eval_config;
+    }
+
+    const std::shared_ptr<const EnemyEvalConfig> getEnemyEvalConfig() const
+    {
+        return std::const_pointer_cast<const EnemyEvalConfig>(enemy_eval_config);
     }
 
     std::string name()

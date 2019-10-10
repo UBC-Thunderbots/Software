@@ -48,7 +48,7 @@ void visit_parameters(ParameterVariant paramvar)
 
 
 void onlyNeedParametersFromFriendlyEvalConfig(
-    const std::shared_ptr<FriendlyEvalConfig> conf)
+    const std::shared_ptr<const FriendlyEvalConfig> conf)
 {
     std::cerr << conf->weHaveNoChill()->name() << conf->weHaveNoChill()->value()
               << std::endl;
@@ -58,26 +58,37 @@ void onlyNeedParametersFromFriendlyEvalConfig(
 TEST(ConfigTest, TestAutogen)
 {
     // TODO this is not a proper test, just have this here to explain how the system will
-    // work This is how the main configuration object will be created somewhere in HL
+    // work this is how the main configuration object will be created somewhere in hl
 
-    // TODO someone suggest a better name DynamicParameters is too reminescent of ROS
-    auto DynamicParametersV2 = std::make_shared<GlobalQualityConfig>();
+    // This creates a shared ptr pointing to a GlobalQualityConfig
+    const std::shared_ptr<GlobalQualityConfig> DynamicParametersV2Mutable =
+                 std::make_shared<GlobalQualityConfig>();
 
-    // The params are accessed as follows in the new system
-    std::cerr << DynamicParametersV2->getFriendlyEvalConfig()->weHaveNoChill()->value();
-    // Which is equivalent to
-    // Util::DynamicParameters::FriendlyEvalConfig::we_have_no_chill.value();
-    // in our current system
+    // accessing parameter values works as expected on the MutableConfig
+    std::cerr << DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()->weHaveNoChillMutable()->value();
+
+    // Which is Util::DynamicParameters::FriendlyEvalConfig::we_have_no_chill.value();
+    // in our current system, and we can also update the values with this
+    DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()->weHaveNoChillMutable()->setValue(true);
+
+    // the mutable config above will only be given to the visualizer and anything else
+    // that needs to update parameters. The Immutable version below will be given
+    // to all other threads
+    const std::shared_ptr<const GlobalQualityConfig> DynamicParametersV2Immutable = 
+                std::const_pointer_cast<const GlobalQualityConfig>(DynamicParametersV2Mutable);
+
+    // this will no longer work on this immutable shared ptr
+    // DynamicParametersV2Immutable->getFriendlyEvalConfig()->weHaveNoChill()->setValue(true);
 
     // But the beauty of this system is that you can divide it up into chunks and pass
     // around. The function defined above onlyNeedParametersFromConfigA, does not
     // have access to any other params other than FriendlyConfigA
     onlyNeedParametersFromFriendlyEvalConfig(
-        DynamicParametersV2->getFriendlyEvalConfig());
+        DynamicParametersV2Immutable->getFriendlyEvalConfig());
 
     // Check visitor function above, is is how the visualizer could visit
-    // and set each of the values
-    for (auto& v : DynamicParametersV2->getMutableParameterList())
+    // and set each of the values, and update them
+    for (auto& v : DynamicParametersV2Mutable->getMutableParameterList())
     {
         visit_parameters(v);
     }

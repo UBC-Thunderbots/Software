@@ -46,7 +46,7 @@ class Parameter
      *
      * @return the value of this parameter
      */
-    T value()
+    T value() const
     {
         std::scoped_lock lock(this->value_mutex_);
         return this->value_;
@@ -74,7 +74,7 @@ class Parameter
      *
      * @return the name of this parameter
      */
-    const std::string name() const
+    std::string name() const
     {
         return name_;
     }
@@ -135,7 +135,8 @@ class Parameter
         return instance;
     }
 
-    std::mutex value_mutex_;
+    // TODO explain mutable
+    mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;
 
     // Store the value so it can be retrieved without fetching from the server again
