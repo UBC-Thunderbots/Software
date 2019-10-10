@@ -128,9 +128,9 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Target any pass in the enemy half of the field, shifted up by 1 meter
     // from the center line
     pass_generator.setTargetRegion(
-        Rectangle(Point(1, world.field().width() / 2), world.field().enemyCornerNeg()));
+        Rectangle(Point(1, world.field().yLength() / 2), world.field().enemyCornerNeg()));
 
-    std::pair<Pass, double> best_pass_and_score_so_far =
+    PassWithRating best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();
 
     // Wait for a robot to be assigned to align to take the corner
@@ -189,21 +189,21 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
-        LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.first;
-        LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.second;
+        LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
         Duration time_since_commit_stage_start =
             world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
                                      MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
                                  1.0);
-    } while (best_pass_and_score_so_far.second < min_score);
+    } while (best_pass_and_score_so_far.rating < min_score);
 
     // Commit to a pass
-    Pass pass = best_pass_and_score_so_far.first;
+    Pass pass = best_pass_and_score_so_far.pass;
 
-    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.first;
-    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.second;
+    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
+    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
     //                    to save CPU cycles

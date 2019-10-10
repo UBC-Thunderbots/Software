@@ -81,12 +81,12 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     if (world.ball().position().x() > -1)
     {
         double y_offset =
-            -std::copysign(world.field().width() / 2, world.ball().position().y());
+            -std::copysign(world.field().yLength() / 2, world.ball().position().y());
         cherry_pick_1_target_region =
-            Rectangle(Point(0, world.field().length() / 4),
-                      Point(world.field().length() / 2, y_offset));
+            Rectangle(Point(0, world.field().xLength() / 4),
+                      Point(world.field().xLength() / 2, y_offset));
         cherry_pick_2_target_region =
-            Rectangle(Point(0, world.field().length() / 4), Point(0, y_offset));
+            Rectangle(Point(0, world.field().xLength() / 4), Point(0, y_offset));
     }
 
     std::array<std::shared_ptr<CherryPickTactic>, 2> cherry_pick_tactics = {
@@ -107,8 +107,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
     pass_generator.setTargetRegion(
-        Rectangle(Point(0, world.field().width() / 2), world.field().enemyCornerNeg()));
-    std::pair<Pass, double> best_pass_and_score_so_far =
+        Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
+    PassWithRating best_pass_and_score_so_far =
         pass_generator.getBestPassSoFar();
 
     // Wait for a good pass by starting out only looking for "perfect" passes (with a
@@ -133,8 +133,8 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics(cherry_pick_tactics);
         updatePassGenerator(pass_generator);
 
-        LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.first;
-        LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.second;
+        LOG(DEBUG) << "Best pass so far is: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "      with score of: " << best_pass_and_score_so_far.rating;
 
         yield({goalie_tactic, shoot_tactic, std::get<0>(cherry_pick_tactics),
                std::get<0>(crease_defender_tactics), std::get<1>(cherry_pick_tactics),
@@ -145,7 +145,7 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // We're ready to pass if we have a robot assigned in the PassGenerator as the
         // passer and the PassGenerator has found a pass above our current threshold
         ready_to_pass = set_passer_robot_in_passgenerator &&
-                        best_pass_and_score_so_far.second > min_pass_score_threshold;
+                        best_pass_and_score_so_far.rating > min_pass_score_threshold;
 
         // If there is a robot assigned to shoot, we assume this is the robot
         // that will be taking the shot
@@ -177,11 +177,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
     if (!shoot_tactic->done())
     {
         // Commit to a pass
-        Pass pass = best_pass_and_score_so_far.first;
+        Pass pass = best_pass_and_score_so_far.pass;
 
-        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.first;
+        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
         LOG(DEBUG) << "Score of pass we committed to: "
-                   << best_pass_and_score_so_far.second;
+                   << best_pass_and_score_so_far.rating;
 
         // Perform the pass and wait until the receiver is finished
         auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);

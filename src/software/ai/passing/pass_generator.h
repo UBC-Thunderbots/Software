@@ -115,7 +115,7 @@ namespace Passing
          *
          * @return The best currently known pass and the rating of that pass (in [0-1])
          */
-        std::pair<Pass, double> getBestPassSoFar();
+        PassWithRating getBestPassSoFar();
 
         /**
          * Destructs this PassGenerator

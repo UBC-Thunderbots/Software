@@ -11,17 +11,17 @@
  * now broken?).
  */
 
-#include "ai/passing/evaluation.h"
+#include "software/ai/passing/evaluation.h"
 
 #include <gtest/gtest.h>
 
 #include <chrono>
 #include <random>
 
-#include "../shared/constants.h"
-#include "test/test_util/test_util.h"
-#include "util/math_functions.h"
-#include "util/parameter/dynamic_parameters.h"
+#include "shared/constants.h"
+#include "software/test_util/test_util.h"
+#include "software/util/math/math_functions.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 using namespace Passing;
 

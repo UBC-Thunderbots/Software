@@ -58,14 +58,13 @@ void PassGenerator::setPasserRobotId(unsigned int robot_id)
     this->passer_robot_id = robot_id;
 }
 
-std::pair<Pass, double> PassGenerator::getBestPassSoFar()
+PassWithRating PassGenerator::getBestPassSoFar()
 {
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
     Pass best_known_pass_copy = best_known_pass;
-    return std::make_pair<Pass, double>(std::move(best_known_pass_copy),
-                                        ratePass(best_known_pass));
+    return PassWithRating{std::move(best_known_pass_copy), ratePass(best_known_pass)};
 }
 
 void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
