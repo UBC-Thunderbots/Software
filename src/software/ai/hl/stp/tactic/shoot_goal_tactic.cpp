@@ -76,11 +76,11 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     // we rotate all the robot positions about the origin so we can construct
     // a rectangle that is aligned with the axis
     Vector front_of_robot_dir =
-            Vector(robot->orientation().cos(), robot->orientation().sin());
+        Vector(robot->orientation().cos(), robot->orientation().sin());
 
     Rectangle baller_frontal_area = Rectangle(
-            (robot->position() + front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS)),
-            robot->position() + front_of_robot_dir.norm(3 * ROBOT_MAX_RADIUS_METERS) -
+        (robot->position() + front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS)),
+        robot->position() + front_of_robot_dir.norm(3 * ROBOT_MAX_RADIUS_METERS) -
             front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS));
 
     for (const auto &enemy : enemy_team.getAllRobots())
