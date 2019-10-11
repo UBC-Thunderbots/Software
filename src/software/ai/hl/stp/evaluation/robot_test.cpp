@@ -182,7 +182,7 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
 TEST(RobotEvaluationTest, pass_with_ball_direct)
 {
     Point ball_position  = Point(0.035, 0.06);
-    Vector ball_velocity = Vector(2, 2);
+    Vector ball_velocity = Vector(4, 4);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
 
