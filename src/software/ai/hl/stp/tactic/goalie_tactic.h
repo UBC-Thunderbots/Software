@@ -18,12 +18,15 @@ class GoalieTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this GoalieTactic.
+     * Updates the world parameters for this GoalieTactic.
      *
-// TODO: comment
+     * @param ball
+     * @param field
+     * @param friendly_team
+     * @param enemy_team
      */
-    void updateParams(const Ball &ball, const Field &field, const Team &friendly_team,
-                      const Team &enemy_team);
+    void updateWorldParams(const Ball &ball, const Field &field,
+                           const Team &friendly_team, const Team &enemy_team);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -34,6 +37,13 @@ class GoalieTactic : public Tactic
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
     double calculateRobotCost(const Robot &robot, const World &world) override;
+
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor &visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;

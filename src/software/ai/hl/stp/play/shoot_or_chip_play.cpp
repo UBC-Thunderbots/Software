@@ -14,8 +14,8 @@
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/hl/stp/tactic/stop_tactic.h"
-#include "software/ai/world/game_state.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/game_state.h"
 
 using namespace Evaluation;
 
@@ -86,14 +86,14 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         friendly_team_for_goalie, world.enemyTeam());
 
         // Update crease defenders
         for (auto &crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateParams(world.ball(), world.field(),
-                                                 world.friendlyTeam(), world.enemyTeam());
+            crease_defender_tactic->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 
@@ -104,8 +104,8 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
             enemy_robot_points.emplace_back(robot.position());
         }
         std::vector<Circle> chip_targets = findGoodChipTargets(world);
-        for (int i = 0; i < chip_targets.size() && i < move_to_open_area_tactics.size();
-             i++)
+        for (unsigned i = 0;
+             i < chip_targets.size() && i < move_to_open_area_tactics.size(); i++)
         {
             // Face towards the ball
             Angle orientation =
@@ -115,7 +115,7 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 chip_targets[i].getOrigin() -
                 Vector::createFromAngle(orientation).norm(ROBOT_MAX_RADIUS_METERS);
             ;
-            move_to_open_area_tactics[i]->updateParams(position, orientation, 0.0);
+            move_to_open_area_tactics[i]->updateControlParams(position, orientation, 0.0);
             result.emplace_back(move_to_open_area_tactics[i]);
         }
 
@@ -125,8 +125,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             chip_target = chip_targets[0].getOrigin();
         }
-        shoot_or_chip_tactic->updateParams(world.field(), world.friendlyTeam(),
-                                           world.enemyTeam(), world.ball(), chip_target);
+        shoot_or_chip_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
+                                                world.enemyTeam(), world.ball());
+        shoot_or_chip_tactic->updateControlParams(chip_target);
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);

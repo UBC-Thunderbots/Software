@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "software/ai/hl/stp/tactic/tactic.h"
-#include "software/ai/world/world.h"
+#include "software/world/world.h"
 
 // We typedef the coroutine return type to make it shorter, more descriptive,
 // and easier to work with.

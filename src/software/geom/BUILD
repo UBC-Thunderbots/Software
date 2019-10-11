@@ -5,6 +5,7 @@ cc_library(
     srcs = [
         "polygon.cpp",
         "rectangle.cpp",
+        "shot.cpp",
         "util.cpp",
     ],
     hdrs = [
@@ -16,6 +17,7 @@ cc_library(
         "ray.h",
         "rectangle.h",
         "segment.h",
+        "shot.h",
         "util.h",
     ],
     copts = [
@@ -24,6 +26,7 @@ cc_library(
     deps = [
         "@boost//:geometry",
         "@g3log",
+        "@boost//:polygon",
     ],
 )
 
