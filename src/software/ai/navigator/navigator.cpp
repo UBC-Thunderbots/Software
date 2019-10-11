@@ -75,6 +75,7 @@ void Navigator::visit(const MoveIntent &move_intent)
     {
         case 0:
         {
+            LOG(WARNING) << "Path planner could not find a path";
             auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
             current_primitive = std::move(stop);
         }
