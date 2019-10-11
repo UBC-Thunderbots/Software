@@ -6,6 +6,11 @@
 #include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 
+Navigator::Navigator(std::unique_ptr<PathPlanner> path_planner)
+    : path_planner_(std::move(path_planner))
+{
+}
+
 void Navigator::visit(const CatchIntent &catch_intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(catch_intent);
@@ -44,6 +49,8 @@ void Navigator::visit(const KickIntent &kick_intent)
 
 void Navigator::visit(const MoveIntent &move_intent)
 {
+    std::vector<Point> path_points;
+
     Point start =
         this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
     Point dest = move_intent.getDestination();
@@ -51,49 +58,45 @@ void Navigator::visit(const MoveIntent &move_intent)
     std::vector<Obstacle> obstacles =
         createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    auto path_planner =
-        std::make_unique<ThetaStarPathPlanner>(this->world.field(), obstacles);
-
-    auto path_points = path_planner->findPath(start, dest);
-
-    if (path_points)
+    try
     {
-        planned_paths.emplace_back(*path_points);
-        if ((*path_points).size() > 2)
-        {
-            current_destination = (*path_points)[1];
-            double segment_final_vel =
-                getCloseToEnemyObstacleFactor((*path_points)[1]) *
-                calculateTransitionSpeedBetweenSegments(
-                    (*path_points)[0], (*path_points)[1], (*path_points)[2],
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                        Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value());
-
-            auto move = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), segment_final_vel,
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
-            return;
-        }
-        if ((*path_points).size() == 2)
-        {
-            current_destination = (*path_points)[1];
-            auto move           = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(),
-                move_intent.getFinalSpeed() *
-                    getCloseToEnemyObstacleFactor((*path_points)[1]),
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
-            return;
-        }
+        path_points = std::get<std::vector<Point>>(
+            path_planner_->findPath(start, dest, this->world.field(), obstacles));
     }
-    auto stop         = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
-    current_primitive = std::move(stop);
+    catch (const std::bad_variant_access &)
+    {
+        // variant either monostate or Curve, so no valid path
+        auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
+        current_primitive = std::move(stop);
+    }
+
+    planned_paths.emplace_back(path_points);
+    if ((path_points).size() > 2)
+    {
+        current_destination = (path_points)[1];
+        double segment_final_vel =
+            getCloseToEnemyObstacleFactor((path_points)[1]) *
+            calculateTransitionSpeedBetweenSegments(
+                (path_points)[0], (path_points)[1], (path_points)[2],
+                ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                    Util::DynamicParameters::Navigator::transition_speed_factor.value());
+
+        auto move = std::make_unique<MovePrimitive>(
+            move_intent.getRobotId(), current_destination, move_intent.getFinalAngle(),
+            segment_final_vel, move_intent.isDribblerEnabled(),
+            move_intent.isSlowEnabled(), move_intent.getAutoKickType());
+        current_primitive = std::move(move);
+    }
+    else if ((path_points).size() == 2)
+    {
+        current_destination = (path_points)[1];
+        auto move           = std::make_unique<MovePrimitive>(
+            move_intent.getRobotId(), current_destination, move_intent.getFinalAngle(),
+            move_intent.getFinalSpeed() * getCloseToEnemyObstacleFactor((path_points)[1]),
+            move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+            move_intent.getAutoKickType());
+        current_primitive = std::move(move);
+    }
 }
 
 void Navigator::visit(const MoveSpinIntent &move_spin_intent)

@@ -6,8 +6,10 @@
  * points.
  */
 
-std::optional<std::vector<Point>> StraightLinePathPlanner::findPath(const Point &start,
-                                                                    const Point &dest)
+std::variant<std::monostate, Curve, std::vector<Point>> StraightLinePathPlanner::findPath(
+    const Point &start, const Point &dest, const Field &field,
+    const std::vector<Obstacle> &obstacles)
 {
-    return std::make_optional<std::vector<Point>>({start, dest});
+    return std::variant<std::monostate, Curve, std::vector<Point>>(
+        std::vector<Point>({start, dest}));
 }

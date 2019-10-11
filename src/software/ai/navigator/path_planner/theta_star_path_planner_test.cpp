@@ -71,26 +71,31 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     std::vector<Obstacle> obstacles = {Obstacle(
         Polygon({Point(0.5, 1), Point(-0.5, 1), Point(-0.5, -1), Point(0.5, -1)}))};
 
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+    std::vector<Point> path_points;
 
-
-    auto path_points = planner->findPath(start, dest);
-
-    // We expect to find a path
-    ASSERT_TRUE(path_points);
+    try
+    {
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, field, obstacles));
+    }
+    catch (const std::bad_variant_access&)
+    {
+        // not a valid path
+        EXPECT_TRUE(0);
+    }
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path_points->front());
-    EXPECT_EQ(dest, path_points->back());
+    EXPECT_EQ(start, path_points.front());
+    EXPECT_EQ(dest, path_points.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({0, 0.1}, {3.1, -0.1});
-    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure the path does not go through any obstacles, except for the
     // first point, which is in the obstacle blocking the start position
-    checkPathDoesNotIntersectObstacle({path_points->begin() + 1, path_points->end()},
+    checkPathDoesNotIntersectObstacle({path_points.begin() + 1, path_points.end()},
                                       obstacles);
 }
 
@@ -105,24 +110,29 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     std::vector<Obstacle> obstacles = {Obstacle(
         Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))};
 
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+    std::vector<Point> path_points;
 
-
-    auto path_points = planner->findPath(start, dest);
-
-    // We expect to find a path
-    ASSERT_TRUE(path_points);
+    try
+    {
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, field, obstacles));
+    }
+    catch (const std::bad_variant_access&)
+    {
+        // not a valid path
+        EXPECT_TRUE(0);
+    }
 
     // The path should start at exactly the start point
-    EXPECT_EQ(start, path_points->front());
+    EXPECT_EQ(start, path_points.front());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 0.1}, {3.1, -0.1});
-    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Make sure the path does not go through any obstacles
-    checkPathDoesNotIntersectObstacle(*path_points, obstacles);
+    checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_x_axis)
@@ -135,26 +145,31 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     std::vector<Obstacle> obstacles = {
         Obstacle(Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)}))};
 
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+    std::vector<Point> path_points;
 
-
-    auto path_points = planner->findPath(start, dest);
-
-    // We expect to find a path
-    ASSERT_TRUE(path_points);
+    try
+    {
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, field, obstacles));
+    }
+    catch (const std::bad_variant_access&)
+    {
+        // not a valid path
+        EXPECT_TRUE(0);
+    }
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path_points->front());
-    EXPECT_EQ(dest, path_points->back());
+    EXPECT_EQ(start, path_points.front());
+    EXPECT_EQ(dest, path_points.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
-    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Can't make sure the path does not go through any obstacles
     // since start is blocked
-    // checkPathDoesNotIntersectObstacle(*path_points, obstacles);
+    // checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_y_axis)
@@ -167,18 +182,23 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     std::vector<Obstacle> obstacles = {
         Obstacle(Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)}))};
 
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+    std::vector<Point> path_points;
 
-
-    auto path_points = planner->findPath(start, dest);
-
-    // We expect to find a path
-    ASSERT_TRUE(path_points);
+    try
+    {
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, field, obstacles));
+    }
+    catch (const std::bad_variant_access&)
+    {
+        // not a valid path
+        EXPECT_TRUE(0);
+    }
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path_points->front());
-    EXPECT_EQ(dest, path_points->back());
+    EXPECT_EQ(start, path_points.front());
+    EXPECT_EQ(dest, path_points.back());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box(
@@ -187,11 +207,11 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
             -0.1,
         },
         {-1.2, 3.1});
-    checkPathDoesNotExceedBoundingBox(*path_points, bounding_box);
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
 
     // Can't make sure the path does not go through any obstacles
     // since start is blocked
-    // checkPathDoesNotIntersectObstacle(*path_points, obstacles);
+    // checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
@@ -201,19 +221,25 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 
     std::vector<Obstacle> obstacles = {};
 
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+    std::vector<Point> path_points;
 
-    auto path_points = planner->findPath(start, dest);
-
-    // We should be able to find path points
-    ASSERT_TRUE(path_points);
+    try
+    {
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, field, obstacles));
+    }
+    catch (const std::bad_variant_access&)
+    {
+        // not a valid path
+        EXPECT_TRUE(0);
+    }
 
     // Since there are no obstacles, there should be two path points, one at the start
     // and one at the destination
-    ASSERT_EQ(2, path_points->size());
-    ASSERT_EQ(start, path_points->front());
-    ASSERT_EQ(dest, path_points->back());
+    ASSERT_EQ(2, path_points.size());
+    ASSERT_EQ(start, path_points.front());
+    ASSERT_EQ(dest, path_points.back());
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
@@ -223,15 +249,23 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
 
-    std::unique_ptr<PathPlanner> planner =
-        std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+    std::vector<Point> path_points;
 
-    auto path_points = planner->findPath(start, dest);
+    try
+    {
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, field, obstacles));
+    }
+    catch (const std::bad_variant_access&)
+    {
+        // not a valid path
+        EXPECT_TRUE(0);
+    }
 
-    ASSERT_TRUE(path_points);
-    ASSERT_EQ(2, path_points->size());
-    ASSERT_EQ(start, path_points->front());
-    ASSERT_EQ(dest, path_points->back());
+    ASSERT_EQ(2, path_points.size());
+    ASSERT_EQ(start, path_points.front());
+    ASSERT_EQ(dest, path_points.back());
 }
 
 TEST(TestThetaStarPathPlanner, performance)
@@ -265,15 +299,24 @@ TEST(TestThetaStarPathPlanner, performance)
 
     Point start(0, 0), dest(4.5, 0);
 
+    std::vector<Point> path_points;
     auto start_time = std::chrono::system_clock::now();
     for (int i = 0; i < num_iterations; i++)
     {
         for (auto obstacles : obstacle_sets)
         {
             std::unique_ptr<PathPlanner> planner =
-                std::make_unique<ThetaStarPathPlanner>(field, obstacles);
+                std::make_unique<ThetaStarPathPlanner>();
 
-            auto path_points = planner->findPath(start, dest);
+            try
+            {
+                path_points = std::get<std::vector<Point>>(
+                    planner->findPath(start, dest, field, obstacles));
+            }
+            catch (const std::bad_variant_access&)
+            {
+                EXPECT_TRUE(0);
+            }
         }
     }
 

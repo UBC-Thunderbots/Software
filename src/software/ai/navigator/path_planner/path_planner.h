@@ -1,9 +1,11 @@
 #pragma once
-#include <optional>
+#include <variant>
 #include <vector>
 
+#include "software/ai/navigator/curve/curve.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
+#include "software/world/field.h"
 
 /**
  * PathPlanner is an interface for a path planner that,
@@ -15,8 +17,22 @@
 class PathPlanner
 {
    public:
-    virtual std::optional<std::vector<Point>> findPath(const Point &start,
-                                                       const Point &dest) = 0;
+    /**
+     * Returns a "good" path between start and dest.
+     *
+     * @param start start point
+     * @param dest destination point
+     * @param field field
+     * @param obstacles obstacles to avoid
+     *
+     * @return the optimal path between start and dest
+     * 		if no valid path then return std::monostate
+     * 		if spline navigator then return a Curve
+     * 		if point navigator then return a std::vector of points
+     */
+    virtual std::variant<std::monostate, Curve, std::vector<Point>> findPath(
+        const Point &start, const Point &dest, const Field &field,
+        const std::vector<Obstacle> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;
 };
