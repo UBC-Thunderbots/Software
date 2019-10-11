@@ -170,14 +170,13 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
 }
 
 // top level function
-std::variant<std::monostate, Curve, std::vector<Point>> ThetaStarPathPlanner::findPath(
-    const Point &start, const Point &dest, const Field &field,
-    const std::vector<Obstacle> &obstacles)
+PathType ThetaStarPathPlanner::findPath(const Point &start, const Point &dest,
+                                        const Field &field,
+                                        const std::vector<Obstacle> &obstacles)
 {
     obstacles_ = obstacles;
-    std::variant<std::monostate, Curve, std::vector<Point>> retval;
+    PathType empty_ret_val(std::vector<Point>({}));
     CellCoordinate src_coord, dest_coord;
-
 
     fieldXLength     = field.totalXLength();
     fieldYLength     = field.totalYLength();
@@ -197,14 +196,14 @@ std::variant<std::monostate, Curve, std::vector<Point>> ThetaStarPathPlanner::fi
     if (isValid(src_coord.first, src_coord.second) == false)
     {
         LOG(WARNING) << "Source is not valid; no path found" << std::endl;
-        return retval;
+        return empty_ret_val;
     }
 
     // If the dest is out of range
     if (isValid(dest_coord.first, dest_coord.second) == false)
     {
         LOG(WARNING) << "Destination is not valid; no path found" << std::endl;
-        return retval;
+        return empty_ret_val;
     }
 
     if ((start - dest).len() < CLOSE_TO_DEST_THRESHOLD ||
@@ -212,16 +211,14 @@ std::variant<std::monostate, Curve, std::vector<Point>> ThetaStarPathPlanner::fi
     {
         // If the dest GridCell is within one grid size of start or
         // start and dest, or start and closest_dest, within threshold
-        retval = std::vector<Point>({start, dest});
-        return retval;
+        return std::vector<Point>({start, dest});
     }
 
 
     if ((start - closest_dest).len() <
         (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
-        retval = std::vector<Point>({start, closest_dest});
-        return retval;
+        return std::vector<Point>({start, closest_dest});
     }
 
     // The source is blocked
@@ -234,7 +231,7 @@ std::variant<std::monostate, Curve, std::vector<Point>> ThetaStarPathPlanner::fi
         }
         else
         {
-            return retval;
+            return empty_ret_val;
         }
     }
 
@@ -248,7 +245,7 @@ std::variant<std::monostate, Curve, std::vector<Point>> ThetaStarPathPlanner::fi
         }
         else
         {
-            return retval;
+            return empty_ret_val;
         }
     }
 
@@ -325,11 +322,11 @@ loop_end:
 
     // When the dest GridCell is not found and the open
     // list is empty, then we conclude that we failed to
-    // reach the dest_coordiantion GridCell. This may happen when the
+    // reach the destination GridCell. This may happen when the
     // there is no way to dest GridCell (due to blockages)
     if (foundDest == false)
     {
-        return retval;
+        return empty_ret_val;
     }
 
     auto path_points = tracePath(dest_coord);
@@ -342,8 +339,7 @@ loop_end:
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
 
-    retval = std::vector<Point>(path_points);
-    return retval;
+    return PathType(path_points);
 }
 
 std::optional<ThetaStarPathPlanner::CellCoordinate>

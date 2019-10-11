@@ -5,4 +5,6 @@
 
 class Curve
 {
+    // Stub
+    // To be implemented alongside spline navigator
 };

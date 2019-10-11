@@ -14,25 +14,28 @@
  * if a path exists, otherwise it will return nothing.
  */
 
+using PathType = std::variant<std::vector<Curve>, std::vector<Point>>;
+
 class PathPlanner
 {
    public:
     /**
-     * Returns a "good" path between start and dest.
+     * Returns a path between start and dest.
+     * (consider the case where we have a "StraightLinePathPlanner" for testing purposes)
      *
      * @param start start point
      * @param dest destination point
      * @param field field
      * @param obstacles obstacles to avoid
      *
-     * @return the optimal path between start and dest
-     * 		if no valid path then return std::monostate
-     * 		if spline navigator then return a Curve
+     * @return a path between start and dest
+     * 		if no valid path then return an empty vector
+     * 		if spline navigator then return a std::vector of Curve
      * 		if point navigator then return a std::vector of points
+     * 		    * this vector must include the start point and end point
      */
-    virtual std::variant<std::monostate, Curve, std::vector<Point>> findPath(
-        const Point &start, const Point &dest, const Field &field,
-        const std::vector<Obstacle> &obstacles) = 0;
+    virtual PathType findPath(const Point &start, const Point &dest, const Field &field,
+                              const std::vector<Obstacle> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;
 };

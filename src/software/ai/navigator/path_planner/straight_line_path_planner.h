@@ -19,7 +19,6 @@ class StraightLinePathPlanner : public PathPlanner
      *
      * @return a vector that is {start, dest}
      */
-    std::variant<std::monostate, Curve, std::vector<Point>> findPath(
-        const Point &start, const Point &dest, const Field &field,
-        const std::vector<Obstacle> &obstacles) override;
+    PathType findPath(const Point &start, const Point &dest, const Field &field,
+                      const std::vector<Obstacle> &obstacles) override;
 };

@@ -65,42 +65,54 @@ void Navigator::visit(const MoveIntent &move_intent)
     }
     catch (const std::bad_variant_access &)
     {
-        // variant either monostate or Curve, so no valid path
-        auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
-        current_primitive = std::move(stop);
-        return;
+        throw std::invalid_argument(
+            "Path is a curve, which is not currently handled by the navigator");
     }
 
     planned_paths.emplace_back(path_points);
-    if ((path_points).size() > 2)
-    {
-        current_destination = (path_points)[1];
-        double segment_final_vel =
-            getCloseToEnemyObstacleFactor((path_points)[1]) *
-            calculateTransitionSpeedBetweenSegments(
-                (path_points)[0], (path_points)[1], (path_points)[2],
-                ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                    Util::DynamicParameters::Navigator::transition_speed_factor.value());
 
-        auto move = std::make_unique<MovePrimitive>(
-            move_intent.getRobotId(), current_destination, move_intent.getFinalAngle(),
-            segment_final_vel, move_intent.isDribblerEnabled(),
-            move_intent.isSlowEnabled(), move_intent.getAutoKickType());
-        current_primitive = std::move(move);
-    }
-    else if ((path_points).size() == 2)
+    switch (path_points.size())
     {
-        current_destination = (path_points)[1];
-        auto move           = std::make_unique<MovePrimitive>(
-            move_intent.getRobotId(), current_destination, move_intent.getFinalAngle(),
-            move_intent.getFinalSpeed() * getCloseToEnemyObstacleFactor((path_points)[1]),
-            move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-            move_intent.getAutoKickType());
-        current_primitive = std::move(move);
-    }
-    else
-    {
-        throw std::runtime_error("Path only contains one point.");
+        case 0:
+        {
+            auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
+            current_primitive = std::move(stop);
+        }
+        case 1:
+        {
+            throw std::runtime_error(
+                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or dest or some other point");
+        }
+        case 2:
+        {
+            current_destination = (path_points)[1];
+            auto move           = std::make_unique<MovePrimitive>(
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(),
+                move_intent.getFinalSpeed() *
+                    getCloseToEnemyObstacleFactor((path_points)[1]),
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getAutoKickType());
+            current_primitive = std::move(move);
+        }
+        default:
+        {
+            current_destination = (path_points)[1];
+            double segment_final_vel =
+                getCloseToEnemyObstacleFactor((path_points)[1]) *
+                calculateTransitionSpeedBetweenSegments(
+                    (path_points)[0], (path_points)[1], (path_points)[2],
+                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                        Util::DynamicParameters::Navigator::transition_speed_factor
+                            .value());
+
+            auto move = std::make_unique<MovePrimitive>(
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(), segment_final_vel,
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getAutoKickType());
+            current_primitive = std::move(move);
+        }
     }
 }
 

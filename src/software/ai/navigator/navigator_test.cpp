@@ -10,12 +10,12 @@
 TEST(NavigatorTest, convert_catch_intent_to_catch_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<CatchIntent>(1, 0, 10, 0.3, 0));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -28,13 +28,13 @@ TEST(NavigatorTest, convert_catch_intent_to_catch_primitive)
 TEST(NavigatorTest, convert_chip_intent_to_chip_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
         std::make_unique<ChipIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -47,12 +47,12 @@ TEST(NavigatorTest, convert_chip_intent_to_chip_primitive)
 TEST(NavigatorTest, convert_direct_velocity_intent_to_direct_velocity_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<DirectVelocityIntent>(3, 1, -2, 0.4, 1000, 4));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -65,13 +65,13 @@ TEST(NavigatorTest, convert_direct_velocity_intent_to_direct_velocity_primitive)
 TEST(NavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
         std::make_unique<DirectWheelsIntent>(2, 80, 22, 55, 201, 5000, 60));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -84,13 +84,13 @@ TEST(NavigatorTest, convert_direct_wheels_intent_to_direct_wheels_primitive)
 TEST(NavigatorTest, convert_dribble_intent_to_dribble_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
         std::make_unique<DribbleIntent>(0, Point(), Angle::quarter(), 8888, true, 50));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -103,13 +103,13 @@ TEST(NavigatorTest, convert_dribble_intent_to_dribble_primitive)
 TEST(NavigatorTest, convert_kick_intent_to_kick_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
         std::make_unique<KickIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -122,13 +122,13 @@ TEST(NavigatorTest, convert_kick_intent_to_kick_primitive)
 TEST(NavigatorTest, convert_movespin_intent_to_movespin_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(
         std::make_unique<MoveSpinIntent>(0, Point(), AngularVelocity::full(), 1, 0));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -141,13 +141,13 @@ TEST(NavigatorTest, convert_movespin_intent_to_movespin_primitive)
 TEST(NavigatorTest, convert_pivot_intent_to_pivot_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<PivotIntent>(0, Point(1, 0.4), Angle::half(),
                                                        Angle::ofRadians(3.2), true, 1));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -161,12 +161,12 @@ TEST(NavigatorTest, convert_pivot_intent_to_pivot_primitive)
 TEST(NavigatorTest, convert_stop_intent_to_stop_primitive)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 1 primitive back
     EXPECT_EQ(primitive_ptrs.size(), 1);
@@ -179,7 +179,7 @@ TEST(NavigatorTest, convert_stop_intent_to_stop_primitive)
 TEST(NavigatorTest, convert_multiple_intents_to_primitives)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
-    Navigator Navigator(std::make_unique<ThetaStarPathPlanner>(ThetaStarPathPlanner()));
+    Navigator navigator(std::make_unique<ThetaStarPathPlanner>());
 
     std::vector<std::unique_ptr<Intent>> intents;
     intents.emplace_back(std::make_unique<StopIntent>(0, false, 1));
@@ -188,7 +188,7 @@ TEST(NavigatorTest, convert_multiple_intents_to_primitives)
     //    intents.emplace_back(
     //        std::make_unique<MoveIntent>(0, Point(), Angle::quarter(), 0, 1));
 
-    auto primitive_ptrs = Navigator.getAssignedPrimitives(world, intents);
+    auto primitive_ptrs = navigator.getAssignedPrimitives(world, intents);
 
     // Make sure we got exactly 3 primitives back
     EXPECT_EQ(primitive_ptrs.size(), 2);

@@ -24,11 +24,10 @@ class ThetaStarPathPlanner : public PathPlanner
      * @param obstacles obstacles to avoid
      *
      * @return a vector of points that is the optimal path avoiding obstacles
-     * 		if no valid path then return std::nullopt
+     * 		if no valid path then return empty vector
      */
-    std::variant<std::monostate, Curve, std::vector<Point>> findPath(
-        const Point &start, const Point &dest, const Field &field,
-        const std::vector<Obstacle> &obstacles) override;
+    PathType findPath(const Point &start, const Point &dest, const Field &field,
+                      const std::vector<Obstacle> &obstacles) override;
 
    private:
     typedef std::pair<int, int> CellCoordinate;

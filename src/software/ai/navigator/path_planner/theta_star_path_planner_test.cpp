@@ -82,7 +82,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     catch (const std::bad_variant_access&)
     {
         // not a valid path
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     // Make sure the start and end of the path are correct
@@ -121,7 +121,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     catch (const std::bad_variant_access&)
     {
         // not a valid path
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     // The path should start at exactly the start point
@@ -156,7 +156,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     catch (const std::bad_variant_access&)
     {
         // not a valid path
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     // The path should start at exactly the start point and end at exactly the dest
@@ -169,7 +169,6 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
 
     // Can't make sure the path does not go through any obstacles
     // since start is blocked
-    // checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_y_axis)
@@ -193,7 +192,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     catch (const std::bad_variant_access&)
     {
         // not a valid path
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     // The path should start at exactly the start point and end at exactly the dest
@@ -211,7 +210,6 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
 
     // Can't make sure the path does not go through any obstacles
     // since start is blocked
-    // checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
@@ -232,7 +230,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     catch (const std::bad_variant_access&)
     {
         // not a valid path
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     // Since there are no obstacles, there should be two path points, one at the start
@@ -260,7 +258,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     catch (const std::bad_variant_access&)
     {
         // not a valid path
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     ASSERT_EQ(2, path_points.size());
@@ -315,7 +313,7 @@ TEST(TestThetaStarPathPlanner, performance)
             }
             catch (const std::bad_variant_access&)
             {
-                EXPECT_TRUE(0);
+                FAIL();
             }
         }
     }
