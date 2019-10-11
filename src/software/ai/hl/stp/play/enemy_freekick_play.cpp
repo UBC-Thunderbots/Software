@@ -9,7 +9,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
 
@@ -23,26 +22,12 @@ std::string EnemyFreekickPlay::getName() const
 
 bool EnemyFreekickPlay::isApplicable(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 bool EnemyFreekickPlay::invariantHolds(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
