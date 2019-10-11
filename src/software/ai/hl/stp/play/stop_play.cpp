@@ -108,7 +108,8 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // line from the center of the goal to the ball intersects. A robot will be placed
         // on that line, and the other two will be on either side
         Point ball_defense_point_center =
-            world.ball().position() + (0.5 + 2 * ROBOT_MAX_RADIUS_METERS) * goal_to_ball_unit_vector;
+            world.ball().position() +
+            (0.5 + 2 * ROBOT_MAX_RADIUS_METERS) * goal_to_ball_unit_vector;
         Point ball_defense_point_left =
             ball_defense_point_center -
             robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
