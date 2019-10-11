@@ -68,6 +68,7 @@ void Navigator::visit(const MoveIntent &move_intent)
         // variant either monostate or Curve, so no valid path
         auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
         current_primitive = std::move(stop);
+        return;
     }
 
     planned_paths.emplace_back(path_points);
@@ -96,6 +97,10 @@ void Navigator::visit(const MoveIntent &move_intent)
             move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
             move_intent.getAutoKickType());
         current_primitive = std::move(move);
+    }
+    else
+    {
+        throw std::runtime_error("Path only contains one point.");
     }
 }
 
