@@ -208,18 +208,22 @@ def _cc_stm32h7_binary_impl(ctx):
 
     elf_file = linking_outputs.executable
 
-    #    bin_file = ctx.actions.declare_file("{}.bin".format(ctx.label.name))
-    #
-    #    ctx.actions.run_shell(
-    #        inputs = [elf_file],
-    #        outputs = [bin_file],
-    #        tools = [@com_arm_developer_gcc//:objcopy],
-    #        command = "$(location @com_arm_developer_gcc//:objcopy) -O binary $< $@",
-    #    )
+    # Create the .bin from the .elf
+    bin_file = ctx.actions.declare_file("{}.bin".format(ctx.label.name))
+    ctx.actions.run_shell(
+        inputs = [elf_file],
+        outputs = [bin_file],
+        tools = cc_toolchain.all_files,
+        command = "{objcopy} -O binary {elf_out} {cc_bin}".format(
+            objcopy=cc_toolchain.objcopy_executable(),
+            elf_out=elf_file.path,
+            cc_bin=bin_file.path,
+        )
+    )
 
     return [
         DefaultInfo(
-            files = depset(_filter_none([elf_file])),
+            files = depset(_filter_none([elf_file, bin_file])),
         ),
     ]
 

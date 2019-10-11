@@ -24,16 +24,6 @@ cc_stm32h7_binary(
     ],
 )
 
-# TODO: need to move this into the custom rule, we need a ".bin" to flash
-genrule(
-    name = "asdf",
-    srcs = ["frankie_v1_main"],
-    outs = ["frankie_v1_main.bin"],
-    cmd = "$(location @com_arm_developer_gcc//:objcopy) -O binary $< $@",
-    output_to_bindir = True,
-    tools = ["@com_arm_developer_gcc//:objcopy"],
-)
-
 cc_library(
     name = "devices_vector_table",
     srcs = ["startup_stm32h742xx.s"],
