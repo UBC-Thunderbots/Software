@@ -169,7 +169,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
-    world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.4, 0)},
+    world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.25, 0)},
                                                      Timestamp::fromSeconds(0));
     Ball ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     world.updateBallState(ball);
