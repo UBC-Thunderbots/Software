@@ -191,9 +191,11 @@ void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)
         {
             updateCreaseDefenderTactics(crease_defender_tactics);
             updateGoalie(goalie_tactic);
-            passer->updateParams(pass, world.ball());
-            receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
-                                   world.ball());
+            passer->updateWorldParams(world.ball());
+            passer->updateControlParams(pass);
+            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
+                                        world.ball());
+            receiver->updateControlParams(pass);
             yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                    std::get<1>(crease_defender_tactics)});
         } while (!receiver->done());
@@ -211,14 +213,14 @@ void ShootOrPassPlay::updateCherryPickTactics(
 {
     for (auto &tactic : tactics)
     {
-        tactic->updateParams(world);
+        tactic->updateWorldParams(world);
     }
 }
 
 void ShootOrPassPlay::updateShootGoalTactic(std::shared_ptr<ShootGoalTactic> shoot_tactic)
 {
-    shoot_tactic->updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                               world.ball());
+    shoot_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
+                                    world.enemyTeam(), world.ball());
 }
 
 void ShootOrPassPlay::updatePassGenerator(PassGenerator &pass_generator)
@@ -232,15 +234,15 @@ void ShootOrPassPlay::updateCreaseDefenderTactics(
 {
     for (auto &crease_defender : crease_defenders)
     {
-        crease_defender->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                      world.enemyTeam());
+        crease_defender->updateWorldParams(world.ball(), world.field(),
+                                           world.friendlyTeam(), world.enemyTeam());
     }
 }
 
 void ShootOrPassPlay::updateGoalie(std::shared_ptr<GoalieTactic> goalie)
 {
-    goalie->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                         world.enemyTeam());
+    goalie->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(),
+                              world.enemyTeam());
 }
 
 // Register this play in the PlayFactory

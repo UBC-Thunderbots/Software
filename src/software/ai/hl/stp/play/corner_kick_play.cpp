@@ -16,7 +16,12 @@ using namespace Passing;
 
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
-CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3)) {}
+CornerKickPlay::CornerKickPlay()
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
+          Util::DynamicParameters::CornerKickPlay::max_time_commit_to_pass_seconds
+              .value()))
+{
+}
 
 std::string CornerKickPlay::getName() const
 {
@@ -140,8 +145,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -161,8 +166,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -181,8 +186,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
                cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
@@ -220,8 +225,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                     world.ball());
         receiver->updateControlParams(pass);
         receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
     } while (!receiver->done());

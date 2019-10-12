@@ -192,6 +192,18 @@ Evaluation:
         default: 1.0
         type: "double"
         description: minimum speed along the pass axis for it to count as a pass
+      possession_buffer_time_seconds:
+        min: 0.0
+        max: 5.0
+        default: 1.0
+        type: "double"
+        description: how far back in time to check if a robot has possession
+      pass_buffer_time_seconds:
+        min: 0.0
+        max: 5.0
+        default: 1.0
+        type: "double"
+        description: how far back in time to check if a robot is receiving a pass
     Indirect_Chip:
       chip_target_fraction:
         min: 0.0
@@ -347,6 +359,13 @@ DefenseShadowEnemyTactic:
     min: 0.0
     type: "double"
     description: Try to steal the passee's ball below this ball speed
+CornerKickPlay:
+  max_time_commit_to_pass_seconds:
+    min: 0.0
+    max: 5.0
+    default: 3.0
+    type: "double"
+    description: The maximum time that we will wait before committing to a pass
 ShootOrChipPlay:
   fallback_chip_target_enemy_goal_offset:
     min: 0.0

@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/evaluation/possession.h"
 
-#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
+#include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
@@ -59,7 +59,9 @@ namespace Evaluation
             // Check that the robot has had possession of the ball recently.
             while (i < robot_history_timestamps.size() &&
                    robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                       Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
+                       Duration::fromSeconds(
+                           Util::DynamicParameters::Evaluation::Possession::
+                               possession_buffer_time_seconds.value()))
             {
                 if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
                     return true;
@@ -82,7 +84,9 @@ namespace Evaluation
             // Check that the robot has had possession of the ball recently.
             while (i < robot_history_timestamps.size() &&
                    robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                       Duration::fromSeconds(PASS_BUFFER_TIME_IN_SECONDS))
+                       Duration::fromSeconds(
+                           Util::DynamicParameters::Evaluation::Possession::
+                               pass_buffer_time_seconds.value()))
             {
                 if (robotBeingPassedTo(ball, robot, robot_history_timestamps[i]))
                     return true;

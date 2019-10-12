@@ -179,10 +179,23 @@ TEST(RobotEvaluationTest, pass_with_stationary_ball)
     EXPECT_FALSE(Evaluation::robotBeingPassedTo(ball, robot));
 }
 
-TEST(RobotEvaluationTest, pass_with_ball_direct)
+TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
 {
     Point ball_position  = Point(0.035, 0.06);
-    Vector ball_velocity = Vector(4, 4);
+    Vector ball_velocity = Vector(5, 5);
+    Timestamp timestamp  = Timestamp::fromSeconds(0);
+    Ball ball            = Ball(ball_position, ball_velocity, timestamp);
+
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+                        AngularVelocity::zero(), timestamp);
+
+    EXPECT_TRUE(Evaluation::robotBeingPassedTo(ball, robot));
+}
+
+TEST(RobotEvaluationTest, pass_with_ball_direct_slow)
+{
+    Point ball_position  = Point(0.035, 0.06);
+    Vector ball_velocity = Vector(1, 1);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
 
