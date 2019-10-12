@@ -14,10 +14,11 @@ ShadowEnemyTactic::ShadowEnemyTactic(const Field &field, const Team &friendly_te
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
-      shadow_distance(ROBOT_MAX_RADIUS_METERS * 3),
-      enemy_team_can_pass(enemy_team_can_pass),
       ignore_goalie(ignore_goalie),
-      ball(ball)
+      ball(ball),
+      ball_steal_speed(ball_steal_speed),
+      enemy_team_can_pass(enemy_team_can_pass),
+      shadow_distance(ROBOT_MAX_RADIUS_METERS * 3)
 {
 }
 
