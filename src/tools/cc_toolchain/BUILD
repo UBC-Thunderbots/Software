@@ -90,6 +90,10 @@ cc_toolchain(
     static_runtime_lib = "@org_llvm_clang//:static_libs",
     strip_files = ":clang_wrappers",
     supports_param_files = True,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
     toolchain_config = ":clang-k8",
     toolchain_identifier = "clang-x86_64",
 )
@@ -115,6 +119,10 @@ cc_toolchain(
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = 0,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
     toolchain_config = ":gcc-stm32f0",
     toolchain_identifier = "gcc-stm32f0",
 )
@@ -140,6 +148,10 @@ cc_toolchain(
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = 0,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
     toolchain_config = ":gcc-stm32f4",
     toolchain_identifier = "gcc-stm32f4",
 )
@@ -165,6 +177,10 @@ cc_toolchain(
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = 0,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
     toolchain_config = ":gcc-stm32g4",
     toolchain_identifier = "gcc-stm32g4",
 )
@@ -190,6 +206,10 @@ cc_toolchain(
     objcopy_files = ":empty",
     strip_files = ":empty",
     supports_param_files = 0,
+    # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
+    # when possible
+    # https://github.com/bazelbuild/intellij/issues/486
+    tags = ["no-ide"],
     toolchain_config = ":gcc-stm32h7",
     toolchain_identifier = "gcc-stm32h7",
 )
