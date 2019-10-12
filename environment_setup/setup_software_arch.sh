@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-# UBC Thunderbots Ubuntu Software Setup
+# UBC Thunderbots Archlinux Software Setup
 #
 # This script must be run with sudo! root permissions are required to install
 # packages and copy files to the /etc/udev/rules.d directory. The reason that the script
@@ -29,25 +29,19 @@ echo "================================================================"
 echo "Installing Utilities and Dependencies"
 echo "================================================================"
 
-sudo apt-get update
-sudo apt-get install -y software-properties-common # required for add-apt-repository
-# Required to make sure we install protobuf version 3.0.0 or greater
-sudo add-apt-repository ppa:maarten-fonville/protobuf -y
-
-sudo apt-get update
+sudo pacman -Sy
 
 host_software_packages=(
     curl
     cmake
     protobuf-compiler
     libprotobuf-dev
-    libusb-1.0-0-dev
-    qt5-default # The GUI library for our visualizer
-    libudev-dev
+    libusb
+    qt5 # The GUI library for our visualizer
     libeigen3-dev # A math / numerical library used for things like linear regression
-    python3-yaml # yaml for cfg generation (Dynamic Parameters)
+    python-yaml # yaml for cfg generation (Dynamic Parameters)
 )
-sudo apt-get install ${host_software_packages[@]} -y
+sudo pacman -S ${host_software_packages[@]} --noconfirm
 
 if [ $? -ne 0 ]; then
     echo "##############################################################"
