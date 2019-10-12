@@ -3,7 +3,7 @@
  * in pass.cpp
  */
 
-#include "software/ai/evaluation/intercept.h"
+#include "software/ai/hl/stp/evaluation/intercept.h"
 
 #include <gtest/gtest.h>
 

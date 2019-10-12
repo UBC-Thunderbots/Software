@@ -2,7 +2,7 @@
  * Unit tests for indirect_chip_and_chase_target evaluation function and its related
  * functions.
  */
-#include "software/ai/evaluation/indirect_chip.h"
+#include "software/ai/hl/stp/evaluation/indirect_chip.h"
 
 #include <gtest/gtest.h>
 

@@ -524,6 +524,7 @@ TEST(GeomUtilTest, test_line_rect_intersect)
 
 TEST(GeomUtilTest, test_vector_rect_intersect)
 {
+
     Rectangle rect({1.0, 1.0}, {-1.0, -1.0});
     Point pr1(((std::rand() % 200) - 100) / 100.0, 1.0);
     Point pr2(((std::rand() % 200) - 100) / 100.0, -1.0);
@@ -574,6 +575,8 @@ TEST(GeomUtilTest, test_unique_line_intersect)
 
 TEST(GeomUtilTest, test_line_intersect)
 {
+
+
     // should check for the the rare cases
 
     for (int i = 0; i < 10; i++)
@@ -607,6 +610,8 @@ TEST(GeomUtilTest, test_close_parallel_segments_dont_intersect)
 
 TEST(GeomUtilTest, test_seg_crosses_seg)
 {
+
+
     // should check for the the rare cases
 
     for (int i = 0; i < 10; i++)
@@ -644,6 +649,7 @@ TEST(GeomUtilTest, test_seg_crosses_seg)
 
 TEST(GeomUtilTest, test_vector_crosses_seg)
 {
+
     // should check for the the rare cases
 
     // case where vector faces segment but segment may/ may not be long enough

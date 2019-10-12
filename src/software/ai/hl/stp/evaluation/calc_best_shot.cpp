@@ -1,4 +1,4 @@
-#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 
 #include "software/geom/util.h"
 

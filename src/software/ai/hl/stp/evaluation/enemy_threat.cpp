@@ -1,13 +1,13 @@
-#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/evaluation/enemy_threat.h"
 
 #include <deque>
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/intercept.h"
-#include "software/ai/evaluation/possession.h"
-#include "software/ai/evaluation/robot.h"
-#include "software/ai/evaluation/team.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/intercept.h"
+#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/hl/stp/evaluation/robot.h"
+#include "software/ai/hl/stp/evaluation/team.h"
 #include "software/geom/util.h"
 
 std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID>

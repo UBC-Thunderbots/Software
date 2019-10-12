@@ -1,4 +1,4 @@
-#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/hl/stp/evaluation/enemy_threat.h"
 
 #include <gtest/gtest.h>
 

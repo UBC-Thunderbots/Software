@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
-#include "software/ai/evaluation/calc_best_shot.h"
-#include "software/ai/evaluation/possession.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"

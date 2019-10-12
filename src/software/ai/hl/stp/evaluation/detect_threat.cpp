@@ -3,7 +3,7 @@
  * team on the playing field
  */
 
-#include "software/ai/evaluation/detect_threat.h"
+#include "software/ai/hl/stp/evaluation/detect_threat.h"
 
 #include <optional>
 

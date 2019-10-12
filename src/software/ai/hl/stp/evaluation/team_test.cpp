@@ -1,5 +1,5 @@
 
-#include "software/ai/evaluation/team.h"
+#include "software/ai/hl/stp/evaluation/team.h"
 
 #include <gtest/gtest.h>
 

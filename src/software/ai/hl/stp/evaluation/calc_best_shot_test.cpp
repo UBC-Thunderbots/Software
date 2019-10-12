@@ -3,7 +3,7 @@
  * in calc_best_shot.cpp
  */
 
-#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 
 #include <gtest/gtest.h>
 
