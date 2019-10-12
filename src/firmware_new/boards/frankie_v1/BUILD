@@ -107,7 +107,6 @@ cc_stm32h7_hal_library(
         "Middlewares/Third_Party/FreeRTOS/Source/stream_buffer.c",
         "Middlewares/Third_Party/FreeRTOS/Source/tasks.c",
         "Middlewares/Third_Party/FreeRTOS/Source/timers.c",
-        #        "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c",
         "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.c",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
