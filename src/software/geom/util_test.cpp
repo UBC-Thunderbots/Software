@@ -11,20 +11,11 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-// Set this to 1 to enable debug output.
-#define DEBUG 0
-
-#if DEBUG
-#define dbgout std::cout
-#else
-std::ostringstream dbgout;
-#endif
 
 TEST(GeomUtilTest, dist_point_rectangle_point_within)
 {
     Point p(1, 2.1);
     Rectangle rect({0, 2}, {2, 4});
-
     EXPECT_DOUBLE_EQ(0, dist(p, rect));
 }
 
@@ -539,36 +530,17 @@ TEST(GeomUtilTest, test_line_rect_intersect)
 
 TEST(GeomUtilTest, test_vector_rect_intersect)
 {
-    dbgout << "========= Enter vectorRectIntersect Test =========" << std::endl;
     Rectangle rect({1.0, 1.0}, {-1.0, -1.0});
     Point pr1(((std::rand() % 200) - 100) / 100.0, 1.0);
     Point pr2(((std::rand() % 200) - 100) / 100.0, -1.0);
     Point pr3(1.0, ((std::rand() % 200) - 100) / 100.0);
     Point pr4(-1.0, ((std::rand() % 200) - 100) / 100.0);
     Point pb(((std::rand() % 200) - 100) / 100.0, ((std::rand() % 200) - 100) / 100.0);
-    Point pe1    = (pr1 - pb).norm() + pr1;
-    Point pe2    = (pr2 - pb).norm() + pr2;
-    Point pe3    = (pr3 - pb).norm() + pr3;
-    Point pe4    = (pr4 - pb).norm() + pr4;
     Point found1 = vectorRectIntersect(rect, pb, pr1);
     Point found2 = vectorRectIntersect(rect, pb, pr2);
     Point found3 = vectorRectIntersect(rect, pb, pr3);
     Point found4 = vectorRectIntersect(rect, pb, pr4);
 
-    // uncomment to print out some debugging info
-    dbgout << " vectorA (" << pb.x() << ", " << pb.y() << ") " << std::endl;
-    dbgout << " Intersect1 (" << pr1.x() << ", " << pr1.y() << ") "
-           << " found1 (" << found1.x() << ", " << found1.y() << ") " << std::endl;
-    dbgout << " Intersect2 (" << pr2.x() << ", " << pr2.y() << ") "
-           << " found2 (" << found2.x() << ", " << found2.y() << ") " << std::endl;
-    dbgout << " Intersect3 (" << pr3.x() << ", " << pr3.y() << ") "
-           << " found3 (" << found3.x() << ", " << found3.y() << ") " << std::endl;
-    dbgout << " Intersect4 (" << pr4.x() << ", " << pr4.y() << ") "
-           << " found4 (" << found4.x() << ", " << found4.y() << ") " << std::endl;
-    dbgout << " vectorB1 (" << pe1.x() << ", " << pe1.y() << ") " << std::endl;
-    dbgout << " vectorB2 (" << pe2.x() << ", " << pe2.y() << ") " << std::endl;
-    dbgout << " vectorB3 (" << pe3.x() << ", " << pe3.y() << ") " << std::endl;
-    dbgout << " vectorB4 (" << pe4.x() << ", " << pe4.y() << ") " << std::endl;
 
     EXPECT_TRUE((found1 - pr1).len() < 0.001);
     EXPECT_TRUE((found2 - pr2).len() < 0.001);
@@ -604,8 +576,6 @@ TEST(GeomUtilTest, test_unique_line_intersect)
 
 TEST(GeomUtilTest, test_line_intersect)
 {
-    dbgout << "========= Enter lineIntersection Test ========" << std::endl;
-
     // should check for the the rare cases
 
     for (int i = 0; i < 10; i++)
@@ -623,14 +593,6 @@ TEST(GeomUtilTest, test_line_intersect)
 
         Point found = lineIntersection(a1, a2, b1, b2).value();
 
-        // uncomment to print out some messages
-        dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
-        dbgout << " (" << a2.x() << ", " << a2.y() << ") ";
-        dbgout << " (" << b1.x() << ", " << b1.y() << ") ";
-        dbgout << " (" << b2.x() << ", " << b2.y() << ") " << std::endl;
-        dbgout << "expecting (" << expected.x() << ", " << expected.y() << ") "
-               << std::endl;
-        dbgout << "found (" << found.x() << ", " << found.y() << ") " << std::endl;
 
         EXPECT_TRUE((expected - found).len() < 0.0001);
     }
@@ -647,8 +609,6 @@ TEST(GeomUtilTest, test_close_parallel_segments_dont_intersect)
 
 TEST(GeomUtilTest, test_seg_crosses_seg)
 {
-    dbgout << "========= Enter seg_crosses_seg Test ========" << std::endl;
-
     // should check for the the rare cases
 
     for (int i = 0; i < 10; i++)
@@ -678,15 +638,7 @@ TEST(GeomUtilTest, test_seg_crosses_seg)
         bool found    = intersects(Segment(a1, a2), Segment(b1, b2));
 
         // uncomment to print out some messages
-        dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
-        dbgout << " (" << a2.x() << ", " << a2.y() << ") ";
-        dbgout << " (" << b1.x() << ", " << b1.y() << ") ";
-        dbgout << " (" << b2.x() << ", " << b2.y() << ") ";
-        dbgout << " (" << i0.x() << ", " << i0.y() << ") ";
-        dbgout << " a_over " << (a_over ? "true" : "false") << " b_over "
-               << (b_over ? "true" : "false") << std::endl;
-        dbgout << "expecting " << (expected ? "true" : "false") << " found "
-               << (found ? "true" : "false") << std::endl;
+
 
         EXPECT_EQ(expected, found);
     }
@@ -694,8 +646,6 @@ TEST(GeomUtilTest, test_seg_crosses_seg)
 
 TEST(GeomUtilTest, test_vector_crosses_seg)
 {
-    dbgout << "========= Enter vector_crosses_seg Test ========" << std::endl;
-
     // should check for the the rare cases
 
     // case where vector faces segment but segment may/ may not be long enough
@@ -720,14 +670,6 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
 
         bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
 
-        // uncomment to print out some messages
-        dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
-        dbgout << " (" << a2.x() << ", " << a2.y() << ") ";
-        dbgout << " (" << b1.x() << ", " << b1.y() << ") ";
-        dbgout << " (" << b2.x() << ", " << b2.y() << ") ";
-        dbgout << " (" << i0.x() << ", " << i0.y() << ") ";
-        dbgout << "expecting " << (expected ? "true" : "false") << " found "
-               << (found ? "true" : "false") << std::endl;
 
         EXPECT_EQ(expected, found);
     }
@@ -755,14 +697,6 @@ TEST(GeomUtilTest, test_vector_crosses_seg)
 
         bool found = intersects(Ray(a1, ray_direction), Segment(b1, b2));
 
-        // uncomment to print out some messages
-        dbgout << "points are (" << a1.x() << ", " << a1.y() << ") ";
-        dbgout << " (" << a2.x() << ", " << a2.y() << ") ";
-        dbgout << " (" << b1.x() << ", " << b1.y() << ") ";
-        dbgout << " (" << b2.x() << ", " << b2.y() << ") ";
-        dbgout << " (" << i0.x() << ", " << i0.y() << ") ";
-        dbgout << "expecting " << (expected ? "true" : "false") << " found "
-               << (found ? "true" : "false") << std::endl;
 
         EXPECT_EQ(expected, found);
     }
