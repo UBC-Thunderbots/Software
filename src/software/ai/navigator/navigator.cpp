@@ -6,6 +6,14 @@
 #include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 
+template <class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
+
 Navigator::Navigator(std::unique_ptr<PathPlanner> path_planner)
     : path_planner_(std::move(path_planner))
 {
@@ -58,17 +66,42 @@ void Navigator::visit(const MoveIntent &move_intent)
     std::vector<Obstacle> obstacles =
         createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            path_planner_->findPath(start, dest, this->world.field(), obstacles));
-    }
-    catch (const std::bad_variant_access &)
-    {
-        throw std::invalid_argument(
-            "Path is a curve, which is not currently handled by the navigator");
-    }
+    auto path = path_planner_->findPath(start, dest, this->world.field(), obstacles);
 
+    std::visit(
+        overloaded{
+            [=, &move_intent](std::vector<Point> path_points) {
+                movePointNavigation(move_intent, path_points);
+            },
+            [=, &move_intent](std::vector<Curve> path_curves) {
+                moveCurveNavigation(move_intent, path_curves);
+            },
+        },
+        path);
+}
+
+void Navigator::visit(const MoveSpinIntent &move_spin_intent)
+{
+    auto p            = std::make_unique<MoveSpinPrimitive>(move_spin_intent);
+    current_primitive = std::move(p);
+}
+
+void Navigator::visit(const PivotIntent &pivot_intent)
+{
+    auto p            = std::make_unique<PivotPrimitive>(pivot_intent);
+    current_primitive = std::move(p);
+}
+
+void Navigator::visit(const StopIntent &stop_intent)
+{
+    auto p            = std::make_unique<StopPrimitive>(stop_intent);
+    current_primitive = std::move(p);
+}
+
+// helpers
+void Navigator::movePointNavigation(const MoveIntent &move_intent,
+                                    std::vector<Point> &path_points)
+{
     planned_paths.emplace_back(path_points);
 
     switch (path_points.size())
@@ -117,25 +150,13 @@ void Navigator::visit(const MoveIntent &move_intent)
     }
 }
 
-void Navigator::visit(const MoveSpinIntent &move_spin_intent)
+void Navigator::moveCurveNavigation(const MoveIntent &move_intent,
+                                    std::vector<Curve> &path_curves)
 {
-    auto p            = std::make_unique<MoveSpinPrimitive>(move_spin_intent);
-    current_primitive = std::move(p);
+    // Stubbed: this will be implemented alongside spline navigator
+    throw std::runtime_error("Support for curves is not implemented yet");
 }
 
-void Navigator::visit(const PivotIntent &pivot_intent)
-{
-    auto p            = std::make_unique<PivotPrimitive>(pivot_intent);
-    current_primitive = std::move(p);
-}
-
-void Navigator::visit(const StopIntent &stop_intent)
-{
-    auto p            = std::make_unique<StopPrimitive>(stop_intent);
-    current_primitive = std::move(p);
-}
-
-// helpers
 std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
 {
     Rectangle rectangle({0, 0}, {0, 0});
