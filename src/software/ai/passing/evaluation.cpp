@@ -9,7 +9,7 @@
 
 #include "software/../shared/constants.h"
 #include "software/ai/evaluation/pass.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/geom/util.h"
 #include "software/util/parameter/dynamic_parameters.h"
 

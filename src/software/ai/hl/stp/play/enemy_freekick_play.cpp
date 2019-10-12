@@ -1,7 +1,7 @@
 #include "software/ai/hl/stp/play/enemy_freekick_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/block_shot_path_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"

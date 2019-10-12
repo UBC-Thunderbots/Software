@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/evaluation/robot.h"
+#include "software/ai/evaluation/robot.h"
 
 #include "shared/constants.h"
 

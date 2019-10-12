@@ -4,7 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 

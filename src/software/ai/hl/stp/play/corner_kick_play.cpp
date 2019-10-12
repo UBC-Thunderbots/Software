@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/ball.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/ball.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
