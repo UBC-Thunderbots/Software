@@ -66,16 +66,16 @@ bool parseCommandLineArgs(int argc, char **argv)
     std::string backend_help_str =
         "The backend that you would like to use, one of: " + all_backend_names;
 
+    options_description desc{"Options"};
+    desc.add_options()
+            ("help,h","Help screen")
+            ("backend",value<std::string>()->notifier(setBackendFromString)->required(),
+             backend_help_str.c_str())
+            ("headless", boost::program_options::bool_switch(&headless),"Run without the Visualizer");
+
+    variables_map vm;
     try
     {
-        options_description desc{"Options"};
-        desc.add_options()("help,h", "Help screen")(
-            "backend", value<std::string>()->notifier(setBackendFromString)->required(),
-            backend_help_str.c_str())("headless",
-                                      boost::program_options::bool_switch(&headless),
-                                      "Run without the Visualizer");
-
-        variables_map vm;
         store(parse_command_line(argc, argv, desc), vm);
 
         // We only process notifications if "help" was not given, which allows us to
@@ -85,10 +85,8 @@ bool parseCommandLineArgs(int argc, char **argv)
             std::cout << desc << std::endl;
             return false;
         }
-        else
-        {
-            notify(vm);
-        }
+
+        notify(vm);
     }
     catch (const error &ex)
     {
