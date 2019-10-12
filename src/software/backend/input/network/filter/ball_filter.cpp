@@ -328,7 +328,7 @@ std::optional<BallState> BallFilter::estimateBallState(
             velocity_estimate->average_velocity_magnitude);
 
         return BallState(filtered_ball_position, filtered_velocity,
-                    latest_ball_detection.timestamp);
+                         latest_ball_detection.timestamp);
     }
 }
 

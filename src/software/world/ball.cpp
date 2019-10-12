@@ -10,7 +10,8 @@ Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
     updateCurrentState(position, velocity, timestamp);
 }
 
-Ball::Ball(BallState &ball_state, unsigned int history_duration) : states_(history_duration)
+Ball::Ball(BallState &ball_state, unsigned int history_duration)
+    : states_(history_duration)
 {
     states_.push_front(ball_state);
 }
@@ -20,33 +21,34 @@ BallState Ball::currentState() const
     return states_.front();
 }
 
-void Ball::updateCurrentState(const BallState& new_state)
+void Ball::updateCurrentState(const BallState &new_state)
 {
     if (new_state.timestamp() < lastUpdateTimestamp() && !states_.empty())
     {
         throw std::invalid_argument(
-                "Error: State of ball is updating times from the past");
+            "Error: State of ball is updating times from the past");
     }
 
     states_.push_front(new_state);
 }
 
-void Ball::updateCurrentState(const Point &new_position, const Vector &new_velocity, const Timestamp &timestamp)
+void Ball::updateCurrentState(const Point &new_position, const Vector &new_velocity,
+                              const Timestamp &timestamp)
 {
     return updateCurrentState(BallState(new_position, new_velocity, timestamp));
 }
 
-void Ball::updateStateToPredictedState(const Timestamp& timestamp)
+void Ball::updateStateToPredictedState(const Timestamp &timestamp)
 {
     if (timestamp < lastUpdateTimestamp())
     {
         throw std::invalid_argument(
-                "Error: Predicted state is updating times from the past");
+            "Error: Predicted state is updating times from the past");
     }
 
     auto duration_in_future = timestamp - lastUpdateTimestamp();
     Point new_position      = estimatePositionAtFutureTime(duration_in_future);
-    Vector new_velocity      = estimateVelocityAtFutureTime(duration_in_future);
+    Vector new_velocity     = estimateVelocityAtFutureTime(duration_in_future);
 
     updateCurrentState(BallState(new_position, new_velocity, timestamp));
 }
@@ -59,7 +61,7 @@ Timestamp Ball::lastUpdateTimestamp() const
 std::vector<Timestamp> Ball::getPreviousTimestamps() const
 {
     std::vector<Timestamp> timestamps{};
-    for (const BallState& state : states_)
+    for (const BallState &state : states_)
     {
         timestamps.push_back(state.timestamp());
     }
@@ -75,7 +77,7 @@ Point Ball::position() const
 std::vector<Point> Ball::getPreviousPositions() const
 {
     std::vector<Point> positions{};
-    for (const BallState& state : states_)
+    for (const BallState &state : states_)
     {
         positions.push_back(state.position());
     }
@@ -106,7 +108,7 @@ Vector Ball::velocity() const
 std::vector<Vector> Ball::getPreviousVelocities() const
 {
     std::vector<Vector> velocities{};
-    for (const BallState& state : states_)
+    for (const BallState &state : states_)
     {
         velocities.push_back(state.velocity());
     }
@@ -162,4 +164,3 @@ bool Ball::operator!=(const Ball &other) const
 {
     return !(*this == other);
 }
-

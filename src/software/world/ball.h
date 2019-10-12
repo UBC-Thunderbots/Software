@@ -8,8 +8,9 @@
 #include "software/util/time/timestamp.h"
 #include "software/world/ball_state.h"
 
-class Ball final {
-public:
+class Ball final
+{
+   public:
     /**
      * Creates a new ball with the given position and velocity
      *
@@ -45,7 +46,8 @@ public:
      */
     void updateCurrentState(const BallState &new_state);
 
-    void updateCurrentState(const Point &new_position, const Vector &new_velocity, const Timestamp &timestamp);
+    void updateCurrentState(const Point &new_position, const Vector &new_velocity,
+                            const Timestamp &timestamp);
 
     /**
      * Updates the ball's state to be its predicted state at the given timestamp.
@@ -169,7 +171,8 @@ public:
      */
     bool operator!=(const Ball &other) const;
 
-private:
-    // All previous states of the ball, with the most recent position at the front of the queue
+   private:
+    // All previous states of the ball, with the most recent position at the front of the
+    // queue
     boost::circular_buffer<BallState> states_;
 };

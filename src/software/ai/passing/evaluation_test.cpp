@@ -455,7 +455,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     // (as World cannot have it's Timestamp updated independently of its members)git sfsd
     world.updateBallState(
         BallState({0, 0}, {0, 0},
-             Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
+                  Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));
 

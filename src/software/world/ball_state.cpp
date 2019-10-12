@@ -2,20 +2,23 @@
 
 BallState::BallState(Point position, Vector velocity, const Timestamp &timestamp)
 {
-    this->pos = position;
-    this->vel = velocity;
+    this->pos  = position;
+    this->vel  = velocity;
     this->time = timestamp;
 }
 
-Point BallState::position() const {
+Point BallState::position() const
+{
     return pos;
 }
 
-Vector BallState::velocity() const {
+Vector BallState::velocity() const
+{
     return vel;
 }
 
-Timestamp BallState::timestamp() const {
+Timestamp BallState::timestamp() const
+{
     return time;
 }
 
@@ -28,4 +31,3 @@ bool BallState::operator!=(const BallState &other) const
 {
     return false;
 }
-

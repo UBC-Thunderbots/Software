@@ -7,8 +7,7 @@
 
 class BallState final
 {
-public:
-
+   public:
     /**
      * Creates a new ball state with the given position, velocity, and timestamp
      *
@@ -17,7 +16,7 @@ public:
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
      */
-    explicit BallState(Point position, Vector velocity, const Timestamp& timestamp);
+    explicit BallState(Point position, Vector velocity, const Timestamp &timestamp);
 
     /**
      * Returns the position of the ball represented by this state
@@ -41,11 +40,12 @@ public:
     Timestamp timestamp() const;
 
     /**
-     * Defines the equality operator for a BallState. BallStates are equal if their positions and
-     * velocities are the same
+     * Defines the equality operator for a BallState. BallStates are equal if their
+     * positions and velocities are the same
      *
      * @param other The ball state to compare against for equality
-     * @return True if the other ball state is equal to this ball state, and false otherwise
+     * @return True if the other ball state is equal to this ball state, and false
+     * otherwise
      */
     bool operator==(const BallState &other) const;
 
@@ -53,10 +53,12 @@ public:
      * Defines the inequality operator for a BallState.
      *
      * @param other The ball state to compare against for inequality
-     * @return True if the other ball state is not equal to this ball state, and false otherwise
+     * @return True if the other ball state is not equal to this ball state, and false
+     * otherwise
      */
     bool operator!=(const BallState &other) const;
-private:
+
+   private:
     Point pos;
 
     Vector vel;

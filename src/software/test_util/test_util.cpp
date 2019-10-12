@@ -68,7 +68,8 @@ namespace Test
 
     World TestUtil::setBallPosition(World world, Point ball_position, Timestamp timestamp)
     {
-        BallState ballState = BallState(ball_position, world.ball().velocity(), timestamp);
+        BallState ballState =
+            BallState(ball_position, world.ball().velocity(), timestamp);
         world.updateBallState(ballState);
 
         return world;
@@ -77,7 +78,8 @@ namespace Test
     World TestUtil::setBallVelocity(World world, Vector ball_velocity,
                                     Timestamp timestamp)
     {
-        BallState ballState = BallState(world.ball().position(), ball_velocity, timestamp);
+        BallState ballState =
+            BallState(world.ball().position(), ball_velocity, timestamp);
         world.updateBallState(ballState);
 
         return world;
