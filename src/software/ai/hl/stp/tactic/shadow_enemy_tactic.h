@@ -21,31 +21,38 @@ class ShadowEnemyTactic : public Tactic
      * where to shadow the enemy
      * @param ball_steal_speed If the enemy robot has possession of the ball, and it is
      * moving less than this speed, the shadowing robot will try steal the ball
+     * @param enemy_team_can_pass Whether or not we think the enemy team can pass the ball
      * @param loop_forever Whether or not this Tactic should never complete. If true, the
      * tactic will be restarted every time it completes
      */
     explicit ShadowEnemyTactic(const Field &field, const Team &friendly_team,
                                const Team &enemy_team, bool ignore_goalie,
                                const Ball &ball, const double ball_steal_speed,
-                               bool loop_forever = false);
+                               bool enemy_team_can_pass, bool loop_forever = false);
 
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this ShadowEnemyTactic.
+     * Updates the world parameters for this ShadowEnemyTactic.
      *
-     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
      * @param field The field being played on
      * @param friendly_team The friendly team
      * @param enemy_team The enemy team
-     * @param enemy_team_can_pass Whether or not we think the enemy team can pass the ball
+     * @param ball The ball
+     */
+    void updateWorldParams(const Field &field, const Team &friendly_team,
+                           const Team &enemy_team, const Ball &ball);
+
+    /**
+     * Updates the control parameters for this ShadowEnemyTactic
+     *
+     * @param enemy_threat The EnemyThreat indicating which enemy to shadow
      * @param shadow_distance How far from the enemy the robot will shadow. This is the
      * distance between the center of the enemy robot and the center of the robot
      * shadowing it
      */
-    void updateParams(const Evaluation::EnemyThreat &enemy_threat, const Field &field,
-                      const Team &friendly_team, const Team &enemy_team,
-                      double shadow_distance, bool enemy_team_can_pass, const Ball &ball);
+    void updateControlParams(const Evaluation::EnemyThreat &enemy_threat,
+                             double shadow_distance);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

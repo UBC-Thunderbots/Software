@@ -133,9 +133,6 @@ TEST(removeTrianglesOutsideRectangleTest, remove_triangles_outside_rectangle_tes
 TEST(GetTriangleCenterTest, get_triangle_center_test)
 {
     LegacyTriangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
-    Point p1                = triangle[0];
-    Point p2                = triangle[1];
-    Point p3                = triangle[2];
 
     Point center = Point(0, (-1 + sqrt(0.75) - 1) / 3);
 
@@ -146,9 +143,6 @@ TEST(GetTriangleCenterTest, get_triangle_center_test)
 TEST(GetTriangleAreaTest, get_triangle_area_test)
 {
     LegacyTriangle triangle = {Point(-1, -1), Point(0, sqrt(0.75)), Point(1, -1)};
-    Point p1                = triangle[0];
-    Point p2                = triangle[1];
-    Point p3                = triangle[2];
 
     double area = abs(0.5 * (2 * (1 + sqrt(0.75))));
 

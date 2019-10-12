@@ -11,7 +11,6 @@ TEST(StopTacticTest, robot_stopping_without_coasting_while_already_moving)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
-    tactic.updateParams();
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -36,7 +35,6 @@ TEST(StopTacticTest, robot_stopping_while_already_stopped)
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     StopTactic tactic = StopTactic(false, false);
     tactic.updateRobot(robot);
-    tactic.updateParams();
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -64,7 +62,6 @@ TEST(StopTacticTest, test_calculate_robot_cost)
                         Timestamp::fromSeconds(0));
 
     StopTactic tactic = StopTactic(false, false);
-    tactic.updateParams();
 
     // We always expect the cost to be 0.5, because the StopTactic prefers all robots
     // equally

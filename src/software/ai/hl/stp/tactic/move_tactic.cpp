@@ -11,10 +11,10 @@ std::string MoveTactic::getName() const
     return "Move Tactic";
 }
 
-void MoveTactic::updateParams(Point destination, Angle final_orientation,
-                              double final_speed)
+void MoveTactic::updateControlParams(Point destination, Angle final_orientation,
+                                     double final_speed)
 {
-    // Update the parameters stored by this Tactic
+    // Update the control parameters stored by this Tactic
     this->destination       = destination;
     this->final_orientation = final_orientation;
     this->final_speed       = final_speed;
@@ -25,7 +25,7 @@ double MoveTactic::calculateRobotCost(const Robot &robot, const World &world)
     // Prefer robots closer to the destination
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
-    double cost = (robot.position() - destination).len() / world.field().totalLength();
+    double cost = (robot.position() - destination).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 

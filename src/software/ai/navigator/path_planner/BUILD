@@ -1,10 +1,10 @@
-package(default_visibility = ["//software/ai/navigator/path_planning_navigator:__subpackages__"])
+package(default_visibility = ["//software/ai/navigator:__subpackages__"])
 
 cc_library(
     name = "path_planner",
     hdrs = ["path_planner.h"],
     deps = [
-        "//software/ai/navigator/path_planning_navigator/obstacle",
+        "//software/ai/navigator/obstacle",
         "//software/geom",
     ],
 )
@@ -31,7 +31,6 @@ cc_library(
     hdrs = ["theta_star_path_planner.h"],
     deps = [
         ":path_planner",
-        "//software/world:ball",
         "//software/world:field",
     ],
 )

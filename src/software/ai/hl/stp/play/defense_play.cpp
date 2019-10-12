@@ -40,15 +40,15 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true),
+            Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true),
+            Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true)};
+            Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value(), true)};
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
@@ -69,8 +69,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
-        bool enemy_team_can_pass =
-            Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block
@@ -84,35 +82,34 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
                     crease_defender_tactic->getAssignedRobot()->id());
             }
         }
-        goalie_tactic->updateParams(world.ball(), world.field(), friendly_team_for_goalie,
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         friendly_team_for_goalie, world.enemyTeam());
 
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // Update crease defenders
         for (auto crease_defender_tactic : crease_defender_tactics)
         {
-            crease_defender_tactic->updateParams(world.ball(), world.field(),
-                                                 world.friendlyTeam(), world.enemyTeam());
+            crease_defender_tactic->updateWorldParams(
+                world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
             result.emplace_back(crease_defender_tactic);
         }
 
         // Assign ShadowEnemy tactics until we have every enemy covered. If there any
         // extra friendly robots, have them perform a reasonable default defensive tactic
-        for (int i = 0; i < std::min(stop_tactics.size(), shadow_enemy_tactics.size());
-             i++)
+        for (unsigned i = 0;
+             i < std::min(stop_tactics.size(), shadow_enemy_tactics.size()); i++)
         {
             if (i < enemy_threats.size())
             {
-                shadow_enemy_tactics.at(i)->updateParams(
-                    enemy_threats.at(i), world.field(), world.friendlyTeam(),
-                    world.enemyTeam(), ROBOT_MAX_RADIUS_METERS * 3, enemy_team_can_pass,
-                    world.ball());
+                shadow_enemy_tactics.at(i)->updateWorldParams(
+                    world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
+                shadow_enemy_tactics.at(i)->updateControlParams(
+                    enemy_threats.at(i), ROBOT_MAX_RADIUS_METERS * 3);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else
             {
-                stop_tactics.at(i)->updateParams();
                 result.emplace_back(stop_tactics.at(i));
             }
         }

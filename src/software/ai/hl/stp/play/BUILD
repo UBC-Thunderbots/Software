@@ -97,30 +97,6 @@ cc_test(
 )
 
 cc_library(
-    name = "free_kick_play",
-    srcs = ["free_kick_play.cpp"],
-    hdrs = ["free_kick_play.h"],
-    deps = [
-        ":play",
-        ":play_factory",
-        "//shared:constants",
-        "//software/ai/hl/stp/evaluation:calc_best_shot",
-        "//software/ai/hl/stp/evaluation:possession",
-        "//software/ai/hl/stp/tactic:cherry_pick_tactic",
-        "//software/ai/hl/stp/tactic:crease_defender_tactic",
-        "//software/ai/hl/stp/tactic:move_tactic",
-        "//software/ai/hl/stp/tactic:passer_tactic",
-        "//software/ai/hl/stp/tactic:patrol_tactic",
-        "//software/ai/hl/stp/tactic:receiver_tactic",
-        "//software/ai/hl/stp/tactic:shoot_goal_tactic",
-        "//software/ai/passing:pass_generator",
-        "//software/util/logger",
-        "@g3log",
-    ],
-    alwayslink = True,
-)
-
-cc_library(
     name = "halt_play",
     srcs = ["halt_play.cpp"],
     hdrs = ["halt_play.h"],
@@ -282,7 +258,6 @@ cc_library(
         ":defense_play",
         ":enemy_freekick_play",
         ":example_play",
-        ":free_kick_play",
         ":halt_play",
         ":kickoff_enemy_play",
         ":kickoff_friendly_play",

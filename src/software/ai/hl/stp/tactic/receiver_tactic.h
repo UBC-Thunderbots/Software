@@ -36,15 +36,21 @@ class ReceiverTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this ReceiverTactic.
+     * Updates the world parameters for this ReceiverTactic.
      *
      * @param updated_friendly_team The current state of the friendly team
      * @param updated_enemy_team The current state of the enemy team
-     * @param updated_pass The pass this tactic should try to receive
      * @param updated_ball The ball being passed
      */
-    void updateParams(const Team& updated_friendly_team, const Team& updated_enemy_team,
-                      const Passing::Pass& updated_pass, const Ball& updated_ball);
+    void updateWorldParams(const Team& updated_friendly_team,
+                           const Team& updated_enemy_team, const Ball& updated_ball);
+
+    /**
+     * Updates the control parameters for this ReceiverTactic.
+     *
+     * @param updated_pass The pass this tactic should try to receive
+     */
+    void updateControlParams(const Passing::Pass& updated_pass);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -113,15 +119,15 @@ class ReceiverTactic : public Tactic
     // The field the pass is occuring on
     Field field;
 
-    // The friendly team
-    Team friendly_team;
-
-    // The enemy team
-    Team enemy_team;
-
     // The pass this tactic is executing
     Passing::Pass pass;
 
     // The ball being passed
     Ball ball;
+
+    // The friendly team
+    Team friendly_team;
+
+    // The enemy team
+    Team enemy_team;
 };
