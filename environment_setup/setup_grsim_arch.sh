@@ -1,8 +1,12 @@
 #!/bin/bash
 
+#########################################################################################
+# WARNING: THIS SCRIPT IS ONLY FOR ARCH LINUX SYSTEMS, AND IS NOT OFFICIALLY SUPPORTED. #
+# IT IS HAS NO GUARANTEE OF WORKING!                                                    #
+# (but you are free to fix it if it doesn't :) )                                        #
+######################################################################################### 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # UBC Thunderbots Arch Linux grSim Setup
-#
 # This script will install all the required libraries and dependencies to run
 # grSim. This only includes the simulator (grSim), and not anything related to
 # our AI. See the setup_software.sh script for that.
