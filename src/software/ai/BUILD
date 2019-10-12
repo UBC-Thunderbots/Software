@@ -14,7 +14,6 @@ cc_library(
         "//software/ai/hl/stp/play:all_plays",
         "//software/ai/hl/stp/play:halt_play",
         "//software/ai/navigator",
-        "//software/ai/navigator/path_planning_navigator",
         "//software/ai/primitive",
         "//software/util/time:timestamp",
         "//software/world",

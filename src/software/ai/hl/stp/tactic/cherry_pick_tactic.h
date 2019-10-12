@@ -25,12 +25,12 @@ class CherryPickTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this tactic
+     * Updates the world parameters for this tactic
      *
      * @param world The current state of the world
      */
 
-    void updateParams(const World& world);
+    void updateWorldParams(const World& world);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots

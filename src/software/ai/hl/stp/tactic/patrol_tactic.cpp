@@ -8,11 +8,12 @@
 
 PatrolTactic::PatrolTactic(const std::vector<Point> &points,
                            double at_patrol_point_tolerance,
+                           Angle orientation_at_patrol_points,
                            double linear_speed_at_patrol_points)
     : Tactic(true),
       patrol_points(points),
       at_patrol_point_tolerance(at_patrol_point_tolerance),
-      orientation_at_patrol_points(Angle::zero()),
+      orientation_at_patrol_points(orientation_at_patrol_points),
       linear_speed_at_patrol_points(linear_speed_at_patrol_points),
       patrol_point_index(0)
 {
@@ -21,12 +22,6 @@ PatrolTactic::PatrolTactic(const std::vector<Point> &points,
 std::string PatrolTactic::getName() const
 {
     return "Patrol Tactic";
-}
-
-void PatrolTactic::updateParams(Angle orientation_at_patrol_points)
-{
-    // Update the parameters stored by this Tactic
-    this->orientation_at_patrol_points = orientation_at_patrol_points;
 }
 
 double PatrolTactic::calculateRobotCost(const Robot &robot, const World &world)

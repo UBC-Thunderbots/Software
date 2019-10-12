@@ -19,7 +19,7 @@ TEST(TacticTest, test_get_assigned_robot_with_no_robot_and_no_params)
 TEST(TacticTest, test_get_assigned_robot_with_no_robot)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
     auto robot = tactic.getAssignedRobot();
 
     EXPECT_EQ(robot, std::nullopt);
@@ -39,7 +39,7 @@ TEST(TacticTest, test_get_assigned_robot_with_a_robot_assigned)
 TEST(TacticTest, test_nullptr_returned_when_no_robot_assigned)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     EXPECT_FALSE(tactic.getNextIntent());
 }
@@ -47,7 +47,7 @@ TEST(TacticTest, test_nullptr_returned_when_no_robot_assigned)
 TEST(TacticTest, test_tactic_not_done_after_run_with_no_robot_assigned)
 {
     MoveTestTactic tactic = MoveTestTactic();
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     // Run the tactic several times
     for (int i = 0; i < 5; i++)
@@ -70,7 +70,7 @@ TEST(TacticTest, test_tactic_does_not_prematurely_report_done)
     // currently is, so that we know the tactic should not report done
     MoveTestTactic tactic = MoveTestTactic();
     tactic.updateRobot(robot);
-    tactic.updateParams(Point(3, 4));
+    tactic.updateControlParams(Point(3, 4));
 
     // Run the Tactic several times, leaving the robot and parameters as is so the
     // tactic should not approach a "done" state
@@ -94,7 +94,7 @@ TEST(TacticTest, test_tactic_reports_done_at_same_time_nullptr_returned)
     // Therefore we expect the tactic to be done
     MoveTestTactic tactic = MoveTestTactic();
     tactic.updateRobot(robot);
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     // The tactic should always return an Intent the first time it is run to make sure we
     // are doing the right thing (and just don't happen to be in the "done state" at the
@@ -119,7 +119,7 @@ TEST(TacticTest, test_tactic_restarts_when_set_to_loop_infinitely)
     // Therefore we expect the tactic to be done
     MoveTestTactic tactic = MoveTestTactic(true);
     tactic.updateRobot(robot);
-    tactic.updateParams(Point());
+    tactic.updateControlParams(Point());
 
     // Even though the Tactic should be done, we expect it to continue returning valid
     // Intents because it will be constantly restarting
@@ -200,7 +200,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Stop
         makeParams({
@@ -209,7 +210,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our kickoff setup
         makeParams({
@@ -219,7 +221,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our kickoff before we've moved the ball
         makeParams({
@@ -230,7 +233,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our kickoff after we've moved the ball
         makeParams({
@@ -240,7 +244,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their kickoff setup
         makeParams({
@@ -250,7 +255,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their kickoff before they've moved the ball
         makeParams({
@@ -261,7 +267,8 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::CENTER_CIRCLE,
                 AvoidArea::ENEMY_HALF,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their kickoff after they've moved the ball
         makeParams({
@@ -271,7 +278,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }
         ),
         // Our indirect free kick setup
@@ -280,7 +288,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our indirect free kick after we've moved the ball
         makeParams({
@@ -289,7 +298,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their indirect free kick setup
         makeParams({
@@ -298,7 +308,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL, 
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their indirect free kick after they've moved the ball
         makeParams({
@@ -307,7 +318,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our direct free kick setup
         makeParams({
@@ -315,7 +327,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA, 
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our direct free kick after we've moved the ball
         makeParams({
@@ -324,7 +337,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their direct free kick setup
         makeParams({
@@ -333,7 +347,8 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::HALF_METER_AROUND_BALL, 
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their direct free kick after they've moved the ball
         makeParams({
@@ -342,7 +357,8 @@ INSTANTIATE_TEST_CASE_P(
             },
             {
                 AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                AvoidArea::FRIENDLY_DEFENSE_AREA
+                AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our penalty kick setup
         makeParams({
@@ -351,6 +367,7 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Our penalty kick
         makeParams({
@@ -360,6 +377,7 @@ INSTANTIATE_TEST_CASE_P(
             {
                 AvoidArea::ENEMY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their penalty kick setup
         makeParams({
@@ -369,6 +387,7 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their penalty kick before they move the ball
         makeParams({
@@ -379,6 +398,7 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             }),
         // Their penalty kick after they move the ball
         makeParams({
@@ -390,6 +410,7 @@ INSTANTIATE_TEST_CASE_P(
                 AvoidArea::HALF_METER_AROUND_BALL,
                 AvoidArea::FRIENDLY_HALF,
                 AvoidArea::FRIENDLY_DEFENSE_AREA,
+                AvoidArea::BALL
             })
         ));
 // clang-format on
@@ -458,6 +479,6 @@ TEST(TacticTest, test_whitelisted_areas_are_ignored)
     ASSERT_TRUE(next_intent);
 
     EXPECT_EQ(std::vector<AvoidArea>({AvoidArea::INFLATED_ENEMY_DEFENSE_AREA,
-                                      AvoidArea::FRIENDLY_DEFENSE_AREA}),
+                                      AvoidArea::FRIENDLY_DEFENSE_AREA, AvoidArea::BALL}),
               next_intent->getAreasToAvoid());
 }
