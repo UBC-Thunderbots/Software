@@ -84,14 +84,14 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // (width, pos_side, neg_side) and the line from the desired position to the
     // center of the friendly goal
     auto width_x_goal    = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                         goalie_restricted_area.neCorner(),
-                                         goalie_restricted_area.seCorner());
+                                         goalie_restricted_area.posXPosYCorner(),
+                                         goalie_restricted_area.posXNegYCorner());
     auto pos_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                            goalie_restricted_area.neCorner(),
-                                            goalie_restricted_area.nwCorner());
+                                            goalie_restricted_area.posXPosYCorner(),
+                                            goalie_restricted_area.negXPosYCorner());
     auto neg_side_x_goal = lineIntersection(goalie_desired_position, field.friendlyGoal(),
-                                            goalie_restricted_area.seCorner(),
-                                            goalie_restricted_area.swCorner());
+                                            goalie_restricted_area.posXNegYCorner(),
+                                            goalie_restricted_area.negXNegYCorner());
 
     // if the goalie restricted area already contains the point, then we are
     // safe to move there.
@@ -102,22 +102,22 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // Due to the nature of the line intersection, its important to make sure the
     // corners are included, if the goalies desired position intersects with width (see
     // above), use those positions
-    else if (width_x_goal && width_x_goal->y() <= goalie_restricted_area.neCorner().y() &&
-             width_x_goal->y() >= goalie_restricted_area.seCorner().y())
+    else if (width_x_goal && width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
+             width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y())
     {
         return std::make_optional<Point>(*width_x_goal);
     }
 
     // if either two sides of the goal are intercepted, then use those positions
     else if (pos_side_x_goal &&
-             pos_side_x_goal->x() <= goalie_restricted_area.neCorner().x() &&
-             pos_side_x_goal->x() >= goalie_restricted_area.nwCorner().x())
+             pos_side_x_goal->x() <= goalie_restricted_area.posXPosYCorner().x() &&
+             pos_side_x_goal->x() >= goalie_restricted_area.negXPosYCorner().x())
     {
         return std::make_optional<Point>(*pos_side_x_goal);
     }
     else if (neg_side_x_goal &&
-             neg_side_x_goal->x() <= goalie_restricted_area.seCorner().x() &&
-             neg_side_x_goal->x() >= goalie_restricted_area.swCorner().x())
+             neg_side_x_goal->x() <= goalie_restricted_area.posXNegYCorner().x() &&
+             neg_side_x_goal->x() >= goalie_restricted_area.negXNegYCorner().x())
     {
         return std::make_optional<Point>(*neg_side_x_goal);
     }
