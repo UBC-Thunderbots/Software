@@ -18,7 +18,7 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
     }
     catch (const std::bad_variant_access&)
     {
-        EXPECT_TRUE(0);
+        FAIL();
     }
 
     EXPECT_EQ(path_points[0], start);
