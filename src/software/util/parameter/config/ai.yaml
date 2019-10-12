@@ -195,7 +195,7 @@ Evaluation:
       possession_buffer_time_seconds:
         min: 0.0
         max: 5.0
-        default: 1.0
+        default: 1.5
         type: "double"
         description: how far back in time to check if a robot has possession
       pass_buffer_time_seconds:

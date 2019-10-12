@@ -34,6 +34,7 @@ namespace Evaluation
      * Return true if the provided team is the process of passing to another robot.
      * This is determined by checking the angle deviation of the ball velocity vector
      * off of the robot the ball is headed towards, and the speed of the ball.
+     * TODO: Unit test this (#919)
      *
      * @param world The ball
      * @param team The team containing the robots to check for passes
