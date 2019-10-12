@@ -31,12 +31,12 @@ class ShadowFreekickerTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this ShadowFreekicker tactic
+     * Updates the world parameters for this ShadowFreekicker tactic
      *
      * @param enemy_team : The enemy team of robots.
      * @param ball  : The Ball being played with
      */
-    void updateParams(Team enemy_team, Ball ball);
+    void updateWorldParams(Team enemy_team, Ball ball);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
@@ -61,9 +61,9 @@ class ShadowFreekickerTactic : public Tactic
 
     // Used for defining whether this robot is a left/right Freekick Shadower
     FreekickShadower free_kick_shadower;
+    Team enemy_team;
     Ball ball;
     Field field;
-    Team enemy_team;
 
     const double FREE_KICK_MAX_PROXIMITY =
         0.50;  // Robots cannot be closer than 50cm from the ball during a freekick

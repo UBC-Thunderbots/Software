@@ -1,48 +1,48 @@
-#include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
+#include "software/ai/navigator/navigator.h"
 
 #include <g3log/g3log.hpp>
 
 #include "software/ai/intent/all_intents.h"
-#include "software/ai/navigator/path_planning_navigator/util.h"
+#include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 
-void PathPlanningNavigator::visit(const CatchIntent &catch_intent)
+void Navigator::visit(const CatchIntent &catch_intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(catch_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const ChipIntent &chip_intent)
+void Navigator::visit(const ChipIntent &chip_intent)
 {
     auto p            = std::make_unique<ChipPrimitive>(chip_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const DirectVelocityIntent &direct_velocity_intent)
+void Navigator::visit(const DirectVelocityIntent &direct_velocity_intent)
 {
     auto p            = std::make_unique<DirectVelocityPrimitive>(direct_velocity_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const DirectWheelsIntent &direct_wheels_intent)
+void Navigator::visit(const DirectWheelsIntent &direct_wheels_intent)
 {
     auto p            = std::make_unique<DirectWheelsPrimitive>(direct_wheels_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const DribbleIntent &dribble_intent)
+void Navigator::visit(const DribbleIntent &dribble_intent)
 {
     auto p            = std::make_unique<DribblePrimitive>(dribble_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const KickIntent &kick_intent)
+void Navigator::visit(const KickIntent &kick_intent)
 {
     auto p            = std::make_unique<KickPrimitive>(kick_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const MoveIntent &move_intent)
+void Navigator::visit(const MoveIntent &move_intent)
 {
     Point start =
         this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
@@ -96,26 +96,26 @@ void PathPlanningNavigator::visit(const MoveIntent &move_intent)
     current_primitive = std::move(stop);
 }
 
-void PathPlanningNavigator::visit(const MoveSpinIntent &move_spin_intent)
+void Navigator::visit(const MoveSpinIntent &move_spin_intent)
 {
     auto p            = std::make_unique<MoveSpinPrimitive>(move_spin_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const PivotIntent &pivot_intent)
+void Navigator::visit(const PivotIntent &pivot_intent)
 {
     auto p            = std::make_unique<PivotPrimitive>(pivot_intent);
     current_primitive = std::move(p);
 }
 
-void PathPlanningNavigator::visit(const StopIntent &stop_intent)
+void Navigator::visit(const StopIntent &stop_intent)
 {
     auto p            = std::make_unique<StopPrimitive>(stop_intent);
     current_primitive = std::move(p);
 }
 
 // helpers
-std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea avoid_area)
+std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
 {
     Rectangle rectangle({0, 0}, {0, 0});
     switch (avoid_area)
@@ -188,7 +188,7 @@ std::optional<Obstacle> PathPlanningNavigator::obstacleFromAvoidArea(AvoidArea a
     return std::nullopt;
 }
 
-std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimitives(
+std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
     this->world              = world;
@@ -222,8 +222,8 @@ std::vector<std::unique_ptr<Primitive>> PathPlanningNavigator::getAssignedPrimit
     return assigned_primitives;
 }
 
-std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
-    const std::vector<AvoidArea> &avoid_areas, int robot_id)
+std::vector<Obstacle> Navigator::createCurrentObstacles(
+    const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id)
 {
     std::vector<Obstacle> obstacles = velocity_obstacles;
 
@@ -271,7 +271,7 @@ std::vector<Obstacle> PathPlanningNavigator::createCurrentObstacles(
     return obstacles;
 }
 
-double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
+double Navigator::getCloseToEnemyObstacleFactor(Point &p)
 {
     double closest_dist = DBL_MAX;
     for (auto &robot : world.enemyTeam().getAllRobots())
@@ -300,7 +300,7 @@ double PathPlanningNavigator::getCloseToEnemyObstacleFactor(Point &p)
     }
 }
 
-std::vector<std::vector<Point>> PathPlanningNavigator::getPlannedPaths()
+std::vector<std::vector<Point>> Navigator::getPlannedPaths()
 {
     return planned_paths;
 }

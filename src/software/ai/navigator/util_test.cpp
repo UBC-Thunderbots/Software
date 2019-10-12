@@ -1,4 +1,4 @@
-#include "software/ai/navigator/path_planning_navigator/util.h"
+#include "software/ai/navigator/util.h"
 
 #include <gtest/gtest.h>
 #include <math.h>

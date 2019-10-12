@@ -20,8 +20,8 @@ TEST(ShootGoalTacticTest, robot_will_shoot_on_open_net)
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::zero(), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball());
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -56,8 +56,8 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::ofDegrees(6), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball());
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
 
     // The robot will start the shot since it can see enough of the net
     auto intent_ptr = tactic.getNextIntent();
@@ -82,8 +82,8 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(4.2, 0)},
                                                      Timestamp::fromSeconds(0));
     tactic.updateRobot(robot);
-    tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball());
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
     intent_ptr = tactic.getNextIntent();
 
     // Check an intent was returned (the pointer is not null)
@@ -106,8 +106,8 @@ TEST(ShootGoalTacticTest, robot_will_commit_to_a_shot_until_it_is_entirely_block
     world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.7, 0)},
                                                      Timestamp::fromSeconds(0));
     tactic.updateRobot(robot);
-    tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball());
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
     intent_ptr = tactic.getNextIntent();
     intent_ptr = tactic.getNextIntent();
 
@@ -142,8 +142,8 @@ TEST(ShootGoalTacticTest, robot_will_align_to_ball_if_shot_is_blocked)
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball());
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
 
     auto intent_ptr = tactic.getNextIntent();
 
@@ -169,7 +169,7 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
     Robot robot = Robot(0, Point(0, 0), Vector(2, -1), Angle::zero(),
                         AngularVelocity::zero(), Timestamp::fromSeconds(0));
     world.mutableFriendlyTeam().updateRobots({robot});
-    world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.4, 0)},
+    world = ::Test::TestUtil::setEnemyRobotPositions(world, {Point(0.25, 0)},
                                                      Timestamp::fromSeconds(0));
     Ball ball(Point(ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0), Timestamp::fromSeconds(0));
     world.updateBallState(ball);
@@ -178,8 +178,8 @@ TEST(ShootGoalTacticTest, robot_will_chip_ball_if_enemy_close_to_stealing_ball)
         ShootGoalTactic(world.field(), world.friendlyTeam(), world.enemyTeam(),
                         world.ball(), Angle::ofDegrees(1.27), std::nullopt, false);
     tactic.updateRobot(robot);
-    tactic.updateParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
-                        world.ball());
+    tactic.updateWorldParams(world.field(), world.friendlyTeam(), world.enemyTeam(),
+                             world.ball());
 
     auto intent_ptr = tactic.getNextIntent();
 

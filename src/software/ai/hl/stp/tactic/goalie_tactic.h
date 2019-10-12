@@ -30,15 +30,15 @@ class GoalieTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this GoalieTactic.
+     * Updates the world parameters for this GoalieTactic.
      *
-     * @param ball The const reference to the ball on the field
-     * @param field The const reference to the field this tactic will run
-     * @param friendly_team The friendly team
-     * @param enemy_team The enemy team
+     * @param ball
+     * @param field
+     * @param friendly_team
+     * @param enemy_team
      */
-    void updateParams(const Ball &ball, const Field &field, const Team &friendly_team,
-                      const Team &enemy_team);
+    void updateWorldParams(const Ball &ball, const Field &field,
+                           const Team &friendly_team, const Team &enemy_team);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. The goalie

@@ -153,9 +153,10 @@ class BallFilter
         boost::circular_buffer<SSLBallDetection> ball_detections);
 
    private:
+    unsigned int _min_buffer_size;
+    unsigned int _max_buffer_size;
+
     // A circular buffer used to store previous ball detections, so we can use them
     // in the filter
     boost::circular_buffer<SSLBallDetection> ball_detection_buffer;
-    unsigned int _min_buffer_size;
-    unsigned int _max_buffer_size;
 };

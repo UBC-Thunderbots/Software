@@ -5,19 +5,20 @@
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
+#include "software/util/parameter/dynamic_parameters.h"
 
 ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
                                  const Team &enemy_team, const Ball &ball,
                                  Angle min_net_open_angle,
                                  std::optional<Point> chip_target, bool loop_forever)
-    : field(field),
+    : Tactic(loop_forever, {RobotCapabilityFlags::Kick}),
+      field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       ball(ball),
       min_net_open_angle(min_net_open_angle),
       chip_target(chip_target),
-      has_shot_available(false),
-      Tactic(loop_forever, {RobotCapabilityFlags::Kick})
+      has_shot_available(false)
 {
 }
 
@@ -26,8 +27,8 @@ std::string ShootGoalTactic::getName() const
     return "Shoot Goal Tactic";
 }
 
-void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball)
+void ShootGoalTactic::updateWorldParams(const Field &field, const Team &friendly_team,
+                                        const Team &enemy_team, const Ball &ball)
 {
     this->field         = field;
     this->friendly_team = friendly_team;
@@ -35,12 +36,9 @@ void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team
     this->ball          = ball;
 }
 
-void ShootGoalTactic::updateParams(const Field &field, const Team &friendly_team,
-                                   const Team &enemy_team, const Ball &ball,
-                                   std::optional<Point> chip_target)
+void ShootGoalTactic::updateControlParams(std::optional<Point> chip_target)
 {
     this->chip_target = chip_target;
-    updateParams(field, friendly_team, enemy_team, ball);
 }
 
 double ShootGoalTactic::calculateRobotCost(const Robot &robot, const World &world)
@@ -78,19 +76,22 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     // Our rectangle class does not have the concept of rotation, so instead
     // we rotate all the robot positions about the origin so we can construct
     // a rectangle that is aligned with the axis
-    Angle theta = -robot->orientation();
+    Vector front_of_robot_dir =
+        Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    Point rotated_baller_position = robot->position().rotate(theta);
-
-    Rectangle area_in_front_of_rotated_baller(
-        rotated_baller_position - Vector(0, 3 * ROBOT_MAX_RADIUS_METERS),
-        rotated_baller_position +
-            Vector(5 * ROBOT_MAX_RADIUS_METERS, 3 * ROBOT_MAX_RADIUS_METERS));
+    auto steal_ball_rect_width = Util::DynamicParameters::ShootGoalTactic::
+                                     enemy_about_to_steal_ball_rectangle_width.value();
+    auto steal_ball_rect_length =
+        Util::DynamicParameters::ShootGoalTactic::
+            enemy_about_to_steal_ball_rectangle_extension_length.value();
+    Rectangle baller_frontal_area = Rectangle(
+        (robot->position() + front_of_robot_dir.perp().norm(steal_ball_rect_width / 2.0)),
+        robot->position() + front_of_robot_dir.norm(steal_ball_rect_length) -
+            front_of_robot_dir.perp().norm(ROBOT_MAX_RADIUS_METERS));
 
     for (const auto &enemy : enemy_team.getAllRobots())
     {
-        Point rotated_enemy_position = enemy.position().rotate(theta);
-        if (area_in_front_of_rotated_baller.containsPoint(rotated_enemy_position))
+        if (baller_frontal_area.containsPoint(enemy.position()))
         {
             return true;
         }

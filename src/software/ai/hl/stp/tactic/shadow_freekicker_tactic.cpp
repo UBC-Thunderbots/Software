@@ -10,11 +10,11 @@
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,
                                                bool loop_forever)
-    : free_kick_shadower(free_kick_shadower),
+    : Tactic(loop_forever),
+      free_kick_shadower(free_kick_shadower),
       enemy_team(enemy_team),
       ball(ball),
-      field(field),
-      Tactic(loop_forever)
+      field(field)
 {
 }
 
@@ -23,7 +23,7 @@ std::string ShadowFreekickerTactic::getName() const
     return "Shadow Freekick Tactic";
 }
 
-void ShadowFreekickerTactic::updateParams(Team enemy_team, Ball ball)
+void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
 {
     this->enemy_team = enemy_team;
     this->ball       = ball;

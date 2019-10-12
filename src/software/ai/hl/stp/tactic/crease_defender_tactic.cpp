@@ -16,12 +16,12 @@
 CreaseDefenderTactic::CreaseDefenderTactic(
     const Field &field, const Ball &ball, const Team &friendly_team,
     const Team &enemy_team, CreaseDefenderTactic::LeftOrRight left_or_right)
-    : field(field),
+    : Tactic(true),
+      field(field),
       ball(ball),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
-      left_or_right(left_or_right),
-      Tactic(true)
+      left_or_right(left_or_right)
 {
 }
 
@@ -30,10 +30,11 @@ std::string CreaseDefenderTactic::getName() const
     return "Crease Defender Tactic";
 }
 
-void CreaseDefenderTactic::updateParams(const Ball &ball, const Field &field,
-                                        const Team &friendly_team, const Team &enemy_team)
+void CreaseDefenderTactic::updateWorldParams(const Ball &ball, const Field &field,
+                                             const Team &friendly_team,
+                                             const Team &enemy_team)
 {
-    // Update the parameters stored by this Tactic
+    // Update the world parameters stored by this Tactic
     this->ball          = ball;
     this->field         = field;
     this->friendly_team = friendly_team;
@@ -180,9 +181,9 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         if (desired_robot_state_opt)
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
-            yield(move_action.updateStateAndGetNextIntent(*robot, defender_position,
-                                                          defender_orientation, 0.0,
-                                                          false, AutokickType::AUTOCHIP));
+            yield(move_action.updateStateAndGetNextIntent(
+                *robot, defender_position, defender_orientation, 0.0, false, false,
+                AutokickType::AUTOCHIP));
         }
         else
         {

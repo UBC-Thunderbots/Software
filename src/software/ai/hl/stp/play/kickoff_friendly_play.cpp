@@ -95,8 +95,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // set the requirement that Robot 1 must be able to kick and chip
@@ -104,10 +104,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
             RobotCapabilityFlags::Kick, RobotCapabilityFlags::Chip};
 
         // setup 5 kickoff positions in order of priority
-        for (int i = 0; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
-                                             0);
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::half(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 
@@ -121,24 +121,25 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // TODO This needs to be adjusted post field testing, ball needs to land exactly
         // in the middle of the enemy field
-        chip_tactic->updateParams(
-            world.ball(), world.field().centerPoint(),
+        chip_tactic->updateWorldParams(world.ball());
+        chip_tactic->updateControlParams(
+            world.field().centerPoint(),
             world.field().centerPoint() + Point(world.field().xLength() / 4, 0),
             world.field().xLength() / 2);
         result.emplace_back(chip_tactic);
 
         // the robot at position 0 will be closest to the ball, so positions starting from
         // 1 will be assigned to the rest of the robots
-        for (int i = 1; i < kickoff_setup_positions.size(); i++)
+        for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
-            move_tactics.at(i)->updateParams(kickoff_setup_positions.at(i), Angle::half(),
-                                             0);
+            move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
+                                                    Angle::half(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 

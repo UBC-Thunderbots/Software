@@ -47,8 +47,8 @@ class RadioOutput
     void sendVisionPacket(const Team& friendly_team, Ball ball);
 
    private:
-    MRFDongle dongle;
-
     // The Annunciator that sends messages from the dongle to AI
     Annunciator annunciator;
+
+    MRFDongle dongle;
 };

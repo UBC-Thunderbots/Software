@@ -4,10 +4,9 @@
 
 #include "software/ai/hl/stp/play/halt_play.h"
 #include "software/ai/hl/stp/stp.h"
-#include "software/ai/navigator/path_planning_navigator/path_planning_navigator.h"
 
 AI::AI()
-    : navigator(std::make_shared<PathPlanningNavigator>()),
+    : navigator(std::make_shared<Navigator>()),
       // We use the current time in nanoseconds to initialize STP with a "random" seed
       high_level(std::make_unique<STP>(
           []() { return std::make_unique<HaltPlay>(); },

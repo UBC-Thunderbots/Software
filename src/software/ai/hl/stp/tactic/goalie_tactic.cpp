@@ -14,11 +14,11 @@
 
 GoalieTactic::GoalieTactic(const Ball &ball, const Field &field,
                            const Team &friendly_team, const Team &enemy_team)
-    : ball(ball),
+    : Tactic(true),
+      ball(ball),
       field(field),
       friendly_team(friendly_team),
-      enemy_team(enemy_team),
-      Tactic(true)
+      enemy_team(enemy_team)
 {
     addWhitelistedAvoidArea(AvoidArea::FRIENDLY_DEFENSE_AREA);
     addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
@@ -29,10 +29,10 @@ std::string GoalieTactic::getName() const
     return "Goalie Tactic";
 }
 
-void GoalieTactic::updateParams(const Ball &ball, const Field &field,
-                                const Team &friendly_team, const Team &enemy_team)
+void GoalieTactic::updateWorldParams(const Ball &ball, const Field &field,
+                                     const Team &friendly_team, const Team &enemy_team)
 {
-    // Update the parameters stored by this Tactic
+    // Update the world parameters stored by this Tactic
     this->ball          = ball;
     this->field         = field;
     this->friendly_team = friendly_team;
@@ -178,8 +178,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         Segment full_goal_segment =
             Segment(neg_goal_line_inflated, pos_goal_line_inflated);
 
-        auto [intersection1, intersection2] =
-            raySegmentIntersection(ball_ray, full_goal_segment);
+        std::optional<Point> intersection1 =
+            raySegmentIntersection(ball_ray, full_goal_segment).first;
 
         // Load DynamicParameter
         // when should the goalie start panicking to move into place to stop the ball
@@ -214,8 +214,9 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Point goalie_pos = closestPointOnSeg(
                 (*robot).position(), Segment(ball.position(), *intersection1));
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
-            next_intent              = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, goalie_final_speed, AUTOCHIP);
+
+            next_intent = move_action.updateStateAndGetNextIntent(
+                *robot, goalie_pos, goalie_orientation, 0.0, false, false, AUTOCHIP);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
