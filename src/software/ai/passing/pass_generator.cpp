@@ -56,14 +56,14 @@ void PassGenerator::setPasserRobotId(unsigned int robot_id)
     this->passer_robot_id = robot_id;
 }
 
-std::pair<Pass, double> PassGenerator::getBestPassSoFar()
+PassWithRating PassGenerator::getBestPassSoFar()
 {
     // Take ownership of the best_known_pass for the duration of this function
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
     Pass best_known_pass_copy = best_known_pass;
-    return std::make_pair<Pass, double>(std::move(best_known_pass_copy),
-                                        ratePass(best_known_pass));
+
+    return PassWithRating{std::move(best_known_pass_copy), ratePass(best_known_pass)};
 }
 
 void PassGenerator::setTargetRegion(std::optional<Rectangle> area)
@@ -275,10 +275,10 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
     // Take ownership of world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
 
-    std::uniform_real_distribution x_distribution(-world.field().length() / 2,
-                                                  world.field().length() / 2);
-    std::uniform_real_distribution y_distribution(-world.field().width() / 2,
-                                                  world.field().width() / 2);
+    std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
+                                                  world.field().xLength() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
+                                                  world.field().yLength() / 2);
 
     double curr_time = world.getMostRecentTimestamp().getSeconds();
     double min_start_time_offset =
@@ -292,7 +292,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
         Util::DynamicParameters::Passing::max_pass_speed_m_per_s.value());
 
     std::vector<Pass> passes;
-    for (int i = 0; i < num_passes_to_gen; i++)
+    for (unsigned i = 0; i < num_passes_to_gen; i++)
     {
         Point receiver_point(x_distribution(random_num_gen),
                              y_distribution(random_num_gen));

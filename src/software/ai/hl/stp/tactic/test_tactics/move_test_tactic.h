@@ -25,7 +25,7 @@ class MoveTestTactic : public Tactic
      *
      * @param destination_ The destination to move to (in global coordinates)
      */
-    void updateParams(Point destination_);
+    void updateControlParams(Point destination_);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -37,6 +37,15 @@ class MoveTestTactic : public Tactic
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
+
+    /*
+     * Throws std::invalid_argument always
+     *
+     * @param a visitor that is ignored
+     *
+     * @throws std::invalid_argument always
+     */
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

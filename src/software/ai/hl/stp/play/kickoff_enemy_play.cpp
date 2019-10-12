@@ -38,15 +38,15 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true),
+            false, true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true),
+            false, true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
             Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
-            true)};
+            false, true)};
 
     // these positions are picked according to the following slide
     // https://images.slideplayer.com/32/9922349/slides/slide_2.jpg
@@ -77,18 +77,18 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     std::vector<Point> defense_positions = {
         Point(world.field().friendlyGoalpostNeg().x() +
-                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              -world.field().defenseAreaWidth() / 2.0),
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              -world.field().defenseAreaYLength() / 2.0),
         Point(world.field().friendlyGoalpostPos().x() +
-                  world.field().defenseAreaLength() + 2 * ROBOT_MAX_RADIUS_METERS,
-              world.field().defenseAreaWidth() / 2.0),
-        Point(world.field().friendlyGoal().x() + world.field().defenseAreaLength() +
+                  world.field().defenseAreaXLength() + 2 * ROBOT_MAX_RADIUS_METERS,
+              world.field().defenseAreaYLength() / 2.0),
+        Point(world.field().friendlyGoal().x() + world.field().defenseAreaXLength() +
                   2 * ROBOT_MAX_RADIUS_METERS,
               world.field().friendlyGoal().y()),
         Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              world.field().defenseAreaWidth() / 2.0),
+              world.field().defenseAreaYLength() / 2.0),
         Point(-(world.field().centerCircleRadius() + 2 * ROBOT_MAX_RADIUS_METERS),
-              -world.field().defenseAreaWidth() / 2.0),
+              -world.field().defenseAreaYLength() / 2.0),
     };
     // these move tactics will be used to go to those positions
     std::vector<std::shared_ptr<MoveTactic>> move_tactics = {
@@ -103,13 +103,13 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
         std::vector<std::shared_ptr<Tactic>> result = {goalie_tactic};
 
         // keeps track of the next defense position to assign
         int defense_position_index = 0;
-        for (int i = 0; i < defense_positions.size(); ++i)
+        for (unsigned i = 0; i < defense_positions.size(); ++i)
         {
             if (i < 3 && i < enemy_threats.size())
             {
@@ -123,9 +123,10 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // We shadow assuming the robots do not pass so we do not try block passes
                 // while shadowing, since we can't go on the enemy side to block the pass
                 // anyway
-                shadow_enemy_tactics.at(i)->updateParams(
-                    enemy_threat, world.field(), world.friendlyTeam(), world.enemyTeam(),
-                    shadow_dist, false, world.ball());
+                shadow_enemy_tactics.at(i)->updateWorldParams(
+                    world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
+                shadow_enemy_tactics.at(i)->updateControlParams(enemy_threat,
+                                                                shadow_dist);
                 result.emplace_back(shadow_enemy_tactics.at(i));
             }
             else
@@ -134,8 +135,8 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
                 // enemies, we move the rest of the robots to the defense positions
                 // listed above
                 move_tactics.at(defense_position_index)
-                    ->updateParams(defense_positions.at(defense_position_index),
-                                   Angle::zero(), 0);
+                    ->updateControlParams(defense_positions.at(defense_position_index),
+                                          Angle::zero(), 0);
                 result.emplace_back(move_tactics.at(defense_position_index));
                 defense_position_index++;
             }

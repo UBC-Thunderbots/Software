@@ -21,11 +21,6 @@ class StopTestTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this StopTestTactic.
-     */
-    void updateParams();
-
-    /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers all robots
      * equally with a cost of 0.5
      *
@@ -35,6 +30,15 @@ class StopTestTactic : public Tactic
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
+
+    /*
+     * Throws std::invalid_argument always
+     *
+     * @param a visitor that is ignored
+     *
+     * @throws std::invalid_argument always
+     */
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

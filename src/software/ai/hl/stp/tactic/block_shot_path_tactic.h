@@ -21,18 +21,18 @@ class BlockShotPathTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this BlockShotPathTactic.
+     * Updates the control parameters for this BlockShotPathTactic.
      *
      * @param enemy_robot The enemy robot to block from shooting on the friendly net
      */
-    void updateParams(const Robot& enemy_robot);
+    void updateControlParams(const Robot& enemy_robot);
 
     /**
-     * Updates the parameters for this BlockShotPathTactic.
+     * Updates the control parameters for this BlockShotPathTactic.
      *
      * @param shot_origin The origin of the shot to block
      */
-    void updateParams(const Point& shot_origin);
+    void updateControlParams(const Point& shot_origin);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -44,6 +44,13 @@ class BlockShotPathTactic : public Tactic
      * to this tactic. Lower cost values indicate a more preferred robot.
      */
     double calculateRobotCost(const Robot& robot, const World& world) override;
+
+    /**
+     * Accepts a Tactic Visitor and calls the visit function on itself
+     *
+     * @param visitor A Tactic Visitor
+     */
+    void accept(TacticVisitor& visitor) const override;
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;

@@ -7,8 +7,8 @@ QPointF createQPointF(const Point& point)
 
 QRectF createQRectF(const Rectangle& rectangle)
 {
-    return QRectF(createQPointF(rectangle.nwCorner()),
-                  createQPointF(rectangle.seCorner()));
+    return QRectF(createQPointF(rectangle.negXPosYCorner()),
+                  createQPointF(rectangle.posXNegYCorner()));
 }
 
 QLineF createQLineF(const Segment& segment)

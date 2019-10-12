@@ -7,9 +7,9 @@ cc_library(
     deps = [
         ":pass",
         "//software/ai/evaluation:pass",
-        "//software/ai/world",
         "//software/geom",
         "//software/util/math:math_functions",
+        "//software/world",
     ],
 )
 
@@ -29,9 +29,9 @@ cc_library(
     srcs = ["pass.cpp"],
     hdrs = ["pass.h"],
     deps = [
-        "//software/ai/world:field",
         "//software/geom",
         "//software/util/time:timestamp",
+        "//software/world:field",
     ],
 )
 
@@ -46,14 +46,23 @@ cc_test(
 )
 
 cc_library(
+    name = "pass_with_rating",
+    hdrs = ["pass_with_rating.h"],
+    deps = [
+        ":pass",
+    ],
+)
+
+cc_library(
     name = "pass_generator",
     srcs = ["pass_generator.cpp"],
     hdrs = ["pass_generator.h"],
     deps = [
         ":evaluation",
         ":pass",
-        "//software/ai/world",
+        ":pass_with_rating",
         "//software/util/optimization:gradient_descent",
+        "//software/world",
     ],
 )
 

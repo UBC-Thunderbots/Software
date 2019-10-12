@@ -6,6 +6,7 @@ cc_library(
     hdrs = ["block_shot_path_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
@@ -29,11 +30,12 @@ cc_library(
     hdrs = ["cherry_pick_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/passing:pass_generator",
-        "//software/ai/world",
         "//software/geom",
+        "//software/world",
         "@g3log",
     ],
 )
@@ -54,6 +56,7 @@ cc_library(
     hdrs = ["chip_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/geom",
@@ -67,6 +70,7 @@ cc_library(
     hdrs = ["crease_defender_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
@@ -82,6 +86,7 @@ cc_library(
     hdrs = ["goalie_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
@@ -97,6 +102,7 @@ cc_library(
     hdrs = ["move_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/geom",
@@ -120,6 +126,7 @@ cc_library(
     hdrs = ["passer_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:kick_action",
         "//software/ai/hl/stp/action:move_action",
@@ -145,6 +152,7 @@ cc_library(
     hdrs = ["patrol_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
@@ -159,6 +167,7 @@ cc_library(
     hdrs = ["penalty_kick_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:dribble_action",
         "//software/ai/hl/stp/action:kick_action",
@@ -175,6 +184,7 @@ cc_library(
     hdrs = ["receiver_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:calc_best_shot",
@@ -201,6 +211,7 @@ cc_library(
     hdrs = ["shadow_enemy_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
@@ -226,6 +237,7 @@ cc_library(
     hdrs = ["shadow_freekicker_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:possession",
@@ -240,6 +252,7 @@ cc_library(
     hdrs = ["shoot_goal_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:kick_action",
@@ -247,6 +260,7 @@ cc_library(
         "//software/ai/hl/stp/evaluation:calc_best_shot",
         "//software/ai/hl/stp/evaluation:intercept",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "@g3log",
     ],
 )
@@ -267,6 +281,7 @@ cc_library(
     hdrs = ["stop_tactic.h"],
     deps = [
         ":tactic",
+        ":tactic_visitor",
         "//shared:constants",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/action:stop_action",
@@ -286,12 +301,34 @@ cc_test(
 )
 
 cc_library(
+    name = "all_tactics",
+    hdrs = ["all_tactics.h"],
+    deps = [
+        ":block_shot_path_tactic",
+        ":cherry_pick_tactic",
+        ":chip_tactic",
+        ":crease_defender_tactic",
+        ":goalie_tactic",
+        ":move_tactic",
+        ":passer_tactic",
+        ":patrol_tactic",
+        ":penalty_kick_tactic",
+        ":receiver_tactic",
+        ":shadow_enemy_tactic",
+        ":shadow_freekicker_tactic",
+        ":shoot_goal_tactic",
+        ":stop_tactic",
+        ":tactic",
+    ],
+)
+
+cc_library(
     name = "tactic",
     srcs = ["tactic.cpp"],
     hdrs = ["tactic.h"],
     deps = [
         "//software/ai/hl/stp/action",
-        "//software/ai/world",
+        "//software/world",
     ],
 )
 
@@ -304,4 +341,10 @@ cc_test(
         "//software/test_util",
         "@gtest//:gtest_main",
     ],
+)
+
+cc_library(
+    name = "tactic_visitor",
+    hdrs = ["tactic_visitor.h"],
+    deps = [":tactic"],
 )

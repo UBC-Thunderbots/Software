@@ -4,10 +4,11 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
-    : field(field), Tactic(loop_forever)
+    : Tactic(loop_forever), field(field)
 {
 }
 
@@ -16,14 +17,14 @@ std::string BlockShotPathTactic::getName() const
     return "Block Shot Path Tactic";
 }
 
-void BlockShotPathTactic::updateParams(const Robot& enemy_robot)
+void BlockShotPathTactic::updateControlParams(const Robot& enemy_robot)
 {
-    updateParams(enemy_robot.position());
+    updateControlParams(enemy_robot.position());
 }
 
-void BlockShotPathTactic::updateParams(const Point& shot_origin)
+void BlockShotPathTactic::updateControlParams(const Point& shot_origin)
 {
-    // Update the parameters stored by this Tactic
+    // Update the control parameters stored by this Tactic
     this->shot_origin = shot_origin;
 }
 
@@ -33,7 +34,8 @@ double BlockShotPathTactic::calculateRobotCost(const Robot& robot, const World& 
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     Point block_position = getBlockPosition();
-    double cost = (robot.position() - block_position).len() / world.field().totalLength();
+    double cost =
+        (robot.position() - block_position).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -56,4 +58,9 @@ void BlockShotPathTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         yield(move_action.updateStateAndGetNextIntent(*robot, block_position,
                                                       block_orientation, 0.0));
     } while (!move_action.done());
+}
+
+void BlockShotPathTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }

@@ -13,9 +13,9 @@ TEST(TestUtilsTest, create_testing_field)
 
     // Check that the field has the correct dimensions for a
     // SSL Division B field according to the rules
-    EXPECT_DOUBLE_EQ(9.6, field.totalLength());
-    EXPECT_DOUBLE_EQ(6.6, field.totalWidth());
-    EXPECT_DOUBLE_EQ(0.3, field.boundaryWidth());
+    EXPECT_DOUBLE_EQ(9.6, field.totalXLength());
+    EXPECT_DOUBLE_EQ(6.6, field.totalYLength());
+    EXPECT_DOUBLE_EQ(0.3, field.boundaryYLength());
 
     EXPECT_EQ(Point(-4.5, 0.0), field.friendlyGoal());
     EXPECT_EQ(Point(4.5, 0.0), field.enemyGoal());

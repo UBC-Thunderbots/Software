@@ -115,8 +115,8 @@ std::optional<std::pair<int, std::optional<Robot>>> Evaluation::getNumPassesToRo
     // the case, 0 passes would be required. Since that case is already checked, when we
     // start the loop we are checking for the possibility of the receiver getting the ball
     // in 1 pass. This is why pass_num starts at 1.
-    for (int pass_num = 1; pass_num < passing_team.numRobots() &&
-                           !current_passers.empty() && !unvisited_robots.empty();
+    for (unsigned pass_num = 1; pass_num < passing_team.numRobots() &&
+                                !current_passers.empty() && !unvisited_robots.empty();
          pass_num++)
     {
         std::map<Robot, std::vector<Robot>, Robot::cmpRobotByID> receiver_passer_pairs =
@@ -250,8 +250,8 @@ std::vector<Evaluation::EnemyThreat> Evaluation::getAllEnemyThreats(
                                                                      enemy_team, robot);
         if (best_shot_data)
         {
-            best_shot_angle  = best_shot_data->second;
-            best_shot_target = best_shot_data->first;
+            best_shot_angle  = best_shot_data->getOpenAngle();
+            best_shot_target = best_shot_data->getPointToShootAt();
         }
 
         // Set default values. If the robot can't be passed to we set the number of passes

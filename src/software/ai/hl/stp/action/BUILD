@@ -49,7 +49,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/intent:kick_intent",
         "//software/ai/intent:move_intent",
-        "//software/ai/world:ball",
+        "//software/world:ball",
     ],
 )
 
@@ -148,8 +148,8 @@ cc_library(
     hdrs = ["action.h"],
     deps = [
         "//software/ai/intent",
-        "//software/ai/world:ball",
-        "//software/ai/world:robot",
+        "//software/world:ball",
+        "//software/world:robot",
         "@boost//:coroutine2",
     ],
 )

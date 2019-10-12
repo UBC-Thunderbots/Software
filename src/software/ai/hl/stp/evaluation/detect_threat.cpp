@@ -8,8 +8,8 @@
 #include <optional>
 
 #include "shared/constants.h"
-#include "software/ai/world/field.h"
 #include "software/geom/util.h"
+#include "software/world/field.h"
 
 namespace Evaluation
 {
@@ -19,8 +19,8 @@ namespace Evaluation
         Segment friendlyNetSegment =
             Segment(field.friendlyGoalpostPos(), field.friendlyGoalpostNeg());
 
-        auto [intersection1, intersection2] =
-            raySegmentIntersection(ballRay, friendlyNetSegment);
+        std::optional<Point> intersection1 =
+            raySegmentIntersection(ballRay, friendlyNetSegment).first;
 
         return intersection1;
     }
@@ -31,8 +31,9 @@ namespace Evaluation
         Segment enemyNetSegment =
             Segment(field.enemyGoalpostPos(), field.enemyGoalpostNeg());
 
-        auto [intersection1, intersection2] =
-            raySegmentIntersection(ballRay, enemyNetSegment);
+        std::optional<Point> intersection1 =
+            raySegmentIntersection(ballRay, enemyNetSegment).first;
+
         return intersection1;
     }
 
