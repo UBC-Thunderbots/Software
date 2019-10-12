@@ -5,36 +5,16 @@
 
 const std::string ExamplePlay::name = "Example Play";
 
-/**
- * This function returns name of the play
- * @return ExamplePlay's name (which is "Example Play" as seen on Line 6)
- */
 std::string ExamplePlay::getName() const
 {
     return ExamplePlay::name;
 }
 
-/**
- * This function returns whether the play is applicable
- * Applicable describes the conditions for the play should start
- * For instance, the play should start when it is kick-off
- * @return If ExamplePlay is applicable
- * It is applicable since it should start regardless of anything else
- * since it is a demo
- */
 bool ExamplePlay::isApplicable(const World &world) const
 {
     return true;
 }
 
-/**
- * This function returns whether the play's invariant holds
- * Invariant describes the conditions for the play to keep running
- * For instance, the invariant may not hold if we lose possession of the ball
- * @return If ExamplePlay's invariant holds
- * It holds true since it should keep running regardless of anything else
- * since it is a demo
- */
 bool ExamplePlay::invariantHolds(const World &world) const
 {
     return true;
