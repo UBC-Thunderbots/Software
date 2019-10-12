@@ -20,17 +20,81 @@ PATH_TO_AUTOGEN_NODE = './software/dynamic_reconfigure_manager/'
 DYNAMIC_PARMETERS_HEADER = 'dynamic_parameters.h'
 DYNAMIC_PARMETERS_CPP = 'dynamic_parameters.cpp'
 
-# TODO: removed unused bits here
+#######################################################################
+#                              Parameter                              #
+#######################################################################
 
-################
-# CPP Contants #
-################
+PARAMETER_PUBLIC_ENTRY =\
+        """const std::shared_ptr<const Parameter<{type}>> {immutable_accessor_name} () const
+           {{
+               return std::const_pointer_cast<const Parameter<{type}>>(param_variable_name);
+           }}
 
-H_PARAMETER_DECL = '// {comment}\nextern Parameter<{type}> {name}; \n\n'
-CPP_PARAMETER_INSTNACE = 'Parameter<{type}> {name}(\"{name}\", \"{namespace}\", {quote}{default}{quote});\n\n'
+           std::shared_ptr<Parameter<{type}>> {mutable_accessor_name} () const
+           {{
+               return {param_variable_name};
+           }}
+        """
 
-NAMESPACE_OPEN = 'namespace {name} {{ \n'
-NAMESPACE_CLOSE = '}\n'
+PARAMETER_PRIVATE_ENTRY =\
+        "std::shared_ptr<Parameter<{type}>> {param_variable_name};"
+
+PARAMETER_CONSTRUCTOR_ENTRY =\
+        "{param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", \"ns\", {value});"
+
+#######################################################################
+#                               Config                                #
+#######################################################################
+
+CONFIG_PUBLIC_ENTRY =\
+        """const std::shared_ptr<const {config_name}> {immutable_accessor_name} () const
+           {{
+               return std::const_pointer_cast<const config_name>(config_variable_name);
+           }}
+
+           std::shared_ptr<const {config_name}> {mutable_accessor_name} () const
+           {{
+               return {config_variable_name};
+           }}
+        """
+
+CONFIG_CONSTRUCTOR_ENTRY =\
+        "{config_variable_name} = std::make_shared<{config_name}>();"
+
+CONFIG_PRIVATE_ENTRY =\
+        "std::shared_ptr<config_name> {config_variable_name};"
+
+CONFIG_CLASS =\
+"""class {config_name} : public Config
+{{
+   public:
+   {config_name}()
+   {{
+       {constructor_entries}
+       internal_param_list = {{{parameter_list_entries}}};
+   }}
+   {public_entries}
+
+   std::string name()
+   {{
+       return "{config_name}";
+   }}
+
+   ParameterList& getMutableParameterList()
+   {{
+       return internal_param_list;
+   }}
+
+   const ParameterList& getParameterList()
+   {{
+       return internal_param_list;
+   }}
+
+   private:
+   ParameterList internal_parameter_list;
+   {private_entries}
+}};
+"""
 
 AUTOGEN_WARNING = \
 """
@@ -42,11 +106,11 @@ AUTOGEN_WARNING = \
  *  !! WARNING !!
  */
 """
+
 H_HEADER = \
 """{}
 #pragma once
-#include \"software/util/parameter/parameter.h\"
-namespace Util::DynamicParameters{{
+#include \"software/util/parameter/config.hpp\"
 """.format(AUTOGEN_WARNING)
 
 CPP_HEADER = \

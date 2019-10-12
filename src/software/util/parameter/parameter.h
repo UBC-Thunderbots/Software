@@ -34,7 +34,6 @@ class Parameter
                           const std::string& parameter_namespace, T default_value)
     {
         this->name_      = parameter_name;
-        this->namespace_ = parameter_namespace;
         this->value_     = default_value;
 
         // TODO remove registry once Visuzlier uses new structure

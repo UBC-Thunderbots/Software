@@ -1,20 +1,15 @@
 directories:
-  # Add the directories you want added as source here
-  # By default, we've added your entire workspace ('.')
-  .
+  software
 
 # Automatically includes all relevant targets under the 'directories' above
 derive_targets_from_directories: true
 
 targets:
-  # We add all the targets here to automatically load all possible symbols.
-  # This can slow down symbol loading, but it's much more reliable then picking
-  # and choosing targets.
-  //...
+  # If source code isn't resolving, add additional targets that compile it here
 
 additional_languages:
   # Uncomment any additional languages you want supported
   # dart
   # javascript
-  python
+  # python
   # typescript

@@ -97,10 +97,8 @@ class FriendlyEvalConfig : public MutableConfig
    public:
     FriendlyEvalConfig()
     {
-        we_suck_param = std::make_shared<Parameter<bool>>(
-            "we_suck", "should_we_still_have_namespaces", false);
-        we_have_no_chill_param = std::make_shared<Parameter<bool>>(
-            "we_have_no_chill", "should_we_still_have_namespaces", false);
+        we_suck_param = std::make_shared<Parameter<bool>>("we_suck", "", false);
+        we_have_no_chill_param = std::make_shared<Parameter<bool>>("we_have_no_chill", "", false);
 
         internal_param_list = {we_have_no_chill_param, we_suck_param};
     }

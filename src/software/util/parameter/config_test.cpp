@@ -83,6 +83,7 @@ TEST(ConfigTest, TestAutogen)
     // to all other threads
     const std::shared_ptr<const GlobalQualityConfig> DynamicParametersV2Immutable =
         std::const_pointer_cast<const GlobalQualityConfig>(DynamicParametersV2Mutable);
+
     // const_pointer_cast does exactly what we want it to do, it takes a const pointer to
     // a GlobalQualityConfig and changes it to a const pointer to a const
     // GlobalQualityConfig AND still shares the same internal representiation
@@ -94,20 +95,18 @@ TEST(ConfigTest, TestAutogen)
     ASSERT_EQ(DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuck()->value(),
               true);
 
-    DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()->weSuckMutable()->setValue(
-        false);
-    ASSERT_EQ(DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuck()->value(),
-              false);
+    DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()->weSuckMutable()->setValue(false);
+    ASSERT_EQ(DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuck()->value(), false);
 
-    // the following commands will not compile for example
+    // NOTE: the following commands will not compile for example
     // DynamicParametersV2Immutable->getFriendlyEvalConfig()->weHaveNoChill()->setValue(true);
     // DynamicParametersV2Immutable->getFriendlyEvalConfigMutable()->weSuckMutable()->setValue(false);
+    // DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuckMutable()->setValue(false);
 
     // But the beauty of this system is that you can divide it up into chunks and pass
     // around. The function defined above onlyNeedParametersFromConfigA, does not
     // have access to any other params other than FriendlyConfigA
-    onlyNeedParametersFromFriendlyEvalConfig(
-        DynamicParametersV2Immutable->getFriendlyEvalConfig());
+    onlyNeedParametersFromFriendlyEvalConfig(DynamicParametersV2Immutable->getFriendlyEvalConfig());
 
 
     // Check visitor function above, is is how the visualizer could visit
