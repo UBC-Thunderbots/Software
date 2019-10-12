@@ -23,18 +23,16 @@ class Parameter
    public:
     /**
      * Constructs a new Parameter
-     * TODO Maybe remove namespaces
      *
      * @param parameter_name The name of the parameter used by dynamic_reconfigure
-     * @param parameter_namespace The namespace of the parameter used by
      * dynamic_reconfigure
      * @param default_value The default value for this parameter
      */
-    explicit Parameter<T>(const std::string& parameter_name,
-                          const std::string& parameter_namespace, T default_value)
+    explicit Parameter<T>(const std::string& parameter_name, T default_value, std::vector<T> parameter_options)
     {
-        this->name_      = parameter_name;
-        this->value_     = default_value;
+        this->name_  = parameter_name;
+        this->value_ = default_value;
+        this->options_ = parameter_options;
 
         // TODO remove registry once Visuzlier uses new structure
         Parameter<T>::registerParameter(this);
@@ -49,6 +47,16 @@ class Parameter
     {
         std::scoped_lock lock(this->value_mutex_);
         return this->value_;
+    }
+
+    /**
+     * Returns the options for this parameter
+     *
+     * @return the options of this parameter
+     */
+    const std::vector<T> getOptions() const
+    {
+        return this->options_;
     }
 
     /**
@@ -140,6 +148,8 @@ class Parameter
 
     // Store the value so it can be retrieved without fetching from the server again
     T value_;
+
+    std::vector<T> options_;
 
     // Store the name of the parameter
     std::string name_;

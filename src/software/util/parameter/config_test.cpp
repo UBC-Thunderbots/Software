@@ -47,16 +47,6 @@ void visit_parameters(ParameterVariant paramvar)
 }
 
 
-void onlyNeedParametersFromFriendlyEvalConfig(
-    const std::shared_ptr<const FriendlyEvalConfig> conf)
-{
-    std::cerr << conf->weHaveNoChill()->name() << conf->weHaveNoChill()->value()
-              << std::endl;
-    std::cerr << conf->weSuck()->name() << conf->weSuck()->value() << std::endl;
-
-    // this wont compile
-    // conf->weSuck()->setValue(false);
-}
 
 TEST(ConfigTest, TestAutogen)
 {
@@ -64,54 +54,18 @@ TEST(ConfigTest, TestAutogen)
     // work this is how the main configuration object will be created somewhere in hl
 
     // This creates a shared ptr pointing to a GlobalQualityConfig
-    const std::shared_ptr<GlobalQualityConfig> DynamicParametersV2Mutable =
-        std::make_shared<GlobalQualityConfig>();
-
-    // accessing parameter values works as expected on the MutableConfig
-    std::cerr << DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()
-                     ->weHaveNoChillMutable()
-                     ->value();
-
-    // Which is Util::DynamicParameters::FriendlyEvalConfig::we_have_no_chill.value();
-    // in our current system, and we can also update the values with this
-    DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()
-        ->weHaveNoChillMutable()
-        ->setValue(true);
+    const std::shared_ptr<ThunderbotsConfig> DynamicParametersV2Mutable =
+        std::make_shared<ThunderbotsConfig>();
 
     // the mutable config above will only be given to the visualizer and anything else
     // that needs to update parameters. The Immutable version below will be given
     // to all other threads
-    const std::shared_ptr<const GlobalQualityConfig> DynamicParametersV2Immutable =
-        std::const_pointer_cast<const GlobalQualityConfig>(DynamicParametersV2Mutable);
-
-    // const_pointer_cast does exactly what we want it to do, it takes a const pointer to
-    // a GlobalQualityConfig and changes it to a const pointer to a const
-    // GlobalQualityConfig AND still shares the same internal representiation
-
-    // Example usage of Mutable vs Immutable: The changes through the mutable version be
-    // seen in the the Immutable version (we don't want a copy)
-    DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()->weSuckMutable()->setValue(
-        true);
-    ASSERT_EQ(DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuck()->value(),
-              true);
-
-    DynamicParametersV2Mutable->getFriendlyEvalConfigMutable()->weSuckMutable()->setValue(false);
-    ASSERT_EQ(DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuck()->value(), false);
-
-    // NOTE: the following commands will not compile for example
-    // DynamicParametersV2Immutable->getFriendlyEvalConfig()->weHaveNoChill()->setValue(true);
-    // DynamicParametersV2Immutable->getFriendlyEvalConfigMutable()->weSuckMutable()->setValue(false);
-    // DynamicParametersV2Immutable->getFriendlyEvalConfig()->weSuckMutable()->setValue(false);
-
-    // But the beauty of this system is that you can divide it up into chunks and pass
-    // around. The function defined above onlyNeedParametersFromConfigA, does not
-    // have access to any other params other than FriendlyConfigA
-    onlyNeedParametersFromFriendlyEvalConfig(DynamicParametersV2Immutable->getFriendlyEvalConfig());
-
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParametersV2Immutable =
+        std::const_pointer_cast<const ThunderbotsConfig>(DynamicParametersV2Mutable);
 
     // Check visitor function above, is is how the visualizer could visit
     // and set each of the values, and update them
-    for (auto& v : DynamicParametersV2Mutable->getMutableParameterList())
+    for (auto& v : DynamicParametersV2Mutable->getParameterList())
     {
         visit_parameters(v);
     }

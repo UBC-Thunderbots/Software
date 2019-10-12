@@ -284,14 +284,14 @@ PivotAction:
 RobotCapabilities:
   broken_dribblers:
     default: ""
-    type: "string"
+    type: "std::string"
     description: Comma-separated list of numbers of robots with broken dribblers
   broken_chippers:
     default: ""
-    type: "string"
+    type: "std::string"
     description: Comma-separated list of numbers of robots with broken chippers
   broken_kickers:
     default: ""
-    type: "string"
+    type: "std::string"
     description: Comma-separated list of numbers of robots with broken kickers
 

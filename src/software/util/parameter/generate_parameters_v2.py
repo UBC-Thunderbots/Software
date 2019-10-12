@@ -73,6 +73,9 @@ class Parameter(object):
         self.default_value = parameter_description['default']
         self.ptype = parameter_description['type']
 
+        if self.ptype == 'bool':
+            self.default_value = 'false' if self.default_value == False else 'true'
+
         # min max will only be in a parameter if it is of type int
         # or float, the rest of the parameters will NOT.
         self.min_value = None
@@ -84,7 +87,7 @@ class Parameter(object):
 
         # any parameter can provide options, which is a list of valid
         # values the parameter can take
-        self.options = None
+        self.options = []
 
         if 'options' in parameter_description:
             self.options = parameter_description['options']
@@ -100,7 +103,9 @@ class Parameter(object):
         return constants.PARAMETER_CONSTRUCTOR_ENTRY.format(
             type=self.ptype,
             param_variable_name=self.param_variable_name,
+            quote="\"" if self.ptype == 'std::string' else "",
             param_name=self.param_name,
+            options=','.join('"{0}"'.format(option) for option in self.options),
             value=self.default_value)
 
     def get_private_entries(self):
@@ -192,10 +197,8 @@ class Config(object):
                                                   for parameter in self.parameters)
 
         # parameter list initialization
-        parameter_list_parameter_entries = ',\n'.join(parameter.param_variable_name
-                                                      for parameter in self.parameters)
-        parameter_list_config_entries = ',\n'.join(config.config_variable_name
-                                                   for config in self.configs)
+        parameter_list_entries = [parameter.param_variable_name for parameter in self.parameters]
+        parameter_list_entries += [config.config_variable_name for config in self.configs]
 
         # public section of the config class is where all the accessors reside
         # for each param and nested config
@@ -213,8 +216,7 @@ class Config(object):
         return constants.CONFIG_CLASS.format(
             config_name=self.config_name,
             constructor_entries=constructor_config_entires + constructor_parameter_entries,
-            parameter_list_entries=parameter_list_config_entries +
-            parameter_list_parameter_entries,
+            parameter_list_entries=',\n'.join(parameter_list_entries),
             public_entries=public_parameter_entries + public_config_entries,
             private_entries=private_parameter_entries + private_config_entries)
 
@@ -295,7 +297,7 @@ if __name__ == '__main__':
     # get config
     config = load_configuration(sys.argv[1:-1])
 
-    ThunderbotsConfig = Config('ThunderbotsConfig', config)
+    ThunderbotsConfig = Config('Thunderbots', config)
 
     for config in ThunderbotsConfig.all_configs:
         print(config)

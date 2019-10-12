@@ -27,7 +27,7 @@ DYNAMIC_PARMETERS_CPP = 'dynamic_parameters.cpp'
 PARAMETER_PUBLIC_ENTRY =\
         """const std::shared_ptr<const Parameter<{type}>> {immutable_accessor_name} () const
            {{
-               return std::const_pointer_cast<const Parameter<{type}>>(param_variable_name);
+               return std::const_pointer_cast<const Parameter<{type}>>({param_variable_name});
            }}
 
            std::shared_ptr<Parameter<{type}>> {mutable_accessor_name} () const
@@ -40,7 +40,8 @@ PARAMETER_PRIVATE_ENTRY =\
         "std::shared_ptr<Parameter<{type}>> {param_variable_name};"
 
 PARAMETER_CONSTRUCTOR_ENTRY =\
-        "{param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", \"ns\", {value});"
+        """std::vector<{type}>{param_variable_name}_options = std::vector<{type}>{{{options}}};
+        {param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", {quote}{value}{quote}, {param_variable_name}_options);"""
 
 #######################################################################
 #                               Config                                #
@@ -49,7 +50,7 @@ PARAMETER_CONSTRUCTOR_ENTRY =\
 CONFIG_PUBLIC_ENTRY =\
         """const std::shared_ptr<const {config_name}> {immutable_accessor_name} () const
            {{
-               return std::const_pointer_cast<const config_name>(config_variable_name);
+               return std::const_pointer_cast<const {config_name}>({config_variable_name});
            }}
 
            std::shared_ptr<const {config_name}> {mutable_accessor_name} () const
@@ -62,37 +63,37 @@ CONFIG_CONSTRUCTOR_ENTRY =\
         "{config_variable_name} = std::make_shared<{config_name}>();"
 
 CONFIG_PRIVATE_ENTRY =\
-        "std::shared_ptr<config_name> {config_variable_name};"
+        "std::shared_ptr<{config_name}> {config_variable_name};"
 
 CONFIG_CLASS =\
 """class {config_name} : public Config
 {{
    public:
-   {config_name}()
-   {{
-       {constructor_entries}
-       internal_param_list = {{{parameter_list_entries}}};
-   }}
-   {public_entries}
+    {config_name}()
+    {{
+        {constructor_entries}
+        internal_param_list = {{{parameter_list_entries}}};
+    }}
+    {public_entries}
 
-   std::string name()
-   {{
-       return "{config_name}";
-   }}
+    std::string name()
+    {{
+        return "{config_name}";
+    }}
 
-   ParameterList& getMutableParameterList()
-   {{
-       return internal_param_list;
-   }}
+    ParameterList& getMutableParameterList()
+    {{
+        return internal_param_list;
+    }}
 
-   const ParameterList& getParameterList()
-   {{
-       return internal_param_list;
-   }}
+    const ParameterList& getParameterList()
+    {{
+        return internal_param_list;
+    }}
 
    private:
-   ParameterList internal_parameter_list;
-   {private_entries}
+        ParameterList internal_param_list;
+        {private_entries}
 }};
 """
 
@@ -110,74 +111,5 @@ AUTOGEN_WARNING = \
 H_HEADER = \
 """{}
 #pragma once
-#include \"software/util/parameter/config.hpp\"
+#include \"software/util/parameter/config_utils.hpp\"
 """.format(AUTOGEN_WARNING)
-
-CPP_HEADER = \
-"""{}
-# include \"software/util/parameter/dynamic_parameters.h\"
-namespace Util::DynamicParameters{{
-""".format(AUTOGEN_WARNING)
-
-FOOTER = "}\n"
-
-CFG_STR_VECTOR = "std::vector<std::string> cfg_strs{{{}}};\n"
-
-RECONFIGURE_SERVER = \
-"""ros::NodeHandle {name}("/{name}");
-dynamic_reconfigure::Server<param_server::{name}Config> server({name});
-"""
-
-CPP_TYPE_MAP = {
-    "int": "int32_t",
-    "double": "double",
-    "string": "std::string",
-    "bool": "bool",
-}
-
-#################
-# CFG Contansts #
-#################
-
-CFG_NEW_NAMESPACE = '{namespace} = gen.add_group(\"{namespace}\")\n'
-CFG_SUB_NAMESPACE = '{sub_namespace} = {namespace}.add_group(\"{sub_namespace}\")\n'
-CFG_PARAMETER = '{namespace}.add(\"{name}\", {type}, 0, \"{description}\", {quote}{default}{quote}, {min_val}, {max_val}, edit_method={enum})\n'
-
-CFG_CONST = "{qualified_name} = gen.const(\"{qualified_name}\", {type}, {quote}{value}{quote}, \"\")\n"
-CFG_ENUM = "{qualified_name}_enum = gen.enum([{cfg_options}], \"Selector for {param_name}\")\n"
-
-CFG_HEADER = \
-"""#!/usr/bin/env python
-from dynamic_reconfigure.parameter_generator_catkin import *
-gen = ParameterGenerator()
-"""
-CFG_FOOTER = 'exit(gen.generate(\"param_server\", \"ps\", \"{}\"))'
-
-RANGE_TYPES = ["int", "double"]
-QUOTE_TYPES = ["string"]
-EXT = '.cfg'
-
-CFG_TYPE_MAP = {
-    "int": "int_t",
-    "double": "double_t",
-    "string": "str_t",
-    "bool": "bool_t",
-}
-
-##################
-# NODE Constants #
-##################
-
-NODE_HEADER = \
-"""{}
-#include <dynamic_reconfigure/server.h>
-#include <ros/ros.h>
-""".format(AUTOGEN_WARNING)
-
-INCLUDE_STATEMENT = "#include <thunderbots/{}Config.h>\n"
-INIT_NODE = "ros::init(argc, argv, \"dynamic_parameters\");\n"
-MAIN_FUNC = "int main(int argc, char** argv){{\n{}\n}};"
-SPIN_NODE = "ros::spin();"
-
-NEW_SERVER = """ros::NodeHandle nh_{name}(\"/{name}\");
-dynamic_reconfigure::Server<param_server::{name}Config> {name}(nh_{name});\n"""

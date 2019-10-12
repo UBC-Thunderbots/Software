@@ -30,7 +30,7 @@ cc_library(
 cc_library(
     name = "config",
     hdrs = ["config.hpp", "config_utils.hpp"],
-    deps = [],
+    deps = [":parameter"],
 )
 
 cc_test(

@@ -17,7 +17,7 @@ AI:
         Overrides the current play with the play
         specified by current_play parameter
   current_ai_play:
-    type: "string"
+    type: "std::string"
     default: "Example Play"
     options:
         - "Example Play"
@@ -42,7 +42,7 @@ AI:
           Overrides the current refbox play with the play
           specified by current_play parameter
     current_refbox_play:
-      type: "string"
+      type: "std::string"
       default: "Halt"
       description: >- 
           Specifies the refbox play that should be in use
