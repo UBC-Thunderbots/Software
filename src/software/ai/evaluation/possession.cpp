@@ -1,9 +1,9 @@
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/possession.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
-#include "software/ai/hl/stp/evaluation/robot.h"
-#include "software/ai/hl/stp/evaluation/team.h"
+#include "software/ai/evaluation/intercept.h"
+#include "software/ai/evaluation/robot.h"
+#include "software/ai/evaluation/team.h"
 #include "software/ai/world/ball.h"
 #include "software/ai/world/field.h"
 

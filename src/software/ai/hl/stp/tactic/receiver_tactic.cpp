@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/geom/util.h"
 
 using namespace Passing;
