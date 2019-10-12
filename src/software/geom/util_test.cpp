@@ -536,10 +536,6 @@ TEST(GeomUtilTest, test_vector_rect_intersect)
     Point pr3(1.0, ((std::rand() % 200) - 100) / 100.0);
     Point pr4(-1.0, ((std::rand() % 200) - 100) / 100.0);
     Point pb(((std::rand() % 200) - 100) / 100.0, ((std::rand() % 200) - 100) / 100.0);
-    Point pe1    = (pr1 - pb).norm() + pr1;
-    Point pe2    = (pr2 - pb).norm() + pr2;
-    Point pe3    = (pr3 - pb).norm() + pr3;
-    Point pe4    = (pr4 - pb).norm() + pr4;
     Point found1 = vectorRectIntersect(rect, pb, pr1);
     Point found2 = vectorRectIntersect(rect, pb, pr2);
     Point found3 = vectorRectIntersect(rect, pb, pr3);
