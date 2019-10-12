@@ -6,10 +6,10 @@
 
 #include "software/geom/point.h"
 #include "software/util/time/timestamp.h"
+#include "software/world/ball_state.h"
 
-class Ball final
-{
-   public:
+class Ball final {
+public:
     /**
      * Creates a new ball with the given position and velocity
      *
@@ -20,29 +20,32 @@ class Ball final
      * @param history_duration The number of previous ball states that should be stored.
      *
      */
-    explicit Ball(Point position, Vector velocity, const Timestamp& timestamp,
+    explicit Ball(Point position, Vector velocity, const Timestamp &timestamp,
                   unsigned int history_duration = 20);
 
+
     /**
-     * Updates the ball with new data, updating the current data as well as the predictive
-     * model
+     * Creates a new ball with the given BallState
      *
-     * @param new_position the new position of the ball, defined in metres
-     * @param new_velocity the new velocity of the ball, defined in metres per second
-     * @param timestamp The timestamp at which the ball was observed to be at the given
-     * position and velocity. The timestamp must be >= the ball's latest update timestamp
+     * @param ball_state the state of the ball
+     * @param history_duration the number of previous ball states that should be stored
      */
-    void updateState(const Point& new_position, const Vector& new_velocity,
-                     const Timestamp& timestamp);
+    explicit Ball(BallState &ball_state, unsigned int history_duration = 20);
+
+    /**
+     * Returns the last updated BallState of the ball
+     */
+    BallState currentState() const;
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
      * model
      *
-     * @throws std::invalid_argument if the ball is updated with a time from the past
-     * @param new_ball_data A ball containing new ball data
+     * @param new_state the new state of the ball
      */
-    void updateState(const Ball& new_ball_data);
+    void updateCurrentState(const BallState &new_state);
+
+    void updateCurrentState(const Point &new_position, const Vector &new_velocity, const Timestamp &timestamp);
 
     /**
      * Updates the ball's state to be its predicted state at the given timestamp.
@@ -52,7 +55,7 @@ class Ball final
      * @param timestamp The timestamp at which to update the ball's state to. Must
      * be >= the ball's last update timestamp
      */
-    void updateStateToPredictedState(const Timestamp& timestamp);
+    void updateStateToPredictedState(const Timestamp &timestamp);
 
     /**
      * Returns the timestamp for when this ball's data was last updated
@@ -62,11 +65,27 @@ class Ball final
     Timestamp lastUpdateTimestamp() const;
 
     /**
+     * Gets the previous timestamps for each state stored in states_
+     *
+     * @return Vector containing the update timestamp history starting with the oldest
+     * available data at index 0
+     */
+    std::vector<Timestamp> getPreviousTimestamps() const;
+
+    /**
      * Returns the current position of the ball
      *
      * @return the current position of the ball
      */
     Point position() const;
+
+    /**
+     * Gets the previous positions for each state stored in states_
+     *
+     * @return Vector containing the position history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Point> getPreviousPositions() const;
 
     /**
      * Returns the estimated position of the ball at a future time, relative to when the
@@ -82,7 +101,7 @@ class Ball final
      * @return the estimated position of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
-    Point estimatePositionAtFutureTime(const Duration& duration_in_future) const;
+    Point estimatePositionAtFutureTime(const Duration &duration_in_future) const;
 
     /**
      * Returns the current velocity of the ball
@@ -90,6 +109,14 @@ class Ball final
      * @return the current velocity of the ball
      */
     Vector velocity() const;
+
+    /**
+     * Gets the previous velocities for each state stored in states_
+     *
+     * @return Vector containing the velocity history starting with the oldest available
+     * data at index 0
+     */
+    std::vector<Vector> getPreviousVelocities() const;
 
     /**
      * Returns the estimated velocity of the ball at a future time, relative to when the
@@ -105,42 +132,15 @@ class Ball final
      * @return the estimated velocity of the ball at the given number of milliseconds
      * in the future. Coordinates are in metres.
      */
-    Vector estimateVelocityAtFutureTime(const Duration& duration_in_future) const;
+    Vector estimateVelocityAtFutureTime(const Duration &duration_in_future) const;
 
     /**
-     * Gets the buffer which holds all the previous position states of the ball
+     * Gets the previous states stores in states_
      *
-     * @return Vector containing the position history starting with the oldest available
+     * @return Vector containing the state history starting with the oldest available
      * data at index 0
      */
-    std::vector<Point> getPreviousPositions() const;
-
-    /**
-     * Gets the buffer which holds all the previous velocity states of the ball
-     *
-     * @return Vector containing the velocity history starting with the oldest available
-     * data at index 0
-     */
-    std::vector<Vector> getPreviousVelocities() const;
-
-    /**
-     * Gets the buffer which holds all the timestamps of the previous states
-     *
-     * @return Vector containing the update timestamp history starting with the oldest
-     * available data at index 0
-     */
-    std::vector<Timestamp> getPreviousTimestamps() const;
-
-    /**
-     * Adds a state to the front of the circular buffers storing the state of histories of
-     * the ball
-     *
-     * @param position Position of ball
-     * @param velocity Velocity of ball
-     * @param timestamp Time that ball   was in this state
-     */
-    void addStateToBallHistory(const Point& position, const Vector& velocity,
-                               const Timestamp& timestamp);
+    std::vector<BallState> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -150,7 +150,7 @@ class Ball final
      * @return Index of the ball's update timestamp closest to the desired time or a
      * std::nullopt if there is not matching timestamp.
      */
-    std::optional<int> getHistoryIndexFromTimestamp(Timestamp& timestamp) const;
+    std::optional<int> getHistoryIndexFromTimestamp(Timestamp &timestamp) const;
 
     /**
      * Defines the equality operator for a Ball. Balls are equal if their positions and
@@ -159,7 +159,7 @@ class Ball final
      * @param other The Ball to compare against for equality
      * @return True if the other ball is equal to this ball, and false otherwise
      */
-    bool operator==(const Ball& other) const;
+    bool operator==(const Ball &other) const;
 
     /**
      * Defines the inequality operator for a Ball.
@@ -167,16 +167,9 @@ class Ball final
      * @param other The ball to compare against for inequality
      * @return True if the other ball is not equal to this ball, and false otherwise
      */
-    bool operator!=(const Ball& other) const;
+    bool operator!=(const Ball &other) const;
 
-   private:
-    // All previous positions of the ball, with the most recent position at the front of
-    // the queue, coordinates in meters
-    boost::circular_buffer<Point> positions_;
-    // All previous velocities of the ball, with the most recent velocity at the front of
-    // the queue, coordinates in meters
-    boost::circular_buffer<Vector> velocities_;
-    // All previous timestamps of when the ball was updated , with the most recent
-    // timestamp at the front of the queue, coordinates in meters
-    boost::circular_buffer<Timestamp> last_update_timestamps;
+private:
+    // All previous states of the ball, with the most recent position at the front of the queue
+    boost::circular_buffer<BallState> states_;
 };

@@ -33,7 +33,7 @@ bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
     }
 
     // The actual vector to the ball from the center of the robot
-    Vector robot_center_to_ball = ball.getPreviousPositions()[ball_index] -
+    Vector robot_center_to_ball = ball.getPreviousStates()[ball_index].position() -
                                   robot.getPreviousPositions()[robot_index];
 
     // Calculate the ideal vector from the robot to the ball for the robot to have

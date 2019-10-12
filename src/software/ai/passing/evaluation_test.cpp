@@ -428,7 +428,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_at_past_time)
     // current time by the evaluation function
     // Here we are updating the Ball Timestamp to indirectly update the World Timestamp
     // (as World cannot have it's Timestamp updated independently of its members)
-    world.updateBallState(Ball({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
+    world.updateBallState(BallState({0, 0}, {0, 0}, Timestamp::fromSeconds(5)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(2));
 
@@ -454,7 +454,7 @@ TEST_F(PassingEvaluationTest, ratePass_pass_too_far_in_future)
     // Here we are updating the Ball Timestamp to indirectly update the World Timestamp
     // (as World cannot have it's Timestamp updated independently of its members)git sfsd
     world.updateBallState(
-        Ball({0, 0}, {0, 0},
+        BallState({0, 0}, {0, 0},
              Timestamp::fromSeconds(max_time_offset_for_pass_seconds_param + 20)));
 
     Pass pass({3, 0}, {2, 0}, avg_desired_pass_speed, Timestamp::fromSeconds(20000000));

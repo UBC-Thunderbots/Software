@@ -3,11 +3,12 @@
 #include <boost/circular_buffer.hpp>
 #include <optional>
 
+#include "software/world/ball.h"
+#include "software/world/ball_state.h"
+#include "software/world/field.h"
 #include "software/geom/line.h"
 #include "software/geom/point.h"
 #include "software/util/time/timestamp.h"
-#include "software/world/ball.h"
-#include "software/world/field.h"
 
 /**
  * A lightweight datatype used to input new data into the filter.
@@ -149,7 +150,7 @@ class BallFilter
      * @return The filtered current state of the ball. If a filtered result cannot be
      * calculated, returns std::nullopt
      */
-    std::optional<Ball> estimateBallState(
+    std::optional<BallState> estimateBallState(
         boost::circular_buffer<SSLBallDetection> ball_detections);
 
    private:

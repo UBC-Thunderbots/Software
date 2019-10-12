@@ -165,8 +165,8 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
 
         if (!camera_disabled)
         {
-            Ball ball = network_filter.getFilteredBallData({detection});
-            world.updateBallState(ball);
+            BallState ball_state = network_filter.getFilteredBallData({detection});
+            world.updateBallState(ball_state);
 
             Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
             int friendly_goalie_id =
