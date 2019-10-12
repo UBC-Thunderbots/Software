@@ -20,7 +20,11 @@ build --remote_upload_local_results=false
 build --incompatible_remove_legacy_whole_archive=False
 
 # Every warning is treated as an error
-build --cxxopt=-Werror
+#build --cxxopt=-Werror
+build --cxxopt="-Wno-error=invalid-constexpr"
 
 # We want bazel to output the results of our gtests
 test --test_output=all
+
+# Use Our Custom Toolchain
+build --crosstool_top=//tools/cc_toolchain:toolchain
