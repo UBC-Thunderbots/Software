@@ -1,24 +1,23 @@
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+        name = "yaml_config_descriptions",
+        srcs = glob(["config/*.yaml",]),
+)
+
 genrule(
-    name = "dynamic_parameters_cc_generate",
+    name = "config_cc_generate",
     srcs = [
-        "generate_parameters.py",
+        "generate_parameters_v2.py",
         "constants.py",
-        "config/ai.yaml",
-        "config/ai_control.yaml",
-        "config/enemy_team_capability.yaml",
-        "config/particle_filter.yaml",
-        "config/vision_and_filters.yaml",
-        "config/xbox_controller.yaml",
+        "//software/util/parameter:yaml_config_descriptions",
     ],
     outs = [
-        # NOTE: the order of these matters, since we give them as command line
-        #       arguments to the generation file
-        "dynamic_parameters.h",
-        "dynamic_parameters.cpp",
+        "config.hpp",
     ],
-    cmd = "python3 software/util/parameter/generate_parameters.py $(OUTS)",
+    cmd = "python3 software/util/parameter/generate_parameters_v2.py \
+           $(locations //software/util/parameter:yaml_config_descriptions) \
+           $(OUTS)",
     visibility = ["//visibility:private"],
 )
 
@@ -30,7 +29,7 @@ cc_library(
 
 cc_library(
     name = "config",
-    hdrs = ["config.hpp"],
+    hdrs = ["config.hpp", "config_utils.hpp"],
     deps = [],
 )
 
