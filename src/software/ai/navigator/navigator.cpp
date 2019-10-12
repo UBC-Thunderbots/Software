@@ -6,6 +6,8 @@
 #include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 
+// overloaded is used for the visiting PathType
+// Adapted from https://en.cppreference.com/w/cpp/utility/variant/visit
 template <class... Ts>
 struct overloaded : Ts...
 {
