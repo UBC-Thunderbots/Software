@@ -30,9 +30,9 @@ class PathPlanner
      *
      * @return a path between start and dest
      * 		if no valid path then return an empty vector
-     * 		if spline navigator then return a std::vector of Curve
-     * 		if point navigator then return a std::vector of points
-     * 		    * this vector must include the start point and end point
+     * 		if valid path then return either
+     * 		a vector of points or a vector of curves
+     * 		    * The vector of points must include the start point and end point
      */
     virtual PathType findPath(const Point &start, const Point &dest, const Field &field,
                               const std::vector<Obstacle> &obstacles) = 0;
