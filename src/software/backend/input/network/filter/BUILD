@@ -5,10 +5,10 @@ cc_library(
     srcs = ["ball_filter.cpp"],
     hdrs = ["ball_filter.h"],
     deps = [
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
         "//software/geom",
         "//software/util/math:math_functions",
+        "//software/world:ball",
+        "//software/world:field",
         "@eigen",
     ],
 )
@@ -28,7 +28,7 @@ cc_library(
     srcs = ["robot_filter.cpp"],
     hdrs = ["robot_filter.h"],
     deps = [
-        "//software/ai/world:robot",
+        "//software/world:robot",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_library(
     hdrs = ["robot_team_filter.h"],
     deps = [
         ":robot_filter",
-        "//software/ai/world:team",
         "//software/util:constants",
+        "//software/world:team",
     ],
 )

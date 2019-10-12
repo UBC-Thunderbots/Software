@@ -1,11 +1,11 @@
 #include "software/backend/input/network/networking/network_filter.h"
 
 #include "shared/constants.h"
-#include "software/ai/world/refbox_constants.h"
 #include "software/proto/messages_robocup_ssl_detection.pb.h"
 #include "software/proto/messages_robocup_ssl_geometry.pb.h"
 #include "software/util/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/refbox_constants.h"
 
 // We can initialize the field_state with all zeroes here because this state will never
 // be accessed by an external observer to this class. the getFieldData must be called to
@@ -42,7 +42,7 @@ Field NetworkFilter::createFieldFromPacketGeometry(
 {
     // We can't guarantee the order that any geometry elements are passed to us in, so
     // We map the name of each line/arc to the actual object so we can refer to them
-    // consistantly
+    // consistently
     std::map<std::string, SSL_FieldCicularArc> ssl_circular_arcs;
     std::map<std::string, SSL_FieldLineSegment> ssl_field_lines;
 

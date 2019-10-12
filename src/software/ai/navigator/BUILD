@@ -6,6 +6,6 @@ cc_library(
     deps = [
         "//software/ai/intent",
         "//software/ai/primitive",
-        "//software/ai/world",
+        "//software/world",
     ],
 )

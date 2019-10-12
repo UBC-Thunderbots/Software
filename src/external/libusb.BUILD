@@ -3,25 +3,10 @@
 
 cc_library(
     name = "libusb",
-    srcs = glob([
-        "libusb/*.c",
-        "libusb/os/linux_*.c",
-        "libusb/os/*_posix.c",
-    ]),
-    hdrs = glob([
-        "libusb/*.h",
-        "libusb/os/linux_*.h",
-        "libusb/os/*_posix.h",
-        "Xcode/config.h",
-    ]),
-    includes = [
-        ".",
-        "Xcode",
-        "libusb",
-        "libusb/os",
-    ],
-    deps = [
-        "@libudev",
-    ],
+    srcs = glob(["usr/lib/libusb*.so", # Arch Linux
+                 "usr/lib/x86_64-linux-gnu/libusb*.so", # Ubuntu
+                ]),
+    hdrs = glob(["usr/include/libusb-1.0/*"]),
+    includes = ["usr/include/libusb-1.0"],
     visibility = ["//visibility:public"],
 )

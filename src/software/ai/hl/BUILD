@@ -6,6 +6,6 @@ cc_library(
     deps = [
         "//software/ai/hl/stp:play_info",
         "//software/ai/intent",
-        "//software/ai/world",
+        "//software/world",
     ],
 )

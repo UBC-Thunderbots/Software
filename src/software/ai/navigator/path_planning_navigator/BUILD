@@ -15,8 +15,8 @@ cc_library(
         "//software/ai/navigator/path_planning_navigator/path_planner:straight_line_path_planner",
         "//software/ai/navigator/path_planning_navigator/path_planner:theta_star_path_planner",
         "//software/ai/primitive:all_primitives",
-        "//software/ai/world",
         "//software/util/parameter:dynamic_parameters",
+        "//software/world",
     ],
 )
 

@@ -4,6 +4,7 @@
 
 #include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
@@ -31,7 +32,7 @@ void ShadowFreekickerTactic::updateParams(Team enemy_team, Ball ball)
 double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
@@ -79,4 +80,9 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
             0, false));
     } while (true);
+}
+
+void ShadowFreekickerTactic::accept(TacticVisitor &visitor) const
+{
+    visitor.visit(*this);
 }

@@ -10,6 +10,7 @@
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
 
@@ -39,7 +40,7 @@ double PenaltyKickTactic::calculateRobotCost(const Robot& robot, const World& wo
     // We normalize with the total field length so that robots that are within the field
     // have a cost less than 1
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 
@@ -187,4 +188,9 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (
         !(kick_action.done() ||
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
+}
+
+void PenaltyKickTactic::accept(TacticVisitor& visitor) const
+{
+    visitor.visit(*this);
 }
