@@ -76,7 +76,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Symlink qt include directory
-ln -sf /usr/include/x86_64-linux-gnu/qt5 ../src/external/qt
+ln -snf /usr/include/x86_64-linux-gnu/qt5 $GIT_ROOT/src/external/qt
 
 # Done
 echo "================================================================"

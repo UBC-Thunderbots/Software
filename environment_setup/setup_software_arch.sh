@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-# UBC Thunderbots Archlinux Software Setup
+# UBC Thunderbots Arch Linux Software Setup
 #
 # This script must be run with sudo! root permissions are required to install
 # packages and copy files to the /etc/udev/rules.d directory. The reason that the script
@@ -34,11 +34,10 @@ sudo pacman -Sy
 host_software_packages=(
     curl
     cmake
-    protobuf-compiler
-    libprotobuf-dev
+    protobuf
     libusb
-    qt5 # The GUI library for our visualizer
-    libeigen3-dev # A math / numerical library used for things like linear regression
+    qt5-base # The GUI library for our visualizer
+    eigen # A math / numerical library used for things like linear regression
     python-yaml # yaml for cfg generation (Dynamic Parameters)
 )
 sudo pacman -S ${host_software_packages[@]} --noconfirm
@@ -50,30 +49,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Install Bazel
-echo "================================================================" 
-echo "Installing Bazel"
-echo "================================================================"
-
-# Adapted from https://docs.bazel.build/versions/master/install-ubuntu.html#install-on-ubuntu
-sudo apt-get update
-sudo apt-get install openjdk-11-jdk -y
-echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install bazel -y
-if [ $? -ne 0 ]; then
-    echo "##############################################################"
-    echo "Error: Installing Bazel failed"
-    echo "##############################################################"
-    exit 1
-fi
-
 # Symlink qt include directory
-ln -sf /usr/include/x86_64-linux-gnu/qt5 ../src/external/qt
+ln -snf /usr/include/qt $GIT_ROOT/src/external/qt
 
 # Done
 echo "================================================================"
 echo "Done Software Setup"
 echo "================================================================"
-
