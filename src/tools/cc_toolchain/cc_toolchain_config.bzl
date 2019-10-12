@@ -371,7 +371,7 @@ def _make_common_features(ctx):
 
     return result
 
-def _impl(ctx):
+def _clang_impl(ctx):
     host_system_name = "k8"
 
     action_configs = []
@@ -581,7 +581,7 @@ def _impl(ctx):
     ]
 
 cc_toolchain_config = rule(
-    implementation = _impl,
+    implementation = _clang_impl,
     attrs = {
         "cpu": attr.string(mandatory = True, values = ["k8"]),
         "builtin_include_directories": attr.string_list(),

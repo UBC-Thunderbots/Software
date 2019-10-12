@@ -22,10 +22,15 @@ cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         "k8": "cc_toolchain_linux",
-        "stm32g4": "cc_toolchain_stm32g4",
-        "stm32f4": "cc_toolchain_stm32f4",
+        "k8|compiler": "cc_toolchain_linux",
         "stm32f0": "cc_toolchain_stm32f0",
+        "stm32f0|compiler": "cc_toolchain_stm32f0",
+        "stm32f4": "cc_toolchain_stm32f4",
+        "stm32f4|compiler": "cc_toolchain_stm32f4",
+        "stm32g4": "cc_toolchain_stm32g4",
+        "stm32g4|compiler": "cc_toolchain_stm32g4",
         "stm32h7": "cc_toolchain_stm32h7",
+        "stm32h7|compiler": "cc_toolchain_stm32h7",
     },
 )
 

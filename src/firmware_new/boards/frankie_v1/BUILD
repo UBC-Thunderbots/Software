@@ -5,23 +5,15 @@ load("//firmware_new:rules.bzl", "cc_stm32h7_binary", "cc_stm32h7_hal_library")
 # TODO: probably want a custom rule, or at least a macro for this
 cc_stm32h7_binary(
     name = "frankie_v1_main",
-    srcs = [
-        "freertos.c",
-        "main.c",
-        "stm32h7xx_hal_msp.c",
-        "stm32h7xx_it.c",
-        "system_stm32h7xx.c",
-    ],
-    hdrs = [
-        "main.h",
-        "stm32h7xx_it.h",
-    ],
+    srcs = glob(["*.c"]),
+    hdrs = glob(["*.h"]),
     linker_script = "STM32H742XGHx_FLASH.ld",
     processor = "STM32H743xx",
     deps = [
         ":devices_vector_table",
         ":frankie_v1_hal",
     ],
+    # TODO: we need to be able to give a `.ioc` file here and check for generation
 )
 
 cc_library(
@@ -46,6 +38,8 @@ cc_stm32h7_hal_library(
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_cortex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma_ex.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_exti.h",
         "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_flash.h",

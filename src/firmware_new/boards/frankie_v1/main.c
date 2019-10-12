@@ -9,10 +9,10 @@
   * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -45,6 +45,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 osThreadId_t defaultTaskHandle;
+osThreadId_t myTask02Handle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -52,6 +53,7 @@ osThreadId_t defaultTaskHandle;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void StartDefaultTask(void *argument);
+void StartTask02(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -117,9 +119,17 @@ int main(void)
   const osThreadAttr_t defaultTask_attributes = {
     .name = "defaultTask",
     .priority = (osPriority_t) osPriorityNormal,
-    .stack_size = 128
+    .stack_size = 1024
   };
   defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+
+  /* definition and creation of myTask02 */
+  const osThreadAttr_t myTask02_attributes = {
+    .name = "myTask02",
+    .priority = (osPriority_t) osPriorityLow,
+    .stack_size = 1024
+  };
+  myTask02Handle = osThreadNew(StartTask02, NULL, &myTask02_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -203,6 +213,7 @@ void StartDefaultTask(void *argument)
     
     
     
+    
 
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
@@ -211,6 +222,45 @@ void StartDefaultTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END 5 */ 
+}
+
+/* USER CODE BEGIN Header_StartTask02 */
+/**
+* @brief Function implementing the myTask02 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask02 */
+void StartTask02(void *argument)
+{
+  /* USER CODE BEGIN StartTask02 */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartTask02 */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
 }
 
 /**
