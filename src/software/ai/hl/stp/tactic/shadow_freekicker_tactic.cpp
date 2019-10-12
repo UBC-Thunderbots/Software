@@ -10,11 +10,11 @@
 ShadowFreekickerTactic::ShadowFreekickerTactic(FreekickShadower free_kick_shadower,
                                                Team enemy_team, Ball ball, Field field,
                                                bool loop_forever)
-    : free_kick_shadower(free_kick_shadower),
+    : Tactic(loop_forever),
+      free_kick_shadower(free_kick_shadower),
       enemy_team(enemy_team),
       ball(ball),
-      field(field),
-      Tactic(loop_forever)
+      field(field)
 {
 }
 
@@ -23,7 +23,7 @@ std::string ShadowFreekickerTactic::getName() const
     return "Shadow Freekick Tactic";
 }
 
-void ShadowFreekickerTactic::updateParams(Team enemy_team, Ball ball)
+void ShadowFreekickerTactic::updateWorldParams(Team enemy_team, Ball ball)
 {
     this->enemy_team = enemy_team;
     this->ball       = ball;
@@ -32,7 +32,7 @@ void ShadowFreekickerTactic::updateParams(Team enemy_team, Ball ball)
 double ShadowFreekickerTactic::calculateRobotCost(const Robot &robot, const World &world)
 {
     double cost =
-        (robot.position() - world.ball().position()).len() / world.field().totalLength();
+        (robot.position() - world.ball().position()).len() / world.field().totalXLength();
     return std::clamp<double>(cost, 0, 1);
 }
 void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yield)

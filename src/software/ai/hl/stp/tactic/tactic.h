@@ -25,11 +25,13 @@ class TacticVisitor;
  *
  * HOW THIS CLASS IS USED:
  * Plays will construct and return the Tactics they want to be running. Every time a play
- * is run, it will update the parameters of each tactic with the updateParams(...)
- * function (see the concrete implementations of this class for examples). This is done
- * every time in order for the Tactics to have the most up to date information when they
- * calculate the next Intent they want to run (for example if we were following a moving
- * robot, we need to constantly update our destination).
+ * is run, it will update the parameters of each tactic with the updateWorldParams(...)
+ * and the updateControlParams(...) function (see the concrete implementations of this
+ * class for examples). The updateWorldParams(...) updates any parameters that are derived
+ * from the World independent of play, and the updateControlParams(...) updates all other
+ * parameters. This is done every time in order for the Tactics to have the most up to
+ * date information when they calculate the next Intent they want to run (for example if
+ * we were following a moving robot, we need to constantly update our destination).
  *
  * The calulateRobotCost() and getNextIntent() functions will be called after the params
  * are updated. Params must be updated first so that these functions can make the correct

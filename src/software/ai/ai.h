@@ -41,6 +41,6 @@ class AI final
     std::shared_ptr<Navigator> getNavigator() const;
 
    private:
-    std::unique_ptr<HL> high_level;
     std::shared_ptr<Navigator> navigator;
+    std::unique_ptr<HL> high_level;
 };

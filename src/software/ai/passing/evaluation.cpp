@@ -67,9 +67,6 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
 double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
                                    const Passing::Pass& pass)
 {
-    // TODO: You don't even use this first parameter, but stuff is hardcoded below
-    double ideal_shoot_angle_degrees =
-        Util::DynamicParameters::Passing::ideal_min_shoot_angle_degrees.value();
     double ideal_max_rotation_to_shoot_degrees =
         Util::DynamicParameters::Passing::ideal_max_rotation_to_shoot_degrees.value();
 
@@ -297,8 +294,8 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
             static_field_position_quality_friendly_goal_distance_weight.value();
 
     // Make a slightly smaller field, and positive weight values in this reduced field
-    double half_field_length = field.length() / 2;
-    double half_field_width  = field.width() / 2;
+    double half_field_length = field.xLength() / 2;
+    double half_field_width  = field.yLength() / 2;
     Rectangle reduced_size_field(
         Point(-half_field_length + x_offset, -half_field_width + y_offset),
         Point(half_field_length - x_offset, half_field_width - y_offset));
