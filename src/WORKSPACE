@@ -1,0 +1,77 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+
+http_archive(
+    name = "gtest",
+    sha256 = "927827c183d01734cc5cfef85e0ff3f5a92ffe6188e0d18e909c5efebf28a0c7",
+    strip_prefix = "googletest-release-1.8.1",
+    url = "https://github.com/google/googletest/archive/release-1.8.1.zip",
+)
+
+http_archive(
+    name = "g3log",
+    build_file = "@//external:g3log.BUILD",
+    sha256 = "1c141aa62c30985e8fd8c56bddbf2e32f080bf839a48f53c9593ecdebfb8a175",
+    strip_prefix = "g3log-1.3.2",
+    url = "https://github.com/KjellKod/g3log/archive/1.3.2.zip",
+)
+
+http_archive(
+    name = "rules_proto",
+    sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
+    strip_prefix = "rules_proto-97d8af4dc474595af3900dd85cb3a29ad28cc313",
+    url = "https://github.com/bazelbuild/rules_proto/archive/97d8af4dc474595af3900dd85cb3a29ad28cc313.tar.gz",
+)
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
+git_repository(
+    name = "com_github_nelhage_rules_boost",
+    remote = "https://github.com/nelhage/rules_boost",
+    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+
+boost_deps()
+
+http_archive(
+    name = "eigen",
+    build_file = "@//external:eigen.BUILD",
+    sha256 = "3a66f9bfce85aff39bc255d5a341f87336ec6f5911e8d816dd4a3fdc500f8acf",
+    strip_prefix = "eigen-eigen-c5e90d9e764e",
+    url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
+)
+
+new_local_repository(
+    name = "libusb",
+    build_file = "@//external:libusb.BUILD",
+    path = "/",
+)
+
+new_git_repository(
+    name = "munkres_cpp",
+    build_file = "@//external:munkres_cpp.BUILD",
+    commit = "61086fcf5b3a8ad4bda578cdc2d1dca57b548786",
+    remote = "https://github.com/saebyn/munkres-cpp.git",
+)
+
+# Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
+git_repository(
+    name = "bazel_rules_qt",
+    commit = "3f949bf4b5dcae2941ba3b71b3ddeb5d39637907",
+    remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
+)
+
+# Right now qt5 is installed on the system using the setup_software.sh script
+# We assume we can find the headers in the "standard" path used in this rule
+new_local_repository(
+    name = "qt",
+    build_file = "@bazel_rules_qt//:qt.BUILD",
+    path = "/usr/include/x86_64-linux-gnu/qt5/",
+)

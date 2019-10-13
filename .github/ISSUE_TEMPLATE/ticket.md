@@ -3,27 +3,7 @@ name: Task
 about: Defines an item of work for the project
 ---
 
-<!--
-    Make sure to complete the following before submitting this ticket
-    - Add the ticket to an epic
-    - Add an estimate of the work required for this task
-    - Add to a release
-    - Add relevant labels
-    - Add any relevant dependencies
-
-    NOTE: You will need to have the ZenHub Chrome or Firefox plugin
-    https://www.zenhub.com/extension
--->
-
 ### Description of the task
-
-<!--
-    Define the task in one sentence
-    If you cannot write the task in a sentence, perhaps the task is too large
-    and you should divide it down further
--->
-
-### Outline the task in more detail
 
 <!--
     What does this work depend on?
@@ -50,3 +30,12 @@ about: Defines an item of work for the project
 - [ ] Item A
 - [ ] Item B
 - [ ] Item C
+
+### Blocked By
+
+<!--
+    List all other issues that need to be completed before this one, ex:
+    - #123
+    - #374
+-->
+
