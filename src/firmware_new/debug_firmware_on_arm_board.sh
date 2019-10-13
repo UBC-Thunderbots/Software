@@ -4,8 +4,9 @@ CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 THIS_SCRIPT_FILENAME=`basename "$0"`
 
 # We require exactly one argument, the path to the `.elf`
-if [$# -ne 2]; then
-    echo "Usage: ./$THIS_SCRIPT_FILENAME /path/to/something.elf /path/to/some_openocd_config.cfg"
+if [ $# -ne 2 ]; then
+    echo "Error: Incorrect number of arguments to script"
+    echo "Usage: $THIS_SCRIPT_FILENAME /path/to/something.elf /path/to/some_openocd_config.cfg"
     exit 1
 fi
 
