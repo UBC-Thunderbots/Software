@@ -20,7 +20,7 @@ class ExamplePlay : public Play
 
     /**
      * This function returns whether the play is applicable
-     * Applicable describes the conditions for the play should start
+     * Applicable describes the conditions that must be met for the play to start
      * For instance, the play should start when it is kick-off
      * @param world The state of the world with which to perform the evaluation
      * @return If ExamplePlay is applicable
@@ -29,7 +29,7 @@ class ExamplePlay : public Play
 
     /**
      * This function returns whether the play's invariant holds
-     * Invariant describes the conditions for the play to keep running
+     * Invariant describes the conditions that must be met for the play to continue running
      * For instance, the invariant may not hold if we lose possession of the ball
      * @param world The state of the world with which to perform the evaluation
      * @return If ExamplePlay's invariant holds
