@@ -12,7 +12,9 @@ std::string ExamplePlay::getName() const
 
 bool ExamplePlay::isApplicable(const World &world) const
 {
-    return true;
+    // This play is never applicable so it will never be chosen during gameplay
+    // This play can be run for testing by using the Play override
+    return false;
 }
 
 bool ExamplePlay::invariantHolds(const World &world) const
