@@ -101,6 +101,19 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot)
     EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
 }
 
+TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot_at_future_timestamp)
+{
+    Point ball_position  = Point(0.07, 0);
+    Vector ball_velocity = Vector(0, 0);
+    Timestamp timestamp  = Timestamp::fromSeconds(1);
+    Ball ball            = Ball(ball_position, ball_velocity, timestamp);
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        timestamp);
+
+    EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
+}
+
 TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
 {
     Point ball_position  = Point(0.07, 0);
@@ -184,6 +197,19 @@ TEST(RobotEvaluationTest, pass_with_ball_direct_fast)
     Point ball_position  = Point(0.035, 0.06);
     Vector ball_velocity = Vector(5, 5);
     Timestamp timestamp  = Timestamp::fromSeconds(0);
+    Ball ball            = Ball(ball_position, ball_velocity, timestamp);
+
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+                        AngularVelocity::zero(), timestamp);
+
+    EXPECT_TRUE(Evaluation::robotBeingPassedTo(ball, robot));
+}
+
+TEST(RobotEvaluationTest, pass_with_ball_direct_fast_at_future_timestamp)
+{
+    Point ball_position  = Point(0.035, 0.06);
+    Vector ball_velocity = Vector(5, 5);
+    Timestamp timestamp  = Timestamp::fromSeconds(1);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
 
     Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
