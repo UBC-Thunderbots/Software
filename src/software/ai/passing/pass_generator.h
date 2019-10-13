@@ -51,7 +51,9 @@ namespace Passing
        public:
         // Delete the default constructor, we want to force users to choose what
         // pass quality they deem reasonable
-        PassGenerator() = delete;
+        PassGenerator() 
+            
+            = delete;
 
         // Delete the copy and assignment operators because this class really shouldn't
         // need them and we don't want to risk doing anything nasty with the internal
