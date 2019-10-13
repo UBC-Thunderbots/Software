@@ -16,22 +16,18 @@ class ThetaStarPathPlanner : public PathPlanner
 {
    public:
     /**
-     * Constructs a theta star path planner
-     * @param field field
-     * @param ball ball
-     * @param obstacles obstacles to avoid
-     */
-    explicit ThetaStarPathPlanner(Field field, const std::vector<Obstacle> &obstacles);
-
-    /**
      * Returns a path that is an optimized path between start and dest.
+     *
      * @param start start point
      * @param dest destination point
-     * @return a vector that is the optimal path avoiding obstacles
-     * 		if no valid path then return std::nullopt
+     * @param field field
+     * @param obstacles obstacles to avoid
+     *
+     * @return a vector of points that is the optimal path avoiding obstacles
+     * 		if no valid path then return empty vector
      */
-    std::optional<std::vector<Point>> findPath(const Point &start,
-                                               const Point &dest) override;
+    PathType findPath(const Point &start, const Point &dest, const Field &field,
+                      const std::vector<Obstacle> &obstacles) override;
 
    private:
     typedef std::pair<int, int> CellCoordinate;
@@ -209,8 +205,11 @@ class ThetaStarPathPlanner : public PathPlanner
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
-    Field field_;
     std::vector<Obstacle> obstacles_;
     int numRows;
     int numCols;
+    double fieldXLength;
+    double fieldYLength;
+    double fieldXHalfLength;
+    double fieldYHalfLength;
 };

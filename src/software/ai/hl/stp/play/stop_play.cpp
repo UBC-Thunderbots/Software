@@ -107,8 +107,11 @@ void StopPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // ball_defense_point_center is a point on the circle around the ball that the
         // line from the center of the goal to the ball intersects. A robot will be placed
         // on that line, and the other two will be on either side
+        // We add an extra robot radius as a buffer to be extra safe we don't break any
+        // rules by getting too close
         Point ball_defense_point_center =
-            world.ball().position() + 0.5 * goal_to_ball_unit_vector;
+            world.ball().position() +
+            (0.5 + 2 * ROBOT_MAX_RADIUS_METERS) * goal_to_ball_unit_vector;
         Point ball_defense_point_left =
             ball_defense_point_center -
             robot_positioning_unit_vector * 4 * ROBOT_MAX_RADIUS_METERS;
