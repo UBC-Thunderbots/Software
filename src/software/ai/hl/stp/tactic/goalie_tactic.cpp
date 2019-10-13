@@ -1,6 +1,7 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
@@ -162,11 +163,6 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // robot radius so as we move along the segment we don't try run into the goal
         // posts. This will be used in case3 as a fallback when we don't have an
         // intersection with the crease lines
-        Point p1                        = Point(field.friendlyGoalpostNeg().x(),
-                         field.friendlyGoalpostNeg().y() + ROBOT_MAX_RADIUS_METERS);
-        Point p2                        = Point(field.friendlyGoalpostPos().x(),
-                         field.friendlyGoalpostPos().y() - ROBOT_MAX_RADIUS_METERS);
-        Segment goalie_movement_segment = Segment(p1, p2);
 
         // compute intersection points from ball position and velocity
         Ray ball_ray = Ray(ball.position(), ball.velocity());
@@ -288,7 +284,7 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, goalie_final_speed, AUTOCHIP);
+                *robot, goalie_pos, goalie_orientation, goalie_final_speed, false, false, AUTOCHIP);
         }
         yield(std::move(next_intent));
     } while (!move_action.done());
