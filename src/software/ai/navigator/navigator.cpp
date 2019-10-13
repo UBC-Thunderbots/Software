@@ -17,7 +17,7 @@ template <class... Ts>
 overloaded(Ts...)->overloaded<Ts...>;
 
 Navigator::Navigator(std::unique_ptr<PathPlanner> path_planner)
-    : path_planner_(std::move(path_planner))
+    : path_planner(std::move(path_planner))
 {
 }
 
@@ -61,14 +61,15 @@ void Navigator::visit(const MoveIntent &move_intent)
 {
     std::vector<Point> path_points;
 
-    Point start =
-        this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
-    Point dest = move_intent.getDestination();
+    current_start =
+        world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
+    current_end = move_intent.getDestination();
 
     std::vector<Obstacle> obstacles =
-        createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
+        getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    auto path = path_planner_->findPath(start, dest, this->world.field(), obstacles);
+    auto path =
+        path_planner->findPath(current_start, current_end, world.field(), obstacles);
 
     std::visit(
         overloaded{
@@ -106,49 +107,45 @@ void Navigator::movePointNavigation(const MoveIntent &move_intent,
 {
     planned_paths.emplace_back(path_points);
 
-    switch (path_points.size())
+    if (path_points.size() == 0)
     {
-        case 0:
-        {
             LOG(WARNING) << "Path planner could not find a path";
             auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
             current_primitive = std::move(stop);
-        }
-        case 1:
-        {
-            throw std::runtime_error(
-                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or dest or some other point");
-        }
-        case 2:
-        {
-            current_destination = (path_points)[1];
-            auto move           = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(),
-                move_intent.getFinalSpeed() *
-                    getCloseToEnemyObstacleFactor((path_points)[1]),
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
-        }
-        default:
-        {
-            current_destination = (path_points)[1];
-            double segment_final_vel =
-                getCloseToEnemyObstacleFactor((path_points)[1]) *
-                calculateTransitionSpeedBetweenSegments(
-                    (path_points)[0], (path_points)[1], (path_points)[2],
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                        Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value());
+            current_destination = current_start;
+    }
+    else if (path_points.size() == 1)
+    {
+        throw std::runtime_error(
+            "Path only contains one point, which is invalid, since it's ambiguous if it's the start or end or some other point");
+    }
+    else
+    {
+        double desired_final_speed;
+        current_destination = path_points[1];
 
-            auto move = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), segment_final_vel,
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
+        if (path_points.size() == 2)
+        {
+            // we are going to destination
+            desired_final_speed = move_intent.getFinalSpeed();
         }
+        else
+        {
+            // we are going to some intermediate point so we transition smoothly
+            double transition_final_speed =
+                ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                Util::DynamicParameters::Navigator::transition_speed_factor.value();
+            desired_final_speed = calculateTransitionSpeedBetweenSegments(
+                path_points[0], path_points[1], path_points[2], transition_final_speed);
+        }
+
+        auto move = std::make_unique<MovePrimitive>(
+            move_intent.getRobotId(), path_points[1], move_intent.getFinalAngle(),
+            // slow down around enemy robots
+            desired_final_speed * getEnemyObstacleDistanceFactor(path_points[1]),
+            move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+            move_intent.getAutoKickType());
+        current_primitive = std::move(move);
     }
 }
 
@@ -159,7 +156,7 @@ void Navigator::moveCurveNavigation(const MoveIntent &move_intent,
     throw std::runtime_error("Support for curves is not implemented yet");
 }
 
-std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
+std::optional<Obstacle> Navigator::getObstacleFromAvoidArea(AvoidArea avoid_area)
 {
     Rectangle rectangle({0, 0}, {0, 0});
     switch (avoid_area)
@@ -237,7 +234,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
 {
     this->world              = world;
     this->current_robot      = std::nullopt;
-    this->velocity_obstacles = {};
+    this->current_velocity_obstacles = {};
     planned_paths.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
@@ -248,7 +245,7 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         {
             if (this->current_robot->velocity().len() > 0.3)
             {
-                this->velocity_obstacles.emplace_back(
+                this->current_velocity_obstacles.emplace_back(
                     Obstacle::createVelocityObstacleWithScalingParams(
                         this->current_robot->position(), this->current_destination,
                         this->current_robot->velocity().len(),
@@ -266,10 +263,10 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     return assigned_primitives;
 }
 
-std::vector<Obstacle> Navigator::createCurrentObstacles(
+std::vector<Obstacle> Navigator::getCurrentObstacles(
     const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id)
 {
-    std::vector<Obstacle> obstacles = velocity_obstacles;
+    std::vector<Obstacle> obstacles = current_velocity_obstacles;
 
     // Avoid obstacles specific to this MoveIntent
     for (auto area : avoid_areas)
@@ -289,7 +286,7 @@ std::vector<Obstacle> Navigator::createCurrentObstacles(
         }
         else
         {
-            auto obstacle_opt = obstacleFromAvoidArea(area);
+            auto obstacle_opt = getObstacleFromAvoidArea(area);
             if (obstacle_opt)
             {
                 obstacles.emplace_back(*obstacle_opt);
@@ -315,8 +312,9 @@ std::vector<Obstacle> Navigator::createCurrentObstacles(
     return obstacles;
 }
 
-double Navigator::getCloseToEnemyObstacleFactor(Point &p)
+double Navigator::getEnemyObstacleDistanceFactor(Point &p)
 {
+    // find min dist between p and any robot
     double closest_dist = DBL_MAX;
     for (auto &robot : world.enemyTeam().getAllRobots())
     {
@@ -332,15 +330,16 @@ double Navigator::getCloseToEnemyObstacleFactor(Point &p)
         }
     }
 
-    // linear mapping of 0 to 1 onto 0 to 2 and return 1 when closest_dist is greater than
+    // linear mapping of 0 to 1 onto 0 to robot max speed and return 1 when closest_dist
+    // is greater than
     // 2
-    if (closest_dist > 2)
+    if (closest_dist > ROBOT_MAX_SPEED_METERS_PER_SECOND)
     {
         return 1;
     }
     else
     {
-        return closest_dist / 2;
+        return closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND;
     }
 }
 

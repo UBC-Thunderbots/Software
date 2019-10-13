@@ -19,9 +19,22 @@ class Navigator : public IntentVisitor
    public:
     explicit Navigator(std::unique_ptr<PathPlanner> path_planner);
 
+    /**
+     * Get assigned primitives for given assigned intents
+     *
+     * @param world World to navigate around
+     * @assignedIntents intents to navigate into primitives
+     *
+     * @return vector of primitives for the given intents
+     */
     std::vector<std::unique_ptr<Primitive>> getAssignedPrimitives(
         const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents);
 
+    /**
+     * Get the planned paths for navigation
+     *
+     * @return planned paths
+     */
     std::vector<std::vector<Point>> getPlannedPaths();
 
     /**
@@ -95,16 +108,6 @@ class Navigator : public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
-    /**
-     * Create an obstacle for the given avoid area, with a buffer such that the edge
-     * of the robot does not protrude into the area
-     *
-     * @param avoid_area The area to convert into an obstacle
-     *
-     * @return A obstacle representing the given area
-     */
-    std::optional<Obstacle> obstacleFromAvoidArea(AvoidArea avoid_area);
-
     // This navigators knowledge / state of the world
     World world;
 
@@ -120,9 +123,33 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     Point current_destination;
 
-    std::vector<Obstacle> velocity_obstacles;
+    /**
+     * These are velocity obstacles that are built up
+     * as we plan paths for each of the intents
+     *
+     * By adding an obstacle in front of friendly robots
+     * to show the intended path, the next robot can plan around that
+     */
+    std::vector<Obstacle> current_velocity_obstacles;
 
+    // This is used by the visualizer to see the planned paths
     std::vector<std::vector<Point>> planned_paths;
+
+    // Path planner used to navigate movement
+    std::unique_ptr<PathPlanner> path_planner;
+
+    // Start and end points of the current intent being navigated
+    Point current_start, current_end;
+
+    /**
+     * Create an obstacle for the given avoid area, with a buffer such that the edge
+     * of the robot does not protrude into the area
+     *
+     * @param avoid_area The area to convert into an obstacle
+     *
+     * @return A obstacle representing the given area
+     */
+    std::optional<Obstacle> getObstacleFromAvoidArea(AvoidArea avoid_area);
 
     /**
      * Creates a list of obstacles to avoid based on avoid areas,
@@ -133,8 +160,8 @@ class Navigator : public IntentVisitor
      *
      * @returns list of obstacles
      */
-    std::vector<Obstacle> createCurrentObstacles(
-        const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id);
+    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas,
+                                              unsigned int robot_id);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -146,7 +173,7 @@ class Navigator : public IntentVisitor
      *
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
-    double getCloseToEnemyObstacleFactor(Point &p);
+    double getEnemyObstacleDistanceFactor(Point &p);
 
     /**
      * Set the current_primitive based on the intent and path_points
@@ -165,10 +192,8 @@ class Navigator : public IntentVisitor
      * @param move_intent MoveIntent to navigate with
      * @param path_curves path of curves to navigate
      *
-     * @modifies current_primitive, planned_paths
+     * @modifies current_primitive, planned_paths, current_destination
      */
     void moveCurveNavigation(const MoveIntent &move_intent,
                              std::vector<Curve> &path_curves);
-
-    std::unique_ptr<PathPlanner> path_planner_;
 };
