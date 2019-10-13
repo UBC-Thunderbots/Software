@@ -22,11 +22,14 @@ AIDrawFunction drawNavigator(std::shared_ptr<Navigator> navigator)
 
         for (const auto& path : planned_paths)
         {
-            for (unsigned i = 0; i < path.size() - 1; i++)
+            if (path.size())
             {
-                Segment path_segment(path[i], path[i + 1]);
-                QLineF line = createQLineF(path_segment);
-                scene->addLine(line, pen);
+                for (unsigned i = 0; i < path.size() - 1; i++)
+                {
+                    Segment path_segment(path[i], path[i + 1]);
+                    QLineF line = createQLineF(path_segment);
+                    scene->addLine(line, pen);
+                }
             }
         }
     };

@@ -113,11 +113,13 @@ void Navigator::movePointNavigation(const MoveIntent &move_intent,
             LOG(WARNING) << "Path planner could not find a path";
             auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
             current_primitive = std::move(stop);
+            break;
         }
         case 1:
         {
             throw std::runtime_error(
                 "Path only contains one point, which is invalid, since it's ambiguous if it's the start or dest or some other point");
+            break;
         }
         case 2:
         {
@@ -130,6 +132,7 @@ void Navigator::movePointNavigation(const MoveIntent &move_intent,
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
+            break;
         }
         default:
         {
@@ -148,6 +151,7 @@ void Navigator::movePointNavigation(const MoveIntent &move_intent,
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
+            break;
         }
     }
 }
