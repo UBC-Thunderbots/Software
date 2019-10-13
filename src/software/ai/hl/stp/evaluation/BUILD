@@ -213,8 +213,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
-        "//software/world:ball",
-        "//software/world:robot",
+        "//software/world",
     ],
 )
 
