@@ -127,7 +127,7 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
     wall_body_def.type = b2_staticBody;
     wall_body_def.position.Set(1.5, 0.0);
     wall_body_def.angle = 0.0;
-    b2Body* wall_body = world->CreateBody(&wall_body_def);
+    b2Body* wall_body   = world->CreateBody(&wall_body_def);
 
     b2PolygonShape wall_shape;
     wall_shape.SetAsBox(1, 1);
@@ -136,7 +136,7 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
     wall_fixture_def.shape = &wall_shape;
     // Perfectly elastic collisions and no friction
     wall_fixture_def.restitution = 1.0;
-    wall_fixture_def.friction = 0.0;
+    wall_fixture_def.friction    = 0.0;
     wall_body->CreateFixture(&wall_fixture_def);
 
     Ball ball_parameter(Point(0, 0), Vector(0.5, 0), Timestamp::fromSeconds(0));
@@ -146,8 +146,9 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 120; i++)
     {
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position iterations but are generally
-        // the recommended defaults from https://www.iforce2d.net/b2dtut/worlds
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are generally the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
     }
 
@@ -168,7 +169,7 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
     wall_body_def.type = b2_staticBody;
     wall_body_def.position.Set(2.0, 0.5);
     wall_body_def.angle = M_PI_4;
-    b2Body* wall_body = world->CreateBody(&wall_body_def);
+    b2Body* wall_body   = world->CreateBody(&wall_body_def);
 
     b2PolygonShape wall_shape;
     wall_shape.SetAsBox(1, 1);
@@ -177,7 +178,7 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
     wall_fixture_def.shape = &wall_shape;
     // Perfectly elastic collisions and no friction
     wall_fixture_def.restitution = 1.0;
-    wall_fixture_def.friction = 0.0;
+    wall_fixture_def.friction    = 0.0;
     wall_body->CreateFixture(&wall_fixture_def);
 
     Ball ball_parameter(Point(0, 0), Vector(1.0, 0), Timestamp::fromSeconds(0));
@@ -187,8 +188,9 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 120; i++)
     {
-        // 5 and 8 here are somewhat arbitrary values for the velocity and position iterations but are generally
-        // the recommended defaults from https://www.iforce2d.net/b2dtut/worlds
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are generally the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
     }
 
