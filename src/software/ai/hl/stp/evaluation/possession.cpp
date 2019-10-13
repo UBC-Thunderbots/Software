@@ -1,6 +1,5 @@
 #include "software/ai/hl/stp/evaluation/possession.h"
 
-#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
@@ -62,7 +61,7 @@ namespace Evaluation
                 i < robot_history_timestamps.size() &&
                 robot.lastUpdateTimestamp() - robot_history_timestamps[i] <=
                     Duration::fromSeconds(Util::DynamicParameters::Evaluation::
-                                              Possession::possession_buffer_time.value()))
+                                              Possession::possession_buffer_time_seconds.value()))
             {
                 std::optional<bool> robot_has_possession =
                     robotHasPossession(world.ball(), robot, robot_history_timestamps[i]);
