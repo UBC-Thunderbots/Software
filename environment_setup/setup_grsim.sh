@@ -41,6 +41,15 @@ host_software_packages=(
 # Update the list of sources
 sudo apt-get update
 
+cd /tmp
+git clone https://github.com/jpfeltracco/vartypes.git
+cd vartypes
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+
 # Install the packages
 sudo apt-get install ${host_software_packages[@]} -y
 if [ $? -ne 0 ]; then
