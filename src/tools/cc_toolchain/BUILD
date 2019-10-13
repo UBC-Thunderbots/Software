@@ -19,6 +19,16 @@ package(default_visibility = ["//visibility:public"])
 load(":cc_toolchain_config.bzl", "cc_toolchain_config", "cc_toolchain_config_stm32")
 
 cc_toolchain_suite(
+    name = "toolchain1",
+    toolchains = {
+        "k8": "cc_toolchain_stm32h7",
+        "k8|compiler": "cc_toolchain_stm32h7",
+        "stm32h7": "cc_toolchain_stm32h7",
+        "stm32h7|compiler": "cc_toolchain_stm32h7",
+    },
+)
+
+cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
         "k8": "cc_toolchain_linux",

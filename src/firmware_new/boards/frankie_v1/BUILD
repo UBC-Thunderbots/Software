@@ -7,6 +7,7 @@ cc_stm32h7_binary(
     name = "frankie_v1_main",
     srcs = glob(["*.c"]),
     hdrs = glob(["*.h"]),
+    assembly = glob(["*.s"]),
     linker_script = "STM32H742XGHx_FLASH.ld",
     processor = "STM32H743xx",
     deps = [

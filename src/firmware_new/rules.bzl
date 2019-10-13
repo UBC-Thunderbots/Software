@@ -134,7 +134,8 @@ cc_stm32h7_hal_library = rule(
         "drivers_and_middleware_hdrs": attr.string_list(),
         "drivers_and_middleware_srcs": attr.string_list(),
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
-        "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
+        #        "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
+        "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:toolchain1"),
         # TODO: check if using this means we don't need to specify a cpu/toolchain on the command line
         # TODO: is this doing anything?
         "_compiler": attr.label(
@@ -156,12 +157,29 @@ def _cc_stm32h7_binary_impl(ctx):
         requested_features = ctx.features,
         unsupported_features = ctx.disabled_features,
     )
+
     compilation_contexts = []
     linking_contexts = []
     for dep in ctx.attr.deps:
         if CcInfo in dep:
             compilation_contexts.append(dep[CcInfo].compilation_context)
             linking_contexts.append(dep[CcInfo].linking_context)
+
+    # Manually compile assembly files
+    assembly_object_files = []
+    for assembly_file in ctx.files.assembly:
+        object_file = ctx.actions.declare_file("_objs/{}.o".format(assembly_file.basename))
+        ctx.actions.run_shell(
+            inputs = [assembly_file],
+            outputs = [object_file],
+            tools = cc_toolchain.all_files,
+            command = "{gcc_bin} -x assembler-with-cpp $< -o {obj_out} {assembly_file}".format(
+                gcc_bin = cc_toolchain.compiler_executable(),
+                obj_out = object_file.path,
+                assembly_file = assembly_file.path,
+            ),
+        )
+        assembly_object_files.append(object_file)
 
     (_compilation_context, compilation_outputs) = cc_common.compile(
         name = ctx.label.name,
@@ -192,6 +210,12 @@ def _cc_stm32h7_binary_impl(ctx):
         "-lnosys",
     ]
 
+    print(depset(_filter_none(assembly_object_files)))
+    print(depset(ctx.files.srcs))
+    print(compilation_outputs.objects)
+    test = cc_common.create_compilation_outputs(objects = depset(compilation_outputs.objects))
+    #assembly_compilation_outputs = cc_common.create_compilation_outputs(objects = depset(_filter_none(assembly_object_files)))
+
     linking_outputs = cc_common.link(
         name = "{}.elf".format(ctx.label.name),
         actions = ctx.actions,
@@ -215,10 +239,10 @@ def _cc_stm32h7_binary_impl(ctx):
         outputs = [bin_file],
         tools = cc_toolchain.all_files,
         command = "{objcopy} -O binary {elf_out} {cc_bin}".format(
-            objcopy=cc_toolchain.objcopy_executable(),
-            elf_out=elf_file.path,
-            cc_bin=bin_file.path,
-        )
+            objcopy = cc_toolchain.objcopy_executable(),
+            elf_out = elf_file.path,
+            cc_bin = bin_file.path,
+        ),
     )
 
     return [
@@ -231,7 +255,8 @@ cc_stm32h7_binary = rule(
     implementation = _cc_stm32h7_binary_impl,
     attrs = {
         "srcs": attr.label_list(allow_files = [".c"]),
-        # TODO: Should not allow headers here
+        "assembly": attr.label_list(allow_files = [".s"]),
+        # TODO: Should not allow headers here?
         "hdrs": attr.label_list(allow_files = [".h"]),
         "linker_script": attr.label(
             mandatory = True,
@@ -247,7 +272,7 @@ cc_stm32h7_binary = rule(
         ),
         "linkopts": attr.string_list(),
         "copts": attr.string_list(),
-        "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
+        "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:toolchain1"),
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
         # TODO: is this doing anything?
         "_compiler": attr.label(
