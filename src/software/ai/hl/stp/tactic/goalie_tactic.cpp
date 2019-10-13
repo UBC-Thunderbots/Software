@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
+#include "software/ai/hl/stp/action/stop_action.h"
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
@@ -103,7 +103,8 @@ std::optional<Point> GoalieTactic::restrainGoalieInRectangle(
     // Due to the nature of the line intersection, its important to make sure the
     // corners are included, if the goalies desired position intersects with width (see
     // above), use those positions
-    else if (width_x_goal && width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
+    else if (width_x_goal &&
+             width_x_goal->y() <= goalie_restricted_area.posXPosYCorner().y() &&
              width_x_goal->y() >= goalie_restricted_area.posXNegYCorner().y())
     {
         return std::make_optional<Point>(*width_x_goal);
@@ -284,7 +285,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, goalie_final_speed, false, false, AUTOCHIP);
+                *robot, goalie_pos, goalie_orientation, goalie_final_speed, false, false,
+                AUTOCHIP);
         }
         yield(std::move(next_intent));
     } while (!move_action.done());
