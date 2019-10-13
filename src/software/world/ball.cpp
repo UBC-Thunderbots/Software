@@ -23,7 +23,7 @@ BallState Ball::currentState() const
 
 void Ball::updateCurrentState(const BallState &new_state)
 {
-    if (new_state.timestamp() < lastUpdateTimestamp() && !states_.empty())
+    if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
         throw std::invalid_argument(
             "Error: State of ball is updating times from the past");

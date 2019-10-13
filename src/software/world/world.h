@@ -50,7 +50,7 @@ class World final
     /**
      * Updates the state of the ball in the world with the new ball data
      *
-     * @param new_ball_data A Ball containing new ball information
+     * @param new_ball_data A BallState containing new ball information
      */
     void updateBallState(const BallState& new_ball_state);
 

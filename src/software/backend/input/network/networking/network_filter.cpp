@@ -147,13 +147,11 @@ BallState NetworkFilter::getFilteredBallData(
         }
     }
 
-    std::optional<Ball> new_ball_state =
+    std::optional<Ball> new_ball =
         ball_filter.getFilteredData(ball_detections, field_state);
-    if (new_ball_state)
+    if (new_ball)
     {
-        Ball new_ball = *new_ball_state;
-        ball_state    = BallState(new_ball.position(), new_ball.velocity(),
-                               new_ball.lastUpdateTimestamp());
+        ball_state = (*new_ball).currentState();
     }
 
     return ball_state;

@@ -82,17 +82,17 @@ class NetworkFilter
     Field createFieldFromPacketGeometry(
         const SSL_GeometryFieldSize &packet_geometry) const;
 
-    BallFilter ball_filter;
-    RobotTeamFilter friendly_team_filter;
-    RobotTeamFilter enemy_team_filter;
-
     // Objects used to aggregate and store state. We use these to aggregate the state
     // so that we always publish "complete" data, not just data from a single frame/
     // part of the field
     Field field_state;
+    BallState ball_state;
     Team friendly_team_state;
     Team enemy_team_state;
-    BallState ball_state;
+
+    BallFilter ball_filter;
+    RobotTeamFilter friendly_team_filter;
+    RobotTeamFilter enemy_team_filter;
 
     // backend *should* be the only part of the system that is aware of Refbox/Vision
     // global coordinates. To AI, +x will always be enemy and -x will always be friendly.

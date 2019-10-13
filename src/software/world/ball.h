@@ -137,7 +137,7 @@ class Ball final
     Vector estimateVelocityAtFutureTime(const Duration &duration_in_future) const;
 
     /**
-     * Gets the previous states stores in states_
+     * Gets the previous states stored in states_
      *
      * @return Vector containing the state history starting with the oldest available
      * data at index 0
