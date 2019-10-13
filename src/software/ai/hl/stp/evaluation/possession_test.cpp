@@ -190,26 +190,22 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
 
     ball.updateState(
         {0.1, 2.5}, {0, 10},
-        Timestamp::fromSeconds(
-            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
-                    .value()));
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
     world.updateBallState(ball);
 
     robot0.updateState(
         Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(
-            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
-                    .value()));
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
     robot1.updateState(
         Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(
-            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
-                    .value()));
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
     robot2.updateState(
         Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-        Timestamp::fromSeconds(
-            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
-                    .value()));
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
 
     team.updateRobots({robot0, robot1, robot2});
     world.updateFriendlyTeamState(team);
