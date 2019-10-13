@@ -9,6 +9,8 @@
 
 #include "shared/constants.h"
 #include "software/test_util/test_util.h"
+#include "software/util/parameter/dynamic_parameters.h"
+
 
 TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
 {
@@ -186,16 +188,28 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
     Robot robot2 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
-    ball.updateState({0.1, 2.5}, {0, 10},
-                     Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
+    ball.updateState(
+        {0.1, 2.5}, {0, 10},
+        Timestamp::fromSeconds(
+            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
+                    .value()));
     world.updateBallState(ball);
 
-    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
-    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
-    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(2 + POSSESSION_BUFFER_TIME_IN_SECONDS));
+    robot0.updateState(
+        Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(
+            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
+                    .value()));
+    robot1.updateState(
+        Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(
+            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
+                    .value()));
+    robot2.updateState(
+        Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(
+            2 + Util::DynamicParameters::Evaluation::Possession::possession_buffer_time
+                    .value()));
 
     team.updateRobots({robot0, robot1, robot2});
     world.updateFriendlyTeamState(team);

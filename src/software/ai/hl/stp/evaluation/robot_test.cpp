@@ -98,7 +98,7 @@ TEST(RobotEvaluationTest, has_possession_directly_in_front_of_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
+    EXPECT_TRUE(*Evaluation::robotHasPossession(ball, robot));
 }
 
 TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
@@ -111,7 +111,7 @@ TEST(RobotEvaluationTest, has_possession_ball_to_side_of_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::half(), AngularVelocity::zero(),
                         timestamp);
 
-    EXPECT_FALSE(Evaluation::robotHasPossession(ball, robot));
+    EXPECT_FALSE(*Evaluation::robotHasPossession(ball, robot));
 }
 
 TEST(RobotEvaluationTest, has_possession_robot_moving_ball_in_dribbler)
@@ -124,7 +124,7 @@ TEST(RobotEvaluationTest, has_possession_robot_moving_ball_in_dribbler)
     Robot robot = Robot(0, Point(0, 0), Vector(1, 1), Angle::zero(),
                         AngularVelocity::zero(), timestamp);
 
-    EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
+    EXPECT_TRUE(*Evaluation::robotHasPossession(ball, robot));
 }
 
 TEST(RobotEvaluationTest, has_possession_ball_far_away_from_robot)
@@ -137,7 +137,7 @@ TEST(RobotEvaluationTest, has_possession_ball_far_away_from_robot)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    EXPECT_FALSE(Evaluation::robotHasPossession(ball, robot));
+    EXPECT_FALSE(*Evaluation::robotHasPossession(ball, robot));
 }
 
 TEST(RobotEvaluationTest, has_possession_ball_slightly_off_center_but_still_on_dribbler)
@@ -150,7 +150,7 @@ TEST(RobotEvaluationTest, has_possession_ball_slightly_off_center_but_still_on_d
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
                         timestamp);
 
-    EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
+    EXPECT_TRUE(*Evaluation::robotHasPossession(ball, robot));
 }
 
 
@@ -165,5 +165,5 @@ TEST(RobotEvaluationTest, has_possession_robot_on_angle_with_ball_in_dribbler)
     Robot robot = Robot(0, Point(0, 0), Vector(), Angle::ofDegrees(59.74356),
                         AngularVelocity::zero(), timestamp);
 
-    EXPECT_TRUE(Evaluation::robotHasPossession(ball, robot));
+    EXPECT_TRUE(*Evaluation::robotHasPossession(ball, robot));
 }
