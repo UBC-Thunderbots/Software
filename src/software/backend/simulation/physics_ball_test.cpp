@@ -118,15 +118,15 @@ TEST(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulat
     EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
 }
 
-TEST(PhysicsBallTest, test_ball_changes_direction_after_object_collision)
+TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collision)
 {
     b2Vec2 gravity(0, 0);
     auto world = std::make_shared<b2World>(gravity);
 
     b2BodyDef wall_body_def;
     wall_body_def.type = b2_staticBody;
-    wall_body_def.position.Set(2, 0.0);
-    wall_body_def.angle = M_PI;
+    wall_body_def.position.Set(1.5, 0.0);
+    wall_body_def.angle = 0.0;
     b2Body* wall_body = world->CreateBody(&wall_body_def);
 
     b2PolygonShape wall_shape;
@@ -134,25 +134,65 @@ TEST(PhysicsBallTest, test_ball_changes_direction_after_object_collision)
 
     b2FixtureDef wall_fixture_def;
     wall_fixture_def.shape = &wall_shape;
-    // Perfectly elasitc collisions and no friction
+    // Perfectly elastic collisions and no friction
     wall_fixture_def.restitution = 1.0;
     wall_fixture_def.friction = 0.0;
     wall_body->CreateFixture(&wall_fixture_def);
 
-    Ball ball_parameter(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0));
+    Ball ball_parameter(Point(0, 0), Vector(0.5, 0), Timestamp::fromSeconds(0));
     auto physics_ball = PhysicsBall(world, ball_parameter);
 
     // We have to take lots of small steps because a significant amount of accuracy
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 120; i++)
     {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position iterations but are generally
+        // the recommended defaults from https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
-        std::cout << physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(0)).velocity() << std::endl;
-        std::cout << wall_body->GetPosition().x << std::endl;
     }
 
     auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
 
-//    EXPECT_TRUE(Vector(3, -0.5).isClose(ball.velocity(), 1e-5));
-//    EXPECT_EQ(Timestamp::fromSeconds(1.1), ball.lastUpdateTimestamp());
+    EXPECT_TRUE(Vector(-0.5, 0.0).isClose(ball.velocity(), 1e-5));
+}
+
+TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflection)
+{
+    b2Vec2 gravity(0, 0);
+    auto world = std::make_shared<b2World>(gravity);
+
+    // Create a box angled 45 degrees so the ball is deflected downwards
+    // The box is slightly raised in the y-axis so the ball doesn't perfectly
+    // hit the corner
+    b2BodyDef wall_body_def;
+    wall_body_def.type = b2_staticBody;
+    wall_body_def.position.Set(2.0, 0.5);
+    wall_body_def.angle = M_PI_4;
+    b2Body* wall_body = world->CreateBody(&wall_body_def);
+
+    b2PolygonShape wall_shape;
+    wall_shape.SetAsBox(1, 1);
+
+    b2FixtureDef wall_fixture_def;
+    wall_fixture_def.shape = &wall_shape;
+    // Perfectly elastic collisions and no friction
+    wall_fixture_def.restitution = 1.0;
+    wall_fixture_def.friction = 0.0;
+    wall_body->CreateFixture(&wall_fixture_def);
+
+    Ball ball_parameter(Point(0, 0), Vector(1.0, 0), Timestamp::fromSeconds(0));
+    auto physics_ball = PhysicsBall(world, ball_parameter);
+
+    // We have to take lots of small steps because a significant amount of accuracy
+    // is lost if we take a single step of 1 second
+    for (unsigned int i = 0; i < 120; i++)
+    {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position iterations but are generally
+        // the recommended defaults from https://www.iforce2d.net/b2dtut/worlds
+        world->Step(1.0 / 60.0, 5, 8);
+    }
+
+    auto ball = physics_ball.getBallWithTimestamp(Timestamp::fromSeconds(1.1));
+
+    EXPECT_TRUE(Vector(0.0, -1.0).isClose(ball.velocity(), 1e-5));
 }
