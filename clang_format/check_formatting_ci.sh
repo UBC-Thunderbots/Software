@@ -3,7 +3,7 @@
 #
 
 CLANG_VERSION="7.0"
-CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CURR_DIR=$(dirname $0)
 
 echo "=========================================================="
 echo " THIS SHOULD ONLY BE RUN IN CI, PLEASE DO NOT USE LOCALLY"
@@ -11,7 +11,7 @@ echo "=========================================================="
 
 # Determine what we should compare this branch against to figure out what
 # files were changed
-if [ "$TRAVIS_PULL_REQUEST" == "false" ] ; then
+if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
   # Not in a pull request, so compare against parent commit
   BASE_COMMIT="HEAD^"
   echo "Running clang-format against parent commit $(git rev-parse $BASE_COMMIT)"
