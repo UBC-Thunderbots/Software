@@ -32,8 +32,8 @@ rules_proto_toolchains()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    remote = "https://github.com/nelhage/rules_boost",
     commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
+    remote = "https://github.com/nelhage/rules_boost",
 )
 
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
@@ -76,10 +76,12 @@ new_local_repository(
     path = "external/qt", # This directory is symlinked in the setup script
 )
 
+# We use our own fork of Box2D as we have made a few small modifications
+# See the repository readme for details
 new_git_repository(
     name = "box2d",
     build_file = "@//external:box2d.BUILD",
-    commit = "ef96a4f17f1c5527d20993b586b400c2617d6ae1",
-    remote = "https://github.com/erincatto/Box2D.git",
-    shallow_since = "1561963347 +0200",
+    commit = "9d71bf40b9bea0f0d9ef36ea9c35c3df2d067e79",
+    remote = "https://github.com/UBC-Thunderbots/Box2D",
+    shallow_since = "1570941579 -0700",
 )
