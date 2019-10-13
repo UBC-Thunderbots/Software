@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
-    : ball(ball), Tactic(loop_forever, {RobotCapabilities::Capability::Chip})
+    : Tactic(loop_forever, {RobotCapabilities::Capability::Chip}), ball(ball)
 {
 }
 

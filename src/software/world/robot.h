@@ -3,7 +3,6 @@
 #include <optional>
 #include <vector>
 
-#include "ai/world/robot_capabilities.h"
 #include "boost/circular_buffer.hpp"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"

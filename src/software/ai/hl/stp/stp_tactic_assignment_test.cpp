@@ -377,5 +377,5 @@ TEST_F(STPTacticAssignmentTest,
     auto assigned_tactics = stp.assignRobotsToTactics(world, tactics);
 
     EXPECT_EQ(assigned_tactics.size(), 1);
-    EXPECT_EQ(assigned_tactics.at(0)->getAssignedRobot(), robot_1);
+    EXPECT_TRUE(*assigned_tactics.at(0)->getAssignedRobot() == robot_1);
 }
