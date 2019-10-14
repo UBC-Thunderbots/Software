@@ -44,6 +44,8 @@ cc_test(
         ":navigator",
         "//software/test_util",
         "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_planner:one_point_path_test_path_planner",
+        "//software/ai/navigator/path_planner:no_path_test_path_planner",
         "@gtest//:gtest_main",
     ],
 )
