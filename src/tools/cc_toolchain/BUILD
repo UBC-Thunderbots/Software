@@ -92,6 +92,8 @@ cc_toolchain_config(
 cc_toolchain(
     name = "cc_toolchain_linux",
     all_files = ":clang_all",
+    ar_files = ":clang_all",
+    as_files = ":clang_all",
     compiler_files = ":clang_wrappers",
     dwp_files = ":clang_wrappers",
     dynamic_runtime_lib = "@org_llvm_clang//:runtime_libs",
@@ -123,6 +125,8 @@ cc_toolchain_config_stm32(
 cc_toolchain(
     name = "cc_toolchain_stm32f0",
     all_files = ":arm_everything",
+    ar_files = ":arm_everything",
+    as_files = ":arm_everything",
     compiler_files = ":arm_everything",
     dwp_files = ":empty",
     linker_files = ":arm_everything",
@@ -152,6 +156,8 @@ cc_toolchain_config_stm32(
 cc_toolchain(
     name = "cc_toolchain_stm32f4",
     all_files = ":arm_everything",
+    ar_files = ":arm_everything",
+    as_files = ":arm_everything",
     compiler_files = ":arm_everything",
     dwp_files = ":empty",
     linker_files = ":arm_everything",
@@ -181,6 +187,8 @@ cc_toolchain_config_stm32(
 cc_toolchain(
     name = "cc_toolchain_stm32g4",
     all_files = ":arm_everything",
+    ar_files = ":arm_everything",
+    as_files = ":arm_everything",
     compiler_files = ":arm_everything",
     dwp_files = ":empty",
     linker_files = ":arm_everything",
@@ -210,6 +218,8 @@ cc_toolchain_config_stm32(
 cc_toolchain(
     name = "cc_toolchain_stm32h7",
     all_files = ":arm_everything",
+    ar_files = ":arm_everything",
+    as_files = ":arm_everything",
     compiler_files = ":arm_everything",
     dwp_files = ":empty",
     linker_files = ":arm_everything",

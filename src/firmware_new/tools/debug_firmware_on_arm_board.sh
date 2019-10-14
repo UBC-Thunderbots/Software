@@ -51,8 +51,8 @@ fi
 #   - find all the source files so you can view them in gdb
 #   - load firmware onto the board
 arm-none-eabi-gdb \
-    -ex "directory $BAZEL_ROOT_DIR" \
     -ex "target extended-remote :3333" \
+    -ex "directory $BAZEL_ROOT_DIR" \
     -ex "load" \
     -tui $ELF_FILE
 

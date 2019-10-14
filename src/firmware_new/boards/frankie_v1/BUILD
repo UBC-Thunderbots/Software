@@ -11,17 +11,16 @@ cc_stm32h7_binary(
     linker_script = "STM32H742XGHx_FLASH.ld",
     processor = "STM32H743xx",
     deps = [
-        ":devices_vector_table",
         ":frankie_v1_hal",
     ],
     # TODO: we need to be able to give a `.ioc` file here and check for generation
 )
 
-cc_library(
-    name = "devices_vector_table",
-    srcs = ["startup_stm32h742xx.s"],
-    deps = [],
-)
+#cc_library(
+#    name = "devices_vector_table",
+#    srcs = ["startup_stm32h742xx.s"],
+#    deps = [],
+#)
 
 # TODO: rename this, it encompasses middlewares as well now
 cc_stm32h7_hal_library(

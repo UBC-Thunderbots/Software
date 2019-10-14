@@ -173,7 +173,7 @@ def _cc_stm32h7_binary_impl(ctx):
             inputs = [assembly_file],
             outputs = [object_file],
             tools = cc_toolchain.all_files,
-            command = "{gcc_bin} -x assembler-with-cpp $< -o {obj_out} {assembly_file}".format(
+            command = "{gcc_bin} -c -x assembler-with-cpp {assembly_file} -o {obj_out} ".format(
                 gcc_bin = cc_toolchain.compiler_executable(),
                 obj_out = object_file.path,
                 assembly_file = assembly_file.path,
@@ -210,11 +210,10 @@ def _cc_stm32h7_binary_impl(ctx):
         "-lnosys",
     ]
 
-    print(depset(_filter_none(assembly_object_files)))
-    print(depset(ctx.files.srcs))
-    print(compilation_outputs.objects)
-    test = cc_common.create_compilation_outputs(objects = depset(compilation_outputs.objects))
-    #assembly_compilation_outputs = cc_common.create_compilation_outputs(objects = depset(_filter_none(assembly_object_files)))
+    assembly_compilation_outputs = cc_common.create_compilation_outputs(
+        objects = depset(_filter_none(assembly_object_files)),
+        pic_objects = depset(_filter_none(assembly_object_files)),
+    )
 
     linking_outputs = cc_common.link(
         name = "{}.elf".format(ctx.label.name),
@@ -222,7 +221,9 @@ def _cc_stm32h7_binary_impl(ctx):
         feature_configuration = feature_configuration,
         cc_toolchain = cc_toolchain,
         language = "c++",
-        compilation_outputs = compilation_outputs,
+        compilation_outputs = cc_common.merge_compilation_outputs(
+            compilation_outputs = [assembly_compilation_outputs, compilation_outputs],
+        ),
         linking_contexts = linking_contexts,
         user_link_flags = linkopts,
         link_deps_statically = True,
