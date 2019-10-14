@@ -31,17 +31,19 @@ double Rectangle::distToBoundary(Point p)
 
 Point Rectangle::furthestCorner(Point p)
 {
-    Point furthestPoint = operator[](0);
-    double furthestDist = dist(p, operator[](0));
+    std::vector<Point> corners = this->corners();
 
-    for (int i = 1; i < 4; i++)
-    {
-        double newDist = dist(p, operator[](i));
-        if (newDist > furthestDist)
-        {
-            furthestPoint = operator[](i);
-            furthestDist  = newDist;
-        }
-    }
-    return furthestPoint;
+    return *std::max_element(corners.begin(), corners.end(), [&](const Point& corner1, const Point& corner2){
+        return dist(corner1, p) < dist(corner2, p);
+    });
+}
+
+std::vector<Point> Rectangle::corners()
+{
+    return std::vector<Point>  {
+            operator[](0),
+            operator[](1),
+            operator[](2),
+            operator[](3)
+    };
 }

@@ -16,9 +16,6 @@
 #include "software/geom/segment.h"
 #include "software/geom/voronoi_util.h"
 
-using boost::polygon::voronoi_builder;
-using boost::polygon::voronoi_diagram;
-
 double proj_len(const Segment &first, const Vector &second)
 {
     return proj_len(first.toVector(), second - first.getSegStart());
@@ -1356,13 +1353,11 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
             rectangle,
             halfPoint + (perpVec * dist(rectangle.furthestCorner(halfPoint), halfPoint)),
             halfPoint - (perpVec * dist(rectangle.furthestCorner(halfPoint), halfPoint)));
-        intersects.emplace_back(rectangle[0]);
-        intersects.emplace_back(rectangle[1]);
-        intersects.emplace_back(rectangle[2]);
-        intersects.emplace_back(rectangle[3]);
+        std::vector<Point> corners = rectangle.corners();
+        intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersects)
         {
-            double radius = dist(findClosestPoint(intersect, points), intersect);
+            double radius = dist(findClosestPoint(intersect, points).value(), intersect);
             empty_circles.emplace_back(intersect, radius);
         }
         return empty_circles;
@@ -1375,7 +1370,8 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
     // The corners of the rectangles are locations for the centre of circles with their radius being the distance to
     // the corner's closest point.
     for (int i = 0; i < 4; i++) {
-        empty_circles.emplace_back(Circle(rectangle[i], dist(rectangle[i], findClosestPoint(rectangle[i], points))));
+        Point closest = findClosestPoint(rectangle[i], points).value();
+        empty_circles.emplace_back(Circle(rectangle[i], dist(rectangle[i], closest)));
     }
 
     std::vector<Point> intersects = findVoronoiEdgeRecIntersects(vd, rectangle, points);
@@ -1415,16 +1411,16 @@ Polygon circleToPolygon(const Circle &circle, size_t num_points)
     return Polygon(points);
 }
 
-Point findClosestPoint(const Point& originPoint, std::vector<Point> testPoints)
+std::optional<Point> findClosestPoint(const Point& origin_point, std::vector<Point> test_points)
 {
-    double minDist = dist(originPoint, testPoints.front());
-    Point minDistPoint = testPoints[0];
-    for (unsigned long i = 1; i < testPoints.size(); i++) {
-        double testDist = dist(originPoint, testPoints[i]);
-        if (testDist < minDist) {
-            minDist = testDist;
-            minDistPoint = testPoints[i];
-        }
+    std::optional<Point> closest_point = std::nullopt;
+
+    if (!test_points.empty()){
+        closest_point = *std::min_element(test_points.begin(), test_points.end(),
+                                          [&](const Point& test_point1, const Point& test_point2){
+                                              return dist(origin_point, test_point1) < dist(origin_point, test_point2);
+                                          });
     }
-    return minDistPoint;
+
+    return closest_point;
 }

@@ -640,4 +640,4 @@ Polygon circleToPolygon(const Circle &circle, size_t num_points);
  * @param testPoints
  * @return The point in testPoints closest to testPoints.
  */
-Point findClosestPoint(const Point& originPoint, std::vector<Point> testPoints);
+std::optional<Point> findClosestPoint(const Point& origin_point, std::vector<Point> test_points);

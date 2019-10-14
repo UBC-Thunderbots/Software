@@ -145,6 +145,8 @@ class Rectangle final
      */
     Point furthestCorner(Point p);
 
+    std::vector<Point> corners();
+
     constexpr bool operator==(const Rectangle &p) const
     {
         return this->min_corner == p.min_corner && this->diagonal == p.diagonal;
