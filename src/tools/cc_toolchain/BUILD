@@ -18,13 +18,16 @@ package(default_visibility = ["//visibility:public"])
 
 load(":cc_toolchain_config.bzl", "cc_toolchain_config", "cc_toolchain_config_stm32")
 
+# Normally you should only have a single `cc_toolchain_suite`. However since you can only
+# supply a single "cpu" to bazel at a time (ex. 'k8'), we would not be able to build
+# the parts of the stm32 parts of the codebase at the same time as the normal C++ parts,
+# because they use different compilers. Our solution is to have two separate toolchain
+# suites, and use a specific one for our stm32h7 rules
 cc_toolchain_suite(
-    name = "toolchain1",
+    name = "stm32h7_toolchain",
     toolchains = {
         "k8": "cc_toolchain_stm32h7",
         "k8|compiler": "cc_toolchain_stm32h7",
-        "stm32h7": "cc_toolchain_stm32h7",
-        "stm32h7|compiler": "cc_toolchain_stm32h7",
     },
 )
 
@@ -78,8 +81,11 @@ cc_toolchain_config(
     name = "clang-k8",
     builtin_include_directories = [
         "external/org_llvm_clang/include/",
-        "external/org_llvm_clang/lib/clang/7.0.0/include/",
+        "external/org_llvm_clang/include/c++/v1/",
+        "external/org_llvm_clang/lib/clang/8.0.0/include/",
+        "external/org_llvm_clang/lib/clang/9.0.0/include/",
         "/usr/include/",
+        "/usr/local/include/",
     ],
     cpu = "k8",
     host_compiler_path = "wrapper/clang-clang",

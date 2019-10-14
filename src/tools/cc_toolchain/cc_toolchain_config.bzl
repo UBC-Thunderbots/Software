@@ -428,14 +428,15 @@ def _clang_impl(ctx):
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
+    # TODO: should not be commented out
     stdlib_feature = feature(
         name = "stdlib",
         flag_sets = [
             flag_set(
                 actions = ALL_COMPILE_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-stdlib=libc++",
-                ])],
+                #                flag_groups = [flag_group(flags = [
+                #                    "-stdlib=libc++",
+                #                ])],
             ),
             flag_set(
                 actions = ALL_LINK_ACTIONS,

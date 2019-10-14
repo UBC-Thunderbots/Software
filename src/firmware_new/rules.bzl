@@ -1,7 +1,5 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-# TODO: remove all debug print statements
-
 # TODO: Do we need this?
 MyCCompileInfo = provider(doc = "", fields = ["object"])
 
@@ -60,7 +58,6 @@ def _cc_stm32h7_hal_library_impl(ctx):
     ]
 
     external_deps_folder = ctx.actions.declare_directory("external_deps")
-    print(external_deps_folder.path)
     ctx.actions.run_shell(
         inputs = [fw_zip],
         outputs = [external_deps_folder] + drivers_and_middleware_hdrs + drivers_and_middleware_srcs,
@@ -135,7 +132,7 @@ cc_stm32h7_hal_library = rule(
         "drivers_and_middleware_srcs": attr.string_list(),
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
         #        "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
-        "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:toolchain1"),
+        "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:stm32h7_toolchain"),
         # TODO: check if using this means we don't need to specify a cpu/toolchain on the command line
         # TODO: is this doing anything?
         "_compiler": attr.label(
@@ -195,11 +192,6 @@ def _cc_stm32h7_binary_impl(ctx):
     linkopts = []
     for linkopt in ctx.attr.linkopts:
         linkopts.append(ctx.expand_location(linkopt, targets = [ctx.attr.linker_script]))
-
-    print(ctx.attr)
-
-    print(linkopts)
-    print(ctx.attr.linker_script)
 
     linkopts += [
         "-T{}".format(ctx.file.linker_script.path),
@@ -273,7 +265,7 @@ cc_stm32h7_binary = rule(
         ),
         "linkopts": attr.string_list(),
         "copts": attr.string_list(),
-        "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:toolchain1"),
+        "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:stm32h7_toolchain"),
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
         # TODO: is this doing anything?
         "_compiler": attr.label(

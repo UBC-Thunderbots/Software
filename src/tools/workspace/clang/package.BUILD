@@ -33,14 +33,14 @@ filegroup(
 
 filegroup(
     name = "clang_libs",
-    srcs = glob(["lib/clang/8.0.0/lib/linux/*.a"]),
+    srcs = glob(["lib/clang/9.0.0/lib/linux/*.a"]),
 )
 
 filegroup(
     name = "includes",
     srcs = glob([
         "include/c++/**",
-        "lib/clang/8.0.0/include/**",
+        "lib/clang/9.0.0/include/**",
     ]),
 )
 
