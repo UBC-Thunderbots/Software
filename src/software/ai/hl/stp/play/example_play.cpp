@@ -12,7 +12,9 @@ std::string ExamplePlay::getName() const
 
 bool ExamplePlay::isApplicable(const World &world) const
 {
-    return true;
+    // This play is never applicable so it will never be chosen during gameplay
+    // This play can be run for testing by using the Play override
+    return false;
 }
 
 bool ExamplePlay::invariantHolds(const World &world) const
@@ -36,22 +38,22 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
         Angle angle_between_robots = Angle::full() / world.friendlyTeam().numRobots();
 
         // Move the robots in a circle around the ball, facing the ball
-        move_tactic_1->updateParams(
+        move_tactic_1->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 1),
             (angle_between_robots * 1) + Angle::half(), 0);
-        move_tactic_2->updateParams(
+        move_tactic_2->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 2),
             (angle_between_robots * 2) + Angle::half(), 0);
-        move_tactic_3->updateParams(
+        move_tactic_3->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 3),
             (angle_between_robots * 3) + Angle::half(), 0);
-        move_tactic_4->updateParams(
+        move_tactic_4->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 4),
             (angle_between_robots * 4) + Angle::half(), 0);
-        move_tactic_5->updateParams(
+        move_tactic_5->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 5),
             (angle_between_robots * 5) + Angle::half(), 0);
-        move_tactic_6->updateParams(
+        move_tactic_6->updateControlParams(
             world.ball().position() + Point::createFromAngle(angle_between_robots * 6),
             (angle_between_robots * 6) + Angle::half(), 0);
 

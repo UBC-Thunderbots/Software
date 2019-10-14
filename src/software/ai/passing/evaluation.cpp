@@ -5,6 +5,7 @@
 
 #include "software/ai/passing/evaluation.h"
 
+#include <g3log/g3log.hpp>
 #include <numeric>
 
 #include "software/../shared/constants.h"
@@ -18,7 +19,7 @@ using namespace AI::Evaluation;
 
 double Passing::ratePass(const World& world, const Passing::Pass& pass,
                          const std::optional<Rectangle>& target_region,
-                         std::optional<unsigned int> passer_robot_id)
+                         std::optional<unsigned int> passer_robot_id, PassType pass_type)
 {
     double static_pass_quality =
         getStaticPositionQuality(world.field(), pass.receiverPoint());
@@ -58,18 +59,30 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
     double pass_speed_quality = sigmoid(pass.speed(), min_pass_speed, 0.2) *
                                 (1 - sigmoid(pass.speed(), max_pass_speed, 0.2));
 
-    double pass_quality = static_pass_quality * friendly_pass_rating * enemy_pass_rating *
-                          shoot_pass_rating * in_region_quality *
-                          pass_time_offset_quality * pass_speed_quality;
+    // We ignore shoot pass quality if we're rating for a "RECEIVE_AND_DRIBBLE" pass
+    double pass_quality = 0;
+    switch (pass_type)
+    {
+        case RECEIVE_AND_DRIBBLE:
+            pass_quality = static_pass_quality * friendly_pass_rating *
+                           enemy_pass_rating * in_region_quality *
+                           pass_time_offset_quality * pass_speed_quality;
+            break;
+        case ONE_TOUCH_SHOT:
+            pass_quality = static_pass_quality * friendly_pass_rating *
+                           enemy_pass_rating * shoot_pass_rating * in_region_quality *
+                           pass_time_offset_quality * pass_speed_quality;
+            break;
+        default:
+            throw std::invalid_argument("Unhandled pass type given to `ratePass`");
+    }
+
     return pass_quality;
 }
 
 double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
                                    const Passing::Pass& pass)
 {
-    // TODO: You don't even use this first parameter, but stuff is hardcoded below
-    double ideal_shoot_angle_degrees =
-        Util::DynamicParameters::Passing::ideal_min_shoot_angle_degrees.value();
     double ideal_max_rotation_to_shoot_degrees =
         Util::DynamicParameters::Passing::ideal_max_rotation_to_shoot_degrees.value();
 
@@ -88,7 +101,7 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
     Point shot_target        = field.enemyGoal();
     if (shot_opt)
     {
-        open_angle_to_goal = shot_opt->second;
+        open_angle_to_goal = shot_opt->getOpenAngle();
     }
 
     // Figure out what the maximum open angle of the goal could be from the receiver pos.
@@ -297,8 +310,8 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
             static_field_position_quality_friendly_goal_distance_weight.value();
 
     // Make a slightly smaller field, and positive weight values in this reduced field
-    double half_field_length = field.length() / 2;
-    double half_field_width  = field.width() / 2;
+    double half_field_length = field.xLength() / 2;
+    double half_field_width  = field.yLength() / 2;
     Rectangle reduced_size_field(
         Point(-half_field_length + x_offset, -half_field_width + y_offset),
         Point(half_field_length - x_offset, half_field_width - y_offset));

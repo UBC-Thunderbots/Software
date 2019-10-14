@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class DribbleIntent : public Intent, public DribblePrimitive
+class DribbleIntent : public DribblePrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

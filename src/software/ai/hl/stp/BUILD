@@ -27,8 +27,8 @@ cc_test(
     deps = [
         ":stp",
         "//software/ai/hl/stp/play:halt_play",
-        "//software/ai/world",
         "//software/test_util",
+        "//software/world",
         "@gtest//:gtest_main",
     ],
 )

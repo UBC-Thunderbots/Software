@@ -32,8 +32,8 @@ rules_proto_toolchains()
 
 git_repository(
     name = "com_github_nelhage_rules_boost",
-    commit = "a1dd05e7e9178f8aad86e39f3a5b377902eae5b2",
     remote = "https://github.com/nelhage/rules_boost",
+    commit = "9f9fb8b2f0213989247c9d5c0e814a8451d18d7f",
 )
 
 load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
@@ -48,17 +48,9 @@ http_archive(
     url = "https://bitbucket.org/eigen/eigen/get/c5e90d9.tar.gz",
 )
 
-http_archive(
+new_local_repository(
     name = "libusb",
     build_file = "@//external:libusb.BUILD",
-    sha256 = "a5fc7c3c8ecfaca3e149ffb5a422f358fc5276fe56d851f46a4023d1e061bc00",
-    strip_prefix = "libusb-1.0.23",
-    url = "https://github.com/libusb/libusb/archive/v1.0.23.zip",
-)
-
-new_local_repository(
-    name = "libudev",
-    build_file = "@//external:libudev.BUILD",
     path = "/",
 )
 
@@ -81,5 +73,5 @@ git_repository(
 new_local_repository(
     name = "qt",
     build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "/usr/include/x86_64-linux-gnu/qt5/",
+    path = "external/qt", # This directory is symlinked in the setup script
 )

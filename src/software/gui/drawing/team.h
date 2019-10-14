@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 
-#include "software/ai/world/team.h"
+#include "software/world/team.h"
 
 /**
  * This file contains all the functions that allow us to draw a Team in a

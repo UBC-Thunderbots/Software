@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class KickIntent : public Intent, public KickPrimitive
+class KickIntent : public KickPrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

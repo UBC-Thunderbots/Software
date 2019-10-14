@@ -6,8 +6,8 @@
 
 #include "shared/constants.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/ai/world/robot.h"
 #include "software/geom/angle.h"
+#include "software/world/robot.h"
 
 
 using namespace std::chrono;
@@ -193,10 +193,10 @@ TEST_F(MotionControllerTest, negative_time_test)
     MotionControllerCommand motion_command;
     motion_command.emplace<MotionController::PositionCommand>(position_command);
 
-    EXPECT_THROW(MotionController::Velocity robot_velocities =
-                     motionController.bangBangVelocityController(robot, delta_time,
-                                                                 motion_command);
-                 , std::invalid_argument);
+    // Expect getting robot velocities to throw
+    EXPECT_THROW(
+        motionController.bangBangVelocityController(robot, delta_time, motion_command);
+        , std::invalid_argument);
 }
 
 TEST_F(MotionControllerTest, zero_time_test)

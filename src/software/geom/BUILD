@@ -5,6 +5,7 @@ cc_library(
     srcs = [
         "polygon.cpp",
         "rectangle.cpp",
+        "shot.cpp",
         "util.cpp",
         "voronoi_util.cpp",
     ],
@@ -17,6 +18,7 @@ cc_library(
         "ray.h",
         "rectangle.h",
         "segment.h",
+        "shot.h",
         "util.h",
         "voronoi_util.h",
     ],
@@ -26,6 +28,7 @@ cc_library(
     deps = [
         "@boost//:geometry",
         "@g3log",
+        "@boost//:polygon",
     ],
 )
 

@@ -1,6 +1,7 @@
-#include "software/ai/world/ball.h"
-#include "software/ai/world/field.h"
-#include "software/ai/world/team.h"
+#pragma once
+#include "software/world/ball.h"
+#include "software/world/field.h"
+#include "software/world/team.h"
 
 namespace Evaluation
 {
@@ -14,9 +15,9 @@ namespace Evaluation
      * @return the robot that either has the ball, or is the closest to having it. If the
      * team has no robots, std::nullopt is returned
      */
-    std::optional<Robot> getRobotWithEffectiveBallPossession(const Team &team,
-                                                             const Ball &ball,
-                                                             const Field &field);
+    std::optional<Robot> getRobotWithEffectiveBallPossession(const Team& team,
+                                                             const Ball& ball,
+                                                             const Field& field);
     /**
      * Return true if the provided team has possession of the ball. A team is considered
      * to have possession if any robot on the team has had possession within the last
@@ -27,5 +28,17 @@ namespace Evaluation
      * @param ball The ball
      * @return True if the team has possession, false otherwise
      */
-    bool teamHasPossession(const Team &team, const Ball &ball);
+    bool teamHasPossession(const Team& team, const Ball& ball);
+
+    /**
+     * Return true if the provided team is the process of passing to another robot.
+     * This is determined by checking the angle deviation of the ball velocity vector
+     * off of the robot the ball is headed towards, and the speed of the ball.
+     * TODO: Unit test this (#919)
+     *
+     * @param world The ball
+     * @param team The team containing the robots to check for passes
+     * @return true if the team is in the process of passing, false otherwise
+     */
+    bool teamPassInProgress(const Ball& ball, const Team& team);
 }  // namespace Evaluation

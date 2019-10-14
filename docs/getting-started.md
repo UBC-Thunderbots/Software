@@ -136,7 +136,7 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 1. Open any `BUILD` file and right clight in a `cc_library()` call. This will give you the option to `Run` or `Debug` that specific target. Try it by opening `Software/src/software/geom/BUILD` and right-clicking on the `cc_library` for `angle_test`!
 2. Add a custom build configuration (more powerful, so make sure you understand this!)
     1. Select `Add Configuration` from the drop-down in the top-right of CLion
-    2. Under `Templates`, choose `Bazel Command`.
+    2. Click on `+`, choose `Bazel Command`.
     3. For `Target Expression`, you can put anything that comes after a `build`, `run`, `test`, etc. call on the command line. For example: `//software/geom:angle_test`.
     4. For `Bazel Command` you can put any bazel command, like `build`, `run`, `test`, etc.
     5. Click `Ok`, then there should be a green arrow in the top right corner by the drop-down menu. Click it and the test will run!

@@ -4,8 +4,8 @@
 #include "software/ai/hl/stp/play_info.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/primitive/primitive.h"
-#include "software/ai/world/world.h"
 #include "software/util/time/timestamp.h"
+#include "software/world/world.h"
 
 /**
  * This class wraps all our AI logic and decision making to help separate our
@@ -41,6 +41,6 @@ class AI final
     std::shared_ptr<Navigator> getNavigator() const;
 
    private:
-    std::unique_ptr<HL> high_level;
     std::shared_ptr<Navigator> navigator;
+    std::unique_ptr<HL> high_level;
 };

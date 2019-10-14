@@ -6,8 +6,8 @@ cc_library(
     hdrs = ["ball.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world",
         "//software/geom",
+        "//software/world",
     ],
 )
 
@@ -27,8 +27,8 @@ cc_library(
     hdrs = ["calc_best_shot.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world",
         "//software/geom",
+        "//software/world",
     ],
 )
 
@@ -50,8 +50,8 @@ cc_library(
     hdrs = ["deflect_off_enemy_target.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world",
         "//software/geom",
+        "//software/world",
     ],
 )
 
@@ -72,9 +72,9 @@ cc_library(
     hdrs = ["detect_threat.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
         "//software/geom",
+        "//software/world:ball",
+        "//software/world:field",
     ],
 )
 
@@ -83,10 +83,10 @@ cc_test(
     srcs = ["detect_threat_test.cpp"],
     deps = [
         ":detect_threat",
-        "//software/ai/world:ball",
         "//software/geom",
         "//software/test_util",
         "//software/util/time:timestamp",
+        "//software/world:ball",
         "@gtest//:gtest_main",
     ],
 )
@@ -102,8 +102,8 @@ cc_library(
         ":robot",
         ":team",
         "//shared:constants",
-        "//software/ai/world",
         "//software/geom",
+        "//software/world",
     ],
 )
 
@@ -112,8 +112,8 @@ cc_test(
     srcs = ["enemy_threat_test.cpp"],
     deps = [
         ":enemy_threat",
-        "//software/ai/world:ball",
         "//software/test_util",
+        "//software/world:ball",
         "@gtest//:gtest_main",
     ],
 )
@@ -124,9 +124,9 @@ cc_library(
     hdrs = ["find_open_areas.h"],
     deps = [
         ":indirect_chip",
-        "//software/ai/world",
         "//software/geom",
         "//software/util/parameter:dynamic_parameters",
+        "//software/world",
     ],
 )
 
@@ -136,9 +136,9 @@ cc_library(
     hdrs = ["indirect_chip.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world",
         "//software/geom",
         "//software/util/parameter:dynamic_parameters",
+        "//software/world",
     ],
 )
 
@@ -147,9 +147,9 @@ cc_test(
     srcs = ["indirect_chip_test.cpp"],
     deps = [
         ":indirect_chip",
-        "//software/ai/world",
         "//software/geom",
         "//software/test_util",
+        "//software/world",
         "@gtest//:gtest_main",
     ],
 )
@@ -161,11 +161,11 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/ai/evaluation:pass",
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
-        "//software/ai/world:robot",
         "//software/geom",
         "//software/util/optimization:gradient_descent",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:robot",
     ],
 )
 
@@ -187,11 +187,11 @@ cc_library(
         ":intercept",
         ":robot",
         ":team",
-        "//shared:constants",
-        "//software/ai/world:ball",
-        "//software/ai/world:field",
-        "//software/ai/world:robot",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
+        "//software/world:ball",
+        "//software/world:field",
+        "//software/world:robot",
     ],
 )
 
@@ -212,9 +212,10 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         "//shared:constants",
-        "//software/ai/world:ball",
-        "//software/ai/world:robot",
+        "//software/world:ball",
+        "//software/world:robot",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
     ],
 )
 
@@ -232,8 +233,8 @@ cc_library(
     srcs = ["team.cpp"],
     hdrs = ["team.h"],
     deps = [
-        "//software/ai/world:robot",
-        "//software/ai/world:team",
+        "//software/world:robot",
+        "//software/world:team",
     ],
 )
 

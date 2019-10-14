@@ -9,16 +9,8 @@
 *.pb.cc
 *.pb.h
 
-# ROS and catkin
-/src/CMakeLists.txt
-/build
-/devel
-/install
-/logs
-
-# rosbag
-*.bag
-*.bag.active
+# Symlinked qt directory
+src/external/qt
 
 # Pycache
 *.pyc
@@ -119,3 +111,6 @@ Makefile
 
 #cscope
 cscope*
+
+# Explicitly un-ignore the .bazelproject file
+!/src/.clwb/.bazelproject

@@ -2,11 +2,11 @@
 
 #include "software/ai/ai.h"
 #include "software/ai/hl/stp/play_info.h"
-#include "software/ai/world/world.h"
 #include "software/gui/drawing/draw_functions.h"
 #include "software/multithreading/subject.h"
 #include "software/multithreading/threaded_observer.h"
 #include "software/typedefs.h"
+#include "software/world/world.h"
 
 /**
  * This class wraps an `AI` object, performing all the work of receiving World

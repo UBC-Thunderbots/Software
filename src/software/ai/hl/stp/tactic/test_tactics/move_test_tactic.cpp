@@ -15,7 +15,7 @@ std::string MoveTestTactic::getName() const
     return "Move Test Tactic";
 }
 
-void MoveTestTactic::updateParams(Point destination_)
+void MoveTestTactic::updateControlParams(Point destination_)
 {
     // Update the parameters stored by this Tactic
     this->destination = destination_;
@@ -37,4 +37,12 @@ void MoveTestTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         yield(std::make_unique<MoveIntent>(this->robot->id(), this->destination,
                                            Angle::zero(), 0.0, 0));
     } while ((this->robot->position() - this->destination).len() > 0.01);
+}
+
+void MoveTestTactic::accept(TacticVisitor &visitor) const
+{
+    // MoveTestTactic is meant to be a simple test tactic and so
+    // we invoke YAGNI to not implement the visitor for this tactic
+    throw std::invalid_argument(
+        "Error: Tactic Visitor does not implement visiting this Tactic, so this accept function does nothing");
 }

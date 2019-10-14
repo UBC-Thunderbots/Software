@@ -24,26 +24,26 @@ class Rectangle final
      *
      * @param neg_x_neg_y_corner The <-x,-y> corner of the rectangle
      *
-     * @param width The width of the rectangle
+     * @param xLength The xLength of the rectangle
      *
-     * @param height The height of the rectangle
+     * @param yLength The yLength of the rectangle
      */
-    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double width,
-                                 double height);
+    explicit constexpr Rectangle(const Point &neg_x_neg_y_corner, double x_length,
+                                 double y_length);
 
     /**
-     * Returns the width of the rectangle
+     * Returns the length along the x-axis of the rectangle
      *
-     * @return The width of the rectangle
+     * @return The length along the x-axis of the rectangle
      */
-    constexpr double width() const;
+    constexpr double xLength() const;
 
     /**
-     * Returns the height of the rectangle
+     * Returns the length along the y-axis of the rectangle
      *
-     * @return The height of the rectangle
+     * @return The length along the y-axis of the rectangle
      */
-    constexpr double height() const;
+    constexpr double yLength() const;
 
     /**
      * Returns the area of the rectangle
@@ -164,18 +164,19 @@ inline constexpr Rectangle::Rectangle(const Point &point1, const Point &point2)
 {
 }
 
-inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double width,
-                                      double height)
-    : min_corner(neg_x_neg_y_corner), diagonal(width, height)
+inline constexpr Rectangle::Rectangle(const Point &neg_x_neg_y_corner, double x_length,
+                                      double y_length)
+    : min_corner(neg_x_neg_y_corner), diagonal(x_length, y_length)
+
 {
 }
 
-inline constexpr double Rectangle::width() const
+inline constexpr double Rectangle::xLength() const
 {
     return diagonal.x();
 }
 
-inline constexpr double Rectangle::height() const
+inline constexpr double Rectangle::yLength() const
 {
     return diagonal.y();
 }

@@ -31,10 +31,6 @@ void HaltTestPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     do
     {
-        stop_test_tactic_1->updateParams();
-        stop_test_tactic_2->updateParams();
-        stop_test_tactic_3->updateParams();
-
         yield({stop_test_tactic_1, stop_test_tactic_2, stop_test_tactic_3});
     } while (true);
 }
