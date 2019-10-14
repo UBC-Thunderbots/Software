@@ -1419,7 +1419,7 @@ Point findClosestPoint(const Point& originPoint, std::vector<Point> testPoints)
 {
     double minDist = dist(originPoint, testPoints.front());
     Point minDistPoint = testPoints[0];
-    for (int i = 1; i < testPoints.size(); i++) {
+    for (unsigned long i = 1; i < testPoints.size(); i++) {
         double testDist = dist(originPoint, testPoints[i]);
         if (testDist < minDist) {
             minDist = testDist;

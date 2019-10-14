@@ -27,8 +27,8 @@ cc_library(
     ],
     deps = [
         "@boost//:geometry",
-        "@g3log",
         "@boost//:polygon",
+        "@g3log",
     ],
 )
 
@@ -72,7 +72,6 @@ cc_test(
     ],
     deps = [
         ":geom",
-        "//software/ai/world:field",
         "//software/test_util",
         "@gtest//:gtest_main",
     ],

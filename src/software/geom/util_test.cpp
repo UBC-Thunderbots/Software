@@ -8,7 +8,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "software/ai/world/field.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 #include "software/test_util/test_util.h"
