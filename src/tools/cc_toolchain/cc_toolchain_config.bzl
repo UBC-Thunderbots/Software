@@ -220,7 +220,8 @@ def _make_common_features(ctx):
         ],
     )
 
-    result["fastbuild_feature"] = feature(name = "fastbuild", implies = ["dbg"])
+    # TODO: should `fastbuild` really imply `dbg`? Building in debug symbols should be slower
+    result["fastbuild_feature"] = feature(name = "fastbuild", implies = ["common"])
 
     result["user_compile_flags_feature"] = feature(
         name = "user_compile_flags",

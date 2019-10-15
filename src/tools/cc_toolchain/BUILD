@@ -79,6 +79,7 @@ filegroup(
 
 cc_toolchain_config(
     name = "clang-k8",
+    # TODO: We definitely don't need all these include directories
     builtin_include_directories = [
         "external/org_llvm_clang/include/",
         "external/org_llvm_clang/include/c++/v1/",
