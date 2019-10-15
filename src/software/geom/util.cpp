@@ -433,11 +433,11 @@ std::vector<Shot> angleSweepCirclesAll(const Vector &src, const Vector &p1,
     }
 
     std::vector<Shot> result;
-    for (unsigned i = 0; i < events_collapsed.size() - 1; i += 2)
+    for (unsigned i = 1; i < events_collapsed.size(); i += 2)
     {
         // Calculate the center of this range on the target line segement
-        Angle range_start = events_collapsed[i].first + start_angle;
-        Angle range_end   = events_collapsed[i + 1].first + start_angle;
+        Angle range_start = events_collapsed[i - 1].first + start_angle;
+        Angle range_end   = events_collapsed[i].first + start_angle;
         Angle mid         = (range_end - range_start) / 2 + range_start;
         Vector ray        = Vector::createFromAngle(mid) * 10.0;
         Vector inter      = lineIntersection(src, src + ray, p1, p2).value();
