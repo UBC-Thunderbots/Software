@@ -11,6 +11,9 @@ TEMP_FOLDER="/tmp/temp-thunderbots-gcc-setup"
 # Output name for tarball
 OUTPUT_TAR_NAME="gcc-arm-none-eabi-7.tar.bz2"
 
+# Install openocd
+./install_openocd.sh
+
 # The link to the arm-none-eabi tarball
 # got the link here: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
 GCC_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2017q4/gcc-arm-none-eabi-7-2017-q4-major-linux.tar.bz2?revision=375265d4-e9b5-41c8-bf23-56cbe927e156?product=GNU%20Arm%20Embedded%20Toolchain,64-bit,,Linux,7-2017-q4-major"
