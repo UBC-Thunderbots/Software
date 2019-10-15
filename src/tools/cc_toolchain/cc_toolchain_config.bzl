@@ -434,9 +434,9 @@ def _clang_impl(ctx):
         flag_sets = [
             flag_set(
                 actions = ALL_COMPILE_ACTIONS,
-                #                flag_groups = [flag_group(flags = [
-                #                    "-stdlib=libc++",
-                #                ])],
+                flag_groups = [flag_group(flags = [
+                    "-stdlib=libc++",
+                ])],
             ),
             flag_set(
                 actions = ALL_LINK_ACTIONS,
