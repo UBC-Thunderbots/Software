@@ -1,8 +1,13 @@
 #!/bin/bash
 
+# The directory this script is located in
 CURR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-BAZEL_ROOT_DIR="$CURR_DIR/../.."
+
+# The name of this script
 THIS_SCRIPT_FILENAME=`basename "$0"`
+
+# The root of the bazel project, used to find source files for gdb
+BAZEL_ROOT_DIR="$CURR_DIR/../.."
 
 NUM_ARGS=$#
 if [ $NUM_ARGS -ne 2 ]; then
