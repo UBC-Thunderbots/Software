@@ -108,7 +108,7 @@ class BallFilterTest : public ::testing::Test
         // Check for division by 0
         if (ball_velocity_magnitude == 0)
         {
-            throw std::system_error();
+            throw std::invalid_argument("ball_velocity_magnitude with value of 0 given, this will result in division by 0");
         }
         // Calculate how many simulation steps to take, given the ball's velocity and the
         // time step in order for the ball to reach the end of the given segment.
