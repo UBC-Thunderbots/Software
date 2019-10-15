@@ -27,7 +27,7 @@
 ## Introduction
 These instructions assume that you have the following accounts setup:
 - [Github](https://github.com/login)
-- [Slack](https://slack.com/signin)
+- [Slack](https://thunderbots.slack.com/)
 
 These instructions assume you have a basic understanding of Linux and the command-line. There are many great tutorials online, such as [LinuxCommand](http://linuxcommand.org/). The most important things you'll need to know are how to move around the filesystem, and how to run programs or scripts.
 
