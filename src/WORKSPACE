@@ -76,7 +76,24 @@ new_local_repository(
     path = "/usr/include/x86_64-linux-gnu/qt5/",
 )
 
-#TODO: make this consistent with our other external deps
-load("//tools/workspace:default.bzl", "add_default_repositories")
+http_archive(
+    # TODO: better name, unless there is good reason for this one?
+    name = "org_llvm_clang",
+    build_file = "@//external:clang.BUILD",
+    sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
+    strip_prefix = "clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04",
+    urls = [
+        "http://releases.llvm.org/9.0.0/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz",
+    ],
+)
 
-add_default_repositories()
+http_archive(
+    # TODO: better name, unless there is good reason for this one?
+    name = "com_arm_developer_gcc",
+    build_file = "@//external:arm_gcc.BUILD",
+    sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
+    strip_prefix = "gcc-arm-none-eabi-8-2019-q3-update",
+    urls = [
+        "https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2",
+    ],
+)
