@@ -1,9 +1,5 @@
 load("@bazel_tools//tools/cpp:toolchain_utils.bzl", "find_cpp_toolchain")
 
-# TODO: Do we need this?
-MyCCompileInfo = provider(doc = "", fields = ["object"])
-
-# TODO: comment here
 SUPPORTED_PROCESSORS = [
     "STM32H743xx",
     "STM32H753xx",
@@ -16,38 +12,25 @@ SUPPORTED_PROCESSORS = [
 ]
 
 # We got this URL by running wireshark and watching what STM32CubeMX tried to download
+# when it does its code generation
 STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL = \
     "http://www.ebuc23.com/s3/stm_test/software/firmware/stm32cube_fw_h7_v150.zip"
+STM32_H7_DRIVERS_AND_MIDDLEWARE_ZIP_PREFIX = "STM32Cube_FW_H7_V1.5.0"
 
-# TODO: comment here
 def _filter_none(input_list):
+    """ Returns the given list with all 'None' Elements Removed """
     filtered_list = []
     for element in input_list:
         if element != None:
             filtered_list.append(element)
     return filtered_list
 
-""" Rule to Build A HAL Library With Specific Configuration """
-
 def _cc_stm32h7_hal_library_impl(ctx):
-    # Begin by copying all the requested files into the current directory
-    # TODO: better comment here
+    """
+    Rule to build a HAL library for a stm32h7 MCU based on given configuration files
+    """
 
-    # TODO: rename "fw" to firmware..........
-
-    fw_zip_name = "fw.zip"
-    fw_zip = ctx.actions.declare_file(fw_zip_name)
-    ctx.actions.run_shell(
-        outputs = [fw_zip],
-        command = """
-        curl -L {} -o {}
-        """.format(STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL, fw_zip.path),
-        progress_message = "Downloading firmware from {}".format(STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL),
-    )
-
-    # TODO: unzipping should be with downloading above, or in it's own step, to minimize the number of time it has to be run?
-
-    # TODO: the whole "external_deps" thing is a _bit_ convoluted, we can maybe simplify things a bit?
+    # Get the files we need to download in order to build the library
     drivers_and_middleware_hdrs = [
         ctx.actions.declare_file("external_deps/{}".format(filename))
         for filename in ctx.attr.drivers_and_middleware_hdrs
@@ -57,18 +40,50 @@ def _cc_stm32h7_hal_library_impl(ctx):
         for filename in ctx.attr.drivers_and_middleware_srcs
     ]
 
-    external_deps_folder = ctx.actions.declare_directory("external_deps")
+    # We assume that every header is included directly, ie. `#include "stm32h7xx.h"`
+    # instead of `#include "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h"`
+    drivers_and_middleware_includes = [file.dirname for file in drivers_and_middleware_hdrs]
+
+    # HAL is configured by having the user compile in headers with various options set
+    hal_config_hdr_includes = [file.dirname for file in ctx.files.hal_config_hdrs]
+
+    # Begin by downloading all third party files we need
+    drivers_and_middleware_zip_name = "drivers_and_middleware.zip"
+    drivers_and_middleware_zip = ctx.actions.declare_file(drivers_and_middleware_zip_name)
     ctx.actions.run_shell(
-        inputs = [fw_zip],
-        outputs = [external_deps_folder] + drivers_and_middleware_hdrs + drivers_and_middleware_srcs,
+        outputs = [drivers_and_middleware_zip],
         command = """
-        unzip -qo {} 'STM32Cube_FW_H7_V1.5.0/Drivers/*' 'STM32Cube_FW_H7_V1.5.0/Middlewares/*'
-        rm -rf {external_deps_path}
-        mv STM32Cube_FW_H7_V1.5.0 {external_deps_path}
-        """.format(fw_zip.path, external_deps_path = external_deps_folder.path),
-        progress_message = "Unzipping firmware",
+        curl -L {download_url} -o {output_path}
+        """.format(
+            download_url = STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL,
+            output_path = drivers_and_middleware_zip.path,
+        ),
+        progress_message = "Downloading drivers and middleware from {}".format(
+            STM32_H7_DRIVERS_AND_MIDDLEWARE_DOWNLOAD_URL,
+        ),
     )
 
+    # Unzip the files we just downloaded
+    external_deps_folder = ctx.actions.declare_directory("external_deps")
+    ctx.actions.run_shell(
+        inputs = [drivers_and_middleware_zip],
+        outputs =
+            [external_deps_folder] +
+            drivers_and_middleware_hdrs +
+            drivers_and_middleware_srcs,
+        command = """
+        unzip -qo {path_to_zip} '{zip_prefix}/Drivers/*' '{zip_prefix}/Middlewares/*'
+        rm -rf {external_deps_path}
+        mv {zip_prefix} {external_deps_path}
+        """.format(
+            path_to_zip = drivers_and_middleware_zip.path,
+            zip_prefix = STM32_H7_DRIVERS_AND_MIDDLEWARE_ZIP_PREFIX,
+            external_deps_path = external_deps_folder.path,
+        ),
+        progress_message = "Unzipping drivers and middleware",
+    )
+
+    # Setup the toolchain
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
@@ -79,9 +94,7 @@ def _cc_stm32h7_hal_library_impl(ctx):
     compilation_contexts = []
     linking_contexts = []
 
-    hal_config_hdr_includes = [file.dirname for file in ctx.files.hal_config_hdrs]
-    drivers_and_middleware_includes = [file.dirname for file in drivers_and_middleware_hdrs]
-
+    # Compile
     (compilation_context, compilation_outputs) = cc_common.compile(
         name = ctx.label.name,
         actions = ctx.actions,
@@ -92,10 +105,14 @@ def _cc_stm32h7_hal_library_impl(ctx):
             ctx.files.hal_config_hdrs +
             ctx.files.free_rtos_config_hdrs,
         srcs = drivers_and_middleware_srcs,
-        includes = drivers_and_middleware_includes + hal_config_hdr_includes,
+        includes =
+            drivers_and_middleware_includes +
+            hal_config_hdr_includes,
         user_compile_flags = ["-D{}".format(ctx.attr.processor), "-DUSE_HAL_DRIVER"],
         compilation_contexts = compilation_contexts,
     )
+
+    # Link
     (linking_context, linking_outputs) = cc_common.create_linking_context_from_compilation_outputs(
         name = ctx.label.name,
         actions = ctx.actions,
@@ -133,20 +150,16 @@ cc_stm32h7_hal_library = rule(
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
         #        "_cc_toolchain": attr.label(default = "@bazel_tools//tools/cpp:current_cc_toolchain"),
         "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:stm32h7_toolchain"),
-        # TODO: check if using this means we don't need to specify a cpu/toolchain on the command line
-        # TODO: is this doing anything?
-        "_compiler": attr.label(
-            default = Label("//tools/cc_toolchain:gcc-stm32h7"),
-            allow_single_file = True,
-            #executable = True,
-        ),
     },
     fragments = ["cpp"],
 )
 
-""" Rule to build a binary for the stm32h7 series of MCU's """
-
 def _cc_stm32h7_binary_impl(ctx):
+    """
+    Rule to build binaries (.bin and .elf) for a stm32h7 MCU
+    """
+
+    # Initial configuration
     cc_toolchain = find_cpp_toolchain(ctx)
     feature_configuration = cc_common.configure_features(
         ctx = ctx,
@@ -155,6 +168,8 @@ def _cc_stm32h7_binary_impl(ctx):
         unsupported_features = ctx.disabled_features,
     )
 
+    # Add all dependencies for this target to the required contexts for compilation
+    # and linking
     compilation_contexts = []
     linking_contexts = []
     for dep in ctx.attr.deps:
@@ -162,7 +177,7 @@ def _cc_stm32h7_binary_impl(ctx):
             compilation_contexts.append(dep[CcInfo].compilation_context)
             linking_contexts.append(dep[CcInfo].linking_context)
 
-    # Manually compile assembly files
+    # Manually compile the assembly files
     assembly_object_files = []
     for assembly_file in ctx.files.assembly:
         object_file = ctx.actions.declare_file("_objs/{}.o".format(assembly_file.basename))
@@ -177,7 +192,12 @@ def _cc_stm32h7_binary_impl(ctx):
             ),
         )
         assembly_object_files.append(object_file)
+    assembly_compilation_outputs = cc_common.create_compilation_outputs(
+        objects = depset(_filter_none(assembly_object_files)),
+        pic_objects = depset(_filter_none(assembly_object_files)),
+    )
 
+    # Compile the source code normally
     (_compilation_context, compilation_outputs) = cc_common.compile(
         name = ctx.label.name,
         actions = ctx.actions,
@@ -189,24 +209,7 @@ def _cc_stm32h7_binary_impl(ctx):
         user_compile_flags = ctx.attr.copts + ["-D{}".format(ctx.attr.processor), "-DUSE_HAL_DRIVER"],
     )
 
-    linkopts = []
-    for linkopt in ctx.attr.linkopts:
-        linkopts.append(ctx.expand_location(linkopt, targets = [ctx.attr.linker_script]))
-
-    linkopts += [
-        "-T{}".format(ctx.file.linker_script.path),
-        # TODO: why do we need  "-specs=nano.specs"? What does it do?
-        "-specs=nano.specs",
-        "-lc",
-        "-lm",
-        "-lnosys",
-    ]
-
-    assembly_compilation_outputs = cc_common.create_compilation_outputs(
-        objects = depset(_filter_none(assembly_object_files)),
-        pic_objects = depset(_filter_none(assembly_object_files)),
-    )
-
+    # Link
     linking_outputs = cc_common.link(
         name = "{}.elf".format(ctx.label.name),
         actions = ctx.actions,
@@ -217,15 +220,20 @@ def _cc_stm32h7_binary_impl(ctx):
             compilation_outputs = [assembly_compilation_outputs, compilation_outputs],
         ),
         linking_contexts = linking_contexts,
-        user_link_flags = linkopts,
+        user_link_flags = ctx.attr.linkopts + [
+            "-T{}".format(ctx.file.linker_script.path),
+            "-specs=nano.specs",
+            "-lc",
+            "-lm",
+            "-lnosys",
+        ],
         link_deps_statically = True,
         additional_inputs = [ctx.file.linker_script],
         output_type = "executable",
     )
 
-    elf_file = linking_outputs.executable
-
     # Create the .bin from the .elf
+    elf_file = linking_outputs.executable
     bin_file = ctx.actions.declare_file("{}.bin".format(ctx.label.name))
     ctx.actions.run_shell(
         inputs = [elf_file],
@@ -251,28 +259,13 @@ cc_stm32h7_binary = rule(
         "assembly": attr.label_list(allow_files = [".s"]),
         # TODO: Should not allow headers here?
         "hdrs": attr.label_list(allow_files = [".h"]),
-        "linker_script": attr.label(
-            mandatory = True,
-            allow_single_file = True,
-        ),
-        "deps": attr.label_list(
-            allow_empty = True,
-            providers = [CcInfo],
-        ),
-        "data": attr.label_list(
-            default = [],
-            allow_files = True,
-        ),
+        "linker_script": attr.label(mandatory = True, allow_single_file = True),
+        "deps": attr.label_list(allow_empty = True, providers = [CcInfo]),
+        "data": attr.label_list(default = [], allow_files = True),
         "linkopts": attr.string_list(),
         "copts": attr.string_list(),
         "_cc_toolchain": attr.label(default = "//tools/cc_toolchain:stm32h7_toolchain"),
         "processor": attr.string(mandatory = True, values = SUPPORTED_PROCESSORS),
-        # TODO: is this doing anything?
-        "_compiler": attr.label(
-            default = Label("//tools/cc_toolchain:gcc-stm32h7"),
-            allow_single_file = True,
-            #executable = True,
-        ),
     },
     fragments = ["cpp"],
 )

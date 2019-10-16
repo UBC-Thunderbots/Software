@@ -1,8 +1,5 @@
 load("//firmware_new:rules.bzl", "cc_stm32h7_binary", "cc_stm32h7_hal_library")
 
-# TODO: do we need custom flags for this?
-# TODO: how to enforce compiler???
-# TODO: probably want a custom rule, or at least a macro for this
 cc_stm32h7_binary(
     name = "frankie_v1_main",
     srcs = glob(["*.c"]),
@@ -16,13 +13,6 @@ cc_stm32h7_binary(
     # TODO: we need to be able to give a `.ioc` file here and check for generation
 )
 
-#cc_library(
-#    name = "devices_vector_table",
-#    srcs = ["startup_stm32h742xx.s"],
-#    deps = [],
-#)
-
-# TODO: rename this, it encompasses middlewares as well now
 cc_stm32h7_hal_library(
     name = "frankie_v1_hal",
     drivers_and_middleware_hdrs = [
