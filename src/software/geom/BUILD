@@ -7,6 +7,7 @@ cc_library(
         "rectangle.cpp",
         "shot.cpp",
         "util.cpp",
+        "polynomial.cpp",
     ],
     hdrs = [
         "angle.h",
@@ -19,6 +20,7 @@ cc_library(
         "segment.h",
         "shot.h",
         "util.h",
+        "polynomial.h",
     ],
     copts = [
         "-std=c++17",
