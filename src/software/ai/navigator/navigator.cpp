@@ -6,7 +6,7 @@
 #include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 
-// overloaded is used for the visiting PathType
+// overloaded is used for the visiting Path
 // Adapted from https://en.cppreference.com/w/cpp/utility/variant/visit
 template <class... Ts>
 struct overloaded : Ts...
@@ -68,7 +68,10 @@ void Navigator::visit(const MoveIntent &move_intent)
     std::vector<Obstacle> obstacles =
         createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    auto path = path_planner_->findPath(start, dest, this->world.field(), obstacles);
+    Rectangle navigableArea(
+        Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
+        this->world.field().totalXLength(), this->world.field().totalYLength());
+    auto path = path_planner_->findPath(start, dest, navigableArea, obstacles);
 
     std::visit(
         overloaded{

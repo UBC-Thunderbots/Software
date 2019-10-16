@@ -14,11 +14,13 @@ class NoPathTestPathPlanner : public PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param field  WARNING: NoPathTestPathPlanner does not respect the field
+     * @param navigableArea WARNING: NoPathTestPathPlanner does not respect the
+     * navigableArea
      * @param obstacles WARNING: NoPathTestPathPlanner does not avoid obstacles
      *
      * @return a vector that is {}
      */
-    PathType findPath(const Point &start, const Point &destination, const Field &field,
-                      const std::vector<Obstacle> &obstacles) override;
+    Path findPath(const Point &start, const Point &destination,
+                  const Rectangle &navigableArea,
+                  const std::vector<Obstacle> &obstacles) override;
 };

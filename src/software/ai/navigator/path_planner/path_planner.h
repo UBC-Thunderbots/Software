@@ -5,7 +5,7 @@
 #include "software/ai/navigator/curve/curve.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
-#include "software/world/field.h"
+#include "software/geom/rectangle.h"
 
 /**
  * PathPlanner is an interface for a path planner that,
@@ -14,7 +14,7 @@
  * if a path exists, otherwise it will return nothing.
  */
 
-using PathType = std::variant<std::vector<Curve>, std::vector<Point>>;
+using Path = std::variant<std::vector<Curve>, std::vector<Point>>;
 
 class PathPlanner
 {
@@ -25,7 +25,7 @@ class PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param field field
+     * @param navigableArea Rectangle representing the navigable area
      * @param obstacles obstacles to avoid
      *
      * @return a path between start and destination
@@ -34,9 +34,9 @@ class PathPlanner
      * 		a vector of points or a vector of curves
      * 		    * The vector of points must include the start point and end point
      */
-    virtual PathType findPath(const Point &start, const Point &destination,
-                              const Field &field,
-                              const std::vector<Obstacle> &obstacles) = 0;
+    virtual Path findPath(const Point &start, const Point &destination,
+                          const Rectangle &navigableArea,
+                          const std::vector<Obstacle> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;
 };

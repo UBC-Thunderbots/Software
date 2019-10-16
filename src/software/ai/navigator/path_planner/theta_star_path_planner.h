@@ -3,7 +3,6 @@
 #include <unistd.h>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "software/world/field.h"
 
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
@@ -20,14 +19,15 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param field field
+     * @param navigableArea Rectangle representing the navigable area
      * @param obstacles obstacles to avoid
      *
      * @return a vector of points that is the optimal path avoiding obstacles
      * 		if no valid path then return empty vector
      */
-    PathType findPath(const Point &start, const Point &destination, const Field &field,
-                      const std::vector<Obstacle> &obstacles) override;
+    Path findPath(const Point &start, const Point &destination,
+                  const Rectangle &navigableArea,
+                  const std::vector<Obstacle> &obstacles) override;
 
    private:
     typedef std::pair<int, int> CellCoordinate;
