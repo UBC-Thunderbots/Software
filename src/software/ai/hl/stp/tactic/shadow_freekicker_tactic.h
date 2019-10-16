@@ -12,8 +12,8 @@ class ShadowFreekickerTactic : public Tactic
    public:
     enum FreekickShadower
     {
-        First  = 0,
-        Second = 1,
+        LEFT  = 0,
+        RIGHT = 1,
     };
 
     /**
@@ -66,5 +66,5 @@ class ShadowFreekickerTactic : public Tactic
     Field field;
 
     const double FREE_KICK_MAX_PROXIMITY =
-        0.50;  // Robots cannot be closer than 50cm from the ball during a freekick
+        0.50 * 1.05;  // Robots cannot be closer than 50cm from the ball during a freekick (with a buffer factor)
 };
