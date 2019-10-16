@@ -246,6 +246,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "shadow_freekicker_tactic_test",
+    srcs = ["shadow_freekicker_tactic_test.cpp"],
+    deps = [
+        ":shadow_freekicker_tactic",
+        "//software/geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "shoot_goal_tactic",
     srcs = ["shoot_goal_tactic.cpp"],
