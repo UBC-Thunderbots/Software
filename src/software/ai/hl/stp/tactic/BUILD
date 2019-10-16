@@ -80,6 +80,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "crease_defender_tactic_test",
+    srcs = ["crease_defender_tactic_test.cpp"],
+    deps = [
+        ":crease_defender_tactic",
+        "//shared:constants",
+        "//software/ai/intent:move_intent",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
