@@ -189,7 +189,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla"] + ctx.attr.host_compiler_warnings,
+                        flags = ["-Wall", "-Wextra", "-Wvla", "-Werror"] + ctx.attr.host_compiler_warnings,
                     ),
                 ],
             ),
