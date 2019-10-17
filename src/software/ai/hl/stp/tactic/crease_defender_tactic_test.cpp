@@ -69,9 +69,9 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
 
     try
     {
-        // The robot's position should be one full robot diameter to the left, perpendicular to the shot vector,
-        // so that the goalie is allowed to block the shot in the middle and the crease defender isn't
-        // overlapping with the goalie
+        // The robot's position should be one full robot diameter to the left,
+        // perpendicular to the shot vector, so that the goalie is allowed to block the
+        // shot in the middle and the crease defender isn't overlapping with the goalie
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(
             Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
@@ -112,9 +112,9 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_sid
 
     try
     {
-        // The robot's position should be one full robot diameter to the right, perpendicular to the shot vector,
-        // so that the goalie is allowed to block the shot in the middle and the crease defender isn't
-        // overlapping with the goalie
+        // The robot's position should be one full robot diameter to the right,
+        // perpendicular to the shot vector, so that the goalie is allowed to block the
+        // shot in the middle and the crease defender isn't overlapping with the goalie
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(
             Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
