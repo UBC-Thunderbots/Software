@@ -1,11 +1,15 @@
 #include "software/geom/polynomial.h"
 
-Polynomial::Polynomial(const std::vector<double>& x_coeffs, const std::vector<double>& y_coeffs) : x_coeffs(x_coeffs), y_coeffs(y_coeffs)
+Polynomial::Polynomial(const std::vector<double>& x_coeffs,
+                       const std::vector<double>& y_coeffs)
+    : x_coeffs(x_coeffs), y_coeffs(y_coeffs)
 {
     pruneCoeffs();
 }
 
-Polynomial::Polynomial(const std::initializer_list<double>& x_coeffs, const std::initializer_list<double>& y_coeffs) : x_coeffs(x_coeffs), y_coeffs(y_coeffs)
+Polynomial::Polynomial(const std::initializer_list<double>& x_coeffs,
+                       const std::initializer_list<double>& y_coeffs)
+    : x_coeffs(x_coeffs), y_coeffs(y_coeffs)
 {
     pruneCoeffs();
 }

@@ -23,7 +23,8 @@ class Polynomial
      *  *coeffs[coeffs.size()-1] != 0
      *  *order of polynomial is coeffs.size()
      */
-    explicit Polynomial(const std::vector<double>& x_coeffs, const std::vector<double>& y_coeffs);
+    explicit Polynomial(const std::vector<double>& x_coeffs,
+                        const std::vector<double>& y_coeffs);
 
     /**
      * Construct a polynomial from coefficients
@@ -35,7 +36,8 @@ class Polynomial
      *  *coeffs[coeffs.size()-1] != 0
      *  *order of polynomial is coeffs.size()
      */
-    explicit Polynomial(const std::initializer_list<double>& x_coeffs, const std::initializer_list<double>& y_coeffs);
+    explicit Polynomial(const std::initializer_list<double>& x_coeffs,
+                        const std::initializer_list<double>& y_coeffs);
 
     /**
      * Returns the x coefficients of the polynomial
