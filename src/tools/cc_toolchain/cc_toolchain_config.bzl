@@ -189,7 +189,8 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Werror"] + ctx.attr.host_compiler_warnings,
+                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wno-invalid-constexpr"] +
+                                ctx.attr.host_compiler_warnings,
                     ),
                 ],
             ),
@@ -311,7 +312,8 @@ def _make_common_features(ctx):
 
     result["has_configured_linker_path_feature"] = feature(name = "has_configured_linker_path")
 
-    result["copy_dynamic_libraries_to_binary_feature"] = feature(name = "copy_dynamic_libraries_to_binary")
+    result["copy_dynamic_libraries_to_binary_feature"] = \
+        feature(name = "copy_dynamic_libraries_to_binary")
 
     result["user_link_flags_feature"] = feature(
         name = "user_link_flags",
