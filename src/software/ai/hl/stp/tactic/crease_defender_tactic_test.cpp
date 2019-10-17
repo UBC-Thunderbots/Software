@@ -6,7 +6,7 @@
 #include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 
-TEST(BlockShotPathTacticTest, single_defender_blocks_shot_without_goalie)
+TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_without_goalie)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
@@ -42,7 +42,7 @@ TEST(BlockShotPathTacticTest, single_defender_blocks_shot_without_goalie)
     }
 }
 
-TEST(BlockShotPathTacticTest, single_defender_blocks_shot_with_goalie_left_side)
+TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
@@ -69,6 +69,9 @@ TEST(BlockShotPathTacticTest, single_defender_blocks_shot_with_goalie_left_side)
 
     try
     {
+        // The robot's position should be one full robot diameter to the left, perpendicular to the shot vector,
+        // so that the goalie is allowed to block the shot in the middle and the crease defender isn't
+        // overlapping with the goalie
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(
             Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
@@ -82,7 +85,7 @@ TEST(BlockShotPathTacticTest, single_defender_blocks_shot_with_goalie_left_side)
     }
 }
 
-TEST(BlockShotPathTacticTest, single_defender_blocks_shot_with_goalie_right_side)
+TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_side)
 {
     World world = ::Test::TestUtil::createBlankTestingWorld();
     ::Test::TestUtil::setBallPosition(world, Point(0, 0), Timestamp::fromSeconds(0));
@@ -109,6 +112,9 @@ TEST(BlockShotPathTacticTest, single_defender_blocks_shot_with_goalie_right_side
 
     try
     {
+        // The robot's position should be one full robot diameter to the right, perpendicular to the shot vector,
+        // so that the goalie is allowed to block the shot in the middle and the crease defender isn't
+        // overlapping with the goalie
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(
             Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
