@@ -240,13 +240,25 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         // position goalie in best position to block shot
         else
         {
-            // compute angle between two vectors, negative goal post to ball and positive
-            // goal post to ball
-            Angle block_cone_angle =
-                (ball.position() - field.friendlyGoalpostNeg())
-                    .orientation()
-                    .minDiff(
-                        (ball.position() - field.friendlyGoalpostPos()).orientation());
+            // block the cone by default
+            float radius =
+                Util::DynamicParameters::GoalieTactic::block_cone_buffer.value() +
+                ROBOT_MAX_RADIUS_METERS;
+            Point goalie_pos =
+                calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),
+                              ball.position(), radius);
+
+            // restrict the goalie to a semicircle inscribed inside the defense area
+            Point goalie_restricted_pos =
+                field.friendlyGoal() - (field.friendlyDefenseArea().yLength() *
+                                        (field.friendlyGoal() - goalie_pos).norm());
+
+            // restrict the point to be within the defense area
+            auto goalie_orientation = (ball.position() - goalie_pos).orientation();
+            next_intent             = move_action.updateStateAndGetNextIntent(
+                *robot, goalie_restricted_pos, goalie_orientation, 0.0, false, false,
+                AUTOCHIP);
+        }
 
             // compute block cone position, allowing 1 ROBOT_MAX_RADIUS_METERS extra on
             // either side
@@ -265,6 +277,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             auto clamped_goalie_pos =
                 restrainGoalieInRectangle(goalie_pos, deflated_defense_area);
 
+            // if the goalie could not be restrained in the deflated defense area,
+            // then the ball must be either on a really sharp angle to the net where
+            // its impossible to get a shot, or the ball is behind the net, in which
+            // case we snap to either post
             if (!clamped_goalie_pos)
             {
                 if (ball.position().y() > 0)
