@@ -100,6 +100,7 @@ cc_library(
         ":tactic",
         ":tactic_visitor",
         "//shared:constants",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:enemy_threat",
