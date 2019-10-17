@@ -76,7 +76,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_left_side
         EXPECT_TRUE(move_intent.getDestination().isClose(
             Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
                       ROBOT_MAX_RADIUS_METERS,
-                  0.18),
+                  2 * ROBOT_MAX_RADIUS_METERS),
             0.05));
     }
     catch (...)
@@ -119,7 +119,7 @@ TEST(CreaseDefenderTacticTest, single_defender_blocks_shot_with_goalie_right_sid
         EXPECT_TRUE(move_intent.getDestination().isClose(
             Point(world.field().friendlyDefenseArea().posXPosYCorner().x() +
                       ROBOT_MAX_RADIUS_METERS,
-                  -0.18),
+                  -2 * ROBOT_MAX_RADIUS_METERS),
             0.05));
     }
     catch (...)
