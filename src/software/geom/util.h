@@ -385,7 +385,7 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
  * where the points define the line segment of overlap.
  */
 std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
-        const Ray &ray, const Rectangle &rectangle);
+    const Ray &ray, const Rectangle &rectangle);
 
 /**
  * Calculates the intersection of two Rays

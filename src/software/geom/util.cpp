@@ -849,16 +849,16 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
 }
 
 std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
-        const Ray &ray, const Rectangle &rectangle)
+    const Ray &ray, const Rectangle &rectangle)
 {
     std::vector<Segment> rectangle_segments = {
-            Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
-            Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
-            Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
-            Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
+        Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
+        Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
+        Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
+        Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
     };
     std::pair<std::optional<Point>, std::optional<Point>> result =
-            std::make_pair(std::nullopt, std::nullopt);
+        std::make_pair(std::nullopt, std::nullopt);
     for (const auto &seg : rectangle_segments)
     {
         auto intersection = raySegmentIntersection(ray, seg);
