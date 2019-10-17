@@ -848,6 +848,31 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     }
 }
 
+std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
+    const Ray &ray, const Rectangle &rectangle)
+{
+    std::vector<Segment> rectangle_segments = {
+        Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
+        Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
+        Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
+        Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
+    };
+    std::pair<std::optional<Point>, std::optional<Point>> result =
+        std::make_pair(std::nullopt, std::nullopt);
+    for (const auto &seg : rectangle_segments)
+    {
+        auto intersection = raySegmentIntersection(ray, seg);
+        // Always take the result with more non-nullopt values
+        if ((intersection.first && !result.first) ||
+            (intersection.second && !result.second))
+        {
+            result = intersection;
+        }
+    }
+
+    return result;
+}
+
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
 {
     // Calculate if the intersecion exists along segments of infinite length
