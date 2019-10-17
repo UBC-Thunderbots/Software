@@ -30,8 +30,7 @@ cc_library(
         "//software/ai/intent:all_intents",
         "//software/ai/intent:intent_visitor",
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/path_planner:straight_line_path_planner",
-        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_planner:path_planner",
         "//software/ai/primitive:all_primitives",
         "//software/util/parameter:dynamic_parameters",
         "//software/world",
@@ -44,6 +43,9 @@ cc_test(
     deps = [
         ":navigator",
         "//software/test_util",
+        "//software/ai/navigator/path_planner:theta_star_path_planner",
+        "//software/ai/navigator/path_planner:one_point_path_test_path_planner",
+        "//software/ai/navigator/path_planner:no_path_test_path_planner",
         "@gtest//:gtest_main",
     ],
 )
