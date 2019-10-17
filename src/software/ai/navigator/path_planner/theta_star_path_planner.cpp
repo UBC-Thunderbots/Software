@@ -11,7 +11,7 @@ bool ThetaStarPathPlanner::isValid(int row, int col)
 {
     // Returns true if row number and column number
     // is in range
-    return (row >= 0) && (row < numRows) && (col >= 0) && (col < numCols);
+    return (row >= 0) && (row < numGridRows) && (col >= 0) && (col < numGridCols);
 }
 
 bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
@@ -24,7 +24,7 @@ bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
         bool blocked = false;
 
         Point p = convertCellToPoint(row, col);
-        for (auto &obstacle : obstacles_)
+        for (auto &obstacle : obstacles)
         {
             if (obstacle.containsPoint(p))
             {
@@ -174,27 +174,23 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
                                     const Rectangle &navigableArea,
                                     const std::vector<Obstacle> &obstacles)
 {
-    obstacles_ = obstacles;
-    Path empty_ret_val(std::vector<Point>({}));
-    CellCoordinate src_coord, dest_coord;
+    // Initialize member variables
+    this->obstacles = obstacles;
+    maxNavXCoord = (navigableArea.xLength() - ROBOT_MAX_RADIUS_METERS) / 2.0;
+    maxNavYCoord = (navigableArea.yLength() - ROBOT_MAX_RADIUS_METERS) / 2.0;
+    numGridRows = (int)((maxNavXCoord * 2.0) / SIZE_OF_GRID_CELL_IN_METERS);
+    numGridCols = (int)((maxNavYCoord * 2.0) / SIZE_OF_GRID_CELL_IN_METERS);
 
+    // Reset data structures to path plan again
     openList.clear();
     unblocked_grid.clear();
 
-    fieldXLength     = navigableArea.xLength();
-    fieldYLength     = navigableArea.yLength();
-    fieldXHalfLength = fieldXLength / 2.0;
-    fieldYHalfLength = fieldYLength / 2.0;
-
-    // initialize grid
-    numRows =
-        (int)((fieldXLength - ROBOT_MAX_RADIUS_METERS) / SIZE_OF_GRID_CELL_IN_METERS);
-    numCols =
-        (int)((fieldYLength - ROBOT_MAX_RADIUS_METERS) / SIZE_OF_GRID_CELL_IN_METERS);
-
+    // Initialize local variables
     Point closest_destination = findClosestFreePoint(destination);
-    src_coord          = convertPointToCell(start);
-    dest_coord                = convertPointToCell(closest_destination);
+    CellCoordinate src_coord = convertPointToCell(start);
+    CellCoordinate dest_coord = convertPointToCell(closest_destination);
+    Path empty_ret_val(std::vector<Point>({}));
+
     // If the source is out of range
     if (isValid(src_coord.first, src_coord.second) == false)
     {
@@ -253,10 +249,10 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     }
 
     closedList =
-        std::vector<std::vector<bool>>(numRows, std::vector<bool>(numCols, false));
+        std::vector<std::vector<bool>>(numGridRows, std::vector<bool>(numGridCols, false));
 
     cellDetails = std::vector<std::vector<GridCell>>(
-        numRows, std::vector<GridCell>(numCols, ThetaStarPathPlanner::GridCell(
+        numGridRows, std::vector<GridCell>(numGridCols, ThetaStarPathPlanner::GridCell(
                                                     -1, -1, DBL_MAX, DBL_MAX, DBL_MAX)));
 
     int i, j;
@@ -353,7 +349,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
     int j = currCell.second;
     unsigned nextIndex, currIndex = 3;
     int nextIncrement[4] = {1, 0, -1, 0};
-    for (int depth = 1; depth < numRows; depth++)
+    for (int depth = 1; depth < numGridRows; depth++)
     {
         nextIndex = (currIndex + 1) % 4;
         i += nextIncrement[nextIndex] * depth;
@@ -384,7 +380,7 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
         int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
         int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
 
-        for (int r = 1; r < fieldXLength * BLOCKED_DESTINATION_SEARCH_RESOLUTION; r++)
+        for (int r = 1; r < maxNavXCoord * 2.0 * BLOCKED_DESTINATION_SEARCH_RESOLUTION; r++)
         {
             int x = 0, y = r;
             int d = 3 - 2 * r;
@@ -459,13 +455,10 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
 
 bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
 {
-    double x_limit = fieldXHalfLength + ROBOT_MAX_RADIUS_METERS;
-    double y_limit = fieldYHalfLength + ROBOT_MAX_RADIUS_METERS;
-
-    if ((p.x() > -x_limit) && (p.x() < x_limit) && (p.y() > -y_limit) &&
-        (p.y() < y_limit))
+    if ((p.x() > -maxNavXCoord) && (p.x() < maxNavXCoord) && (p.y() > -maxNavYCoord) &&
+        (p.y() < maxNavYCoord))
     {
-        for (auto &obstacle : obstacles_)
+        for (auto &obstacle : obstacles)
         {
             if (obstacle.containsPoint(p))
             {
@@ -481,16 +474,16 @@ Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
 {
     // account for robot radius
     return Point((row * SIZE_OF_GRID_CELL_IN_METERS) -
-                     (fieldXHalfLength - ROBOT_MAX_RADIUS_METERS),
+                     maxNavXCoord,
                  (col * SIZE_OF_GRID_CELL_IN_METERS) -
-                     (fieldYHalfLength - ROBOT_MAX_RADIUS_METERS));
+                     maxNavYCoord);
 }
 
 ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::convertPointToCell(Point p)
 {
     // account for robot radius
-    return std::make_pair((int)((p.x() + (fieldXHalfLength - ROBOT_MAX_RADIUS_METERS)) /
+    return std::make_pair((int)((p.x() + maxNavXCoord) /
                                 SIZE_OF_GRID_CELL_IN_METERS),
-                          (int)((p.y() + (fieldYHalfLength - ROBOT_MAX_RADIUS_METERS)) /
+                          (int)((p.y() + maxNavYCoord) /
                                 SIZE_OF_GRID_CELL_IN_METERS));
 }

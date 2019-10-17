@@ -144,19 +144,19 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isValidAndFreeOfObstacles(Point p);
 
     /**
-     * Converts a cell in grid to a point on field
+     * Converts a cell in grid to a point on navigable area
      *
      * @param row row of cell
      * @param col col of cell
      *
-     * @return Point on field
+     * @return Point on navigable area
      */
     Point convertCellToPoint(int row, int col);
 
     /**
-     * Converts a point on field to a cell in grid
+     * Converts a point on navigable area to a cell in grid
      *
-     * @param p point on field
+     * @param p point on navigable area
      *
      * @return cell in grid
      */
@@ -179,13 +179,11 @@ class ThetaStarPathPlanner : public PathPlanner
     const double SIZE_OF_GRID_CELL_IN_METERS =
         (ROBOT_MAX_RADIUS_METERS / GRID_DIVISION_FACTOR);
 
-    std::vector<Obstacle> obstacles_;
-    int numRows;
-    int numCols;
-    double fieldXLength;
-    double fieldYLength;
-    double fieldXHalfLength;
-    double fieldYHalfLength;
+    std::vector<Obstacle> obstacles;
+    int numGridRows;
+    int numGridCols;
+    double maxNavXCoord;
+    double maxNavYCoord;
 
     /*
     Create an open list having information as-
