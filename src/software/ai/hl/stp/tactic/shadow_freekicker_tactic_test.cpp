@@ -51,7 +51,7 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_left_side)
             (move_intent.getDestination() - world.field().friendlyGoal()).orientation();
         EXPECT_GT(goal_to_dest_angle, goal_to_ball_angle);
     }
-    catch (...)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
@@ -100,7 +100,7 @@ TEST(ShadowFreekickerTacticTest, test_shadow_free_kicker_right_side)
             (move_intent.getDestination() - world.field().friendlyGoal()).orientation();
         EXPECT_LT(goal_to_dest_angle, goal_to_ball_angle);
     }
-    catch (...)
+    catch (std::bad_cast&)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
