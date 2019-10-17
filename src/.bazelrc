@@ -21,3 +21,6 @@ test --test_output=all
 
 # Use Our Custom Toolchain
 build --crosstool_top=//tools/cc_toolchain:toolchain
+
+# TODO: comment here
+build --auto_cpu_environment_group=//tools:cpus
