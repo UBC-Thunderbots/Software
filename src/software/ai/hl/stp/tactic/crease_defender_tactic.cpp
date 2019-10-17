@@ -23,6 +23,7 @@ CreaseDefenderTactic::CreaseDefenderTactic(
       enemy_team(enemy_team),
       left_or_right(left_or_right)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
 }
 
 std::string CreaseDefenderTactic::getName() const
