@@ -109,6 +109,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "defense_shadow_enemy_tactic_test",
+    srcs = ["defense_shadow_enemy_tactic_test.cpp"],
+    deps = [
+        ":defense_shadow_enemy_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
@@ -350,6 +360,7 @@ cc_library(
         ":cherry_pick_tactic",
         ":chip_tactic",
         ":crease_defender_tactic",
+        ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
         ":move_tactic",
         ":passer_tactic",
