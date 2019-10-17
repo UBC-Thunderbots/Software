@@ -381,7 +381,7 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
  * @param rectangle The rectangle
  * @return Returns {std::nullopt, std::nullopt} if no intersections exist.
  * Returns {Point, std::nullopt} if a single intersection exists.
- * Returns {Point, Point} if the ray overlaps a segment of the rectangle are overlapping,
+ * Returns {Point, Point} if the ray overlaps a segment of the rectangle,
  * where the points define the line segment of overlap.
  */
 std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
