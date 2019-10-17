@@ -93,6 +93,23 @@ cc_test(
 )
 
 cc_library(
+    name = "defense_shadow_enemy_tactic",
+    srcs = ["defense_shadow_enemy_tactic.cpp"],
+    hdrs = ["defense_shadow_enemy_tactic.h"],
+    deps = [
+        ":tactic",
+        ":tactic_visitor",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/hl/stp/evaluation:calc_best_shot",
+        "//software/ai/hl/stp/evaluation:enemy_threat",
+        "//software/ai/hl/stp/evaluation:robot",
+        "//software/util/parameter:dynamic_parameters",
+    ],
+)
+
+cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
     hdrs = ["goalie_tactic.h"],
