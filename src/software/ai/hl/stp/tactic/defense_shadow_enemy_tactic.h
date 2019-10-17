@@ -10,7 +10,7 @@
  */
 class DefenseShadowEnemyTactic : public Tactic
 {
-public:
+   public:
     /**
      * Creates a new DefenseShadowEnemyTactic
      *
@@ -25,9 +25,9 @@ public:
      * @param loop_forever Whether or not this tactic should loop forever
      */
     explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                                      const Team &enemy_team, const Ball& ball, bool ignore_goalie,
-                                      double shadow_distance, bool enemy_team_can_pass,
-                                      bool loop_forever = true);
+                                      const Team &enemy_team, const Ball &ball,
+                                      bool ignore_goalie, double shadow_distance,
+                                      bool enemy_team_can_pass, bool loop_forever = true);
 
     std::string getName() const override;
 
@@ -39,7 +39,8 @@ public:
      * @param enemy_team The current state of the enemy team
      * @param ball The current state of the ball
      */
-    void updateWorldParams(const Field& field, const Team& friendly_team, const Team& enemy_team, const Ball& ball);
+    void updateWorldParams(const Field &field, const Team &friendly_team,
+                           const Team &enemy_team, const Ball &ball);
 
     /**
      * Updates the control parameters for this Tactic
@@ -55,9 +56,9 @@ public:
      *
      * @param visitor A Tactic Visitor
      */
-    void accept(TacticVisitor& visitor) const override;
+    void accept(TacticVisitor &visitor) const override;
 
-private:
+   private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
     // Tactic parameters

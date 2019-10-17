@@ -21,8 +21,8 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     Team friendly_team = Team(Duration::fromSeconds(1), {friendly_robot});
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
-    DefenseShadowEnemyTactic tactic =
-        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, false, true);
+    DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
+        field, friendly_team, enemy_team, ball, true, 0.5, false, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
@@ -39,7 +39,7 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
                   Angle::ofDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AutokickType::AUTOCHIP);
     }
-    catch (std::bad_cast&)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
@@ -61,8 +61,8 @@ TEST(DefenseShadowEnemyTacticTest,
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
               Timestamp::fromSeconds(0));
 
-    DefenseShadowEnemyTactic tactic =
-        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true, true);
+    DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
+        field, friendly_team, enemy_team, ball, true, 0.5, true, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
@@ -87,7 +87,8 @@ TEST(DefenseShadowEnemyTacticTest,
 }
 
 
-TEST(DefenseShadowEnemyTacticTest,
+TEST(
+    DefenseShadowEnemyTacticTest,
     test_shadower_does_not_steal_ball_if_the_enemy_has_possession_but_the_ball_is_moving_quickly)
 {
     Robot enemy_robot(1, Point(0, 0), Vector(0, 0), Angle::half(),
@@ -103,8 +104,8 @@ TEST(DefenseShadowEnemyTacticTest,
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),
               Timestamp::fromSeconds(0));
 
-    DefenseShadowEnemyTactic tactic =
-            DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true, true);
+    DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
+        field, friendly_team, enemy_team, ball, true, 0.5, true, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
@@ -118,7 +119,7 @@ TEST(DefenseShadowEnemyTacticTest,
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
         EXPECT_TRUE(move_intent.getDestination().isClose(Point(-0.5, 0), 0.01));
         EXPECT_LT(move_intent.getFinalAngle().minDiff(
-                (enemy_robot.position() - friendly_robot.position()).orientation()),
+                      (enemy_robot.position() - friendly_robot.position()).orientation()),
                   Angle::ofDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
     }
