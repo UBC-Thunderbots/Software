@@ -415,6 +415,15 @@ ShootOrPassPlay:
     default: 6
     type: double
     description: The minimum open angle to the goal that we require before taking a shot
+ShadowFreekickerTactic:
+  robot_separation_scaling_factor:
+    min: 1.0
+    max: 5.0
+    default: 1.1
+    type: double
+    description: >-
+      How much to scale the separation distance between the two robots shadowing
+      an enemy freekicker
 HighLevelStrategy:
   use_shoot_or_pass_instead_of_shoot_or_chip:
     default: true

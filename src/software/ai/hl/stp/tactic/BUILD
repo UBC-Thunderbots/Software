@@ -242,6 +242,7 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:possession",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "@g3log",
     ],
 )
