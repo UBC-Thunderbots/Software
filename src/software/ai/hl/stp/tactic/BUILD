@@ -254,7 +254,19 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/hl/stp/evaluation:possession",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "@g3log",
+    ],
+)
+
+cc_test(
+    name = "shadow_freekicker_tactic_test",
+    srcs = ["shadow_freekicker_tactic_test.cpp"],
+    deps = [
+        ":shadow_freekicker_tactic",
+        "//software/geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
