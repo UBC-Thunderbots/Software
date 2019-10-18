@@ -16,6 +16,7 @@ cc_library(
         "//software/ai/hl/stp/evaluation:possession",
         "//software/ai/hl/stp/tactic:cherry_pick_tactic",
         "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/ai/hl/stp/tactic:goalie_tactic",
         "//software/ai/hl/stp/tactic:passer_tactic",
         "//software/ai/hl/stp/tactic:receiver_tactic",
         "//software/ai/passing:pass_generator",
@@ -212,6 +213,32 @@ cc_library(
 )
 
 cc_library(
+    name = "shoot_or_pass_play",
+    srcs = ["shoot_or_pass_play.cpp"],
+    hdrs = ["shoot_or_pass_play.h"],
+    deps = [
+        ":play",
+        ":play_factory",
+        "//shared:constants",
+        "//software/ai/hl/stp/evaluation:calc_best_shot",
+        "//software/ai/hl/stp/evaluation:possession",
+        "//software/ai/hl/stp/tactic:crease_defender_tactic",
+        "//software/ai/hl/stp/tactic:cherry_pick_tactic",
+        "//software/ai/hl/stp/tactic:goalie_tactic",
+        "//software/ai/hl/stp/tactic:move_tactic",
+        "//software/ai/hl/stp/tactic:shadow_enemy_tactic",
+        "//software/ai/hl/stp/tactic:shoot_goal_tactic",
+        "//software/ai/hl/stp/tactic:passer_tactic",
+        "//software/ai/hl/stp/tactic:patrol_tactic",
+        "//software/ai/hl/stp/tactic:receiver_tactic",
+        "//software/ai/passing:pass_generator",
+        "//software/util/parameter:dynamic_parameters",
+        "@g3log",
+    ],
+    alwayslink = True,
+)
+
+cc_library(
     name = "stop_play",
     srcs = ["stop_play.cpp"],
     hdrs = ["stop_play.h"],
@@ -264,6 +291,7 @@ cc_library(
         ":penalty_kick_enemy_play",
         ":penalty_kick_play",
         ":shoot_or_chip_play",
+        ":shoot_or_pass_play",
         ":stop_play",
     ],
 )

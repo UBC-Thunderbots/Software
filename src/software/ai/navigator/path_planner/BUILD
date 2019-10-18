@@ -37,6 +37,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "no_path_test_path_planner",
+    srcs = ["no_path_test_path_planner.cpp"],
+    hdrs = ["no_path_test_path_planner.h"],
+    deps = [
+        ":path_planner",
+        "//software/world:field",
+    ],
+)
+
+cc_library(
+    name = "one_point_path_test_path_planner",
+    srcs = ["one_point_path_test_path_planner.cpp"],
+    hdrs = ["one_point_path_test_path_planner.h"],
+    deps = [
+        ":path_planner",
+        "//software/world:field",
+    ],
+)
+
 cc_test(
     name = "theta_star_path_planner_test",
     srcs = ["theta_star_path_planner_test.cpp"],

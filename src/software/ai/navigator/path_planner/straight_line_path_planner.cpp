@@ -6,9 +6,9 @@
  * points.
  */
 
-PathType StraightLinePathPlanner::findPath(const Point &start, const Point &dest,
+PathType StraightLinePathPlanner::findPath(const Point &start, const Point &destination,
                                            const Field &field,
                                            const std::vector<Obstacle> &obstacles)
 {
-    return PathType(std::vector<Point>({start, dest}));
+    return PathType(std::vector<Point>({start, destination}));
 }

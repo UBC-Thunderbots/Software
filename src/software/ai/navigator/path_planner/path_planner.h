@@ -20,21 +20,22 @@ class PathPlanner
 {
    public:
     /**
-     * Returns a path between start and dest.
+     * Returns a path between start and destination.
      * (consider the case where we have a "StraightLinePathPlanner" for testing purposes)
      *
      * @param start start point
-     * @param dest destination point
+     * @param destination destination point
      * @param field field
      * @param obstacles obstacles to avoid
      *
-     * @return a path between start and dest
+     * @return a path between start and destination
      * 		if no valid path then return an empty vector
      * 		if valid path then return either
      * 		a vector of points or a vector of curves
      * 		    * The vector of points must include the start point and end point
      */
-    virtual PathType findPath(const Point &start, const Point &dest, const Field &field,
+    virtual PathType findPath(const Point &start, const Point &destination,
+                              const Field &field,
                               const std::vector<Obstacle> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;
