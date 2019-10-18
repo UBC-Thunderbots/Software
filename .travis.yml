@@ -11,12 +11,17 @@ jobs:
       script: >
         cd src
         &&
+        # Build, test, run coverage
         bazel coverage //... 
         --compilation_mode=fastbuild 
         --verbose_test_summary 
         --instrumentation_filter=//... 
         --test_output=errors
         &&
+        # Build our CPU-specific targets
+        bazel build //... --cpu=stm32h7
+        &&
+        # Upload coverage results
         bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
     - name: "Check Formatting"
       script:
