@@ -11,6 +11,9 @@ before_install:
   # Decrypt the key for uploading to the remote bazel cache if possible
   - openssl aes-256-cbc -K $encrypted_b311edfc2b7f_key -iv $encrypted_b311edfc2b7f_iv -in bazel-remote-cache-key.json.enc -out bazel-remote-cache-key.json -d
 
+env:
+  - PATH_TO_REMOTE_BAZEL_CACHE_KEY="../bazel-remote-cache-key.json"
+
 
 install:
     - ./environment_setup/setup_software.sh
@@ -18,16 +21,26 @@ install:
 jobs:
   include:
     - name: "Build, Test, and Run Coverage"
-      script: >
-        cd src
-        &&
-        bazel coverage //... 
-        --compilation_mode=fastbuild 
-        --verbose_test_summary 
-        --instrumentation_filter=//... 
-        --test_output=errors
-        &&
-        bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
+      script:
+        - cd src
+        - >
+         BAZEL_BUILD_ARGS = "
+            --compilation_mode=fastbuild 
+            --verbose_test_summary
+            --instrumentation_filter=//...
+            --test_output=errors
+         "
+         if test -f "$PATH_TO_REMOTE_BAZEL_CACHE_KEY"; then
+           BAZEL_BUILD_ARGS="
+             $BAZEL_BUILD_ARGS 
+             --remote_upload_local_results=true 
+             --google_credentials=$PATH_TO_REMOTE_BAZEL_CACHE_KEY
+           " 
+         fi
+        # Build and test with coverage
+        - bazel coverage //... $BAZEL_BUILD_ARGS 
+        # Upload coverage results
+        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
     - name: "Check Formatting"
       script:
         - ./clang_format/check_formatting_ci.sh
