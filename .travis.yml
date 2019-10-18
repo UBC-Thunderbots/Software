@@ -18,7 +18,7 @@ jobs:
           --instrumentation_filter=//... 
           --test_output=errors
         # Build our CPU-specific targets
-        - bazel build //... --cpu=stm32h7
+        - bazel build //firmware_new/... --cpu=stm32h7
         # Upload coverage results
         - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
     - name: "Check Formatting"
