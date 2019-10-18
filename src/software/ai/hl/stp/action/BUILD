@@ -41,6 +41,35 @@ cc_test(
 )
 
 cc_library(
+    name = "intercept_ball_action",
+    srcs = ["intercept_ball_action.cpp"],
+    hdrs = ["intercept_ball_action.h"],
+    deps = [
+        ":action",
+        "//shared:constants",
+        "//software/ai/hl/stp/evaluation:intercept",
+        "//software/ai/hl/stp/evaluation:robot",
+        "//software/ai/intent:move_intent",
+        "//software/geom",
+        "//software/util/logger",
+        "//software/world:ball",
+        "//software/world:field",
+    ],
+)
+
+cc_test(
+    name = "intercept_ball_action_test",
+    srcs = ["intercept_ball_action_test.cpp"],
+    deps = [
+        ":intercept_ball_action",
+        "//software/ai/intent:move_intent",
+        "//software/test_util",
+        "//software/world:ball",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "kick_action",
     srcs = ["kick_action.cpp"],
     hdrs = ["kick_action.h"],
