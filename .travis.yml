@@ -28,6 +28,7 @@ jobs:
     - name: "Build, Test, and Run Coverage"
       script:
         - cd src
+        # Initial set of args for bazel
         - >
          BAZEL_BUILD_ARGS="
            --compilation_mode=fastbuild
@@ -35,6 +36,7 @@ jobs:
            --instrumentation_filter=//...
            --test_output=errors
            "  
+        # If the key is available, add bazel arguments to upload to remote cache
         - >
          if test -f "$PATH_TO_REMOTE_BAZEL_CACHE_KEY"; then
            BAZEL_BUILD_ARGS="
