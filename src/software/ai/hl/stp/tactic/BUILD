@@ -105,6 +105,7 @@ cc_library(
         "//software/ai/hl/stp/evaluation:calc_best_shot",
         "//software/ai/hl/stp/evaluation:enemy_threat",
         "//software/ai/hl/stp/evaluation:robot",
+        "//software/util/logger",
         "//software/util/parameter:dynamic_parameters",
     ],
 )
@@ -127,9 +128,9 @@ cc_library(
         ":tactic",
         ":tactic_visitor",
         "//shared:constants",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/evaluation:enemy_threat",
         "//software/geom",
         "@g3log",

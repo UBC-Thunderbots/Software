@@ -5,6 +5,7 @@
 #include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
+#include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
 DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
@@ -65,6 +66,7 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
     {
         if (!enemy_threat)
         {
+            LOG(WARNING) << "Running DefenseShadowEnemyTactic without an enemy threat";
             yield(stop_action.updateStateAndGetNextIntent(*robot, false));
         }
 
