@@ -41,17 +41,25 @@ environment_group(
     ],
 )
 
+# This represents a mapping of CPU -> Compiler To Use
+# The CPU can be chosen by using `--cpu` as a bazel flag (ex. `--cpu=stm32h7`)
+# otherwise it will default to using whatever CPU is in the system doing the compiling
 cc_toolchain_suite(
     name = "toolchain",
     toolchains = {
+        # k8 is any x86 system
         "k8": "cc_toolchain_linux",
         "k8|compiler": "cc_toolchain_linux",
+        # stm32f0 MCU
         "stm32f0": "cc_toolchain_stm32f0",
         "stm32f0|compiler": "cc_toolchain_stm32f0",
+        # stm32f4 MCU
         "stm32f4": "cc_toolchain_stm32f4",
         "stm32f4|compiler": "cc_toolchain_stm32f4",
+        # stm32g4 MCU
         "stm32g4": "cc_toolchain_stm32g4",
         "stm32g4|compiler": "cc_toolchain_stm32g4",
+        # stm32h7 MCU
         "stm32h7": "cc_toolchain_stm32h7",
         "stm32h7|compiler": "cc_toolchain_stm32h7",
     },
@@ -89,17 +97,11 @@ filegroup(
 
 cc_toolchain_config(
     name = "clang-k8",
-    # TODO: We definitely don't need all these include directories
     builtin_include_directories = [
-        "external/org_llvm_clang/include/",
         "external/org_llvm_clang/include/c++/v1/",
         "org_llvm_clang/lib/clang/9.0.0/include/",
         "/usr/include/",
         "/usr/local/include/",
-        "/usr/include/c++/7.4.0",
-        "/usr/include/x86_64-linux-gnu/c++/7.4.0",
-        "/usr/include/clang/6.0.0/include",
-        "/usr/include",
     ],
     cpu = "k8",
     host_compiler_path = "wrapper/clang-clang",
