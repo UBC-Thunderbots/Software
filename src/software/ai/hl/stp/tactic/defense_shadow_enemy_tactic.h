@@ -23,9 +23,10 @@ class DefenseShadowEnemyTactic : public Tactic
      * @param shadow_distance How far away to shadow the enemy from
      * @param loop_forever Whether or not this tactic should loop forever
      */
-    explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team, const Team &enemy_team,
-                                      const Ball &ball,
-                                      bool ignore_goalie, double shadow_distance, bool loop_forever = true);
+    explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
+                                      const Team &enemy_team, const Ball &ball,
+                                      bool ignore_goalie, double shadow_distance,
+                                      bool loop_forever = true);
 
     std::string getName() const override;
 

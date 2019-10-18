@@ -21,8 +21,8 @@ TEST(DefenseShadowEnemyTacticTest, test_shadower_blocks_net_when_enemy_cannot_pa
     Team friendly_team = Team(Duration::fromSeconds(1), {friendly_robot});
     Ball ball(Point(1, 1), Vector(0, 0), Timestamp::fromSeconds(0));
 
-    DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
-            field, friendly_team, enemy_team, ball, true, 0.5, true);
+    DefenseShadowEnemyTactic tactic =
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
@@ -61,8 +61,8 @@ TEST(DefenseShadowEnemyTacticTest,
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(0, 0),
               Timestamp::fromSeconds(0));
 
-    DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
-            field, friendly_team, enemy_team, ball, true, 0.5, true);
+    DefenseShadowEnemyTactic tactic =
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
@@ -104,8 +104,8 @@ TEST(
     Ball ball(Point(-ROBOT_MAX_RADIUS_METERS, 0), Vector(4, 3),
               Timestamp::fromSeconds(0));
 
-    DefenseShadowEnemyTactic tactic = DefenseShadowEnemyTactic(
-            field, friendly_team, enemy_team, ball, true, 0.5, true);
+    DefenseShadowEnemyTactic tactic =
+        DefenseShadowEnemyTactic(field, friendly_team, enemy_team, ball, true, 0.5, true);
     tactic.updateRobot(friendly_robot);
     tactic.updateWorldParams(field, friendly_team, enemy_team, ball);
     tactic.updateControlParams(enemy_threat);
