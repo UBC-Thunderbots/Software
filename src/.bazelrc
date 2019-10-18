@@ -10,7 +10,7 @@ build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache
 
 # Don't try to upload results since we assume this computer does not have the
 # required credentials. You can override this on the command line, ex:
-# `bazel build --remote_upload_local_results=false //...`
+# `bazel build --remote_upload_local_results=true //...`
 build --remote_upload_local_results=false 
 
 # We rely on all symbols being included when linking for our implementation of
