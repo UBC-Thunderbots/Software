@@ -2,6 +2,16 @@ sudo: true
 dist: bionic
 language: generic
 
+# We get this encrypted variable by:
+# 1) Setup the cache in google cloud storage as per https://docs.bazel.build/versions/master/remote-caching.html
+# 2) getting secure key as a `.json` from https://cloud.google.com/iam/docs/creating-managing-service-accounts#creating_a_service_account 
+# 3) Encrypting the `.json` via https://docs.travis-ci.com/user/encrypting-files/ 
+
+before_install:
+  # Decrypt the key for uploading to the remote bazel cache if possible
+  - openssl aes-256-cbc -K $encrypted_b311edfc2b7f_key -iv $encrypted_b311edfc2b7f_iv -in bazel-remote-cache-key.json.enc -out bazel-remote-cache-key.json -d
+
+
 install:
     - ./environment_setup/setup_software.sh
 
