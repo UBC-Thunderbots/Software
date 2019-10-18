@@ -9,7 +9,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
 
@@ -23,26 +22,12 @@ std::string EnemyFreekickPlay::getName() const
 
 bool EnemyFreekickPlay::isApplicable(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 bool EnemyFreekickPlay::invariantHolds(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -59,10 +44,10 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick (at most we will have 2
     auto shadow_freekicker_1 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::First, world.enemyTeam(), world.ball(), world.field(),
+        ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
         true);
     auto shadow_freekicker_2 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::Second, world.enemyTeam(), world.ball(), world.field(),
+        ShadowFreekickerTactic::RIGHT, world.enemyTeam(), world.ball(), world.field(),
         true);
 
     // Init Shadow Enemy Tactics for extra robots

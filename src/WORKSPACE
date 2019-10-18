@@ -73,7 +73,7 @@ git_repository(
 new_local_repository(
     name = "qt",
     build_file = "@bazel_rules_qt//:qt.BUILD",
-    path = "/usr/include/x86_64-linux-gnu/qt5/",
+    path = "external/qt", # This directory is symlinked in the setup script
 )
 
 http_archive(
