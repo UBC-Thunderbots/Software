@@ -17,6 +17,8 @@ before_install:
     fi
 
 env:
+  # This path is relative to the bazel root directory (ie. where `WORKSPACE`)
+  # is located
   - PATH_TO_REMOTE_BAZEL_CACHE_KEY="../bazel-remote-cache-key.json"
 
 
