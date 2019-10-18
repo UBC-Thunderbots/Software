@@ -104,6 +104,15 @@ cc_library(
     deps = [],
 )
 
+cc_test(
+    name = "robot_capabilities_test",
+    srcs = ["robot_capabilities_test.cpp"],
+    deps = [
+        "robot_capabilities",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "team",
     srcs = ["team.cpp"],

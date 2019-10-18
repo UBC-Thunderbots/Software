@@ -1,4 +1,4 @@
-#include "ai/world/robot_capabilities.h"
+#include "software/world/robot_capabilities.h"
 
 #include <gtest/gtest.h>
 
