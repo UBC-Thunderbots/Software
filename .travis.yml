@@ -35,6 +35,7 @@ jobs:
             --instrumentation_filter=//...
             --test_output=errors
          "
+         &&
          if test -f "$PATH_TO_REMOTE_BAZEL_CACHE_KEY"; then
            BAZEL_BUILD_ARGS="
              $BAZEL_BUILD_ARGS 
