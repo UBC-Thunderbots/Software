@@ -189,7 +189,7 @@ def _make_common_features(ctx):
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = ["-Wall", "-Wextra", "-Wvla", "-Wno-invalid-constexpr"] +
+                        flags = ["-Wall", "-Wextra", "-Wvla"] +
                                 ctx.attr.host_compiler_warnings,
                     ),
                 ],
@@ -430,7 +430,6 @@ def _clang_impl(ctx):
 
     supports_pic_feature = feature(name = "supports_pic", enabled = True)
 
-    # TODO: should not be commented out
     stdlib_feature = feature(
         name = "stdlib",
         flag_sets = [
@@ -493,17 +492,14 @@ def _clang_impl(ctx):
         implies = ["common"],
     )
 
-    # TODO: We should NOT have "-Winvalid-constexpr" disabled
-    warning_feature = feature(
-        name = "warning",
+    clang_warnings_feature = feature(
+        name = "clang_warnings_feature",
         flag_sets = [
             flag_set(
                 actions = [ACTION_NAMES.c_compile, ACTION_NAMES.cpp_compile],
                 flag_groups = [
                     flag_group(
-                        flags = [
-                            "-Wno-error=invalid-constexpr",
-                        ],
+                        flags = ["-Wno-invalid-constexpr"],
                     ),
                 ],
             ),
@@ -518,7 +514,7 @@ def _clang_impl(ctx):
             "c++17",
             "determinism",
             "hardening",
-            "warnings",
+            "clang_warnings_feature",
             "build-id",
             "no-canonical-prefixes",
             "lld",
@@ -536,7 +532,7 @@ def _clang_impl(ctx):
         lld_feature,
         opt_feature,
         runtime_library_search_directories,
-        warning_feature,
+        clang_warnings_feature,
     ]
 
     cxx_builtin_include_directories = ctx.attr.builtin_include_directories

@@ -18,17 +18,27 @@ package(default_visibility = ["//visibility:public"])
 
 load(":cc_toolchain_config.bzl", "cc_toolchain_config", "cc_toolchain_config_stm32")
 
-# Normally you should only have a single `cc_toolchain_suite`. However since you can only
-# supply a single "cpu" to bazel at a time (ex. 'k8'), we would not be able to build
-# the parts of the stm32 parts of the codebase at the same time as the normal C++ parts,
-# because they use different compilers. Our solution is to have two separate toolchain
-# suites, and use a specific one for our stm32h7 rules
-cc_toolchain_suite(
-    name = "stm32h7_toolchain",
-    toolchains = {
-        "k8": "cc_toolchain_stm32h7",
-        "k8|compiler": "cc_toolchain_stm32h7",
-    },
+# Create environments for each CPU this toolchain supports
+environment(name = "k8")
+
+environment(name = "stm32f0")
+
+environment(name = "stm32f4")
+
+environment(name = "stm32g4")
+
+environment(name = "stm32h7")
+
+environment_group(
+    name = "cpus",
+    defaults = [
+        ":k8",
+        ":stm32h7",
+    ],
+    environments = [
+        ":k8",
+        ":stm32h7",
+    ],
 )
 
 cc_toolchain_suite(

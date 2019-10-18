@@ -20,7 +20,7 @@ build --incompatible_remove_legacy_whole_archive=False
 test --test_output=all
 
 # Use Our Custom Toolchain
-build --crosstool_top=//tools/cc_toolchain:toolchain
+build --crosstool_top=//cc_toolchain:toolchain
 
 # TODO: comment here
-build --auto_cpu_environment_group=//tools:cpus
+build --auto_cpu_environment_group=//cc_toolchain:cpus

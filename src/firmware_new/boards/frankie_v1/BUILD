@@ -14,7 +14,7 @@ cc_binary(
         "-lm",
         "-lnosys",
     ],
-    restricted_to = ["//tools:stm32h7"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [
         ":STM32H742XGHx_FLASH.ld",
         ":frankie_v1_main_lib",
@@ -34,7 +34,7 @@ cc_library(
     copts = [
         "-DSTM32H743xx",
     ],
-    restricted_to = ["//tools:stm32h7"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
     deps = [":hal_library"],
 )
 
@@ -133,7 +133,7 @@ cc_library(
         "Middlewares/Third_Party/FreeRTOS/Source/include",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/",
     ],
-    restricted_to = ["//tools:stm32h7"],
+    restricted_to = ["//cc_toolchain:stm32h7"],
 )
 
 stm32h7_hal_library_files_genrule("hal_library_files")
