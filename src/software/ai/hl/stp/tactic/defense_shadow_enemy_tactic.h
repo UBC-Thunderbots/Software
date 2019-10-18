@@ -21,13 +21,11 @@ class DefenseShadowEnemyTactic : public Tactic
      * @param ignore_goalie Whether or not to ignore the friendly goalie when determining
      * the best position to shadow in order to block shots
      * @param shadow_distance How far away to shadow the enemy from
-     * @param enemy_team_can_pass Whether or not the enemy team can pass
      * @param loop_forever Whether or not this tactic should loop forever
      */
-    explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
-                                      const Team &enemy_team, const Ball &ball,
-                                      bool ignore_goalie, double shadow_distance,
-                                      bool enemy_team_can_pass, bool loop_forever = true);
+    explicit DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team, const Team &enemy_team,
+                                      const Ball &ball,
+                                      bool ignore_goalie, double shadow_distance, bool loop_forever = true);
 
     std::string getName() const override;
 
@@ -76,6 +74,4 @@ class DefenseShadowEnemyTactic : public Tactic
     bool ignore_goalie;
     // How far from the enemy the robot will position itself to shadow
     double shadow_distance;
-    // Whether or not we think the enemy team can pass the ball
-    bool enemy_team_can_pass;
 };

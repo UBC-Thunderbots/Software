@@ -7,18 +7,16 @@
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
-DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(
-    const Field &field, const Team &friendly_team, const Team &enemy_team,
-    const Ball &ball, bool ignore_goalie, double shadow_distance,
-    bool enemy_team_can_pass, bool loop_forever)
+DefenseShadowEnemyTactic::DefenseShadowEnemyTactic(const Field &field, const Team &friendly_team,
+                                                   const Team &enemy_team, const Ball &ball,
+                                                   bool ignore_goalie, double shadow_distance, bool loop_forever)
     : Tactic(loop_forever),
       field(field),
       friendly_team(friendly_team),
       enemy_team(enemy_team),
       ball(ball),
       ignore_goalie(ignore_goalie),
-      shadow_distance(shadow_distance),
-      enemy_team_can_pass(enemy_team_can_pass)
+      shadow_distance(shadow_distance)
 {
 }
 
