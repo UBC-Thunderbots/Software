@@ -14,4 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exec external/com_arm_developer_gcc/bin/arm-none-eabi-cpp "$@"
+exec external/arm_developer_gcc/bin/arm-none-eabi-cpp "$@"

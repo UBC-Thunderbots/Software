@@ -38,6 +38,8 @@ cc_library(
     deps = [":hal_library"],
 )
 
+stm32h7_hal_library_files_genrule("hal_library_files")
+
 cc_library(
     name = "hal_library",
     srcs = [
@@ -135,5 +137,3 @@ cc_library(
     ],
     restricted_to = ["//cc_toolchain:stm32h7"],
 )
-
-stm32h7_hal_library_files_genrule("hal_library_files")

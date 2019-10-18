@@ -54,9 +54,9 @@ def main():
          if x.endswith(".c") or x.endswith(".S")]) > 0
 
     if not is_a_c_file_present:
-        run("external/com_arm_developer_gcc/bin/arm-none-eabi-g++", args)
+        run("external/arm_developer_gcc/bin/arm-none-eabi-g++", args)
     else:
-        run("external/com_arm_developer_gcc/bin/arm-none-eabi-gcc", strip_cpp_args(args))
+        run("external/arm_developer_gcc/bin/arm-none-eabi-gcc", strip_cpp_args(args))
 
 
 if __name__ == '__main__':

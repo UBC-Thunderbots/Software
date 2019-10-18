@@ -73,15 +73,15 @@ filegroup(
 filegroup(
     name = "arm_everything",
     srcs = [
-        "@com_arm_developer_gcc//:everything",
+        "@arm_developer_gcc//:everything",
     ] + glob(["wrapper/arm-none-eabi-*"]),
 )
 
 filegroup(
     name = "clang_wrappers",
     srcs = glob(["wrapper/clang-*"]) + [
-        "@org_llvm_clang//:binaries",
-        "@org_llvm_clang//:clang_libs",
+        "@llvm_clang//:binaries",
+        "@llvm_clang//:clang_libs",
     ],
 )
 
@@ -89,17 +89,17 @@ filegroup(
     name = "clang_all",
     srcs = [
         ":clang_wrappers",
-        "@org_llvm_clang//:includes",
-        "@org_llvm_clang//:runtime_libs",
-        "@org_llvm_clang//:static_libs",
+        "@llvm_clang//:includes",
+        "@llvm_clang//:runtime_libs",
+        "@llvm_clang//:static_libs",
     ],
 )
 
 cc_toolchain_config(
     name = "clang-k8",
     builtin_include_directories = [
-        "external/org_llvm_clang/include/c++/v1/",
-        "org_llvm_clang/lib/clang/9.0.0/include/",
+        "external/llvm_clang/include/c++/v1/",
+        "llvm_clang/lib/clang/9.0.0/include/",
         "/usr/include/",
         "/usr/local/include/",
     ],
@@ -118,10 +118,10 @@ cc_toolchain(
     as_files = ":clang_all",
     compiler_files = ":clang_all",
     dwp_files = ":clang_all",
-    dynamic_runtime_lib = "@org_llvm_clang//:runtime_libs",
+    dynamic_runtime_lib = "@llvm_clang//:runtime_libs",
     linker_files = ":clang_all",
     objcopy_files = ":clang_all",
-    static_runtime_lib = "@org_llvm_clang//:static_libs",
+    static_runtime_lib = "@llvm_clang//:static_libs",
     strip_files = ":clang_all",
     supports_param_files = True,
     # We add this tag to circumvent a bug in the CLion bazel plugin. It should be removed
@@ -135,8 +135,8 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-stm32f0",
     builtin_include_directories = [
-        "external/com_arm_developer_gcc/arm-none-eabi/include/",
-        "external/com_arm_developer_gcc/arm-none-eabi/include/sys/",
+        "external/arm_developer_gcc/arm-none-eabi/include/",
+        "external/arm_developer_gcc/arm-none-eabi/include/sys/",
     ],
     cpu = "stm32f0",
     host_compiler_path = "wrapper/arm-none-eabi-g++",
@@ -166,8 +166,8 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-stm32f4",
     builtin_include_directories = [
-        "external/com_arm_developer_gcc/arm-none-eabi/include/",
-        "external/com_arm_developer_gcc/arm-none-eabi/include/sys/",
+        "external/arm_developer_gcc/arm-none-eabi/include/",
+        "external/arm_developer_gcc/arm-none-eabi/include/sys/",
     ],
     cpu = "stm32f4",
     host_compiler_path = "wrapper/arm-none-eabi-g++",
@@ -197,8 +197,8 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-stm32g4",
     builtin_include_directories = [
-        "external/com_arm_developer_gcc/arm-none-eabi/include/",
-        "external/com_arm_developer_gcc/arm-none-eabi/include/sys/",
+        "external/arm_developer_gcc/arm-none-eabi/include/",
+        "external/arm_developer_gcc/arm-none-eabi/include/sys/",
     ],
     cpu = "stm32g4",
     host_compiler_path = "wrapper/arm-none-eabi-g++",
@@ -228,8 +228,8 @@ cc_toolchain(
 cc_toolchain_config_stm32(
     name = "gcc-stm32h7",
     builtin_include_directories = [
-        "external/com_arm_developer_gcc/arm-none-eabi/include/",
-        "external/com_arm_developer_gcc/arm-none-eabi/include/sys/",
+        "external/arm_developer_gcc/arm-none-eabi/include/",
+        "external/arm_developer_gcc/arm-none-eabi/include/sys/",
     ],
     cpu = "stm32h7",
     host_compiler_path = "wrapper/arm-none-eabi-g++",

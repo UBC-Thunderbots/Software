@@ -14,4 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-exec external/org_llvm_clang/bin/lld "$@"
+exec external/llvm_clang/bin/lld "$@"
