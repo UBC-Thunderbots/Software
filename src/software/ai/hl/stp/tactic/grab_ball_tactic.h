@@ -1,7 +1,7 @@
 #pragma once
 
-#include "software/ai/hl/stp/tactic/tactic.h"
 #include "shared/constants.h"
+#include "software/ai/hl/stp/tactic/tactic.h"
 
 /**
  * The GrabBallTactic will try gain possession of the ball. If the ball is loose on the
@@ -10,7 +10,7 @@
  */
 class GrabBallTactic : public Tactic
 {
-public:
+   public:
     /**
      * Creates a new GrabBallTactic
      *
@@ -51,7 +51,7 @@ public:
      */
     void accept(TacticVisitor &visitor) const override;
 
-private:
+   private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
 
     // Tactic parameters

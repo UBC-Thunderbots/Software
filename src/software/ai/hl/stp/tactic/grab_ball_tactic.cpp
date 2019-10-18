@@ -6,15 +6,15 @@
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/movespin_action.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
+#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
-#include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/util/logger/init.h"
 
 
 GrabBallTactic::GrabBallTactic(const Field &field, const Ball &ball,
                                const Team &enemy_team, bool loop_forever)
-        : Tactic(loop_forever), field(field), ball(ball), enemy_team(enemy_team)
+    : Tactic(loop_forever), field(field), ball(ball), enemy_team(enemy_team)
 {
 }
 
@@ -55,7 +55,8 @@ double GrabBallTactic::calculateRobotCost(const Robot &robot, const World &world
 void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 {
     InterceptBallAction intercept_action = InterceptBallAction(field, ball, true);
-    MoveSpinAction movespin_action       = MoveSpinAction(MoveSpinAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
+    MoveSpinAction movespin_action =
+        MoveSpinAction(MoveSpinAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
     MoveAction move_action = MoveAction(MoveAction::ROBOT_CLOSE_TO_DEST_THRESHOLD);
     auto intercept         = Evaluation::findBestInterceptForBall(ball, field, *robot);
     do
@@ -65,7 +66,7 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         {
             double enemy_dist = dist(enemy.position(), ball.position());
             smallest_enemy_dist_to_ball =
-                    std::min(enemy_dist, smallest_enemy_dist_to_ball);
+                std::min(enemy_dist, smallest_enemy_dist_to_ball);
         }
 
         if (smallest_enemy_dist_to_ball < BALL_DIST_FROM_ENEMY)
@@ -73,13 +74,13 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             if (dist(robot->position(), ball.position()) < ROBOT_MAX_RADIUS_METERS * 2)
             {
                 yield(movespin_action.updateStateAndGetNextIntent(
-                        *robot, ball.position(), AngularVelocity::ofDegrees(360 * 2.5), 0));
+                    *robot, ball.position(), AngularVelocity::ofDegrees(360 * 2.5), 0));
             }
             else
             {
                 yield(move_action.updateStateAndGetNextIntent(
-                        *robot, ball.position(),
-                        (ball.position() - robot->position()).orientation(), 0.0));
+                    *robot, ball.position(),
+                    (ball.position() - robot->position()).orientation(), 0.0));
             }
         }
         else

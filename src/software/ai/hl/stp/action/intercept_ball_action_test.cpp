@@ -9,9 +9,9 @@
 TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball = Ball(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0));
-    Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
+    Ball ball   = Ball(Point(0, 0), Vector(1, 0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
     InterceptBallAction action = InterceptBallAction(field, ball, true);
@@ -22,14 +22,16 @@ TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 
-    try {
+    try
+    {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(Point(3, 0).isClose( move_intent.getDestination(), 0.01));
+        EXPECT_TRUE(Point(3, 0).isClose(move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
     }
-    catch (std::bad_cast) {
+    catch (std::bad_cast)
+    {
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }
 }
@@ -37,9 +39,9 @@ TEST(InterceptBallActionTest, test_robot_ahead_of_ball_moves_in_front_of_ball)
 TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_too_fast)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball = Ball(Point(0, 0), Vector(8, 0), Timestamp::fromSeconds(0));
-    Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
+    Ball ball   = Ball(Point(0, 0), Vector(8, 0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
     InterceptBallAction action = InterceptBallAction(field, ball, true);
@@ -50,14 +52,16 @@ TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_t
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 
-    try {
+    try
+    {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(field.enemyGoal().isClose( move_intent.getDestination(), 0.01));
+        EXPECT_TRUE(field.enemyGoal().isClose(move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
     }
-    catch (std::bad_cast) {
+    catch (std::bad_cast)
+    {
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }
 }
@@ -65,9 +69,9 @@ TEST(InterceptBallActionTest, test_robot_moves_to_edge_of_field_if_ball_moving_t
 TEST(InterceptBallActionTest, test_robot_moves_to_the_ball_if_the_ball_is_moving_slowly)
 {
     Field field = ::Test::TestUtil::createSSLDivBField();
-    Ball ball = Ball(Point(0, 0), Vector(0.2, 0), Timestamp::fromSeconds(0));
-    Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(), AngularVelocity::zero(),
-                        Timestamp::fromSeconds(0));
+    Ball ball   = Ball(Point(0, 0), Vector(0.2, 0), Timestamp::fromSeconds(0));
+    Robot robot = Robot(0, Point(3, 1), Vector(0, 0), Angle::zero(),
+                        AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
 
     InterceptBallAction action = InterceptBallAction(field, ball, true);
@@ -78,14 +82,16 @@ TEST(InterceptBallActionTest, test_robot_moves_to_the_ball_if_the_ball_is_moving
     EXPECT_TRUE(intent_ptr);
     EXPECT_FALSE(action.done());
 
-    try {
+    try
+    {
         MoveIntent move_intent = dynamic_cast<MoveIntent &>(*intent_ptr);
-        EXPECT_TRUE(ball.position().isClose( move_intent.getDestination(), 0.01));
+        EXPECT_TRUE(ball.position().isClose(move_intent.getDestination(), 0.01));
         Angle angle_facing_ball = (ball.position() - robot.position()).orientation();
         EXPECT_EQ(angle_facing_ball, move_intent.getFinalAngle());
         EXPECT_EQ(AutokickType::NONE, move_intent.getAutoKickType());
     }
-    catch (std::bad_cast) {
+    catch (std::bad_cast)
+    {
         ADD_FAILURE() << "MoveIntent was not returned by the InterceptBallAction";
     }
 }

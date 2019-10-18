@@ -2,14 +2,14 @@
 
 #include "software/ai/hl/stp/action/action.h"
 #include "software/ai/primitive/move_primitive.h"
-#include "software/world/ball.h"
-#include "software/world/field.h"
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
+#include "software/world/ball.h"
+#include "software/world/field.h"
 
 class InterceptBallAction : public Action
 {
-public:
+   public:
     /**
      * Creates a new InterceptBallAction
      *
@@ -34,7 +34,7 @@ public:
                                                         const Field& field,
                                                         const Ball& ball);
 
-private:
+   private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
     std::optional<Point> getPointBallLeavesField(const Field& field, const Ball& ball);
