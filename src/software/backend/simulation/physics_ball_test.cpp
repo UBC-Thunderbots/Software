@@ -87,6 +87,9 @@ TEST(PhysicsBallTest, test_ball_velocity_and_position_updates_during_simulation_
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 60; i++)
     {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
     }
 
@@ -109,6 +112,9 @@ TEST(PhysicsBallTest, test_ball_acceleration_and_velocity_updates_during_simulat
     // is lost if we take a single step of 1 second
     for (unsigned int i = 0; i < 60; i++)
     {
+        // 5 and 8 here are somewhat arbitrary values for the velocity and position
+        // iterations but are the recommended defaults from
+        // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
     }
 
@@ -147,7 +153,7 @@ TEST(PhysicsBallTest, test_ball_changes_reverses_direction_after_object_collisio
     for (unsigned int i = 0; i < 120; i++)
     {
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are generally the recommended defaults from
+        // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
     }
@@ -189,7 +195,7 @@ TEST(PhysicsBallTest, test_ball_changes_changes_direction_after_object_deflectio
     for (unsigned int i = 0; i < 120; i++)
     {
         // 5 and 8 here are somewhat arbitrary values for the velocity and position
-        // iterations but are generally the recommended defaults from
+        // iterations but are the recommended defaults from
         // https://www.iforce2d.net/b2dtut/worlds
         world->Step(1.0 / 60.0, 5, 8);
     }
