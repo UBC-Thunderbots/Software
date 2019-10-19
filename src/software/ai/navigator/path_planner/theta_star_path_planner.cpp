@@ -40,12 +40,12 @@ bool ThetaStarPathPlanner::isUnBlocked(int row, int col)
     return unblocked_grid[cell];
 }
 
-bool ThetaStarPathPlanner::isDestination(int row, int col, CellCoordinate dest)
+bool ThetaStarPathPlanner::isDestination(int row, int col, GridPoint dest)
 {
     return (row == dest.first && col == dest.second);
 }
 
-double ThetaStarPathPlanner::calculateHValue(int row, int col, CellCoordinate dest)
+double ThetaStarPathPlanner::calculateHValue(int row, int col, GridPoint dest)
 {
     // Return using the distance formula
     return ((double)sqrt((row - dest.first) * (row - dest.first) +
@@ -53,7 +53,7 @@ double ThetaStarPathPlanner::calculateHValue(int row, int col, CellCoordinate de
 }
 
 bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
-                                       CellCoordinate new_pair)
+                                       GridPoint new_pair)
 {
     Point nextPoint    = Point(new_pair.first, new_pair.second);
     Point parentPoint  = Point(curr_parent_i, curr_parent_j);
@@ -74,29 +74,29 @@ bool ThetaStarPathPlanner::lineOfSight(int curr_parent_i, int curr_parent_j,
     return true;
 }
 
-std::vector<Point> ThetaStarPathPlanner::tracePath(CellCoordinate dest)
+std::vector<Point> ThetaStarPathPlanner::tracePath(GridPoint dest)
 {
     int row                        = dest.first;
     int col                        = dest.second;
     std::vector<Point> path_points = std::vector<Point>();
 
-    std::stack<CellCoordinate> Path;
+    std::stack<GridPoint> Path;
 
     // loop until parent is self
-    while (!(cellDetails[row][col].parent_i_ == row &&
-             cellDetails[row][col].parent_j_ == col))
+    while (!(cellDetails[row][col].parent.first == row &&
+             cellDetails[row][col].parent.second == col))
     {
-        Path.push(std::make_pair(row, col));
-        int temp_row = cellDetails[row][col].parent_i_;
-        int temp_col = cellDetails[row][col].parent_j_;
+        Path.push(GridPoint(row, col));
+        int temp_row = cellDetails[row][col].parent.first;
+        int temp_col = cellDetails[row][col].parent.second;
         row          = temp_row;
         col          = temp_col;
     }
 
-    Path.push(std::make_pair(row, col));
+    Path.push(GridPoint(row, col));
     while (!Path.empty())
     {
-        CellCoordinate p = Path.top();
+        GridPoint p = Path.top();
         Path.pop();
         path_points.push_back(convertCellToPoint(p.first, p.second));
     }
@@ -104,8 +104,8 @@ std::vector<Point> ThetaStarPathPlanner::tracePath(CellCoordinate dest)
     return path_points;
 }
 
-bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNew,
-                                        CellCoordinate dest, double currToNextNodeDist)
+bool ThetaStarPathPlanner::updateVertex(GridPoint pCurr, GridPoint pNew, GridPoint dest,
+                                        double currToNextNodeDist)
 {
     // Only process this GridCell if this is a valid one
     if (isValid(pNew.first, pNew.second) == true)
@@ -117,20 +117,17 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
             isUnBlocked(pNew.first, pNew.second) == true)
         {
             double gNew;
-            int new_parent_i, new_parent_j;
-            int parent_i = cellDetails[pCurr.first][pCurr.second].parent_i_;
-            int parent_j = cellDetails[pCurr.first][pCurr.second].parent_j_;
-            if (lineOfSight(parent_i, parent_j, pNew))
+            GridPoint parent_new;
+            GridPoint parent = cellDetails[pCurr.first][pCurr.second].parent;
+            if (lineOfSight(parent.first, parent.second, pNew))
             {
-                new_parent_i = parent_i;
-                new_parent_j = parent_j;
-                gNew         = cellDetails[parent_i][parent_j].g_ +
-                       calculateHValue(parent_i, parent_j, pNew);
+                parent_new = parent;
+                gNew       = cellDetails[parent.first][parent.second].g_ +
+                       calculateHValue(parent.first, parent.second, pNew);
             }
             else
             {
-                new_parent_i = pCurr.first;
-                new_parent_j = pCurr.second;
+                parent_new = pCurr;
                 gNew = cellDetails[pCurr.first][pCurr.second].g_ + currToNextNodeDist;
             }
 
@@ -148,15 +145,13 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
             if (cellDetails[pNew.first][pNew.second].f_ == DBL_MAX ||
                 cellDetails[pNew.first][pNew.second].f_ > fNew)
             {
-                openList.insert(
-                    std::make_pair(fNew, std::make_pair(pNew.first, pNew.second)));
+                openList.insert(OpenListCell(fNew, GridPoint(pNew.first, pNew.second)));
 
                 // Update the details of this GridCell
                 cellDetails[pNew.first][pNew.second].f_        = fNew;
                 cellDetails[pNew.first][pNew.second].g_        = gNew;
                 cellDetails[pNew.first][pNew.second].h_        = hNew;
-                cellDetails[pNew.first][pNew.second].parent_i_ = new_parent_i;
-                cellDetails[pNew.first][pNew.second].parent_j_ = new_parent_j;
+                cellDetails[pNew.first][pNew.second].parent    = parent_new;
             }
             // If the destination GridCell is the same as the
             // current successor
@@ -176,10 +171,12 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
 {
     // Initialize member variables
     this->obstacles = obstacles;
-    maxNavXCoord = navigableArea.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    maxNavYCoord = navigableArea.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    numGridRows = (int)((maxNavXCoord * 2.0) / SIZE_OF_GRID_CELL_IN_METERS);
-    numGridCols = (int)((maxNavYCoord * 2.0) / SIZE_OF_GRID_CELL_IN_METERS);
+    maxNavXCoord    = navigableArea.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    maxNavYCoord    = navigableArea.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    numGridRows     = (int)((maxNavXCoord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
+                        SIZE_OF_GRID_CELL_IN_METERS);
+    numGridCols     = (int)((maxNavYCoord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
+                        SIZE_OF_GRID_CELL_IN_METERS);
 
     // Reset data structures to path plan again
     openList.clear();
@@ -187,8 +184,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
 
     // Initialize local variables
     Point closest_destination = findClosestFreePoint(destination);
-    CellCoordinate src_coord = convertPointToCell(start);
-    CellCoordinate dest_coord = convertPointToCell(closest_destination);
+    GridPoint src_coord       = convertPointToCell(start);
+    GridPoint dest_coord      = convertPointToCell(closest_destination);
     Path empty_ret_val(std::vector<Point>({}));
 
     // If the source is out of range
@@ -248,12 +245,13 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
         }
     }
 
-    closedList =
-        std::vector<std::vector<bool>>(numGridRows, std::vector<bool>(numGridCols, false));
+    closedList = std::vector<std::vector<bool>>(numGridRows,
+                                                std::vector<bool>(numGridCols, false));
 
     cellDetails = std::vector<std::vector<GridCell>>(
-        numGridRows, std::vector<GridCell>(numGridCols, ThetaStarPathPlanner::GridCell(
-                                                    -1, -1, DBL_MAX, DBL_MAX, DBL_MAX)));
+        numGridRows, std::vector<GridCell>(
+                         numGridCols, ThetaStarPathPlanner::GridCell(
+                                          GridPoint(-1, -1), DBL_MAX, DBL_MAX, DBL_MAX)));
 
     int i, j;
 
@@ -262,12 +260,11 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     cellDetails[i][j].f_        = 0.0;
     cellDetails[i][j].g_        = 0.0;
     cellDetails[i][j].h_        = 0.0;
-    cellDetails[i][j].parent_i_ = i;
-    cellDetails[i][j].parent_j_ = j;
+    cellDetails[i][j].parent    = src_coord;
 
     // Put the starting GridCell on the open list and set its
     // 'f' as 0
-    openList.insert(std::make_pair(0.0, std::make_pair(i, j)));
+    openList.insert(OpenListCell(0.0, src_coord));
 
     // We set this boolean value as false as initially
     // the destination is not reached.
@@ -298,8 +295,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
             <+x,-y>     --> (i+1, j+1)
             <-x,-y>     --> (i+1, j-1)*/
 
-        CellCoordinate pCurr, pNew;
-        pCurr = std::make_pair(i, j);
+        GridPoint pCurr, pNew;
+        pCurr = GridPoint(i, j);
 
         for (int x_offset : {-1, 0, 1})
         {
@@ -307,7 +304,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
             {
                 double dist_to_neighbour =
                     std::sqrt(std::pow(x_offset, 2) + std::pow(y_offset, 2));
-                pNew      = std::make_pair(i + x_offset, j + y_offset);
+                pNew      = GridPoint(i + x_offset, j + y_offset);
                 foundDest = updateVertex(pCurr, pNew, dest_coord, dist_to_neighbour);
                 if (foundDest)
                 {
@@ -341,8 +338,8 @@ loop_end:
     return Path(path_points);
 }
 
-std::optional<ThetaStarPathPlanner::CellCoordinate>
-ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
+std::optional<ThetaStarPathPlanner::GridPoint>
+ThetaStarPathPlanner::findClosestUnblockedCell(GridPoint currCell)
 {
     // spiral out from currCell looking for unblocked cells
     int i = currCell.first;
@@ -356,7 +353,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
         j += nextIncrement[currIndex] * depth;
         if (isValid(i, j) && isUnBlocked(i, j))
         {
-            return std::make_pair(i, j);
+            return GridPoint(i, j);
         }
         currIndex = nextIndex;
 
@@ -365,7 +362,7 @@ ThetaStarPathPlanner::findClosestUnblockedCell(CellCoordinate currCell)
         j += nextIncrement[currIndex] * depth;
         if (isValid(i, j) && isUnBlocked(i, j))
         {
-            return std::make_pair(i, j);
+            return GridPoint(i, j);
         }
         currIndex = nextIndex;
     }
@@ -380,7 +377,8 @@ Point ThetaStarPathPlanner::findClosestFreePoint(Point p)
         int xc = (int)(p.x() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
         int yc = (int)(p.y() * BLOCKED_DESTINATION_SEARCH_RESOLUTION);
 
-        for (int r = 1; r < maxNavXCoord * 2.0 * BLOCKED_DESTINATION_SEARCH_RESOLUTION; r++)
+        for (int r = 1; r < maxNavXCoord * 2.0 * BLOCKED_DESTINATION_SEARCH_RESOLUTION;
+             r++)
         {
             int x = 0, y = r;
             int d = 3 - 2 * r;
@@ -473,17 +471,13 @@ bool ThetaStarPathPlanner::isValidAndFreeOfObstacles(Point p)
 Point ThetaStarPathPlanner::convertCellToPoint(int row, int col)
 {
     // account for robot radius
-    return Point((row * SIZE_OF_GRID_CELL_IN_METERS) -
-                     maxNavXCoord,
-                 (col * SIZE_OF_GRID_CELL_IN_METERS) -
-                     maxNavYCoord);
+    return Point((row * SIZE_OF_GRID_CELL_IN_METERS) - maxNavXCoord,
+                 (col * SIZE_OF_GRID_CELL_IN_METERS) - maxNavYCoord);
 }
 
-ThetaStarPathPlanner::CellCoordinate ThetaStarPathPlanner::convertPointToCell(Point p)
+ThetaStarPathPlanner::GridPoint ThetaStarPathPlanner::convertPointToCell(Point p)
 {
     // account for robot radius
-    return std::make_pair((int)((p.x() + maxNavXCoord) /
-                                SIZE_OF_GRID_CELL_IN_METERS),
-                          (int)((p.y() + maxNavYCoord) /
-                                SIZE_OF_GRID_CELL_IN_METERS));
+    return GridPoint((int)((p.x() + maxNavXCoord) / SIZE_OF_GRID_CELL_IN_METERS),
+                     (int)((p.y() + maxNavYCoord) / SIZE_OF_GRID_CELL_IN_METERS));
 }

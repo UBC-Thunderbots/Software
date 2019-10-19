@@ -30,18 +30,18 @@ class ThetaStarPathPlanner : public PathPlanner
                   const std::vector<Obstacle> &obstacles) override;
 
    private:
-    typedef std::pair<int, int> CellCoordinate;
-    typedef std::pair<double, CellCoordinate> OpenListCell;
+    using GridPoint    = std::pair<int, int>;
+    using OpenListCell = std::pair<double, GridPoint>;
 
     class GridCell
     {
        public:
-        GridCell(int parent_i, int parent_j, double f, double g, double h)
-            : parent_i_(parent_i), parent_j_(parent_j), f_(f), g_(g), h_(h)
+        GridCell(GridPoint parent, double f, double g, double h)
+            : parent(parent), f_(f), g_(g), h_(h)
         {
         }
 
-        int parent_i_, parent_j_;
+        GridPoint parent;
         double f_, g_, h_;
     };
 
@@ -71,7 +71,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return true if cell is the destination
      */
-    bool isDestination(int row, int col, CellCoordinate dest);
+    bool isDestination(int row, int col, GridPoint dest);
 
     /**
      * Returns heuristic value of a cell
@@ -82,7 +82,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return Euclidean distance to dest
      */
-    double calculateHValue(int row, int col, CellCoordinate dest);
+    double calculateHValue(int row, int col, GridPoint dest);
 
     /**
      * Traces a path from the destination back to the start
@@ -91,7 +91,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return vector of points with the path from start to dest
      */
-    std::vector<Point> tracePath(CellCoordinate dest);
+    std::vector<Point> tracePath(GridPoint dest);
 
     /**
      * Updates the new node's fields based on the current node, destination
@@ -104,7 +104,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return                      true if pNew is destination
      */
-    bool updateVertex(CellCoordinate pCurr, CellCoordinate pNew, CellCoordinate dest,
+    bool updateVertex(GridPoint pCurr, GridPoint pNew, GridPoint dest,
                       double currToNextNodeDist);
 
     /**
@@ -115,7 +115,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return                      true if line of sight from parent to new cell
      */
-    bool lineOfSight(int curr_parent_i, int curr_parent_j, CellCoordinate new_pair);
+    bool lineOfSight(int curr_parent_i, int curr_parent_j, GridPoint new_pair);
 
     /**
      * Finds closest unblocked cell to currCell
@@ -124,7 +124,7 @@ class ThetaStarPathPlanner : public PathPlanner
      * @return          closest unblocked cell to currCell
      *                  if none found, return nullopt
      */
-    std::optional<CellCoordinate> findClosestUnblockedCell(CellCoordinate currCell);
+    std::optional<GridPoint> findClosestUnblockedCell(GridPoint currCell);
 
     /**
      * Finds closest valid point that's not in an obstacle to p
@@ -160,7 +160,7 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @return cell in grid
      */
-    CellCoordinate convertPointToCell(Point p);
+    GridPoint convertPointToCell(Point p);
 
     // if close to destination then return no path
     static constexpr double CLOSE_TO_DEST_THRESHOLD = 0.01;  // in metres
@@ -208,5 +208,5 @@ class ThetaStarPathPlanner : public PathPlanner
     // true --> The cell is not blocked
     // false --> The cell is blocked
     // We update this as we go to avoid updating cells we don't use
-    std::map<std::pair<int, int>, bool> unblocked_grid;
+    std::map<GridPoint, bool> unblocked_grid;
 };
