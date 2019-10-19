@@ -187,8 +187,8 @@ cc_library(
         ":intercept",
         ":robot",
         ":team",
-        "//shared:constants",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "//software/world:ball",
         "//software/world:field",
         "//software/world:robot",
@@ -212,9 +212,10 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         "//shared:constants",
-        "//software/geom",
         "//software/world:ball",
         "//software/world:robot",
+        "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
     ],
 )
 
