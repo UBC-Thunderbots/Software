@@ -9,23 +9,43 @@ using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;
 using boost::polygon::voronoi_vertex;
 
+struct VoronoiDiagram
+{
+    explicit VoronoiDiagram(std::vector<Point> points)
+    {
+        construct_voronoi(points.begin(), points.end(), &vd);
+        this->points = points;
+    }
+
+private:
+    voronoi_diagram<double> vd;
+    std::vector<Point> points;
+
+public:
+    const voronoi_diagram<double> &getVd() const {
+        return vd;
+    }
+
+    const std::vector<Point> &getPoints() const {
+        return points;
+    }
+};
+
 /**
  * Finds the points of intersection between the edges of a voronoi diagram and a bounding rectangle
  *
  * @param vd The voronoi diagram
  * @param bounding_box The bounding rectangle
- * @param points The points used to create the Voronoi diagram.
  * @return
  */
-std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& vd, Rectangle bounding_box, std::vector<Point> points);
+std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, Rectangle bounding_box);
 
 /**
  * Find the set of open circles whose origin lies within the given rectangle, and that do not overlap any of the
  * vertices in the Delaunay triangulation of the given voronoi diagram
  *
- * @param vd The voronoi diagram
+ * @param vd The voronoi diagram object
  * @param bounding_box The bounding rectangle of the Voronoi diagram.
- * @param points The points used to create the Voronoi diagram
  * @return A vector of open circles.
  */
-std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& vd, Rectangle bounding_box, std::vector<Point> points);
+std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, const Rectangle& bounding_box);

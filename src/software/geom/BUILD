@@ -76,3 +76,15 @@ cc_test(
         "@gtest//:gtest_main",
     ],
 )
+
+cc_test(
+    name = "voronoi_util_test",
+    srcs = [
+        "voronoi_util_test.cpp",
+    ],
+    deps = [
+        ":geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)

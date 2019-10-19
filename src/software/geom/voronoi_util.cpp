@@ -3,12 +3,11 @@
 #include "software/geom/voronoi_util.h"
 #include "software/geom/util.h"
 
-
-std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& vd, Rectangle bounding_box, std::vector<Point> points)
+std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, Rectangle bounding_box)
 {
     std::vector<Point> intersects;
 
-    for (auto edge : vd.edges())
+    for (auto edge : diagram.getVd().edges())
     {
         // Edges extending outside the rectangle will be infinite edges
         if (!edge.is_finite() && edge.is_primary())
@@ -19,8 +18,8 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& v
                 // The direction of the infinite vector will be perpendicular to the
                 // vector connecting the two points which own the two half edges. We can
                 // use this to calculate another point on the infinite edge.
-                Point p1    = points[edge.cell()->source_index()];
-                Point p2    = points[edge.twin()->cell()->source_index()];
+                Point p1    = diagram.getPoints()[edge.cell()->source_index()];
+                Point p2    = diagram.getPoints()[edge.twin()->cell()->source_index()];
                 double endX = (p1.y() - p2.y());
                 double endY = (p1.x() - p2.x()) * -1;
                 // Extend the edge out to beyond the rectangle to ensure interception
@@ -36,7 +35,7 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& v
     return intersects;
 }
 
-std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& vd, Rectangle bounding_box, std::vector<Point> points)
+std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, const Rectangle& bounding_box)
 {
     // For each vertex, construct it's delauney triangle and then compute the largest
     // empty circle around it
@@ -50,7 +49,7 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& 
     // https://stackoverflow.com/questions/34342038/how-to-triangulate-polygons-in-boost
 
     std::vector<Circle> empty_circles;
-    for (auto vertex : vd.vertices())
+    for (auto vertex : diagram.getVd().vertices())
     {
         // We only want to consider vertices within our rectangle
         if (bounding_box.containsPoint(Point(vertex.x(), vertex.y())))
@@ -67,7 +66,7 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& 
                     continue;
                 }
 
-                triangle.push_back(points[cell->source_index()]);
+                triangle.push_back(diagram.getPoints()[cell->source_index()]);
                 if (triangle.size() == 3)
                 {
                     // Find the smallest distance from the vertex to a vertex on it's

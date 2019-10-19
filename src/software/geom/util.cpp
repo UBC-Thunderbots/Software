@@ -1348,6 +1348,15 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     // on the field, and the size of the circle is the distance to the closest vertex
     // on the triangle that this vertex was created from
 
+    // Filters out points that are outside of the bounding box
+    points.erase(
+        std::remove_if(
+                points.begin(),
+                points.end(),
+                [&bounding_box](const Point& p){return !bounding_box.containsPoint(p);}),
+            points.end()
+    );
+
     std::vector<Circle> empty_circles;
 
     // Creating the Voronoi diagram with 2 or less points will produce no edges so we need
@@ -1360,8 +1369,8 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     else if (points.size() == 1)
     {
         // If there is only 1 point, return circles centered at all four corners of the bounding bounding_box.
-        for (int i = 0; i < 4; i++) {
-            empty_circles.emplace_back(Circle(bounding_box[i], dist(points.front(), bounding_box[0])));
+        for (Point &corner : bounding_box.corners()) {
+            empty_circles.emplace_back(Circle(corner, dist(points.front(), corner)));
         }
         return empty_circles;
     }
@@ -1389,17 +1398,16 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     }
 
     // Construct the voronoi diagram
-    voronoi_diagram<double> vd;
-    construct_voronoi(points.begin(), points.end(), &vd);
+    VoronoiDiagram vd(points);
 
     // The corners of the rectangles are locations for the centre of circles with their radius being the distance to
     // the corner's closest point.
-    for (int i = 0; i < 4; i++) {
-        Point closest = findClosestPoint(bounding_box[i], points).value();
-        empty_circles.emplace_back(Circle(bounding_box[i], dist(bounding_box[i], closest)));
+    for (const Point& corner : bounding_box.corners()){
+        Point closest = findClosestPoint(corner, points).value();
+        empty_circles.emplace_back(Circle(corner, dist(corner, closest)));
     }
 
-    std::vector<Point> intersects = findVoronoiEdgeRecIntersects(vd, bounding_box, points);
+    std::vector<Point> intersects = findVoronoiEdgeRecIntersects(vd, bounding_box);
 
     // Radius of the circle will be the distance from the interception point
     // to the nearest input point.
@@ -1413,7 +1421,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         empty_circles.emplace_back(Circle(p, radius));
     }
 
-    std::vector<Circle> calculatedEmptyCircles = voronoiVerticesToOpenCircles(vd, bounding_box, points);
+    std::vector<Circle> calculatedEmptyCircles = voronoiVerticesToOpenCircles(vd, bounding_box);
     empty_circles.insert(empty_circles.end(), calculatedEmptyCircles.begin(), calculatedEmptyCircles.end());
 
     // Sort the circles in descending order of radius
