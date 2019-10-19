@@ -1,20 +1,20 @@
-cameras:
-  ignoreCamera_0:
+Cameras:
+  IgnoreCamera_0:
     type: "bool"
     default: false
     description: >-
         Ignores camera 0
-  ignoreCamera_1:
+  IgnoreCamera_1:
     type: "bool"
     default: false
     description: >-
         Ignores camera 1
-  ignoreCamera_2:
+  IgnoreCamera_2:
     type: "bool"
     default: false
     description: >-
         Ignores camera 2
-  ignoreCamera_3:
+  IgnoreCamera_3:
     type: "bool"
     default: false
     description: >-

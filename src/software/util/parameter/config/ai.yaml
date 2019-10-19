@@ -1,5 +1,5 @@
 PassingConfig:
-  staticFieldPositionQualityXOffset:
+  StaticFieldPositionQualityXOffset:
     min: 0
     max: 1
     default: 0.3
@@ -7,7 +7,7 @@ PassingConfig:
     description: >-
                The offset from the sides of the field to place the rectangular
                sigmoid we use to determine what areas to pass to
-  staticFieldPositionQualityYOffset:
+  StaticFieldPositionQualityYOffset:
     min: 0
     max: 1
     default: 0.3
@@ -15,7 +15,7 @@ PassingConfig:
     description: >-
                The offset from the sides of the field to place the rectangular
                sigmoid we use to determine what areas to pass to
-  staticFieldPositionQualityFriendlyGoalDistanceWeight:
+  StaticFieldPositionQualityFriendlyGoalDistanceWeight:
     min: 0
     max: 1
     default: 0.3
@@ -24,7 +24,7 @@ PassingConfig:
         The weight that being close to the goal will have on the static
         position quality. Lower, more negative weights result in the distance
         to the goal having less of an effect.
-  enemyProximityImportance:
+  EnemyProximityImportance:
     min: 0
     max: 10
     default: 0.5
@@ -32,7 +32,7 @@ PassingConfig:
     description: >-
                This controls how heavily we weight a robot being near the pass
                receiver when calculating enemy risk to a pass
-  idealMinShootAngleDegrees:
+  IdealMinShootAngleDegrees:
     min: -360
     max: 360
     default: 40
@@ -42,7 +42,7 @@ PassingConfig:
         pass reception position that we think will likely result in a good
         shooting opportunity. Note that we may take shots below this in some
         cases, it's more of a weight then a cutoff.
-  idealMaxRotationToShootDegrees:
+  IdealMaxRotationToShootDegrees:
     min: 0
     max: 180
     default: 60
@@ -52,19 +52,19 @@ PassingConfig:
                shoot that we think would likely result in a goal. Note that we may
                try to take shots that require us to rotate more then this, it's more
                of a soft limit.
-  minPassSpeedMPerS:
+  MinPassSpeedMPerS:
     min: 0
     max: 5
     default: 2.0
     type: "double"
     description: "The minimum pass speed (in m/s)"
-  maxPassSpeedMPerS:
+  MaxPassSpeedMPerS:
     min: 0
     max: 10
     default: 5.0
     type: "double"
     description: "The maximum pass speed (in m/s)"
-  minTimeOffsetForPassSeconds:
+  MinTimeOffsetForPassSeconds:
     min: 0
     max: 5
     default: 0.7
@@ -73,7 +73,7 @@ PassingConfig:
       Minimum time into the future at which the pass should occur. This is
       to ensure we have enough time to setup a robot to actually perform
       the pass. This is in seconds.
-  maxTimeOffsetForPassSeconds:
+  MaxTimeOffsetForPassSeconds:
     min: 0
     max: 5
     default: 4.0
@@ -82,7 +82,7 @@ PassingConfig:
       Maximum time into the future at which the pass should occur. This gives the
       upper bound on the pass start time, relative to the current time. This is in
       seconds.
-  enemyReactionTime:
+  EnemyReactionTime:
     min: 0
     max: 3.0
     default: 0.4
@@ -90,25 +90,25 @@ PassingConfig:
     description: >-
       How long we think the enemy will take to recognize we're passing and start
       moving to intercept
-  numPassesToOptimize:
+  NumPassesToOptimize:
     min: 1
     max: 1000
     default: 15
     type: "int"
     description: "The number of passes to try to optimize at any given time"
-  numPassesToKeepAfterPruning:
+  NumPassesToKeepAfterPruning:
     min: 0
     max: 1000
     default: 3
     type: "int"
     description: "The number of passes to keep after pruning"
-  numberOfGradientDescentStepsPerIter:
+  NumberOfGradientDescentStepsPerIter:
     min: 0
     max: 1000
     default: 10
     type: "int"
     description: "The number of steps of gradient descent to perform in each iteration"
-  passEqualityMaxPositionDifferenceMeters:
+  PassEqualityMaxPositionDifferenceMeters:
     min: 0
     max: 4
     default: 0.05
@@ -116,56 +116,56 @@ PassingConfig:
     description: >-
       The maximum allowed difference between the reciever and passer
       point of two passes for which they are considered equal
-  passEqualityMaxStartTimeDifferenceSeconds:
+  PassEqualityMaxStartTimeDifferenceSeconds:
     min: 0
     max: 3
     default: 0.1
     type: "double"
     description: "TODO: Add description as part of #149"
-  passEqualityMaxSpeedDifferenceMetersPerSecond:
+  PassEqualityMaxSpeedDifferenceMetersPerSecond:
     min: 0
     max: 4
     default: 0.3
     type: "double"
     description: "TODO: Add description as part of #149"
 NavigatorConfig:
-  defaultAvoidDist:
+  DefaultAvoidDist:
     min: 0
     max: 100
     default: 50
     type: "double"
     description: "TODO: Add description as part of #149"
-  collisionAvoidVelocityScale:
+  CollisionAvoidVelocityScale:
     min: 0
     max: 1
     default: 0.5
     type: "double"
     description: "TODO: Add description as part of #149"
-  transitionSpeedFactor:
+  TransitionSpeedFactor:
     min: 0
     max: 1
     default: 0.6
     type: "double"
     description: "Factor of max speed to use for transition speed calculations"
-  velocityObstacleInflationFactor:
+  VelocityObstacleInflationFactor:
     min: 0
     max: 1
     default: 0.2
     type: "double"
     description: "Factor for velocity obstacle length scaling"
-  robotObstacleInflationFactor:
+  RobotObstacleInflationFactor:
     min: 0
     max: 10
     default: 1.3
     type: "double"
     description: "Factor for robot obstacle size"
-  ballObstacleInflationFactor:
+  BallObstacleInflationFactor:
     min: 0
     max: 10
     default: 1.3
     type: "double"
     description: "Factor for ball obstacle size"
-robotExpiryBufferMilliseconds:
+RobotExpiryBufferMilliseconds:
   min: 0
   max: 100
   default: 50
@@ -173,75 +173,75 @@ robotExpiryBufferMilliseconds:
   description: "TODO: Add description as part of #149"
 EvaluationConfig:
     IndirectChipConfig:
-      chipTargetFraction:
+      ChipTargetFraction:
         min: 0.0
         max: 100.0
         default: 5.0/10.0
         type: "double"
         description: Adjusts how far between ball and target the robot will chip
-      chipPowerBounceThreshold:
+      ChipPowerBounceThreshold:
         min: 0.0
         max: 5.0
         default: 7.5/10.0
         type: "double"
         description: Maximum fraction of distance between chipper and target the first bounce should be, so ball is rolling when it reaches the target
-      maxChipPower:
+      MaxChipPower:
         min: 0.0
         max: 100.0
         default: 8.0
         type: "double"
         description: Maximum power the robot can chip the ball at without malfunctions
-      chipTargetAreaInset:
+      ChipTargetAreaInset:
         min: 0.0
         max: 100.0
         default: 0.3
         type: "double"
         description: Closest distance to edge of field that the robot could chip and chase to
-      minChipTriArea:
+      MinChipTriArea:
         min: 0.0
         max: 100.0
         default: 0.5
         type: "double"
         description: Minimum area of chip target triangle
-      minChipTriEdgeLen:
+      MinChipTriEdgeLen:
         min: 0.0
         max: 100.0
         default: 0.8
         type: "double"
         description: Minimum edge length of chip target triangle
-      minChipTriEdgeAngle:
+      MinChipTriEdgeAngle:
         min: 0.0
         max: 180.0
         default: 20
         type: "double"
         description: Minimum angle in degrees between chip triangle edges
-      chipCherryPowerDownscale:
+      ChipCherryPowerDownscale:
         min: 0.0
         max: 100.0
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
 DefenseShadowEnemyTacticConfig:
-  ballStealSpeed:
+  BallStealSpeed:
     default: 0.3
     max: 1.0
     min: 0.0
     type: "double"
     description: Try to steal the passee's ball below this ball speed
 DefenderCreaseTacticConfig:
-  maxDefenderSeperationDeg:
+  MaxDefenderSeperationDeg:
     min: 0.0
     max: 50
     default: 13.0
     type: "double"
     description: The maximum angle the crease defenders will seperate by, in degrees.
-  minDefenderSeperationDeg:
+  MinDefenderSeperationDeg:
     min: 0.0
     max: 50
     default: 3.0
     type: "double"
     description: The minimum angle the crease defenders will seperate by, in degrees.
-  ballDistForMaxDefenderSeperation:
+  BallDistForMaxDefenderSeperation:
     min: 0.0
     max: 5
     default: 3
@@ -249,7 +249,7 @@ DefenderCreaseTacticConfig:
     description: >-
       The distance between the ball and the defenders at which they will have their
       maximum seperation.
-  ballDistForMinDefenderSeperation:
+  BallDistForMinDefenderSeperation:
     min: 0.0
     max: 5
     default: 1
@@ -258,7 +258,7 @@ DefenderCreaseTacticConfig:
       The distance between the ball and the defenders at which they will have their
       minimum seperation.
 GoalieTacticConfig:
-  blockConeBuffer:
+  BlockConeBuffer:
       min: 0.0
       max: 2.0
       default: 0.0
@@ -267,13 +267,13 @@ GoalieTacticConfig:
         The block cone buffer is the extra distance to add on either side of the robot
         to allow to it be further back in the block cone
 PivotActionConfig:
-  arbScaling:
+  ArbScaling:
       min: 0.0
       max: 10.0
       type: "double"
       default: 1.0
       description: How quickly to pivot
-  finishAngleThreshold:
+  FinishAngleThreshold:
       min: 0.0
       max: 360.0
       type: "double"
@@ -282,15 +282,15 @@ PivotActionConfig:
           How much tolerance in degrees we allow for the final angle before annoucing
           pivot has finished
 RobotCapabilitiesConfig:
-  brokenDribblers:
+  BrokenDribblers:
     default: ""
     type: "std::string"
     description: Comma-separated list of numbers of robots with broken dribblers
-  brokenChippers:
+  BrokenChippers:
     default: ""
     type: "std::string"
     description: Comma-separated list of numbers of robots with broken chippers
-  brokenKickers:
+  BrokenKickers:
     default: ""
     type: "std::string"
     description: Comma-separated list of numbers of robots with broken kickers
