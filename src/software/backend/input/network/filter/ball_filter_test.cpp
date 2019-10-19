@@ -390,7 +390,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
     double ball_position_variance                = 0.003;
     double time_step_variance                    = 0.001;
     double expected_position_tolerance           = 0.008;
-    Angle expected_velocity_angle_tolernace      = Angle::ofDegrees(2.8);
+    Angle expected_velocity_angle_tolerance      = Angle::ofDegrees(3.0);
     double expected_velocity_magnitude_tolerance = 0.21;
     int num_steps_to_ignore                      = 5;
     Timestamp start_time                         = current_timestamp;
@@ -398,7 +398,7 @@ TEST_F(BallFilterTest, ball_moving_fast_in_a_straight_line_with_medium_noise_in_
     testFilterAlongLineSegment(
         start_time, ball_path, ball_velocity_magnitude, ball_position_variance,
         time_step_variance, expected_position_tolerance,
-        expected_velocity_angle_tolernace, expected_velocity_magnitude_tolerance,
+        expected_velocity_angle_tolerance, expected_velocity_magnitude_tolerance,
         num_steps_to_ignore);
 }
 
