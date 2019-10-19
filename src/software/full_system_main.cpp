@@ -19,8 +19,15 @@ namespace
     std::shared_ptr<AIWrapper> ai;
     std::shared_ptr<Backend> backend;
     std::shared_ptr<VisualizerWrapper> visualizer;
-    bool headless = false;
 }  // namespace
+
+struct commandLineArgs
+{
+    bool help                = false;
+    std::string backend_name = "";
+    bool headless            = false;
+    bool err                 = false;
+};
 
 // clang-format off
 std::string BANNER =
@@ -37,10 +44,9 @@ std::string BANNER =
 
 void setBackendFromString(std::string backend_name)
 {
-    BackendFactory backend_factory;
     try
     {
-        backend = backend_factory.createBackend(backend_name);
+        backend = BackendFactory::createBackend(backend_name);
     }
     catch (const std::invalid_argument &e)
     {
@@ -56,10 +62,11 @@ void setBackendFromString(std::string backend_name)
  *
  * @return True if the program should continue, false otherwise
  */
-bool parseCommandLineArgs(int argc, char **argv)
+commandLineArgs parseCommandLineArgs(int argc, char **argv)
 {
+    commandLineArgs args;
     // Build one string with all the backend_names
-    std::vector<std::string> backend_names = BackendFactory().getRegisteredBackendNames();
+    std::vector<std::string> backend_names = BackendFactory::getRegisteredBackendNames();
     std::string all_backend_names =
         std::accumulate(std::begin(backend_names), std::end(backend_names), std::string(),
                         [](std::string &ss, std::string &s) { return ss + s + ", "; });
@@ -67,40 +74,38 @@ bool parseCommandLineArgs(int argc, char **argv)
         "The backend that you would like to use, one of: " + all_backend_names;
 
     options_description desc{"Options"};
-    desc.add_options()
-            ("help,h","Help screen")
-            ("backend",value<std::string>()->notifier(setBackendFromString)->required(),
-             backend_help_str.c_str())
-            ("headless", boost::program_options::bool_switch(&headless),"Run without the Visualizer");
+    desc.add_options()("help,h", boost::program_options::bool_switch(&args.help),
+                       "Help screen")(
+        "backend", value<std::string>(&args.backend_name)->default_value(""),
+        backend_help_str.c_str())("headless",
+                                  boost::program_options::bool_switch(&args.headless),
+                                  "Run without the Visualizer");
 
     variables_map vm;
     try
     {
         store(parse_command_line(argc, argv, desc), vm);
+        notify(vm);
 
-        // We only process notifications if "help" was not given, which allows us to
-        // avoid issues where required arguments are not required if "help" is given
-        if (vm.count("help"))
+        if (args.help)
         {
             std::cout << desc << std::endl;
-            return false;
         }
-
-        notify(vm);
     }
     catch (const error &ex)
     {
         std::cerr << ex.what() << '\n';
-        return false;
+        args.err = true;
+        return args;
     }
 
-    return true;
+    return args;
 }
 
 /**
  * Connects all the observers together
  */
-void connectObservers()
+void connectObservers(bool headless)
 {
     backend->Subject<World>::registerObserver(ai);
     ai->Subject<ConstPrimitiveVectorPtr>::registerObserver(backend);
@@ -121,20 +126,24 @@ int main(int argc, char **argv)
 
     ai = std::make_shared<AIWrapper>();
 
-    if (parseCommandLineArgs(argc, argv))
+    commandLineArgs args = parseCommandLineArgs(argc, argv);
+
+    if (!args.help && !args.err)
     {
         // The ai has to be initialized after the backend (which is started in
         // parseCommandLineArgs) This is a bug. See #834
         ai = std::make_shared<AIWrapper>();
 
-        if (!headless)
+        setBackendFromString(args.backend_name);
+
+        if (!args.headless)
         {
             visualizer = std::make_shared<VisualizerWrapper>(argc, argv);
         }
 
-        connectObservers();
+        connectObservers(args.headless);
 
-        if (!headless)
+        if (!args.headless)
         {
             // This blocks forever without using the CPU
             // Wait for the visualizer to shut down before shutting
