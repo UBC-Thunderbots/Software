@@ -431,11 +431,11 @@ std::vector<Shot> angleSweepCirclesAll(const Vector &src, const Vector &p1,
     }
 
     std::vector<Shot> result;
-    for (unsigned i = 0; i < events_collapsed.size() - 1; i += 2)
+    for (unsigned i = 1; i < events_collapsed.size(); i += 2)
     {
         // Calculate the center of this range on the target line segement
-        Angle range_start = events_collapsed[i].first + start_angle;
-        Angle range_end   = events_collapsed[i + 1].first + start_angle;
+        Angle range_start = events_collapsed[i - 1].first + start_angle;
+        Angle range_end   = events_collapsed[i].first + start_angle;
         Angle mid         = (range_end - range_start) / 2 + range_start;
         Vector ray        = Vector::createFromAngle(mid) * 10.0;
         Vector inter      = lineIntersection(src, src + ray, p1, p2).value();
@@ -844,6 +844,31 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     {
         return std::make_pair(std::nullopt, std::nullopt);
     }
+}
+
+std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
+    const Ray &ray, const Rectangle &rectangle)
+{
+    std::vector<Segment> rectangle_segments = {
+        Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
+        Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
+        Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
+        Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
+    };
+    std::pair<std::optional<Point>, std::optional<Point>> result =
+        std::make_pair(std::nullopt, std::nullopt);
+    for (const auto &seg : rectangle_segments)
+    {
+        auto intersection = raySegmentIntersection(ray, seg);
+        // Always take the result with more non-nullopt values
+        if ((intersection.first && !result.first) ||
+            (intersection.second && !result.second))
+        {
+            result = intersection;
+        }
+    }
+
+    return result;
 }
 
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
