@@ -1349,13 +1349,11 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     // on the triangle that this vertex was created from
 
     // Filters out points that are outside of the bounding box
-    points.erase(
-        std::remove_if(
-                points.begin(),
-                points.end(),
-                [&bounding_box](const Point& p){return !bounding_box.containsPoint(p);}),
-            points.end()
-    );
+    points.erase(std::remove_if(points.begin(), points.end(),
+                                [&bounding_box](const Point &p) {
+                                    return !bounding_box.containsPoint(p);
+                                }),
+                 points.end());
 
     std::vector<Circle> empty_circles;
 
@@ -1363,13 +1361,16 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     // to handle these cases manually
     if (points.empty())
     {
-        // If there are no points, return an empty vector since there are no constraints to the size of the circle.
+        // If there are no points, return an empty vector since there are no constraints
+        // to the size of the circle.
         return empty_circles;
     }
     else if (points.size() == 1)
     {
-        // If there is only 1 point, return circles centered at all four corners of the bounding bounding_box.
-        for (Point &corner : bounding_box.corners()) {
+        // If there is only 1 point, return circles centered at all four corners of the
+        // bounding bounding_box.
+        for (Point &corner : bounding_box.corners())
+        {
             empty_circles.emplace_back(Circle(corner, dist(points.front(), corner)));
         }
         return empty_circles;
@@ -1378,15 +1379,17 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     {
         // If there are 2 point, split the points with a vector perpendicular to the
         // vector connecting the two points. Return 2 circles that are centered at the
-        // points where the splitting vector intercepts the bounding_box. We should also include circles centered at each
-        // of the corners.
+        // points where the splitting vector intercepts the bounding_box. We should also
+        // include circles centered at each of the corners.
         Point connectedVec            = points[1] - points[0];
         Point halfPoint               = points[0] + (connectedVec * 0.5);
         Point perpVec                 = Point(connectedVec.y(), -connectedVec.x()).norm();
         std::vector<Point> intersects = lineRectIntersect(
-                bounding_box,
-            halfPoint + (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)),
-            halfPoint - (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)));
+            bounding_box,
+            halfPoint +
+                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)),
+            halfPoint -
+                (perpVec * dist(bounding_box.furthestCorner(halfPoint), halfPoint)));
         std::vector<Point> corners = bounding_box.corners();
         intersects.insert(intersects.end(), corners.begin(), corners.end());
         for (const Point &intersect : intersects)
@@ -1400,9 +1403,10 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     // Construct the voronoi diagram
     VoronoiDiagram vd(points);
 
-    // The corners of the rectangles are locations for the centre of circles with their radius being the distance to
-    // the corner's closest point.
-    for (const Point& corner : bounding_box.corners()){
+    // The corners of the rectangles are locations for the centre of circles with their
+    // radius being the distance to the corner's closest point.
+    for (const Point &corner : bounding_box.corners())
+    {
         Point closest = findClosestPoint(corner, points).value();
         empty_circles.emplace_back(Circle(corner, dist(corner, closest)));
     }
@@ -1421,8 +1425,10 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         empty_circles.emplace_back(Circle(p, radius));
     }
 
-    std::vector<Circle> calculatedEmptyCircles = voronoiVerticesToOpenCircles(vd, bounding_box);
-    empty_circles.insert(empty_circles.end(), calculatedEmptyCircles.begin(), calculatedEmptyCircles.end());
+    std::vector<Circle> calculatedEmptyCircles =
+        voronoiVerticesToOpenCircles(vd, bounding_box);
+    empty_circles.insert(empty_circles.end(), calculatedEmptyCircles.begin(),
+                         calculatedEmptyCircles.end());
 
     // Sort the circles in descending order of radius
     std::sort(empty_circles.begin(), empty_circles.end(),
@@ -1444,15 +1450,18 @@ Polygon circleToPolygon(const Circle &circle, size_t num_points)
     return Polygon(points);
 }
 
-std::optional<Point> findClosestPoint(const Point& origin_point, std::vector<Point> test_points)
+std::optional<Point> findClosestPoint(const Point &origin_point,
+                                      std::vector<Point> test_points)
 {
     std::optional<Point> closest_point = std::nullopt;
 
-    if (!test_points.empty()){
-        closest_point = *std::min_element(test_points.begin(), test_points.end(),
-                                          [&](const Point& test_point1, const Point& test_point2){
-                                              return dist(origin_point, test_point1) < dist(origin_point, test_point2);
-                                          });
+    if (!test_points.empty())
+    {
+        closest_point = *std::min_element(
+            test_points.begin(), test_points.end(),
+            [&](const Point &test_point1, const Point &test_point2) {
+                return dist(origin_point, test_point1) < dist(origin_point, test_point2);
+            });
     }
 
     return closest_point;

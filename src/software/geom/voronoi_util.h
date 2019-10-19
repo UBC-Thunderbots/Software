@@ -1,9 +1,10 @@
 #pragma once
 
-#include "software/geom/point.h"
 #include <boost/polygon/voronoi.hpp>
-#include "software/geom/rectangle.h"
+
 #include "software/geom/circle.h"
+#include "software/geom/point.h"
+#include "software/geom/rectangle.h"
 
 using boost::polygon::voronoi_builder;
 using boost::polygon::voronoi_diagram;
@@ -17,35 +18,41 @@ struct VoronoiDiagram
         this->points = points;
     }
 
-private:
+   private:
     voronoi_diagram<double> vd;
     std::vector<Point> points;
 
-public:
-    const voronoi_diagram<double> &getVd() const {
+   public:
+    const voronoi_diagram<double> &getVd() const
+    {
         return vd;
     }
 
-    const std::vector<Point> &getPoints() const {
+    const std::vector<Point> &getPoints() const
+    {
         return points;
     }
 };
 
 /**
- * Finds the points of intersection between the edges of a voronoi diagram and a bounding rectangle
+ * Finds the points of intersection between the edges of a voronoi diagram and a bounding
+ * rectangle
  *
  * @param vd The voronoi diagram
  * @param bounding_box The bounding rectangle
  * @return
  */
-std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, Rectangle bounding_box);
+std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram,
+                                                Rectangle bounding_box);
 
 /**
- * Find the set of open circles whose origin lies within the given rectangle, and that do not overlap any of the
- * vertices in the Delaunay triangulation of the given voronoi diagram
+ * Find the set of open circles whose origin lies within the given rectangle, and that do
+ * not overlap any of the vertices in the Delaunay triangulation of the given voronoi
+ * diagram
  *
  * @param vd The voronoi diagram object
  * @param bounding_box The bounding rectangle of the Voronoi diagram.
  * @return A vector of open circles.
  */
-std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, const Rectangle& bounding_box);
+std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram,
+                                                 const Rectangle &bounding_box);

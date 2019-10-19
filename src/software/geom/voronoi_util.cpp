@@ -1,9 +1,12 @@
-#include <g3log/loglevels.hpp>
-#include <g3log/g3log.hpp>
 #include "software/geom/voronoi_util.h"
+
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+
 #include "software/geom/util.h"
 
-std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, Rectangle bounding_box)
+std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram,
+                                                Rectangle bounding_box)
 {
     std::vector<Point> intersects;
 
@@ -17,8 +20,8 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, R
             {
                 // The direction of the infinite vector will be perpendicular to the
                 // vector connecting the two points which own the two half edges. We can
-                // use this to calculate another point on the infinite edge as show below (the
-                // x's are points in this case)
+                // use this to calculate another point on the infinite edge as show below
+                // (the x's are points in this case)
                 //      +-------------------------------------+
                 //      |                                     |
                 //      |                 ^                   |
@@ -39,16 +42,19 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, R
                 // functions work.
                 Point end = Point(endX, endY) * dist(bounding_box.furthestCorner(p2), p2);
 
-                std::vector<Point> edgeIntersects = lineRectIntersect(bounding_box, Point(start->x(), start->y()), end);
+                std::vector<Point> edgeIntersects =
+                    lineRectIntersect(bounding_box, Point(start->x(), start->y()), end);
 
-                intersects.insert(intersects.end(), edgeIntersects.begin(), edgeIntersects.end());
+                intersects.insert(intersects.end(), edgeIntersects.begin(),
+                                  edgeIntersects.end());
             }
         }
     }
     return intersects;
 }
 
-std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, const Rectangle& bounding_box)
+std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram,
+                                                 const Rectangle &bounding_box)
 {
     // For each vertex, construct it's delauney triangle and then compute the largest
     // empty circle around it
@@ -75,7 +81,7 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, 
                 if (!cell->contains_point())
                 {
                     LOG(WARNING)
-                            << "Found cell without point inside, something is likely seriously wrong";
+                        << "Found cell without point inside, something is likely seriously wrong";
                     continue;
                 }
 
@@ -88,13 +94,13 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, 
                     for (auto const &triangle_vertex : triangle)
                     {
                         radii.emplace_back(
-                                (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
+                            (Point(vertex.x(), vertex.y()) - triangle_vertex).len());
                     }
                     double smallest_radius =
-                            *std::min_element(radii.begin(), radii.end());
+                        *std::min_element(radii.begin(), radii.end());
 
                     empty_circles.emplace_back(
-                            Circle(Point(vertex.x(), vertex.y()), smallest_radius));
+                        Circle(Point(vertex.x(), vertex.y()), smallest_radius));
 
                     continue;
                 }
@@ -105,4 +111,3 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram, 
     }
     return empty_circles;
 }
-

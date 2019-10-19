@@ -1407,7 +1407,8 @@ TEST(GeomUtilTest, test_find_open_circle_points_outside_of_box_one_in_box)
 {
     Rectangle rectangle(Point(-1, -1), Point(1, 1));
 
-    std::vector<Point> points = {Point(-2, -1), Point(3, -2), Point(-1.1, -1.1), Point(0.9, 0.9)};
+    std::vector<Point> points         = {Point(-2, -1), Point(3, -2), Point(-1.1, -1.1),
+                                 Point(0.9, 0.9)};
     std::vector<Circle> empty_circles = findOpenCircles(rectangle, points);
 
     ASSERT_EQ(4, empty_circles.size());
@@ -1522,38 +1523,35 @@ TEST(GeomUtilTest, test_ray_rectangle_intersection_ray_overlaps_rectangle_segmen
 TEST(GeomUtilTest, test_find_closest_point_zero_points)
 {
     std::vector<Point> test_points = {};
-    Point reference_point(0.9,0.9);
+    Point reference_point(0.9, 0.9);
     EXPECT_EQ(std::nullopt, findClosestPoint(reference_point, test_points));
 }
 
 TEST(GeomUtilTest, test_find_closest_point_one_point)
 {
     std::vector<Point> test_points = {Point(-2, -1)};
-    Point reference_point(0.9,0.9);
+    Point reference_point(0.9, 0.9);
     EXPECT_EQ(test_points[0], findClosestPoint(reference_point, test_points));
 }
 
 TEST(GeomUtilTest, test_find_closest_point_two_points)
 {
     std::vector<Point> test_points = {Point(-2, -1), Point(0.7, 0.6)};
-    Point reference_point(0.9,0.9);
+    Point reference_point(0.9, 0.9);
     EXPECT_EQ(test_points[1], findClosestPoint(reference_point, test_points));
 }
 
 TEST(GeomUtilTest, test_find_closest_point_two_points_the_same)
 {
     std::vector<Point> test_points = {Point(0.7, 0.6), Point(0.7, 0.6)};
-    Point reference_point(0.9,0.9);
+    Point reference_point(0.9, 0.9);
     EXPECT_EQ(test_points[0], findClosestPoint(reference_point, test_points));
 }
 
-TEST(GeomUtilTest, test_find_closest_point_many_points){
-    std::vector<Point> test_points = {
-            Point(0.7, 0.6),
-            Point(0.8, 0.6),
-            Point(-0.7, -0.6),
-            Point(0.1, 0.2),
-            Point(-1, -3.4)};
-    Point reference_point(0.9,0.9);
+TEST(GeomUtilTest, test_find_closest_point_many_points)
+{
+    std::vector<Point> test_points = {Point(0.7, 0.6), Point(0.8, 0.6), Point(-0.7, -0.6),
+                                      Point(0.1, 0.2), Point(-1, -3.4)};
+    Point reference_point(0.9, 0.9);
     EXPECT_EQ(test_points[1], findClosestPoint(reference_point, test_points));
 }

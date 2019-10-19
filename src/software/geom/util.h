@@ -639,8 +639,8 @@ int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
  * @param bounding_box The rectangle in which to look for open circles
  * @param points The points that must not lie within the circles
  *
- * @return A list of circles, sorted in descending order of radius. If no points were provided,
- *  returns an empty list. Any points outside the bounding_box are ommitted.
+ * @return A list of circles, sorted in descending order of radius. If no points were
+ * provided, returns an empty list. Any points outside the bounding_box are ommitted.
  */
 std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
 
@@ -654,4 +654,5 @@ Polygon circleToPolygon(const Circle &circle, size_t num_points);
  * @param testPoints
  * @return The point in testPoints closest to testPoints.
  */
-std::optional<Point> findClosestPoint(const Point& origin_point, std::vector<Point> test_points);
+std::optional<Point> findClosestPoint(const Point &origin_point,
+                                      std::vector<Point> test_points);

@@ -33,17 +33,13 @@ Point Rectangle::furthestCorner(Point p)
 {
     std::vector<Point> corners = this->corners();
 
-    return *std::max_element(corners.begin(), corners.end(), [&](const Point& corner1, const Point& corner2){
-        return dist(corner1, p) < dist(corner2, p);
-    });
+    return *std::max_element(corners.begin(), corners.end(),
+                             [&](const Point& corner1, const Point& corner2) {
+                                 return dist(corner1, p) < dist(corner2, p);
+                             });
 }
 
 std::vector<Point> Rectangle::corners()
 {
-    return std::vector<Point>  {
-            operator[](0),
-            operator[](1),
-            operator[](2),
-            operator[](3)
-    };
+    return std::vector<Point>{operator[](0), operator[](1), operator[](2), operator[](3)};
 }
