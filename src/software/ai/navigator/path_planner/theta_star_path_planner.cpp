@@ -176,8 +176,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
 {
     // Initialize member variables
     this->obstacles = obstacles;
-    maxNavXCoord = (navigableArea.xLength() - ROBOT_MAX_RADIUS_METERS) / 2.0;
-    maxNavYCoord = (navigableArea.yLength() - ROBOT_MAX_RADIUS_METERS) / 2.0;
+    maxNavXCoord = navigableArea.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    maxNavYCoord = navigableArea.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
     numGridRows = (int)((maxNavXCoord * 2.0) / SIZE_OF_GRID_CELL_IN_METERS);
     numGridCols = (int)((maxNavYCoord * 2.0) / SIZE_OF_GRID_CELL_IN_METERS);
 
