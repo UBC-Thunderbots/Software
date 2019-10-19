@@ -10,8 +10,7 @@ Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
     updateCurrentState(position, velocity, timestamp);
 }
 
-Ball::Ball(BallState &ball_state, unsigned int history_size)
-    : states_(history_size)
+Ball::Ball(BallState &ball_state, unsigned int history_size) : states_(history_size)
 {
     updateCurrentState(ball_state);
 }

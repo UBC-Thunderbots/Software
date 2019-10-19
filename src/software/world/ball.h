@@ -139,8 +139,8 @@ class Ball final
     /**
      * Gets the previous states stored in states_
      *
-     * @return The circular buffer containing the state history starting with the newest available
-     * data at index 0
+     * @return The circular buffer containing the state history starting with the newest
+     * available data at index 0
      */
     boost::circular_buffer<BallState> getPreviousStates() const;
 
@@ -173,6 +173,7 @@ class Ball final
 
    private:
     // All previous states of the ball, with the most recent position at the front of the
-    // queue, This buffer will never be empty as it's initialized with a BallState on creation
+    // queue, This buffer will never be empty as it's initialized with a BallState on
+    // creation
     boost::circular_buffer<BallState> states_;
 };
