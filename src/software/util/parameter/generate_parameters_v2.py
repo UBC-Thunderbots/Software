@@ -38,7 +38,8 @@ def load_configuration(paths_to_yaml: list):
     for filename in paths_to_yaml:
         with open(filename, 'r') as param_yaml:
             try:
-                param_info[filename.split(".")[0].split('/')[-1]] = yaml.load(param_yaml)
+                param_info[filename.split(".")[0].split(
+                    '/')[-1]] = yaml.load(param_yaml)
             except yaml.YAMLError as ymle:
                 error_msg = "{} could not be loaded correctly, please check format".format(
                     filename)
@@ -54,7 +55,7 @@ def load_configuration(paths_to_yaml: list):
 class Parameter(object):
 
     """Container to hold the required data to generate
-    a DynamicParameter in any Config
+    a DynamicParameter that can be in any Config
 
     :param parameter_name: the name of the parameter
     :param parameter_description: the yaml configuration for the parameter 
@@ -66,6 +67,7 @@ class Parameter(object):
     def __init__(self, parameter_name: str, parameter_description: dict):
         """INITIALIZER"""
 
+        # TODO maybe make these properties
         self.parameter_description = parameter_description
         self.param_name = convert_to_camel_case(parameter_name)
         self.param_variable_name = parameter_name + '_param'
@@ -73,6 +75,8 @@ class Parameter(object):
         self.default_value = parameter_description['default']
         self.ptype = parameter_description['type']
 
+        # python stores booleans as True and False, but we need them to be
+        # lowercase for c++
         if self.ptype == 'bool':
             self.default_value = 'false' if self.default_value == False else 'true'
 
@@ -105,7 +109,8 @@ class Parameter(object):
             param_variable_name=self.param_variable_name,
             quote="\"" if self.ptype == 'std::string' else "",
             param_name=self.param_name,
-            options=','.join('"{0}"'.format(option) for option in self.options),
+            options=','.join('"{0}"'.format(option)
+                             for option in self.options),
             value=self.default_value)
 
     def get_private_entries(self):
@@ -180,14 +185,17 @@ class Config(object):
                 self.configs.append(config)
                 Config.all_configs.append(config)
 
-    def __str__(self):
-        """Overrides the toString method to print the c++ config class
-        that will go in config.hpp 
+    def get_class_str(self):
+        """Returns the config class that will go in config.hpp 
 
         :returns: string containing everything needed to define a Config class
         :rtype: str
 
         """
+        ################
+        # Acquire Data #
+        ################
+        
         # constructor entries: The constructor of a config class initializes
         # all parameters and nested configs as well as the parameterlist which
         # contains a list of all parameters and configs
@@ -197,8 +205,10 @@ class Config(object):
                                                   for parameter in self.parameters)
 
         # parameter list initialization
-        parameter_list_entries = [parameter.param_variable_name for parameter in self.parameters]
-        parameter_list_entries += [config.config_variable_name for config in self.configs]
+        parameter_list_entries = [
+            parameter.param_variable_name for parameter in self.parameters]
+        parameter_list_entries += [
+            config.config_variable_name for config in self.configs]
 
         # public section of the config class is where all the accessors reside
         # for each param and nested config
@@ -213,12 +223,33 @@ class Config(object):
         private_config_entries = '\n'.join(config.get_private_entries()
                                            for config in self.configs)
 
+        ##################
+        # Generate Class #
+        ##################
+        
         return constants.CONFIG_CLASS.format(
+
+            # the config name is the name of the configuration class
             config_name=self.config_name,
-            constructor_entries=constructor_config_entires + constructor_parameter_entries,
-            parameter_list_entries=',\n'.join(parameter_list_entries),
-            public_entries=public_parameter_entries + public_config_entries,
-            private_entries=private_parameter_entries + private_config_entries)
+
+            # the entires that will go into the constructor of the config
+            # class excluding the parameter_list initialization
+            constructor_entries=\
+                    constructor_config_entires + constructor_parameter_entries,
+
+            # parameter list initialization with all the parameters and configs
+            # that are a part of this class
+            parameter_list_entries=\
+                    ',\n'.join(parameter_list_entries),
+
+            # public members of the config class
+            public_entries=\
+                    public_parameter_entries + public_config_entries,
+
+            # private members of the config class
+            private_entries=\
+                    private_parameter_entries + private_config_entries
+            )
 
     def get_constructor_entries(self):
         """Returns the c++ code needed in the constructor of the parent config
