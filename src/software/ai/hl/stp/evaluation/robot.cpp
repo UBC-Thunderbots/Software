@@ -1,7 +1,9 @@
 #include "software/ai/hl/stp/evaluation/robot.h"
 
 #include "shared/constants.h"
-
+#include "software/util/parameter/dynamic_parameters.h"
+#include "software/world/ball.h"
+#include "software/world/robot.h"
 
 bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,
                                                               const Angle orientation,
@@ -16,31 +18,86 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(Ball ball, Robot robot, Timestamp timestamp)
+bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
+                                    Timestamp timestamp)
 {
-    int ball_index  = 0;
-    int robot_index = 0;
-    if (timestamp.getMilliseconds() != 0)
-    {
-        // Get the indices for the state information at the desired timestamp.
-        auto ball_index_result  = ball.getHistoryIndexFromTimestamp(timestamp);
-        auto robot_index_result = robot.getHistoryIndexFromTimestamp(timestamp);
-        if (!ball_index_result || !robot_index_result)
-            return false;
+    Point robot_pos_at_time;
+    Angle robot_ori_at_time;
+    Point ball_pos_at_time;
 
-        ball_index  = ball_index_result.value();
-        robot_index = robot_index_result.value();
+
+    if (robot.getHistoryIndexFromTimestamp(timestamp))
+    {
+        robot_pos_at_time = robot.getPreviousPositions().at(
+            *robot.getHistoryIndexFromTimestamp(timestamp));
+        robot_ori_at_time = robot.getPreviousOrientations().at(
+            *robot.getHistoryIndexFromTimestamp(timestamp));
+    }
+    else
+    {
+        robot_pos_at_time = robot.position();
+        robot_ori_at_time = robot.orientation();
     }
 
-    // The actual vector to the ball from the center of the robot
-    Vector robot_center_to_ball = ball.getPreviousStates()[ball_index].position() -
-                                  robot.getPreviousPositions()[robot_index];
+    if (ball.getHistoryIndexFromTimestamp(timestamp))
+    {
+        ball_pos_at_time =
+            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
+    }
+    else
+    {
+        ball_pos_at_time = ball.position();
+    }
 
-    // Calculate the ideal vector from the robot to the ball for the robot to have
-    // possession.
-    Angle orientation = robot.getPreviousOrientations()[robot_index];
-    Vector expected_point =
-        Point::createFromAngle(orientation).norm(DIST_TO_FRONT_OF_ROBOT_METERS);
 
-    return robot_center_to_ball.isClose(expected_point, DRIBBLER_WIDTH / 2);
+    // check if the ball is within a certain distance of the robot
+    auto max_dist_to_robot =
+        ROBOT_MAX_RADIUS_METERS +
+        Util::DynamicParameters::Evaluation::Possession::possession_dist.value();
+    if ((ball_pos_at_time - robot_pos_at_time).len() > max_dist_to_robot)
+    {
+        return false;
+    }
+    else
+    {
+        // check that ball is in a 90-degree cone in front of the robot
+        auto ball_to_robot_angle = robot_ori_at_time.minDiff(
+            (ball_pos_at_time - robot_pos_at_time).orientation());
+        return ball_to_robot_angle < Angle::ofDegrees(45.0);
+    }
+}
+
+bool Evaluation::robotBeingPassedTo(const Ball& ball, const Robot& robot,
+                                    Timestamp timestamp)
+{
+    Point robot_pos, ball_pos, ball_velocity;
+    if (robot.getHistoryIndexFromTimestamp(timestamp) &&
+        ball.getHistoryIndexFromTimestamp(timestamp))
+    {
+        robot_pos = robot.getPreviousPositions().at(
+            *robot.getHistoryIndexFromTimestamp(timestamp));
+        ball_pos =
+            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
+        ball_velocity = ball.getPreviousVelocities().at(
+            *ball.getHistoryIndexFromTimestamp(timestamp));
+    }
+    else
+    {
+        robot_pos     = robot.position();
+        ball_pos      = ball.position();
+        ball_velocity = ball.velocity();
+    }
+
+    auto ball_to_robot_vector = robot_pos - ball_pos;
+    // angle deviation from the axis of the pass
+    auto ball_angle_deviation =
+        ball_to_robot_vector.orientation().minDiff(ball_velocity.orientation());
+    // pass axis velocity
+    double pass_axis_speed = ball_velocity.project(ball_to_robot_vector.norm()).len();
+    return (ball_angle_deviation <
+            Angle::ofDegrees(
+                Util::DynamicParameters::Evaluation::Possession::passed_to_angle_tolerance
+                    .value())) &&
+           pass_axis_speed >
+               Util::DynamicParameters::Evaluation::Possession::min_pass_speed.value();
 };
