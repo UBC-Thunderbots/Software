@@ -17,7 +17,20 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram, R
             {
                 // The direction of the infinite vector will be perpendicular to the
                 // vector connecting the two points which own the two half edges. We can
-                // use this to calculate another point on the infinite edge.
+                // use this to calculate another point on the infinite edge as show below (the
+                // x's are points in this case)
+                //      +-------------------------------------+
+                //      |                                     |
+                //      |                 ^                   |
+                //      |                 |                   |
+                //      |                 |                   |
+                //      |                 |                   |
+                //      |         X       |        X          |
+                //      |                 |                   |
+                //      |                 |                   |
+                //      |                 v                   |
+                //      |                                     |
+                //      +-------------------------------------+
                 Point p1    = diagram.getPoints()[edge.cell()->source_index()];
                 Point p2    = diagram.getPoints()[edge.twin()->cell()->source_index()];
                 double endX = (p1.y() - p2.y());
