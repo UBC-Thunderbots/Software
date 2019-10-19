@@ -193,7 +193,7 @@ PathType ThetaStarPathPlanner::findPath(const Point &start, const Point &destina
         (int)((fieldYLength - ROBOT_MAX_RADIUS_METERS) / SIZE_OF_GRID_CELL_IN_METERS);
 
     Point closest_destination = findClosestFreePoint(destination);
-    src_coord          = convertPointToCell(start);
+    src_coord                 = convertPointToCell(start);
     dest_coord                = convertPointToCell(closest_destination);
     // If the source is out of range
     if (isValid(src_coord.first, src_coord.second) == false)

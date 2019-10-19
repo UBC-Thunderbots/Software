@@ -7,7 +7,7 @@
 
 /**
  * Polynomial is a representation of a polynomial
- * of the form coeffs[0] + coeffs[1] * x + coeff[2] * x^2...
+ * of the form coeffs[0] + coeffs[1] * + coeff[2] * x^2...
  */
 class Polynomial
 {
@@ -16,56 +16,53 @@ class Polynomial
     /**
      * Construct a polynomial from coefficients
      *
-     * @param x_coeffs x coefficients of the polynomial
-     * @param y_coeffs y coefficients of the polynomial
+     * @param coeffs coefficients of the polynomial
      *
      * @note will prune off coeffs to enforce invariant:
      *  *coeffs[coeffs.size()-1] != 0
      *  *order of polynomial is coeffs.size()
      */
-    explicit Polynomial(const std::vector<double>& x_coeffs,
-                        const std::vector<double>& y_coeffs);
+    explicit Polynomial(const std::vector<double>& coeffs);
 
     /**
      * Construct a polynomial from coefficients
      *
-     * @param x_coeffs x coefficients of the polynomial
-     * @param y_coeffs y coefficients of the polynomial
+     * @param coeffs coefficients of the polynomial
      *
      * @note will prune off coeffs to enforce invariant:
      *  *coeffs[coeffs.size()-1] != 0
      *  *order of polynomial is coeffs.size()
      */
-    explicit Polynomial(const std::initializer_list<double>& x_coeffs,
-                        const std::initializer_list<double>& y_coeffs);
+    explicit Polynomial(const std::initializer_list<double>& coeffs);
 
     /**
-     * Returns the x coefficients of the polynomial
+     * Construct a linear polynomial from two pairs of values
      *
-     * @return the x coefficients of the polynomial
+     * @param p1 first pair of values: first is the input, second is the output
+     * @param p2 second pair of values: first is the input, second is the output
      */
-    const std::vector<double>& getXCoeffs() const;
+    explicit Polynomial(const std::pair<double, double>& p1,
+                        const std::pair<double, double>& p2);
 
     /**
-     * Returns the y coefficients of the polynomial
+     * Returns the coefficients of the polynomial
      *
-     * @return the y coefficients of the polynomial
+     * @return the coefficients of the polynomial
      */
-    const std::vector<double>& getYCoeffs() const;
+    const std::vector<double>& getCoeffs() const;
 
     /**
-     * Calculates the value of polynomial evaluated at time t
+     * Calculates the value of polynomial evaluated at value val
      *
-     * @param t time to evaluate polynomial
+     * @param val value to evaluate polynomial
      *
-     * @return value of polynomial evaluated at time t
+     * @return value of polynomial evaluated at value val
      */
-    Point calculateValue(double t) const;
+    double calculateValue(double val) const;
 
    private:
     // the coefficients for the polynomial
-    std::vector<double> x_coeffs;
-    std::vector<double> y_coeffs;
+    std::vector<double> coeffs;
 
     void pruneCoeffs(void);
 };

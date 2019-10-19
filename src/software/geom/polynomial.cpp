@@ -1,63 +1,46 @@
 #include "software/geom/polynomial.h"
 
-Polynomial::Polynomial(const std::vector<double>& x_coeffs,
-                       const std::vector<double>& y_coeffs)
-    : x_coeffs(x_coeffs), y_coeffs(y_coeffs)
+Polynomial::Polynomial(const std::vector<double>& coeffs) : coeffs(coeffs)
 {
     pruneCoeffs();
 }
 
-Polynomial::Polynomial(const std::initializer_list<double>& x_coeffs,
-                       const std::initializer_list<double>& y_coeffs)
-    : x_coeffs(x_coeffs), y_coeffs(y_coeffs)
+Polynomial::Polynomial(const std::initializer_list<double>& coeffs) : coeffs(coeffs)
 {
     pruneCoeffs();
 }
 
-const std::vector<double>& Polynomial::getXCoeffs() const
+Polynomial::Polynomial(const std::pair<double, double>& p1,
+                       const std::pair<double, double>& p2)
 {
-    return x_coeffs;
+    double slope = (p2.second - p1.second) / (p2.first - p1.first);
+    coeffs.push_back(p1.second - (p1.first * slope));
+    coeffs.push_back(slope);
 }
 
-const std::vector<double>& Polynomial::getYCoeffs() const
+const std::vector<double>& Polynomial::getCoeffs() const
 {
-    return y_coeffs;
+    return coeffs;
 }
 
-Point Polynomial::calculateValue(double t) const
+double Polynomial::calculateValue(double val) const
 {
-    double x_val = x_coeffs[0], y_val = y_coeffs[0];
-    for (size_t i = 1; i < x_coeffs.size(); i++)
+    double retval = coeffs[0];
+    for (size_t i = 1; i < coeffs.size(); i++)
     {
-        x_val += x_coeffs[i] * std::pow(t, i);
-    }
-    for (size_t i = 1; i < y_coeffs.size(); i++)
-    {
-        y_val += y_coeffs[i] * std::pow(t, i);
+        retval += coeffs[i] * std::pow(val, i);
     }
 
-    return Point(x_val, y_val);
+    return retval;
 }
 
 void Polynomial::pruneCoeffs(void)
 {
-    for (size_t i = x_coeffs.size(); i > 0; i--)
+    for (size_t i = coeffs.size(); i > 0; i--)
     {
-        if (x_coeffs[i] == 0)
+        if (coeffs[i] == 0)
         {
-            x_coeffs.pop_back();
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    for (size_t i = y_coeffs.size(); i > 0; i--)
-    {
-        if (y_coeffs[i] == 0)
-        {
-            y_coeffs.pop_back();
+            coeffs.pop_back();
         }
         else
         {

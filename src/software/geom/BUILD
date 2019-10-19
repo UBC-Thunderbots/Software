@@ -8,6 +8,7 @@ cc_library(
         "shot.cpp",
         "util.cpp",
         "polynomial.cpp",
+        "spline.cpp",
     ],
     hdrs = [
         "angle.h",
@@ -21,6 +22,7 @@ cc_library(
         "shot.h",
         "util.h",
         "polynomial.h",
+        "spline.h",
     ],
     copts = [
         "-std=c++17",
@@ -29,6 +31,27 @@ cc_library(
         "@boost//:geometry",
         "@g3log",
         "@boost//:polygon",
+    ],
+)
+
+cc_library(
+    name = "spline",
+    srcs = [
+        "polynomial.cpp",
+        "spline.cpp",
+    ],
+    hdrs = [
+        "polynomial.h",
+        "spline.h",
+    ],
+    copts = [
+        "-std=c++17",
+    ],
+    deps = [
+        "@boost//:geometry",
+        "@g3log",
+        "@boost//:polygon",
+        ":geom"
     ],
 )
 
