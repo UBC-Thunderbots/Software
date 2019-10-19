@@ -147,7 +147,6 @@ cc_library(
     hdrs = ["world.h"],
     deps = [
         ":ball",
-        ":ball_state",
         ":field",
         ":game_state",
         ":robot",

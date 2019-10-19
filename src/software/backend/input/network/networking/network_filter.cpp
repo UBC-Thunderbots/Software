@@ -151,7 +151,7 @@ BallState NetworkFilter::getFilteredBallData(
         ball_filter.getFilteredData(ball_detections, field_state);
     if (new_ball)
     {
-        ball_state = (*new_ball).currentState();
+        ball_state = new_ball->currentState();
     }
 
     return ball_state;

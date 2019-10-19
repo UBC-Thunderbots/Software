@@ -4,16 +4,16 @@
 #include "software/world/ball_state.h"
 
 Ball::Ball(Point position, Vector velocity, const Timestamp &timestamp,
-           unsigned int history_duration)
-    : states_(history_duration)
+           unsigned int history_size)
+    : states_(history_size)
 {
     updateCurrentState(position, velocity, timestamp);
 }
 
-Ball::Ball(BallState &ball_state, unsigned int history_duration)
-    : states_(history_duration)
+Ball::Ball(BallState &ball_state, unsigned int history_size)
+    : states_(history_size)
 {
-    states_.push_front(ball_state);
+    updateCurrentState(ball_state);
 }
 
 BallState Ball::currentState() const
@@ -26,7 +26,7 @@ void Ball::updateCurrentState(const BallState &new_state)
     if (!states_.empty() && new_state.timestamp() < lastUpdateTimestamp())
     {
         throw std::invalid_argument(
-            "Error: State of ball is updating times from the past");
+            "Error: Trying to update ball state using a state older then the current state");
     }
 
     states_.push_front(new_state);
@@ -131,15 +131,9 @@ Vector Ball::estimateVelocityAtFutureTime(const Duration &duration_in_future) co
     return velocity() * exp(-0.1 * seconds_in_future);
 }
 
-std::vector<BallState> Ball::getPreviousStates() const
+boost::circular_buffer<BallState> Ball::getPreviousStates() const
 {
-    std::vector<BallState> retval{};
-    for (BallState state : states_)
-    {
-        retval.push_back(state);
-    }
-
-    return retval;
+    return states_;
 }
 
 std::optional<int> Ball::getHistoryIndexFromTimestamp(Timestamp &timestamp) const

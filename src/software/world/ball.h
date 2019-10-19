@@ -12,26 +12,26 @@ class Ball final
 {
    public:
     /**
-     * Creates a new ball with the given position and velocity
+     * Creates a new ball with a new state given by the position and velocity
      *
      * @param position The position of the ball, with coordinates in metres
      * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
-     * @param history_duration The number of previous ball states that should be stored.
+     * @param history_size The number of previous ball states that should be stored.
      *
      */
     explicit Ball(Point position, Vector velocity, const Timestamp &timestamp,
-                  unsigned int history_duration = 20);
+                  unsigned int history_size = 20);
 
 
     /**
      * Creates a new ball with the given BallState
      *
      * @param ball_state the state of the ball
-     * @param history_duration the number of previous ball states that should be stored
+     * @param history_size the number of previous ball states that should be stored
      */
-    explicit Ball(BallState &ball_state, unsigned int history_duration = 20);
+    explicit Ball(BallState &ball_state, unsigned int history_size = 20);
 
     /**
      * Returns the last updated BallState of the ball
@@ -139,10 +139,10 @@ class Ball final
     /**
      * Gets the previous states stored in states_
      *
-     * @return Vector containing the state history starting with the oldest available
+     * @return The circular buffer containing the state history starting with the newest available
      * data at index 0
      */
-    std::vector<BallState> getPreviousStates() const;
+    boost::circular_buffer<BallState> getPreviousStates() const;
 
     /**
      * Finds an update timestamp that is close to the provided timestamp and returns the
@@ -173,6 +173,6 @@ class Ball final
 
    private:
     // All previous states of the ball, with the most recent position at the front of the
-    // queue
+    // queue, This buffer will never be empty as it's initialized with a BallState on creation
     boost::circular_buffer<BallState> states_;
 };
