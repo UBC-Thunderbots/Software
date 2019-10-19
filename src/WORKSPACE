@@ -77,7 +77,6 @@ new_local_repository(
 )
 
 http_archive(
-    # TODO: better name, unless there is good reason for this one?
     name = "llvm_clang",
     build_file = "@//external:clang.BUILD",
     sha256 = "a23b082b30c128c9831dbdd96edad26b43f56624d0ad0ea9edec506f5385038d",
@@ -88,7 +87,6 @@ http_archive(
 )
 
 http_archive(
-    # TODO: better name, unless there is good reason for this one?
     name = "arm_developer_gcc",
     build_file = "@//external:arm_gcc.BUILD",
     sha256 = "b50b02b0a16e5aad8620e9d7c31110ef285c1dde28980b1a9448b764d77d8f92",
