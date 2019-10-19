@@ -43,7 +43,11 @@ std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot
         return std::nullopt;
     }
 
-    if (ball.getHistoryIndexFromTimestamp(*timestamp))
+    if (!timestamp.has_value())
+    {
+        ball_pos_at_time = ball.position();
+    }
+    else if (ball.getHistoryIndexFromTimestamp(*timestamp))
     {
         ball_pos_at_time = ball.getPreviousPositions().at(
             *ball.getHistoryIndexFromTimestamp(*timestamp));

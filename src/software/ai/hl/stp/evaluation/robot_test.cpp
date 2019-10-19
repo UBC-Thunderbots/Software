@@ -134,13 +134,15 @@ TEST(RobotEvaluationTest, has_possession_robot_moving_ball_in_dribbler)
 {
     Point ball_position  = Point(0.07, 0);
     Vector ball_velocity = Vector(0, 0);
-    Timestamp timestamp  = Timestamp::fromSeconds(0);
+    Timestamp timestamp  = Timestamp::fromSeconds(1);
     Ball ball            = Ball(ball_position, ball_velocity, timestamp);
 
     Robot robot = Robot(0, Point(0, 0), Vector(1, 1), Angle::zero(),
                         AngularVelocity::zero(), timestamp);
 
-    EXPECT_TRUE(*Evaluation::robotHasPossession(ball, robot));
+    auto result = Evaluation::robotHasPossession(ball, robot);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_TRUE(*result);
 }
 
 TEST(RobotEvaluationTest, has_possession_ball_far_away_from_robot)
