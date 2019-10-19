@@ -631,17 +631,18 @@ std::optional<Segment> mergeFullyOverlappingSegments(Segment segment1, Segment s
 int calcBinaryTrespassScore(const Rectangle &rectangle, const Point &point);
 
 /**
- * Finds all circles which do not contain a point in them within the given rectangle
+ * Finds all circles which do not contain a point in them within the given rectangle.
  *
  * NOTE: this only guarantees that the center of each circle is within the
  *       rectangle, some portion of the circle may extend outside the rectangle
  *
- * @param rectangle The rectangle in which to look for open circles
+ * @param bounding_box The rectangle in which to look for open circles
  * @param points The points that must not lie within the circles
  *
- * @return A list of circles, sorted in descending order of radius
+ * @return A list of circles, sorted in descending order of radius. If no points were provided,
+ *  returns an empty list. Any points outside the bounding_box are ommitted.
  */
-std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> points);
+std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> points);
 
 Polygon circleToPolygon(const Circle &circle, size_t num_points);
 

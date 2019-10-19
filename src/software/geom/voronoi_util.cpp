@@ -4,7 +4,7 @@
 #include "software/geom/util.h"
 
 
-std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& vd, Rectangle rec, std::vector<Point> points)
+std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& vd, Rectangle bounding_box, std::vector<Point> points)
 {
     std::vector<Point> intersects;
 
@@ -25,9 +25,9 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& v
                 double endY = (p1.x() - p2.x()) * -1;
                 // Extend the edge out to beyond the rectangle to ensure interception
                 // functions work.
-                Point end = Point(endX, endY) * dist(rec.furthestCorner(p2), p2);
+                Point end = Point(endX, endY) * dist(bounding_box.furthestCorner(p2), p2);
 
-                std::vector<Point> edgeIntersects = lineRectIntersect(rec, Point(start->x(), start->y()), end);
+                std::vector<Point> edgeIntersects = lineRectIntersect(bounding_box, Point(start->x(), start->y()), end);
 
                 intersects.insert(intersects.end(), edgeIntersects.begin(), edgeIntersects.end());
             }
@@ -36,7 +36,7 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const voronoi_diagram<double>& v
     return intersects;
 }
 
-std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& vd, Rectangle rec, std::vector<Point> points)
+std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& vd, Rectangle bounding_box, std::vector<Point> points)
 {
     // For each vertex, construct it's delauney triangle and then compute the largest
     // empty circle around it
@@ -53,7 +53,7 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const voronoi_diagram<double>& 
     for (auto vertex : vd.vertices())
     {
         // We only want to consider vertices within our rectangle
-        if (rec.containsPoint(Point(vertex.x(), vertex.y())))
+        if (bounding_box.containsPoint(Point(vertex.x(), vertex.y())))
         {
             std::vector<Point> triangle;
             auto edge = vertex.incident_edge();
