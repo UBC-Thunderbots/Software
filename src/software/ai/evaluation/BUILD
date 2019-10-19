@@ -232,6 +232,7 @@ cc_library(
     deps = [
         "//shared:constants",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "//software/world:ball",
         "//software/world:robot",
     ],

@@ -6,6 +6,21 @@
 #include "software/ai/navigator/util.h"
 #include "software/ai/primitive/all_primitives.h"
 
+// overloaded is used for the visiting PathType
+// Adapted from https://en.cppreference.com/w/cpp/utility/variant/visit
+template <class... Ts>
+struct overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overloaded(Ts...)->overloaded<Ts...>;
+
+Navigator::Navigator(std::unique_ptr<PathPlanner> path_planner)
+    : path_planner_(std::move(path_planner))
+{
+}
+
 void Navigator::visit(const CatchIntent &catch_intent)
 {
     auto p            = std::make_unique<CatchPrimitive>(catch_intent);
@@ -44,6 +59,8 @@ void Navigator::visit(const KickIntent &kick_intent)
 
 void Navigator::visit(const MoveIntent &move_intent)
 {
+    std::vector<Point> path_points;
+
     Point start =
         this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
     Point dest = move_intent.getDestination();
@@ -51,49 +68,18 @@ void Navigator::visit(const MoveIntent &move_intent)
     std::vector<Obstacle> obstacles =
         createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    auto path_planner =
-        std::make_unique<ThetaStarPathPlanner>(this->world.field(), obstacles);
+    auto path = path_planner_->findPath(start, dest, this->world.field(), obstacles);
 
-    auto path_points = path_planner->findPath(start, dest);
-
-    if (path_points)
-    {
-        planned_paths.emplace_back(*path_points);
-        if ((*path_points).size() > 2)
-        {
-            current_destination = (*path_points)[1];
-            double segment_final_vel =
-                getCloseToEnemyObstacleFactor((*path_points)[1]) *
-                calculateTransitionSpeedBetweenSegments(
-                    (*path_points)[0], (*path_points)[1], (*path_points)[2],
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                        Util::DynamicParameters::Navigator::transition_speed_factor
-                            .value());
-
-            auto move = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(), segment_final_vel,
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
-            return;
-        }
-        if ((*path_points).size() == 2)
-        {
-            current_destination = (*path_points)[1];
-            auto move           = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(),
-                move_intent.getFinalSpeed() *
-                    getCloseToEnemyObstacleFactor((*path_points)[1]),
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
-            return;
-        }
-    }
-    auto stop         = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
-    current_primitive = std::move(stop);
+    std::visit(
+        overloaded{
+            [=, &move_intent](std::vector<Point> path_points) {
+                movePointNavigation(move_intent, path_points);
+            },
+            [=, &move_intent](std::vector<Curve> path_curves) {
+                moveCurveNavigation(move_intent, path_curves);
+            },
+        },
+        path);
 }
 
 void Navigator::visit(const MoveSpinIntent &move_spin_intent)
@@ -115,6 +101,68 @@ void Navigator::visit(const StopIntent &stop_intent)
 }
 
 // helpers
+void Navigator::movePointNavigation(const MoveIntent &move_intent,
+                                    std::vector<Point> &path_points)
+{
+    planned_paths.emplace_back(path_points);
+
+    switch (path_points.size())
+    {
+        case 0:
+        {
+            LOG(WARNING) << "Path planner could not find a path";
+            auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
+            current_primitive = std::move(stop);
+            break;
+        }
+        case 1:
+        {
+            throw std::runtime_error(
+                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or dest or some other point");
+            break;
+        }
+        case 2:
+        {
+            current_destination = (path_points)[1];
+            auto move           = std::make_unique<MovePrimitive>(
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(),
+                move_intent.getFinalSpeed() *
+                    getCloseToEnemyObstacleFactor((path_points)[1]),
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getAutoKickType());
+            current_primitive = std::move(move);
+            break;
+        }
+        default:
+        {
+            current_destination = (path_points)[1];
+            double segment_final_vel =
+                getCloseToEnemyObstacleFactor((path_points)[1]) *
+                calculateTransitionSpeedBetweenSegments(
+                    (path_points)[0], (path_points)[1], (path_points)[2],
+                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                        Util::DynamicParameters::Navigator::transition_speed_factor
+                            .value());
+
+            auto move = std::make_unique<MovePrimitive>(
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(), segment_final_vel,
+                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getAutoKickType());
+            current_primitive = std::move(move);
+            break;
+        }
+    }
+}
+
+void Navigator::moveCurveNavigation(const MoveIntent &move_intent,
+                                    std::vector<Curve> &path_curves)
+{
+    // Stubbed: this will be implemented alongside spline navigator
+    throw std::runtime_error("Support for curves is not implemented yet");
+}
+
 std::optional<Obstacle> Navigator::obstacleFromAvoidArea(AvoidArea avoid_area)
 {
     Rectangle rectangle({0, 0}, {0, 0});

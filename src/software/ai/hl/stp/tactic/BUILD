@@ -80,6 +80,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "crease_defender_tactic_test",
+    srcs = ["crease_defender_tactic_test.cpp"],
+    deps = [
+        ":crease_defender_tactic",
+        "//shared:constants",
+        "//software/ai/intent:move_intent",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
@@ -88,6 +100,7 @@ cc_library(
         ":tactic",
         ":tactic_visitor",
         "//shared:constants",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/evaluation:enemy_threat",
@@ -242,7 +255,19 @@ cc_library(
         "//software/ai/hl/stp/action:move_action",
         "//software/ai/evaluation:possession",
         "//software/geom",
+        "//software/util/parameter:dynamic_parameters",
         "@g3log",
+    ],
+)
+
+cc_test(
+    name = "shadow_freekicker_tactic_test",
+    srcs = ["shadow_freekicker_tactic_test.cpp"],
+    deps = [
+        ":shadow_freekicker_tactic",
+        "//software/geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
