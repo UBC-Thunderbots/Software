@@ -28,7 +28,7 @@ cc_library(
 )
 
 cc_library(
-    name = "config",
+    name = "dynamic_parameters",
     hdrs = ["config.hpp", "config_utils.hpp"],
     deps = [":parameter"],
 )
@@ -42,20 +42,11 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "dynamic_parameters",
-    srcs = ["dynamic_parameters.cpp"],
-    hdrs = [
-        "dynamic_parameters.h",
-    ],
-    deps = [":parameter"],
-)
-
 cc_test(
     name = "config_test",
     srcs = ["config_test.cpp"],
     deps = [
-        ":config",
+        ":dynamic_parameters",
         ":parameter",
         "@gtest//:gtest_main",
     ],

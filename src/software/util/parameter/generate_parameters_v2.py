@@ -38,8 +38,8 @@ def load_configuration(paths_to_yaml: list):
     for filename in paths_to_yaml:
         with open(filename, 'r') as param_yaml:
             try:
-                param_info[filename.split(".")[0].split(
-                    '/')[-1]] = yaml.load(param_yaml)
+                config_descriptions = yaml.load(param_yaml)
+                param_info.update(config_descriptions)
             except yaml.YAMLError as ymle:
                 error_msg = "{} could not be loaded correctly, please check format".format(
                     filename)
@@ -55,7 +55,7 @@ def load_configuration(paths_to_yaml: list):
 class Parameter(object):
 
     """Container to hold the required data to generate
-    a DynamicParameter that can be in any Config
+    a Parameter that can be in any Config
 
     :param parameter_name: the name of the parameter
     :param parameter_description: the yaml configuration for the parameter 
@@ -82,6 +82,8 @@ class Parameter(object):
 
         # min max will only be in a parameter if it is of type int
         # or float, the rest of the parameters will NOT.
+        # TODO raise exception? or just don't use it if the user provides
+        # min/max for a string
         self.min_value = None
         self.max_value = None
 
@@ -105,12 +107,25 @@ class Parameter(object):
 
         """
         return constants.PARAMETER_CONSTRUCTOR_ENTRY.format(
+            # the type of the parameter
             type=self.ptype,
+
+            # the variable name
             param_variable_name=self.param_variable_name,
+
+            # we need to add additional quotes around the value if it is a string
+            # so the quotes are formatted here
             quote="\"" if self.ptype == 'std::string' else "",
+
+            # the parameter name (differernt from variable name)
             param_name=self.param_name,
+
+            # the parameter takes in a vector of options
+            # which is generated here
             options=','.join('"{0}"'.format(option)
                              for option in self.options),
+
+            # the default value of the parameter
             value=self.default_value)
 
     def get_private_entries(self):
@@ -195,7 +210,7 @@ class Config(object):
         ################
         # Acquire Data #
         ################
-        
+
         # constructor entries: The constructor of a config class initializes
         # all parameters and nested configs as well as the parameterlist which
         # contains a list of all parameters and configs
@@ -226,7 +241,7 @@ class Config(object):
         ##################
         # Generate Class #
         ##################
-        
+
         return constants.CONFIG_CLASS.format(
 
             # the config name is the name of the configuration class
@@ -234,22 +249,23 @@ class Config(object):
 
             # the entires that will go into the constructor of the config
             # class excluding the parameter_list initialization
-            constructor_entries=\
-                    constructor_config_entires + constructor_parameter_entries,
+            constructor_entries=constructor_config_entires + constructor_parameter_entries,
 
             # parameter list initialization with all the parameters and configs
             # that are a part of this class
-            parameter_list_entries=\
-                    ',\n'.join(parameter_list_entries),
+            parameter_list_entries=',\n'.join(parameter_list_entries),
 
             # public members of the config class
-            public_entries=\
-                    public_parameter_entries + public_config_entries,
+            public_entries=public_parameter_entries + public_config_entries,
 
             # private members of the config class
-            private_entries=\
-                    private_parameter_entries + private_config_entries
-            )
+            private_entries=private_parameter_entries + private_config_entries
+        )
+
+    def __str__(self):
+        return self.get_class_str()
+    def __repr__(self):
+        return self.get_class_str()
 
     def get_constructor_entries(self):
         """Returns the c++ code needed in the constructor of the parent config
@@ -338,5 +354,6 @@ if __name__ == '__main__':
         config_gen.write(constants.H_HEADER)
 
         for config in ThunderbotsConfig.all_configs:
-            config_gen.write(config.__str__())
-        config_gen.write(ThunderbotsConfig.__str__())
+            config_gen.write(config.get_class_str())
+
+        config_gen.write(ThunderbotsConfig.get_class_str())
