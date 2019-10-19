@@ -69,7 +69,7 @@ class Parameter(object):
 
         # TODO maybe make these properties
         self.parameter_description = parameter_description
-        self.param_name = convert_to_camel_case(parameter_name)
+        self.param_name = parameter_name
         self.param_variable_name = parameter_name + '_param'
 
         self.default_value = parameter_description['default']
@@ -181,7 +181,7 @@ class Config(object):
         """INITIALIZER"""
 
         self.config_description = config_description
-        self.config_name = convert_to_camel_case(config_name)+'Config'
+        self.config_name = config_name
         self.config_variable_name = config_name + '_config'
         self.parameters = []
         self.configs = []
@@ -307,36 +307,6 @@ class Config(object):
 
 
 #######################################################################
-#                                Utils                                #
-#######################################################################
-
-def convert_to_camel_case(string_to_convert):
-    """Takes a string, and regardless of the format,
-    will convert it to CamelCase. This is mostly a ROS convention
-    that was in place for our old parameter system, where all of
-    our parameters will snake_case. 
-
-    NOTE: if the string is already camel case it will return the same
-    string
-
-    :param string_to_convert: the snake_case_string_to_convert
-    :type arg1: str
-    :returns: the stringConvertedToCamelCase
-    :rtype: TODO
-
-    """
-    parts = string_to_convert.split('_')
-
-    # if the string is not snake case, just return
-    if len(parts) == 1:
-        return string_to_convert
-
-    # we return the camel case version of the string, the first
-    # part of the string is also capitalized
-    return ''.join(part.title() for part in parts)
-
-
-#######################################################################
 #                                MAIN                                 #
 #######################################################################
 if __name__ == '__main__':
@@ -344,7 +314,7 @@ if __name__ == '__main__':
     # get config
     config = load_configuration(sys.argv[1:-1])
 
-    ThunderbotsConfig = Config('Thunderbots', config)
+    ThunderbotsConfig = Config('ThunderbotsConfig', config)
 
     for config in ThunderbotsConfig.all_configs:
         print(config)
@@ -352,6 +322,9 @@ if __name__ == '__main__':
     with open(sys.argv[-1], 'w') as config_gen:
 
         config_gen.write(constants.H_HEADER)
+
+        for config in ThunderbotsConfig.all_configs:
+            config_gen.write("class " + config.config_name + ";\n")
 
         for config in ThunderbotsConfig.all_configs:
             config_gen.write(config.get_class_str())
