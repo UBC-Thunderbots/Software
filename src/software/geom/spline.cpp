@@ -22,8 +22,8 @@ Point Spline::calculateValue(double val)
         return end_point;
     }
 
-    double x_val = segments[(size_t) val].x.calculateValue(val);
-    double y_val = segments[(size_t) val].y.calculateValue(val);
+    double x_val = segments[(size_t)val].x.calculateValue(val);
+    double y_val = segments[(size_t)val].y.calculateValue(val);
     return Point(x_val, y_val);
 }
 

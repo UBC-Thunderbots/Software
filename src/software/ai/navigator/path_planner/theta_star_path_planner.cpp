@@ -171,8 +171,8 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
 
 // top level function
 Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination,
-                                       const Rectangle &navigableArea,
-                                       const std::vector<Obstacle> &obstacles)
+                                    const Rectangle &navigableArea,
+                                    const std::vector<Obstacle> &obstacles)
 {
     obstacles_ = obstacles;
     Path empty_ret_val(std::vector<Point>({}));
@@ -342,8 +342,8 @@ loop_end:
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
 
-    for (Point p: path_points)
-        std::cout<<"findPath: "<<p<<std::endl;
+    for (Point p : path_points)
+        std::cout << "findPath: " << p << std::endl;
     return Path(path_points);
 }
 
