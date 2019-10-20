@@ -39,16 +39,31 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
-            Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(), true),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
+            Util::DynamicParameters->getEnemyCapabilityConfig()
+                ->EnemyTeamCanPass()
+                ->value(),
+            true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
-            Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(), true),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
+            Util::DynamicParameters->getEnemyCapabilityConfig()
+                ->EnemyTeamCanPass()
+                ->value(),
+            true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->ball_steal_speed.value(),
-            Util::DynamicParameters->getEnemyCapabilityConfig()->enemy_team_can_pass.value(), true)};
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
+            Util::DynamicParameters->getEnemyCapabilityConfig()
+                ->EnemyTeamCanPass()
+                ->value(),
+            true)};
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
         std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),

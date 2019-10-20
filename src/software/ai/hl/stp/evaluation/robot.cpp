@@ -52,8 +52,10 @@ bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
 
     // check if the ball is within a certain distance of the robot
     auto max_dist_to_robot =
-        ROBOT_MAX_RADIUS_METERS +
-        Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->possession_dist.value();
+        ROBOT_MAX_RADIUS_METERS + Util::DynamicParameters->getEvaluationConfig()
+                                      ->getPossessionConfig()
+                                      ->PossessionDist()
+                                      ->value();
     if ((ball_pos_at_time - robot_pos_at_time).len() > max_dist_to_robot)
     {
         return false;
@@ -95,9 +97,12 @@ bool Evaluation::robotBeingPassedTo(const Ball& ball, const Robot& robot,
     // pass axis velocity
     double pass_axis_speed = ball_velocity.project(ball_to_robot_vector.norm()).len();
     return (ball_angle_deviation <
-            Angle::ofDegrees(
-                Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->PassedToAngleTolerance
-                    ->value())) &&
-           pass_axis_speed >
-               Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->MinSpeedPass()->value();
+            Angle::ofDegrees(Util::DynamicParameters->getEvaluationConfig()
+                                 ->getPossessionConfig()
+                                 ->PassedToAngleTolerance()
+                                 ->value())) &&
+           pass_axis_speed > Util::DynamicParameters->getEvaluationConfig()
+                                 ->getPossessionConfig()
+                                 ->MinPassSpeed()
+                                 ->value();
 };

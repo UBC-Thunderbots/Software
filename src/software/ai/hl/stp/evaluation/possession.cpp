@@ -57,11 +57,13 @@ namespace Evaluation
             unsigned i = 0;
 
             // Check that the robot has had possession of the ball recently.
-            while (i < robot_history_timestamps.size() &&
-                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                       Duration::fromSeconds(
-                           Util::DynamicParameters::Evaluation::Possession::
-                               possession_buffer_time_seconds.value()))
+            while (
+                i < robot_history_timestamps.size() &&
+                robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                    Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
+                                              ->getPossessionConfig()
+                                              ->PossessionBufferTimeSeconds()
+                                              ->value()))
             {
                 if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
                     return true;
@@ -82,11 +84,13 @@ namespace Evaluation
             unsigned i = 0;
 
             // Check that the robot has had possession of the ball recently.
-            while (i < robot_history_timestamps.size() &&
-                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                       Duration::fromSeconds(
-                           Util::DynamicParameters::Evaluation::Possession::
-                               pass_buffer_time_seconds.value()))
+            while (
+                i < robot_history_timestamps.size() &&
+                robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                    Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
+                                              ->getPossessionConfig()
+                                              ->PassBufferTimeSeconds()
+                                              ->value()))
             {
                 if (robotBeingPassedTo(ball, robot, robot_history_timestamps[i]))
                     return true;

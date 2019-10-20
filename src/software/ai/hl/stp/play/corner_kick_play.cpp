@@ -17,9 +17,10 @@ using namespace Passing;
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
 CornerKickPlay::CornerKickPlay()
-    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
-          Util::DynamicParameters::CornerKickPlay::max_time_commit_to_pass_seconds
-              .value()))
+    : MAX_TIME_TO_COMMIT_TO_PASS(
+          Duration::fromSeconds(Util::DynamicParameters->getCornerKickPlayConfig()
+                                    ->MaxTimeCommitToPassSeconds()
+                                    ->value()))
 {
 }
 
