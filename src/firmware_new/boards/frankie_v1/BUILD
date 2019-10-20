@@ -40,6 +40,9 @@ cc_library(
 
 stm32h7_hal_library_files_genrule("hal_library_files")
 
+# We got some of this list of hdrs/srcs by looking at the Makefile STM32CubeMX generates,
+# (if the project type is set to `MakeFile`) and others by simply attempting compilation,
+# seeing where stuff failed, and finding the correct header in the downloaded files
 cc_library(
     name = "hal_library",
     srcs = [

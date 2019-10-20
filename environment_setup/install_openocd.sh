@@ -4,7 +4,7 @@ echo "================================================================"
 echo "Installing OpenOCD"
 echo "================================================================"
 
-# Any faulure should terminate this script
+# Any failure should terminate this script
 set -e
 
 OPENOCD_TMP_DIR="/tmp/openocd.git"

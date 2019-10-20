@@ -13,6 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This was originally taken from https://github.com/mjbots/rules_mbed, with many
+# thunderbots-specific modifications
+
 load(
     "@bazel_tools//tools/cpp:cc_toolchain_config_lib.bzl",
     "action_config",
@@ -670,35 +673,8 @@ def _stm32_impl(ctx):
         ],
     )
 
-    stm32f0_feature = feature(
-        name = "stm32f0",
-        flag_sets = [
-            flag_set(
-                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-mcpu=cortex-m0",
-                ])],
-            ),
-        ],
-        implies = ["stm32"],
-    )
-
     stm32f4_feature = feature(
         name = "stm32f4",
-        flag_sets = [
-            flag_set(
-                actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = [
-                    "-mcpu=cortex-m4",
-                    "-mfpu=fpv4-sp-d16",
-                ])],
-            ),
-        ],
-        implies = ["stm32"],
-    )
-
-    stm32g4_feature = feature(
-        name = "stm32g4",
         flag_sets = [
             flag_set(
                 actions = ALL_COMPILE_ACTIONS + ALL_LINK_ACTIONS,
@@ -734,9 +710,7 @@ def _stm32_impl(ctx):
             "warnings",
             "no-canonical-prefixes",
         ] + ([ctx.attr.cpu] if ctx.attr.cpu in [
-            "stm32f0",
             "stm32f4",
-            "stm32g4",
             "stm32h7",
         ] else []),
     )
@@ -746,9 +720,7 @@ def _stm32_impl(ctx):
         common_feature,
         opt_feature,
         stm32_feature,
-        stm32f0_feature,
         stm32f4_feature,
-        stm32g4_feature,
         stm32h7_feature,
     ]
 
@@ -800,9 +772,7 @@ cc_toolchain_config_stm32 = rule(
     implementation = _stm32_impl,
     attrs = {
         "cpu": attr.string(mandatory = True, values = [
-            "stm32f0",
             "stm32f4",
-            "stm32g4",
             "stm32h7",
         ]),
         "builtin_include_directories": attr.string_list(),

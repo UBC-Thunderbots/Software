@@ -17,8 +17,7 @@
 import os
 import sys
 
-"""Delegate to the C compiler and strip C++ specific options if
-necessary."""
+"""Delegate to the C compiler and strip C++ specific options if we're compiling C files"""
 
 
 def is_cpp_arg(x):
