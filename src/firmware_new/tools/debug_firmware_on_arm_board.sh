@@ -45,7 +45,7 @@ WORKSPACE_DIR="$CURR_DIR/../../"
 
 # Load everything we need from bazel
 path_to_arm_none_eabi_gdb=$(rlocation "__main__/external/arm_developer_gcc/bin/arm-none-eabi-gdb")
-path_to_frankie_v1_elf=$(rlocation "__main__/firmware_new/boards/frankie_v1/frankie_v1_main.elf")
+path_to_frankie_v1_elf=$(rlocation "__main__/firmware_new/boards/frankie_v1/frankie_v1_main")
 
 # ADD NEW DEPENDENCIES HERE: it's used for error checking, you'll thank yourself later
 EXPECTED_NUM_OF_BAZEL_DEPENDENCIES=2
