@@ -46,13 +46,13 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // We find the point on the Ray formed by the ball's velocity that is closest to
     // the robot. If the time for the robot to get to that point is less than the time
     // for the ball to get to that point, the robot moves to that point to intercept the
-    // ball. Once the robot is in the ball's path, it will move to a point just in front of
-    // the ball in order to meet it quicker, while staying in it's path.
+    // ball. Once the robot is in the ball's path, it will move to a point just in front
+    // of the ball in order to meet it quicker, while staying in it's path.
     //
     // If the robot cannot reach the closest point on the ray before the ball, the robot
-    // will move to intercept the ball at the point it would leave the field. This generally
-    // causes the robot to move far enough ahead of the ball that it can switch to intercepting
-    // at the closest point on the ray like above.
+    // will move to intercept the ball at the point it would leave the field. This
+    // generally causes the robot to move far enough ahead of the ball that it can switch
+    // to intercepting at the closest point on the ray like above.
     //
     // Finally, if the ball is moving slowly the robot will go directly to the ball.
     do
@@ -91,8 +91,8 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             LOG(DEBUG) << "ball leaving field" << std::endl;
             yield(std::make_unique<MoveIntent>(
-                    robot->id(), point_ball_leaves_field.value(),
-                    (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
+                robot->id(), point_ball_leaves_field.value(),
+                (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
         }
         else
         {
@@ -104,37 +104,39 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     } while (!Evaluation::robotHasPossession(ball, *robot) || loop_forever);
 }
 
-void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yield, Point closest_point_on_ball_trajectory) {
+void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yield,
+                                                  Point closest_point_on_ball_trajectory)
+{
     bool robot_on_ball_line =
-        pointInFrontVector(ball.position(), ball.velocity(),
-                           robot->position()) &&
+        pointInFrontVector(ball.position(), ball.velocity(), robot->position()) &&
         dist(robot->position(),
-             Line(ball.position(), ball.position() + ball.velocity())) < ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD;
+             Line(ball.position(), ball.position() + ball.velocity())) <
+            ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD;
 
     if (ball.velocity().len() < BALL_MOVING_SLOW_SPEED_THRESHOLD)
     {
         LOG(DEBUG) << "moving to ball slow" << std::endl;
         yield(std::make_unique<MoveIntent>(
             robot->id(), ball.position(),
-            (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL, 0, true,
-            NONE));
+            (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
+            0, true, NONE));
     }
     else if (robot_on_ball_line)
     {
-        Vector ball_to_robot     = robot->position() - ball.position();
-        double dist_to_ball                 = dist(robot->position(), ball.position());
-        double dist_in_front_of_ball_to_intercept                = std::max<double>(dist_to_ball - 1.0, 0.0);
-        Point point_to_meet_ball = ball.position() + ball_to_robot.norm(dist_in_front_of_ball_to_intercept);
+        Vector ball_to_robot = robot->position() - ball.position();
+        double dist_to_ball  = dist(robot->position(), ball.position());
+        double dist_in_front_of_ball_to_intercept =
+            std::max<double>(dist_to_ball - 1.0, 0.0);
+        Point point_to_meet_ball =
+            ball.position() + ball_to_robot.norm(dist_in_front_of_ball_to_intercept);
         yield(std::make_unique<MoveIntent>(
             robot->id(), point_to_meet_ball,
-            (ball.position() - robot->position()).orientation(), 0, 0, true,
-            NONE));
+            (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
     }
     else
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), closest_point_on_ball_trajectory,
-            (ball.position() - robot->position()).orientation(), 0, 0, true,
-            NONE));
+            (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
     }
 }
