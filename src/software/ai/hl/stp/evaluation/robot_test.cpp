@@ -194,6 +194,35 @@ TEST(RobotEvaluationTest, has_possession_robot_on_angle_with_ball_in_dribbler)
     EXPECT_TRUE(*result);
 }
 
+TEST(RobotEvaluationTest, possession_robot_timestamp_too_far_past)
+{
+    Point ball_position  = Point(0.07, 0);
+    Vector ball_velocity = Vector(0, 0);
+    Ball ball = Ball(ball_position, ball_velocity, Timestamp::fromSeconds(1000));
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(0));
+
+    auto result =
+        Evaluation::robotHasPossession(ball, robot, Timestamp::fromSeconds(1000));
+    EXPECT_FALSE(result.has_value());
+}
+
+TEST(RobotEvaluationTest, possession_ball_timestamp_too_far_past)
+{
+    Point ball_position  = Point(0.07, 0);
+    Vector ball_velocity = Vector(0, 0);
+    Ball ball            = Ball(ball_position, ball_velocity, Timestamp::fromSeconds(0));
+
+    Robot robot = Robot(0, Point(0, 0), Vector(), Angle::zero(), AngularVelocity::zero(),
+                        Timestamp::fromSeconds(1000));
+
+    auto result =
+        Evaluation::robotHasPossession(ball, robot, Timestamp::fromSeconds(1000));
+    EXPECT_FALSE(result.has_value());
+}
+
+
 TEST(RobotEvaluationTest, pass_with_stationary_ball)
 {
     Point ball_position  = Point(0.035, 0.06);
@@ -306,4 +335,23 @@ TEST(RobotEvaluationTest, pass_with_ball_slightly_off)
     auto result = Evaluation::robotBeingPassedTo(world, robot);
     EXPECT_TRUE(result.has_value());
     EXPECT_TRUE(*result);
+}
+
+TEST(RobotEvaluationTest, pass_ball_robot_timestamp_too_far_past)
+{
+    Point ball_position  = Point(0.035, 0.06);
+    Vector ball_velocity = Vector(4, 4.5);
+    Timestamp timestamp  = Timestamp::fromSeconds(0);
+    Ball ball            = Ball(ball_position, ball_velocity, timestamp);
+    Field field          = ::Test::TestUtil::createSSLDivBField();
+    World world(field, ball, Team(Duration::fromSeconds(10)),
+                Team(Duration::fromSeconds(10)));
+
+    Robot robot = Robot(0, Point(2.035, 2.06), Vector(), Angle::ofDegrees(59.74356),
+                        AngularVelocity::zero(), timestamp);
+    world.mutableFriendlyTeam().updateState(Team(Duration::fromSeconds(10), {robot}));
+
+    auto result =
+        Evaluation::robotBeingPassedTo(world, robot, Timestamp::fromSeconds(1000));
+    EXPECT_FALSE(result.has_value());
 }
