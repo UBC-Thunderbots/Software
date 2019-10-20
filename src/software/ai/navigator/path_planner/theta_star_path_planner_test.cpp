@@ -5,6 +5,7 @@
 #include "shared/constants.h"
 #include "software/geom/point.h"
 #include "software/test_util/test_util.h"
+#include "software/world/field.h"
 
 /**
  * Prints out the path formed by the points given
@@ -74,10 +75,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
     std::vector<Point> path_points;
 
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
     try
     {
         path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, field, obstacles));
+            planner->findPath(start, dest, navigableArea, obstacles));
     }
     catch (const std::bad_variant_access&)
     {
@@ -113,10 +117,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
     std::vector<Point> path_points;
 
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
     try
     {
         path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, field, obstacles));
+            planner->findPath(start, dest, navigableArea, obstacles));
     }
     catch (const std::bad_variant_access&)
     {
@@ -148,10 +155,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
     std::vector<Point> path_points;
 
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
     try
     {
         path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, field, obstacles));
+            planner->findPath(start, dest, navigableArea, obstacles));
     }
     catch (const std::bad_variant_access&)
     {
@@ -184,10 +194,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
     std::vector<Point> path_points;
 
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
     try
     {
         path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, field, obstacles));
+            planner->findPath(start, dest, navigableArea, obstacles));
     }
     catch (const std::bad_variant_access&)
     {
@@ -222,10 +235,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
     std::vector<Point> path_points;
 
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
     try
     {
         path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, field, obstacles));
+            planner->findPath(start, dest, navigableArea, obstacles));
     }
     catch (const std::bad_variant_access&)
     {
@@ -250,10 +266,13 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
     std::vector<Point> path_points;
 
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
     try
     {
         path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, field, obstacles));
+            planner->findPath(start, dest, navigableArea, obstacles));
     }
     catch (const std::bad_variant_access&)
     {
@@ -306,10 +325,13 @@ TEST(TestThetaStarPathPlanner, performance)
             std::unique_ptr<PathPlanner> planner =
                 std::make_unique<ThetaStarPathPlanner>();
 
+            Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                                    field.totalXLength(), field.totalYLength());
+
             try
             {
                 path_points = std::get<std::vector<Point>>(
-                    planner->findPath(start, dest, field, obstacles));
+                    planner->findPath(start, dest, navigableArea, obstacles));
             }
             catch (const std::bad_variant_access&)
             {

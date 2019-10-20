@@ -34,45 +34,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "spline",
-    srcs = [
-        "spline.cpp",
-    ],
-    hdrs = [
-        "spline.h",
-    ],
-    copts = [
-        "-std=c++17",
-    ],
-    deps = [
-        "@boost//:geometry",
-        "@g3log",
-        "@boost//:polygon",
-        ":geom",
-        ":polynomial",
-    ],
-)
-
-cc_library(
-    name = "polynomial",
-    srcs = [
-        "polynomial.cpp",
-    ],
-    hdrs = [
-        "polynomial.h",
-    ],
-    copts = [
-        "-std=c++17",
-    ],
-    deps = [
-        "@boost//:geometry",
-        "@g3log",
-        "@boost//:polygon",
-        ":geom"
-    ],
-)
-
 cc_test(
     name = "spline_test",
     srcs = [
@@ -81,7 +42,6 @@ cc_test(
     deps = [
         ":geom",
         "@gtest//:gtest_main",
-        ":spline"
     ],
 )
 
@@ -93,7 +53,6 @@ cc_test(
     deps = [
         ":geom",
         "@gtest//:gtest_main",
-        ":polynomial"
     ],
 )
 

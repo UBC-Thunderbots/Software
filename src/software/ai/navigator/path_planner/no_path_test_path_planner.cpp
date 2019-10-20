@@ -5,9 +5,9 @@
  * which returns a path consisting of no points.
  */
 
-PathType NoPathTestPathPlanner::findPath(const Point &start, const Point &destination,
-                                         const Field &field,
-                                         const std::vector<Obstacle> &obstacles)
+Path NoPathTestPathPlanner::findPath(const Point &start, const Point &destination,
+                                     const Rectangle &navigableArea,
+                                     const std::vector<Obstacle> &obstacles)
 {
-    return PathType(std::vector<Point>({}));
+    return Path(std::vector<Point>({}));
 }

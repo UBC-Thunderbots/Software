@@ -10,11 +10,12 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
     Point start{0, 0}, dest{1, 1};
     std::unique_ptr<PathPlanner> planner = std::make_unique<StraightLinePathPlanner>();
 
+    Rectangle navigableArea = Rectangle(Point(0, 0), 0, 0);
+
     try
     {
-        path_points = std::get<std::vector<Point>>(planner->findPath(
-            start, dest, Field(0, 0, 0, 0, 0, 0, 0, Timestamp::fromSeconds(0)),
-            std::vector<Obstacle>()));
+        path_points = std::get<std::vector<Point>>(
+            planner->findPath(start, dest, navigableArea, std::vector<Obstacle>()));
     }
     catch (const std::bad_variant_access&)
     {

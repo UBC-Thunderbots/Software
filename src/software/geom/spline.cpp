@@ -27,6 +27,11 @@ Point Spline::calculateValue(double val)
     return Point(x_val, y_val);
 }
 
+size_t Spline::size(void)
+{
+    return segments.size();
+}
+
 void Spline::initLinearSegments(const std::vector<Point>& points)
 {
     if (points.size() > 0)

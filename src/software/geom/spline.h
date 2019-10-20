@@ -39,6 +39,13 @@ class Spline
      */
     Point calculateValue(double val);
 
+    /**
+     * Gets size of the domain of the spline
+     *
+     * @return size of the domain of the spline
+     */
+    size_t size(void);
+
    private:
     class SplineSegment
     {
