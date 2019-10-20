@@ -23,6 +23,7 @@
    * [With CLion](#with-clion)
    * [From the command-line](#from-the-command-line)
 * [Debugging](#debugging)
+* [Flashing and Debugging A STM32 MCU](#flashing-and-debugging-a-stm32-mcu)
 
 ## Introduction
 These instructions assume that you have the following accounts setup:
@@ -146,3 +147,10 @@ Now that you're setup, if you can run it on the command line, you can run it in 
 
 ## Debugging
 Debugging in CLion is as simple as running the above instructions for building CLion, but clicking the little green bug in the top right corner instead of the little green arrow! Debugging from the command line is certainly possible, but debugging in a full IDE is *really* nice (plz trust us). If you insist on using the command line for everything, or if you have CLion issues, see [here](https://stackoverflow.com/questions/45812725/c-debugging-with-gdb-bazel-emacs).
+
+## Flashing And Debugging A STM32 MCU
+*NOTE: These instructions are currently setup assuming you are flashing a [NUCLEO-H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html)* 
+1. Make sure you've following [Installing Firmware Dependencies](#installing-firmware-dependencies)
+2. From the `src` folder, run `bazel run --cpu=stm32h7 --compilation_mode=dbg //firmware_new/tools:debug_firmware_on_arm_board 0`. We specify `--cpu=stm32h7` because we want to compile code for the stm32h7 MCU (rather then a `x86_64` processor like you have in your computer), and `--compilation_mode=dbg` in order to build in the debug symbols required so you can step through the code and see what's going on.
+3. Remove the `0` at the end of big command from step (2). Now you should be given a list of options for elf files to flash, with their associated number.
+4. At this point you should be in a gdb window. Take a look at [this tutorial](https://www.cprogramming.com/gdb.html) for some basics.
