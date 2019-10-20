@@ -51,7 +51,13 @@ class GameState
     // Robocup SSL Rules 9.2.
     Point ball_placement_point;
 
-    GameState() : state(HALT), restart_reason(NONE), game_state(RefboxGameState::HALT), our_restart(false) {}
+    GameState()
+        : state(HALT),
+          restart_reason(NONE),
+          game_state(RefboxGameState::HALT),
+          our_restart(false)
+    {
+    }
 
     /**
      * Updates the game state with a value from backend_input

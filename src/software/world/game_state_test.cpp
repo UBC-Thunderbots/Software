@@ -3,7 +3,8 @@
 #include "software/test_util/test_util.h"
 #include "software/world/refbox_constants.h"
 
-TEST(GameStateTest, default_constructor){
+TEST(GameStateTest, default_constructor)
+{
     GameState game_state;
 
     EXPECT_EQ(RefboxGameState::HALT, game_state.getRefboxGameState());

@@ -155,7 +155,8 @@ void GameState::setBallPlacementPoint(Point placementPoint)
 std::optional<Point> GameState::getBallPlacementPoint() const
 {
     std::optional<Point> opt_ball_placement_point = std::nullopt;
-    if (isSetupRestart()){
+    if (isSetupRestart())
+    {
         opt_ball_placement_point = ball_placement_point;
     }
     return opt_ball_placement_point;
