@@ -33,8 +33,8 @@ std::vector<Point> VoronoiDiagram::findVoronoiEdgeRecIntersects(Rectangle boundi
                 //      |                 v                   |
                 //      |                                     |
                 //      +-------------------------------------+
-                Point p1 = points[edge.cell()->source_index()];
-                Point p2 = points[edge.twin()->cell()->source_index()];
+                Point p1    = points[edge.cell()->source_index()];
+                Point p2    = points[edge.twin()->cell()->source_index()];
                 double endX = (p1.y() - p2.y());
                 double endY = (p1.x() - p2.x()) * -1;
                 // Extend the edge out to beyond the rectangle to ensure interception
