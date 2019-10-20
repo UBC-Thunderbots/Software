@@ -80,7 +80,7 @@ TEST(DefenseShadowEnemyTacticTest,
                   Angle::ofDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
     }
-    catch (std::bad_cast&)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
@@ -123,7 +123,7 @@ TEST(
                   Angle::ofDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
     }
-    catch (std::bad_cast&)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
