@@ -112,11 +112,12 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
         }
         default:
         {
-            current_destination = path.calculateValue(1.0);
-            double segment_final_vel =
-                getCloseToEnemyObstacleFactor(path.calculateValue(1.0) *
+            current_destination      = path.calculateValue(1.0);
+            double segment_final_vel = getCloseToEnemyObstacleFactor(
+                path.calculateValue(1.0) *
                 calculateTransitionSpeedBetweenSegments(
-                    path.calculateValue(0.0), path.calculateValue(1.0), path.calculateValue(2.0),
+                    path.calculateValue(0.0), path.calculateValue(1.0),
+                    path.calculateValue(2.0),
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
                             .value()));
