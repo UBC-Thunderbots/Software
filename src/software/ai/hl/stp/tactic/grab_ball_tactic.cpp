@@ -71,10 +71,10 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
         if (smallest_enemy_dist_to_ball < BALL_DIST_FROM_ENEMY)
         {
-            if (dist(robot->position(), ball.position()) < ROBOT_MAX_RADIUS_METERS * 2)
+            if (dist(robot->position(), ball.position()) < BALL_DIST_FROM_ENEMY)
             {
                 yield(movespin_action.updateStateAndGetNextIntent(
-                    *robot, ball.position(), AngularVelocity::ofDegrees(360 * 2.5), 0));
+                    *robot, ball.position(), STEAL_BALL_SPIN_SPEED, 0));
             }
             else
             {

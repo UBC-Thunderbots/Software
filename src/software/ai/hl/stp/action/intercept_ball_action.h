@@ -37,7 +37,29 @@ class InterceptBallAction : public Action
    private:
     void calculateNextIntent(IntentCoroutine::push_type& yield) override;
 
+    /**
+     * Determines the best place to intercept the ball and move the robot to that position.
+     *
+     * @param yield The coroutine to yield to
+     * @param closest_point_on_ball_trajectory The closest point on the ball's trajectory to the robot's
+     * current position
+     */
+    void moveToInterceptPosition(IntentCoroutine::push_type& yield, Point closest_point_on_ball_trajectory);
+
+    /**
+     * Returns the point at which the ball would leave the field given its current trajectory. This function
+     * assumes the ball's current position is within the field. If it is not, an std::nullopt is returned.
+     *
+     * @param field The field
+     * @param ball The ball
+     * @return An optional containing the point at which the ball would leave the field. If the ball's position
+     * is not within the field, std::nullopt is returned
+     */
     std::optional<Point> getPointBallLeavesField(const Field& field, const Ball& ball);
+
+    const double BALL_MOVING_SLOW_SPEED_THRESHOLD = 0.3;
+    const double ROBOT_CLOSE_TO_BALL_TRAJECTORY_LINE_THRESHOLD = 0.02;
+    const double FINAL_SPEED_AT_SLOW_BALL = 0.3;
 
     // Action parameters
     Field field;

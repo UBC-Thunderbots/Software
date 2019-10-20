@@ -32,7 +32,6 @@ class GrabBallTactic : public Tactic
      */
     void updateParams(const Field &field, const Ball &ball, const Team &enemy_team);
 
-    // TODO
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
      * closer to the destination
@@ -53,6 +52,9 @@ class GrabBallTactic : public Tactic
 
    private:
     void calculateNextIntent(IntentCoroutine::push_type &yield) override;
+
+    // Spin 2.5 rotations per second to steal the ball
+    const AngularVelocity STEAL_BALL_SPIN_SPEED = AngularVelocity::ofDegrees(360 * 2.5);
 
     // Tactic parameters
     Field field;
