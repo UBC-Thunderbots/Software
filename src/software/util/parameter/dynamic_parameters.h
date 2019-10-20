@@ -8,5 +8,5 @@ namespace Util
     const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
         std::make_shared<ThunderbotsConfig>();
     const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
-        std::const_pointer_cast<const ThunderbotsConfig>(DynamicParameters);
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 }  // namespace Util
