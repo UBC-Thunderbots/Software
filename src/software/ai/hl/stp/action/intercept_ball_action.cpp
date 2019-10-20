@@ -62,6 +62,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         bool point_in_front_of_ball =
             pointInFrontVector(ball.position(), ball.velocity(), closest_point);
 
+        // We add 1e-6 to avoid division by 0 without affecting the result significantly
         Duration ball_time_to_position = Duration::fromSeconds(
             dist(closest_point, ball.position()) / (ball.velocity().len() + 1e-6));
         Duration robot_time_to_pos = AI::Evaluation::getTimeToPositionForRobot(
