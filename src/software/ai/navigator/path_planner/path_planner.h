@@ -5,6 +5,7 @@
 #include "software/ai/navigator/curve/curve.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
+#include "software/geom/spline.h"
 #include "software/geom/rectangle.h"
 
 /**
@@ -14,7 +15,7 @@
  * if a path exists, otherwise it will return nothing.
  */
 
-using Path = std::variant<std::vector<Curve>, std::vector<Point>>;
+using Path = Spline;
 
 class PathPlanner
 {
