@@ -36,7 +36,8 @@ void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         {
             yield(std::make_unique<MoveIntent>(
                 robot->id(), pivot_point, (pivot_point - robot->position()).orientation(),
-                0.0, 0, enable_dribbler));
+                0.0, 0, enable_dribbler ? DribblerEnable::ON : DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::NONE));
             LOG(DEBUG) << "obtaining ball, moving!";
         }
         else
