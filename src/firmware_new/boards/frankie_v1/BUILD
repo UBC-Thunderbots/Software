@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 
 cc_binary(

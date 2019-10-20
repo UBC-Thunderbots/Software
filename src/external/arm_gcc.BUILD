@@ -35,3 +35,8 @@ filegroup(
     name = "objcopy",
     srcs = ["bin/arm-none-eabi-objcopy"],
 )
+
+filegroup(
+    name = "gdb",
+    srcs = ["bin/arm-none-eabi-gdb"],
+)
