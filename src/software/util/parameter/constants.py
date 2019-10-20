@@ -30,7 +30,7 @@ PARAMETER_PUBLIC_ENTRY =\
                return std::const_pointer_cast<const Parameter<{type}>>({param_variable_name});
            }}
 
-           std::shared_ptr<Parameter<{type}>> {mutable_accessor_name} () const
+           const std::shared_ptr<Parameter<{type}>> {mutable_accessor_name} ()
            {{
                return {param_variable_name};
            }}
@@ -53,7 +53,7 @@ CONFIG_PUBLIC_ENTRY =\
                return std::const_pointer_cast<const {config_name}>({config_variable_name});
            }}
 
-           std::shared_ptr<const {config_name}> {mutable_accessor_name} () const
+           const std::shared_ptr<{config_name}> {mutable_accessor_name} ()
            {{
                return {config_variable_name};
            }}
