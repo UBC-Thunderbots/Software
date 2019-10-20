@@ -57,6 +57,7 @@ class Spline
     /**
      * Initialize segments with points.size() - 1 linear segments interpolating
      * the points
+     * Initialize start and end points
      *
      * @param points points to interpolate
      */
