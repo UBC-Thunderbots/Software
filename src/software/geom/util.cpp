@@ -14,7 +14,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/segment.h"
-#include "software/geom/voronoi_util.h"
+#include "software/geom/voronoi_diagram.h"
 
 double proj_len(const Segment &first, const Vector &second)
 {
@@ -1411,7 +1411,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         empty_circles.emplace_back(Circle(corner, dist(corner, closest)));
     }
 
-    std::vector<Point> intersects = findVoronoiEdgeRecIntersects(vd, bounding_box);
+    std::vector<Point> intersects = vd.findVoronoiEdgeRecIntersects(bounding_box);
 
     // Radius of the circle will be the distance from the interception point
     // to the nearest input point.
@@ -1426,7 +1426,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
     }
 
     std::vector<Circle> calculatedEmptyCircles =
-        voronoiVerticesToOpenCircles(vd, bounding_box);
+        vd.voronoiVerticesToOpenCircles(bounding_box);
     empty_circles.insert(empty_circles.end(), calculatedEmptyCircles.begin(),
                          calculatedEmptyCircles.end());
 

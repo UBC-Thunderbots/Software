@@ -1,4 +1,4 @@
-#include "software/geom/voronoi_util.h"
+#include "software/geom/voronoi_diagram.h"
 
 #include <gtest/gtest.h>
 
@@ -12,7 +12,7 @@ TEST(VoronoiUtilTest, find_intesects_with_boundary_diagram_no_edges)
     std::vector<Point> points = {Point(-1, -1)};
     VoronoiDiagram vd(points);
 
-    std::vector<Point> intersects = findVoronoiEdgeRecIntersects(vd, bounding_box);
+    std::vector<Point> intersects = vd.findVoronoiEdgeRecIntersects(bounding_box);
 
     EXPECT_EQ(0, intersects.size());
 }
@@ -23,7 +23,7 @@ TEST(VoronoiUtilTest, find_intesects_with_boundary_diagram_with_3_points)
     std::vector<Point> points = {Point(-1, -1), Point(1, -1), Point(0, 1)};
     VoronoiDiagram vd(points);
 
-    std::vector<Point> intersects = findVoronoiEdgeRecIntersects(vd, bounding_box);
+    std::vector<Point> intersects = vd.findVoronoiEdgeRecIntersects(bounding_box);
 
     EXPECT_EQ(3, intersects.size());
 
@@ -43,7 +43,7 @@ TEST(VoronoiUtilTest, vertices_to_circles_one_vertices_in_diagram)
     std::vector<Point> points = {Point(-1, -1)};
     VoronoiDiagram vd(points);
 
-    std::vector<Circle> empty_circles = voronoiVerticesToOpenCircles(vd, bounding_box);
+    std::vector<Circle> empty_circles = vd.voronoiVerticesToOpenCircles(bounding_box);
 
     EXPECT_EQ(0, empty_circles.size());
 }
@@ -54,7 +54,7 @@ TEST(VoronoiUtilTest, vertices_to_circles_1_vertex_in_diagram)
     std::vector<Point> points = {Point(-1, -1), Point(1, -1), Point(0, 1)};
     VoronoiDiagram vd(points);
 
-    std::vector<Circle> empty_circles = voronoiVerticesToOpenCircles(vd, bounding_box);
+    std::vector<Circle> empty_circles = vd.voronoiVerticesToOpenCircles(bounding_box);
 
     EXPECT_EQ(1, empty_circles.size());
     EXPECT_EQ(0, empty_circles[0].getOrigin().x());
@@ -69,7 +69,7 @@ TEST(VoronoiUtilTest, vertices_to_circles_many_vertices_in_circle)
                                  Point(1.5, 1)};
     VoronoiDiagram vd(points);
 
-    std::vector<Circle> empty_circles = voronoiVerticesToOpenCircles(vd, bounding_box);
+    std::vector<Circle> empty_circles = vd.voronoiVerticesToOpenCircles(bounding_box);
 
     EXPECT_EQ(2, empty_circles.size());
     EXPECT_EQ(0, empty_circles[0].getOrigin().x());

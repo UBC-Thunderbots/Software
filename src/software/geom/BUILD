@@ -7,7 +7,7 @@ cc_library(
         "rectangle.cpp",
         "shot.cpp",
         "util.cpp",
-        "voronoi_util.cpp",
+        "voronoi_diagram.cpp",
     ],
     hdrs = [
         "angle.h",
@@ -20,7 +20,7 @@ cc_library(
         "segment.h",
         "shot.h",
         "util.h",
-        "voronoi_util.h",
+        "voronoi_diagram.h",
     ],
     copts = [
         "-std=c++17",
@@ -80,7 +80,7 @@ cc_test(
 cc_test(
     name = "voronoi_util_test",
     srcs = [
-        "voronoi_util_test.cpp",
+        "voronoi_diagram_test.cpp",
     ],
     deps = [
         ":geom",
