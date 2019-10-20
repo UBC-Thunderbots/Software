@@ -18,17 +18,19 @@ struct VoronoiDiagram
         this->points = points;
     }
 
+    VoronoiDiagram() = delete;
+
    private:
     voronoi_diagram<double> vd;
     std::vector<Point> points;
 
    public:
-    const voronoi_diagram<double> &getVd() const
+    const voronoi_diagram<double> &getDiagram() const
     {
         return vd;
     }
 
-    const std::vector<Point> &getPoints() const
+    const std::vector<Point> &getPointsUsedForGeneration() const
     {
         return points;
     }

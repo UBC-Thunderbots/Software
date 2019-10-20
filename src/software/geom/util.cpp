@@ -1365,7 +1365,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         // to the size of the circle.
         return empty_circles;
     }
-    else if (points.size() == 1)
+    if (points.size() == 1)
     {
         // If there is only 1 point, return circles centered at all four corners of the
         // bounding bounding_box.
@@ -1375,7 +1375,7 @@ std::vector<Circle> findOpenCircles(Rectangle bounding_box, std::vector<Point> p
         }
         return empty_circles;
     }
-    else if (points.size() == 2)
+    if (points.size() == 2)
     {
         // If there are 2 point, split the points with a vector perpendicular to the
         // vector connecting the two points. Return 2 circles that are centered at the

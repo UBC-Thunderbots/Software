@@ -10,7 +10,7 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram,
 {
     std::vector<Point> intersects;
 
-    for (auto edge : diagram.getVd().edges())
+    for (auto edge : diagram.getDiagram().edges())
     {
         // Edges extending outside the rectangle will be infinite edges
         if (!edge.is_finite() && edge.is_primary())
@@ -34,8 +34,8 @@ std::vector<Point> findVoronoiEdgeRecIntersects(const VoronoiDiagram &diagram,
                 //      |                 v                   |
                 //      |                                     |
                 //      +-------------------------------------+
-                Point p1    = diagram.getPoints()[edge.cell()->source_index()];
-                Point p2    = diagram.getPoints()[edge.twin()->cell()->source_index()];
+                Point p1    = diagram.getPointsUsedForGeneration()[edge.cell()->source_index()];
+                Point p2    = diagram.getPointsUsedForGeneration()[edge.twin()->cell()->source_index()];
                 double endX = (p1.y() - p2.y());
                 double endY = (p1.x() - p2.x()) * -1;
                 // Extend the edge out to beyond the rectangle to ensure interception
@@ -68,7 +68,7 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram,
     // https://stackoverflow.com/questions/34342038/how-to-triangulate-polygons-in-boost
 
     std::vector<Circle> empty_circles;
-    for (auto vertex : diagram.getVd().vertices())
+    for (auto vertex : diagram.getDiagram().vertices())
     {
         // We only want to consider vertices within our rectangle
         if (bounding_box.containsPoint(Point(vertex.x(), vertex.y())))
@@ -85,7 +85,7 @@ std::vector<Circle> voronoiVerticesToOpenCircles(const VoronoiDiagram &diagram,
                     continue;
                 }
 
-                triangle.push_back(diagram.getPoints()[cell->source_index()]);
+                triangle.push_back(diagram.getPointsUsedForGeneration()[cell->source_index()]);
                 if (triangle.size() == 3)
                 {
                     // Find the smallest distance from the vertex to a vertex on it's
