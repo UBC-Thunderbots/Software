@@ -64,10 +64,14 @@ TEST(ConfigTest, TestAutogen)
         std::const_pointer_cast<const ThunderbotsConfig>(DynamicParametersV2Mutable);
 
     // basic test
-    DynamicParametersV2Mutable->getMutableAIConfig()->mutableOverrideAIPlay()->setValue(true);;
+    DynamicParametersV2Mutable->getMutableAIConfig()->mutableOverrideAIPlay()->setValue(
+        true);
+    ;
     ASSERT_TRUE(DynamicParametersV2Immutable->getAIConfig()->OverrideAIPlay()->value());
 
-    DynamicParametersV2Mutable->getMutableAIConfig()->mutableOverrideAIPlay()->setValue(false);;
+    DynamicParametersV2Mutable->getMutableAIConfig()->mutableOverrideAIPlay()->setValue(
+        false);
+    ;
     ASSERT_FALSE(DynamicParametersV2Immutable->getAIConfig()->OverrideAIPlay()->value());
     // Check visitor function above, is is how the visualizer could visit
     // and set each of the values, and update them
