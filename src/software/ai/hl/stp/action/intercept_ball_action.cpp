@@ -97,8 +97,9 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         else
         {
-            // This is a fallback case that ideally should never be reached. We will only enter this
-            // case if the robot is not in front of the ball, and the ball is not within the field.
+            // This is a fallback case that ideally should never be reached. We will only
+            // enter this case if the robot is not in front of the ball, and the ball is
+            // not within the field.
             LOG(DEBUG) << "Moving to ball backup case" << std::endl;
             yield(std::make_unique<MoveIntent>(
                 robot->id(), ball.position(),
