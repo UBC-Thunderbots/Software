@@ -8,7 +8,8 @@
 
 using namespace Passing;
 
-PassGenerator::PassGenerator(const World& world, const Point& passer_point)
+PassGenerator::PassGenerator(const World& world, const Point& passer_point,
+                             const PassType& pass_type)
     : updated_world(world),
       world(world),
       passer_robot_id(std::nullopt),
@@ -17,6 +18,7 @@ PassGenerator::PassGenerator(const World& world, const Point& passer_point)
       best_known_pass({0, 0}, {0, 0}, 0, Timestamp::fromSeconds(0)),
       target_region(std::nullopt),
       random_num_gen(random_device()),
+      pass_type(pass_type),
       in_destructor(false)
 {
     // Generate the initial set of passes
@@ -61,7 +63,6 @@ PassWithRating PassGenerator::getBestPassSoFar()
     std::lock_guard<std::mutex> best_known_pass_lock(best_known_pass_mutex);
 
     Pass best_known_pass_copy = best_known_pass;
-
     return PassWithRating{std::move(best_known_pass_copy), ratePass(best_known_pass)};
 }
 
@@ -131,7 +132,7 @@ void PassGenerator::optimizePasses()
     // The objective function we minimize in gradient descent to improve each pass
     // that we're optimizing
     const auto objective_function =
-        [this](std::array<double, NUM_PARAMS_TO_OPTIMIZE> pass_array) {
+        [this](const std::array<double, NUM_PARAMS_TO_OPTIMIZE>& pass_array) {
             try
             {
                 Pass pass = convertArrayToPass(pass_array);
@@ -252,7 +253,7 @@ void PassGenerator::updatePasserPointOfAllPasses(const Point& new_passer_point)
     }
 }
 
-double PassGenerator::ratePass(Pass pass)
+double PassGenerator::ratePass(const Pass& pass)
 {
     // Take ownership of world, target_region, passer_robot_id for the duration of this
     // function
@@ -263,7 +264,7 @@ double PassGenerator::ratePass(Pass pass)
     double rating = 0;
     try
     {
-        rating = ::ratePass(world, pass, target_region, passer_robot_id);
+        rating = ::ratePass(world, pass, target_region, passer_robot_id, pass_type);
     }
     catch (std::invalid_argument& e)
     {
@@ -298,7 +299,7 @@ std::vector<Pass> PassGenerator::generatePasses(unsigned long num_passes_to_gen)
         Util::DynamicParameters->getPassingConfig()->MaxPassSpeedMPerS()->value());
 
     std::vector<Pass> passes;
-    for (int i = 0; i < num_passes_to_gen; i++)
+    for (unsigned i = 0; i < num_passes_to_gen; i++)
     {
         Point receiver_point(x_distribution(random_num_gen),
                              y_distribution(random_num_gen));
@@ -344,7 +345,7 @@ bool PassGenerator::passesEqual(Passing::Pass pass1, Passing::Pass pass2)
 }
 
 std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>
-PassGenerator::convertPassToArray(Pass pass)
+PassGenerator::convertPassToArray(const Pass& pass)
 {
     // Take ownership of the world for the duration of this function
     std::lock_guard<std::mutex> world_lock(world_mutex);
@@ -354,7 +355,7 @@ PassGenerator::convertPassToArray(Pass pass)
 }
 
 Pass PassGenerator::convertArrayToPass(
-    std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE> array)
+    const std::array<double, PassGenerator::NUM_PARAMS_TO_OPTIMIZE>& array)
 {
     // Take ownership of the passer_point and world for the duration of this function
     std::lock_guard<std::mutex> passer_point_lock(passer_point_mutex);

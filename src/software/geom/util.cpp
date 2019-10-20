@@ -431,12 +431,13 @@ std::vector<Shot> angleSweepCirclesAll(const Vector &src, const Vector &p1,
     {
         events_collapsed.emplace_back(std::make_pair(end_angle - start_angle, -1));
     }
+
     std::vector<Shot> result;
-    for (int i = 0; i < events_collapsed.size() - 1; i += 2)
+    for (unsigned i = 1; i < events_collapsed.size(); i += 2)
     {
         // Calculate the center of this range on the target line segement
-        Angle range_start = events_collapsed[i].first + start_angle;
-        Angle range_end   = events_collapsed[i + 1].first + start_angle;
+        Angle range_start = events_collapsed[i - 1].first + start_angle;
+        Angle range_end   = events_collapsed[i].first + start_angle;
         Angle mid         = (range_end - range_start) / 2 + range_start;
         Vector ray        = Vector::createFromAngle(mid) * 10.0;
         Vector inter      = lineIntersection(src, src + ray, p1, p2).value();
@@ -696,29 +697,6 @@ Vector closestPointOnLine(const Vector &centre, const Vector &lineA, const Vecto
     return lineB;
 }
 
-namespace
-{
-    std::vector<Vector> lineseg_circle_intersect(const Vector &centre, double radius,
-                                                 const Vector &segA, const Vector &segB)
-    {
-        std::vector<Vector> ans;
-        std::vector<Vector> poss = lineCircleIntersect(centre, radius, segA, segB);
-
-        for (Vector i : poss)
-        {
-            bool x_ok = i.x() <= std::max(segA.x(), segB.x()) + EPS &&
-                        i.x() >= std::min(segA.x(), segB.x()) - EPS;
-            bool y_ok = i.y() <= std::max(segA.y(), segB.y()) + EPS &&
-                        i.y() >= std::min(segA.y(), segB.y()) - EPS;
-            if (x_ok && y_ok)
-            {
-                ans.push_back(i);
-            }
-        }
-        return ans;
-    }
-}  // namespace
-
 bool uniqueLineIntersects(const Vector &a, const Vector &b, const Vector &c,
                           const Vector &d)
 {
@@ -868,6 +846,31 @@ std::pair<std::optional<Point>, std::optional<Point>> raySegmentIntersection(
     {
         return std::make_pair(std::nullopt, std::nullopt);
     }
+}
+
+std::pair<std::optional<Point>, std::optional<Point>> rayRectangleIntersection(
+    const Ray &ray, const Rectangle &rectangle)
+{
+    std::vector<Segment> rectangle_segments = {
+        Segment(rectangle.posXPosYCorner(), rectangle.negXPosYCorner()),
+        Segment(rectangle.negXPosYCorner(), rectangle.negXNegYCorner()),
+        Segment(rectangle.negXNegYCorner(), rectangle.posXNegYCorner()),
+        Segment(rectangle.posXNegYCorner(), rectangle.posXPosYCorner()),
+    };
+    std::pair<std::optional<Point>, std::optional<Point>> result =
+        std::make_pair(std::nullopt, std::nullopt);
+    for (const auto &seg : rectangle_segments)
+    {
+        auto intersection = raySegmentIntersection(ray, seg);
+        // Always take the result with more non-nullopt values
+        if ((intersection.first && !result.first) ||
+            (intersection.second && !result.second))
+        {
+            result = intersection;
+        }
+    }
+
+    return result;
 }
 
 std::optional<Point> getRayIntersection(Ray ray1, Ray ray2)
@@ -1426,7 +1429,7 @@ std::vector<Circle> findOpenCircles(Rectangle rectangle, std::vector<Point> poin
 Polygon circleToPolygon(const Circle &circle, size_t num_points)
 {
     std::vector<Point> points;
-    for (auto i = 0; i < num_points; i++)
+    for (unsigned i = 0; i < num_points; i++)
     {
         Point p =
             circle.getOrigin() + Point(circle.getRadius(), 0)

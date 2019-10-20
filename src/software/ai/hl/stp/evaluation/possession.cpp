@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/evaluation/possession.h"
 
-#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/evaluation/team.h"
+#include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/ball.h"
 #include "software/world/field.h"
 
@@ -49,19 +49,46 @@ namespace Evaluation
 
     bool teamHasPossession(const Team &team, const Ball &ball)
     {
-        for (Robot robot : team.getAllRobots())
+        for (const Robot &robot : team.getAllRobots())
         {
             std::vector<Timestamp> robot_history_timestamps =
                 robot.getPreviousTimestamps();
 
-            int i = 0;
+            unsigned i = 0;
 
             // Check that the robot has had possession of the ball recently.
             while (i < robot_history_timestamps.size() &&
                    robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                       Duration::fromSeconds(POSSESSION_BUFFER_TIME_IN_SECONDS))
+                       Duration::fromSeconds(
+                           Util::DynamicParameters::Evaluation::Possession::
+                               possession_buffer_time_seconds.value()))
             {
                 if (robotHasPossession(ball, robot, robot_history_timestamps[i]))
+                    return true;
+                i++;
+            }
+        }
+
+        return false;
+    }
+
+    bool teamPassInProgress(const Ball &ball, const Team &team)
+    {
+        for (const Robot &robot : team.getAllRobots())
+        {
+            std::vector<Timestamp> robot_history_timestamps =
+                robot.getPreviousTimestamps();
+
+            unsigned i = 0;
+
+            // Check that the robot has had possession of the ball recently.
+            while (i < robot_history_timestamps.size() &&
+                   robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
+                       Duration::fromSeconds(
+                           Util::DynamicParameters::Evaluation::Possession::
+                               pass_buffer_time_seconds.value()))
+            {
+                if (robotBeingPassedTo(ball, robot, robot_history_timestamps[i]))
                     return true;
                 i++;
             }

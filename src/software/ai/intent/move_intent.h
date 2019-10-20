@@ -5,7 +5,7 @@
 #include "software/geom/angle.h"
 #include "software/geom/point.h"
 
-class MoveIntent : public Intent, public MovePrimitive
+class MoveIntent : public MovePrimitive, public Intent
 {
    public:
     static const std::string INTENT_NAME;

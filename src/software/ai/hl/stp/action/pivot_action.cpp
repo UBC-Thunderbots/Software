@@ -29,9 +29,6 @@ std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& ro
 
 void PivotAction::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-    // Compute final position, to know when the robot is done
-    const double pivot_radius = BALL_MAX_RADIUS_METERS;
-
     do
     {
         // If we're not in position to pivot, move to grab the ball

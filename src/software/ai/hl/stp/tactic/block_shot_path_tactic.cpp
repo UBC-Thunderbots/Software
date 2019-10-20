@@ -8,7 +8,7 @@
 #include "software/geom/util.h"
 
 BlockShotPathTactic::BlockShotPathTactic(const Field& field, bool loop_forever)
-    : field(field), Tactic(loop_forever)
+    : Tactic(loop_forever), field(field)
 {
 }
 
@@ -17,14 +17,14 @@ std::string BlockShotPathTactic::getName() const
     return "Block Shot Path Tactic";
 }
 
-void BlockShotPathTactic::updateParams(const Robot& enemy_robot)
+void BlockShotPathTactic::updateControlParams(const Robot& enemy_robot)
 {
-    updateParams(enemy_robot.position());
+    updateControlParams(enemy_robot.position());
 }
 
-void BlockShotPathTactic::updateParams(const Point& shot_origin)
+void BlockShotPathTactic::updateControlParams(const Point& shot_origin)
 {
-    // Update the parameters stored by this Tactic
+    // Update the control parameters stored by this Tactic
     this->shot_origin = shot_origin;
 }
 

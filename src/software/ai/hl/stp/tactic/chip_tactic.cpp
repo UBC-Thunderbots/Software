@@ -6,7 +6,7 @@
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 
 ChipTactic::ChipTactic(const Ball &ball, bool loop_forever)
-    : ball(ball), Tactic(loop_forever, {RobotCapabilityFlags::Chip})
+    : Tactic(loop_forever, {RobotCapabilityFlags::Chip}), ball(ball)
 {
 }
 
@@ -15,11 +15,16 @@ std::string ChipTactic::getName() const
     return "Chip Tactic";
 }
 
-void ChipTactic::updateParams(const Ball &ball, Point chip_origin, Point chip_target,
-                              double chip_distance_meters)
+void ChipTactic::updateWorldParams(const Ball &ball)
 {
-    // update the parameters stored by this tactic
-    this->ball                 = ball;
+    // update the world parameters stored by this tactic
+    this->ball = ball;
+}
+
+void ChipTactic::updateControlParams(Point chip_origin, Point chip_target,
+                                     double chip_distance_meters)
+{
+    // update the control parameters stored by this tactic
     this->chip_origin          = chip_origin;
     this->chip_target          = chip_target;
     this->chip_distance_meters = chip_distance_meters;

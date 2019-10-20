@@ -6,6 +6,7 @@
 #include "software/ai/hl/stp/evaluation/ball.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
+#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
@@ -15,7 +16,12 @@ using namespace Passing;
 
 const std::string CornerKickPlay::name = "Corner Kick Play";
 
-CornerKickPlay::CornerKickPlay() : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(5)) {}
+CornerKickPlay::CornerKickPlay()
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(
+          Util::DynamicParameters::CornerKickPlay::max_time_commit_to_pass_seconds
+              .value()))
+{
+}
 
 std::string CornerKickPlay::getName() const
 {
@@ -24,14 +30,19 @@ std::string CornerKickPlay::getName() const
 
 bool CornerKickPlay::isApplicable(const World &world) const
 {
-    return world.gameState().isOurDirectFree() &&
-           Evaluation::ballInFriendlyCorner(world.field(), world.ball(),
-                                            BALL_IN_CORNER_RADIUS);
+    double min_dist_to_corner =
+        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).len());
+
+    return world.gameState().isOurFreeKick() &&
+           min_dist_to_corner <= BALL_IN_CORNER_RADIUS;
 }
 
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
-    return !Evaluation::teamHasPossession(world.enemyTeam(), world.ball());
+    return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
+           (!Evaluation::teamHasPossession(world.enemyTeam(), world.ball()) ||
+            Evaluation::teamPassInProgress(world.ball(), world.friendlyTeam()));
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -61,6 +72,9 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Figure out if we're taking the kick from the +y or -y corner
     bool kick_from_pos_corner = world.ball().position().y() > 0;
 
+    auto goalie_tactic = std::make_shared<GoalieTactic>(
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+
     // We want the two cherry pickers to be in rectangles on the +y and -y sides of the
     // field in the +x half. We also further offset the rectangle from the goal line
     // for the cherry-picker closer to where we're taking the corner kick from
@@ -85,6 +99,7 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
+    align_to_ball_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
 
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
@@ -105,14 +120,20 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                          copysign(0.5, opposite_corner_to_kick.y()));
     auto bait_move_tactic_1 = std::make_shared<MoveTactic>(true);
     auto bait_move_tactic_2 = std::make_shared<MoveTactic>(true);
-    bait_move_tactic_1->updateParams(
+    bait_move_tactic_1->updateControlParams(
         bait_move_tactic_1_pos,
         (world.field().enemyGoal() - bait_move_tactic_1_pos).orientation(), 0.0);
-    bait_move_tactic_2->updateParams(
+    bait_move_tactic_2->updateControlParams(
         bait_move_tactic_2_pos,
         (world.field().enemyGoal() - bait_move_tactic_2_pos).orientation(), 0.0);
 
-    PassGenerator pass_generator(world, world.ball().position());
+    PassGenerator pass_generator(world, world.ball().position(),
+                                 PassType::ONE_TOUCH_SHOT);
+
+    // Target any pass in the enemy half of the field, shifted up by 1 meter
+    // from the center line
+    pass_generator.setTargetRegion(
+        Rectangle(Point(1, world.field().yLength() / 2), world.field().enemyCornerNeg()));
 
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
@@ -121,11 +142,14 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
         updateAlignToBallTactic(align_to_ball_tactic);
+        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
-        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               bait_move_tactic_1, bait_move_tactic_2});
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
+               cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
     }
 
 
@@ -139,10 +163,14 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
+        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
-        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               bait_move_tactic_1, bait_move_tactic_2});
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
+
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
+               cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
     } while (!align_to_ball_tactic->done());
 
     LOG(DEBUG) << "Finished aligning to ball";
@@ -155,11 +183,14 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     do
     {
         updateAlignToBallTactic(align_to_ball_tactic);
+        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
         updateCherryPickTactics({cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y});
         updatePassGenerator(pass_generator);
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
-        yield({align_to_ball_tactic, cherry_pick_tactic_pos_y, cherry_pick_tactic_neg_y,
-               bait_move_tactic_1, bait_move_tactic_2});
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_pos_y,
+               cherry_pick_tactic_neg_y, bait_move_tactic_1, bait_move_tactic_2});
 
         best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
         LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
@@ -178,12 +209,8 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
     LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
-    // Destruct the PassGenerator and CherryPick tactics (which contain a PassGenerator
-    // each) to save a significant number of CPU cycles
-    // TODO: stop the PassGenerators here instead of destructing them (Issue #636)
-    pass_generator.~PassGenerator();
-    cherry_pick_tactic_pos_y->~CherryPickTactic();
-    cherry_pick_tactic_neg_y->~CherryPickTactic();
+    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
+    //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
     auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
@@ -192,10 +219,16 @@ void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                          world.enemyTeam(), pass, world.ball(), false);
     do
     {
-        passer->updateParams(pass, world.ball());
-        receiver->updateParams(world.friendlyTeam(), world.enemyTeam(), pass,
-                               world.ball());
-        yield({passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
+        passer->updateWorldParams(world.ball());
+        passer->updateControlParams(pass);
+        receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
+                                    world.ball());
+        receiver->updateControlParams(pass);
+        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
+
+        yield({goalie_tactic, passer, receiver, bait_move_tactic_1, bait_move_tactic_2});
     } while (!receiver->done());
 
     LOG(DEBUG) << "Finished";
@@ -206,7 +239,7 @@ void CornerKickPlay::updateCherryPickTactics(
 {
     for (auto &tactic : tactics)
     {
-        tactic->updateParams(world);
+        tactic->updateWorldParams(world);
     }
 }
 
@@ -216,7 +249,7 @@ void CornerKickPlay::updateAlignToBallTactic(
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
-    align_to_ball_tactic->updateParams(
+    align_to_ball_tactic->updateControlParams(
         world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
         ball_to_center_vec.orientation(), 0);
 }

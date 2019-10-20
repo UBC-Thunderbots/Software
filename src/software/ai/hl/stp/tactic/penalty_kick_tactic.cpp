@@ -17,7 +17,7 @@
 PenaltyKickTactic::PenaltyKickTactic(const Ball& ball, const Field& field,
                                      const std::optional<Robot>& enemy_goalie,
                                      bool loop_forever)
-    : ball(ball), field(field), enemy_goalie(enemy_goalie), Tactic(loop_forever)
+    : Tactic(loop_forever), ball(ball), field(field), enemy_goalie(enemy_goalie)
 {
 }
 
@@ -26,9 +26,9 @@ std::string PenaltyKickTactic::getName() const
     return "Penalty Kick Tactic";
 }
 
-void PenaltyKickTactic::updateParams(const Ball& updated_ball,
-                                     const std::optional<Robot>& updated_enemy_goalie,
-                                     const Field& updated_field)
+void PenaltyKickTactic::updateWorldParams(
+    const Ball& updated_ball, const std::optional<Robot>& updated_enemy_goalie,
+    const Field& updated_field)
 {
     this->enemy_goalie = updated_enemy_goalie;
     this->ball         = updated_ball;
@@ -62,7 +62,7 @@ bool PenaltyKickTactic::evaluate_penalty_shot()
     Ray shot_ray = Ray(ball.position(), Point(robot.value().orientation().cos(),
                                               robot.value().orientation().sin()));
 
-    auto [intersect_1, intersect_2] = raySegmentIntersection(shot_ray, goal_line);
+    std::optional<Point> intersect_1 = raySegmentIntersection(shot_ray, goal_line).first;
 
     if (intersect_1.has_value())
     {
@@ -133,10 +133,6 @@ Point PenaltyKickTactic::evaluate_next_position()
 
 void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 {
-    // Keep track if a shot has been taken
-    bool shot_taken             = false;
-    bool is_facing_pos_goalpost = false;
-
     // We will need to keep track of time so we don't break the rules by taking too long
     Timestamp penalty_kick_start = robot->getMostRecentTimestamp();
 

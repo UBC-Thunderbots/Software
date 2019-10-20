@@ -9,7 +9,6 @@
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_enemy_tactic.h"
 #include "software/ai/hl/stp/tactic/shadow_freekicker_tactic.h"
-#include "software/ai/hl/stp/tactic/stop_tactic.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/game_state.h"
 
@@ -23,26 +22,12 @@ std::string EnemyFreekickPlay::getName() const
 
 bool EnemyFreekickPlay::isApplicable(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 bool EnemyFreekickPlay::invariantHolds(const World &world) const
 {
-    if (world.gameState().isTheirFreeKick())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return world.gameState().isTheirFreeKick();
 }
 
 void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -59,25 +44,21 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init FreeKickShadower tactics (these robots will both block the enemy robot taking
     // a free kick (at most we will have 2
     auto shadow_freekicker_1 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::First, world.enemyTeam(), world.ball(), world.field(),
+        ShadowFreekickerTactic::LEFT, world.enemyTeam(), world.ball(), world.field(),
         true);
     auto shadow_freekicker_2 = std::make_shared<ShadowFreekickerTactic>(
-        ShadowFreekickerTactic::Second, world.enemyTeam(), world.ball(), world.field(),
+        ShadowFreekickerTactic::RIGHT, world.enemyTeam(), world.ball(), world.field(),
         true);
 
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-            ->BallStealSpeed()
-            ->value(),
-        true);
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
+        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(), true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
-            ->BallStealSpeed()
-            ->value(),
-        true);
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
+        Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value(), true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
     // shadow)
@@ -93,22 +74,17 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
 
-        // Check if the enemy is passing-capable
-        bool enemy_team_can_pass = Util::DynamicParameters->getEnemyCapabilityConfig()
-                                       ->EnemyTeamCanPass()
-                                       ->value();
-
         // Update goalie tactic
-        goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),
-                                    world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         // Update free kicke shadowers
-        shadow_freekicker_1->updateParams(world.enemyTeam(), world.ball());
-        shadow_freekicker_2->updateParams(world.enemyTeam(), world.ball());
+        shadow_freekicker_1->updateWorldParams(world.enemyTeam(), world.ball());
+        shadow_freekicker_2->updateWorldParams(world.enemyTeam(), world.ball());
 
         // Update crease defenders
-        crease_defender_tactic->updateParams(world.ball(), world.field(),
-                                             world.friendlyTeam(), world.enemyTeam());
+        crease_defender_tactic->updateWorldParams(
+            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
         // Add Freekick shadower tactics
         tactics_to_run.emplace_back(shadow_freekicker_1);
@@ -121,11 +97,11 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // enough threats to shadow, move our robots to block the friendly net
         if (enemy_threats.size() == 0)
         {
-            move_tactic_main->updateParams(
+            move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
                 0);
-            move_tactic_main->updateParams(
+            move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, -2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
                 0);
@@ -135,11 +111,11 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         if (enemy_threats.size() == 1)
         {
-            shadow_tactic_main->updateParams(enemy_threats.at(1), world.field(),
-                                             world.friendlyTeam(), world.enemyTeam(),
-                                             ROBOT_MAX_RADIUS_METERS * 3,
-                                             enemy_team_can_pass, world.ball());
-            move_tactic_main->updateParams(
+            shadow_tactic_main->updateWorldParams(world.field(), world.friendlyTeam(),
+                                                  world.enemyTeam(), world.ball());
+            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
+                                                    ROBOT_MAX_RADIUS_METERS * 3);
+            move_tactic_main->updateControlParams(
                 world.field().friendlyGoal() + Point(0, 2 * ROBOT_MAX_RADIUS_METERS),
                 (world.ball().position() - world.field().friendlyGoal()).orientation(),
                 0);
@@ -149,14 +125,14 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         }
         if (enemy_threats.size() >= 2)
         {
-            shadow_tactic_main->updateParams(enemy_threats.at(1), world.field(),
-                                             world.friendlyTeam(), world.enemyTeam(),
-                                             ROBOT_MAX_RADIUS_METERS * 3,
-                                             enemy_team_can_pass, world.ball());
-            shadow_tactic_secondary->updateParams(enemy_threats.at(2), world.field(),
-                                                  world.friendlyTeam(), world.enemyTeam(),
-                                                  ROBOT_MAX_RADIUS_METERS * 3,
-                                                  enemy_team_can_pass, world.ball());
+            shadow_tactic_main->updateWorldParams(world.field(), world.friendlyTeam(),
+                                                  world.enemyTeam(), world.ball());
+            shadow_tactic_main->updateControlParams(enemy_threats.at(1),
+                                                    ROBOT_MAX_RADIUS_METERS * 3);
+            shadow_tactic_secondary->updateWorldParams(
+                world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball());
+            shadow_tactic_secondary->updateControlParams(enemy_threats.at(2),
+                                                         ROBOT_MAX_RADIUS_METERS * 3);
 
             tactics_to_run.emplace_back(shadow_tactic_main);
             tactics_to_run.emplace_back(shadow_tactic_secondary);

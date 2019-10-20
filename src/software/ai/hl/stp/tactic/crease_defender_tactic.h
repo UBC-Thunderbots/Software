@@ -42,12 +42,15 @@ class CreaseDefenderTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this CreaseDefenderTactic.
+     * Updates the world parameters for this CreaseDefenderTactic.
      *
-// TODO: comment
+     * @param ball
+     * @param field
+     * @param friendly_team
+     * @param enemy_team
      */
-    void updateParams(const Ball &ball, const Field &field, const Team &friendly_team,
-                      const Team &enemy_team);
+    void updateWorldParams(const Ball &ball, const Field &field,
+                           const Team &friendly_team, const Team &enemy_team);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -98,8 +101,8 @@ class CreaseDefenderTactic : public Tactic
                                                      Angle offset);
 
     // Tactic parameters
-    Ball ball;
     Field field;
+    Ball ball;
     Team friendly_team;
     Team enemy_team;
     LeftOrRight left_or_right;

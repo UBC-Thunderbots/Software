@@ -25,14 +25,14 @@ class PenaltyKickTactic : public Tactic
     std::string getName() const override;
 
     /**
-     * Updates the parameters for this PenaltyKickTactic.
+     * Updates the world parameters for this PenaltyKickTactic.
      *
      * @param updated_ball : The ball
      * @param enemy_goalie : Optional variable for the enemy goalie robot
      * @param field : The Field we are playing on
      */
-    void updateParams(const Ball &updated_ball, const std::optional<Robot> &enemy_goalie,
-                      const Field &field);
+    void updateWorldParams(const Ball &updated_ball,
+                           const std::optional<Robot> &enemy_goalie, const Field &field);
 
     /**
      * Calculates the cost of assigning the given robot to this Tactic. Prefers robots
@@ -62,9 +62,9 @@ class PenaltyKickTactic : public Tactic
     Point evaluate_next_position();
 
     // Tactic parameters
-    std::optional<Robot> enemy_goalie;
     Ball ball;
     Field field;
+    std::optional<Robot> enemy_goalie;
 
     const bool ENABLE_DRIBBLER = true;
 
