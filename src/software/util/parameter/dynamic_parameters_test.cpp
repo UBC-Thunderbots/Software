@@ -1,4 +1,4 @@
-rinclude <gtest/gtest.h>
+rinclude<gtest / gtest.h>
 #include <ros/ros.h>
 
 #include <random>
@@ -6,12 +6,12 @@ rinclude <gtest/gtest.h>
 #include "software/util/parameter/dynamic_parameter_utils.h"
 #include "software/util/parameter/parameter.h"
 
-/* * Registry Test Fixutre:
- *      This fixture is used everywhere to return a unique_value value
- *      specific to the type its instantiated with.
- */
-template <typename T>
-class RegistryTest : public ::testing::Test
+    /* * Registry Test Fixutre:
+     *      This fixture is used everywhere to return a unique_value value
+     *      specific to the type its instantiated with.
+     */
+    template <typename T>
+    class RegistryTest : public ::testing::Test
 {
    protected:
     RegistryTest()

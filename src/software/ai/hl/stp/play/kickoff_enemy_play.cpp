@@ -37,15 +37,21 @@ void KickoffEnemyPlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
             true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
             true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
+                ->BallStealSpeed()
+                ->value(),
             true)};
 
     // these positions are picked according to the following slide

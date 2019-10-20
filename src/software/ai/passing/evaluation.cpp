@@ -38,10 +38,12 @@ double Passing::ratePass(const World& world, const Passing::Pass& pass,
     }
 
     // Place strict limits on pass start time
-    double min_pass_time_offset =
-        Util::DynamicParameters->getPassingConfig()->MinTimeOffsetForPassSeconds()->value();
-    double max_pass_time_offset =
-        Util::DynamicParameters->getPassingConfig()->MaxTimeOffsetForPassSeconds()->value();
+    double min_pass_time_offset = Util::DynamicParameters->getPassingConfig()
+                                      ->MinTimeOffsetForPassSeconds()
+                                      ->value();
+    double max_pass_time_offset = Util::DynamicParameters->getPassingConfig()
+                                      ->MaxTimeOffsetForPassSeconds()
+                                      ->value();
     double pass_time_offset_quality =
         sigmoid(pass.startTime().getSeconds(),
                 min_pass_time_offset + world.getMostRecentTimestamp().getSeconds(), 0.5) *
@@ -71,7 +73,9 @@ double Passing::ratePassShootScore(const Field& field, const Team& enemy_team,
     double ideal_shoot_angle_degrees =
         Util::DynamicParameters->getPassingConfig()->IdealMinShootAngleDegrees()->value();
     double ideal_max_rotation_to_shoot_degrees =
-        Util::DynamicParameters->getPassingConfig()->IdealMaxRotationToShootDegrees()->value();
+        Util::DynamicParameters->getPassingConfig()
+            ->IdealMaxRotationToShootDegrees()
+            ->value();
 
     std::vector<Point> obstacles;
     for (const Robot& robot : enemy_team.getAllRobots())
@@ -288,13 +292,16 @@ double Passing::getStaticPositionQuality(const Field& field, const Point& positi
     static const double sig_width = 0.1;
 
     // The offset from the sides of the field for the center of the sigmoid functions
-    double x_offset =
-        Util::DynamicParameters->getPassingConfig()->StaticFieldPositionQualityXOffset()->value();
-    double y_offset =
-        Util::DynamicParameters->getPassingConfig()->StaticFieldPositionQualityYOffset()->value();
+    double x_offset = Util::DynamicParameters->getPassingConfig()
+                          ->StaticFieldPositionQualityXOffset()
+                          ->value();
+    double y_offset = Util::DynamicParameters->getPassingConfig()
+                          ->StaticFieldPositionQualityYOffset()
+                          ->value();
     double friendly_goal_weight =
-        Util::DynamicParameters->getPassingConfig()->
-            StaticFieldPositionQualityFriendlyGoalDistanceWeight()->value();
+        Util::DynamicParameters->getPassingConfig()
+            ->StaticFieldPositionQualityFriendlyGoalDistanceWeight()
+            ->value();
 
     // Make a slightly smaller field, and positive weight values in this reduced field
     double half_field_length = field.xLength() / 2;

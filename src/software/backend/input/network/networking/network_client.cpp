@@ -132,9 +132,15 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         // We invert the field side if we explicitly choose to override the values
         // provided by refbox. The 'defending_positive_side' parameter dictates the side
         // we are defending if we are overriding the value
-        // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960 
-        if (Util::DynamicParameters->getAIConfig()->getRefboxConfig()->OverrideRefboxDefendingSide()->value() &&
-            Util::DynamicParameters->getAIConfig()->getRefboxConfig()->DefendingPositiveSide()->value())
+        // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
+        if (Util::DynamicParameters->getAIConfig()
+                ->getRefboxConfig()
+                ->OverrideRefboxDefendingSide()
+                ->value() &&
+            Util::DynamicParameters->getAIConfig()
+                ->getRefboxConfig()
+                ->DefendingPositiveSide()
+                ->value())
         {
             invertFieldSide(detection);
         }
@@ -170,14 +176,18 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             world.updateBallState(ball);
 
             Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-            int friendly_goalie_id =
-                Util::DynamicParameters->getAIConfig()->getRefboxConfig()->FriendlyGoalieId()->value();
+            int friendly_goalie_id = Util::DynamicParameters->getAIConfig()
+                                         ->getRefboxConfig()
+                                         ->FriendlyGoalieId()
+                                         ->value();
             friendly_team.assignGoalie(friendly_goalie_id);
             world.mutableFriendlyTeam() = friendly_team;
 
-            Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
-            int enemy_goalie_id =
-                Util::DynamicParameters->getAIConfig()->getRefboxConfig()->EnemyGoalieId()->value();
+            Team enemy_team     = network_filter.getFilteredEnemyTeamData({detection});
+            int enemy_goalie_id = Util::DynamicParameters->getAIConfig()
+                                      ->getRefboxConfig()
+                                      ->EnemyGoalieId()
+                                      ->value();
             enemy_team.assignGoalie(enemy_goalie_id);
             world.mutableEnemyTeam() = enemy_team;
         }

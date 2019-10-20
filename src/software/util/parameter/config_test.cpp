@@ -60,8 +60,8 @@ TEST(ConfigTest, TestAutogen)
     // the mutable config above will only be given to the visualizer and anything else
     // that needs to update parameters. The Immutable version below will be given
     // to all other threads
-    //const std::shared_ptr<const ThunderbotsConfig> DynamicParametersV2Immutable =
-        //std::const_pointer_cast<const ThunderbotsConfig>(DynamicParametersV2Mutable);
+    // const std::shared_ptr<const ThunderbotsConfig> DynamicParametersV2Immutable =
+    // std::const_pointer_cast<const ThunderbotsConfig>(DynamicParametersV2Mutable);
 
     DynamicParametersV2Mutable->getAIConfig()->OverrideAIPlay()->value();
 

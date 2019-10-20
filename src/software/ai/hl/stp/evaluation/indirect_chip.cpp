@@ -30,9 +30,11 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
     std::vector<LegacyTriangle> target_triangles =
         findOpenTriangles(allTriangles, all_enemy_positions);
 
-    Rectangle target_area_rectangle = findBestChipTargetArea(
-        world, Util::DynamicParameters->getEvaluationConfig()->getIndirectChipConfig()->ChipTargetAreaInset()
-                   ->value());
+    Rectangle target_area_rectangle =
+        findBestChipTargetArea(world, Util::DynamicParameters->getEvaluationConfig()
+                                          ->getIndirectChipConfig()
+                                          ->ChipTargetAreaInset()
+                                          ->value());
 
     target_triangles =
         removeTrianglesOutsideRectangle(target_area_rectangle, target_triangles);
@@ -50,30 +52,40 @@ std::optional<Point> Evaluation::findTargetPointForIndirectChipAndChase(
         // Get the largest triangle within the vector of triangles that has area greater
         // than minimum area of chip target triangle, and all edge lengths greater than
         // minimum edge length of chip target triangle
-        std::optional<LegacyTriangle> largest_triangle = getLargestValidTriangle(
-            triangles,
-            Util::DynamicParameters->getEvaluationConfig()->getIndirectChipConfig()->MinChipTriArea()->value(),
-            Util::DynamicParameters->getEvaluationConfig()->getIndirectChipConfig()->MinChipTriEdgeLen()
-                ->value());
+        std::optional<LegacyTriangle> largest_triangle =
+            getLargestValidTriangle(triangles,
+                                    Util::DynamicParameters->getEvaluationConfig()
+                                        ->getIndirectChipConfig()
+                                        ->MinChipTriArea()
+                                        ->value(),
+                                    Util::DynamicParameters->getEvaluationConfig()
+                                        ->getIndirectChipConfig()
+                                        ->MinChipTriEdgeLen()
+                                        ->value());
         LegacyTriangle t = largest_triangle.value();
 
         Point target = getTriangleCenter(t);
         // Adjust the target point to have a length of distance between itself and the
         // ball's position, then scaling it by a certain percentage
         target = target.norm((target - ball_position).len() *
-                             Util::DynamicParameters->getEvaluationConfig()->getIndirectChipConfig()->
-                                 ChipCherryPowerDownscale()->value());
+                             Util::DynamicParameters->getEvaluationConfig()
+                                 ->getIndirectChipConfig()
+                                 ->ChipCherryPowerDownscale()
+                                 ->value());
 
         // Target should never be further away than maximum chip power
         if ((target - ball_position).len() >
-            Util::DynamicParameters->getEvaluationConfig()->getIndirectChipConfig()->MaxChipPower()->value())
+            Util::DynamicParameters->getEvaluationConfig()
+                ->getIndirectChipConfig()
+                ->MaxChipPower()
+                ->value())
         {
             target =
-                ball_position +
-                (target - ball_position)
-                    .norm(
-                        Util::DynamicParameters->getEvaluationConfig()->getIndirectChipConfig()->MaxChipPower()
-                            ->value());
+                ball_position + (target - ball_position)
+                                    .norm(Util::DynamicParameters->getEvaluationConfig()
+                                              ->getIndirectChipConfig()
+                                              ->MaxChipPower()
+                                              ->value());
         }
 
         return std::optional(target);

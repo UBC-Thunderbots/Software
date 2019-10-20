@@ -111,9 +111,10 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         else
         {
             // block the cone by default
-            float radius =
-                Util::DynamicParameters->getGoalieTacticConfig()->BlockConeBuffer()->value() +
-                ROBOT_MAX_RADIUS_METERS;
+            float radius = Util::DynamicParameters->getGoalieTacticConfig()
+                               ->BlockConeBuffer()
+                               ->value() +
+                           ROBOT_MAX_RADIUS_METERS;
             Point goalie_pos =
                 calcBlockCone(field.friendlyGoalpostNeg(), field.friendlyGoalpostPos(),
                               ball.position(), radius);

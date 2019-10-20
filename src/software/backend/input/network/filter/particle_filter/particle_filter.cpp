@@ -84,13 +84,17 @@ void ParticleFilter::update(Point ballPredictedPos)
     // percentage of particles to use
     // as basepoints for the next iteration. These particles should converge to
     // the ball's location.
-    int num_condensations =
-        Util::DynamicParameters->getNetworkInput()->getFilterConfig()->getParticleFilterConfig()->NumCondensations()->
-            value();
+    int num_condensations = Util::DynamicParameters->getNetworkInput()
+                                ->getFilterConfig()
+                                ->getParticleFilterConfig()
+                                ->NumCondensations()
+                                ->value();
 
-    double top_percentage_of_particles =
-        Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->getParticleFilterConfig()->
-            TopPercentageOfParticles()->value();
+    double top_percentage_of_particles = Util::DynamicParameters->getNetworkInputConfig()
+                                             ->getFilterConfig()
+                                             ->getParticleFilterConfig()
+                                             ->TopPercentageOfParticles()
+                                             ->value();
 
     for (int i = 0; i < num_condensations; i++)
     {
@@ -152,17 +156,24 @@ void ParticleFilter::update(Point ballPredictedPos)
     // but still use
     // the predicted position, so we are tolerant to the ball disappearing for a
     // few frames.
-    double ball_confidence_threshold =
-        Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->getParticleFilterConfig()->
-            BallConfidenceThreshold.value();
-    double ball_confidence_delta = Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->
-                                       getParticleFilterConfig->BallConfidenceDelta()->value();
-    double ball_valid_dist_threshold =
-        Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->getParticleFilterConfig()->
-            BallValidDistThreshold()->value();
-    double ball_max_variance =
-        Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->getParticleFilterConfig()->BallMaxVariance()
-            ->value();
+    double ball_confidence_threshold = Util::DynamicParameters->getNetworkInputConfig()
+                                           ->getFilterConfig()
+                                           ->getParticleFilterConfig()
+                                           ->BallConfidenceThreshold.value();
+    double ball_confidence_delta = Util::DynamicParameters->getNetworkInputConfig()
+                                       ->getFilterConfig()
+                                       ->getParticleFilterConfig->BallConfidenceDelta()
+                                       ->value();
+    double ball_valid_dist_threshold = Util::DynamicParameters->getNetworkInputConfig()
+                                           ->getFilterConfig()
+                                           ->getParticleFilterConfig()
+                                           ->BallValidDistThreshold()
+                                           ->value();
+    double ball_max_variance = Util::DynamicParameters->getNetworkInputConfig()
+                                   ->getFilterConfig()
+                                   ->getParticleFilterConfig()
+                                   ->BallMaxVariance()
+                                   ->value();
     if (detections.empty())
     {
         if (ballConfidence < ball_confidence_threshold)
@@ -315,16 +326,26 @@ void ParticleFilter::updateParticleConfidences()
 double ParticleFilter::evaluateParticle(const Point &particle)
 {
     double detectionScore       = 0.0;
-    double max_detection_weight = Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->
-                                      getParticleFilterConfi()->MaxDetectionWeight()->value();
-    double previous_ball_weight = Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->
-                                      getParticleFilterConfig()->PreviousBallWeight()->value();
-    double ball_dist_threshold =
-        Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->getParticleFilterConfig()->BallDistThreshold()
-            ->value();
-    double prediction_weight =
-        Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->getParticleFilterConfig()->PredictionWeight()
-            ->value();
+    double max_detection_weight = Util::DynamicParameters->getNetworkInputConfig()
+                                      ->getFilterConfig()
+                                      ->getParticleFilterConfi()
+                                      ->MaxDetectionWeight()
+                                      ->value();
+    double previous_ball_weight = Util::DynamicParameters->getNetworkInputConfig()
+                                      ->getFilterConfig()
+                                      ->getParticleFilterConfig()
+                                      ->PreviousBallWeight()
+                                      ->value();
+    double ball_dist_threshold = Util::DynamicParameters->getNetworkInputConfig()
+                                     ->getFilterConfig()
+                                     ->getParticleFilterConfig()
+                                     ->BallDistThreshold()
+                                     ->value();
+    double prediction_weight = Util::DynamicParameters->getNetworkInputConfig()
+                                   ->getFilterConfig()
+                                   ->getParticleFilterConfig()
+                                   ->PredictionWeight()
+                                   ->value();
 
     for (unsigned int i = 0; i < detections.size(); i++)
     {
@@ -383,10 +404,16 @@ double ParticleFilter::evaluateParticle(const Point &particle)
 
 double ParticleFilter::getDetectionWeight(const double dist)
 {
-    double detection_weight_decay = Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->
-                                        ParticleFilter()->DetectionWeightDecay()->value();
-    double max_detection_weight = Util::DynamicParameters->getNetworkInputConfig()->getFilterConfig()->
-                                      ParticleFilter()->MaxDetectionWeight()->value();
+    double detection_weight_decay = Util::DynamicParameters->getNetworkInputConfig()
+                                        ->getFilterConfig()
+                                        ->ParticleFilter()
+                                        ->DetectionWeightDecay()
+                                        ->value();
+    double max_detection_weight = Util::DynamicParameters->getNetworkInputConfig()
+                                      ->getFilterConfig()
+                                      ->ParticleFilter()
+                                      ->MaxDetectionWeight()
+                                      ->value();
     double weight = max_detection_weight - detection_weight_decay * dist;
     return weight < 0.0 ? 0.0 : weight;
 }
