@@ -5,8 +5,8 @@
 #include "software/ai/navigator/curve/curve.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
-#include "software/geom/spline.h"
 #include "software/geom/rectangle.h"
+#include "software/geom/spline.h"
 
 /**
  * PathPlanner is an interface for a path planner that,

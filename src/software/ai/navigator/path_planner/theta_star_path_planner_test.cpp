@@ -10,7 +10,7 @@
 std::vector<Point> convertPathToPoints(Path path)
 {
     std::vector<Point> points;
-    for (double i = 0.0; i<=path.size(); i++)
+    for (double i = 0.0; i <= path.size(); i++)
     {
         points.push_back(path.calculateValue(i));
     }
@@ -121,214 +121,169 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     checkPathDoesNotIntersectObstacle(path_points, obstacles);
 }
 
-//TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_x_axis)
-//{
-//    // Test where we need to navigate around a single obstacle along the x-axis
-//    Field field = ::Test::TestUtil::createSSLDivBField();
-//    Point start{0, 0}, dest{3, 0};
-//
-//    // Place a rectangle over our destination location
-//    std::vector<Obstacle> obstacles = {
-//        Obstacle(Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)}))};
-//
-//    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-//    std::vector<Point> path_points;
-//
-//    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-//                            field.totalXLength(), field.totalYLength());
-//
-//    try
-//    {
-//        path_points = std::get<std::vector<Point>>(
-//            planner->findPath(start, dest, navigableArea, obstacles));
-//    }
-//    catch (const std::bad_variant_access&)
-//    {
-//        // not a valid path
-//        FAIL();
-//    }
-//
-//    // The path should start at exactly the start point and end at exactly the dest
-//    EXPECT_EQ(start, path_points.front());
-//    EXPECT_EQ(dest, path_points.back());
-//
-//    // Make sure the path does not exceed a bounding box
-//    Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
-//    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-//
-//    // Can't make sure the path does not go through any obstacles
-//    // since start is blocked
-//}
-//
-//TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_y_axis)
-//{
-//    // Test where we need to navigate around a single obstacle along the x-axis
-//    Field field = ::Test::TestUtil::createSSLDivBField();
-//    Point start{0, 0}, dest{0, 3};
-//
-//    // Place a rectangle over our destination location
-//    std::vector<Obstacle> obstacles = {
-//        Obstacle(Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)}))};
-//
-//    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-//    std::vector<Point> path_points;
-//
-//    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-//                            field.totalXLength(), field.totalYLength());
-//
-//    try
-//    {
-//        path_points = std::get<std::vector<Point>>(
-//            planner->findPath(start, dest, navigableArea, obstacles));
-//    }
-//    catch (const std::bad_variant_access&)
-//    {
-//        // not a valid path
-//        FAIL();
-//    }
-//
-//    // The path should start at exactly the start point and end at exactly the dest
-//    EXPECT_EQ(start, path_points.front());
-//    EXPECT_EQ(dest, path_points.back());
-//
-//    // Make sure the path does not exceed a bounding box
-//    Rectangle bounding_box(
-//        {
-//            1.2,
-//            -0.1,
-//        },
-//        {-1.2, 3.1});
-//    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
-//
-//    // Can't make sure the path does not go through any obstacles
-//    // since start is blocked
-//}
-//
-//TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
-//{
-//    Field field = ::Test::TestUtil::createSSLDivBField();
-//    Point start{2, 2}, dest{-3, -3};
-//
-//    std::vector<Obstacle> obstacles = {};
-//
-//    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-//    std::vector<Point> path_points;
-//
-//    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-//                            field.totalXLength(), field.totalYLength());
-//
-//    try
-//    {
-//        path_points = std::get<std::vector<Point>>(
-//            planner->findPath(start, dest, navigableArea, obstacles));
-//    }
-//    catch (const std::bad_variant_access&)
-//    {
-//        // not a valid path
-//        FAIL();
-//    }
-//
-//    // Since there are no obstacles, there should be two path points, one at the start
-//    // and one at the destination
-//    ASSERT_EQ(2, path_points.size());
-//    ASSERT_EQ(start, path_points.front());
-//    ASSERT_EQ(dest, path_points.back());
-//}
-//
-//TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
-//{
-//    Field field = ::Test::TestUtil::createSSLDivBField();
-//    Point start{2.29, 2.29}, dest{2.3, 2.3};
-//
-//    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
-//
-//    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-//    std::vector<Point> path_points;
-//
-//    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-//                            field.totalXLength(), field.totalYLength());
-//
-//    try
-//    {
-//        path_points = std::get<std::vector<Point>>(
-//            planner->findPath(start, dest, navigableArea, obstacles));
-//    }
-//    catch (const std::bad_variant_access&)
-//    {
-//        // not a valid path
-//        FAIL();
-//    }
-//
-//    ASSERT_EQ(2, path_points.size());
-//    ASSERT_EQ(start, path_points.front());
-//    ASSERT_EQ(dest, path_points.back());
-//}
-//
-//TEST(TestThetaStarPathPlanner, performance)
-//{
-//    // This test can be used to guage performance, and profiled to find areas for
-//    // improvement
-//    std::vector<std::vector<Obstacle>> obstacle_sets = {
-//        {
-//            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//        },
-//        {
-//            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
-//            Obstacle::createCircleObstacle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
-//        }};
-//    Field field = ::Test::TestUtil::createSSLDivBField();
-//
-//    int num_iterations = 10;
-//
-//    Point start(0, 0), dest(4.5, 0);
-//
-//    std::vector<Point> path_points;
-//    auto start_time = std::chrono::system_clock::now();
-//    for (int i = 0; i < num_iterations; i++)
-//    {
-//        for (auto obstacles : obstacle_sets)
-//        {
-//            std::unique_ptr<PathPlanner> planner =
-//                std::make_unique<ThetaStarPathPlanner>();
-//
-//            Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-//                                    field.totalXLength(), field.totalYLength());
-//
-//            try
-//            {
-//                path_points = std::get<std::vector<Point>>(
-//                    planner->findPath(start, dest, navigableArea, obstacles));
-//            }
-//            catch (const std::bad_variant_access&)
-//            {
-//                FAIL();
-//            }
-//        }
-//    }
-//
-//    auto end_time = std::chrono::system_clock::now();
-//
-//    std::chrono::duration<double> duration = end_time - start_time;
-//
-//    std::chrono::duration<double> avg =
-//        duration / ((double)num_iterations * obstacle_sets.size());
-//
-//    //    std::cout << "Took " <<
-//    //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
-//    //    << "ms to run, average time of " <<
-//    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0 <<
-//    //    "ms";
-//}
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_x_axis)
+{
+    // Test where we need to navigate around a single obstacle along the x-axis
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{0, 0}, dest{3, 0};
+
+    // Place a rectangle over our destination location
+    std::vector<Obstacle> obstacles = {
+        Obstacle(Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)}))};
+
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
+    Path path = planner->findPath(start, dest, navigableArea, obstacles);
+
+    // The path should start at exactly the start point and end at exactly the dest
+    EXPECT_EQ(start, path.calculateValue(0));
+    EXPECT_EQ(dest, path.calculateValue(path.size()));
+
+    std::vector<Point> path_points = convertPathToPoints(path);
+
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+
+    // Can't make sure the path does not go through any obstacles
+    // since start is blocked
+}
+
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_along_y_axis)
+{
+    // Test where we need to navigate around a single obstacle along the x-axis
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{0, 0}, dest{0, 3};
+
+    // Place a rectangle over our destination location
+    std::vector<Obstacle> obstacles = {
+        Obstacle(Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)}))};
+
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
+    Path path = planner->findPath(start, dest, navigableArea, obstacles);
+
+    // The path should start at exactly the start point and end at exactly the dest
+    EXPECT_EQ(start, path.calculateValue(0));
+    EXPECT_EQ(dest, path.calculateValue(path.size()));
+
+    std::vector<Point> path_points = convertPathToPoints(path);
+
+    // Make sure the path does not exceed a bounding box
+    Rectangle bounding_box(
+        {
+            1.2,
+            -0.1,
+        },
+        {-1.2, 3.1});
+    checkPathDoesNotExceedBoundingBox(path_points, bounding_box);
+
+    // Can't make sure the path does not go through any obstacles
+    // since start is blocked
+}
+
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{2, 2}, dest{-3, -3};
+
+    std::vector<Obstacle> obstacles = {};
+
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
+    Path path = planner->findPath(start, dest, navigableArea, obstacles);
+
+    // Since there are no obstacles, there should be two path points, one at the start
+    // and one at the destination
+    EXPECT_EQ(2, path.size() + 1);
+    EXPECT_EQ(start, path.calculateValue(0));
+    EXPECT_EQ(dest, path.calculateValue(path.size()));
+}
+
+TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
+{
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    Point start{2.29, 2.29}, dest{2.3, 2.3};
+
+    std::vector<Obstacle> obstacles = std::vector<Obstacle>();
+
+    std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
+
+    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                            field.totalXLength(), field.totalYLength());
+
+    Path path = planner->findPath(start, dest, navigableArea, obstacles);
+
+    EXPECT_EQ(2, path.size() + 1);
+    EXPECT_EQ(start, path.calculateValue(0));
+    EXPECT_EQ(dest, path.calculateValue(path.size()));
+}
+
+TEST(TestThetaStarPathPlanner, performance)
+{
+    // This test can be used to guage performance, and profiled to find areas for
+    // improvement
+    std::vector<std::vector<Obstacle>> obstacle_sets = {
+        {
+            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+        },
+        {
+            Obstacle::createCircleObstacle({0, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({-0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 0.5}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 1.0}, ROBOT_MAX_RADIUS_METERS, 1),
+            Obstacle::createCircleObstacle({0.5, 1.5}, ROBOT_MAX_RADIUS_METERS, 1),
+        }};
+    Field field = ::Test::TestUtil::createSSLDivBField();
+
+    int num_iterations = 10;
+
+    Point start(0, 0), dest(4.5, 0);
+
+    auto start_time = std::chrono::system_clock::now();
+    for (int i = 0; i < num_iterations; i++)
+    {
+        for (auto obstacles : obstacle_sets)
+        {
+            std::unique_ptr<PathPlanner> planner =
+                std::make_unique<ThetaStarPathPlanner>();
+
+            Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
+                                    field.totalXLength(), field.totalYLength());
+
+            planner->findPath(start, dest, navigableArea, obstacles);
+        }
+    }
+
+    auto end_time = std::chrono::system_clock::now();
+
+    std::chrono::duration<double> duration = end_time - start_time;
+
+    std::chrono::duration<double> avg =
+        duration / ((double)num_iterations * obstacle_sets.size());
+
+    //    std::cout << "Took " <<
+    //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0
+    //    << "ms to run, average time of " <<
+    //    std::chrono::duration_cast<std::chrono::microseconds>(avg).count() / 1000.0 <<
+    //    "ms";
+}

@@ -342,8 +342,6 @@ loop_end:
     path_points.erase(path_points.begin());
     path_points.insert(path_points.begin(), start);
 
-    for (Point p : path_points)
-        std::cout << "findPath: " << p << std::endl;
     return Path(path_points);
 }
 
