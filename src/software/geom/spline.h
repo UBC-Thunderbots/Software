@@ -17,6 +17,8 @@ class Spline
      * Construct a spline by drawing line segments between consecutive
      * Points
      *
+     * @throws std::runtime_error if points.size() == 1
+     *
      * @param points Points on the spline
      */
     explicit Spline(const std::vector<Point>& points);
@@ -24,6 +26,8 @@ class Spline
     /**
      * Construct a spline by drawing line segments between consecutive
      * Points
+     *
+     * @throws std::runtime_error if points.size() == 1
      *
      * @param points Points on the spline
      */
@@ -37,14 +41,14 @@ class Spline
      * @return value of spline evaluated at value val
      *      * if not defined by a spline then return closest start/end point
      */
-    Point calculateValue(double val);
+    Point calculateValue(double val) const;
 
     /**
      * Gets size of the domain of the spline
      *
      * @return size of the domain of the spline
      */
-    size_t size(void);
+    size_t size(void) const;
 
    private:
     class SplineSegment
@@ -65,6 +69,8 @@ class Spline
      * Initialize segments with points.size() - 1 linear segments interpolating
      * the points
      * Initialize start and end points
+     *
+     * @throws std::runtime_error if points.size() == 1
      *
      * @param points points to interpolate
      */

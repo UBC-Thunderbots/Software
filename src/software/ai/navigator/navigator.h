@@ -146,29 +146,24 @@ class Navigator : public IntentVisitor
      *
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
-    double getCloseToEnemyObstacleFactor(Point &p);
+    double getCloseToEnemyObstacleFactor(Point p);
 
     /**
-     * Set the current_primitive based on the intent and path_points
+     * Set the current_primitive based on the intent and path
      *
      * @param move_intent MoveIntent to navigate with
-     * @param path_points path of points to navigate
+     * @param path path to navigate
      *
      * @modifies current_primitive
      */
-    void movePointNavigation(const MoveIntent &move_intent,
-                             std::vector<Point> &path_points);
+    void moveNavigation(const MoveIntent &move_intent, const Path &path);
 
     /**
-     * Set the current_primitive based on the intent and path_curves
+     * Add path to planned_paths
      *
-     * @param move_intent MoveIntent to navigate with
-     * @param path_curves path of curves to navigate
-     *
-     * @modifies current_primitive, planned_paths
+     * @param path path to add
      */
-    void moveCurveNavigation(const MoveIntent &move_intent,
-                             std::vector<Curve> &path_curves);
+    void addPlannedPaths(const Path &path);
 
     std::unique_ptr<PathPlanner> path_planner_;
 };

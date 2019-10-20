@@ -2,7 +2,6 @@
 #include <variant>
 #include <vector>
 
-#include "software/ai/navigator/curve/curve.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
@@ -30,10 +29,7 @@ class PathPlanner
      * @param obstacles obstacles to avoid
      *
      * @return a path between start and destination
-     * 		if no valid path then return an empty vector
-     * 		if valid path then return either
-     * 		a vector of points or a vector of curves
-     * 		    * The vector of points must include the start point and end point
+     *     * no path is represented by a path of size 0
      */
     virtual Path findPath(const Point &start, const Point &destination,
                           const Rectangle &navigableArea,

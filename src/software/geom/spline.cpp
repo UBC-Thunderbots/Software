@@ -10,7 +10,7 @@ Spline::Spline(const std::initializer_list<Point>& points)
     initLinearSegments(points);
 }
 
-Point Spline::calculateValue(double val)
+Point Spline::calculateValue(double val) const
 {
     if (val < 0)
     {
@@ -27,14 +27,18 @@ Point Spline::calculateValue(double val)
     return Point(x_val, y_val);
 }
 
-size_t Spline::size(void)
+size_t Spline::size(void) const
 {
     return segments.size();
 }
 
 void Spline::initLinearSegments(const std::vector<Point>& points)
 {
-    if (points.size() > 0)
+    if (points.size() == 1)
+    {
+        throw std::runtime_error("Cannot create spline with one point");
+    }
+    else if (points.size() > 1)
     {
         for (size_t i = 1; i < points.size(); i++)
         {
