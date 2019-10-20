@@ -13,13 +13,11 @@ NetworkClient::NetworkClient(std::string vision_multicast_address,
                              int gamecontroller_multicast_port,
                              std::function<void(World)> received_world_callback)
     : network_filter(),
-      world(),
       io_service(),
       last_valid_t_capture(std::numeric_limits<double>::max()),
       initial_packet_count(0),
       received_world_callback(received_world_callback)
 {
-    world.updateRefboxGameState(RefboxGameState::HALT);
     setupVisionClient(vision_multicast_address, vision_multicast_port);
 
     setupGameControllerClient(gamecontroller_multicast_address,
