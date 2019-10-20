@@ -150,6 +150,15 @@ class MotionConstraintManager : public TacticVisitor
     void visit(const PasserTactic &tactic) override;
 
     /**
+     * Visits a DefenseShadowEnemyTactic to perform an operation.
+     *
+     * @param tactic The DefenseShadowEnemyTactic to visit
+     *
+     * @modifies current_whitelisted_constraints
+     */
+    void visit(const DefenseShadowEnemyTactic &tactic) override;
+
+    /**
      * Visits a MoveTestTactic to perform an operation.
      *
      * @param tactic The MoveTestTactic to visit

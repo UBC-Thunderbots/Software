@@ -20,6 +20,7 @@ class ShootGoalTactic;
 class PasserTactic;
 class MoveTestTactic;
 class StopTestTactic;
+class DefenseShadowEnemyTactic;
 
 /**
  * This class provides an interface for all Tactic Visitors. The Visitor design pattern
@@ -145,4 +146,11 @@ class TacticVisitor
      * @param tactic The StopTestTactic to visit
      */
     virtual void visit(const StopTestTactic &tactic) = 0;
+
+    /**
+     * Visits a DefenseShadowEnemyTactic to perform an operation.
+     *
+     * @param tactic The DefenseShadowEnemyTactic to visit
+     */
+    virtual void visit(const DefenseShadowEnemyTactic &tactic) = 0;
 };
