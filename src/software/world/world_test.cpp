@@ -61,10 +61,10 @@ TEST_F(WorldTest, default_constructor)
     EXPECT_EQ(Field(0, 0, 0, 0, 0, 0, 0, current_time), world.field());
     EXPECT_EQ(Ball(Point(), Vector(), Timestamp::fromSeconds(0)), world.ball());
     EXPECT_EQ(Team(Duration::fromMilliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                  Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
               world.friendlyTeam());
     EXPECT_EQ(Team(Duration::fromMilliseconds(
-                  Util::DynamicParameters::robot_expiry_buffer_milliseconds.value())),
+                  Util::DynamicParameters->RobotExpiryBufferMilliseconds()->value())),
               world.enemyTeam());
 }
 

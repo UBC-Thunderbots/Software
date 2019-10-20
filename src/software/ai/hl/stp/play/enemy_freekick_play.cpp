@@ -68,11 +68,11 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     // Init Shadow Enemy Tactics for extra robots
     auto shadow_tactic_main = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
         true);
     auto shadow_tactic_secondary = std::make_shared<ShadowEnemyTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-        Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+        Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
         true);
 
     // Init Move Tactics for extra robots (These will be used if there are no robots to
@@ -91,7 +91,7 @@ void EnemyFreekickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Check if the enemy is passing-capable
         bool enemy_team_can_pass =
-            Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
+            Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
 
         // Update goalie tactic
         goalie_tactic->updateParams(world.ball(), world.field(), world.friendlyTeam(),

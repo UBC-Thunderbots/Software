@@ -39,15 +39,15 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::vector<std::shared_ptr<ShadowEnemyTactic>> shadow_enemy_tactics = {
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
             true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
             true),
         std::make_shared<ShadowEnemyTactic>(
             world.field(), world.friendlyTeam(), world.enemyTeam(), true, world.ball(),
-            Util::DynamicParameters::DefenseShadowEnemyTactic::ball_steal_speed.value(),
+            Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()->BallStealSpeed()->value(),
             true)};
 
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
@@ -70,7 +70,7 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
         auto enemy_threats = Evaluation::getAllEnemyThreats(
             world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(), false);
         bool enemy_team_can_pass =
-            Util::DynamicParameters::EnemyCapability::enemy_team_can_pass.value();
+            Util::DynamicParameters->getEnemyCapabilityConfig()->EnemyTeamCanPass()->value();
 
         // If we have any crease defenders, we don't want the goalie tactic to consider
         // them when deciding where to block

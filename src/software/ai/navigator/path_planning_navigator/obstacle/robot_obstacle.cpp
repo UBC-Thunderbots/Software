@@ -2,14 +2,12 @@
 
 #include "shared/constants.h"
 
-using namespace Util::DynamicParameters::Navigator;
-
 RobotObstacle::RobotObstacle(const Robot& robot, double avoid_dist)
 {
     boundary = Circle(robot.position(), avoid_dist + ROBOT_MAX_RADIUS_METERS);
     velocity = Segment(
         robot.position(),
-        robot.position() + robot.velocity() * collision_avoid_velocity_scale.value());
+        robot.position() + robot.velocity() * Util::DynamicParameters->getNavigatorConfig()->CollisionAvoidVelocityScale()->value());
 }
 
 double RobotObstacle::getViolationDistance(const Point& point)
@@ -32,8 +30,8 @@ Point RobotObstacle::getNearestValidPoint(const Point& point)
 
 bool RobotObstacle::willCollide(const Robot& robot)
 {
-    RobotObstacle other = RobotObstacle(robot, default_avoid_dist.value());
-    return dist(velocity, other.velocity) < default_avoid_dist.value();
+    RobotObstacle other = RobotObstacle(robot, Util::DynamicParameters->getNavigatorConfig()->CollisionAvoidVelocityScale()->value());
+    return dist(velocity, other.velocity) < Util::DynamicParameters->getNavigatorConfig()->CollisionAvoidVelocityScale()->value();
 }
 
 std::vector<RobotObstacle> generate_friendly_obstacles(const Team& friendly_team,

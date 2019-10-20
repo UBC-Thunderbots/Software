@@ -29,7 +29,7 @@ cc_library(
 
 cc_library(
     name = "dynamic_parameters",
-    hdrs = ["config.hpp", "config_utils.hpp"],
+    hdrs = ["config.hpp", "config_utils.hpp", "dynamic_parameters.h"],
     deps = [":parameter"],
 )
 

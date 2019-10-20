@@ -1,4 +1,4 @@
-Cameras:
+CameraConfig:
   IgnoreCamera_0:
     type: "bool"
     default: false

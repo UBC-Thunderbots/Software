@@ -34,7 +34,7 @@ AIConfig:
         - "ShootOrChip Play"
     description: >-
         Specifies the ai play that should be in use
-  Refbox:
+  RefboxConfig:
     OverrideRefboxPlay:
       type: "bool"
       default: false

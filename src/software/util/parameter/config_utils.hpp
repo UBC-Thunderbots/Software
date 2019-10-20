@@ -50,4 +50,4 @@ class Config
     virtual ParameterList& getMutableParameterList() = 0;
 };
 
-Config::~Config() {}
+inline Config::~Config() {}
