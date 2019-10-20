@@ -20,7 +20,7 @@ import constants
 
 def load_configuration(paths_to_yaml: list):
     """Loads the yaml files in the current directory and
-    makes a dictionary containg the parameter name and its
+    makes a dictionary containing the parameter name and its
     attributes with the proper hierarchy
 
     NOTE: No exception handling in place so that when an error happens
@@ -117,7 +117,7 @@ class Parameter(object):
             # so the quotes are formatted here
             quote="\"" if self.ptype == 'std::string' else "",
 
-            # the parameter name (differernt from variable name)
+            # the parameter name (different from variable name)
             param_name=self.param_name,
 
             # the parameter takes in a vector of options
@@ -189,7 +189,7 @@ class Config(object):
         for name, param_or_config in self.config_description.items():
 
             # if the dictionary has type/value in the values, then it must
-            # be a paremeter, so create one
+            # be a parameter, so create one
             if "type" in param_or_config:
                 self.parameters.append(Parameter(name, param_or_config))
 
@@ -311,22 +311,24 @@ class Config(object):
 #######################################################################
 if __name__ == '__main__':
 
-    # get config
-    config = load_configuration(sys.argv[1:-1])
-
-    ThunderbotsConfig = Config('ThunderbotsConfig', config)
-
-    for config in ThunderbotsConfig.all_configs:
-        print(config)
+    # create config
+    ThunderbotsConfig =\
+            Config('ThunderbotsConfig', load_configuration(sys.argv[1:-1]))
 
     with open(sys.argv[-1], 'w') as config_gen:
 
+        # header
         config_gen.write(constants.H_HEADER)
 
+        # forward declarations
         for config in ThunderbotsConfig.all_configs:
             config_gen.write("class " + config.config_name + ";\n")
 
+        # all the classes
         for config in ThunderbotsConfig.all_configs:
             config_gen.write(config.get_class_str())
 
+        # main ThunderbotsConfig class
         config_gen.write(ThunderbotsConfig.get_class_str())
+
+    print("INFO: Generated Dynamic Parameters v2")
