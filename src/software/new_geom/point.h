@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "software/geom/angle.h"
+#include "software/new_geom/angle.h"
 #include "software/new_geom/vector.h"
 
 /**
@@ -15,16 +15,6 @@
 class Point final
 {
 public:
-    // Due to internal representation of doubles being slightly less accurate/consistent
-    // with some numbers and operations, we consider points that are very close together
-    // to be equal (since they likely are, just possibly slightly misrepresented by the
-    // system/compiler). We use this EPSILON as a threshold for comparison. 1e-15 was
-    // chosen as a value because doubles have about 16 consistent significant figures.
-    // Comparing numbers with 15 significant figures gives us a
-    // small buffer while remaining as accurate as possible.
-    // http://www.cplusplus.com/forum/beginner/95128/
-    static constexpr double EPSILON = 1e-15;
-
     /**
      * Creates a Point at the origin (0, 0).
      */
@@ -112,6 +102,13 @@ public:
     double distanceFromPoint(const Point &p) const;
 
     /**
+     * Returns a new Vector from this Point
+     *
+     * @return A new vector from this Point
+     */
+    Vector toVector() const;
+
+    /**
      * Returns the unit vector in direction of this point
      *
      * @return A unit vector in the direction of this Point, or a
@@ -131,13 +128,13 @@ public:
     Vector norm(double length) const;
 
     /**
-     * Rotates this Point counterclockwise by an angle
+     * Returns a new Point that is this Point rotated counterclockwise by an angle
      *
      * @param rot the angle to rotate the vector
      *
-     * @return the Point rotated by rot
+     * @return the new Point rotated by rot
      */
-    Point rotate(Angle rot) const;
+    Point rotate(const Angle& rot) const;
 
     /**
      * Returns the direction of this Point
@@ -173,7 +170,7 @@ public:
      *
      * @return true if the other point is within a distance of 1.0e-9, not inclusive
      */
-    constexpr bool isClose(const Point &other) const;
+    bool isClose(const Point &other) const;
 
     /**
      * Checks whether this Point is close to another Point
@@ -185,7 +182,7 @@ public:
      * @return true if the other point is within the given distance (not inclusive) of
      * this Point
      */
-    constexpr bool isClose(const Point &other, double dist) const;
+    bool isClose(const Point &other, double dist) const;
 
     /**
      * Assigns one Point to another
@@ -268,7 +265,7 @@ inline std::ostream &operator<<(std::ostream &os, const Point &p);
  *
  * @return true if the two points represent the same point, and false otherwise
  */
-constexpr bool operator==(const Point &p, const Point &q);
+bool operator==(const Point &p, const Point &q);
 
 /**
  * Compares two points for inequality
@@ -278,7 +275,7 @@ constexpr bool operator==(const Point &p, const Point &q);
  *
  * @return true if the two points represent different points, and false otherwise
  */
-constexpr bool operator!=(const Point &p, const Point &q);
+bool operator!=(const Point &p, const Point &q);
 
 inline Point Point::createFromAngle(Angle angle)
 {
@@ -290,6 +287,8 @@ inline constexpr Point::Point() : _x(0.0), _y(0.0) {}
 inline constexpr Point::Point(double x, double y) : _x(x), _y(y) {}
 
 inline constexpr Point::Point(const Point &p) : _x(p.x()), _y(p.y()) {}
+
+inline constexpr Point::Point(const Vector &v) : _x(v.x()), _y(v.y()) {}
 
 inline constexpr double Point::x() const
 {
@@ -322,7 +321,12 @@ inline double Point::distanceFromOrigin() const {
 }
 
 inline double Point::distanceFromPoint(const Point &p) const {
-    sqrt(pow((_x - p.x()), 2) + pow((_y - p.y()), 2));
+    return sqrt(pow((_x - p.x()), 2) + pow((_y - p.y()), 2));
+}
+
+inline Vector Point::toVector() const
+{
+    return Vector(_x, _y);
 }
 
 inline Vector Point::norm() const
@@ -335,7 +339,7 @@ inline Vector Point::norm(double length) const
     return distanceFromOrigin() < 1.0e-9 ? Vector() : Vector(_x * length / distanceFromOrigin(), _y * length / distanceFromOrigin());
 }
 
-inline Point Point::rotate(Angle rot) const
+inline Point Point::rotate(const Angle& rot) const
 {
     return Point(_x * rot.cos() - _y * rot.sin(), _x * rot.sin() + _y * rot.cos());
 }
@@ -350,12 +354,12 @@ inline constexpr bool Point::isnan() const
     return std::isnan(_x) || std::isnan(_y);
 }
 
-inline constexpr bool Point::isClose(const Point &other) const
+inline bool Point::isClose(const Point &other) const
 {
-    return distanceFromPoint(other) < 1e-9;
+    return distanceFromPoint(other) < GeomConstants::NEAR;
 }
 
-inline constexpr bool Point::isClose(const Point &other, double dist) const
+inline bool Point::isClose(const Point &other, double dist) const
 {
     return distanceFromPoint(other) < dist * dist;
 }
@@ -394,12 +398,12 @@ inline std::ostream &operator<<(std::ostream &os, const Point &p)
     return os;
 }
 
-inline constexpr bool operator==(const Point &p, const Point &q)
+inline bool operator==(const Point &p, const Point &q)
 {
-    return p.isClose(q, Point::EPSILON);
+    return p.isClose(q, GeomConstants::EPSILON);
 }
 
-inline constexpr bool operator!=(const Point &p, const Point &q)
+inline bool operator!=(const Point &p, const Point &q)
 {
     return !(p == q);
 }
