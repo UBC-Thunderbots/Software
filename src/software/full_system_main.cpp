@@ -105,7 +105,8 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
 /**
  * Connects all the observers together
  *
- * @param headless - determines whether or not the visualizer is run (false to run visualizer)
+ * @param headless - determines whether or not the visualizer is run (false to run
+ * visualizer)
  */
 void connectObservers(bool headless)
 {
