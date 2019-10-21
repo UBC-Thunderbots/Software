@@ -1,8 +1,6 @@
 #pragma once
 
 #include <boost/geometry.hpp>
-#include <boost/geometry/geometries/register/point.hpp>
-#include <boost/polygon/point_concept.hpp>
 #include <cmath>
 #include <iostream>
 
@@ -26,7 +24,7 @@ public:
      *
      * @return Vector the Vector
      */
-    static Vector createFromAngle(Angle angle);
+    static Vector createFromAngle(const Angle &angle);
 
     /**
      * Creates a Vector with arbitrary x and y values.
@@ -58,7 +56,7 @@ public:
     constexpr double y() const;
 
     /**
-     * Sets the magnitudes of this point to the new magnitudes
+     * Sets the magnitudes of this vector to the new magnitudes
      *
      * @param x the new magnitude in the x-coordinate
      * @param y the new magnitude in the y-coordinate
@@ -126,7 +124,7 @@ public:
      *
      * @return the Vector rotated by rot
      */
-    Vector rotate(Angle rot) const;
+    Vector rotate(const Angle &rot) const;
 
     /**
      * Projects this vector onto another vector
@@ -336,7 +334,7 @@ constexpr bool operator==(const Vector &u, const Vector &v);
  */
 constexpr bool operator!=(const Vector &u, const Vector &v);
 
-inline Vector Vector::createFromAngle(Angle angle)
+inline Vector Vector::createFromAngle(const Angle &angle)
 {
     return Vector(angle.cos(), angle.sin());
 }
@@ -398,7 +396,7 @@ inline constexpr Vector Vector::perp() const
     return Vector(-_y, _x);
 }
 
-inline Vector Vector::rotate(Angle rot) const
+inline Vector Vector::rotate(const Angle &rot) const
 {
     return Vector(_x * rot.cos() - _y * rot.sin(), _x * rot.sin() + _y * rot.cos());
 }

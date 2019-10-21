@@ -27,7 +27,7 @@ public:
      *
      * @return Point the Point
      */
-    static Point createFromAngle(Angle angle);
+    static Point createFromAngle(const Angle &angle);
 
     /**
      * Creates a Point at arbitrary coordinates.
@@ -130,11 +130,11 @@ public:
     /**
      * Returns a new Point that is this Point rotated counterclockwise by an angle
      *
-     * @param rot the angle to rotate the vector
+     * @param rot the angle to rotate the Point
      *
      * @return the new Point rotated by rot
      */
-    Point rotate(const Angle& rot) const;
+    Point rotate(const Angle &rot) const;
 
     /**
      * Returns the direction of this Point
@@ -277,7 +277,7 @@ bool operator==(const Point &p, const Point &q);
  */
 bool operator!=(const Point &p, const Point &q);
 
-inline Point Point::createFromAngle(Angle angle)
+inline Point Point::createFromAngle(const Angle &angle)
 {
     return Point(angle.cos(), angle.sin());
 }
@@ -339,7 +339,7 @@ inline Vector Point::norm(double length) const
     return distanceFromOrigin() < 1.0e-9 ? Vector() : Vector(_x * length / distanceFromOrigin(), _y * length / distanceFromOrigin());
 }
 
-inline Point Point::rotate(const Angle& rot) const
+inline Point Point::rotate(const Angle &rot) const
 {
     return Point(_x * rot.cos() - _y * rot.sin(), _x * rot.sin() + _y * rot.cos());
 }
