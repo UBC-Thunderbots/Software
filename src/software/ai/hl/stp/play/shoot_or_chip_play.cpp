@@ -67,9 +67,16 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
     std::array<std::shared_ptr<MoveTactic>, 2> move_to_open_area_tactics = {
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
+    // Figure out where the fallback chip target is
+    double fallback_chip_target_x_offset =
+            Util::DynamicParameters::ShootOrChipPlay::fallback_chip_target_enemy_goal_offset.value();
+
+    Point fallback_chip_target =
+            world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
+
     auto shoot_or_chip_tactic = std::make_shared<ShootGoalTactic>(
         world.field(), world.friendlyTeam(), world.enemyTeam(), world.ball(),
-        MIN_OPEN_ANGLE_FOR_SHOT, std::nullopt, false);
+        MIN_OPEN_ANGLE_FOR_SHOT, fallback_chip_target, false);
 
     do
     {
@@ -128,6 +135,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
         shoot_or_chip_tactic->updateWorldParams(world.field(), world.friendlyTeam(),
                                                 world.enemyTeam(), world.ball());
         shoot_or_chip_tactic->updateControlParams(chip_target);
+
+        shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
+        shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);
