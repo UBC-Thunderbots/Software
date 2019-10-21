@@ -9,6 +9,8 @@
 
 #include "shared/constants.h"
 #include "software/test_util/test_util.h"
+#include "software/util/parameter/dynamic_parameters.h"
+
 
 TEST(PossessionEvaluationTest, get_team_baller_with_empty_team)
 {
@@ -134,7 +136,9 @@ TEST(PossessionEvaluationTest, get_team_baller_ball_moving_extremely_fast_out_of
 TEST(PossessionEvaluationTest, team_has_possession_robot_in_control)
 {
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
-    Team team = Team(Duration::fromSeconds(1));
+    Team team   = Team(Duration::fromSeconds(1));
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -144,14 +148,17 @@ TEST(PossessionEvaluationTest, team_has_possession_robot_in_control)
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     team.updateRobots({robot0, robot1, robot2});
+    world.updateFriendlyTeamState(team);
 
-    EXPECT_TRUE(Evaluation::teamHasPossession(team, ball));
+    EXPECT_TRUE(Evaluation::teamHasPossession(world, team));
 }
 
 TEST(PossessionEvaluationTest, team_does_not_have_posession)
 {
     Ball ball({-2, 3}, {0, 10}, Timestamp::fromSeconds(0));
-    Team team = Team(Duration::fromSeconds(1));
+    Team team   = Team(Duration::fromSeconds(1));
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -161,15 +168,18 @@ TEST(PossessionEvaluationTest, team_does_not_have_posession)
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     team.updateRobots({robot0, robot1, robot2});
+    world.updateFriendlyTeamState(team);
 
 
-    EXPECT_FALSE(Evaluation::teamHasPossession(team, ball));
+    EXPECT_FALSE(Evaluation::teamHasPossession(world, team));
 }
 
-TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
+TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
 {
     Team team = Team(Duration::fromSeconds(1));
-    Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(2));
+    Ball ball({-0.9, 3}, {0, 10}, Timestamp::fromSeconds(2));
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(2, Point(1.5, 2.3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
@@ -178,24 +188,37 @@ TEST(PossessionEvaluationTest, team_had_possession_one_second_ago)
     Robot robot2 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
-    ball.updateState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(3));
+    ball.updateState(
+        {0.1, 2.5}, {0, 10},
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
+    world.updateBallState(ball);
 
-    robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(3));
-    robot1.updateState(Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(3));
-    robot2.updateState(Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
-                       Timestamp::fromSeconds(3));
+    robot0.updateState(
+        Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
+    robot1.updateState(
+        Point(-2, 0), Vector(), Angle::quarter(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
+    robot2.updateState(
+        Point(1.5, 2.3), Vector(), Angle::zero(), AngularVelocity::zero(),
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value()));
 
     team.updateRobots({robot0, robot1, robot2});
+    world.updateFriendlyTeamState(team);
 
-    EXPECT_TRUE(Evaluation::teamHasPossession(team, ball));
+    EXPECT_TRUE(Evaluation::teamHasPossession(world, team));
 }
 
 TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 {
     Team team = Team(Duration::fromSeconds(1));
     Ball ball({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(0));
+    Field field = ::Test::TestUtil::createSSLDivBField();
+    World world(field, ball, team, Team(Duration::fromSeconds(1)));
 
     Robot robot0 = Robot(0, Point(-1, 3), Vector(), Angle::zero(),
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
@@ -205,6 +228,7 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
                          AngularVelocity::zero(), Timestamp::fromSeconds(0));
 
     ball.updateState({-0.93, 3}, {0, 10}, Timestamp::fromSeconds(4));
+    world.updateBallState(ball);
 
     robot0.updateState(Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
                        Timestamp::fromSeconds(4));
@@ -215,6 +239,7 @@ TEST(PossessionEvaluationTest, team_had_possession_more_than_three_seconds_ago)
 
 
     team.updateRobots({robot0, robot1, robot2});
+    world.updateFriendlyTeamState(team);
 
-    EXPECT_FALSE(Evaluation::teamHasPossession(team, ball));
+    EXPECT_FALSE(Evaluation::teamHasPossession(world, team));
 }
