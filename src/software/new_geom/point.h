@@ -42,14 +42,14 @@ class Point final
      *
      * @param the Point to duplicate
      */
-    constexpr Point(const Point &p);
+    explicit constexpr Point(const Point &p);
 
     /**
      * Creates a new Point from a Vector
      *
      * @param the Vector to create a Point from
      */
-    constexpr Point(const Vector &v);
+    explicit constexpr Point(const Vector &v);
 
     /**
      * Returns the x coordinate of this Point
@@ -129,6 +129,7 @@ class Point final
 
     /**
      * Returns a new Point that is this Point rotated counterclockwise by an angle
+     * about the origin.
      *
      * @param rot the angle to rotate the Point
      *
@@ -154,13 +155,6 @@ class Point final
      *              +
      */
     Angle orientation() const;
-
-    /**
-     * Checks whether this Point contains NaN in either coordinate
-     *
-     * @return true if either coordinate is NaN, and false otherwise
-     */
-    constexpr bool isnan() const;
 
     /**
      * Checks whether this Point is close to another Point, where “close”
@@ -198,13 +192,13 @@ class Point final
      * The X coordinate of the Point. The variable name starts with an underscore to
      * prevent name conflicts with its accessor function.
      */
-    double _x;
+    double x_;
 
     /**
      * The Y coordinate of the Point. The variable name starts with an underscore to
      * prevent name conflicts with its accessor function.
      */
-    double _y;
+    double y_;
 };
 
 /**
@@ -215,7 +209,7 @@ class Point final
  *
  * @return the Point sum of the given Point and Vector
  */
-constexpr Point operator+(const Point &p, const Vector &v);
+constexpr Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_result));
 
 /**
  * Adds a vector to a point and sets that point to the resulting sum
@@ -282,87 +276,77 @@ inline Point Point::createFromAngle(const Angle &angle)
     return Point(angle.cos(), angle.sin());
 }
 
-inline constexpr Point::Point() : _x(0.0), _y(0.0) {}
+inline constexpr Point::Point() : x_(0.0), y_(0.0) {}
 
-inline constexpr Point::Point(double x, double y) : _x(x), _y(y) {}
+inline constexpr Point::Point(double x, double y) : x_(x), y_(y) {}
 
-inline constexpr Point::Point(const Point &p) : _x(p.x()), _y(p.y()) {}
+inline constexpr Point::Point(const Point &p) : x_(p.x()), y_(p.y()) {}
 
-inline constexpr Point::Point(const Vector &v) : _x(v.x()), _y(v.y()) {}
+inline constexpr Point::Point(const Vector &v) : x_(v.x()), y_(v.y()) {}
 
 inline constexpr double Point::x() const
 {
-    return _x;
+    return x_;
 }
 
 inline constexpr double Point::y() const
 {
-    return _y;
+    return y_;
 }
 
 inline void Point::set(double x, double y)
 {
-    this->_x = x;
-    this->_y = y;
+    this->x_ = x;
+    this->y_ = y;
 }
 
 inline void Point::setX(double x)
 {
-    this->_x = x;
+    this->x_ = x;
 }
 
 inline void Point::setY(double y)
 {
-    this->_y = y;
+    this->y_ = y;
 }
 
 inline double Point::distanceFromOrigin() const
 {
-    return std::hypot(_x, _y);
+    return std::hypot(x_, y_);
 }
 
 inline double Point::distanceFromPoint(const Point &p) const
 {
-    return sqrt(pow((_x - p.x()), 2) + pow((_y - p.y()), 2));
+    return sqrt(pow((x_ - p.x()), 2) + pow((y_ - p.y()), 2));
 }
 
 inline Vector Point::toVector() const
 {
-    return Vector(_x, _y);
+    return Vector(x_, y_);
 }
 
 inline Vector Point::norm() const
 {
     return distanceFromOrigin() < 1.0e-9
                ? Vector()
-               : Vector(_x / distanceFromOrigin(), _y / distanceFromOrigin());
+               : Vector(x_ / distanceFromOrigin(), y_ / distanceFromOrigin());
 }
 
 inline Vector Point::norm(double length) const
 {
     return distanceFromOrigin() < 1.0e-9 ? Vector()
-                                         : Vector(_x * length / distanceFromOrigin(),
-                                                  _y * length / distanceFromOrigin());
+                                         : Vector(x_ * length / distanceFromOrigin(),
+                                                  y_ * length / distanceFromOrigin());
 }
 
 inline Point Point::rotate(const Angle &rot) const
 {
-    return Point(_x * rot.cos() - _y * rot.sin(), _x * rot.sin() + _y * rot.cos());
+    return Point(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
 }
 
 inline Angle Point::orientation() const
 {
-    return Angle::ofRadians(std::atan2(_y, _x));
-}
-
-inline constexpr bool Point::isnan() const
-{
-    return std::isnan(_x) || std::isnan(_y);
-}
-
-inline bool Point::isClose(const Point &other) const
-{
-    return distanceFromPoint(other) < GeomConstants::NEAR;
+    return Angle::fromRadians(std::atan2(y_, x_));
 }
 
 inline bool Point::isClose(const Point &other, double dist) const
@@ -372,8 +356,8 @@ inline bool Point::isClose(const Point &other, double dist) const
 
 inline Point &Point::operator=(const Point &q)
 {
-    _x = q.x();
-    _y = q.y();
+    x_ = q.x();
+    y_ = q.y();
     return *this;
 }
 

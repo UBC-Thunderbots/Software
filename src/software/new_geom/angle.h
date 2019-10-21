@@ -46,7 +46,7 @@ class Angle final
      *
      * @return the constructed angle
      */
-    static constexpr Angle ofRadians(double rad);
+    static constexpr Angle fromRadians(double rad);
 
     /**
      * Constructs an angle from a value in degrees.
@@ -55,10 +55,10 @@ class Angle final
      *
      * @return the constructed angle
      */
-    static constexpr Angle ofDegrees(double deg);
+    static constexpr Angle fromDegrees(double deg);
 
     /**
-     * Computes the arc sine of a value.
+     * Computes the arcsine of a value.
      *
      * @param x the value.
      *
@@ -67,7 +67,7 @@ class Angle final
     static Angle asin(double x);
 
     /**
-     * Computes the arc cosine of a value.
+     * Computes the arccosine of a value.
      *
      * @param x the value.
      *
@@ -76,7 +76,7 @@ class Angle final
     static Angle acos(double x);
 
     /**
-     * Computes the arc tangent of a value.
+     * Computes the arctangent of a value.
      *
      * @param x the value.
      *
@@ -189,6 +189,9 @@ class Angle final
     constexpr Angle angleMod() const;
 
    private:
+    /**
+     * The measurement in radians of this Angle.
+     */
     double rads;
 
     explicit constexpr Angle(double rads);
@@ -401,29 +404,29 @@ inline constexpr Angle Angle::full()
     return Angle(2.0 * M_PI);
 }
 
-inline constexpr Angle Angle::ofRadians(double rad)
+inline constexpr Angle Angle::fromRadians(double rad)
 {
     return Angle(rad);
 }
 
-inline constexpr Angle Angle::ofDegrees(double deg)
+inline constexpr Angle Angle::fromDegrees(double deg)
 {
     return Angle(deg / 180.0 * M_PI);
 }
 
 inline Angle Angle::asin(double x)
 {
-    return Angle::ofRadians(std::asin(x));
+    return Angle::fromRadians(std::asin(x));
 }
 
 inline Angle Angle::acos(double x)
 {
-    return ofRadians(std::acos(x));
+    return fromRadians(std::acos(x));
 }
 
 inline Angle Angle::atan(double x)
 {
-    return Angle::ofRadians(std::atan(x));
+    return Angle::fromRadians(std::atan(x));
 }
 
 inline constexpr Angle::Angle() : rads(0.0) {}
@@ -438,16 +441,9 @@ inline constexpr double Angle::toDegrees() const
     return rads / M_PI * 180.0;
 }
 
-inline constexpr Angle Angle::mod(const Angle &divisor) const
-{
-    return Angle::ofRadians(toRadians() - static_cast<double>(static_cast<long>(
-                                              toRadians() / divisor.toRadians())) *
-                                              divisor.toRadians());
-}
-
 inline constexpr Angle Angle::remainder(const Angle &divisor) const
 {
-    return Angle::ofRadians(toRadians() -
+    return Angle::fromRadians(toRadians() -
                             static_cast<double>(static_cast<long>(
                                 (toRadians() / divisor.toRadians()) >= 0
                                     ? (toRadians() / divisor.toRadians() + 0.5)
@@ -457,7 +453,7 @@ inline constexpr Angle Angle::remainder(const Angle &divisor) const
 
 inline constexpr Angle Angle::abs() const
 {
-    return Angle::ofRadians(toRadians() < 0 ? -toRadians() : toRadians());
+    return Angle::fromRadians(toRadians() < 0 ? -toRadians() : toRadians());
 }
 
 inline bool Angle::isFinite() const
@@ -499,32 +495,32 @@ inline constexpr Angle::Angle(double rads) : rads(rads) {}
 
 inline constexpr Angle operator-(const Angle &angle)
 {
-    return Angle::ofRadians(-angle.toRadians());
+    return Angle::fromRadians(-angle.toRadians());
 }
 
 inline constexpr Angle operator+(const Angle &x, const Angle &y)
 {
-    return Angle::ofRadians(x.toRadians() + y.toRadians());
+    return Angle::fromRadians(x.toRadians() + y.toRadians());
 }
 
 inline constexpr Angle operator-(const Angle &x, const Angle &y)
 {
-    return Angle::ofRadians(x.toRadians() - y.toRadians());
+    return Angle::fromRadians(x.toRadians() - y.toRadians());
 }
 
 inline constexpr Angle operator*(const Angle &angle, double scale)
 {
-    return Angle::ofRadians(angle.toRadians() * scale);
+    return Angle::fromRadians(angle.toRadians() * scale);
 }
 
 inline constexpr Angle operator*(double scale, const Angle &angle)
 {
-    return Angle::ofRadians(scale * angle.toRadians());
+    return Angle::fromRadians(scale * angle.toRadians());
 }
 
 inline constexpr Angle operator/(const Angle &angle, double divisor)
 {
-    return Angle::ofRadians(angle.toRadians() / divisor);
+    return Angle::fromRadians(angle.toRadians() / divisor);
 }
 
 inline constexpr double operator/(const Angle &x, const Angle &y)
@@ -588,8 +584,3 @@ inline std::ostream &operator<<(std::ostream &os, const Angle &a)
     os << a.toRadians() << "R";
     return os;
 }
-
-// We also use variables of type 'Angle' to represent angular velocities, since they
-// are essentially represented the same. This typedef allows us to refer to Angles as
-// AngularVelocities, which makes the interfaces more intuitive.
-typedef Angle AngularVelocity;

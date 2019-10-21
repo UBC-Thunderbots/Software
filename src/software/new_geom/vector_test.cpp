@@ -13,7 +13,7 @@ TEST(CreateVectorTests, vector_default_constructor_test)
 
 TEST(CreateVectorTests, vector_from_angle)
 {
-    Vector v = Vector::createFromAngle(Angle::ofDegrees(30));
+    Vector v = Vector::createFromAngle(Angle::fromDegrees(30));
     EXPECT_DOUBLE_EQ(sqrt(3) / 2, v.x());
     EXPECT_DOUBLE_EQ(0.5, v.y());
 }
@@ -125,21 +125,9 @@ TEST(VectorLogicTests, vector_cross_product_test)
 TEST(VectorLogicTests, vector_orientation_test)
 {
     Vector u = Vector(sqrt(2) / 2, sqrt(2) / 2);
-    EXPECT_EQ(Angle::ofDegrees(45), u.orientation());
+    EXPECT_EQ(Angle::fromDegrees(45), u.orientation());
     Vector v = Vector(0, -1);
-    EXPECT_EQ(Angle::ofDegrees(-90), v.orientation());
-}
-
-TEST(VectorLogicTests, vector_is_nan_test)
-{
-    Vector v = Vector();
-    EXPECT_FALSE(v.isnan());
-    v.setX(NAN);
-    EXPECT_TRUE(v.isnan());
-    v = Vector();
-    EXPECT_FALSE(v.isnan());
-    v.setY(NAN);
-    EXPECT_TRUE(v.isnan());
+    EXPECT_EQ(Angle::fromDegrees(-90), v.orientation());
 }
 
 TEST(VectorOperatorTests, vector_assignment_test)

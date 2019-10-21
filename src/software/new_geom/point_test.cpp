@@ -11,7 +11,7 @@ TEST(CreatePointTests, point_default_constructor_test)
 
 TEST(CreatePointTests, point_from_angle_test)
 {
-    Point p = Point::createFromAngle(Angle::ofDegrees(60));
+    Point p = Point::createFromAngle(Angle::fromDegrees(60));
     EXPECT_DOUBLE_EQ(0.5, p.x());
     EXPECT_DOUBLE_EQ(sqrt(3) / 2, p.y());
 }
@@ -101,28 +101,6 @@ TEST(PointLogicTests, point_orientation_test)
     EXPECT_EQ(Angle::zero(), p.orientation());
     p = p.rotate(Angle::half());
     EXPECT_EQ(Angle::half(), p.orientation());
-}
-
-TEST(PointLogicTests, point_is_nan_test)
-{
-    Point p = Point();
-    EXPECT_FALSE(p.isnan());
-    p.setX(NAN);
-    EXPECT_TRUE(p.isnan());
-    p = Point();
-    EXPECT_FALSE(p.isnan());
-    p.setY(NAN);
-    EXPECT_TRUE(p.isnan());
-}
-
-TEST(PointLogicTests, point_is_close_test)
-{
-    Point p = Point();
-    Point q = Point(1e-9 - 1e-10, 0);
-    EXPECT_TRUE(p.isClose(q));
-    q = Point(1, 0);
-    EXPECT_FALSE(p.isClose(q));
-    EXPECT_TRUE(p.isClose(q, 2));
 }
 
 TEST(PointOperatorTests, point_assignment_test)

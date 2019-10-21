@@ -5,6 +5,7 @@ cc_library(
     srcs = [],
     hdrs = [
         "angle.h",
+        "angular_velocity.h",
         "geom_constants.h",
         "point.h",
         "vector.h",
@@ -14,6 +15,7 @@ cc_library(
     ],
     deps = [
         "@boost//:geometry",
+        "@boost//:polygon",
     ],
 )
 

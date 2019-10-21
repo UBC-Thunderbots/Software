@@ -175,13 +175,6 @@ class Vector final
     Angle orientation() const;
 
     /**
-     * Checks whether this Vector contains NaN in either of its x or y magnitude
-     *
-     * @return true if either x or y magnitude is NaN, and false otherwise
-     */
-    constexpr bool isnan() const;
-
-    /**
      * Assigns one Vector to another
      *
      * @param other the Vector whose x and y magnitudes should be copied into this Vector
@@ -195,13 +188,13 @@ class Vector final
      * The magnitude in the X coordinate of the Vector. The variable name starts with an
      * underscore to prevent name conflicts with its accessor function.
      */
-    double _x;
+    double x_;
 
     /**
      * The magnitude in the Y coordinate of the Vector. The variable name starts with an
      * underscore to prevent name conflicts with its accessor function.
      */
-    double _y;
+    double y_;
 };
 
 /**
@@ -212,7 +205,7 @@ class Vector final
  *
  * @return the vector-sum of the two vectors
  */
-constexpr Vector operator+(const Vector &p, const Vector &q);
+constexpr Vector operator+(const Vector &p, const Vector &q) __attribute__((warn_unused_result));
 
 /**
  * Adds a Vector to another Vector and set the former vector to the sum
@@ -262,7 +255,7 @@ Vector &operator-=(Vector &u, const Vector &v);
  *
  * @return the scaled vector
  */
-constexpr Vector operator*(double s, const Vector &v);
+constexpr Vector operator*(double s, const Vector &v) __attribute__((warn_unused_result));
 
 /**
  * Multiplies a vector by a scalar
@@ -272,7 +265,7 @@ constexpr Vector operator*(double s, const Vector &v);
  *
  * @return the scaled vector
  */
-constexpr Vector operator*(const Vector &p, double s);
+constexpr Vector operator*(const Vector &p, double s) __attribute__((warn_unused_result));
 
 /**
  * Scales a vector by a scalar
@@ -292,13 +285,13 @@ Vector &operator*=(Vector &p, double s);
  *
  * @return the scaled vector
  */
-constexpr Vector operator/(const Vector &p, double s);
+constexpr Vector operator/(const Vector &p, double s) __attribute__((warn_unused_result));
 
 /**
  * Scales a vector by a scalar
  *
  * @param p the vector to scale
- * @param s the sclaing factor
+ * @param s the scaling factor
  *
  * @return p scaled by the scaling factor
  */
@@ -339,66 +332,66 @@ inline Vector Vector::createFromAngle(const Angle &angle)
     return Vector(angle.cos(), angle.sin());
 }
 
-inline constexpr Vector::Vector() : _x(0.0), _y(0.0) {}
+inline constexpr Vector::Vector() : x_(0.0), y_(0.0) {}
 
-inline constexpr Vector::Vector(double x, double y) : _x(x), _y(y) {}
+inline constexpr Vector::Vector(double x, double y) : x_(x), y_(y) {}
 
-inline constexpr Vector::Vector(const Vector &v) : _x(v.x()), _y(v.y()) {}
+inline constexpr Vector::Vector(const Vector &v) : x_(v.x()), y_(v.y()) {}
 
 inline constexpr double Vector::x() const
 {
-    return _x;
+    return x_;
 }
 
 inline constexpr double Vector::y() const
 {
-    return _y;
+    return y_;
 }
 
 inline void Vector::set(double x, double y)
 {
-    this->_x = x;
-    this->_y = y;
+    this->x_ = x;
+    this->y_ = y;
 }
 
 inline void Vector::setX(double x)
 {
-    this->_x = x;
+    this->x_ = x;
 }
 
 inline void Vector::setY(double y)
 {
-    this->_y = y;
+    this->y_ = y;
 }
 
 inline constexpr double Vector::lensq() const
 {
-    return _x * _x + _y * _y;
+    return x_ * x_ + y_ * y_;
 }
 
 inline double Vector::len() const
 {
-    return std::hypot(_x, _y);
+    return std::hypot(x_, y_);
 }
 
 inline Vector Vector::norm() const
 {
-    return len() < 1.0e-9 ? Vector() : Vector(_x / len(), _y / len());
+    return len() < 1.0e-9 ? Vector() : Vector(x_ / len(), y_ / len());
 }
 
 inline Vector Vector::norm(double length) const
 {
-    return len() < 1.0e-9 ? Vector() : Vector(_x * length / len(), _y * length / len());
+    return len() < 1.0e-9 ? Vector() : Vector(x_ * length / len(), y_ * length / len());
 }
 
 inline constexpr Vector Vector::perp() const
 {
-    return Vector(-_y, _x);
+    return Vector(-y_, x_);
 }
 
 inline Vector Vector::rotate(const Angle &rot) const
 {
-    return Vector(_x * rot.cos() - _y * rot.sin(), _x * rot.sin() + _y * rot.cos());
+    return Vector(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
 }
 
 inline constexpr Vector Vector::project(const Vector &other) const
@@ -408,29 +401,24 @@ inline constexpr Vector Vector::project(const Vector &other) const
 
 inline constexpr double Vector::dot(const Vector &other) const
 {
-    return _x * other.x() + _y * other.y();
+    return x_ * other.x() + y_ * other.y();
 }
 
 inline constexpr double Vector::cross(const Vector &other) const
 {
-    return _x * other.y() - _y * other.x();
+    return x_ * other.y() - y_ * other.x();
 }
 
 inline Vector &Vector::operator=(const Vector &q)
 {
-    _x = q.x();
-    _y = q.y();
+    x_ = q.x();
+    y_ = q.y();
     return *this;
 }
 
 inline Angle Vector::orientation() const
 {
-    return Angle::ofRadians(std::atan2(_y, _x));
-}
-
-inline constexpr bool Vector::isnan() const
-{
-    return std::isnan(_x) || std::isnan(_y);
+    return Angle::fromRadians(std::atan2(y_, x_));
 }
 
 inline constexpr Vector operator+(const Vector &u, const Vector &v)
