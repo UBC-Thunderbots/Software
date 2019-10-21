@@ -15,7 +15,7 @@ std::string PenaltyKickPlay::getName() const
 bool PenaltyKickPlay::isApplicable(const World &world) const
 {
     return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isOurPenalty();
+            (world.gameState().isOurPenalty());
 }
 
 bool PenaltyKickPlay::invariantHolds(const World &world) const
