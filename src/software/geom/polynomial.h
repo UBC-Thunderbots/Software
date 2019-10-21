@@ -7,7 +7,7 @@
 
 /**
  * Polynomial is a representation of a polynomial
- * of the form coeffs[0] + coeffs[1] * + coeff[2] * x^2...
+ * that can calculate values at a given input
  */
 class Polynomial
 {
@@ -15,34 +15,39 @@ class Polynomial
     Polynomial() = delete;
     /**
      * Construct a polynomial from coefficients
+     * s.t. n = coeffs.size() == the order of the polynomial
+     * and of the form coeffs[0]*x^(n-1)
+     * + coeffs[1]*x^(n-2) + ... + coeffs[n-1]
      *
      * @param coeffs coefficients of the polynomial
+     *      * must be 
      *
-     * @note will prune off coeffs to enforce invariant:
-     *  *coeffs[coeffs.size()-1] != 0
-     *  *order of polynomial is coeffs.size()
+     * @throws std::invalid_argument if coeffs[0] == 0
      */
     explicit Polynomial(const std::vector<double>& coeffs);
 
     /**
      * Construct a polynomial from coefficients
+     * s.t. n = coeffs.size() == the order of the polynomial
+     * and of the form coeffs[0]*x^(n-1)
+     * + coeffs[1]*x^(n-2) + ... + coeffs[n-1]
      *
      * @param coeffs coefficients of the polynomial
      *
-     * @note will prune off coeffs to enforce invariant:
-     *  *coeffs[coeffs.size()-1] != 0
-     *  *order of polynomial is coeffs.size()
+     * @throws std::invalid_argument if coeffs[0] == 0
      */
     explicit Polynomial(const std::initializer_list<double>& coeffs);
 
     /**
-     * Construct a linear polynomial from two pairs of values
+     * Construct a linear polynomial from two pairs of input/output
      *
-     * @param p1 first pair of values: first is the input, second is the output
-     * @param p2 second pair of values: first is the input, second is the output
+     * @param constraint1 first pair of values: first is the input, second is the output
+     * @param constraint2 second pair of values: first is the input, second is the output
+     *
+     * @throws std::invalid_argument if constraint1.first == constraint2.first
      */
-    explicit Polynomial(const std::pair<double, double>& p1,
-                        const std::pair<double, double>& p2);
+    explicit Polynomial(const std::pair<double, double>& constraint1,
+                        const std::pair<double, double>& constraint2);
 
     /**
      * Returns the coefficients of the polynomial
@@ -58,11 +63,11 @@ class Polynomial
      *
      * @return value of polynomial evaluated at value val
      */
-    double calculateValue(double val) const;
+    double valueAt(double val) const;
 
    private:
     // the coefficients for the polynomial
+    // of the form coeffs[0]*x^(n-1) + coeffs[1]*x^(n-2)
+    // + ... + coeffs[n-1]
     std::vector<double> coeffs;
-
-    void pruneCoeffs(void);
 };
