@@ -95,7 +95,7 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
 
         // try to steal the ball and yeet it away if the enemy robot has already
         // received the pass
-        if (Evaluation::robotHasPossession(ball, enemy_robot) &&
+        if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
             ball.velocity().len() <
                 Util::DynamicParameters->getDefenseShadowEnemyTacticConfig()
                     ->BallStealSpeed()

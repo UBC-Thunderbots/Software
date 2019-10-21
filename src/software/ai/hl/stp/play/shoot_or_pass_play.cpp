@@ -14,6 +14,7 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
 #include "software/util/parameter/dynamic_parameters.h"
+#include "src/g3log/loglevels.hpp"
 
 using namespace Passing;
 
@@ -34,14 +35,14 @@ bool ShootOrPassPlay::isApplicable(const World &world) const
             ->value();
 
     return use_shoot_or_pass_instead_of_shoot_or_chip && world.gameState().isPlaying() &&
-           Evaluation::teamHasPossession(world.friendlyTeam(), world.ball());
+           Evaluation::teamHasPossession(world, world.friendlyTeam());
 }
 
 bool ShootOrPassPlay::invariantHolds(const World &world) const
 {
     return world.gameState().isPlaying() &&
-           (!Evaluation::teamHasPossession(world.enemyTeam(), world.ball()) ||
-            Evaluation::teamPassInProgress(world.ball(), world.friendlyTeam()));
+           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
 void ShootOrPassPlay::getNextTactics(TacticCoroutine::push_type &yield)

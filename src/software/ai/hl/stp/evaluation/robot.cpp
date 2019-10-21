@@ -2,8 +2,7 @@
 
 #include "shared/constants.h"
 #include "software/util/parameter/dynamic_parameters.h"
-#include "software/world/ball.h"
-#include "software/world/robot.h"
+
 
 bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point position,
                                                               const Angle orientation,
@@ -18,35 +17,46 @@ bool Evaluation::robotOrientationWithinAngleThresholdOfTarget(const Point positi
     return diff_orientation < threshold;
 }
 
-bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
-                                    Timestamp timestamp)
+std::optional<bool> Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
+                                                   std::optional<Timestamp> timestamp)
 {
     Point robot_pos_at_time;
     Angle robot_ori_at_time;
     Point ball_pos_at_time;
 
-
-    if (robot.getHistoryIndexFromTimestamp(timestamp))
-    {
-        robot_pos_at_time = robot.getPreviousPositions().at(
-            *robot.getHistoryIndexFromTimestamp(timestamp));
-        robot_ori_at_time = robot.getPreviousOrientations().at(
-            *robot.getHistoryIndexFromTimestamp(timestamp));
-    }
-    else
+    if (!timestamp.has_value())
     {
         robot_pos_at_time = robot.position();
         robot_ori_at_time = robot.orientation();
     }
-
-    if (ball.getHistoryIndexFromTimestamp(timestamp))
+    else if (robot.getHistoryIndexFromTimestamp(*timestamp))
     {
-        ball_pos_at_time =
-            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
+        robot_pos_at_time = robot.getPreviousPositions().at(
+            *robot.getHistoryIndexFromTimestamp(*timestamp));
+        robot_ori_at_time = robot.getPreviousOrientations().at(
+            *robot.getHistoryIndexFromTimestamp(*timestamp));
     }
     else
     {
+        // we have no information about the robot at this time because it is too far back.
+        // return nullopt
+        return std::nullopt;
+    }
+
+    if (!timestamp.has_value())
+    {
         ball_pos_at_time = ball.position();
+    }
+    else if (ball.getHistoryIndexFromTimestamp(*timestamp))
+    {
+        ball_pos_at_time = ball.getPreviousPositions().at(
+            *ball.getHistoryIndexFromTimestamp(*timestamp));
+    }
+    else
+    {
+        // we have no information about the ball at this time because it is too far back.
+        // return nullopt
+        return std::nullopt;
     }
 
 
@@ -65,29 +75,35 @@ bool Evaluation::robotHasPossession(const Ball& ball, const Robot& robot,
         // check that ball is in a 90-degree cone in front of the robot
         auto ball_to_robot_angle = robot_ori_at_time.minDiff(
             (ball_pos_at_time - robot_pos_at_time).orientation());
-        return ball_to_robot_angle < Angle::ofDegrees(45.0);
+        return std::make_optional<bool>(ball_to_robot_angle < Angle::ofDegrees(45.0));
     }
 }
 
-bool Evaluation::robotBeingPassedTo(const Ball& ball, const Robot& robot,
-                                    Timestamp timestamp)
+std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Robot& robot,
+                                                   std::optional<Timestamp> timestamp)
 {
     Point robot_pos, ball_pos, ball_velocity;
-    if (robot.getHistoryIndexFromTimestamp(timestamp) &&
-        ball.getHistoryIndexFromTimestamp(timestamp))
+    if (!timestamp.has_value())
+    {
+        robot_pos     = robot.position();
+        ball_pos      = world.ball().position();
+        ball_velocity = world.ball().velocity();
+    }
+    else if (robot.getHistoryIndexFromTimestamp(*timestamp) &&
+             world.ball().getHistoryIndexFromTimestamp(*timestamp))
     {
         robot_pos = robot.getPreviousPositions().at(
-            *robot.getHistoryIndexFromTimestamp(timestamp));
-        ball_pos =
-            ball.getPreviousPositions().at(*ball.getHistoryIndexFromTimestamp(timestamp));
-        ball_velocity = ball.getPreviousVelocities().at(
-            *ball.getHistoryIndexFromTimestamp(timestamp));
+            *robot.getHistoryIndexFromTimestamp(*timestamp));
+        ball_pos = world.ball().getPreviousPositions().at(
+            *world.ball().getHistoryIndexFromTimestamp(*timestamp));
+        ball_velocity = world.ball().getPreviousVelocities().at(
+            *world.ball().getHistoryIndexFromTimestamp(*timestamp));
     }
     else
     {
-        robot_pos     = robot.position();
-        ball_pos      = ball.position();
-        ball_velocity = ball.velocity();
+        // we don't have information about the state of the robot and/or ball
+        // at the given timestamp, return nullopt
+        return std::nullopt;
     }
 
     auto ball_to_robot_vector = robot_pos - ball_pos;
@@ -96,13 +112,11 @@ bool Evaluation::robotBeingPassedTo(const Ball& ball, const Robot& robot,
         ball_to_robot_vector.orientation().minDiff(ball_velocity.orientation());
     // pass axis velocity
     double pass_axis_speed = ball_velocity.project(ball_to_robot_vector.norm()).len();
-    return (ball_angle_deviation <
-            Angle::ofDegrees(Util::DynamicParameters->getEvaluationConfig()
-                                 ->getPossessionConfig()
-                                 ->PassedToAngleTolerance()
-                                 ->value())) &&
-           pass_axis_speed > Util::DynamicParameters->getEvaluationConfig()
-                                 ->getPossessionConfig()
-                                 ->MinPassSpeed()
-                                 ->value();
+    return std::make_optional<bool>(
+        (ball_angle_deviation <
+         Angle::ofDegrees(
+             Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->PassToAngleTolerance()->value();
+                 .value())) &&
+        pass_axis_speed >
+            Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->MinPassSpeed()->value());
 };

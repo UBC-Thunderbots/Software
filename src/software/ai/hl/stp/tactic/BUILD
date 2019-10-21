@@ -137,6 +137,46 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "goalie_tactic_test",
+    srcs = ["goalie_tactic_test.cpp"],
+    deps = [
+        ":goalie_tactic",
+        "//software/geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "grab_ball_tactic",
+    srcs = ["grab_ball_tactic.cpp"],
+    hdrs = ["grab_ball_tactic.h"],
+    deps = [
+        ":tactic",
+        ":tactic_visitor",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:intercept_ball_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:movespin_action",
+        "//software/ai/hl/stp/evaluation:intercept",
+        "//software/geom",
+        "//software/util/logger",
+    ],
+)
+
+cc_test(
+    name = "grab_ball_tactic_test",
+    srcs = ["grab_ball_tactic_test.cpp"],
+    deps = [
+        ":grab_ball_tactic",
+        "//software/ai/intent:move_intent",
+        "//software/ai/intent:movespin_intent",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "move_tactic",
     srcs = ["move_tactic.cpp"],
@@ -363,6 +403,7 @@ cc_library(
         ":crease_defender_tactic",
         ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
+        ":grab_ball_tactic",
         ":move_tactic",
         ":passer_tactic",
         ":patrol_tactic",
