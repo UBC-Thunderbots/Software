@@ -53,7 +53,10 @@ TEST(AngleTest, Angle_abs)
 
 TEST(AngleTest, Angle_isFinite)
 {
-    // TODO: Add tests
+    EXPECT_TRUE(Angle::zero().isFinite());
+    EXPECT_TRUE(Angle::half().isFinite());
+
+    EXPECT_FALSE(Angle::ofDegrees(NAN).isFinite());
 }
 
 TEST(AngleTest, Angle_diff)
