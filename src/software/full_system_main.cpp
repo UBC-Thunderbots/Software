@@ -55,12 +55,12 @@ void setBackendFromString(std::string backend_name)
 }
 
 /**
- * Parses Arguments and Indicates If The Program Should Continue
+ * Parses Arguments and Indicates which arguments were received
  *
  * @param argc
  * @param argv
  *
- * @return True if the program should continue, false otherwise
+ * @return a struct of which arguments are passed
  */
 commandLineArgs parseCommandLineArgs(int argc, char **argv)
 {
@@ -104,6 +104,8 @@ commandLineArgs parseCommandLineArgs(int argc, char **argv)
 
 /**
  * Connects all the observers together
+ *
+ * @param headless - determines whether or not the visualizer is run (false to run visualizer)
  */
 void connectObservers(bool headless)
 {
