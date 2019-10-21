@@ -2,6 +2,7 @@
 
 #include <g3log/g3log.hpp>
 
+#include "shared/constants.h"
 #include "software/ai/hl/stp/evaluation/ball.h"
 #include "software/ai/hl/stp/evaluation/possession.h"
 #include "software/ai/hl/stp/play/corner_kick_play.h"
@@ -14,7 +15,6 @@
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 #include "software/ai/passing/pass_generator.h"
-#include "shared/constants.h"
 #include "software/util/logger/custom_logging_levels.h"
 
 using namespace Passing;
@@ -22,7 +22,7 @@ using namespace Passing;
 const std::string IndirectFreeKickPlay::name = "Indirect Free Kick Play";
 
 IndirectFreeKickPlay::IndirectFreeKickPlay()
-        : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
+    : MAX_TIME_TO_COMMIT_TO_PASS(Duration::fromSeconds(3))
 {
 }
 
@@ -34,8 +34,8 @@ std::string IndirectFreeKickPlay::getName() const
 bool IndirectFreeKickPlay::isApplicable(const World &world) const
 {
     double min_dist_to_corner =
-            std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
-                     (world.field().enemyCornerNeg() - world.ball().position()).len());
+        std::min((world.field().enemyCornerPos() - world.ball().position()).len(),
+                 (world.field().enemyCornerNeg() - world.ball().position()).len());
 
     // Make sure we don't interfere with the cornerkick play
     return world.gameState().isOurFreeKick() &&
@@ -62,16 +62,16 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Setup the goalie
     auto goalie_tactic = std::make_shared<GoalieTactic>(
-            world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
 
     // Setup crease defenders to help the goalie
     std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics = {
-            std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                                   world.friendlyTeam(), world.enemyTeam(),
-                                                   CreaseDefenderTactic::LeftOrRight::LEFT),
-            std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
-                                                   world.friendlyTeam(), world.enemyTeam(),
-                                                   CreaseDefenderTactic::LeftOrRight::RIGHT),
+        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                               world.friendlyTeam(), world.enemyTeam(),
+                                               CreaseDefenderTactic::LeftOrRight::LEFT),
+        std::make_shared<CreaseDefenderTactic>(world.field(), world.ball(),
+                                               world.friendlyTeam(), world.enemyTeam(),
+                                               CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
     // If the passing is coming from the friendly end, we split the cherry-pickers
@@ -83,23 +83,22 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Otherwise, the pass is coming from the enemy end, put the two cherry-pickers
     // on the opposite side of the x-axis to wherever the pass is coming from
-    if (world.ball().position().x() > -1){
-        double y_offset = -std::copysign(world.field().xLength()/2, world.ball().position().y());
-        cherry_pick_1_target_region = Rectangle(
-                Point(0, world.field().xLength()/4),
-                Point(world.field().xLength()/2, y_offset)
-        );
-        cherry_pick_2_target_region = Rectangle(
-                Point(0, world.field().xLength()/4),
-                Point(0, y_offset)
-        );
+    if (world.ball().position().x() > -1)
+    {
+        double y_offset =
+            -std::copysign(world.field().xLength() / 2, world.ball().position().y());
+        cherry_pick_1_target_region =
+            Rectangle(Point(0, world.field().xLength() / 4),
+                      Point(world.field().xLength() / 2, y_offset));
+        cherry_pick_2_target_region =
+            Rectangle(Point(0, world.field().xLength() / 4), Point(0, y_offset));
     }
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
     auto cherry_pick_tactic_1 =
-            std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
+        std::make_shared<CherryPickTactic>(world, cherry_pick_1_target_region);
     auto cherry_pick_tactic_2 =
-            std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
+        std::make_shared<CherryPickTactic>(world, cherry_pick_2_target_region);
 
     // This tactic will move a robot into position to initially take the free-kick
     auto align_to_ball_tactic = std::make_shared<MoveTactic>();
@@ -107,12 +106,10 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     PassGenerator pass_generator(world, world.ball().position(),
                                  PassType::RECEIVE_AND_DRIBBLE);
-    pass_generator.setTargetRegion(Rectangle(
-            Point(0, world.field().yLength()/2), world.field().enemyCornerNeg()
-    ));
+    pass_generator.setTargetRegion(
+        Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
 
-    PassWithRating best_pass_and_score_so_far =
-            pass_generator.getBestPassSoFar();
+    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
     // Wait for a robot to be assigned to align to take the corner
     while (!align_to_ball_tactic->getAssignedRobot())
@@ -123,7 +120,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -145,7 +143,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -166,7 +165,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
         updatePassGenerator(pass_generator);
         updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
 
         yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
                cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
@@ -177,9 +177,9 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
 
         Duration time_since_commit_stage_start =
-                world.getMostRecentTimestamp() - commit_stage_start_time;
+            world.getMostRecentTimestamp() - commit_stage_start_time;
         min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
-                                 MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
+                                     MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
                                  1.0);
     } while (best_pass_and_score_so_far.rating < min_score);
 
@@ -198,17 +198,19 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // Perform the pass and wait until the receiver is finished
         auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
         auto receiver = std::make_shared<ReceiverTactic>(
-                world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
-                false);
+            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
+            false);
         do
         {
             updateCreaseDefenderTactics(crease_defender_tactics);
             passer->updateWorldParams(world.ball());
             passer->updateControlParams(pass);
-            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(), world.ball());
+            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
+                                        world.ball());
             receiver->updateControlParams(pass);
             receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
-            goalie_tactic->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+            goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                             world.friendlyTeam(), world.enemyTeam());
 
             yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                    std::get<1>(crease_defender_tactics)});
@@ -224,11 +226,11 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
         // Figure out where the fallback chip target is
         double fallback_chip_target_x_offset =
-                Util::DynamicParameters::ShootOrChipPlay::
+            Util::DynamicParameters::ShootOrChipPlay::
                 fallback_chip_target_enemy_goal_offset.value();
 
         Point chip_target =
-                world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
+            world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
 
         do
         {
@@ -236,8 +238,10 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
             updateCreaseDefenderTactics(crease_defender_tactics);
             chip_tactic->updateWorldParams(world.ball());
-            chip_tactic->updateControlParams(world.ball().position(), chip_target, chip_dist);
-            goalie_tactic->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
+            chip_tactic->updateControlParams(world.ball().position(), chip_target,
+                                             chip_dist);
+            goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                             world.friendlyTeam(), world.enemyTeam());
 
             yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
                    std::get<1>(crease_defender_tactics)});
@@ -250,7 +254,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 }
 
 void IndirectFreeKickPlay::updateCherryPickTactics(
-        std::vector<std::shared_ptr<CherryPickTactic>> tactics)
+    std::vector<std::shared_ptr<CherryPickTactic>> tactics)
 {
     for (auto &tactic : tactics)
     {
@@ -259,14 +263,14 @@ void IndirectFreeKickPlay::updateCherryPickTactics(
 }
 
 void IndirectFreeKickPlay::updateAlignToBallTactic(
-        std::shared_ptr<MoveTactic> align_to_ball_tactic)
+    std::shared_ptr<MoveTactic> align_to_ball_tactic)
 {
     Vector ball_to_center_vec = Vector(0, 0) - world.ball().position();
     // We want the kicker to get into position behind the ball facing the center
     // of the field
     align_to_ball_tactic->updateControlParams(
-            world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
-            ball_to_center_vec.orientation(), 0);
+        world.ball().position() - ball_to_center_vec.norm(ROBOT_MAX_RADIUS_METERS * 2),
+        ball_to_center_vec.orientation(), 0);
 }
 
 void IndirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
@@ -276,12 +280,12 @@ void IndirectFreeKickPlay::updatePassGenerator(PassGenerator &pass_generator)
 }
 
 void IndirectFreeKickPlay::updateCreaseDefenderTactics(
-        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders)
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders)
 {
     for (auto &crease_defender : crease_defenders)
     {
-        crease_defender->updateWorldParams(world.ball(), world.field(), world.friendlyTeam(),
-                                      world.enemyTeam());
+        crease_defender->updateWorldParams(world.ball(), world.field(),
+                                           world.friendlyTeam(), world.enemyTeam());
     }
 }
 

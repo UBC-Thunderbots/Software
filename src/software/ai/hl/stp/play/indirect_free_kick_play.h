@@ -2,15 +2,15 @@
 
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
 
 /**
  * A Play for Indirect Free kicks
  */
 class IndirectFreeKickPlay : public Play
 {
-public:
+   public:
     static const std::string name;
 
     IndirectFreeKickPlay();
@@ -23,7 +23,7 @@ public:
 
     void getNextTactics(TacticCoroutine::push_type &yield) override;
 
-private:
+   private:
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
@@ -55,5 +55,6 @@ private:
      *
      * @param crease_defenders The defenders to update
      */
-    void updateCreaseDefenderTactics(std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
+    void updateCreaseDefenderTactics(
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defenders);
 };

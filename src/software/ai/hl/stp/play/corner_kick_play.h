@@ -26,7 +26,7 @@ class CornerKickPlay : public Play
     // considered a corner kick
     static constexpr double BALL_IN_CORNER_RADIUS = 0.5;
 
-private:
+   private:
     // The maximum time that we will wait before committing to a pass
     const Duration MAX_TIME_TO_COMMIT_TO_PASS;
 
