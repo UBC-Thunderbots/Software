@@ -212,10 +212,9 @@ cc_library(
     hdrs = ["robot.h"],
     deps = [
         "//shared:constants",
-        "//software/world:ball",
-        "//software/world:robot",
         "//software/geom",
         "//software/util/parameter:dynamic_parameters",
+        "//software/world",
     ],
 )
 
@@ -224,6 +223,7 @@ cc_test(
     srcs = ["robot_test.cpp"],
     deps = [
         ":robot",
+        "//software/test_util",
         "@gtest//:gtest_main",
     ],
 )
