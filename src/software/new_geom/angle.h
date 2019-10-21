@@ -444,11 +444,11 @@ inline constexpr double Angle::toDegrees() const
 inline constexpr Angle Angle::remainder(const Angle &divisor) const
 {
     return Angle::fromRadians(toRadians() -
-                            static_cast<double>(static_cast<long>(
-                                (toRadians() / divisor.toRadians()) >= 0
-                                    ? (toRadians() / divisor.toRadians() + 0.5)
-                                    : (toRadians() / divisor.toRadians() - 0.5))) *
-                                divisor.toRadians());
+                              static_cast<double>(static_cast<long>(
+                                  (toRadians() / divisor.toRadians()) >= 0
+                                      ? (toRadians() / divisor.toRadians() + 0.5)
+                                      : (toRadians() / divisor.toRadians() - 0.5))) *
+                                  divisor.toRadians());
 }
 
 inline constexpr Angle Angle::abs() const

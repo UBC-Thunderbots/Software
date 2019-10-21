@@ -205,7 +205,8 @@ class Vector final
  *
  * @return the vector-sum of the two vectors
  */
-constexpr Vector operator+(const Vector &p, const Vector &q) __attribute__((warn_unused_result));
+constexpr Vector operator+(const Vector &p, const Vector &q)
+    __attribute__((warn_unused_result));
 
 /**
  * Adds a Vector to another Vector and set the former vector to the sum

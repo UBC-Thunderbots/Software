@@ -209,7 +209,8 @@ class Point final
  *
  * @return the Point sum of the given Point and Vector
  */
-constexpr Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_result));
+constexpr Point operator+(const Point &p, const Vector &v)
+    __attribute__((warn_unused_result));
 
 /**
  * Adds a vector to a point and sets that point to the resulting sum

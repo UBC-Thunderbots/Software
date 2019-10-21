@@ -1,4 +1,5 @@
-namespace GeomConstants {
+namespace GeomConstants
+{
     // Due to internal representation of doubles being slightly less accurate/consistent
     // with some numbers and operations, we consider points that are very close together
     // to be equal (since they likely are, just possibly slightly misrepresented by the
@@ -8,4 +9,4 @@ namespace GeomConstants {
     // small buffer while remaining as accurate as possible.
     // http://www.cplusplus.com/forum/beginner/95128/
     static constexpr double EPSILON = 1e-15;
-}
+}  // namespace GeomConstants

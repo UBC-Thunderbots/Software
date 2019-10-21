@@ -62,26 +62,32 @@ TEST(AngleTest, Angle_isFinite)
 
 TEST(AngleTest, Angle_diff)
 {
-    EXPECT_DOUBLE_EQ(27, Angle::fromDegrees(50).minDiff(Angle::fromDegrees(23)).toDegrees());
+    EXPECT_DOUBLE_EQ(27,
+                     Angle::fromDegrees(50).minDiff(Angle::fromDegrees(23)).toDegrees());
     // We require a slightly larger tolerance for this test to pass
-    EXPECT_NEAR(27, Angle::fromDegrees(360 + 13).minDiff(Angle::fromDegrees(-14)).toDegrees(),
+    EXPECT_NEAR(27,
+                Angle::fromDegrees(360 + 13).minDiff(Angle::fromDegrees(-14)).toDegrees(),
                 1e-13);
     EXPECT_DOUBLE_EQ(
-        27, Angle::fromDegrees(180 - 13).minDiff(Angle::fromDegrees(-180 + 14)).toDegrees());
+        27,
+        Angle::fromDegrees(180 - 13).minDiff(Angle::fromDegrees(-180 + 14)).toDegrees());
     EXPECT_DOUBLE_EQ(
-        27, Angle::fromDegrees(180 + 13).minDiff(Angle::fromDegrees(-180 - 14)).toDegrees());
+        27,
+        Angle::fromDegrees(180 + 13).minDiff(Angle::fromDegrees(-180 - 14)).toDegrees());
     EXPECT_DOUBLE_EQ(
-        27, Angle::fromDegrees(-180 + 13).minDiff(Angle::fromDegrees(180 - 14)).toDegrees());
+        27,
+        Angle::fromDegrees(-180 + 13).minDiff(Angle::fromDegrees(180 - 14)).toDegrees());
     EXPECT_DOUBLE_EQ(
-        27, Angle::fromDegrees(-180 - 13).minDiff(Angle::fromDegrees(180 + 14)).toDegrees());
+        27,
+        Angle::fromDegrees(-180 - 13).minDiff(Angle::fromDegrees(180 + 14)).toDegrees());
 }
 
 TEST(AngleTest, sin)
 {
     EXPECT_DOUBLE_EQ(0, Angle::zero().sin());
     EXPECT_DOUBLE_EQ(0.5, Angle::fromDegrees(30).sin());
-    EXPECT_DOUBLE_EQ(sqrt(2)/2, Angle::fromDegrees(45).sin());
-    EXPECT_DOUBLE_EQ(sqrt(3)/2, Angle::fromDegrees(60).sin());
+    EXPECT_DOUBLE_EQ(sqrt(2) / 2, Angle::fromDegrees(45).sin());
+    EXPECT_DOUBLE_EQ(sqrt(3) / 2, Angle::fromDegrees(60).sin());
     EXPECT_DOUBLE_EQ(1, Angle::quarter().sin());
     EXPECT_NEAR(0, Angle::half().sin(), 1e-7);
     EXPECT_DOUBLE_EQ(-1, Angle::threeQuarter().sin());
@@ -92,8 +98,8 @@ TEST(AngleTest, asin)
 {
     EXPECT_EQ(Angle::zero(), Angle::asin(0));
     EXPECT_EQ(Angle::fromDegrees(30), Angle::asin(0.5));
-    EXPECT_EQ(Angle::fromDegrees(45), Angle::asin(sqrt(2)/2));
-    EXPECT_EQ(Angle::fromDegrees(60), Angle::asin(sqrt(3)/2));
+    EXPECT_EQ(Angle::fromDegrees(45), Angle::asin(sqrt(2) / 2));
+    EXPECT_EQ(Angle::fromDegrees(60), Angle::asin(sqrt(3) / 2));
     EXPECT_EQ(Angle::quarter(), Angle::asin(1));
     EXPECT_EQ(Angle::threeQuarter(), Angle::asin(-1));
 }
@@ -101,8 +107,8 @@ TEST(AngleTest, asin)
 TEST(AngleTest, cos)
 {
     EXPECT_DOUBLE_EQ(1, Angle::zero().cos());
-    EXPECT_DOUBLE_EQ(sqrt(3)/2, Angle::fromDegrees(30).cos());
-    EXPECT_DOUBLE_EQ(sqrt(2)/2, Angle::fromDegrees(45).cos());
+    EXPECT_DOUBLE_EQ(sqrt(3) / 2, Angle::fromDegrees(30).cos());
+    EXPECT_DOUBLE_EQ(sqrt(2) / 2, Angle::fromDegrees(45).cos());
     EXPECT_DOUBLE_EQ(0.5, Angle::fromDegrees(60).cos());
     EXPECT_NEAR(0, Angle::quarter().cos(), 1e-7);
     EXPECT_NEAR(-1, Angle::half().cos(), 1e-7);
@@ -114,8 +120,8 @@ TEST(AngleTest, acos)
 {
     EXPECT_EQ(Angle::zero(), Angle::acos(1));
     EXPECT_EQ(Angle::fromDegrees(60), Angle::acos(0.5));
-    EXPECT_EQ(Angle::fromDegrees(45), Angle::acos(sqrt(2)/2));
-    EXPECT_EQ(Angle::fromDegrees(30), Angle::acos(sqrt(3)/2));
+    EXPECT_EQ(Angle::fromDegrees(45), Angle::acos(sqrt(2) / 2));
+    EXPECT_EQ(Angle::fromDegrees(30), Angle::acos(sqrt(3) / 2));
     EXPECT_EQ(Angle::quarter(), Angle::acos(0));
     EXPECT_EQ(Angle::half(), Angle::acos(-1));
 }
@@ -123,7 +129,7 @@ TEST(AngleTest, acos)
 TEST(AngleTest, tan)
 {
     EXPECT_DOUBLE_EQ(0, Angle::zero().tan());
-    EXPECT_DOUBLE_EQ(1/sqrt(3), Angle::fromDegrees(30).tan());
+    EXPECT_DOUBLE_EQ(1 / sqrt(3), Angle::fromDegrees(30).tan());
     EXPECT_DOUBLE_EQ(1, Angle::fromDegrees(45).tan());
     EXPECT_DOUBLE_EQ(sqrt(3), Angle::fromDegrees(60).tan());
     EXPECT_NEAR(0, Angle::half().tan(), 1e-7);
@@ -133,7 +139,7 @@ TEST(AngleTest, tan)
 TEST(AngleTest, atan)
 {
     EXPECT_EQ(Angle::zero(), Angle::atan(0));
-    EXPECT_EQ(Angle::fromDegrees(30), Angle::atan(1/sqrt(3)));
+    EXPECT_EQ(Angle::fromDegrees(30), Angle::atan(1 / sqrt(3)));
     EXPECT_EQ(Angle::fromDegrees(45), Angle::atan(1));
     EXPECT_EQ(Angle::fromDegrees(60), Angle::atan(sqrt(3)));
 }
