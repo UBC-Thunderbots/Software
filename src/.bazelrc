@@ -1,6 +1,3 @@
-# Use C++ 17
-build --cxxopt='-std=c++17'
-
 # Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
 build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache_us_multi_region
 
@@ -19,8 +16,12 @@ build --remote_upload_local_results=false
 # the "factory" design pattern.
 build --incompatible_remove_legacy_whole_archive=False
 
-# Every warning is treated as an error
-build --cxxopt=-Werror
-
 # We want bazel to output the results of our gtests
 test --test_output=all
+
+# Use Our Custom Toolchain
+build --crosstool_top=//cc_toolchain:toolchain
+
+# Automatically set the CPU environment based on the `--cpu` flag as per our
+# defined CPU environments
+build --auto_cpu_environment_group=//cc_toolchain:cpus
