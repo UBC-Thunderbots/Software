@@ -3,6 +3,43 @@
 #include "software/test_util/test_util.h"
 #include "software/world/refbox_constants.h"
 
+TEST(GameStateTest, default_constructor)
+{
+    GameState game_state;
+
+    EXPECT_EQ(RefboxGameState::HALT, game_state.getRefboxGameState());
+    EXPECT_EQ(GameState::RestartReason::NONE, game_state.getRestartReason());
+    EXPECT_FALSE(game_state.isOurRestart());
+
+    EXPECT_TRUE(game_state.isHalted());
+    EXPECT_FALSE(game_state.isStopped());
+    EXPECT_FALSE(game_state.isPlaying());
+    EXPECT_FALSE(game_state.isKickoff());
+    EXPECT_FALSE(game_state.isPenalty());
+    EXPECT_FALSE(game_state.isBallPlacement());
+    EXPECT_FALSE(game_state.isOurRestart());
+    EXPECT_FALSE(game_state.isDirectFree());
+    EXPECT_FALSE(game_state.isIndirectFree());
+    EXPECT_FALSE(game_state.isOurKickoff());
+    EXPECT_FALSE(game_state.isOurPenalty());
+    EXPECT_FALSE(game_state.isOurDirectFree());
+    EXPECT_FALSE(game_state.isOurIndirectFree());
+    EXPECT_FALSE(game_state.isOurFreeKick());
+    EXPECT_FALSE(game_state.isOurBallPlacement());
+    EXPECT_FALSE(game_state.isTheirKickoff());
+    EXPECT_FALSE(game_state.isTheirPenalty());
+    EXPECT_FALSE(game_state.isTheirDirectFree());
+    EXPECT_FALSE(game_state.isTheirIndirectFree());
+    EXPECT_FALSE(game_state.isTheirFreeKick());
+    EXPECT_FALSE(game_state.isTheirBallPlacement());
+    EXPECT_FALSE(game_state.isSetupRestart());
+    EXPECT_FALSE(game_state.isReadyState());
+    EXPECT_FALSE(game_state.canKick());
+    EXPECT_TRUE(game_state.stayAwayFromBall());
+    EXPECT_FALSE(game_state.stayOnSide());
+    EXPECT_FALSE(game_state.stayBehindPenaltyLine());
+}
+
 // tuple of start state, update state, end state, our_restart, restart reason
 typedef std::tuple<RefboxGameState, RefboxGameState, RefboxGameState, bool,
                    GameState::RestartReason>
@@ -186,7 +223,7 @@ PREDICATE_TEST(isOurKickoff, RefboxGameState::PREPARE_KICKOFF_US)
 PREDICATE_TEST(isOurPenalty, RefboxGameState::PREPARE_PENALTY_US)
 PREDICATE_TEST(isOurDirectFree, RefboxGameState::DIRECT_FREE_US)
 PREDICATE_TEST(isOurIndirectFree, RefboxGameState::INDIRECT_FREE_US)
-PREDICATE_TEST(isOurPlacement, RefboxGameState::BALL_PLACEMENT_US)
+PREDICATE_TEST(isOurBallPlacement, RefboxGameState::BALL_PLACEMENT_US)
 PREDICATE_TEST(isOurFreeKick, RefboxGameState::DIRECT_FREE_US,
                RefboxGameState::INDIRECT_FREE_US)
 PREDICATE_TEST(isTheirKickoff, RefboxGameState::PREPARE_KICKOFF_THEM)

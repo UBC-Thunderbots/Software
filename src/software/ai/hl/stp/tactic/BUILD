@@ -93,6 +93,34 @@ cc_test(
 )
 
 cc_library(
+    name = "defense_shadow_enemy_tactic",
+    srcs = ["defense_shadow_enemy_tactic.cpp"],
+    hdrs = ["defense_shadow_enemy_tactic.h"],
+    deps = [
+        ":tactic",
+        ":tactic_visitor",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
+        "//software/ai/hl/stp/evaluation:calc_best_shot",
+        "//software/ai/hl/stp/evaluation:enemy_threat",
+        "//software/ai/hl/stp/evaluation:robot",
+        "//software/util/logger",
+        "//software/util/parameter:dynamic_parameters",
+    ],
+)
+
+cc_test(
+    name = "defense_shadow_enemy_tactic_test",
+    srcs = ["defense_shadow_enemy_tactic_test.cpp"],
+    deps = [
+        ":defense_shadow_enemy_tactic",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "goalie_tactic",
     srcs = ["goalie_tactic.cpp"],
     hdrs = ["goalie_tactic.h"],
@@ -100,12 +128,41 @@ cc_library(
         ":tactic",
         ":tactic_visitor",
         "//shared:constants",
-        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/action:chip_action",
         "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:stop_action",
         "//software/ai/hl/stp/evaluation:enemy_threat",
         "//software/geom",
         "@g3log",
+    ],
+)
+
+cc_library(
+    name = "grab_ball_tactic",
+    srcs = ["grab_ball_tactic.cpp"],
+    hdrs = ["grab_ball_tactic.h"],
+    deps = [
+        ":tactic",
+        ":tactic_visitor",
+        "//shared:constants",
+        "//software/ai/hl/stp/action:intercept_ball_action",
+        "//software/ai/hl/stp/action:move_action",
+        "//software/ai/hl/stp/action:movespin_action",
+        "//software/ai/hl/stp/evaluation:intercept",
+        "//software/geom",
+        "//software/util/logger",
+    ],
+)
+
+cc_test(
+    name = "grab_ball_tactic_test",
+    srcs = ["grab_ball_tactic_test.cpp"],
+    deps = [
+        ":grab_ball_tactic",
+        "//software/ai/intent:move_intent",
+        "//software/ai/intent:movespin_intent",
+        "//software/test_util",
+        "@gtest//:gtest_main",
     ],
 )
 
@@ -333,7 +390,9 @@ cc_library(
         ":cherry_pick_tactic",
         ":chip_tactic",
         ":crease_defender_tactic",
+        ":defense_shadow_enemy_tactic",
         ":goalie_tactic",
+        ":grab_ball_tactic",
         ":move_tactic",
         ":passer_tactic",
         ":patrol_tactic",
