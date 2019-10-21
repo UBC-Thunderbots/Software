@@ -91,7 +91,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
             Rectangle(Point(0, world.field().xLength() / 4),
                       Point(world.field().xLength() / 2, y_offset));
         cherry_pick_2_target_region =
-            Rectangle(Point(0, world.field().xLength() / 4), Point(0, y_offset));
+            Rectangle(Point(0, world.field().xLength() / 4.0), Point(0, y_offset));
     }
     // These two tactics will set robots to roam around the field, trying to put
     // themselves into a good position to receive a pass
