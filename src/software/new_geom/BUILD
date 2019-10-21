@@ -12,7 +12,9 @@ cc_library(
     copts = [
         "-std=c++17",
     ],
-    deps = [],
+    deps = [
+        "@boost//:geometry",
+    ],
 )
 
 cc_test(
