@@ -1,7 +1,8 @@
 #include "software/new_geom/vector.h"
-#include "software/new_geom/point.h"
 
 #include <gtest/gtest.h>
+
+#include "software/new_geom/point.h"
 
 TEST(CreateVectorTests, vector_default_constructor_test)
 {
@@ -13,13 +14,13 @@ TEST(CreateVectorTests, vector_default_constructor_test)
 TEST(CreateVectorTests, vector_from_angle)
 {
     Vector v = Vector::createFromAngle(Angle::ofDegrees(30));
-    EXPECT_DOUBLE_EQ(sqrt(3)/2, v.x());
+    EXPECT_DOUBLE_EQ(sqrt(3) / 2, v.x());
     EXPECT_DOUBLE_EQ(0.5, v.y());
 }
 
 TEST(CreateVectorTests, vector_specific_constructor_test)
 {
-    Vector v = Vector(-3,4);
+    Vector v = Vector(-3, 4);
     EXPECT_EQ(-3, v.x());
     EXPECT_EQ(4, v.y());
 }
@@ -34,7 +35,7 @@ TEST(CreateVectorTests, vector_copy_constructor_test)
 
 TEST(CreateVectorTests, vector_from_point_test)
 {
-    Point p = Point(-3, 7);
+    Point p  = Point(-3, 7);
     Vector v = p.toVector();
     EXPECT_EQ(-3, v.x());
     EXPECT_EQ(7, v.y());
@@ -87,7 +88,7 @@ TEST(VectorLogicTests, vector_perp_test)
 TEST(VectorLogicTests, rotate_vector_test)
 {
     Vector v = Vector(3, 4);
-    v = v.rotate(Angle::quarter());
+    v        = v.rotate(Angle::quarter());
     EXPECT_DOUBLE_EQ(-4, v.x());
     EXPECT_DOUBLE_EQ(3, v.y());
     v = v.rotate(Angle::half());
@@ -100,8 +101,8 @@ TEST(VectorLogicTests, rotate_vector_test)
 
 TEST(VectorLogicTests, vector_proj_test)
 {
-    Vector u = Vector(1, 2);
-    Vector v = Vector(3, 4);
+    Vector u    = Vector(1, 2);
+    Vector v    = Vector(3, 4);
     Vector proj = u.project(v);
     EXPECT_EQ(1.32, proj.x());
     EXPECT_EQ(1.76, proj.y());
@@ -123,7 +124,7 @@ TEST(VectorLogicTests, vector_cross_product_test)
 
 TEST(VectorLogicTests, vector_orientation_test)
 {
-    Vector u = Vector(sqrt(2)/2, sqrt(2)/2);
+    Vector u = Vector(sqrt(2) / 2, sqrt(2) / 2);
     EXPECT_EQ(Angle::ofDegrees(45), u.orientation());
     Vector v = Vector(0, -1);
     EXPECT_EQ(Angle::ofDegrees(-90), v.orientation());
@@ -145,7 +146,7 @@ TEST(VectorOperatorTests, vector_assignment_test)
 {
     Vector u = Vector(2, 3);
     Vector v = Vector();
-    v = u;
+    v        = u;
     EXPECT_EQ(2, v.x());
     EXPECT_EQ(3, v.y());
 }

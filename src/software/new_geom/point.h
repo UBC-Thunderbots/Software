@@ -14,7 +14,7 @@
  */
 class Point final
 {
-public:
+   public:
     /**
      * Creates a Point at the origin (0, 0).
      */
@@ -193,7 +193,7 @@ public:
      */
     Point &operator=(const Point &other);
 
-private:
+   private:
     /**
      * The X coordinate of the Point. The variable name starts with an underscore to
      * prevent name conflicts with its accessor function.
@@ -245,7 +245,7 @@ constexpr Point operator-(const Point &p) __attribute__((warn_unused_result));
  * @return the vector-difference of the two points
  */
 constexpr Vector operator-(const Point &p, const Point &q)
-__attribute__((warn_unused_result));
+    __attribute__((warn_unused_result));
 
 /**
  * Prints a point to a stream
@@ -316,11 +316,13 @@ inline void Point::setY(double y)
     this->_y = y;
 }
 
-inline double Point::distanceFromOrigin() const {
+inline double Point::distanceFromOrigin() const
+{
     return std::hypot(_x, _y);
 }
 
-inline double Point::distanceFromPoint(const Point &p) const {
+inline double Point::distanceFromPoint(const Point &p) const
+{
     return sqrt(pow((_x - p.x()), 2) + pow((_y - p.y()), 2));
 }
 
@@ -331,12 +333,16 @@ inline Vector Point::toVector() const
 
 inline Vector Point::norm() const
 {
-    return distanceFromOrigin() < 1.0e-9 ? Vector() : Vector(_x / distanceFromOrigin(), _y / distanceFromOrigin());
+    return distanceFromOrigin() < 1.0e-9
+               ? Vector()
+               : Vector(_x / distanceFromOrigin(), _y / distanceFromOrigin());
 }
 
 inline Vector Point::norm(double length) const
 {
-    return distanceFromOrigin() < 1.0e-9 ? Vector() : Vector(_x * length / distanceFromOrigin(), _y * length / distanceFromOrigin());
+    return distanceFromOrigin() < 1.0e-9 ? Vector()
+                                         : Vector(_x * length / distanceFromOrigin(),
+                                                  _y * length / distanceFromOrigin());
 }
 
 inline Point Point::rotate(const Angle &rot) const

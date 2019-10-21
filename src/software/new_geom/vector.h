@@ -11,7 +11,7 @@
  */
 class Vector final
 {
-public:
+   public:
     /**
      * Creates a zero-vector.
      */
@@ -190,16 +190,16 @@ public:
      */
     Vector &operator=(const Vector &other);
 
-private:
+   private:
     /**
-     * The magnitude in the X coordinate of the Vector. The variable name starts with an underscore to
-     * prevent name conflicts with its accessor function.
+     * The magnitude in the X coordinate of the Vector. The variable name starts with an
+     * underscore to prevent name conflicts with its accessor function.
      */
     double _x;
 
     /**
-     * The magnitude in the Y coordinate of the Vector. The variable name starts with an underscore to
-     * prevent name conflicts with its accessor function.
+     * The magnitude in the Y coordinate of the Vector. The variable name starts with an
+     * underscore to prevent name conflicts with its accessor function.
      */
     double _y;
 };
@@ -242,7 +242,7 @@ constexpr Vector operator-(const Vector &p) __attribute__((warn_unused_result));
  * @return the vector-difference of the two vectors
  */
 constexpr Vector operator-(const Vector &u, const Vector &v)
-__attribute__((warn_unused_result));
+    __attribute__((warn_unused_result));
 
 /**
  * Subtracts from a Vector another Vector and set the former vector to the difference
@@ -495,7 +495,7 @@ inline std::ostream &operator<<(std::ostream &os, const Vector &v)
 
 inline constexpr bool operator==(const Vector &u, const Vector &v)
 {
-    return (u-v).lensq() < GeomConstants::EPSILON;
+    return (u - v).lensq() < GeomConstants::EPSILON;
 }
 
 inline constexpr bool operator!=(const Vector &u, const Vector &v)
