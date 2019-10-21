@@ -9,5 +9,5 @@ Path NoPathTestPathPlanner::findPath(const Point &start, const Point &destinatio
                                      const Rectangle &navigableArea,
                                      const std::vector<Obstacle> &obstacles)
 {
-    return Path(std::vector<Point>({}));
+    return Path(std::nullopt);
 }

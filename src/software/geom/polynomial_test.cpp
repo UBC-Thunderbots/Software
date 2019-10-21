@@ -43,12 +43,12 @@ TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
     {
         Polynomial p(constraint1, constraint2);
     }
-    catch(...)
+    catch (...)
     {
         SUCCEED();
         return;
     }
-    ADD_FAILURE()<<"Successfully able to build a polynomial that isn't a function";
+    ADD_FAILURE() << "Successfully able to build a polynomial that isn't a function";
 }
 
 TEST(TestSpline, test_polynomial_flat_line_constructor)

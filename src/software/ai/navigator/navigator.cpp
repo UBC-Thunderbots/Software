@@ -86,38 +86,33 @@ void Navigator::visit(const StopIntent &stop_intent)
 // helpers
 void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
 {
-    addPlannedPaths(path);
-
-    switch (path.size())
+    if (path)
     {
-        case 0:
+        addPlannedPaths(path);
+        if ((*path).size() == 1)
         {
-            LOG(WARNING) << "Path planner could not find a path";
-            auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
-            current_primitive = std::move(stop);
-            break;
+            throw std::runtime_error(
+                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or dest or some other point");
         }
-        case 1:
+        if ((*path).size() == 2)
         {
-            current_destination = path.calculateValue(1.0);
+            current_destination = (*path).valueAt(1.0);
             auto move           = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
                 move_intent.getFinalAngle(),
                 move_intent.getFinalSpeed() *
-                    getCloseToEnemyObstacleFactor(path.calculateValue(1.0)),
+                    getCloseToEnemyObstacleFactor((*path).valueAt(1.0)),
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
-            break;
         }
-        default:
+        else
         {
-            current_destination      = path.calculateValue(1.0);
+            current_destination      = (*path).valueAt(1.0);
             double segment_final_vel = getCloseToEnemyObstacleFactor(
-                path.calculateValue(1.0) *
+                (*path).valueAt(1.0) *
                 calculateTransitionSpeedBetweenSegments(
-                    path.calculateValue(0.0), path.calculateValue(1.0),
-                    path.calculateValue(2.0),
+                    (*path).valueAt(0.0), (*path).valueAt(1.0), (*path).valueAt(2.0),
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
                             .value()));
@@ -128,8 +123,13 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
-            break;
         }
+    }
+    else
+    {
+        LOG(WARNING) << "Path planner could not find a path";
+        auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
+        current_primitive = std::move(stop);
     }
 }
 
@@ -326,9 +326,9 @@ std::vector<std::vector<Point>> Navigator::getPlannedPaths()
 void Navigator::addPlannedPaths(const Path &path)
 {
     std::vector<Point> points;
-    for (double i = 0.0; i <= path.size(); i++)
+    for (double i = 0.0; i < (*path).size(); i++)
     {
-        points.push_back(path.calculateValue(i));
+        points.push_back((*path).valueAt(i));
     }
     planned_paths.emplace_back(points);
 }

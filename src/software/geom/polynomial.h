@@ -15,12 +15,12 @@ class Polynomial
     Polynomial() = delete;
     /**
      * Construct a polynomial from coefficients
-     * s.t. n = coeffs.size() == the order of the polynomial
+     * s.t. n = coeffs.size() == the degree of the polynomial
      * and of the form coeffs[0]*x^(n-1)
      * + coeffs[1]*x^(n-2) + ... + coeffs[n-1]
      *
      * @param coeffs coefficients of the polynomial
-     *      * must be 
+     *      * must be
      *
      * @throws std::invalid_argument if coeffs[0] == 0
      */
@@ -28,7 +28,7 @@ class Polynomial
 
     /**
      * Construct a polynomial from coefficients
-     * s.t. n = coeffs.size() == the order of the polynomial
+     * s.t. n = coeffs.size() == the degree of the polynomial
      * and of the form coeffs[0]*x^(n-1)
      * + coeffs[1]*x^(n-2) + ... + coeffs[n-1]
      *

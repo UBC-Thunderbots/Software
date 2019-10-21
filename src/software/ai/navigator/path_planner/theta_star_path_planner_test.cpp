@@ -10,9 +10,9 @@
 std::vector<Point> convertPathToPoints(Path path)
 {
     std::vector<Point> points;
-    for (double i = 0.0; i <= path.size(); i++)
+    for (double i = 0.0; i < (*path).size(); i++)
     {
-        points.push_back(path.calculateValue(i));
+        points.push_back((*path).valueAt(i));
     }
     return points;
 }
@@ -75,8 +75,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
     Path path = planner->findPath(start, dest, navigableArea, obstacles);
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path.calculateValue(0));
-    EXPECT_EQ(dest, path.calculateValue(path.size()));
+    EXPECT_EQ(start, (*path).valueAt(0));
+    EXPECT_EQ(dest, (*path).valueAt((*path).size()));
 
     std::vector<Point> path_points = convertPathToPoints(path);
 
@@ -109,7 +109,7 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
     Path path = planner->findPath(start, dest, navigableArea, obstacles);
 
     // The path should start at exactly the start point
-    EXPECT_EQ(start, path.calculateValue(0));
+    EXPECT_EQ(start, (*path).valueAt(0));
 
     std::vector<Point> path_points = convertPathToPoints(path);
 
@@ -139,8 +139,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     Path path = planner->findPath(start, dest, navigableArea, obstacles);
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path.calculateValue(0));
-    EXPECT_EQ(dest, path.calculateValue(path.size()));
+    EXPECT_EQ(start, (*path).valueAt(0));
+    EXPECT_EQ(dest, (*path).valueAt((*path).size()));
 
     std::vector<Point> path_points = convertPathToPoints(path);
 
@@ -170,8 +170,8 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
     Path path = planner->findPath(start, dest, navigableArea, obstacles);
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path.calculateValue(0));
-    EXPECT_EQ(dest, path.calculateValue(path.size()));
+    EXPECT_EQ(start, (*path).valueAt(0));
+    EXPECT_EQ(dest, (*path).valueAt((*path).size()));
 
     std::vector<Point> path_points = convertPathToPoints(path);
 
@@ -204,9 +204,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
 
     // Since there are no obstacles, there should be two path points, one at the start
     // and one at the destination
-    EXPECT_EQ(2, path.size() + 1);
-    EXPECT_EQ(start, path.calculateValue(0));
-    EXPECT_EQ(dest, path.calculateValue(path.size()));
+    EXPECT_EQ(2, (*path).size());
+    EXPECT_EQ(start, (*path).valueAt(0));
+    EXPECT_EQ(dest, (*path).valueAt((*path).size() - 1));
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
@@ -223,9 +223,9 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
 
     Path path = planner->findPath(start, dest, navigableArea, obstacles);
 
-    EXPECT_EQ(2, path.size() + 1);
-    EXPECT_EQ(start, path.calculateValue(0));
-    EXPECT_EQ(dest, path.calculateValue(path.size()));
+    EXPECT_EQ(2, (*path).size());
+    EXPECT_EQ(start, (*path).valueAt(0));
+    EXPECT_EQ(dest, (*path).valueAt((*path).size() - 1));
 }
 
 TEST(TestThetaStarPathPlanner, performance)
@@ -279,7 +279,7 @@ TEST(TestThetaStarPathPlanner, performance)
     std::chrono::duration<double> duration = end_time - start_time;
 
     std::chrono::duration<double> avg =
-        duration / ((double)num_iterations * obstacle_sets.size());
+        duration / ((double)num_iterations * obstacle_sets.size() - 1);
 
     //    std::cout << "Took " <<
     //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0

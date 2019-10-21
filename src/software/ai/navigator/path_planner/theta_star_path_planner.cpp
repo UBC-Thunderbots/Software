@@ -175,7 +175,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
                                     const std::vector<Obstacle> &obstacles)
 {
     obstacles_ = obstacles;
-    Path empty_ret_val(std::vector<Point>({}));
+    Path empty_ret_val(std::nullopt);
     CellCoordinate src_coord, dest_coord;
 
     openList.clear();

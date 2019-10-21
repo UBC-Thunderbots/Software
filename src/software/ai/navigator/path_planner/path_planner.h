@@ -14,7 +14,7 @@
  * if a path exists, otherwise it will return nothing.
  */
 
-using Path = Spline;
+using Path = std::optional<Spline>;
 
 class PathPlanner
 {

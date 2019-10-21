@@ -13,6 +13,6 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 
     Path path = planner->findPath(start, dest, navigableArea, std::vector<Obstacle>());
 
-    EXPECT_EQ(path.calculateValue(0), start);
-    EXPECT_EQ(path.calculateValue(1), dest);
+    EXPECT_EQ((*path).valueAt(0), start);
+    EXPECT_EQ((*path).valueAt(1), dest);
 }

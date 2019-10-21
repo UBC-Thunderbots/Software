@@ -17,7 +17,7 @@ class Spline
      * Construct a spline by drawing line segments between consecutive
      * Points
      *
-     * @throws std::runtime_error if points.size() == 1
+     * @throws std::invalid_argument if points.size() == 0
      *
      * @param points Points on the spline
      */
@@ -27,11 +27,11 @@ class Spline
      * Construct a spline by drawing line segments between consecutive
      * Points
      *
-     * @throws std::runtime_error if points.size() == 1
+     * @throws std::invalid_argument if points.size() == 0
      *
      * @param points Points on the spline
      */
-    Spline(const std::initializer_list<Point>& _points);
+    Spline(const std::initializer_list<Point>& points);
 
     /**
      * Calculates the value of spline evaluated at value val
@@ -41,12 +41,12 @@ class Spline
      * @return value of spline evaluated at value val
      *      * if not defined by a spline then return closest start/end point
      */
-    Point calculateValue(double val) const;
+    Point valueAt(double val) const;
 
     /**
-     * Gets size of the domain of the spline
+     * Gets the number of knots in the spline including start and end points
      *
-     * @return size of the domain of the spline
+     * @return size of the spline
      */
     size_t size(void) const;
 
@@ -54,16 +54,22 @@ class Spline
     class SplineSegment
     {
        public:
-        SplineSegment(Polynomial x, Polynomial y) : x(x), y(y) {}
+        SplineSegment(Polynomial x, Polynomial y, Point start_point, Point end_point)
+            : x(x), y(y), start_point(start_point), end_point(end_point)
+        {
+        }
         const Polynomial x;
         const Polynomial y;
+        const Point start_point;
+        const Point end_point;
     };
 
     // segments represent the polynomials that interpolate between
     // time at index to index + 1
     std::vector<SplineSegment> segments;
 
-    Point start_point, end_point;
+    // points that connect segments
+    const std::vector<Point> knots;
 
     /**
      * Initialize segments with points.size() - 1 linear segments interpolating
