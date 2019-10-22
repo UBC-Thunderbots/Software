@@ -48,7 +48,7 @@ AutokickType MovePrimitive::getAutoKickType() const
     return autokick;
 }
 
-DribblerEnable MovePrimitive::isDribblerEnabled() const
+DribblerEnable MovePrimitive::getDribblerEnable() const
 {
     return enable_dribbler;
 }

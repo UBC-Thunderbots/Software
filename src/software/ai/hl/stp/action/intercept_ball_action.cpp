@@ -46,7 +46,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     // We find the point on the Ray formed by the ball's velocity that is closest to
     // the robot. If the time for the robot to get to that point is less than the time
     // for the ball to get to that point, the robot moves to that point to intercept the
-    // ball. Once the robot is in the ball's path, it will move to a point just in front
+    // ball. Once the robot is in the ball's path, it will move to a point just in frontkkk
     // of the ball in order to meet it quicker, while staying in it's path.
     //
     // If the robot cannot reach the closest point on the ray before the ball, the robot
@@ -93,7 +93,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             LOG(DEBUG) << "ball leaving field" << std::endl;
             yield(std::make_unique<MoveIntent>(
                 robot->id(), point_ball_leaves_field.value(),
-                (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
+                (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON, MoveType::NORMAL,  AutokickType::NONE));
         }
         else
         {
@@ -103,7 +103,7 @@ void InterceptBallAction::calculateNextIntent(IntentCoroutine::push_type& yield)
             LOG(DEBUG) << "Moving to ball backup case" << std::endl;
             yield(std::make_unique<MoveIntent>(
                 robot->id(), ball.position(),
-                (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
+                (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
         }
     } while (!Evaluation::robotHasPossession(ball, *robot) || loop_forever);
 }
@@ -123,7 +123,7 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
         yield(std::make_unique<MoveIntent>(
             robot->id(), ball.position(),
             (ball.position() - robot->position()).orientation(), FINAL_SPEED_AT_SLOW_BALL,
-            0, true, NONE));
+            0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
     }
     else if (robot_on_ball_line)
     {
@@ -135,12 +135,12 @@ void InterceptBallAction::moveToInterceptPosition(IntentCoroutine::push_type& yi
             ball.position() + ball_to_robot.norm(dist_in_front_of_ball_to_intercept);
         yield(std::make_unique<MoveIntent>(
             robot->id(), point_to_meet_ball,
-            (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
+            (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
     }
     else
     {
         yield(std::make_unique<MoveIntent>(
             robot->id(), closest_point_on_ball_trajectory,
-            (ball.position() - robot->position()).orientation(), 0, 0, true, NONE));
+            (ball.position() - robot->position()).orientation(), 0, 0, DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
     }
 }

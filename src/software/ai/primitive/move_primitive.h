@@ -100,7 +100,7 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    DribblerEnable isDribblerEnabled() const;
+    DribblerEnable getDribblerEnable() const;
 
     /**
      * Gets whether or not the robot should be moving slow

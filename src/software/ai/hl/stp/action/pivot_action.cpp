@@ -15,7 +15,7 @@ std::unique_ptr<Intent> PivotAction::updateStateAndGetNextIntent(const Robot& ro
                                                                  Point pivot_point,
                                                                  Angle final_angle,
                                                                  Angle pivot_speed,
-                                                                 bool enable_dribbler)
+                                                                 DribblerEnable enable_dribbler)
 {
     // update the parameters stored by this action
     this->robot           = robot;
