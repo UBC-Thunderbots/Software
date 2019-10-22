@@ -41,6 +41,5 @@ for profdata_file_name in $PROFDATA_FILES; do
     #       script as a `sh_binary` in bazel, it will overrite the 
     #       bazel-testlogs folder when it's run (thus overwriting the profdata
     #       files)
-    ./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$profdata_file_name" $OBJECT_FILES_ARG > $output_lcov_file_name 
-    #> /dev/null 2>&1
+    ./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$profdata_file_name" $OBJECT_FILES_ARG > $output_lcov_file_name > /dev/null 2>&1
 done
