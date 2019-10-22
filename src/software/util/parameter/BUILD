@@ -49,6 +49,7 @@ cc_test(
     deps = [
         ":dynamic_parameters",
         ":parameter",
+        "@yaml-cpp",
         "@gtest//:gtest_main",
     ],
 )

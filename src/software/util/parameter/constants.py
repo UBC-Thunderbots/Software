@@ -43,6 +43,9 @@ PARAMETER_CONSTRUCTOR_ENTRY =\
         """std::vector<{type}>{param_variable_name}_options = std::vector<{type}>{{{options}}};
         {param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", {quote}{value}{quote}, {param_variable_name}_options);"""
 
+IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY =\
+        "std::const_pointer_cast<const Parameter<{type}>>({param_variable_name})"
+
 #######################################################################
 #                               Config                                #
 #######################################################################
@@ -65,6 +68,9 @@ CONFIG_CONSTRUCTOR_ENTRY =\
 CONFIG_PRIVATE_ENTRY =\
         "std::shared_ptr<{config_name}> {config_variable_name};"
 
+IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY =\
+        "std::const_pointer_cast<const {config_name}>({config_variable_name})"
+
 CONFIG_CLASS =\
 """class {config_name} : public Config
 {{
@@ -72,27 +78,29 @@ CONFIG_CLASS =\
     {config_name}()
     {{
         {constructor_entries}
-        internal_param_list = {{{parameter_list_entries}}};
+        mutable_internal_param_list = {{{mutable_parameter_list_entries}}};
+        immutable_internal_param_list = {{{immutable_parameter_list_entries}}};
     }}
     {public_entries}
 
-    std::string name()
+    const std::string name() const
     {{
         return "{config_name}";
     }}
 
-    ParameterList& getMutableParameterList()
+    const MutableParameterList& getMutableParameterList()
     {{
-        return internal_param_list;
+        return mutable_internal_param_list;
     }}
 
-    const ParameterList& getParameterList()
+    const ParameterList& getParameterList() const
     {{
-        return internal_param_list;
+        return immutable_internal_param_list;
     }}
 
    private:
-        ParameterList internal_param_list;
+        MutableParameterList mutable_internal_param_list;
+        ParameterList immutable_internal_param_list;
         {private_entries}
 }};
 """

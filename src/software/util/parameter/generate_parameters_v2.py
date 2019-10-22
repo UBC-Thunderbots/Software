@@ -219,11 +219,26 @@ class Config(object):
         constructor_parameter_entries = '\n'.join(parameter.get_constructor_entries()
                                                   for parameter in self.parameters)
 
-        # parameter list initialization
-        parameter_list_entries = [
+        # mutable parameter list initialization
+        mutable_parameter_list_entries = [
             parameter.param_variable_name for parameter in self.parameters]
-        parameter_list_entries += [
+        mutable_parameter_list_entries += [
             config.config_variable_name for config in self.configs]
+
+        # immutable parameter list initialization
+        immutable_parameter_list_entries = [
+			constants.IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY.format(
+				type=parameter.ptype,
+				param_variable_name=parameter.param_variable_name
+			) for parameter in self.parameters
+		]
+
+        immutable_parameter_list_entries += [
+			constants.IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY.format(
+				config_name=config.config_name,
+				config_variable_name=config.config_variable_name
+			) for config in self.configs
+		]
 
         # public section of the config class is where all the accessors reside
         # for each param and nested config
@@ -252,8 +267,12 @@ class Config(object):
             constructor_entries=constructor_config_entires + constructor_parameter_entries,
 
             # parameter list initialization with all the parameters and configs
-            # that are a part of this class
-            parameter_list_entries=',\n'.join(parameter_list_entries),
+            # that are a part of this class, without the const pointer cast
+            mutable_parameter_list_entries=',\n'.join(mutable_parameter_list_entries),
+
+            # parameter list initialization with all the parameters and configs
+            # that are a part of this class, with the const pointer cast
+            immutable_parameter_list_entries=',\n'.join(immutable_parameter_list_entries),
 
             # public members of the config class
             public_entries=public_parameter_entries + public_config_entries,
