@@ -146,7 +146,7 @@ class Navigator : public IntentVisitor
      *
      * @return A factor from 0 to 1 for how close p is to an enemy obstacle
      */
-    double getCloseToEnemyObstacleFactor(Point p);
+    double getCloseToEnemyObstacleFactor(const Point &p);
 
     /**
      * Set the current_primitive based on the intent and path

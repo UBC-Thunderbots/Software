@@ -290,7 +290,7 @@ std::vector<Obstacle> Navigator::createCurrentObstacles(
     return obstacles;
 }
 
-double Navigator::getCloseToEnemyObstacleFactor(Point p)
+double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
 {
     double closest_dist = DBL_MAX;
     for (auto &robot : world.enemyTeam().getAllRobots())
