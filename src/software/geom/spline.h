@@ -38,6 +38,8 @@ class Spline
      *
      * @param val value to evaluate spline
      *
+     * @throws std::invalid_argument if val is outside of domain
+     *
      * @return value of spline evaluated at value val
      *      * if not defined by a spline then return closest start/end point
      */
@@ -50,18 +52,32 @@ class Spline
      */
     size_t size(void) const;
 
+    /**
+     * Gets knots in the spline including start and end points
+     *
+     * @return knots in the spline
+     */
+    const std::vector<Point> getKnots(void) const;
+
+    /**
+     * Gets domain of the spline
+     *
+     * @return domain of the spline
+     */
+    const std::pair<double, double> getDomain(void) const;
+
    private:
     class SplineSegment
     {
        public:
-        SplineSegment(Polynomial x, Polynomial y, Point start_point, Point end_point)
-            : x(x), y(y), start_point(start_point), end_point(end_point)
+        SplineSegment(Polynomial x, Polynomial y, double start, double end)
+            : x(x), y(y), start(start), end(end)
         {
         }
         const Polynomial x;
         const Polynomial y;
-        const Point start_point;
-        const Point end_point;
+        const double start;
+        const double end;
     };
 
     // segments represent the polynomials that interpolate between
@@ -70,6 +86,9 @@ class Spline
 
     // points that connect segments
     const std::vector<Point> knots;
+
+    // the interval over which the spline has defined points
+    const std::pair<double, double> domain;
 
     /**
      * Initialize segments with points.size() - 1 linear segments interpolating

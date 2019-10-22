@@ -7,7 +7,7 @@
 #include "software/ai/primitive/all_primitives.h"
 
 Navigator::Navigator(std::unique_ptr<PathPlanner> path_planner)
-    : path_planner_(std::move(path_planner))
+    : path_planner(std::move(path_planner))
 {
 }
 
@@ -60,7 +60,7 @@ void Navigator::visit(const MoveIntent &move_intent)
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    Path path = path_planner_->findPath(start, dest, navigableArea, obstacles);
+    Path path = path_planner->findPath(start, dest, navigableArea, obstacles);
 
     moveNavigation(move_intent, path);
 }
@@ -88,31 +88,32 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
 {
     if (path)
     {
-        addPlannedPaths(path);
-        if ((*path).size() == 1)
+        std::vector<Point> path_points = path->getKnots();
+        planned_paths.emplace_back(path_points);
+        if (path_points.size() == 1)
         {
             throw std::runtime_error(
                 "Path only contains one point, which is invalid, since it's ambiguous if it's the start or dest or some other point");
         }
-        if ((*path).size() == 2)
+        if (path_points.size() == 2)
         {
-            current_destination = (*path).valueAt(1.0);
+            current_destination = path_points[1];
             auto move           = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
                 move_intent.getFinalAngle(),
                 move_intent.getFinalSpeed() *
-                    getCloseToEnemyObstacleFactor((*path).valueAt(1.0)),
+                    getCloseToEnemyObstacleFactor(path_points[1]),
                 move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
         }
         else
         {
-            current_destination      = (*path).valueAt(1.0);
+            current_destination      = path_points[1];
             double segment_final_vel = getCloseToEnemyObstacleFactor(
-                (*path).valueAt(1.0) *
+                path_points[1] *
                 calculateTransitionSpeedBetweenSegments(
-                    (*path).valueAt(0.0), (*path).valueAt(1.0), (*path).valueAt(2.0),
+                    path_points[0], path_points[1], path_points[2],
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters::Navigator::transition_speed_factor
                             .value()));
@@ -321,14 +322,4 @@ double Navigator::getCloseToEnemyObstacleFactor(Point p)
 std::vector<std::vector<Point>> Navigator::getPlannedPaths()
 {
     return planned_paths;
-}
-
-void Navigator::addPlannedPaths(const Path &path)
-{
-    std::vector<Point> points;
-    for (double i = 0.0; i < (*path).size(); i++)
-    {
-        points.push_back((*path).valueAt(i));
-    }
-    planned_paths.emplace_back(points);
 }

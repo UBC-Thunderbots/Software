@@ -158,12 +158,5 @@ class Navigator : public IntentVisitor
      */
     void moveNavigation(const MoveIntent &move_intent, const Path &path);
 
-    /**
-     * Add path to planned_paths
-     *
-     * @param path path to add
-     */
-    void addPlannedPaths(const Path &path);
-
-    std::unique_ptr<PathPlanner> path_planner_;
+    std::unique_ptr<PathPlanner> path_planner;
 };
