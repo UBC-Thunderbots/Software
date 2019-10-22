@@ -183,7 +183,6 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 MoveType::NORMAL, AutokickType::NONE));
         }
 
-
     } while (
         !(kick_action.done() ||
           (penalty_kick_start - robot->getMostRecentTimestamp()) < penalty_shot_timeout));
