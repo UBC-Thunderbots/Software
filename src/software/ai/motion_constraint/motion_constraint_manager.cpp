@@ -47,6 +47,10 @@ void MotionConstraintManager::visit(const ShootGoalTactic &tactic) {}
 
 void MotionConstraintManager::visit(const PasserTactic &tactic) {}
 
+void MotionConstraintManager::visit(const DefenseShadowEnemyTactic &tactic) {}
+
+void MotionConstraintManager::visit(const GrabBallTactic &tactic) {}
+
 void MotionConstraintManager::visit(const MoveTestTactic &tactic) {}
 
 void MotionConstraintManager::visit(const StopTestTactic &tactic) {}
