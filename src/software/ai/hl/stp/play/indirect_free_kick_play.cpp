@@ -153,7 +153,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     LOG(DEBUG) << "Finished aligning to ball";
 
-    // Align the kicker to take the corner kick and wait for a good pass
+    // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
     double min_score                  = 1.0;
