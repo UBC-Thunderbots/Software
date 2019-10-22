@@ -495,6 +495,25 @@ def _clang_impl(ctx):
         implies = ["common"],
     )
 
+    coverage_feature = feature(
+        name = "coverage",
+        flag_sets = [
+            flag_set(
+                actions = ALL_COMPILE_ACTIONS,
+                flag_groups = [
+                    flag_group(
+                        flags = ["-fprofile-instr-generate", "-fcoverage-mapping"],
+                    ),
+                ],
+            ),
+            flag_set(
+                actions = ALL_LINK_ACTIONS,
+                flag_groups = [flag_group(flags = ["-fprofile-instr-generate"])],
+            ),
+        ],
+        provides = ["profile"],
+    )
+
     clang_warnings_feature = feature(
         name = "clang_warnings_feature",
         flag_sets = [
@@ -533,6 +552,7 @@ def _clang_impl(ctx):
         stdlib_feature,
         common_feature,
         lld_feature,
+        coverage_feature,
         opt_feature,
         runtime_library_search_directories,
         clang_warnings_feature,
@@ -546,7 +566,7 @@ def _clang_impl(ctx):
         tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
         tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/clang-cpp"),
         tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
-        tool_path(name = "gcov", path = "fake"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/clang-profdata"),
         tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
         tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/clang-nm"),
         tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/clang-objcopy"),
@@ -731,8 +751,7 @@ def _stm32_impl(ctx):
         tool_path(name = "ar", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-ar"),
         tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-ld"),
         tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-cpp"),
-        #        tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
-        tool_path(name = "gcov", path = "/arm-none-eabi-gcov"),
+        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-gcov"),
         tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-ld"),
         tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-nm"),
         tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/arm-none-eabi-objcopy"),

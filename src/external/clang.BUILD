@@ -21,13 +21,14 @@ filegroup(
     srcs = [
         "bin/clang",
         "bin/clang++",
-        "bin/llvm-dwp",
-        "bin/llvm-objcopy",
-        "bin/llvm-objdump",
         "bin/ld.lld",
         "bin/llvm-ar",
-        "bin/llvm-nm",
         "bin/llvm-cov",
+        "bin/llvm-dwp",
+        "bin/llvm-nm",
+        "bin/llvm-profdata",
+        "bin/llvm-objcopy",
+        "bin/llvm-objdump",
     ],
 )
 
