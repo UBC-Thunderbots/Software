@@ -108,9 +108,9 @@ void DefenseShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &y
         {
             Angle facing_enemy_robot =
                 (enemy_robot.position() - robot->position()).orientation();
-            yield(move_action.updateStateAndGetNextIntent(*robot, position_to_block_shot,
-                                                          facing_enemy_robot, 0, DribblerEnable::OFF,
-                                                          MoveType::NORMAL, AutokickType::AUTOCHIP));
+            yield(move_action.updateStateAndGetNextIntent(
+                *robot, position_to_block_shot, facing_enemy_robot, 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::AUTOCHIP));
         }
 
     } while (!move_action.done());
