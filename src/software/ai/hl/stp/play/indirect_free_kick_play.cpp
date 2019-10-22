@@ -111,7 +111,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
 
-    // Wait for a robot to be assigned to align to take the corner
+    // Wait for a robot to be assigned to aligned to the ball to pass
     while (!align_to_ball_tactic->getAssignedRobot())
     {
         LOG(DEBUG) << "Nothing assigned to align to ball yet";
