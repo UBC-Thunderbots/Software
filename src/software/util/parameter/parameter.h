@@ -143,7 +143,8 @@ class Parameter
         return instance;
     }
 
-    // TODO explain mutable
+    // the value mutex is marked mutable so it can be used when accessing the value
+    // of this parameter in a const function.
     mutable std::mutex value_mutex_;
     std::mutex callback_mutex_;
 

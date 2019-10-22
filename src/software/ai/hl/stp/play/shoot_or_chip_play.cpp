@@ -69,8 +69,9 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset =
-        Util::DynamicParameters::ShootOrChipPlay::fallback_chip_target_enemy_goal_offset
-            .value();
+        Util::DynamicParameters->getShootOrChipPlayConfig()
+            ->FallbackChipTargetEnemyGoalOffset()
+            ->value();
 
     Point fallback_chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);

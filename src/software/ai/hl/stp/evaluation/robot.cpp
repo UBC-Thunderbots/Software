@@ -114,9 +114,12 @@ std::optional<bool> Evaluation::robotBeingPassedTo(const World& world, const Rob
     double pass_axis_speed = ball_velocity.project(ball_to_robot_vector.norm()).len();
     return std::make_optional<bool>(
         (ball_angle_deviation <
-         Angle::ofDegrees(
-             Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->PassToAngleTolerance()->value();
-                 .value())) &&
-        pass_axis_speed >
-            Util::DynamicParameters->getEvaluationConfig()->getPossessionConfig()->MinPassSpeed()->value());
+         Angle::ofDegrees(Util::DynamicParameters->getEvaluationConfig()
+                              ->getPossessionConfig()
+                              ->PassedToAngleTolerance()
+                              ->value())) &&
+        pass_axis_speed > Util::DynamicParameters->getEvaluationConfig()
+                              ->getPossessionConfig()
+                              ->MinPassSpeed()
+                              ->value());
 };

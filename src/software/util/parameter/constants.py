@@ -60,7 +60,7 @@ CONFIG_PUBLIC_ENTRY =\
         """
 
 CONFIG_CONSTRUCTOR_ENTRY =\
-        "{config_variable_name} = std::make_shared<{config_name}>();"
+        "{config_variable_name} = std::make_shared<{config_name}>();\n"
 
 CONFIG_PRIVATE_ENTRY =\
         "std::shared_ptr<{config_name}> {config_variable_name};"
@@ -111,5 +111,6 @@ AUTOGEN_WARNING = \
 H_HEADER = \
 """{}
 #pragma once
+#include <iostream>
 #include \"software/util/parameter/config_utils.hpp\"
 """.format(AUTOGEN_WARNING)

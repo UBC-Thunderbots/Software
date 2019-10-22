@@ -86,10 +86,10 @@ namespace Evaluation
 
             // Check that the robot has had possession of the ball recently.
             while (robot.lastUpdateTimestamp() - robot_history_timestamps[i] <
-                    Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
-                                              ->getPossessionConfig()
-                                              ->PassBufferTimeSeconds()
-                                              ->value()))
+                   Duration::fromSeconds(Util::DynamicParameters->getEvaluationConfig()
+                                             ->getPossessionConfig()
+                                             ->PassBufferTimeSeconds()
+                                             ->value()))
             {
                 std::optional<bool> robot_being_passed_to =
                     robotBeingPassedTo(world, robot, robot_history_timestamps[i]);
