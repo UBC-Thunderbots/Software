@@ -32,7 +32,10 @@ for profdata_file_name in $PROFDATA_FILES; do
     # Remove the output if it already exists
     rm -f $output_lcov_file_name
 
-    # Generate the lcov files for the given profdata
+    # TODO: Actually supress results once CI working
+    # Generate the output, suppressing output because we're giving llvm-cov 
+    # a bunch of extra object files it has no idea what to do with, not to 
+    # mention a few invalid `.dat` files
     # NOTE: it's bad practice to call `llvm-cov` like this, but we want to be
     #       sure that we're using the right version, and if we declare this
     #       script as a `sh_binary` in bazel, it will overrite the 
