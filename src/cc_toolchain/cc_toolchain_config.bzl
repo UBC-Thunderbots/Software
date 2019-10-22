@@ -502,13 +502,21 @@ def _clang_impl(ctx):
                 actions = ALL_COMPILE_ACTIONS,
                 flag_groups = [
                     flag_group(
-                        flags = ["-fprofile-instr-generate", "-fcoverage-mapping"],
+                        # TODO: Note about our choice of flags here
+                        #flags = ["-fprofile-instr-generate", "-fcoverage-mapping"],
+                        flags = ["--coverage", "-ftest-coverage"],
                     ),
                 ],
             ),
             flag_set(
                 actions = ALL_LINK_ACTIONS,
-                flag_groups = [flag_group(flags = ["-fprofile-instr-generate"])],
+                flag_groups = [
+                    flag_group(
+                        # TODO: Note about our choice of flags here
+                        #flags = ["-fprofile-instr-generate"]
+                        flags = ["--coverage", "-ftest-coverage"]
+                    )
+                ],
             ),
         ],
         provides = ["profile"],
@@ -566,7 +574,8 @@ def _clang_impl(ctx):
         tool_path(name = "compat-ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
         tool_path(name = "cpp", path = ctx.attr.host_compiler_prefix + "/clang-cpp"),
         tool_path(name = "dwp", path = ctx.attr.host_compiler_prefix + "/clang-dwp"),
-        tool_path(name = "gcov", path = ctx.attr.host_compiler_prefix + "/clang-profdata"),
+        # TODO: note about executable we're using here (ie. not 'llvm-profdata')
+        tool_path(name = "gcov", path = "/usr/bin/gcov"),
         tool_path(name = "ld", path = ctx.attr.host_compiler_prefix + "/clang-lld"),
         tool_path(name = "nm", path = ctx.attr.host_compiler_prefix + "/clang-nm"),
         tool_path(name = "objcopy", path = ctx.attr.host_compiler_prefix + "/clang-objcopy"),
