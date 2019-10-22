@@ -9,13 +9,6 @@ TEST(CreatePointTests, point_default_constructor_test)
     EXPECT_EQ(0, p.y());
 }
 
-TEST(CreatePointTests, point_from_angle_test)
-{
-    Point p = Point::createFromAngle(Angle::fromDegrees(60));
-    EXPECT_DOUBLE_EQ(0.5, p.x());
-    EXPECT_DOUBLE_EQ(sqrt(3) / 2, p.y());
-}
-
 TEST(CreatePointTests, point_specific_constructor_test)
 {
     Point p = Point(1, 2);
@@ -65,22 +58,6 @@ TEST(PointLogicTests, point_dist_from_other_point_test)
     EXPECT_EQ(10, p.distanceFromPoint(q));
 }
 
-TEST(PointLogicTests, norm_vector_from_point_test)
-{
-    Point p  = Point(3, 4);
-    Vector v = p.norm();
-    EXPECT_EQ(0.6, v.x());
-    EXPECT_EQ(0.8, v.y());
-}
-
-TEST(PointLogicTests, norm_vector_from_point_with_length_test)
-{
-    Point p  = Point(3, 4);
-    Vector v = p.norm(2);
-    EXPECT_EQ(1.2, v.x());
-    EXPECT_EQ(1.6, v.y());
-}
-
 TEST(PointLogicTests, rotate_point_test)
 {
     Point p = Point(3, 4);
@@ -93,14 +70,6 @@ TEST(PointLogicTests, rotate_point_test)
     p = p.rotate(Angle::quarter());
     EXPECT_DOUBLE_EQ(3, p.x());
     EXPECT_DOUBLE_EQ(4, p.y());
-}
-
-TEST(PointLogicTests, point_orientation_test)
-{
-    Point p = Point();
-    EXPECT_EQ(Angle::zero(), p.orientation());
-    p = p.rotate(Angle::half());
-    EXPECT_EQ(Angle::half(), p.orientation());
 }
 
 TEST(PointOperatorTests, point_assignment_test)

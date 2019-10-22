@@ -21,15 +21,6 @@ class Point final
     explicit constexpr Point();
 
     /**
-     * Creates a unit-magnitude Point from an angle.
-     *
-     * @param angle the angle
-     *
-     * @return Point the Point
-     */
-    static Point createFromAngle(const Angle &angle);
-
-    /**
      * Creates a Point at arbitrary coordinates.
      *
      * @param x the <var>x</var> value of the Point
@@ -109,25 +100,6 @@ class Point final
     Vector toVector() const;
 
     /**
-     * Returns the unit vector in direction of this point
-     *
-     * @return A unit vector in the direction of this Point, or a
-     * zero-vector if this Point is zero
-     */
-    Vector norm() const;
-
-    /**
-     * Returns a scaled normalized vector in the same direction as this
-     * Point
-     *
-     * @param length the desired length of the resultant vector
-     *
-     * @return a vector in the same direction as this Point and with the given length,
-     * or a zero-vector if this Point is zero
-     */
-    Vector norm(double length) const;
-
-    /**
      * Returns a new Point that is this Point rotated counterclockwise by an angle
      * about the origin.
      *
@@ -136,25 +108,6 @@ class Point final
      * @return the new Point rotated by rot
      */
     Point rotate(const Angle &rot) const;
-
-    /**
-     * Returns the direction of this Point
-     *
-     * @return the direction of this Point, in the range [-π, π], with 0 being
-     * the positive x direction, π/2 being up (positive y), etc. like on a standard x-y
-     * plane
-     *
-     *              +
-     *              | Y
-     *              |
-     *              |
-     *      +---------------+
-     *       -X     |      X
-     *              |
-     *              | -Y
-     *              +
-     */
-    Angle orientation() const;
 
     /**
      * Checks whether this Point is close to another Point, where “close”
@@ -272,11 +225,6 @@ bool operator==(const Point &p, const Point &q);
  */
 bool operator!=(const Point &p, const Point &q);
 
-inline Point Point::createFromAngle(const Angle &angle)
-{
-    return Point(angle.cos(), angle.sin());
-}
-
 inline constexpr Point::Point() : x_(0.0), y_(0.0) {}
 
 inline constexpr Point::Point(double x, double y) : x_(x), y_(y) {}
@@ -326,28 +274,9 @@ inline Vector Point::toVector() const
     return Vector(x_, y_);
 }
 
-inline Vector Point::norm() const
-{
-    return distanceFromOrigin() < 1.0e-9
-               ? Vector()
-               : Vector(x_ / distanceFromOrigin(), y_ / distanceFromOrigin());
-}
-
-inline Vector Point::norm(double length) const
-{
-    return distanceFromOrigin() < 1.0e-9 ? Vector()
-                                         : Vector(x_ * length / distanceFromOrigin(),
-                                                  y_ * length / distanceFromOrigin());
-}
-
 inline Point Point::rotate(const Angle &rot) const
 {
     return Point(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
-}
-
-inline Angle Point::orientation() const
-{
-    return Angle::fromRadians(std::atan2(y_, x_));
 }
 
 inline bool Point::isClose(const Point &other, double dist) const
