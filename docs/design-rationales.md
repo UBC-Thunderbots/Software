@@ -56,7 +56,7 @@ The `geom` folder is pretty self-explanaory and contains all of our geometry cla
 
 `STP` is a way of breaking down roles and responsabilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
 
-At a high-level, `STP` takes a `World` and returns `Intents`.
+`STP` takes a `World` and returns `Intents`.
 
 #### Skills / Actions
 The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Actions represent simple tasks an individual robot can do. Examples include:
