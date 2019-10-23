@@ -69,3 +69,6 @@ The `Visualizer` also lets us control the [AI](#ai) by setting `Parameters` (TOD
 
 ## Diagram
 ![alt text](images/high-level_architecture.png)
+
+
+![alt text](images/high_level_architecture_diagram.svg)
