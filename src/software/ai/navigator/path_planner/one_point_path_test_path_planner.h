@@ -14,13 +14,13 @@ class OnePointPathTestPathPlanner : public PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param navigableArea WARNING: OnePointPathTestPathPlanner does not respect the
-     * navigableArea
+     * @param navigable_area WARNING: OnePointPathTestPathPlanner does not respect the
+     * navigable_area
      * @param obstacles WARNING: OnePointPathTestPathPlanner does not avoid obstacles
      *
      * @return a vector that has one point
      */
     Path findPath(const Point &start, const Point &destination,
-                  const Rectangle &navigableArea,
+                  const Rectangle &navigable_area,
                   const std::vector<Obstacle> &obstacles) override;
 };

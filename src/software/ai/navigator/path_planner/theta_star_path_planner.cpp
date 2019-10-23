@@ -171,7 +171,7 @@ bool ThetaStarPathPlanner::updateVertex(CellCoordinate pCurr, CellCoordinate pNe
 
 // top level function
 Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination,
-                                    const Rectangle &navigableArea,
+                                    const Rectangle &navigable_area,
                                     const std::vector<Obstacle> &obstacles)
 {
     obstacles_ = obstacles;
@@ -181,8 +181,8 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     openList.clear();
     unblocked_grid.clear();
 
-    fieldXLength     = navigableArea.xLength();
-    fieldYLength     = navigableArea.yLength();
+    fieldXLength     = navigable_area.xLength();
+    fieldYLength     = navigable_area.yLength();
     fieldXHalfLength = fieldXLength / 2.0;
     fieldYHalfLength = fieldYLength / 2.0;
 

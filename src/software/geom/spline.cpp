@@ -1,35 +1,36 @@
 #include "software/geom/spline.h"
 
-Spline::Spline(const std::vector<Point>& points)
-    : knots(points), domain(std::make_pair(0.0, 1.0))
+Spline::Spline(const std::vector<Point>& points) : knots(points)
 {
     initLinearSegments(points);
 }
 
-Spline::Spline(const std::initializer_list<Point>& points)
-    : knots(points), domain(std::make_pair(0.0, 1.0))
+Spline::Spline(const std::initializer_list<Point>& points) : knots(points)
 {
     initLinearSegments(points);
 }
 
 Point Spline::valueAt(double val) const
 {
-    if (val < domain.first || val > domain.second)
+    if (val < 0.0 || val > 1.0)
     {
-        throw std::invalid_argument("val is outside of the domain of this spline");
+        std::stringstream ss;
+        ss << "Tried to evaluate spline at " << val
+           << ", which is outside of domain of the spline: [0,1]";
+        throw std::invalid_argument(ss.str());
     }
 
-    if (val == domain.first)
+    if (val == 0.0)
     {
         return knots.front();
     }
 
-    if (val == domain.second)
+    if (val == 1.0)
     {
         return knots.back();
     }
 
-    // assume that the segments are equally spaced in domain
+    // assume that the segments are equally spaced in [0,1]
     int index = (int)(val * knots.size());
     if (val < segments[index].start || val > segments[index].end)
     {
@@ -48,11 +49,6 @@ size_t Spline::size(void) const
 const std::vector<Point> Spline::getKnots(void) const
 {
     return knots;
-}
-
-const std::pair<double, double> Spline::getDomain(void) const
-{
-    return domain;
 }
 
 void Spline::initLinearSegments(const std::vector<Point>& points)

@@ -43,7 +43,7 @@ TEST(TestSpline, test_polynomial_invalid_value_pair_constructor)
     {
         Polynomial p(constraint1, constraint2);
     }
-    catch (...)
+    catch (std::invalid_argument &e)
     {
         SUCCEED();
         return;

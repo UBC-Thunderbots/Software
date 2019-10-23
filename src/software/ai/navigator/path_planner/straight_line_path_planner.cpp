@@ -7,7 +7,7 @@
  */
 
 Path StraightLinePathPlanner::findPath(const Point &start, const Point &destination,
-                                       const Rectangle &navigableArea,
+                                       const Rectangle &navigable_area,
                                        const std::vector<Obstacle> &obstacles)
 {
     return Path(std::vector<Point>({start, destination}));

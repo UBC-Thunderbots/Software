@@ -9,9 +9,9 @@ TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
     Point start{0, 0}, dest{1, 1};
     std::unique_ptr<PathPlanner> planner = std::make_unique<StraightLinePathPlanner>();
 
-    Rectangle navigableArea = Rectangle(Point(0, 0), 0, 0);
+    Rectangle navigable_area = Rectangle(Point(0, 0), 0, 0);
 
-    Path path = planner->findPath(start, dest, navigableArea, std::vector<Obstacle>());
+    Path path = planner->findPath(start, dest, navigable_area, std::vector<Obstacle>());
 
     EXPECT_TRUE(path != std::nullopt);
 

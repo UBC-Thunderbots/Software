@@ -25,14 +25,14 @@ class PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param navigableArea Rectangle representing the navigable area
+     * @param navigable_area Rectangle representing the navigable area
      * @param obstacles obstacles to avoid
      *
      * @return a path between start and destination
      *     * no path is represented by a path of size 0
      */
     virtual Path findPath(const Point &start, const Point &destination,
-                          const Rectangle &navigableArea,
+                          const Rectangle &navigable_area,
                           const std::vector<Obstacle> &obstacles) = 0;
 
     virtual ~PathPlanner() = default;

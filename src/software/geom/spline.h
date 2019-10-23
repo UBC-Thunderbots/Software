@@ -59,13 +59,6 @@ class Spline
      */
     const std::vector<Point> getKnots(void) const;
 
-    /**
-     * Gets domain of the spline
-     *
-     * @return domain of the spline
-     */
-    const std::pair<double, double> getDomain(void) const;
-
    private:
     class SplineSegment
     {
@@ -86,9 +79,6 @@ class Spline
 
     // points that connect segments
     const std::vector<Point> knots;
-
-    // the interval over which the spline has defined points
-    const std::pair<double, double> domain;
 
     /**
      * Initialize segments with points.size() - 1 linear segments interpolating
