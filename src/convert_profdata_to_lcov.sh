@@ -2,12 +2,18 @@
 
 # TODO: comment on what this script does and why we need it
 
+LOG_FILE_NAME=profdata_to_lcov.log
+
 # All the folders we'll search for object files in
-OBJECT_FILES_FOLDERS="bazel-out/k8-fastbuild/bin/software bazel-out/k8-fastbuild/bin/firmware bazel-out/k8-fastbuild/bin/firmware_new"
+declare -a OBJECT_FILES_FOLDERS=(
+    "bazel-out/k8-fastbuild/bin/software "
+    "bazel-out/k8-fastbuild/bin/firmware_new"
+    "bazel-out/k8-fastbuild/bin/firmware "
+)
 
 # Find all object files
 OBJECT_FILES=""
-for folder in $OBJECT_FILES_FOLDERS; do
+for folder in "${OBJECT_FILES_FOLDERS[@]}"; do
     OBJECT_FILES="$OBJECT_FILES $(find -L  $folder -iname "*.o")"
 done
 
@@ -23,6 +29,9 @@ for object_file in $OBJECT_FILES; do
     OBJECT_FILES_ARG="$OBJECT_FILES_ARG -object $object_file"
 done
 
+# Remove the log if it already exists
+rm -f $LOG_FILE_NAME
+
 # Convert all the profdata files into lcov files
 for profdata_file_name in $PROFDATA_FILES; do
     output_lcov_file_name="$profdata_file_name.lcov.txt"
@@ -32,14 +41,14 @@ for profdata_file_name in $PROFDATA_FILES; do
     # Remove the output if it already exists
     rm -f $output_lcov_file_name
 
-    # TODO: Actually supress results once CI working
-    # Generate the output, suppressing output because we're giving llvm-cov 
-    # a bunch of extra object files it has no idea what to do with, not to 
-    # mention a few invalid `.dat` files
-    # NOTE: it's bad practice to call `llvm-cov` like this, but we want to be
-    #       sure that we're using the right version, and if we declare this
-    #       script as a `sh_binary` in bazel, it will overrite the 
+    # Generate the lcov data and pipe it into files with the same name but
+    # a different extension, saving and errors to a file. We can't just 
+    # log all the errors to the shell because of how many we cause by just
+    # indiscriminately passing everything we can find to `llvm-cov`.
+    # NOTE: it's bad practice to call `llvm-cov` directly like this, but we 
+    #       want to be sure that we're using the right version, and if we 
+    #       declare this script as a `sh_binary` in bazel, it will overwrite the 
     #       bazel-testlogs folder when it's run (thus overwriting the profdata
     #       files)
-    ./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$profdata_file_name" $OBJECT_FILES_ARG > $output_lcov_file_name > /dev/null 2>&1
+    ./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$profdata_file_name" $OBJECT_FILES_ARG > $output_lcov_file_name 2> $LOG_FILE_NAME
 done
