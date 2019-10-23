@@ -54,7 +54,9 @@ The `geom` folder is pretty self-explanaory and contains all of our geometry cla
 ### High-Level / STP (Skills, Tactics, Plays)
 `STP` is a framework for gameplay strategy originally proposed by Carnegie Mellon University back in 2004. The original paper can be found [here](https://kilthub.cmu.edu/articles/STP_Skills_Tactics_and_Plays_for_Multi-Robot_Control_in_Adversarial_Environments/6561002/1).
 
-`STP` is a way of breaking down roles and responsabilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces.
+`STP` is a way of breaking down roles and responsabilities into a simple hierarchy, making it easier to build up more complex strategies from simpler pieces. This is the core of where our strategy is implemented.
+
+At a high-level, `STP` takes a `World` and returns `Intents`.
 
 #### Skills / Actions
 The `S` in `STP` stands for `Skills`. In our system, we call these `Actions`. Actions represent simple tasks an individual robot can do. Examples include:
@@ -89,7 +91,10 @@ Furthermore, every play specifies an `Applicable` and `Invariant` condition. The
 
 
 ### Navigator
-TODO
+The Navigator is responsible for path planning and navigation. It takes in `Intents`, and outputs `Primitives`. Essentially it takes in the higher-level commands specified by `Intents` and breaks them down into simpler `Primitive` commands that can be executed by the robots.
+
+`MoveIntents` are the most complicated example of this because path planning is invovled. In order for a robot to move to the desired destination of a `MoveIntent`, the Navigator will use various path-planning algorithms to find a path across the field that does not collide with any robots or violate any restrictions set on the `MoveIntent`. The Navigator then translates this path into a series of `MovePrimitives`, which are sent to the robot sequentially so that it follows the planned path across the field.
+
 
 ## Dynamic Parameters
 `Dynamic Parameter` are the system we use to change values in our code at runtime. The reason we want to change values at runtime is primarily because we may want to tweak our strategy or aspects of our gameplay very quickly, and want to avoid having to stop the `AI`, make a change, recompile the code, and re-launch the `AI`. During games we are only allowed to touch our computers and make changes during halftime or a timeout, so every second counts! It's also very useful for testing things manually, and we also use it to communicate between the `Visualizer` and the rest of the system, so that the `Visualizer` can control the system.
