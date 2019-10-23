@@ -10,10 +10,12 @@ TEST(TestSpline, test_spline_points_constructor)
     std::vector<Point> spline_points = s.getKnots();
     EXPECT_EQ(spline_points, points);
     EXPECT_EQ(s.valueAt(0.0), points[0]);
+    EXPECT_EQ(s.startPoint(), points[0]);
     EXPECT_EQ(s.valueAt(0.1), Point(3.8, 14.4));
     EXPECT_EQ(s.valueAt(0.5), points[1]);
     EXPECT_EQ(s.valueAt(0.6), Point(1, -0.2));
     EXPECT_EQ(s.valueAt(1.0), points[2]);
+    EXPECT_EQ(s.endPoint(), points[2]);
 
     bool failing = true;
 
@@ -56,10 +58,12 @@ TEST(TestSpline, test_polynomial_points_list_constructor)
     std::vector<Point> spline_points = s.getKnots();
     EXPECT_EQ(spline_points, points);
     EXPECT_EQ(s.valueAt(0.0), points[0]);
+    EXPECT_EQ(s.startPoint(), points[0]);
     EXPECT_EQ(s.valueAt(0.1), Point(1.2, 2.2));
     EXPECT_EQ(s.valueAt(0.5), points[1]);
     EXPECT_EQ(s.valueAt(0.6), Point(1.6, 2.2));
     EXPECT_EQ(s.valueAt(1.0), points[2]);
+    EXPECT_EQ(s.endPoint(), points[2]);
 
     bool failing = true;
 

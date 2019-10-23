@@ -51,6 +51,16 @@ const std::vector<Point> Spline::getKnots(void) const
     return knots;
 }
 
+const Point Spline::startPoint(void) const
+{
+    return knots.front();
+}
+
+const Point Spline::endPoint(void) const
+{
+    return knots.back();
+}
+
 void Spline::initLinearSegments(const std::vector<Point>& points)
 {
     if (points.size() == 0)

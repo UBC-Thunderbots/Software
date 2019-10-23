@@ -59,6 +59,20 @@ class Spline
      */
     const std::vector<Point> getKnots(void) const;
 
+    /**
+     * Gets start point of spline
+     *
+     * @return start point of spline
+     */
+    const Point startPoint(void) const;
+
+    /**
+     * Gets end point of spline
+     *
+     * @return end point of spline
+     */
+    const Point endPoint(void) const;
+
    private:
     class SplineSegment
     {
