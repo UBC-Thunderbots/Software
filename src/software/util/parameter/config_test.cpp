@@ -1,5 +1,6 @@
 #include "software/util/parameter/config.hpp"
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
@@ -36,39 +37,51 @@ class YamlLoadFixture : public ::testing::Test
      */
     void SetUp() override
     {
-        boost::filesystem::path path("./config");
+        // this is loaded from bazel data
+        boost::filesystem::path path("./software/util/parameter/config");
 
         for (auto& entry : boost::filesystem::directory_iterator(path))
         {
             YAML::Node config = YAML::LoadFile(entry.path().string());
-            config_yaml["ThunderbotsConfig/" + config.Tag()] = config;
+            for (auto it = config.begin(); it != config.end(); it++)
+            {
+                // this creates an internal representation of the yaml files similar
+                // to how generate_parameters.py creates its internal dictionary
+                // before generating the required code.
+                config_yaml["ThunderbotsConfig"][it->first.as<std::string>()] =
+                    it->second;
+            }
         }
     }
 
-    void TearDown() override {}
+    // stores the yaml that should have the same structure
+    // as the config generated
     YAML::Node config_yaml;
 };
 
 class TestAutogenParameterList : public YamlLoadFixture
 {
    public:
+    /*
+     * Tests that the generated parameterlist tree is identical to the yaml tree
+     * Visits each config in the top level config and descends (sort of depth first)
+     *
+     * NOTE: at any given time this test may fail due to the key not existing in the yaml
+     * dictionary which indicates an error w/ the generate script.
+     */
     void visit_parameters(ParameterVariant paramvar, const YAML::Node& current_config)
     {
         std::visit(overloaded{[&](std::shared_ptr<const Parameter<int>> param) {
-                                  assert_generarted_param_identical_to_yaml<int>(
-                                      param, current_config);
+                                  assert_parameter<int>(param, current_config);
                               },
                               [&](std::shared_ptr<const Parameter<bool>> param) {
-                                  assert_generarted_param_identical_to_yaml<bool>(
-                                      param, current_config);
+                                  assert_parameter<bool>(param, current_config);
                               },
                               [&](std::shared_ptr<const Parameter<std::string>> param) {
-                                  assert_generarted_param_identical_to_yaml<std::string>(
-                                      param, current_config);
+                                  assert_parameter<std::string>(param, current_config);
                               },
                               [&](std::shared_ptr<const Parameter<double>> param) {
-                                  assert_generarted_param_identical_to_yaml<double>(
-                                      param, current_config);
+                                  assert_parameter<double>(param, current_config);
                               },
                               [&](std::shared_ptr<const Config> param) {
                                   for (auto& v : param->getParameterList())
@@ -84,14 +97,32 @@ class TestAutogenParameterList : public YamlLoadFixture
      * and checks that the yaml was generated correctly into the expected
      * parameter.
      *
-     * Interally creates failures
+     * Interally asserts and creates failures
      */
-    template <class T>
-    void assert_generarted_param_identical_to_yaml(
-        const std::shared_ptr<const Parameter<T>>& param,
-        const YAML::Node& param_description)
+    template <typename T>
+    void assert_parameter(const std::shared_ptr<const Parameter<T>>& param,
+                          const YAML::Node& param_description)
     {
-        std::cerr << "PARAM CHECKER" << param_description << std::endl;
+        try
+        {
+            // make sure the default value matches, accessing the yaml node with an
+            // invalid key will fail the test by default
+            ASSERT_EQ(param_description[param->name()]["default"].template as<T>(),
+                      param->value());
+
+            // check to see if the options have been loaded correctly if they exist
+            if (param_description[param->name()]["options"])
+            {
+                std::vector<T> options = param_description[param->name()]["options"]
+                                             .template as<std::vector<T>>();
+                ASSERT_THAT(param->getOptions(),
+                            ::testing::ElementsAreArray(options.begin(), options.end()));
+            }
+        }
+        catch (...)
+        {
+            ADD_FAILURE() << param->name() << " didn't generate properly!";
+        }
     }
 };
 

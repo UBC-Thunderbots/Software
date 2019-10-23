@@ -46,9 +46,11 @@ cc_test(
 cc_test(
     name = "config_test",
     srcs = ["config_test.cpp"],
+    data = ["//software/util/parameter:yaml_config_descriptions"],
     deps = [
         ":dynamic_parameters",
         ":parameter",
+        "@boost//:filesystem",
         "@yaml-cpp",
         "@gtest//:gtest_main",
     ],

@@ -208,13 +208,13 @@ EvaluationConfig:
       ChipTargetFraction:
         min: 0.0
         max: 100.0
-        default: 5.0/10.0
+        default: 0.5
         type: "double"
         description: Adjusts how far between ball and target the robot will chip
       ChipPowerBounceThreshold:
         min: 0.0
         max: 5.0
-        default: 7.5/10.0
+        default: 0.75
         type: "double"
         description: Maximum fraction of distance between chipper and target the first bounce should be, so ball is rolling when it reaches the target
       MaxChipPower:
