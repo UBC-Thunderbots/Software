@@ -23,13 +23,13 @@ Diagrams in GitHub: https://github.com/jgraph/drawio-github
 
 ## Glossary
 A few commonly-used terms to be familiar with:
-1. SSL-Vision
+1. `SSL-Vision`
     * This is the shared vision system used by the Small Size League. It is what connects to the cameras above the field, does the vision processing, and transmits the positional data of everything on the field to our AI computers.
     * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-vision)
-2. SSL-Gamecontroller
+2. `SSL-Gamecontroller`
     * Sometimes referred to as the "Refbox", this is another shared piece of Small Size League software that is used to send gamecontroller and referee commands to the teams. A human controls this application during the games to send the appropriate commands to the robots. For examples, some of these commands are what stage the gameplay is in, such as `HALT`, `STOP`, `READY`, or `PLAY`.
     * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/ssl-game-controller)
-3.  grSim
+3.  `grSim`
     * The general robot simulator used by the Small-Size-League. We use this to manually test strategy since it is easy to place the robots and ball in desired locations, run a strategy, and see what the robots do. It is not perfectly accurate, but is useful for testing high-level logic.
     * The GitHub repository can be found [here](https://github.com/RoboCup-SSL/grSim)
    
@@ -68,7 +68,4 @@ The `Visualizer` also lets us control the [AI](#ai) by setting `Parameters` (TOD
 
 
 ## Diagram
-![alt text](images/high-level_architecture.png)
-
-
-![alt text](images/high_level_architecture_diagram.svg)
+![High Level Architecture Diagram](images/high_level_architecture_diagram.svg)
