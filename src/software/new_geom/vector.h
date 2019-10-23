@@ -111,7 +111,8 @@ class Vector final
     Vector norm(double length) const;
 
     /**
-     * Returns the vector perpendicular to this Vector
+     * Returns the vector perpendicular to this Vector (rotated +90 degrees
+     * from the original vector)
      *
      * @return a vector perpendicular to this Vector
      */

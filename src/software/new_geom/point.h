@@ -110,16 +110,6 @@ class Point final
     Point rotate(const Angle &rot) const;
 
     /**
-     * Checks whether this Point is close to another Point, where “close”
-     * is defined as 1.0e-9
-     *
-     * @param other the other point to check against
-     *
-     * @return true if the other point is within a distance of 1.0e-9, not inclusive
-     */
-    bool isClose(const Point &other) const;
-
-    /**
      * Checks whether this Point is close to another Point
      *
      * @param other the other point to check against

@@ -204,7 +204,7 @@ class Angle final
  *
  * @return the negated angle
  */
-constexpr Angle operator-(const Angle &angle);
+constexpr Angle operator-(const Angle &angle) __attribute__((warn_unused_result));
 
 /**
  * Adds two angles.
@@ -214,7 +214,7 @@ constexpr Angle operator-(const Angle &angle);
  *
  * @return the sum of the angles
  */
-constexpr Angle operator+(const Angle &x, const Angle &y);
+constexpr Angle operator+(const Angle &x, const Angle &y) __attribute__((warn_unused_result));
 
 /**
  * Subtracts two angles.
@@ -225,7 +225,7 @@ constexpr Angle operator+(const Angle &x, const Angle &y);
  *
  * @return the difference between the minuend and subtrahend.
  */
-constexpr Angle operator-(const Angle &x, const Angle &y);
+constexpr Angle operator-(const Angle &x, const Angle &y) __attribute__((warn_unused_result));
 
 /**
  * Multiplies an angle by a scalar factor.
@@ -235,7 +235,7 @@ constexpr Angle operator-(const Angle &x, const Angle &y);
  *
  * @return the product of the angle and the scalar factor
  */
-constexpr Angle operator*(const Angle &angle, double scale);
+constexpr Angle operator*(const Angle &angle, double scale) __attribute__((warn_unused_result));
 
 /**
  * Multiplies an angle by a scalar factor.
@@ -245,7 +245,7 @@ constexpr Angle operator*(const Angle &angle, double scale);
  *
  * @return the product of the angle and the scalar factor
  */
-constexpr Angle operator*(double scale, const Angle &angle);
+constexpr Angle operator*(double scale, const Angle &angle) __attribute__((warn_unused_result));
 
 /**
  * Divides an angle by a scalar divisor.
@@ -255,7 +255,7 @@ constexpr Angle operator*(double scale, const Angle &angle);
  *
  * @return the quotient of this Angle ÷ the divisor.
  */
-constexpr Angle operator/(const Angle &angle, double divisor);
+constexpr Angle operator/(const Angle &angle, double divisor) __attribute__((warn_unused_result));
 
 /**
  * Divides two angles.
@@ -265,7 +265,7 @@ constexpr Angle operator/(const Angle &angle, double divisor);
  *
  * @return the quotient of the divident ÷ the divisor.
  */
-constexpr double operator/(const Angle &x, const Angle &y);
+constexpr double operator/(const Angle &x, const Angle &y) __attribute__((warn_unused_result));
 
 /**
  * Adds an angle to another angle.
