@@ -1,20 +1,18 @@
 #pragma once
 
 #include <functional>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
 
 /**
- * TODO update this comment
  * This class defines a dynamic parameter, meaning the parameter
- * value can be changed during runtime. Although the class is templated, it is only meant
- * to support the types also supported by the ROS Parameter Server.
+ * value can be changed during runtime.
  *
- * See http://wiki.ros.org/Parameter%20Server for the list of types
+ * In our codebase, we currently support bool, int32_t, double, and strings
  *
- * In our codebase, we support bool, int32_t, double, and strings
  * */
 
 template <class T>
@@ -69,6 +67,7 @@ class Parameter
     void setValue(const T new_value)
     {
         std::scoped_lock value_lock(this->value_mutex_);
+        std::cerr << this->name_ << " just got a new value: " << new_value << std::endl;
         this->value_ = new_value;
         std::scoped_lock callback_lock(this->callback_mutex_);
         for (auto callback_func : callback_functions)
