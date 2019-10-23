@@ -17,6 +17,7 @@
 * [Backend](#backend)
 * [AI](#ai)
 * [Visualizer](#visualizer)
+* [Diagram](#diagram)
 
 ## Glossary
 A few commonly-used terms to be familiar with:
@@ -63,3 +64,6 @@ The `Visualizer` is exactly what it sounds like: A visualizion of our [AI](#ai).
 
 The `Visualizer` also lets us control the [AI](#ai) by setting `Parameters` (TODO: link here). Through the `Visualizer`, we can manually choose what strategy the [AI](#ai) should use, what team we think we are playing as, and tune more granular behavior such as how close an enemy must be to the ball before we consider them a threat.
 
+
+## Diagram
+![alt text](images/high-level_architecture.png)
