@@ -65,9 +65,9 @@ class Parameter(object):
     """
 
     def __init__(self, parameter_name: str, parameter_description: dict):
+
         """INITIALIZER"""
 
-        # TODO maybe make these properties
         self.parameter_description = parameter_description
         self.param_name = parameter_name
         self.param_variable_name = parameter_name + '_param'
@@ -81,11 +81,10 @@ class Parameter(object):
             self.default_value = 'false' if self.default_value == False else 'true'
 
         # min max will only be in a parameter if it is of type int
-        # or float, the rest of the parameters will NOT.
-        # TODO raise exception? or just don't use it if the user provides
-        # min/max for a string
-        self.min_value = None
-        self.max_value = None
+        # or float, the rest of the parameters will be nullopt
+        # NOTE: we either have both min/max or no bounds at all
+        self.min_value = "std::nullopt"
+        self.max_value = "std::nullopt"
 
         if 'min' and 'max' in parameter_description:
             self.min_value = parameter_description['min']
@@ -120,10 +119,14 @@ class Parameter(object):
             # the parameter name (different from variable name)
             param_name=self.param_name,
 
+            # min and max
+            param_min=self.min_value,
+            param_max=self.max_value,
+
             # the parameter takes in a vector of options
             # which is generated here
-            options=','.join('"{0}"'.format(option)
-                             for option in self.options),
+            options=','.join(('"{0}"' if self.ptype == 'std::string' else '{0}')
+                                .format(option) for option in self.options),
 
             # the default value of the parameter
             value=self.default_value)

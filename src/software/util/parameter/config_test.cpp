@@ -118,6 +118,18 @@ class TestAutogenParameterList : public YamlLoadFixture
                 ASSERT_THAT(param->getOptions(),
                             ::testing::ElementsAreArray(options.begin(), options.end()));
             }
+
+            if (param_description[param->name()]["min"])
+            {
+                ASSERT_EQ(*param->getMin(),
+                          param_description[param->name()]["min"].template as<T>());
+            }
+
+            if (param_description[param->name()]["max"])
+            {
+                ASSERT_EQ(*param->getMax(),
+                          param_description[param->name()]["max"].template as<T>());
+            }
         }
         catch (...)
         {
@@ -126,7 +138,82 @@ class TestAutogenParameterList : public YamlLoadFixture
     }
 };
 
-TEST_F(TestAutogenParameterList, DynamicParametersTest)
+class TestParameterMutation : public YamlLoadFixture
+{
+   public:
+    /*
+     * Visits each parameter and mutates on the following policy
+     *
+     * std::string gets "test" appended at the end
+     * int gets incremented by 4
+     * double gets incremented by 2
+     * bool gets flipped
+     *
+     * NOTE: at any given time this test may fail due to the key not existing in the yaml
+     * dictionary which indicates an error w/ the generate script.
+     */
+    void mutate_all_parameters(MutableParameterVariant paramvar)
+    {
+        std::visit(overloaded{[&](std::shared_ptr<Parameter<int>> param) {
+                                  param->setValue(param->value() + 4);
+                              },
+                              [&](std::shared_ptr<Parameter<bool>> param) {
+                                  param->setValue(!param->value());
+                              },
+                              [&](std::shared_ptr<Parameter<std::string>> param) {
+                                  param->setValue(param->value() + "test");
+                              },
+                              [&](std::shared_ptr<Parameter<double>> param) {
+                                  param->setValue(param->value() - 2.0);
+                              },
+                              [&](std::shared_ptr<Config> param) {
+                                  for (auto& v : param->getMutableParameterList())
+                                  {
+                                      mutate_all_parameters(v);
+                                  }
+                              }},
+                   paramvar);
+    }
+
+    /*
+     * Tests that the mutations in the mutable parameter list tree are propagated to
+     * the immutable tree
+     *
+     * NOTE: at any given time this test may fail due to the key not existing in the yaml
+     * dictionary which indicates an error w/ the generate script.
+     */
+    void assert_mutation(ParameterVariant paramvar, const YAML::Node& current_config)
+    {
+        std::visit(
+            overloaded{
+                [&](std::shared_ptr<const Parameter<int>> param) {
+                    ASSERT_EQ(current_config[param->name()]["default"].as<int>(),
+                              param->value() - 4);
+                },
+                [&](std::shared_ptr<const Parameter<bool>> param) {
+                    ASSERT_EQ(current_config[param->name()]["default"].as<bool>(),
+                              !param->value());
+                },
+                [&](std::shared_ptr<const Parameter<std::string>> param) {
+                    ASSERT_EQ(current_config[param->name()]["default"].as<std::string>() +
+                                  "test",
+                              param->value());
+                },
+                [&](std::shared_ptr<const Parameter<double>> param) {
+                    ASSERT_NEAR(current_config[param->name()]["default"].as<double>(),
+                                param->value() + 2.0, 1E-10);
+                },
+                [&](std::shared_ptr<const Config> param) {
+                    for (auto& v : param->getParameterList())
+                    {
+                        assert_mutation(v, current_config[param->name()]);
+                    }
+                }},
+            paramvar);
+    }
+};
+
+TEST_F(TestParameterMutation, DynamicParametersTest)
 {
     // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
     const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
@@ -136,5 +223,6 @@ TEST_F(TestAutogenParameterList, DynamicParametersTest)
     const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
         std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
 
-    visit_parameters(DynamicParameters, config_yaml);
+    mutate_all_parameters(MutableDynamicParameters);
+    assert_mutation(DynamicParameters, config_yaml);
 }
