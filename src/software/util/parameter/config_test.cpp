@@ -138,6 +138,19 @@ class TestAutogenParameterList : public YamlLoadFixture
     }
 };
 
+TEST_F(TestAutogenParameterList, DynamicParametersTest)
+{
+    // This creates a shared ptr pointing to a ThunderbotsConfig which can be mutated
+    const std::shared_ptr<ThunderbotsConfig> MutableDynamicParameters =
+        std::make_shared<ThunderbotsConfig>();
+
+    // This creates an immutable ThunderbotsConfig w/ proper const correctnesss
+    const std::shared_ptr<const ThunderbotsConfig> DynamicParameters =
+        std::const_pointer_cast<const ThunderbotsConfig>(MutableDynamicParameters);
+
+    visit_parameters(DynamicParameters, config_yaml);
+}
+
 class TestParameterMutation : public YamlLoadFixture
 {
    public:
