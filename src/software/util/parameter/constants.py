@@ -42,7 +42,7 @@ PARAMETER_PRIVATE_ENTRY =\
 PARAMETER_CONSTRUCTOR_ENTRY =\
         """std::vector<{type}>{param_variable_name}_options = std::vector<{type}>{{{options}}};
         {param_variable_name} = std::make_shared<Parameter<{type}>>(\"{param_name}\", {quote}{value}{quote},{param_variable_name}_options,
-                                {quote}{param_min}{quote}, {quote}{param_max}{quote});"""
+                                {param_min}, {param_max});"""
 
 IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY =\
         "std::const_pointer_cast<const Parameter<{type}>>({param_variable_name})"

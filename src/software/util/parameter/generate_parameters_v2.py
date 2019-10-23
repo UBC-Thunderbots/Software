@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 """
 This script runs as a gen_rule for bazel build //software/util/parameter and
-generates the necessary c++ files before compiling to setup DynamicParametersV2
+generates the necessary c++ files before compiling to setup DynamicParameters
 
-NOTE: This script is super similar to the one that exists for DynamicParametersV1
-for ROS, and will eventual replace that, until then please bare with the horrible file
-naming/versioning
 """
 import yaml
 import os
@@ -21,7 +18,7 @@ import constants
 def load_configuration(paths_to_yaml: list):
     """Loads the yaml files in the current directory and
     makes a dictionary containing the parameter name and its
-    attributes with the proper hierarchy
+    keys with the proper hierarchy
 
     NOTE: No exception handling in place so that when an error happens
     it raises to the main thread when bazel build runs
@@ -85,10 +82,18 @@ class Parameter(object):
         # NOTE: we either have both min/max or no bounds at all
         self.min_value = "std::nullopt"
         self.max_value = "std::nullopt"
+        self.quote = "\"" if self.ptype == 'std::string' else ""
 
+        # load both min and max
         if 'min' and 'max' in parameter_description:
-            self.min_value = parameter_description['min']
-            self.max_value = parameter_description['max']
+            self.min_value = "{quote}{min_value}{quote}".format(
+                min_value=parameter_description['min'],
+                quote=self.quote
+            )
+            self.max_value = "{quote}{max_value}{quote}".format(
+                max_value=parameter_description['max'],
+                quote=self.quote
+            )
 
         # any parameter can provide options, which is a list of valid
         # values the parameter can take
@@ -98,7 +103,7 @@ class Parameter(object):
             self.options = parameter_description['options']
 
     def get_constructor_entries(self):
-        """Returns the c++ lines that go in the constructor of the parent
+        """Returns the c++ that resides in the constructor of the parent
         config this parameter will be in.
 
         :returns: string that goes in the constructor of the parent config
@@ -126,14 +131,14 @@ class Parameter(object):
             # the parameter takes in a vector of options
             # which is generated here
             options=','.join(('"{0}"' if self.ptype == 'std::string' else '{0}')
-                                .format(option) for option in self.options),
+                             .format(option) for option in self.options),
 
             # the default value of the parameter
             value=self.default_value)
 
     def get_private_entries(self):
-        """Returns the public members of the Config class that are required
-        for this parameter
+        """Returns the public members of the parent Config class
+        that are required for this parameter
 
         :returns: entries into the private section of the Config class
         :rtype: str
@@ -144,8 +149,8 @@ class Parameter(object):
             param_variable_name=self.param_variable_name)
 
     def get_public_entries(self):
-        """Returns the public members of the Config class that are required
-        for this parameter.
+        """Returns the public members of the parent Config class
+        that are required for this parameter.
 
         :returns: entries into the public section of the Config class
         :rtype: str
@@ -164,9 +169,9 @@ class Parameter(object):
 
 class Config(object):
 
-    """Recursive data structure representing the equivalent c++ class in config.hpp
-    that defines a configuration. Created from a yaml configuration dictionary that the
-    user specifies.
+    """Recursive data structure representing the equivalent c++ class
+    in config.hpp that defines a configuration. Created from a yaml
+    dictionary that the user specifies.
 
     :param config_name: the name of the config
     :param config_description: the yaml configuration for the config 
@@ -181,6 +186,7 @@ class Config(object):
     all_configs = []
 
     def __init__(self, config_name: str,  config_description: dict):
+
         """INITIALIZER"""
 
         self.config_description = config_description
@@ -204,7 +210,7 @@ class Config(object):
                 Config.all_configs.append(config)
 
     def get_class_str(self):
-        """Returns the config class that will go in config.hpp 
+        """Returns the c++ config class string that will go in config.hpp 
 
         :returns: string containing everything needed to define a Config class
         :rtype: str
@@ -215,8 +221,8 @@ class Config(object):
         ################
 
         # constructor entries: The constructor of a config class initializes
-        # all parameters and nested configs as well as the parameterlist which
-        # contains a list of all parameters and configs
+        # all parameters and nested configs as well as the mutable/immutable parameterlists
+        # which contain a list of all parameters and configs
         constructor_config_entires = '\n'.join(config.get_constructor_entries()
                                                for config in self.configs)
         constructor_parameter_entries = '\n'.join(parameter.get_constructor_entries()
@@ -230,18 +236,18 @@ class Config(object):
 
         # immutable parameter list initialization
         immutable_parameter_list_entries = [
-			constants.IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY.format(
-				type=parameter.ptype,
-				param_variable_name=parameter.param_variable_name
-			) for parameter in self.parameters
-		]
+            constants.IMMUTABLE_PARAMETER_LIST_PARAMETER_ENTRY.format(
+                type=parameter.ptype,
+                param_variable_name=parameter.param_variable_name
+            ) for parameter in self.parameters
+        ]
 
         immutable_parameter_list_entries += [
-			constants.IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY.format(
-				config_name=config.config_name,
-				config_variable_name=config.config_variable_name
-			) for config in self.configs
-		]
+            constants.IMMUTABLE_PARAMETER_LIST_CONFIG_ENTRY.format(
+                config_name=config.config_name,
+                config_variable_name=config.config_variable_name
+            ) for config in self.configs
+        ]
 
         # public section of the config class is where all the accessors reside
         # for each param and nested config
@@ -265,17 +271,19 @@ class Config(object):
             # the config name is the name of the configuration class
             config_name=self.config_name,
 
-            # the entires that will go into the constructor of the config
+            # the entries that will go into the constructor of the config
             # class excluding the parameter_list initialization
             constructor_entries=constructor_config_entires + constructor_parameter_entries,
 
             # parameter list initialization with all the parameters and configs
             # that are a part of this class, without the const pointer cast
-            mutable_parameter_list_entries=',\n'.join(mutable_parameter_list_entries),
+            mutable_parameter_list_entries=',\n'.join(
+                mutable_parameter_list_entries),
 
             # parameter list initialization with all the parameters and configs
             # that are a part of this class, with the const pointer cast
-            immutable_parameter_list_entries=',\n'.join(immutable_parameter_list_entries),
+            immutable_parameter_list_entries=',\n'.join(
+                immutable_parameter_list_entries),
 
             # public members of the config class
             public_entries=public_parameter_entries + public_config_entries,
@@ -283,11 +291,6 @@ class Config(object):
             # private members of the config class
             private_entries=private_parameter_entries + private_config_entries
         )
-
-    def __str__(self):
-        return self.get_class_str()
-    def __repr__(self):
-        return self.get_class_str()
 
     def get_constructor_entries(self):
         """Returns the c++ code needed in the constructor of the parent config
@@ -335,7 +338,7 @@ if __name__ == '__main__':
 
     # create config
     ThunderbotsConfig =\
-            Config('ThunderbotsConfig', load_configuration(sys.argv[1:-1]))
+        Config('ThunderbotsConfig', load_configuration(sys.argv[1:-1]))
 
     with open(sys.argv[-1], 'w') as config_gen:
 
@@ -353,4 +356,4 @@ if __name__ == '__main__':
         # main ThunderbotsConfig class
         config_gen.write(ThunderbotsConfig.get_class_str())
 
-    print("INFO: Generated Dynamic Parameters v2")
+    print("INFO: Generated Dynamic Parameters")

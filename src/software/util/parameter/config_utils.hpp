@@ -8,19 +8,25 @@
 
 class Config;
 
-// A ParameterVariant is a variant of shared_ptrs of parameters of int/bool/double/string
-// or to a Config object which is a collection of parameters or configs iteslf.
+// A MutableParameterVariant is a variant of shared_ptrs of parameters of
+// int/bool/double/string or to a Config object which is a collection of parameters or
+// configs iteslf. The objects in this variant can be mutated
 using MutableParameterVariant =
     std::variant<std::shared_ptr<Parameter<int>>, std::shared_ptr<Parameter<bool>>,
                  std::shared_ptr<Parameter<double>>,
                  std::shared_ptr<Parameter<std::string>>, std::shared_ptr<Config>>;
 
+// A ParameterVariant is similar to a MutableParameterVariant, except the
+// parameters/configs in ParameterVariant can not be mutated.
 using ParameterVariant = std::variant<
     std::shared_ptr<const Parameter<int>>, std::shared_ptr<const Parameter<bool>>,
     std::shared_ptr<const Parameter<double>>,
     std::shared_ptr<const Parameter<std::string>>, std::shared_ptr<const Config>>;
 
-using ParameterList        = std::vector<ParameterVariant>;
+// List of ParameterVariants (immutable)
+using ParameterList = std::vector<ParameterVariant>;
+
+// List of MutableParameterVaraints (mutable)
 using MutableParameterList = std::vector<MutableParameterVariant>;
 
 /* Config Class
