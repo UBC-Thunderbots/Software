@@ -30,14 +30,20 @@ Point Spline::valueAt(double val) const
         return knots.back();
     }
 
-    // assume that the segments are equally spaced in [0,1]
-    int index = (int)(val * knots.size());
-    if (val < segments[index].start || val > segments[index].end)
+    auto seg_it =
+        std::find_if(segments.begin(), segments.end(), [&](const SplineSegment& sseg) {
+            return (val >= sseg.start && val <= sseg.end);
+        });
+    if (seg_it == segments.end())
     {
-        throw std::runtime_error("Segments are not equally spaced as expected");
+        std::stringstream ss;
+        ss << "Tried to evaluate spline at " << val
+           << ", which was not in any interval of any segment";
+        throw std::runtime_error(ss.str());
     }
-    double x_val = segments[index].x.valueAt(val);
-    double y_val = segments[index].y.valueAt(val);
+
+    double x_val = seg_it->x.valueAt(val);
+    double y_val = seg_it->y.valueAt(val);
     return Point(x_val, y_val);
 }
 

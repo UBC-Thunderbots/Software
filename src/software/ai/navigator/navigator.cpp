@@ -56,11 +56,11 @@ void Navigator::visit(const MoveIntent &move_intent)
     std::vector<Obstacle> obstacles =
         createCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
 
-    Rectangle navigableArea(
+    Rectangle navigable_area(
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    Path path = path_planner->findPath(start, dest, navigableArea, obstacles);
+    Path path = path_planner->findPath(start, dest, navigable_area, obstacles);
 
     moveNavigation(move_intent, path);
 }
