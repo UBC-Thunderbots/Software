@@ -35,7 +35,6 @@ echo $BLACKLIST_ARG
 # Find all object files
 declare -a OBJECT_FILES=()
 for folder in "${OBJECT_FILES_FOLDERS[@]}"; do
-    echo "find -L $folder -type f -iname \"*.o\" $BLACKLIST_ARG"
     for file in $(find -L $folder $BLACKLIST_ARG -name '*.o' -type f -print); do 
         OBJECT_FILES+=( "$file" )
     done
@@ -47,8 +46,6 @@ OBJECT_FILES_ARG=""
 for object_file in "${OBJECT_FILES[@]}"; do
     OBJECT_FILES_ARG="$OBJECT_FILES_ARG -object $object_file"
 done
-echo $OBJECT_FILES_ARG
-exit 1
 
 # Remove the log if it already exists
 rm -f $LOG_FILE_NAME
