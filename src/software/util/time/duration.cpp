@@ -3,8 +3,9 @@
  */
 
 #include "software/util/time/duration.h"
-
 #include "shared/constants.h"
+
+#include <cmath>
 
 Duration::Duration() : Duration(0) {}
 
