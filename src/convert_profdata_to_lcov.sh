@@ -2,7 +2,7 @@
 
 #
 # This script finds `.dat` files, assumes they are `profdata` files, and
-# converts them to `.lcov` files that CodeCov can understand. 
+# converts them to a `.lcov` file that CodeCov can understand. 
 # 
 # This script exists because clang outputs a different format for code coverage
 # data then gcc does, and bazel has not yet unified it's coverage output.
@@ -10,7 +10,10 @@
 # able to remove this script
 #
 
-LOG_FILE_NAME=profdata_to_lcov.log
+LOG_FILE_NAME="profdata_to_lcov.log"
+MERGED_PROFDATA_FILE_NAME="merged_coverage.dat"
+MERGED_LCOV_FILE_NAME="$MERGED_PROFDATA_FILE_NAME.lcov"
+PROFDATA_FILE_LIST_NAME="all_coverage_files.txt"
 
 # All the folders we'll search for object files in
 declare -a OBJECT_FILES_FOLDERS=(
@@ -20,25 +23,16 @@ declare -a OBJECT_FILES_FOLDERS=(
 )
 
 # Some object files seem to make `llvm-cov` fail with the following error:
+# "error: Could not load coverage information"
+# So we ignore them.
 # At the time of writing, the known bad files are:
 #   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/parameters/moc_parameters.pic.o 
 #   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/robot_status/moc_robot_status.pic.o 
 #   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/world_view/moc_world_view.pic.o 
 #   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/ai_control/moc_ai_control.pic.o 
-#declare -a OBJECT_FILES_FOLDER_BLACKLIST=(
-#    "bazel-out/k8-fastbuild/bin/software/gui/widgets/\*"
-#)
-#
-## Build the arg to prune the blacklist directories
-#BLACKLIST_ARG=""
-#for directory in "${OBJECT_FILES_FOLDER_BLACKLIST[@]}"; do
-#    BLACKLIST_ARG="-not \( -path "$directory" -prune \) $BLACKLIST_ARG"
-#done
-
 # Please refer to this post for how to construct a prune argument. It's not
 # as simple as you think. https://stackoverflow.com/a/4210072
 BLACKLIST_ARG="-path bazel-out/k8-fastbuild/bin/software/gui/widgets -prune -o"
-echo $BLACKLIST_ARG
 
 # Find all object files
 declare -a OBJECT_FILES=()
@@ -60,26 +54,18 @@ rm -f $LOG_FILE_NAME
 
 # Find all profdata files (we assume bazel was configured to output profdata
 # to all the ".dat" files, there's no easy way to check that it's not just an
-# lcov file already), and convert them into lcov files
-for profdata_file_name in $(find -L bazel-testlogs -iname "coverage.dat"); do
-    output_lcov_file_name="$profdata_file_name.lcov.txt"
-
-    echo "Converting profdata file $profdata_file_name to lcov file: $output_lcov_file_name"
-
-    # Note the file we're converting in the log
-    echo "==== $output_lcov_file_name =====" >> $LOG_FILE_NAME
-
-    # Remove the output if it already exists
-    rm -f $output_lcov_file_name
-
-    # Generate the lcov data and pipe it into files with the same name but
-    # a different extension, saving and errors to a file. We can't just 
-    # log all the errors to the shell because of how many we cause by just
-    # indiscriminately passing everything we can find to `llvm-cov`.
-    # NOTE: it's bad practice to call `llvm-cov` directly like this, but we 
-    #       want to be sure that we're using the right version, and if we 
-    #       declare this script as a `sh_binary` in bazel, it will overwrite the 
-    #       bazel-testlogs folder when it's run (thus overwriting the profdata
-    #       files)
-    ./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$profdata_file_name" $OBJECT_FILES_ARG > $output_lcov_file_name 2> $LOG_FILE_NAME
+# lcov file already), and put the found paths into a file
+# Create a file with the names of all the coverage files we want to merge
+rm -rf $PROFDATA_FILE_LIST_NAME
+for profdata_file_path in $(find -L bazel-testlogs -iname "coverage.dat"); do
+    echo "$profdata_file_path" >> $PROFDATA_FILE_LIST_NAME
 done
+
+# Merge all the profdata files into one big one
+rm -rf $MERGED_PROFDATA_FILE_NAME
+./bazel-src/external/llvm_clang/bin/llvm-profdata merge -output=$MERGED_PROFDATA_FILE_NAME -input-files=$PROFDATA_FILE_LIST_NAME 2>> $LOG_FILE_NAME
+
+# Convert the merged profdata file into a single lcov file
+rm -rf $MERGED_LCOV_FILE_NAME
+./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$MERGED_PROFDATA_FILE_NAME" $OBJECT_FILES_ARG > "$MERGED_PROFDATA_FILE_NAME.lcov" 2> $LOG_FILE_NAME
+

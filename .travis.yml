@@ -24,7 +24,7 @@ jobs:
         # `cc_toolchain_config.bzl` to just `--coverage` and remove this script
         - ./convert_profdata_to_lcov.sh
         # Upload coverage results
-        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
+        - bash <(curl -s https://codecov.io/bash)
         # Build our CPU-specific targets
         - bazel build //firmware_new/... --cpu=stm32h7
     - name: "Check Formatting"
