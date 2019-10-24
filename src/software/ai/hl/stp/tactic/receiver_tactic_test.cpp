@@ -40,7 +40,7 @@ TEST(ReceiverTacticTest, robot_not_at_receive_position_pass_not_started)
     EXPECT_DOUBLE_EQ(0.5, move_intent.getDestination().x());
     EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
     EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2, move_intent.getFinalAngle());
-    EXPECT_FALSE(move_intent.getDribblerEnable());
+    EXPECT_FALSE(move_intent.isDribblerEnabled());
     EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
@@ -79,7 +79,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_not_started)
         EXPECT_DOUBLE_EQ(0.0, move_intent.getDestination().y());
         EXPECT_EQ((pass.receiverOrientation() + shot_dir) / 2,
                   move_intent.getFinalAngle());
-        EXPECT_FALSE(move_intent.getDribblerEnable());
+        EXPECT_FALSE(move_intent.isDribblerEnabled());
         EXPECT_EQ(move_intent.getAutoKickType(), NONE);
     }
 }
@@ -119,7 +119,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_open_angle_
     EXPECT_LT(move_intent.getFinalAngle().toDegrees(), -1);
     EXPECT_GT(move_intent.getFinalAngle().toDegrees(), -90);
 
-    EXPECT_FALSE(move_intent.getDribblerEnable());
+    EXPECT_FALSE(move_intent.isDribblerEnabled());
     EXPECT_EQ(move_intent.getAutoKickType(), AUTOKICK);
 }
 
@@ -155,7 +155,7 @@ TEST(ReceiverTacticTest,
     EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
 
-    EXPECT_TRUE(move_intent.getDribblerEnable());
+    EXPECT_TRUE(move_intent.isDribblerEnabled());
     EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 
@@ -198,7 +198,7 @@ TEST(ReceiverTacticTest, robot_at_receive_position_pass_started_goal_blocked)
     EXPECT_NEAR(0.0, move_intent.getDestination().y(), 0.0001);
     EXPECT_EQ(pass.receiverOrientation(), move_intent.getFinalAngle());
 
-    EXPECT_TRUE(move_intent.getDribblerEnable());
+    EXPECT_TRUE(move_intent.isDribblerEnabled());
     EXPECT_EQ(move_intent.getAutoKickType(), NONE);
 }
 

@@ -84,9 +84,8 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
-        yield(move_action.updateStateAndGetNextIntent(
-            *robot, pass.receiverPoint(), desired_angle, 0, DribblerEnable::OFF,
-            MoveType::NORMAL, AutokickType::NONE));
+        yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
+                                                      desired_angle, 0));
     }
 
     // Vector from the ball to the robot
@@ -113,8 +112,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             Angle ideal_orientation = shot.getOpenAngle();
 
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
-                MoveType::NORMAL, AUTOKICK));
+                *robot, ideal_position, ideal_orientation, 0, false, false, AUTOKICK));
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -137,8 +135,7 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             // Move into position with the dribbler on
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
-                MoveType::NORMAL, AutokickType::NONE));
+                *robot, ball_receive_pos, ball_receive_orientation, 0, true, NONE));
         }
     }
     LOG(DEBUG) << "Finished";

@@ -11,7 +11,7 @@ double calculateTransitionSpeedBetweenSegments(const Point &p1, const Point &p2,
 
 std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
                                                    const std::vector<Point> &points,
-                                                   DribblerEnable enable_dribbler,
+                                                   bool enable_dribbler,
                                                    AutokickType autokick)
 {
     std::vector<MovePrimitive> movePrimitives;
@@ -31,9 +31,8 @@ std::vector<MovePrimitive> convertToMovePrimitives(unsigned int robot_id,
                                                                   next_next_point, 0);
         }
 
-        MovePrimitive movePrimitive =
-            MovePrimitive(robot_id, point, point.orientation(), final_speed,
-                          enable_dribbler, MoveType::NORMAL, autokick);
+        MovePrimitive movePrimitive = MovePrimitive(
+            robot_id, point, point.orientation(), final_speed, enable_dribbler, autokick);
         movePrimitives.emplace_back(movePrimitive);
     }
 

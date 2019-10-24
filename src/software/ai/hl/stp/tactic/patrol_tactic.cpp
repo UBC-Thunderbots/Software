@@ -69,15 +69,13 @@ void PatrolTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
     {
         auto next_intent = move_action.updateStateAndGetNextIntent(
             *robot, patrol_points.at(patrol_point_index), orientation_at_patrol_points,
-            linear_speed_at_patrol_points, DribblerEnable::OFF, MoveType::NORMAL,
-            AutokickType::NONE);
+            linear_speed_at_patrol_points);
         if (!next_intent || move_action.done())
         {
             patrol_point_index = (patrol_point_index + 1) % patrol_points.size();
             next_intent        = move_action.updateStateAndGetNextIntent(
                 *robot, patrol_points.at(patrol_point_index),
-                orientation_at_patrol_points, linear_speed_at_patrol_points,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE);
+                orientation_at_patrol_points, linear_speed_at_patrol_points);
         }
 
         yield(std::move(next_intent));

@@ -16,18 +16,6 @@ enum AutokickType
     AUTOCHIP
 };
 
-enum MoveType
-{
-    NORMAL,
-    SLOW,
-};
-
-enum DribblerEnable
-{
-    OFF = false,
-    ON  = true,
-};
-
 class MovePrimitive : public Primitive
 {
    public:
@@ -51,8 +39,8 @@ class MovePrimitive : public Primitive
      */
     explicit MovePrimitive(unsigned int robot_id, const Point &dest,
                            const Angle &final_angle, double final_speed,
-                           DribblerEnable enable_dribbler, MoveType move_type,
-                           AutokickType autokick);
+                           bool enable_dribbler = false, bool slow = false,
+                           AutokickType autokick = NONE);
 
     /**
      * Gets the primitive name
@@ -100,14 +88,14 @@ class MovePrimitive : public Primitive
      *
      * @return whether or not the dribbler should be enabled while moving
      */
-    DribblerEnable getDribblerEnable() const;
+    bool isDribblerEnabled() const;
 
     /**
      * Gets whether or not the robot should be moving slow
      *
      * @return whether or not the robot should be moving slow
      */
-    MoveType getMoveType() const;
+    bool isSlowEnabled() const;
 
     void accept(PrimitiveVisitor &visitor) const override;
 
@@ -133,7 +121,7 @@ class MovePrimitive : public Primitive
     Point dest;
     Angle final_angle;
     double final_speed;
-    DribblerEnable enable_dribbler;
-    MoveType move_type;
+    bool enable_dribbler;
+    bool slow;
     AutokickType autokick;
 };

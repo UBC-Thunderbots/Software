@@ -170,8 +170,7 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // The default behaviour is to move behind the ball and face the net
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
-                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
         }
     } while (!(kick_action.done() || chip_action.done()));
 }

@@ -44,9 +44,8 @@ void CherryPickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         // Move the robot to be the best possible receiver for the best pass we can
         // find (within the target region)
         Pass pass = pass_generator.getBestPassSoFar().pass;
-        yield(move_action.updateStateAndGetNextIntent(
-            *robot, pass.receiverPoint(), pass.receiverOrientation(), 0,
-            DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
+        yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
+                                                      pass.receiverOrientation(), 0));
     } while (true);
 }
 
