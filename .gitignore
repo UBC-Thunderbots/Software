@@ -57,6 +57,7 @@ Makefile
 
 # Testing
 *coverage
+*.lcov
 
 # Production
 *build

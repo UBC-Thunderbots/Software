@@ -69,3 +69,6 @@ rm -rf $MERGED_PROFDATA_FILE_NAME
 rm -rf $MERGED_LCOV_FILE_NAME
 ./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$MERGED_PROFDATA_FILE_NAME" $OBJECT_FILES_ARG > "$MERGED_PROFDATA_FILE_NAME.lcov" 2> $LOG_FILE_NAME
 
+# Clean up intermediate files, otherwise CodeCov will pick these up as well
+rm -rf $PROFDATA_FILE_LIST_NAME
+rm -rf $MERGED_PROFDATA_FILE_NAME
