@@ -11,7 +11,7 @@
  * This class defines a dynamic parameter, meaning the parameter
  * value can be changed during runtime.
  *
- * In our codebase, we currently support bool, int32_t, double, and strings
+ * In our codebase, we currently support bool, int, double, and strings
  *
  * */
 
