@@ -63,8 +63,6 @@ class Parameter(object):
 
     def __init__(self, parameter_name: str, parameter_description: dict):
 
-        """INITIALIZER"""
-
         self.parameter_description = parameter_description
         self.param_name = parameter_name
         self.param_variable_name = parameter_name + '_param'
@@ -186,8 +184,6 @@ class Config(object):
     all_configs = []
 
     def __init__(self, config_name: str,  config_description: dict):
-
-        """INITIALIZER"""
 
         self.config_description = config_description
         self.config_name = config_name

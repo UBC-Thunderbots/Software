@@ -26,7 +26,7 @@ using ParameterVariant = std::variant<
 // List of ParameterVariants (immutable)
 using ParameterList = std::vector<ParameterVariant>;
 
-// List of MutableParameterVaraints (mutable)
+// List of MutableParameterVariants (mutable)
 using MutableParameterList = std::vector<MutableParameterVariant>;
 
 /* Config Class
