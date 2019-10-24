@@ -14,6 +14,15 @@
 
 namespace Passing
 {
+    // The types of passes we can perform
+    enum PassType
+    {
+        // Receive the pass and keep posession by just dribbling it
+        RECEIVE_AND_DRIBBLE,
+        // One-touch shot where the receiving robot immediately takes a shot on net
+        ONE_TOUCH_SHOT,
+    };
+
     /**
      * Calculate the quality of a given pass
      *
@@ -26,13 +35,16 @@ namespace Passing
      *                        robot does not try to pass to itself. If `std::nullopt` is
      *                        given, it is assumed the passer robot is not on the
      *                        friendly team of the given world
+     * @param pass_type The type of pass we're trying to rate this pass as (certain
+     *                  types of passes have different characteristics we try to
+     *                  optimize for)
      *
      * @return A value in [0,1] representing the quality of the pass, with 1 being an
      *         ideal pass, and 0 being the worst pass possible
      */
     double ratePass(const World& world, const Passing::Pass& pass,
                     const std::optional<Rectangle>& target_region,
-                    std::optional<unsigned int> passer_robot_id);
+                    std::optional<unsigned int> passer_robot_id, PassType pass_type);
 
     /**
      * Rate pass based on the probability of scoring once we receive the pass

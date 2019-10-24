@@ -55,13 +55,13 @@ Passing:
   min_pass_speed_m_per_s:
     min: 0
     max: 5
-    default: 2.0
+    default: 3.5
     type: "double"
     description: "The minimum pass speed (in m/s)"
   max_pass_speed_m_per_s:
     min: 0
     max: 10
-    default: 5.0
+    default: 5.5
     type: "double"
     description: "The maximum pass speed (in m/s)"
   min_time_offset_for_pass_seconds:
@@ -172,6 +172,38 @@ robot_expiry_buffer_milliseconds:
   type: "int"
   description: "TODO: Add description as part of #149"
 Evaluation:
+    Possession:
+      possession_dist:
+        min: 0.0
+        max: 1.0
+        default: 0.2
+        type: "double"
+        description: How close the ball has to be to the robot for the robot to have the ball
+      passed_to_angle_tolerance:
+        min: 0.0
+        max: 90.0
+        default: 15.0
+        type: "double"
+        description: "angle in degrees that the ball velocity can deviate from the axis between
+                      the ball and the robot before it doesn't count as a pass"
+      min_pass_speed:
+        min: 0.0
+        max: 10.0
+        default: 1.0
+        type: "double"
+        description: minimum speed along the pass axis for it to count as a pass
+      possession_buffer_time_seconds:
+        min: 0.0
+        max: 5.0
+        default: 1.5
+        type: "double"
+        description: how far back in time to check if a robot has possession
+      pass_buffer_time_seconds:
+        min: 0.0
+        max: 5.0
+        default: 1.0
+        type: "double"
+        description: how far back in time to check if a robot is receiving a pass
     Indirect_Chip:
       chip_target_fraction:
         min: 0.0
@@ -221,13 +253,6 @@ Evaluation:
         default: 0.85
         type: "double"
         description: Percentage of distance to center of triangle to return as target
-DefenseShadowEnemyTactic:
-  ball_steal_speed:
-    default: 0.3
-    max: 1.0
-    min: 0.0
-    type: "double"
-    description: Try to steal the passee's ball below this ball speed
 DefenderCreaseTactic:
   max_defender_seperation_deg:
     min: 0.0
@@ -257,16 +282,11 @@ DefenderCreaseTactic:
     description: >-
       The distance between the ball and the defenders at which they will have their
       minimum seperation.
-GoalieTactic:
-  block_cone_buffer:
-      min: 0.0
-      max: 2.0
-      default: 0.0
-      type: "double"
-      description: >-
-        The block cone buffer is the extra distance to add on either side of the robot
-        to allow to it be further back in the block cone
 PivotAction:
+  experimental:
+      type: "bool"
+      default: false
+      description: If toggled, then loose ball will attempt to pivot with bottom parameters
   arb_scaling:
       min: 0.0
       max: 10.0
@@ -281,6 +301,44 @@ PivotAction:
       description: >-
           How much tolerance in degrees we allow for the final angle before annoucing
           pivot has finished
+GoalieTactic:
+  block_cone_buffer:
+      min: 0.0
+      max: 2.0
+      default: 0.0
+      type: "double"
+      description: >-
+        The block cone buffer is the extra distance to add on either side of the robot
+        to allow to it be further back in the block cone
+  goalie_final_speed:
+      min: 0.0
+      max: 3.0
+      default: 0.0
+      type: "double"
+      description: >- 
+        Control the final speed of the goalie to be able to intercept shots better
+  ball_speed_panic:
+      min: 0.0
+      max: 6.0
+      default: 0.2
+      type: "double"
+      description: >- 
+        At what speed of the ball should the goalie panic and stop the ball
+  block_cone_radius:
+      min: 0.0
+      max: 1.0
+      default: 0.3
+      type: "double"
+      description: >- 
+          The radius to wedge the robot into the cone, defaults to MAX_ROBOT_RADIUS
+  defense_area_deflation:
+      min: 0.1
+      max: 0.5
+      default: 0.2
+      type: "double"
+      description: >- 
+        How much to deflate the defense area by, larger value means closer to the
+        net
 ShootGoalTactic:
   enemy_about_to_steal_ball_rectangle_width:
       min: 0.0
@@ -312,4 +370,62 @@ RobotCapabilities:
     default: ""
     type: "string"
     description: Comma-separated list of numbers of robots with broken kickers
-
+DefenseShadowEnemyTactic:
+  ball_steal_speed:
+    default: 0.3
+    max: 1.0
+    min: 0.0
+    type: "double"
+    description: Try to steal the passee's ball below this ball speed
+CornerKickPlay:
+  max_time_commit_to_pass_seconds:
+    min: 0.0
+    max: 5.0
+    default: 3.0
+    type: "double"
+    description: The maximum time that we will wait before committing to a pass
+ShootOrChipPlay:
+  fallback_chip_target_enemy_goal_offset:
+    min: 0.0
+    max: 4.0
+    default: 1.5
+    type: double
+    description: >-
+      The x offset from the enemy goal for the fallback chip target, ie. where we will
+      chip if any enemy approches us before we have a good shot or a robot to chip to
+ShootOrPassPlay:
+  abs_min_pass_score:
+    min: 0.0
+    max: 1.0
+    default: 0.05
+    type: double
+    description: The absolute minimum pass quality we're willing to attempt
+  pass_score_ramp_down_duration:
+    min: 0.0
+    max: 5.0
+    default: 2.0
+    type: double
+    description: >-
+      When we're choosing a pass, we start by looking for a pass with a perfect score
+      of 1, and then over time lower the score we're will to accept. This parameter
+      how fast we ramp down to abs_min_pass_score. This is in seconds.
+  min_open_angle_for_shot_deg:
+    min: 0.0
+    max: 90.0
+    default: 6
+    type: double
+    description: The minimum open angle to the goal that we require before taking a shot
+ShadowFreekickerTactic:
+  robot_separation_scaling_factor:
+    min: 1.0
+    max: 5.0
+    default: 1.1
+    type: double
+    description: >-
+      How much to scale the separation distance between the two robots shadowing
+      an enemy freekicker
+HighLevelStrategy:
+  use_shoot_or_pass_instead_of_shoot_or_chip:
+    default: true
+    type: bool
+    description: Use the ShootOrPassPlay instead of the ShootOrChipPlay
