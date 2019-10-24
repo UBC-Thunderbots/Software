@@ -11,11 +11,33 @@ declare -a OBJECT_FILES_FOLDERS=(
     "bazel-out/k8-fastbuild/bin/firmware"
 )
 
+# Some object files seem to make `llvm-cov` fail with the following error:
+# At the time of writing, the known bad files are:
+#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/parameters/moc_parameters.pic.o 
+#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/robot_status/moc_robot_status.pic.o 
+#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/world_view/moc_world_view.pic.o 
+#   bazel-out/k8-fastbuild/bin/software/gui/widgets/_objs/ai_control/moc_ai_control.pic.o 
+#declare -a OBJECT_FILES_FOLDER_BLACKLIST=(
+#    "bazel-out/k8-fastbuild/bin/software/gui/widgets/\*"
+#)
+#
+## Build the arg to prune the blacklist directories
+#BLACKLIST_ARG=""
+#for directory in "${OBJECT_FILES_FOLDER_BLACKLIST[@]}"; do
+#    BLACKLIST_ARG="-not \( -path "$directory" -prune \) $BLACKLIST_ARG"
+#done
+
+# Please refer to this post for how to construct a prune argument. It's not
+# as simple as you think. https://stackoverflow.com/a/4210072
+BLACKLIST_ARG="-path bazel-out/k8-fastbuild/bin/software/gui/widgets -prune -o"
+echo $BLACKLIST_ARG
+
 # Find all object files
 declare -a OBJECT_FILES=()
 for folder in "${OBJECT_FILES_FOLDERS[@]}"; do
-    for file in $(find -L  $folder -iname "*.o"); do 
-         OBJECT_FILES+=( "$file" )
+    echo "find -L $folder -type f -iname \"*.o\" $BLACKLIST_ARG"
+    for file in $(find -L $folder $BLACKLIST_ARG -name '*.o' -type f -print); do 
+        OBJECT_FILES+=( "$file" )
     done
 done
 
@@ -25,6 +47,8 @@ OBJECT_FILES_ARG=""
 for object_file in "${OBJECT_FILES[@]}"; do
     OBJECT_FILES_ARG="$OBJECT_FILES_ARG -object $object_file"
 done
+echo $OBJECT_FILES_ARG
+exit 1
 
 # Remove the log if it already exists
 rm -f $LOG_FILE_NAME
