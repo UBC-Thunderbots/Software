@@ -10,7 +10,6 @@
 # able to remove this script
 #
 
-LOG_FILE_NAME="profdata_to_lcov.log"
 MERGED_PROFDATA_FILE_NAME="merged_coverage.dat"
 MERGED_LCOV_FILE_NAME="$MERGED_PROFDATA_FILE_NAME.lcov"
 PROFDATA_FILE_LIST_NAME="all_coverage_files.txt"
@@ -49,9 +48,6 @@ for object_file in "${OBJECT_FILES[@]}"; do
     OBJECT_FILES_ARG="$OBJECT_FILES_ARG -object $object_file"
 done
 
-# Remove the log if it already exists
-rm -f $LOG_FILE_NAME
-
 # Find all profdata files (we assume bazel was configured to output profdata
 # to all the ".dat" files, there's no easy way to check that it's not just an
 # lcov file already), and put the found paths into a file
@@ -63,11 +59,11 @@ done
 
 # Merge all the profdata files into one big one
 rm -rf $MERGED_PROFDATA_FILE_NAME
-./bazel-src/external/llvm_clang/bin/llvm-profdata merge -output=$MERGED_PROFDATA_FILE_NAME -input-files=$PROFDATA_FILE_LIST_NAME 2>> $LOG_FILE_NAME
+./bazel-src/external/llvm_clang/bin/llvm-profdata merge -output=$MERGED_PROFDATA_FILE_NAME -input-files=$PROFDATA_FILE_LIST_NAME
 
 # Convert the merged profdata file into a single lcov file
 rm -rf $MERGED_LCOV_FILE_NAME
-./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$MERGED_PROFDATA_FILE_NAME" $OBJECT_FILES_ARG > "$MERGED_PROFDATA_FILE_NAME.lcov" 2> $LOG_FILE_NAME
+./bazel-src/external/llvm_clang/bin/llvm-cov export -format=lcov -instr-profile="$MERGED_PROFDATA_FILE_NAME" $OBJECT_FILES_ARG > "$MERGED_PROFDATA_FILE_NAME.lcov"
 
 # Clean up intermediate files, otherwise CodeCov will pick these up as well
 rm -rf $PROFDATA_FILE_LIST_NAME
