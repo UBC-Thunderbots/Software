@@ -67,21 +67,42 @@ TEST_F(STPTest, test_calculate_new_play_when_multiple_plays_valid)
     // deterministic because we have provided a seed for this test (in the setUp function)
 
     std::unique_ptr<Play> play;
-    std::vector<std::string> actual_play_names;
-
-    for (unsigned int i = 0; i < 10; i++)
+    for (int i = 0; i < 8; i++)
     {
         play = stp.calculateNewPlay(world);
-        actual_play_names.emplace_back(play->getName());
+        EXPECT_TRUE(play);
+        EXPECT_EQ(play->getName(), MoveTestPlay::name);
     }
 
-    std::vector<std::string> expected_play_names = {
-        HaltTestPlay::name, MoveTestPlay::name, MoveTestPlay::name, HaltTestPlay::name,
-        MoveTestPlay::name, MoveTestPlay::name, MoveTestPlay::name, MoveTestPlay::name,
-        MoveTestPlay::name, MoveTestPlay::name,
-    };
+    play = stp.calculateNewPlay(world);
+    EXPECT_TRUE(play);
+    EXPECT_EQ(play->getName(), HaltTestPlay::name);
 
-    EXPECT_EQ(expected_play_names, actual_play_names);
+    for (int i = 0; i < 2; i++)
+    {
+        play = stp.calculateNewPlay(world);
+        EXPECT_TRUE(play);
+        EXPECT_EQ(play->getName(), MoveTestPlay::name);
+    }
+
+    for (int i = 0; i < 3; i++)
+    {
+        play = stp.calculateNewPlay(world);
+        EXPECT_TRUE(play);
+        EXPECT_EQ(play->getName(), HaltTestPlay::name);
+    }
+
+    play = stp.calculateNewPlay(world);
+    EXPECT_TRUE(play);
+    EXPECT_EQ(play->getName(), MoveTestPlay::name);
+
+    play = stp.calculateNewPlay(world);
+    EXPECT_TRUE(play);
+    EXPECT_EQ(play->getName(), HaltTestPlay::name);
+
+    play = stp.calculateNewPlay(world);
+    EXPECT_TRUE(play);
+    EXPECT_EQ(play->getName(), MoveTestPlay::name);
 }
 
 TEST_F(STPTest, test_current_play_initially_unassigned)

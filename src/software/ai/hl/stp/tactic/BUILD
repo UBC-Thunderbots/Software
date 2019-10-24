@@ -137,6 +137,17 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "goalie_tactic_test",
+    srcs = ["goalie_tactic_test.cpp"],
+    deps = [
+        ":goalie_tactic",
+        "//software/geom",
+        "//software/test_util",
+        "@gtest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "grab_ball_tactic",
     srcs = ["grab_ball_tactic.cpp"],

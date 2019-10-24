@@ -1,6 +1,14 @@
 #! /bin/bash
 
-# TODO: comment on what this script does and why we need it
+#
+# This script finds `.dat` files, assumes they are `profdata` files, and
+# converts them to `.lcov` files that CodeCov can understand. 
+# 
+# This script exists because clang outputs a different format for code coverage
+# data then gcc does, and bazel has not yet unified it's coverage output.
+# Once https://github.com/bazelbuild/bazel/issues/9406 is resolved we should be
+# able to remove this script
+#
 
 LOG_FILE_NAME=profdata_to_lcov.log
 
