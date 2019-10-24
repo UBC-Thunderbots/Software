@@ -17,6 +17,8 @@ jobs:
           --verbose_test_summary 
           --instrumentation_filter=//... 
           --test_output=errors
+          --experimental_use_llvm_covmap
+          --collect_code_coverage
         # Convert profdata results to lcov. We have to do this because of the
         # current state of support for clang compiler coverage results in
         # bazel. Once https://github.com/bazelbuild/bazel/issues/9406 is 
