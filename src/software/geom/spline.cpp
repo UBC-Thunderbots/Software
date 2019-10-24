@@ -20,20 +20,12 @@ Point Spline::valueAt(double val) const
         throw std::invalid_argument(ss.str());
     }
 
-    if (val == 0.0)
-    {
-        return knots.front();
-    }
-
-    if (val == 1.0)
-    {
-        return knots.back();
-    }
-
+    // Note: this could be more performant with binary search
     auto seg_it =
         std::find_if(segments.begin(), segments.end(), [&](const SplineSegment& sseg) {
             return (val >= sseg.start && val <= sseg.end);
         });
+
     if (seg_it == segments.end())
     {
         std::stringstream ss;
