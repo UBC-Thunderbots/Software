@@ -68,3 +68,4 @@ rm -rf $MERGED_LCOV_FILE_NAME
 # Clean up intermediate files, otherwise CodeCov will pick these up as well
 rm -rf $PROFDATA_FILE_LIST_NAME
 rm -rf $MERGED_PROFDATA_FILE_NAME
+
