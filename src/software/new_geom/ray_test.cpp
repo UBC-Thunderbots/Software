@@ -6,36 +6,58 @@ TEST(RayTest, default_constructor)
 {
     Ray r = Ray();
     EXPECT_EQ(Point(), r.getStart());
-    EXPECT_EQ(Vector(), r.getDirection());
+    EXPECT_EQ(Angle::zero(), r.getDirection());
 }
 
-TEST(RayTest, start_direction_constructor)
+TEST(RayTest, angle_constructor)
+{
+    Ray r = Ray(Point(1, 2), Angle::half());
+    EXPECT_EQ(Point(1, 2), r.getStart());
+    EXPECT_EQ(Angle::half(), r.getDirection());
+}
+
+TEST(RayTest, vector_constructor)
 {
     Ray r = Ray(Point(1, 2), Vector(2, 3));
     EXPECT_EQ(Point(1, 2), r.getStart());
-    EXPECT_EQ(Vector(2, 3), r.getDirection());
+    EXPECT_EQ(Vector(2, 3).orientation(), r.getDirection());
 }
 
-TEST(RayTest, setters)
+TEST(RayTest, point_setter)
 {
-    Ray r = Ray(Point(3, 2), Vector(0, 1));
+    Ray r = Ray(Point(3, 2), Angle::half());
     EXPECT_EQ(Point(3, 2), r.getStart());
-    EXPECT_EQ(Vector(0, 1), r.getDirection());
 
     r.setStart(Point(-1.5, 2.3));
-    r.setDirection(Vector(4.2, -1.2));
     EXPECT_EQ(Point(-1.5, 2.3), r.getStart());
-    EXPECT_EQ(Vector(4.2, -1.2), r.getDirection());
+}
+
+TEST(RayTest, angle_direction_setter)
+{
+    Ray r = Ray(Point(3, 2), Angle::quarter());
+    EXPECT_EQ(Angle::quarter(), r.getDirection());
+
+    r.setDirection(Angle::ofDegrees(60));
+    EXPECT_EQ(Angle::ofDegrees(60), r.getDirection());
+}
+
+TEST(RayTest, vector_direction_setter)
+{
+    Ray r = Ray(Point(3, 2), Angle::ofRadians(0.5));
+    EXPECT_EQ(Angle::ofRadians(0.5), r.getDirection());
+
+    r.setDirection(Vector(4.2, -1.2));
+    EXPECT_EQ(Vector(4.2, -1.2).orientation(), r.getDirection());
 }
 
 TEST(RayTest, rotate)
 {
-    Ray r = Ray(Point(1, 1), Vector(2, 0));
+    Ray r = Ray(Point(1, 1), Angle::zero());
     r.rotate(Angle::quarter());
     EXPECT_EQ(Point(1, 1), r.getStart());
-    EXPECT_EQ(Vector(0, 2), r.getDirection());
+    EXPECT_EQ(Angle::quarter(), r.getDirection());
 
     r.rotate(Angle::threeQuarter());
     EXPECT_EQ(Point(1, 1), r.getStart());
-    EXPECT_EQ(Vector(2, 0), r.getDirection());
+    EXPECT_EQ(Angle::zero(), r.getDirection());
 }

@@ -12,13 +12,24 @@ class Ray final
     inline explicit constexpr Ray() {}
 
     /**
-     * Creates a Ray with a start point and a direction
+     * Creates a Ray with a start point and a direction angle
      *
-     * @param start the starting point of Ray
-     * @param direction the direction of Ray
+     * @param start the start point of Ray
+     * @param direction the direction angle of Ray
+     */
+    inline explicit Ray(const Point& start, const Angle& direction)
+        : start_(start), direction_(direction)
+    {
+    }
+
+    /**
+     * Creates a Ray with a start point and a direction vector
+     *
+     * @param start the start point of Ray
+     * @param direction the direction vector of Ray
      */
     inline explicit Ray(const Point& start, const Vector& direction)
-        : start_(start), direction_(direction)
+        : Ray(start, direction.orientation())
     {
     }
 
@@ -37,7 +48,7 @@ class Ray final
      *
      * @return the direction of this Ray
      */
-    inline Vector getDirection() const
+    inline Angle getDirection() const
     {
         return direction_;
     }
@@ -53,13 +64,23 @@ class Ray final
     }
 
     /**
-     * Sets the direction of this Ray
+     * Sets the direction of this Ray with an angle
      *
-     * @param direction the new direction
+     * @param direction the new direction as an angle
+     */
+    inline void setDirection(const Angle& direction)
+    {
+        direction_ = direction;
+    }
+
+    /**
+     * Sets the direction of this Ray with a vector
+     *
+     * @param direction the new direction as a vector
      */
     inline void setDirection(const Vector& direction)
     {
-        direction_ = direction;
+        direction_ = direction.orientation();
     }
 
     /**
@@ -69,17 +90,17 @@ class Ray final
      */
     inline void rotate(Angle angle)
     {
-        direction_ = direction_.rotate(angle);
+        direction_ += angle;
     }
 
    private:
     /**
-     * The start point of the ray.
+     * The start point of the Ray.
      */
     Point start_;
 
     /**
-     * The direction of the ray.
+     * The direction of the Ray.
      */
-    Vector direction_;
+    Angle direction_;
 };
