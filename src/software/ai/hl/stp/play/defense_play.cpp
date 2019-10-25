@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/play/defense_play.h"
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
-#include "software/ai/hl/stp/evaluation/team.h"
+#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/possession.h"
+#include "software/ai/evaluation/team.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"

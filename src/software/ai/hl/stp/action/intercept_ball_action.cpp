@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/evaluation/pass.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
-#include "software/ai/hl/stp/evaluation/robot.h"
+#include "software/ai/evaluation/robot.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/geom/ray.h"
 #include "software/geom/util.h"

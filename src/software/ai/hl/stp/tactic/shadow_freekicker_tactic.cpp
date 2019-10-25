@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 

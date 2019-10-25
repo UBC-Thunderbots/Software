@@ -47,8 +47,8 @@ cc_library(
     deps = [
         ":action",
         "//shared:constants",
-        "//software/ai/hl/stp/evaluation:intercept",
-        "//software/ai/hl/stp/evaluation:robot",
+        "//software/ai/evaluation:intercept",
+        "//software/ai/evaluation:robot",
         "//software/ai/intent:move_intent",
         "//software/geom",
         "//software/util/logger",
