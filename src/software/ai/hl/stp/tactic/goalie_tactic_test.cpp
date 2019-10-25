@@ -1,9 +1,9 @@
-#include "ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
 #include <gtest/gtest.h>
 
-#include "ai/intent/move_intent.h"
-#include "test/test_util/test_util.h"
+#include "software/ai/intent/move_intent.h"
+#include "software/test_util/test_util.h"
 
 // The following tests will make sure the goalie stays in the requested
 // deflated defense area when best positioning to defend the ball.

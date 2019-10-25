@@ -2,10 +2,10 @@
 
 #include <limits>
 
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/intercept_ball_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/movespin_action.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/geom/util.h"
@@ -80,7 +80,8 @@ void GrabBallTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, ball.position(),
-                    (ball.position() - robot->position()).orientation(), 0.0));
+                    (ball.position() - robot->position()).orientation(), 0.0,
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
             }
         }
         else

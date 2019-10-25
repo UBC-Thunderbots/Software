@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/util/parameter/dynamic_parameters.h"
@@ -170,7 +170,8 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // The default behaviour is to move behind the ball and face the net
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
         }
     } while (!(kick_action.done() || chip_action.done()));
 }

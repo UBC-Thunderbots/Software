@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/evaluation/indirect_chip.h"
+#include "software/ai/evaluation/indirect_chip.h"
 
 #include "shared/constants.h"
 #include "software/geom/angle.h"

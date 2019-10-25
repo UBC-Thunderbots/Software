@@ -129,7 +129,7 @@ void Navigator::movePointNavigation(const MoveIntent &move_intent,
                 move_intent.getFinalAngle(),
                 move_intent.getFinalSpeed() *
                     getCloseToEnemyObstacleFactor((path_points)[1]),
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getDribblerEnable(), move_intent.getMoveType(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
             break;
@@ -148,7 +148,7 @@ void Navigator::movePointNavigation(const MoveIntent &move_intent,
             auto move = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
                 move_intent.getFinalAngle(), segment_final_vel,
-                move_intent.isDribblerEnabled(), move_intent.isSlowEnabled(),
+                move_intent.getDribblerEnable(), move_intent.getMoveType(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
             break;

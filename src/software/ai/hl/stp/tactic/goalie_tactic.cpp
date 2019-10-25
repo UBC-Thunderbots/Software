@@ -1,10 +1,10 @@
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/chip_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -213,7 +213,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
             next_intent = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_pos, goalie_orientation, 0.0, false, false, AUTOCHIP);
+                *robot, goalie_pos, goalie_orientation, 0.0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::AUTOCHIP);
         }
         // case 2: goalie does not need to panic and just needs to chip the ball out
         // of the net
@@ -257,8 +258,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
             // restrict the point to be within the defense area
             auto goalie_orientation = (ball.position() - goalie_pos).orientation();
             next_intent             = move_action.updateStateAndGetNextIntent(
-                *robot, goalie_restricted_pos, goalie_orientation, 0.0, false, false,
-                AUTOCHIP);
+                *robot, goalie_restricted_pos, goalie_orientation, 0.0,
+                DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
         }
 
         // compute angle between two vectors, negative goal post to ball and positive
@@ -309,8 +310,8 @@ void GoalieTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
         Angle goalie_orientation = (ball.position() - goalie_pos).orientation();
 
         next_intent = move_action.updateStateAndGetNextIntent(
-            *robot, goalie_pos, goalie_orientation, goalie_final_speed, false, false,
-            AUTOCHIP);
+            *robot, goalie_pos, goalie_orientation, goalie_final_speed,
+            DribblerEnable::OFF, MoveType::NORMAL, AUTOCHIP);
 
         yield(std::move(next_intent));
     } while (!move_action.done());
