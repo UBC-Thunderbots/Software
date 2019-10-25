@@ -6,10 +6,10 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/dribble_action.h"
 #include "software/ai/hl/stp/action/kick_action.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
@@ -171,14 +171,16 @@ void PenaltyKickTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         else if (!approach_ball_move_act.done())
         {
             yield(approach_ball_move_act.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0, true));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::ON, MoveType::NORMAL, AutokickType::NONE));
         }
         else
         {
             const Point next_shot_position = evaluate_next_position();
             const Angle next_angle = (next_shot_position - ball.position()).orientation();
             yield(rotate_with_ball_move_act.updateStateAndGetNextIntent(
-                *robot, robot.value().position(), next_angle, 0, true));
+                *robot, robot.value().position(), next_angle, 0, DribblerEnable::ON,
+                MoveType::NORMAL, AutokickType::NONE));
         }
 
     } while (

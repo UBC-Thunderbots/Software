@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/util.h"
 
@@ -84,8 +84,9 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
         }
         // We want the robot to move to the receiving position for the shot and also
         // rotate to the correct orientation
-        yield(move_action.updateStateAndGetNextIntent(*robot, pass.receiverPoint(),
-                                                      desired_angle, 0));
+        yield(move_action.updateStateAndGetNextIntent(
+            *robot, pass.receiverPoint(), desired_angle, 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutokickType::NONE));
     }
 
     // Vector from the ball to the robot
@@ -112,7 +113,8 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
             Angle ideal_orientation = shot.getOpenAngle();
 
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ideal_position, ideal_orientation, 0, false, false, AUTOKICK));
+                *robot, ideal_position, ideal_orientation, 0, DribblerEnable::OFF,
+                MoveType::NORMAL, AUTOKICK));
 
             // Calculations to check for termination conditions
             ball_to_robot_vector = robot->position() - ball.position();
@@ -135,7 +137,8 @@ void ReceiverTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
 
             // Move into position with the dribbler on
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, ball_receive_pos, ball_receive_orientation, 0, true, NONE));
+                *robot, ball_receive_pos, ball_receive_orientation, 0, DribblerEnable::ON,
+                MoveType::NORMAL, AutokickType::NONE));
         }
     }
     LOG(DEBUG) << "Finished";
