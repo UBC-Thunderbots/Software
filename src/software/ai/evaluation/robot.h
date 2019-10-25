@@ -1,8 +1,7 @@
 #pragma once
 
 #include "software/geom/point.h"
-#include "software/world/ball.h"
-#include "software/world/robot.h"
+#include "software/world/world.h"
 
 /**
  * This file contains independent Evaluation function to evaluate whether robot
@@ -30,24 +29,31 @@ namespace Evaluation
 
     /**
      * Determines if a robot has possession of the ball. A robot is considered to have
-     * possession if the ball is in a area close to the its dribbler.
+     * possession if the ball is in a area close to its dribbler.
      *
-     * @param ball The ball the is wanted to be possessed
+     * @param  The ball that is wanted to be possessed
      * @param robot The Robot which wants to know if it has the ball.
-     * @return True if the ball is close to the front dribbler and false otherwise
+     * @param timestamp The time at which we want to know if the robot had the ball
+     * @return True if the ball is close to the front dribbler, False if the ball is not,
+     *          and nullopt if we don't have information for the given timestamp. This
+     * function is guaranteed to return non-nullopt if no timestamp is passed in.
      */
-
-    bool robotHasPossession(const Ball& ball, const Robot& robot,
-                            Timestamp timestamp = Timestamp());
+    std::optional<bool> robotHasPossession(
+        const Ball& ball, const Robot& robot,
+        std::optional<Timestamp> timestamp = std::nullopt);
 
     /**
-     * Determines if a robot is in the process of receiving a passed ball.
-     *
-     * @param  The ball that has been passed
-     * @param robot The Robot which is a candidate for receiving the passed ball.
-     * @param timestamp The time at which we want to know if the robot had the ball
-     * @return True if the ball is close to the front dribbler and false otherwise
+     * Returns true if the robot is being passed to. A robot is considered to be being
+     * passed to if the ball is heading toward it above a certain speed.
+     * @param world The world
+     * @param robot The robot
+     * @param timestamp the timestamp of the world and robot states we want to consider
+     * @return True if the robot is being passed to at the given time, False if the robot
+     * is not being passed to, and nullopt if we don't have information for the given
+     * timestamp. This function is guaranteed to return non-nullopt if no timestamp is
+     * passed in.
      */
-    bool robotBeingPassedTo(const Ball& ball, const Robot& robot,
-                            Timestamp timestamp = Timestamp());
+    std::optional<bool> robotBeingPassedTo(
+        const World& world, const Robot& robot,
+        std::optional<Timestamp> timestamp = std::nullopt);
 }  // namespace Evaluation

@@ -80,7 +80,8 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_robot.position() +
                 enemy_to_passer_vector.norm(this->shadow_distance);
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0));
+                *robot, position_to_block_pass, enemy_to_passer_vector.orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
         }
         else
         {
@@ -107,19 +108,20 @@ void ShadowEnemyTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
                 enemy_robot.position() + enemy_shot_vector.norm(this->shadow_distance);
 
             // If the enemy robot already had the ball, try steal it and chip it away
-            if (Evaluation::robotHasPossession(ball, enemy_robot) &&
+            if (*Evaluation::robotHasPossession(ball, enemy_robot) &&
                 ball.velocity().len() < ball_steal_speed)
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, ball.position(),
-                    (ball.position() - robot->position()).orientation(), 0, true, false,
-                    AutokickType::AUTOCHIP));
+                    (ball.position() - robot->position()).orientation(), 0,
+                    DribblerEnable::ON, MoveType::NORMAL, AutokickType::AUTOCHIP));
             }
             else
             {
                 yield(move_action.updateStateAndGetNextIntent(
                     *robot, position_to_block_shot,
-                    enemy_shot_vector.orientation() + Angle::half(), 0));
+                    enemy_shot_vector.orientation() + Angle::half(), 0,
+                    DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
             }
         }
     } while (!move_action.done());

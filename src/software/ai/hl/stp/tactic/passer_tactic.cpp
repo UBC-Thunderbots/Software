@@ -61,8 +61,9 @@ void PasserTactic::calculateNextIntent(IntentCoroutine::push_type& yield)
                 .norm(DIST_TO_FRONT_OF_ROBOT_METERS + BALL_MAX_RADIUS_METERS * 2);
         Point wait_position = pass.passerPoint() - ball_offset;
 
-        yield(move_action.updateStateAndGetNextIntent(*robot, wait_position,
-                                                      pass.passerOrientation(), 0));
+        yield(move_action.updateStateAndGetNextIntent(
+            *robot, wait_position, pass.passerOrientation(), 0, DribblerEnable::OFF,
+            MoveType::NORMAL, AutokickType::NONE));
     }
 
     // The angle between the ball velocity vector and a vector from the passer
