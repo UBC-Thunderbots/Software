@@ -2,8 +2,9 @@
 
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
+#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
+#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 
 /**
  * A Play for Indirect Free kicks
@@ -29,6 +30,16 @@ class IndirectFreeKickPlay : public Play
 
     // The minimum pass score we will attempt
     static constexpr double MIN_ACCEPTABLE_PASS_SCORE = 0.05;
+
+    /**
+     * Finds a place to chip the ball near the net and chips there.
+     *
+     * @param yield The coroutine to yield to
+     * @param crease_defender_tactics The crease defender tactics to use
+     * @param goalie_tactic The goalie tactic to use
+     */
+    void chipAtGoalStage(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics, std::shared_ptr<GoalieTactic> goalie_tactic);
+
 
     /**
      * Updates the given cherry-pick tactics

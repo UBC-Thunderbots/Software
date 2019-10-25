@@ -8,8 +8,6 @@
 #include "software/ai/hl/stp/play/corner_kick_play.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/chip_tactic.h"
-#include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
-#include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
@@ -222,31 +220,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
                    << " which is below our threshold of" << MIN_ACCEPTABLE_PASS_SCORE
                    << ", so chipping at enemy net";
 
-        auto chip_tactic = std::make_shared<ChipTactic>(world.ball());
-
-        // Figure out where the fallback chip target is
-        double fallback_chip_target_x_offset =
-            Util::DynamicParameters::ShootOrChipPlay::
-                fallback_chip_target_enemy_goal_offset.value();
-
-        Point chip_target =
-            world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
-
-        do
-        {
-            double chip_dist = (chip_target - world.ball().position()).len();
-
-            updateCreaseDefenderTactics(crease_defender_tactics);
-            chip_tactic->updateWorldParams(world.ball());
-            chip_tactic->updateControlParams(world.ball().position(), chip_target,
-                                             chip_dist);
-            goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                             world.friendlyTeam(), world.enemyTeam());
-
-            yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
-                   std::get<1>(crease_defender_tactics)});
-
-        } while (!chip_tactic->done());
+        chipAtGoalStage(yield, crease_defender_tactics, goalie_tactic);
     }
 
 
@@ -287,6 +261,36 @@ void IndirectFreeKickPlay::updateCreaseDefenderTactics(
         crease_defender->updateWorldParams(world.ball(), world.field(),
                                            world.friendlyTeam(), world.enemyTeam());
     }
+}
+
+void IndirectFreeKickPlay::chipAtGoalStage(TacticCoroutine::push_type &yield,
+                                           std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+                                           std::shared_ptr<GoalieTactic> goalie_tactic) {
+    auto chip_tactic = std::make_shared<ChipTactic>(world.ball());
+
+    // Figure out where the fallback chip target is
+    double fallback_chip_target_x_offset =
+        Util::DynamicParameters::ShootOrChipPlay::
+            fallback_chip_target_enemy_goal_offset.value();
+
+    Point chip_target =
+        world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
+
+    do
+    {
+        double chip_dist = (chip_target - world.ball().position()).len();
+
+        updateCreaseDefenderTactics(crease_defender_tactics);
+        chip_tactic->updateWorldParams(world.ball());
+        chip_tactic->updateControlParams(world.ball().position(), chip_target,
+                                         chip_dist);
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
+
+        yield({goalie_tactic, chip_tactic, std::get<0>(crease_defender_tactics),
+               std::get<1>(crease_defender_tactics)});
+
+    } while (!chip_tactic->done());
 }
 
 // Register this play in the PlayFactory
