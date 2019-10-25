@@ -20,23 +20,32 @@ Point Spline::valueAt(double val) const
         throw std::invalid_argument(ss.str());
     }
 
-    // Note: this could be more performant with binary search
-    auto seg_it =
-        std::find_if(segments.begin(), segments.end(), [&](const SplineSegment& sseg) {
-            return (val >= sseg.start && val <= sseg.end);
-        });
+    Point retval;
 
-    if (seg_it == segments.end())
+    if (segments.empty())
     {
-        std::stringstream ss;
-        ss << "Tried to evaluate spline at " << val
-           << ", which was not in any interval of any segment";
-        throw std::runtime_error(ss.str());
+        retval = knots.front();
+    }
+    else
+    {
+        // Note: this could be more performant with binary search
+        auto seg_it = std::find_if(segments.begin(), segments.end(),
+                                   [&](const SplineSegment& sseg) {
+                                       return (val >= sseg.start && val <= sseg.end);
+                                   });
+
+        if (seg_it == segments.end())
+        {
+            std::stringstream ss;
+            ss << "Tried to evaluate spline at " << val
+               << ", which was not in any interval of any segment";
+            throw std::runtime_error(ss.str());
+        }
+
+        retval = Point(seg_it->x.valueAt(val), seg_it->y.valueAt(val));
     }
 
-    double x_val = seg_it->x.valueAt(val);
-    double y_val = seg_it->y.valueAt(val);
-    return Point(x_val, y_val);
+    return retval;
 }
 
 size_t Spline::size(void) const
