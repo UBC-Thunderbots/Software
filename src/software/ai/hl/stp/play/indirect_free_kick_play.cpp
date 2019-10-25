@@ -12,7 +12,6 @@
 #include "software/ai/hl/stp/tactic/passer_tactic.h"
 #include "software/ai/hl/stp/tactic/receiver_tactic.h"
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
-#include "software/ai/passing/pass_generator.h"
 #include "software/util/logger/custom_logging_levels.h"
 
 using namespace Passing;
@@ -107,8 +106,6 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     pass_generator.setTargetRegion(
         Rectangle(Point(0, world.field().yLength() / 2), world.field().enemyCornerNeg()));
 
-    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
-
     // Wait for a robot to be assigned to aligned to the ball to pass
     while (!align_to_ball_tactic->getAssignedRobot())
     {
@@ -151,35 +148,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     LOG(DEBUG) << "Finished aligning to ball";
 
-    // Align the kicker to pass and wait for a good pass
-    // To get the best pass possible we start by aiming for a perfect one and then
-    // decrease the minimum score over time
-    double min_score                  = 1.0;
-    Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
-    do
-    {
-        updateAlignToBallTactic(align_to_ball_tactic);
-        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
-        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
-        updatePassGenerator(pass_generator);
-        updateCreaseDefenderTactics(crease_defender_tactics);
-        goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                         world.friendlyTeam(), world.enemyTeam());
-
-        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
-               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
-               std::get<1>(crease_defender_tactics)});
-
-        best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
-        LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
-        LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
-
-        Duration time_since_commit_stage_start =
-            world.getMostRecentTimestamp() - commit_stage_start_time;
-        min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
-                                     MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
-                                 1.0);
-    } while (best_pass_and_score_so_far.rating < min_score);
+    PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+    findPassStage(yield, align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2, crease_defender_tactics, goalie_tactic, pass_generator, best_pass_and_score_so_far);
 
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
@@ -301,6 +271,46 @@ void IndirectFreeKickPlay::performPassStage(
         yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
                std::get<1>(crease_defender_tactics)});
     } while (!receiver->done());
+}
+
+void IndirectFreeKickPlay::findPassStage(TacticCoroutine::push_type &yield,
+                                                   std::shared_ptr<MoveTactic> align_to_ball_tactic,
+                                                   std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
+                                                   std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
+                                                   std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+                                                   std::shared_ptr<GoalieTactic> goalie_tactic,
+                                                   PassGenerator &pass_generator,
+                                                   PassWithRating& best_pass_and_score_so_far) {
+
+     // Align the kicker to pass and wait for a good pass
+    // To get the best pass possible we start by aiming for a perfect one and then
+    // decrease the minimum score over time
+    double min_score                  = 1.0;
+    Timestamp commit_stage_start_time = world.getMostRecentTimestamp();
+    do
+    {
+        updateAlignToBallTactic(align_to_ball_tactic);
+        align_to_ball_tactic->addBlacklistedAvoidArea(AvoidArea::BALL);
+        updateCherryPickTactics({cherry_pick_tactic_1, cherry_pick_tactic_2});
+        updatePassGenerator(pass_generator);
+        updateCreaseDefenderTactics(crease_defender_tactics);
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
+
+        yield({goalie_tactic, align_to_ball_tactic, cherry_pick_tactic_1,
+               cherry_pick_tactic_2, std::get<0>(crease_defender_tactics),
+               std::get<1>(crease_defender_tactics)});
+
+        best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
+        LOG(DEBUG) << "Best pass found so far is: " << best_pass_and_score_so_far.pass;
+        LOG(DEBUG) << "    with score: " << best_pass_and_score_so_far.rating;
+
+        Duration time_since_commit_stage_start =
+            world.getMostRecentTimestamp() - commit_stage_start_time;
+        min_score = 1 - std::min(time_since_commit_stage_start.getSeconds() /
+                                     MAX_TIME_TO_COMMIT_TO_PASS.getSeconds(),
+                                 1.0);
+    } while (best_pass_and_score_so_far.rating < min_score);
 }
 
 // Register this play in the PlayFactory
