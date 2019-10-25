@@ -4,7 +4,7 @@
 #include <random>
 #include <thread>
 
-#include "software/ai/passing/evaluation.h"
+#include "software/ai/passing/cost_function.h"
 #include "software/ai/passing/pass.h"
 #include "software/ai/passing/pass_with_rating.h"
 #include "software/util/optimization/gradient_descent_optimizer.h"
