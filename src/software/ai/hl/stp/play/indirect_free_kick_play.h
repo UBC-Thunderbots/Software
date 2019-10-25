@@ -40,6 +40,16 @@ class IndirectFreeKickPlay : public Play
      */
     void chipAtGoalStage(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics, std::shared_ptr<GoalieTactic> goalie_tactic);
 
+    /**
+     * Given a pass, coordinates and executes the pass with a Passer and Receiver
+     *
+     * @param yield The coroutine to yield
+     * @param crease_defender_tactics The crease defender tactics to use
+     * @param goalie_tactic The goalie tactic to use
+     * @param best_pass_and_score_so_far The Pass to execute
+     */
+    void performPassStage(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics, std::shared_ptr<GoalieTactic> goalie_tactic, PassWithRating best_pass_and_score_so_far);
+
 
     /**
      * Updates the given cherry-pick tactics

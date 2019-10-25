@@ -183,36 +183,7 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
-        // Commit to a pass
-        Pass pass = best_pass_and_score_so_far.pass;
-
-        LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-        LOG(DEBUG) << "Score of pass we committed to: "
-                   << best_pass_and_score_so_far.rating;
-
-        // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
-        //                    to save CPU cycles
-
-        // Perform the pass and wait until the receiver is finished
-        auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
-        auto receiver = std::make_shared<ReceiverTactic>(
-            world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
-            false);
-        do
-        {
-            updateCreaseDefenderTactics(crease_defender_tactics);
-            passer->updateWorldParams(world.ball());
-            passer->updateControlParams(pass);
-            receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
-                                        world.ball());
-            receiver->updateControlParams(pass);
-            receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
-            goalie_tactic->updateWorldParams(world.ball(), world.field(),
-                                             world.friendlyTeam(), world.enemyTeam());
-
-            yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
-                   std::get<1>(crease_defender_tactics)});
-        } while (!receiver->done());
+        performPassStage(yield, crease_defender_tactics, goalie_tactic, best_pass_and_score_so_far);
     }
     else
     {
@@ -291,6 +262,42 @@ void IndirectFreeKickPlay::chipAtGoalStage(TacticCoroutine::push_type &yield,
                std::get<1>(crease_defender_tactics)});
 
     } while (!chip_tactic->done());
+}
+
+void IndirectFreeKickPlay::performPassStage(TacticCoroutine::push_type &yield,
+                                            std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+                                            std::shared_ptr<GoalieTactic> goalie_tactic,
+                                            PassWithRating best_pass_and_score_so_far) {
+    // Commit to a pass
+    Pass pass = best_pass_and_score_so_far.pass;
+
+    LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
+    LOG(DEBUG) << "Score of pass we committed to: "
+               << best_pass_and_score_so_far.rating;
+
+    // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
+    //                    to save CPU cycles
+
+    // Perform the pass and wait until the receiver is finished
+    auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
+    auto receiver = std::make_shared<ReceiverTactic>(
+        world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
+        false);
+    do
+    {
+        updateCreaseDefenderTactics(crease_defender_tactics);
+        passer->updateWorldParams(world.ball());
+        passer->updateControlParams(pass);
+        receiver->updateWorldParams(world.friendlyTeam(), world.enemyTeam(),
+                                    world.ball());
+        receiver->updateControlParams(pass);
+        receiver->addWhitelistedAvoidArea(AvoidArea::BALL);
+        goalie_tactic->updateWorldParams(world.ball(), world.field(),
+                                         world.friendlyTeam(), world.enemyTeam());
+
+        yield({goalie_tactic, passer, receiver, std::get<0>(crease_defender_tactics),
+               std::get<1>(crease_defender_tactics)});
+    } while (!receiver->done());
 }
 
 // Register this play in the PlayFactory
