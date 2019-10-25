@@ -62,6 +62,16 @@ class Ray final
         direction_ = direction;
     }
 
+    /**
+     * Rotates this Ray counterclockwise by an angle
+     *
+     * @param angle the angle to rotate the Ray
+     */
+    inline void rotate(Angle angle)
+    {
+        direction_ = direction_.rotate(angle);
+    }
+
    private:
     /**
      * The start point of the ray.

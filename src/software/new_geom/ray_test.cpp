@@ -27,3 +27,15 @@ TEST(RayTest, setters)
     EXPECT_EQ(Point(-1.5, 2.3), r.getStart());
     EXPECT_EQ(Vector(4.2, -1.2), r.getDirection());
 }
+
+TEST(RayTest, rotate)
+{
+    Ray r = Ray(Point(1, 1), Vector(2, 0));
+    r.rotate(Angle::quarter());
+    EXPECT_EQ(Point(1, 1), r.getStart());
+    EXPECT_EQ(Vector(0, 2), r.getDirection());
+
+    r.rotate(Angle::threeQuarter());
+    EXPECT_EQ(Point(1, 1), r.getStart());
+    EXPECT_EQ(Vector(2, 0), r.getDirection());
+}
