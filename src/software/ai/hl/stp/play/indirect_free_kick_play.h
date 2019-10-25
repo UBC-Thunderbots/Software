@@ -73,14 +73,13 @@ class IndirectFreeKickPlay : public Play
      * @param best_pass_and_score_so_far The best pass and score so far
      */
     void findPassStage(
-            TacticCoroutine::push_type &yield,
-            std::shared_ptr<MoveTactic> align_to_ball_tactic,
-            std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
-            std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
-            std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-            std::shared_ptr<GoalieTactic> goalie_tactic,
-            PassGenerator& pass_generator,
-            PassWithRating& best_pass_and_score_so_far);
+        TacticCoroutine::push_type &yield,
+        std::shared_ptr<MoveTactic> align_to_ball_tactic,
+        std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
+        std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+        std::shared_ptr<GoalieTactic> goalie_tactic, PassGenerator &pass_generator,
+        PassWithRating &best_pass_and_score_so_far);
 
     /**
      * Updates the given cherry-pick tactics

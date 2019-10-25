@@ -149,7 +149,9 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
     LOG(DEBUG) << "Finished aligning to ball";
 
     PassWithRating best_pass_and_score_so_far = pass_generator.getBestPassSoFar();
-    findPassStage(yield, align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2, crease_defender_tactics, goalie_tactic, pass_generator, best_pass_and_score_so_far);
+    findPassStage(yield, align_to_ball_tactic, cherry_pick_tactic_1, cherry_pick_tactic_2,
+                  crease_defender_tactics, goalie_tactic, pass_generator,
+                  best_pass_and_score_so_far);
 
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
@@ -273,16 +275,15 @@ void IndirectFreeKickPlay::performPassStage(
     } while (!receiver->done());
 }
 
-void IndirectFreeKickPlay::findPassStage(TacticCoroutine::push_type &yield,
-                                                   std::shared_ptr<MoveTactic> align_to_ball_tactic,
-                                                   std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
-                                                   std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
-                                                   std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-                                                   std::shared_ptr<GoalieTactic> goalie_tactic,
-                                                   PassGenerator &pass_generator,
-                                                   PassWithRating& best_pass_and_score_so_far) {
-
-     // Align the kicker to pass and wait for a good pass
+void IndirectFreeKickPlay::findPassStage(
+    TacticCoroutine::push_type &yield, std::shared_ptr<MoveTactic> align_to_ball_tactic,
+    std::shared_ptr<CherryPickTactic> cherry_pick_tactic_1,
+    std::shared_ptr<CherryPickTactic> cherry_pick_tactic_2,
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+    std::shared_ptr<GoalieTactic> goalie_tactic, PassGenerator &pass_generator,
+    PassWithRating &best_pass_and_score_so_far)
+{
+    // Align the kicker to pass and wait for a good pass
     // To get the best pass possible we start by aiming for a perfect one and then
     // decrease the minimum score over time
     double min_score                  = 1.0;
