@@ -98,10 +98,10 @@ TEST_F(PassingEvaluationTest, ratePass_speed_test)
                        Timestamp::fromSeconds(0)),
              }));
 
-    std::uniform_real_distribution x_distribution(-world.field().length() / 2,
-                                                  world.field().length() / 2);
-    std::uniform_real_distribution y_distribution(-world.field().width() / 2,
-                                                  world.field().width() / 2);
+    std::uniform_real_distribution x_distribution(-world.field().xLength() / 2,
+                                                  world.field().xLength() / 2);
+    std::uniform_real_distribution y_distribution(-world.field().yLength() / 2,
+                                                  world.field().yLength() / 2);
 
     double curr_time = world.getMostRecentTimestamp().getSeconds();
     double min_start_time_offset =
