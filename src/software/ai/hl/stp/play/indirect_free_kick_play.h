@@ -2,9 +2,9 @@
 
 #include "software/ai/hl/stp/play/play.h"
 #include "software/ai/hl/stp/tactic/cherry_pick_tactic.h"
-#include "software/ai/hl/stp/tactic/move_tactic.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
+#include "software/ai/hl/stp/tactic/move_tactic.h"
 
 /**
  * A Play for Indirect Free kicks
@@ -38,7 +38,10 @@ class IndirectFreeKickPlay : public Play
      * @param crease_defender_tactics The crease defender tactics to use
      * @param goalie_tactic The goalie tactic to use
      */
-    void chipAtGoalStage(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics, std::shared_ptr<GoalieTactic> goalie_tactic);
+    void chipAtGoalStage(
+        TacticCoroutine::push_type &yield,
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+        std::shared_ptr<GoalieTactic> goalie_tactic);
 
     /**
      * Given a pass, coordinates and executes the pass with a Passer and Receiver
@@ -48,7 +51,11 @@ class IndirectFreeKickPlay : public Play
      * @param goalie_tactic The goalie tactic to use
      * @param best_pass_and_score_so_far The Pass to execute
      */
-    void performPassStage(TacticCoroutine::push_type &yield, std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics, std::shared_ptr<GoalieTactic> goalie_tactic, PassWithRating best_pass_and_score_so_far);
+    void performPassStage(
+        TacticCoroutine::push_type &yield,
+        std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+        std::shared_ptr<GoalieTactic> goalie_tactic,
+        PassWithRating best_pass_and_score_so_far);
 
 
     /**

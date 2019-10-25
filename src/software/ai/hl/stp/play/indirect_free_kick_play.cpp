@@ -183,7 +183,8 @@ void IndirectFreeKickPlay::getNextTactics(TacticCoroutine::push_type &yield)
 
     if (best_pass_and_score_so_far.rating > MIN_ACCEPTABLE_PASS_SCORE)
     {
-        performPassStage(yield, crease_defender_tactics, goalie_tactic, best_pass_and_score_so_far);
+        performPassStage(yield, crease_defender_tactics, goalie_tactic,
+                         best_pass_and_score_so_far);
     }
     else
     {
@@ -234,15 +235,17 @@ void IndirectFreeKickPlay::updateCreaseDefenderTactics(
     }
 }
 
-void IndirectFreeKickPlay::chipAtGoalStage(TacticCoroutine::push_type &yield,
-                                           std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-                                           std::shared_ptr<GoalieTactic> goalie_tactic) {
+void IndirectFreeKickPlay::chipAtGoalStage(
+    TacticCoroutine::push_type &yield,
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+    std::shared_ptr<GoalieTactic> goalie_tactic)
+{
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball());
 
     // Figure out where the fallback chip target is
     double fallback_chip_target_x_offset =
-        Util::DynamicParameters::ShootOrChipPlay::
-            fallback_chip_target_enemy_goal_offset.value();
+        Util::DynamicParameters::ShootOrChipPlay::fallback_chip_target_enemy_goal_offset
+            .value();
 
     Point chip_target =
         world.field().enemyGoal() - Vector(fallback_chip_target_x_offset, 0);
@@ -253,8 +256,7 @@ void IndirectFreeKickPlay::chipAtGoalStage(TacticCoroutine::push_type &yield,
 
         updateCreaseDefenderTactics(crease_defender_tactics);
         chip_tactic->updateWorldParams(world.ball());
-        chip_tactic->updateControlParams(world.ball().position(), chip_target,
-                                         chip_dist);
+        chip_tactic->updateControlParams(world.ball().position(), chip_target, chip_dist);
         goalie_tactic->updateWorldParams(world.ball(), world.field(),
                                          world.friendlyTeam(), world.enemyTeam());
 
@@ -264,25 +266,26 @@ void IndirectFreeKickPlay::chipAtGoalStage(TacticCoroutine::push_type &yield,
     } while (!chip_tactic->done());
 }
 
-void IndirectFreeKickPlay::performPassStage(TacticCoroutine::push_type &yield,
-                                            std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
-                                            std::shared_ptr<GoalieTactic> goalie_tactic,
-                                            PassWithRating best_pass_and_score_so_far) {
+void IndirectFreeKickPlay::performPassStage(
+    TacticCoroutine::push_type &yield,
+    std::array<std::shared_ptr<CreaseDefenderTactic>, 2> crease_defender_tactics,
+    std::shared_ptr<GoalieTactic> goalie_tactic,
+    PassWithRating best_pass_and_score_so_far)
+{
     // Commit to a pass
     Pass pass = best_pass_and_score_so_far.pass;
 
     LOG(DEBUG) << "Committing to pass: " << best_pass_and_score_so_far.pass;
-    LOG(DEBUG) << "Score of pass we committed to: "
-               << best_pass_and_score_so_far.rating;
+    LOG(DEBUG) << "Score of pass we committed to: " << best_pass_and_score_so_far.rating;
 
     // TODO (Issue #636): We should stop the PassGenerator and Cherry-pick tactic here
     //                    to save CPU cycles
 
     // Perform the pass and wait until the receiver is finished
-    auto passer   = std::make_shared<PasserTactic>(pass, world.ball(), false);
-    auto receiver = std::make_shared<ReceiverTactic>(
-        world.field(), world.friendlyTeam(), world.enemyTeam(), pass, world.ball(),
-        false);
+    auto passer = std::make_shared<PasserTactic>(pass, world.ball(), false);
+    auto receiver =
+        std::make_shared<ReceiverTactic>(world.field(), world.friendlyTeam(),
+                                         world.enemyTeam(), pass, world.ball(), false);
     do
     {
         updateCreaseDefenderTactics(crease_defender_tactics);
