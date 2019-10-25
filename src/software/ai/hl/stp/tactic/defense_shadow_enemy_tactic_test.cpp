@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 

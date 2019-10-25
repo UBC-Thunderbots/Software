@@ -1,9 +1,9 @@
 #include "software/ai/hl/stp/tactic/defense_shadow_enemy_tactic.h"
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/robot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/evaluation/robot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/util/logger/init.h"
 #include "software/util/parameter/dynamic_parameters.h"
