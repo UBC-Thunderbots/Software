@@ -35,6 +35,7 @@ cc_library(
         "//shared:constants",
         "//software/ai/hl/stp/evaluation:enemy_threat",
         "//software/ai/hl/stp/evaluation:possession",
+        "//software/ai/hl/stp/evaluation:team",
         "//software/ai/hl/stp/tactic:crease_defender_tactic",
         "//software/ai/hl/stp/tactic:defense_shadow_enemy_tactic",
         "//software/ai/hl/stp/tactic:goalie_tactic",
