@@ -68,7 +68,6 @@ void DefensePlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                CreaseDefenderTactic::LeftOrRight::RIGHT),
     };
 
-    // fallback tactics slightly more reasonable than before
     auto move_tactics = std::vector<std::shared_ptr<MoveTactic>>{
         std::make_shared<MoveTactic>(true), std::make_shared<MoveTactic>(true)};
 
