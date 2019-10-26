@@ -383,7 +383,7 @@ inline Vector Vector::norm() const
 
 inline Vector Vector::norm(double length) const
 {
-    return len() < 1.0e-9 ? Vector() : Vector(x_ * length / len(), y_ * length / len());
+    return norm() * length;
 }
 
 inline constexpr Vector Vector::perp() const

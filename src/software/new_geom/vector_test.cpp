@@ -77,6 +77,13 @@ TEST(VectorLogicTests, norm_vector_from_vector_with_length_test)
     EXPECT_EQ(1.6, v.y());
 }
 
+TEST(VectorLogicTests, norm_near_zero_vector_test)
+{
+    Vector u = Vector(GeomConstants::EPSILON * 0.99, GeomConstants::EPSILON * 0.99);
+    Vector v = u.norm();
+    EXPECT_EQ(Vector(), v);
+}
+
 TEST(VectorLogicTests, vector_perp_test)
 {
     Vector u = Vector(3, 4);
