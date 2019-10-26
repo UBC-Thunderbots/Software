@@ -60,7 +60,8 @@ void Navigator::visit(const MoveIntent &move_intent)
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    Path path = path_planner->findPath(current_start, current_end, navigable_area, obstacles);
+    Path path =
+        path_planner->findPath(current_start, current_end, navigable_area, obstacles);
 
     moveNavigation(move_intent, path);
 }
@@ -113,7 +114,8 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                     Util::DynamicParameters::Navigator::transition_speed_factor.value();
                 desired_final_speed = calculateTransitionSpeedBetweenSegments(
-                    path_points[0], path_points[1], path_points[2], transition_final_speed);
+                    path_points[0], path_points[1], path_points[2],
+                    transition_final_speed);
             }
 
             auto move = std::make_unique<MovePrimitive>(
