@@ -113,15 +113,17 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
                 double transition_final_speed =
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                     Util::DynamicParameters::Navigator::transition_speed_factor.value();
+
                 desired_final_speed = calculateTransitionSpeedBetweenSegments(
-                    path_points[0], path_points[1], path_points[2],
+                    path_points[0], current_destination, path_points[2],
                     transition_final_speed);
             }
 
             auto move = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), path_points[1], move_intent.getFinalAngle(),
+                move_intent.getRobotId(), current_destination,
+                move_intent.getFinalAngle(),
                 // slow down around enemy robots
-                desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
+                desired_final_speed * getCloseToEnemyObstacleFactor(current_destination),
                 move_intent.getDribblerEnable(), move_intent.getMoveType(),
                 move_intent.getAutoKickType());
             current_primitive = std::move(move);
@@ -309,17 +311,8 @@ double Navigator::getCloseToEnemyObstacleFactor(const Point &p)
         }
     }
 
-    // linear mapping of 0 to 1 onto 0 to robot max speed and return 1 when closest_dist
-    // is greater than
-    // 2
-    if (closest_dist > ROBOT_MAX_SPEED_METERS_PER_SECOND)
-    {
-        return 1;
-    }
-    else
-    {
-        return closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND;
-    }
+    // clamp ratio between 0 and 1
+    return std::clamp(closest_dist / ROBOT_MAX_SPEED_METERS_PER_SECOND, 0.0, 1.0);
 }
 
 std::vector<std::vector<Point>> Navigator::getPlannedPaths()
