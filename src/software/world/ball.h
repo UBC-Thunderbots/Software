@@ -18,7 +18,8 @@ class Ball final
      * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
-     * @param history_size The number of previous ball states that should be stored. Must be > 0
+     * @param history_size The number of previous ball states that should be stored. Must
+     * be > 0
      *
      */
     explicit Ball(Point position, Vector velocity, const Timestamp &timestamp,
@@ -48,7 +49,8 @@ class Ball final
 
     /**
      * Updates the ball with new data, updating the current data as well as the predictive
-     * model, converts the given parameters to a BallState and calls updateCurrentState(BallState &new_state)
+     * model, converts the given parameters to a BallState and calls
+     * updateCurrentState(BallState &new_state)
      *
      * @param new_position , the new position of the ball
      * @param new_velocity , the new velocity of the ball

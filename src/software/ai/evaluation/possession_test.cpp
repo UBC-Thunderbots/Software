@@ -189,9 +189,9 @@ TEST(PossessionEvaluationTest, team_had_possession_half_second_ago)
                          AngularVelocity::zero(), Timestamp::fromSeconds(2));
 
     world.updateBallState(BallState(
-            {0.1, 2.5}, {0, 10},
-            Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
-            possession_buffer_time_seconds.value())));
+        {0.1, 2.5}, {0, 10},
+        Timestamp::fromSeconds(2 + Util::DynamicParameters::Evaluation::Possession::
+                                       possession_buffer_time_seconds.value())));
 
     robot0.updateState(
         Point(-2, 3), Vector(), Angle::zero(), AngularVelocity::zero(),
