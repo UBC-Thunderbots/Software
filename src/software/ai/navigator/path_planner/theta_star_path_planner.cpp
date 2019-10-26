@@ -186,7 +186,7 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     Point closest_destination = findClosestFreePoint(destination);
     GridPoint src_coord       = convertPointToCell(start);
     GridPoint dest_coord      = convertPointToCell(closest_destination);
-    Path empty_ret_val(std::vector<Point>({}));
+    Path empty_ret_val(std::nullopt);
 
     // If the source is out of range
     if (isValid(src_coord.first, src_coord.second) == false)

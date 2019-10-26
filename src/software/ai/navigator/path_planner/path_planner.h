@@ -5,10 +5,7 @@
 #include "software/ai/navigator/obstacle/obstacle.h"
 #include "software/geom/point.h"
 #include "software/geom/rectangle.h"
-<<<<<<< HEAD
-=======
 #include "software/geom/spline.h"
->>>>>>> upstream/master
 
 /**
  * PathPlanner is an interface for a path planner that,
@@ -17,11 +14,7 @@
  * if a path exists, otherwise it will return nothing.
  */
 
-<<<<<<< HEAD
-using Path = std::variant<std::vector<Curve>, std::vector<Point>>;
-=======
 using Path = std::optional<Spline>;
->>>>>>> upstream/master
 
 class PathPlanner
 {
