@@ -18,7 +18,7 @@ class Ball final
      * @param velocity The velocity of the ball, in metres per second
      * @param timestamp The timestamp at which the ball was observed to be at the
      * given position and velocity
-     * @param history_size The number of previous ball states that should be stored.
+     * @param history_size The number of previous ball states that should be stored. Must be > 0
      *
      */
     explicit Ball(Point position, Vector velocity, const Timestamp &timestamp,
@@ -34,7 +34,7 @@ class Ball final
     explicit Ball(BallState &ball_state, unsigned int history_size = 20);
 
     /**
-     * Returns the last updated BallState of the ball
+     * Returns the current state of the ball
      */
     BallState currentState() const;
 
@@ -46,6 +46,14 @@ class Ball final
      */
     void updateCurrentState(const BallState &new_state);
 
+    /**
+     * Updates the ball with new data, updating the current data as well as the predictive
+     * model, converts the given parameters to a BallState and calls updateCurrentState(BallState &new_state)
+     *
+     * @param new_position , the new position of the ball
+     * @param new_velocity , the new velocity of the ball
+     * @param timestamp , the timestamp of the given position and velocity
+     */
     void updateCurrentState(const Point &new_position, const Vector &new_velocity,
                             const Timestamp &timestamp);
 
@@ -175,5 +183,6 @@ class Ball final
     // All previous states of the ball, with the most recent position at the front of the
     // queue, This buffer will never be empty as it's initialized with a BallState on
     // creation
+    // The buffer size (history_size) must be > 0
     boost::circular_buffer<BallState> states_;
 };

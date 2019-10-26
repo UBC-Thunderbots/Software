@@ -1,25 +1,25 @@
-#include "ball_state.h"
+#include "software/world/ball_state.h"
 
 BallState::BallState(Point position, Vector velocity, const Timestamp &timestamp)
 {
-    this->pos  = position;
-    this->vel  = velocity;
-    this->time = timestamp;
+    this->position_  = position;
+    this->velocity_  = velocity;
+    this->timestamp_ = timestamp;
 }
 
 Point BallState::position() const
 {
-    return pos;
+    return position_;
 }
 
 Vector BallState::velocity() const
 {
-    return vel;
+    return velocity_;
 }
 
 Timestamp BallState::timestamp() const
 {
-    return time;
+    return timestamp_;
 }
 
 bool BallState::operator==(const BallState &other) const

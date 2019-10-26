@@ -59,9 +59,9 @@ class BallState final
     bool operator!=(const BallState &other) const;
 
    private:
-    Point pos;
+    Point position_;
 
-    Vector vel;
+    Vector velocity_;
 
-    Timestamp time;
+    Timestamp timestamp_;
 };
