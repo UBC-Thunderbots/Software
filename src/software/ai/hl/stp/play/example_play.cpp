@@ -32,6 +32,7 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
     auto move_tactic_5 = std::make_shared<MoveTactic>(true);
     auto move_tactic_6 = std::make_shared<MoveTactic>(true);
 
+    // Continue to loop to demonstrate the example play indefinitely
     do
     {
         // The angle between each robot spaced out in a circle around the ball
@@ -58,6 +59,8 @@ void ExamplePlay::getNextTactics(TacticCoroutine::push_type &yield)
             (angle_between_robots * 6) + Angle::half(), 0);
 
         // yield the Tactics this Play wants to run, in order of priority
+        // If there are fewer robots in play, robots at the end of the list will not be
+        // assigned
         yield({move_tactic_1, move_tactic_2, move_tactic_3, move_tactic_4, move_tactic_5,
                move_tactic_6});
     } while (true);
