@@ -117,7 +117,7 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
                         Util::DynamicParameters->getNavigatorConfig()
                             ->TransitionSpeedFactor()
-                            ->value());
+                            ->value()));
 
             auto move = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
