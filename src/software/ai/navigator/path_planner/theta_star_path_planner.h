@@ -1,9 +1,7 @@
 #pragma once
-#include <bits/stdc++.h>
 #include <unistd.h>
 
 #include "software/ai/navigator/path_planner/path_planner.h"
-#include "software/world/field.h"
 
 /**
  * ThetaStarPathPlanner uses the theta * algorithm to implement
@@ -20,14 +18,15 @@ class ThetaStarPathPlanner : public PathPlanner
      *
      * @param start start point
      * @param destination destination point
-     * @param field field
+     * @param navigable_area Rectangle representing the navigable area
      * @param obstacles obstacles to avoid
      *
      * @return a vector of points that is the optimal path avoiding obstacles
      * 		if no valid path then return empty vector
      */
-    PathType findPath(const Point &start, const Point &destination, const Field &field,
-                      const std::vector<Obstacle> &obstacles) override;
+    Path findPath(const Point &start, const Point &destination,
+                  const Rectangle &navigable_area,
+                  const std::vector<Obstacle> &obstacles) override;
 
    private:
     typedef std::pair<int, int> CellCoordinate;
@@ -144,19 +143,19 @@ class ThetaStarPathPlanner : public PathPlanner
     bool isValidAndFreeOfObstacles(Point p);
 
     /**
-     * Converts a cell in grid to a point on field
+     * Converts a cell in grid to a point on navigable area
      *
      * @param row row of cell
      * @param col col of cell
      *
-     * @return Point on field
+     * @return Point on navigable area
      */
     Point convertCellToPoint(int row, int col);
 
     /**
-     * Converts a point on field to a cell in grid
+     * Converts a point on navigable area to a cell in grid
      *
-     * @param p point on field
+     * @param p point on navigable area
      *
      * @return cell in grid
      */
