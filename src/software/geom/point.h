@@ -469,7 +469,9 @@ inline Angle Point::orientation() const
 
 inline constexpr bool Point::isnan() const
 {
-    return std::isnan(_x) || std::isnan(_y);
+    // comparing a value to itself will return false only if the value is NaN
+    // see https://www.geeksforgeeks.org/nan-in-cpp-what-is-it-and-how-to-check-for-it/
+    return _x == _x || _y == _y;
 }
 
 inline constexpr bool Point::isClose(const Point &other) const
@@ -479,7 +481,9 @@ inline constexpr bool Point::isClose(const Point &other) const
 
 inline constexpr bool Point::isClose(const Point &other, double dist) const
 {
-    return std::pow(_x - other.x(), 2) + std::pow(_y - other.y(), 2) < dist * dist;
+    double x_dist = _x - other.x();
+    double y_dist = _y - other.y();
+    return (x_dist *  x_dist) + (y_dist * y_dist) < dist * dist;
 }
 
 inline constexpr Point operator+(const Point &p, const Point &q)
