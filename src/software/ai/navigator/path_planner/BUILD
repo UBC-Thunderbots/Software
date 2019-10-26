@@ -5,7 +5,6 @@ cc_library(
     hdrs = ["path_planner.h"],
     deps = [
         "//software/ai/navigator/obstacle",
-        "//software/ai/navigator/curve",
         "//software/geom",
     ],
 )

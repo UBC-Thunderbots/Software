@@ -7,21 +7,6 @@
 #include "software/test_util/test_util.h"
 #include "software/world/field.h"
 
-/**
- * Prints out the path formed by the points given
- * @param path_points
- */
-void printPath(std::vector<Point> path_points)
-{
-    for (Point p : path_points)
-    {
-        {
-            printf("-> (%lf,%lf) ", p.x(), p.y());
-        }
-    }
-    printf("\n");
-}
-
 void checkPathDoesNotExceedBoundingBox(std::vector<Point> path_points,
                                        Rectangle bounding_box)
 {
@@ -73,25 +58,19 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_src)
         Polygon({Point(0.5, 1), Point(-0.5, 1), Point(-0.5, -1), Point(0.5, -1)}))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-    std::vector<Point> path_points;
 
-    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                            field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                             field.totalXLength(), field.totalYLength());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, obstacles));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        // not a valid path
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
 
     // Make sure the start and end of the path are correct
-    EXPECT_EQ(start, path_points.front());
-    EXPECT_EQ(dest, path_points.back());
+    EXPECT_EQ(start, path->startPoint());
+    EXPECT_EQ(dest, path->endPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({0, 0.1}, {3.1, -0.1});
@@ -115,24 +94,18 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_blocked_dest)
         Polygon({Point(3.5, 1), Point(2.5, 1), Point(2.5, -1), Point(3.5, -1)}))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-    std::vector<Point> path_points;
 
-    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                            field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                             field.totalXLength(), field.totalYLength());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, obstacles));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        // not a valid path
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
 
     // The path should start at exactly the start point
-    EXPECT_EQ(start, path_points.front());
+    EXPECT_EQ(start, path->startPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 0.1}, {3.1, -0.1});
@@ -153,25 +126,19 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
         Obstacle(Polygon({Point(1, 1), Point(2, 1), Point(2, -1), Point(1, -1)}))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-    std::vector<Point> path_points;
 
-    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                            field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                             field.totalXLength(), field.totalYLength());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, obstacles));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        // not a valid path
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path_points.front());
-    EXPECT_EQ(dest, path_points.back());
+    EXPECT_EQ(start, path->startPoint());
+    EXPECT_EQ(dest, path->endPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box({-0.1, 1.2}, {3.1, -1.2});
@@ -192,25 +159,19 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_single_obstacle_alon
         Obstacle(Polygon({Point(1, 1), Point(1, 2), Point(-1, 2), Point(-1, 1)}))};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-    std::vector<Point> path_points;
 
-    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                            field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                             field.totalXLength(), field.totalYLength());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, obstacles));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        // not a valid path
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
 
     // The path should start at exactly the start point and end at exactly the dest
-    EXPECT_EQ(start, path_points.front());
-    EXPECT_EQ(dest, path_points.back());
+    EXPECT_EQ(start, path->startPoint());
+    EXPECT_EQ(dest, path->endPoint());
 
     // Make sure the path does not exceed a bounding box
     Rectangle bounding_box(
@@ -233,27 +194,19 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_empty_grid)
     std::vector<Obstacle> obstacles = {};
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-    std::vector<Point> path_points;
 
-    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                            field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                             field.totalXLength(), field.totalYLength());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, obstacles));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        // not a valid path
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, obstacles);
+
+    EXPECT_TRUE(path != std::nullopt);
 
     // Since there are no obstacles, there should be two path points, one at the start
     // and one at the destination
-    ASSERT_EQ(2, path_points.size());
-    ASSERT_EQ(start, path_points.front());
-    ASSERT_EQ(dest, path_points.back());
+    EXPECT_EQ(2, path->size());
+    EXPECT_EQ(start, path->startPoint());
+    EXPECT_EQ(dest, path->endPoint());
 }
 
 TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
@@ -264,25 +217,19 @@ TEST(TestThetaStarPathPlanner, test_theta_star_path_planner_same_cell_dest)
     std::vector<Obstacle> obstacles = std::vector<Obstacle>();
 
     std::unique_ptr<PathPlanner> planner = std::make_unique<ThetaStarPathPlanner>();
-    std::vector<Point> path_points;
 
-    Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                            field.totalXLength(), field.totalYLength());
+    Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                             field.totalXLength(), field.totalYLength());
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, obstacles));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        // not a valid path
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, obstacles);
 
-    ASSERT_EQ(2, path_points.size());
-    ASSERT_EQ(start, path_points.front());
-    ASSERT_EQ(dest, path_points.back());
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(2, path->size());
+    EXPECT_EQ(start, path->startPoint());
+    EXPECT_EQ(dest, path->endPoint());
 }
 
 TEST(TestThetaStarPathPlanner, performance)
@@ -316,7 +263,6 @@ TEST(TestThetaStarPathPlanner, performance)
 
     Point start(0, 0), dest(4.5, 0);
 
-    std::vector<Point> path_points;
     auto start_time = std::chrono::system_clock::now();
     for (int i = 0; i < num_iterations; i++)
     {
@@ -325,18 +271,10 @@ TEST(TestThetaStarPathPlanner, performance)
             std::unique_ptr<PathPlanner> planner =
                 std::make_unique<ThetaStarPathPlanner>();
 
-            Rectangle navigableArea(Point(field.totalXLength(), field.totalYLength()),
-                                    field.totalXLength(), field.totalYLength());
+            Rectangle navigable_area(Point(field.totalXLength(), field.totalYLength()),
+                                     field.totalXLength(), field.totalYLength());
 
-            try
-            {
-                path_points = std::get<std::vector<Point>>(
-                    planner->findPath(start, dest, navigableArea, obstacles));
-            }
-            catch (const std::bad_variant_access&)
-            {
-                FAIL();
-            }
+            planner->findPath(start, dest, navigable_area, obstacles);
         }
     }
 
@@ -345,7 +283,7 @@ TEST(TestThetaStarPathPlanner, performance)
     std::chrono::duration<double> duration = end_time - start_time;
 
     std::chrono::duration<double> avg =
-        duration / ((double)num_iterations * obstacle_sets.size());
+        duration / ((double)num_iterations * obstacle_sets.size() - 1);
 
     //    std::cout << "Took " <<
     //    std::chrono::duration_cast<std::chrono::microseconds>(duration).count() / 1000.0

@@ -330,7 +330,7 @@ GoalieTactic:
       default: 0.3
       type: "double"
       description: >- 
-          The radius to wedge the robot into the cone, defaults to robot radius
+          The radius to wedge the robot into the cone, defaults to MAX_ROBOT_RADIUS
   defense_area_deflation:
       min: 0.1
       max: 0.5

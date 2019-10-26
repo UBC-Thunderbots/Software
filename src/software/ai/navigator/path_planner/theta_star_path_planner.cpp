@@ -166,13 +166,13 @@ bool ThetaStarPathPlanner::updateVertex(GridPoint pCurr, GridPoint pNew, GridPoi
 
 // top level function
 Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination,
-                                    const Rectangle &navigableArea,
+                                    const Rectangle &navigable_area,
                                     const std::vector<Obstacle> &obstacles)
 {
     // Initialize member variables
     this->obstacles = obstacles;
-    maxNavXCoord    = navigableArea.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
-    maxNavYCoord    = navigableArea.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    maxNavXCoord    = navigable_area.xLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
+    maxNavYCoord    = navigable_area.yLength() / 2.0 - ROBOT_MAX_RADIUS_METERS;
     numGridRows     = (int)((maxNavXCoord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
                         SIZE_OF_GRID_CELL_IN_METERS);
     numGridCols     = (int)((maxNavYCoord * 2.0 + ROBOT_MAX_RADIUS_METERS) /
@@ -207,14 +207,14 @@ Path ThetaStarPathPlanner::findPath(const Point &start, const Point &destination
     {
         // If the destination GridCell is within one grid size of start or
         // start and destination, or start and closest_destination, within threshold
-        return std::vector<Point>({start, destination});
+        return Path(std::vector<Point>({start, destination}));
     }
 
 
     if ((start - closest_destination).len() <
         (CLOSE_TO_DEST_THRESHOLD * BLOCKED_DESINATION_OSCILLATION_MITIGATION))
     {
-        return std::vector<Point>({start, closest_destination});
+        return Path(std::vector<Point>({start, closest_destination}));
     }
 
     // The source is blocked

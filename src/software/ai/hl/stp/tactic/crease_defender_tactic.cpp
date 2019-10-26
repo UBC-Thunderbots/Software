@@ -3,9 +3,9 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
+#include "software/ai/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/action/move_action.h"
 #include "software/ai/hl/stp/action/stop_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/point.h"
 #include "software/geom/ray.h"
@@ -183,8 +183,8 @@ void CreaseDefenderTactic::calculateNextIntent(IntentCoroutine::push_type &yield
         {
             auto [defender_position, defender_orientation] = *desired_robot_state_opt;
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, defender_position, defender_orientation, 0.0, false, false,
-                AutokickType::AUTOCHIP));
+                *robot, defender_position, defender_orientation, 0.0, DribblerEnable::OFF,
+                MoveType::NORMAL, AutokickType::AUTOCHIP));
         }
         else
         {

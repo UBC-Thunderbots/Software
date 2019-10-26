@@ -6,22 +6,17 @@
 
 TEST(TestStraightLinePathPlanner, test_straight_line_path_planner)
 {
-    std::vector<Point> path_points;
     Point start{0, 0}, dest{1, 1};
     std::unique_ptr<PathPlanner> planner = std::make_unique<StraightLinePathPlanner>();
 
-    Rectangle navigableArea = Rectangle(Point(0, 0), 0, 0);
+    Rectangle navigable_area = Rectangle(Point(0, 0), 0, 0);
 
-    try
-    {
-        path_points = std::get<std::vector<Point>>(
-            planner->findPath(start, dest, navigableArea, std::vector<Obstacle>()));
-    }
-    catch (const std::bad_variant_access&)
-    {
-        FAIL();
-    }
+    Path path = planner->findPath(start, dest, navigable_area, std::vector<Obstacle>());
 
-    EXPECT_EQ(path_points[0], start);
-    EXPECT_EQ(path_points[1], dest);
+    EXPECT_TRUE(path != std::nullopt);
+
+    std::vector<Point> path_points = path->getKnots();
+
+    EXPECT_EQ(path_points.front(), start);
+    EXPECT_EQ(path_points.back(), dest);
 }
