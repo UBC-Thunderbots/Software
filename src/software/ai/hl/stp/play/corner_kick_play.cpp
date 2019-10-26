@@ -3,8 +3,8 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/ball.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/ball.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"
 #include "software/ai/hl/stp/tactic/move_tactic.h"
@@ -41,8 +41,8 @@ bool CornerKickPlay::isApplicable(const World &world) const
 bool CornerKickPlay::invariantHolds(const World &world) const
 {
     return (world.gameState().isPlaying() || world.gameState().isReadyState()) &&
-           (!Evaluation::teamHasPossession(world.enemyTeam(), world.ball()) ||
-            Evaluation::teamPassInProgress(world.ball(), world.friendlyTeam()));
+           (!Evaluation::teamHasPossession(world, world.enemyTeam()) ||
+            Evaluation::teamPassInProgress(world, world.friendlyTeam()));
 }
 
 void CornerKickPlay::getNextTactics(TacticCoroutine::push_type &yield)

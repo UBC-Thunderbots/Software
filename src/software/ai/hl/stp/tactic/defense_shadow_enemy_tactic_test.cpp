@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/enemy_threat.h"
 #include "software/ai/intent/move_intent.h"
 #include "software/test_util/test_util.h"
 
@@ -80,7 +80,7 @@ TEST(DefenseShadowEnemyTacticTest,
                   Angle::ofDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
@@ -123,7 +123,7 @@ TEST(
                   Angle::ofDegrees(1));
         EXPECT_TRUE(move_intent.getAutoKickType() == AUTOCHIP);
     }
-    catch (std::bad_cast)
+    catch (std::bad_cast &)
     {
         ADD_FAILURE() << "MoveIntent was not returned by the ShootGoalTactic!";
     }
