@@ -3,10 +3,10 @@
 #include <g3log/g3log.hpp>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/enemy_threat.h"
-#include "software/ai/hl/stp/evaluation/find_open_areas.h"
-#include "software/ai/hl/stp/evaluation/indirect_chip.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/enemy_threat.h"
+#include "software/ai/evaluation/find_open_areas.h"
+#include "software/ai/evaluation/indirect_chip.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/play/play_factory.h"
 #include "software/ai/hl/stp/tactic/crease_defender_tactic.h"
 #include "software/ai/hl/stp/tactic/goalie_tactic.h"

@@ -27,6 +27,7 @@ void MoveTestAction::calculateNextIntent(IntentCoroutine::push_type& yield)
     do
     {
         yield(std::make_unique<MoveIntent>(robot->id(), destination, Angle::zero(), 0.0,
-                                           0));
+                                           0, DribblerEnable::OFF, MoveType::NORMAL,
+                                           AutokickType::NONE));
     } while ((robot->position() - destination).len() > close_to_dest_threshold);
 }

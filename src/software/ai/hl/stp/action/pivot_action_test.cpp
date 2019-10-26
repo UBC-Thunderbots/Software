@@ -14,7 +14,7 @@ TEST(PivotActionTest, robot_too_far_from_orbit)
     PivotAction action = PivotAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
-        robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), true);
+        robot, Point(0, 0), Angle::zero(), Angle::ofRadians(2.0), DribblerEnable::ON);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -40,7 +40,7 @@ TEST(PivotActionTest, yield_pivotintent_when_close_to_ball)
     PivotAction action = PivotAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
-        robot, Point(0, 0), Angle::half(), Angle::ofRadians(2.0), true);
+        robot, Point(0, 0), Angle::half(), Angle::ofRadians(2.0), DribblerEnable::ON);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);
@@ -66,7 +66,7 @@ TEST(PivotActionTest, yield_moveintent_when_far_from_ball)
     PivotAction action = PivotAction();
 
     auto intent_ptr = action.updateStateAndGetNextIntent(
-        robot, Point(0, 0), Angle::half(), Angle::ofRadians(2.0), true);
+        robot, Point(0, 0), Angle::half(), Angle::ofRadians(2.0), DribblerEnable::ON);
 
     // Check an intent was returned (the pointer is not null)
     EXPECT_TRUE(intent_ptr);

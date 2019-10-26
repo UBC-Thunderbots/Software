@@ -1,4 +1,4 @@
-#include "software/ai/hl/stp/evaluation/ball.h"
+#include "software/ai/evaluation/ball.h"
 
 #include <gtest/gtest.h>
 

@@ -5,9 +5,10 @@
 const std::string MoveIntent::INTENT_NAME = "Move Intent";
 
 MoveIntent::MoveIntent(unsigned int robot_id, const Point &dest, const Angle &final_angle,
-                       double final_speed, unsigned int priority, bool enable_dribbler,
-                       bool slow, AutokickType autokick)
-    : MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler, slow,
+                       double final_speed, unsigned int priority,
+                       DribblerEnable enable_dribbler, MoveType move_type,
+                       AutokickType autokick)
+    : MovePrimitive(robot_id, dest, final_angle, final_speed, enable_dribbler, move_type,
                     autokick),
       Intent(priority)
 {
