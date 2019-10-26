@@ -5,11 +5,18 @@
 # Link to the instructions that basically layout how this bash script works:
 #   https://gnu-mcu-eclipse.github.io/toolchain/arm/install/
 
+# Directory this script is in
+CURR_DIR=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
+
 # Temporary setup folder to download and unpack tarball
 TEMP_FOLDER="/tmp/temp-thunderbots-gcc-setup"
 
 # Output name for tarball
 OUTPUT_TAR_NAME="gcc-arm-none-eabi-7.tar.bz2"
+
+# Install openocd
+cd $CURR_DIR
+./install_openocd.sh
 
 # The link to the arm-none-eabi tarball
 # got the link here: https://developer.arm.com/open-source/gnu-toolchain/gnu-rm/downloads
