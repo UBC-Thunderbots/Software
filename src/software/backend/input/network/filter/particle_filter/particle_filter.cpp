@@ -328,7 +328,7 @@ double ParticleFilter::evaluateParticle(const Point &particle)
     double detectionScore       = 0.0;
     double max_detection_weight = Util::DynamicParameters->getNetworkInputConfig()
                                       ->getFilterConfig()
-                                      ->getParticleFilterConfi()
+                                      ->getParticleFilterConfig()
                                       ->MaxDetectionWeight()
                                       ->value();
     double previous_ball_weight = Util::DynamicParameters->getNetworkInputConfig()
@@ -406,12 +406,12 @@ double ParticleFilter::getDetectionWeight(const double dist)
 {
     double detection_weight_decay = Util::DynamicParameters->getNetworkInputConfig()
                                         ->getFilterConfig()
-                                        ->ParticleFilter()
+                                        ->getParticleFilterConfig()
                                         ->DetectionWeightDecay()
                                         ->value();
     double max_detection_weight = Util::DynamicParameters->getNetworkInputConfig()
                                       ->getFilterConfig()
-                                      ->ParticleFilter()
+                                      ->getParticleFilterConfig()
                                       ->MaxDetectionWeight()
                                       ->value();
     double weight = max_detection_weight - detection_weight_decay * dist;
