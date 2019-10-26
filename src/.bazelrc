@@ -1,6 +1,3 @@
-# Use C++ 17
-build --cxxopt='-std=c++17'
-
 # Use Our Remote Cache To Avoid Rebuilding Files Already Built By CI
 build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache_us_multi_region
 
@@ -8,17 +5,23 @@ build --remote_http_cache=https://storage.googleapis.com/thunderbots_bazel_cache
 # considered "experimental"
 --spawn_strategy=standalone
 
-# Don't try to upload results since we assume this computer does not have the
-# required credentials. You can override this on the command line, ex:
-# `bazel build --remote_upload_local_results=true //...`
+# Don't Try to Upload Results (since CI does not currently have required credentials)
+# See https://github.com/UBC-Thunderbots/Software/issues/829 for more info
 build --remote_upload_local_results=false 
+
+# Credentials for Uploading Build Results To Our Remote Cache
+#build --google_credentials="/home/gareth/Downloads/tbots-bazel-cache-key.json"
 
 # We rely on all symbols being included when linking for our implementation of
 # the "factory" design pattern.
 build --incompatible_remove_legacy_whole_archive=False
 
-# Every warning is treated as an error
-build --cxxopt=-Werror
-
 # We want bazel to output the results of our gtests
 test --test_output=all
+
+# Use Our Custom Toolchain
+build --crosstool_top=//cc_toolchain:toolchain
+
+# Automatically set the CPU environment based on the `--cpu` flag as per our
+# defined CPU environments
+build --auto_cpu_environment_group=//cc_toolchain:cpus

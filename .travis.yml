@@ -2,26 +2,6 @@ sudo: true
 dist: bionic
 language: generic
 
-# We get this encrypted variable by:
-# 1) Setup the cache in google cloud storage as per https://docs.bazel.build/versions/master/remote-caching.html
-# 2) getting secure key as a `.json` from https://cloud.google.com/iam/docs/creating-managing-service-accounts#creating_a_service_account 
-# 3) Encrypting the `.json` via https://docs.travis-ci.com/user/encrypting-files/ 
-
-before_install:
-  - ls
-  # Decrypt the key for uploading to the remote bazel cache if we're not in 
-  # a pull request (Travis does not allow encrypted variables in public PR's)
-  - >
-    if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then 
-      openssl aes-256-cbc -K $encrypted_b311edfc2b7f_key -iv $encrypted_b311edfc2b7f_iv -in bazel-remote-cache-key.json.enc -out bazel-remote-cache-key.json -d
-    fi
-
-env:
-  # This path is relative to the bazel root directory (ie. where `WORKSPACE`)
-  # is located
-  - PATH_TO_REMOTE_BAZEL_CACHE_KEY="../bazel-remote-cache-key.json"
-
-
 install:
     - ./environment_setup/setup_software.sh
 
@@ -30,27 +10,25 @@ jobs:
     - name: "Build, Test, and Run Coverage"
       script:
         - cd src
-        # Initial set of args for bazel
+        # Build, test, run coverage
         - >
-         BAZEL_BUILD_ARGS="
-           --compilation_mode=fastbuild
-           --verbose_test_summary
-           --instrumentation_filter=//...
-           --test_output=errors
-           "  
-        # If the key is available, add bazel arguments to upload to remote cache
-        - >
-         if test -f "$PATH_TO_REMOTE_BAZEL_CACHE_KEY"; then
-           BAZEL_BUILD_ARGS="
-             $BAZEL_BUILD_ARGS 
-             --remote_upload_local_results=true 
-             --google_credentials=$PATH_TO_REMOTE_BAZEL_CACHE_KEY
-           " 
-         fi
-        # Build and test with coverage
-        - bazel coverage //... $BAZEL_BUILD_ARGS 
+          bazel coverage //... 
+          --compilation_mode=fastbuild 
+          --verbose_test_summary 
+          --instrumentation_filter=//... 
+          --test_output=errors
+          --experimental_use_llvm_covmap
+          --collect_code_coverage
+        # Convert profdata results to lcov. We have to do this because of the
+        # current state of support for clang compiler coverage results in
+        # bazel. Once https://github.com/bazelbuild/bazel/issues/9406 is 
+        # addressed, we can probably change the `coverage_feature` flags in
+        # `cc_toolchain_config.bzl` to just `--coverage` and remove this script
+        - ./convert_profdata_to_lcov.sh
         # Upload coverage results
-        - bash <(curl -s https://codecov.io/bash) -s bazel-testlogs/
+        - bash <(curl -s https://codecov.io/bash)
+        # Build our CPU-specific targets
+        - bazel build //firmware_new/... --cpu=stm32h7
     - name: "Check Formatting"
       script:
         - ./clang_format/check_formatting_ci.sh
