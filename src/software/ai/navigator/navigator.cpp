@@ -111,13 +111,12 @@ void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
         {
             current_destination      = path_points[1];
             double segment_final_vel = getCloseToEnemyObstacleFactor(
-                path_points[1] *
-                calculateTransitionSpeedBetweenSegments(
-                    path_points[0], path_points[1], path_points[2],
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                        Util::DynamicParameters->getNavigatorConfig()
-                            ->TransitionSpeedFactor()
-                            ->value()));
+                path_points[1] * calculateTransitionSpeedBetweenSegments(
+                                     path_points[0], path_points[1], path_points[2],
+                                     ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                                         Util::DynamicParameters->getNavigatorConfig()
+                                             ->TransitionSpeedFactor()
+                                             ->value()));
 
             auto move = std::make_unique<MovePrimitive>(
                 move_intent.getRobotId(), current_destination,
