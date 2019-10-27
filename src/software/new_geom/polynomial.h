@@ -3,8 +3,6 @@
 #include <cmath>
 #include <vector>
 
-#include "software/geom/point.h"
-
 /**
  * Polynomial is a representation of a polynomial
  * that can calculate values at a given input

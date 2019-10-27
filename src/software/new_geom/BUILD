@@ -12,7 +12,6 @@ cc_library(
         "-std=c++17",
     ],
     deps = [
-        "//software/geom",
         "@boost//:geometry",
         "@boost//:polygon",
     ],
