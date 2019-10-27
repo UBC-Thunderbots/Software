@@ -17,29 +17,41 @@
 
 using Path = std::optional<Spline>;
 
-// Struct used to plan a path for a robot
-struct PathObjective
+// Used to plan a path for a robot
+class PathObjective
 {
+   public:
+    PathObjective(const Point start, const Point end, const double current_velocity,
+                  const std::vector<Obstacle> &avoid_area_obstacles)
+        : start(start),
+          end(end),
+          current_velocity(current_velocity),
+          avoid_area_obstacles(avoid_area_obstacles)
+    {
+    }
+
     const Point start;
     const Point end;
     const double current_velocity;
+    const std::vector<Obstacle> avoid_area_obstacles;
 };
 
 class PathManager
 {
    public:
     /**
-     * Returns paths for each objective, given navigable_area and static_obstacles
+     * Returns map of robot ids to paths guided by path objectives,
+     * given navigable_area and static_obstacles
      *
-     * @param objectives vector of start and end points
+     * @param objectives map of robot id to path objectives
      * @param navigable_area Rectangle representing the navigable area
      * @param static_obstacles static obstacles to avoid, excluding the robots
      *  whose paths are being planned
      *
-     * @return a paths for each pair of start and end points
+     * @return map of robot ids to paths
      */
-    virtual std::vector<Path> getManagedPaths(
-        std::vector<PathObjective> objectives, const Rectangle &navigable_area,
+    virtual const std::map<int, Path> getManagedPaths(
+        const std::map<int, PathObjective> &objectives, const Rectangle &navigable_area,
         const std::vector<Obstacle> &static_obstacles) = 0;
 
     virtual ~PathManager() = default;

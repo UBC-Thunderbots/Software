@@ -10,8 +10,8 @@
 class ObstaclePathManager : public PathManager
 {
    public:
-    std::vector<Path> getManagedPaths(
-        std::vector<PathObjective> objectives, const Rectangle &navigable_area,
+    const std::map<int, Path> getManagedPaths(
+        const std::map<int, PathObjective> &objectives, const Rectangle &navigable_area,
         const std::vector<Obstacle> &static_obstacles) override;
 
     /**
@@ -19,13 +19,13 @@ class ObstaclePathManager : public PathManager
      * except for current_index
      *
      * @param objectives objectives to make obstacles
-     * @param current_index objective to skip
+     * @param current_index map key skip objective
      * @param inflation_factor how much to inflate obstacle
      *
      * @return list of obstacles that around other objectives' starts
      */
-    std::vector<Obstacle> getObstaclesFromOtherObjectives(
-        std::vector<PathObjective> objectives, size_t current_index,
+    const std::vector<Obstacle> getObstaclesFromOtherObjectives(
+        const std::map<int, PathObjective> &objectives, size_t current_index,
         double inflation_factor);
 
     explicit ObstaclePathManager(std::unique_ptr<PathPlanner> path_planner);

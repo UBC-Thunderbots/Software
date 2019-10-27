@@ -2,292 +2,310 @@
 
 #include <g3log/g3log.hpp>
 
-#include "software/ai/intent/all_intents.h"
-#include "software/ai/navigator/util.h"
-#include "software/ai/primitive/all_primitives.h"
-
-Navigator::Navigator(std::unique_ptr<PathPlanner> path_planner)
-    : path_planner(std::move(path_planner))
+Navigator::Navigator(std::unique_ptr<PathManager> path_manager)
+    : path_manager(std::move(path_manager))
 {
 }
 
-void Navigator::visit(const CatchIntent &catch_intent)
+void Navigator::visit(const CatchIntent &intent)
 {
-    auto p            = std::make_unique<CatchPrimitive>(catch_intent);
+    auto p            = std::make_unique<CatchPrimitive>(intent);
     current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
-void Navigator::visit(const ChipIntent &chip_intent)
+void Navigator::visit(const ChipIntent &intent)
 {
-    auto p            = std::make_unique<ChipPrimitive>(chip_intent);
+    auto p            = std::make_unique<ChipPrimitive>(intent);
     current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
-void Navigator::visit(const DirectVelocityIntent &direct_velocity_intent)
+void Navigator::visit(const DirectVelocityIntent &intent)
 {
-    auto p            = std::make_unique<DirectVelocityPrimitive>(direct_velocity_intent);
+    auto p            = std::make_unique<DirectVelocityPrimitive>(intent);
     current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
-void Navigator::visit(const DirectWheelsIntent &direct_wheels_intent)
+void Navigator::visit(const DirectWheelsIntent &intent)
 {
-    auto p            = std::make_unique<DirectWheelsPrimitive>(direct_wheels_intent);
+    auto p            = std::make_unique<DirectWheelsPrimitive>(intent);
     current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
-void Navigator::visit(const DribbleIntent &dribble_intent)
+void Navigator::visit(const DribbleIntent &intent)
 {
-    auto p            = std::make_unique<DribblePrimitive>(dribble_intent);
+    auto p            = std::make_unique<DribblePrimitive>(intent);
     current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
-void Navigator::visit(const KickIntent &kick_intent)
+void Navigator::visit(const KickIntent &intent)
 {
-    auto p            = std::make_unique<KickPrimitive>(kick_intent);
+    auto p            = std::make_unique<KickPrimitive>(intent);
     current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
-void Navigator::visit(const MoveIntent &move_intent)
+void Navigator::visit(const MoveIntent &intent)
 {
-    current_start =
-        this->world.friendlyTeam().getRobotById(move_intent.getRobotId())->position();
-    current_end = move_intent.getDestination();
+    Point start =
+        this->world.friendlyTeam().getRobotById(intent.getRobotId())->position();
+    Point end                 = intent.getDestination();
+    auto avoid_area_obstacles = getObstaclesFromAvoidAreas(intent.getAreasToAvoid());
 
-    std::vector<Obstacle> obstacles =
-        getCurrentObstacles(move_intent.getAreasToAvoid(), move_intent.getRobotId());
+    auto robot_it = std::find_if(
+        world.friendlyTeam().getAllRobots().begin(),
+        world.friendlyTeam().getAllRobots().end(),
+        [&](const Robot &robot) { return (robot.id() == intent.getRobotId()); });
 
-    Rectangle navigable_area(
-        Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
-        this->world.field().totalXLength(), this->world.field().totalYLength());
-
-    Path path =
-        path_planner->findPath(current_start, current_end, navigable_area, obstacles);
-
-    moveNavigation(move_intent, path);
-}
-
-void Navigator::visit(const MoveSpinIntent &move_spin_intent)
-{
-    auto p            = std::make_unique<MoveSpinPrimitive>(move_spin_intent);
-    current_primitive = std::move(p);
-}
-
-void Navigator::visit(const PivotIntent &pivot_intent)
-{
-    auto p            = std::make_unique<PivotPrimitive>(pivot_intent);
-    current_primitive = std::move(p);
-}
-
-void Navigator::visit(const StopIntent &stop_intent)
-{
-    auto p            = std::make_unique<StopPrimitive>(stop_intent);
-    current_primitive = std::move(p);
-}
-
-// helpers
-void Navigator::moveNavigation(const MoveIntent &move_intent, const Path &path)
-{
-    if (path)
+    if (robot_it == world.friendlyTeam().getAllRobots().end())
     {
-        std::vector<Point> path_points = path->getKnots();
-        planned_paths.emplace_back(path_points);
-
-        if (path_points.size() == 1)
-        {
-            throw std::runtime_error(
-                "Path only contains one point, which is invalid, since it's ambiguous if it's the start or end or some other point");
-        }
-        else
-        {
-            double desired_final_speed;
-            current_destination = path_points[1];
-
-            if (path_points.size() == 2)
-            {
-                // we are going to destination
-                desired_final_speed = move_intent.getFinalSpeed();
-            }
-            else
-            {
-                // we are going to some intermediate point so we transition smoothly
-                double transition_final_speed =
-                    ROBOT_MAX_SPEED_METERS_PER_SECOND *
-                    Util::DynamicParameters::Navigator::transition_speed_factor.value();
-
-                desired_final_speed = calculateTransitionSpeedBetweenSegments(
-                    path_points[0], current_destination, path_points[2],
-                    transition_final_speed);
-            }
-
-            auto move = std::make_unique<MovePrimitive>(
-                move_intent.getRobotId(), current_destination,
-                move_intent.getFinalAngle(),
-                // slow down around enemy robots
-                desired_final_speed * getCloseToEnemyObstacleFactor(current_destination),
-                move_intent.getDribblerEnable(), move_intent.getMoveType(),
-                move_intent.getAutoKickType());
-            current_primitive = std::move(move);
-        }
+        std::stringstream ss;
+        ss << "Tried to find robot associated with robot id = " << intent.getRobotId()
+           << ", but failed";
+        throw std::runtime_error(ss.str());
     }
     else
     {
-        LOG(WARNING) << "Path planner could not find a path";
-        auto stop = std::make_unique<StopPrimitive>(move_intent.getRobotId(), false);
-        current_primitive = std::move(stop);
+        path_objectives.insert(
+            {intent.getRobotId(), PathObjective(start, end, robot_it->velocity().len(),
+                                                avoid_area_obstacles)});
     }
+    path_planning_intents.insert({intent.getRobotId(), intent});
+    current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
-std::optional<Obstacle> Navigator::getObstacleFromAvoidArea(AvoidArea avoid_area)
+void Navigator::visit(const MoveSpinIntent &intent)
 {
-    Rectangle rectangle({0, 0}, {0, 0});
-    switch (avoid_area)
-    {
-        case AvoidArea::FRIENDLY_DEFENSE_AREA:
-            // We extend the friendly defense area back by several meters to prevent
-            // robots going around the back of the goal
-            rectangle = Rectangle(
-                world.field().friendlyDefenseArea().posXPosYCorner(),
-                Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
-            rectangle.expand(
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                    .value() *
-                ROBOT_MAX_RADIUS_METERS);
-            return Obstacle(rectangle);
-        case AvoidArea::ENEMY_DEFENSE_AREA:
-            // We extend the enemy defense area back by several meters to prevent
-            // robots going around the back of the goal
-            rectangle = Rectangle(
-                world.field().enemyDefenseArea().negXPosYCorner(),
-                Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
-            rectangle.expand(
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                    .value() *
-                ROBOT_MAX_RADIUS_METERS);
-            return Obstacle(rectangle);
-        case AvoidArea::INFLATED_ENEMY_DEFENSE_AREA:
-            rectangle = world.field().enemyDefenseArea();
-            rectangle.expand(
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                        .value() *
-                    ROBOT_MAX_RADIUS_METERS +
-                0.3);  // 0.3 is by definition what inflated means
-            return Obstacle(rectangle);
-        case AvoidArea::CENTER_CIRCLE:
-            return Obstacle::createCircleObstacle(
-                world.field().centerPoint(), world.field().centerCircleRadius(),
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                    .value());
-        case AvoidArea::HALF_METER_AROUND_BALL:
-            return Obstacle::createCircleObstacle(
-                world.ball().position(), 0.5,  // 0.5 represents half a metre radius
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                    .value());
-        case AvoidArea::BALL:
-            return Obstacle::createCircularBallObstacle(world.ball(), 0.06);
-        case AvoidArea::ENEMY_HALF:
-            rectangle = Rectangle({0, world.field().totalYLength() / 2},
-                                  world.field().enemyCornerNeg() -
-                                      Point(0, world.field().boundaryYLength()));
-            rectangle.expand(
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                    .value() *
-                ROBOT_MAX_RADIUS_METERS);
-            return Obstacle(rectangle);
-        case AvoidArea::FRIENDLY_HALF:
-            rectangle = Rectangle({0, world.field().totalYLength() / 2},
-                                  world.field().friendlyCornerNeg() -
-                                      Point(0, world.field().boundaryYLength()));
-            rectangle.expand(
-                Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                    .value() *
-                ROBOT_MAX_RADIUS_METERS);
-            return Obstacle(rectangle);
-        default:
-            LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
-                         << " to obstacle";
-    }
+    auto p            = std::make_unique<MoveSpinPrimitive>(intent);
+    current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
+}
 
-    return std::nullopt;
+void Navigator::visit(const PivotIntent &intent)
+{
+    auto p            = std::make_unique<PivotPrimitive>(intent);
+    current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
+}
+
+void Navigator::visit(const StopIntent &intent)
+{
+    auto p            = std::make_unique<StopPrimitive>(intent);
+    current_primitive = std::move(p);
+    non_path_planning_robots.insert(intent.getRobotId());
 }
 
 std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     const World &world, const std::vector<std::unique_ptr<Intent>> &assignedIntents)
 {
     this->world              = world;
-    this->current_robot      = std::nullopt;
-    this->current_velocity_obstacles = {};
     planned_paths.clear();
+    non_path_planning_robots.clear();
+    path_objectives.clear();
+    path_planning_intents.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
     {
         intent->accept(*this);
-        if (this->current_robot)
+        if (current_primitive)
         {
-            if (this->current_robot->velocity().len() > 0.3)
-            {
-                this->current_velocity_obstacles.emplace_back(
-                    Obstacle::createVelocityObstacleWithScalingParams(
-                        this->current_robot->position(), this->current_destination,
-                        this->current_robot->velocity().len(),
-                        Util::DynamicParameters::Navigator::
-                            robot_obstacle_inflation_factor.value(),
-                        Util::DynamicParameters::Navigator::
-                            velocity_obstacle_inflation_factor.value()));
-            }
-
-            this->current_robot = std::nullopt;
+            assigned_primitives.emplace_back(std::move(current_primitive));
         }
-        assigned_primitives.emplace_back(std::move(current_primitive));
     }
+
+    Rectangle navigable_area(
+        Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
+        this->world.field().totalXLength(), this->world.field().totalYLength());
+
+    auto paths = path_manager->getManagedPaths(path_objectives, navigable_area,
+                                               getNonPathPlanningObstacles());
+    addPathsToPrimitives(paths, assigned_primitives);
 
     return assigned_primitives;
 }
 
-std::vector<Obstacle> Navigator::getCurrentObstacles(
-    const std::vector<AvoidArea> &avoid_areas, unsigned int robot_id)
+void Navigator::addPathsToPrimitives(
+    const std::map<int, Path> &paths,
+    std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
 {
-    std::vector<Obstacle> obstacles = current_velocity_obstacles;
-
-    // Avoid obstacles specific to this MoveIntent
-    for (auto area : avoid_areas)
+    for (const auto &path : paths)
     {
-        if (area == AvoidArea::ENEMY_ROBOTS)
+        // look for move intent
+        auto intent_it = path_planning_intents.find(path.first);
+        if (intent_it == path_planning_intents.end())
         {
-            for (auto &robot : world.enemyTeam().getAllRobots())
+            std::stringstream ss;
+            ss << "Tried to find intent associated with robot id = " << path.first
+               << ", but failed";
+            throw std::runtime_error(ss.str());
+        }
+        MoveIntent intent = intent_it->second;
+        if (path.second)
+        {
+            std::vector<Point> path_points = path.second->getKnots();
+            planned_paths.emplace_back(path_points);
+
+            if (path_points.size() == 1)
             {
-                Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
-                    robot,
-                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
-                        .value(),
-                    Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor
-                        .value());
-                obstacles.push_back(o);
+                throw std::runtime_error(
+                    "Path only contains one point, which is invalid, since it's ambiguous if it's the start or end or some other point");
+            }
+            else
+            {
+                double desired_final_speed;
+
+                if (path_points.size() == 2)
+                {
+                    // we are going to destination
+                    desired_final_speed = intent.getFinalSpeed();
+                }
+                else
+                {
+                    // we are going to some intermediate point so we transition smoothly
+                    double transition_final_speed =
+                        ROBOT_MAX_SPEED_METERS_PER_SECOND *
+                        Util::DynamicParameters::Navigator::transition_speed_factor
+                            .value();
+
+                    desired_final_speed = calculateTransitionSpeedBetweenSegments(
+                        path_points[0], path_points[1], path_points[2],
+                        transition_final_speed);
+                }
+
+                auto move = std::make_unique<MovePrimitive>(
+                    intent.getRobotId(), path_points[1], intent.getFinalAngle(),
+                    // slow down around enemy robots
+                    desired_final_speed * getCloseToEnemyObstacleFactor(path_points[1]),
+                    intent.getDribblerEnable(), intent.getMoveType(),
+                    intent.getAutoKickType());
+                current_primitive = std::move(move);
             }
         }
         else
         {
-            auto obstacle_opt = getObstacleFromAvoidArea(area);
-            if (obstacle_opt)
-            {
-                obstacles.emplace_back(*obstacle_opt);
-            }
+            LOG(WARNING) << "Path manager could not find a path";
+            auto stop = std::make_unique<StopPrimitive>(intent.getRobotId(), false);
+            current_primitive = std::move(stop);
         }
+        assigned_primitives.emplace_back(std::move(current_primitive));
     }
+}
 
+std::vector<Obstacle> Navigator::getNonPathPlanningObstacles()
+{
+    std::vector<Obstacle> obstacles;
+    double inflation_factor =
+        Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value();
     for (auto &robot : world.friendlyTeam().getAllRobots())
     {
-        if (robot.id() == robot_id)
+        if (non_path_planning_robots.find(robot.id()) != non_path_planning_robots.end())
         {
-            // store current robot
-            this->current_robot = robot;
-            // skip current robot
-            continue;
+            obstacles.push_back(
+                Obstacle::createCircularRobotObstacle(robot, inflation_factor));
         }
-        Obstacle o = Obstacle::createCircularRobotObstacle(
-            robot,
-            Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value());
-        obstacles.push_back(o);
+    }
+    return obstacles;
+}
+
+std::vector<Obstacle> Navigator::getObstaclesFromAvoidAreas(
+    const std::vector<AvoidArea> &avoid_areas)
+{
+    std::vector<Obstacle> obstacles;
+    Rectangle rectangle({0, 0}, {0, 0});
+    for (auto avoid_area : avoid_areas)
+    {
+        switch (avoid_area)
+        {
+            case AvoidArea::ENEMY_ROBOTS:
+                for (auto &robot : world.enemyTeam().getAllRobots())
+                {
+                    Obstacle o = Obstacle::createRobotObstacleWithScalingParams(
+                        robot,
+                        Util::DynamicParameters::Navigator::
+                            robot_obstacle_inflation_factor.value(),
+                        Util::DynamicParameters::Navigator::
+                            velocity_obstacle_inflation_factor.value());
+                    obstacles.push_back(o);
+                }
+                break;
+            case AvoidArea::FRIENDLY_DEFENSE_AREA:
+                // We extend the friendly defense area back by several meters to prevent
+                // robots going around the back of the goal
+                rectangle = Rectangle(
+                    world.field().friendlyDefenseArea().posXPosYCorner(),
+                    Point(-10, world.field().friendlyDefenseArea().posXNegYCorner().y()));
+                rectangle.expand(
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value() *
+                    ROBOT_MAX_RADIUS_METERS);
+                obstacles.push_back(Obstacle(rectangle));
+                break;
+            case AvoidArea::ENEMY_DEFENSE_AREA:
+                // We extend the enemy defense area back by several meters to prevent
+                // robots going around the back of the goal
+                rectangle = Rectangle(
+                    world.field().enemyDefenseArea().negXPosYCorner(),
+                    Point(10, world.field().enemyDefenseArea().negXNegYCorner().y()));
+                rectangle.expand(
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value() *
+                    ROBOT_MAX_RADIUS_METERS);
+                obstacles.push_back(Obstacle(rectangle));
+                break;
+            case AvoidArea::INFLATED_ENEMY_DEFENSE_AREA:
+                rectangle = world.field().enemyDefenseArea();
+                rectangle.expand(
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                            .value() *
+                        ROBOT_MAX_RADIUS_METERS +
+                    0.3);  // 0.3 is by definition what inflated means
+                obstacles.push_back(Obstacle(rectangle));
+                break;
+            case AvoidArea::CENTER_CIRCLE:
+                obstacles.push_back(Obstacle::createCircleObstacle(
+                    world.field().centerPoint(), world.field().centerCircleRadius(),
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value()));
+                break;
+            case AvoidArea::HALF_METER_AROUND_BALL:
+                obstacles.push_back(Obstacle::createCircleObstacle(
+                    world.ball().position(), 0.5,  // 0.5 represents half a metre radius
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value()));
+                break;
+            case AvoidArea::BALL:
+                obstacles.push_back(
+                    Obstacle::createCircularBallObstacle(world.ball(), 0.06));
+                break;
+            case AvoidArea::ENEMY_HALF:
+                rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                      world.field().enemyCornerNeg() -
+                                          Point(0, world.field().boundaryYLength()));
+                rectangle.expand(
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value() *
+                    ROBOT_MAX_RADIUS_METERS);
+                obstacles.push_back(Obstacle(rectangle));
+                break;
+            case AvoidArea::FRIENDLY_HALF:
+                rectangle = Rectangle({0, world.field().totalYLength() / 2},
+                                      world.field().friendlyCornerNeg() -
+                                          Point(0, world.field().boundaryYLength()));
+                rectangle.expand(
+                    Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor
+                        .value() *
+                    ROBOT_MAX_RADIUS_METERS);
+                obstacles.push_back(Obstacle(rectangle));
+                break;
+            default:
+                LOG(WARNING) << "Could not convert AvoidArea " << (int)avoid_area
+                             << " to obstacle";
+        }
     }
 
     return obstacles;

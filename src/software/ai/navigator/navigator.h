@@ -1,23 +1,26 @@
 #pragma once
 
+#include "software/ai/intent/all_intents.h"
 #include "software/ai/intent/intent.h"
 #include "software/ai/intent/intent_visitor.h"
 #include "software/ai/navigator/navigator.h"
 #include "software/ai/navigator/obstacle/obstacle.h"
-#include "software/ai/navigator/path_planner/path_planner.h"
+#include "software/ai/navigator/path_manager/path_manager.h"
+#include "software/ai/navigator/util.h"
+#include "software/ai/primitive/all_primitives.h"
 #include "software/ai/primitive/primitive.h"
 #include "software/util/parameter/dynamic_parameters.h"
 #include "software/world/world.h"
 
+
 /**
  * This Navigator converts the given Intents into their respective Primitives
- *
- * It will construct a path planner to navigate around AvoidAreas
+ * and navigate around obstacles
  */
 class Navigator : public IntentVisitor
 {
    public:
-    explicit Navigator(std::unique_ptr<PathPlanner> path_planner);
+    explicit Navigator(std::unique_ptr<PathManager> path_manager);
 
     /**
      * Get assigned primitives for given assigned intents
@@ -108,6 +111,9 @@ class Navigator : public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
+    // Path manager used to navigate movement
+    std::unique_ptr<PathManager> path_manager;
+
     // This navigators knowledge / state of the world
     World world;
 
@@ -115,53 +121,33 @@ class Navigator : public IntentVisitor
     // This variable is set by each `visit` function
     std::unique_ptr<Primitive> current_primitive;
 
-    // The current Robot the navigator has navigated for from an Intent.
-    // This variable is set by each `visit` function
-    std::optional<Robot> current_robot;
-
-    // The current destination the navigator has navigated to from an Intent.
-    // This variable is set by each `visit` function
-    Point current_destination;
-
     /**
-     * These are velocity obstacles that are built up
-     * as we plan paths for each of the intents
-     *
-     * By adding an obstacle in front of friendly robots
-     * to show the intended path, the next robot can plan around that
+     * These are obstacles that represent robots that aren't
+     * assigned move intents
+     * When move intents are processed to path plan,
+     * we can avoid these non-"moving" robots
      */
-    std::vector<Obstacle> current_velocity_obstacles;
+    std::set<int> non_path_planning_robots;
 
     // This is used by the visualizer to see the planned paths
     std::vector<std::vector<Point>> planned_paths;
 
-    // Path planner used to navigate movement
-    std::unique_ptr<PathPlanner> path_planner;
+    // path objectives are used to plan paths
+    std::map<int, PathObjective> path_objectives;
 
-    // Start and end points of the current intent being navigated
-    Point current_start, current_end;
+    // intents that need path planning
+    std::map<int, MoveIntent> path_planning_intents;
 
     /**
-     * Create an obstacle for the given avoid area, with a buffer such that the edge
+     * Create obstacles for the given avoid areas, with a buffer such that the edge
      * of the robot does not protrude into the area
      *
-     * @param avoid_area The area to convert into an obstacle
+     * @param avoid_areas The areas to convert into obstacles
      *
-     * @return A obstacle representing the given area
+     * @return Obstacles representing the given avoid areas
      */
-    std::optional<Obstacle> getObstacleFromAvoidArea(AvoidArea avoid_area);
-
-    /**
-     * Creates a list of obstacles to avoid based on avoid areas,
-     * enemy team, and friendly team, while excluding the robot attached to robot_id
-     *
-     * @param avoid_areas specifies areas to create obstacles for
-     * @param robot_id current robot that is not an obstacle
-     *
-     * @returns list of obstacles
-     */
-    std::vector<Obstacle> getCurrentObstacles(const std::vector<AvoidArea> &avoid_areas,
-                                              unsigned int robot_id);
+    std::vector<Obstacle> getObstaclesFromAvoidAreas(
+        const std::vector<AvoidArea> &avoid_areas);
 
     /**
      * Calculates a factor for how close p is to an enemy obstacle.
@@ -184,4 +170,21 @@ class Navigator : public IntentVisitor
      * @modifies current_primitive
      */
     void moveNavigation(const MoveIntent &move_intent, const Path &path);
+
+    /**
+     * Gets obstacles to represent all the non path planning robots
+     *
+     * @return list of obstacles
+     */
+    std::vector<Obstacle> getNonPathPlanningObstacles();
+
+    /**
+     * Convert paths into primitives and add them to assigned_primitives
+     *
+     * @param paths paths to convert
+     * @param assigned_primitives list of primitives to add to
+     */
+    void addPathsToPrimitives(
+        const std::map<int, Path> &paths,
+        std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
 };

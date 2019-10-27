@@ -13,11 +13,11 @@ ObstaclePathManager::ObstaclePathManager(std::unique_ptr<PathPlanner> path_plann
 {
 }
 
-std::vector<Path> ObstaclePathManager::getManagedPaths(
-    std::vector<PathObjective> objectives, const Rectangle &navigable_area,
+const std::map<int, Path> ObstaclePathManager::getManagedPaths(
+    const std::map<int, PathObjective> &objectives, const Rectangle &navigable_area,
     const std::vector<Obstacle> &static_obstacles)
 {
-    std::vector<Path> retval;
+    std::map<int, Path> retval;
 
     std::vector<Obstacle>
         current_velocity_obstacles;  // velocity obstacles used to avoid collisions
@@ -28,28 +28,31 @@ std::vector<Path> ObstaclePathManager::getManagedPaths(
     double velocity_obstacle_inflation =
         Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value();
 
-    for (size_t i = 0; i < objectives.size(); i++)
+    for (auto const &current_objective : objectives)
     {
-        PathObjective current_objective = objectives[i];
-
         // find path with relevant obstacles
-        std::vector<Obstacle> path_obstacles =
-            getObstaclesFromOtherObjectives(objectives, i, robot_obstacle_inflation);
+        std::vector<Obstacle> path_obstacles = getObstaclesFromOtherObjectives(
+            objectives, current_objective.first, robot_obstacle_inflation);
         path_obstacles.insert(path_obstacles.begin(), current_velocity_obstacles.begin(),
                               current_velocity_obstacles.end());
-        Path path = path_planner->findPath(current_objective.start, current_objective.end,
-                                           navigable_area, path_obstacles);
+        path_obstacles.insert(path_obstacles.begin(),
+                              current_objective.second.avoid_area_obstacles.begin(),
+                              current_objective.second.avoid_area_obstacles.end());
+        Path path = path_planner->findPath(current_objective.second.start,
+                                           current_objective.second.end, navigable_area,
+                                           path_obstacles);
 
         // store path in retval
-        retval.push_back(path);
+        retval.insert({current_objective.first, path});
+
+        // store velocity obstacle for current path
         if (path)
         {
-            // store velocity obstacle for current path
             std::vector<Point> path_points = path->getKnots();
             current_velocity_obstacles.emplace_back(
                 Obstacle::createVelocityObstacleWithScalingParams(
-                    current_objective.start, path_points[1],
-                    current_objective.current_velocity, robot_obstacle_inflation,
+                    current_objective.second.start, path_points[1],
+                    current_objective.second.current_velocity, robot_obstacle_inflation,
                     velocity_obstacle_inflation));
         }
     }
@@ -57,16 +60,17 @@ std::vector<Path> ObstaclePathManager::getManagedPaths(
     return retval;
 }
 
-std::vector<Obstacle> ObstaclePathManager::getObstaclesFromOtherObjectives(
-    std::vector<PathObjective> objectives, size_t current_index, double inflation_factor)
+const std::vector<Obstacle> ObstaclePathManager::getObstaclesFromOtherObjectives(
+    const std::map<int, PathObjective> &objectives, size_t current_index,
+    double inflation_factor)
 {
     std::vector<Obstacle> obstacles;
-    for (size_t i = 0; i < objectives.size(); i++)
+    for (auto const &obj : objectives)
     {
-        if (i != current_index)
+        if (obj.first != current_index)
         {
             obstacles.push_back(Obstacle::createCircleObstacle(
-                objectives[i].start, ROBOT_MAX_RADIUS_METERS, inflation_factor));
+                obj.second.start, ROBOT_MAX_RADIUS_METERS, inflation_factor));
         }
     }
     return obstacles;
