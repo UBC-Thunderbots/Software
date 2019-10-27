@@ -20,20 +20,16 @@ class Polynomial
     explicit Polynomial();
 
     /**
-     * Construct a polynomial from coefficients
-     * s.t. n = coeffs.size() == the degree of the polynomial
-     * and of the form coeffs[0] + coeffs[1]*x^(1)
-     * + ... + coeffs[n-1]*x^(n-1)
+     * Construct a polynomial from coefficients of the form
+     * coeffs[0] + coeffs[1]*x^(1) + ... + coeffs[n-1]*x^(n-1)
      *
      * @param coeffs coefficients of the polynomial
      */
     explicit Polynomial(const std::vector<double> &coeffs);
 
     /**
-     * Construct a polynomial from coefficients
-     * s.t. n = coeffs.size() == the degree of the polynomial
-     * and of the form coeffs[0] + coeffs[1]*x^(1)
-     * + ... + coeffs[n-1]*x^(n-1)
+     * Construct a polynomial from coefficients of the form
+     * coeffs[0] + coeffs[1]*x^(1) + ... + coeffs[n-1]*x^(n-1)
      *
      * @param coeffs coefficients of the polynomial
      */

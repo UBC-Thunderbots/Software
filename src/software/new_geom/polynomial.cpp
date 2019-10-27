@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "software/new_geom/polynomial.h"
 
 Polynomial::Polynomial() {}
@@ -51,13 +53,13 @@ unsigned int Polynomial::getOrder() const
 
 double Polynomial::valueAt(double val) const
 {
-    // If this has a large performance impact, could be improved
-    // by using Horner's Method:
+    // Horner's Method:
     // https://www.geeksforgeeks.org/horners-method-polynomial-evaluation/
-    double retval = 0;
-    for (unsigned int i = 0; i <= getOrder(); i++)
+    unsigned int order = getOrder();
+    double retval = getCoeff(order);
+    for (unsigned int i = 1; i <= order; i++)
     {
-        retval += getCoeff(i) * std::pow(val, i);
+        retval = retval * val + getCoeff(order - i);
     }
     return retval;
 }
@@ -65,7 +67,8 @@ double Polynomial::valueAt(double val) const
 Polynomial operator+(const Polynomial &p1, const Polynomial &p2)
 {
     Polynomial sum;
-    for (unsigned int i = 0; i <= std::max(p1.getOrder(), p2.getOrder()); i++)
+    unsigned int max_order = std::max(p1.getOrder(), p2.getOrder());
+    for (unsigned int i = 0; i <= max_order; i++)
     {
         sum.setCoeff(i, p1.getCoeff(i) + p2.getCoeff(i));
     }
@@ -75,7 +78,8 @@ Polynomial operator+(const Polynomial &p1, const Polynomial &p2)
 Polynomial operator-(const Polynomial &p1, const Polynomial &p2)
 {
     Polynomial difference;
-    for (unsigned int i = 0; i <= std::max(p1.getOrder(), p2.getOrder()); i++)
+    unsigned int max_order = std::max(p1.getOrder(), p2.getOrder());
+    for (unsigned int i = 0; i <= max_order; i++)
     {
         difference.setCoeff(i, p1.getCoeff(i) - p2.getCoeff(i));
     }
@@ -85,9 +89,11 @@ Polynomial operator-(const Polynomial &p1, const Polynomial &p2)
 Polynomial operator*(const Polynomial &p1, const Polynomial &p2)
 {
     Polynomial product;
-    for (unsigned int i = 0; i <= p1.getOrder(); i++)
+    unsigned int p1_order = p1.getOrder();
+    unsigned int p2_order = p2.getOrder();
+    for (unsigned int i = 0; i <= p1_order; i++)
     {
-        for (unsigned int j = 0; j <= p2.getOrder(); j++)
+        for (unsigned int j = 0; j <= p2_order; j++)
         {
             product.setCoeff(i + j,
                              product.getCoeff(i + j) + (p1.getCoeff(i) * p2.getCoeff(j)));
@@ -113,11 +119,13 @@ Polynomial &operator*=(Polynomial &p1, const Polynomial &p2)
 
 bool operator==(const Polynomial &p1, const Polynomial &p2)
 {
-    if (p1.getOrder() != p2.getOrder())
+    unsigned int p1_order = p1.getOrder();
+    unsigned int p2_order = p2.getOrder();
+    if (p1_order != p2_order)
     {
         return false;
     }
-    for (unsigned int i = 0; i < p1.getOrder(); i++)
+    for (unsigned int i = 0; i < p1_order; i++)
     {
         if (std::abs(p1.getCoeff(i) - p2.getCoeff(i)) >= Polynomial::EPSILON)
         {
