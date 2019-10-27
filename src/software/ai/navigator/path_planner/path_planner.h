@@ -1,5 +1,4 @@
 #pragma once
-#include <variant>
 #include <vector>
 
 #include "software/ai/navigator/obstacle/obstacle.h"
@@ -10,8 +9,8 @@
 /**
  * PathPlanner is an interface for a path planner that,
  * given start and destination points, a list of obstacles,
- * will return the 'best' path from start to the destination
- * if a path exists, otherwise it will return nothing.
+ * and navigable_area will return the 'best' path
+ * from start to the destination
  */
 
 using Path = std::optional<Spline>;
