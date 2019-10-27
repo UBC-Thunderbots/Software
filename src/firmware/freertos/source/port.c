@@ -261,6 +261,19 @@ void portRELAX_CRITICAL_ISR_CHECK(void) {
 }
 
 
+void vPortEndScheduler( void ) {
+  // So. This should really have been defined as a function under
+  // `freertos/vendor/portable`. However, some _genius_ decided that it was OK
+  // to write their *OWN* implementation of `portable.h` and `port.c`. We have
+  // no idea why they did this or how it works. When we tried to build this
+  // with bazel it complained about this function not being defined. We tried
+  // to define it in the header, but that complained about multiple
+  // implementations of this function existing. Why? WHO KNOWS. WE SURE AS ALL
+  // HELL DON'T. If you're reading this in the hopes of some magical
+  // enlightenment, you're SOL, may god have mercy on your soul.
+  //
+  // - Gareth and Mathew, 2019
+}
 
 void vPortSVCHandler(void) {
 	// These variables must be held in exactly these registers, as they are used below in the inline assembly block.

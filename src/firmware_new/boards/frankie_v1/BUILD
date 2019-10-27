@@ -5,9 +5,9 @@ load("//firmware_new:rules.bzl", "stm32h7_hal_library_files_genrule")
 cc_binary(
     name = "frankie_v1_main",
     srcs = ["main.c"],
-    copts = [
-        "-DUSE_HAL_DRIVER",
-        "-DSTM32H743xx",
+    defines = [
+        "USE_HAL_DRIVER",
+        "STM32H743xx",
     ],
     linkopts = [
         "-T$(location //firmware_new/boards/frankie_v1:STM32H742XGHx_FLASH.ld)",
@@ -127,8 +127,8 @@ cc_library(
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/portmacro.h",
         "stm32h7xx_hal_conf.h",
     ],
-    copts = [
-        "-DSTM32H743xx",
+    defines = [
+        "STM32H743xx",
     ],
     includes = [
         "./",

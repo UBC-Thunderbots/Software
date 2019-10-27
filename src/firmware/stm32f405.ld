@@ -57,6 +57,13 @@ SECTIONS {
 	linker_heap_size = 128K - (. - 0x20000000);
 	.heap : ALIGN(8) {
 		. = linker_heap_size;
+        __heap_start__ = .;
+        end = __heap_start__;
+        _end = end;
+        __end = end;
+        KEEP(*(.heap))
+        __heap_end__ = .;
+        __HeapLimit = __heap_end__;
 	} >sram_region AT>sram_region
 
 	/* Stacks will go in CCM. */

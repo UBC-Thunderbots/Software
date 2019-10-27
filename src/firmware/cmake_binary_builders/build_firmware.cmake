@@ -21,21 +21,22 @@ function(build_firmware FIRMWARE_SOURCE_DIR SRC_FILES BINARY_NAME OUT_DIR)
 
     # a list of the c flags we are going to use
     set(CFLAGS
-        -std=gnu99
-        -O2
-        -mfloat-abi=hard
-        -mlittle-endian
-        -mcpu=cortex-m4
-        -mfpu=fpv4-sp-d16
-        -mthumb
-        -ggdb3
-        -fno-common
-        -ffunction-sections
-        -static
-        -Wall
-        -Wextra
-        -Wdouble-promotion
-        -Wpointer-arith)
+"        -std=gnu99",
+"        -O2",
+"        -mfloat-abi=hard",
+"        -mlittle-endian",
+"        -mcpu=cortex-m4",
+"        -mfpu=fpv4-sp-d16",
+"        -mthumb",
+"        -ggdb3",
+"        -fno-common",
+"        -ffunction-sections",
+"        -static",
+"        -Wall",
+"        -Wextra",
+"        -Wdouble-promotion",
+"        -Wpointer-arith",
+        )
         
     # specify all of the compiler flags
     target_compile_options(${BINARY_NAME}.elf PUBLIC ${CFLAGS})
