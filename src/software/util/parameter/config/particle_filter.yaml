@@ -1,80 +1,79 @@
-NetworkInput:
-  Filter:
-    ParticleFilter:
-      num_condensations:
+NetworkInputConfig:
+  FilterConfig:
+    ParticleFilterConfig:
+      NumCondensations:
         min: 1
         max: 50
         default: 5
         type: "int"
         description: "The number of condensations for the particle filter"
-      top_percentage_of_particles:
+      TopPercentageOfParticles:
         min: 0
         max: 1
         default: 0.1
         type: "double"
         description: >-
             The top fraction of particles that are used as basepoints for the next 
-      max_detection_weight:
+      MaxDetectionWeight:
         min: 0
         max: 1000
         default: 100
         type: "double"
         description: >- 
             The weight of vision detections
-      detection_weight_decay:
+      DetectionWeightDecay:
         min: 0
         max: 10000
         default: 200
         type: "double"
         description: >-
             The decay rate (per meter) of the detection weight
-      previous_ball_weight:
+      PreviousBallWeight:
         min: 0
         max: 1000
         default: 1
         type: "double"
         description: >- 
             The weight of the previous ball's position
-      prediction_weight:
+      PredictionWeight:
         min: 0
         max: 1000
         default: 15
         type: "double"
         description: >- 
             The weight of the previous ball's predicted position
-      ball_dist_threshold:
+      BallDistThreshold:
         min: 0
         max: 100
         default: 0.5
         type: "double"
         description: >-
             How close a particle must be to the ball to get the extra
-      ball_confidence_threshold:
+      BallConfidenceThreshold:
         min: 0
         max: 100
         default: 60
         type: "double"
         description: >-
             The confidence threshold for being confident or not of the ball's
-      ball_valid_dist_threshold:
+      BallValidDistThreshold:
         min: 0
         max: 100
         default: 0.1
         type: "double"
         description: >-
             How much the detected ball can move per tick without losing confidence
-      ball_confidence_delta:
+      BallConfidenceDelta:
         min: 0
         max: 100
         default: 5
         type: "double"
         description: >-
             How much the ball's confidence changes at a time
-      ball_max_variance:
+      BallMaxVariance:
         min: 0
         max: 10
         default: 1
         type: "double"
         description: >-
             The max variance a ball detection can have without losing confidence
-      

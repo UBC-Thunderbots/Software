@@ -61,6 +61,14 @@ new_git_repository(
     remote = "https://github.com/saebyn/munkres-cpp.git",
 )
 
+# yaml cpp parser for dynamic parameters test
+git_repository(
+    name = "yaml-cpp",
+    commit = "f531f8a8c3f8ca0923f9219c72fcca511555f824",
+    remote = "https://github.com/jbeder/yaml-cpp.git",
+    shallow_since = "1571237073 -0500",
+)
+
 # Qt bazel rules from https://github.com/justbuchanan/bazel_rules_qt
 git_repository(
     name = "bazel_rules_qt",
