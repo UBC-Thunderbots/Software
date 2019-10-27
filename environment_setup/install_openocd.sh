@@ -21,6 +21,8 @@ git clone https://github.com/ntfreak/openocd.git $OPENOCD_TMP_DIR
 
 # Build and Install Openocd
 cd $OPENOCD_TMP_DIR
+sudo cp contrib/60-openocd.rules /etc/udev/rules.d/
+sudo adduser $USER plugdev
 ./bootstrap
 ./configure
 make
