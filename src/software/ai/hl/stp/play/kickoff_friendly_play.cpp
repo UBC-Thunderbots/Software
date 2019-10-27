@@ -15,13 +15,15 @@ std::string KickoffFriendlyPlay::getName() const
 
 bool KickoffFriendlyPlay::isApplicable(const World &world) const
 {
-    return (world.gameState().isReadyState() || world.gameState().isSetupState()) &&
-           world.gameState().isOurKickoff();
+    return ((world.gameState().isReadyState() || world.gameState().isSetupState()) &&
+            world.gameState().isOurKickoff()) &&
+           !world.gameState().isHalted() && !world.gameState().isStopped();
 }
 
 bool KickoffFriendlyPlay::invariantHolds(const World &world) const
 {
-    return !world.gameState().isPlaying();
+    return (!world.gameState().isPlaying() || world.gameState().isHalted() ||
+            world.gameState().isStopped());
 }
 
 void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
@@ -89,6 +91,10 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         world.ball(), world.field(), world.friendlyTeam(), world.enemyTeam());
     auto chip_tactic = std::make_shared<ChipTactic>(world.ball(), true);
 
+    // the chipper is allowed to go into the centre circle and touch the ball
+    chip_tactic->addWhitelistedAvoidArea(AvoidArea::CENTER_CIRCLE);
+    chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
+
     // Part 1: setup state (move to key positions)
     while (world.gameState().isSetupState())
     {
@@ -107,7 +113,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         for (unsigned i = 0; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::half(), 0);
+                                                    Angle::zero(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 
@@ -129,8 +135,8 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         // in the middle of the enemy field
         chip_tactic->updateWorldParams(world.ball());
         chip_tactic->updateControlParams(
-            world.field().centerPoint(),
-            world.field().centerPoint() + Point(world.field().xLength() / 4, 0),
+            world.ball().position(),
+            world.field().centerPoint() + Point(world.field().xLength() / 6, 0),
             world.field().xLength() / 2);
         result.emplace_back(chip_tactic);
 
@@ -139,7 +145,7 @@ void KickoffFriendlyPlay::getNextTactics(TacticCoroutine::push_type &yield)
         for (unsigned i = 1; i < kickoff_setup_positions.size(); i++)
         {
             move_tactics.at(i)->updateControlParams(kickoff_setup_positions.at(i),
-                                                    Angle::half(), 0);
+                                                    Angle::zero(), 0);
             result.emplace_back(move_tactics.at(i));
         }
 

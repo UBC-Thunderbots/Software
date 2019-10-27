@@ -18,6 +18,7 @@ class ReceiverTactic;
 class PatrolTactic;
 class ShootGoalTactic;
 class PasserTactic;
+class GrabBallTactic;
 class MoveTestTactic;
 class StopTestTactic;
 class DefenseShadowEnemyTactic;
@@ -132,6 +133,13 @@ class TacticVisitor
      * @param tactic The PasserTactic to visit
      */
     virtual void visit(const PasserTactic &tactic) = 0;
+
+    /**
+     * Visits a GrabBallTactic to perform an operation.
+     *
+     * @param tactic The GrabBallTactic to visit
+     */
+    virtual void visit(const GrabBallTactic &tactic) = 0;
 
     /**
      * Visits a MoveTestTactic to perform an operation.

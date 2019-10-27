@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include "shared/constants.h"
-#include "software/ai/hl/stp/evaluation/possession.h"
+#include "software/ai/evaluation/possession.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/util/parameter/dynamic_parameters.h"
 
@@ -45,8 +45,9 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
         std::optional<Robot> enemy_with_ball =
             Evaluation::getRobotWithEffectiveBallPossession(enemy_team, ball, field);
         double robot_separation_scaling_factor =
-            Util::DynamicParameters::ShadowFreekickerTactic::
-                robot_separation_scaling_factor.value();
+            Util::DynamicParameters->getShadowFreekickerTacticConfig()
+                ->RobotSeparationScalingFactor()
+                ->value();
 
         if (enemy_with_ball.has_value())
         {
@@ -82,7 +83,7 @@ void ShadowFreekickerTactic::calculateNextIntent(IntentCoroutine::push_type &yie
 
         yield(move_action.updateStateAndGetNextIntent(
             *robot, defend_position, (ball.position() - robot->position()).orientation(),
-            0, false));
+            0, DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
     } while (true);
 }
 

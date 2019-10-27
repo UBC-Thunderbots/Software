@@ -1,8 +1,8 @@
 #include "software/ai/hl/stp/tactic/shoot_goal_tactic.h"
 
+#include "software/ai/evaluation/calc_best_shot.h"
+#include "software/ai/evaluation/intercept.h"
 #include "software/ai/hl/stp/action/move_action.h"
-#include "software/ai/hl/stp/evaluation/calc_best_shot.h"
-#include "software/ai/hl/stp/evaluation/intercept.h"
 #include "software/ai/hl/stp/tactic/tactic_visitor.h"
 #include "software/geom/rectangle.h"
 #include "software/util/parameter/dynamic_parameters.h"
@@ -79,11 +79,12 @@ bool ShootGoalTactic::isEnemyAboutToStealBall() const
     Vector front_of_robot_dir =
         Vector(robot->orientation().cos(), robot->orientation().sin());
 
-    auto steal_ball_rect_width = Util::DynamicParameters::ShootGoalTactic::
-                                     enemy_about_to_steal_ball_rectangle_width.value();
-    auto steal_ball_rect_length =
-        Util::DynamicParameters::ShootGoalTactic::
-            enemy_about_to_steal_ball_rectangle_extension_length.value();
+    auto steal_ball_rect_width = Util::DynamicParameters->getShootGoalTacticConfig()
+                                     ->EnemyAboutToStealBallRectangleWidth()
+                                     ->value();
+    auto steal_ball_rect_length = Util::DynamicParameters->getShootGoalTacticConfig()
+                                      ->EnemyAboutToStealBallRectangleExtensionLength()
+                                      ->value();
     Rectangle baller_frontal_area = Rectangle(
         (robot->position() + front_of_robot_dir.perp().norm(steal_ball_rect_width / 2.0)),
         robot->position() + front_of_robot_dir.norm(steal_ball_rect_length) -
@@ -170,7 +171,8 @@ void ShootGoalTactic::calculateNextIntent(IntentCoroutine::push_type &yield)
 
             // The default behaviour is to move behind the ball and face the net
             yield(move_action.updateStateAndGetNextIntent(
-                *robot, behind_ball, (-behind_ball_vector).orientation(), 0));
+                *robot, behind_ball, (-behind_ball_vector).orientation(), 0,
+                DribblerEnable::OFF, MoveType::NORMAL, AutokickType::NONE));
         }
     } while (!(kick_action.done() || chip_action.done()));
 }
