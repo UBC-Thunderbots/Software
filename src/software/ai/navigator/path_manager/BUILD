@@ -14,6 +14,9 @@ cc_library(
     name = "obstacle_path_manager",
     srcs = ["obstacle_path_manager.cpp"],
     hdrs = ["obstacle_path_manager.h"],
-    deps = [":path_manager"],
+    deps = [
+        ":path_manager",
+        "//software/util/parameter:dynamic_parameters",
+    ],
 )
 
