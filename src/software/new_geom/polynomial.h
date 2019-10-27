@@ -12,31 +12,34 @@
 class Polynomial
 {
    public:
-    Polynomial() = delete;
+    // Threshold for coefficient comparison.
+    // http://www.cplusplus.com/forum/beginner/95128/
+    static constexpr double EPSILON = 1e-15;
+
     /**
-     * Construct a polynomial from coefficients
-     * s.t. n = coeffs.size() == the degree of the polynomial
-     * and of the form coeffs[0]*x^(n-1)
-     * + coeffs[1]*x^(n-2) + ... + coeffs[n-1]
-     *
-     * @param coeffs coefficients of the polynomial
-     *      * must be
-     *
-     * @throws std::invalid_argument if coeffs[0] == 0
+     * Construct a zero polynomial
      */
-    explicit Polynomial(const std::vector<double>& coeffs);
+    explicit Polynomial();
 
     /**
      * Construct a polynomial from coefficients
      * s.t. n = coeffs.size() == the degree of the polynomial
-     * and of the form coeffs[0]*x^(n-1)
-     * + coeffs[1]*x^(n-2) + ... + coeffs[n-1]
+     * and of the form coeffs[0] + coeffs[1]*x^(1)
+     * + ... + coeffs[n-1]*x^(n-1)
      *
      * @param coeffs coefficients of the polynomial
-     *
-     * @throws std::invalid_argument if coeffs[0] == 0
      */
-    explicit Polynomial(const std::initializer_list<double>& coeffs);
+    explicit Polynomial(const std::vector<double> &coeffs);
+
+    /**
+     * Construct a polynomial from coefficients
+     * s.t. n = coeffs.size() == the degree of the polynomial
+     * and of the form coeffs[0] + coeffs[1]*x^(1)
+     * + ... + coeffs[n-1]*x^(n-1)
+     *
+     * @param coeffs coefficients of the polynomial
+     */
+    explicit Polynomial(const std::initializer_list<double> &coeffs);
 
     /**
      * Construct a linear polynomial from two pairs of input/output
@@ -46,15 +49,31 @@ class Polynomial
      *
      * @throws std::invalid_argument if constraint1.first == constraint2.first
      */
-    explicit Polynomial(const std::pair<double, double>& constraint1,
-                        const std::pair<double, double>& constraint2);
+    explicit Polynomial(const std::pair<double, double> &constraint1,
+                        const std::pair<double, double> &constraint2);
 
     /**
-     * Returns the coefficients of the polynomial
+     * Returns the coefficient of the term of given order
      *
-     * @return the coefficients of the polynomial
+     * @param order the order of the term
+     * @return the coefficient of the term
      */
-    const std::vector<double>& getCoeffs() const;
+    double getCoeff(unsigned int order) const;
+
+    /**
+     * Sets the coefficient of the term of given order
+     *
+     * @param order the order of the term to set the coefficient
+     * @param coeff the coefficient
+     */
+    void setCoeff(unsigned int order, double coeff);
+
+    /**
+     * Returns the order of the Polynomial
+     *
+     * @return the order of the Polynomial
+     */
+    unsigned int getOrder() const;
 
     /**
      * Calculates the value of polynomial evaluated at value val
@@ -67,7 +86,77 @@ class Polynomial
 
    private:
     // the coefficients for the polynomial
-    // of the form coeffs[0]*x^(n-1) + coeffs[1]*x^(n-2)
-    // + ... + coeffs[n-1]
+    // of the form coeffs[0] + coeffs[1]*x^(1)
+    // + ... + coeff[n-1]*x^(n-1)
     std::vector<double> coeffs;
 };
+
+/**
+ * Adds two Polynomials
+ *
+ * @param p1 the first Polynomial
+ * @param p2 the second Polynomial
+ *
+ * @return the sum of the Polynomials
+ */
+Polynomial operator+(const Polynomial &p1, const Polynomial &p2);
+
+/**
+ * Subtracts two Polynomials
+ *
+ * @param p1 the first Polynomial
+ * @param p2 the second Polynomial
+ *
+ * @return the difference of the Polynomials
+ */
+Polynomial operator-(const Polynomial &p1, const Polynomial &p2);
+
+/**
+ * Multiplies two Polynomials
+ *
+ * @param p1 the first Polynomial
+ * @param p2 the second Polynomial
+ *
+ * @return the product of the Polynomials
+ */
+Polynomial operator*(const Polynomial &p1, const Polynomial &p2);
+
+/**
+ * Adds a Polynomial to another Polynomial
+ *
+ * @param p1 the Polynomial to add to.
+ * @param p2 the Polynomial to add.
+ *
+ * @return the new Polynomial
+ */
+Polynomial &operator+=(Polynomial &p1, const Polynomial &p2);
+
+/**
+ * Subtracts a Polynomial from a Polynomial
+ *
+ * @param p1 the Polynomial to subtract from.
+ * @param p2 the Polynomial to subtract.
+ *
+ * @return the new Polynomial
+ */
+Polynomial &operator-=(Polynomial &p1, const Polynomial &p2);
+
+/**
+ * Multiplies a Polynomial to another Polynomial
+ *
+ * @param p1 the Polynomial to multiply
+ * @param p2 the Polynomial to multiply by
+ *
+ * @return the new Polynomial
+ */
+Polynomial &operator*=(Polynomial &p1, const Polynomial &p2);
+
+/**
+ * Compares two Polynomials for equality
+ *
+ * @param p1 the first Polynomial.
+ * @param p2 the second Polynomial.
+ *
+ * @return true if p1 is equal to p2, and false otherwise.
+ */
+bool operator==(const Polynomial &p1, const Polynomial &p2);
