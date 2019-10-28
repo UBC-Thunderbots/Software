@@ -1,6 +1,7 @@
 #include "software/new_geom/vector.h"
 
 #include <gtest/gtest.h>
+#include <chrono>
 
 #include "software/new_geom/point.h"
 
@@ -57,14 +58,14 @@ TEST(SetVectorTests, vector_set_x_and_y_test)
 TEST(VectorLogicTests, vector_len_and_lensq_test)
 {
     Vector v = Vector(3, 4);
-    EXPECT_EQ(25, v.lensq());
-    EXPECT_EQ(5, v.len());
+    EXPECT_EQ(25, v.lengthSquared());
+    EXPECT_EQ(5, v.length());
 }
 
 TEST(VectorLogicTests, norm_vector_from_vector_test)
 {
     Vector u = Vector(3, 4);
-    Vector v = u.norm();
+    Vector v = u.normalize();
     EXPECT_EQ(0.6, v.x());
     EXPECT_EQ(0.8, v.y());
 }
@@ -72,7 +73,7 @@ TEST(VectorLogicTests, norm_vector_from_vector_test)
 TEST(VectorLogicTests, norm_vector_from_vector_with_length_test)
 {
     Vector u = Vector(3, 4);
-    Vector v = u.norm(2);
+    Vector v = u.normalize(2);
     EXPECT_EQ(1.2, v.x());
     EXPECT_EQ(1.6, v.y());
 }
@@ -80,14 +81,14 @@ TEST(VectorLogicTests, norm_vector_from_vector_with_length_test)
 TEST(VectorLogicTests, norm_near_zero_vector_test)
 {
     Vector u = Vector(GeomConstants::EPSILON * 0.99, GeomConstants::EPSILON * 0.99);
-    Vector v = u.norm();
+    Vector v = u.normalize();
     EXPECT_EQ(Vector(), v);
 }
 
 TEST(VectorLogicTests, vector_perp_test)
 {
     Vector u = Vector(3, 4);
-    Vector v = u.perp();
+    Vector v = u.perpendicular();
     EXPECT_EQ(-4, v.x());
     EXPECT_EQ(3, v.y());
 }
