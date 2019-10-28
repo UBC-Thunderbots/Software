@@ -9,6 +9,7 @@
 #include "software/util/time/timestamp.h"
 #include "software/world/robot_capabilities.h"
 
+using RobotId = unsigned int;
 /**
  * Defines an SSL robot
  */

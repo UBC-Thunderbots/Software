@@ -56,25 +56,23 @@ void Navigator::visit(const MoveIntent &intent)
     Point end                 = intent.getDestination();
     auto avoid_area_obstacles = getObstaclesFromAvoidAreas(intent.getAreasToAvoid());
 
-    auto robot_it = std::find_if(
-        world.friendlyTeam().getAllRobots().begin(),
-        world.friendlyTeam().getAllRobots().end(),
-        [&](const Robot &robot) { return (robot.id() == intent.getRobotId()); });
+    auto robot = world.friendlyTeam().getRobotById(intent.getRobotId());
 
-    if (robot_it == world.friendlyTeam().getAllRobots().end())
+    if (robot)
+    {
+        robot_id_to_path_objectives.insert(
+            {intent.getRobotId(),
+             PathObjective(start, end, robot->velocity().len(), avoid_area_obstacles)});
+    }
+    else
     {
         std::stringstream ss;
         ss << "Tried to find robot associated with robot id = " << intent.getRobotId()
            << ", but failed";
-        throw std::runtime_error(ss.str());
+        LOG(WARNING) << ss.str();
     }
-    else
-    {
-        path_objectives.insert(
-            {intent.getRobotId(), PathObjective(start, end, robot_it->velocity().len(),
-                                                avoid_area_obstacles)});
-    }
-    path_planning_intents.insert({intent.getRobotId(), intent});
+
+    robot_id_to_move_intents.insert({intent.getRobotId(), intent});
     current_primitive = std::unique_ptr<Primitive>(nullptr);
 }
 
@@ -105,8 +103,8 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
     this->world              = world;
     planned_paths.clear();
     non_path_planning_robots.clear();
-    path_objectives.clear();
-    path_planning_intents.clear();
+    robot_id_to_path_objectives.clear();
+    robot_id_to_move_intents.clear();
 
     auto assigned_primitives = std::vector<std::unique_ptr<Primitive>>();
     for (const auto &intent : assignedIntents)
@@ -122,32 +120,35 @@ std::vector<std::unique_ptr<Primitive>> Navigator::getAssignedPrimitives(
         Point(this->world.field().totalXLength(), this->world.field().totalYLength()),
         this->world.field().totalXLength(), this->world.field().totalYLength());
 
-    auto paths = path_manager->getManagedPaths(path_objectives, navigable_area,
-                                               getNonPathPlanningObstacles());
+    auto paths = path_manager->getManagedPaths(
+        robot_id_to_path_objectives, navigable_area, getNonPathPlanningObstacles());
     addPathsToPrimitives(paths, assigned_primitives);
 
     return assigned_primitives;
 }
 
 void Navigator::addPathsToPrimitives(
-    const std::map<int, Path> &paths,
+    const std::map<RobotId, Path> &robot_id_to_paths,
     std::vector<std::unique_ptr<Primitive>> &assigned_primitives)
 {
-    for (const auto &path : paths)
+    for (const auto &robot_id_to_path : robot_id_to_paths)
     {
+        auto robot_id = robot_id_to_path.first;
+        auto path     = robot_id_to_path.second;
+
         // look for move intent
-        auto intent_it = path_planning_intents.find(path.first);
-        if (intent_it == path_planning_intents.end())
+        auto robot_id_to_intent_it = robot_id_to_move_intents.find(robot_id);
+        if (robot_id_to_intent_it == robot_id_to_move_intents.end())
         {
             std::stringstream ss;
-            ss << "Tried to find intent associated with robot id = " << path.first
+            ss << "Tried to find intent associated with robot id = " << robot_id
                << ", but failed";
-            throw std::runtime_error(ss.str());
+            LOG(WARNING) << ss.str();
         }
-        MoveIntent intent = intent_it->second;
-        if (path.second)
+        MoveIntent intent = robot_id_to_intent_it->second;
+        if (path)
         {
-            std::vector<Point> path_points = path.second->getKnots();
+            std::vector<Point> path_points = path->getKnots();
             planned_paths.emplace_back(path_points);
 
             if (path_points.size() == 1)

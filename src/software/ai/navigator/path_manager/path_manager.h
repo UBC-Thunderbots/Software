@@ -15,25 +15,20 @@
  * start and destination
  */
 
-using Path = std::optional<Spline>;
-
 // Used to plan a path for a robot
 class PathObjective
 {
    public:
     PathObjective(const Point start, const Point end, const double current_velocity,
-                  const std::vector<Obstacle> &avoid_area_obstacles)
-        : start(start),
-          end(end),
-          current_velocity(current_velocity),
-          avoid_area_obstacles(avoid_area_obstacles)
+                  const std::vector<Obstacle> &obstacles)
+        : start(start), end(end), current_velocity(current_velocity), obstacles(obstacles)
     {
     }
 
     const Point start;
     const Point end;
     const double current_velocity;
-    const std::vector<Obstacle> avoid_area_obstacles;
+    const std::vector<Obstacle> obstacles;  // obstacles specific to this objective
 };
 
 class PathManager
@@ -50,8 +45,9 @@ class PathManager
      *
      * @return map of robot ids to paths
      */
-    virtual const std::map<int, Path> getManagedPaths(
-        const std::map<int, PathObjective> &objectives, const Rectangle &navigable_area,
+    virtual const std::map<RobotId, Path> getManagedPaths(
+        const std::map<RobotId, PathObjective> &objectives,
+        const Rectangle &navigable_area,
         const std::vector<Obstacle> &static_obstacles) = 0;
 
     virtual ~PathManager() = default;

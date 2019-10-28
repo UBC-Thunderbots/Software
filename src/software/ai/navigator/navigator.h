@@ -111,7 +111,7 @@ class Navigator : public IntentVisitor
     void visit(const StopIntent &stop_intent) override;
 
    private:
-    // Path manager used to navigate movement
+    // Path manager used to navigate around obstacles
     std::unique_ptr<PathManager> path_manager;
 
     // This navigators knowledge / state of the world
@@ -127,16 +127,16 @@ class Navigator : public IntentVisitor
      * When move intents are processed to path plan,
      * we can avoid these non-"moving" robots
      */
-    std::set<int> non_path_planning_robots;
+    std::set<RobotId> non_path_planning_robots;
 
     // This is used by the visualizer to see the planned paths
     std::vector<std::vector<Point>> planned_paths;
 
     // path objectives are used to plan paths
-    std::map<int, PathObjective> path_objectives;
+    std::map<RobotId, PathObjective> robot_id_to_path_objectives;
 
     // intents that need path planning
-    std::map<int, MoveIntent> path_planning_intents;
+    std::map<RobotId, MoveIntent> robot_id_to_move_intents;
 
     /**
      * Create obstacles for the given avoid areas, with a buffer such that the edge
@@ -185,6 +185,6 @@ class Navigator : public IntentVisitor
      * @param assigned_primitives list of primitives to add to
      */
     void addPathsToPrimitives(
-        const std::map<int, Path> &paths,
+        const std::map<RobotId, Path> &paths,
         std::vector<std::unique_ptr<Primitive>> &assigned_primitives);
 };
