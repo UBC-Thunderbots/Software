@@ -23,10 +23,12 @@ const std::map<int, Path> ObstaclePathManager::getManagedPaths(
         current_velocity_obstacles;  // velocity obstacles used to avoid collisions
 
     // cache dynamic params
-    double robot_obstacle_inflation =
-        Util::DynamicParameters->getNavigatorConfig()->RobotObstacleInflationFactor()->value();
-    double velocity_obstacle_inflation =
-        Util::DynamicParameters->getNavigatorConfig()->VelocityObstacleInflationFactor()->value();
+    double robot_obstacle_inflation = Util::DynamicParameters->getNavigatorConfig()
+                                          ->RobotObstacleInflationFactor()
+                                          ->value();
+    double velocity_obstacle_inflation = Util::DynamicParameters->getNavigatorConfig()
+                                             ->VelocityObstacleInflationFactor()
+                                             ->value();
 
     for (auto const &current_objective : objectives)
     {
