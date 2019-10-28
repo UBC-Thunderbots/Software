@@ -20,6 +20,8 @@ ShootGoalTactic::ShootGoalTactic(const Field &field, const Team &friendly_team,
       chip_target(chip_target),
       has_shot_available(false)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string ShootGoalTactic::getName() const

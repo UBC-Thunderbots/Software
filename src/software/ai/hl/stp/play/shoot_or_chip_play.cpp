@@ -138,9 +138,6 @@ void ShootOrChipPlay::getNextTactics(TacticCoroutine::push_type &yield)
                                                 world.enemyTeam(), world.ball());
         shoot_or_chip_tactic->updateControlParams(chip_target);
 
-        shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::BALL);
-        shoot_or_chip_tactic->addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
-
         // We want this second in priority only to the goalie
         result.insert(result.begin() + 1, shoot_or_chip_tactic);
 

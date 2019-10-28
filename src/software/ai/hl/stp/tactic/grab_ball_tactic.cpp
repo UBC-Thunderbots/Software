@@ -16,6 +16,8 @@ GrabBallTactic::GrabBallTactic(const Field &field, const Ball &ball,
                                const Team &enemy_team, bool loop_forever)
     : Tactic(loop_forever), field(field), ball(ball), enemy_team(enemy_team)
 {
+    addWhitelistedAvoidArea(AvoidArea::BALL);
+    addWhitelistedAvoidArea(AvoidArea::HALF_METER_AROUND_BALL);
 }
 
 std::string GrabBallTactic::getName() const
