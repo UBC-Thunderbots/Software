@@ -152,8 +152,7 @@ class Point final
  *
  * @return the Point sum of the given Point and Vector
  */
-Point operator+(const Point &p, const Vector &v)
-    __attribute__((warn_unused_result));
+Point operator+(const Point &p, const Vector &v) __attribute__((warn_unused_result));
 
 /**
  * Adds a vector to a point and sets that point to the resulting sum
@@ -182,8 +181,7 @@ Point operator-(const Point &p) __attribute__((warn_unused_result));
  *
  * @return the vector-difference of the two points
  */
-Vector operator-(const Point &p, const Point &q)
-    __attribute__((warn_unused_result));
+Vector operator-(const Point &p, const Point &q) __attribute__((warn_unused_result));
 
 /**
  * Prints a point to a stream

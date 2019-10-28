@@ -206,8 +206,7 @@ class Vector final
  *
  * @return the vector-sum of the two vectors
  */
-Vector operator+(const Vector &p, const Vector &q)
-    __attribute__((warn_unused_result));
+Vector operator+(const Vector &p, const Vector &q) __attribute__((warn_unused_result));
 
 /**
  * Adds a Vector to another Vector and set the former vector to the sum
@@ -236,8 +235,7 @@ Vector operator-(const Vector &p) __attribute__((warn_unused_result));
  *
  * @return the vector-difference of the two vectors
  */
-Vector operator-(const Vector &u, const Vector &v)
-    __attribute__((warn_unused_result));
+Vector operator-(const Vector &u, const Vector &v) __attribute__((warn_unused_result));
 
 /**
  * Subtracts from a Vector another Vector and set the former vector to the difference

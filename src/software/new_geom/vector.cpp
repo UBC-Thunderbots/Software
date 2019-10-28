@@ -1,5 +1,6 @@
-#include "software/new_geom/angle.h"
 #include "software/new_geom/vector.h"
+
+#include "software/new_geom/angle.h"
 
 Vector Vector::createFromAngle(const Angle &angle)
 {
