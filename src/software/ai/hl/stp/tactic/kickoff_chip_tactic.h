@@ -4,7 +4,8 @@
 
 /**
  * The KickoffChipTactic will move the assigned robot to the given chip origin and then
- * chip the ball to the chip target.
+ * chip the ball to the chip target. The robot assigned this tactic is allowed in the 
+ * centre circle and near the ball during kickoff. 
  */
 
 class KickoffChipTactic : public Tactic
