@@ -1,6 +1,6 @@
-#include <stdexcept>
-
 #include "software/new_geom/polynomial.h"
+
+#include <stdexcept>
 
 Polynomial::Polynomial() {}
 
@@ -56,7 +56,7 @@ double Polynomial::valueAt(double val) const
     // Horner's Method:
     // https://www.geeksforgeeks.org/horners-method-polynomial-evaluation/
     unsigned int order = getOrder();
-    double retval = getCoeff(order);
+    double retval      = getCoeff(order);
     for (unsigned int i = 1; i <= order; i++)
     {
         retval = retval * val + getCoeff(order - i);

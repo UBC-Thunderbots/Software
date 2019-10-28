@@ -39,7 +39,7 @@ TEST(PolynomialTest, test_polynomial_coeffs_constructor)
 
 TEST(PolynomialTest, test_polynomial_coeffs_list_constructor)
 {
-    std::vector<double> coeffs({1, 2, 3}); // 1 + 2x + 3x^2
+    std::vector<double> coeffs({1, 2, 3});  // 1 + 2x + 3x^2
     Polynomial p({1, 2, 3});
     EXPECT_DOUBLE_EQ(p.getCoeff(0), 1);
     EXPECT_DOUBLE_EQ(p.getCoeff(1), 2);
