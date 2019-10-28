@@ -132,8 +132,15 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         // We invert the field side if we explicitly choose to override the values
         // provided by refbox. The 'defending_positive_side' parameter dictates the side
         // we are defending if we are overriding the value
-        if (Util::DynamicParameters::AI::refbox::override_refbox_defending_side.value() &&
-            Util::DynamicParameters::AI::refbox::defending_positive_side.value())
+        // TODO remove as part of https://github.com/UBC-Thunderbots/Software/issues/960
+        if (Util::DynamicParameters->getAIConfig()
+                ->getRefboxConfig()
+                ->OverrideRefboxDefendingSide()
+                ->value() &&
+            Util::DynamicParameters->getAIConfig()
+                ->getRefboxConfig()
+                ->DefendingPositiveSide()
+                ->value())
         {
             invertFieldSide(detection);
         }
@@ -142,19 +149,19 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
         {
             case 0:
                 camera_disabled =
-                    Util::DynamicParameters::cameras::ignore_camera_0.value();
+                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_0()->value();
                 break;
             case 1:
                 camera_disabled =
-                    Util::DynamicParameters::cameras::ignore_camera_1.value();
+                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_1()->value();
                 break;
             case 2:
                 camera_disabled =
-                    Util::DynamicParameters::cameras::ignore_camera_2.value();
+                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_2()->value();
                 break;
             case 3:
                 camera_disabled =
-                    Util::DynamicParameters::cameras::ignore_camera_3.value();
+                    Util::DynamicParameters->getCameraConfig()->IgnoreCamera_3()->value();
                 break;
             default:
                 LOG(WARNING) << "An unkown camera id was detected, disabled by default "
@@ -169,14 +176,18 @@ void NetworkClient::filterAndPublishVisionData(SSL_WrapperPacket packet)
             world.updateBallState(ball);
 
             Team friendly_team = network_filter.getFilteredFriendlyTeamData({detection});
-            int friendly_goalie_id =
-                Util::DynamicParameters::AI::refbox::friendly_goalie_id.value();
+            int friendly_goalie_id = Util::DynamicParameters->getAIConfig()
+                                         ->getRefboxConfig()
+                                         ->FriendlyGoalieId()
+                                         ->value();
             friendly_team.assignGoalie(friendly_goalie_id);
             world.mutableFriendlyTeam() = friendly_team;
 
-            Team enemy_team = network_filter.getFilteredEnemyTeamData({detection});
-            int enemy_goalie_id =
-                Util::DynamicParameters::AI::refbox::enemy_goalie_id.value();
+            Team enemy_team     = network_filter.getFilteredEnemyTeamData({detection});
+            int enemy_goalie_id = Util::DynamicParameters->getAIConfig()
+                                      ->getRefboxConfig()
+                                      ->EnemyGoalieId()
+                                      ->value();
             enemy_team.assignGoalie(enemy_goalie_id);
             world.mutableEnemyTeam() = enemy_team;
         }

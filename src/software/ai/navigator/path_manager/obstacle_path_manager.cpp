@@ -24,9 +24,9 @@ const std::map<int, Path> ObstaclePathManager::getManagedPaths(
 
     // cache dynamic params
     double robot_obstacle_inflation =
-        Util::DynamicParameters::Navigator::robot_obstacle_inflation_factor.value();
+        Util::DynamicParameters->getNavigatorConfig()->RobotObstacleInflationFactor()->value();
     double velocity_obstacle_inflation =
-        Util::DynamicParameters::Navigator::velocity_obstacle_inflation_factor.value();
+        Util::DynamicParameters->getNavigatorConfig()->VelocityObstacleInflationFactor()->value();
 
     for (auto const &current_objective : objectives)
     {

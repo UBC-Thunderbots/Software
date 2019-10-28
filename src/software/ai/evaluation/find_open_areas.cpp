@@ -5,9 +5,11 @@
 
 std::vector<Circle> Evaluation::findGoodChipTargets(const World& world)
 {
-    Rectangle target_area_rectangle = findBestChipTargetArea(
-        world, Util::DynamicParameters::Evaluation::Indirect_Chip::chip_target_area_inset
-                   .value());
+    Rectangle target_area_rectangle =
+        findBestChipTargetArea(world, Util::DynamicParameters->getEvaluationConfig()
+                                          ->getIndirectChipConfig()
+                                          ->ChipTargetAreaInset()
+                                          ->value());
 
     std::vector<Point> enemy_locations;
     for (Robot robot : world.enemyTeam().getAllRobots())
