@@ -483,7 +483,7 @@ inline constexpr bool Point::isClose(const Point &other, double dist) const
 {
     double x_dist = _x - other.x();
     double y_dist = _y - other.y();
-    return (x_dist *  x_dist) + (y_dist * y_dist) < dist * dist;
+    return (x_dist * x_dist) + (y_dist * y_dist) < dist * dist;
 }
 
 inline constexpr Point operator+(const Point &p, const Point &q)
