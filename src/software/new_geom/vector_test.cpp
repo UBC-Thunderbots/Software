@@ -1,6 +1,7 @@
 #include "software/new_geom/vector.h"
 
 #include <gtest/gtest.h>
+
 #include <chrono>
 
 #include "software/new_geom/point.h"
