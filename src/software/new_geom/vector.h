@@ -15,7 +15,7 @@ class Vector final
     /**
      * Creates a zero-vector.
      */
-    explicit constexpr Vector();
+    explicit Vector();
 
     /**
      * Creates a unit-magnitude Vector from an angle.
@@ -32,28 +32,28 @@ class Vector final
      * @param x the <var>x</var> value of the Vector
      * @param y the <var>y</var> value of the Vector
      */
-    constexpr Vector(double x, double y);
+    Vector(double x, double y);
 
     /**
      * Creates a new Vector that is a copy of the given Vector
      *
      * @param the Vector to duplicate
      */
-    constexpr Vector(const Vector &v);
+    Vector(const Vector &v);
 
     /**
      * Returns the magnitude in the x-coordinate of this Vector
      *
      * @return the magnitude in the x-coordinate of this Vector
      */
-    constexpr double x() const;
+    double x() const;
 
     /**
      * Returns the magnitude in the y-coordinate of this Vector
      *
      * @return the magnitude in the y-coordinate of this Vector
      */
-    constexpr double y() const;
+    double y() const;
 
     /**
      * Sets the magnitudes of this vector to the new magnitudes
@@ -82,14 +82,14 @@ class Vector final
      *
      * @return the square of the length of the Vector
      */
-    constexpr double lensq() const;
+    double lengthSquared() const;
 
     /**
      * Returns the length of the Vector
      *
      * @return the length of the Vector
      */
-    double len() const;
+    double length() const;
 
     /**
      * Returns this Vector as a unit vector in the same direction
@@ -97,7 +97,7 @@ class Vector final
      * @return Vector a unit vector in the same direction as this Vector, or a
      * zero-vector if this Vector is a zero-vector
      */
-    Vector norm() const;
+    Vector normalize() const;
 
     /**
      * Returns a scaled normalized vector in the same direction as this
@@ -108,7 +108,7 @@ class Vector final
      * @return a vector in the same direction as this Vector and with the given length,
      * or a zero-vector if this Vector is a zero-vector
      */
-    Vector norm(double length) const;
+    Vector normalize(double length) const;
 
     /**
      * Returns the vector perpendicular to this Vector (rotated +90 degrees
@@ -116,7 +116,7 @@ class Vector final
      *
      * @return a vector perpendicular to this Vector
      */
-    constexpr Vector perp() const;
+    Vector perpendicular() const;
 
     /**
      * Rotates this Vector counterclockwise by an angle
@@ -135,7 +135,7 @@ class Vector final
      * @return the component of this Vector that is in the same direction as the given
      * Vector
      */
-    constexpr Vector project(const Vector &other) const;
+    Vector project(const Vector &other) const;
 
     /**
      * Takes the dot product of two vectors
@@ -144,7 +144,7 @@ class Vector final
      *
      * @return the dot product of the vectors
      */
-    constexpr double dot(const Vector &other) const;
+    double dot(const Vector &other) const;
 
     /**
      * Takes the cross product of two vectors
@@ -154,7 +154,7 @@ class Vector final
      * @return the z component of the 3-dimensional cross product between this Vector and
      * the other Vector
      */
-    constexpr double cross(const Vector &other) const;
+    double cross(const Vector &other) const;
 
     /**
      * Returns the direction of this Vector
@@ -206,7 +206,7 @@ class Vector final
  *
  * @return the vector-sum of the two vectors
  */
-constexpr Vector operator+(const Vector &p, const Vector &q)
+Vector operator+(const Vector &p, const Vector &q)
     __attribute__((warn_unused_result));
 
 /**
@@ -226,7 +226,7 @@ Vector &operator+=(Vector &u, const Vector &v);
  *
  * @return the vector with its magnitudes negated
  */
-constexpr Vector operator-(const Vector &p) __attribute__((warn_unused_result));
+Vector operator-(const Vector &p) __attribute__((warn_unused_result));
 
 /**
  * Subtracts one Vector from another
@@ -236,13 +236,13 @@ constexpr Vector operator-(const Vector &p) __attribute__((warn_unused_result));
  *
  * @return the vector-difference of the two vectors
  */
-constexpr Vector operator-(const Vector &u, const Vector &v)
+Vector operator-(const Vector &u, const Vector &v)
     __attribute__((warn_unused_result));
 
 /**
  * Subtracts from a Vector another Vector and set the former vector to the difference
  *
- * @paramp u the Vector to substract from
+ * @paramp u the Vector to subtract from
  * @param v the Vector to subtract
  *
  * @return the new value of Vector u
@@ -257,7 +257,7 @@ Vector &operator-=(Vector &u, const Vector &v);
  *
  * @return the scaled vector
  */
-constexpr Vector operator*(double s, const Vector &v) __attribute__((warn_unused_result));
+Vector operator*(double s, const Vector &v) __attribute__((warn_unused_result));
 
 /**
  * Multiplies a vector by a scalar
@@ -267,7 +267,7 @@ constexpr Vector operator*(double s, const Vector &v) __attribute__((warn_unused
  *
  * @return the scaled vector
  */
-constexpr Vector operator*(const Vector &p, double s) __attribute__((warn_unused_result));
+Vector operator*(const Vector &p, double s) __attribute__((warn_unused_result));
 
 /**
  * Scales a vector by a scalar
@@ -287,7 +287,7 @@ Vector &operator*=(Vector &p, double s);
  *
  * @return the scaled vector
  */
-constexpr Vector operator/(const Vector &p, double s) __attribute__((warn_unused_result));
+Vector operator/(const Vector &p, double s) __attribute__((warn_unused_result));
 
 /**
  * Scales a vector by a scalar
@@ -307,7 +307,7 @@ Vector &operator/=(Vector &p, double s);
  *
  * @return the stream with the Vector printed
  */
-inline std::ostream &operator<<(std::ostream &os, const Vector &v);
+std::ostream &operator<<(std::ostream &os, const Vector &v);
 
 /**
  * Compares two Vectors for equality
@@ -317,7 +317,7 @@ inline std::ostream &operator<<(std::ostream &os, const Vector &v);
  *
  * @return true if the two vectors represent the same vector, and false otherwise
  */
-constexpr bool operator==(const Vector &u, const Vector &v);
+bool operator==(const Vector &u, const Vector &v);
 
 /**
  * Compares two vectors for inequality
@@ -327,171 +327,7 @@ constexpr bool operator==(const Vector &u, const Vector &v);
  *
  * @return true if the two vectors represent different vectors, and false otherwise
  */
-constexpr bool operator!=(const Vector &u, const Vector &v);
-
-inline Vector Vector::createFromAngle(const Angle &angle)
-{
-    return Vector(angle.cos(), angle.sin());
-}
-
-inline constexpr Vector::Vector() : x_(0.0), y_(0.0) {}
-
-inline constexpr Vector::Vector(double x, double y) : x_(x), y_(y) {}
-
-inline constexpr Vector::Vector(const Vector &v) : x_(v.x()), y_(v.y()) {}
-
-inline constexpr double Vector::x() const
-{
-    return x_;
-}
-
-inline constexpr double Vector::y() const
-{
-    return y_;
-}
-
-inline void Vector::set(double x, double y)
-{
-    this->x_ = x;
-    this->y_ = y;
-}
-
-inline void Vector::setX(double x)
-{
-    this->x_ = x;
-}
-
-inline void Vector::setY(double y)
-{
-    this->y_ = y;
-}
-
-inline constexpr double Vector::lensq() const
-{
-    return x_ * x_ + y_ * y_;
-}
-
-inline double Vector::len() const
-{
-    return std::hypot(x_, y_);
-}
-
-inline Vector Vector::norm() const
-{
-    return len() < 1.0e-9 ? Vector() : Vector(x_ / len(), y_ / len());
-}
-
-inline Vector Vector::norm(double length) const
-{
-    return norm() * length;
-}
-
-inline constexpr Vector Vector::perp() const
-{
-    return Vector(-y_, x_);
-}
-
-inline Vector Vector::rotate(const Angle &rot) const
-{
-    return Vector(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
-}
-
-inline constexpr Vector Vector::project(const Vector &other) const
-{
-    return dot(other) / other.lensq() * other;
-}
-
-inline constexpr double Vector::dot(const Vector &other) const
-{
-    return x_ * other.x() + y_ * other.y();
-}
-
-inline constexpr double Vector::cross(const Vector &other) const
-{
-    return x_ * other.y() - y_ * other.x();
-}
-
-inline Vector &Vector::operator=(const Vector &q)
-{
-    x_ = q.x();
-    y_ = q.y();
-    return *this;
-}
-
-inline Angle Vector::orientation() const
-{
-    return Angle::fromRadians(std::atan2(y_, x_));
-}
-
-inline constexpr Vector operator+(const Vector &u, const Vector &v)
-{
-    return Vector(u.x() + v.x(), u.y() + v.y());
-}
-
-inline Vector &operator+=(Vector &u, const Vector &v)
-{
-    u.set(u.x() + v.x(), u.y() + v.y());
-    return u;
-}
-
-inline constexpr Vector operator-(const Vector &v)
-{
-    return Vector(-v.x(), -v.y());
-}
-
-inline constexpr Vector operator-(const Vector &u, const Vector &v)
-{
-    return Vector(u.x() - v.x(), u.y() - v.y());
-}
-
-inline Vector &operator-=(Vector &u, const Vector &v)
-{
-    u.set(u.x() - v.x(), u.y() - v.y());
-    return u;
-}
-
-inline constexpr Vector operator*(double s, const Vector &v)
-{
-    return Vector(v.x() * s, v.y() * s);
-}
-
-inline constexpr Vector operator*(const Vector &v, double s)
-{
-    return Vector(v.x() * s, v.y() * s);
-}
-
-inline Vector &operator*=(Vector &v, double s)
-{
-    v.set(v.x() * s, v.y() * s);
-    return v;
-}
-
-inline constexpr Vector operator/(const Vector &v, double s)
-{
-    return Vector(v.x() / s, v.y() / s);
-}
-
-inline Vector &operator/=(Vector &v, double s)
-{
-    v.set(v.x() / s, v.y() / s);
-    return v;
-}
-
-inline std::ostream &operator<<(std::ostream &os, const Vector &v)
-{
-    os << "(" << v.x() << ", " << v.y() << ")";
-    return os;
-}
-
-inline constexpr bool operator==(const Vector &u, const Vector &v)
-{
-    return (u - v).lensq() < GeomConstants::EPSILON;
-}
-
-inline constexpr bool operator!=(const Vector &u, const Vector &v)
-{
-    return !(u == v);
-}
+bool operator!=(const Vector &u, const Vector &v);
 
 // We need to define a hash function so that the Vector class can be used in unordered STL
 // containers

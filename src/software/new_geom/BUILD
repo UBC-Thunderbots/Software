@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "new_geom",
-    srcs = [],
+    srcs = [
+        "point.cpp",
+        "vector.cpp",
+    ],
     hdrs = [
         "angle.h",
         "angular_velocity.h",

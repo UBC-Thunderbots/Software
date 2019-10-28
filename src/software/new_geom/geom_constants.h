@@ -1,7 +1,7 @@
 namespace GeomConstants
 {
     // Due to internal representation of doubles being slightly less accurate/consistent
-    // with some numbers and operations, we consider points that are very close together
+    // with some numbers and operations, we consider doubles that are very close together
     // to be equal (since they likely are, just possibly slightly misrepresented by the
     // system/compiler). We use this EPSILON as a threshold for comparison. 1e-15 was
     // chosen as a value because doubles have about 16 consistent significant figures.

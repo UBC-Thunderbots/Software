@@ -104,16 +104,6 @@ class Angle final
     constexpr double toDegrees() const;
 
     /**
-     * Computes the modulus of a division between this angle and another
-     * angle.
-     *
-     * @param divisor the divisor.
-     *
-     * @return the modulus of this Angle ÷ divisor.
-     */
-    constexpr Angle mod(const Angle &divisor) const;
-
-    /**
      * Computes the remainder of a division between this angle and
      * another angle.
      *

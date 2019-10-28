@@ -18,7 +18,7 @@ class Point final
     /**
      * Creates a Point at the origin (0, 0).
      */
-    explicit constexpr Point();
+    explicit Point();
 
     /**
      * Creates a Point at arbitrary coordinates.
@@ -26,35 +26,35 @@ class Point final
      * @param x the <var>x</var> value of the Point
      * @param y the <var>y</var> value of the Point
      */
-    constexpr Point(double x, double y);
+    Point(double x, double y);
 
     /**
      * Creates a new Point that is a copy of the given Point
      *
      * @param the Point to duplicate
      */
-    explicit constexpr Point(const Point &p);
+    explicit Point(const Point &p);
 
     /**
      * Creates a new Point from a Vector
      *
      * @param the Vector to create a Point from
      */
-    explicit constexpr Point(const Vector &v);
+    explicit Point(const Vector &v);
 
     /**
      * Returns the x coordinate of this Point
      *
      * @return the x coordinate of this Point
      */
-    constexpr double x() const;
+    double x() const;
 
     /**
      * Returns the y coordinate of this Point
      *
      * @return the y coordinate of this Point
      */
-    constexpr double y() const;
+    double y() const;
 
     /**
      * Sets the coordinates of this point to the new coordinates
@@ -152,7 +152,7 @@ class Point final
  *
  * @return the Point sum of the given Point and Vector
  */
-constexpr Point operator+(const Point &p, const Vector &v)
+Point operator+(const Point &p, const Vector &v)
     __attribute__((warn_unused_result));
 
 /**
@@ -172,7 +172,7 @@ Point &operator+=(Point &p, const Vector &v);
  *
  * @return the point with its coordinates negated
  */
-constexpr Point operator-(const Point &p) __attribute__((warn_unused_result));
+Point operator-(const Point &p) __attribute__((warn_unused_result));
 
 /**
  * Subtracts one Point from another
@@ -182,7 +182,7 @@ constexpr Point operator-(const Point &p) __attribute__((warn_unused_result));
  *
  * @return the vector-difference of the two points
  */
-constexpr Vector operator-(const Point &p, const Point &q)
+Vector operator-(const Point &p, const Point &q)
     __attribute__((warn_unused_result));
 
 /**
@@ -193,7 +193,7 @@ constexpr Vector operator-(const Point &p, const Point &q)
  *
  * @return the stream with the point printed
  */
-inline std::ostream &operator<<(std::ostream &os, const Point &p);
+std::ostream &operator<<(std::ostream &os, const Point &p);
 
 /**
  * Compares two Points for equality
@@ -214,109 +214,6 @@ bool operator==(const Point &p, const Point &q);
  * @return true if the two points represent different points, and false otherwise
  */
 bool operator!=(const Point &p, const Point &q);
-
-inline constexpr Point::Point() : x_(0.0), y_(0.0) {}
-
-inline constexpr Point::Point(double x, double y) : x_(x), y_(y) {}
-
-inline constexpr Point::Point(const Point &p) : x_(p.x()), y_(p.y()) {}
-
-inline constexpr Point::Point(const Vector &v) : x_(v.x()), y_(v.y()) {}
-
-inline constexpr double Point::x() const
-{
-    return x_;
-}
-
-inline constexpr double Point::y() const
-{
-    return y_;
-}
-
-inline void Point::set(double x, double y)
-{
-    this->x_ = x;
-    this->y_ = y;
-}
-
-inline void Point::setX(double x)
-{
-    this->x_ = x;
-}
-
-inline void Point::setY(double y)
-{
-    this->y_ = y;
-}
-
-inline double Point::distanceFromOrigin() const
-{
-    return std::hypot(x_, y_);
-}
-
-inline double Point::distanceFromPoint(const Point &p) const
-{
-    return sqrt(pow((x_ - p.x()), 2) + pow((y_ - p.y()), 2));
-}
-
-inline Vector Point::toVector() const
-{
-    return Vector(x_, y_);
-}
-
-inline Point Point::rotate(const Angle &rot) const
-{
-    return Point(x_ * rot.cos() - y_ * rot.sin(), x_ * rot.sin() + y_ * rot.cos());
-}
-
-inline bool Point::isClose(const Point &other, double dist) const
-{
-    return distanceFromPoint(other) < dist * dist;
-}
-
-inline Point &Point::operator=(const Point &q)
-{
-    x_ = q.x();
-    y_ = q.y();
-    return *this;
-}
-
-inline constexpr Point operator+(const Point &p, const Vector &v)
-{
-    return Point(p.x() + v.x(), p.y() + v.y());
-}
-
-inline Point &operator+=(Point &p, const Vector &v)
-{
-    p.set(p.x() + v.x(), p.y() + v.y());
-    return p;
-}
-
-inline constexpr Point operator-(const Point &p)
-{
-    return Point(-p.x(), -p.y());
-}
-
-inline constexpr Vector operator-(const Point &p, const Point &q)
-{
-    return Vector(p.x() - q.x(), p.y() - q.y());
-}
-
-inline std::ostream &operator<<(std::ostream &os, const Point &p)
-{
-    os << "(" << p.x() << ", " << p.y() << ")";
-    return os;
-}
-
-inline bool operator==(const Point &p, const Point &q)
-{
-    return p.isClose(q, GeomConstants::EPSILON);
-}
-
-inline bool operator!=(const Point &p, const Point &q)
-{
-    return !(p == q);
-}
 
 // We need to define a hash function so that the Point class can be used in unordered STL
 // containers
@@ -348,7 +245,7 @@ struct boost::polygon::point_traits<Point>
 {
     typedef int coordinate_type;
 
-    static inline coordinate_type get(const Point &point, orientation_2d orient)
+    static coordinate_type get(const Point &point, orientation_2d orient)
     {
         return (orient == HORIZONTAL) ? point.x() : point.y();
     }
