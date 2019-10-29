@@ -76,6 +76,13 @@ git_repository(
     remote = "https://github.com/justbuchanan/bazel_rules_qt.git",
 )
 
+# Magic enum library from https://github.com/Neargye/magic_enum
+git_repository(
+    name = "magic_enum",
+    commit = "49d2429cf110f804048bc459b1d2c126d43b0a9a",
+    remote = "https://github.com/Neargye/magic_enum.git",
+)
+
 # Right now qt5 is installed on the system using the setup_software.sh script
 # We assume we can find the headers in the "standard" path used in this rule
 new_local_repository(
