@@ -17,10 +17,6 @@ Our C++ coding style is based off of [Google's C++ Style Guide](https://google.g
 
 If you want to know more about our coding style you can take a look at our [clang-format configuration file](https://github.com/UBC-Thunderbots/Software/blob/master/.clang-format).
 
-{% hint style="info" %}
-Each coding style has a tag \(i.e. _N1_\), use this tag to comment on code reviews.
-{% endhint %}
-
 ### Names and Variables
 
 * Classes, structures, namespaces, unions, enumerates, "typename"-type template parameters, and typedefs names uses `CamelCase` with a capital letter.
@@ -172,7 +168,7 @@ If you think some ASCII art will help explain something better, go for it! [asci
   ```cpp
   explicit AI(const World& world);
   ```
-* Use C++ smart pointers and avoid raw pointers. (See also: [what are smart pointers and why they are good](https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one))
+* Use C++ smart pointers. Do not use raw pointers unless _absolutely_ necessary (and even then, probably not) (See also: [what are smart pointers and why they are good](https://stackoverflow.com/questions/106508/what-is-a-smart-pointer-and-when-should-i-use-one))
 * Explicitly use the namespace when using invoking classes or functions with namespaces. Do not use `using namespace` in the source. If the namespace hierarchy is long, shorten it.
   ```cpp
   // Incorrect
