@@ -112,6 +112,12 @@ Rectangle Field::fieldLines() const
     return Rectangle(friendlyCornerNeg(), enemyCornerPos());
 }
 
+Rectangle Field::fieldBoundary() const {
+    Point neg_x_neg_y_corner(-totalXLength() / 2, -totalYLength() / 2);
+    Point pos_x_pos_y_corner(totalXLength() / 2, totalYLength() / 2);
+    return Rectangle(neg_x_neg_y_corner, pos_x_pos_y_corner);
+}
+
 double Field::centerCircleRadius() const
 {
     return center_circle_radius_;

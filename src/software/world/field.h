@@ -181,6 +181,15 @@ class Field
     Rectangle fieldLines() const;
 
     /**
+     * Gets the area within the field boundary (the physical walls surrounding the Field).
+     * This is the entire area where the robots and ball can move, and is a superset of the
+     * area inside the field lines.
+     *
+     * @return The area within the field boundary as a rectangle
+     */
+    Rectangle fieldBoundary() const;
+
+    /**
      * Gets the position of the centre of the friendly goal.
      *
      * @return the position of the friendly goal.
