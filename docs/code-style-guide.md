@@ -8,6 +8,7 @@
     * [Headers](#headers)
     * [Includes](#includes)
     * [Spelling](#spelling)
+    * [Exceptions](#exceptions)
     * [Miscellaneous](#miscellaneous)
 
 ## Coding Style and Conventions
@@ -142,6 +143,11 @@ If you think some ASCII art will help explain something better, go for it! [asci
     * Exceptions:
       * Use "defense" in lieu of "defence" as it is more similar to the word "defensive".
       * Use "offense" in lieu of "offence".
+
+### Exceptions
+
+* Throwing an exception indicates that the AI has entered an unrecoverable state.
+* In almost all cases, it is preferable to return a `std::optional` type, so the caller has to handle the case of the called function "failing", perhaps alongside some logging that the error occured.
 
 ### Miscellaneous
 
