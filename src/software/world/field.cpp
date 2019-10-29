@@ -107,6 +107,14 @@ Rectangle Field::enemyDefenseArea() const
         Point(field_x_length_ * 0.5 - defense_x_length_, -defense_y_length_ / 2.0));
 }
 
+Rectangle Field::friendlyHalf() const {
+    return Rectangle(friendlyCornerNeg(),Point(0, friendlyCornerPos().y()));
+}
+
+Rectangle Field::enemyHalf() const {
+    return Rectangle(Point(0, enemyCornerNeg().y()), enemyCornerPos());
+}
+
 Rectangle Field::fieldLines() const
 {
     return Rectangle(friendlyCornerNeg(), enemyCornerPos());
