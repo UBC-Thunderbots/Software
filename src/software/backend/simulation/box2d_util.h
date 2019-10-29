@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Box2D/Box2D.h>
+#include "software/geom/point.h"
 
 /**
  * These functions are utilities and convenience functions to make certain operations
@@ -18,3 +19,5 @@
  * body or the world are null, false is returned.
  */
 bool bodyExistsInWorld(b2Body* body, std::shared_ptr<b2World> world);
+
+b2Vec2 createVec2(const Point& point);

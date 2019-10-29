@@ -1,4 +1,5 @@
 #include "software/backend/simulation/box2d_util.h"
+#include "software/geom/point.h"
 
 #include <Box2D/Box2D.h>
 #include <gtest/gtest.h>
@@ -96,4 +97,12 @@ TEST(Box2DUtilTest, test_existence_of_body_in_world_with_multiple_bodies)
 
     auto result_4 = bodyExistsInWorld(body_4, world);
     EXPECT_FALSE(result_4);
+}
+
+TEST(Box2DUtilTest, test_create_b2Vec2_from_point) {
+    b2Vec2 expected = {-1.02, 5.4};
+    EXPECT_EQ(expected, createVec2(Point(-1.02, 5.4)));
+
+    expected = {0.0, 100.100};
+    EXPECT_EQ(expected, createVec2(Point(0.0, 100.100)));
 }
